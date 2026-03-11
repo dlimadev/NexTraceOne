@@ -51,4 +51,37 @@
   <data name="Generic.Unexpected" xml:space="preserve">
     <value>Ocorreu um erro inesperado.</value>
   </data>
+  <data name="Identity.User.NotFound" xml:space="preserve">
+    <value>Usuário '{0}' não foi encontrado.</value>
+  </data>
+  <data name="Identity.User.EmailAlreadyExists" xml:space="preserve">
+    <value>O e-mail '{0}' já está cadastrado.</value>
+  </data>
+  <data name="Identity.Auth.InvalidCredentials" xml:space="preserve">
+    <value>As credenciais informadas são inválidas.</value>
+  </data>
+  <data name="Identity.Auth.AccountLocked" xml:space="preserve">
+    <value>A conta está bloqueada até '{0:O}'.</value>
+  </data>
+  <data name="Identity.Session.Expired" xml:space="preserve">
+    <value>A sessão '{0}' expirou.</value>
+  </data>
+  <data name="Identity.Session.Revoked" xml:space="preserve">
+    <value>A sessão '{0}' foi revogada.</value>
+  </data>
+  <data name="Identity.Session.InvalidRefreshToken" xml:space="preserve">
+    <value>O refresh token informado é inválido.</value>
+  </data>
+  <data name="Identity.Session.NotFound" xml:space="preserve">
+    <value>Sessão '{0}' não foi encontrada.</value>
+  </data>
+  <data name="Identity.Role.NotFound" xml:space="preserve">
+    <value>Papel '{0}' não foi encontrado.</value>
+  </data>
+  <data name="Identity.TenantMembership.NotFound" xml:space="preserve">
+    <value>Vínculo do usuário '{0}' no tenant '{1}' não foi encontrado.</value>
+  </data>
+  <data name="Identity.TenantMembership.AlreadyExists" xml:space="preserve">
+    <value>Já existe vínculo do usuário '{0}' no tenant '{1}'.</value>
+  </data>
 </root>

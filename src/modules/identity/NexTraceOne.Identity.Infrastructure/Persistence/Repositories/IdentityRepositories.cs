@@ -10,7 +10,8 @@ internal sealed class UserRepository(IdentityDbContext context)
     : RepositoryBase<User, UserId>(context), IUserRepository
 {
     public async Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken)
-        => await context.Users.SingleOrDefaultAsync(x => x.Email == email, cancellationToken);
+        // Usa .Value para garantir tradução correta para SQL via value conversion do EF Core
+        => await context.Users.SingleOrDefaultAsync(x => x.Email.Value == email.Value, cancellationToken);
 
     public async Task<User?> GetByFederatedIdentityAsync(string provider, string externalId, CancellationToken cancellationToken)
         => await context.Users.SingleOrDefaultAsync(
@@ -18,7 +19,8 @@ internal sealed class UserRepository(IdentityDbContext context)
             cancellationToken);
 
     public Task<bool> ExistsAsync(Email email, CancellationToken cancellationToken)
-        => context.Users.AnyAsync(x => x.Email == email, cancellationToken);
+        // Usa .Value para garantir tradução correta para SQL via value conversion do EF Core
+        => context.Users.AnyAsync(x => x.Email.Value == email.Value, cancellationToken);
 
     public async Task<IReadOnlyDictionary<UserId, User>> GetByIdsAsync(IReadOnlyCollection<UserId> ids, CancellationToken cancellationToken)
         => await context.Users
@@ -30,7 +32,8 @@ internal sealed class SessionRepository(IdentityDbContext context)
     : RepositoryBase<Session, SessionId>(context), ISessionRepository
 {
     public async Task<Session?> GetByRefreshTokenHashAsync(RefreshTokenHash refreshTokenHash, CancellationToken cancellationToken)
-        => await context.Sessions.SingleOrDefaultAsync(x => x.RefreshToken == refreshTokenHash, cancellationToken);
+        // Usa .Value para garantir tradução correta para SQL via value conversion do EF Core
+        => await context.Sessions.SingleOrDefaultAsync(x => x.RefreshToken.Value == refreshTokenHash.Value, cancellationToken);
 
     public async Task<Session?> GetActiveByUserIdAsync(UserId userId, CancellationToken cancellationToken)
         => await context.Sessions
@@ -71,13 +74,16 @@ internal sealed class TenantMembershipRepository(IdentityDbContext context)
         CancellationToken cancellationToken)
     {
         var membershipQuery = context.TenantMemberships.Where(x => x.TenantId == tenantId);
-        var userQuery = context.Users.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
             var normalizedSearch = search.Trim().ToLowerInvariant();
-            var userIds = await userQuery
-                .Where(x => x.Email.Value.Contains(normalizedSearch) || x.FullName.Value.ToLower().Contains(normalizedSearch))
+            // FullName é OwnsOne: usa as propriedades mapeadas diretamente (FirstName e LastName)
+            var userIds = await context.Users
+                .AsNoTracking()
+                .Where(x => x.Email.Value.Contains(normalizedSearch)
+                    || x.FullName.FirstName.ToLower().Contains(normalizedSearch)
+                    || x.FullName.LastName.ToLower().Contains(normalizedSearch))
                 .Select(x => x.Id)
                 .ToListAsync(cancellationToken);
 

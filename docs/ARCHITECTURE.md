@@ -38,6 +38,8 @@ Events/
   IDomainEvent          — Intra-módulo, via MediatR INotification
   IIntegrationEvent     — Cross-módulo, via Outbox Pattern
   DomainEventBase       — Record abstrato com EventId + OccurredAt
+  IntegrationEventBase  — Record abstrato base para Integration Events (EventId, OccurredAt, SourceModule)
+                          Todos os Integration Events de módulos DEVEM herdar desta classe.
 
 Results/
   Result<T>             — Sucesso ou falha sem exceção
