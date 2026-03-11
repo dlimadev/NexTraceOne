@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
@@ -7,6 +8,7 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 /// <summary>
 /// Interceptor que preenche CreatedAt/By e UpdatedAt/By automaticamente
 /// em todas as AuditableEntity antes do SaveChanges.
+/// Usa reflexão segura para suportar todos os genéricos AuditableEntity{TId} sem dynamic.
 /// </summary>
 public sealed class AuditInterceptor(
     ICurrentUser currentUser,
@@ -29,29 +31,36 @@ public sealed class AuditInterceptor(
 
         foreach (var entry in context.ChangeTracker.Entries())
         {
-            if (entry.Entity is not object entity || !IsAuditableEntity(entity.GetType()))
+            if (entry.Entity is null || !IsAuditableEntity(entry.Entity.GetType()))
             {
                 continue;
             }
 
-            dynamic auditableEntity = entity;
-
-            if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Added)
-            {
-                auditableEntity.SetCreated(now, actor);
-                auditableEntity.SetUpdated(now, actor);
-            }
-            else if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Modified)
-            {
-                auditableEntity.SetUpdated(now, actor);
-            }
+            ApplyAuditFields(entry.Entity, entry.State, now, actor);
         }
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private static bool IsAuditableEntity(Type type)
-        => IsAssignableToGenericType(type, typeof(AuditableEntity<>));
+    private static void ApplyAuditFields(object entity, EntityState state, DateTimeOffset now, string actor)
+    {
+        var entityType = entity.GetType();
+        var setCreated = entityType.GetMethod("SetCreated");
+        var setUpdated = entityType.GetMethod("SetUpdated");
+
+        if (state == EntityState.Added)
+        {
+            setCreated?.Invoke(entity, [now, actor]);
+            setUpdated?.Invoke(entity, [now, actor]);
+        }
+        else if (state == EntityState.Modified)
+        {
+            setUpdated?.Invoke(entity, [now, actor]);
+        }
+    }
+
+    private static bool IsAuditableEntity(Type? type)
+        => type is not null && IsAssignableToGenericType(type, typeof(AuditableEntity<>));
 
     private static bool IsAssignableToGenericType(Type type, Type genericType)
     {

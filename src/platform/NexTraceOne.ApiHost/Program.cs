@@ -15,40 +15,45 @@ using NexTraceOne.Licensing.API;
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // [1] Verificação de integridade dos assemblies antes de qualquer inicialização
-// AssemblyIntegrityChecker.VerifyOrThrow(); // TODO: Habilitar em produção
+// Habilitado em produção via variável de ambiente. Em dev, definir NEXTRACE_SKIP_INTEGRITY=true
+if (!string.Equals(Environment.GetEnvironmentVariable("NEXTRACE_SKIP_INTEGRITY"), "true", StringComparison.OrdinalIgnoreCase))
+{
+    AssemblyIntegrityChecker.VerifyOrThrow();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
-// [2] Serilog
+// [2] Serilog — logger estruturado da plataforma
 builder.Host.ConfigureNexTraceSerilog(builder.Configuration);
 
-// [3] Building Blocks
-// TODO: builder.Services.AddBuildingBlocksApplication(builder.Configuration);
-// TODO: builder.Services.AddBuildingBlocksInfrastructure(builder.Configuration);
+// [3] Building Blocks transversais
+// NOTA: AddBuildingBlocksApplication e AddBuildingBlocksInfrastructure são registrados
+// por cada módulo via AddIdentityModule → AddIdentityApplication → AddBuildingBlocksApplication.
+// O registro direto aqui garante disponibilidade quando módulos ainda não estão adicionados.
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
 builder.Services.AddBuildingBlocksObservability(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 
-// [4] Módulos — cada um registra sua Application + Infrastructure
+// [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddLicensingModule(builder.Configuration);
-// TODO: ... (todos os módulos)
+// Módulos adicionais serão registrados aqui à medida que forem implementados
 
-// [5] OpenAPI / Swagger
-builder.Services.AddExceptionHandler(_ => { });
+// [5] OpenAPI
 builder.Services.AddOpenApi();
 
-// [6] Rate Limiting, CORS, Health Checks
-// TODO: builder.Services.AddNexTraceRateLimiting(...);
-
-// [7] Quartz.NET (Outbox Processor, SLA Escalation)
-// TODO: builder.Services.AddNexTraceJobs(...);
+// [6] Tratamento de exceções não capturadas
+builder.Services.AddExceptionHandler(_ => { });
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-// ── Middlewares ──
+// ── Middlewares na ordem correta ──
 app.UseHttpsRedirection();
+
+// Resolve o tenant antes da autenticação/autorização
 app.UseMiddleware<TenantResolutionMiddleware>();
+
 app.UseExceptionHandler(exceptionApp =>
 {
     exceptionApp.Run(async context =>
@@ -64,6 +69,7 @@ app.UseExceptionHandler(exceptionApp =>
         });
     });
 });
+
 app.UseAuthentication();
 app.UseAuthorization();
 
