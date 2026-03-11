@@ -1,203 +1,89 @@
-# CLAUDE.md — NexTraceOne
+# NexTraceOne — Sovereign Change Intelligence Platform
 
-This file provides guidance for AI assistants (Claude Code and similar tools) working in this repository.
+## Identidade
 
----
+NexTraceOne é uma **Sovereign Change Intelligence Platform** — enterprise, self-hosted, soberana e auditável.
+Conecta contrato → mudança → impacto → aprovação → runtime → custo em um único sistema auditável.
+Segmento: Bancos, seguradoras, telecom, governo, grandes enterprises.
 
-## Project Overview
+## Stack
 
-**Repository:** `dlimadev/NexTraceOne`
-**Status:** Initial setup — no source code committed yet.
+- **Backend:** .NET 10, ASP.NET Core 10 (Minimal APIs, REPR Pattern), EF Core 10, PostgreSQL 16
+- **Libs:** MediatR 12, FluentValidation 11, Quartz.NET 3, OpenTelemetry 1.x, Serilog 4, Ardalis.GuardClauses, Mapster (source-gen)
+- **Arquitetura:** Modular Monolith + Vertical Slice (VSA) + DDD tático + CQRS + Outbox Pattern
+- **Infra MVP1:** PostgreSQL apenas (sem Redis, sem OpenSearch, sem Temporal)
 
-NexTraceOne is a project currently in its bootstrapping phase. This CLAUDE.md will be updated as the codebase evolves. When code is added, update the relevant sections below.
-
----
-
-## Repository State
-
-As of the initial commit, the repository contains only this CLAUDE.md file. There are no:
-- Source files
-- Package manifests (package.json, pyproject.toml, Cargo.toml, etc.)
-- Build scripts
-- Test suites
-- CI/CD pipelines
-- Configuration files
-
-All sections below are scaffolded and should be filled in as the project grows.
-
----
-
-## Directory Structure
+## Estrutura do Projeto (Archon Pattern v2)
 
 ```
 NexTraceOne/
-├── CLAUDE.md          # This file
-└── (to be populated)
+├── src/
+│   ├── building-blocks/          ← 6 projetos granulares (substituem SharedKernel)
+│   │   ├── NexTraceOne.BuildingBlocks.Domain
+│   │   ├── NexTraceOne.BuildingBlocks.Application
+│   │   ├── NexTraceOne.BuildingBlocks.Infrastructure
+│   │   ├── NexTraceOne.BuildingBlocks.EventBus
+│   │   ├── NexTraceOne.BuildingBlocks.Observability
+│   │   └── NexTraceOne.BuildingBlocks.Security
+│   ├── modules/                  ← 14 módulos × 5 camadas cada
+│   │   └── {nome}/
+│   │       ├── NexTraceOne.{Nome}.Domain
+│   │       ├── NexTraceOne.{Nome}.Application
+│   │       ├── NexTraceOne.{Nome}.Contracts
+│   │       ├── NexTraceOne.{Nome}.Infrastructure
+│   │       └── NexTraceOne.{Nome}.API
+│   └── platform/
+│       ├── NexTraceOne.ApiHost           ← Compõe todos os módulos
+│       └── NexTraceOne.BackgroundWorkers ← Outbox, Jobs
+├── tools/NexTraceOne.CLI                 ← CLI 'nex' (consome só Contracts)
+├── tests/
+│   ├── building-blocks/
+│   ├── modules/
+│   └── platform/
+└── docs/
 ```
 
-Update this tree whenever significant directories or files are added.
+## Referências Detalhadas
 
----
+See @docs/ARCHITECTURE.md for arquitetura completa, Building Blocks, módulos e regras de dependência.
+See @docs/CONVENTIONS.md for padrões de código, idioma, documentação XML e regras inegociáveis.
+See @docs/ROADMAP.md for estado atual do projeto, fases e próximos passos.
+See @docs/DOMAIN.md for taxonomia de mudanças, discovery de dependências e domínio de negócio.
+See @docs/SECURITY.md for pilares de segurança, RLS, encryption, integrity e licensing.
 
-## Technology Stack
+## Regras Críticas (SEMPRE seguir)
 
-| Layer | Technology | Notes |
-|-------|-----------|-------|
-| TBD   | TBD       | TBD   |
+1. **Idioma:** Código/logs/nomes em INGLÊS. Comentários XML (`<summary>`) e inline em PORTUGUÊS.
+2. **Nunca** usar `DateTime.Now` — sempre `IDateTimeProvider`.
+3. **Nunca** acessar DbContext de outro módulo — comunicação via Integration Events ou Contracts.
+4. **Nunca** publicar Integration Events sem Outbox Pattern.
+5. **Um módulo por vez**, uma camada por vez (Domain → Application → Infrastructure → API), um aggregate por vez.
+6. **Toda classe pública** com `<summary>` XML em português.
+7. **Todo método público** com `<summary>` XML em português.
+8. **Result Pattern** para operações que podem falhar — sem exceções para controle de fluxo.
+9. **Testes unitários** adjacentes a cada implementação.
 
----
-
-## Development Setup
-
-### Prerequisites
-
-Document required tools, runtime versions, and system dependencies here.
+## Comandos
 
 ```bash
-# Example — replace with actual setup commands
-# node --version  # vX.X.X
-# python --version  # X.X.X
+# Build
+dotnet build NexTraceOne.sln
+
+# Testes
+dotnet test NexTraceOne.sln
+
+# Executar API
+dotnet run --project src/platform/NexTraceOne.ApiHost
+
+# Executar Workers
+dotnet run --project src/platform/NexTraceOne.BackgroundWorkers
+
+# Executar CLI
+dotnet run --project tools/NexTraceOne.CLI
 ```
 
-### Initial Setup
+## Estado Atual
 
-```bash
-git clone <repo-url>
-cd NexTraceOne
-# install dependencies
-# configure environment
-```
-
-### Environment Variables
-
-Document required environment variables here. Never commit secrets.
-
-```bash
-# Copy example env file and fill in values
-cp .env.example .env
-```
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| TBD      | TBD      | TBD         |
-
----
-
-## Common Commands
-
-Update this table as scripts are added to the project.
-
-| Command | Purpose |
-|---------|---------|
-| TBD | Build the project |
-| TBD | Run tests |
-| TBD | Run linter |
-| TBD | Start dev server |
-
----
-
-## Testing
-
-Document the testing framework, how to run tests, and testing conventions here.
-
-```bash
-# Run all tests
-# Run a single test file
-# Run tests with coverage
-```
-
-### Testing Conventions
-
-- TBD: test file naming pattern
-- TBD: test directory location
-- TBD: mocking approach
-
----
-
-## Code Conventions
-
-### General
-
-- Follow the conventions already present in the codebase.
-- Keep changes minimal and focused — do not refactor code unrelated to the task.
-- Do not add comments, docstrings, or type annotations to code you did not change.
-
-### Linting & Formatting
-
-Document linter and formatter configuration files here once added (e.g., `.eslintrc`, `pyproject.toml`, `.prettierrc`).
-
----
-
-## Git Workflow
-
-### Branch Naming
-
-- Feature branches: `feature/<short-description>`
-- Bug fixes: `fix/<short-description>`
-- Claude-generated branches: `claude/<task-id>`
-
-### Commit Messages
-
-Use concise, imperative-style commit messages:
-```
-Add user authentication module
-Fix null pointer in trace parser
-Refactor config loading to use env vars
-```
-
-### Pull Requests
-
-- Keep PRs small and focused on a single concern.
-- Include a clear description of what changed and why.
-- Reference related issues where applicable.
-
----
-
-## AI Assistant Guidelines
-
-### When Asked to Implement Features
-
-1. Read all relevant existing files before making changes.
-2. Understand the existing patterns before introducing new ones.
-3. Make the minimum change necessary to satisfy the request.
-4. Do not add error handling, logging, or validation beyond what is needed.
-5. Do not create new files when editing an existing one is sufficient.
-
-### When Asked to Fix Bugs
-
-1. Reproduce or understand the bug before touching code.
-2. Fix the root cause, not just the symptom.
-3. Do not refactor surrounding code as part of a bug fix.
-
-### When Asked to Explain Code
-
-1. Read the code thoroughly before explaining.
-2. Be precise and cite file paths and line numbers when relevant.
-
-### Things to Avoid
-
-- Do not push to branches other than the one designated in the current task.
-- Do not commit secrets, credentials, or environment files.
-- Do not add dependencies without explicit request.
-- Do not use `--no-verify` to bypass git hooks.
-- Do not force-push without explicit user approval.
-
----
-
-## Security Notes
-
-- Never commit `.env` files or any file containing secrets.
-- Validate input at system boundaries (user input, external APIs).
-- Avoid introducing known OWASP Top 10 vulnerabilities.
-
----
-
-## Updating This File
-
-Update CLAUDE.md whenever:
-- A new major dependency is added
-- A new directory is introduced with a non-obvious purpose
-- A workflow or convention changes
-- A common pitfall is discovered
-
-Keep this file accurate and concise — it is read by AI assistants on every task.
+- ✅ Script de scaffold v2 (Archon Pattern) pronto para execução
+- 🔲 Próximo passo: Executar scaffold e implementar BuildingBlocks.Domain (Entity, ValueObject, Result)
+- 🔲 Fase 1: Building Blocks → Identity → Licensing
