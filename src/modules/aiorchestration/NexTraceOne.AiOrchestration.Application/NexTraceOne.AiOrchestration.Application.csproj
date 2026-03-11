@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.AiOrchestration.Application</RootNamespace>
+    <AssemblyName>NexTraceOne.AiOrchestration.Application</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.AiOrchestration.Domain\NexTraceOne.AiOrchestration.Domain.csproj" />
+    <ProjectReference Include="..\NexTraceOne.AiOrchestration.Contracts\NexTraceOne.AiOrchestration.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+</Project>

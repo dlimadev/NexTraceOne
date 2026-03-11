@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.CLI</RootNamespace>
+    <AssemblyName>nex</AssemblyName>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+  <ItemGroup Label="Módulos (apenas Contracts — consumidor externo)">
+    <ProjectReference Include="..\..\src\modules\identity\NexTraceOne.Identity.Contracts\NexTraceOne.Identity.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\licensing\NexTraceOne.Licensing.Contracts\NexTraceOne.Licensing.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\engineeringgraph\NexTraceOne.EngineeringGraph.Contracts\NexTraceOne.EngineeringGraph.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\developerportal\NexTraceOne.DeveloperPortal.Contracts\NexTraceOne.DeveloperPortal.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\contracts\NexTraceOne.Contracts.Contracts\NexTraceOne.Contracts.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\changeintelligence\NexTraceOne.ChangeIntelligence.Contracts\NexTraceOne.ChangeIntelligence.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\rulesetgovernance\NexTraceOne.RulesetGovernance.Contracts\NexTraceOne.RulesetGovernance.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\workflow\NexTraceOne.Workflow.Contracts\NexTraceOne.Workflow.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\promotion\NexTraceOne.Promotion.Contracts\NexTraceOne.Promotion.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\runtimeintelligence\NexTraceOne.RuntimeIntelligence.Contracts\NexTraceOne.RuntimeIntelligence.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\costintelligence\NexTraceOne.CostIntelligence.Contracts\NexTraceOne.CostIntelligence.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\aiorchestration\NexTraceOne.AiOrchestration.Contracts\NexTraceOne.AiOrchestration.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\externalai\NexTraceOne.ExternalAi.Contracts\NexTraceOne.ExternalAi.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\modules\audit\NexTraceOne.Audit.Contracts\NexTraceOne.Audit.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="Spectre.Console" />
+    <PackageReference Include="Spectre.Console.Cli" />
+  </ItemGroup>
+</Project>

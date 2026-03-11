@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+TestResults/
+
+# NexTraceOne
+logs/
+build/artifacts/
+*.license
+hardware.fingerprint
+sign.pfx
+
+# Docker
+.env.local

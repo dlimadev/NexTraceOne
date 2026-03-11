@@ -62,7 +62,7 @@ $Script:BuildDir       = Join-Path $SolutionRoot "build"
 $Script:DocsDir        = Join-Path $SolutionRoot "docs"
 
 # Prefixos de namespace
-$Script:BB = "NexTraceOne.BuildingBlocks"
+$Script:BBPrefix = "NexTraceOne.BuildingBlocks"
 $Script:MOD = "NexTraceOne"
 
 # Cores para output
@@ -2020,7 +2020,7 @@ public sealed class ${ModuleName}EndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/${ModuleName.ToLower()}")
+        var group = app.MapGroup("/api/v1/$($ModuleName.ToLower())")
             .WithTags("$ModuleName");
 
         // TODO: Mapear endpoints de cada feature
@@ -2588,7 +2588,7 @@ Write-OK "Diretórios criados"
 
 # ── [2] Solução ──────────────────────────────────────────────────────────────
 Write-Step "Criando solução $SolutionName.sln"
-Invoke-Dotnet @("new","sln","--name",$SolutionName,"--output",$SolutionRoot)
+Invoke-Dotnet @("new","sln","--name",$SolutionName,"--output",$SolutionRoot,"-f","sln")
 Write-OK "Solução criada"
 
 # ── [3] Building Blocks ──────────────────────────────────────────────────────
@@ -2604,7 +2604,7 @@ $bbProjects = @(
 )
 
 foreach ($bb in $bbProjects) {
-    $projName = "$BB.$($bb.Name)"
+    $projName = "$BBPrefix.$($bb.Name)"
     $projDir  = Join-Path $BBDir $projName
     New-Directory $projDir
 

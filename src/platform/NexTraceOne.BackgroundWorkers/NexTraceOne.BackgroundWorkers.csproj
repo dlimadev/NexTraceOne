@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.BackgroundWorkers</RootNamespace>
+    <AssemblyName>NexTraceOne.BackgroundWorkers</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup Label="Building Blocks">
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
+  </ItemGroup>
+  <ItemGroup Label="Módulos (Infrastructure)">
+    <ProjectReference Include="..\..\modules\identity\NexTraceOne.Identity.Infrastructure\NexTraceOne.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\licensing\NexTraceOne.Licensing.Infrastructure\NexTraceOne.Licensing.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\engineeringgraph\NexTraceOne.EngineeringGraph.Infrastructure\NexTraceOne.EngineeringGraph.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\developerportal\NexTraceOne.DeveloperPortal.Infrastructure\NexTraceOne.DeveloperPortal.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\contracts\NexTraceOne.Contracts.Infrastructure\NexTraceOne.Contracts.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\changeintelligence\NexTraceOne.ChangeIntelligence.Infrastructure\NexTraceOne.ChangeIntelligence.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\rulesetgovernance\NexTraceOne.RulesetGovernance.Infrastructure\NexTraceOne.RulesetGovernance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\workflow\NexTraceOne.Workflow.Infrastructure\NexTraceOne.Workflow.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\promotion\NexTraceOne.Promotion.Infrastructure\NexTraceOne.Promotion.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\runtimeintelligence\NexTraceOne.RuntimeIntelligence.Infrastructure\NexTraceOne.RuntimeIntelligence.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\costintelligence\NexTraceOne.CostIntelligence.Infrastructure\NexTraceOne.CostIntelligence.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\aiorchestration\NexTraceOne.AiOrchestration.Infrastructure\NexTraceOne.AiOrchestration.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\externalai\NexTraceOne.ExternalAi.Infrastructure\NexTraceOne.ExternalAi.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\audit\NexTraceOne.Audit.Infrastructure\NexTraceOne.Audit.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Quartz" />
+    <PackageReference Include="Quartz.Extensions.Hosting" />
+    <PackageReference Include="Serilog.AspNetCore" />
+  </ItemGroup>
+</Project>
