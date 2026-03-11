@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using NexTraceOne.BuildingBlocks.Domain.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Behaviors;
 
@@ -19,7 +20,44 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        // TODO: Implementar execução de validators e retorno de Result de falha
-        throw new NotImplementedException();
+        if (!validators.Any())
+        {
+            return await next();
+        }
+
+        var context = new ValidationContext<TRequest>(request);
+
+        var failures = (await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken))))
+            .SelectMany(result => result.Errors)
+            .Where(error => error is not null)
+            .Select(error => error.ErrorMessage)
+            .Distinct()
+            .ToArray();
+
+        if (failures.Length == 0)
+        {
+            return await next();
+        }
+
+        var error = Error.Validation(
+            "Validation.Failed",
+            "Validation failed for one or more fields: {0}",
+            string.Join("; ", failures));
+
+        return CreateFailureResponse(error);
+    }
+
+    private static TResponse CreateFailureResponse(Error error)
+    {
+        var responseType = typeof(TResponse);
+
+        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
+        {
+            throw new InvalidOperationException($"Response type '{responseType.Name}' must be a Result<T>.");
+        }
+
+        return (TResponse)(responseType
+            .GetMethod("op_Implicit", [typeof(Error)])!
+            .Invoke(null, [error])!);
     }
 }

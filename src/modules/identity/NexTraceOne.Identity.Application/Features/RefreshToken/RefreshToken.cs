@@ -1,25 +1,99 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Identity.Application.Abstractions;
+using NexTraceOne.Identity.Application.Features;
+using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
+using NexTraceOne.Identity.Domain.Errors;
+using NexTraceOne.Identity.Domain.ValueObjects;
 
 namespace NexTraceOne.Identity.Application.Features.RefreshToken;
 
 /// <summary>
-/// Feature: RefreshToken — Módulo: Identity.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: RefreshToken — rotaciona o refresh token e emite novo access token.
 /// </summary>
 public static class RefreshToken
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Comando de renovação de tokens.</summary>
+    public sealed record Command(string RefreshToken, string? IpAddress = null, string? UserAgent = null)
+        : ICommand<LocalLoginFeature.LoginResponse>, IPublicRequest;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da rotação de refresh token.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.RefreshToken).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que valida o refresh token, rotaciona a sessão e emite novos tokens.</summary>
+    public sealed class Handler(
+        ISessionRepository sessionRepository,
+        IUserRepository userRepository,
+        ITenantMembershipRepository membershipRepository,
+        IRoleRepository roleRepository,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IDateTimeProvider dateTimeProvider,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
+    {
+        public async Task<Result<LocalLoginFeature.LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var refreshTokenHash = RefreshTokenHash.Create(request.RefreshToken);
+            var session = await sessionRepository.GetByRefreshTokenHashAsync(refreshTokenHash, cancellationToken);
+
+            if (session is null)
+            {
+                return IdentityErrors.InvalidRefreshToken();
+            }
+
+            if (session.RevokedAt.HasValue)
+            {
+                return IdentityErrors.SessionRevoked(session.Id.Value);
+            }
+
+            if (session.IsExpired(dateTimeProvider.UtcNow))
+            {
+                return IdentityErrors.SessionExpired(session.Id.Value);
+            }
+
+            var user = await userRepository.GetByIdAsync(session.UserId, cancellationToken);
+            if (user is null)
+            {
+                return IdentityErrors.UserNotFound(session.UserId.Value);
+            }
+
+            var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
+                currentTenant,
+                membershipRepository,
+                user.Id,
+                cancellationToken);
+
+            if (membership is null)
+            {
+                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, currentTenant.Id);
+            }
+
+            var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
+            if (role is null)
+            {
+                return IdentityErrors.RoleNotFound(membership.RoleId.Value);
+            }
+
+            var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();
+            session.Rotate(RefreshTokenHash.Create(newRefreshToken), dateTimeProvider.UtcNow.AddDays(30));
+            user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
+
+            return IdentityFeatureSupport.CreateLoginResponse(
+                user,
+                membership,
+                role,
+                jwtTokenGenerator,
+                newRefreshToken);
+        }
+    }
 }

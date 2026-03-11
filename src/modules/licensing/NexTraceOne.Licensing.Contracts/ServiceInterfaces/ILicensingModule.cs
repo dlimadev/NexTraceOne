@@ -1,3 +1,5 @@
+using NexTraceOne.Licensing.Contracts.DTOs;
+
 namespace NexTraceOne.Licensing.Contracts.ServiceInterfaces;
 
 /// <summary>
@@ -7,5 +9,12 @@ namespace NexTraceOne.Licensing.Contracts.ServiceInterfaces;
 /// </summary>
 public interface ILicensingModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
+    /// <summary>Obtém o estado atual da licença pela chave pública.</summary>
+    Task<LicenseStatusDto?> GetLicenseStatusAsync(string licenseKey, CancellationToken cancellationToken);
+
+    /// <summary>Verifica se uma capability está habilitada para a licença informada.</summary>
+    Task<bool> HasCapabilityAsync(string licenseKey, string capabilityCode, CancellationToken cancellationToken);
+
+    /// <summary>Valida se a licença está apta para execução no hardware atual.</summary>
+    Task<bool> VerifyLicenseAsync(string licenseKey, CancellationToken cancellationToken);
 }

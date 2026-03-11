@@ -1,16 +1,34 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.Identity.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo Identity.
-/// TODO: Implementar regras de domínio, invariantes e domain events de Permission.
+/// Entidade que representa uma permissão granular organizada por módulo.
 /// </summary>
-public sealed class Permission : AuditableEntity<PermissionId>
+public sealed class Permission : Entity<PermissionId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private Permission() { }
+
+    /// <summary>Código único da permissão, no formato módulo:ação.</summary>
+    public string Code { get; private set; } = string.Empty;
+
+    /// <summary>Nome amigável da permissão.</summary>
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>Módulo ao qual a permissão pertence.</summary>
+    public string Module { get; private set; } = string.Empty;
+
+    /// <summary>Cria uma permissão com identificador conhecido.</summary>
+    public static Permission Create(PermissionId id, string code, string name, string module)
+        => new()
+        {
+            Id = Guard.Against.Null(id),
+            Code = Guard.Against.NullOrWhiteSpace(code),
+            Name = Guard.Against.NullOrWhiteSpace(name),
+            Module = Guard.Against.NullOrWhiteSpace(module)
+        };
 }
 
 /// <summary>Identificador fortemente tipado de Permission.</summary>

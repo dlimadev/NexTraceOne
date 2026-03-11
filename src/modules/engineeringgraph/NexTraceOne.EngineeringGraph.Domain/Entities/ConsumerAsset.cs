@@ -1,16 +1,34 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.EngineeringGraph.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo EngineeringGraph.
-/// TODO: Implementar regras de domínio, invariantes e domain events de ConsumerAsset.
+/// Consumidor conhecido de uma API no grafo de engenharia.
 /// </summary>
-public sealed class ConsumerAsset : AuditableEntity<ConsumerAssetId>
+public sealed class ConsumerAsset : Entity<ConsumerAssetId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private ConsumerAsset() { }
+
+    /// <summary>Nome único do consumidor.</summary>
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>Tipo do consumidor, como Service ou Job.</summary>
+    public string Kind { get; private set; } = string.Empty;
+
+    /// <summary>Ambiente principal do consumidor.</summary>
+    public string Environment { get; private set; } = string.Empty;
+
+    /// <summary>Cria um novo consumidor conhecido do grafo.</summary>
+    public static ConsumerAsset Create(string name, string kind, string environment)
+        => new()
+        {
+            Id = ConsumerAssetId.New(),
+            Name = Guard.Against.NullOrWhiteSpace(name),
+            Kind = Guard.Against.NullOrWhiteSpace(kind),
+            Environment = Guard.Against.NullOrWhiteSpace(environment)
+        };
 }
 
 /// <summary>Identificador fortemente tipado de ConsumerAsset.</summary>

@@ -1,5 +1,7 @@
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.BuildingBlocks.Domain.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Behaviors;
 
@@ -19,7 +21,33 @@ public sealed class TransactionBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        // TODO: Implementar transaction scope com commit/rollback
-        throw new NotImplementedException();
+        var response = await next();
+
+        if (IsCommandRequest())
+        {
+            if (IsSuccessfulResult(response))
+            {
+                await unitOfWork.CommitAsync(cancellationToken);
+            }
+        }
+
+        return response;
     }
+
+    private static bool IsSuccessfulResult(TResponse response)
+    {
+        var responseType = typeof(TResponse);
+
+        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
+        {
+            return true;
+        }
+
+        return (bool)(responseType.GetProperty(nameof(Result<object>.IsSuccess))?.GetValue(response) ?? false);
+    }
+
+    private static bool IsCommandRequest()
+        => typeof(ICommand).IsAssignableFrom(typeof(TRequest))
+           || typeof(TRequest).GetInterfaces().Any(
+               i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommand<>));
 }

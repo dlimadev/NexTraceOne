@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NexTraceOne.BuildingBlocks.Security.Encryption;
 
 namespace NexTraceOne.BuildingBlocks.Infrastructure.Converters;
 
@@ -15,14 +16,8 @@ public sealed class EncryptedStringConverter : ValueConverter<string, string>
     { }
 
     private static string Encrypt(string plainText)
-    {
-        // TODO: Implementar AES-256-GCM encryption
-        throw new NotImplementedException();
-    }
+        => AesGcmEncryptor.Encrypt(plainText);
 
     private static string Decrypt(string cipherText)
-    {
-        // TODO: Implementar AES-256-GCM decryption
-        throw new NotImplementedException();
-    }
+        => AesGcmEncryptor.Decrypt(cipherText);
 }

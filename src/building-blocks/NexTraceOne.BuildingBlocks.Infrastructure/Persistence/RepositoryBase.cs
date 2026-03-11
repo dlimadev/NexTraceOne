@@ -9,18 +9,19 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 /// CRUD completo + Specification evaluation. Módulos só implementam métodos de negócio.
 /// </summary>
 public abstract class RepositoryBase<TEntity, TId>(DbContext context)
-    where TEntity : AggregateRoot<TId>
+    where TEntity : Entity<TId>
     where TId     : ITypedId
 {
+    protected readonly DbContext Context = context;
     protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
 
-    public async Task<TEntity?> GetByIdAsync(TId id, CancellationToken ct = default)
+    public virtual async Task<TEntity?> GetByIdAsync(TId id, CancellationToken ct = default)
         => await DbSet.FindAsync([id], ct);
 
     public async Task<TEntity> GetByIdOrThrowAsync(TId id, CancellationToken ct = default)
     {
-        // TODO: Implementar com lançamento de NexTraceNotFoundException
-        throw new NotImplementedException();
+        var entity = await GetByIdAsync(id, ct);
+        return entity ?? throw new KeyNotFoundException($"Entity '{typeof(TEntity).Name}' with id '{id}' was not found.");
     }
 
     public Task<bool> ExistsAsync(TId id, CancellationToken ct = default)

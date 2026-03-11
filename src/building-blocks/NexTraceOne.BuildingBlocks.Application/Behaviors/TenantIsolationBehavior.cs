@@ -1,5 +1,7 @@
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.BuildingBlocks.Domain.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Behaviors;
 
@@ -19,7 +21,40 @@ public sealed class TenantIsolationBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        // TODO: Verificar tenant ativo e rejeitar se ausente (exceto IPublicRequest)
-        throw new NotImplementedException();
+        if (request is IPublicRequest)
+        {
+            return await next();
+        }
+
+        if (currentTenant.Id == Guid.Empty)
+        {
+            return CreateFailureResponse(Error.Security(
+                "Tenant.Isolation.NoTenant",
+                "Tenant context was not provided."));
+        }
+
+        if (!currentTenant.IsActive)
+        {
+            return CreateFailureResponse(Error.Forbidden(
+                "Tenant.Isolation.Inactive",
+                "Tenant '{0}' is inactive.",
+                currentTenant.Name));
+        }
+
+        return await next();
+    }
+
+    private static TResponse CreateFailureResponse(Error error)
+    {
+        var responseType = typeof(TResponse);
+
+        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
+        {
+            throw new InvalidOperationException($"Response type '{responseType.Name}' must be a Result<T>.");
+        }
+
+        return (TResponse)(responseType
+            .GetMethod("op_Implicit", [typeof(Error)])!
+            .Invoke(null, [error])!);
     }
 }

@@ -6,12 +6,15 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Identity.Application\NexTraceOne.Identity.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Identity.Contracts\NexTraceOne.Identity.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.Identity.Domain\NexTraceOne.Identity.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Mapster" />
   </ItemGroup>

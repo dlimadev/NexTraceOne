@@ -19,4 +19,4 @@ var rootCommand = new RootCommand("NexTraceOne CLI — Sovereign Change Intellig
 // TODO: nex tests      — gera cenários de teste em Robot Framework
 // TODO: nex catalog    — consulta catálogo de APIs e serviços
 
-return await rootCommand.InvokeAsync(args);
+return await rootCommand.Parse(args).InvokeAsync(new InvocationConfiguration());

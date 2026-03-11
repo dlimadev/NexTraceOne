@@ -10,8 +10,5 @@ namespace NexTraceOne.BuildingBlocks.EventBus.Outbox;
 public sealed class OutboxEventBus : IEventBus
 {
     public Task PublishAsync<T>(T integrationEvent, CancellationToken ct = default) where T : class
-    {
-        // TODO: Serializar evento e salvar como OutboxMessage na mesma transação
-        throw new NotImplementedException();
-    }
+        => throw new NotSupportedException("Use the DbContext outbox pipeline for persistent event delivery.");
 }

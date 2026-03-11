@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 
 namespace NexTraceOne.BuildingBlocks.Infrastructure;
 
@@ -12,7 +13,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar interceptors, converters, outbox processor
+        services.AddScoped<AuditInterceptor>();
+        services.AddScoped<TenantRlsInterceptor>();
+
         return services;
     }
 }

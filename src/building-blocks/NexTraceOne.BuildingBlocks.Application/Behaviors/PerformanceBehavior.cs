@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace NexTraceOne.BuildingBlocks.Application.Behaviors;
 
@@ -20,7 +21,26 @@ public sealed class PerformanceBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        // TODO: Implementar medição com Stopwatch e alertas por threshold
-        throw new NotImplementedException();
+        var stopwatch = Stopwatch.StartNew();
+        var response = await next();
+
+        stopwatch.Stop();
+
+        if (stopwatch.ElapsedMilliseconds >= ErrorThresholdMs)
+        {
+            logger.LogError(
+                "Request {RequestName} exceeded critical threshold with {ElapsedMilliseconds}ms",
+                typeof(TRequest).Name,
+                stopwatch.ElapsedMilliseconds);
+        }
+        else if (stopwatch.ElapsedMilliseconds >= WarningThresholdMs)
+        {
+            logger.LogWarning(
+                "Request {RequestName} exceeded warning threshold with {ElapsedMilliseconds}ms",
+                typeof(TRequest).Name,
+                stopwatch.ElapsedMilliseconds);
+        }
+
+        return response;
     }
 }

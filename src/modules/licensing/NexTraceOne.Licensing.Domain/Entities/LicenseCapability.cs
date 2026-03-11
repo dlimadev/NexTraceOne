@@ -1,16 +1,40 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.Licensing.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo Licensing.
-/// TODO: Implementar regras de domínio, invariantes e domain events de LicenseCapability.
+/// Capacidade licenciada que habilita funcionalidades específicas da plataforma.
 /// </summary>
-public sealed class LicenseCapability : AuditableEntity<LicenseCapabilityId>
+public sealed class LicenseCapability : Entity<LicenseCapabilityId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private LicenseCapability() { }
+
+    /// <summary>Código único da capability.</summary>
+    public string Code { get; private set; } = string.Empty;
+
+    /// <summary>Nome amigável da capability.</summary>
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>Indica se a capability está habilitada na licença.</summary>
+    public bool IsEnabled { get; private set; }
+
+    /// <summary>Cria uma capability habilitada para a licença.</summary>
+    public static LicenseCapability Create(string code, string name, bool isEnabled = true)
+        => new()
+        {
+            Id = LicenseCapabilityId.New(),
+            Code = Guard.Against.NullOrWhiteSpace(code),
+            Name = Guard.Against.NullOrWhiteSpace(name),
+            IsEnabled = isEnabled
+        };
+
+    /// <summary>Habilita a capability na licença.</summary>
+    public void Enable() => IsEnabled = true;
+
+    /// <summary>Desabilita a capability na licença.</summary>
+    public void Disable() => IsEnabled = false;
 }
 
 /// <summary>Identificador fortemente tipado de LicenseCapability.</summary>

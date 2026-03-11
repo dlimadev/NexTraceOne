@@ -1,3 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+
 namespace NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 
 /// <summary>
@@ -6,5 +9,12 @@ namespace NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 /// </summary>
 public static class NexTraceHealthChecks
 {
-    // TODO: Implementar AddNexTraceHealthChecks(IServiceCollection)
+    /// <summary>Registra health checks mínimos da plataforma para readiness e liveness.</summary>
+    public static IServiceCollection AddNexTraceHealthChecks(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddCheck("self", () => HealthCheckResult.Healthy("NexTraceOne host is running."));
+
+        return services;
+    }
 }

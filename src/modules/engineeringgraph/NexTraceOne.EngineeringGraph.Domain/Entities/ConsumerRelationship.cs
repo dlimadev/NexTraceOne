@@ -1,16 +1,54 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.EngineeringGraph.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo EngineeringGraph.
-/// TODO: Implementar regras de domínio, invariantes e domain events de ConsumerRelationship.
+/// Relação entre um consumidor e uma API do grafo de engenharia.
 /// </summary>
-public sealed class ConsumerRelationship : AuditableEntity<ConsumerRelationshipId>
+public sealed class ConsumerRelationship : Entity<ConsumerRelationshipId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private ConsumerRelationship() { }
+
+    /// <summary>Identificador do consumidor relacionado.</summary>
+    public ConsumerAssetId ConsumerAssetId { get; private set; } = ConsumerAssetId.New();
+
+    /// <summary>Nome do consumidor para consultas rápidas.</summary>
+    public string ConsumerName { get; private set; } = string.Empty;
+
+    /// <summary>Tipo da fonte que confirmou a relação.</summary>
+    public string SourceType { get; private set; } = string.Empty;
+
+    /// <summary>Score de confiança atual da relação.</summary>
+    public decimal ConfidenceScore { get; private set; }
+
+    /// <summary>Primeira observação da relação no grafo.</summary>
+    public DateTimeOffset FirstObservedAt { get; private set; }
+
+    /// <summary>Última observação da relação no grafo.</summary>
+    public DateTimeOffset LastObservedAt { get; private set; }
+
+    /// <summary>Cria uma nova relação entre consumidor e API.</summary>
+    public static ConsumerRelationship Create(ConsumerAsset consumerAsset, DiscoverySource discoverySource, DateTimeOffset observedAt)
+        => new()
+        {
+            Id = ConsumerRelationshipId.New(),
+            ConsumerAssetId = consumerAsset.Id,
+            ConsumerName = Guard.Against.NullOrWhiteSpace(consumerAsset.Name),
+            SourceType = Guard.Against.NullOrWhiteSpace(discoverySource.SourceType),
+            ConfidenceScore = discoverySource.ConfidenceScore,
+            FirstObservedAt = observedAt,
+            LastObservedAt = observedAt
+        };
+
+    /// <summary>Atualiza uma relação existente com nova observação e confiança.</summary>
+    public void Refresh(DiscoverySource discoverySource, DateTimeOffset observedAt)
+    {
+        SourceType = Guard.Against.NullOrWhiteSpace(discoverySource.SourceType);
+        ConfidenceScore = discoverySource.ConfidenceScore;
+        LastObservedAt = observedAt;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de ConsumerRelationship.</summary>

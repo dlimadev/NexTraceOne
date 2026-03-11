@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 
 namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
@@ -11,8 +12,7 @@ public sealed class ChangeIntelligenceEndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/changeintelligence")
-            .WithTags("ChangeIntelligence");
+        _ = app.MapGroup("/api/v1/changeintelligence");
 
         // TODO: Mapear endpoints de cada feature
     }

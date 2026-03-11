@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.ExternalAi.Application;
+using NexTraceOne.ExternalAi.Infrastructure;
 
 namespace NexTraceOne.ExternalAi.API;
 

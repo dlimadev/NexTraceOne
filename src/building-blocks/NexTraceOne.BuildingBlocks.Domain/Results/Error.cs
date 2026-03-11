@@ -6,14 +6,41 @@ namespace NexTraceOne.BuildingBlocks.Domain.Results;
 /// </summary>
 public sealed record Error(string Code, string Message, ErrorType Type)
 {
-    // Factories para os tipos de erro mais comuns
-    public static Error NotFound(string code, string msg)     => new(code, msg, ErrorType.NotFound);
-    public static Error Validation(string code, string msg)   => new(code, msg, ErrorType.Validation);
-    public static Error Conflict(string code, string msg)     => new(code, msg, ErrorType.Conflict);
-    public static Error Unauthorized(string code, string msg) => new(code, msg, ErrorType.Unauthorized);
-    public static Error Forbidden(string code, string msg)    => new(code, msg, ErrorType.Forbidden);
-    public static Error Security(string code, string msg)     => new(code, msg, ErrorType.Security);
-    public static Error Business(string code, string msg)     => new(code, msg, ErrorType.Business);
+    /// <summary>Argumentos dinâmicos usados para interpolação e localização da mensagem.</summary>
+    public object[] MessageArgs { get; init; } = [];
+
+    /// <summary>Mensagem final formatada com os argumentos informados.</summary>
+    public string FormattedMessage => MessageArgs.Length == 0
+        ? Message
+        : string.Format(Message, MessageArgs);
+
+    /// <summary>Cria um erro NotFound com suporte a argumentos de formatação.</summary>
+    public static Error NotFound(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.NotFound) { MessageArgs = args };
+
+    /// <summary>Cria um erro de validação com suporte a argumentos de formatação.</summary>
+    public static Error Validation(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.Validation) { MessageArgs = args };
+
+    /// <summary>Cria um erro de conflito com suporte a argumentos de formatação.</summary>
+    public static Error Conflict(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.Conflict) { MessageArgs = args };
+
+    /// <summary>Cria um erro de autenticação com suporte a argumentos de formatação.</summary>
+    public static Error Unauthorized(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.Unauthorized) { MessageArgs = args };
+
+    /// <summary>Cria um erro de autorização com suporte a argumentos de formatação.</summary>
+    public static Error Forbidden(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.Forbidden) { MessageArgs = args };
+
+    /// <summary>Cria um erro de segurança com suporte a argumentos de formatação.</summary>
+    public static Error Security(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.Security) { MessageArgs = args };
+
+    /// <summary>Cria um erro de negócio com suporte a argumentos de formatação.</summary>
+    public static Error Business(string code, string msg, params object[] args)
+        => new(code, msg, ErrorType.Business) { MessageArgs = args };
 
     /// <summary>Erro nulo — representa ausência de erro (interno).</summary>
     public static readonly Error None = new(string.Empty, string.Empty, ErrorType.None);

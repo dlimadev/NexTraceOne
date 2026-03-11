@@ -1,5 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MediatR;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Behaviors;
+using NexTraceOne.BuildingBlocks.Application.Localization;
 
 namespace NexTraceOne.BuildingBlocks.Application;
 
@@ -13,7 +17,17 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar MediatR behaviors, DateTimeProvider, validators
+        services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+        services.AddScoped<IErrorLocalizer, ErrorLocalizer>();
+        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+
         return services;
     }
 }

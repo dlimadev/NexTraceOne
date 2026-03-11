@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.Licensing.Application;
+using NexTraceOne.Licensing.Infrastructure;
 
 namespace NexTraceOne.Licensing.API;
 

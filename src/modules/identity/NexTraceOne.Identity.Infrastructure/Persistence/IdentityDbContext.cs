@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Identity.Domain.Entities;
 
 namespace NexTraceOne.Identity.Infrastructure.Persistence;
 
@@ -14,10 +15,27 @@ public sealed class IdentityDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Usuários persistidos do módulo Identity.</summary>
+    public DbSet<User> Users => Set<User>();
+
+    /// <summary>Papéis persistidos do módulo Identity.</summary>
+    public DbSet<Role> Roles => Set<Role>();
+
+    /// <summary>Permissões persistidas do módulo Identity.</summary>
+    public DbSet<Permission> Permissions => Set<Permission>();
+
+    /// <summary>Sessões persistidas do módulo Identity.</summary>
+    public DbSet<Session> Sessions => Set<Session>();
+
+    /// <summary>Vínculos de tenant persistidos do módulo Identity.</summary>
+    public DbSet<TenantMembership> TenantMemberships => Set<TenantMembership>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

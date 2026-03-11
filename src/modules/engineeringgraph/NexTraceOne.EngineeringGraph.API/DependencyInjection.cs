@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.EngineeringGraph.Application;
+using NexTraceOne.EngineeringGraph.Infrastructure;
 
 namespace NexTraceOne.EngineeringGraph.API;
 

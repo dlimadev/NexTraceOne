@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.Workflow.Application;
+using NexTraceOne.Workflow.Infrastructure;
 
 namespace NexTraceOne.Workflow.API;
 

@@ -7,7 +7,11 @@
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Contracts.Application\NexTraceOne.Contracts.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.Contracts.Contracts\NexTraceOne.Contracts.Contracts.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Contracts.Infrastructure\NexTraceOne.Contracts.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MediatR" />

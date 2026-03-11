@@ -1,3 +1,5 @@
+using NexTraceOne.Identity.Contracts.DTOs;
+
 namespace NexTraceOne.Identity.Contracts.ServiceInterfaces;
 
 /// <summary>
@@ -7,5 +9,12 @@ namespace NexTraceOne.Identity.Contracts.ServiceInterfaces;
 /// </summary>
 public interface IIdentityModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
+    /// <summary>Obtém um usuário pelo identificador público.</summary>
+    Task<UserSummaryDto?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>Obtém as permissões efetivas do usuário dentro de um tenant.</summary>
+    Task<IReadOnlyList<string>> GetUserPermissionsAsync(Guid userId, Guid tenantId, CancellationToken cancellationToken);
+
+    /// <summary>Valida se o usuário possui vínculo ativo com o tenant informado.</summary>
+    Task<bool> ValidateTenantMembershipAsync(Guid userId, Guid tenantId, CancellationToken cancellationToken);
 }

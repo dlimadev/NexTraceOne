@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.ChangeIntelligence.Application;
+using NexTraceOne.ChangeIntelligence.Infrastructure;
 
 namespace NexTraceOne.ChangeIntelligence.API;
 

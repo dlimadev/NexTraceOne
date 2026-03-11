@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.CostIntelligence.Application;
+using NexTraceOne.CostIntelligence.Infrastructure;
 
 namespace NexTraceOne.CostIntelligence.API;
 

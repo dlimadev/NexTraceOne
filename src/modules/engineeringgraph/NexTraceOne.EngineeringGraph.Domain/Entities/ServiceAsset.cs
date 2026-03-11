@@ -1,16 +1,34 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.EngineeringGraph.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo EngineeringGraph.
-/// TODO: Implementar regras de domínio, invariantes e domain events de ServiceAsset.
+/// Serviço proprietário de um ativo de API no grafo de engenharia.
 /// </summary>
-public sealed class ServiceAsset : AuditableEntity<ServiceAssetId>
+public sealed class ServiceAsset : Entity<ServiceAssetId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private ServiceAsset() { }
+
+    /// <summary>Nome único do serviço.</summary>
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>Domínio de negócio ao qual o serviço pertence.</summary>
+    public string Domain { get; private set; } = string.Empty;
+
+    /// <summary>Equipe responsável pelo serviço.</summary>
+    public string TeamName { get; private set; } = string.Empty;
+
+    /// <summary>Cria um novo serviço proprietário.</summary>
+    public static ServiceAsset Create(string name, string domain, string teamName)
+        => new()
+        {
+            Id = ServiceAssetId.New(),
+            Name = Guard.Against.NullOrWhiteSpace(name),
+            Domain = Guard.Against.NullOrWhiteSpace(domain),
+            TeamName = Guard.Against.NullOrWhiteSpace(teamName)
+        };
 }
 
 /// <summary>Identificador fortemente tipado de ServiceAsset.</summary>

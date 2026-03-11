@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.Audit.Application;
+using NexTraceOne.Audit.Infrastructure;
 
 namespace NexTraceOne.Audit.API;
 

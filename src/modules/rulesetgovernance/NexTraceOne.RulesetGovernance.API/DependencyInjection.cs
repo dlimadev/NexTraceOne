@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.RulesetGovernance.Application;
+using NexTraceOne.RulesetGovernance.Infrastructure;
 
 namespace NexTraceOne.RulesetGovernance.API;
 

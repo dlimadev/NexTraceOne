@@ -1,16 +1,109 @@
+using Ardalis.GuardClauses;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.EngineeringGraph.Domain.Errors;
 
 namespace NexTraceOne.EngineeringGraph.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo EngineeringGraph.
-/// TODO: Implementar regras de domínio, invariantes e domain events de ApiAsset.
+/// Aggregate Root que representa uma API publicada no grafo de engenharia.
 /// </summary>
-public sealed class ApiAsset : AuditableEntity<ApiAssetId>
+public sealed class ApiAsset : AggregateRoot<ApiAssetId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
+    private readonly List<ConsumerRelationship> _consumerRelationships = [];
+    private readonly List<DiscoverySource> _discoverySources = [];
+
     private ApiAsset() { }
+
+    /// <summary>Nome lógico da API.</summary>
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>Rota principal exposta pela API.</summary>
+    public string RoutePattern { get; private set; } = string.Empty;
+
+    /// <summary>Versão semântica atual do ativo.</summary>
+    public string Version { get; private set; } = string.Empty;
+
+    /// <summary>Visibilidade da API, como Internal ou Public.</summary>
+    public string Visibility { get; private set; } = string.Empty;
+
+    /// <summary>Serviço proprietário da API.</summary>
+    public ServiceAsset OwnerService { get; private set; } = null!;
+
+    /// <summary>Relações conhecidas de consumidores da API.</summary>
+    public IReadOnlyList<ConsumerRelationship> ConsumerRelationships => _consumerRelationships.AsReadOnly();
+
+    /// <summary>Fontes de descoberta associadas ao ativo.</summary>
+    public IReadOnlyList<DiscoverySource> DiscoverySources => _discoverySources.AsReadOnly();
+
+    /// <summary>Registra um novo ativo de API no grafo.</summary>
+    public static ApiAsset Register(string name, string routePattern, string version, string visibility, ServiceAsset ownerService)
+        => new()
+        {
+            Id = ApiAssetId.New(),
+            Name = Guard.Against.NullOrWhiteSpace(name),
+            RoutePattern = Guard.Against.NullOrWhiteSpace(routePattern),
+            Version = Guard.Against.NullOrWhiteSpace(version),
+            Visibility = Guard.Against.NullOrWhiteSpace(visibility),
+            OwnerService = Guard.Against.Null(ownerService)
+        };
+
+    /// <summary>Adiciona uma fonte de descoberta ao ativo evitando duplicidade por referência.</summary>
+    public Result<Unit> AddDiscoverySource(DiscoverySource discoverySource)
+    {
+        Guard.Against.Null(discoverySource);
+
+        var duplicateExists = _discoverySources.Any(source =>
+            string.Equals(source.SourceType, discoverySource.SourceType, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(source.ExternalReference, discoverySource.ExternalReference, StringComparison.OrdinalIgnoreCase));
+
+        if (duplicateExists)
+        {
+            return EngineeringGraphErrors.DuplicateDiscoverySource(discoverySource.SourceType, discoverySource.ExternalReference);
+        }
+
+        _discoverySources.Add(discoverySource);
+        return Unit.Value;
+    }
+
+    /// <summary>Mapeia ou atualiza a relação de consumo de uma API por um consumidor conhecido.</summary>
+    public Result<ConsumerRelationship> MapConsumerRelationship(ConsumerAsset consumerAsset, DiscoverySource discoverySource, DateTimeOffset observedAt)
+    {
+        Guard.Against.Null(consumerAsset);
+        Guard.Against.Null(discoverySource);
+
+        var addDiscoverySourceResult = AddDiscoverySource(discoverySource);
+        if (addDiscoverySourceResult.IsFailure && addDiscoverySourceResult.Error.Code != "EngineeringGraph.DiscoverySource.Duplicate")
+        {
+            return addDiscoverySourceResult.Error;
+        }
+
+        var relationship = _consumerRelationships.SingleOrDefault(item => item.ConsumerAssetId == consumerAsset.Id);
+        if (relationship is null)
+        {
+            relationship = ConsumerRelationship.Create(consumerAsset, discoverySource, observedAt);
+            _consumerRelationships.Add(relationship);
+            return relationship;
+        }
+
+        relationship.Refresh(discoverySource, observedAt);
+        return relationship;
+    }
+
+    /// <summary>Infere uma dependência a partir de telemetria OpenTelemetry.</summary>
+    public Result<ConsumerRelationship> InferDependencyFromOtel(
+        string consumerName,
+        string environment,
+        string externalReference,
+        DateTimeOffset observedAt,
+        decimal confidenceScore)
+    {
+        var consumerAsset = ConsumerAsset.Create(consumerName, "Service", environment);
+        var discoverySource = DiscoverySource.Create("OpenTelemetry", externalReference, observedAt, confidenceScore);
+        return MapConsumerRelationship(consumerAsset, discoverySource, observedAt);
+    }
 }
 
 /// <summary>Identificador fortemente tipado de ApiAsset.</summary>

@@ -43,5 +43,7 @@ public sealed class Result<T>
 
     /// <summary>Projeta o valor de sucesso para outro tipo mantendo o Result.</summary>
     public Result<TOut> Map<TOut>(Func<T, TOut> mapper)
-        => IsSuccess ? Result<TOut>.Success(mapper(_value!)) : new Error(_error!.Code, _error.Message, _error.Type);
+        => IsSuccess
+            ? Result<TOut>.Success(mapper(_value!))
+            : new Error(_error!.Code, _error.Message, _error.Type) { MessageArgs = _error.MessageArgs };
 }

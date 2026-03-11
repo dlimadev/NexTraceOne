@@ -7,4 +7,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" />
+    <PackageReference Include="BCrypt.Net-Next" />
+  </ItemGroup>
 </Project>

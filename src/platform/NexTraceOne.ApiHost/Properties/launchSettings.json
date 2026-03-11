@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NexTraceOne.ApiHost": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:1477;http://localhost:1478"
+    }
+  }
+}
