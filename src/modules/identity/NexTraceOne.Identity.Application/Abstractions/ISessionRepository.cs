@@ -17,6 +17,9 @@ public interface ISessionRepository
     /// <summary>Obtém a sessão ativa mais recente de um usuário.</summary>
     Task<Session?> GetActiveByUserIdAsync(UserId userId, CancellationToken cancellationToken);
 
+    /// <summary>Lista todas as sessões ativas de um usuário.</summary>
+    Task<IReadOnlyList<Session>> ListActiveByUserIdAsync(UserId userId, CancellationToken cancellationToken);
+
     /// <summary>Adiciona uma nova sessão para persistência.</summary>
     void Add(Session session);
 }

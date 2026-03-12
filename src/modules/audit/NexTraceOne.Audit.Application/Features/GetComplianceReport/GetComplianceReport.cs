@@ -1,25 +1,54 @@
-using MediatR;
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Audit.Application.Abstractions;
 
 namespace NexTraceOne.Audit.Application.Features.GetComplianceReport;
 
 /// <summary>
-/// Feature: GetComplianceReport — Módulo: Audit.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetComplianceReport — gera relatório de compliance com base nos dados de auditoria.
 /// </summary>
 public static class GetComplianceReport
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de relatório de compliance.</summary>
+    public sealed record Query(DateTimeOffset From, DateTimeOffset To) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Handler que gera o relatório de compliance.</summary>
+    public sealed class Handler(
+        IAuditEventRepository auditEventRepository,
+        IAuditChainRepository auditChainRepository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+            var events = await auditEventRepository.SearchAsync(null, null, request.From, request.To, 1, 10000, cancellationToken);
+            var links = await auditChainRepository.GetAllLinksAsync(cancellationToken);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var moduleBreakdown = events
+                .GroupBy(e => e.SourceModule)
+                .Select(g => new ModuleSummary(g.Key, g.Count()))
+                .ToArray();
+
+            return new Response(
+                request.From,
+                request.To,
+                events.Count,
+                links.Count,
+                true,
+                moduleBreakdown);
+        }
+    }
+
+    /// <summary>Resposta do relatório de compliance.</summary>
+    public sealed record Response(
+        DateTimeOffset From,
+        DateTimeOffset To,
+        int TotalEvents,
+        int TotalChainLinks,
+        bool ChainIntact,
+        IReadOnlyList<ModuleSummary> ModuleBreakdown);
+
+    /// <summary>Resumo de eventos por módulo.</summary>
+    public sealed record ModuleSummary(string SourceModule, int EventCount);
 }

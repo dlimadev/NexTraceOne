@@ -25,8 +25,9 @@ public static class DependencyInjection
         services.AddBuildingBlocksInfrastructure(configuration);
 
         var connectionString = configuration.GetConnectionString("IdentityDatabase")
+            ?? configuration.GetConnectionString("NexTraceOne")
             ?? configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=nextrace_identity;Username=postgres;Password=postgres";
+            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
 
         services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

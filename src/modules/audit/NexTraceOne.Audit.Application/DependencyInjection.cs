@@ -1,11 +1,17 @@
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Audit.Application.Features.ConfigureRetention;
+using NexTraceOne.Audit.Application.Features.ExportAuditReport;
+using NexTraceOne.Audit.Application.Features.GetAuditTrail;
+using NexTraceOne.Audit.Application.Features.RecordAuditEvent;
+using NexTraceOne.Audit.Application.Features.SearchAuditLog;
 
 namespace NexTraceOne.Audit.Application;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo Audit.
-/// Inclui: MediatR handlers, FluentValidation validators.
 /// </summary>
 public static class DependencyInjection
 {
@@ -13,7 +19,15 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar MediatR handlers e validators deste módulo
+        services.AddBuildingBlocksApplication(configuration);
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        services.AddTransient<IValidator<RecordAuditEvent.Command>, RecordAuditEvent.Validator>();
+        services.AddTransient<IValidator<GetAuditTrail.Query>, GetAuditTrail.Validator>();
+        services.AddTransient<IValidator<SearchAuditLog.Query>, SearchAuditLog.Validator>();
+        services.AddTransient<IValidator<ExportAuditReport.Query>, ExportAuditReport.Validator>();
+        services.AddTransient<IValidator<ConfigureRetention.Command>, ConfigureRetention.Validator>();
+
         return services;
     }
 }

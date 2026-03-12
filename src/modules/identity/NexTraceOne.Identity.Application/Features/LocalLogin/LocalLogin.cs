@@ -106,8 +106,18 @@ public static class LocalLogin
     }
 
     /// <summary>Resposta padronizada de autenticação.</summary>
-    public sealed record LoginResponse(string AccessToken, string RefreshToken, int ExpiresIn, UserResponse User);
+    public sealed record LoginResponse(
+        string AccessToken,
+        string RefreshToken,
+        int ExpiresIn,
+        UserResponse User);
 
     /// <summary>Resumo do usuário autenticado incluído na resposta de login.</summary>
-    public sealed record UserResponse(Guid Id, string Email, string FullName, Guid TenantId, string RoleName);
+    public sealed record UserResponse(
+        Guid Id,
+        string Email,
+        string FullName,
+        Guid TenantId,
+        string RoleName,
+        IReadOnlyList<string> Permissions);
 }

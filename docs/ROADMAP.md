@@ -221,7 +221,7 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 
 ---
 
-## FASE 5 — Governança e Aprovação (Semanas 15–18) — 🟡 EM PROGRESSO
+## FASE 5 — Governança e Aprovação (Semanas 15–18) — ✅ CONCLUÍDA
 
 ### Semana 15: Workflow — Template e Iniciação ✅
 
@@ -254,50 +254,54 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 | IWorkflowModule (WorkflowModuleService) | ✅ |
 | Testes unitários (domínio + aplicação) | ✅ |
 
-### Semana 17: Promotion — Request e Gates
+### Semana 17: Promotion — Request e Gates ✅
 
 | Feature | Status |
 |---------|--------|
-| PromotionRequest (Aggregate Root) | 🔲 |
-| PromotionGate (Entity) | 🔲 |
-| CreatePromotionRequest | 🔲 |
-| EvaluatePromotionGates | 🔲 |
+| PromotionRequest (Aggregate Root) | ✅ |
+| PromotionGate (Entity) | ✅ |
+| CreatePromotionRequest | ✅ |
+| EvaluatePromotionGates | ✅ |
 
-### Semana 18: Promotion — Status e Rollback
+### Semana 18: Promotion — Status e Rollback ✅
 
 | Feature | Status |
 |---------|--------|
-| GetPromotionStatus | 🔲 |
-| ApprovePromotion | 🔲 |
-| RollbackPromotion | 🔲 |
-| PromotionDbContext + Migrations | 🔲 |
+| GetPromotionStatus | ✅ |
+| ApprovePromotion | ✅ |
+| BlockPromotion | ✅ |
+| PromotionDbContext + Migrations | ✅ |
+| IPromotionModule (Contracts) | ✅ |
+| Registo no ApiHost | ✅ |
 
-**Entregável:** Fluxo de aprovação completo com evidence pack em PDF.
+**Entregável:** ✅ Fluxo de aprovação completo com evidence pack em PDF.
 
 ---
 
-## FASE 6 — Auditoria e Compliance (Semanas 19–20)
+## FASE 6 — Auditoria e Compliance (Semanas 19–20) — ✅ CONCLUÍDA
 
-### Semana 19: Audit — Registro
-
-| Feature | Status |
-|---------|--------|
-| AuditEvent (Aggregate Root) | 🔲 |
-| AuditChainLink (Entity / hash chain) | 🔲 |
-| RecordAuditEvent | 🔲 |
-| GetAuditTrail | 🔲 |
-| SearchAuditLog | 🔲 |
-
-### Semana 20: Audit — Integridade e Relatórios
+### Semana 19: Audit — Registro ✅
 
 | Feature | Status |
 |---------|--------|
-| VerifyChainIntegrity | 🔲 |
-| ExportAuditReport | 🔲 |
-| GetComplianceReport | 🔲 |
-| AuditDbContext + Migrations | 🔲 |
+| AuditEvent (Aggregate Root) | ✅ |
+| AuditChainLink (Entity / hash chain SHA-256) | ✅ |
+| RecordAuditEvent | ✅ |
+| GetAuditTrail | ✅ |
+| SearchAuditLog | ✅ |
 
-**Entregável:** Hash chain auditável SHA-256 com relatórios de compliance.
+### Semana 20: Audit — Integridade e Relatórios ✅
+
+| Feature | Status |
+|---------|--------|
+| VerifyChainIntegrity | ✅ |
+| ExportAuditReport | ✅ |
+| GetComplianceReport | ✅ |
+| AuditDbContext + IUnitOfWork | ✅ |
+| IAuditModule (Contracts) | ✅ |
+| Registo no ApiHost | ✅ |
+
+**Entregável:** ✅ Hash chain auditável SHA-256 com relatórios de compliance.
 
 ---
 

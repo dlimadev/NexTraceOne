@@ -1,3 +1,5 @@
+using Ardalis.GuardClauses;
+using FluentValidation;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
@@ -5,21 +7,31 @@ using NexTraceOne.BuildingBlocks.Domain.Results;
 namespace NexTraceOne.Audit.Application.Features.ConfigureRetention;
 
 /// <summary>
-/// Feature: ConfigureRetention — Módulo: Audit.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: ConfigureRetention — configura a política de retenção de eventos de auditoria.
+/// Placeholder para configuração futura via admin.
 /// </summary>
 public static class ConfigureRetention
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Comando de configuração de retenção.</summary>
+    public sealed record Command(string PolicyName, int RetentionDays) : ICommand;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada do comando.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PolicyName).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.RetentionDays).GreaterThan(0).LessThanOrEqualTo(3650);
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
-
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+    /// <summary>Handler placeholder para configuração de retenção.</summary>
+    public sealed class Handler : ICommandHandler<Command>
+    {
+        public Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
+            return Task.FromResult(Result<Unit>.Success(Unit.Value));
+        }
+    }
 }

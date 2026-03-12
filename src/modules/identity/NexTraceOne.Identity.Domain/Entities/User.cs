@@ -108,6 +108,10 @@ public sealed class User : AggregateRoot<UserId>
     public void SetPassword(HashedPassword passwordHash)
         => PasswordHash = Guard.Against.Null(passwordHash);
 
+    /// <summary>Atualiza o nome completo do usuário.</summary>
+    public void UpdateProfile(FullName fullName)
+        => FullName = Guard.Against.Null(fullName);
+
     /// <summary>Desativa o usuário para impedir novos logins.</summary>
     public void Deactivate() => IsActive = false;
 

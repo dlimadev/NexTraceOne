@@ -279,6 +279,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.IntegrationTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.E2E.Tests", "tests\platform\NexTraceOne.E2E.Tests\NexTraceOne.E2E.Tests.csproj", "{158FDAD3-383B-4A7E-B70F-A0B9EDCD0B10}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{CE609670-85B9-0D16-FB54-ED063D5D8A6D}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "nextraceone.frontend", "src\frontend\nextraceone.frontend.esproj", "{FF054AA3-853D-41FF-8912-75A193DEE64D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1501,6 +1505,12 @@ Global
 		{158FDAD3-383B-4A7E-B70F-A0B9EDCD0B10}.Release|x64.Build.0 = Release|Any CPU
 		{158FDAD3-383B-4A7E-B70F-A0B9EDCD0B10}.Release|x86.ActiveCfg = Release|Any CPU
 		{158FDAD3-383B-4A7E-B70F-A0B9EDCD0B10}.Release|x86.Build.0 = Release|Any CPU
+		{FF054AA3-853D-41FF-8912-75A193DEE64D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF054AA3-853D-41FF-8912-75A193DEE64D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FF054AA3-853D-41FF-8912-75A193DEE64D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FF054AA3-853D-41FF-8912-75A193DEE64D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF054AA3-853D-41FF-8912-75A193DEE64D}.Release|x64.ActiveCfg = Release|Any CPU
+		{FF054AA3-853D-41FF-8912-75A193DEE64D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1641,5 +1651,6 @@ Global
 		{0BBE7088-7CBC-971A-0DFF-8D023E1EA1B7} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{F6493800-937E-4620-9513-547E76D64851} = {0BBE7088-7CBC-971A-0DFF-8D023E1EA1B7}
 		{158FDAD3-383B-4A7E-B70F-A0B9EDCD0B10} = {0BBE7088-7CBC-971A-0DFF-8D023E1EA1B7}
+		{FF054AA3-853D-41FF-8912-75A193DEE64D} = {CE609670-85B9-0D16-FB54-ED063D5D8A6D}
 	EndGlobalSection
 EndGlobal

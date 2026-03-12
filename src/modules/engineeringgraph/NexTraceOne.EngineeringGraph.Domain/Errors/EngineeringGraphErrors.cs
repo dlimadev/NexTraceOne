@@ -30,4 +30,21 @@ public static class EngineeringGraphErrors
             "Discovery source '{0}' with reference '{1}' is already registered for this API asset.",
             sourceType,
             externalReference);
+
+    /// <summary>Ativo de API já descomissionado.</summary>
+    public static Error ApiAssetDecommissioned(Guid apiAssetId)
+        => Error.Conflict("EngineeringGraph.ApiAsset.Decommissioned", "API asset '{0}' is decommissioned.", apiAssetId);
+
+    /// <summary>Relação de consumidor não encontrada.</summary>
+    public static Error ConsumerRelationshipNotFound(Guid relationshipId)
+        => Error.NotFound("EngineeringGraph.ConsumerRelationship.NotFound", "Consumer relationship '{0}' was not found.", relationshipId);
+
+    /// <summary>Confiança da dependência descoberta abaixo do mínimo.</summary>
+    public static Error LowConfidenceDependency(string consumerName, decimal actual, decimal minimum)
+        => Error.Business(
+            "EngineeringGraph.Dependency.LowConfidence",
+            "Dependency to '{0}' has confidence '{1:P0}' below minimum '{2:P0}'.",
+            consumerName,
+            actual,
+            minimum);
 }

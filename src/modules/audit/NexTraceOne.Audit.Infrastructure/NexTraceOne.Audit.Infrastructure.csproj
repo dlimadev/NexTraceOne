@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Audit.Application\NexTraceOne.Audit.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Audit.Contracts\NexTraceOne.Audit.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.Audit.Domain\NexTraceOne.Audit.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />

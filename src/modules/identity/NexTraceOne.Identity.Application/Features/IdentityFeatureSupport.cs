@@ -54,6 +54,7 @@ internal static class IdentityFeatureSupport
                 user.Email.Value,
                 user.FullName.Value,
                 membership.TenantId.Value,
-                role.Name));
+                role.Name,
+                permissions));
     }
 }

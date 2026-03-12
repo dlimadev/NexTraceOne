@@ -1,25 +1,56 @@
+using Ardalis.GuardClauses;
+using FluentValidation;
 using MediatR;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.EngineeringGraph.Application.Abstractions;
+using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.EngineeringGraph.Domain.Errors;
 
 namespace NexTraceOne.EngineeringGraph.Application.Features.DecommissionAsset;
 
 /// <summary>
-/// Feature: DecommissionAsset — Módulo: EngineeringGraph.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: DecommissionAsset — marca um ativo de API como descomissionado.
 /// </summary>
 public static class DecommissionAsset
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Comando de descomissionamento de ativo de API.</summary>
+    public sealed record Command(Guid ApiAssetId) : ICommand;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada do comando de descomissionamento.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ApiAssetId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que descomissiona um ativo de API.</summary>
+    public sealed class Handler(
+        IApiAssetRepository apiAssetRepository,
+        IUnitOfWork unitOfWork) : ICommandHandler<Command>
+    {
+        public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var apiAssetId = ApiAssetId.From(request.ApiAssetId);
+            var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
+            if (apiAsset is null)
+            {
+                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+            }
+
+            var result = apiAsset.Decommission();
+            if (result.IsFailure)
+            {
+                return result.Error;
+            }
+
+            await unitOfWork.CommitAsync(cancellationToken);
+            return Unit.Value;
+        }
+    }
 }

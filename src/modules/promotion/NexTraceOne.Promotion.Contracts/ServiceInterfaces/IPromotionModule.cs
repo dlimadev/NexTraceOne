@@ -7,5 +7,9 @@ namespace NexTraceOne.Promotion.Contracts.ServiceInterfaces;
 /// </summary>
 public interface IPromotionModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
+    /// <summary>Verifica se a promoção de uma release para o ambiente destino está aprovada.</summary>
+    Task<bool> IsPromotionApprovedAsync(Guid releaseId, Guid targetEnvironmentId, CancellationToken cancellationToken);
+
+    /// <summary>Obtém o status atual da promoção de uma release.</summary>
+    Task<string?> GetPromotionStatusAsync(Guid promotionRequestId, CancellationToken cancellationToken);
 }

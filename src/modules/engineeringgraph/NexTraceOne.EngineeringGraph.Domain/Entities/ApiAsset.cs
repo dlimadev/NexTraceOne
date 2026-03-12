@@ -104,6 +104,53 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
         var discoverySource = DiscoverySource.Create("OpenTelemetry", externalReference, observedAt, confidenceScore);
         return MapConsumerRelationship(consumerAsset, discoverySource, observedAt);
     }
+
+    /// <summary>Indica se o ativo está descomissionado.</summary>
+    public bool IsDecommissioned { get; private set; }
+
+    /// <summary>Atualiza metadados do ativo sem alterar o proprietário.</summary>
+    public Result<Unit> UpdateMetadata(string name, string routePattern, string version, string visibility)
+    {
+        if (IsDecommissioned)
+        {
+            return EngineeringGraphErrors.ApiAssetDecommissioned(Id.Value);
+        }
+
+        Name = Guard.Against.NullOrWhiteSpace(name);
+        RoutePattern = Guard.Against.NullOrWhiteSpace(routePattern);
+        Version = Guard.Against.NullOrWhiteSpace(version);
+        Visibility = Guard.Against.NullOrWhiteSpace(visibility);
+        return Unit.Value;
+    }
+
+    /// <summary>Marca o ativo como descomissionado impedindo novos mapeamentos.</summary>
+    public Result<Unit> Decommission()
+    {
+        if (IsDecommissioned)
+        {
+            return EngineeringGraphErrors.ApiAssetDecommissioned(Id.Value);
+        }
+
+        IsDecommissioned = true;
+        return Unit.Value;
+    }
+
+    /// <summary>Valida se uma dependência descoberta possui confiança suficiente.</summary>
+    public Result<ConsumerRelationship> ValidateDiscoveredDependency(ConsumerRelationshipId relationshipId, decimal minimumConfidence)
+    {
+        var relationship = _consumerRelationships.SingleOrDefault(item => item.Id == relationshipId);
+        if (relationship is null)
+        {
+            return EngineeringGraphErrors.ConsumerRelationshipNotFound(relationshipId.Value);
+        }
+
+        if (relationship.ConfidenceScore < minimumConfidence)
+        {
+            return EngineeringGraphErrors.LowConfidenceDependency(relationship.ConsumerName, relationship.ConfidenceScore, minimumConfidence);
+        }
+
+        return relationship;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de ApiAsset.</summary>

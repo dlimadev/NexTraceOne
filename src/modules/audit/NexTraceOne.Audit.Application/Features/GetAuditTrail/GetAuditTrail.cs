@@ -1,25 +1,49 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Audit.Application.Abstractions;
 
 namespace NexTraceOne.Audit.Application.Features.GetAuditTrail;
 
 /// <summary>
-/// Feature: GetAuditTrail — Módulo: Audit.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetAuditTrail — obtém a trilha de auditoria de um recurso específico.
 /// </summary>
 public static class GetAuditTrail
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de trilha de auditoria por recurso.</summary>
+    public sealed record Query(string ResourceType, string ResourceId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ResourceType).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.ResourceId).NotEmpty().MaximumLength(500);
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que retorna a trilha de auditoria do recurso.</summary>
+    public sealed class Handler(IAuditEventRepository auditEventRepository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var events = await auditEventRepository.GetTrailByResourceAsync(request.ResourceType, request.ResourceId, cancellationToken);
+
+            var items = events
+                .Select(e => new AuditTrailItem(e.Id.Value, e.SourceModule, e.ActionType, e.PerformedBy, e.OccurredAt, e.ChainLink?.CurrentHash))
+                .ToArray();
+
+            return new Response(items);
+        }
+    }
+
+    /// <summary>Resposta da trilha de auditoria.</summary>
+    public sealed record Response(IReadOnlyList<AuditTrailItem> Items);
+
+    /// <summary>Item da trilha de auditoria.</summary>
+    public sealed record AuditTrailItem(Guid EventId, string SourceModule, string ActionType, string PerformedBy, DateTimeOffset OccurredAt, string? ChainHash);
 }

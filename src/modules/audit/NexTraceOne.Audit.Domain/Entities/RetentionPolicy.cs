@@ -1,16 +1,55 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.Audit.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo Audit.
-/// TODO: Implementar regras de domínio, invariantes e domain events de RetentionPolicy.
+/// Política de retenção de eventos de auditoria configurável por tenant.
 /// </summary>
-public sealed class RetentionPolicy : AuditableEntity<RetentionPolicyId>
+public sealed class RetentionPolicy : Entity<RetentionPolicyId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private RetentionPolicy() { }
+
+    /// <summary>Nome da política de retenção.</summary>
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>Dias de retenção dos eventos.</summary>
+    public int RetentionDays { get; private set; }
+
+    /// <summary>Indica se a política está ativa.</summary>
+    public bool IsActive { get; private set; }
+
+    /// <summary>Cria uma nova política de retenção.</summary>
+    public static RetentionPolicy Create(string name, int retentionDays)
+    {
+        if (retentionDays <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(retentionDays), "Retention days must be greater than zero.");
+        }
+
+        return new RetentionPolicy
+        {
+            Id = RetentionPolicyId.New(),
+            Name = Guard.Against.NullOrWhiteSpace(name),
+            RetentionDays = retentionDays,
+            IsActive = true
+        };
+    }
+
+    /// <summary>Atualiza o período de retenção.</summary>
+    public void UpdateRetention(int retentionDays)
+    {
+        if (retentionDays <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(retentionDays), "Retention days must be greater than zero.");
+        }
+
+        RetentionDays = retentionDays;
+    }
+
+    /// <summary>Desativa a política.</summary>
+    public void Deactivate() => IsActive = false;
 }
 
 /// <summary>Identificador fortemente tipado de RetentionPolicy.</summary>

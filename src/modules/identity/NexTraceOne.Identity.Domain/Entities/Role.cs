@@ -9,16 +9,20 @@ namespace NexTraceOne.Identity.Domain.Entities;
 /// </summary>
 public sealed class Role : Entity<RoleId>
 {
-    /// <summary>Nome do papel administrativo total.</summary>
-    public const string Admin = "Admin";
-    /// <summary>Nome do papel gerencial.</summary>
-    public const string Manager = "Manager";
+    /// <summary>Nome do papel de administrador da plataforma com acesso total.</summary>
+    public const string PlatformAdmin = "PlatformAdmin";
+    /// <summary>Nome do papel de líder técnico com aprovação e governança.</summary>
+    public const string TechLead = "TechLead";
     /// <summary>Nome do papel técnico de desenvolvimento.</summary>
     public const string Developer = "Developer";
     /// <summary>Nome do papel somente leitura.</summary>
     public const string Viewer = "Viewer";
-    /// <summary>Nome do papel de auditoria.</summary>
+    /// <summary>Nome do papel de auditoria e compliance.</summary>
     public const string Auditor = "Auditor";
+    /// <summary>Nome do papel de revisão de segurança.</summary>
+    public const string SecurityReview = "SecurityReview";
+    /// <summary>Nome do papel restrito apenas a aprovações de workflow.</summary>
+    public const string ApprovalOnly = "ApprovalOnly";
 
     private Role() { }
 
@@ -55,23 +59,114 @@ public sealed class Role : Entity<RoleId>
     public static IReadOnlyList<string> GetPermissionsForRole(string roleName)
         => roleName switch
         {
-            Admin => [
+            PlatformAdmin => [
                 "identity:users:read",
                 "identity:users:write",
+                "identity:roles:read",
                 "identity:roles:assign",
+                "identity:sessions:read",
                 "identity:sessions:revoke",
-                "platform:audit:read"],
-            Manager => [
+                "identity:permissions:read",
+                "engineering-graph:assets:read",
+                "engineering-graph:assets:write",
+                "contracts:read",
+                "contracts:write",
+                "contracts:import",
+                "change-intelligence:releases:read",
+                "change-intelligence:releases:write",
+                "change-intelligence:blast-radius:read",
+                "workflow:read",
+                "workflow:write",
+                "workflow:approve",
+                "promotion:read",
+                "promotion:write",
+                "promotion:promote",
+                "ruleset-governance:read",
+                "ruleset-governance:write",
+                "audit:read",
+                "audit:export",
+                "licensing:read",
+                "licensing:write",
+                "platform:settings:read",
+                "platform:settings:write"],
+            TechLead => [
                 "identity:users:read",
-                "identity:roles:assign",
-                "platform:audit:read"],
+                "identity:roles:read",
+                "identity:sessions:read",
+                "engineering-graph:assets:read",
+                "engineering-graph:assets:write",
+                "contracts:read",
+                "contracts:write",
+                "contracts:import",
+                "change-intelligence:releases:read",
+                "change-intelligence:releases:write",
+                "change-intelligence:blast-radius:read",
+                "workflow:read",
+                "workflow:write",
+                "workflow:approve",
+                "promotion:read",
+                "promotion:write",
+                "promotion:promote",
+                "ruleset-governance:read",
+                "audit:read",
+                "audit:export"],
             Developer => [
-                "identity:users:read"],
+                "identity:users:read",
+                "engineering-graph:assets:read",
+                "contracts:read",
+                "contracts:write",
+                "contracts:import",
+                "change-intelligence:releases:read",
+                "change-intelligence:releases:write",
+                "change-intelligence:blast-radius:read",
+                "workflow:read",
+                "promotion:read",
+                "ruleset-governance:read",
+                "audit:read"],
             Viewer => [
-                "identity:users:read"],
+                "identity:users:read",
+                "engineering-graph:assets:read",
+                "contracts:read",
+                "change-intelligence:releases:read",
+                "change-intelligence:blast-radius:read",
+                "workflow:read",
+                "promotion:read",
+                "audit:read"],
             Auditor => [
                 "identity:users:read",
-                "platform:audit:read"],
+                "identity:sessions:read",
+                "engineering-graph:assets:read",
+                "contracts:read",
+                "change-intelligence:releases:read",
+                "change-intelligence:blast-radius:read",
+                "workflow:read",
+                "promotion:read",
+                "ruleset-governance:read",
+                "audit:read",
+                "audit:export"],
+            SecurityReview => [
+                "identity:users:read",
+                "identity:roles:read",
+                "identity:sessions:read",
+                "identity:sessions:revoke",
+                "engineering-graph:assets:read",
+                "contracts:read",
+                "change-intelligence:releases:read",
+                "change-intelligence:blast-radius:read",
+                "workflow:read",
+                "workflow:approve",
+                "promotion:read",
+                "ruleset-governance:read",
+                "ruleset-governance:write",
+                "audit:read",
+                "audit:export"],
+            ApprovalOnly => [
+                "workflow:read",
+                "workflow:approve",
+                "change-intelligence:releases:read",
+                "change-intelligence:blast-radius:read",
+                "promotion:read",
+                "audit:read"],
             _ => []
         };
 }

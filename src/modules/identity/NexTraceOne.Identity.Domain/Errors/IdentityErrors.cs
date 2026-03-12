@@ -21,6 +21,10 @@ public static class IdentityErrors
     public static Error AccountLocked(DateTimeOffset? lockoutEnd)
         => Error.Forbidden("Identity.Auth.AccountLocked", "The account is locked until '{0:O}'.", lockoutEnd ?? DateTimeOffset.MinValue);
 
+    /// <summary>Conta desativada.</summary>
+    public static Error AccountDeactivated(Guid userId)
+        => Error.Forbidden("Identity.Auth.AccountDeactivated", "The account '{0}' has been deactivated.", userId);
+
     /// <summary>Sessão expirada.</summary>
     public static Error SessionExpired(Guid sessionId)
         => Error.Unauthorized("Identity.Session.Expired", "Session '{0}' has expired.", sessionId);
@@ -48,4 +52,16 @@ public static class IdentityErrors
     /// <summary>Sessão não encontrada.</summary>
     public static Error SessionNotFound(Guid sessionId)
         => Error.NotFound("Identity.Session.NotFound", "Session '{0}' was not found.", sessionId);
+
+    /// <summary>Senha atual inválida na troca de senha.</summary>
+    public static Error CurrentPasswordInvalid()
+        => Error.Validation("Identity.User.CurrentPasswordInvalid", "The current password is incorrect.");
+
+    /// <summary>Usuário não autenticado (sem token ou token inválido).</summary>
+    public static Error NotAuthenticated()
+        => Error.Unauthorized("Identity.Auth.NotAuthenticated", "Authentication is required to access this resource.");
+
+    /// <summary>Usuário não possui a permissão necessária.</summary>
+    public static Error InsufficientPermissions(string permission)
+        => Error.Forbidden("Identity.Auth.InsufficientPermissions", "You do not have the required permission: '{0}'.", permission);
 }

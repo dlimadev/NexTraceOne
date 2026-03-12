@@ -6,6 +6,7 @@ using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Identity.API;
+using NexTraceOne.Identity.Infrastructure.Persistence;
 using NexTraceOne.Licensing.API;
 using NexTraceOne.Licensing.Infrastructure.Persistence;
 using NexTraceOne.EngineeringGraph.API;
@@ -14,6 +15,14 @@ using NexTraceOne.Contracts.API;
 using NexTraceOne.Contracts.Infrastructure.Persistence;
 using NexTraceOne.ChangeIntelligence.API;
 using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
+using NexTraceOne.RulesetGovernance.API;
+using NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
+using NexTraceOne.Workflow.API;
+using NexTraceOne.Workflow.Infrastructure.Persistence;
+using NexTraceOne.Promotion.API;
+using NexTraceOne.Promotion.Infrastructure.Persistence;
+using NexTraceOne.Audit.API;
+using NexTraceOne.Audit.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -48,11 +57,27 @@ builder.Services.AddLicensingModule(builder.Configuration);
 builder.Services.AddEngineeringGraphModule(builder.Configuration);
 builder.Services.AddContractsModule(builder.Configuration);
 builder.Services.AddChangeIntelligenceModule(builder.Configuration);
+builder.Services.AddRulesetGovernanceModule(builder.Configuration);
+builder.Services.AddWorkflowModule(builder.Configuration);
+builder.Services.AddPromotionModule(builder.Configuration);
+builder.Services.AddAuditModule(builder.Configuration);
 
 // [5] OpenAPI
 builder.Services.AddOpenApi();
 
-// [6] Tratamento de exceções não capturadas
+// [6] CORS para frontend
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:5173", "http://localhost:3000"];
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins(corsOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
+
+// [7] Tratamento de exceções não capturadas
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddProblemDetails();
 
@@ -77,6 +102,11 @@ if (shouldMigrate)
     {
         logger.LogInformation("Applying pending database migrations...");
 
+        var identityDb = migrationScope.ServiceProvider
+            .GetRequiredService<IdentityDbContext>();
+        pendingContexts.Add(nameof(IdentityDbContext));
+        await identityDb.Database.MigrateAsync();
+
         var licensingDb = migrationScope.ServiceProvider
             .GetRequiredService<LicensingDbContext>();
         pendingContexts.Add(nameof(LicensingDbContext));
@@ -96,6 +126,26 @@ if (shouldMigrate)
             .GetRequiredService<ChangeIntelligenceDbContext>();
         pendingContexts.Add(nameof(ChangeIntelligenceDbContext));
         await changeIntelligenceDb.Database.MigrateAsync();
+
+        var rulesetGovernanceDb = migrationScope.ServiceProvider
+            .GetRequiredService<RulesetGovernanceDbContext>();
+        pendingContexts.Add(nameof(RulesetGovernanceDbContext));
+        await rulesetGovernanceDb.Database.MigrateAsync();
+
+        var workflowDb = migrationScope.ServiceProvider
+            .GetRequiredService<WorkflowDbContext>();
+        pendingContexts.Add(nameof(WorkflowDbContext));
+        await workflowDb.Database.MigrateAsync();
+
+        var promotionDb = migrationScope.ServiceProvider
+            .GetRequiredService<PromotionDbContext>();
+        pendingContexts.Add(nameof(PromotionDbContext));
+        await promotionDb.Database.MigrateAsync();
+
+        var auditDb = migrationScope.ServiceProvider
+            .GetRequiredService<AuditDbContext>();
+        pendingContexts.Add(nameof(AuditDbContext));
+        await auditDb.Database.MigrateAsync();
 
         logger.LogInformation(
             "Migrations applied successfully for: {Contexts}",
