@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Contracts.Domain.Entities;
 
 namespace NexTraceOne.Contracts.Infrastructure.Persistence;
 
@@ -14,10 +15,19 @@ public sealed class ContractsDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Versões de contrato OpenAPI persistidas no módulo Contracts.</summary>
+    public DbSet<ContractVersion> ContractVersions => Set<ContractVersion>();
 
+    /// <summary>Diffs semânticos entre versões de contrato persistidos no módulo Contracts.</summary>
+    public DbSet<ContractDiff> ContractDiffs => Set<ContractDiff>();
+
+    /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

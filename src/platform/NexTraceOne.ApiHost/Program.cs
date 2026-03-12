@@ -8,6 +8,10 @@ using NexTraceOne.ApiHost;
 using NexTraceOne.Identity.API;
 using NexTraceOne.Licensing.API;
 using NexTraceOne.Licensing.Infrastructure.Persistence;
+using NexTraceOne.EngineeringGraph.API;
+using NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
+using NexTraceOne.Contracts.API;
+using NexTraceOne.Contracts.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -39,7 +43,8 @@ builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddLicensingModule(builder.Configuration);
-// Módulos adicionais serão registrados aqui à medida que forem implementados
+builder.Services.AddEngineeringGraphModule(builder.Configuration);
+builder.Services.AddContractsModule(builder.Configuration);
 
 // [5] OpenAPI
 builder.Services.AddOpenApi();
@@ -73,6 +78,16 @@ if (shouldMigrate)
             .GetRequiredService<LicensingDbContext>();
         pendingContexts.Add(nameof(LicensingDbContext));
         await licensingDb.Database.MigrateAsync();
+
+        var engineeringGraphDb = migrationScope.ServiceProvider
+            .GetRequiredService<EngineeringGraphDbContext>();
+        pendingContexts.Add(nameof(EngineeringGraphDbContext));
+        await engineeringGraphDb.Database.MigrateAsync();
+
+        var contractsDb = migrationScope.ServiceProvider
+            .GetRequiredService<ContractsDbContext>();
+        pendingContexts.Add(nameof(ContractsDbContext));
+        await contractsDb.Database.MigrateAsync();
 
         logger.LogInformation(
             "Migrations applied successfully for: {Contexts}",

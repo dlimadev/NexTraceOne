@@ -1,3 +1,5 @@
+using NexTraceOne.BuildingBlocks.Domain.Enums;
+
 namespace NexTraceOne.Contracts.Contracts.ServiceInterfaces;
 
 /// <summary>
@@ -7,5 +9,9 @@ namespace NexTraceOne.Contracts.Contracts.ServiceInterfaces;
 /// </summary>
 public interface IContractsModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
+    /// <summary>Retorna o nível de mudança da versão mais recente do contrato de um ativo.</summary>
+    Task<ChangeLevel?> GetLatestChangeLevelAsync(Guid apiAssetId, CancellationToken ct = default);
+
+    /// <summary>Verifica se existe alguma versão de contrato para um ativo.</summary>
+    Task<bool> HasContractVersionAsync(Guid apiAssetId, CancellationToken ct = default);
 }

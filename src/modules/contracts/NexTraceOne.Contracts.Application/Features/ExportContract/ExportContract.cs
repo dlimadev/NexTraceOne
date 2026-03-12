@@ -1,25 +1,51 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Contracts.Application.Abstractions;
+using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Contracts.Domain.Errors;
 
 namespace NexTraceOne.Contracts.Application.Features.ExportContract;
 
 /// <summary>
-/// Feature: ExportContract — Módulo: Contracts.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: ExportContract — exporta o conteúdo bruto da especificação de uma versão de contrato.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ExportContract
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de exportação de conteúdo de versão de contrato.</summary>
+    public sealed record Query(Guid ContractVersionId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query de exportação de contrato.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ContractVersionId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que retorna o conteúdo bruto e metadados de uma versão de contrato.</summary>
+    public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var version = await repository.GetByIdAsync(ContractVersionId.From(request.ContractVersionId), cancellationToken);
+            if (version is null)
+                return ContractsErrors.ContractVersionNotFound(request.ContractVersionId.ToString());
+
+            return new Response(version.Id.Value, version.SemVer, version.SpecContent, version.Format);
+        }
+    }
+
+    /// <summary>Resposta da exportação do conteúdo de versão de contrato.</summary>
+    public sealed record Response(
+        Guid ContractVersionId,
+        string SemVer,
+        string SpecContent,
+        string Format);
 }
+

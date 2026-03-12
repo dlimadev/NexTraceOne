@@ -104,20 +104,33 @@ dotnet run --project tools/NexTraceOne.CLI
   - `GlobalUsings.cs` adicionado a todos os projetos de teste de Building Blocks
 - ✅ **Plano MVP1 Expandido** — `docs/MVP1-EXPANDED-PLAN.md` com análise de 14 módulos
 - ✅ **Cobertura Funcional** — `docs/FUNCTIONAL-COVERAGE.md` com análise completa FASE 1-3
+- ✅ **EngineeringGraph** — Domain + Application + Infrastructure + API 100% completos
+  - `EngineeringGraphDbContext` com IUnitOfWork
+  - `ApiAssetRepository` + `ServiceAssetRepository`
+  - Migrations EF Core: `20260312083851_InitialEngineeringGraphSchema`
+  - Testes: `EngineeringGraphApplicationTests` (12 testes)
+- ✅ **Contracts** — Domain + Application + Infrastructure + API 100% completos
+  - `ContractVersion` + `ContractDiff` + `SemanticVersion` + `ChangeEntry`
+  - Features: `ImportContract`, `CreateContractVersion`, `ComputeSemanticDiff`, `ClassifyBreakingChange`, `SuggestSemanticVersion`, `GetContractHistory`, `LockContractVersion`, `ExportContract`, `ValidateContractIntegrity`
+  - `ContractsDbContext` com IUnitOfWork + `ContractVersionRepository`
+  - Migrations EF Core: `20260312090000_InitialContractsSchema`
+  - Testes: `ContractsApplicationTests` (21 testes)
 
 ### Próximo Passo Imediato 🟡
 
-**Fase 2, Semana 6–7 — EngineeringGraph:**
-1. `EngineeringGraphDbContext` com IUnitOfWork
-2. `ApiAssetRepository` + `ServiceAssetRepository`
-3. Migrations EF Core
-4. Implementar handlers: `RegisterApiAsset`, `RegisterServiceAsset`, `MapConsumerRelationship`, `GetAssetGraph`
-5. Testes unitários e de integração
+**Fase 4, Semana 10–13 — ChangeIntelligence (CORE DO PRODUTO):**
+1. `Release` (Aggregate Root) com `ChangeEvent`
+2. `NotifyDeployment` — webhook receiver do CI/CD
+3. `ClassifyChangeLevel` — integra com Contracts para diff semântico
+4. `CalculateBlastRadius` — consulta EngineeringGraph para consumidores transitivos
+5. `ComputeChangeScore` — score de risco 0.0–1.0
+6. `ChangeIntelligenceDbContext` + Migrations EF Core
+7. Testes unitários
 
-### Após EngineeringGraph 🔲
+### Após ChangeIntelligence 🔲
 
-- Contracts (Fase 3, Semana 8–9) — diff semântico OpenAPI
-- ChangeIntelligence (Fase 4, Semana 10–13) — **CORE DO PRODUTO**
+- RulesetGovernance (Fase 5, Semana 14–15) — linting Spectral-compatible
+- Workflow (Fase 6, Semana 16–18) — evidence pack + aprovação
 
 Ver `docs/ROADMAP.md` para o cronograma completo de 26 semanas.
 Ver `docs/MVP1-EXPANDED-PLAN.md` para análise de valor vs. esforço por módulo.

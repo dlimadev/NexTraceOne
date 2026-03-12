@@ -1,25 +1,63 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.BuildingBlocks.Domain.Enums;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Contracts.Application.Abstractions;
+using NexTraceOne.Contracts.Domain.Errors;
 
 namespace NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange;
 
 /// <summary>
-/// Feature: ClassifyBreakingChange — Módulo: Contracts.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: ClassifyBreakingChange — classifica o nível de mudança de uma versão de contrato com base no seu diff mais recente.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ClassifyBreakingChange
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de classificação de mudança de versão de contrato.</summary>
+    public sealed record Query(Guid ContractVersionId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query de classificação de mudança.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ContractVersionId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que classifica o nível de mudança a partir do diff mais recente da versão de contrato.</summary>
+    public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var version = await repository.GetByIdAsync(
+                Domain.Entities.ContractVersionId.From(request.ContractVersionId), cancellationToken);
+
+            if (version is null)
+                return ContractsErrors.ContractVersionNotFound(request.ContractVersionId.ToString());
+
+            var latestDiff = version.Diffs.OrderByDescending(d => d.ComputedAt).FirstOrDefault();
+            if (latestDiff is null)
+                return ContractsErrors.DiffNotFound(request.ContractVersionId.ToString());
+
+            return new Response(
+                latestDiff.ChangeLevel,
+                latestDiff.BreakingChanges.Count,
+                latestDiff.AdditiveChanges.Count,
+                latestDiff.NonBreakingChanges.Count,
+                latestDiff.SuggestedSemVer);
+        }
+    }
+
+    /// <summary>Resposta da classificação de nível de mudança da versão de contrato.</summary>
+    public sealed record Response(
+        ChangeLevel ChangeLevel,
+        int BreakingChangeCount,
+        int AdditiveChangeCount,
+        int NonBreakingChangeCount,
+        string? SuggestedSemVer);
 }
+
