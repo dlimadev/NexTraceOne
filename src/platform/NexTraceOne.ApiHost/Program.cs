@@ -12,6 +12,8 @@ using NexTraceOne.EngineeringGraph.API;
 using NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
 using NexTraceOne.Contracts.API;
 using NexTraceOne.Contracts.Infrastructure.Persistence;
+using NexTraceOne.ChangeIntelligence.API;
+using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -45,6 +47,7 @@ builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddLicensingModule(builder.Configuration);
 builder.Services.AddEngineeringGraphModule(builder.Configuration);
 builder.Services.AddContractsModule(builder.Configuration);
+builder.Services.AddChangeIntelligenceModule(builder.Configuration);
 
 // [5] OpenAPI
 builder.Services.AddOpenApi();
@@ -88,6 +91,11 @@ if (shouldMigrate)
             .GetRequiredService<ContractsDbContext>();
         pendingContexts.Add(nameof(ContractsDbContext));
         await contractsDb.Database.MigrateAsync();
+
+        var changeIntelligenceDb = migrationScope.ServiceProvider
+            .GetRequiredService<ChangeIntelligenceDbContext>();
+        pendingContexts.Add(nameof(ChangeIntelligenceDbContext));
+        await changeIntelligenceDb.Database.MigrateAsync();
 
         logger.LogInformation(
             "Migrations applied successfully for: {Contexts}",
