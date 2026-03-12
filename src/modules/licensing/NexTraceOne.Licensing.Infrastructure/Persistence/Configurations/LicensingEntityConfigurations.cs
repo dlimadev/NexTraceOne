@@ -20,24 +20,28 @@ internal sealed class LicenseConfiguration : IEntityTypeConfiguration<License>
         builder.Property(x => x.IsActive).IsRequired();
         builder.HasIndex(x => x.LicenseKey).IsUnique();
 
-        builder.HasMany<LicenseCapability>("_capabilities")
+        builder.HasMany(x => x.Capabilities)
             .WithOne()
             .HasForeignKey("LicenseId")
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<LicenseActivation>("_activations")
+        builder.HasMany(x => x.Activations)
             .WithOne()
             .HasForeignKey("LicenseId")
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany<UsageQuota>("_usageQuotas")
+        builder.HasMany(x => x.UsageQuotas)
             .WithOne()
             .HasForeignKey("LicenseId")
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.HardwareBinding)
             .WithOne()
             .HasForeignKey<HardwareBinding>("LicenseId")
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
@@ -53,7 +57,6 @@ internal sealed class LicenseCapabilityConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.Code).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
         builder.Property(x => x.IsEnabled).IsRequired();
-        builder.HasIndex(x => new { x.Code, LicenseId = EF.Property<Guid>(x, "LicenseId") }).IsUnique();
     }
 }
 
@@ -68,7 +71,6 @@ internal sealed class HardwareBindingConfiguration : IEntityTypeConfiguration<Ha
         builder.Property(x => x.Fingerprint).HasMaxLength(200).IsRequired();
         builder.Property(x => x.BoundAt).IsRequired();
         builder.Property(x => x.LastValidatedAt).IsRequired();
-        builder.HasIndex("LicenseId").IsUnique();
     }
 }
 
@@ -84,7 +86,6 @@ internal sealed class LicenseActivationConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.ActivatedBy).HasMaxLength(200).IsRequired();
         builder.Property(x => x.ActivatedAt).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
-        builder.HasIndex("LicenseId");
     }
 }
 
@@ -100,6 +101,5 @@ internal sealed class UsageQuotaConfiguration : IEntityTypeConfiguration<UsageQu
         builder.Property(x => x.Limit).IsRequired();
         builder.Property(x => x.CurrentUsage).IsRequired();
         builder.Property(x => x.AlertThresholdPercentage).HasPrecision(5, 4).IsRequired();
-        builder.HasIndex(x => new { x.MetricCode, LicenseId = EF.Property<Guid>(x, "LicenseId") }).IsUnique();
     }
 }

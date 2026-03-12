@@ -37,6 +37,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<LicensingDbContext>());
         services.AddScoped<ILicenseRepository, LicenseRepository>();
+        services.AddScoped<IHardwareBindingRepository, HardwareBindingRepository>();
         services.AddScoped<IHardwareFingerprintProvider, HardwareFingerprintProvider>();
         services.AddScoped<ILicensingModule, LicensingModuleService>();
 

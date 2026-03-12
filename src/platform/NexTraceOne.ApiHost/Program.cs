@@ -7,6 +7,8 @@ using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Identity.API;
 using NexTraceOne.Licensing.API;
+using NexTraceOne.Licensing.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Sovereign Change Intelligence Platform
@@ -47,6 +49,44 @@ builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+// ── Auto-migrations: executa em Development ou quando NEXTRACE_AUTO_MIGRATE=true ──
+var shouldMigrate = app.Environment.IsDevelopment()
+    || string.Equals(
+        Environment.GetEnvironmentVariable("NEXTRACE_AUTO_MIGRATE"),
+        "true",
+        StringComparison.OrdinalIgnoreCase);
+
+if (shouldMigrate)
+{
+    using var migrationScope = app.Services.CreateScope();
+    var logger = migrationScope.ServiceProvider
+        .GetRequiredService<ILogger<Program>>();
+
+    var pendingContexts = new List<string>();
+
+    try
+    {
+        logger.LogInformation("Applying pending database migrations...");
+
+        var licensingDb = migrationScope.ServiceProvider
+            .GetRequiredService<LicensingDbContext>();
+        pendingContexts.Add(nameof(LicensingDbContext));
+        await licensingDb.Database.MigrateAsync();
+
+        logger.LogInformation(
+            "Migrations applied successfully for: {Contexts}",
+            string.Join(", ", pendingContexts));
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(
+            ex,
+            "Error applying migrations for contexts: {Contexts}",
+            string.Join(", ", pendingContexts));
+        throw;
+    }
+}
 
 // ── Middlewares na ordem correta ──
 app.UseHttpsRedirection();
