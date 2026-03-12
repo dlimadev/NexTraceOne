@@ -131,6 +131,21 @@ public static class IdentityErrors
 
     // ── SSO / External Identity ──────────────────────────────────────────
 
+    /// <summary>
+    /// Contexto de tenant obrigatório para a operação.
+    /// O caller deve estar autenticado com um tenant válido no JWT ou header.
+    /// </summary>
+    public static Error TenantContextRequired()
+        => Error.Forbidden("Identity.Tenant.ContextRequired", "A valid tenant context is required for this operation.");
+
+    /// <summary>Operação proibida — o caller não tem permissão para executar esta ação.</summary>
+    public static Error Forbidden()
+        => Error.Forbidden("Identity.Auth.Forbidden", "You are not authorized to perform this operation.");
+
+    /// <summary>Item de access review já foi decidido anteriormente — re-decisão não é permitida.</summary>
+    public static Error AccessReviewItemAlreadyDecided(Guid itemId)
+        => Error.Validation("Identity.AccessReview.ItemAlreadyDecided", "Access review item '{0}' has already been decided and cannot be changed.", itemId);
+
     /// <summary>Identidade externa não encontrada.</summary>
     public static Error ExternalIdentityNotFound(string provider, string externalId)
         => Error.NotFound("Identity.ExternalIdentity.NotFound", "External identity for provider '{0}' with external ID '{1}' was not found.", provider, externalId);
@@ -138,4 +153,20 @@ public static class IdentityErrors
     /// <summary>Mapeamento de grupo SSO não encontrado.</summary>
     public static Error SsoGroupMappingNotFound(Guid mappingId)
         => Error.NotFound("Identity.SsoGroupMapping.NotFound", "SSO group mapping '{0}' was not found.", mappingId);
+
+    // ── OIDC / Federação ─────────────────────────────────────────────────
+
+    /// <summary>
+    /// Provider OIDC não configurado para este tenant.
+    /// O admin deve configurar o provider antes de usar o fluxo federado.
+    /// </summary>
+    public static Error OidcProviderNotConfigured(string provider)
+        => Error.Validation("Identity.Oidc.ProviderNotConfigured", "OIDC provider '{0}' is not configured for this tenant.", provider);
+
+    /// <summary>
+    /// Callback OIDC falhou — code inválido, expirado ou provider indisponível.
+    /// O usuário deve tentar novamente o fluxo de autenticação.
+    /// </summary>
+    public static Error OidcCallbackFailed(string provider)
+        => Error.Unauthorized("Identity.Oidc.CallbackFailed", "OIDC authentication callback failed for provider '{0}'. Please try again.", provider);
 }

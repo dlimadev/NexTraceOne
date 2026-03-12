@@ -21,6 +21,11 @@ using NexTraceOne.Identity.Application.Features.RevokeBreakGlass;
 using NexTraceOne.Identity.Application.Features.RevokeDelegation;
 using NexTraceOne.Identity.Application.Features.RevokeSession;
 using NexTraceOne.Identity.Application.Features.SelectTenant;
+using NexTraceOne.Identity.Application.Features.StartOidcLogin;
+using NexTraceOne.Identity.Application.Features.OidcCallback;
+using NexTraceOne.Identity.Application.Features.StartAccessReviewCampaign;
+using NexTraceOne.Identity.Application.Features.GetAccessReviewCampaign;
+using NexTraceOne.Identity.Application.Features.DecideAccessReviewItem;
 
 namespace NexTraceOne.Identity.Application;
 
@@ -45,6 +50,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RevokeSession.Command>, RevokeSession.Validator>();
         services.AddTransient<IValidator<ChangePassword.Command>, ChangePassword.Validator>();
 
+        // OIDC Redirect Flow
+        services.AddTransient<IValidator<StartOidcLogin.Command>, StartOidcLogin.Validator>();
+        services.AddTransient<IValidator<OidcCallback.Command>, OidcCallback.Validator>();
+
         // Gestão de usuários
         services.AddTransient<IValidator<CreateUser.Command>, CreateUser.Validator>();
         services.AddTransient<IValidator<GetUserProfile.Query>, GetUserProfile.Validator>();
@@ -62,6 +71,11 @@ public static class DependencyInjection
         services.AddTransient<IValidator<CreateDelegation.Command>, CreateDelegation.Validator>();
         services.AddTransient<IValidator<RevokeDelegation.Command>, RevokeDelegation.Validator>();
         services.AddTransient<IValidator<SelectTenant.Command>, SelectTenant.Validator>();
+
+        // Access Review — recertificação periódica de acessos
+        services.AddTransient<IValidator<StartAccessReviewCampaign.Command>, StartAccessReviewCampaign.Validator>();
+        services.AddTransient<IValidator<GetAccessReviewCampaign.Query>, GetAccessReviewCampaign.Validator>();
+        services.AddTransient<IValidator<DecideAccessReviewItem.Command>, DecideAccessReviewItem.Validator>();
 
         return services;
     }

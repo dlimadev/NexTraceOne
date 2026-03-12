@@ -170,6 +170,79 @@ public static class SecurityEventType
 
     /// <summary>MFA adicional solicitado (step-up).</summary>
     public const string StepUpMfaRequired = "security.response.stepup_mfa_required";
+
+    // ── Gestão de Identidade ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Papel/perfil atribuído ou alterado para um usuário em um tenant.
+    /// Evento crítico para trilha de auditoria de conformidade (SOX, LGPD, ISO 27001).
+    /// </summary>
+    public const string RoleAssigned = "security.identity.role_assigned";
+
+    /// <summary>
+    /// Papel/perfil removido de um usuário em um tenant.
+    /// Registrado quando a associação é desativada ou substituída.
+    /// </summary>
+    public const string RoleRevoked = "security.identity.role_revoked";
+
+    /// <summary>
+    /// Senha do usuário alterada com sucesso pelo próprio usuário (self-service).
+    /// </summary>
+    public const string PasswordChanged = "security.identity.password_changed";
+
+    /// <summary>
+    /// Senha do usuário resetada por um administrador.
+    /// Requer justificativa e gera alerta ao próprio usuário.
+    /// </summary>
+    public const string PasswordResetByAdmin = "security.identity.password_reset_admin";
+
+    /// <summary>
+    /// Tentativa de alteração de senha falhou por senha atual incorreta.
+    /// Múltiplas falhas consecutivas podem indicar ataque de força bruta.
+    /// </summary>
+    public const string PasswordChangeFailed = "security.identity.password_change_failed";
+
+    // ── Autorização por Ambiente ─────────────────────────────────────────
+
+    /// <summary>
+    /// Acesso negado a um ambiente específico (e.g., Production) por falta de permissão.
+    /// Indica tentativa de acesso não autorizado a um escopo mais elevado.
+    /// </summary>
+    public const string EnvironmentAccessDenied = "security.environment.access_denied";
+
+    /// <summary>Permissão de acesso concedida a um ambiente específico para o usuário.</summary>
+    public const string EnvironmentAccessGranted = "security.environment.access_granted";
+
+    /// <summary>Permissão de acesso a um ambiente específico revogada do usuário.</summary>
+    public const string EnvironmentAccessRevoked = "security.environment.access_revoked";
+
+    // ── Access Review ────────────────────────────────────────────────────
+
+    /// <summary>Campanha de recertificação de acessos iniciada para o tenant.</summary>
+    public const string AccessReviewStarted = "security.access_review.started";
+
+    /// <summary>Item de revisão de acesso aprovado (acesso confirmado).</summary>
+    public const string AccessReviewItemApproved = "security.access_review.item_approved";
+
+    /// <summary>Item de revisão de acesso revogado (acesso removido).</summary>
+    public const string AccessReviewItemRevoked = "security.access_review.item_revoked";
+
+    /// <summary>
+    /// Itens de revisão não decididos dentro do prazo foram automaticamente revogados.
+    /// Mecanismo de segurança para garantir que acessos não revisados não persistam.
+    /// </summary>
+    public const string AccessReviewExpiredAutoRevoked = "security.access_review.expired_auto_revoked";
+
+    // ── OIDC / Federação ─────────────────────────────────────────────────
+
+    /// <summary>Fluxo OIDC iniciado — redirecionamento para o provider externo.</summary>
+    public const string OidcFlowStarted = "security.oidc.flow_started";
+
+    /// <summary>Callback OIDC recebido e identidade federada vinculada com sucesso.</summary>
+    public const string OidcCallbackSuccess = "security.oidc.callback_success";
+
+    /// <summary>Callback OIDC falhou — token inválido, state adulterado ou provider rejeitou.</summary>
+    public const string OidcCallbackFailed = "security.oidc.callback_failed";
 }
 
 /// <summary>Identificador fortemente tipado de SecurityEvent.</summary>

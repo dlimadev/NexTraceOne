@@ -57,6 +57,14 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        // Provider OIDC para fluxo federado (Authorization Code flow)
+        services.AddHttpClient("oidc");
+        services.AddScoped<IOidcProvider, OidcProviderService>();
+
+        // Ponte de auditoria: propaga SecurityEvents do Identity para o módulo Audit central.
+        // ISecurityAuditBridge é injetado opcionalmente nos handlers que geram eventos críticos.
+        services.AddScoped<ISecurityAuditBridge, SecurityAuditBridge>();
+
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
 

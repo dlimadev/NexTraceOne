@@ -21,6 +21,13 @@ public interface ITenantMembershipRepository
         int pageSize,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Lista todos os vínculos ativos de um tenant sem paginação.
+    /// Usado em operações de recertificação de acessos (Access Review Campaign)
+    /// onde é necessário processar todos os membros de uma vez.
+    /// </summary>
+    Task<IReadOnlyList<TenantMembership>> ListAllActiveByTenantAsync(TenantId tenantId, CancellationToken cancellationToken);
+
     /// <summary>Adiciona um novo vínculo para persistência.</summary>
     void Add(TenantMembership membership);
 }
