@@ -44,6 +44,7 @@ public static class AssignRole
         IRoleRepository roleRepository,
         ITenantMembershipRepository membershipRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -113,7 +114,7 @@ public static class AssignRole
                 ? $"{{\"newRole\":\"{newRole.Name}\",\"tenantId\":\"{request.TenantId}\"}}"
                 : $"{{\"previousRoleId\":\"{previousRoleId!.Value}\",\"newRole\":\"{newRole.Name}\",\"tenantId\":\"{request.TenantId}\"}}";
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 userId,
                 sessionId: null,
@@ -123,7 +124,10 @@ public static class AssignRole
                 ipAddress: null,
                 userAgent: null,
                 metadataJson,
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
         }
     }
 }
