@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Promotion.Domain.Entities;
 
 namespace NexTraceOne.Promotion.Infrastructure.Persistence;
 
@@ -14,10 +15,25 @@ public sealed class PromotionDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Ambientes de deployment persistidos no módulo Promotion.</summary>
+    public DbSet<DeploymentEnvironment> DeploymentEnvironments => Set<DeploymentEnvironment>();
 
+    /// <summary>Solicitações de promoção persistidas no módulo Promotion.</summary>
+    public DbSet<PromotionRequest> PromotionRequests => Set<PromotionRequest>();
+
+    /// <summary>Gates de promoção persistidos no módulo Promotion.</summary>
+    public DbSet<PromotionGate> PromotionGates => Set<PromotionGate>();
+
+    /// <summary>Avaliações de gate persistidas no módulo Promotion.</summary>
+    public DbSet<GateEvaluation> GateEvaluations => Set<GateEvaluation>();
+
+    /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(PromotionDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

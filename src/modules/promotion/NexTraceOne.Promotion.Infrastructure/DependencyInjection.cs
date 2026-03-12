@@ -1,5 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.Promotion.Application.Abstractions;
+using NexTraceOne.Promotion.Infrastructure.Persistence;
+using NexTraceOne.Promotion.Infrastructure.Persistence.Repositories;
 
 namespace NexTraceOne.Promotion.Infrastructure;
 
@@ -9,11 +16,30 @@ namespace NexTraceOne.Promotion.Infrastructure;
 /// </summary>
 public static class DependencyInjection
 {
+    /// <summary>Adiciona os serviços de infraestrutura do módulo Promotion ao container DI.</summary>
     public static IServiceCollection AddPromotionInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar DbContext, repositórios, adapters
+        services.AddBuildingBlocksInfrastructure(configuration);
+
+        var connectionString = configuration.GetConnectionString("PromotionDatabase")
+            ?? configuration.GetConnectionString("NexTraceOne")
+            ?? configuration.GetConnectionString("DefaultConnection")
+            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+
+        services.AddDbContext<PromotionDbContext>((serviceProvider, options) =>
+            options.UseNpgsql(connectionString)
+                .AddInterceptors(
+                    serviceProvider.GetRequiredService<AuditInterceptor>(),
+                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PromotionDbContext>());
+        services.AddScoped<IDeploymentEnvironmentRepository, DeploymentEnvironmentRepository>();
+        services.AddScoped<IPromotionRequestRepository, PromotionRequestRepository>();
+        services.AddScoped<IPromotionGateRepository, PromotionGateRepository>();
+        services.AddScoped<IGateEvaluationRepository, GateEvaluationRepository>();
+
         return services;
     }
 }
