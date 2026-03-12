@@ -4,16 +4,12 @@ using NexTraceOne.BuildingBlocks.Domain.Primitives;
 namespace NexTraceOne.Contracts.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo Contracts.
-/// TODO: Implementar regras de domínio, invariantes e domain events de ContractLock.
+/// Value object que representa o estado de bloqueio de uma versão de contrato.
+/// Utilizado internamente por ContractVersion para encapsular os dados de lock.
 /// </summary>
-public sealed class ContractLock : AuditableEntity<ContractLockId>
-{
-    // TODO: Implementar propriedades, construtor privado e factory methods
-    private ContractLock() { }
-}
+public sealed record ContractLock(string LockedBy, DateTimeOffset LockedAt);
 
-/// <summary>Identificador fortemente tipado de ContractLock.</summary>
+/// <summary>Identificador fortemente tipado de ContractLock (mantido para compatibilidade).</summary>
 public sealed record ContractLockId(Guid Value) : TypedIdBase(Value)
 {
     /// <summary>Cria novo Id com Guid gerado automaticamente.</summary>
