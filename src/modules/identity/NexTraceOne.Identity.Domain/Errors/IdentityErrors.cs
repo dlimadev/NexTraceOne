@@ -169,4 +169,22 @@ public static class IdentityErrors
     /// </summary>
     public static Error OidcCallbackFailed(string provider)
         => Error.Unauthorized("Identity.Oidc.CallbackFailed", "OIDC authentication callback failed for provider '{0}'. Please try again.", provider);
+
+    // ── Environment ──────────────────────────────────────────────────────
+
+    /// <summary>Ambiente não encontrado.</summary>
+    public static Error EnvironmentNotFound(Guid environmentId)
+        => Error.NotFound("Identity.Environment.NotFound", "Environment '{0}' was not found.", environmentId);
+
+    /// <summary>Slug de ambiente já existente no tenant.</summary>
+    public static Error EnvironmentSlugAlreadyExists(string slug)
+        => Error.Conflict("Identity.Environment.SlugAlreadyExists", "An environment with slug '{0}' already exists in this tenant.", slug);
+
+    /// <summary>Acesso ao ambiente negado.</summary>
+    public static Error EnvironmentAccessDenied(Guid userId, Guid environmentId)
+        => Error.Forbidden("Identity.Environment.AccessDenied", "User '{0}' does not have access to environment '{1}'.", userId, environmentId);
+
+    /// <summary>Acesso ao ambiente já existente.</summary>
+    public static Error EnvironmentAccessAlreadyExists(Guid userId, Guid environmentId)
+        => Error.Conflict("Identity.Environment.AccessAlreadyExists", "User '{0}' already has access to environment '{1}'.", userId, environmentId);
 }
