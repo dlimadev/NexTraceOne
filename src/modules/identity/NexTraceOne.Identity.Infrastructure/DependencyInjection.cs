@@ -68,6 +68,10 @@ public static class DependencyInjection
         // ISecurityAuditBridge é injetado opcionalmente nos handlers que geram eventos críticos.
         services.AddScoped<ISecurityAuditBridge, SecurityAuditBridge>();
 
+        // Rastreador de eventos de segurança para propagação automática ao Audit central.
+        // Escopo por requisição — acumula eventos durante a execução do handler.
+        services.AddScoped<ISecurityEventTracker, SecurityEventTracker>();
+
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
 

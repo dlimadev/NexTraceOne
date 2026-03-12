@@ -32,7 +32,9 @@ public sealed class AssignRoleTests
         membershipRepository.GetByUserAndTenantAsync(user.Id, TenantId.From(tenantId), Arg.Any<CancellationToken>())
             .Returns((TenantMembership?)null);
 
-        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, securityEventRepository, new TestDateTimeProvider(now));
+        var securityEventTracker = Substitute.For<ISecurityEventTracker>();
+
+        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, securityEventRepository, securityEventTracker, new TestDateTimeProvider(now));
 
         var result = await sut.Handle(new AssignRoleFeature.Command(user.Id.Value, tenantId, role.Id.Value), CancellationToken.None);
 
@@ -40,6 +42,8 @@ public sealed class AssignRoleTests
         membershipRepository.Received(1).Add(Arg.Any<TenantMembership>());
         // Verifica que o SecurityEvent de role change foi gerado
         securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.RoleAssigned));
+        // Verifica que o evento foi rastreado para propagação ao Audit central
+        securityEventTracker.Received(1).Track(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.RoleAssigned));
     }
 
     [Fact]
@@ -56,13 +60,14 @@ public sealed class AssignRoleTests
         var roleRepository = Substitute.For<IRoleRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var securityEventTracker = Substitute.For<ISecurityEventTracker>();
 
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         roleRepository.GetByIdAsync(newRole.Id, Arg.Any<CancellationToken>()).Returns(newRole);
         membershipRepository.GetByUserAndTenantAsync(user.Id, TenantId.From(tenantId), Arg.Any<CancellationToken>())
             .Returns(existingMembership);
 
-        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, securityEventRepository, new TestDateTimeProvider(now));
+        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, securityEventRepository, securityEventTracker, new TestDateTimeProvider(now));
 
         var result = await sut.Handle(new AssignRoleFeature.Command(user.Id.Value, tenantId, newRole.Id.Value), CancellationToken.None);
 
@@ -72,6 +77,8 @@ public sealed class AssignRoleTests
         membershipRepository.DidNotReceive().Add(Arg.Any<TenantMembership>());
         // Verifica que o SecurityEvent de mudança de papel foi gerado
         securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.RoleAssigned));
+        // Verifica que o evento foi rastreado para propagação ao Audit central
+        securityEventTracker.Received(1).Track(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.RoleAssigned));
     }
 
     [Fact]
@@ -88,6 +95,7 @@ public sealed class AssignRoleTests
             Substitute.For<IRoleRepository>(),
             Substitute.For<ITenantMembershipRepository>(),
             Substitute.For<ISecurityEventRepository>(),
+            Substitute.For<ISecurityEventTracker>(),
             new TestDateTimeProvider(now));
 
         var result = await sut.Handle(new AssignRoleFeature.Command(userId, Guid.NewGuid(), Guid.NewGuid()), CancellationToken.None);
