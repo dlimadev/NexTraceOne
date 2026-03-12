@@ -10,6 +10,7 @@ namespace NexTraceOne.Identity.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature AssignRole.
+/// Cobrem criação de vínculo, atualização de papel existente, erros e geração de SecurityEvent.
 /// </summary>
 public sealed class AssignRoleTests
 {
@@ -24,18 +25,21 @@ public sealed class AssignRoleTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
+        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
 
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         roleRepository.GetByIdAsync(role.Id, Arg.Any<CancellationToken>()).Returns(role);
         membershipRepository.GetByUserAndTenantAsync(user.Id, TenantId.From(tenantId), Arg.Any<CancellationToken>())
             .Returns((TenantMembership?)null);
 
-        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, new TestDateTimeProvider(now));
+        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, securityEventRepository, new TestDateTimeProvider(now));
 
         var result = await sut.Handle(new AssignRoleFeature.Command(user.Id.Value, tenantId, role.Id.Value), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         membershipRepository.Received(1).Add(Arg.Any<TenantMembership>());
+        // Verifica que o SecurityEvent de role change foi gerado
+        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.RoleAssigned));
     }
 
     [Fact]
@@ -51,13 +55,14 @@ public sealed class AssignRoleTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
+        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
 
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         roleRepository.GetByIdAsync(newRole.Id, Arg.Any<CancellationToken>()).Returns(newRole);
         membershipRepository.GetByUserAndTenantAsync(user.Id, TenantId.From(tenantId), Arg.Any<CancellationToken>())
             .Returns(existingMembership);
 
-        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, new TestDateTimeProvider(now));
+        var sut = new AssignRoleFeature.Handler(userRepository, roleRepository, membershipRepository, securityEventRepository, new TestDateTimeProvider(now));
 
         var result = await sut.Handle(new AssignRoleFeature.Command(user.Id.Value, tenantId, newRole.Id.Value), CancellationToken.None);
 
@@ -65,6 +70,8 @@ public sealed class AssignRoleTests
         // Verifica que o papel foi atualizado no vínculo existente
         existingMembership.RoleId.Should().Be(newRole.Id);
         membershipRepository.DidNotReceive().Add(Arg.Any<TenantMembership>());
+        // Verifica que o SecurityEvent de mudança de papel foi gerado
+        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.RoleAssigned));
     }
 
     [Fact]
@@ -80,6 +87,7 @@ public sealed class AssignRoleTests
             userRepository,
             Substitute.For<IRoleRepository>(),
             Substitute.For<ITenantMembershipRepository>(),
+            Substitute.For<ISecurityEventRepository>(),
             new TestDateTimeProvider(now));
 
         var result = await sut.Handle(new AssignRoleFeature.Command(userId, Guid.NewGuid(), Guid.NewGuid()), CancellationToken.None);

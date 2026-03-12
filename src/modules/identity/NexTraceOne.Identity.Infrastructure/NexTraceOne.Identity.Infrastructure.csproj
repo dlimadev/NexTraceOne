@@ -10,6 +10,7 @@
     <ProjectReference Include="..\NexTraceOne.Identity.Domain\NexTraceOne.Identity.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\..\..\modules\audit\NexTraceOne.Audit.Contracts\NexTraceOne.Audit.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" />

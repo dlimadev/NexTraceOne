@@ -58,4 +58,11 @@ internal sealed class TenantMembershipRepository(IdentityDbContext context)
 
         return (items, totalCount);
     }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TenantMembership>> ListAllActiveByTenantAsync(TenantId tenantId, CancellationToken cancellationToken)
+        => await context.TenantMemberships
+            .Where(x => x.TenantId == tenantId && x.IsActive)
+            .OrderBy(x => x.UserId)
+            .ToListAsync(cancellationToken);
 }
