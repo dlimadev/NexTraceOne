@@ -1,5 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.Workflow.Application.Abstractions;
+using NexTraceOne.Workflow.Infrastructure.Persistence;
+using NexTraceOne.Workflow.Infrastructure.Persistence.Repositories;
 
 namespace NexTraceOne.Workflow.Infrastructure;
 
@@ -9,11 +16,32 @@ namespace NexTraceOne.Workflow.Infrastructure;
 /// </summary>
 public static class DependencyInjection
 {
+    /// <summary>Adiciona os serviços de infraestrutura do módulo Workflow ao container DI.</summary>
     public static IServiceCollection AddWorkflowInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar DbContext, repositórios, adapters
+        services.AddBuildingBlocksInfrastructure(configuration);
+
+        var connectionString = configuration.GetConnectionString("WorkflowDatabase")
+            ?? configuration.GetConnectionString("NexTraceOne")
+            ?? configuration.GetConnectionString("DefaultConnection")
+            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+
+        services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
+            options.UseNpgsql(connectionString)
+                .AddInterceptors(
+                    serviceProvider.GetRequiredService<AuditInterceptor>(),
+                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WorkflowDbContext>());
+        services.AddScoped<IWorkflowTemplateRepository, WorkflowTemplateRepository>();
+        services.AddScoped<IWorkflowInstanceRepository, WorkflowInstanceRepository>();
+        services.AddScoped<IWorkflowStageRepository, WorkflowStageRepository>();
+        services.AddScoped<IEvidencePackRepository, EvidencePackRepository>();
+        services.AddScoped<IApprovalDecisionRepository, ApprovalDecisionRepository>();
+        services.AddScoped<ISlaPolicyRepository, SlaPolicyRepository>();
+
         return services;
     }
 }

@@ -1,0 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Workflow.Application.Abstractions;
+using NexTraceOne.Workflow.Domain.Entities;
+
+namespace NexTraceOne.Workflow.Infrastructure.Persistence.Repositories;
+
+/// <summary>
+/// Repositório de políticas de SLA, implementando consultas específicas de negócio.
+/// </summary>
+internal sealed class SlaPolicyRepository(WorkflowDbContext context)
+    : RepositoryBase<SlaPolicy, SlaPolicyId>(context), ISlaPolicyRepository
+{
+    /// <summary>Busca uma SlaPolicy pelo seu identificador.</summary>
+    public override async Task<SlaPolicy?> GetByIdAsync(SlaPolicyId id, CancellationToken ct = default)
+        => await context.SlaPolicies
+            .SingleOrDefaultAsync(p => p.Id == id, ct);
+
+    /// <summary>Lista políticas de SLA de um template de workflow.</summary>
+    public async Task<IReadOnlyList<SlaPolicy>> GetByTemplateIdAsync(WorkflowTemplateId templateId, CancellationToken cancellationToken = default)
+        => await context.SlaPolicies
+            .Where(p => p.WorkflowTemplateId == templateId)
+            .OrderBy(p => p.StageName)
+            .ToListAsync(cancellationToken);
+
+    /// <summary>Lista políticas de SLA com violações expiradas (estágios que ultrapassaram o tempo máximo).</summary>
+    public async Task<IReadOnlyList<SlaPolicy>> ListExpiredAsync(CancellationToken cancellationToken = default)
+        => await context.SlaPolicies
+            .Where(p => p.EscalationEnabled)
+            .ToListAsync(cancellationToken);
+}
