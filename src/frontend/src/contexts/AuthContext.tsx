@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { LoginResponse, UserProfile } from '../types';
 import { identityApi } from '../api';
 
@@ -41,6 +41,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       tenantId,
     };
   });
+
+  // Carrega o perfil do usuário ao iniciar quando há token armazenado
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const userId = localStorage.getItem('user_id');
+    if (token && userId) {
+      identityApi.getUserProfile(userId).then((profile) => {
+        setState((s) => ({ ...s, user: profile }));
+      }).catch((error: unknown) => {
+        // Log silencioso: usuário continua autenticado, mas sem perfil
+        // (permissões serão vazias até um re-login bem-sucedido)
+        console.warn('[AuthContext] Failed to load user profile on startup:', error);
+      });
+    }
+  }, []);
 
   const login = useCallback(async (email: string, password: string, tenantId: string) => {
     const data = await identityApi.login({ email, password, tenantId });

@@ -1,12 +1,27 @@
 import { test, expect, type Page } from '@playwright/test';
 
 // Utilitário para simular uma sessão autenticada injetando tokens no localStorage
-async function mockAuthSession(page: Page): Promise<void> {
+async function mockAuthSession(page: Page, roles: string[] = ['Admin']): Promise<void> {
   await page.addInitScript(() => {
     localStorage.setItem('access_token', 'mock-e2e-token');
     localStorage.setItem('tenant_id', 'tenant-e2e-001');
     localStorage.setItem('user_id', 'user-e2e-001');
   });
+
+  // Intercepta a chamada de perfil para retornar roles configuráveis
+  await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 'user-e2e-001',
+        email: 'admin@acme.com',
+        fullName: 'Admin User',
+        roles,
+        tenantId: 'tenant-e2e-001',
+      }),
+    })
+  );
 }
 
 test.describe('Login Page', () => {
@@ -210,5 +225,61 @@ test.describe('Releases Page (autenticado)', () => {
     await expect(
       page.getByText(/enter an api asset id above/i)
     ).toBeVisible();
+  });
+});
+
+test.describe('Controle de Acesso (RBAC)', () => {
+  test('Developer não vê link de Users na sidebar', async ({ page }) => {
+    await mockAuthSession(page, ['Developer']);
+    await page.goto('/');
+    // Aguarda perfil ser carregado (sidebar renderizar sem Users)
+    await expect(page.getByRole('link', { name: /releases/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('link', { name: /users/i })).not.toBeVisible();
+  });
+
+  test('Admin vê o link de Users na sidebar', async ({ page }) => {
+    await mockAuthSession(page, ['Admin']);
+    await page.goto('/');
+    await expect(page.getByRole('link', { name: /users/i })).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('Manager vê o link de Users na sidebar', async ({ page }) => {
+    await mockAuthSession(page, ['Manager']);
+    await page.goto('/');
+    await expect(page.getByRole('link', { name: /users/i })).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('Developer é redirecionado ao tentar acessar /users diretamente', async ({ page }) => {
+    await mockAuthSession(page, ['Developer']);
+    await page.goto('/users');
+    // Deve redirecionar para /unauthorized
+    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+    await expect(page.getByText(/access denied/i)).toBeVisible();
+  });
+
+  test('Viewer é redirecionado ao tentar acessar /users diretamente', async ({ page }) => {
+    await mockAuthSession(page, ['Viewer']);
+    await page.goto('/users');
+    await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
+  });
+
+  test('Auditor pode acessar /audit', async ({ page }) => {
+    await mockAuthSession(page, ['Auditor']);
+    await page.goto('/audit');
+    await expect(page.getByRole('heading', { name: /audit log/i })).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('página /unauthorized exibe mensagem e botão de retorno', async ({ page }) => {
+    await mockAuthSession(page, ['Developer']);
+    await page.goto('/users');
+    await expect(page.getByText(/access denied/i)).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('button', { name: /go to dashboard/i })).toBeVisible();
+  });
+
+  test('botão Go to Dashboard redireciona para /', async ({ page }) => {
+    await mockAuthSession(page, ['Developer']);
+    await page.goto('/users');
+    await page.getByRole('button', { name: /go to dashboard/i }).click();
+    await expect(page).toHaveURL('/');
   });
 });
