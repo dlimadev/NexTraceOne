@@ -1,25 +1,92 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.EngineeringGraph.Application.Abstractions;
+using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.EngineeringGraph.Domain.Errors;
 
 namespace NexTraceOne.EngineeringGraph.Application.Features.MapConsumerRelationship;
 
 /// <summary>
-/// Feature: MapConsumerRelationship — Módulo: EngineeringGraph.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: MapConsumerRelationship — mapeia ou actualiza a relação de consumo de uma API.
+/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class MapConsumerRelationship
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Comando de mapeamento de relação de consumo.</summary>
+    public sealed record Command(
+        Guid ApiAssetId,
+        string ConsumerName,
+        string ConsumerKind,
+        string ConsumerEnvironment,
+        string SourceType,
+        string ExternalReference,
+        decimal ConfidenceScore) : ICommand<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada do comando de mapeamento.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ApiAssetId).NotEmpty();
+            RuleFor(x => x.ConsumerName).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.ConsumerKind).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.ConsumerEnvironment).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.SourceType).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.ExternalReference).NotEmpty().MaximumLength(500);
+            RuleFor(x => x.ConfidenceScore).InclusiveBetween(0.01m, 1.0m);
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que mapeia ou actualiza a relação de consumo no grafo.</summary>
+    public sealed class Handler(
+        IApiAssetRepository apiAssetRepository,
+        IDateTimeProvider dateTimeProvider,
+        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+    {
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var apiAssetId = ApiAssetId.From(request.ApiAssetId);
+            var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
+            if (apiAsset is null)
+            {
+                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+            }
+
+            var consumerAsset = ConsumerAsset.Create(request.ConsumerName, request.ConsumerKind, request.ConsumerEnvironment);
+            var discoverySource = DiscoverySource.Create(request.SourceType, request.ExternalReference, dateTimeProvider.UtcNow, request.ConfidenceScore);
+            var relationshipResult = apiAsset.MapConsumerRelationship(consumerAsset, discoverySource, dateTimeProvider.UtcNow);
+
+            if (relationshipResult.IsFailure)
+            {
+                return relationshipResult.Error;
+            }
+
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            var relationship = relationshipResult.Value;
+            return new Response(
+                relationship.Id.Value,
+                request.ApiAssetId,
+                relationship.ConsumerName,
+                relationship.SourceType,
+                relationship.ConfidenceScore,
+                relationship.FirstObservedAt,
+                relationship.LastObservedAt);
+        }
+    }
+
+    /// <summary>Resposta do mapeamento da relação de consumo.</summary>
+    public sealed record Response(
+        Guid RelationshipId,
+        Guid ApiAssetId,
+        string ConsumerName,
+        string SourceType,
+        decimal ConfidenceScore,
+        DateTimeOffset FirstObservedAt,
+        DateTimeOffset LastObservedAt);
 }
