@@ -10,6 +10,7 @@ namespace NexTraceOne.Identity.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature LocalLogin.
+/// Cobrem cenários de sucesso, falha de credenciais, lockout e geração de eventos de segurança.
 /// </summary>
 public sealed class LocalLoginTests
 {
@@ -19,13 +20,14 @@ public sealed class LocalLoginTests
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
         var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), now);
-        var role = Role.CreateSystem(membership.RoleId, Role.Admin, "Administrative access");
+        var role = Role.CreateSystem(membership.RoleId, Role.PlatformAdmin, "Administrative access");
         var userRepository = Substitute.For<IUserRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var sessionRepository = Substitute.For<ISessionRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
         var currentTenant = new TestCurrentTenant(membership.TenantId.Value);
         var sut = new LocalLoginFeature.Handler(
             userRepository,
@@ -35,7 +37,8 @@ public sealed class LocalLoginTests
             passwordHasher,
             jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            currentTenant);
+            currentTenant,
+            securityEventRepository);
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         membershipRepository.GetByUserAndTenantAsync(user.Id, membership.TenantId, Arg.Any<CancellationToken>()).Returns(membership);
@@ -50,6 +53,7 @@ public sealed class LocalLoginTests
         result.IsSuccess.Should().BeTrue();
         result.Value.AccessToken.Should().Be("access-token");
         sessionRepository.Received(1).Add(Arg.Any<Session>());
+        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.AuthenticationSucceeded));
     }
 
     [Fact]
@@ -63,6 +67,7 @@ public sealed class LocalLoginTests
         var sessionRepository = Substitute.For<ISessionRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
         var sut = new LocalLoginFeature.Handler(
             userRepository,
             membershipRepository,
@@ -71,7 +76,8 @@ public sealed class LocalLoginTests
             passwordHasher,
             jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            new TestCurrentTenant(Guid.NewGuid()));
+            new TestCurrentTenant(Guid.NewGuid()),
+            securityEventRepository);
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         passwordHasher.Verify("wrong-password", user.PasswordHash!.Value).Returns(false);
@@ -81,6 +87,7 @@ public sealed class LocalLoginTests
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Identity.Auth.InvalidCredentials");
         sessionRepository.DidNotReceive().Add(Arg.Any<Session>());
+        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.AuthenticationFailed));
     }
 
     [Fact]
@@ -99,6 +106,7 @@ public sealed class LocalLoginTests
         var sessionRepository = Substitute.For<ISessionRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
         var sut = new LocalLoginFeature.Handler(
             userRepository,
             membershipRepository,
@@ -107,7 +115,8 @@ public sealed class LocalLoginTests
             passwordHasher,
             jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            new TestCurrentTenant(Guid.NewGuid()));
+            new TestCurrentTenant(Guid.NewGuid()),
+            securityEventRepository);
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         passwordHasher.Verify("wrong-password", user.PasswordHash!.Value).Returns(false);
@@ -116,5 +125,6 @@ public sealed class LocalLoginTests
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Identity.Auth.AccountLocked");
+        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.AccountLocked));
     }
 }

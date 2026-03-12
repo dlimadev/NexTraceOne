@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   GitBranch,
@@ -16,27 +17,33 @@ import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
 
 interface NavItem {
-  label: string;
+  /** Chave i18n para o label exibido na sidebar. */
+  labelKey: string;
   to: string;
   icon: React.ReactNode;
   permission?: Permission;
 }
 
+/**
+ * Itens de navegação da sidebar com códigos de permissão alinhados ao catálogo real do backend.
+ * As permissões usam o formato modular: "modulo:recurso:ação".
+ */
 const navItems: NavItem[] = [
-  { label: 'Dashboard', to: '/', icon: <LayoutDashboard size={18} /> },
-  { label: 'Releases', to: '/releases', icon: <Zap size={18} />, permission: 'releases:read' },
-  { label: 'Engineering Graph', to: '/graph', icon: <GitBranch size={18} />, permission: 'graph:read' },
-  { label: 'Contracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read' },
-  { label: 'Workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read' },
-  { label: 'Promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read' },
-  { label: 'Users', to: '/users', icon: <Users size={18} />, permission: 'users:read' },
-  { label: 'Audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read' },
+  { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} /> },
+  { labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:releases:read' },
+  { labelKey: 'sidebar.engineeringGraph', to: '/graph', icon: <GitBranch size={18} />, permission: 'engineering-graph:assets:read' },
+  { labelKey: 'sidebar.contracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read' },
+  { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read' },
+  { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read' },
+  { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read' },
+  { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read' },
 ];
 
 export function Sidebar() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { can } = usePermissions();
+  const { can, roleName } = usePermissions();
 
   const handleLogout = () => {
     logout();
@@ -57,7 +64,7 @@ export function Sidebar() {
           </div>
           <span className="font-semibold text-lg tracking-tight">NexTraceOne</span>
         </div>
-        <p className="text-xs text-gray-400 mt-1">Change Intelligence</p>
+        <p className="text-xs text-gray-400 mt-1">{t('sidebar.changeIntelligence')}</p>
       </div>
 
       {/* Navigation */}
@@ -77,7 +84,7 @@ export function Sidebar() {
                 }
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span>{t(item.labelKey)}</span>
                 <ChevronRight size={14} className="ml-auto opacity-40" />
               </NavLink>
             </li>
@@ -93,12 +100,12 @@ export function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{user?.email ?? 'User'}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.roles?.[0] ?? 'Developer'}</p>
+            <p className="text-xs text-gray-400 truncate">{roleName || 'Developer'}</p>
           </div>
           <button
             onClick={handleLogout}
             className="text-gray-400 hover:text-white transition-colors"
-            title="Logout"
+            title={t('auth.signOut')}
           >
             <LogOut size={16} />
           </button>

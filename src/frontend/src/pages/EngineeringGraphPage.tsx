@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, RefreshCw, Server, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
@@ -17,6 +18,7 @@ const trustColors: Record<string, 'default' | 'success' | 'warning' | 'danger' |
 type Tab = 'graph' | 'services' | 'apis';
 
 export function EngineeringGraphPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('services');
   const [showServiceForm, setShowServiceForm] = useState(false);
@@ -50,24 +52,24 @@ export function EngineeringGraphPage() {
   });
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'services', label: 'Services' },
-    { key: 'apis', label: 'APIs' },
-    { key: 'graph', label: 'Dependencies' },
+    { key: 'services', label: t('engineeringGraph.tabs.services') },
+    { key: 'apis', label: t('engineeringGraph.tabs.apis') },
+    { key: 'graph', label: t('engineeringGraph.tabs.dependencies') },
   ];
 
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Engineering Graph</h1>
-          <p className="text-gray-500 mt-1">Service catalog and dependency mapping</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('engineeringGraph.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('engineeringGraph.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => setShowServiceForm((v) => !v)}>
-            <Plus size={16} /> Service
+            <Plus size={16} /> {t('engineeringGraph.registerService')}
           </Button>
           <Button onClick={() => setShowApiForm((v) => !v)}>
-            <Plus size={16} /> API
+            <Plus size={16} /> {t('engineeringGraph.registerApi')}
           </Button>
         </div>
       </div>
@@ -75,15 +77,15 @@ export function EngineeringGraphPage() {
       {/* Register Service Form */}
       {showServiceForm && (
         <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-gray-800">Register Service</h2></CardHeader>
+          <CardHeader><h2 className="font-semibold text-gray-800">{t('engineeringGraph.registerServiceTitle')}</h2></CardHeader>
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); registerService.mutate(serviceForm); }}
               className="grid grid-cols-3 gap-4"
             >
-              {(['name', 'team', 'description'] as const).map((field) => (
+              {([{field: 'name', key: 'engineeringGraph.name'}, {field: 'team', key: 'engineeringGraph.team'}, {field: 'description', key: 'engineeringGraph.description'}] as const).map(({field, key}) => (
                 <div key={field}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">{field}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t(key)}</label>
                   <input
                     type="text"
                     value={serviceForm[field]}
@@ -94,8 +96,8 @@ export function EngineeringGraphPage() {
                 </div>
               ))}
               <div className="col-span-3 flex gap-2 justify-end">
-                <Button variant="secondary" type="button" onClick={() => setShowServiceForm(false)}>Cancel</Button>
-                <Button type="submit" loading={registerService.isPending}>Register</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowServiceForm(false)}>{t('common.cancel')}</Button>
+                <Button type="submit" loading={registerService.isPending}>{t('engineeringGraph.register')}</Button>
               </div>
             </form>
           </CardBody>
@@ -105,17 +107,17 @@ export function EngineeringGraphPage() {
       {/* Register API Form */}
       {showApiForm && (
         <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-gray-800">Register API Asset</h2></CardHeader>
+          <CardHeader><h2 className="font-semibold text-gray-800">{t('engineeringGraph.registerApiTitle')}</h2></CardHeader>
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); registerApi.mutate(apiForm); }}
               className="grid grid-cols-2 gap-4"
             >
               {([
-                { field: 'name', label: 'Name' },
-                { field: 'baseUrl', label: 'Base URL' },
-                { field: 'ownerServiceId', label: 'Owner Service ID' },
-                { field: 'description', label: 'Description' },
+                { field: 'name', label: t('engineeringGraph.name') },
+                { field: 'baseUrl', label: t('engineeringGraph.baseUrl') },
+                { field: 'ownerServiceId', label: t('engineeringGraph.ownerServiceId') },
+                { field: 'description', label: t('engineeringGraph.description') },
               ] as const).map(({ field, label }) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -129,8 +131,8 @@ export function EngineeringGraphPage() {
                 </div>
               ))}
               <div className="col-span-2 flex gap-2 justify-end">
-                <Button variant="secondary" type="button" onClick={() => setShowApiForm(false)}>Cancel</Button>
-                <Button type="submit" loading={registerApi.isPending}>Register</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowApiForm(false)}>{t('common.cancel')}</Button>
+                <Button type="submit" loading={registerApi.isPending}>{t('engineeringGraph.register')}</Button>
               </div>
             </form>
           </CardBody>
@@ -162,7 +164,7 @@ export function EngineeringGraphPage() {
             <Card>
               <CardBody className="p-0">
                 {!graph?.services?.length ? (
-                  <p className="px-6 py-12 text-sm text-gray-400 text-center">No services registered</p>
+                  <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('engineeringGraph.noServices')}</p>
                 ) : (
                   <ul className="divide-y divide-gray-100">
                     {graph.services.map((svc) => (
@@ -187,7 +189,7 @@ export function EngineeringGraphPage() {
             <Card>
               <CardBody className="p-0">
                 {!graph?.apis?.length ? (
-                  <p className="px-6 py-12 text-sm text-gray-400 text-center">No APIs registered</p>
+                  <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('engineeringGraph.noApis')}</p>
                 ) : (
                   <ul className="divide-y divide-gray-100">
                     {graph.apis.map((api) => (
@@ -212,14 +214,14 @@ export function EngineeringGraphPage() {
             <Card>
               <CardBody className="p-0">
                 {!graph?.relationships?.length ? (
-                  <p className="px-6 py-12 text-sm text-gray-400 text-center">No dependency relationships mapped</p>
+                  <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('engineeringGraph.noDependencies')}</p>
                 ) : (
                   <table className="min-w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                        <th className="px-6 py-3 font-medium text-gray-500">API Asset</th>
-                        <th className="px-6 py-3 font-medium text-gray-500">Consumer Service</th>
-                        <th className="px-6 py-3 font-medium text-gray-500">Trust Level</th>
+                        <th className="px-6 py-3 font-medium text-gray-500">{t('engineeringGraph.apiAsset')}</th>
+                        <th className="px-6 py-3 font-medium text-gray-500">{t('engineeringGraph.consumerService')}</th>
+                        <th className="px-6 py-3 font-medium text-gray-500">{t('engineeringGraph.trustLevel')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">

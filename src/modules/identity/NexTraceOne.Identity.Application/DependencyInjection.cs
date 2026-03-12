@@ -5,15 +5,22 @@ using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Identity.Application.Features.ActivateUser;
 using NexTraceOne.Identity.Application.Features.AssignRole;
 using NexTraceOne.Identity.Application.Features.ChangePassword;
+using NexTraceOne.Identity.Application.Features.CreateDelegation;
 using NexTraceOne.Identity.Application.Features.CreateUser;
 using NexTraceOne.Identity.Application.Features.DeactivateUser;
+using NexTraceOne.Identity.Application.Features.DecideJitAccess;
 using NexTraceOne.Identity.Application.Features.FederatedLogin;
 using NexTraceOne.Identity.Application.Features.GetUserProfile;
 using NexTraceOne.Identity.Application.Features.ListActiveSessions;
 using NexTraceOne.Identity.Application.Features.ListTenantUsers;
 using NexTraceOne.Identity.Application.Features.LocalLogin;
 using NexTraceOne.Identity.Application.Features.RefreshToken;
+using NexTraceOne.Identity.Application.Features.RequestBreakGlass;
+using NexTraceOne.Identity.Application.Features.RequestJitAccess;
+using NexTraceOne.Identity.Application.Features.RevokeBreakGlass;
+using NexTraceOne.Identity.Application.Features.RevokeDelegation;
 using NexTraceOne.Identity.Application.Features.RevokeSession;
+using NexTraceOne.Identity.Application.Features.SelectTenant;
 
 namespace NexTraceOne.Identity.Application;
 
@@ -46,6 +53,15 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ActivateUser.Command>, ActivateUser.Validator>();
         services.AddTransient<IValidator<ListActiveSessions.Query>, ListActiveSessions.Validator>();
         services.AddTransient<IValidator<AssignRole.Command>, AssignRole.Validator>();
+
+        // Enterprise — Break Glass, JIT Access, Delegação
+        services.AddTransient<IValidator<RequestBreakGlass.Command>, RequestBreakGlass.Validator>();
+        services.AddTransient<IValidator<RevokeBreakGlass.Command>, RevokeBreakGlass.Validator>();
+        services.AddTransient<IValidator<RequestJitAccess.Command>, RequestJitAccess.Validator>();
+        services.AddTransient<IValidator<DecideJitAccess.Command>, DecideJitAccess.Validator>();
+        services.AddTransient<IValidator<CreateDelegation.Command>, CreateDelegation.Validator>();
+        services.AddTransient<IValidator<RevokeDelegation.Command>, RevokeDelegation.Validator>();
+        services.AddTransient<IValidator<SelectTenant.Command>, SelectTenant.Validator>();
 
         return services;
     }

@@ -38,12 +38,20 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
 
-        // Repositórios
+        // Repositórios — v1.0 Core
+        services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<ITenantMembershipRepository, TenantMembershipRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+        // Repositórios — v1.1 Enterprise
+        services.AddScoped<IBreakGlassRepository, BreakGlassRepository>();
+        services.AddScoped<IJitAccessRepository, JitAccessRepository>();
+        services.AddScoped<IDelegationRepository, DelegationRepository>();
+        services.AddScoped<IAccessReviewRepository, AccessReviewRepository>();
+        services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
 
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();

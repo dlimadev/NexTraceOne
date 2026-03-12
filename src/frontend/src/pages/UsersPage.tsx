@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { identityApi } from '../api';
 
+/**
+ * Página de gestão de usuários do módulo Identity.
+ * Lista usuários do tenant atual com paginação e permite criação de novos usuários.
+ * Todos os textos são resolvidos via i18n (chaves em users.*).
+ */
 export function UsersPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [tenantId] = useState(() => localStorage.getItem('tenant_id') ?? '');
   const [showForm, setShowForm] = useState(false);
@@ -31,25 +38,25 @@ export function UsersPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-500 mt-1">Identity and access management</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('users.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('users.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
-          <Plus size={16} /> Create User
+          <Plus size={16} /> {t('users.createUser')}
         </Button>
       </div>
 
-      {/* Create User Form */}
+      {/* Formulário de criação de usuário */}
       {showForm && (
         <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-gray-800">Create New User</h2></CardHeader>
+          <CardHeader><h2 className="font-semibold text-gray-800">{t('users.createNewUser')}</h2></CardHeader>
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); createMutation.mutate(form); }}
               className="grid grid-cols-3 gap-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.firstName')}</label>
                 <input
                   type="text"
                   value={form.firstName}
@@ -59,7 +66,7 @@ export function UsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.lastName')}</label>
                 <input
                   type="text"
                   value={form.lastName}
@@ -69,7 +76,7 @@ export function UsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.email')}</label>
                 <input
                   type="email"
                   value={form.email}
@@ -79,44 +86,44 @@ export function UsersPage() {
                 />
               </div>
               <div className="col-span-3 flex gap-2 justify-end">
-                <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
-                <Button type="submit" loading={createMutation.isPending}>Create</Button>
+                <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>{t('common.cancel')}</Button>
+                <Button type="submit" loading={createMutation.isPending}>{t('common.create')}</Button>
               </div>
             </form>
           </CardBody>
         </Card>
       )}
 
-      {/* Users Table */}
+      {/* Tabela de usuários do tenant */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-800">Tenant Users</h2>
-            {data && <span className="text-sm text-gray-500">{data.totalCount} total</span>}
+            <h2 className="text-base font-semibold text-gray-800">{t('users.tenantUsers')}</h2>
+            {data && <span className="text-sm text-gray-500">{data.totalCount} {t('common.total')}</span>}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
           {!tenantId ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">No tenant ID found. Please log in again.</p>
+            <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('users.noTenantId')}</p>
           ) : isLoading ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={20} className="animate-spin text-gray-400" />
             </div>
           ) : !data?.items?.length ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">No users found in this tenant</p>
+            <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('users.noUsersFound')}</p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">Name</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Email</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Roles</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Created</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('users.name')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('users.email')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('users.roles')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {data.items.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50">
+                  <tr key={u.userId} className="hover:bg-gray-50">
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-medium text-sm">
@@ -127,14 +134,12 @@ export function UsersPage() {
                     </td>
                     <td className="px-6 py-3 text-gray-600">{u.email}</td>
                     <td className="px-6 py-3">
-                      <div className="flex gap-1 flex-wrap">
-                        {u.roles.map((r) => (
-                          <Badge key={r} variant="info">{r}</Badge>
-                        ))}
-                      </div>
+                      <Badge variant="info">{u.roleName}</Badge>
                     </td>
-                    <td className="px-6 py-3 text-xs text-gray-500">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                    <td className="px-6 py-3">
+                      <Badge variant={u.isActive ? 'success' : 'default'}>
+                        {u.isActive ? t('users.active') : t('users.inactive')}
+                      </Badge>
                     </td>
                   </tr>
                 ))}

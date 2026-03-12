@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUpCircle, CheckCircle, XCircle, Plus, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
@@ -36,6 +37,7 @@ const emptyForm: CreateForm = {
 };
 
 export function PromotionPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CreateForm>(emptyForm);
@@ -73,11 +75,11 @@ export function PromotionPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Promotion</h1>
-          <p className="text-gray-500 mt-1">Control environment promotion with quality gates</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('promotion.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('promotion.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
-          <Plus size={16} /> New Promotion Request
+          <Plus size={16} /> {t('promotion.newRequest')}
         </Button>
       </div>
 
@@ -85,7 +87,7 @@ export function PromotionPage() {
       {showForm && (
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="font-semibold text-gray-800">Create Promotion Request</h2>
+            <h2 className="font-semibold text-gray-800">{t('promotion.createRequest')}</h2>
           </CardHeader>
           <CardBody>
             <form
@@ -96,18 +98,18 @@ export function PromotionPage() {
               className="grid grid-cols-3 gap-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Release ID</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('promotion.releaseId')}</label>
                 <input
                   type="text"
                   value={form.releaseId}
                   onChange={(e) => setForm((f) => ({ ...f, releaseId: e.target.value }))}
                   required
-                  placeholder="UUID of the release"
+                  placeholder={t('promotion.releaseIdPlaceholder')}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Source Environment</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('promotion.sourceEnvironment')}</label>
                 <select
                   value={form.sourceEnvironment}
                   onChange={(e) => setForm((f) => ({ ...f, sourceEnvironment: e.target.value }))}
@@ -119,7 +121,7 @@ export function PromotionPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Target Environment</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('promotion.targetEnvironment')}</label>
                 <select
                   value={form.targetEnvironment}
                   onChange={(e) => setForm((f) => ({ ...f, targetEnvironment: e.target.value }))}
@@ -132,10 +134,10 @@ export function PromotionPage() {
               </div>
               <div className="col-span-3 flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button type="submit" loading={createMutation.isPending}>
-                  Create Request
+                  {t('promotion.createButton')}
                 </Button>
               </div>
             </form>
@@ -146,7 +148,7 @@ export function PromotionPage() {
       {/* Environment pipeline */}
       <Card className="mb-6">
         <CardHeader>
-          <h2 className="font-semibold text-gray-800">Environment Pipeline</h2>
+          <h2 className="font-semibold text-gray-800">{t('promotion.environmentPipeline')}</h2>
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-4">
@@ -169,7 +171,7 @@ export function PromotionPage() {
       {pending.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="font-semibold text-gray-800">Pending Requests</h2>
+            <h2 className="font-semibold text-gray-800">{t('promotion.pendingRequests')}</h2>
           </CardHeader>
           <CardBody className="p-0">
             <ul className="divide-y divide-gray-100">
@@ -191,7 +193,7 @@ export function PromotionPage() {
                           onClick={() => promoteMutation.mutate(req.id)}
                           loading={promoteMutation.isPending}
                         >
-                          Promote
+                          {t('promotion.promote')}
                         </Button>
                       )}
                       <Button
@@ -199,7 +201,7 @@ export function PromotionPage() {
                         onClick={() => rejectMutation.mutate({ id: req.id, reason: 'Rejected via UI' })}
                         loading={rejectMutation.isPending}
                       >
-                        Reject
+                        {t('workflow.reject')}
                       </Button>
                     </div>
                   </div>
@@ -232,7 +234,7 @@ export function PromotionPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-800">All Promotion Requests</h2>
+            <h2 className="font-semibold text-gray-800">{t('promotion.allRequests')}</h2>
             {data && (
               <span className="text-sm text-gray-500">{data.totalCount} total</span>
             )}
@@ -245,21 +247,21 @@ export function PromotionPage() {
             </div>
           ) : isError ? (
             <p className="px-6 py-12 text-sm text-red-500 text-center">
-              Failed to load promotion requests
+              {t('promotion.loadFailed')}
             </p>
           ) : !requests.length ? (
             <p className="px-6 py-12 text-sm text-gray-400 text-center">
-              No promotion requests yet
+              {t('promotion.noRequests')}
             </p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">Route</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Release</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Status</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Gates</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Created</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.route')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.release')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.status')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.gates')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.created')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -278,7 +280,7 @@ export function PromotionPage() {
                         <Badge variant={statusVariant(req.status)}>{req.status}</Badge>
                       </td>
                       <td className="px-6 py-3 text-sm text-gray-600">
-                        {total > 0 ? `${passed}/${total} passed` : '—'}
+                        {total > 0 ? t('promotion.gatesPassed', { passed, total }) : '—'}
                       </td>
                       <td className="px-6 py-3 text-xs text-gray-500">
                         {new Date(req.createdAt).toLocaleString()}

@@ -15,4 +15,9 @@ public interface IRoleRepository
 
     /// <summary>Obtém todos os papéis pré-definidos do sistema.</summary>
     Task<IReadOnlyList<Role>> GetSystemRolesAsync(CancellationToken cancellationToken);
+
+    /// <summary>Obtém vários papéis por uma coleção de Ids.</summary>
+    Task<IReadOnlyDictionary<RoleId, Role>> GetByIdsAsync(
+        IReadOnlyCollection<RoleId> ids,
+        CancellationToken cancellationToken);
 }

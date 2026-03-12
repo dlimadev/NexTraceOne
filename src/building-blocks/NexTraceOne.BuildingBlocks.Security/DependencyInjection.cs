@@ -1,18 +1,26 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
+using NexTraceOne.BuildingBlocks.Security.Authorization;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using System.Text;
 
 namespace NexTraceOne.BuildingBlocks.Security;
 
 /// <summary>
-/// Registra autenticação JWT, resolução de tenant, e componentes de segurança transversais.
+/// Registra autenticação JWT, autorização baseada em permissões, resolução de tenant
+/// e componentes de segurança transversais.
+///
 /// A configuração JWT é lida primeiro de "Jwt:*" (padrão do appsettings) e depois
 /// de "Security:Jwt:*" como fallback, garantindo compatibilidade entre módulos.
+///
+/// O modelo de autorização utiliza policies dinâmicas baseadas em permissão granular:
+/// cada endpoint pode exigir uma permissão específica via RequirePermission("permission.code"),
+/// resolvida automaticamente pelo <see cref="PermissionPolicyProvider"/>.
 /// </summary>
 public static class DependencyInjection
 {
@@ -55,6 +63,9 @@ public static class DependencyInjection
                 };
             });
 
+        // Autorização baseada em permissões granulares — policies dinâmicas via PermissionPolicyProvider
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         services.AddAuthorization();
 
         return services;

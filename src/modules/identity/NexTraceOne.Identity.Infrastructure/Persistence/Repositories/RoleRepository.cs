@@ -18,4 +18,16 @@ internal sealed class RoleRepository(IdentityDbContext context)
     /// <inheritdoc />
     public async Task<IReadOnlyList<Role>> GetSystemRolesAsync(CancellationToken cancellationToken)
         => await context.Roles.Where(x => x.IsSystem).OrderBy(x => x.Name).ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyDictionary<RoleId, Role>> GetByIdsAsync(
+        IReadOnlyCollection<RoleId> ids,
+        CancellationToken cancellationToken)
+    {
+        var roles = await context.Roles
+            .Where(r => ids.Contains(r.Id))
+            .ToListAsync(cancellationToken);
+
+        return roles.ToDictionary(r => r.Id, r => r);
+    }
 }

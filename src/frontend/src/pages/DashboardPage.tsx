@@ -1,10 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Zap, GitBranch, FileText, CheckSquare, Activity } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { engineeringGraphApi } from '../api';
 
+/**
+ * Página principal do dashboard — exibe visão geral da plataforma.
+ * Todos os textos resolvidos via i18n (chaves em dashboard.*).
+ */
 export function DashboardPage() {
+  const { t } = useTranslation();
+
   // Graph is used to get service/api counts
   const { data: graph } = useQuery({
     queryKey: ['graph'],
@@ -14,31 +21,31 @@ export function DashboardPage() {
 
   const stats = [
     {
-      title: 'Active Services',
+      title: t('dashboard.activeServices'),
       value: graph?.services?.length ?? '—',
       icon: <Activity size={28} />,
       color: 'text-indigo-600',
     },
     {
-      title: 'Registered APIs',
+      title: t('dashboard.registeredApis'),
       value: graph?.apis?.length ?? '—',
       icon: <GitBranch size={28} />,
       color: 'text-blue-600',
     },
     {
-      title: 'Consumer Relations',
+      title: t('dashboard.consumerRelations'),
       value: graph?.relationships?.length ?? '—',
       icon: <Zap size={28} />,
       color: 'text-yellow-600',
     },
     {
-      title: 'Total Contracts',
+      title: t('dashboard.totalContracts'),
       value: '—',
       icon: <FileText size={28} />,
       color: 'text-green-600',
     },
     {
-      title: 'Pending Approvals',
+      title: t('dashboard.pendingApprovals'),
       value: '—',
       icon: <CheckSquare size={28} />,
       color: 'text-purple-600',
@@ -48,8 +55,8 @@ export function DashboardPage() {
   return (
     <div className="p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Overview of your change intelligence platform</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
       {/* Stats */}
@@ -63,12 +70,12 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <h2 className="text-base font-semibold text-gray-800">Recent Services</h2>
+            <h2 className="text-base font-semibold text-gray-800">{t('dashboard.recentServices')}</h2>
           </CardHeader>
           <CardBody className="p-0">
             {!graph?.services?.length ? (
               <p className="px-6 py-8 text-sm text-gray-400 text-center">
-                No services registered yet
+                {t('dashboard.noServices')}
               </p>
             ) : (
               <ul className="divide-y divide-gray-100">
@@ -90,12 +97,12 @@ export function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <h2 className="text-base font-semibold text-gray-800">Registered APIs</h2>
+            <h2 className="text-base font-semibold text-gray-800">{t('dashboard.registeredApisTitle')}</h2>
           </CardHeader>
           <CardBody className="p-0">
             {!graph?.apis?.length ? (
               <p className="px-6 py-8 text-sm text-gray-400 text-center">
-                No APIs registered yet
+                {t('dashboard.noApis')}
               </p>
             ) : (
               <ul className="divide-y divide-gray-100">

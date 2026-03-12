@@ -9,6 +9,11 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence;
 /// DbContext do módulo Identity.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
+///
+/// Entidades gerenciadas:
+/// - v1.0: User, Role, Permission, Session, TenantMembership
+/// - v1.1: ExternalIdentity, SsoGroupMapping, BreakGlassRequest, JitAccessRequest,
+///          Delegation, AccessReviewCampaign, AccessReviewItem, SecurityEvent
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -17,6 +22,11 @@ public sealed class IdentityDbContext(
     IDateTimeProvider clock)
     : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
+    // ── v1.0 Core ────────────────────────────────────────────────────────
+
+    /// <summary>Tenants (organizações/clientes) persistidos do módulo Identity.</summary>
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+
     /// <summary>Usuários persistidos do módulo Identity.</summary>
     public DbSet<User> Users => Set<User>();
 
@@ -31,6 +41,38 @@ public sealed class IdentityDbContext(
 
     /// <summary>Vínculos de tenant persistidos do módulo Identity.</summary>
     public DbSet<TenantMembership> TenantMemberships => Set<TenantMembership>();
+
+    // ── v1.1 Enterprise — SSO / Federation ───────────────────────────────
+
+    /// <summary>Identidades externas vinculadas a usuários internos (OIDC, SAML, SCIM).</summary>
+    public DbSet<ExternalIdentity> ExternalIdentities => Set<ExternalIdentity>();
+
+    /// <summary>Mapeamentos de grupos SSO para roles internas.</summary>
+    public DbSet<SsoGroupMapping> SsoGroupMappings => Set<SsoGroupMapping>();
+
+    // ── v1.1 Enterprise — Privileged Access ──────────────────────────────
+
+    /// <summary>Solicitações de acesso emergencial (Break Glass).</summary>
+    public DbSet<BreakGlassRequest> BreakGlassRequests => Set<BreakGlassRequest>();
+
+    /// <summary>Solicitações de acesso privilegiado temporário (JIT).</summary>
+    public DbSet<JitAccessRequest> JitAccessRequests => Set<JitAccessRequest>();
+
+    /// <summary>Delegações formais de permissões entre usuários.</summary>
+    public DbSet<Delegation> Delegations => Set<Delegation>();
+
+    // ── v1.1 Enterprise — Access Review ──────────────────────────────────
+
+    /// <summary>Campanhas de recertificação periódica de acessos.</summary>
+    public DbSet<AccessReviewCampaign> AccessReviewCampaigns => Set<AccessReviewCampaign>();
+
+    /// <summary>Itens individuais de revisão de acesso.</summary>
+    public DbSet<AccessReviewItem> AccessReviewItems => Set<AccessReviewItem>();
+
+    // ── v1.1 Enterprise — Session Intelligence ───────────────────────────
+
+    /// <summary>Eventos de segurança e anomalias detectadas.</summary>
+    public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;

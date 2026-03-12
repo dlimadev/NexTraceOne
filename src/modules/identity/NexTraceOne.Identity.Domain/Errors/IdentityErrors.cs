@@ -45,6 +45,14 @@ public static class IdentityErrors
     public static Error TenantMembershipNotFound(Guid userId, Guid tenantId)
         => Error.NotFound("Identity.TenantMembership.NotFound", "Membership for user '{0}' in tenant '{1}' was not found.", userId, tenantId);
 
+    /// <summary>Tenant não encontrado ou inativo.</summary>
+    public static Error TenantNotFound(Guid tenantId)
+        => Error.NotFound("Identity.Tenant.NotFound", "Tenant '{0}' was not found or is inactive.", tenantId);
+
+    /// <summary>Slug de tenant já existente.</summary>
+    public static Error TenantSlugAlreadyExists(string slug)
+        => Error.Conflict("Identity.Tenant.SlugAlreadyExists", "A tenant with slug '{0}' already exists.", slug);
+
     /// <summary>Vínculo de tenant já existente.</summary>
     public static Error MembershipAlreadyExists(Guid userId, Guid tenantId)
         => Error.Conflict("Identity.TenantMembership.AlreadyExists", "Membership for user '{0}' in tenant '{1}' already exists.", userId, tenantId);
@@ -64,4 +72,70 @@ public static class IdentityErrors
     /// <summary>Usuário não possui a permissão necessária.</summary>
     public static Error InsufficientPermissions(string permission)
         => Error.Forbidden("Identity.Auth.InsufficientPermissions", "You do not have the required permission: '{0}'.", permission);
+
+    // ── Break Glass ──────────────────────────────────────────────────────
+
+    /// <summary>Solicitação Break Glass não encontrada.</summary>
+    public static Error BreakGlassNotFound(Guid requestId)
+        => Error.NotFound("Identity.BreakGlass.NotFound", "Break glass request '{0}' was not found.", requestId);
+
+    /// <summary>Limite trimestral de Break Glass atingido — requer revisão de segurança.</summary>
+    public static Error BreakGlassQuotaExceeded(Guid userId, int usageCount)
+        => Error.Forbidden("Identity.BreakGlass.QuotaExceeded", "User '{0}' has reached the quarterly break glass limit ({1} uses). Security review required.", userId, usageCount);
+
+    /// <summary>Break Glass já não está ativo e não pode ser revogado.</summary>
+    public static Error BreakGlassNotActive(Guid requestId)
+        => Error.Validation("Identity.BreakGlass.NotActive", "Break glass request '{0}' is not currently active.", requestId);
+
+    // ── JIT Access ───────────────────────────────────────────────────────
+
+    /// <summary>Solicitação JIT não encontrada.</summary>
+    public static Error JitAccessNotFound(Guid requestId)
+        => Error.NotFound("Identity.JitAccess.NotFound", "JIT access request '{0}' was not found.", requestId);
+
+    /// <summary>Auto-aprovação não permitida em solicitações JIT.</summary>
+    public static Error JitSelfApprovalNotAllowed()
+        => Error.Forbidden("Identity.JitAccess.SelfApprovalNotAllowed", "Self-approval is not allowed for JIT access requests.");
+
+    /// <summary>Solicitação JIT não está pendente (já decidida ou expirada).</summary>
+    public static Error JitAccessNotPending(Guid requestId)
+        => Error.Validation("Identity.JitAccess.NotPending", "JIT access request '{0}' is not in a pending state.", requestId);
+
+    // ── Delegation ───────────────────────────────────────────────────────
+
+    /// <summary>Delegação não encontrada.</summary>
+    public static Error DelegationNotFound(Guid delegationId)
+        => Error.NotFound("Identity.Delegation.NotFound", "Delegation '{0}' was not found.", delegationId);
+
+    /// <summary>Tentativa de delegar permissões que o delegante não possui.</summary>
+    public static Error DelegationScopeExceedsGrantor()
+        => Error.Forbidden("Identity.Delegation.ScopeExceedsGrantor", "The requested delegation scope exceeds the grantor's permissions.");
+
+    /// <summary>Tentativa de delegar permissões de administração de sistema.</summary>
+    public static Error DelegationOfSystemAdminNotAllowed()
+        => Error.Forbidden("Identity.Delegation.SystemAdminNotAllowed", "Delegation of system administration permissions is not allowed.");
+
+    /// <summary>Auto-delegação não permitida.</summary>
+    public static Error DelegationToSelfNotAllowed()
+        => Error.Validation("Identity.Delegation.SelfNotAllowed", "A user cannot delegate permissions to themselves.");
+
+    // ── Access Review ────────────────────────────────────────────────────
+
+    /// <summary>Campanha de access review não encontrada.</summary>
+    public static Error AccessReviewCampaignNotFound(Guid campaignId)
+        => Error.NotFound("Identity.AccessReview.CampaignNotFound", "Access review campaign '{0}' was not found.", campaignId);
+
+    /// <summary>Item de access review não encontrado.</summary>
+    public static Error AccessReviewItemNotFound(Guid itemId)
+        => Error.NotFound("Identity.AccessReview.ItemNotFound", "Access review item '{0}' was not found.", itemId);
+
+    // ── SSO / External Identity ──────────────────────────────────────────
+
+    /// <summary>Identidade externa não encontrada.</summary>
+    public static Error ExternalIdentityNotFound(string provider, string externalId)
+        => Error.NotFound("Identity.ExternalIdentity.NotFound", "External identity for provider '{0}' with external ID '{1}' was not found.", provider, externalId);
+
+    /// <summary>Mapeamento de grupo SSO não encontrado.</summary>
+    public static Error SsoGroupMappingNotFound(Guid mappingId)
+        => Error.NotFound("Identity.SsoGroupMapping.NotFound", "SSO group mapping '{0}' was not found.", mappingId);
 }

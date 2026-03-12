@@ -3,7 +3,6 @@
 export interface LoginRequest {
   email: string;
   password: string;
-  tenantId: string;
 }
 
 /** Resposta de autenticação — alinhada com o backend LoginResponse. */
@@ -34,6 +33,25 @@ export interface CurrentUserProfile {
   isActive: boolean;
   lastLoginAt: string | null;
   tenantId: string;
+  roleName: string;
+  permissions: string[];
+}
+
+/** Informações amigáveis de um tenant para seleção. */
+export interface TenantInfo {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  roleName: string;
+}
+
+/** Resposta da seleção de tenant após autenticação. */
+export interface SelectTenantResponse {
+  accessToken: string;
+  expiresIn: number;
+  tenantId: string;
+  tenantName: string;
   roleName: string;
   permissions: string[];
 }
@@ -84,6 +102,72 @@ export interface ActiveSession {
   ipAddress: string;
   userAgent: string;
   expiresAt: string;
+}
+
+// ─── Enterprise: Break Glass ─────────────────────────────────────────────────
+
+/** Solicitação de acesso emergencial (Break Glass). */
+export interface BreakGlassRequest {
+  id: string;
+  requestedBy: string;
+  justification: string;
+  status: 'Active' | 'Expired' | 'Revoked' | 'PostMortemCompleted';
+  requestedAt: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  hasPostMortem: boolean;
+}
+
+/** Resposta da ativação de Break Glass. */
+export interface BreakGlassActivationResponse {
+  requestId: string;
+  expiresAt: string;
+  quarterlyUsageCount: number;
+  quarterlyUsageLimit: number;
+}
+
+// ─── Enterprise: JIT Access ──────────────────────────────────────────────────
+
+/** Solicitação de acesso privilegiado temporário (JIT). */
+export interface JitAccessRequest {
+  id: string;
+  requestedBy: string;
+  permissionCode: string;
+  scope: string;
+  justification: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Expired' | 'Revoked';
+  requestedAt: string;
+  approvalDeadline: string;
+  grantedFrom: string | null;
+  grantedUntil: string | null;
+}
+
+/** Resposta da criação de solicitação JIT. */
+export interface JitAccessCreatedResponse {
+  requestId: string;
+  approvalDeadline: string;
+}
+
+// ─── Enterprise: Delegation ──────────────────────────────────────────────────
+
+/** Delegação formal de permissões entre usuários. */
+export interface DelegationInfo {
+  id: string;
+  grantorId: string;
+  delegateeId: string;
+  permissions: string[];
+  reason: string;
+  status: 'Active' | 'Expired' | 'Revoked';
+  validFrom: string;
+  validUntil: string;
+  createdAt: string;
+}
+
+/** Resposta da criação de delegação. */
+export interface DelegationCreatedResponse {
+  delegationId: string;
+  validFrom: string;
+  validUntil: string;
 }
 
 // ─── Engineering Graph ───────────────────────────────────────────────────────

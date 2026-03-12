@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
+import { TenantSelectionPage } from './pages/TenantSelectionPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ReleasesPage } from './pages/ReleasesPage';
 import { EngineeringGraphPage } from './pages/EngineeringGraphPage';
@@ -30,6 +31,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/select-tenant" element={<TenantSelectionPage />} />
             <Route element={<AppLayout />}>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/releases" element={<ReleasesPage />} />

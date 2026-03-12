@@ -3,22 +3,34 @@ using Microsoft.AspNetCore.Http;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using ActivateUserFeature = NexTraceOne.Identity.Application.Features.ActivateUser.ActivateUser;
 using AssignRoleFeature = NexTraceOne.Identity.Application.Features.AssignRole.AssignRole;
 using ChangePasswordFeature = NexTraceOne.Identity.Application.Features.ChangePassword.ChangePassword;
+using CreateDelegationFeature = NexTraceOne.Identity.Application.Features.CreateDelegation.CreateDelegation;
 using CreateUserFeature = NexTraceOne.Identity.Application.Features.CreateUser.CreateUser;
 using DeactivateUserFeature = NexTraceOne.Identity.Application.Features.DeactivateUser.DeactivateUser;
+using DecideJitAccessFeature = NexTraceOne.Identity.Application.Features.DecideJitAccess.DecideJitAccess;
 using FederatedLoginFeature = NexTraceOne.Identity.Application.Features.FederatedLogin.FederatedLogin;
 using GetCurrentUserFeature = NexTraceOne.Identity.Application.Features.GetCurrentUser.GetCurrentUser;
 using GetUserProfileFeature = NexTraceOne.Identity.Application.Features.GetUserProfile.GetUserProfile;
 using ListActiveSessionsFeature = NexTraceOne.Identity.Application.Features.ListActiveSessions.ListActiveSessions;
+using ListBreakGlassFeature = NexTraceOne.Identity.Application.Features.ListBreakGlassRequests.ListBreakGlassRequests;
+using ListDelegationsFeature = NexTraceOne.Identity.Application.Features.ListDelegations.ListDelegations;
+using ListJitAccessFeature = NexTraceOne.Identity.Application.Features.ListJitAccessRequests.ListJitAccessRequests;
 using ListPermissionsFeature = NexTraceOne.Identity.Application.Features.ListPermissions.ListPermissions;
 using ListRolesFeature = NexTraceOne.Identity.Application.Features.ListRoles.ListRoles;
 using ListTenantUsersFeature = NexTraceOne.Identity.Application.Features.ListTenantUsers.ListTenantUsers;
 using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
 using LogoutFeature = NexTraceOne.Identity.Application.Features.Logout.Logout;
 using RefreshTokenFeature = NexTraceOne.Identity.Application.Features.RefreshToken.RefreshToken;
+using RequestBreakGlassFeature = NexTraceOne.Identity.Application.Features.RequestBreakGlass.RequestBreakGlass;
+using RequestJitAccessFeature = NexTraceOne.Identity.Application.Features.RequestJitAccess.RequestJitAccess;
+using RevokeDelegationFeature = NexTraceOne.Identity.Application.Features.RevokeDelegation.RevokeDelegation;
+using RevokeBreakGlassFeature = NexTraceOne.Identity.Application.Features.RevokeBreakGlass.RevokeBreakGlass;
 using RevokeSessionFeature = NexTraceOne.Identity.Application.Features.RevokeSession.RevokeSession;
+using ListMyTenantsFeature = NexTraceOne.Identity.Application.Features.ListMyTenants.ListMyTenants;
+using SelectTenantFeature = NexTraceOne.Identity.Application.Features.SelectTenant.SelectTenant;
 
 namespace NexTraceOne.Identity.API.Endpoints;
 
@@ -29,7 +41,13 @@ namespace NexTraceOne.Identity.API.Endpoints;
 /// </summary>
 public sealed class IdentityEndpointModule
 {
-    /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
+    /// <summary>
+    /// Registra endpoints no roteador do ASP.NET Core.
+    /// Cada endpoint possui autorização granular baseada em permissão.
+    /// Endpoints públicos (login, federated, refresh) usam AllowAnonymous.
+    /// Endpoints de self-service (logout, /me, password) exigem apenas autenticação.
+    /// Endpoints administrativos exigem permissão específica via RequirePermission.
+    /// </summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v1/identity");
@@ -37,6 +55,10 @@ public sealed class IdentityEndpointModule
         MapAuthEndpoints(group);
         MapUserEndpoints(group);
         MapRoleAndPermissionEndpoints(group);
+        MapBreakGlassEndpoints(group);
+        MapJitAccessEndpoints(group);
+        MapDelegationEndpoints(group);
+        MapTenantEndpoints(group);
     }
 
     /// <summary>Endpoints de autenticação — login, logout, refresh, revoke, /me.</summary>
@@ -124,7 +146,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/identity/users/{0}", localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:users:write");
 
         group.MapGet("/users/{id:guid}", async (
             Guid id,
@@ -134,7 +156,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new GetUserProfileFeature.Query(id), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:users:read");
 
         group.MapGet("/tenants/{tenantId:guid}/users", async (
             Guid tenantId,
@@ -149,7 +171,7 @@ public sealed class IdentityEndpointModule
                 new ListTenantUsersFeature.Query(tenantId, search, page == 0 ? 1 : page, pageSize == 0 ? 20 : pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:users:read");
 
         group.MapPost("/users/{userId:guid}/roles", async (
             Guid userId,
@@ -160,7 +182,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new AssignRoleFeature.Command(userId, request.TenantId, request.RoleId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:roles:assign");
 
         group.MapPut("/users/{userId:guid}/deactivate", async (
             Guid userId,
@@ -170,7 +192,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new DeactivateUserFeature.Command(userId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:users:write");
 
         group.MapPut("/users/{userId:guid}/activate", async (
             Guid userId,
@@ -180,7 +202,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new ActivateUserFeature.Command(userId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:users:write");
 
         group.MapGet("/users/{userId:guid}/sessions", async (
             Guid userId,
@@ -190,7 +212,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new ListActiveSessionsFeature.Query(userId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:sessions:read");
     }
 
     /// <summary>Endpoints de consulta de papéis e permissões do sistema.</summary>
@@ -203,7 +225,7 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new ListRolesFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:roles:read");
 
         group.MapGet("/permissions", async (
             ISender sender,
@@ -212,8 +234,141 @@ public sealed class IdentityEndpointModule
         {
             var result = await sender.Send(new ListPermissionsFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:permissions:read");
+    }
+
+    /// <summary>Endpoints de acesso emergencial (Break Glass) — v1.1 enterprise.</summary>
+    private static void MapBreakGlassEndpoints(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
+    {
+        var bgGroup = group.MapGroup("/break-glass");
+
+        bgGroup.MapPost("/", async (
+            RequestBreakGlassFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequireAuthorization();
+
+        bgGroup.MapPost("/{requestId:guid}/revoke", async (
+            Guid requestId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new RevokeBreakGlassFeature.Command(requestId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:sessions:revoke");
+
+        bgGroup.MapGet("/", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListBreakGlassFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:sessions:read");
+    }
+
+    /// <summary>Endpoints de acesso privilegiado temporário (JIT) — v1.1 enterprise.</summary>
+    private static void MapJitAccessEndpoints(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
+    {
+        var jitGroup = group.MapGroup("/jit-access");
+
+        jitGroup.MapPost("/", async (
+            RequestJitAccessFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequireAuthorization();
+
+        jitGroup.MapPost("/{requestId:guid}/decide", async (
+            Guid requestId,
+            DecideJitRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new DecideJitAccessFeature.Command(requestId, body.Approve, body.RejectionReason),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:sessions:revoke");
+
+        jitGroup.MapGet("/pending", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListJitAccessFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:sessions:read");
+    }
+
+    /// <summary>Endpoints de delegação formal de permissões — v1.1 enterprise.</summary>
+    private static void MapDelegationEndpoints(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
+    {
+        var delGroup = group.MapGroup("/delegations");
+
+        delGroup.MapPost("/", async (
+            CreateDelegationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequireAuthorization();
+
+        delGroup.MapPost("/{delegationId:guid}/revoke", async (
+            Guid delegationId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new RevokeDelegationFeature.Command(delegationId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:sessions:revoke");
+
+        delGroup.MapGet("/", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListDelegationsFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:users:read");
+    }
+
+    /// <summary>Endpoints de tenant — listagem de tenants do usuário autenticado.</summary>
+    private static void MapTenantEndpoints(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
+    {
+        group.MapGet("/tenants/mine", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListMyTenantsFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequireAuthorization();
+
+        group.MapPost("/auth/select-tenant", async (
+            SelectTenantRequest request,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new SelectTenantFeature.Command(request.TenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
         }).RequireAuthorization();
     }
 
+    private sealed record SelectTenantRequest(Guid TenantId);
     private sealed record AssignRoleRequest(Guid TenantId, Guid RoleId);
+    private sealed record DecideJitRequest(bool Approve, string? RejectionReason);
 }

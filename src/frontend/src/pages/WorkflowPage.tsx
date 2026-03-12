@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CheckSquare, Clock, RefreshCw, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
@@ -20,6 +21,7 @@ const TEMPLATE_LEVEL_LABELS = ['Operational', 'Non-Breaking', 'Additive', 'Break
 const TEMPLATE_LEVEL_VARIANTS = ['default', 'success', 'info', 'danger', 'warning'] as const;
 
 export function WorkflowPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [rejectReason, setRejectReason] = useState('');
   const [rejectTarget, setRejectTarget] = useState<{ instanceId: string; stageId: string } | null>(null);
@@ -64,8 +66,8 @@ export function WorkflowPage() {
   return (
     <div className="p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Workflow & Approvals</h1>
-        <p className="text-gray-500 mt-1">Manage approval workflows and evidence packs</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('workflow.title')}</h1>
+        <p className="text-gray-500 mt-1">{t('workflow.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -74,7 +76,7 @@ export function WorkflowPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Clock size={16} className="text-gray-500" />
-              <h2 className="font-semibold text-gray-800">Pending Approvals</h2>
+              <h2 className="font-semibold text-gray-800">{t('workflow.pendingApprovals')}</h2>
               {pending.length > 0 && (
                 <Badge variant="warning">{pending.length}</Badge>
               )}
@@ -88,10 +90,10 @@ export function WorkflowPage() {
             ) : instancesError ? (
               <div className="flex items-center gap-2 px-6 py-8 text-sm text-red-500 justify-center">
                 <XCircle size={16} />
-                <span>Failed to load workflow instances</span>
+                <span>{t('workflow.loadFailed')}</span>
               </div>
             ) : pending.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">No pending approvals</p>
+              <p className="text-sm text-gray-400 text-center py-8">{t('workflow.noPending')}</p>
             ) : (
               <ul className="divide-y divide-gray-100">
                 {pending.map((inst) => (
@@ -102,7 +104,7 @@ export function WorkflowPage() {
                           {inst.id.slice(0, 8)}…
                         </p>
                         {inst.currentStage && (
-                          <p className="text-xs text-gray-500 mt-0.5">Stage: {inst.currentStage}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{t('workflow.stage')}: {inst.currentStage}</p>
                         )}
                         <p className="text-xs text-gray-400 mt-0.5">
                           {new Date(inst.createdAt).toLocaleString()}
@@ -126,7 +128,7 @@ export function WorkflowPage() {
                                     }
                                     loading={approveMutation.isPending}
                                   >
-                                    Approve
+                                    {t('workflow.approve')}
                                   </Button>
                                   <Button
                                     variant="danger"
@@ -134,7 +136,7 @@ export function WorkflowPage() {
                                       setRejectTarget({ instanceId: inst.id, stageId })
                                     }
                                   >
-                                    Reject
+                                    {t('workflow.reject')}
                                   </Button>
                                 </>
                               );
@@ -150,7 +152,7 @@ export function WorkflowPage() {
                         <textarea
                           value={rejectReason}
                           onChange={(e) => setRejectReason(e.target.value)}
-                          placeholder="Reason for rejection (required)"
+                          placeholder={t('workflow.rejectPlaceholder')}
                           rows={2}
                           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
                         />
@@ -162,7 +164,7 @@ export function WorkflowPage() {
                               setRejectReason('');
                             }}
                           >
-                            Cancel
+                            {t('common.cancel')}
                           </Button>
                           <Button
                             variant="danger"
@@ -176,7 +178,7 @@ export function WorkflowPage() {
                               })
                             }
                           >
-                            Confirm Reject
+                            {t('workflow.confirmReject')}
                           </Button>
                         </div>
                       </div>
@@ -193,7 +195,7 @@ export function WorkflowPage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <CheckSquare size={16} className="text-gray-500" />
-              <h2 className="font-semibold text-gray-800">Workflow Templates</h2>
+              <h2 className="font-semibold text-gray-800">{t('workflow.workflowTemplates')}</h2>
             </div>
           </CardHeader>
           <CardBody className="p-0">
@@ -237,17 +239,17 @@ export function WorkflowPage() {
       {instances && instances.items.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
-            <h2 className="font-semibold text-gray-800">All Workflow Instances</h2>
+            <h2 className="font-semibold text-gray-800">{t('workflow.allInstances')}</h2>
           </CardHeader>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">Instance ID</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Release ID</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Status</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Current Stage</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Created</th>
+                   <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.instanceId')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.releaseId')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.status')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.currentStage')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.created')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

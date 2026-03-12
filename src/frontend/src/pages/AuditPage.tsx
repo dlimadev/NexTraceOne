@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Shield, RefreshCw, Search, CheckCircle, XCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { auditApi } from '../api';
 
 export function AuditPage() {
+  const { t } = useTranslation();
   const [eventTypeFilter, setEventTypeFilter] = useState('');
   const [page, setPage] = useState(1);
 
@@ -30,8 +32,8 @@ export function AuditPage() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
-          <p className="text-gray-500 mt-1">Immutable event trail with SHA-256 hash chain</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('audit.title')}</h1>
+          <p className="text-gray-500 mt-1">{t('audit.subtitle')}</p>
         </div>
         <Button
           variant="secondary"
@@ -39,7 +41,7 @@ export function AuditPage() {
           loading={verifying}
         >
           <Shield size={16} />
-          Verify Integrity
+          {t('audit.verifyIntegrity')}
         </Button>
       </div>
 
@@ -75,12 +77,12 @@ export function AuditPage() {
                 setEventTypeFilter(e.target.value);
                 setPage(1);
               }}
-              placeholder="Filter by event type (e.g. ReleaseCreated)"
+              placeholder={t('audit.filterPlaceholder')}
               className="flex-1 text-sm focus:outline-none"
             />
             <Button variant="secondary" onClick={() => refetch()} loading={isFetching}>
               <RefreshCw size={14} />
-              Refresh
+              {t('common.refresh')}
             </Button>
           </div>
         </CardBody>
@@ -91,7 +93,7 @@ export function AuditPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Shield size={16} className="text-gray-500" />
-              <h2 className="font-semibold text-gray-800">Audit Events</h2>
+              <h2 className="font-semibold text-gray-800">{t('audit.auditEvents')}</h2>
             </div>
             {data && (
               <span className="text-sm text-gray-500">{data.totalCount} total</span>
@@ -105,21 +107,21 @@ export function AuditPage() {
             </div>
           ) : isError ? (
             <p className="px-6 py-12 text-sm text-red-500 text-center">
-              Failed to load audit events
+              {t('audit.loadFailed')}
             </p>
           ) : !data?.items?.length ? (
             <p className="px-6 py-12 text-sm text-gray-400 text-center">
-              No audit events found
+              {t('audit.noEvents')}
             </p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">Event Type</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Actor</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Aggregate</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Timestamp</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">Hash</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.eventType')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.actor')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.aggregate')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.timestamp')}</th>
+                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.hash')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -153,17 +155,17 @@ export function AuditPage() {
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
-              Previous
+              {t('audit.previous')}
             </Button>
             <span className="text-sm text-gray-500">
-              Page {data.page} of {data.totalPages}
+              {t('audit.pageOf', { page: data.page, totalPages: data.totalPages })}
             </span>
             <Button
               variant="secondary"
               disabled={page >= data.totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
-              Next
+              {t('common.next')}
             </Button>
           </div>
         )}

@@ -17,7 +17,7 @@ public sealed class CreateUserTests
     public async Task Handle_Should_CreateUser_When_EmailIsAvailable()
     {
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
-        var role = Role.CreateSystem(RoleId.New(), Role.Manager, "Managerial access");
+        var role = Role.CreateSystem(RoleId.New(), Role.Developer, "Developer access");
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();

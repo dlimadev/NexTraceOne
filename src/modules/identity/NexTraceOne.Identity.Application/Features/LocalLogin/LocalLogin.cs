@@ -42,7 +42,8 @@ public static class LocalLogin
         IPasswordHasher passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, LoginResponse>
+        ICurrentTenant currentTenant,
+        ISecurityEventRepository securityEventRepository) : ICommandHandler<Command, LoginResponse>
     {
         public async Task<Result<LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -51,20 +52,28 @@ public static class LocalLogin
             var user = await userRepository.GetByEmailAsync(Email.Create(request.Email), cancellationToken);
             if (user is null || !user.IsActive || user.PasswordHash is null)
             {
+                RecordAuthFailure(request, null, "Invalid credentials or user inactive.");
                 return IdentityErrors.InvalidCredentials();
             }
 
             if (user.IsLocked(dateTimeProvider.UtcNow))
             {
+                RecordAuthFailure(request, user.Id, "Account locked due to excessive failed attempts.");
                 return IdentityErrors.AccountLocked(user.LockoutEnd);
             }
 
             if (!passwordHasher.Verify(request.Password, user.PasswordHash.Value))
             {
                 user.RegisterFailedLogin(dateTimeProvider.UtcNow);
-                return user.IsLocked(dateTimeProvider.UtcNow)
-                    ? IdentityErrors.AccountLocked(user.LockoutEnd)
-                    : IdentityErrors.InvalidCredentials();
+
+                if (user.IsLocked(dateTimeProvider.UtcNow))
+                {
+                    RecordAccountLocked(request, user.Id);
+                    return IdentityErrors.AccountLocked(user.LockoutEnd);
+                }
+
+                RecordAuthFailure(request, user.Id, "Invalid password.");
+                return IdentityErrors.InvalidCredentials();
             }
 
             var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
@@ -96,12 +105,70 @@ public static class LocalLogin
 
             sessionRepository.Add(session);
 
+            RecordAuthSuccess(request, user.Id, membership.TenantId);
+
             return IdentityFeatureSupport.CreateLoginResponse(
                 user,
                 membership,
                 role,
                 jwtTokenGenerator,
                 refreshToken);
+        }
+
+        /// <summary>Registra evento de autenticação bem-sucedida para trilha de auditoria.</summary>
+        private void RecordAuthSuccess(Command request, UserId userId, TenantId tenantId)
+        {
+            securityEventRepository.Add(SecurityEvent.Create(
+                tenantId,
+                userId,
+                sessionId: null,
+                SecurityEventType.AuthenticationSucceeded,
+                $"Local authentication succeeded for user '{userId.Value}'.",
+                riskScore: 0,
+                request.IpAddress,
+                request.UserAgent,
+                metadataJson: null,
+                dateTimeProvider.UtcNow));
+        }
+
+        /// <summary>Registra evento de falha de autenticação para detecção de anomalias.</summary>
+        private void RecordAuthFailure(Command request, UserId? userId, string reason)
+        {
+            var tenantId = currentTenant.Id != Guid.Empty
+                ? TenantId.From(currentTenant.Id)
+                : TenantId.From(Guid.Empty);
+
+            securityEventRepository.Add(SecurityEvent.Create(
+                tenantId,
+                userId,
+                sessionId: null,
+                SecurityEventType.AuthenticationFailed,
+                $"Local authentication failed: {reason}",
+                riskScore: 30,
+                request.IpAddress,
+                request.UserAgent,
+                metadataJson: null,
+                dateTimeProvider.UtcNow));
+        }
+
+        /// <summary>Registra evento de bloqueio de conta por tentativas excessivas.</summary>
+        private void RecordAccountLocked(Command request, UserId userId)
+        {
+            var tenantId = currentTenant.Id != Guid.Empty
+                ? TenantId.From(currentTenant.Id)
+                : TenantId.From(Guid.Empty);
+
+            securityEventRepository.Add(SecurityEvent.Create(
+                tenantId,
+                userId,
+                sessionId: null,
+                SecurityEventType.AccountLocked,
+                $"Account locked for user '{userId.Value}' due to excessive failed login attempts.",
+                riskScore: 70,
+                request.IpAddress,
+                request.UserAgent,
+                metadataJson: null,
+                dateTimeProvider.UtcNow));
         }
     }
 
