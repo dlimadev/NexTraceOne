@@ -12,32 +12,40 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { usePermissions } from '../hooks/usePermissions';
+import type { Permission } from '../auth/permissions';
 
 interface NavItem {
   label: string;
   to: string;
   icon: React.ReactNode;
+  permission?: Permission;
 }
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', to: '/', icon: <LayoutDashboard size={18} /> },
-  { label: 'Releases', to: '/releases', icon: <Zap size={18} /> },
-  { label: 'Engineering Graph', to: '/graph', icon: <GitBranch size={18} /> },
-  { label: 'Contracts', to: '/contracts', icon: <FileText size={18} /> },
-  { label: 'Workflow', to: '/workflow', icon: <CheckSquare size={18} /> },
-  { label: 'Promotion', to: '/promotion', icon: <ArrowUpCircle size={18} /> },
-  { label: 'Users', to: '/users', icon: <Users size={18} /> },
-  { label: 'Audit', to: '/audit', icon: <ClipboardList size={18} /> },
+  { label: 'Releases', to: '/releases', icon: <Zap size={18} />, permission: 'releases:read' },
+  { label: 'Engineering Graph', to: '/graph', icon: <GitBranch size={18} />, permission: 'graph:read' },
+  { label: 'Contracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read' },
+  { label: 'Workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read' },
+  { label: 'Promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read' },
+  { label: 'Users', to: '/users', icon: <Users size={18} />, permission: 'users:read' },
+  { label: 'Audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read' },
 ];
 
 export function Sidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { can } = usePermissions();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const visibleItems = navItems.filter(
+    (item) => !item.permission || can(item.permission)
+  );
 
   return (
     <aside className="w-64 bg-gray-900 text-gray-100 flex flex-col h-screen fixed left-0 top-0">
@@ -55,7 +63,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         <ul className="space-y-1">
-          {navItems.map((item) => (
+          {visibleItems.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}

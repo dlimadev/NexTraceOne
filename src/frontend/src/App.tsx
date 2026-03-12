@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppLayout } from './components/AppLayout';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ReleasesPage } from './pages/ReleasesPage';
@@ -11,6 +12,7 @@ import { UsersPage } from './pages/UsersPage';
 import { WorkflowPage } from './pages/WorkflowPage';
 import { PromotionPage } from './pages/PromotionPage';
 import { AuditPage } from './pages/AuditPage';
+import { UnauthorizedPage } from './pages/UnauthorizedPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,8 +37,23 @@ export default function App() {
               <Route path="/contracts" element={<ContractsPage />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/audit" element={<AuditPage />} />
+              <Route
+                path="/users"
+                element={
+                  <ProtectedRoute permission="users:read" redirectTo="/unauthorized">
+                    <UsersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/audit"
+                element={
+                  <ProtectedRoute permission="audit:read" redirectTo="/unauthorized">
+                    <AuditPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
