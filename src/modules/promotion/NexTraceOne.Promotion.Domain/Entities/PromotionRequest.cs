@@ -1,16 +1,168 @@
+using Ardalis.GuardClauses;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Promotion.Domain.Enums;
+using NexTraceOne.Promotion.Domain.Errors;
 
 namespace NexTraceOne.Promotion.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo Promotion.
-/// TODO: Implementar regras de domínio, invariantes e domain events de PromotionRequest.
+/// Aggregate Root que representa uma solicitação de promoção de release entre ambientes.
+/// Gerencia o ciclo de vida da promoção: Pending → InEvaluation → Approved/Rejected/Blocked/Cancelled.
 /// </summary>
-public sealed class PromotionRequest : AuditableEntity<PromotionRequestId>
+public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private PromotionRequest() { }
+
+    /// <summary>Identificador da release que será promovida.</summary>
+    public Guid ReleaseId { get; private set; }
+
+    /// <summary>Identificador do ambiente de origem da promoção.</summary>
+    public DeploymentEnvironmentId SourceEnvironmentId { get; private set; } = default!;
+
+    /// <summary>Identificador do ambiente de destino da promoção.</summary>
+    public DeploymentEnvironmentId TargetEnvironmentId { get; private set; } = default!;
+
+    /// <summary>Identificador do usuário que solicitou a promoção.</summary>
+    public string RequestedBy { get; private set; } = string.Empty;
+
+    /// <summary>Status atual da solicitação de promoção.</summary>
+    public PromotionStatus Status { get; private set; } = PromotionStatus.Pending;
+
+    /// <summary>Justificativa opcional para a solicitação de promoção.</summary>
+    public string? Justification { get; private set; }
+
+    /// <summary>Data/hora UTC em que a promoção foi solicitada.</summary>
+    public DateTimeOffset RequestedAt { get; private set; }
+
+    /// <summary>Data/hora UTC em que a promoção foi concluída (aprovada, rejeitada, bloqueada ou cancelada).</summary>
+    public DateTimeOffset? CompletedAt { get; private set; }
+
+    /// <summary>
+    /// Cria uma nova solicitação de promoção de release entre ambientes.
+    /// </summary>
+    public static PromotionRequest Create(
+        Guid releaseId,
+        DeploymentEnvironmentId sourceEnvironmentId,
+        DeploymentEnvironmentId targetEnvironmentId,
+        string requestedBy,
+        DateTimeOffset requestedAt)
+    {
+        Guard.Against.Default(releaseId);
+        Guard.Against.Null(sourceEnvironmentId);
+        Guard.Against.Null(targetEnvironmentId);
+        Guard.Against.NullOrWhiteSpace(requestedBy);
+        Guard.Against.StringTooLong(requestedBy, 500);
+
+        return new PromotionRequest
+        {
+            Id = PromotionRequestId.New(),
+            ReleaseId = releaseId,
+            SourceEnvironmentId = sourceEnvironmentId,
+            TargetEnvironmentId = targetEnvironmentId,
+            RequestedBy = requestedBy,
+            Status = PromotionStatus.Pending,
+            RequestedAt = requestedAt
+        };
+    }
+
+    /// <summary>
+    /// Aprova a solicitação de promoção.
+    /// Retorna falha se a transição de status for inválida.
+    /// </summary>
+    public Result<Unit> Approve(DateTimeOffset completedAt)
+    {
+        var result = ValidateTransition(PromotionStatus.Approved);
+        if (result.IsFailure)
+            return result;
+
+        Status = PromotionStatus.Approved;
+        CompletedAt = completedAt;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Rejeita a solicitação de promoção.
+    /// Retorna falha se a transição de status for inválida.
+    /// </summary>
+    public Result<Unit> Reject(DateTimeOffset completedAt)
+    {
+        var result = ValidateTransition(PromotionStatus.Rejected);
+        if (result.IsFailure)
+            return result;
+
+        Status = PromotionStatus.Rejected;
+        CompletedAt = completedAt;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Bloqueia a solicitação de promoção por regra de governança.
+    /// Retorna falha se a transição de status for inválida.
+    /// </summary>
+    public Result<Unit> Block(DateTimeOffset completedAt)
+    {
+        var result = ValidateTransition(PromotionStatus.Blocked);
+        if (result.IsFailure)
+            return result;
+
+        Status = PromotionStatus.Blocked;
+        CompletedAt = completedAt;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Cancela a solicitação de promoção antes de sua conclusão.
+    /// Retorna falha se a transição de status for inválida.
+    /// </summary>
+    public Result<Unit> Cancel(DateTimeOffset completedAt)
+    {
+        var result = ValidateTransition(PromotionStatus.Cancelled);
+        if (result.IsFailure)
+            return result;
+
+        Status = PromotionStatus.Cancelled;
+        CompletedAt = completedAt;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Define a justificativa para a solicitação de promoção.
+    /// </summary>
+    public void SetJustification(string text)
+    {
+        Guard.Against.StringTooLong(text, 4000);
+        Justification = text;
+    }
+
+    /// <summary>
+    /// Valida se a transição de status é permitida.
+    /// Transições válidas: Pending → InEvaluation → (Approved|Rejected|Blocked);
+    /// Pending/InEvaluation → Cancelled.
+    /// </summary>
+    private Result<Unit> ValidateTransition(PromotionStatus newStatus)
+    {
+        if (CompletedAt is not null)
+            return PromotionErrors.AlreadyCompleted();
+
+        var isValid = (Status, newStatus) switch
+        {
+            (PromotionStatus.Pending, PromotionStatus.InEvaluation) => true,
+            (PromotionStatus.Pending, PromotionStatus.Cancelled) => true,
+            (PromotionStatus.InEvaluation, PromotionStatus.Approved) => true,
+            (PromotionStatus.InEvaluation, PromotionStatus.Rejected) => true,
+            (PromotionStatus.InEvaluation, PromotionStatus.Blocked) => true,
+            (PromotionStatus.InEvaluation, PromotionStatus.Cancelled) => true,
+            _ => false
+        };
+
+        if (!isValid)
+            return PromotionErrors.InvalidStatusTransition(Status.ToString(), newStatus.ToString());
+
+        return Unit.Value;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de PromotionRequest.</summary>
