@@ -29,7 +29,15 @@ public static class ContractsErrors
     public static Error EmptySpecContent()
         => Error.Validation("Contracts.ContractVersion.EmptySpecContent", "The OpenAPI spec content cannot be empty.");
 
+    /// <summary>Nenhuma versão anterior encontrada para este ativo de API.</summary>
+    public static Error NoPreviousVersion(string apiAssetId)
+        => Error.Business("Contracts.ContractVersion.NoPreviousVersion", "No previous contract version found for API asset '{0}'.", apiAssetId);
+
     /// <summary>Falha ao computar o diff entre versões de contrato.</summary>
     public static Error DiffComputationFailed(string reason)
         => Error.Business("Contracts.ContractDiff.ComputationFailed", "Failed to compute contract diff: {0}", reason);
+
+    /// <summary>Nenhum diff encontrado para a versão de contrato informada.</summary>
+    public static Error DiffNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.ContractDiff.NotFound", "No diff found for contract version '{0}'.", contractVersionId);
 }

@@ -1,25 +1,64 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Contracts.Application.Abstractions;
+using NexTraceOne.Contracts.Domain.Errors;
 
 namespace NexTraceOne.Contracts.Application.Features.GetContractHistory;
 
 /// <summary>
-/// Feature: GetContractHistory — Módulo: Contracts.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetContractHistory — lista o histórico de versões de contrato de um ativo de API.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetContractHistory
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de histórico de versões de contrato.</summary>
+    public sealed record Query(Guid ApiAssetId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query de histórico de contratos.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ApiAssetId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que lista o histórico de versões de um ativo de API.</summary>
+    public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var versions = await repository.ListByApiAssetAsync(request.ApiAssetId, cancellationToken);
+
+            var summaries = versions
+                .Select(v => new ContractVersionSummary(
+                    v.Id.Value,
+                    v.SemVer,
+                    v.IsLocked,
+                    v.CreatedAt,
+                    v.ImportedFrom))
+                .ToList()
+                .AsReadOnly();
+
+            return new Response(request.ApiAssetId, summaries);
+        }
+    }
+
+    /// <summary>Resumo de uma versão de contrato para listagem.</summary>
+    public sealed record ContractVersionSummary(
+        Guid VersionId,
+        string SemVer,
+        bool IsLocked,
+        DateTimeOffset CreatedAt,
+        string ImportedFrom);
+
+    /// <summary>Resposta do histórico de versões de contrato.</summary>
+    public sealed record Response(
+        Guid ApiAssetId,
+        IReadOnlyList<ContractVersionSummary> Versions);
 }
+
