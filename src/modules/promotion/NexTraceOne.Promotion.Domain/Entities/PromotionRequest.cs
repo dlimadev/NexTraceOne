@@ -129,6 +129,21 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     }
 
     /// <summary>
+    /// Inicia o processo de avaliação da solicitação de promoção.
+    /// Transição: Pending → InEvaluation.
+    /// Retorna falha se a transição de status for inválida.
+    /// </summary>
+    public Result<Unit> StartEvaluation()
+    {
+        var result = ValidateTransition(PromotionStatus.InEvaluation);
+        if (result.IsFailure)
+            return result;
+
+        Status = PromotionStatus.InEvaluation;
+        return Unit.Value;
+    }
+
+    /// <summary>
     /// Define a justificativa para a solicitação de promoção.
     /// </summary>
     public void SetJustification(string text)
