@@ -1,25 +1,68 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Workflow.Application.Abstractions;
+using NexTraceOne.Workflow.Domain.Entities;
 
 namespace NexTraceOne.Workflow.Application.Features.CreateWorkflowTemplate;
 
 /// <summary>
-/// Feature: CreateWorkflowTemplate — Módulo: Workflow.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: CreateWorkflowTemplate — cria um novo template reutilizável de workflow de aprovação.
+/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class CreateWorkflowTemplate
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Comando para criação de um template de workflow.</summary>
+    public sealed record Command(
+        string Name,
+        string Description,
+        string ChangeType,
+        string ApiCriticality,
+        string TargetEnvironment,
+        int MinimumApprovers) : ICommand<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada do comando de criação de template.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.Description).NotNull().MaximumLength(2000);
+            RuleFor(x => x.ChangeType).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.ApiCriticality).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.TargetEnvironment).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.MinimumApprovers).GreaterThanOrEqualTo(1);
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que cria um novo WorkflowTemplate e o persiste.</summary>
+    public sealed class Handler(
+        IWorkflowTemplateRepository repository,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+    {
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var template = WorkflowTemplate.Create(
+                request.Name,
+                request.Description,
+                request.ChangeType,
+                request.ApiCriticality,
+                request.TargetEnvironment,
+                request.MinimumApprovers,
+                dateTimeProvider.UtcNow);
+
+            repository.Add(template);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return new Response(template.Id.Value, template.Name, template.IsActive);
+        }
+    }
+
+    /// <summary>Resposta da criação do template de workflow.</summary>
+    public sealed record Response(Guid TemplateId, string Name, bool IsActive);
 }
