@@ -1,14 +1,16 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Utilitário para simular uma sessão autenticada injetando tokens no localStorage.
- * Intercepta a chamada de perfil para retornar dados configuráveis.
+ * Utilitário para simular uma sessão autenticada nos testes E2E de módulos.
+ *
+ * Segurança: utiliza sessionStorage com as chaves reais do tokenStorage (nxt_at, nxt_tid, nxt_uid),
+ * mantendo paridade com o comportamento de produção. O refresh token permanece apenas em memória.
  */
 async function mockAuthSession(page: Page, roles: string[] = ['Admin']): Promise<void> {
   await page.addInitScript(() => {
-    localStorage.setItem('access_token', 'mock-e2e-token');
-    localStorage.setItem('tenant_id', 'tenant-e2e-001');
-    localStorage.setItem('user_id', 'user-e2e-001');
+    sessionStorage.setItem('nxt_at', 'mock-e2e-token');
+    sessionStorage.setItem('nxt_tid', 'tenant-e2e-001');
+    sessionStorage.setItem('nxt_uid', 'user-e2e-001');
   });
 
   await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>

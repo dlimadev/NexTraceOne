@@ -65,15 +65,15 @@ builder.Services.AddAuditModule(builder.Configuration);
 // [5] OpenAPI
 builder.Services.AddOpenApi();
 
-// [6] CORS para frontend
+// [6] CORS para frontend — restringido a métodos e headers necessários
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:5173", "http://localhost:3000"];
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
         policy.WithOrigins(corsOrigins)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
+            .WithHeaders("Content-Type", "Authorization", "X-Tenant-Id", "X-Requested-With")
+            .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
             .AllowCredentials());
 });
 
@@ -163,6 +163,25 @@ if (shouldMigrate)
 
 // ── Middlewares na ordem correta ──
 app.UseHttpsRedirection();
+
+// [Security] Headers de segurança — aplicados antes de qualquer conteúdo
+// Estes headers reduzem superfície de ataque contra XSS, clickjacking, MIME sniffing e downgrade de protocolo.
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["X-XSS-Protection"] = "0";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
+
+    if (!app.Environment.IsDevelopment())
+    {
+        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+    }
+
+    await next();
+});
 
 // Resolve o tenant antes da autenticação/autorização
 app.UseMiddleware<TenantResolutionMiddleware>();

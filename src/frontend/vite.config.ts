@@ -14,6 +14,21 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // Segurança on-premise: nunca gerar source maps em produção.
+    // Source maps expõem o código-fonte original e facilitam engenharia reversa.
+    sourcemap: false,
+    // Limitar tamanho de chunk para evitar exposição excessiva em um único arquivo
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        // Nomes sem hash de conteúdo no path para dificultar mapeamento
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

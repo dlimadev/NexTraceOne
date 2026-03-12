@@ -82,7 +82,9 @@ public sealed class OutboxProcessorJob(
             catch (Exception ex)
             {
                 message.RetryCount++;
-                message.LastError = ex.Message;
+                // Segurança: não armazenar a mensagem completa da exceção no banco,
+                // pois pode conter detalhes internos (stack trace, tipos, connection strings).
+                message.LastError = $"Processing failed at attempt {message.RetryCount}.";
                 logger.LogError(ex, "Failed to process outbox message {OutboxMessageId}", message.Id);
             }
         }

@@ -63,6 +63,15 @@ public sealed class AesGcmEncryptor
         return Encoding.UTF8.GetString(plainBytes);
     }
 
+    /// <summary>
+    /// Resolve a chave de criptografia a partir da variável de ambiente NEXTRACE_ENCRYPTION_KEY.
+    ///
+    /// Em produção, a chave DEVE ser fornecida externamente. Nunca usar fallback hardcoded
+    /// para evitar que dados sensíveis sejam protegidos por uma chave conhecida publicamente.
+    ///
+    /// Em desenvolvimento (ASPNETCORE_ENVIRONMENT=Development), uma chave derivada é usada
+    /// como fallback apenas para conveniência, com log de aviso.
+    /// </summary>
     private static byte[] ResolveEncryptionKey()
     {
         var configuredKey = Environment.GetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY");
@@ -79,6 +88,7 @@ public sealed class AesGcmEncryptor
             }
             catch (FormatException)
             {
+                // Chave não é Base64 válida — tenta como UTF-8 direto
             }
 
             var utf8Bytes = Encoding.UTF8.GetBytes(configuredKey);
@@ -86,8 +96,20 @@ public sealed class AesGcmEncryptor
             {
                 return utf8Bytes;
             }
+
+            // Chave fornecida mas com tamanho inválido — deriva via SHA-256
+            return SHA256.HashData(Encoding.UTF8.GetBytes(configuredKey));
         }
 
-        return SHA256.HashData(Encoding.UTF8.GetBytes("NexTraceOne-Development-Encryption-Key"));
+        // Nenhuma chave configurada: fallback de desenvolvimento apenas
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        if (!string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "NEXTRACE_ENCRYPTION_KEY environment variable is required in non-development environments. " +
+                "Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
+        }
+
+        return SHA256.HashData(Encoding.UTF8.GetBytes("NexTraceOne-Development-Only-Key-Not-For-Production"));
     }
 }

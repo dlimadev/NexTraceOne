@@ -7,8 +7,9 @@ namespace NexTraceOne.BuildingBlocks.Application.Behaviors;
 
 /// <summary>
 /// Pipeline behavior que loga entrada, saída e duração de cada request MediatR.
-/// Log de entrada inclui: tipo do request e dados (sem informação sensível).
-/// Log de saída inclui: sucesso/falha e tempo de execução em ms.
+///
+/// Segurança: o request NÃO é serializado no log para evitar vazamento de dados sensíveis
+/// (senhas, tokens, dados pessoais). Apenas o nome do tipo é registrado.
 /// </summary>
 public sealed class LoggingBehavior<TRequest, TResponse>(
     ILogger<LoggingBehavior<TRequest, TResponse>> logger)
@@ -23,7 +24,9 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
         var requestName = typeof(TRequest).Name;
         var stopwatch = Stopwatch.StartNew();
 
-        logger.LogInformation("Handling request {RequestName}: {@Request}", requestName, request);
+        // Segurança: não logar o conteúdo do request para evitar vazamento de dados sensíveis
+        // (senhas, tokens, API keys, dados pessoais) em logs e sistemas de observabilidade.
+        logger.LogInformation("Handling request {RequestName}", requestName);
 
         var response = await next();
 
