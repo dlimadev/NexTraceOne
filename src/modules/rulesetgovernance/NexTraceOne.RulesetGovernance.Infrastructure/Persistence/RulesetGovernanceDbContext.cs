@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.RulesetGovernance.Domain.Entities;
 
 namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
 
@@ -14,10 +15,22 @@ public sealed class RulesetGovernanceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Rulesets de governança persistidos no módulo RulesetGovernance.</summary>
+    public DbSet<Ruleset> Rulesets => Set<Ruleset>();
 
+    /// <summary>Bindings de ruleset para tipos de ativo.</summary>
+    public DbSet<RulesetBinding> RulesetBindings => Set<RulesetBinding>();
+
+    /// <summary>Resultados de execução de linting.</summary>
+    public DbSet<LintResult> LintResults => Set<LintResult>();
+
+    /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RulesetGovernanceDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

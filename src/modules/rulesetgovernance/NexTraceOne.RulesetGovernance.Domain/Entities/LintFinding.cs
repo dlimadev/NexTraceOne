@@ -1,24 +1,45 @@
-using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.RulesetGovernance.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo RulesetGovernance.
-/// TODO: Implementar regras de domínio, invariantes e domain events de LintFinding.
+/// Value Object que representa um finding individual de uma execução de linting.
+/// Contém regra violada, severidade, mensagem descritiva e caminho do arquivo/local.
 /// </summary>
-public sealed class LintFinding : AuditableEntity<LintFindingId>
+public sealed class Finding : ValueObject
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
-    private LintFinding() { }
-}
+    private Finding() { }
 
-/// <summary>Identificador fortemente tipado de LintFinding.</summary>
-public sealed record LintFindingId(Guid Value) : TypedIdBase(Value)
-{
-    /// <summary>Cria novo Id com Guid gerado automaticamente.</summary>
-    public static LintFindingId New() => new(Guid.NewGuid());
+    /// <summary>Nome da regra violada.</summary>
+    public string Rule { get; private set; } = string.Empty;
 
-    /// <summary>Cria Id a partir de Guid existente.</summary>
-    public static LintFindingId From(Guid id) => new(id);
+    /// <summary>Severidade do finding.</summary>
+    public FindingSeverity Severity { get; private set; }
+
+    /// <summary>Mensagem descritiva do finding.</summary>
+    public string Message { get; private set; } = string.Empty;
+
+    /// <summary>Caminho do elemento no documento onde a violação foi encontrada.</summary>
+    public string Path { get; private set; } = string.Empty;
+
+    /// <summary>Cria um novo finding de linting.</summary>
+    public static Finding Create(string rule, FindingSeverity severity, string message, string path)
+    {
+        return new Finding
+        {
+            Rule = rule,
+            Severity = severity,
+            Message = message,
+            Path = path
+        };
+    }
+
+    /// <inheritdoc />
+    protected override IEnumerable<object?> GetEqualityComponents()
+    {
+        yield return Rule;
+        yield return Severity;
+        yield return Message;
+        yield return Path;
+    }
 }

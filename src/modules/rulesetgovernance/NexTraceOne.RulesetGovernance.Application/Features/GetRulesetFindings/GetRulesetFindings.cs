@@ -1,25 +1,68 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.RulesetGovernance.Application.Abstractions;
+using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.RulesetGovernance.Domain.Errors;
 
 namespace NexTraceOne.RulesetGovernance.Application.Features.GetRulesetFindings;
 
 /// <summary>
-/// Feature: GetRulesetFindings — Módulo: RulesetGovernance.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetRulesetFindings -- retorna os findings de linting de uma release.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetRulesetFindings
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de consulta de findings de uma release.</summary>
+    public sealed record Query(Guid ReleaseId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query de findings.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ReleaseId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que retorna os findings de linting de uma release.</summary>
+    public sealed class Handler(ILintResultRepository repository) : IQueryHandler<Query, Response>
+    {
+        /// <summary>Processa a query de findings.</summary>
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var lintResult = await repository.GetByReleaseIdAsync(request.ReleaseId, cancellationToken);
+            if (lintResult is null)
+                return RulesetGovernanceErrors.LintResultNotFound(request.ReleaseId.ToString());
+
+            var findingDtos = lintResult.Findings.Select(f => new FindingDto(
+                f.Rule,
+                f.Severity.ToString(),
+                f.Message,
+                f.Path)).ToList();
+
+            return new Response(
+                lintResult.Id.Value,
+                lintResult.ReleaseId,
+                lintResult.Score,
+                lintResult.TotalFindings,
+                findingDtos,
+                lintResult.ExecutedAt);
+        }
+    }
+
+    /// <summary>DTO de um finding individual.</summary>
+    public sealed record FindingDto(string Rule, string Severity, string Message, string Path);
+
+    /// <summary>Resposta com os findings da release.</summary>
+    public sealed record Response(
+        Guid LintResultId,
+        Guid ReleaseId,
+        decimal Score,
+        int TotalFindings,
+        IReadOnlyList<FindingDto> Findings,
+        DateTimeOffset ExecutedAt);
 }
