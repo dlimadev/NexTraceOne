@@ -2,4 +2,7 @@ export { identityApi } from './identity';
 export { engineeringGraphApi } from './engineeringGraph';
 export { contractsApi } from './contracts';
 export { changeIntelligenceApi } from './changeIntelligence';
+export { workflowApi } from './workflow';
+export { auditApi } from './audit';
+export { promotionApi } from './promotion';
 export { default as apiClient } from './client';
