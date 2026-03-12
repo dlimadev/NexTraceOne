@@ -45,6 +45,7 @@ public static class ChangePassword
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -94,7 +95,7 @@ public static class ChangePassword
                 ? TenantId.From(currentTenant.Id)
                 : TenantId.From(Guid.Empty);
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 userId,
                 sessionId: null,
@@ -104,7 +105,10 @@ public static class ChangePassword
                 ipAddress: null,
                 userAgent: null,
                 metadataJson: null,
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
         }
 
         /// <summary>
@@ -118,7 +122,7 @@ public static class ChangePassword
                 ? TenantId.From(currentTenant.Id)
                 : TenantId.From(Guid.Empty);
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 userId,
                 sessionId: null,
@@ -128,7 +132,10 @@ public static class ChangePassword
                 ipAddress: null,
                 userAgent: null,
                 metadataJson: null,
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
         }
     }
 }

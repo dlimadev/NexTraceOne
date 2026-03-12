@@ -18,6 +18,7 @@ builder.Services.AddSingleton<ICurrentTenant, WorkerCurrentTenant>();
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddHostedService<OutboxProcessorJob>();
+builder.Services.AddHostedService<IdentityExpirationJob>();
 
 var host = builder.Build();
 host.Run();

@@ -53,6 +53,9 @@ public static class DependencyInjection
         services.AddScoped<IAccessReviewRepository, AccessReviewRepository>();
         services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
 
+        // Repositórios — v1.2 Autorização por Ambiente
+        services.AddScoped<IEnvironmentRepository, EnvironmentRepository>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -64,6 +67,10 @@ public static class DependencyInjection
         // Ponte de auditoria: propaga SecurityEvents do Identity para o módulo Audit central.
         // ISecurityAuditBridge é injetado opcionalmente nos handlers que geram eventos críticos.
         services.AddScoped<ISecurityAuditBridge, SecurityAuditBridge>();
+
+        // Rastreador de eventos de segurança para propagação automática ao Audit central.
+        // Escopo por requisição — acumula eventos durante a execução do handler.
+        services.AddScoped<ISecurityEventTracker, SecurityEventTracker>();
 
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
