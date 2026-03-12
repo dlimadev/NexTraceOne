@@ -74,7 +74,9 @@
   "header": {
     "toggleLanguage": "Toggle language",
     "notifications": "Notifications",
-    "settings": "Settings"
+    "settings": "Settings",
+    "languagePortuguese": "Português",
+    "languageEnglish": "English"
   },
   "commandPalette": {
     "title": "Command Palette",

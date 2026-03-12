@@ -6,16 +6,21 @@ import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { identityApi } from '../api';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Página de gestão de usuários do módulo Identity.
  * Lista usuários do tenant atual com paginação e permite criação de novos usuários.
  * Todos os textos são resolvidos via i18n (chaves em users.*).
+ *
+ * O tenantId é obtido do AuthContext (fonte de verdade) em vez de localStorage,
+ * evitando manipulação direta de storage e garantindo consistência com o estado de autenticação.
  */
 export function UsersPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [tenantId] = useState(() => localStorage.getItem('tenant_id') ?? '');
+  const { tenantId: authTenantId } = useAuth();
+  const tenantId = authTenantId ?? '';
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ email: '', firstName: '', lastName: '', tenantId });
 
@@ -62,6 +67,8 @@ export function UsersPage() {
                   value={form.firstName}
                   onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
                   required
+                  maxLength={100}
+                  autoComplete="given-name"
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
@@ -72,6 +79,8 @@ export function UsersPage() {
                   value={form.lastName}
                   onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
                   required
+                  maxLength={100}
+                  autoComplete="family-name"
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
@@ -82,6 +91,8 @@ export function UsersPage() {
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   required
+                  maxLength={254}
+                  autoComplete="email"
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>

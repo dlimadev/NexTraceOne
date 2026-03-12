@@ -1,31 +1,113 @@
+/**
+ * Cliente HTTP centralizado da aplicação — ponto único de comunicação com a API.
+ *
+ * Medidas de segurança implementadas:
+ * - Tokens lidos de sessionStorage (access) e memória (refresh), nunca de localStorage.
+ * - Interceptor de refresh tenta renovar o access token antes de forçar re-login.
+ * - Nenhum dado sensível é logado no console em caso de erro.
+ * - Evento customizado 'auth:session-expired' permite que o AuthContext reaja
+ *   sem acoplamento direto (evita import circular).
+ *
+ * @see src/utils/tokenStorage.ts para detalhes da estratégia de armazenamento.
+ */
 import axios from 'axios';
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import {
+  getAccessToken,
+  getTenantId,
+  getRefreshToken,
+  storeTokens,
+  clearAllTokens,
+} from '../utils/tokenStorage';
 
 const apiClient = axios.create({
   baseURL: '/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
+/**
+ * Interceptor de request: injeta access token e tenant ID de forma segura.
+ * Tokens são obtidos do módulo tokenStorage (sessionStorage + memória).
+ */
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  const tenantId = localStorage.getItem('tenant_id');
+  const tenantId = getTenantId();
   if (tenantId) {
     config.headers['X-Tenant-Id'] = tenantId;
   }
   return config;
 });
 
+/**
+ * Flag para evitar múltiplas tentativas simultâneas de refresh.
+ * Quando um refresh está em andamento, requests subsequentes aguardam o resultado.
+ */
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string) => void> = [];
+
+function onRefreshComplete(newToken: string): void {
+  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(callback: (token: string) => void): void {
+  refreshSubscribers.push(callback);
+}
+
+/**
+ * Interceptor de response: tenta refresh do token antes de invalidar sessão.
+ *
+ * Fluxo de 401:
+ * 1. Se existe refresh token em memória, tenta renová-lo.
+ * 2. Se o refresh for bem-sucedido, re-executa o request original com o novo token.
+ * 3. Se o refresh falhar, limpa sessão e dispara evento 'auth:session-expired'.
+ * 4. Não faz window.location.href diretamente para evitar race conditions.
+ */
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('tenant_id');
-      window.location.href = '/login';
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      const refreshToken = getRefreshToken();
+
+      if (refreshToken) {
+        if (isRefreshing) {
+          return new Promise((resolve) => {
+            addRefreshSubscriber((newToken: string) => {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              resolve(apiClient(originalRequest));
+            });
+          });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+          const { data } = await axios.post('/api/v1/identity/auth/refresh', { refreshToken });
+          const newAccessToken = data.accessToken as string;
+          const newRefreshToken = data.refreshToken as string;
+          storeTokens(newAccessToken, newRefreshToken);
+          onRefreshComplete(newAccessToken);
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return apiClient(originalRequest);
+        } catch {
+          clearAllTokens();
+          window.dispatchEvent(new CustomEvent('auth:session-expired'));
+          return Promise.reject(error);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
+      clearAllTokens();
+      window.dispatchEvent(new CustomEvent('auth:session-expired'));
     }
+
     return Promise.reject(error);
   }
 );

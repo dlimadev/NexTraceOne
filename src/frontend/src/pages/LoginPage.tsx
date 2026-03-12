@@ -80,6 +80,8 @@ export function LoginPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('auth.emailPlaceholder')}
+                maxLength={254}
+                autoComplete="email"
                 className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
@@ -96,6 +98,8 @@ export function LoginPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('auth.passwordPlaceholder')}
+                maxLength={128}
+                autoComplete="current-password"
                 className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>

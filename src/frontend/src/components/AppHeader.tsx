@@ -63,7 +63,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
                   onClick={toggleLang}
                   className="w-full text-left px-3 py-2 text-sm text-body hover:bg-hover transition-colors"
                 >
-                  {i18n.language?.startsWith('pt') ? 'English' : 'Português'}
+                  {i18n.language?.startsWith('pt') ? t('header.languageEnglish') : t('header.languagePortuguese')}
                 </button>
               </div>
             </>
