@@ -7,5 +7,9 @@ namespace NexTraceOne.EngineeringGraph.Contracts.ServiceInterfaces;
 /// </summary>
 public interface IEngineeringGraphModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
+    /// <summary>Verifica se um ativo de API existe pelo seu identificador.</summary>
+    Task<bool> ApiAssetExistsAsync(Guid apiAssetId, CancellationToken cancellationToken);
+
+    /// <summary>Verifica se um ativo de serviço existe pelo nome único.</summary>
+    Task<bool> ServiceAssetExistsAsync(string serviceName, CancellationToken cancellationToken);
 }

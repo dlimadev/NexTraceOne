@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.EngineeringGraph.Domain.Entities;
 
 namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
 
@@ -14,10 +15,27 @@ public sealed class EngineeringGraphDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Ativos de API persistidos do módulo EngineeringGraph.</summary>
+    public DbSet<ApiAsset> ApiAssets => Set<ApiAsset>();
+
+    /// <summary>Ativos de serviço persistidos do módulo EngineeringGraph.</summary>
+    public DbSet<ServiceAsset> ServiceAssets => Set<ServiceAsset>();
+
+    /// <summary>Relações de consumo persistidas do módulo EngineeringGraph.</summary>
+    public DbSet<ConsumerRelationship> ConsumerRelationships => Set<ConsumerRelationship>();
+
+    /// <summary>Consumidores conhecidos persistidos do módulo EngineeringGraph.</summary>
+    public DbSet<ConsumerAsset> ConsumerAssets => Set<ConsumerAsset>();
+
+    /// <summary>Fontes de descoberta persistidas do módulo EngineeringGraph.</summary>
+    public DbSet<DiscoverySource> DiscoverySources => Set<DiscoverySource>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(EngineeringGraphDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }
