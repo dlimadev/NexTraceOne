@@ -5,7 +5,7 @@
 Metodologia: **1 módulo por vez · 1 camada por vez · 1 aggregate por vez**.
 Cada fase termina com aprovação antes de iniciar a próxima.
 
-> **Última atualização:** Março 2026 — Pós-conclusão do módulo Contracts.
+> **Última atualização:** Março 2026 — Pós-conclusão dos módulos ChangeIntelligence, RulesetGovernance e Workflow.
 > Ver `docs/MVP1-EXPANDED-PLAN.md` para análise detalhada de valor vs. esforço por módulo.
 
 ---
@@ -19,19 +19,19 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 - ✅ **Licensing** — Domain + Application + Infrastructure 100% completos (LicensingDbContext, Repositories, Migrations)
 - ✅ **EngineeringGraph** — Domain + Application + Infrastructure + API 100% completos (ApiAsset, ServiceAsset, ConsumerRelationship, Discovery, Migrations, Testes)
 - ✅ **Contracts** — Domain + Application + Infrastructure + API 100% completos (ContractVersion, ContractDiff, SemanticDiff, BreakingChange classification, Migrations, Testes)
+- ✅ **ChangeIntelligence** — Domain + Application + Infrastructure + API 100% completos (Release, ChangeEvent, BlastRadius, ChangeScore, NotifyDeployment, CalculateBlastRadius, Migrations, Testes)
+- ✅ **RulesetGovernance** — Domain + Application + Infrastructure + API 100% completos (Ruleset, LintResult, UploadRuleset, ExecuteLint, Spectral-compatible, Migrations, Testes)
+- ✅ **Workflow** — Domain + Application + Infrastructure + API 100% completos (12 features: CreateWorkflowTemplate, InitiateWorkflow, ApproveStage, RejectWorkflow, RequestChanges, AddObservation, GetWorkflowStatus, ListPendingApprovals, GenerateEvidencePack, GetEvidencePack, ExportEvidencePackPdf, EscalateSlaViolation, WorkflowDbContext, Migrations, Testes)
 - ✅ **Scaffold completo** — 14 módulos × 5 camadas criados (estrutura física e entities de domínio definidas)
-- ✅ **Testes unitários** — Building Blocks, Identity, Licensing, EngineeringGraph, Contracts
+- ✅ **Testes unitários** — Building Blocks, Identity, Licensing, EngineeringGraph, Contracts, ChangeIntelligence, RulesetGovernance, Workflow
 
 ### O que está pendente:
 
-- 🔲 **ChangeIntelligence** — features são stubs com TODO (CORE DO PRODUTO)
-- 🔲 **RulesetGovernance** — features são stubs com TODO
-- 🔲 **Workflow** — features são stubs com TODO
-- 🔲 **Promotion** — features são stubs com TODO
-- 🔲 **Audit** — features são stubs com TODO
-- 🔲 **DeveloperPortal** — features são stubs com TODO
-- 🔲 **RuntimeIntelligence** (parcial) — features são stubs com TODO
-- 🔲 **CostIntelligence** (parcial) — features são stubs com TODO
+- 🔲 **DeveloperPortal** — SearchCatalog, GetApiDetail, GetMyApis, GetApiConsumers
+- 🔲 **Promotion** — CreatePromotionRequest, EvaluatePromotionGates, ApprovePromotion, RollbackPromotion
+- 🔲 **Audit** — RecordAuditEvent, GetAuditTrail, SearchAuditLog, VerifyChainIntegrity, ExportAuditReport
+- 🔲 **RuntimeIntelligence** (parcial) — IngestRuntimeSnapshot, GetRuntimeDriftFindings
+- 🔲 **CostIntelligence** (parcial) — IngestCostSnapshot, GetCostByRelease, AttributeCostToService
 - ❌ **AiOrchestration** — excluído do MVP1, vai para MVP2
 - ❌ **ExternalAi** — excluído do MVP1, vai para MVP2
 
@@ -174,71 +174,85 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 
 ---
 
-## FASE 4 — Change Intelligence (Semanas 11–14) — CORE DO PRODUTO
+## FASE 4 — Change Intelligence (Semanas 11–14) — ✅ CONCLUÍDA
 
-### Semana 11: ChangeIntelligence — Pipeline Inicial
-
-| Feature | Status |
-|---------|--------|
-| Release (Aggregate Root) | 🔲 |
-| ChangeEvent (Entity) | 🔲 |
-| NotifyDeployment | 🔲 |
-| ClassifyChangeLevel | 🔲 |
-| UpdateDeploymentState | 🔲 |
-
-### Semana 12: ChangeIntelligence — Blast Radius
+### Semana 11: ChangeIntelligence — Pipeline Inicial ✅
 
 | Feature | Status |
 |---------|--------|
-| BlastRadiusReport (Entity) | 🔲 |
-| CalculateBlastRadius (consome EngineeringGraph via Contracts) | 🔲 |
-| ComputeChangeScore | 🔲 |
+| Release (Aggregate Root) | ✅ |
+| ChangeEvent (Entity) | ✅ |
+| NotifyDeployment | ✅ |
+| ClassifyChangeLevel | ✅ |
+| UpdateDeploymentState | ✅ |
 
-### Semana 13: ChangeIntelligence — Queries e Rollback
-
-| Feature | Status |
-|---------|--------|
-| GetRelease | 🔲 |
-| ListReleases | 🔲 |
-| GetBlastRadiusReport | 🔲 |
-| RegisterRollback | 🔲 |
-| ChangeIntelligenceDbContext + Migrations | 🔲 |
-
-### Semana 14: RulesetGovernance
+### Semana 12: ChangeIntelligence — Blast Radius ✅
 
 | Feature | Status |
 |---------|--------|
-| Ruleset (Aggregate Root) | 🔲 |
-| LintExecution (Entity) | 🔲 |
-| UploadRuleset | 🔲 |
-| ExecuteLintForRelease | 🔲 |
-| GetLintResult | 🔲 |
-| RulesetGovernanceDbContext + Migrations | 🔲 |
+| BlastRadiusReport (Entity) | ✅ |
+| CalculateBlastRadius (consome EngineeringGraph via Contracts) | ✅ |
+| ComputeChangeScore | ✅ |
 
-**Entregável:** Pipeline completo de classificação de mudança com blast radius e score.
+### Semana 13: ChangeIntelligence — Queries e Rollback ✅
+
+| Feature | Status |
+|---------|--------|
+| GetRelease | ✅ |
+| ListReleases | ✅ |
+| GetBlastRadiusReport | ✅ |
+| RegisterRollback | ✅ |
+| ChangeIntelligenceDbContext + Migrations | ✅ |
+
+### Semana 14: RulesetGovernance ✅
+
+| Feature | Status |
+|---------|--------|
+| Ruleset (Aggregate Root) | ✅ |
+| LintResult (Entity) | ✅ |
+| UploadRuleset | ✅ |
+| ExecuteLintForRelease | ✅ |
+| GetRulesetFindings | ✅ |
+| ComputeRulesetScore | ✅ |
+| InstallDefaultRulesets | ✅ |
+| RulesetGovernanceDbContext + Migrations | ✅ |
+
+**Entregável:** ✅ Pipeline completo de classificação de mudança com blast radius e score.
 
 ---
 
-## FASE 5 — Governança e Aprovação (Semanas 15–18)
+## FASE 5 — Governança e Aprovação (Semanas 15–18) — 🟡 EM PROGRESSO
 
-### Semana 15: Workflow — Template e Iniciação
-
-| Feature | Status |
-|---------|--------|
-| WorkflowTemplate (Aggregate Root) | 🔲 |
-| WorkflowInstance (Entity) | 🔲 |
-| CreateWorkflowTemplate | 🔲 |
-| InitiateWorkflow | 🔲 |
-
-### Semana 16: Workflow — Aprovação e Evidence Pack
+### Semana 15: Workflow — Template e Iniciação ✅
 
 | Feature | Status |
 |---------|--------|
-| ApproveStage | 🔲 |
-| RejectWorkflow | 🔲 |
-| GenerateEvidencePack | 🔲 |
-| ExportEvidencePackPdf | 🔲 |
-| WorkflowDbContext + Migrations | 🔲 |
+| WorkflowTemplate (Aggregate Root) | ✅ |
+| WorkflowInstance (Aggregate Root) | ✅ |
+| WorkflowStage (Entity) | ✅ |
+| ApprovalDecision (Entity) | ✅ |
+| EvidencePack (Aggregate Root) | ✅ |
+| SlaPolicy (Entity) | ✅ |
+| CreateWorkflowTemplate | ✅ |
+| InitiateWorkflow | ✅ |
+
+### Semana 16: Workflow — Aprovação e Evidence Pack ✅
+
+| Feature | Status |
+|---------|--------|
+| ApproveStage | ✅ |
+| RejectWorkflow | ✅ |
+| RequestChanges | ✅ |
+| AddObservation | ✅ |
+| GetWorkflowStatus | ✅ |
+| ListPendingApprovals | ✅ |
+| GenerateEvidencePack | ✅ |
+| GetEvidencePack | ✅ |
+| ExportEvidencePackPdf | ✅ |
+| EscalateSlaViolation | ✅ |
+| WorkflowDbContext + Migrations | ✅ |
+| IWorkflowModule (WorkflowModuleService) | ✅ |
+| Testes unitários (domínio + aplicação) | ✅ |
 
 ### Semana 17: Promotion — Request e Gates
 
@@ -327,11 +341,12 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 
 ## Próximos Passos Imediatos
 
-1. **Completar `LicensingDbContext`, `LicenseRepository` e migrations** (Fase 2, Semana 5)
-2. **Implementar `EngineeringGraph`** — `RegisterApiAsset` + `MapConsumerRelationship` (Fase 2, Semana 6)
-3. **Implementar `Contracts`** — `ImportContract` + `ComputeSemanticDiff` (Fase 3, Semana 8)
-4. **Implementar `ChangeIntelligence`** — `NotifyDeployment` + `CalculateBlastRadius` (Fase 4, Semana 11)
-5. **Registro no ApiHost** de todos os módulos conforme implementados
+1. **Implementar `Promotion`** — CreatePromotionRequest, EvaluatePromotionGates, ApprovePromotion, RollbackPromotion (Fase 5, Semana 17–18)
+2. **Implementar `Audit`** — RecordAuditEvent, GetAuditTrail, SearchAuditLog, VerifyChainIntegrity (Fase 6, Semana 19–20)
+3. **Implementar `DeveloperPortal`** — SearchCatalog, GetApiDetail, GetMyApis, GetApiConsumers (Fase 3, Semana 10)
+4. **Implementar `RuntimeIntelligence`** (parcial) — IngestRuntimeSnapshot, GetRuntimeDriftFindings (Fase 7, Semana 21)
+5. **Implementar `CostIntelligence`** (parcial) — IngestCostSnapshot, GetCostByRelease (Fase 7, Semana 22)
+6. **Registro no ApiHost** de todos os módulos (Promotion, Audit, DeveloperPortal)
 
 ---
 

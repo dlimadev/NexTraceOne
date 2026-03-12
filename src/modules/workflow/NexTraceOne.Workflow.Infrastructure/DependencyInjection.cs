@@ -5,8 +5,10 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Workflow.Application.Abstractions;
+using NexTraceOne.Workflow.Contracts.ServiceInterfaces;
 using NexTraceOne.Workflow.Infrastructure.Persistence;
 using NexTraceOne.Workflow.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Workflow.Infrastructure.Services;
 
 namespace NexTraceOne.Workflow.Infrastructure;
 
@@ -41,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IEvidencePackRepository, EvidencePackRepository>();
         services.AddScoped<IApprovalDecisionRepository, ApprovalDecisionRepository>();
         services.AddScoped<ISlaPolicyRepository, SlaPolicyRepository>();
+        services.AddScoped<IWorkflowModule, WorkflowModuleService>();
 
         return services;
     }

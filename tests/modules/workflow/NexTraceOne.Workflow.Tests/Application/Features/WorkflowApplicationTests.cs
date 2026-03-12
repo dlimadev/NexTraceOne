@@ -6,8 +6,14 @@ using CreateWorkflowTemplateFeature = NexTraceOne.Workflow.Application.Features.
 using InitiateWorkflowFeature = NexTraceOne.Workflow.Application.Features.InitiateWorkflow.InitiateWorkflow;
 using ApproveStageFeature = NexTraceOne.Workflow.Application.Features.ApproveStage.ApproveStage;
 using RejectWorkflowFeature = NexTraceOne.Workflow.Application.Features.RejectWorkflow.RejectWorkflow;
+using RequestChangesFeature = NexTraceOne.Workflow.Application.Features.RequestChanges.RequestChanges;
+using AddObservationFeature = NexTraceOne.Workflow.Application.Features.AddObservation.AddObservation;
 using GetWorkflowStatusFeature = NexTraceOne.Workflow.Application.Features.GetWorkflowStatus.GetWorkflowStatus;
+using ListPendingApprovalsFeature = NexTraceOne.Workflow.Application.Features.ListPendingApprovals.ListPendingApprovals;
 using GenerateEvidencePackFeature = NexTraceOne.Workflow.Application.Features.GenerateEvidencePack.GenerateEvidencePack;
+using GetEvidencePackFeature = NexTraceOne.Workflow.Application.Features.GetEvidencePack.GetEvidencePack;
+using ExportEvidencePackPdfFeature = NexTraceOne.Workflow.Application.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
+using EscalateSlaViolationFeature = NexTraceOne.Workflow.Application.Features.EscalateSlaViolation.EscalateSlaViolation;
 
 namespace NexTraceOne.Workflow.Tests.Application.Features;
 
@@ -292,5 +298,377 @@ public sealed class WorkflowApplicationTests
         result.Value.CompletenessPercentage.Should().BeGreaterThan(0m);
         evidencePackRepository.Received(1).Add(Arg.Any<EvidencePack>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    // ── RequestChanges ────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task RequestChanges_Handle_WithComment_ShouldRecordDecision()
+    {
+        var instance = CreateInstance();
+        instance.Advance();
+        var stage = CreateStage(instance.Id);
+        stage.Start(FixedNow);
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        stageRepository.GetByIdAsync(Arg.Any<WorkflowStageId>(), Arg.Any<CancellationToken>())
+            .Returns(stage);
+
+        var sut = new RequestChangesFeature.Handler(
+            instanceRepository, stageRepository, decisionRepository, unitOfWork, dateTimeProvider);
+
+        var command = new RequestChangesFeature.Command(
+            instance.Id.Value,
+            stage.Id.Value,
+            "reviewer@company.com",
+            "Please fix these issues",
+            new List<string> { "Missing tests", "Remove debug logs" });
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.RequestedItemsCount.Should().Be(2);
+        decisionRepository.Received(1).Add(Arg.Any<ApprovalDecision>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public void RequestChanges_Handle_WithoutComment_ShouldFail()
+    {
+        var validator = new RequestChangesFeature.Validator();
+        var command = new RequestChangesFeature.Command(
+            Guid.NewGuid(), Guid.NewGuid(), "reviewer@company.com", "",
+            new List<string> { "Item 1" });
+
+        var validationResult = validator.Validate(command);
+
+        validationResult.IsValid.Should().BeFalse();
+        validationResult.Errors.Should().Contain(e => e.PropertyName == "Comment");
+    }
+
+    [Fact]
+    public async Task RequestChanges_Handle_InstanceNotFound_ShouldFail()
+    {
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns((WorkflowInstance?)null);
+
+        var sut = new RequestChangesFeature.Handler(
+            instanceRepository, stageRepository, decisionRepository, unitOfWork, dateTimeProvider);
+
+        var command = new RequestChangesFeature.Command(
+            Guid.NewGuid(), Guid.NewGuid(), "reviewer@company.com",
+            "Some comment", new List<string> { "Item 1" });
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("Instance.NotFound");
+    }
+
+    // ── AddObservation ────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task AddObservation_Handle_ShouldRecordObservation()
+    {
+        var instance = CreateInstance();
+        var stage = CreateStage(instance.Id);
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        stageRepository.GetByIdAsync(Arg.Any<WorkflowStageId>(), Arg.Any<CancellationToken>())
+            .Returns(stage);
+
+        var sut = new AddObservationFeature.Handler(
+            instanceRepository, stageRepository, decisionRepository, unitOfWork, dateTimeProvider);
+
+        var command = new AddObservationFeature.Command(
+            instance.Id.Value,
+            stage.Id.Value,
+            "observer@company.com",
+            "This change looks interesting from a performance perspective.");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.StageId.Should().Be(stage.Id.Value);
+        decisionRepository.Received(1).Add(Arg.Any<ApprovalDecision>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AddObservation_Handle_StageNotFound_ShouldFail()
+    {
+        var instance = CreateInstance();
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        stageRepository.GetByIdAsync(Arg.Any<WorkflowStageId>(), Arg.Any<CancellationToken>())
+            .Returns((WorkflowStage?)null);
+
+        var sut = new AddObservationFeature.Handler(
+            instanceRepository, stageRepository, decisionRepository, unitOfWork, dateTimeProvider);
+
+        var command = new AddObservationFeature.Command(
+            instance.Id.Value, Guid.NewGuid(), "observer@company.com", "Some observation");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("Stage.NotFound");
+    }
+
+    // ── ListPendingApprovals ──────────────────────────────────────────────
+
+    [Fact]
+    public async Task ListPendingApprovals_Handle_ShouldReturnPaginatedInstances()
+    {
+        var instance1 = CreateInstance();
+        instance1.Advance();
+        var instance2 = CreateInstance();
+        instance2.Advance();
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        instanceRepository.ListByStatusAsync(WorkflowStatus.InReview, 1, 10, Arg.Any<CancellationToken>())
+            .Returns(new List<WorkflowInstance> { instance1, instance2 });
+        instanceRepository.CountByStatusAsync(WorkflowStatus.InReview, Arg.Any<CancellationToken>())
+            .Returns(2);
+
+        var sut = new ListPendingApprovalsFeature.Handler(instanceRepository);
+
+        var result = await sut.Handle(
+            new ListPendingApprovalsFeature.Query("approver@company.com", 1, 10),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().HaveCount(2);
+        result.Value.TotalCount.Should().Be(2);
+        result.Value.Page.Should().Be(1);
+        result.Value.PageSize.Should().Be(10);
+    }
+
+    [Fact]
+    public async Task ListPendingApprovals_Handle_NoPending_ShouldReturnEmptyList()
+    {
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        instanceRepository.ListByStatusAsync(Arg.Any<WorkflowStatus>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<WorkflowInstance>());
+        instanceRepository.CountByStatusAsync(Arg.Any<WorkflowStatus>(), Arg.Any<CancellationToken>())
+            .Returns(0);
+
+        var sut = new ListPendingApprovalsFeature.Handler(instanceRepository);
+
+        var result = await sut.Handle(
+            new ListPendingApprovalsFeature.Query("approver@company.com", 1, 10),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().BeEmpty();
+        result.Value.TotalCount.Should().Be(0);
+    }
+
+    // ── GetEvidencePack ───────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetEvidencePack_Handle_ShouldReturnPack()
+    {
+        var instance = CreateInstance();
+        var pack = EvidencePack.Create(instance.Id, instance.ReleaseId, FixedNow);
+        pack.UpdateScores(0.4m, 0.7m, 0.6m);
+        pack.SetContractDiff("Breaking change: removed field");
+
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        evidencePackRepository.GetByWorkflowInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(pack);
+
+        var sut = new GetEvidencePackFeature.Handler(evidencePackRepository);
+
+        var result = await sut.Handle(
+            new GetEvidencePackFeature.Query(instance.Id.Value), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.WorkflowInstanceId.Should().Be(instance.Id.Value);
+        result.Value.BlastRadiusScore.Should().Be(0.4m);
+        result.Value.SpectralScore.Should().Be(0.7m);
+        result.Value.ChangeIntelligenceScore.Should().Be(0.6m);
+        result.Value.ContractDiffSummary.Should().Be("Breaking change: removed field");
+        result.Value.CompletenessPercentage.Should().BeGreaterThan(0m);
+    }
+
+    [Fact]
+    public async Task GetEvidencePack_Handle_NotFound_ShouldFail()
+    {
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        evidencePackRepository.GetByWorkflowInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns((EvidencePack?)null);
+
+        var sut = new GetEvidencePackFeature.Handler(evidencePackRepository);
+
+        var result = await sut.Handle(
+            new GetEvidencePackFeature.Query(Guid.NewGuid()), CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("EvidencePack.NotFound");
+    }
+
+    // ── ExportEvidencePackPdf ─────────────────────────────────────────────
+
+    [Fact]
+    public async Task ExportEvidencePackPdf_Handle_ShouldReturnStructuredData()
+    {
+        var instance = CreateInstance();
+        var stage = CreateStage(instance.Id);
+        var pack = EvidencePack.Create(instance.Id, instance.ReleaseId, FixedNow);
+        pack.UpdateScores(0.5m, 0.8m, 0.6m);
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        evidencePackRepository.GetByWorkflowInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(pack);
+        stageRepository.ListByInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<WorkflowStage> { stage });
+        decisionRepository.ListByInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ApprovalDecision>());
+
+        var sut = new ExportEvidencePackPdfFeature.Handler(
+            instanceRepository, evidencePackRepository, stageRepository, decisionRepository);
+
+        var result = await sut.Handle(
+            new ExportEvidencePackPdfFeature.Query(instance.Id.Value), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.WorkflowInstanceId.Should().Be(instance.Id.Value);
+        result.Value.ReleaseId.Should().Be(instance.ReleaseId);
+        result.Value.Stages.Should().HaveCount(1);
+        result.Value.Decisions.Should().BeEmpty();
+        result.Value.BlastRadiusScore.Should().Be(0.5m);
+    }
+
+    [Fact]
+    public async Task ExportEvidencePackPdf_Handle_EvidencePackNotFound_ShouldFail()
+    {
+        var instance = CreateInstance();
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        evidencePackRepository.GetByWorkflowInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns((EvidencePack?)null);
+
+        var sut = new ExportEvidencePackPdfFeature.Handler(
+            instanceRepository, evidencePackRepository, stageRepository, decisionRepository);
+
+        var result = await sut.Handle(
+            new ExportEvidencePackPdfFeature.Query(instance.Id.Value), CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("EvidencePack.NotFound");
+    }
+
+    // ── EscalateSlaViolation ──────────────────────────────────────────────
+
+    [Fact]
+    public async Task EscalateSlaViolation_Handle_WithMatchingPolicy_ShouldReturnEscalation()
+    {
+        var template = CreateTemplate();
+        var instance = CreateInstance(template.Id);
+        var stage = CreateStage(instance.Id);
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var slaPolicyRepository = Substitute.For<ISlaPolicyRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        stageRepository.GetByIdAsync(Arg.Any<WorkflowStageId>(), Arg.Any<CancellationToken>())
+            .Returns(stage);
+
+        var slaPolicy = SlaPolicy.Create(template.Id, "Code Review", 24, true, "TechLead");
+        slaPolicyRepository.GetByTemplateIdAsync(Arg.Any<WorkflowTemplateId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SlaPolicy> { slaPolicy });
+
+        var sut = new EscalateSlaViolationFeature.Handler(
+            instanceRepository, stageRepository, slaPolicyRepository, unitOfWork, dateTimeProvider);
+
+        var command = new EscalateSlaViolationFeature.Command(
+            instance.Id.Value, stage.Id.Value, "SLA expired after 24 hours");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.WorkflowInstanceId.Should().Be(instance.Id.Value);
+        result.Value.EscalationTargetRole.Should().Be("TechLead");
+        result.Value.EscalatedPolicies.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task EscalateSlaViolation_Handle_NoMatchingPolicy_ShouldReturnNoEscalationTarget()
+    {
+        var instance = CreateInstance();
+        var stage = CreateStage(instance.Id);
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var slaPolicyRepository = Substitute.For<ISlaPolicyRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        stageRepository.GetByIdAsync(Arg.Any<WorkflowStageId>(), Arg.Any<CancellationToken>())
+            .Returns(stage);
+        slaPolicyRepository.GetByTemplateIdAsync(Arg.Any<WorkflowTemplateId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SlaPolicy>());
+
+        var sut = new EscalateSlaViolationFeature.Handler(
+            instanceRepository, stageRepository, slaPolicyRepository, unitOfWork, dateTimeProvider);
+
+        var command = new EscalateSlaViolationFeature.Command(
+            instance.Id.Value, stage.Id.Value, "Stage overdue");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.EscalationTargetRole.Should().BeNull();
+        result.Value.EscalatedPolicies.Should().BeEmpty();
     }
 }
