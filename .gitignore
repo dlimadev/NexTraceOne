@@ -17,3 +17,8 @@ sign.pfx
 
 # Docker
 .env.local
+
+# Frontend
+src/frontend/node_modules/
+src/frontend/dist/
+src/frontend/.vite/
