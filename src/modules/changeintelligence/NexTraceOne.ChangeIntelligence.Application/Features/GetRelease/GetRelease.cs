@@ -48,7 +48,7 @@ public static class GetRelease
                 release.ChangeLevel,
                 release.ChangeScore,
                 release.WorkItemReference,
-                default);
+                release.CreatedAt);
         }
     }
 

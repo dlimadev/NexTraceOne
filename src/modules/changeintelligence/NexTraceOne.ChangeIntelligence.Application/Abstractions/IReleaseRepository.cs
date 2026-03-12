@@ -14,6 +14,9 @@ public interface IReleaseRepository
     /// <summary>Lista releases de um ativo de API ordenadas por data de criação descendente.</summary>
     Task<IReadOnlyList<Release>> ListByApiAssetAsync(Guid apiAssetId, int page, int pageSize, CancellationToken cancellationToken = default);
 
+    /// <summary>Conta o total de releases de um ativo de API.</summary>
+    Task<int> CountByApiAssetAsync(Guid apiAssetId, CancellationToken cancellationToken = default);
+
     /// <summary>Adiciona uma nova Release ao repositório.</summary>
     void Add(Release release);
 }

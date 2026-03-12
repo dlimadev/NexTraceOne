@@ -53,7 +53,8 @@ public static class NotifyDeployment
                 request.Version,
                 request.Environment,
                 request.PipelineSource,
-                request.CommitSha);
+                request.CommitSha,
+                dateTimeProvider.UtcNow);
 
             repository.Add(release);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -64,7 +65,7 @@ public static class NotifyDeployment
                 release.Version,
                 release.Environment,
                 release.Status.ToString(),
-                dateTimeProvider.UtcNow);
+                release.CreatedAt);
         }
     }
 

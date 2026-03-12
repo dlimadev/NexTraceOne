@@ -49,6 +49,9 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// <summary>Se esta release é um rollback, identificador da release original.</summary>
     public ReleaseId? RolledBackFromReleaseId { get; private set; }
 
+    /// <summary>Data/hora UTC em que a release foi criada.</summary>
+    public DateTimeOffset CreatedAt { get; private set; }
+
     /// <summary>
     /// Cria uma nova release a partir de um evento de deployment recebido do CI/CD.
     /// Validações de negócio mais profundas são feitas no command handler.
@@ -59,7 +62,8 @@ public sealed class Release : AggregateRoot<ReleaseId>
         string version,
         string environment,
         string pipelineSource,
-        string commitSha)
+        string commitSha,
+        DateTimeOffset createdAt)
     {
         Guard.Against.Default(apiAssetId);
         Guard.Against.NullOrWhiteSpace(serviceName);
@@ -79,7 +83,8 @@ public sealed class Release : AggregateRoot<ReleaseId>
             CommitSha = commitSha,
             Status = DeploymentStatus.Pending,
             ChangeLevel = ChangeLevel.Operational,
-            ChangeScore = 0m
+            ChangeScore = 0m,
+            CreatedAt = createdAt
         };
     }
 

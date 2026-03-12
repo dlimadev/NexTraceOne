@@ -45,7 +45,7 @@ public static class ListReleases
                 r.Status.ToString(),
                 r.ChangeLevel,
                 r.ChangeScore,
-                default)).ToList();
+                r.CreatedAt)).ToList();
 
             return new Response(dtos);
         }

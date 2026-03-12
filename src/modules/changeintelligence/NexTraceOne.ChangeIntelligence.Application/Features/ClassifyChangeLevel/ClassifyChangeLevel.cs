@@ -54,5 +54,3 @@ public static class ClassifyChangeLevel
     /// <summary>Resposta da classificação do nível de mudança da Release.</summary>
     public sealed record Response(Guid ReleaseId, ChangeLevel ChangeLevel);
 }
-
-

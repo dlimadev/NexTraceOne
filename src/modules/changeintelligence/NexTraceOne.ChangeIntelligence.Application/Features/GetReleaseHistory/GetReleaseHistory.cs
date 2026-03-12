@@ -34,10 +34,13 @@ public static class GetReleaseHistory
         {
             Guard.Against.Null(request);
 
-            var releases = await repository.ListByApiAssetAsync(
+            var releasesTask = repository.ListByApiAssetAsync(
                 request.ApiAssetId, request.Page, request.PageSize, cancellationToken);
+            var totalCountTask = repository.CountByApiAssetAsync(request.ApiAssetId, cancellationToken);
 
-            var dtos = releases.Select(r => new ReleaseDto(
+            await Task.WhenAll(releasesTask, totalCountTask);
+
+            var dtos = releasesTask.Result.Select(r => new ReleaseDto(
                 r.Id.Value,
                 r.ServiceName,
                 r.Version,
@@ -45,9 +48,9 @@ public static class GetReleaseHistory
                 r.Status.ToString(),
                 r.ChangeLevel,
                 r.ChangeScore,
-                default)).ToList();
+                r.CreatedAt)).ToList();
 
-            return new Response(dtos, dtos.Count);
+            return new Response(dtos, totalCountTask.Result);
         }
     }
 
