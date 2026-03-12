@@ -7,5 +7,17 @@ namespace NexTraceOne.RulesetGovernance.Contracts.ServiceInterfaces;
 /// </summary>
 public interface IRulesetGovernanceModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
+    /// <summary>Obtém o score de conformidade (linting) de uma release.</summary>
+    Task<RulesetScoreDto?> GetRulesetScoreAsync(Guid releaseId, CancellationToken cancellationToken);
+
+    /// <summary>Verifica se uma release passou no linting com score acima do limiar.</summary>
+    Task<bool> IsReleaseCompliantAsync(Guid releaseId, decimal minimumScore, CancellationToken cancellationToken);
 }
+
+/// <summary>DTO de score de conformidade para comunicação entre módulos.</summary>
+public sealed record RulesetScoreDto(
+    Guid LintResultId,
+    Guid ReleaseId,
+    decimal Score,
+    int TotalFindings,
+    DateTimeOffset ExecutedAt);
