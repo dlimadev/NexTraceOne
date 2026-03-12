@@ -1,25 +1,61 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.ChangeIntelligence.Application.Abstractions;
+using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeIntelligence.Domain.Errors;
 
 namespace NexTraceOne.ChangeIntelligence.Application.Features.GetChangeScore;
 
 /// <summary>
-/// Feature: GetChangeScore — Módulo: ChangeIntelligence.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetChangeScore — retorna o score de risco computado de uma Release.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetChangeScore
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de consulta do score de mudança de uma Release.</summary>
+    public sealed record Query(Guid ReleaseId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query de consulta do score de mudança.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ReleaseId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que retorna o score de risco computado de uma Release.</summary>
+    public sealed class Handler(IChangeScoreRepository repository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var releaseId = ReleaseId.From(request.ReleaseId);
+            var score = await repository.GetByReleaseIdAsync(releaseId, cancellationToken);
+            if (score is null)
+                return ChangeIntelligenceErrors.ChangeScoreNotFound(request.ReleaseId.ToString());
+
+            return new Response(
+                score.Id.Value,
+                score.ReleaseId.Value,
+                score.Score,
+                score.BreakingChangeWeight,
+                score.BlastRadiusWeight,
+                score.EnvironmentWeight,
+                score.ComputedAt);
+        }
+    }
+
+    /// <summary>Resposta com os dados do score de mudança da Release.</summary>
+    public sealed record Response(
+        Guid ScoreId,
+        Guid ReleaseId,
+        decimal Score,
+        decimal BreakingChangeWeight,
+        decimal BlastRadiusWeight,
+        decimal EnvironmentWeight,
+        DateTimeOffset ComputedAt);
 }
