@@ -94,24 +94,30 @@ dotnet run --project tools/NexTraceOne.CLI
 - ✅ **Identity** — Login, FederatedLogin, RefreshToken, CreateUser, AssignRole, Sessions, RBAC
   - Queries EF Core corrigidas: `.Email.Value`, `.RefreshToken.Value`, `.FullName.FirstName`
   - Testes: `AssignRoleTests`, `RevokeSessionTests`
-- ✅ **Licensing (estrutura)** — Domain + Application 90% — Infrastructure pendente
+- ✅ **Licensing** — Domain + Application + Infrastructure 100% completos
+  - `LicensingDbContext` com IUnitOfWork
+  - `LicenseRepository` + `HardwareBindingRepository`
+  - Migrations EF Core: `20260312001718_InitialLicensingSchema`
+  - Testes: `LicensingApplicationTests`
 - ✅ **Scaffold completo** — 14 módulos × 5 camadas (estrutura física + entities definidas)
 - ✅ **Testes Building Blocks** — `ResultTests`, `ValueObjectTests`, `PagedListTests`
+  - `GlobalUsings.cs` adicionado a todos os projetos de teste de Building Blocks
 - ✅ **Plano MVP1 Expandido** — `docs/MVP1-EXPANDED-PLAN.md` com análise de 14 módulos
+- ✅ **Cobertura Funcional** — `docs/FUNCTIONAL-COVERAGE.md` com análise completa FASE 1-3
 
 ### Próximo Passo Imediato 🟡
 
-**Fase 2, Semana 5 — Completar Licensing Infrastructure:**
-1. `LicensingDbContext` com IUnitOfWork
-2. `LicenseRepository` + `HardwareBindingRepository`
+**Fase 2, Semana 6–7 — EngineeringGraph:**
+1. `EngineeringGraphDbContext` com IUnitOfWork
+2. `ApiAssetRepository` + `ServiceAssetRepository`
 3. Migrations EF Core
-4. Registrar em `AddLicensingInfrastructure`
+4. Implementar handlers: `RegisterApiAsset`, `RegisterServiceAsset`, `MapConsumerRelationship`, `GetAssetGraph`
+5. Testes unitários e de integração
 
-### Após Licensing 🔲
+### Após EngineeringGraph 🔲
 
-- EngineeringGraph (Fase 2, Semana 6–7) — backbone do blast radius
 - Contracts (Fase 3, Semana 8–9) — diff semântico OpenAPI
-- ChangeIntelligence (Fase 4, Semana 11–13) — **CORE DO PRODUTO**
+- ChangeIntelligence (Fase 4, Semana 10–13) — **CORE DO PRODUTO**
 
 Ver `docs/ROADMAP.md` para o cronograma completo de 26 semanas.
 Ver `docs/MVP1-EXPANDED-PLAN.md` para análise de valor vs. esforço por módulo.
