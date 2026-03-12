@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Ardalis.GuardClauses;
 
 namespace NexTraceOne.Contracts.Domain.Entities;
@@ -9,6 +10,8 @@ namespace NexTraceOne.Contracts.Domain.Entities;
 /// </summary>
 public sealed class OpenApiSchema
 {
+    /// <summary>Regex compilada para detecção de paths YAML no nível correto de indentação.</summary>
+    private static readonly Regex YamlPathLineRegex = new(@"^  /[^\s].*:?\s*$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
     private OpenApiSchema() { }
 
     /// <summary>Número de paths definidos na spec.</summary>
@@ -100,7 +103,7 @@ public sealed class OpenApiSchema
             : string.Empty;
 
         // Conta apenas linhas que representam paths OpenAPI: indentadas com 2 espaços e começando com /
-        var pathCount = lines.Count(l => System.Text.RegularExpressions.Regex.IsMatch(l, @"^  /[^\s].*:?\s*$"));
+        var pathCount = lines.Count(l => YamlPathLineRegex.IsMatch(l));
         var httpMethods = new[] { "    get:", "    post:", "    put:", "    patch:", "    delete:", "    head:", "    options:", "    trace:" };
         var endpointCount = lines.Count(l => httpMethods.Any(m => l.StartsWith(m, StringComparison.OrdinalIgnoreCase)));
         var hasSecurity = lines.Any(l => l.TrimStart().StartsWith("securitySchemes:", StringComparison.OrdinalIgnoreCase));

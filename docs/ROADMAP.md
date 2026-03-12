@@ -5,7 +5,7 @@
 Metodologia: **1 módulo por vez · 1 camada por vez · 1 aggregate por vez**.
 Cada fase termina com aprovação antes de iniciar a próxima.
 
-> **Última atualização:** Março 2026 — Pós-auditoria completa de código.
+> **Última atualização:** Março 2026 — Pós-conclusão do módulo Contracts.
 > Ver `docs/MVP1-EXPANDED-PLAN.md` para análise detalhada de valor vs. esforço por módulo.
 
 ---
@@ -16,17 +16,14 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 
 - ✅ **Building Blocks (6/6)** — Domain, Application, Infrastructure, EventBus, Observability, Security — 100% funcionais
 - ✅ **Identity** — Login, FederatedLogin, RefreshToken, CreateUser, AssignRole, Sessions, RBAC — 100% funcional
-- ✅ **Licensing (estrutura)** — Domain + Application features implementadas (90%) — Infrastructure/Repos pendente
+- ✅ **Licensing** — Domain + Application + Infrastructure 100% completos (LicensingDbContext, Repositories, Migrations)
+- ✅ **EngineeringGraph** — Domain + Application + Infrastructure + API 100% completos (ApiAsset, ServiceAsset, ConsumerRelationship, Discovery, Migrations, Testes)
+- ✅ **Contracts** — Domain + Application + Infrastructure + API 100% completos (ContractVersion, ContractDiff, SemanticDiff, BreakingChange classification, Migrations, Testes)
 - ✅ **Scaffold completo** — 14 módulos × 5 camadas criados (estrutura física e entities de domínio definidas)
-- ✅ **Auditoria de código** — SOLID, DDD, CQRS, i18n, segurança, convenções — revisados e corrigidos
-- ✅ **IntegrationEventBase** — base abstrata adicionada ao BuildingBlocks.Domain para todos os Integration Events
-- ✅ **Testes unitários** — Building Blocks (Result, ValueObject, PagedList) e Identity (AssignRole, RevokeSession)
+- ✅ **Testes unitários** — Building Blocks, Identity, Licensing, EngineeringGraph, Contracts
 
-### O que está pendente (todos os outros módulos):
+### O que está pendente:
 
-- 🟡 **Licensing** — completar Infrastructure (LicensingDbContext, Repositories, Migrations)
-- 🔲 **EngineeringGraph** — features são stubs com TODO
-- 🔲 **Contracts** — features são stubs com TODO
 - 🔲 **ChangeIntelligence** — features são stubs com TODO (CORE DO PRODUTO)
 - 🔲 **RulesetGovernance** — features são stubs com TODO
 - 🔲 **Workflow** — features são stubs com TODO
@@ -91,69 +88,78 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 
 ---
 
-## FASE 2 — Licenciamento e Grafo (Semanas 5–7) ← PRÓXIMA
+## FASE 2 — Licenciamento e Grafo (Semanas 5–7) ✅ CONCLUÍDA
 
-### Semana 5: Licensing — Completar Infrastructure
+### Semana 5: Licensing — Infrastructure ✅
 
 **Pré-requisito antes de avançar para EngineeringGraph.**
 
 | Feature / Artefato | Status |
 |---------------------|--------|
-| License (Aggregate Root) | ✅ domain |
-| LicenseCapability, HardwareBinding | ✅ domain |
-| ActivateLicense | ✅ application |
-| VerifyLicenseOnStartup | ✅ application |
-| CheckCapability | ✅ application |
-| TrackUsageMetric | ✅ application |
-| `LicensingDbContext` com IUnitOfWork | 🔲 |
-| `LicenseRepository` + `HardwareBindingRepository` | 🔲 |
-| Migrations EF Core | 🔲 |
-| `AddLicensingInfrastructure` DI | 🔲 |
-| Testes de repositório | 🔲 |
+| License (Aggregate Root) | ✅ |
+| LicenseCapability, HardwareBinding | ✅ |
+| ActivateLicense | ✅ |
+| VerifyLicenseOnStartup | ✅ |
+| CheckCapability | ✅ |
+| TrackUsageMetric | ✅ |
+| `LicensingDbContext` com IUnitOfWork | ✅ |
+| `LicenseRepository` + `HardwareBindingRepository` | ✅ |
+| Migrations EF Core | ✅ |
+| `AddLicensingInfrastructure` DI | ✅ |
+| Testes | ✅ |
 
-### Semana 6: EngineeringGraph — Core
-
-| Feature | Status |
-|---------|--------|
-| ApiAsset (Aggregate Root) | 🔲 |
-| ConsumerRelationship (Entity) | 🔲 |
-| RegisterApiAsset | 🔲 |
-| RegisterServiceAsset | 🔲 |
-| MapConsumerRelationship | 🔲 |
-| GetAssetGraph | 🔲 |
-
-### Semana 7: EngineeringGraph — Discovery
+### Semana 6: EngineeringGraph — Core ✅
 
 | Feature | Status |
 |---------|--------|
-| InferDependencyFromOtel (receptor passivo) | 🔲 |
-| ValidateDiscoveredDependency | 🔲 |
-| EngineeringGraphDbContext + Migrations | 🔲 |
+| ApiAsset (Aggregate Root) | ✅ |
+| ConsumerRelationship (Entity) | ✅ |
+| RegisterApiAsset | ✅ |
+| RegisterServiceAsset | ✅ |
+| MapConsumerRelationship | ✅ |
+| GetAssetGraph | ✅ |
+| GetAssetDetail | ✅ |
+| SearchAssets | ✅ |
 
-**Entregável:** Grafo de dependências funcional com APIs e consumidores mapeados.
+### Semana 7: EngineeringGraph — Discovery ✅
+
+| Feature | Status |
+|---------|--------|
+| InferDependencyFromOtel (receptor passivo) | ✅ |
+| ValidateDiscoveredDependency | ✅ |
+| EngineeringGraphDbContext + Migrations | ✅ |
+| Testes (12 testes unitários) | ✅ |
+
+**Entregável:** ✅ Grafo de dependências funcional com APIs e consumidores mapeados.
 
 ---
 
-## FASE 3 — Contratos e Portal (Semanas 8–10)
+## FASE 3 — Contratos e Portal (Semanas 8–10) 🟡 EM ANDAMENTO
 
-### Semana 8: Contracts — Import e Histórico
-
-| Feature | Status |
-|---------|--------|
-| ContractVersion (Aggregate Root) | 🔲 |
-| ContractDiff (Entity) | 🔲 |
-| ImportContract | 🔲 |
-| GetContractHistory | 🔲 |
-| ValidateContractIntegrity | 🔲 |
-
-### Semana 9: Contracts — Diff Semântico
+### Semana 8: Contracts — Import e Histórico ✅
 
 | Feature | Status |
 |---------|--------|
-| ComputeSemanticDiff | 🔲 |
-| ClassifyBreakingChange | 🔲 |
-| SuggestSemanticVersion | 🔲 |
-| ContractsDbContext + Migrations | 🔲 |
+| ContractVersion (Aggregate Root) | ✅ |
+| ContractDiff (Entity) | ✅ |
+| SemanticVersion (Value Object) | ✅ |
+| ChangeEntry (Value Object) | ✅ |
+| ImportContract | ✅ |
+| CreateContractVersion | ✅ |
+| GetContractHistory | ✅ |
+| ExportContract | ✅ |
+| ValidateContractIntegrity | ✅ |
+
+### Semana 9: Contracts — Diff Semântico ✅
+
+| Feature | Status |
+|---------|--------|
+| ComputeSemanticDiff | ✅ |
+| ClassifyBreakingChange | ✅ |
+| SuggestSemanticVersion | ✅ |
+| LockContractVersion | ✅ |
+| ContractsDbContext + Migrations | ✅ |
+| Testes (21 testes unitários) | ✅ |
 
 ### Semana 10: DeveloperPortal — Read Models
 
@@ -164,7 +170,7 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 | GetMyApis | 🔲 |
 | GetApiConsumers | 🔲 |
 
-**Entregável:** Catálogo de APIs com diff semântico e classificação de breaking changes.
+**Entregável:** ✅ Catálogo de APIs com diff semântico e classificação de breaking changes.
 
 ---
 
