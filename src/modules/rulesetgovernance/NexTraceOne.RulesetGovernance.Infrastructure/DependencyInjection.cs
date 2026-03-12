@@ -11,12 +11,12 @@ using NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Repositories;
 namespace NexTraceOne.RulesetGovernance.Infrastructure;
 
 /// <summary>
-/// Registra servicos de infraestrutura do modulo RulesetGovernance.
+/// Registra serviços de infraestrutura do módulo RulesetGovernance.
 /// Inclui: DbContext, Repositorios, Adapters externos, Quartz Jobs.
 /// </summary>
 public static class DependencyInjection
 {
-    /// <summary>Adiciona os servicos de infraestrutura do modulo RulesetGovernance ao container DI.</summary>
+    /// <summary>Adiciona os serviços de infraestrutura do módulo RulesetGovernance ao container DI.</summary>
     public static IServiceCollection AddRulesetGovernanceInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)

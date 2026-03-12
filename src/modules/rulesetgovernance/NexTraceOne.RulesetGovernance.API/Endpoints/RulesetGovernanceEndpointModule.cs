@@ -15,7 +15,7 @@ using ComputeRulesetScoreFeature = NexTraceOne.RulesetGovernance.Application.Fea
 namespace NexTraceOne.RulesetGovernance.API.Endpoints;
 
 /// <summary>
-/// Registra todos os endpoints Minimal API do modulo RulesetGovernance.
+/// Registra todos os endpoints Minimal API do módulo RulesetGovernance.
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 /// </summary>
 public sealed class RulesetGovernanceEndpointModule

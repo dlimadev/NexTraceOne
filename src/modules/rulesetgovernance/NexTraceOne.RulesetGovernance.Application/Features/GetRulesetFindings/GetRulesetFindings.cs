@@ -10,7 +10,7 @@ namespace NexTraceOne.RulesetGovernance.Application.Features.GetRulesetFindings;
 
 /// <summary>
 /// Feature: GetRulesetFindings -- retorna os findings de linting de uma release.
-/// Estrutura VSA: Query + Validator + Handler + Response em um unico arquivo.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetRulesetFindings
 {

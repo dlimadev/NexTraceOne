@@ -9,7 +9,7 @@ namespace NexTraceOne.RulesetGovernance.Application.Features.GetRulesetScore;
 
 /// <summary>
 /// Feature: GetRulesetScore -- retorna o score de conformidade de uma release.
-/// Estrutura VSA: Query + Validator + Handler + Response em um unico arquivo.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetRulesetScore
 {

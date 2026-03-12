@@ -10,8 +10,8 @@ using NexTraceOne.RulesetGovernance.Domain.Errors;
 namespace NexTraceOne.RulesetGovernance.Application.Features.ExecuteLintForRelease;
 
 /// <summary>
-/// Feature: ExecuteLintForRelease -- registra o resultado de uma execucao de linting sobre uma release.
-/// Estrutura VSA: Command + Validator + Handler + Response em um unico arquivo.
+/// Feature: ExecuteLintForRelease -- registra o resultado de uma execução de linting sobre uma release.
+/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ExecuteLintForRelease
 {
@@ -25,7 +25,7 @@ public static class ExecuteLintForRelease
     /// <summary>Dados de entrada de um finding individual.</summary>
     public sealed record FindingInput(string Rule, FindingSeverity Severity, string Message, string Path);
 
-    /// <summary>Valida a entrada do comando de execucao de linting.</summary>
+    /// <summary>Valida a entrada do comando de execução de linting.</summary>
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
@@ -44,7 +44,7 @@ public static class ExecuteLintForRelease
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
-        /// <summary>Processa o comando de execucao de linting.</summary>
+        /// <summary>Processa o comando de execução de linting.</summary>
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -90,7 +90,7 @@ public static class ExecuteLintForRelease
         }
     }
 
-    /// <summary>Resposta da execucao de linting.</summary>
+    /// <summary>Resposta da execução de linting.</summary>
     public sealed record Response(
         Guid LintResultId,
         Guid ReleaseId,

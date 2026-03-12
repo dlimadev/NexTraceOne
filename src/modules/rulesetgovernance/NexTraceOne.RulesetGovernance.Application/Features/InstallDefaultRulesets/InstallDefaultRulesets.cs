@@ -9,12 +9,12 @@ using NexTraceOne.RulesetGovernance.Domain.Entities;
 namespace NexTraceOne.RulesetGovernance.Application.Features.InstallDefaultRulesets;
 
 /// <summary>
-/// Feature: InstallDefaultRulesets -- cria rulesets padrao pre-instalados no sistema.
-/// Estrutura VSA: Command + Validator + Handler + Response em um unico arquivo.
+/// Feature: InstallDefaultRulesets -- cria rulesets padrão pre-instalados no sistema.
+/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class InstallDefaultRulesets
 {
-    /// <summary>Comando de instalacao de rulesets padrao.</summary>
+    /// <summary>Comando de instalação de rulesets padrão.</summary>
     public sealed record Command() : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando (sem parametros obrigatorios).</summary>
@@ -23,7 +23,7 @@ public static class InstallDefaultRulesets
         public Validator() { }
     }
 
-    /// <summary>Handler que cria o ruleset padrao "OpenAPI Best Practices".</summary>
+    /// <summary>Handler que cria o ruleset padrão "OpenAPI Best Practices".</summary>
     public sealed class Handler(
         IRulesetRepository repository,
         IUnitOfWork unitOfWork,
@@ -47,7 +47,7 @@ public static class InstallDefaultRulesets
             }
             """;
 
-        /// <summary>Processa o comando de instalacao de rulesets padrao.</summary>
+        /// <summary>Processa o comando de instalação de rulesets padrão.</summary>
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -66,6 +66,6 @@ public static class InstallDefaultRulesets
         }
     }
 
-    /// <summary>Resposta da instalacao de rulesets padrao.</summary>
+    /// <summary>Resposta da instalação de rulesets padrão.</summary>
     public sealed record Response(Guid RulesetId, string Name, string RulesetType);
 }

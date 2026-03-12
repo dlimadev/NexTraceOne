@@ -9,17 +9,17 @@ namespace NexTraceOne.RulesetGovernance.Application.Features.ComputeRulesetScore
 /// <summary>
 /// Feature: ComputeRulesetScore -- computa o score de conformidade a partir de findings.
 /// Formula: 100 - (errors * 10) - (warnings * 5) - (infos * 1), clamped entre 0 e 100.
-/// Estrutura VSA: Command + Validator + Handler + Response em um unico arquivo.
+/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ComputeRulesetScore
 {
-    /// <summary>Comando de computacao de score a partir de findings.</summary>
+    /// <summary>Comando de computação de score a partir de findings.</summary>
     public sealed record Command(IReadOnlyList<FindingInput> Findings) : ICommand<Response>;
 
-    /// <summary>Dados de entrada de um finding para computacao de score.</summary>
+    /// <summary>Dados de entrada de um finding para computação de score.</summary>
     public sealed record FindingInput(FindingSeverity Severity);
 
-    /// <summary>Valida a entrada do comando de computacao de score.</summary>
+    /// <summary>Valida a entrada do comando de computação de score.</summary>
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
@@ -31,7 +31,7 @@ public static class ComputeRulesetScore
     /// <summary>Handler que computa o score de conformidade a partir dos findings.</summary>
     public sealed class Handler : ICommandHandler<Command, Response>
     {
-        /// <summary>Processa o comando de computacao de score.</summary>
+        /// <summary>Processa o comando de computação de score.</summary>
         public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -48,6 +48,6 @@ public static class ComputeRulesetScore
         }
     }
 
-    /// <summary>Resposta da computacao de score de conformidade.</summary>
+    /// <summary>Resposta da computação de score de conformidade.</summary>
     public sealed record Response(decimal Score, int ErrorCount, int WarningCount, int InfoCount);
 }

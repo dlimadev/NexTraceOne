@@ -13,7 +13,7 @@ using ComputeRulesetScoreFeature = NexTraceOne.RulesetGovernance.Application.Fea
 
 namespace NexTraceOne.RulesetGovernance.Tests.Application.Features;
 
-/// <summary>Testes de handlers da camada Application do modulo RulesetGovernance.</summary>
+/// <summary>Testes de handlers da camada Application do módulo RulesetGovernance.</summary>
 public sealed class RulesetGovernanceApplicationTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);

@@ -6,9 +6,9 @@ using NexTraceOne.RulesetGovernance.Domain.Entities;
 namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
 
 /// <summary>
-/// DbContext do modulo RulesetGovernance.
+/// DbContext do módulo RulesetGovernance.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
-/// REGRA: Outros modulos NUNCA referenciam este DbContext. Comunicacao via Integration Events.
+/// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>
 public sealed class RulesetGovernanceDbContext(
     DbContextOptions<RulesetGovernanceDbContext> options,
@@ -17,13 +17,13 @@ public sealed class RulesetGovernanceDbContext(
     IDateTimeProvider clock)
     : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    /// <summary>Rulesets de governanca persistidos no modulo RulesetGovernance.</summary>
+    /// <summary>Rulesets de governança persistidos no módulo RulesetGovernance.</summary>
     public DbSet<Ruleset> Rulesets => Set<Ruleset>();
 
     /// <summary>Bindings de ruleset para tipos de ativo.</summary>
     public DbSet<RulesetBinding> RulesetBindings => Set<RulesetBinding>();
 
-    /// <summary>Resultados de execucao de linting.</summary>
+    /// <summary>Resultados de execução de linting.</summary>
     public DbSet<LintResult> LintResults => Set<LintResult>();
 
     /// <inheritdoc />

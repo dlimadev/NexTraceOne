@@ -6,7 +6,7 @@ using NexTraceOne.RulesetGovernance.Domain.Entities;
 namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Repositories;
 
 /// <summary>
-/// Repositorio de rulesets, implementando consultas especificas de negocio.
+/// Repositorio de rulesets, implementando consultas específicas de negócio.
 /// </summary>
 internal sealed class RulesetRepository(RulesetGovernanceDbContext context)
     : RepositoryBase<Ruleset, RulesetId>(context), IRulesetRepository
@@ -16,7 +16,7 @@ internal sealed class RulesetRepository(RulesetGovernanceDbContext context)
         => await context.Rulesets
             .SingleOrDefaultAsync(r => r.Id == id, ct);
 
-    /// <summary>Lista rulesets ativos com paginacao.</summary>
+    /// <summary>Lista rulesets ativos com paginação.</summary>
     public async Task<IReadOnlyList<Ruleset>> ListAsync(int page, int pageSize, CancellationToken cancellationToken = default)
         => await context.Rulesets
             .Where(r => !r.IsDeleted)
