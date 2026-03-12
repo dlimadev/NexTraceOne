@@ -111,12 +111,12 @@ internal sealed class EvidencePackConfiguration : IEntityTypeConfiguration<Evide
             .HasConversion(id => id.Value, value => WorkflowInstanceId.From(value))
             .IsRequired();
         builder.Property(x => x.ReleaseId).IsRequired();
-        builder.Property(x => x.ContractDiffSummary).HasMaxLength(4000);
+        builder.Property(x => x.ContractDiffSummary).HasMaxLength(5000);
         builder.Property(x => x.BlastRadiusScore).HasPrecision(5, 4);
         builder.Property(x => x.SpectralScore).HasPrecision(5, 4);
         builder.Property(x => x.ChangeIntelligenceScore).HasPrecision(5, 4);
         builder.Property(x => x.ApprovalHistory).HasColumnType("jsonb");
-        builder.Property(x => x.ContractHash).HasMaxLength(128);
+        builder.Property(x => x.ContractHash).HasMaxLength(256);
         builder.Property(x => x.CompletenessPercentage).HasPrecision(5, 2).IsRequired();
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
 

@@ -23,7 +23,11 @@ internal sealed class SlaPolicyRepository(WorkflowDbContext context)
             .OrderBy(p => p.StageName)
             .ToListAsync(cancellationToken);
 
-    /// <summary>Lista políticas de SLA com violações expiradas (estágios que ultrapassaram o tempo máximo).</summary>
+    /// <summary>
+    /// Lista políticas de SLA com escalação habilitada.
+    /// A verificação efetiva de violação de SLA requer cruzamento com WorkflowStage.StartedAt,
+    /// que deve ser realizada na camada de Application.
+    /// </summary>
     public async Task<IReadOnlyList<SlaPolicy>> ListExpiredAsync(CancellationToken cancellationToken = default)
         => await context.SlaPolicies
             .Where(p => p.EscalationEnabled)
