@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Identity.Domain.Entities;
+using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
 
 namespace NexTraceOne.Identity.Infrastructure.Persistence;
 
@@ -14,6 +15,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence;
 /// - v1.0: User, Role, Permission, Session, TenantMembership
 /// - v1.1: ExternalIdentity, SsoGroupMapping, BreakGlassRequest, JitAccessRequest,
 ///          Delegation, AccessReviewCampaign, AccessReviewItem, SecurityEvent
+/// - v1.2: Environment, EnvironmentAccess
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -73,6 +75,14 @@ public sealed class IdentityDbContext(
 
     /// <summary>Eventos de segurança e anomalias detectadas.</summary>
     public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
+
+    // ── v1.2 — Autorização por Ambiente ──────────────────────────────────
+
+    /// <summary>Ambientes do ciclo de vida (Development, Pre-Production, Production) por tenant.</summary>
+    public DbSet<Environment> Environments { get; init; } = null!;
+
+    /// <summary>Acessos granulares de usuários a ambientes específicos dentro de um tenant.</summary>
+    public DbSet<EnvironmentAccess> EnvironmentAccesses { get; init; } = null!;
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;

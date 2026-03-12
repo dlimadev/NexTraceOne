@@ -53,6 +53,9 @@ public static class DependencyInjection
         services.AddScoped<IAccessReviewRepository, AccessReviewRepository>();
         services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
 
+        // Repositórios — v1.2 Autorização por Ambiente
+        services.AddScoped<IEnvironmentRepository, EnvironmentRepository>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
