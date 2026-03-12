@@ -1,24 +1,16 @@
-using NexTraceOne.BuildingBlocks.Domain;
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
-
 namespace NexTraceOne.ChangeIntelligence.Domain.Entities;
 
-/// <summary>
-/// Aggregate Root / Entidade do módulo ChangeIntelligence.
-/// TODO: Implementar regras de domínio, invariantes e domain events de DeploymentState.
-/// </summary>
-public sealed class DeploymentState : AuditableEntity<DeploymentStateId>
+/// <summary>Status do deployment de uma release.</summary>
+public enum DeploymentStatus
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
-    private DeploymentState() { }
-}
-
-/// <summary>Identificador fortemente tipado de DeploymentState.</summary>
-public sealed record DeploymentStateId(Guid Value) : TypedIdBase(Value)
-{
-    /// <summary>Cria novo Id com Guid gerado automaticamente.</summary>
-    public static DeploymentStateId New() => new(Guid.NewGuid());
-
-    /// <summary>Cria Id a partir de Guid existente.</summary>
-    public static DeploymentStateId From(Guid id) => new(id);
+    /// <summary>Aguardando execução.</summary>
+    Pending = 0,
+    /// <summary>Em execução.</summary>
+    Running = 1,
+    /// <summary>Concluído com sucesso.</summary>
+    Succeeded = 2,
+    /// <summary>Falhou.</summary>
+    Failed = 3,
+    /// <summary>Revertido (rollback).</summary>
+    RolledBack = 4
 }
