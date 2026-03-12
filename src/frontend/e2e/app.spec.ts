@@ -1,11 +1,17 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Utilitário para simular uma sessão autenticada injetando tokens no localStorage
+/**
+ * Utilitário para simular uma sessão autenticada nos testes E2E.
+ *
+ * Segurança: utiliza sessionStorage com as chaves reais do tokenStorage (nxt_at, nxt_tid, nxt_uid),
+ * garantindo que os testes reflitam o comportamento real da aplicação.
+ * O refresh token NÃO é persistido no storage (apenas em memória), conforme a estratégia de segurança.
+ */
 async function mockAuthSession(page: Page, roles: string[] = ['Admin']): Promise<void> {
   await page.addInitScript(() => {
-    localStorage.setItem('access_token', 'mock-e2e-token');
-    localStorage.setItem('tenant_id', 'tenant-e2e-001');
-    localStorage.setItem('user_id', 'user-e2e-001');
+    sessionStorage.setItem('nxt_at', 'mock-e2e-token');
+    sessionStorage.setItem('nxt_tid', 'tenant-e2e-001');
+    sessionStorage.setItem('nxt_uid', 'user-e2e-001');
   });
 
   // Intercepta a chamada de perfil para retornar roles configuráveis
@@ -156,7 +162,7 @@ test.describe('Navigation (autenticado)', () => {
     await page.goto('/');
     await page.getByTitle('Logout').click();
     await expect(page).toHaveURL('/login');
-    expect(await page.evaluate(() => localStorage.getItem('access_token'))).toBeNull();
+    expect(await page.evaluate(() => sessionStorage.getItem('nxt_at'))).toBeNull();
   });
 });
 

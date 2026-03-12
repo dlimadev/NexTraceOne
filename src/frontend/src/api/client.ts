@@ -89,8 +89,20 @@ apiClient.interceptors.response.use(
 
         try {
           const { data } = await axios.post('/api/v1/identity/auth/refresh', { refreshToken });
-          const newAccessToken = data.accessToken as string;
-          const newRefreshToken = data.refreshToken as string;
+
+          // Segurança: validar estrutura da resposta antes de armazenar tokens.
+          // Previne armazenamento de valores malformados ou vazios em caso de
+          // resposta inesperada do backend.
+          const newAccessToken = data?.accessToken;
+          const newRefreshToken = data?.refreshToken;
+
+          if (
+            typeof newAccessToken !== 'string' || newAccessToken.length === 0 ||
+            typeof newRefreshToken !== 'string' || newRefreshToken.length === 0
+          ) {
+            throw new Error('Invalid token response structure');
+          }
+
           storeTokens(newAccessToken, newRefreshToken);
           onRefreshComplete(newAccessToken);
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
