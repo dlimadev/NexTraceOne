@@ -16,7 +16,7 @@ internal sealed class HardwareBindingRepository(LicensingDbContext context)
     public async Task<HardwareBinding?> GetByLicenseIdAsync(LicenseId licenseId, CancellationToken cancellationToken = default)
         => await DbSet
             .FirstOrDefaultAsync(
-                hb => EF.Property<Guid>(hb, "LicenseId") == licenseId.Value,
+                hb => EF.Property<LicenseId>(hb, "LicenseId") == licenseId,
                 cancellationToken);
 
     /// <summary>Obtém o vínculo de hardware pelo fingerprint do hardware autorizado.</summary>

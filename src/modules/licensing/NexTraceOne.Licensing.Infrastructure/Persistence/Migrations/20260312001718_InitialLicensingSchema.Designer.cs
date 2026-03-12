@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(LicensingDbContext))]
-    [Migration("20260312001202_InitialLicensingSchema")]
+    [Migration("20260312001718_InitialLicensingSchema")]
     partial class InitialLicensingSchema
     {
         /// <inheritdoc />
@@ -81,7 +81,7 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("LastValidatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("LicenseId")
+                    b.Property<Guid>("LicenseId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -221,7 +221,8 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                     b.HasOne("NexTraceOne.Licensing.Domain.Entities.License", null)
                         .WithOne("HardwareBinding")
                         .HasForeignKey("NexTraceOne.Licensing.Domain.Entities.HardwareBinding", "LicenseId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NexTraceOne.Licensing.Domain.Entities.LicenseActivation", b =>

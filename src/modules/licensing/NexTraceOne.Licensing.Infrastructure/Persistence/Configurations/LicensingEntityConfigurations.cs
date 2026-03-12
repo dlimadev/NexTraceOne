@@ -41,7 +41,7 @@ internal sealed class LicenseConfiguration : IEntityTypeConfiguration<License>
         builder.HasOne(x => x.HardwareBinding)
             .WithOne()
             .HasForeignKey<HardwareBinding>("LicenseId")
-            .IsRequired(false)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -97,7 +97,7 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                     Fingerprint = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     BoundAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     LastValidatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LicenseId = table.Column<Guid>(type: "uuid", nullable: true)
+                    LicenseId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
