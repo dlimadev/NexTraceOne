@@ -243,6 +243,20 @@ public static class SecurityEventType
 
     /// <summary>Callback OIDC falhou — token inválido, state adulterado ou provider rejeitou.</summary>
     public const string OidcCallbackFailed = "security.oidc.callback_failed";
+
+    // ── Expirações Automáticas ───────────────────────────────────────────
+
+    /// <summary>Delegação formal expirada automaticamente ao fim da vigência.</summary>
+    public const string DelegationExpired = "security.privileged.delegation_expired";
+
+    /// <summary>Acesso emergencial (Break Glass) expirado automaticamente.</summary>
+    public const string BreakGlassExpired = "security.privileged.break_glass_expired";
+
+    /// <summary>Acesso JIT expirado (sem aprovação no prazo ou grant encerrado).</summary>
+    public const string JitAccessExpired = "security.privileged.jit_expired";
+
+    /// <summary>Acesso a ambiente expirado automaticamente (grant temporário encerrado).</summary>
+    public const string EnvironmentAccessExpired = "security.environment.access_expired";
 }
 
 /// <summary>Identificador fortemente tipado de SecurityEvent.</summary>
