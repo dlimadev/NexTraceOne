@@ -1,6 +1,18 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { LoginResponse, CurrentUserProfile, TenantInfo, SelectTenantResponse } from '../types';
 import { identityApi } from '../api';
+import {
+  storeTokens,
+  updateAccessToken,
+  getAccessToken,
+  getTenantId,
+  getUserId,
+  storeTenantId,
+  storeUserId,
+  clearAllTokens,
+  migrateFromLocalStorage,
+  hasActiveSession,
+} from '../utils/tokenStorage';
 
 /**
  * Estado de autenticação e contexto do tenant selecionado.
@@ -8,6 +20,11 @@ import { identityApi } from '../api';
  * `requiresTenantSelection` indica que o login foi bem-sucedido mas o usuário
  * possui múltiplos tenants — o frontend deve exibir a tela de seleção.
  * `availableTenants` contém a lista de tenants disponíveis para seleção.
+ *
+ * Tokens são armazenados de forma segura via módulo tokenStorage:
+ * - Access token: sessionStorage (escopo de aba)
+ * - Refresh token: memória apenas (não persiste no browser)
+ * - Tenant/User ID: sessionStorage (necessário para re-hidratação)
  */
 interface AuthState {
   isAuthenticated: boolean;
@@ -29,26 +46,27 @@ interface AuthContextValue extends AuthState {
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-/** Persiste dados de sessão no localStorage após login bem-sucedido. */
+/**
+ * Persiste dados de sessão no storage seguro após login bem-sucedido.
+ * Access token vai para sessionStorage, refresh token fica em memória.
+ */
 function persistSession(data: LoginResponse): void {
-  localStorage.setItem('access_token', data.accessToken);
-  localStorage.setItem('refresh_token', data.refreshToken);
-  localStorage.setItem('tenant_id', data.user.tenantId);
-  localStorage.setItem('user_id', data.user.id);
-}
-
-/** Remove todos os dados de sessão do localStorage. */
-function clearSession(): void {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  localStorage.removeItem('tenant_id');
-  localStorage.removeItem('user_id');
+  storeTokens(data.accessToken, data.refreshToken);
+  storeTenantId(data.user.tenantId);
+  storeUserId(data.user.id);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Migra dados de localStorage para o novo storage na primeira carga
+  useEffect(() => {
+    migrateFromLocalStorage();
+  }, []);
+
   const [state, setState] = useState<AuthState>(() => {
-    const token = localStorage.getItem('access_token');
-    const tenantId = localStorage.getItem('tenant_id');
+    // Tenta migrar dados antigos do localStorage se existirem
+    migrateFromLocalStorage();
+    const token = getAccessToken();
+    const tenantId = getTenantId();
     return {
       isAuthenticated: !!token,
       accessToken: token,
@@ -59,14 +77,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   });
 
+  /**
+   * Escuta evento de sessão expirada disparado pelo interceptor do API client.
+   * Limpa estado de autenticação e redireciona para login.
+   * Usar evento customizado evita import circular entre AuthContext e apiClient.
+   */
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      clearAllTokens();
+      setState({
+        isAuthenticated: false,
+        accessToken: null,
+        user: null,
+        tenantId: null,
+        requiresTenantSelection: false,
+        availableTenants: [],
+      });
+    };
+
+    window.addEventListener('auth:session-expired', handleSessionExpired);
+    return () => window.removeEventListener('auth:session-expired', handleSessionExpired);
+  }, []);
+
   // Carrega o perfil do usuário autenticado ao iniciar quando há token armazenado
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
+    if (hasActiveSession()) {
       identityApi.getCurrentUser().then((profile) => {
         setState((s) => ({ ...s, user: profile }));
-      }).catch((error: unknown) => {
-        console.warn('[AuthContext] Failed to load user profile on startup:', error);
+      }).catch(() => {
+        // Se falhar ao carregar perfil, sessão pode estar inválida.
+        // Não loga erro com detalhes para evitar vazamento de dados sensíveis.
       });
     }
   }, []);
@@ -131,8 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const selectTenant = useCallback(async (tenantId: string) => {
     const response: SelectTenantResponse = await identityApi.selectTenant(tenantId);
 
-    localStorage.setItem('access_token', response.accessToken);
-    localStorage.setItem('tenant_id', response.tenantId);
+    updateAccessToken(response.accessToken);
+    storeTenantId(response.tenantId);
 
     // Carrega perfil completo com o novo contexto de tenant
     let profile: CurrentUserProfile | null = null;
@@ -140,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile = await identityApi.getCurrentUser();
     } catch {
       profile = {
-        id: localStorage.getItem('user_id') ?? '',
+        id: getUserId() ?? '',
         email: '',
         firstName: '',
         lastName: '',
@@ -169,7 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // Logout local mesmo se o backend falhar
     }
-    clearSession();
+    clearAllTokens();
     setState({
       isAuthenticated: false,
       accessToken: null,
