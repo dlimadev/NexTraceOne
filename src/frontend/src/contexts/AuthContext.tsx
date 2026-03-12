@@ -1,28 +1,30 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { LoginResponse, UserProfile } from '../types';
+import type { LoginResponse, CurrentUserProfile } from '../types';
 import { identityApi } from '../api';
 
 interface AuthState {
   isAuthenticated: boolean;
   accessToken: string | null;
-  user: UserProfile | null;
+  user: CurrentUserProfile | null;
   tenantId: string | null;
 }
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string, tenantId: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Persiste dados de sessão no localStorage após login bem-sucedido. */
 function persistSession(data: LoginResponse, tenantId: string): void {
   localStorage.setItem('access_token', data.accessToken);
   localStorage.setItem('refresh_token', data.refreshToken);
   localStorage.setItem('tenant_id', tenantId);
-  localStorage.setItem('user_id', data.userId);
+  localStorage.setItem('user_id', data.user.id);
 }
 
+/** Remove todos os dados de sessão do localStorage. */
 function clearSession(): void {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
@@ -42,16 +44,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   });
 
-  // Carrega o perfil do usuário ao iniciar quando há token armazenado
+  // Carrega o perfil do usuário autenticado ao iniciar quando há token armazenado
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    const userId = localStorage.getItem('user_id');
-    if (token && userId) {
-      identityApi.getUserProfile(userId).then((profile) => {
+    if (token) {
+      identityApi.getCurrentUser().then((profile) => {
         setState((s) => ({ ...s, user: profile }));
       }).catch((error: unknown) => {
-        // Log silencioso: usuário continua autenticado, mas sem perfil
-        // (permissões serão vazias até um re-login bem-sucedido)
         console.warn('[AuthContext] Failed to load user profile on startup:', error);
       });
     }
@@ -60,12 +59,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string, tenantId: string) => {
     const data = await identityApi.login({ email, password, tenantId });
     persistSession(data, tenantId);
-    let profile = null;
+
+    // Carrega perfil completo via /me após login para obter permissões atualizadas
+    let profile: CurrentUserProfile | null = null;
     try {
-      profile = await identityApi.getUserProfile(data.userId);
+      profile = await identityApi.getCurrentUser();
     } catch {
-      // Profile fetch failed — user is still authenticated; UI will degrade gracefully
+      // Fallback: monta perfil básico a partir da resposta de login
+      profile = {
+        id: data.user.id,
+        email: data.user.email,
+        firstName: '',
+        lastName: '',
+        fullName: data.user.fullName,
+        isActive: true,
+        lastLoginAt: null,
+        tenantId: data.user.tenantId,
+        roleName: data.user.roleName,
+        permissions: data.user.permissions,
+      };
     }
+
     setState({
       isAuthenticated: true,
       accessToken: data.accessToken,
@@ -74,7 +88,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await identityApi.logout();
+    } catch {
+      // Logout local mesmo se o backend falhar
+    }
     clearSession();
     setState({ isAuthenticated: false, accessToken: null, user: null, tenantId: null });
   }, []);

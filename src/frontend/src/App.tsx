@@ -40,7 +40,7 @@ export default function App() {
               <Route
                 path="/users"
                 element={
-                  <ProtectedRoute permission="users:read" redirectTo="/unauthorized">
+                  <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
                     <UsersPage />
                   </ProtectedRoute>
                 }

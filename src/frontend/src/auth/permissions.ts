@@ -1,82 +1,161 @@
-// Roles disponíveis no sistema RBAC do NexTraceOne
-export type AppRole = 'Admin' | 'Manager' | 'Developer' | 'Viewer' | 'Auditor';
+// Roles disponíveis no sistema RBAC do NexTraceOne (alinhados com o backend)
+export type AppRole =
+  | 'PlatformAdmin'
+  | 'TechLead'
+  | 'Developer'
+  | 'Viewer'
+  | 'Auditor'
+  | 'SecurityReview'
+  | 'ApprovalOnly';
 
-// Permissões granulares por módulo
+// Permissões granulares por módulo (códigos idênticos ao catálogo do backend)
 export type Permission =
-  | 'users:read'
-  | 'users:write'
-  | 'releases:read'
-  | 'releases:write'
+  | 'identity:users:read'
+  | 'identity:users:write'
+  | 'identity:roles:read'
+  | 'identity:roles:assign'
+  | 'identity:sessions:read'
+  | 'identity:sessions:revoke'
+  | 'identity:permissions:read'
+  | 'engineering-graph:assets:read'
+  | 'engineering-graph:assets:write'
   | 'contracts:read'
   | 'contracts:write'
-  | 'graph:read'
-  | 'graph:write'
+  | 'contracts:import'
+  | 'change-intelligence:releases:read'
+  | 'change-intelligence:releases:write'
+  | 'change-intelligence:blast-radius:read'
   | 'workflow:read'
+  | 'workflow:write'
   | 'workflow:approve'
   | 'promotion:read'
   | 'promotion:write'
+  | 'promotion:promote'
+  | 'ruleset-governance:read'
+  | 'ruleset-governance:write'
   | 'audit:read'
-  | 'audit:export';
+  | 'audit:export'
+  | 'licensing:read'
+  | 'licensing:write'
+  | 'platform:settings:read'
+  | 'platform:settings:write';
 
-// Mapeamento de roles para permissões
+// Mapeamento de roles para permissões — espelha Role.GetPermissionsForRole do backend
 const ROLE_PERMISSIONS: Record<AppRole, Permission[]> = {
-  Admin: [
-    'users:read',
-    'users:write',
-    'releases:read',
-    'releases:write',
+  PlatformAdmin: [
+    'identity:users:read',
+    'identity:users:write',
+    'identity:roles:read',
+    'identity:roles:assign',
+    'identity:sessions:read',
+    'identity:sessions:revoke',
+    'identity:permissions:read',
+    'engineering-graph:assets:read',
+    'engineering-graph:assets:write',
     'contracts:read',
     'contracts:write',
-    'graph:read',
-    'graph:write',
+    'contracts:import',
+    'change-intelligence:releases:read',
+    'change-intelligence:releases:write',
+    'change-intelligence:blast-radius:read',
     'workflow:read',
+    'workflow:write',
     'workflow:approve',
     'promotion:read',
     'promotion:write',
+    'promotion:promote',
+    'ruleset-governance:read',
+    'ruleset-governance:write',
+    'audit:read',
+    'audit:export',
+    'licensing:read',
+    'licensing:write',
+    'platform:settings:read',
+    'platform:settings:write',
+  ],
+  TechLead: [
+    'identity:users:read',
+    'identity:roles:read',
+    'identity:sessions:read',
+    'engineering-graph:assets:read',
+    'engineering-graph:assets:write',
+    'contracts:read',
+    'contracts:write',
+    'contracts:import',
+    'change-intelligence:releases:read',
+    'change-intelligence:releases:write',
+    'change-intelligence:blast-radius:read',
+    'workflow:read',
+    'workflow:write',
+    'workflow:approve',
+    'promotion:read',
+    'promotion:write',
+    'promotion:promote',
+    'ruleset-governance:read',
     'audit:read',
     'audit:export',
   ],
-  Manager: [
-    'users:read',
-    'releases:read',
-    'releases:write',
-    'contracts:read',
-    'contracts:write',
-    'graph:read',
-    'graph:write',
-    'workflow:read',
-    'workflow:approve',
-    'promotion:read',
-    'promotion:write',
-    'audit:read',
-  ],
   Developer: [
-    'releases:read',
-    'releases:write',
+    'identity:users:read',
+    'engineering-graph:assets:read',
     'contracts:read',
     'contracts:write',
-    'graph:read',
-    'graph:write',
+    'contracts:import',
+    'change-intelligence:releases:read',
+    'change-intelligence:releases:write',
+    'change-intelligence:blast-radius:read',
     'workflow:read',
     'promotion:read',
+    'ruleset-governance:read',
     'audit:read',
   ],
   Viewer: [
-    'releases:read',
+    'identity:users:read',
+    'engineering-graph:assets:read',
     'contracts:read',
-    'graph:read',
+    'change-intelligence:releases:read',
+    'change-intelligence:blast-radius:read',
     'workflow:read',
     'promotion:read',
     'audit:read',
   ],
   Auditor: [
-    'releases:read',
+    'identity:users:read',
+    'identity:sessions:read',
+    'engineering-graph:assets:read',
     'contracts:read',
-    'graph:read',
+    'change-intelligence:releases:read',
+    'change-intelligence:blast-radius:read',
     'workflow:read',
     'promotion:read',
+    'ruleset-governance:read',
     'audit:read',
     'audit:export',
+  ],
+  SecurityReview: [
+    'identity:users:read',
+    'identity:roles:read',
+    'identity:sessions:read',
+    'identity:sessions:revoke',
+    'engineering-graph:assets:read',
+    'contracts:read',
+    'change-intelligence:releases:read',
+    'change-intelligence:blast-radius:read',
+    'workflow:read',
+    'workflow:approve',
+    'promotion:read',
+    'ruleset-governance:read',
+    'ruleset-governance:write',
+    'audit:read',
+    'audit:export',
+  ],
+  ApprovalOnly: [
+    'workflow:read',
+    'workflow:approve',
+    'change-intelligence:releases:read',
+    'change-intelligence:blast-radius:read',
+    'promotion:read',
+    'audit:read',
   ],
 };
 

@@ -10,8 +10,9 @@ using System.Text;
 namespace NexTraceOne.BuildingBlocks.Security;
 
 /// <summary>
-/// Registra: JWT authentication, TenantResolutionMiddleware, EncryptionService,
-/// AssemblyIntegrityChecker, HardwareFingerprint.
+/// Registra autenticação JWT, resolução de tenant, e componentes de segurança transversais.
+/// A configuração JWT é lida primeiro de "Jwt:*" (padrão do appsettings) e depois
+/// de "Security:Jwt:*" como fallback, garantindo compatibilidade entre módulos.
 /// </summary>
 public static class DependencyInjection
 {
@@ -19,9 +20,18 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var issuer = configuration["Security:Jwt:Issuer"] ?? "NexTraceOne";
-        var audience = configuration["Security:Jwt:Audience"] ?? "NexTraceOne.Clients";
-        var signingKey = configuration["Security:Jwt:SigningKey"] ?? "development-signing-key-development-signing-key-1234567890";
+        // Prioridade: Jwt:* (raiz, padrão do appsettings) → Security:Jwt:* (fallback) → default
+        var issuer = configuration["Jwt:Issuer"]
+            ?? configuration["Security:Jwt:Issuer"]
+            ?? "NexTraceOne";
+
+        var audience = configuration["Jwt:Audience"]
+            ?? configuration["Security:Jwt:Audience"]
+            ?? "NexTraceOne.Clients";
+
+        var signingKey = configuration["Jwt:Secret"]
+            ?? configuration["Security:Jwt:SigningKey"]
+            ?? "development-signing-key-development-signing-key-1234567890";
 
         services.AddHttpContextAccessor();
         services.AddScoped<JwtTokenService>();

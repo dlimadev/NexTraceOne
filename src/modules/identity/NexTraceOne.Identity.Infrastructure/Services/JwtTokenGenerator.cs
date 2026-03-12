@@ -1,34 +1,44 @@
 using Microsoft.Extensions.Configuration;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Contracts.DTOs;
-using NexTraceOne.Identity.Contracts.ServiceInterfaces;
 using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
 namespace NexTraceOne.Identity.Infrastructure.Services;
 
-internal sealed class Pbkdf2PasswordHasher : IPasswordHasher
-{
-    public string Hash(string password) => HashedPassword.FromPlainText(password).Value;
-
-    public bool Verify(string password, string hash) => HashedPassword.FromHash(hash).Verify(password);
-}
-
+/// <summary>
+/// Gerador de JWT (access token) e refresh token para o módulo Identity.
+/// Produz tokens HMAC-SHA256 assinados com chave simétrica configurável.
+/// A configuração é lida do appsettings na seção "Jwt" (raiz) ou "Security:Jwt" (building blocks).
+/// Claims incluídos: sub, email, name, tenant_id, role, role_id, permissions, nbf, exp, iss, aud.
+/// </summary>
 internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeProvider dateTimeProvider) : IJwtTokenGenerator
 {
-    private readonly string _issuer = configuration["Identity:Jwt:Issuer"] ?? "NexTraceOne";
-    private readonly string _audience = configuration["Identity:Jwt:Audience"] ?? "NexTraceOne.Clients";
-    private readonly string _signingKey = configuration["Identity:Jwt:SigningKey"] ?? "development-signing-key-development-signing-key-1234567890";
-    private readonly int _accessTokenLifetimeMinutes = int.TryParse(configuration["Identity:Jwt:AccessTokenLifetimeMinutes"], out var minutes)
+    private readonly string _issuer = configuration["Jwt:Issuer"]
+        ?? configuration["Security:Jwt:Issuer"]
+        ?? "NexTraceOne";
+
+    private readonly string _audience = configuration["Jwt:Audience"]
+        ?? configuration["Security:Jwt:Audience"]
+        ?? "NexTraceOne.Clients";
+
+    private readonly string _signingKey = configuration["Jwt:Secret"]
+        ?? configuration["Security:Jwt:SigningKey"]
+        ?? "development-signing-key-development-signing-key-1234567890";
+
+    private readonly int _accessTokenLifetimeMinutes = int.TryParse(
+            configuration["Jwt:AccessTokenExpirationMinutes"]
+                ?? configuration["Security:Jwt:AccessTokenLifetimeMinutes"],
+            out var minutes)
         ? minutes
         : 60;
 
+    /// <inheritdoc />
     public int AccessTokenLifetimeSeconds => _accessTokenLifetimeMinutes * 60;
 
+    /// <inheritdoc />
     public string GenerateAccessToken(User user, TenantMembership membership, IReadOnlyCollection<string> permissions)
     {
         var header = new Dictionary<string, object>
@@ -60,6 +70,7 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
         return $"{unsignedToken}.{signature}";
     }
 
+    /// <inheritdoc />
     public string GenerateRefreshToken()
     {
         var bytes = RandomNumberGenerator.GetBytes(64);
@@ -77,44 +88,4 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
             .TrimEnd('=')
             .Replace('+', '-')
             .Replace('/', '_');
-}
-
-internal sealed class IdentityModuleService(
-    IUserRepository userRepository,
-    ITenantMembershipRepository membershipRepository,
-    IRoleRepository roleRepository) : IIdentityModule
-{
-    public async Task<UserSummaryDto?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        var user = await userRepository.GetByIdAsync(UserId.From(userId), cancellationToken);
-        return user is null
-            ? null
-            : new UserSummaryDto(user.Id.Value, user.Email.Value, user.FullName.Value, user.IsActive);
-    }
-
-    public async Task<IReadOnlyList<string>> GetUserPermissionsAsync(Guid userId, Guid tenantId, CancellationToken cancellationToken)
-    {
-        var membership = await membershipRepository.GetByUserAndTenantAsync(
-            UserId.From(userId),
-            TenantId.From(tenantId),
-            cancellationToken);
-
-        if (membership is null || !membership.IsActive)
-        {
-            return [];
-        }
-
-        var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
-        return role is null ? [] : Role.GetPermissionsForRole(role.Name);
-    }
-
-    public async Task<bool> ValidateTenantMembershipAsync(Guid userId, Guid tenantId, CancellationToken cancellationToken)
-    {
-        var membership = await membershipRepository.GetByUserAndTenantAsync(
-            UserId.From(userId),
-            TenantId.From(tenantId),
-            cancellationToken);
-
-        return membership is { IsActive: true };
-    }
 }

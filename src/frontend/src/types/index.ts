@@ -6,29 +6,84 @@ export interface LoginRequest {
   tenantId: string;
 }
 
+/** Resposta de autenticação — alinhada com o backend LoginResponse. */
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
-  userId: string;
-  email: string;
-  roles: string[];
+  user: LoginUser;
 }
 
+/** Resumo do usuário retornado no login (nested em LoginResponse). */
+export interface LoginUser {
+  id: string;
+  email: string;
+  fullName: string;
+  tenantId: string;
+  roleName: string;
+  permissions: string[];
+}
+
+/** Perfil do usuário autenticado retornado por /auth/me. */
+export interface CurrentUserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  tenantId: string;
+  roleName: string;
+  permissions: string[];
+}
+
+/** Perfil detalhado retornado por /users/{id} — inclui memberships multi-tenant. */
 export interface UserProfile {
   id: string;
   email: string;
-  fullName: string;
-  roles: string[];
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  memberships: UserMembership[];
+}
+
+export interface UserMembership {
   tenantId: string;
+  roleId: string;
+  roleName: string;
+  isActive: boolean;
 }
 
 export interface TenantUser {
-  id: string;
+  userId: string;
   email: string;
   fullName: string;
-  roles: string[];
-  createdAt: string;
+  isActive: boolean;
+  roleName: string;
+}
+
+export interface RoleInfo {
+  id: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
+  permissions: string[];
+}
+
+export interface PermissionInfo {
+  id: string;
+  code: string;
+  name: string;
+  module: string;
+}
+
+export interface ActiveSession {
+  sessionId: string;
+  ipAddress: string;
+  userAgent: string;
+  expiresAt: string;
 }
 
 // ─── Engineering Graph ───────────────────────────────────────────────────────

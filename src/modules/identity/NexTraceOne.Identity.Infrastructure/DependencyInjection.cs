@@ -14,7 +14,8 @@ namespace NexTraceOne.Identity.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Identity.
-/// Inclui: DbContext, Repositórios, Adapters externos, Quartz Jobs.
+/// Inclui: DbContext com RLS e auditoria, repositórios, serviços de autenticação,
+/// hash de senha e contrato público do módulo.
 /// </summary>
 public static class DependencyInjection
 {
@@ -36,12 +37,19 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
+
+        // Repositórios
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<ITenantMembershipRepository, TenantMembershipRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+        // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
 
         return services;
