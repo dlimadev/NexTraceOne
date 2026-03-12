@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Workflow.Domain.Entities;
 
 namespace NexTraceOne.Workflow.Infrastructure.Persistence;
 
@@ -14,10 +15,31 @@ public sealed class WorkflowDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Templates de workflow persistidos no módulo Workflow.</summary>
+    public DbSet<WorkflowTemplate> WorkflowTemplates => Set<WorkflowTemplate>();
 
+    /// <summary>Instâncias de workflow persistidas no módulo Workflow.</summary>
+    public DbSet<WorkflowInstance> WorkflowInstances => Set<WorkflowInstance>();
+
+    /// <summary>Estágios de workflow persistidos no módulo Workflow.</summary>
+    public DbSet<WorkflowStage> WorkflowStages => Set<WorkflowStage>();
+
+    /// <summary>Pacotes de evidência persistidos no módulo Workflow.</summary>
+    public DbSet<EvidencePack> EvidencePacks => Set<EvidencePack>();
+
+    /// <summary>Políticas de SLA persistidas no módulo Workflow.</summary>
+    public DbSet<SlaPolicy> SlaPolicies => Set<SlaPolicy>();
+
+    /// <summary>Decisões de aprovação persistidas no módulo Workflow.</summary>
+    public DbSet<ApprovalDecision> ApprovalDecisions => Set<ApprovalDecision>();
+
+    /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(WorkflowDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

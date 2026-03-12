@@ -1,0 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Workflow.Application.Abstractions;
+using NexTraceOne.Workflow.Domain.Entities;
+
+namespace NexTraceOne.Workflow.Infrastructure.Persistence.Repositories;
+
+/// <summary>
+/// Repositório de pacotes de evidência, implementando consultas específicas de negócio.
+/// </summary>
+internal sealed class EvidencePackRepository(WorkflowDbContext context)
+    : RepositoryBase<EvidencePack, EvidencePackId>(context), IEvidencePackRepository
+{
+    /// <summary>Busca um EvidencePack pelo seu identificador.</summary>
+    public override async Task<EvidencePack?> GetByIdAsync(EvidencePackId id, CancellationToken ct = default)
+        => await context.EvidencePacks
+            .SingleOrDefaultAsync(e => e.Id == id, ct);
+
+    /// <summary>Busca o EvidencePack associado a uma instância de workflow.</summary>
+    public async Task<EvidencePack?> GetByWorkflowInstanceIdAsync(WorkflowInstanceId instanceId, CancellationToken cancellationToken = default)
+        => await context.EvidencePacks
+            .SingleOrDefaultAsync(e => e.WorkflowInstanceId == instanceId, cancellationToken);
+}
