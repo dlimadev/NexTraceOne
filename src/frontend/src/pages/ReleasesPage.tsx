@@ -70,11 +70,11 @@ export function ReleasesPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-6 lg:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('releases.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('releases.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('releases.title')}</h1>
+          <p className="text-muted mt-1">{t('releases.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
           <Plus size={16} />
@@ -86,38 +86,38 @@ export function ReleasesPage() {
       {showForm && (
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="text-base font-semibold text-gray-800">{t('releases.notifyNewDeployment')}</h2>
+            <h2 className="text-base font-semibold text-heading">{t('releases.notifyNewDeployment')}</h2>
           </CardHeader>
           <CardBody>
             <form onSubmit={handleNotify} className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('releases.apiAssetId')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('releases.apiAssetId')}</label>
                 <input
                   type="text"
                   value={form.apiAssetId}
                   onChange={(e) => setForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                   required
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   placeholder={t('releases.apiAssetPlaceholder')}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('releases.version')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('releases.version')}</label>
                 <input
                   type="text"
                   value={form.version}
                   onChange={(e) => setForm((f) => ({ ...f, version: e.target.value }))}
                   required
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   placeholder={t('releases.versionPlaceholder')}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('releases.environment')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('releases.environment')}</label>
                 <select
                   value={form.environment}
                   onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   <option value="development">Development</option>
                   <option value="staging">Staging</option>
@@ -125,12 +125,12 @@ export function ReleasesPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('releases.commitSha')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('releases.commitSha')}</label>
                 <input
                   type="text"
                   value={form.commitSha}
                   onChange={(e) => setForm((f) => ({ ...f, commitSha: e.target.value }))}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                   placeholder={t('releases.commitPlaceholder')}
                 />
               </div>
@@ -151,13 +151,13 @@ export function ReleasesPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex gap-3 items-center">
-            <Search size={16} className="text-gray-400 shrink-0" />
+            <Search size={16} className="text-muted shrink-0" />
             <input
               type="text"
               value={apiAssetId}
               onChange={(e) => setApiAssetId(e.target.value)}
               placeholder={t('releases.filterPlaceholder')}
-              className="flex-1 text-sm focus:outline-none"
+              className="flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
             />
           </div>
         </CardBody>
@@ -167,46 +167,46 @@ export function ReleasesPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-800">{t('releases.releaseHistory')}</h2>
+            <h2 className="text-base font-semibold text-heading">{t('releases.releaseHistory')}</h2>
             {data && (
-              <span className="text-sm text-gray-500">{data.totalCount} total</span>
+              <span className="text-sm text-muted">{data.totalCount} total</span>
             )}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
           {!apiAssetId ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">
+            <p className="px-6 py-12 text-sm text-muted text-center">
               {t('releases.enterApiAssetId')}
             </p>
           ) : isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-gray-400" />
+              <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
           ) : isError ? (
-            <p className="px-6 py-12 text-sm text-red-500 text-center">
+            <p className="px-6 py-12 text-sm text-critical text-center">
               {t('releases.loadFailed')}
             </p>
           ) : !data?.items?.length ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">
+            <p className="px-6 py-12 text-sm text-muted text-center">
               {t('releases.noReleases')}
             </p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('releases.version')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('releases.environment')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('releases.changeLevel')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('releases.state')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('releases.riskScore')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('releases.date')}</th>
+                <tr className="border-b border-edge bg-panel text-left">
+                  <th className="px-6 py-3 font-medium text-muted">{t('releases.version')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('releases.environment')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('releases.changeLevel')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('releases.state')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('releases.riskScore')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('releases.date')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-edge">
                 {data.items.map((r) => (
-                  <tr key={r.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-3 font-mono text-xs text-gray-700">{r.version}</td>
-                    <td className="px-6 py-3 text-gray-600 capitalize">{r.environment}</td>
+                  <tr key={r.id} className="hover:bg-hover transition-colors">
+                    <td className="px-6 py-3 font-mono text-xs text-body">{r.version}</td>
+                    <td className="px-6 py-3 text-body capitalize">{r.environment}</td>
                     <td className="px-6 py-3">
                       <Badge variant={changeLevelVariant(r.changeLevel)}>
                         {t(CHANGE_LEVEL_KEYS[r.changeLevel] ?? 'releases.changeLevels.unknown')}
@@ -215,10 +215,10 @@ export function ReleasesPage() {
                     <td className="px-6 py-3">
                       <Badge variant={stateVariant(r.deploymentState)}>{r.deploymentState}</Badge>
                     </td>
-                    <td className="px-6 py-3 text-gray-600">
+                    <td className="px-6 py-3 text-body">
                       {r.riskScore != null ? (r.riskScore * 100).toFixed(0) + '%' : '—'}
                     </td>
-                    <td className="px-6 py-3 text-gray-500 text-xs">
+                    <td className="px-6 py-3 text-muted text-xs">
                       {new Date(r.createdAt).toLocaleString()}
                     </td>
                   </tr>

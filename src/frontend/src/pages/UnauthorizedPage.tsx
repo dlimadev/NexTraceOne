@@ -12,12 +12,12 @@ export function UnauthorizedPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center h-full py-24 text-center px-4">
-      <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
-        <ShieldOff size={32} className="text-red-500" />
+    <div className="flex flex-col items-center justify-center h-full py-24 text-center px-4 animate-fade-in">
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-critical/15 rounded-full mb-6">
+        <ShieldOff size={32} className="text-critical" />
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('authorization.accessDenied')}</h1>
-      <p className="text-gray-500 max-w-sm mb-6">
+      <h1 className="text-2xl font-bold text-heading mb-2">{t('authorization.accessDenied')}</h1>
+      <p className="text-muted max-w-sm mb-6">
         {t('authorization.accessDeniedDescription')}
       </p>
       <Button onClick={() => navigate('/')} variant="secondary">

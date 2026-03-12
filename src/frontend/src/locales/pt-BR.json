@@ -67,7 +67,23 @@
     "promotion": "Promoção",
     "users": "Usuários",
     "audit": "Auditoria",
-    "changeIntelligence": "Inteligência de Mudanças"
+    "changeIntelligence": "Inteligência de Mudanças",
+    "sectionPlatform": "Plataforma",
+    "sectionAdmin": "Administração"
+  },
+  "header": {
+    "toggleLanguage": "Alternar idioma",
+    "notifications": "Notificações",
+    "settings": "Configurações"
+  },
+  "commandPalette": {
+    "title": "Paleta de Comandos",
+    "placeholder": "Buscar páginas, ações…",
+    "navigation": "Navegação",
+    "admin": "Administração",
+    "navigate": "navegar",
+    "select": "selecionar",
+    "close": "fechar"
   },
   "users": {
     "title": "Usuários",

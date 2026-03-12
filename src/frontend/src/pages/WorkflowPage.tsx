@@ -64,10 +64,10 @@ export function WorkflowPage() {
   const pending = instances?.items?.filter((i) => i.status === 'Pending' || i.status === 'InProgress') ?? [];
 
   return (
-    <div className="p-8">
+    <div className="p-6 lg:p-8 animate-fade-in">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t('workflow.title')}</h1>
-        <p className="text-gray-500 mt-1">{t('workflow.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-heading">{t('workflow.title')}</h1>
+        <p className="text-muted mt-1">{t('workflow.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -75,8 +75,8 @@ export function WorkflowPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Clock size={16} className="text-gray-500" />
-              <h2 className="font-semibold text-gray-800">{t('workflow.pendingApprovals')}</h2>
+              <Clock size={16} className="text-muted" />
+              <h2 className="font-semibold text-heading">{t('workflow.pendingApprovals')}</h2>
               {pending.length > 0 && (
                 <Badge variant="warning">{pending.length}</Badge>
               )}
@@ -85,28 +85,28 @@ export function WorkflowPage() {
           <CardBody className="p-0">
             {instancesLoading ? (
               <div className="flex items-center justify-center py-10">
-                <RefreshCw size={18} className="animate-spin text-gray-400" />
+                <RefreshCw size={18} className="animate-spin text-muted" />
               </div>
             ) : instancesError ? (
-              <div className="flex items-center gap-2 px-6 py-8 text-sm text-red-500 justify-center">
+              <div className="flex items-center gap-2 px-6 py-8 text-sm text-critical justify-center">
                 <XCircle size={16} />
                 <span>{t('workflow.loadFailed')}</span>
               </div>
             ) : pending.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">{t('workflow.noPending')}</p>
+              <p className="text-sm text-muted text-center py-8">{t('workflow.noPending')}</p>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-edge">
                 {pending.map((inst) => (
                   <li key={inst.id} className="px-6 py-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-800 font-mono truncate">
+                        <p className="text-sm font-medium text-heading font-mono truncate">
                           {inst.id.slice(0, 8)}…
                         </p>
                         {inst.currentStage && (
-                          <p className="text-xs text-gray-500 mt-0.5">{t('workflow.stage')}: {inst.currentStage}</p>
+                          <p className="text-xs text-muted mt-0.5">{t('workflow.stage')}: {inst.currentStage}</p>
                         )}
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-xs text-faded mt-0.5">
                           {new Date(inst.createdAt).toLocaleString()}
                         </p>
                       </div>
@@ -154,7 +154,7 @@ export function WorkflowPage() {
                           onChange={(e) => setRejectReason(e.target.value)}
                           placeholder={t('workflow.rejectPlaceholder')}
                           rows={2}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                          className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-critical focus:border-critical transition-colors"
                         />
                         <div className="flex gap-2 justify-end">
                           <Button
@@ -194,22 +194,22 @@ export function WorkflowPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CheckSquare size={16} className="text-gray-500" />
-              <h2 className="font-semibold text-gray-800">{t('workflow.workflowTemplates')}</h2>
+              <CheckSquare size={16} className="text-muted" />
+              <h2 className="font-semibold text-heading">{t('workflow.workflowTemplates')}</h2>
             </div>
           </CardHeader>
           <CardBody className="p-0">
             {templatesLoading ? (
               <div className="flex items-center justify-center py-10">
-                <RefreshCw size={18} className="animate-spin text-gray-400" />
+                <RefreshCw size={18} className="animate-spin text-muted" />
               </div>
             ) : templates?.length ? (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-edge">
                 {templates.map((t) => (
-                  <li key={t.id} className="px-6 py-3 flex items-center justify-between">
+                  <li key={t.id} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
                     <div>
-                      <p className="text-sm font-medium text-gray-700">{t.name}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-sm font-medium text-body">{t.name}</p>
+                      <p className="text-xs text-muted">
                         {t.stages.length} stage{t.stages.length !== 1 ? 's' : ''}
                       </p>
                     </div>
@@ -220,10 +220,10 @@ export function WorkflowPage() {
                 ))}
               </ul>
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-edge">
                 {['Standard Release', 'Breaking Change Release', 'Hotfix Release'].map((name, i) => (
-                  <li key={name} className="px-6 py-3 flex items-center justify-between">
-                    <span className="text-sm text-gray-700">{name}</span>
+                  <li key={name} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
+                    <span className="text-sm text-body">{name}</span>
                     <Badge variant={TEMPLATE_LEVEL_VARIANTS[i + 1] ?? 'default'}>
                       {TEMPLATE_LEVEL_LABELS[i + 1]}
                     </Badge>
@@ -239,29 +239,29 @@ export function WorkflowPage() {
       {instances && instances.items.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
-            <h2 className="font-semibold text-gray-800">{t('workflow.allInstances')}</h2>
+            <h2 className="font-semibold text-heading">{t('workflow.allInstances')}</h2>
           </CardHeader>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                   <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.instanceId')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.releaseId')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.status')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.currentStage')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('workflow.created')}</th>
+                <tr className="border-b border-edge bg-panel text-left">
+                   <th className="px-6 py-3 font-medium text-muted">{t('workflow.instanceId')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('workflow.releaseId')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('workflow.status')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('workflow.currentStage')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('workflow.created')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-edge">
                 {instances.items.map((inst) => (
-                  <tr key={inst.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-3 font-mono text-xs text-gray-600">{inst.id.slice(0, 8)}…</td>
-                    <td className="px-6 py-3 font-mono text-xs text-gray-600">{inst.releaseId.slice(0, 8)}…</td>
+                  <tr key={inst.id} className="hover:bg-hover transition-colors">
+                    <td className="px-6 py-3 font-mono text-xs text-body">{inst.id.slice(0, 8)}…</td>
+                    <td className="px-6 py-3 font-mono text-xs text-body">{inst.releaseId.slice(0, 8)}…</td>
                     <td className="px-6 py-3">
                       <Badge variant={statusVariant(inst.status)}>{inst.status}</Badge>
                     </td>
-                    <td className="px-6 py-3 text-gray-600">{inst.currentStage ?? '—'}</td>
-                    <td className="px-6 py-3 text-xs text-gray-500">
+                    <td className="px-6 py-3 text-body">{inst.currentStage ?? '—'}</td>
+                    <td className="px-6 py-3 text-xs text-muted">
                       {new Date(inst.createdAt).toLocaleString()}
                     </td>
                   </tr>

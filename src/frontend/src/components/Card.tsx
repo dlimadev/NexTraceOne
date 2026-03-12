@@ -5,9 +5,13 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
+/**
+ * Card base — superfície elevada sobre o canvas escuro.
+ * Usa bg-card com borda edge para separação visual discreta.
+ */
 export function Card({ children, className = '', ...rest }: CardProps) {
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`} {...rest}>
+    <div className={`bg-card rounded-lg shadow-sm border border-edge ${className}`} {...rest}>
       {children}
     </div>
   );
@@ -15,7 +19,7 @@ export function Card({ children, className = '', ...rest }: CardProps) {
 
 export function CardHeader({ children, className = '', ...rest }: CardProps) {
   return (
-    <div className={`px-6 py-4 border-b border-gray-200 ${className}`} {...rest}>
+    <div className={`px-6 py-4 border-b border-edge ${className}`} {...rest}>
       {children}
     </div>
   );

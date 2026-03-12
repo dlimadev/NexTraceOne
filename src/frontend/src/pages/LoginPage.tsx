@@ -44,30 +44,32 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+      <div className="w-full max-w-md animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-4">
-            <span className="text-white font-bold text-xl">N</span>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-accent/15 mb-4">
+            <span className="text-accent font-bold text-xl">N</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">NexTraceOne</h1>
-          <p className="text-gray-500 mt-1">{t('auth.tagline')}</p>
+          <h1 className="text-2xl font-bold text-heading">NexTraceOne</h1>
+          <p className="text-muted mt-1">{t('auth.tagline')}</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6">{t('auth.signIn')}</h2>
+        <div className="bg-card rounded-xl shadow-md border border-edge p-8">
+          {/* Brand accent stripe */}
+          <div className="h-1 brand-gradient rounded-full mb-6" />
+          <h2 className="text-lg font-semibold text-heading mb-6">{t('auth.signIn')}</h2>
 
           {error && (
-            <div className="mb-4 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-4 rounded-md bg-critical/10 border border-critical/30 px-4 py-3 text-sm text-critical">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">
+              <label className="block text-sm font-medium text-body mb-1" htmlFor="email">
                 {t('auth.email')}
               </label>
               <input
@@ -78,12 +80,12 @@ export function LoginPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('auth.emailPlaceholder')}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">
+              <label className="block text-sm font-medium text-body mb-1" htmlFor="password">
                 {t('auth.password')}
               </label>
               <input
@@ -94,7 +96,7 @@ export function LoginPage() {
                 onChange={handleChange}
                 required
                 placeholder={t('auth.passwordPlaceholder')}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
               />
             </div>
 
@@ -104,7 +106,7 @@ export function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-faded mt-6">
           {t('auth.selfHosted')}
         </p>
       </div>

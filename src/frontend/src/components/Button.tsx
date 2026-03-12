@@ -7,11 +7,18 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
+/**
+ * Mapa de variantes visuais alinhado ao tema dark enterprise.
+ * - primary: fundo accent (azul marca), texto claro
+ * - secondary: fundo card (superfície elevada), borda sutil
+ * - danger: fundo crítico, para ações destrutivas
+ * - ghost: sem fundo, apenas texto — hover revela superfície
+ */
 const variantClasses: Record<string, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 disabled:bg-indigo-300',
-  secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
-  danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
-  ghost: 'text-gray-600 hover:bg-gray-100',
+  primary: 'bg-accent text-heading hover:bg-accent-hover disabled:opacity-40',
+  secondary: 'bg-card text-body border border-edge hover:bg-hover disabled:opacity-40',
+  danger: 'bg-critical text-heading hover:brightness-110 disabled:opacity-40',
+  ghost: 'text-muted hover:bg-hover hover:text-body',
 };
 
 const sizeClasses: Record<string, string> = {
@@ -31,7 +38,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       disabled={disabled || loading}
       {...rest}
     >

@@ -5,12 +5,16 @@ interface BadgeProps {
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
 }
 
+/**
+ * Variantes semânticas com fundo translúcido sobre superfícies escuras.
+ * Cada cor de status usa opacidade de 15% para manter legibilidade sem poluir o layout.
+ */
 const variantClasses: Record<string, string> = {
-  default: 'bg-gray-100 text-gray-700',
-  success: 'bg-green-100 text-green-700',
-  warning: 'bg-yellow-100 text-yellow-700',
-  danger: 'bg-red-100 text-red-700',
-  info: 'bg-blue-100 text-blue-700',
+  default: 'bg-elevated text-body',
+  success: 'bg-success/15 text-success',
+  warning: 'bg-warning/15 text-warning',
+  danger: 'bg-critical/15 text-critical',
+  info: 'bg-info/15 text-info',
 };
 
 export function Badge({ children, variant = 'default' }: BadgeProps) {

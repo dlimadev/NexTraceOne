@@ -67,7 +67,23 @@
     "promotion": "Promotion",
     "users": "Users",
     "audit": "Audit",
-    "changeIntelligence": "Change Intelligence"
+    "changeIntelligence": "Change Intelligence",
+    "sectionPlatform": "Platform",
+    "sectionAdmin": "Administration"
+  },
+  "header": {
+    "toggleLanguage": "Toggle language",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "commandPalette": {
+    "title": "Command Palette",
+    "placeholder": "Search pages, actions…",
+    "navigation": "Navigation",
+    "admin": "Administration",
+    "navigate": "navigate",
+    "select": "select",
+    "close": "close"
   },
   "users": {
     "title": "Users",

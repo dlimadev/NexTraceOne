@@ -29,11 +29,11 @@ export function AuditPage() {
   });
 
   return (
-    <div className="p-8">
+    <div className="p-6 lg:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('audit.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('audit.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('audit.title')}</h1>
+          <p className="text-muted mt-1">{t('audit.subtitle')}</p>
         </div>
         <Button
           variant="secondary"
@@ -50,16 +50,16 @@ export function AuditPage() {
         <div
           className={`mb-4 rounded-lg border px-4 py-3 flex items-center gap-3 ${
             integrity.valid
-              ? 'border-green-200 bg-green-50'
-              : 'border-red-200 bg-red-50'
+              ? 'border-success/30 bg-success/10'
+              : 'border-critical/30 bg-critical/10'
           }`}
         >
           {integrity.valid ? (
-            <CheckCircle size={16} className="text-green-600 shrink-0" />
+            <CheckCircle size={16} className="text-success shrink-0" />
           ) : (
-            <XCircle size={16} className="text-red-600 shrink-0" />
+            <XCircle size={16} className="text-critical shrink-0" />
           )}
-          <p className={`text-sm ${integrity.valid ? 'text-green-700' : 'text-red-700'}`}>
+          <p className={`text-sm ${integrity.valid ? 'text-success' : 'text-critical'}`}>
             {integrity.message}
           </p>
         </div>
@@ -69,7 +69,7 @@ export function AuditPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex gap-3 items-center">
-            <Search size={16} className="text-gray-400 shrink-0" />
+            <Search size={16} className="text-muted shrink-0" />
             <input
               type="text"
               value={eventTypeFilter}
@@ -78,7 +78,7 @@ export function AuditPage() {
                 setPage(1);
               }}
               placeholder={t('audit.filterPlaceholder')}
-              className="flex-1 text-sm focus:outline-none"
+              className="flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
             />
             <Button variant="secondary" onClick={() => refetch()} loading={isFetching}>
               <RefreshCw size={14} />
@@ -92,49 +92,49 @@ export function AuditPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Shield size={16} className="text-gray-500" />
-              <h2 className="font-semibold text-gray-800">{t('audit.auditEvents')}</h2>
+              <Shield size={16} className="text-muted" />
+              <h2 className="font-semibold text-heading">{t('audit.auditEvents')}</h2>
             </div>
             {data && (
-              <span className="text-sm text-gray-500">{data.totalCount} total</span>
+              <span className="text-sm text-muted">{data.totalCount} total</span>
             )}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-gray-400" />
+              <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
           ) : isError ? (
-            <p className="px-6 py-12 text-sm text-red-500 text-center">
+            <p className="px-6 py-12 text-sm text-critical text-center">
               {t('audit.loadFailed')}
             </p>
           ) : !data?.items?.length ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">
+            <p className="px-6 py-12 text-sm text-muted text-center">
               {t('audit.noEvents')}
             </p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.eventType')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.actor')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.aggregate')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.timestamp')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('audit.hash')}</th>
+                <tr className="border-b border-edge bg-panel text-left">
+                  <th className="px-6 py-3 font-medium text-muted">{t('audit.eventType')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('audit.actor')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('audit.aggregate')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('audit.timestamp')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('audit.hash')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-edge">
                 {data.items.map((e) => (
-                  <tr key={e.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-3 font-medium text-gray-800">{e.eventType}</td>
-                    <td className="px-6 py-3 text-gray-600">{e.actorEmail}</td>
-                    <td className="px-6 py-3 text-gray-600">{e.aggregateType}</td>
-                    <td className="px-6 py-3 text-xs text-gray-500">
+                  <tr key={e.id} className="hover:bg-hover transition-colors">
+                    <td className="px-6 py-3 font-medium text-heading">{e.eventType}</td>
+                    <td className="px-6 py-3 text-body">{e.actorEmail}</td>
+                    <td className="px-6 py-3 text-body">{e.aggregateType}</td>
+                    <td className="px-6 py-3 text-xs text-muted">
                       {new Date(e.occurredAt).toLocaleString()}
                     </td>
                     <td
-                      className="px-6 py-3 font-mono text-xs text-gray-400 truncate max-w-[120px]"
+                      className="px-6 py-3 font-mono text-xs text-faded truncate max-w-[120px]"
                       title={e.hash}
                       aria-label={`Hash: ${e.hash}`}
                     >
@@ -149,7 +149,7 @@ export function AuditPage() {
 
         {/* Pagination */}
         {data && data.totalPages > 1 && (
-          <div className="px-6 py-4 flex items-center justify-between border-t border-gray-100">
+          <div className="px-6 py-4 flex items-center justify-between border-t border-edge">
             <Button
               variant="secondary"
               disabled={page === 1}
@@ -157,7 +157,7 @@ export function AuditPage() {
             >
               {t('audit.previous')}
             </Button>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-muted">
               {t('audit.pageOf', { page: data.page, totalPages: data.totalPages })}
             </span>
             <Button

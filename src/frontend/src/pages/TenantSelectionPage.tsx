@@ -22,7 +22,6 @@ export function TenantSelectionPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Se não requer seleção de tenant, redireciona ao dashboard ou login
   if (!requiresTenantSelection) {
     return <Navigate to={isAuthenticated ? '/' : '/login'} replace />;
   }
@@ -41,19 +40,19 @@ export function TenantSelectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
+      <div className="w-full max-w-lg animate-fade-in">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-xl mb-4">
-            <Building2 size={28} className="text-white" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-accent/15 mb-4">
+            <Building2 size={28} className="text-accent" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('tenants.selectTenant')}</h1>
-          <p className="text-gray-500 mt-1">{t('tenants.selectTenantDescription')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('tenants.selectTenant')}</h1>
+          <p className="text-muted mt-1">{t('tenants.selectTenantDescription')}</p>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-md bg-critical/10 border border-critical/30 px-4 py-3 text-sm text-critical">
             {error}
           </div>
         )}
@@ -65,32 +64,32 @@ export function TenantSelectionPage() {
               key={tenant.id}
               onClick={() => handleSelect(tenant)}
               disabled={!tenant.isActive || loading !== null}
-              className={`w-full bg-white rounded-xl shadow-sm border px-6 py-4 flex items-center gap-4 text-left transition-all ${
+              className={`w-full bg-card rounded-xl border px-6 py-4 flex items-center gap-4 text-left transition-all ${
                 tenant.isActive
-                  ? 'border-gray-200 hover:border-indigo-300 hover:shadow-md cursor-pointer'
-                  : 'border-gray-100 opacity-60 cursor-not-allowed'
+                  ? 'border-edge hover:border-accent/40 hover:shadow-glow cursor-pointer'
+                  : 'border-edge opacity-50 cursor-not-allowed'
               }`}
             >
-              <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center text-accent font-bold text-sm shrink-0">
                 {tenant.name[0]?.toUpperCase() ?? 'T'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">{tenant.name}</p>
-                <p className="text-sm text-gray-500 truncate">
+                <p className="font-semibold text-heading truncate">{tenant.name}</p>
+                <p className="text-sm text-muted truncate">
                   {tenant.slug}
                   {!tenant.isActive && (
-                    <span className="ml-2 text-xs text-red-500 font-medium">{t('tenants.inactive')}</span>
+                    <span className="ml-2 text-xs text-critical font-medium">{t('tenants.inactive')}</span>
                   )}
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-xs text-gray-400">{t('tenants.role')}</span>
-                <p className="text-sm font-medium text-gray-700">{tenant.roleName}</p>
+                <span className="text-xs text-faded">{t('tenants.role')}</span>
+                <p className="text-sm font-medium text-body">{tenant.roleName}</p>
               </div>
               {loading === tenant.id ? (
-                <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin shrink-0" />
+                <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin shrink-0" />
               ) : (
-                <ChevronRight size={18} className="text-gray-400 shrink-0" />
+                <ChevronRight size={18} className="text-faded shrink-0" />
               )}
             </button>
           ))}
@@ -98,7 +97,7 @@ export function TenantSelectionPage() {
 
         {availableTenants.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">{t('tenants.noTenants')}</p>
+            <p className="text-muted">{t('tenants.noTenants')}</p>
             <Button onClick={() => navigate('/login')} variant="secondary" className="mt-4">
               {t('auth.signInButton')}
             </Button>

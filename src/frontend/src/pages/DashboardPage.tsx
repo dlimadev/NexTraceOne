@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Zap, GitBranch, FileText, CheckSquare, Activity } from 'lucide-react';
 import { StatCard } from '../components/StatCard';
 import { Card, CardHeader, CardBody } from '../components/Card';
+import { EmptyState } from '../components/EmptyState';
 import { engineeringGraphApi } from '../api';
 
 /**
@@ -12,7 +13,6 @@ import { engineeringGraphApi } from '../api';
 export function DashboardPage() {
   const { t } = useTranslation();
 
-  // Graph is used to get service/api counts
   const { data: graph } = useQuery({
     queryKey: ['graph'],
     queryFn: () => engineeringGraphApi.getGraph(),
@@ -23,70 +23,72 @@ export function DashboardPage() {
     {
       title: t('dashboard.activeServices'),
       value: graph?.services?.length ?? '—',
-      icon: <Activity size={28} />,
-      color: 'text-indigo-600',
+      icon: <Activity size={24} />,
+      color: 'text-brand-blue',
     },
     {
       title: t('dashboard.registeredApis'),
       value: graph?.apis?.length ?? '—',
-      icon: <GitBranch size={28} />,
-      color: 'text-blue-600',
+      icon: <GitBranch size={24} />,
+      color: 'text-accent',
     },
     {
       title: t('dashboard.consumerRelations'),
       value: graph?.relationships?.length ?? '—',
-      icon: <Zap size={28} />,
-      color: 'text-yellow-600',
+      icon: <Zap size={24} />,
+      color: 'text-warning',
     },
     {
       title: t('dashboard.totalContracts'),
       value: '—',
-      icon: <FileText size={28} />,
-      color: 'text-green-600',
+      icon: <FileText size={24} />,
+      color: 'text-success',
     },
     {
       title: t('dashboard.pendingApprovals'),
       value: '—',
-      icon: <CheckSquare size={28} />,
-      color: 'text-purple-600',
+      icon: <CheckSquare size={24} />,
+      color: 'text-brand-purple',
     },
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-6 lg:p-8 animate-fade-in">
+      {/* Page title */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
-        <p className="text-gray-500 mt-1">{t('dashboard.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-heading">{t('dashboard.title')}</h1>
+        <p className="text-muted mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
-      {/* Stats */}
+      {/* KPI Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {stats.map((s) => (
           <StatCard key={s.title} {...s} />
         ))}
       </div>
 
-      {/* Services overview */}
+      {/* Services & APIs overview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <h2 className="text-base font-semibold text-gray-800">{t('dashboard.recentServices')}</h2>
+            <h2 className="text-base font-semibold text-heading">{t('dashboard.recentServices')}</h2>
           </CardHeader>
           <CardBody className="p-0">
             {!graph?.services?.length ? (
-              <p className="px-6 py-8 text-sm text-gray-400 text-center">
-                {t('dashboard.noServices')}
-              </p>
+              <EmptyState
+                icon={<Activity size={20} />}
+                title={t('dashboard.noServices')}
+              />
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-edge">
                 {graph.services.slice(0, 5).map((svc) => (
-                  <li key={svc.id} className="px-6 py-3 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm">
+                  <li key={svc.id} className="px-6 py-3 flex items-center gap-3 hover:bg-hover transition-colors">
+                    <div className="w-8 h-8 rounded bg-accent/15 flex items-center justify-center text-accent font-semibold text-sm">
                       {svc.name[0]}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">{svc.name}</p>
-                      <p className="text-xs text-gray-400">{svc.team}</p>
+                      <p className="text-sm font-medium text-heading">{svc.name}</p>
+                      <p className="text-xs text-muted">{svc.team}</p>
                     </div>
                   </li>
                 ))}
@@ -97,20 +99,21 @@ export function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <h2 className="text-base font-semibold text-gray-800">{t('dashboard.registeredApisTitle')}</h2>
+            <h2 className="text-base font-semibold text-heading">{t('dashboard.registeredApisTitle')}</h2>
           </CardHeader>
           <CardBody className="p-0">
             {!graph?.apis?.length ? (
-              <p className="px-6 py-8 text-sm text-gray-400 text-center">
-                {t('dashboard.noApis')}
-              </p>
+              <EmptyState
+                icon={<GitBranch size={20} />}
+                title={t('dashboard.noApis')}
+              />
             ) : (
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-edge">
                 {graph.apis.slice(0, 5).map((api) => (
-                  <li key={api.id} className="px-6 py-3 flex items-center justify-between">
+                  <li key={api.id} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
                     <div>
-                      <p className="text-sm font-medium text-gray-800">{api.name}</p>
-                      <p className="text-xs text-gray-400">{api.baseUrl}</p>
+                      <p className="text-sm font-medium text-heading">{api.name}</p>
+                      <p className="text-xs text-muted font-mono">{api.baseUrl}</p>
                     </div>
                   </li>
                 ))}

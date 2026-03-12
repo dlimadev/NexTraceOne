@@ -35,11 +35,11 @@ export function UsersPage() {
   });
 
   return (
-    <div className="p-8">
+    <div className="p-6 lg:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('users.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('users.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('users.title')}</h1>
+          <p className="text-muted mt-1">{t('users.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
           <Plus size={16} /> {t('users.createUser')}
@@ -49,40 +49,40 @@ export function UsersPage() {
       {/* Formulário de criação de usuário */}
       {showForm && (
         <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-gray-800">{t('users.createNewUser')}</h2></CardHeader>
+          <CardHeader><h2 className="font-semibold text-heading">{t('users.createNewUser')}</h2></CardHeader>
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); createMutation.mutate(form); }}
               className="grid grid-cols-3 gap-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.firstName')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('users.firstName')}</label>
                 <input
                   type="text"
                   value={form.firstName}
                   onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
                   required
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.lastName')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('users.lastName')}</label>
                 <input
                   type="text"
                   value={form.lastName}
                   onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
                   required
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.email')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('users.email')}</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   required
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div className="col-span-3 flex gap-2 justify-end">
@@ -98,41 +98,41 @@ export function UsersPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-800">{t('users.tenantUsers')}</h2>
-            {data && <span className="text-sm text-gray-500">{data.totalCount} {t('common.total')}</span>}
+            <h2 className="text-base font-semibold text-heading">{t('users.tenantUsers')}</h2>
+            {data && <span className="text-sm text-muted">{data.totalCount} {t('common.total')}</span>}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
           {!tenantId ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('users.noTenantId')}</p>
+            <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noTenantId')}</p>
           ) : isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-gray-400" />
+              <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
           ) : !data?.items?.length ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">{t('users.noUsersFound')}</p>
+            <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noUsersFound')}</p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('users.name')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('users.email')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('users.roles')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('common.actions')}</th>
+                <tr className="border-b border-edge bg-panel text-left">
+                  <th className="px-6 py-3 font-medium text-muted">{t('users.name')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('users.email')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('users.roles')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('common.actions')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-edge">
                 {data.items.map((u) => (
-                  <tr key={u.userId} className="hover:bg-gray-50">
+                  <tr key={u.userId} className="hover:bg-hover transition-colors">
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-medium text-sm">
+                        <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent font-medium text-sm">
                           {u.email[0].toUpperCase()}
                         </div>
-                        <span className="font-medium text-gray-800">{u.fullName}</span>
+                        <span className="font-medium text-heading">{u.fullName}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-3 text-gray-600">{u.email}</td>
+                    <td className="px-6 py-3 text-body">{u.email}</td>
                     <td className="px-6 py-3">
                       <Badge variant="info">{u.roleName}</Badge>
                     </td>

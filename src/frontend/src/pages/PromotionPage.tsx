@@ -72,11 +72,11 @@ export function PromotionPage() {
   const pending = requests.filter((r) => r.status === 'Pending' || r.status === 'Approved');
 
   return (
-    <div className="p-8">
+    <div className="p-6 lg:p-8 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('promotion.title')}</h1>
-          <p className="text-gray-500 mt-1">{t('promotion.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('promotion.title')}</h1>
+          <p className="text-muted mt-1">{t('promotion.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm((v) => !v)}>
           <Plus size={16} /> {t('promotion.newRequest')}
@@ -87,7 +87,7 @@ export function PromotionPage() {
       {showForm && (
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="font-semibold text-gray-800">{t('promotion.createRequest')}</h2>
+            <h2 className="font-semibold text-heading">{t('promotion.createRequest')}</h2>
           </CardHeader>
           <CardBody>
             <form
@@ -98,22 +98,22 @@ export function PromotionPage() {
               className="grid grid-cols-3 gap-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('promotion.releaseId')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('promotion.releaseId')}</label>
                 <input
                   type="text"
                   value={form.releaseId}
                   onChange={(e) => setForm((f) => ({ ...f, releaseId: e.target.value }))}
                   required
                   placeholder={t('promotion.releaseIdPlaceholder')}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('promotion.sourceEnvironment')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('promotion.sourceEnvironment')}</label>
                 <select
                   value={form.sourceEnvironment}
                   onChange={(e) => setForm((f) => ({ ...f, sourceEnvironment: e.target.value }))}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   {ENVIRONMENTS.map((env) => (
                     <option key={env} value={env}>{env}</option>
@@ -121,11 +121,11 @@ export function PromotionPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('promotion.targetEnvironment')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('promotion.targetEnvironment')}</label>
                 <select
                   value={form.targetEnvironment}
                   onChange={(e) => setForm((f) => ({ ...f, targetEnvironment: e.target.value }))}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   {ENVIRONMENTS.map((env) => (
                     <option key={env} value={env}>{env}</option>
@@ -148,18 +148,18 @@ export function PromotionPage() {
       {/* Environment pipeline */}
       <Card className="mb-6">
         <CardHeader>
-          <h2 className="font-semibold text-gray-800">{t('promotion.environmentPipeline')}</h2>
+          <h2 className="font-semibold text-heading">{t('promotion.environmentPipeline')}</h2>
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-4">
             {ENVIRONMENTS.map((env, i) => (
               <div key={env} className="flex items-center gap-4">
                 <div className="flex flex-col items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${ENV_COLORS[env] ?? 'bg-gray-400'}`} />
-                  <span className="text-sm font-medium text-gray-700 capitalize">{env}</span>
+                  <div className={`w-3 h-3 rounded-full ${ENV_COLORS[env] ?? 'bg-muted'}`} />
+                  <span className="text-sm font-medium text-body capitalize">{env}</span>
                 </div>
                 {i < ENVIRONMENTS.length - 1 && (
-                  <ArrowUpCircle size={20} className="text-gray-300 rotate-90" />
+                  <ArrowUpCircle size={20} className="text-edge-strong rotate-90" />
                 )}
               </div>
             ))}
@@ -171,18 +171,18 @@ export function PromotionPage() {
       {pending.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
-            <h2 className="font-semibold text-gray-800">{t('promotion.pendingRequests')}</h2>
+            <h2 className="font-semibold text-heading">{t('promotion.pendingRequests')}</h2>
           </CardHeader>
           <CardBody className="p-0">
-            <ul className="divide-y divide-gray-100">
+            <ul className="divide-y divide-edge">
               {pending.map((req) => (
                 <li key={req.id} className="px-6 py-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-medium text-gray-800 capitalize">
+                      <p className="text-sm font-medium text-heading capitalize">
                         {req.sourceEnvironment} → {req.targetEnvironment}
                       </p>
-                      <p className="text-xs text-gray-400 font-mono mt-0.5">
+                      <p className="text-xs text-faded font-mono mt-0.5">
                         Release: {req.releaseId.slice(0, 8)}…
                       </p>
                     </div>
@@ -211,13 +211,13 @@ export function PromotionPage() {
                       {req.gateResults.map((gate) => (
                         <li key={gate.gateName} className="flex items-center gap-2">
                           {gate.passed ? (
-                            <CheckCircle size={12} className="text-green-500 shrink-0" />
+                            <CheckCircle size={12} className="text-success shrink-0" />
                           ) : (
-                            <XCircle size={12} className="text-red-400 shrink-0" />
+                            <XCircle size={12} className="text-critical shrink-0" />
                           )}
-                          <span className="text-xs text-gray-600">{gate.gateName}</span>
+                          <span className="text-xs text-body">{gate.gateName}</span>
                           {gate.message && (
-                            <span className="text-xs text-gray-400">— {gate.message}</span>
+                            <span className="text-xs text-muted">— {gate.message}</span>
                           )}
                         </li>
                       ))}
@@ -234,55 +234,55 @@ export function PromotionPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-800">{t('promotion.allRequests')}</h2>
+            <h2 className="font-semibold text-heading">{t('promotion.allRequests')}</h2>
             {data && (
-              <span className="text-sm text-gray-500">{data.totalCount} total</span>
+              <span className="text-sm text-muted">{data.totalCount} total</span>
             )}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-gray-400" />
+              <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
           ) : isError ? (
-            <p className="px-6 py-12 text-sm text-red-500 text-center">
+            <p className="px-6 py-12 text-sm text-critical text-center">
               {t('promotion.loadFailed')}
             </p>
           ) : !requests.length ? (
-            <p className="px-6 py-12 text-sm text-gray-400 text-center">
+            <p className="px-6 py-12 text-sm text-muted text-center">
               {t('promotion.noRequests')}
             </p>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-left">
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.route')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.release')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.status')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.gates')}</th>
-                  <th className="px-6 py-3 font-medium text-gray-500">{t('promotion.created')}</th>
+                <tr className="border-b border-edge bg-panel text-left">
+                  <th className="px-6 py-3 font-medium text-muted">{t('promotion.route')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('promotion.release')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('promotion.status')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('promotion.gates')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">{t('promotion.created')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-edge">
                 {requests.map((req) => {
                   const passed = req.gateResults.filter((g) => g.passed).length;
                   const total = req.gateResults.length;
                   return (
-                    <tr key={req.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-3 text-gray-700 capitalize">
+                    <tr key={req.id} className="hover:bg-hover transition-colors">
+                      <td className="px-6 py-3 text-body capitalize">
                         {req.sourceEnvironment} → {req.targetEnvironment}
                       </td>
-                      <td className="px-6 py-3 font-mono text-xs text-gray-500">
+                      <td className="px-6 py-3 font-mono text-xs text-muted">
                         {req.releaseId.slice(0, 8)}…
                       </td>
                       <td className="px-6 py-3">
                         <Badge variant={statusVariant(req.status)}>{req.status}</Badge>
                       </td>
-                      <td className="px-6 py-3 text-sm text-gray-600">
+                      <td className="px-6 py-3 text-sm text-body">
                         {total > 0 ? t('promotion.gatesPassed', { passed, total }) : '—'}
                       </td>
-                      <td className="px-6 py-3 text-xs text-gray-500">
+                      <td className="px-6 py-3 text-xs text-muted">
                         {new Date(req.createdAt).toLocaleString()}
                       </td>
                     </tr>
