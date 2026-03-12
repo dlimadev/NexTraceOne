@@ -1,25 +1,56 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.RulesetGovernance.Application.Abstractions;
+using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.RulesetGovernance.Domain.Errors;
 
 namespace NexTraceOne.RulesetGovernance.Application.Features.ArchiveRuleset;
 
 /// <summary>
-/// Feature: ArchiveRuleset — Módulo: RulesetGovernance.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: ArchiveRuleset — arquiva (soft-disable) um ruleset existente.
+/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ArchiveRuleset
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Comando de arquivamento de um ruleset.</summary>
+    public sealed record Command(Guid RulesetId) : ICommand<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada do comando de arquivamento.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.RulesetId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que arquiva um ruleset existente.</summary>
+    public sealed class Handler(
+        IRulesetRepository repository,
+        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+    {
+        /// <summary>Processa o comando de arquivamento de ruleset.</summary>
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var ruleset = await repository.GetByIdAsync(RulesetId.From(request.RulesetId), cancellationToken);
+            if (ruleset is null)
+                return RulesetGovernanceErrors.RulesetNotFound(request.RulesetId.ToString());
+
+            var archiveResult = ruleset.Archive();
+            if (archiveResult.IsFailure)
+                return archiveResult.Error;
+
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return new Response(ruleset.Id.Value, ruleset.IsActive);
+        }
+    }
+
+    /// <summary>Resposta do arquivamento do ruleset.</summary>
+    public sealed record Response(Guid RulesetId, bool IsActive);
 }

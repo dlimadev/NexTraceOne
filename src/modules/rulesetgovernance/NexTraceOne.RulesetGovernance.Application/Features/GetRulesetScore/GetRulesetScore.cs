@@ -1,25 +1,54 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.RulesetGovernance.Application.Abstractions;
+using NexTraceOne.RulesetGovernance.Domain.Errors;
 
 namespace NexTraceOne.RulesetGovernance.Application.Features.GetRulesetScore;
 
 /// <summary>
-/// Feature: GetRulesetScore — Módulo: RulesetGovernance.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetRulesetScore -- retorna o score de conformidade de uma release.
+/// Estrutura VSA: Query + Validator + Handler + Response em um unico arquivo.
 /// </summary>
 public static class GetRulesetScore
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query de consulta do score de conformidade de uma release.</summary>
+    public sealed record Query(Guid ReleaseId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida a entrada da query de score.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ReleaseId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>Handler que retorna o score de conformidade de uma release.</summary>
+    public sealed class Handler(ILintResultRepository repository) : IQueryHandler<Query, Response>
+    {
+        /// <summary>Processa a query de score.</summary>
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var lintResult = await repository.GetByReleaseIdAsync(request.ReleaseId, cancellationToken);
+            if (lintResult is null)
+                return RulesetGovernanceErrors.LintResultNotFound(request.ReleaseId.ToString());
+
+            return new Response(
+                lintResult.ReleaseId,
+                lintResult.Score,
+                lintResult.TotalFindings,
+                lintResult.ExecutedAt);
+        }
+    }
+
+    /// <summary>Resposta com o score de conformidade da release.</summary>
+    public sealed record Response(
+        Guid ReleaseId,
+        decimal Score,
+        int TotalFindings,
+        DateTimeOffset ExecutedAt);
 }

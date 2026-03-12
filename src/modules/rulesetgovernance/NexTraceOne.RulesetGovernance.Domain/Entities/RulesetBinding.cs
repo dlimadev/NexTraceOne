@@ -1,16 +1,45 @@
+using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 
 namespace NexTraceOne.RulesetGovernance.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo RulesetGovernance.
-/// TODO: Implementar regras de domínio, invariantes e domain events de RulesetBinding.
+/// Entidade que associa um Ruleset a um tipo de ativo (asset type).
+/// Permite definir quais rulesets são aplicados automaticamente para cada tipo de API/serviço.
 /// </summary>
 public sealed class RulesetBinding : AuditableEntity<RulesetBindingId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private RulesetBinding() { }
+
+    /// <summary>Identificador do ruleset vinculado.</summary>
+    public RulesetId RulesetId { get; private set; } = null!;
+
+    /// <summary>Tipo do ativo ao qual o ruleset está vinculado (ex: "REST", "gRPC", "GraphQL").</summary>
+    public string AssetType { get; private set; } = string.Empty;
+
+    /// <summary>Data/hora UTC em que o binding foi criado.</summary>
+    public DateTimeOffset BindingCreatedAt { get; private set; }
+
+    /// <summary>
+    /// Cria um novo vínculo entre ruleset e tipo de ativo.
+    /// </summary>
+    public static RulesetBinding Create(
+        RulesetId rulesetId,
+        string assetType,
+        DateTimeOffset createdAt)
+    {
+        Guard.Against.Null(rulesetId);
+        Guard.Against.NullOrWhiteSpace(assetType);
+
+        return new RulesetBinding
+        {
+            Id = RulesetBindingId.New(),
+            RulesetId = rulesetId,
+            AssetType = assetType,
+            BindingCreatedAt = createdAt
+        };
+    }
 }
 
 /// <summary>Identificador fortemente tipado de RulesetBinding.</summary>
