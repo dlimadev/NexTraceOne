@@ -14,7 +14,7 @@ interface AuthContextValue extends AuthState {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 function persistSession(data: LoginResponse, tenantId: string): void {
   localStorage.setItem('access_token', data.accessToken);
