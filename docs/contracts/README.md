@@ -104,10 +104,32 @@ POST /api/v1/contracts
 }
 ```
 
+**Campos:**
+- `format` — aceita "json", "yaml" ou "xml" (XML necessário para WSDL)
+- `protocol` — opcional, padrão "OpenApi". Valores: OpenApi, Swagger, Wsdl, AsyncApi, Protobuf, GraphQl
+- `importedFrom` — origem do import: "upload", URL, "ai-generated", "migration"
+
 1. Valida formato semântico da versão
 2. Verifica se já existe versão com mesmo SemVer para o API Asset
-3. Cria `ContractVersion` com estado `Draft`
+3. Cria `ContractVersion` com estado `Draft` e protocolo informado
 4. Persiste via `IUnitOfWork`
+
+### Criar Nova Versão
+
+```
+POST /api/v1/contracts/versions
+{
+  "apiAssetId": "guid",
+  "semVer": "1.1.0",
+  "specContent": "{ ... }",
+  "format": "json",
+  "importedFrom": "upload",
+  "protocol": null
+}
+```
+
+**Nota:** Quando `protocol` é null/omitido, a nova versão herda o protocolo da versão anterior,
+garantindo continuidade na cadeia de versionamento.
 
 ### Diff Semântico
 
@@ -238,16 +260,20 @@ A página de Contracts (`ContractsPage.tsx`) oferece:
 - **Lifecycle** — transições de estado com botões contextuais
 - **Assinatura** — assinar, verificar integridade
 - **Exportação** — visualizar conteúdo raw
-- **i18n** — 108+ chaves em 4 idiomas (en, pt-BR, pt-PT, es)
+- **i18n** — 127 chaves em 4 idiomas (en, pt-BR, pt-PT, es) com paridade perfeita
 
 ## Testes
 
-- **142 testes** cobrindo:
+- **158+ testes** cobrindo:
   - Entidades de domínio (ContractVersion, lifecycle, lock, sign)
   - Value Objects (SemanticVersion, ContractSignature)
   - Parsers (OpenAPI, Swagger, WSDL, AsyncAPI)
   - Diff Calculators (todos os protocolos + orquestrador)
   - Features de aplicação (import, version, diff, lock, sign, export, lifecycle)
+  - Import multi-protocolo (OpenAPI, Swagger, WSDL/XML, AsyncAPI)
+  - Herança de protocolo entre versões
+  - Validação de formatos (json, yaml, xml)
+  - Canonicalization (JSON key sorting, XML/YAML line normalization)
 
 ## Decisões Arquiteturais
 
