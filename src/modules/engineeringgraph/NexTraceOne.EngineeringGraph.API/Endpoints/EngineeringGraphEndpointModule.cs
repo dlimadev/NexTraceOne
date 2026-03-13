@@ -17,6 +17,7 @@ using MapConsumerRelationshipFeature = NexTraceOne.EngineeringGraph.Application.
 using RegisterApiAssetFeature = NexTraceOne.EngineeringGraph.Application.Features.RegisterApiAsset.RegisterApiAsset;
 using RegisterServiceAssetFeature = NexTraceOne.EngineeringGraph.Application.Features.RegisterServiceAsset.RegisterServiceAsset;
 using SearchAssetsFeature = NexTraceOne.EngineeringGraph.Application.Features.SearchAssets.SearchAssets;
+using SyncConsumersFeature = NexTraceOne.EngineeringGraph.Application.Features.SyncConsumers.SyncConsumers;
 
 namespace NexTraceOne.EngineeringGraph.API.Endpoints;
 
@@ -191,6 +192,20 @@ public sealed class EngineeringGraphEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new ListSavedViewsFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── Integração Inbound Externa ───────────────────────────────────
+        // Endpoint para sincronização de consumidores vindos de sistemas externos.
+        // Suporta autenticação sistema-a-sistema e upsert em lote.
+
+        group.MapPost("/integration/v1/consumers/sync", async (
+            SyncConsumersFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         });
     }

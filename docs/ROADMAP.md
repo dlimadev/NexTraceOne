@@ -127,10 +127,20 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 |---------|--------|
 | InferDependencyFromOtel (receptor passivo) | ✅ |
 | ValidateDiscoveredDependency | ✅ |
+| GetSubgraph (mini-grafos contextuais) | ✅ |
+| GetImpactPropagation (blast radius direto + transitivo) | ✅ |
+| CreateGraphSnapshot / ListSnapshots / GetTemporalDiff | ✅ |
+| GetNodeHealth (overlays explicáveis) | ✅ |
+| CreateSavedView / ListSavedViews | ✅ |
+| SyncConsumers (integração inbound externa com upsert em lote) | ✅ |
 | EngineeringGraphDbContext + Migrations | ✅ |
-| Testes (12 testes unitários) | ✅ |
+| Frontend: EngineeringGraphPage.tsx com 5 abas e i18n completo | ✅ |
+| API client frontend com 15 funções | ✅ |
+| Testes (37 testes unitários — domínio + aplicação + sync) | ✅ |
+| Scripts de seed e massa de teste para frontend | ✅ |
+| Documentação: API de integração externa, roadmap do módulo | ✅ |
 
-**Entregável:** ✅ Grafo de dependências funcional com APIs e consumidores mapeados.
+**Entregável:** ✅ Grafo de dependências funcional com APIs, consumidores, temporalidade, impacto, overlays, integração inbound e massa de teste.
 
 ---
 

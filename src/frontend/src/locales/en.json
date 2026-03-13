@@ -272,6 +272,20 @@
       "removedNodes": "Removed nodes",
       "addedEdges": "Added edges",
       "removedEdges": "Removed edges"
+    },
+    "integration": {
+      "title": "External Integration",
+      "syncConsumers": "Sync Consumers",
+      "sourceSystem": "Source System",
+      "correlationId": "Correlation ID",
+      "syncSuccess": "Consumer sync completed successfully.",
+      "syncPartial": "Consumer sync completed with {{failed}} failures out of {{total}} items.",
+      "created": "Created",
+      "updated": "Updated",
+      "failed": "Failed",
+      "total": "Total",
+      "outcome": "Outcome",
+      "errorCode": "Error Code"
     }
   },
   "contracts": {
