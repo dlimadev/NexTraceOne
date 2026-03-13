@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.Ingestion.Api</RootNamespace>
+    <AssemblyName>NexTraceOne.Ingestion.Api</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup Label="Building Blocks">
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
+    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+  </ItemGroup>
+  <ItemGroup Label="Bounded Contexts">
+    <ProjectReference Include="..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Infrastructure\NexTraceOne.OperationalIntelligence.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" />
+  </ItemGroup>
+</Project>
