@@ -8,6 +8,7 @@ namespace NexTraceOne.Contracts.Infrastructure.Persistence;
 /// <summary>
 /// DbContext do módulo Contracts.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
+/// Suporta multi-protocolo: OpenAPI, Swagger, WSDL, AsyncAPI e formatos futuros.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>
 public sealed class ContractsDbContext(
@@ -17,11 +18,17 @@ public sealed class ContractsDbContext(
     IDateTimeProvider clock)
     : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    /// <summary>Versões de contrato OpenAPI persistidas no módulo Contracts.</summary>
+    /// <summary>Versões de contrato multi-protocolo persistidas no módulo Contracts.</summary>
     public DbSet<ContractVersion> ContractVersions => Set<ContractVersion>();
 
     /// <summary>Diffs semânticos entre versões de contrato persistidos no módulo Contracts.</summary>
     public DbSet<ContractDiff> ContractDiffs => Set<ContractDiff>();
+
+    /// <summary>Violações de ruleset detectadas em versões de contrato.</summary>
+    public DbSet<ContractRuleViolation> ContractRuleViolations => Set<ContractRuleViolation>();
+
+    /// <summary>Artefatos gerados a partir de versões de contrato (testes, scaffolds, evidências).</summary>
+    public DbSet<ContractArtifact> ContractArtifacts => Set<ContractArtifact>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

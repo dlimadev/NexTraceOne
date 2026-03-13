@@ -1,18 +1,53 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Lock, RefreshCw } from 'lucide-react';
+import { Plus, Lock, RefreshCw, Shield, FileCheck, AlertTriangle, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { contractsApi } from '../api';
+import type { ContractLifecycleState, ContractProtocol } from '../types';
+
+/**
+ * Retorna a variante visual do Badge conforme o estado do lifecycle.
+ */
+function lifecycleBadgeVariant(state: ContractLifecycleState): 'success' | 'warning' | 'danger' | 'info' {
+  switch (state) {
+    case 'Draft': return 'info';
+    case 'InReview': return 'warning';
+    case 'Approved': return 'success';
+    case 'Locked': return 'danger';
+    case 'Deprecated': return 'warning';
+    case 'Sunset': return 'danger';
+    case 'Retired': return 'info';
+    default: return 'info';
+  }
+}
+
+/**
+ * Retorna a variante visual do Badge conforme o protocolo.
+ */
+function protocolBadgeVariant(protocol: ContractProtocol): 'success' | 'warning' | 'info' {
+  switch (protocol) {
+    case 'OpenApi': return 'success';
+    case 'Swagger': return 'warning';
+    case 'Wsdl': return 'info';
+    case 'AsyncApi': return 'success';
+    default: return 'info';
+  }
+}
 
 export function ContractsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [apiAssetId, setApiAssetId] = useState('');
   const [showImportForm, setShowImportForm] = useState(false);
-  const [importForm, setImportForm] = useState({ apiAssetId: '', content: '', version: '' });
+  const [importForm, setImportForm] = useState({
+    apiAssetId: '',
+    content: '',
+    version: '',
+    protocol: 'OpenApi' as ContractProtocol,
+  });
 
   const { data: history, isLoading } = useQuery({
     queryKey: ['contracts', 'history', apiAssetId],
@@ -25,13 +60,18 @@ export function ContractsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       setShowImportForm(false);
-      setImportForm({ apiAssetId: '', content: '', version: '' });
+      setImportForm({ apiAssetId: '', content: '', version: '', protocol: 'OpenApi' });
     },
   });
 
   const lockMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       contractsApi.lockVersion(id, reason),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts'] }),
+  });
+
+  const signMutation = useMutation({
+    mutationFn: (id: string) => contractsApi.signVersion(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts'] }),
   });
 
@@ -56,7 +96,7 @@ export function ContractsPage() {
               onSubmit={(e) => { e.preventDefault(); importMutation.mutate(importForm); }}
               className="space-y-4"
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
                   <input
@@ -79,16 +119,29 @@ export function ContractsPage() {
                     placeholder="1.0.0"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.protocol')}</label>
+                  <select
+                    value={importForm.protocol}
+                    onChange={(e) => setImportForm((f) => ({ ...f, protocol: e.target.value as ContractProtocol }))}
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  >
+                    <option value="OpenApi">{t('contracts.protocols.OpenApi')}</option>
+                    <option value="Swagger">{t('contracts.protocols.Swagger')}</option>
+                    <option value="Wsdl">{t('contracts.protocols.Wsdl')}</option>
+                    <option value="AsyncApi">{t('contracts.protocols.AsyncApi')}</option>
+                  </select>
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('contracts.openApiContent')}</label>
+                <label className="block text-sm font-medium text-body mb-1">{t('contracts.specContent')}</label>
                 <textarea
                   value={importForm.content}
                   onChange={(e) => setImportForm((f) => ({ ...f, content: e.target.value }))}
                   required
                   rows={6}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading font-mono placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  placeholder={t('contracts.openApiPlaceholder')}
+                  placeholder={t('contracts.specContentPlaceholder')}
                 />
               </div>
               <div className="flex gap-2 justify-end">
@@ -123,48 +176,85 @@ export function ContractsPage() {
         </CardHeader>
         <div className="overflow-x-auto">
           {!apiAssetId ? (
-            <p className="px-6 py-12 text-sm text-muted text-center">
-              {t('contracts.enterApiAssetId')}
-            </p>
+            <div className="px-6 py-12 text-center">
+              <FileCheck size={40} className="mx-auto mb-3 text-muted opacity-50" />
+              <p className="text-sm text-muted">{t('contracts.enterApiAssetId')}</p>
+            </div>
           ) : isLoading ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
           ) : !history?.length ? (
-            <p className="px-6 py-12 text-sm text-muted text-center">
-              {t('contracts.noContracts')}
-            </p>
+            <div className="px-6 py-12 text-center">
+              <AlertTriangle size={40} className="mx-auto mb-3 text-muted opacity-50" />
+              <p className="text-sm font-medium text-heading mb-1">{t('contracts.emptyState.title')}</p>
+              <p className="text-xs text-muted">{t('contracts.emptyState.description')}</p>
+            </div>
           ) : (
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-edge bg-panel text-left">
-                  <th className="px-6 py-3 font-medium text-muted">{t('contracts.version')}</th>
-                  <th className="px-6 py-3 font-medium text-muted">{t('contracts.status')}</th>
-                  <th className="px-6 py-3 font-medium text-muted">{t('contracts.created')}</th>
-                  <th className="px-6 py-3 font-medium text-muted">{t('common.actions')}</th>
+                  <th className="px-4 py-3 font-medium text-muted">{t('contracts.version')}</th>
+                  <th className="px-4 py-3 font-medium text-muted">{t('contracts.protocol')}</th>
+                  <th className="px-4 py-3 font-medium text-muted">{t('contracts.lifecycle')}</th>
+                  <th className="px-4 py-3 font-medium text-muted">{t('contracts.signing.signatureStatus')}</th>
+                  <th className="px-4 py-3 font-medium text-muted">{t('contracts.created')}</th>
+                  <th className="px-4 py-3 font-medium text-muted">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
                 {history.map((cv) => (
                   <tr key={cv.id} className="hover:bg-hover transition-colors">
-                    <td className="px-6 py-3 font-mono font-medium text-heading">{cv.version}</td>
-                    <td className="px-6 py-3">
-                      <Badge variant={cv.isLocked ? 'danger' : 'success'}>
-                        {cv.isLocked ? t('contracts.locked') : t('contracts.active')}
+                    <td className="px-4 py-3 font-mono font-medium text-heading">{cv.version}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant={protocolBadgeVariant(cv.protocol || 'OpenApi')}>
+                        {t(`contracts.protocols.${cv.protocol || 'OpenApi'}`)}
                       </Badge>
                     </td>
-                    <td className="px-6 py-3 text-xs text-muted">
+                    <td className="px-4 py-3">
+                      <Badge variant={lifecycleBadgeVariant(cv.lifecycleState || 'Draft')}>
+                        {t(`contracts.lifecycleStates.${cv.lifecycleState || 'Draft'}`)}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      {cv.fingerprint ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-success">
+                          <Shield size={12} /> {t('contracts.signed')}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted">{t('contracts.unsigned')}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted">
                       {new Date(cv.createdAt).toLocaleString()}
                     </td>
-                    <td className="px-6 py-3">
-                      {!cv.isLocked && (
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {!cv.isLocked && (
+                          <button
+                            onClick={() => lockMutation.mutate({ id: cv.id, reason: t('contracts.lockedViaUi') })}
+                            className="inline-flex items-center gap-1 text-xs text-muted hover:text-critical transition-colors"
+                            title={t('contracts.lock')}
+                          >
+                            <Lock size={12} /> {t('contracts.lock')}
+                          </button>
+                        )}
+                        {cv.isLocked && !cv.fingerprint && (
+                          <button
+                            onClick={() => signMutation.mutate(cv.id)}
+                            className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
+                            title={t('contracts.sign')}
+                          >
+                            <Shield size={12} /> {t('contracts.sign')}
+                          </button>
+                        )}
                         <button
-                          onClick={() => lockMutation.mutate({ id: cv.id, reason: t('contracts.lockedViaUi') })}
-                          className="inline-flex items-center gap-1 text-xs text-muted hover:text-critical transition-colors"
+                          className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
+                          title={t('contracts.detail')}
                         >
-                          <Lock size={12} /> {t('contracts.lock')}
+                          <ChevronRight size={12} /> {t('contracts.detail')}
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))}

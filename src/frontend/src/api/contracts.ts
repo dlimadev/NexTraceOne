@@ -1,11 +1,12 @@
 import client from './client';
-import type { ContractVersion, SemanticDiff } from '../types';
+import type { ContractVersion, SemanticDiff, ContractProtocol } from '../types';
 
 export const contractsApi = {
   importContract: (data: {
     apiAssetId: string;
     content: string;
     version: string;
+    protocol?: ContractProtocol;
   }) =>
     client.post<{ id: string }>('/contracts', data).then((r) => r.data),
 
@@ -38,9 +39,34 @@ export const contractsApi = {
       .get<ContractVersion[]>(`/contracts/history/${apiAssetId}`)
       .then((r) => r.data),
 
+  getDetail: (contractVersionId: string) =>
+    client
+      .get(`/contracts/${contractVersionId}/detail`)
+      .then((r) => r.data),
+
   lockVersion: (contractVersionId: string, reason: string) =>
     client
       .post(`/contracts/${contractVersionId}/lock`, { reason })
+      .then((r) => r.data),
+
+  transitionLifecycle: (contractVersionId: string, newState: string) =>
+    client
+      .post(`/contracts/${contractVersionId}/lifecycle`, { contractVersionId, newState })
+      .then((r) => r.data),
+
+  deprecateVersion: (contractVersionId: string, deprecationNotice: string, sunsetDate?: string) =>
+    client
+      .post(`/contracts/${contractVersionId}/deprecate`, { contractVersionId, deprecationNotice, sunsetDate })
+      .then((r) => r.data),
+
+  signVersion: (contractVersionId: string) =>
+    client
+      .post(`/contracts/${contractVersionId}/sign`, { contractVersionId })
+      .then((r) => r.data),
+
+  verifySignature: (contractVersionId: string) =>
+    client
+      .get(`/contracts/${contractVersionId}/verify`)
       .then((r) => r.data),
 
   exportVersion: (contractVersionId: string) =>

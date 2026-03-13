@@ -364,12 +364,30 @@ export interface SubgraphResult {
 
 // ─── Contracts ───────────────────────────────────────────────────────────────
 
+/** Protocolo de contrato suportado pelo módulo multi-protocolo. */
+export type ContractProtocol = 'OpenApi' | 'Swagger' | 'Wsdl' | 'AsyncApi' | 'Protobuf' | 'GraphQl';
+
+/** Estado do ciclo de vida de uma versão de contrato. */
+export type ContractLifecycleState = 'Draft' | 'InReview' | 'Approved' | 'Locked' | 'Deprecated' | 'Sunset' | 'Retired';
+
+/** Versão de contrato com suporte multi-protocolo, lifecycle e assinatura. */
 export interface ContractVersion {
   id: string;
   apiAssetId: string;
   version: string;
   content: string;
+  format: string;
+  protocol: ContractProtocol;
+  lifecycleState: ContractLifecycleState;
   isLocked: boolean;
+  lockedAt?: string;
+  lockedBy?: string;
+  fingerprint?: string;
+  signedBy?: string;
+  signedAt?: string;
+  isAiGenerated: boolean;
+  deprecationNotice?: string;
+  sunsetDate?: string;
   createdAt: string;
 }
 
@@ -379,6 +397,7 @@ export interface SemanticDiff {
   changes: ChangeEntry[];
   isBreaking: boolean;
   suggestedVersion: string;
+  confidence?: number;
 }
 
 export interface ChangeEntry {

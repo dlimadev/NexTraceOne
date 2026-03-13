@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Contracts.Domain.Enums;
 using NexTraceOne.Contracts.Domain.ValueObjects;
 
 namespace NexTraceOne.Contracts.Infrastructure.Persistence.Configurations;
 
+/// <summary>
+/// Configura o mapeamento EF Core da entidade ContractDiff (multi-protocolo).
+/// Inclui coluna de protocolo e nível de confiança da sugestão de semver.
+/// </summary>
 internal sealed class ContractDiffConfiguration : IEntityTypeConfiguration<ContractDiff>
 {
     /// <summary>Configura o mapeamento da entidade ContractDiff para a tabela ct_contract_diffs.</summary>
@@ -30,6 +35,16 @@ internal sealed class ContractDiffConfiguration : IEntityTypeConfiguration<Contr
 
         builder.Property(x => x.ApiAssetId).IsRequired();
         builder.Property(x => x.ChangeLevel).IsRequired();
+
+        builder.Property(x => x.Protocol)
+            .HasConversion<string>()
+            .HasMaxLength(50)
+            .HasDefaultValue(ContractProtocol.OpenApi)
+            .IsRequired();
+
+        builder.Property(x => x.Confidence)
+            .HasPrecision(5, 4)
+            .HasDefaultValue(0.8m);
 
         builder.Property(x => x.BreakingChanges)
             .HasConversion(

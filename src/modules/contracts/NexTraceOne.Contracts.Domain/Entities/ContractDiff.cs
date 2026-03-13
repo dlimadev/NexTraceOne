@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Enums;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.Contracts.Domain.Enums;
 using NexTraceOne.Contracts.Domain.ValueObjects;
 
 namespace NexTraceOne.Contracts.Domain.Entities;
@@ -9,6 +10,7 @@ namespace NexTraceOne.Contracts.Domain.Entities;
 /// <summary>
 /// Entidade que representa o resultado de um diff semântico entre duas versões de contrato.
 /// Classifica as mudanças em breaking, non-breaking e aditivas, e sugere a próxima versão semântica.
+/// Suporta diffs específicos por protocolo (OpenAPI, WSDL, AsyncAPI).
 /// </summary>
 public sealed class ContractDiff : Entity<ContractDiffId>
 {
@@ -26,6 +28,9 @@ public sealed class ContractDiff : Entity<ContractDiffId>
     /// <summary>Identificador do ativo de API ao qual pertencem as versões comparadas.</summary>
     public Guid ApiAssetId { get; private set; }
 
+    /// <summary>Protocolo do contrato comparado (permite diff semântico adequado ao tipo).</summary>
+    public ContractProtocol Protocol { get; private set; }
+
     /// <summary>Nível de mudança geral calculado para este diff.</summary>
     public ChangeLevel ChangeLevel { get; private set; }
 
@@ -40,6 +45,9 @@ public sealed class ContractDiff : Entity<ContractDiffId>
 
     /// <summary>Sugestão de próxima versão semântica baseada no nível de mudança.</summary>
     public string SuggestedSemVer { get; private set; } = string.Empty;
+
+    /// <summary>Nível de confiança da sugestão de semver (0.0 a 1.0).</summary>
+    public decimal Confidence { get; private set; }
 
     /// <summary>Data/hora em que o diff foi computado.</summary>
     public DateTimeOffset ComputedAt { get; private set; }
@@ -57,7 +65,9 @@ public sealed class ContractDiff : Entity<ContractDiffId>
         IReadOnlyList<ChangeEntry> nonBreakingChanges,
         IReadOnlyList<ChangeEntry> additiveChanges,
         string suggestedSemVer,
-        DateTimeOffset computedAt)
+        DateTimeOffset computedAt,
+        ContractProtocol protocol = ContractProtocol.OpenApi,
+        decimal confidence = 0.8m)
     {
         Guard.Against.Null(contractVersionId);
         Guard.Against.Null(baseVersionId);
@@ -75,11 +85,13 @@ public sealed class ContractDiff : Entity<ContractDiffId>
             BaseVersionId = baseVersionId,
             TargetVersionId = targetVersionId,
             ApiAssetId = apiAssetId,
+            Protocol = protocol,
             ChangeLevel = changeLevel,
             BreakingChanges = breakingChanges,
             NonBreakingChanges = nonBreakingChanges,
             AdditiveChanges = additiveChanges,
             SuggestedSemVer = suggestedSemVer,
+            Confidence = Math.Clamp(confidence, 0m, 1m),
             ComputedAt = computedAt
         };
     }
