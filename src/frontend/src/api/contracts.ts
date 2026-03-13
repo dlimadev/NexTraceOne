@@ -1,25 +1,55 @@
 import client from './client';
 import type { ContractVersion, ContractVersionDetail, SignatureVerificationResult, SemanticDiff, ContractProtocol } from '../types';
 
+/**
+ * Detecta o formato da especificação (json, yaml ou xml) a partir do conteúdo bruto.
+ * Utilizado para preencher automaticamente o campo format ao importar contratos.
+ */
+function detectFormat(content: string): 'json' | 'yaml' | 'xml' {
+  const trimmed = content.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) return 'json';
+  if (trimmed.startsWith('<') || trimmed.startsWith('<?xml')) return 'xml';
+  return 'yaml';
+}
+
 export const contractsApi = {
   importContract: (data: {
     apiAssetId: string;
     content: string;
     version: string;
     protocol?: ContractProtocol;
+    format?: string;
+    importedFrom?: string;
   }) =>
-    client.post<{ id: string }>('/contracts', data).then((r) => r.data),
+    client.post<{ id: string }>('/contracts', {
+      apiAssetId: data.apiAssetId,
+      semVer: data.version,
+      specContent: data.content,
+      format: data.format || detectFormat(data.content),
+      importedFrom: data.importedFrom || 'upload',
+      protocol: data.protocol || 'OpenApi',
+    }).then((r) => r.data),
 
   createVersion: (data: {
-    contractId: string;
+    apiAssetId: string;
     content: string;
     version: string;
+    protocol?: ContractProtocol;
+    format?: string;
+    importedFrom?: string;
   }) =>
-    client.post<{ id: string }>('/contracts/versions', data).then((r) => r.data),
+    client.post<{ id: string }>('/contracts/versions', {
+      apiAssetId: data.apiAssetId,
+      semVer: data.version,
+      specContent: data.content,
+      format: data.format || detectFormat(data.content),
+      importedFrom: data.importedFrom || 'upload',
+      protocol: data.protocol,
+    }).then((r) => r.data),
 
   computeDiff: (fromVersionId: string, toVersionId: string) =>
     client
-      .post<SemanticDiff>('/contracts/diff', { fromVersionId, toVersionId })
+      .post<SemanticDiff>('/contracts/diff', { baseVersionId: fromVersionId, targetVersionId: toVersionId })
       .then((r) => r.data),
 
   getClassification: (contractVersionId: string) =>
@@ -44,9 +74,9 @@ export const contractsApi = {
       .get<ContractVersionDetail>(`/contracts/${contractVersionId}/detail`)
       .then((r) => r.data),
 
-  lockVersion: (contractVersionId: string, reason: string) =>
+  lockVersion: (contractVersionId: string, lockedBy: string) =>
     client
-      .post(`/contracts/${contractVersionId}/lock`, { reason })
+      .post(`/contracts/${contractVersionId}/lock`, { lockedBy })
       .then((r) => r.data),
 
   transitionLifecycle: (contractVersionId: string, newState: string) =>

@@ -5,25 +5,34 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 using NexTraceOne.Contracts.Application.Abstractions;
 using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Contracts.Domain.Enums;
 using NexTraceOne.Contracts.Domain.Errors;
 
 namespace NexTraceOne.Contracts.Application.Features.ImportContract;
 
 /// <summary>
-/// Feature: ImportContract — importa a primeira versão de um contrato OpenAPI para um ativo de API.
+/// Feature: ImportContract — importa a primeira versão de um contrato multi-protocolo para um ativo de API.
+/// Suporta OpenAPI, Swagger, WSDL/SOAP, AsyncAPI e formatos futuros (Protobuf, GraphQL).
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ImportContract
 {
-    /// <summary>Comando de importação de versão de contrato.</summary>
+    /// <summary>
+    /// Comando de importação de versão de contrato.
+    /// O campo Protocol é opcional e padrão OpenApi para compatibilidade retroativa.
+    /// </summary>
     public sealed record Command(
         Guid ApiAssetId,
         string SemVer,
         string SpecContent,
         string Format,
-        string ImportedFrom) : ICommand<Response>;
+        string ImportedFrom,
+        ContractProtocol Protocol = ContractProtocol.OpenApi) : ICommand<Response>;
 
-    /// <summary>Valida a entrada do comando de importação de contrato.</summary>
+    /// <summary>
+    /// Valida a entrada do comando de importação de contrato.
+    /// Aceita formatos json, yaml e xml para suportar WSDL e outros formatos baseados em XML.
+    /// </summary>
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
@@ -32,13 +41,18 @@ public static class ImportContract
             RuleFor(x => x.SemVer).NotEmpty().MaximumLength(50);
             RuleFor(x => x.SpecContent).NotEmpty();
             RuleFor(x => x.Format).NotEmpty()
-                .Must(f => f is "json" or "yaml")
-                .WithMessage("Format must be 'json' or 'yaml'.");
+                .Must(f => f is "json" or "yaml" or "xml")
+                .WithMessage("Format must be 'json', 'yaml' or 'xml'.");
             RuleFor(x => x.ImportedFrom).NotEmpty().MaximumLength(500);
+            RuleFor(x => x.Protocol).IsInEnum();
         }
     }
 
-    /// <summary>Handler que importa uma nova versão de contrato OpenAPI.</summary>
+    /// <summary>
+    /// Handler que importa uma nova versão de contrato multi-protocolo.
+    /// Delega a criação da entidade ao factory method ContractVersion.Import,
+    /// que aplica todas as regras de domínio e invariantes.
+    /// </summary>
     public sealed class Handler(
         IContractVersionRepository repository,
         IUnitOfWork unitOfWork,
@@ -57,7 +71,8 @@ public static class ImportContract
                 request.SemVer,
                 request.SpecContent,
                 request.Format,
-                request.ImportedFrom);
+                request.ImportedFrom,
+                request.Protocol);
 
             if (result.IsFailure)
                 return result.Error;
@@ -71,16 +86,18 @@ public static class ImportContract
                 version.ApiAssetId,
                 version.SemVer,
                 version.Format,
+                version.Protocol,
                 dateTimeProvider.UtcNow);
         }
     }
 
-    /// <summary>Resposta da importação de versão de contrato.</summary>
+    /// <summary>Resposta da importação de versão de contrato, incluindo protocolo identificado.</summary>
     public sealed record Response(
         Guid ContractVersionId,
         Guid ApiAssetId,
         string SemVer,
         string Format,
+        ContractProtocol Protocol,
         DateTimeOffset CreatedAt);
 }
 
