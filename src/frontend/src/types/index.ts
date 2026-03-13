@@ -458,6 +458,41 @@ export interface ContractProvenance {
   isAiGenerated: boolean;
 }
 
+/** Classificação de mudança de contrato. */
+export interface ContractClassification {
+  contractVersionId: string;
+  changeLevel: 'Breaking' | 'Additive' | 'NonBreaking';
+  breakingChangeCount: number;
+  nonBreakingChangeCount: number;
+  additiveChangeCount: number;
+}
+
+/** Violação de regra de governança em contrato. */
+export interface ContractRuleViolation {
+  id: string;
+  ruleName: string;
+  severity: string;
+  message: string;
+  path: string;
+}
+
+/** Artefato gerado a partir de contrato. */
+export interface ContractArtifact {
+  id: string;
+  name: string;
+  artifactType: string;
+  content: string;
+  createdAt: string;
+}
+
+/** Resultado de busca paginada de contratos. */
+export interface ContractSearchResult {
+  items: ContractVersion[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
 // ─── Change Intelligence ─────────────────────────────────────────────────────
 
 export type ChangeLevel = 0 | 1 | 2 | 3 | 4;

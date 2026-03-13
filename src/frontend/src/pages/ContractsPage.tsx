@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Lock, RefreshCw, Shield, FileCheck, AlertTriangle,
   X, Eye, GitCompare, Download, CheckCircle, XCircle, ArrowRight,
+  Search, FilePlus, AlertOctagon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
@@ -11,7 +12,7 @@ import { Badge } from '../components/Badge';
 import { contractsApi } from '../api';
 import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
-  ContractVersionDetail, SemanticDiff,
+  ContractVersionDetail, SemanticDiff, ContractRuleViolation,
 } from '../types';
 
 /**
@@ -109,6 +110,18 @@ export function ContractsPage() {
   // Estado do painel de exportação
   const [exportContent, setExportContent] = useState<{ id: string; specContent: string; format: string } | null>(null);
 
+  // Estado das violações de regras
+  const [violationsVersionId, setViolationsVersionId] = useState<string | null>(null);
+
+  // Estado do formulário de criação de nova versão
+  const [showCreateVersionForm, setShowCreateVersionForm] = useState(false);
+  const [createVersionForm, setCreateVersionForm] = useState({
+    apiAssetId: '',
+    content: '',
+    version: '',
+    protocol: undefined as ContractProtocol | undefined,
+  });
+
   // Estado para feedback de notificação inline
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -148,6 +161,12 @@ export function ContractsPage() {
     enabled: !!selectedVersionId,
   });
 
+  const { data: violations, isLoading: violationsLoading } = useQuery<ContractRuleViolation[]>({
+    queryKey: ['contracts', 'violations', violationsVersionId],
+    queryFn: () => contractsApi.listRuleViolations(violationsVersionId!),
+    enabled: !!violationsVersionId,
+  });
+
   // ─── Mutations ──────────────────────────────────────────────────────────────
 
   const importMutation = useMutation({
@@ -156,6 +175,19 @@ export function ContractsPage() {
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       setShowImportForm(false);
       setImportForm({ apiAssetId: '', content: '', version: '', protocol: 'OpenApi' });
+    },
+  });
+
+  const createVersionMutation = useMutation({
+    mutationFn: contractsApi.createVersion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      setShowCreateVersionForm(false);
+      setCreateVersionForm({ apiAssetId: '', content: '', version: '', protocol: undefined });
+      showNotification('success', t('contracts.createVersionSuccess'));
+    },
+    onError: () => {
+      showNotification('error', t('contracts.errors.createVersionFailed'));
     },
   });
 
@@ -224,7 +256,7 @@ export function ContractsPage() {
       const result = await contractsApi.exportVersion(versionId);
       setExportContent({ id: versionId, specContent: result.specContent, format: result.format });
     } catch {
-      showNotification('error', t('contracts.errors.importFailed'));
+      showNotification('error', t('contracts.errors.exportFailed'));
     }
   }
 
@@ -278,6 +310,9 @@ export function ContractsPage() {
           </Button>
           <Button onClick={() => setShowImportForm((v) => !v)}>
             <Plus size={16} /> {t('contracts.importContract')}
+          </Button>
+          <Button variant="secondary" onClick={() => setShowCreateVersionForm((v) => !v)}>
+            <FilePlus size={16} /> {t('contracts.createVersion')}
           </Button>
         </div>
       </div>
@@ -342,6 +377,60 @@ export function ContractsPage() {
               <div className="flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowImportForm(false)}>{t('common.cancel')}</Button>
                 <Button type="submit" loading={importMutation.isPending}>{t('contracts.import')}</Button>
+              </div>
+            </form>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Create Version Form */}
+      {showCreateVersionForm && (
+        <Card className="mb-6">
+          <CardHeader><h2 className="font-semibold text-heading">{t('contracts.createVersionTitle')}</h2></CardHeader>
+          <CardBody>
+            <p className="text-sm text-muted mb-4">{t('contracts.createVersionDescription')}</p>
+            <form
+              onSubmit={(e) => { e.preventDefault(); createVersionMutation.mutate(createVersionForm); }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
+                  <input
+                    type="text"
+                    value={createVersionForm.apiAssetId}
+                    onChange={(e) => setCreateVersionForm((f) => ({ ...f, apiAssetId: e.target.value }))}
+                    required
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                    placeholder="UUID"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-body mb-1">{t('contracts.version')}</label>
+                  <input
+                    type="text"
+                    value={createVersionForm.version}
+                    onChange={(e) => setCreateVersionForm((f) => ({ ...f, version: e.target.value }))}
+                    required
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                    placeholder="2.0.0"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('contracts.specContent')}</label>
+                <textarea
+                  value={createVersionForm.content}
+                  onChange={(e) => setCreateVersionForm((f) => ({ ...f, content: e.target.value }))}
+                  required
+                  rows={6}
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading font-mono placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  placeholder={t('contracts.specContentPlaceholder')}
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="secondary" type="button" onClick={() => setShowCreateVersionForm(false)}>{t('common.cancel')}</Button>
+                <Button type="submit" loading={createVersionMutation.isPending}>{t('contracts.createVersion')}</Button>
               </div>
             </form>
           </CardBody>
@@ -710,6 +799,58 @@ export function ContractsPage() {
                     )}
                   </div>
                 )}
+
+                {/* Violações de regras */}
+                <div className="border-t border-edge pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-heading">{t('contracts.violationsTitle')}</h3>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setViolationsVersionId(
+                        violationsVersionId === detail.id ? null : detail.id
+                      )}
+                    >
+                      <AlertOctagon size={14} /> {t('contracts.violations')}
+                    </Button>
+                  </div>
+                  {violationsVersionId === detail.id && (
+                    <>
+                      {violationsLoading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <RefreshCw size={16} className="animate-spin text-muted" />
+                        </div>
+                      ) : violations && violations.length > 0 ? (
+                        <table className="min-w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-edge text-left">
+                              <th className="px-2 py-2 font-medium text-muted">{t('contracts.violationRule')}</th>
+                              <th className="px-2 py-2 font-medium text-muted">{t('contracts.violationSeverity')}</th>
+                              <th className="px-2 py-2 font-medium text-muted">{t('contracts.violationMessage')}</th>
+                              <th className="px-2 py-2 font-medium text-muted">{t('contracts.violationPath')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-edge">
+                            {violations.map((v) => (
+                              <tr key={v.id}>
+                                <td className="px-2 py-2 font-mono text-heading">{v.ruleName}</td>
+                                <td className="px-2 py-2">
+                                  <Badge variant={v.severity === 'Error' ? 'danger' : v.severity === 'Warning' ? 'warning' : 'info'}>
+                                    {v.severity}
+                                  </Badge>
+                                </td>
+                                <td className="px-2 py-2 text-body">{v.message}</td>
+                                <td className="px-2 py-2 font-mono text-muted">{v.path}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p className="text-xs text-muted">{t('contracts.noViolationsFound')}</p>
+                      )}
+                    </>
+                  )}
+                </div>
 
                 {/* Transições de lifecycle */}
                 <div className="border-t border-edge pt-4">

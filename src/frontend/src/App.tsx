@@ -42,7 +42,14 @@ export default function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/releases" element={<ReleasesPage />} />
               <Route path="/graph" element={<EngineeringGraphPage />} />
-              <Route path="/contracts" element={<ContractsPage />} />
+              <Route
+                path="/contracts"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />
               <Route path="/licensing" element={<LicensingPage />} />

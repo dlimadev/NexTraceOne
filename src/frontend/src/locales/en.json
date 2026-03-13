@@ -466,7 +466,11 @@
       "deprecateFailed": "Failed to deprecate contract",
       "transitionFailed": "Failed to transition lifecycle state",
       "verifyFailed": "Failed to verify contract signature",
-      "diffFailed": "Failed to compute semantic diff"
+      "diffFailed": "Failed to compute semantic diff",
+      "searchFailed": "Failed to search contracts",
+      "violationsFailed": "Failed to load rule violations",
+      "createVersionFailed": "Failed to create contract version",
+      "exportFailed": "Failed to export contract"
     },
     "detailView": {
       "title": "Contract Version Detail",
@@ -494,7 +498,25 @@
       "valid": "Signature verification passed",
       "invalid": "Signature verification failed",
       "noSignature": "Contract is not signed"
-    }
+    },
+    "search": "Search",
+    "searchPlaceholder": "Search by version...",
+    "searchResults": "Search Results",
+    "totalResults": "Total Results",
+    "page": "Page",
+    "createVersion": "Create Version",
+    "createVersionTitle": "Create New Version",
+    "createVersionDescription": "Create a new version from an existing contract",
+    "suggestedVersion": "Suggested Version",
+    "classifyChanges": "Classify Changes",
+    "violations": "Violations",
+    "violationsTitle": "Rule Violations",
+    "noViolationsFound": "No rule violations found for this version",
+    "violationSeverity": "Severity",
+    "violationRule": "Rule",
+    "violationMessage": "Message",
+    "violationPath": "Path",
+    "createVersionSuccess": "Contract version created successfully"
   },
   "workflow": {
     "title": "Workflow & Approvals",
