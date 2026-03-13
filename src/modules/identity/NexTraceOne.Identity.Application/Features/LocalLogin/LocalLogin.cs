@@ -13,6 +13,19 @@ namespace NexTraceOne.Identity.Application.Features.LocalLogin;
 
 /// <summary>
 /// Feature: LocalLogin — autentica um usuário local com email e senha.
+///
+/// Fluxo:
+/// 1. Valida credenciais (email + senha) contra o repositório.
+/// 2. Verifica estado de bloqueio da conta.
+/// 3. Resolve o TenantMembership e Role do usuário.
+/// 4. Cria sessão e emite tokens JWT via <see cref="LoginSessionCreator"/>.
+/// 5. Registra eventos de auditoria via <see cref="SecurityAuditRecorder"/>.
+///
+/// Delegação de responsabilidades:
+/// - Criação de sessão → <see cref="LoginSessionCreator"/> (SRP).
+/// - Eventos de auditoria → <see cref="SecurityAuditRecorder"/> (SRP).
+/// - Resolução de membership → <see cref="IdentityFeatureSupport"/> (DRY).
+/// - Construção de resposta → <see cref="IdentityFeatureSupport"/> (DRY).
 /// </summary>
 public static class LocalLogin
 {
@@ -33,7 +46,14 @@ public static class LocalLogin
         }
     }
 
-    /// <summary>Handler que autentica um usuário local e emite tokens.</summary>
+    /// <summary>
+    /// Handler que autentica um usuário local e emite tokens.
+    ///
+    /// Orquestra o fluxo de autenticação local delegando responsabilidades
+    /// específicas para serviços extraídos:
+    /// - LoginSessionCreator para criação de sessão.
+    /// - SecurityAuditRecorder para registro de eventos de segurança.
+    /// </summary>
     public sealed class Handler(
         IUserRepository userRepository,
         ITenantMembershipRepository membershipRepository,
@@ -68,7 +88,10 @@ public static class LocalLogin
 
                 if (user.IsLocked(dateTimeProvider.UtcNow))
                 {
-                    RecordAccountLocked(request, user.Id);
+                    SecurityAuditRecorder.RecordAccountLocked(
+                        securityEventRepository, dateTimeProvider,
+                        SecurityAuditRecorder.ResolveTenantIdForAudit(currentTenant),
+                        user.Id, request.IpAddress, request.UserAgent);
                     return IdentityErrors.AccountLocked(user.LockoutEnd);
                 }
 
@@ -95,17 +118,16 @@ public static class LocalLogin
 
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
-            var session = Session.Create(
-                user.Id,
-                RefreshTokenHash.Create(refreshToken),
-                dateTimeProvider.UtcNow.AddDays(30),
-                request.IpAddress ?? "unknown",
-                request.UserAgent ?? "unknown");
+            // Delega criação de sessão para LoginSessionCreator (SRP)
+            var (_, refreshToken) = LoginSessionCreator.CreateSession(
+                jwtTokenGenerator, sessionRepository, dateTimeProvider,
+                user.Id, request.IpAddress, request.UserAgent);
 
-            sessionRepository.Add(session);
-
-            RecordAuthSuccess(request, user.Id, membership.TenantId);
+            // Delega registro de evento de sucesso para SecurityAuditRecorder (SRP)
+            SecurityAuditRecorder.RecordAuthenticationSuccess(
+                securityEventRepository, dateTimeProvider,
+                membership.TenantId, user.Id,
+                request.IpAddress, request.UserAgent);
 
             return IdentityFeatureSupport.CreateLoginResponse(
                 user,
@@ -115,60 +137,13 @@ public static class LocalLogin
                 refreshToken);
         }
 
-        /// <summary>Registra evento de autenticação bem-sucedida para trilha de auditoria.</summary>
-        private void RecordAuthSuccess(Command request, UserId userId, TenantId tenantId)
-        {
-            securityEventRepository.Add(SecurityEvent.Create(
-                tenantId,
-                userId,
-                sessionId: null,
-                SecurityEventType.AuthenticationSucceeded,
-                $"Local authentication succeeded for user '{userId.Value}'.",
-                riskScore: 0,
-                request.IpAddress,
-                request.UserAgent,
-                metadataJson: null,
-                dateTimeProvider.UtcNow));
-        }
-
-        /// <summary>Registra evento de falha de autenticação para detecção de anomalias.</summary>
+        /// <summary>Registra evento de falha de autenticação delegando para SecurityAuditRecorder.</summary>
         private void RecordAuthFailure(Command request, UserId? userId, string reason)
         {
-            var tenantId = currentTenant.Id != Guid.Empty
-                ? TenantId.From(currentTenant.Id)
-                : TenantId.From(Guid.Empty);
-
-            securityEventRepository.Add(SecurityEvent.Create(
-                tenantId,
-                userId,
-                sessionId: null,
-                SecurityEventType.AuthenticationFailed,
-                $"Local authentication failed: {reason}",
-                riskScore: 30,
-                request.IpAddress,
-                request.UserAgent,
-                metadataJson: null,
-                dateTimeProvider.UtcNow));
-        }
-
-        /// <summary>Registra evento de bloqueio de conta por tentativas excessivas.</summary>
-        private void RecordAccountLocked(Command request, UserId userId)
-        {
-            var tenantId = currentTenant.Id != Guid.Empty
-                ? TenantId.From(currentTenant.Id)
-                : TenantId.From(Guid.Empty);
-
-            securityEventRepository.Add(SecurityEvent.Create(
-                tenantId,
-                userId,
-                sessionId: null,
-                SecurityEventType.AccountLocked,
-                $"Account locked for user '{userId.Value}' due to excessive failed login attempts.",
-                riskScore: 70,
-                request.IpAddress,
-                request.UserAgent,
-                metadataJson: null,
-                dateTimeProvider.UtcNow));
+            SecurityAuditRecorder.RecordAuthenticationFailure(
+                securityEventRepository, dateTimeProvider,
+                SecurityAuditRecorder.ResolveTenantIdForAudit(currentTenant),
+                userId, reason, request.IpAddress, request.UserAgent);
         }
     }
 
