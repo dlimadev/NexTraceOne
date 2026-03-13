@@ -44,6 +44,10 @@ const ALLOWED_INTERNAL_PATHS = [
 export function isSafeRedirectPath(path: string): boolean {
   if (!path || typeof path !== 'string') return false;
 
+  // Verificar caracteres de controle no input original (antes de trim)
+  // eslint-disable-next-line no-control-regex
+  if (/[\x00-\x1f\x7f]/.test(path)) return false;
+
   const trimmed = path.trim();
 
   // Deve começar com '/' (caminho relativo)
@@ -54,10 +58,6 @@ export function isSafeRedirectPath(path: string): boolean {
 
   // Não pode conter scheme (javascript:, data:, http://, etc.)
   if (trimmed.includes('://')) return false;
-
-  // Não pode conter caracteres de controle
-  // eslint-disable-next-line no-control-regex
-  if (/[\x00-\x1f\x7f]/.test(trimmed)) return false;
 
   // Extrai apenas o pathname (remove query string e hash)
   const pathname = trimmed.split('?')[0].split('#')[0];

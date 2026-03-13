@@ -2,7 +2,21 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vite.dev/config/
+/**
+ * Configuração Vite para o frontend NexTraceOne.
+ *
+ * Medidas de segurança on-premise:
+ * - Source maps desativados em produção (sourcemap: false) para não expor código-fonte.
+ * - Minificação ativa (padrão Vite) para dificultar engenharia reversa.
+ * - Chunk splitting para vendor isolado (React/ReactDOM).
+ * - Asset file names sem informação de estrutura interna.
+ * - Build de produção distinto do build de desenvolvimento.
+ *
+ * Riscos residuais documentados:
+ * - Código JavaScript minificado ainda pode ser inspecionado com ferramentas de dev.
+ *   Proteção absoluta contra inspeção client-side não é viável em aplicações web.
+ *   O objetivo é reduzir exposição e dificultar engenharia reversa casual.
+ */
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
@@ -22,10 +36,23 @@ export default defineConfig({
     chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        // Nomes sem hash de conteúdo no path para dificultar mapeamento
+        // Nomes com hash de conteúdo para cache-busting e verificação de integridade.
+        // Não expõem estrutura de pastas ou nomes de módulos internos.
         manualChunks: {
           vendor: ['react', 'react-dom'],
         },
+        // Sanitiza nomes de assets para não expor caminhos internos do projeto.
+        assetFileNames: 'assets/[hash][extname]',
+        chunkFileNames: 'assets/[hash].js',
+        entryFileNames: 'assets/[hash].js',
+      },
+    },
+    // Remover console.log e debugger em produção para evitar vazamento de informação.
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
       },
     },
   },
@@ -49,3 +76,4 @@ export default defineConfig({
     },
   },
 })
+

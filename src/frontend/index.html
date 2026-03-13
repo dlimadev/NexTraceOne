@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
+    <!--
+      CSP defense-in-depth: restringe fontes de conteúdo executável.
+      Em produção, o proxy/servidor deve definir o CSP via header HTTP (mais seguro).
+      Este meta tag funciona como fallback e proteção durante desenvolvimento.
+      Nota: connect-src 'self' permite comunicação com a API no mesmo domínio.
+      font-src inclui fonts.gstatic.com para Google Fonts; em on-premise, considerar
+      hospedar fontes localmente e remover esta exceção.
+    -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self';" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
