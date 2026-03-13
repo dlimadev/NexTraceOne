@@ -65,6 +65,8 @@
     "contracts": "Contracts",
     "workflow": "Workflow",
     "promotion": "Promotion",
+    "licensing": "Licensing",
+    "developerPortal": "Developer Portal",
     "users": "Users",
     "audit": "Audit",
     "changeIntelligence": "Change Intelligence",
@@ -370,5 +372,158 @@
     "hash": "Hash",
     "previous": "Previous",
     "pageOf": "Page {{page}} of {{totalPages}}"
+  },
+  "licensing": {
+    "title": "Licensing",
+    "subtitle": "License management, capabilities, quotas and trial",
+    "licenseKey": "License Key",
+    "licenseKeyPlaceholder": "Enter your license key…",
+    "enterKeyPrompt": "Enter a license key above to view details.",
+    "loadFailed": "Failed to load license information.",
+    "licenseInfo": "License Information",
+    "customerName": "Customer",
+    "type": "Type",
+    "edition": "Edition",
+    "statusLabel": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "expiresAt": "Expires At",
+    "daysRemaining": "Days Remaining",
+    "days": "days",
+    "gracePeriodWarning": "License is in grace period.",
+    "trialConverted": "Trial was converted to a full license.",
+    "healthScore": "Health Score",
+    "quotaWarnings": "Quota Warnings",
+    "capabilitiesTitle": "Capabilities",
+    "noCapabilities": "No capabilities found for this license.",
+    "usageQuotas": "Usage Quotas",
+    "noQuotas": "No quotas found for this license.",
+    "enforcement": "Enforcement",
+    "thresholdAlerts": "Threshold Alerts",
+    "startTrial": "Start Trial",
+    "customerNameLabel": "Customer Name",
+    "customerNamePlaceholder": "Acme Corp",
+    "emailLabel": "Email",
+    "emailPlaceholder": "admin@acme.com",
+    "startTrialButton": "Start Trial",
+    "extendTrial": "Extend Trial",
+    "additionalDays": "Additional Days",
+    "extendTrialButton": "Extend Trial",
+    "convertTrial": "Convert Trial",
+    "editionLabel": "Target Edition",
+    "editions": {
+      "community": "Community",
+      "professional": "Professional",
+      "enterprise": "Enterprise",
+      "unlimited": "Unlimited"
+    },
+    "expiresAtLabel": "Expires At",
+    "maxActivations": "Max Activations",
+    "gracePeriodDays": "Grace Period (days)",
+    "convertTrialButton": "Convert to Full License",
+    "tabs": {
+      "status": "Status",
+      "capabilities": "Capabilities",
+      "quotas": "Quotas",
+      "trial": "Trial"
+    }
+  },
+  "developerPortal": {
+    "title": "Developer Portal",
+    "description": "API catalog, playground, subscriptions and analytics",
+    "tabs": {
+      "catalog": "Catalog",
+      "subscriptions": "Subscriptions",
+      "playground": "Playground",
+      "analytics": "Analytics"
+    },
+    "catalog": {
+      "title": "API Catalog",
+      "searchPlaceholder": "Search APIs by name, team or description...",
+      "noResults": "No APIs found matching your search.",
+      "myApis": "My APIs",
+      "apisIConsume": "APIs I Consume",
+      "owner": "Owner",
+      "version": "Version",
+      "consumers": "Consumers",
+      "health": "Health",
+      "viewDetail": "View Details",
+      "viewContract": "View Contract",
+      "timeline": "Timeline"
+    },
+    "subscriptions": {
+      "title": "My Subscriptions",
+      "create": "New Subscription",
+      "noSubscriptions": "You have no active subscriptions.",
+      "apiName": "API",
+      "level": "Level",
+      "channel": "Channel",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "unsubscribe": "Unsubscribe",
+      "confirmUnsubscribe": "Are you sure you want to unsubscribe?",
+      "form": {
+        "apiAssetId": "API Asset ID",
+        "apiName": "API Name",
+        "subscriberEmail": "Your Email",
+        "consumerServiceName": "Consumer Service",
+        "consumerServiceVersion": "Service Version",
+        "level": "Notification Level",
+        "channel": "Channel",
+        "webhookUrl": "Webhook URL",
+        "submit": "Subscribe"
+      },
+      "levels": {
+        "BreakingChangesOnly": "Breaking Changes Only",
+        "AllChanges": "All Changes",
+        "DeprecationNotices": "Deprecation Notices",
+        "SecurityAdvisories": "Security Advisories"
+      },
+      "channels": {
+        "Email": "Email",
+        "Webhook": "Webhook"
+      }
+    },
+    "playground": {
+      "title": "API Playground",
+      "execute": "Execute",
+      "history": "History",
+      "noHistory": "No playground executions yet.",
+      "form": {
+        "apiAssetId": "API Asset ID",
+        "apiName": "API Name",
+        "httpMethod": "HTTP Method",
+        "requestPath": "Request Path",
+        "requestBody": "Request Body (JSON)",
+        "requestHeaders": "Headers (JSON)",
+        "environment": "Environment"
+      },
+      "result": {
+        "statusCode": "Status Code",
+        "responseBody": "Response Body",
+        "duration": "Duration",
+        "executedAt": "Executed At"
+      }
+    },
+    "analytics": {
+      "title": "Portal Analytics",
+      "totalSearches": "Total Searches",
+      "totalApiViews": "API Views",
+      "totalPlaygroundExecutions": "Playground Executions",
+      "totalCodeGenerations": "Code Generations",
+      "topSearches": "Top Searches",
+      "noData": "No analytics data available yet.",
+      "query": "Search Query",
+      "count": "Count"
+    },
+    "codegen": {
+      "title": "Code Generation",
+      "generate": "Generate",
+      "language": "Language",
+      "type": "Type",
+      "generatedCode": "Generated Code",
+      "copy": "Copy to Clipboard"
+    }
   }
 }

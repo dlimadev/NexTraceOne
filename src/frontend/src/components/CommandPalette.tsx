@@ -9,6 +9,7 @@ import {
   FileText,
   CheckSquare,
   ArrowUpCircle,
+  Shield,
   Users,
   ClipboardList,
   CornerDownLeft,
@@ -36,6 +37,7 @@ const paletteItems: PaletteItem[] = [
   { id: 'contracts', labelKey: 'sidebar.contracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.navigation', permission: 'contracts:read' },
   { id: 'workflow', labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={16} />, group: 'commandPalette.navigation', permission: 'workflow:read' },
   { id: 'promotion', labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={16} />, group: 'commandPalette.navigation', permission: 'promotion:read' },
+  { id: 'licensing', labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={16} />, group: 'commandPalette.admin', permission: 'licensing:read' },
   { id: 'users', labelKey: 'sidebar.users', to: '/users', icon: <Users size={16} />, group: 'commandPalette.admin', permission: 'identity:users:read' },
   { id: 'audit', labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={16} />, group: 'commandPalette.admin', permission: 'audit:read' },
 ];

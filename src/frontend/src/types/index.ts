@@ -460,6 +460,185 @@ export interface GateResult {
   message?: string;
 }
 
+// ─── Licensing ────────────────────────────────────────────────────────────────
+
+export type LicenseType = 'Trial' | 'Standard' | 'Enterprise';
+export type LicenseEdition = 'Community' | 'Professional' | 'Enterprise' | 'Unlimited';
+export type EnforcementLevel = 'Soft' | 'Hard' | 'NeverBreak';
+export type WarningLevel = 'Normal' | 'Advisory' | 'Warning' | 'Critical' | 'Exceeded';
+
+/** Estado completo da licença — retornado pelo endpoint /licensing/status. */
+export interface LicenseStatus {
+  licenseId: string;
+  licenseKey: string;
+  customerName: string;
+  type: LicenseType;
+  edition: LicenseEdition;
+  isActive: boolean;
+  isExpired: boolean;
+  isInGracePeriod: boolean;
+  daysUntilExpiration: number;
+  expiresAt: string;
+  issuedAt: string;
+  trialConverted: boolean;
+  capabilities: CapabilityStatus[];
+  quotas: UsageQuotaStatus[];
+}
+
+/** Estado de uma capability individual da licença. */
+export interface CapabilityStatus {
+  code: string;
+  name: string;
+  isEnabled: boolean;
+}
+
+/** Estado de uma quota de uso com nível de aviso e enforcement. */
+export interface UsageQuotaStatus {
+  metricCode: string;
+  currentUsage: number;
+  limit: number;
+  thresholdReached: boolean;
+  usagePercentage: number;
+  warningLevel: WarningLevel;
+  enforcementLevel: EnforcementLevel;
+}
+
+/** Resultado do health check da licença — score geral e alertas. */
+export interface LicenseHealthResult {
+  licenseId: string;
+  healthScore: number;
+  isExpired: boolean;
+  isInGracePeriod: boolean;
+  daysUntilExpiration: number;
+  quotaWarnings: QuotaWarning[];
+}
+
+/** Aviso individual de quota próxima do limite. */
+export interface QuotaWarning {
+  metricCode: string;
+  warningLevel: WarningLevel;
+  usagePercentage: number;
+  currentUsage: number;
+  limit: number;
+}
+
+/** Alerta de threshold atingido — retornado pelo endpoint /licensing/thresholds. */
+export interface LicenseThresholdAlert {
+  metricCode: string;
+  currentUsage: number;
+  limit: number;
+  thresholdPercentage: number;
+  warningLevel: WarningLevel;
+}
+
+// ─── Developer Portal ─────────────────────────────────────────────────────────
+
+export type SubscriptionLevel = 'BreakingChangesOnly' | 'AllChanges' | 'DeprecationNotices' | 'SecurityAdvisories';
+export type NotificationChannel = 'Email' | 'Webhook';
+export type GenerationType = 'SdkClient' | 'IntegrationExample' | 'ContractTest' | 'DataModels';
+
+/** Item do catálogo de APIs do Developer Portal. */
+export interface CatalogItem {
+  apiAssetId: string;
+  apiName: string;
+  description: string;
+  ownerServiceName: string;
+  version: string;
+  healthStatus: string;
+}
+
+/** Detalhe completo de uma API no catálogo. */
+export interface ApiDetail {
+  apiAssetId: string;
+  apiName: string;
+  description: string;
+  ownerServiceName: string;
+  version: string;
+  baseUrl: string;
+  healthStatus: string;
+  consumerCount: number;
+}
+
+/** Informação de saúde de uma API. */
+export interface ApiHealthInfo {
+  apiAssetId: string;
+  status: string;
+  uptimePercentage: number;
+  lastCheckedAt: string;
+}
+
+/** Entrada na timeline de eventos de uma API. */
+export interface TimelineEntry {
+  eventType: string;
+  description: string;
+  occurredAt: string;
+  actorName: string;
+}
+
+/** Consumidor de uma API — subscriber ativo. */
+export interface ApiConsumer {
+  subscriberId: string;
+  subscriberEmail: string;
+  consumerServiceName: string;
+  level: SubscriptionLevel;
+  subscribedAt: string;
+}
+
+/** Subscription do utilizador a notificações de mudança de uma API. */
+export interface Subscription {
+  id: string;
+  apiAssetId: string;
+  apiName: string;
+  level: SubscriptionLevel;
+  channel: NotificationChannel;
+  isActive: boolean;
+  createdAt: string;
+}
+
+/** Resultado de uma execução no API Playground. */
+export interface PlaygroundResult {
+  sessionId: string;
+  responseStatusCode: number;
+  responseBody: string;
+  durationMs: number;
+  executedAt: string;
+}
+
+/** Item do histórico de execuções do playground. */
+export interface PlaygroundHistoryItem {
+  sessionId: string;
+  apiName: string;
+  httpMethod: string;
+  requestPath: string;
+  responseStatusCode: number;
+  durationMs: number;
+  executedAt: string;
+}
+
+/** Resultado da geração de código a partir de um contrato. */
+export interface CodeGenerationResult {
+  recordId: string;
+  generatedCode: string;
+  language: string;
+  generationType: GenerationType;
+  generatedAt: string;
+}
+
+/** Métricas de analytics do Developer Portal. */
+export interface PortalAnalytics {
+  totalSearches: number;
+  totalApiViews: number;
+  totalPlaygroundExecutions: number;
+  totalCodeGenerations: number;
+  topSearches: TopSearch[];
+}
+
+/** Pesquisa popular no catálogo. */
+export interface TopSearch {
+  query: string;
+  count: number;
+}
+
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
 export interface DashboardStats {

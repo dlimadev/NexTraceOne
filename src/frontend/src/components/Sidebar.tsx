@@ -8,7 +8,9 @@ import {
   Users,
   CheckSquare,
   ArrowUpCircle,
+  Shield,
   ClipboardList,
+  BookOpen,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -35,8 +37,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:releases:read', section: 'platform' },
   { labelKey: 'sidebar.engineeringGraph', to: '/graph', icon: <GitBranch size={18} />, permission: 'engineering-graph:assets:read', section: 'platform' },
   { labelKey: 'sidebar.contracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'platform' },
+  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'platform' },
   { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read', section: 'platform' },
   { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read', section: 'platform' },
+  { labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={18} />, permission: 'licensing:read', section: 'admin' },
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read', section: 'admin' },
 ];

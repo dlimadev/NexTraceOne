@@ -65,6 +65,8 @@
     "contracts": "Contratos",
     "workflow": "Workflow",
     "promotion": "Promoção",
+    "licensing": "Licenciamento",
+    "developerPortal": "Portal do Desenvolvedor",
     "users": "Usuários",
     "audit": "Auditoria",
     "changeIntelligence": "Inteligência de Mudanças",
@@ -370,5 +372,158 @@
     "hash": "Hash",
     "previous": "Anterior",
     "pageOf": "Página {{page}} de {{totalPages}}"
+  },
+  "licensing": {
+    "title": "Licenciamento",
+    "subtitle": "Gestão de licença, capabilities, quotas e trial",
+    "licenseKey": "Chave da Licença",
+    "licenseKeyPlaceholder": "Insira sua chave de licença…",
+    "enterKeyPrompt": "Insira uma chave de licença acima para ver os detalhes.",
+    "loadFailed": "Falha ao carregar informações da licença.",
+    "licenseInfo": "Informações da Licença",
+    "customerName": "Cliente",
+    "type": "Tipo",
+    "edition": "Edição",
+    "statusLabel": "Status",
+    "active": "Ativa",
+    "inactive": "Inativa",
+    "expiresAt": "Expira Em",
+    "daysRemaining": "Dias Restantes",
+    "days": "dias",
+    "gracePeriodWarning": "A licença está em período de carência.",
+    "trialConverted": "O trial foi convertido para licença completa.",
+    "healthScore": "Score de Saúde",
+    "quotaWarnings": "Avisos de Quota",
+    "capabilitiesTitle": "Capabilities",
+    "noCapabilities": "Nenhuma capability encontrada para esta licença.",
+    "usageQuotas": "Quotas de Uso",
+    "noQuotas": "Nenhuma quota encontrada para esta licença.",
+    "enforcement": "Enforcement",
+    "thresholdAlerts": "Alertas de Threshold",
+    "startTrial": "Iniciar Trial",
+    "customerNameLabel": "Nome do Cliente",
+    "customerNamePlaceholder": "Acme Corp",
+    "emailLabel": "Email",
+    "emailPlaceholder": "admin@acme.com",
+    "startTrialButton": "Iniciar Trial",
+    "extendTrial": "Estender Trial",
+    "additionalDays": "Dias Adicionais",
+    "extendTrialButton": "Estender Trial",
+    "convertTrial": "Converter Trial",
+    "editionLabel": "Edição Alvo",
+    "editions": {
+      "community": "Community",
+      "professional": "Professional",
+      "enterprise": "Enterprise",
+      "unlimited": "Unlimited"
+    },
+    "expiresAtLabel": "Expira Em",
+    "maxActivations": "Máximo de Ativações",
+    "gracePeriodDays": "Período de Carência (dias)",
+    "convertTrialButton": "Converter para Licença Completa",
+    "tabs": {
+      "status": "Status",
+      "capabilities": "Capabilities",
+      "quotas": "Quotas",
+      "trial": "Trial"
+    }
+  },
+  "developerPortal": {
+    "title": "Portal do Desenvolvedor",
+    "description": "Catálogo de APIs, playground, subscriptions e analytics",
+    "tabs": {
+      "catalog": "Catálogo",
+      "subscriptions": "Subscrições",
+      "playground": "Playground",
+      "analytics": "Analytics"
+    },
+    "catalog": {
+      "title": "Catálogo de APIs",
+      "searchPlaceholder": "Pesquisar APIs por nome, time ou descrição...",
+      "noResults": "Nenhuma API encontrada para sua pesquisa.",
+      "myApis": "Minhas APIs",
+      "apisIConsume": "APIs que Consumo",
+      "owner": "Proprietário",
+      "version": "Versão",
+      "consumers": "Consumidores",
+      "health": "Saúde",
+      "viewDetail": "Ver Detalhes",
+      "viewContract": "Ver Contrato",
+      "timeline": "Timeline"
+    },
+    "subscriptions": {
+      "title": "Minhas Subscrições",
+      "create": "Nova Subscrição",
+      "noSubscriptions": "Você não possui subscrições ativas.",
+      "apiName": "API",
+      "level": "Nível",
+      "channel": "Canal",
+      "status": "Status",
+      "active": "Ativa",
+      "inactive": "Inativa",
+      "unsubscribe": "Cancelar Subscrição",
+      "confirmUnsubscribe": "Tem certeza que deseja cancelar a subscrição?",
+      "form": {
+        "apiAssetId": "ID do Ativo de API",
+        "apiName": "Nome da API",
+        "subscriberEmail": "Seu Email",
+        "consumerServiceName": "Serviço Consumidor",
+        "consumerServiceVersion": "Versão do Serviço",
+        "level": "Nível de Notificação",
+        "channel": "Canal",
+        "webhookUrl": "URL do Webhook",
+        "submit": "Subscrever"
+      },
+      "levels": {
+        "BreakingChangesOnly": "Apenas Mudanças Quebra",
+        "AllChanges": "Todas as Mudanças",
+        "DeprecationNotices": "Avisos de Deprecação",
+        "SecurityAdvisories": "Avisos de Segurança"
+      },
+      "channels": {
+        "Email": "Email",
+        "Webhook": "Webhook"
+      }
+    },
+    "playground": {
+      "title": "API Playground",
+      "execute": "Executar",
+      "history": "Histórico",
+      "noHistory": "Nenhuma execução no playground ainda.",
+      "form": {
+        "apiAssetId": "ID do Ativo de API",
+        "apiName": "Nome da API",
+        "httpMethod": "Método HTTP",
+        "requestPath": "Caminho do Request",
+        "requestBody": "Corpo do Request (JSON)",
+        "requestHeaders": "Headers (JSON)",
+        "environment": "Ambiente"
+      },
+      "result": {
+        "statusCode": "Código de Status",
+        "responseBody": "Corpo da Resposta",
+        "duration": "Duração",
+        "executedAt": "Executado Em"
+      }
+    },
+    "analytics": {
+      "title": "Analytics do Portal",
+      "totalSearches": "Total de Pesquisas",
+      "totalApiViews": "Visualizações de API",
+      "totalPlaygroundExecutions": "Execuções no Playground",
+      "totalCodeGenerations": "Gerações de Código",
+      "topSearches": "Pesquisas Populares",
+      "noData": "Nenhum dado de analytics disponível ainda.",
+      "query": "Pesquisa",
+      "count": "Contagem"
+    },
+    "codegen": {
+      "title": "Geração de Código",
+      "generate": "Gerar",
+      "language": "Linguagem",
+      "type": "Tipo",
+      "generatedCode": "Código Gerado",
+      "copy": "Copiar para Área de Transferência"
+    }
   }
 }
