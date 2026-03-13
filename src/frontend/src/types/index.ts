@@ -172,6 +172,7 @@ export interface DelegationCreatedResponse {
 
 // ─── Engineering Graph ───────────────────────────────────────────────────────
 
+/** Ativo de API no catálogo de engenharia. */
 export interface ApiAsset {
   id: string;
   name: string;
@@ -181,6 +182,7 @@ export interface ApiAsset {
   createdAt: string;
 }
 
+/** Ativo de serviço no catálogo de engenharia. */
 export interface ServiceAsset {
   id: string;
   name: string;
@@ -189,16 +191,138 @@ export interface ServiceAsset {
   createdAt: string;
 }
 
+/** Relação de consumo entre API e consumidor. */
 export interface ConsumerRelationship {
   apiAssetId: string;
   consumerServiceId: string;
   trustLevel: 'Inferred' | 'Low' | 'Medium' | 'High' | 'Confirmed';
 }
 
+/** Grafo completo com serviços, APIs e relações. */
 export interface AssetGraph {
-  services: ServiceAsset[];
-  apis: ApiAsset[];
-  relationships: ConsumerRelationship[];
+  services: ServiceNode[];
+  apis: ApiNode[];
+}
+
+/** Nó de serviço no grafo de engenharia. */
+export interface ServiceNode {
+  serviceAssetId: string;
+  name: string;
+  domain: string;
+  teamName: string;
+}
+
+/** Nó de API no grafo de engenharia. */
+export interface ApiNode {
+  apiAssetId: string;
+  name: string;
+  routePattern: string;
+  version: string;
+  visibility: string;
+  ownerServiceAssetId: string;
+  consumers: ConsumerEdge[];
+}
+
+/** Aresta de consumo no grafo. */
+export interface ConsumerEdge {
+  relationshipId: string;
+  consumerName: string;
+  sourceType: string;
+  confidenceScore: number;
+  lastObservedAt: string;
+}
+
+/** Nó impactado na propagação de impacto. */
+export interface ImpactedNode {
+  nodeId: string;
+  nodeName: string;
+  depth: number;
+  confidenceScore: number;
+  impactPath: string;
+}
+
+/** Resultado da propagação de impacto (blast radius). */
+export interface ImpactPropagationResult {
+  rootNodeId: string;
+  rootNodeName: string;
+  impactedNodes: ImpactedNode[];
+  directCount: number;
+  transitiveCount: number;
+}
+
+/** Resumo de snapshot temporal do grafo. */
+export interface GraphSnapshotSummary {
+  snapshotId: string;
+  label: string;
+  capturedAt: string;
+  nodeCount: number;
+  edgeCount: number;
+  createdBy: string;
+}
+
+/** Resultado do diff temporal entre dois snapshots. */
+export interface TemporalDiffResult {
+  fromSnapshotId: string;
+  toSnapshotId: string;
+  addedNodesCount: number;
+  removedNodesCount: number;
+  addedEdgesCount: number;
+  removedEdgesCount: number;
+  fromNodesJson: string;
+  toNodesJson: string;
+  fromEdgesJson: string;
+  toEdgesJson: string;
+}
+
+/** Registro de saúde de um nó para overlays. */
+export interface NodeHealthItem {
+  nodeId: string;
+  nodeType: string;
+  status: 'Healthy' | 'Degraded' | 'Unhealthy' | 'Unknown';
+  score: number;
+  factorsJson: string;
+  calculatedAt: string;
+  sourceSystem: string;
+}
+
+/** Resultado da consulta de saúde dos nós. */
+export interface NodeHealthResult {
+  overlayMode: string;
+  items: NodeHealthItem[];
+}
+
+/** Nó de serviço no subgrafo. */
+export interface SubgraphServiceNode {
+  id: string;
+  name: string;
+  domain: string;
+  teamName: string;
+}
+
+/** Nó de API no subgrafo. */
+export interface SubgraphApiNode {
+  id: string;
+  name: string;
+  routePattern: string;
+  version: string;
+  visibility: string;
+  ownerServiceId: string;
+}
+
+/** Aresta no subgrafo. */
+export interface SubgraphEdge {
+  sourceId: string;
+  targetId: string;
+  edgeType: string;
+}
+
+/** Resultado do subgrafo contextual. */
+export interface SubgraphResult {
+  rootNodeId: string;
+  services: SubgraphServiceNode[];
+  apis: SubgraphApiNode[];
+  edges: SubgraphEdge[];
+  isTruncated: boolean;
 }
 
 // ─── Contracts ───────────────────────────────────────────────────────────────
