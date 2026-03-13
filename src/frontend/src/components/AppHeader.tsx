@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Bell, Globe, Settings } from 'lucide-react';
+import { Search, Bell, Globe, Settings, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AppHeaderProps {
@@ -9,22 +9,32 @@ interface AppHeaderProps {
 }
 
 /**
+ * Lista de idiomas suportados pelo frontend.
+ * Cada entrada contém o código i18n, o rótulo exibido e um indicador visual.
+ */
+const SUPPORTED_LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'pt-BR', label: 'Português (Brasil)' },
+  { code: 'pt-PT', label: 'Português (Portugal)' },
+  { code: 'es', label: 'Español' },
+] as const;
+
+/**
  * Header global do aplicativo — barra superior fixa dentro do layout principal.
  *
  * Contém:
  * - Gatilho de busca global (abre CommandPalette)
- * - Alternador de idioma (pt-BR / en)
+ * - Seletor de idioma (en, pt-BR, pt-PT, es)
  * - Sino de notificações (placeholder para MVP1)
- * - Avatar do usuário autenticado com nome e papel
+ * - Avatar do utilizador autenticado com nome e papel
  */
 export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [langOpen, setLangOpen] = useState(false);
 
-  const toggleLang = useCallback(() => {
-    const next = i18n.language?.startsWith('pt') ? 'en' : 'pt-BR';
-    i18n.changeLanguage(next);
+  const selectLanguage = useCallback((code: string) => {
+    i18n.changeLanguage(code);
     setLangOpen(false);
   }, [i18n]);
 
@@ -45,7 +55,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
 
       {/* Right section */}
       <div className="flex items-center gap-1">
-        {/* Language toggle */}
+        {/* Language selector */}
         <div className="relative">
           <button
             onClick={() => setLangOpen(!langOpen)}
@@ -58,13 +68,17 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
           {langOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setLangOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-50 bg-elevated border border-edge rounded-lg shadow-lg py-1 min-w-[120px] animate-fade-in">
-                <button
-                  onClick={toggleLang}
-                  className="w-full text-left px-3 py-2 text-sm text-body hover:bg-hover transition-colors"
-                >
-                  {i18n.language?.startsWith('pt') ? t('header.languageEnglish') : t('header.languagePortuguese')}
-                </button>
+              <div className="absolute right-0 top-full mt-1 z-50 bg-elevated border border-edge rounded-lg shadow-lg py-1 min-w-[180px] animate-fade-in">
+                {SUPPORTED_LANGUAGES.map(({ code, label }) => (
+                  <button
+                    key={code}
+                    onClick={() => selectLanguage(code)}
+                    className="w-full text-left px-3 py-2 text-sm text-body hover:bg-hover transition-colors flex items-center justify-between gap-2"
+                  >
+                    <span>{label}</span>
+                    {i18n.language === code && <Check size={14} className="text-accent shrink-0" />}
+                  </button>
+                ))}
               </div>
             </>
           )}
