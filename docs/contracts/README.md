@@ -22,11 +22,11 @@ assinatura digital para promoção em produção — com suporte a múltiplos pr
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        API Layer                                 │
-│  ContractsEndpointModule (13 endpoints REST)                     │
+│  ContractsEndpointModule (17 endpoints REST)                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                     Application Layer                            │
-│  16 Features VSA (Import, Version, Diff, Lock, Sign, Export,     │
-│  Search, Violations, Lifecycle, Classification...)               │
+│  17 Features VSA (Import, Version, Diff, Lock, Sign, Export,     │
+│  Search, Violations, Lifecycle, Classification, Sync, Validate)  │
 ├─────────────────────────────────────────────────────────────────┤
 │                       Domain Layer                               │
 │  ContractVersion (AR) │ ContractDiff │ ContractArtifact          │
@@ -195,6 +195,8 @@ GET /api/v1/contracts/{id}/verify
 | GET | `/api/v1/contracts/{id}/export` | Exportar especificação |
 | GET | `/api/v1/contracts/search` | Pesquisar contratos (paginado, com filtros) |
 | GET | `/api/v1/contracts/{id}/violations` | Listar violações de regras |
+| GET | `/api/v1/contracts/{id}/validate` | Validar integridade estrutural do contrato |
+| POST | `/api/v1/contracts/sync` | Sincronizar contratos em lote (CI/CD) |
 | POST | `/api/v1/contracts/{id}/lock` | Bloquear versão |
 | POST | `/api/v1/contracts/{id}/lifecycle` | Transicionar lifecycle |
 | POST | `/api/v1/contracts/{id}/deprecate` | Depreciar versão |

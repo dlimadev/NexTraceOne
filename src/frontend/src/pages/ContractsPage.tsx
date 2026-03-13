@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Lock, RefreshCw, Shield, FileCheck, AlertTriangle,
   X, Eye, GitCompare, Download, CheckCircle, XCircle, ArrowRight,
-  FilePlus, AlertOctagon,
+  FilePlus, AlertOctagon, Search,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
@@ -13,6 +13,7 @@ import { contractsApi } from '../api';
 import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
   ContractVersionDetail, SemanticDiff, ContractRuleViolation,
+  ContractIntegrityResult,
 } from '../types';
 
 /**
@@ -112,6 +113,10 @@ export function ContractsPage() {
 
   // Estado das violações de regras
   const [violationsVersionId, setViolationsVersionId] = useState<string | null>(null);
+
+  // Estado da validação de integridade estrutural do contrato
+  const [integrityResult, setIntegrityResult] = useState<{ id: string; result: ContractIntegrityResult } | null>(null);
+  const [integrityLoading, setIntegrityLoading] = useState(false);
 
   // Estado do formulário de criação de nova versão
   const [showCreateVersionForm, setShowCreateVersionForm] = useState(false);
@@ -257,6 +262,23 @@ export function ContractsPage() {
       setExportContent({ id: versionId, specContent: result.specContent, format: result.format });
     } catch {
       showNotification('error', t('contracts.errors.exportFailed'));
+    }
+  }
+
+  /**
+   * Aciona a validação de integridade estrutural do contrato conforme seu protocolo.
+   * Retorna contagem de paths/endpoints e versão extraída do spec, se disponível.
+   */
+  async function handleValidateIntegrity(versionId: string) {
+    setIntegrityLoading(true);
+    setIntegrityResult(null);
+    try {
+      const result = await contractsApi.validateIntegrity(versionId);
+      setIntegrityResult({ id: versionId, result });
+    } catch {
+      showNotification('error', t('contracts.errors.validateFailed'));
+    } finally {
+      setIntegrityLoading(false);
     }
   }
 
@@ -761,6 +783,60 @@ export function ContractsPage() {
                     <span className="text-xs text-muted">{t('contracts.verifyResult.noSignature')}</span>
                   </div>
                 )}
+
+                {/* Validação de integridade estrutural */}
+                <div className="border-t border-edge pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-heading">{t('contracts.validateIntegrity.title')}</h3>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      loading={integrityLoading}
+                      onClick={() => handleValidateIntegrity(detail.id)}
+                    >
+                      <Search size={14} /> {t('contracts.validateIntegrity.action')}
+                    </Button>
+                  </div>
+                  {integrityResult && integrityResult.id === detail.id && (
+                    <div className={`rounded-md px-4 py-3 text-sm border ${
+                      integrityResult.result.isValid
+                        ? 'bg-success/10 border-success/30 text-success'
+                        : 'bg-critical/10 border-critical/30 text-critical'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        {integrityResult.result.isValid
+                          ? <CheckCircle size={14} />
+                          : <XCircle size={14} />}
+                        <span className="font-medium">
+                          {integrityResult.result.isValid
+                            ? t('contracts.validateIntegrity.valid')
+                            : t('contracts.validateIntegrity.invalid')}
+                        </span>
+                      </div>
+                      {integrityResult.result.isValid && (
+                        <div className="grid grid-cols-3 gap-3 mt-2 text-xs text-body">
+                          <div>
+                            <span className="block text-muted">{t('contracts.validateIntegrity.paths')}</span>
+                            <span className="font-semibold">{integrityResult.result.pathCount}</span>
+                          </div>
+                          <div>
+                            <span className="block text-muted">{t('contracts.validateIntegrity.endpoints')}</span>
+                            <span className="font-semibold">{integrityResult.result.endpointCount}</span>
+                          </div>
+                          {integrityResult.result.schemaVersion && (
+                            <div>
+                              <span className="block text-muted">{t('contracts.validateIntegrity.schemaVersion')}</span>
+                              <span className="font-semibold">{integrityResult.result.schemaVersion}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {!integrityResult.result.isValid && integrityResult.result.validationError && (
+                        <p className="text-xs mt-1">{integrityResult.result.validationError}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* Proveniência */}
                 {detail.provenance && (

@@ -470,7 +470,8 @@
       "searchFailed": "Failed to search contracts",
       "violationsFailed": "Failed to load rule violations",
       "createVersionFailed": "Failed to create contract version",
-      "exportFailed": "Failed to export contract"
+      "exportFailed": "Failed to export contract",
+      "validateFailed": "Validation failed. Please try again."
     },
     "detailView": {
       "title": "Contract Version Detail",
@@ -516,7 +517,16 @@
     "violationRule": "Rule",
     "violationMessage": "Message",
     "violationPath": "Path",
-    "createVersionSuccess": "Contract version created successfully"
+    "createVersionSuccess": "Contract version created successfully",
+    "validateIntegrity": {
+      "title": "Structural Integrity",
+      "action": "Validate Integrity",
+      "valid": "Specification is structurally valid",
+      "invalid": "Specification has structural errors",
+      "paths": "Paths / Channels",
+      "endpoints": "Endpoints / Operations",
+      "schemaVersion": "Schema Version"
+    }
   },
   "workflow": {
     "title": "Workflow & Approvals",

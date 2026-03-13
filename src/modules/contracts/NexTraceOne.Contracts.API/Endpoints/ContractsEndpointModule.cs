@@ -18,6 +18,8 @@ using SuggestSemanticVersionFeature = NexTraceOne.Contracts.Application.Features
 using TransitionLifecycleStateFeature = NexTraceOne.Contracts.Application.Features.TransitionLifecycleState.TransitionLifecycleState;
 using ListRuleViolationsFeature = NexTraceOne.Contracts.Application.Features.ListRuleViolations.ListRuleViolations;
 using SearchContractsFeature = NexTraceOne.Contracts.Application.Features.SearchContracts.SearchContracts;
+using SyncContractsFeature = NexTraceOne.Contracts.Application.Features.SyncContracts.SyncContracts;
+using ValidateContractIntegrityFeature = NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity.ValidateContractIntegrity;
 using VerifySignatureFeature = NexTraceOne.Contracts.Application.Features.VerifySignature.VerifySignature;
 
 namespace NexTraceOne.Contracts.API.Endpoints;
@@ -209,6 +211,39 @@ public sealed class ContractsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new ListRuleViolationsFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── Validation & Integrity ───────────────────────────────────
+
+        /// <summary>
+        /// Valida a integridade estrutural de uma versão de contrato conforme seu protocolo.
+        /// Retorna contagem de paths/channels/portTypes e version extraída do spec.
+        /// </summary>
+        group.MapGet("/{contractVersionId:guid}/validate", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ValidateContractIntegrityFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── External Inbound (CI/CD Integration) ─────────────────────
+
+        /// <summary>
+        /// Endpoint de sincronização em lote para sistemas externos (CI/CD, API Gateways).
+        /// Permite importar múltiplos contratos em uma única requisição autenticada sistema-a-sistema.
+        /// Máximo de 50 itens por lote; retorna resultado por item com erros não-bloqueantes.
+        /// </summary>
+        group.MapPost("/sync", async (
+            SyncContractsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         });
     }

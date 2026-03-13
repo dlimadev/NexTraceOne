@@ -470,7 +470,8 @@
       "searchFailed": "Error al buscar contratos",
       "violationsFailed": "Error al cargar violaciones de reglas",
       "createVersionFailed": "Error al crear versión del contrato",
-      "exportFailed": "Error al exportar contrato"
+      "exportFailed": "Error al exportar contrato",
+      "validateFailed": "La validación falló. Por favor, inténtelo de nuevo."
     },
     "detailView": {
       "title": "Detalle de Versión del Contrato",
@@ -516,7 +517,16 @@
     "violationRule": "Regla",
     "violationMessage": "Mensaje",
     "violationPath": "Ruta",
-    "createVersionSuccess": "Versión del contrato creada correctamente"
+    "createVersionSuccess": "Versión del contrato creada correctamente",
+    "validateIntegrity": {
+      "title": "Integridad Estructural",
+      "action": "Validar Integridad",
+      "valid": "La especificación es estructuralmente válida",
+      "invalid": "La especificación tiene errores estructurales",
+      "paths": "Paths / Canales",
+      "endpoints": "Endpoints / Operaciones",
+      "schemaVersion": "Versión del Schema"
+    }
   },
   "workflow": {
     "title": "Workflow y Aprobaciones",
