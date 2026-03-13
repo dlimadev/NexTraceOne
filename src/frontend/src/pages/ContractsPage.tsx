@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Lock, RefreshCw, Shield, FileCheck, AlertTriangle,
   X, Eye, GitCompare, Download, CheckCircle, XCircle, ArrowRight,
-  Search, FilePlus, AlertOctagon,
+  FilePlus, AlertOctagon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
