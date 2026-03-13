@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 using NexTraceOne.BuildingBlocks.Domain.Results;
@@ -100,33 +101,33 @@ public sealed class Subscription : AggregateRoot<SubscriptionId>
     /// Desativa a subscrição, interrompendo o envio de notificações.
     /// Retorna falha se a subscrição já estiver inativa.
     /// </summary>
-    public Result<MediatR.Unit> Deactivate()
+    public Result<Unit> Deactivate()
     {
         if (!IsActive)
             return DeveloperPortalErrors.SubscriptionAlreadyInactive(Id.Value.ToString());
 
         IsActive = false;
-        return MediatR.Unit.Value;
+        return Unit.Value;
     }
 
     /// <summary>
     /// Reativa uma subscrição previamente desativada.
     /// Retorna falha se a subscrição já estiver ativa.
     /// </summary>
-    public Result<MediatR.Unit> Reactivate()
+    public Result<Unit> Reactivate()
     {
         if (IsActive)
             return DeveloperPortalErrors.SubscriptionAlreadyActive(Id.Value.ToString());
 
         IsActive = true;
-        return MediatR.Unit.Value;
+        return Unit.Value;
     }
 
     /// <summary>
     /// Atualiza as preferências de notificação (nível, canal e URL de webhook).
     /// Valida que o canal Webhook possui URL válida.
     /// </summary>
-    public Result<MediatR.Unit> UpdatePreferences(
+    public Result<Unit> UpdatePreferences(
         SubscriptionLevel level,
         NotificationChannel channel,
         string? webhookUrl)
@@ -137,7 +138,7 @@ public sealed class Subscription : AggregateRoot<SubscriptionId>
         Level = level;
         Channel = channel;
         WebhookUrl = webhookUrl;
-        return MediatR.Unit.Value;
+        return Unit.Value;
     }
 
     /// <summary>Regista a data/hora da última notificação enviada com sucesso.</summary>
