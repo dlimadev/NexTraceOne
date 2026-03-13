@@ -13,6 +13,7 @@ import { UsersPage } from './pages/UsersPage';
 import { WorkflowPage } from './pages/WorkflowPage';
 import { PromotionPage } from './pages/PromotionPage';
 import { LicensingPage } from './pages/LicensingPage';
+import { DeveloperPortalPage } from './pages/DeveloperPortalPage';
 import { AuditPage } from './pages/AuditPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />
               <Route path="/licensing" element={<LicensingPage />} />
+              <Route path="/portal" element={<DeveloperPortalPage />} />
               <Route
                 path="/users"
                 element={

@@ -53,5 +53,7 @@ export type Permission =
   | 'audit:export'
   | 'licensing:read'
   | 'licensing:write'
+  | 'developer-portal:read'
+  | 'developer-portal:write'
   | 'platform:settings:read'
   | 'platform:settings:write';
