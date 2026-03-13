@@ -55,120 +55,13 @@ public sealed class Role : Entity<RoleId>
             IsSystem = false
         };
 
-    /// <summary>Retorna as permissões padrão de um papel conhecido.</summary>
+    /// <summary>
+    /// Retorna as permissões padrão de um papel conhecido.
+    /// Delega para <see cref="RolePermissionCatalog"/>, que é a fonte única de verdade
+    /// para mapeamentos papel→permissões. Mantido aqui para compatibilidade retroativa.
+    /// </summary>
     public static IReadOnlyList<string> GetPermissionsForRole(string roleName)
-        => roleName switch
-        {
-            PlatformAdmin => [
-                "identity:users:read",
-                "identity:users:write",
-                "identity:roles:read",
-                "identity:roles:assign",
-                "identity:sessions:read",
-                "identity:sessions:revoke",
-                "identity:permissions:read",
-                "engineering-graph:assets:read",
-                "engineering-graph:assets:write",
-                "contracts:read",
-                "contracts:write",
-                "contracts:import",
-                "change-intelligence:releases:read",
-                "change-intelligence:releases:write",
-                "change-intelligence:blast-radius:read",
-                "workflow:read",
-                "workflow:write",
-                "workflow:approve",
-                "promotion:read",
-                "promotion:write",
-                "promotion:promote",
-                "ruleset-governance:read",
-                "ruleset-governance:write",
-                "audit:read",
-                "audit:export",
-                "licensing:read",
-                "licensing:write",
-                "platform:settings:read",
-                "platform:settings:write"],
-            TechLead => [
-                "identity:users:read",
-                "identity:roles:read",
-                "identity:sessions:read",
-                "engineering-graph:assets:read",
-                "engineering-graph:assets:write",
-                "contracts:read",
-                "contracts:write",
-                "contracts:import",
-                "change-intelligence:releases:read",
-                "change-intelligence:releases:write",
-                "change-intelligence:blast-radius:read",
-                "workflow:read",
-                "workflow:write",
-                "workflow:approve",
-                "promotion:read",
-                "promotion:write",
-                "promotion:promote",
-                "ruleset-governance:read",
-                "audit:read",
-                "audit:export"],
-            Developer => [
-                "identity:users:read",
-                "engineering-graph:assets:read",
-                "contracts:read",
-                "contracts:write",
-                "contracts:import",
-                "change-intelligence:releases:read",
-                "change-intelligence:releases:write",
-                "change-intelligence:blast-radius:read",
-                "workflow:read",
-                "promotion:read",
-                "ruleset-governance:read",
-                "audit:read"],
-            Viewer => [
-                "identity:users:read",
-                "engineering-graph:assets:read",
-                "contracts:read",
-                "change-intelligence:releases:read",
-                "change-intelligence:blast-radius:read",
-                "workflow:read",
-                "promotion:read",
-                "audit:read"],
-            Auditor => [
-                "identity:users:read",
-                "identity:sessions:read",
-                "engineering-graph:assets:read",
-                "contracts:read",
-                "change-intelligence:releases:read",
-                "change-intelligence:blast-radius:read",
-                "workflow:read",
-                "promotion:read",
-                "ruleset-governance:read",
-                "audit:read",
-                "audit:export"],
-            SecurityReview => [
-                "identity:users:read",
-                "identity:roles:read",
-                "identity:sessions:read",
-                "identity:sessions:revoke",
-                "engineering-graph:assets:read",
-                "contracts:read",
-                "change-intelligence:releases:read",
-                "change-intelligence:blast-radius:read",
-                "workflow:read",
-                "workflow:approve",
-                "promotion:read",
-                "ruleset-governance:read",
-                "ruleset-governance:write",
-                "audit:read",
-                "audit:export"],
-            ApprovalOnly => [
-                "workflow:read",
-                "workflow:approve",
-                "change-intelligence:releases:read",
-                "change-intelligence:blast-radius:read",
-                "promotion:read",
-                "audit:read"],
-            _ => []
-        };
+        => RolePermissionCatalog.GetPermissionsForRole(roleName);
 }
 
 /// <summary>Identificador fortemente tipado de Role.</summary>
