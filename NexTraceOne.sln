@@ -143,6 +143,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "auditcompliance", "auditcom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.AuditCompliance.Tests", "tests\modules\auditcompliance\NexTraceOne.AuditCompliance.Tests\NexTraceOne.AuditCompliance.Tests.csproj", "{F30E8DBF-231D-4134-A370-18748AA57556}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Ingestion.Api", "src\platform\NexTraceOne.Ingestion.Api\NexTraceOne.Ingestion.Api.csproj", "{91723A87-DD74-43FA-BB61-1E0484A170C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -699,6 +701,18 @@ Global
 		{F30E8DBF-231D-4134-A370-18748AA57556}.Release|x64.Build.0 = Release|Any CPU
 		{F30E8DBF-231D-4134-A370-18748AA57556}.Release|x86.ActiveCfg = Release|Any CPU
 		{F30E8DBF-231D-4134-A370-18748AA57556}.Release|x86.Build.0 = Release|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Release|x64.Build.0 = Release|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{91723A87-DD74-43FA-BB61-1E0484A170C8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -770,5 +784,6 @@ Global
 		{36FE6AAF-33B0-4526-8728-6C829FBE0CCA} = {E944794B-14E6-2548-1B77-C5D5748AFD59}
 		{91241792-3A5D-8A8D-AFB5-D006089CC20A} = {D7DC9B74-6BC4-2470-2038-1E57C2DCB73B}
 		{F30E8DBF-231D-4134-A370-18748AA57556} = {91241792-3A5D-8A8D-AFB5-D006089CC20A}
+		{91723A87-DD74-43FA-BB61-1E0484A170C8} = {4DF80442-A1E5-CC28-AE7B-27B5F9BFE52B}
 	EndGlobalSection
 EndGlobal

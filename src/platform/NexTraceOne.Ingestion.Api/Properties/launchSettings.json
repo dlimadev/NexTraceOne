@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "NexTraceOne.Ingestion.Api": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:1488;http://localhost:1489",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
