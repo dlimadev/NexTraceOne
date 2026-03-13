@@ -335,3 +335,107 @@ Regras:
 - Se já existir uma estrutura de i18n no projeto, reutilizá-la e padronizá-la.
 - Se a estrutura estiver incompleta, completar sem quebrar o padrão existente.
 - Preparar o sistema para múltiplos idiomas (pt-BR, en) desde o início.
+
+---
+
+## Diretrizes Obrigatórias de Segurança, Privacidade e On-Premise
+
+Estas regras são **obrigatórias** e aplicam-se a todo código novo ou alterado, frontend e backend.
+Referência: `docs/security/` para detalhes completos.
+
+### 14. Segurança como Regra Obrigatória
+
+- Todo código deve ser **secure by default** — nenhuma configuração insegura por padrão.
+- Seguir princípios de **defense in depth**, **least privilege** e **privacy by design**.
+- Nunca confiar exclusivamente no frontend para enforcement de segurança — o backend é a fonte de verdade.
+- Toda validação de entrada deve ocorrer no backend, independentemente do frontend.
+- Tratar toda entrada como potencialmente maliciosa (query params, headers, body, uploads, URLs).
+
+### 15. Renderização Segura no Frontend
+
+- **Nunca** usar `dangerouslySetInnerHTML` com conteúdo não sanitizado.
+- **Nunca** usar `innerHTML` fora de React sem sanitização.
+- Se for necessário renderizar Markdown ou HTML externo, usar DOMPurify ou equivalente.
+- i18n com `escapeValue: true` (padrão seguro) está ativo — não desativar.
+- Validar URLs antes de usar em atributos `href`, `src`, `action` — usar `isSafeUrl()` do módulo `utils/sanitize.ts`.
+- Bloquear esquemas `javascript:`, `data:`, `vbscript:` em URLs dinâmicas.
+
+### 16. Navegação e Redirecionamento Seguros
+
+- Usar `isSafeRedirectPath()` de `utils/navigation.ts` para todo redirecionamento baseado em input externo.
+- Allowlist de rotas internas para prevenção de open redirect.
+- Nunca redirecionar diretamente para URLs vindas de query string, localStorage ou API sem validação.
+- URLs externas devem abrir em nova aba (`target="_blank"`) com `rel="noopener noreferrer"`.
+
+### 17. Sessão, Tokens e Dados Sensíveis
+
+- **Refresh token**: exclusivamente em memória (closure) — nunca em localStorage ou sessionStorage.
+- **Access token**: sessionStorage (escopo de aba) — nunca em localStorage.
+- **Nenhum token em localStorage** — localStorage é acessível entre abas e persiste após fechar o browser.
+- Limpar todos os dados de sessão em logout e session expired.
+- Nunca logar tokens, passwords ou credenciais — nem no console, nem em logs do servidor.
+- Usar `clearAllTokens()` para garantir limpeza completa.
+
+### 18. Autorização Coerente entre Frontend e Backend
+
+- Frontend usa permissões recebidas do backend (via `/me`) apenas para controle visual (UX).
+- Backend faz enforcement real — toda API deve verificar autenticação e autorização.
+- Não manter mapeamento client-side de role→permissões; obter do servidor.
+- Usar o hook `usePermissions()` e `<ProtectedRoute>` para controle visual no frontend.
+- Ocultar/desabilitar ações não autorizadas — nunca confiar que ocultação visual é suficiente.
+
+### 19. API Client e Tratamento Seguro de Erros
+
+- Usar o API client centralizado (`api/client.ts`) para todas as requisições.
+- Nunca montar URLs concatenando strings sem validação.
+- Nunca exibir mensagens técnicas ou stack traces ao usuário — usar `resolveApiError()` + i18n.
+- ErrorBoundary global captura erros não tratados sem expor detalhes em produção.
+- `console.log` e `debugger` são removidos automaticamente em builds de produção via terser.
+
+### 20. Dependências e Supply Chain
+
+- Manter `package-lock.json` versionado no repositório.
+- Executar `npm audit` antes de releases.
+- Executar `dotnet list package --vulnerable` antes de releases.
+- Não instalar dependências sem verificar advisory databases.
+- Preferir dependências com manutenção ativa e licenças compatíveis.
+
+### 21. Compatibilidade com CSP, Headers, CORS
+
+- Frontend deve ser compatível com CSP strict (sem `unsafe-eval`, sem `unsafe-inline` para scripts).
+- Não usar `eval()`, `new Function()`, ou `setTimeout` com strings.
+- Backend define security headers completos (CSP, X-Frame-Options, HSTS, etc.).
+- CORS restritivo com origens explícitas — nunca wildcard com credentials.
+- Meta tag CSP no `index.html` como defense-in-depth.
+
+### 22. LGPD / GDPR-RGPD / Minimização de Dados / Masking / Logs
+
+- **Minimização de dados**: não carregar, persistir, logar ou exibir dados pessoais além do necessário.
+- **Frontend**: não persistir dados pessoais em localStorage; limpar sessionStorage em logout.
+- **Backend**: não retornar dados pessoais desnecessários em respostas API.
+- **Logs**: nunca registrar passwords, tokens, emails completos ou outros PII em logs.
+- **Exports/Downloads**: garantir que exports não incluem dados pessoais desnecessários.
+- **Masking**: considerar masking parcial de emails, IPs e identificadores na UI quando completo não é necessário.
+- **Retenção**: definir e aplicar políticas de retenção para dados com PII.
+- Referência: `docs/security/application-privacy-lgpd-gdpr-notes.md`.
+
+### 23. Execução On-Premise
+
+- **Nunca empacotar ou distribuir código-fonte** (.cs, .tsx, .ts, .csproj, .sln, testes).
+- Distribuir apenas artefatos compilados/publicados (assemblies .NET, JS/CSS minificados).
+- **Source maps desativados** em produção (`sourcemap: false`).
+- **Debug symbols não incluídos** em distribuição de produção (`DebugType=none`).
+- **console.log removido** em builds de produção via terser (`drop_console: true`).
+- Nomes de assets com hash (sem exposição de estrutura interna).
+- **Externalizar segredos**: connection strings, JWT secret, license key via variáveis de ambiente.
+- Nunca incluir valores sensíveis em `appsettings.json` distribuído.
+- Verificação de integridade de assemblies no boot da aplicação.
+- Referência: `docs/security/application-onprem-hardening-notes.md`.
+
+### 24. ErrorBoundary e Observabilidade Segura
+
+- Manter `ErrorBoundary` global envolvendo `<App />` no `main.tsx`.
+- ErrorBoundary nunca expõe stack traces ou detalhes técnicos em produção.
+- Registrar erros no console apenas em desenvolvimento (`import.meta.env.DEV`).
+- Usar Serilog com logger estruturado no backend — logs em inglês, sem PII.
+- OpenTelemetry para tracing e métricas — não incluir dados pessoais em spans/metrics.
