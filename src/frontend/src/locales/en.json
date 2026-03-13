@@ -206,7 +206,10 @@
     "tabs": {
       "services": "Services",
       "apis": "APIs",
-      "dependencies": "Dependencies"
+      "dependencies": "Dependencies",
+      "graph": "Graph",
+      "impact": "Impact Analysis",
+      "temporal": "Temporal Diff"
     },
     "name": "Name",
     "team": "Team",
@@ -219,7 +222,57 @@
     "noDependencies": "No dependency relationships mapped",
     "apiAsset": "API Asset",
     "consumerService": "Consumer Service",
-    "trustLevel": "Trust Level"
+    "trustLevel": "Trust Level",
+    "searchPlaceholder": "Search services, APIs, domains…",
+    "consumers": "consumers",
+    "emptyGraph": "No services or APIs registered yet. Register your first asset to start building the graph.",
+    "noApisForService": "No APIs registered for this service",
+    "legend": "Legend",
+    "legendService": "Service",
+    "legendApi": "API",
+    "legendDependency": "Dependency",
+    "crossServiceDependencies": "Cross-Service Dependencies",
+    "sourceApi": "Source API",
+    "confidence": "Confidence",
+    "stats": {
+      "services": "Services",
+      "apis": "APIs",
+      "edges": "Relationships",
+      "domains": "Domains"
+    },
+    "impact": {
+      "selectNode": "Root node",
+      "selectNodePlaceholder": "Select a node to analyze…",
+      "selectNodeHint": "Select a service or API node to calculate its blast radius.",
+      "maxDepth": "Max depth",
+      "calculating": "Calculating impact propagation…",
+      "totalImpacted": "Total impacted",
+      "directConsumers": "Direct consumers",
+      "transitiveConsumers": "Transitive consumers",
+      "impactedNodes": "Impacted Nodes",
+      "node": "Node",
+      "depth": "Depth",
+      "path": "Impact Path"
+    },
+    "temporal": {
+      "fromSnapshot": "From snapshot",
+      "toSnapshot": "To snapshot",
+      "selectSnapshot": "Select a snapshot…",
+      "createSnapshot": "Create Snapshot",
+      "noSnapshots": "No snapshots available yet.",
+      "createFirst": "Create your first snapshot to start tracking graph evolution over time.",
+      "snapshotHistory": "Snapshot History",
+      "label": "Label",
+      "capturedAt": "Captured at",
+      "nodes": "Nodes",
+      "edges": "Edges",
+      "createdBy": "Created by",
+      "calculatingDiff": "Calculating temporal diff…",
+      "addedNodes": "Added nodes",
+      "removedNodes": "Removed nodes",
+      "addedEdges": "Added edges",
+      "removedEdges": "Removed edges"
+    }
   },
   "contracts": {
     "title": "Contracts",

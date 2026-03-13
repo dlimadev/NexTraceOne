@@ -11,6 +11,10 @@ vi.mock('../../api', () => ({
     getGraph: vi.fn(),
     registerService: vi.fn(),
     registerApi: vi.fn(),
+    getImpactPropagation: vi.fn(),
+    listSnapshots: vi.fn(),
+    getTemporalDiff: vi.fn(),
+    createSnapshot: vi.fn(),
   },
 }));
 
@@ -18,14 +22,21 @@ import { engineeringGraphApi } from '../../api';
 
 const mockGraph: AssetGraph = {
   services: [
-    { id: 's1', name: 'payments-service', team: 'Payments', createdAt: '2024-01-01T00:00:00Z' },
-    { id: 's2', name: 'auth-service', team: 'Identity', createdAt: '2024-01-01T00:00:00Z' },
+    { serviceAssetId: 's1', name: 'payments-service', teamName: 'Payments', domain: 'Payments' },
+    { serviceAssetId: 's2', name: 'auth-service', teamName: 'Identity', domain: 'Identity' },
   ],
   apis: [
-    { id: 'a1', name: 'Payments API', baseUrl: '/api/payments', ownerServiceId: 's1', createdAt: '2024-01-01T00:00:00Z' },
-  ],
-  relationships: [
-    { apiAssetId: 'a1', consumerServiceId: 's2', trustLevel: 'High' },
+    {
+      apiAssetId: 'a1',
+      name: 'Payments API',
+      routePattern: '/api/payments',
+      version: '1.0.0',
+      visibility: 'Public',
+      ownerServiceAssetId: 's1',
+      consumers: [
+        { relationshipId: 'r1', consumerName: 'auth-service', sourceType: 'Inferred', confidenceScore: 0.85, lastObservedAt: '2024-01-01T00:00:00Z' },
+      ],
+    },
   ],
 };
 
@@ -53,17 +64,20 @@ describe('EngineeringGraphPage', () => {
     expect(screen.getByRole('heading', { name: /engineering graph/i })).toBeInTheDocument();
   });
 
-  it('exibe as abas de navegação', () => {
+  it('exibe as abas de navegação incluindo novas abas', () => {
     vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
     expect(screen.getByRole('button', { name: /services/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /apis/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /dependencies/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /graph/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /impact/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /temporal/i })).toBeInTheDocument();
   });
 
   it('exibe os serviços carregados na aba Services', async () => {
     vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
+    await userEvent.click(screen.getByRole('button', { name: /services/i }));
     await waitFor(() => {
       expect(screen.getByText('payments-service')).toBeInTheDocument();
       expect(screen.getByText('auth-service')).toBeInTheDocument();
@@ -80,43 +94,42 @@ describe('EngineeringGraphPage', () => {
     });
   });
 
-  it('navega para a aba Dependencies e exibe relacionamentos', async () => {
+  it('exibe formulário de serviço ao clicar em Register Service', async () => {
     vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    await userEvent.click(screen.getByRole('button', { name: /dependencies/i }));
+    const serviceBtn = screen.getAllByRole('button').find(
+      (btn) => btn.textContent?.includes('Register Service')
+    )!;
+    await userEvent.click(serviceBtn);
     await waitFor(() => {
-      expect(screen.getByText('High')).toBeInTheDocument();
+      // O formulário renderiza campos de input para nome e time
+      expect(screen.getAllByRole('textbox').length).toBeGreaterThanOrEqual(2);
     });
   });
 
-  it('exibe formulário de serviço ao clicar em + Service', async () => {
+  it('exibe formulário de API ao clicar em Register API', async () => {
     vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    const serviceBtn = screen.getAllByRole('button', { name: /service/i }).find(
-      (btn) => btn.textContent?.trim() === 'Service'
+    const apiBtn = screen.getAllByRole('button').find(
+      (btn) => btn.textContent?.includes('Register API')
     )!;
-    await userEvent.click(serviceBtn);
-    expect(screen.getByText('Register Service')).toBeInTheDocument();
-  });
-
-  it('exibe formulário de API ao clicar em + API', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
-    renderGraph();
-    await userEvent.click(screen.getByRole('button', { name: 'API' }));
-    expect(screen.getByText('Register API Asset')).toBeInTheDocument();
+    await userEvent.click(apiBtn);
+    await waitFor(() => {
+      expect(screen.getByText('Register API Asset')).toBeInTheDocument();
+    });
   });
 
   it('chama registerService ao submeter o formulário de serviço', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({ services: [], apis: [], relationships: [] });
+    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({ services: [], apis: [] });
     vi.mocked(engineeringGraphApi.registerService).mockResolvedValue({ id: 's-new' });
     renderGraph();
-    const serviceBtn = screen.getAllByRole('button', { name: /service/i }).find(
-      (btn) => btn.textContent?.trim() === 'Service'
+    const serviceBtn = screen.getAllByRole('button').find(
+      (btn) => btn.textContent?.includes('Register Service')
     )!;
     await userEvent.click(serviceBtn);
     await userEvent.type(screen.getAllByRole('textbox')[0], 'new-service');
     await userEvent.type(screen.getAllByRole('textbox')[1], 'Platform');
-    await userEvent.click(screen.getByRole('button', { name: /register/i }));
+    await userEvent.click(screen.getByRole('button', { name: /register$/i }));
     await waitFor(() => {
       expect(engineeringGraphApi.registerService).toHaveBeenCalled();
       const [firstArg] = vi.mocked(engineeringGraphApi.registerService).mock.calls[0];
@@ -125,8 +138,9 @@ describe('EngineeringGraphPage', () => {
   });
 
   it('exibe mensagem quando não há serviços registados', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({ services: [], apis: [], relationships: [] });
+    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({ services: [], apis: [] });
     renderGraph();
+    await userEvent.click(screen.getByRole('button', { name: /services/i }));
     await waitFor(() => {
       expect(screen.getByText(/no services registered/i)).toBeInTheDocument();
     });

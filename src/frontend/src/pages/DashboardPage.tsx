@@ -34,7 +34,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.consumerRelations'),
-      value: graph?.relationships?.length ?? '—',
+      value: graph?.apis?.reduce((sum: number, a: { consumers?: unknown[] }) => sum + (a.consumers?.length ?? 0), 0) ?? '—',
       icon: <Zap size={24} />,
       color: 'text-warning',
     },
