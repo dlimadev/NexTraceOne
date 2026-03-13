@@ -5,4 +5,5 @@ export { changeIntelligenceApi } from './changeIntelligence';
 export { workflowApi } from './workflow';
 export { auditApi } from './audit';
 export { promotionApi } from './promotion';
+export { licensingApi } from './licensing';
 export { default as apiClient } from './client';

@@ -460,6 +460,77 @@ export interface GateResult {
   message?: string;
 }
 
+// ─── Licensing ────────────────────────────────────────────────────────────────
+
+export type LicenseType = 'Trial' | 'Standard' | 'Enterprise';
+export type LicenseEdition = 'Community' | 'Professional' | 'Enterprise' | 'Unlimited';
+export type EnforcementLevel = 'Soft' | 'Hard' | 'NeverBreak';
+export type WarningLevel = 'Normal' | 'Advisory' | 'Warning' | 'Critical' | 'Exceeded';
+
+/** Estado completo da licença — retornado pelo endpoint /licensing/status. */
+export interface LicenseStatus {
+  licenseId: string;
+  licenseKey: string;
+  customerName: string;
+  type: LicenseType;
+  edition: LicenseEdition;
+  isActive: boolean;
+  isExpired: boolean;
+  isInGracePeriod: boolean;
+  daysUntilExpiration: number;
+  expiresAt: string;
+  issuedAt: string;
+  trialConverted: boolean;
+  capabilities: CapabilityStatus[];
+  quotas: UsageQuotaStatus[];
+}
+
+/** Estado de uma capability individual da licença. */
+export interface CapabilityStatus {
+  code: string;
+  name: string;
+  isEnabled: boolean;
+}
+
+/** Estado de uma quota de uso com nível de aviso e enforcement. */
+export interface UsageQuotaStatus {
+  metricCode: string;
+  currentUsage: number;
+  limit: number;
+  thresholdReached: boolean;
+  usagePercentage: number;
+  warningLevel: WarningLevel;
+  enforcementLevel: EnforcementLevel;
+}
+
+/** Resultado do health check da licença — score geral e alertas. */
+export interface LicenseHealthResult {
+  licenseId: string;
+  healthScore: number;
+  isExpired: boolean;
+  isInGracePeriod: boolean;
+  daysUntilExpiration: number;
+  quotaWarnings: QuotaWarning[];
+}
+
+/** Aviso individual de quota próxima do limite. */
+export interface QuotaWarning {
+  metricCode: string;
+  warningLevel: WarningLevel;
+  usagePercentage: number;
+  currentUsage: number;
+  limit: number;
+}
+
+/** Alerta de threshold atingido — retornado pelo endpoint /licensing/thresholds. */
+export interface LicenseThresholdAlert {
+  metricCode: string;
+  currentUsage: number;
+  limit: number;
+  thresholdPercentage: number;
+  warningLevel: WarningLevel;
+}
+
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
 export interface DashboardStats {
