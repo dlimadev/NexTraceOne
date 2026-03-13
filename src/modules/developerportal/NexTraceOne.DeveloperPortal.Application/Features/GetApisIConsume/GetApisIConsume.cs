@@ -1,25 +1,70 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 
 namespace NexTraceOne.DeveloperPortal.Application.Features.GetApisIConsume;
 
 /// <summary>
-/// Feature: GetApisIConsume — Módulo: DeveloperPortal.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetApisIConsume — painel do consumidor com APIs que o utilizador/serviço consome.
+/// Exibe status, breaking changes, depreciações e ações pendentes.
 /// </summary>
 public static class GetApisIConsume
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query para obter APIs consumidas por um utilizador ou serviço.</summary>
+    public sealed record Query(Guid UserId, int Page = 1, int PageSize = 20) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida os parâmetros da consulta de APIs consumidas.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.UserId).NotEmpty();
+            RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>
+    /// Handler que retorna APIs consumidas com status e alertas.
+    /// Em produção, agrega dados do EngineeringGraph e ChangeIntelligence.
+    /// </summary>
+    public sealed class Handler : IQueryHandler<Query, Response>
+    {
+        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var result = new Response(
+                Items: new List<ConsumedApiDto>().AsReadOnly(),
+                TotalCount: 0,
+                PendingActions: 0,
+                BreakingChangesCount: 0,
+                DeprecationsCount: 0);
+
+            return Task.FromResult(Result<Response>.Success(result));
+        }
+    }
+
+    /// <summary>DTO de API consumida com status e alertas para o painel do consumidor.</summary>
+    public sealed record ConsumedApiDto(
+        Guid ApiAssetId,
+        string ApiName,
+        string? CurrentVersion,
+        string? LatestVersion,
+        string Status,
+        bool HasBreakingChanges,
+        bool IsDeprecated,
+        DateTimeOffset? DeprecationDate,
+        DateTimeOffset? LastChange,
+        string? Owner,
+        decimal RiskScore);
+
+    /// <summary>Resposta do painel do consumidor com APIs consumidas e métricas de alerta.</summary>
+    public sealed record Response(
+        IReadOnlyList<ConsumedApiDto> Items,
+        int TotalCount,
+        int PendingActions,
+        int BreakingChangesCount,
+        int DeprecationsCount);
 }

@@ -1,25 +1,59 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 
 namespace NexTraceOne.DeveloperPortal.Application.Features.GetApiHealth;
 
 /// <summary>
-/// Feature: GetApiHealth — Módulo: DeveloperPortal.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetApiHealth — retorna indicadores de saúde e disponibilidade de uma API.
+/// Inclui SLO, latência, error rate e status do último deployment.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetApiHealth
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query para obter indicadores de saúde de uma API.</summary>
+    public sealed record Query(Guid ApiAssetId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida os parâmetros da consulta de saúde.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ApiAssetId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>
+    /// Handler que retorna indicadores de saúde da API.
+    /// MVP1: retorna dados estáticos — em produção, consulta RuntimeIntelligence.
+    /// </summary>
+    public sealed class Handler : IQueryHandler<Query, Response>
+    {
+        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var result = new Response(
+                ApiAssetId: request.ApiAssetId,
+                HealthStatus: "Unknown",
+                SloCompliance: null,
+                AverageLatencyMs: null,
+                ErrorRate: null,
+                LastDeploymentStatus: null,
+                LastCheckedAt: null);
+
+            return Task.FromResult(Result<Response>.Success(result));
+        }
+    }
+
+    /// <summary>Resposta com indicadores de saúde da API.</summary>
+    public sealed record Response(
+        Guid ApiAssetId,
+        string HealthStatus,
+        decimal? SloCompliance,
+        long? AverageLatencyMs,
+        decimal? ErrorRate,
+        string? LastDeploymentStatus,
+        DateTimeOffset? LastCheckedAt);
 }
