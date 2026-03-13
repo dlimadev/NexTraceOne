@@ -2,14 +2,13 @@ using System.Text.Json;
 using NexTraceOne.BuildingBlocks.Domain.Enums;
 using NexTraceOne.Contracts.Domain.ValueObjects;
 
-#pragma warning disable CA1031 // Captura genérica necessária para resiliência ao processar specs malformadas
-
 namespace NexTraceOne.Contracts.Domain.Services;
 
 /// <summary>
 /// Serviço de domínio responsável pelo cálculo de diff semântico entre especificações OpenAPI.
-/// Contém lógica pura (sem I/O) para parsing de specs e detecção de mudanças breaking,
-/// aditivas e non-breaking entre duas versões de contrato.
+/// Contém lógica pura de comparação para detecção de mudanças breaking, aditivas e non-breaking.
+/// A extração de dados das specs é delegada ao OpenApiSpecParser, separando
+/// a responsabilidade de parsing JSON da lógica de análise de diferenças.
 /// </summary>
 public static class OpenApiDiffCalculator
 {
@@ -33,8 +32,8 @@ public static class OpenApiDiffCalculator
     /// <returns>Resultado com listas de mudanças categorizadas e o nível de mudança calculado.</returns>
     public static DiffResult ComputeDiff(string baseSpecContent, string targetSpecContent)
     {
-        var basePaths = ExtractPathsAndMethods(baseSpecContent);
-        var targetPaths = ExtractPathsAndMethods(targetSpecContent);
+        var basePaths = OpenApiSpecParser.ExtractPathsAndMethods(baseSpecContent);
+        var targetPaths = OpenApiSpecParser.ExtractPathsAndMethods(targetSpecContent);
 
         var breaking = new List<ChangeEntry>();
         var additive = new List<ChangeEntry>();
@@ -89,50 +88,12 @@ public static class OpenApiDiffCalculator
     }
 
     /// <summary>
-    /// Extrai mapa de caminhos e seus métodos HTTP a partir de uma especificação OpenAPI em JSON.
-    /// Retorna um dicionário cujas chaves são os paths (ex: "/users") e cujos valores
-    /// são os conjuntos de métodos HTTP (GET, POST, etc.) definidos em cada path.
-    /// </summary>
-    /// <param name="specContent">Conteúdo JSON da spec OpenAPI.</param>
-    /// <returns>Dicionário path → conjunto de métodos HTTP (case-insensitive).</returns>
-    public static Dictionary<string, HashSet<string>> ExtractPathsAndMethods(string specContent)
-    {
-        var result = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-        try
-        {
-            using var doc = JsonDocument.Parse(specContent);
-            if (doc.RootElement.TryGetProperty("paths", out var paths))
-            {
-                foreach (var path in paths.EnumerateObject())
-                {
-                    var methods = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var method in path.Value.EnumerateObject())
-                    {
-                        var m = method.Name.ToUpperInvariant();
-                        if (m is "GET" or "POST" or "PUT" or "DELETE" or "PATCH" or "HEAD" or "OPTIONS")
-                            methods.Add(m);
-                    }
-                    result[path.Name] = methods;
-                }
-            }
-        }
-        catch (JsonException) { /* Spec inválida — retorna dicionário vazio para não bloquear o diff */ }
-        return result;
-    }
-
-    /// <summary>
     /// Compara parâmetros de um endpoint específico entre duas versões de spec.
     /// Detecta parâmetros removidos (breaking), parâmetros obrigatórios adicionados (breaking)
     /// e parâmetros opcionais adicionados (aditivo).
+    /// Utiliza o OpenApiSpecParser para extração dos dados de cada spec.
     /// </summary>
-    /// <param name="baseSpec">Conteúdo JSON da spec base.</param>
-    /// <param name="targetSpec">Conteúdo JSON da spec alvo.</param>
-    /// <param name="path">Caminho do endpoint (ex: "/users/{id}").</param>
-    /// <param name="method">Método HTTP (ex: "GET").</param>
-    /// <param name="breaking">Lista para acumular mudanças breaking detectadas.</param>
-    /// <param name="additive">Lista para acumular mudanças aditivas detectadas.</param>
-    /// <param name="nonBreaking">Lista para acumular mudanças non-breaking detectadas.</param>
-    public static void ComputeParameterDiff(
+    private static void ComputeParameterDiff(
         string baseSpec,
         string targetSpec,
         string path,
@@ -143,8 +104,8 @@ public static class OpenApiDiffCalculator
     {
         try
         {
-            var baseParams = ExtractParameters(baseSpec, path, method);
-            var targetParams = ExtractParameters(targetSpec, path, method);
+            var baseParams = OpenApiSpecParser.ExtractParameters(baseSpec, path, method);
+            var targetParams = OpenApiSpecParser.ExtractParameters(targetSpec, path, method);
 
             foreach (var (name, _) in baseParams.Where(p => !targetParams.ContainsKey(p.Key)))
                 breaking.Add(new ChangeEntry("ParameterRemoved", path, method, $"Parameter '{name}' was removed from '{method} {path}'.", true));
@@ -158,38 +119,5 @@ public static class OpenApiDiffCalculator
             }
         }
         catch (JsonException) { /* Ignora erros de parse de parâmetros para não bloquear o diff global */ }
-    }
-
-    /// <summary>
-    /// Extrai os parâmetros de um endpoint específico de uma spec OpenAPI.
-    /// Retorna dicionário nome → obrigatório (bool) para cada parâmetro encontrado.
-    /// </summary>
-    /// <param name="specContent">Conteúdo JSON da spec OpenAPI.</param>
-    /// <param name="path">Caminho do endpoint (ex: "/users/{id}").</param>
-    /// <param name="method">Método HTTP (ex: "get").</param>
-    /// <returns>Dicionário nome do parâmetro → indicador de obrigatoriedade (case-insensitive).</returns>
-    public static Dictionary<string, bool> ExtractParameters(string specContent, string path, string method)
-    {
-        var result = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        try
-        {
-            using var doc = JsonDocument.Parse(specContent);
-            if (doc.RootElement.TryGetProperty("paths", out var paths)
-                && paths.TryGetProperty(path, out var pathEl)
-                && pathEl.TryGetProperty(method.ToLowerInvariant(), out var methodEl)
-                && methodEl.TryGetProperty("parameters", out var parameters)
-                && parameters.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var param in parameters.EnumerateArray())
-                {
-                    var name = param.TryGetProperty("name", out var n) ? n.GetString() ?? string.Empty : string.Empty;
-                    var required = param.TryGetProperty("required", out var r) && r.ValueKind == JsonValueKind.True;
-                    if (!string.IsNullOrEmpty(name))
-                        result[name] = required;
-                }
-            }
-        }
-        catch (JsonException) { /* Ignora erros de parse para retornar dicionário vazio */ }
-        return result;
     }
 }

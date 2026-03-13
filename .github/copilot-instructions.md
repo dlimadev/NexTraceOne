@@ -525,3 +525,34 @@ Código que apresente estes sinais deve ser refatorado:
 - Endpoint module com mais de 15 endpoints
 - Entidade com métodos que acessam infraestrutura
 - Utilitário genérico que esconde regra de negócio
+- Background job orquestrando múltiplos tipos de entidade no mesmo arquivo
+- Program.cs com mais de 100 linhas de lógica (extrair extension methods)
+
+### 33. Regras para Background Jobs e Workers
+
+- Cada tipo de processamento batch deve ser isolado em um **handler especializado** com interface dedicada.
+- Jobs de orquestração devem apenas coordenar handlers — não conter lógica de negócio, queries ou persistência.
+- Exemplo: `IdentityExpirationJob` orquestra `IExpirationHandler[]`, cada handler processa um único tipo de entidade.
+- Falhas em um handler não devem impactar outros — isolamento por try/catch obrigatório.
+- Padrão de interface para handlers de batch: receber DbContext, timestamp, batchSize e CancellationToken.
+- Registro de novos handlers no DI é suficiente para estendê-los — Open/Closed Principle aplicado.
+- Cada handler deve gerar seus próprios eventos de auditoria (SecurityEvent) quando aplicável.
+- Logs devem identificar o handler por nome para facilitar troubleshooting.
+
+### 34. Regras para Composition Root (Program.cs / Host)
+
+- Program.cs deve ser **fino e declarativo** — apenas orquestra a composição, não implementa lógica.
+- Extrair responsabilidades complexas em **extension methods** nomeados e documentados.
+- Padrão: `builder.AddCorsConfiguration()`, `app.ApplyDatabaseMigrationsAsync()`, `app.UseSecurityHeaders()`.
+- Cada extension method deve ter uma única responsabilidade configuracional.
+- Lógica de migração de banco deve ser extraída para extension method dedicado com logging estruturado.
+- Security headers devem estar em extension method próprio para reutilização e testabilidade.
+- Validações de configuração (ex: CORS wildcard check) devem ficar no extension method correspondente.
+
+### 35. Regras para Domain Services Puros (Sem I/O)
+
+- Domain services estáticos que fazem cálculos puros devem separar **parsing de dados** de **lógica de comparação/cálculo**.
+- Exemplo: `OpenApiSpecParser` (parsing JSON) separado de `OpenApiDiffCalculator` (detecção de mudanças).
+- Parser retorna estruturas intermediárias; Calculator opera sobre essas estruturas.
+- Benefícios: testabilidade isolada, reutilização do parser, Calculator independente do formato de entrada.
+- Em caso de specs malformadas ou dados inválidos, parsers devem retornar estruturas vazias (não lançar exceções) para não bloquear o processamento.
