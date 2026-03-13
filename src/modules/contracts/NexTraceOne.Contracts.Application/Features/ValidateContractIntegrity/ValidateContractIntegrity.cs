@@ -1,15 +1,19 @@
+using System.Text.Json;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 using NexTraceOne.Contracts.Application.Abstractions;
 using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Contracts.Domain.Enums;
 using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Contracts.Domain.Services;
 
 namespace NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity;
 
 /// <summary>
-/// Feature: ValidateContractIntegrity — valida se uma especificação OpenAPI pode ser parseada com sucesso.
+/// Feature: ValidateContractIntegrity — valida se uma especificação de contrato pode ser parseada com sucesso.
+/// Suporta múltiplos protocolos: OpenAPI, Swagger, AsyncAPI, WSDL, Protobuf e GraphQL.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ValidateContractIntegrity
@@ -26,7 +30,12 @@ public static class ValidateContractIntegrity
         }
     }
 
-    /// <summary>Handler que verifica se a especificação OpenAPI da versão é válida e retorna seus metadados.</summary>
+    /// <summary>
+    /// Handler multi-protocolo que verifica se a especificação da versão é válida e retorna seus metadados.
+    /// Delega o parsing ao domain service correspondente ao protocolo da versão:
+    /// OpenAPI, Swagger (paths/endpoints), AsyncAPI (channels/operations), WSDL (portTypes/operations).
+    /// Protobuf e GraphQL retornam sucesso com contagens zeradas (suporte stub).
+    /// </summary>
     public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
@@ -39,13 +48,75 @@ public static class ValidateContractIntegrity
 
             try
             {
-                var schema = OpenApiSchema.Parse(version.SpecContent, version.Format);
-                return new Response(true, schema.PathCount, schema.EndpointCount, schema.Version, null);
+                return version.Protocol switch
+                {
+                    ContractProtocol.OpenApi => ValidateOpenApi(version),
+                    ContractProtocol.Swagger => ValidateSwagger(version),
+                    ContractProtocol.AsyncApi => ValidateAsyncApi(version),
+                    ContractProtocol.Wsdl => ValidateWsdl(version),
+                    ContractProtocol.Protobuf or ContractProtocol.GraphQl => new Response(true, 0, 0, null, null),
+                    _ => new Response(false, 0, 0, null, $"Unsupported protocol: {version.Protocol}.")
+                };
             }
             catch (Exception)
             {
                 return new Response(false, 0, 0, null, "The specification content could not be parsed.");
             }
+        }
+
+        /// <summary>Valida especificação OpenAPI 3.x via OpenApiSchema.Parse.</summary>
+        private static Response ValidateOpenApi(ContractVersion version)
+        {
+            var schema = OpenApiSchema.Parse(version.SpecContent, version.Format);
+            return new Response(true, schema.PathCount, schema.EndpointCount, schema.Version, null);
+        }
+
+        /// <summary>Valida especificação Swagger 2.0 via SwaggerSpecParser.</summary>
+        private static Response ValidateSwagger(ContractVersion version)
+        {
+            var pathsAndMethods = SwaggerSpecParser.ExtractPathsAndMethods(version.SpecContent);
+            var pathCount = pathsAndMethods.Count;
+            var endpointCount = pathsAndMethods.Values.Sum(m => m.Count);
+
+            string? schemaVersion = null;
+            try
+            {
+                using var doc = JsonDocument.Parse(version.SpecContent);
+                if (doc.RootElement.TryGetProperty("swagger", out var ver))
+                    schemaVersion = ver.GetString();
+            }
+            catch (JsonException) { /* Versão não disponível — segue sem ela */ }
+
+            return new Response(true, pathCount, endpointCount, schemaVersion, null);
+        }
+
+        /// <summary>Valida especificação AsyncAPI via AsyncApiSpecParser.</summary>
+        private static Response ValidateAsyncApi(ContractVersion version)
+        {
+            var channelsAndOps = AsyncApiSpecParser.ExtractChannelsAndOperations(version.SpecContent);
+            var channelCount = channelsAndOps.Count;
+            var operationCount = channelsAndOps.Values.Sum(o => o.Count);
+
+            string? schemaVersion = null;
+            try
+            {
+                using var doc = JsonDocument.Parse(version.SpecContent);
+                if (doc.RootElement.TryGetProperty("asyncapi", out var ver))
+                    schemaVersion = ver.GetString();
+            }
+            catch (JsonException) { /* Versão não disponível — segue sem ela */ }
+
+            return new Response(true, channelCount, operationCount, schemaVersion, null);
+        }
+
+        /// <summary>Valida especificação WSDL via WsdlSpecParser.</summary>
+        private static Response ValidateWsdl(ContractVersion version)
+        {
+            var portTypesAndOps = WsdlSpecParser.ExtractOperations(version.SpecContent);
+            var portTypeCount = portTypesAndOps.Count;
+            var operationCount = portTypesAndOps.Values.Sum(o => o.Count);
+
+            return new Response(true, portTypeCount, operationCount, null, null);
         }
     }
 

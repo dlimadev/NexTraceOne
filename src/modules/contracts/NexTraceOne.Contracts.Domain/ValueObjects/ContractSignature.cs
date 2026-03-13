@@ -53,16 +53,17 @@ public sealed class ContractSignature : ValueObject
 
     /// <summary>
     /// Verifica se o fingerprint armazenado corresponde ao conteúdo informado.
-    /// Útil para auditoria e validação de integridade pós-promoção.
+    /// Utiliza comparação em tempo constante (CryptographicOperations.FixedTimeEquals)
+    /// para prevenir ataques de timing side-channel na verificação de integridade.
     /// </summary>
     public bool Verify(string canonicalContent)
     {
         if (string.IsNullOrWhiteSpace(canonicalContent))
             return false;
 
-        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(canonicalContent));
-        var computed = Convert.ToHexStringLower(hashBytes);
-        return string.Equals(Fingerprint, computed, StringComparison.Ordinal);
+        var computedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(canonicalContent));
+        var storedBytes = Convert.FromHexString(Fingerprint);
+        return CryptographicOperations.FixedTimeEquals(storedBytes, computedBytes);
     }
 
     /// <inheritdoc />

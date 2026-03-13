@@ -40,7 +40,9 @@ public static class CreateContractVersion
         {
             RuleFor(x => x.ApiAssetId).NotEmpty();
             RuleFor(x => x.SemVer).NotEmpty().MaximumLength(50);
-            RuleFor(x => x.SpecContent).NotEmpty();
+            RuleFor(x => x.SpecContent).NotEmpty()
+                .MaximumLength(5_242_880)
+                .WithMessage("Spec content exceeds maximum allowed size of 5MB.");
             RuleFor(x => x.Format).NotEmpty()
                 .Must(f => f is "json" or "yaml" or "xml")
                 .WithMessage("Format must be 'json', 'yaml' or 'xml'.");
