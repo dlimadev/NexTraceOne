@@ -467,6 +467,33 @@
       "transitionFailed": "Falha ao transicionar estado do ciclo de vida",
       "verifyFailed": "Falha ao verificar assinatura do contrato",
       "diffFailed": "Falha ao computar diff semântico"
+    },
+    "detailView": {
+      "title": "Detalhes da Versão do Contrato",
+      "specContent": "Conteúdo da Especificação",
+      "metadata": "Metadados",
+      "provenance": "Proveniência",
+      "close": "Fechar"
+    },
+    "lifecycleTransition": {
+      "title": "Transição de Ciclo de Vida",
+      "currentState": "Estado Atual",
+      "newState": "Novo Estado",
+      "confirm": "Confirmar Transição",
+      "success": "Estado do ciclo de vida atualizado com sucesso"
+    },
+    "diffCompare": {
+      "title": "Comparar Versões",
+      "baseVersion": "Versão Base",
+      "targetVersion": "Versão Alvo",
+      "compare": "Comparar",
+      "result": "Resultado do Diff",
+      "changeLevel": "Nível de Mudança"
+    },
+    "verifyResult": {
+      "valid": "Verificação de assinatura aprovada",
+      "invalid": "Verificação de assinatura falhou",
+      "noSignature": "Contrato não está assinado"
     }
   },
   "workflow": {
