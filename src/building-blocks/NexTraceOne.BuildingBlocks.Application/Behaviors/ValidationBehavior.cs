@@ -44,20 +44,6 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
             "Validation failed for one or more fields: {0}",
             string.Join("; ", failures));
 
-        return CreateFailureResponse(error);
-    }
-
-    private static TResponse CreateFailureResponse(Error error)
-    {
-        var responseType = typeof(TResponse);
-
-        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
-        {
-            throw new InvalidOperationException($"Response type '{responseType.Name}' must be a Result<T>.");
-        }
-
-        return (TResponse)(responseType
-            .GetMethod("op_Implicit", [typeof(Error)])!
-            .Invoke(null, [error])!);
+        return ResultResponseFactory.CreateFailureResponse<TResponse>(error);
     }
 }

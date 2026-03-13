@@ -439,3 +439,89 @@ Referência: `docs/security/` para detalhes completos.
 - Registrar erros no console apenas em desenvolvimento (`import.meta.env.DEV`).
 - Usar Serilog com logger estruturado no backend — logs em inglês, sem PII.
 - OpenTelemetry para tracing e métricas — não incluir dados pessoais em spans/metrics.
+
+---
+
+## Diretrizes Obrigatórias de Arquitetura, SOLID e Separação de Responsabilidades
+
+Estas regras são **obrigatórias** em toda alteração realizada no repositório. Todo contribuidor (humano ou IA) deve segui-las rigorosamente.
+
+### 25. SOLID e SRP como Padrão Obrigatório
+
+- Toda nova classe deve ter **responsabilidade clara e limitada** — uma única razão para mudar.
+- Evitar classes "faz-tudo" (God Objects) que centralizam regras, persistência, validação e integração.
+- Evitar controllers/endpoints gordos — devem apenas delegar para MediatR handlers.
+- Evitar services inflados que misturam autorização, validação, logging, persistência e regra de negócio.
+- Evitar helpers/utils genéricos que escondem regra de negócio importante — regras devem estar no layer correto.
+- Código duplicado entre behaviors, interceptors ou services deve ser extraído para utilitários compartilhados (exemplo: `ResultResponseFactory` para lógica de reflection sobre `Result<T>`).
+- Preferir classes pequenas (~50-150 linhas) com responsabilidade bem definida.
+
+### 26. Separação Clara entre Layers
+
+- **Domain** — entidades, value objects, aggregates, domain events, domain services, specifications. Nunca depende de infraestrutura.
+- **Application** — handlers (CQRS), validators, behaviors, application services. Orquestra casos de uso. Não contém detalhes de persistência.
+- **Infrastructure** — repositories, DbContext, interceptors, serviços externos, integrações. Detalhes técnicos isolados aqui.
+- **API** — endpoints Minimal API que apenas delegam para MediatR. Sem regra de negócio, sem acesso direto a repositório.
+- **Contracts** — DTOs, integration events, interfaces públicas entre módulos. Único ponto de comunicação cross-module.
+
+Regras inegociáveis:
+- Domain **nunca** referencia Infrastructure, Application ou API.
+- Application **nunca** referencia Infrastructure ou API.
+- API **nunca** contém regra de negócio.
+- Módulos comunicam via Integration Events (Outbox Pattern) ou interfaces definidas em Contracts.
+
+### 27. Regras para Entidades de Domínio
+
+- Entidades devem **preservar invariantes** via métodos de domínio e factory methods.
+- Entidades **não devem** conter lógica de infraestrutura, persistência, logging ou integração.
+- Entidades **não devem** ser God Objects com centenas de linhas de switch/if para catálogos de dados — extrair para services ou catálogos dedicados (exemplo: `RolePermissionCatalog` separado de `Role`).
+- Usar **Value Objects** para encapsular validação e igualdade por valor (Email, SemanticVersion, etc.).
+- Usar **Domain Services** para operações que envolvem múltiplos aggregates ou lógica complexa que não pertence a um único entity.
+- Evitar mutabilidade excessiva — preferir private setters com métodos de domínio controlados.
+- Constantes e catálogos extensos devem ficar em classes separadas (exemplo: `SecurityEventType` em arquivo próprio).
+
+### 28. Regras para Services, Handlers e Behaviors
+
+- Handlers devem focar em **um único caso de uso** — seguir o padrão Vertical Slice Architecture (VSA).
+- Cada feature deve conter: Command/Query + Validator + Handler + Response em um único arquivo.
+- Services não devem concentrar múltiplas responsabilidades — se precisar de mais de 200 linhas, considerar extração.
+- Validações devem estar em FluentValidation validators, não espalhadas no handler.
+- Lógica de parsing, cálculo ou transformação complexa deve ser extraída para **domain services** (exemplo: `OpenApiDiffCalculator` separado do handler `ComputeSemanticDiff`).
+- Behaviors de pipeline (MediatR) devem ser focados e reutilizar utilitários compartilhados (exemplo: `ResultResponseFactory`).
+
+### 29. Regras para Endpoints e API
+
+- Endpoint modules devem ser organizados por **domínio/grupo lógico** — não concentrar 30+ endpoints em um único arquivo.
+- Padrão: um arquivo de endpoints por grupo funcional (AuthEndpoints, UserEndpoints, etc.) com um orquestrador principal.
+- Cada endpoint deve: receber request → enviar para MediatR → retornar resultado via `ToHttpResult()`.
+- **Nunca** colocar regra de negócio em endpoint — toda lógica fica no handler.
+- Autorização deve ser declarativa via `.RequirePermission()` ou `.RequireAuthorization()`.
+
+### 30. Regras para Frontend
+
+- Componentes não devem concentrar fetch, autorização, transformação pesada e renderização no mesmo lugar.
+- Extrair hooks/services/helpers específicos quando necessário.
+- Toda mensagem enviada ao usuário deve usar i18n — nunca textos hardcoded.
+- Componentes devem ter responsabilidade clara: apresentação, ou lógica, ou data fetching — não todos juntos.
+
+### 31. Regras de Evolução Segura e Refatoração
+
+- **Preservar contratos públicos** sempre que possível — interfaces, DTOs, endpoints.
+- Evitar breaking changes desnecessárias.
+- Preferir **refatoração incremental e cirúrgica** — não reescrever módulos inteiros sem necessidade.
+- Toda refatoração relevante deve vir com **testes que protejam o comportamento**.
+- Se precisar quebrar contrato, documentar: motivo, impacto, alternativa, ajustes nos consumidores.
+- Ao extrair responsabilidades, manter delegação no ponto original para backward compatibility quando possível.
+
+### 32. Sinais de Alerta para Revisão
+
+Código que apresente estes sinais deve ser refatorado:
+- Classe com mais de 300 linhas
+- Mais de 5 dependências injetadas
+- Mais de 3 razões distintas para mudar
+- Switch/if extenso baseado em tipo/role/status que poderia ser polimorfismo
+- Lógica duplicada entre behaviors, interceptors ou handlers
+- Handler com mais de 150 linhas de lógica
+- Endpoint module com mais de 15 endpoints
+- Entidade com métodos que acessam infraestrutura
+- Utilitário genérico que esconde regra de negócio

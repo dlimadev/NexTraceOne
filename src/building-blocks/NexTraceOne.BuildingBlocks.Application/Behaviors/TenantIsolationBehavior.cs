@@ -28,33 +28,19 @@ public sealed class TenantIsolationBehavior<TRequest, TResponse>(
 
         if (currentTenant.Id == Guid.Empty)
         {
-            return CreateFailureResponse(Error.Security(
+            return ResultResponseFactory.CreateFailureResponse<TResponse>(Error.Security(
                 "Tenant.Isolation.NoTenant",
                 "Tenant context was not provided."));
         }
 
         if (!currentTenant.IsActive)
         {
-            return CreateFailureResponse(Error.Forbidden(
+            return ResultResponseFactory.CreateFailureResponse<TResponse>(Error.Forbidden(
                 "Tenant.Isolation.Inactive",
                 "Tenant '{0}' is inactive.",
                 currentTenant.Name));
         }
 
         return await next();
-    }
-
-    private static TResponse CreateFailureResponse(Error error)
-    {
-        var responseType = typeof(TResponse);
-
-        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
-        {
-            throw new InvalidOperationException($"Response type '{responseType.Name}' must be a Result<T>.");
-        }
-
-        return (TResponse)(responseType
-            .GetMethod("op_Implicit", [typeof(Error)])!
-            .Invoke(null, [error])!);
     }
 }

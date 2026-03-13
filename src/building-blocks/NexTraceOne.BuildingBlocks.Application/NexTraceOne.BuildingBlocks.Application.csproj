@@ -8,6 +8,9 @@
     <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.BuildingBlocks.Application.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
