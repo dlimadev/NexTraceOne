@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IHardwareBindingRepository, HardwareBindingRepository>();
         services.AddScoped<IHardwareFingerprintProvider, HardwareFingerprintProvider>();
         services.AddScoped<ILicensingModule, LicensingModuleService>();
+        services.AddScoped<ILicenseCapabilityChecker, LicenseCapabilityCheckerService>();
 
         return services;
     }

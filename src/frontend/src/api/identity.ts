@@ -17,6 +17,8 @@ import type {
   JitAccessCreatedResponse,
   DelegationInfo,
   DelegationCreatedResponse,
+  AccessReviewCampaign,
+  AccessReviewCampaignDetail,
 } from '../types';
 
 /**
@@ -128,4 +130,17 @@ export const identityApi = {
 
   listDelegations: () =>
     client.get<DelegationInfo[]>('/identity/delegations').then((r) => r.data),
+
+  // ── Enterprise: Access Review ─────────────────────────────────
+  listAccessReviewCampaigns: () =>
+    client.get<AccessReviewCampaign[]>('/identity/access-reviews').then((r) => r.data),
+
+  startAccessReviewCampaign: (data: { name: string; scope: string; reviewerIds: string[] }) =>
+    client.post<{ campaignId: string }>('/identity/access-reviews', data).then((r) => r.data),
+
+  getAccessReviewCampaign: (campaignId: string) =>
+    client.get<AccessReviewCampaignDetail>(`/identity/access-reviews/${encodeURIComponent(campaignId)}`).then((r) => r.data),
+
+  decideAccessReviewItem: (campaignId: string, itemId: string, approve: boolean, comment?: string) =>
+    client.post(`/identity/access-reviews/${encodeURIComponent(campaignId)}/items/${encodeURIComponent(itemId)}/decide`, { approve, comment }),
 };

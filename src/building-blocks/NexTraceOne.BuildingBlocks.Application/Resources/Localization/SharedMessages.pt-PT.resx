@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title.NotFound" xml:space="preserve">
+    <value>Recurso não encontrado</value>
+  </data>
+  <data name="Title.Validation" xml:space="preserve">
+    <value>Falha na validação</value>
+  </data>
+  <data name="Title.Conflict" xml:space="preserve">
+    <value>Conflito detetado</value>
+  </data>
+  <data name="Title.Unauthorized" xml:space="preserve">
+    <value>Não autenticado</value>
+  </data>
+  <data name="Title.Forbidden" xml:space="preserve">
+    <value>Acesso negado</value>
+  </data>
+  <data name="Title.Security" xml:space="preserve">
+    <value>Erro de segurança</value>
+  </data>
+  <data name="Title.Business" xml:space="preserve">
+    <value>Regra de negócio violada</value>
+  </data>
+  <data name="Tenant.Isolation.NoTenant" xml:space="preserve">
+    <value>O contexto do tenant não foi fornecido.</value>
+  </data>
+  <data name="Tenant.Isolation.Inactive" xml:space="preserve">
+    <value>O tenant '{0}' está inativo.</value>
+  </data>
+  <data name="Validation.Failed" xml:space="preserve">
+    <value>A validação falhou para um ou mais campos: {0}</value>
+  </data>
+  <data name="Guard.Required" xml:space="preserve">
+    <value>O valor de '{0}' é obrigatório.</value>
+  </data>
+  <data name="Guard.Invalid" xml:space="preserve">
+    <value>O valor de '{0}' é inválido.</value>
+  </data>
+  <data name="Generic.Unexpected" xml:space="preserve">
+    <value>Ocorreu um erro inesperado.</value>
+  </data>
+  <data name="Identity.User.NotFound" xml:space="preserve">
+    <value>O utilizador '{0}' não foi encontrado.</value>
+  </data>
+  <data name="Identity.User.EmailAlreadyExists" xml:space="preserve">
+    <value>O e-mail '{0}' já se encontra registado.</value>
+  </data>
+  <data name="Identity.Auth.InvalidCredentials" xml:space="preserve">
+    <value>As credenciais fornecidas são inválidas.</value>
+  </data>
+  <data name="Identity.Auth.AccountLocked" xml:space="preserve">
+    <value>A conta está bloqueada até '{0:O}'.</value>
+  </data>
+  <data name="Identity.Session.Expired" xml:space="preserve">
+    <value>A sessão '{0}' expirou.</value>
+  </data>
+  <data name="Identity.Session.Revoked" xml:space="preserve">
+    <value>A sessão '{0}' foi revogada.</value>
+  </data>
+  <data name="Identity.Session.InvalidRefreshToken" xml:space="preserve">
+    <value>O refresh token fornecido é inválido.</value>
+  </data>
+  <data name="Identity.Session.NotFound" xml:space="preserve">
+    <value>A sessão '{0}' não foi encontrada.</value>
+  </data>
+  <data name="Identity.Role.NotFound" xml:space="preserve">
+    <value>O papel '{0}' não foi encontrado.</value>
+  </data>
+  <data name="Identity.TenantMembership.NotFound" xml:space="preserve">
+    <value>A associação do utilizador '{0}' ao tenant '{1}' não foi encontrada.</value>
+  </data>
+  <data name="Identity.TenantMembership.AlreadyExists" xml:space="preserve">
+    <value>Já existe uma associação do utilizador '{0}' ao tenant '{1}'.</value>
+  </data>
+</root>

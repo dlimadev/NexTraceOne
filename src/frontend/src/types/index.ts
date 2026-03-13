@@ -170,6 +170,43 @@ export interface DelegationCreatedResponse {
   validUntil: string;
 }
 
+// ─── Enterprise: Access Review ───────────────────────────────────────────────
+
+/** Campanha de revisão de acessos para compliance. */
+export interface AccessReviewCampaign {
+  id: string;
+  name: string;
+  scope: string;
+  status: 'Open' | 'InProgress' | 'Completed' | 'Cancelled';
+  totalItems: number;
+  decidedItems: number;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+/** Detalhe completo de uma campanha com itens pendentes. */
+export interface AccessReviewCampaignDetail {
+  id: string;
+  name: string;
+  scope: string;
+  status: 'Open' | 'InProgress' | 'Completed' | 'Cancelled';
+  items: AccessReviewItem[];
+  createdAt: string;
+}
+
+/** Item individual de revisão de acesso. */
+export interface AccessReviewItem {
+  id: string;
+  userId: string;
+  userEmail: string;
+  roleName: string;
+  tenantName: string;
+  decision: 'Pending' | 'Confirmed' | 'Revoked' | null;
+  decidedBy: string | null;
+  decidedAt: string | null;
+  comment: string | null;
+}
+
 // ─── Engineering Graph ───────────────────────────────────────────────────────
 
 /** Ativo de API no catálogo de engenharia. */

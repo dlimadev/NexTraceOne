@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -12,11 +13,19 @@ using System.Text;
 namespace NexTraceOne.BuildingBlocks.Security;
 
 /// <summary>
-/// Registra autenticação JWT, autorização baseada em permissões, resolução de tenant
+/// Registra autenticação JWT e API key, autorização baseada em permissões, resolução de tenant
 /// e componentes de segurança transversais.
 ///
 /// A configuração JWT é lida primeiro de "Jwt:*" (padrão do appsettings) e depois
 /// de "Security:Jwt:*" como fallback, garantindo compatibilidade entre módulos.
+///
+/// Autenticação dual: utiliza um PolicyScheme ("Smart") como esquema padrão que
+/// seleciona automaticamente entre API key (quando header X-Api-Key presente) e JWT Bearer
+/// (para todos os demais requests). Isso permite integrações sistema-a-sistema via API key
+/// sem impactar o fluxo interativo existente baseado em JWT.
+///
+/// API keys são configuradas na seção "Security:ApiKeys" do appsettings.json.
+/// Cada key vincula um clientId a um tenant e conjunto de permissões.
 ///
 /// O modelo de autorização utiliza policies dinâmicas baseadas em permissão granular:
 /// cada endpoint pode exigir uma permissão específica via RequirePermission("permission.code"),
@@ -63,7 +72,24 @@ public static class DependencyInjection
         services.AddScoped<ICurrentTenant>(sp => sp.GetRequiredService<CurrentTenantAccessor>());
         services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        // PolicyScheme "Smart" é o esquema padrão: detecta header X-Api-Key para
+        // rotear automaticamente entre API key e JWT Bearer, garantindo que ambos
+        // os mecanismos coexistam sem configuração adicional nos endpoints.
+        const string smartSchemeName = "Smart";
+
+        services.AddAuthentication(smartSchemeName)
+            .AddPolicyScheme(smartSchemeName, "JWT or API Key", policyOptions =>
+            {
+                policyOptions.ForwardDefaultSelector = context =>
+                {
+                    if (context.Request.Headers.ContainsKey("X-Api-Key"))
+                    {
+                        return ApiKeyAuthenticationOptions.SchemeName;
+                    }
+
+                    return JwtBearerDefaults.AuthenticationScheme;
+                };
+            })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -77,7 +103,14 @@ public static class DependencyInjection
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1)
                 };
-            });
+            })
+            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+                ApiKeyAuthenticationOptions.SchemeName,
+                options =>
+                {
+                    var apiKeysSection = configuration.GetSection("Security:ApiKeys");
+                    options.ConfiguredKeys = apiKeysSection.Get<List<ApiKeyConfiguration>>() ?? [];
+                });
 
         // Autorização baseada em permissões granulares — policies dinâmicas via PermissionPolicyProvider
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
