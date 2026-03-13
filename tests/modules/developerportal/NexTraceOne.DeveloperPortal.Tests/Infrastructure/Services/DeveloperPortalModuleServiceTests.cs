@@ -201,11 +201,14 @@ public sealed class DeveloperPortalModuleServiceTests
             ? "https://hooks.acme.com/notify"
             : null;
 
+        var apiName = $"API-{apiAssetId:N}"[..20];
+        var email = $"dev-{subscriberId:N}@acme.com";
+
         var result = Subscription.Create(
             apiAssetId,
-            $"API-{apiAssetId:N}".Substring(0, 20),
+            apiName,
             subscriberId,
-            $"dev-{subscriberId:N}@acme.com".Substring(0, 30),
+            email,
             "TestService",
             "1.0.0",
             SubscriptionLevel.AllChanges,

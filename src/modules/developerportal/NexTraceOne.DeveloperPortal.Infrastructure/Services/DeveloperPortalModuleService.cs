@@ -5,7 +5,7 @@ namespace NexTraceOne.DeveloperPortal.Infrastructure.Services;
 
 /// <summary>
 /// Implementação do contrato público do módulo DeveloperPortal.
-/// Outros módulos consomem esta interface — nunca o DbContext ou repositórios directamente.
+/// Outros módulos consomem esta interface — nunca o DbContext ou repositórios diretamente.
 /// Fornece queries de leitura sobre subscrições do portal para suporte a notificações
 /// e exibição de popularidade de APIs no catálogo.
 /// </summary>
