@@ -26,7 +26,7 @@ O projeto NexTraceOne está em estado de maturidade mista. Os módulos 1-3 (Iden
 
 ### Principais Lacunas
 - Developer Portal: Infrastructure, API, testes e DI estão em scaffold
-- i18n: Apenas en e pt-BR suportados; pt-PT e es ausentes
+- i18n: en, pt-BR, pt-PT e es disponíveis; pt-PT e es necessitam registo em i18n.ts
 - Identity: Sem migrations EF Core (auto-migration apenas)
 - Licensing: Apenas 8 testes (baixa cobertura para a complexidade do domínio)
 - API: Sem versionamento formal, sem Swagger UI, OpenAPI apenas em Development
@@ -281,12 +281,12 @@ Módulo em estágio inicial. Domain Layer está completo com 5 aggregates e lóg
 |--------|--------|----------|--------|
 | English (en) | ✅ Completo | src/frontend/src/locales/en.json | 175+ |
 | Português Brasil (pt-BR) | ✅ Completo | src/frontend/src/locales/pt-BR.json | 175+ |
-| Português Portugal (pt-PT) | ❌ Ausente | — | 0 |
-| Espanhol (es) | ❌ Ausente | — | 0 |
+| Português Portugal (pt-PT) | ✅ Completo | src/frontend/src/locales/pt-PT.json | 316 |
+| Espanhol (es) | ✅ Completo | src/frontend/src/locales/es.json | 316 |
 
 ### 4.3 O que falta
-1. Criar locale pt-PT.json com adaptações para português europeu
-2. Criar locale es.json com traduções para espanhol
+1. ~~Criar locale pt-PT.json com adaptações para português europeu~~ ✅ Concluído
+2. ~~Criar locale es.json com traduções para espanhol~~ ✅ Concluído
 3. Atualizar i18n.ts para registrar pt-PT e es
 4. Atualizar AppHeader para oferecer seletor de 4 idiomas (não apenas toggle)
 5. Adicionar chaves i18n para DeveloperPortal (namespace developerPortal.*)
@@ -296,15 +296,15 @@ Módulo em estágio inicial. Domain Layer está completo com 5 aggregates e lóg
 ### 4.4 Gaps por Módulo
 | Módulo | en | pt-BR | pt-PT | es |
 |--------|-----|-------|-------|-----|
-| Common/Auth/Tenants | ✅ | ✅ | ❌ | ❌ |
-| Dashboard | ✅ | ✅ | ❌ | ❌ |
-| Identity/Users | ✅ | ✅ | ❌ | ❌ |
-| Engineering Graph | ✅ | ✅ | ❌ | ❌ |
-| Contracts | ✅ | ✅ | ❌ | ❌ |
-| Releases/ChangeIntelligence | ✅ | ✅ | ❌ | ❌ |
-| Workflow | ✅ | ✅ | ❌ | ❌ |
-| Promotion | ✅ | ✅ | ❌ | ❌ |
-| Audit | ✅ | ✅ | ❌ | ❌ |
+| Common/Auth/Tenants | ✅ | ✅ | ✅ | ✅ |
+| Dashboard | ✅ | ✅ | ✅ | ✅ |
+| Identity/Users | ✅ | ✅ | ✅ | ✅ |
+| Engineering Graph | ✅ | ✅ | ✅ | ✅ |
+| Contracts | ✅ | ✅ | ✅ | ✅ |
+| Releases/ChangeIntelligence | ✅ | ✅ | ✅ | ✅ |
+| Workflow | ✅ | ✅ | ✅ | ✅ |
+| Promotion | ✅ | ✅ | ✅ | ✅ |
+| Audit | ✅ | ✅ | ✅ | ✅ |
 | Developer Portal | ❌ | ❌ | ❌ | ❌ |
 | Licensing | ❌ | ❌ | ❌ | ❌ |
 
@@ -472,7 +472,7 @@ Revisão completa dos módulos 1-4 do NexTraceOne realizada com base no código 
 
 **Faltando:**
 - DeveloperPortal: Infrastructure, API endpoints, DI wiring, registo no ApiHost, testes, frontend
-- i18n: pt-PT e es ausentes (apenas en e pt-BR suportados)
+- i18n: pt-PT e es criados (falta registo em i18n.ts e seletor de 4 idiomas no AppHeader)
 - APIs: sem Swagger UI, sem API key para integrações, sem rate limiting
 
 **Roadmap atualizado** para refletir estado real. Próxima prioridade: completar DeveloperPortal Infrastructure e expandir suporte i18n.

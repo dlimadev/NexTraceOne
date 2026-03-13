@@ -5,31 +5,45 @@
 Metodologia: **1 módulo por vez · 1 camada por vez · 1 aggregate por vez**.
 Cada fase termina com aprovação antes de iniciar a próxima.
 
-> **Última atualização:** Março 2026 — Pós-conclusão dos módulos ChangeIntelligence, RulesetGovernance e Workflow.
+> **Última atualização:** Março 2026 — Revisão completa pós módulos 1-4 (Identity, Licensing, EngineeringGraph, DeveloperPortal).
+> Ver `docs/SOLUTION-REVIEW-MODULES-1-4.md` para revisão detalhada dos módulos 1 a 4.
 > Ver `docs/MVP1-EXPANDED-PLAN.md` para análise detalhada de valor vs. esforço por módulo.
 
 ---
 
-## Estado Atual do Projeto (Março 2026)
+## Estado Atual do Projeto (Março 2026 — Revisão Real)
 
-### O que está concluído:
+### Build e Testes
+- **Build:** ✅ Compila sem erros (149 warnings)
+- **Testes:** ✅ 370 testes passando, 0 falhas (22 projetos de teste)
 
-- ✅ **Building Blocks (6/6)** — Domain, Application, Infrastructure, EventBus, Observability, Security — 100% funcionais
-- ✅ **Identity** — Login, FederatedLogin, RefreshToken, CreateUser, AssignRole, Sessions, RBAC — 100% funcional
-- ✅ **Licensing** — Domain + Application + Infrastructure 100% completos (LicensingDbContext, Repositories, Migrations)
-- ✅ **EngineeringGraph** — Domain + Application + Infrastructure + API 100% completos (ApiAsset, ServiceAsset, ConsumerRelationship, Discovery, Migrations, Testes)
-- ✅ **Contracts** — Domain + Application + Infrastructure + API 100% completos (ContractVersion, ContractDiff, SemanticDiff, BreakingChange classification, Migrations, Testes)
-- ✅ **ChangeIntelligence** — Domain + Application + Infrastructure + API 100% completos (Release, ChangeEvent, BlastRadius, ChangeScore, NotifyDeployment, CalculateBlastRadius, Migrations, Testes)
-- ✅ **RulesetGovernance** — Domain + Application + Infrastructure + API 100% completos (Ruleset, LintResult, UploadRuleset, ExecuteLint, Spectral-compatible, Migrations, Testes)
-- ✅ **Workflow** — Domain + Application + Infrastructure + API 100% completos (12 features: CreateWorkflowTemplate, InitiateWorkflow, ApproveStage, RejectWorkflow, RequestChanges, AddObservation, GetWorkflowStatus, ListPendingApprovals, GenerateEvidencePack, GetEvidencePack, ExportEvidencePackPdf, EscalateSlaViolation, WorkflowDbContext, Migrations, Testes)
-- ✅ **Scaffold completo** — 14 módulos × 5 camadas criados (estrutura física e entities de domínio definidas)
-- ✅ **Testes unitários** — Building Blocks, Identity, Licensing, EngineeringGraph, Contracts, ChangeIntelligence, RulesetGovernance, Workflow
+### O que está concluído (100%):
+
+- ✅ **Building Blocks (6/6)** — Domain, Application, Infrastructure, EventBus, Observability, Security — 100% funcionais (49 testes)
+- ✅ **Identity (95%)** — 35 features, 111 testes, RBAC + multi-tenancy + OIDC + enterprise features. Sem migrations EF Core (usa auto-migration)
+- ✅ **Licensing (80%)** — Domain + Application + Infrastructure + API completos. Modelo rico (trial, capabilities, quotas, hardware binding). Apenas 8 testes — precisa expandir. Sem frontend
+- ✅ **EngineeringGraph (98%)** — 21 features, 37 testes, blast radius, integração inbound (SyncConsumers), temporalidade, overlays. Frontend com i18n. Módulo de referência
+- ✅ **Contracts (100%)** — 9 features, 42 testes, diff semântico, classificação de breaking changes. Frontend com i18n
+- ✅ **ChangeIntelligence (100%)** — Release, ChangeEvent, BlastRadius, ChangeScore, NotifyDeployment. 18 testes. Frontend com i18n
+- ✅ **RulesetGovernance (100%)** — Ruleset, LintResult, UploadRuleset, ExecuteLint, Spectral-compatible. 26 testes
+- ✅ **Workflow (100%)** — 12 features, 40 testes. Evidence pack, SLA, aprovação completa. Frontend com i18n
+- ✅ **Promotion (100%)** — 5 features, 29 testes. CreatePromotionRequest, EvaluatePromotionGates, ApprovePromotion, BlockPromotion, GetPromotionStatus
+- ✅ **Audit (100%)** — RecordAuditEvent, GetAuditTrail, SearchAuditLog, VerifyChainIntegrity, ExportAuditReport, GetComplianceReport
+- ✅ **Scaffold completo** — 14 módulos × 5 camadas criados
+
+### O que está parcial:
+
+- 🟡 **DeveloperPortal (30%)** — Domain completo (5 aggregates), Application parcial (16 features — 8 implementados, 8 stubs). Infrastructure, API, testes e frontend em scaffold. **Não registrado no ApiHost**
+- 🟡 **i18n (50%)** — en e pt-BR completos (175+ chaves). pt-PT e es ausentes
+- 🟡 **API Integration Readiness (60%)** — APIs sob /api/v1/, SyncConsumers como referência inbound. Sem Swagger UI, sem API key, sem rate limiting
 
 ### O que está pendente:
 
-- 🔲 **DeveloperPortal** — SearchCatalog, GetApiDetail, GetMyApis, GetApiConsumers
-- 🔲 **Promotion** — CreatePromotionRequest, EvaluatePromotionGates, ApprovePromotion, RollbackPromotion
-- 🔲 **Audit** — RecordAuditEvent, GetAuditTrail, SearchAuditLog, VerifyChainIntegrity, ExportAuditReport
+- 🔲 **DeveloperPortal Infrastructure** — DbContext, repositórios, configurations, migrations
+- 🔲 **DeveloperPortal API endpoints** — 16 endpoints não mapeados
+- 🔲 **DeveloperPortal DI wiring** — MediatR e validators não registrados
+- 🔲 **DeveloperPortal registro no ApiHost** — Não está em Program.cs
+- 🔲 **i18n pt-PT e es** — Locales por criar
 - 🔲 **RuntimeIntelligence** (parcial) — IngestRuntimeSnapshot, GetRuntimeDriftFindings
 - 🔲 **CostIntelligence** (parcial) — IngestCostSnapshot, GetCostByRelease, AttributeCostToService
 - ❌ **AiOrchestration** — excluído do MVP1, vai para MVP2
@@ -169,18 +183,30 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 | SuggestSemanticVersion | ✅ |
 | LockContractVersion | ✅ |
 | ContractsDbContext + Migrations | ✅ |
-| Testes (21 testes unitários) | ✅ |
+| Testes (42 testes unitários) | ✅ |
 
-### Semana 10: DeveloperPortal — Read Models
+### Semana 10: DeveloperPortal — Estado Real (Revisão Março 2026)
 
-| Feature | Status |
-|---------|--------|
-| SearchCatalog | 🔲 |
-| GetApiDetail | 🔲 |
-| GetMyApis | 🔲 |
-| GetApiConsumers | 🔲 |
+> **Nota:** Análise baseada no código real. O módulo tem Domain completo mas Infrastructure, API e testes em scaffold.
 
-**Entregável:** ✅ Catálogo de APIs com diff semântico e classificação de breaking changes.
+| Camada / Feature | Status | Detalhe |
+|---------|--------|---------|
+| **Domain** (5 aggregates, 4 enums, 11 errors) | ✅ | CodeGenerationRecord, PlaygroundSession, PortalAnalyticsEvent, SavedSearch, Subscription |
+| **Application** — 8 features implementados | ✅ | CreateSubscription, DeleteSubscription, GenerateCode, GetSubscriptions, GetApiConsumers, GetPlaygroundHistory, GetPortalAnalytics, RecordAnalyticsEvent |
+| **Application** — 8 features stubs | 🟡 | ExecutePlayground (mock), SearchCatalog (vazio), GetApiDetail (stub), GetApiHealth (stub), GetMyApis (stub), GetApisIConsume (stub), GetAssetTimeline (stub), RenderOpenApiContract (stub) |
+| **Application DI** — MediatR + validators | ❌ | TODO não implementado — handlers não são registrados |
+| **Infrastructure** — DbContext | ❌ | Existe mas sem DbSets, sem configs, sem repos |
+| **Infrastructure** — Repositories | ❌ | 5 interfaces definidas mas sem implementação |
+| **Infrastructure** — Migrations | ❌ | Sem migrations EF Core |
+| **Infrastructure DI** — DbContext + repos | ❌ | TODO não implementado |
+| **API** — Endpoints | ❌ | EndpointModule existe mas sem rotas mapeadas |
+| **Contracts** — IDeveloperPortalModule | ❌ | Interface vazia (sem métodos) |
+| **Registro no ApiHost** | ❌ | Módulo não está em Program.cs |
+| **Testes** | ❌ | 1 placeholder (Assert.True(true)) |
+| **Frontend** | ❌ | Sem página dedicada |
+
+**Entregável Contracts:** ✅ Catálogo de APIs com diff semântico e classificação de breaking changes.
+**Entregável DeveloperPortal:** ❌ Incompleto — precisa de Infrastructure, API, DI e testes para ser funcional.
 
 ---
 
@@ -353,14 +379,88 @@ Cada fase termina com aprovação antes de iniciar a próxima.
 
 ---
 
-## Próximos Passos Imediatos
+## Próximos Passos Imediatos (Revisão Março 2026)
 
-1. **Implementar `Promotion`** — CreatePromotionRequest, EvaluatePromotionGates, ApprovePromotion, RollbackPromotion (Fase 5, Semana 17–18)
-2. **Implementar `Audit`** — RecordAuditEvent, GetAuditTrail, SearchAuditLog, VerifyChainIntegrity (Fase 6, Semana 19–20)
-3. **Implementar `DeveloperPortal`** — SearchCatalog, GetApiDetail, GetMyApis, GetApiConsumers (Fase 3, Semana 10)
-4. **Implementar `RuntimeIntelligence`** (parcial) — IngestRuntimeSnapshot, GetRuntimeDriftFindings (Fase 7, Semana 21)
-5. **Implementar `CostIntelligence`** (parcial) — IngestCostSnapshot, GetCostByRelease (Fase 7, Semana 22)
-6. **Registro no ApiHost** de todos os módulos (Promotion, Audit, DeveloperPortal)
+### P0 — Blockers / Críticos
+1. **DeveloperPortal Infrastructure:** Implementar DbContext (DbSets, configs), 5 repositories, gerar migrations EF Core
+2. **DeveloperPortal DI wiring:** Registrar MediatR handlers, FluentValidation validators, repositories, DbContext
+3. **DeveloperPortal API endpoints:** Mapear 16 endpoints no EndpointModule
+4. **DeveloperPortal registro no ApiHost:** Adicionar `AddDeveloperPortalModule()` em Program.cs
+5. **Identity Migrations:** Gerar migrations EF Core explícitas (substituir auto-migration)
+
+### P1 — Importante
+1. **DeveloperPortal testes:** Criar testes unitários para domain + features implementadas (mínimo 20 testes)
+2. **Licensing testes:** Expandir de 8 para ≥30 testes (trial lifecycle, quotas, hardware binding)
+3. **i18n pt-PT:** Criar locale pt-PT.json com adaptações para português europeu
+4. **i18n es:** Criar locale es.json com traduções para espanhol
+5. **i18n config:** Atualizar i18n.ts para registrar pt-PT e es
+6. **Swagger UI:** Habilitar interface interativa para exploração das APIs
+7. **API key / Client credentials:** Implementar autenticação sistema-a-sistema para integrações externas
+8. **Rate limiting:** Implementar throttling nas APIs públicas
+9. **DeveloperPortal features integração:** Integrar stubs com EngineeringGraph e Contracts
+10. **Frontend Licensing page:** Criar dashboard de licenciamento
+11. **Frontend DeveloperPortal page:** Criar UI do portal
+
+### P2 — Evolução Recomendada
+1. **API versioning middleware:** Implementar versionamento formal (Asp.Versioning)
+2. **Idempotency keys:** Generalizar padrão do SyncConsumers para outros endpoints
+3. **Webhook outbound dispatcher:** Implementar envio de notificações via webhook
+4. **Documentação de integração:** Criar EXTERNAL-INTEGRATION-API.md para cada módulo
+5. **Frontend graph visualization:** Apache ECharts para visualização de grafos
+6. **Licensing enforcement behavior:** MediatR behavior para verificar capabilities
+7. **Seletor de 4 idiomas:** Atualizar AppHeader com dropdown para en, pt-BR, pt-PT, es
+8. **Testes E2E:** Expandir para fluxos completos de ponta a ponta
+
+### P3 — Melhorias Futuras
+1. **OTel receptor real:** Implementar discovery automático via OpenTelemetry
+2. **Offline licensing:** Implementar cache local para validação offline
+3. **ImportFromBackstage/Kong real:** Integração com APIs reais do Backstage e Kong
+4. **CORS para parceiros:** Configuração dinâmica de origens para integrações
+
+---
+
+## Roadmap de i18n
+
+### Estado Atual
+| Idioma | Status | Ficheiro |
+|--------|--------|----------|
+| English (en) | ✅ Completo | src/frontend/src/locales/en.json (175+ chaves) |
+| Português Brasil (pt-BR) | ✅ Completo | src/frontend/src/locales/pt-BR.json (175+ chaves) |
+| Português Portugal (pt-PT) | 🟡 Criado (base) | src/frontend/src/locales/pt-PT.json |
+| Espanhol (es) | 🟡 Criado (base) | src/frontend/src/locales/es.json |
+
+### Tarefas Pendentes
+1. ✅ Infraestrutura i18next + react-i18next configurada
+2. ✅ Detecção automática de idioma do browser
+3. 🟡 Criar ficheiro pt-PT.json com adaptações lexicais
+4. 🟡 Criar ficheiro es.json com traduções completas
+5. 🟡 Atualizar i18n.ts para registrar 4 idiomas
+6. 🔲 Atualizar AppHeader com seletor de 4 idiomas (dropdown em vez de toggle)
+7. 🔲 Adicionar namespace developerPortal.* nas 4 locales
+8. 🔲 Adicionar namespace licensing.* nas 4 locales
+9. 🔲 Backend: Criar SharedMessages.pt-PT.resx e SharedMessages.es.resx
+
+---
+
+## Roadmap de Integração Externa das APIs
+
+### Estado Atual
+| Capacidade | Status |
+|-----------|--------|
+| APIs sob /api/v1/ (versioning manual) | ✅ |
+| SyncConsumers (referência inbound) | ✅ |
+| OpenAPI JSON (.NET 10 nativo) | ✅ (Development only) |
+| Result<T>.ToHttpResult() padronizado | ✅ |
+| Error codes i18n | ✅ |
+| Multi-tenancy via header/JWT | ✅ |
+| Postman collection | ✅ |
+| Swagger UI | ❌ |
+| API key / Client credentials | ❌ |
+| Rate limiting | ❌ |
+| Formal API versioning middleware | ❌ |
+| Idempotency keys (além de SyncConsumers) | ❌ |
+| Webhook outbound | ❌ |
+| Documentação por módulo | 🟡 (apenas EngineeringGraph) |
 
 ---
 
