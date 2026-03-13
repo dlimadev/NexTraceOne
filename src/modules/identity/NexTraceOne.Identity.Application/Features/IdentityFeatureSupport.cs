@@ -26,6 +26,9 @@ internal sealed class LoginResponseBuilder(
     IJwtTokenGenerator jwtTokenGenerator) : ILoginResponseBuilder
 {
     /// <inheritdoc />
+    public Guid CurrentTenantId => currentTenant.Id;
+
+    /// <inheritdoc />
     public async Task<TenantMembership?> ResolveMembershipAsync(
         UserId userId,
         CancellationToken cancellationToken)

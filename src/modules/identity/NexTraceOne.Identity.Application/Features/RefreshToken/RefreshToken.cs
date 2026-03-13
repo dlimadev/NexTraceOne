@@ -81,7 +81,7 @@ public static class RefreshToken
 
             if (membership is null)
             {
-                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, Guid.Empty);
+                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, responseBuilder.CurrentTenantId);
             }
 
             var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);

@@ -21,6 +21,13 @@ namespace NexTraceOne.Identity.Application.Abstractions;
 public interface ILoginResponseBuilder
 {
     /// <summary>
+    /// Identificador do tenant corrente do request, extraído de ICurrentTenant.
+    /// Usado pelos handlers para mensagens de erro contextualizadas.
+    /// Retorna Guid.Empty quando não há contexto de tenant disponível.
+    /// </summary>
+    Guid CurrentTenantId { get; }
+
+    /// <summary>
     /// Resolve o vínculo ativo do usuário com base no tenant atual ou no primeiro vínculo disponível.
     /// Retorna null se o usuário não possui membership ativo em nenhum tenant.
     /// </summary>

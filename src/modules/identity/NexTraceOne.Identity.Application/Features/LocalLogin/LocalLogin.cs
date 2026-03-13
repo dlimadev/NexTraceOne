@@ -103,7 +103,7 @@ public static class LocalLogin
 
             if (membership is null)
             {
-                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, auditRecorder.ResolveTenantIdForAudit().Value);
+                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, responseBuilder.CurrentTenantId);
             }
 
             var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
