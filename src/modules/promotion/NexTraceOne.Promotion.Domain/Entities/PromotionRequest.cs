@@ -73,60 +73,28 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
     public Result<Unit> Approve(DateTimeOffset completedAt)
-    {
-        var result = ValidateTransition(PromotionStatus.Approved);
-        if (result.IsFailure)
-            return result;
-
-        Status = PromotionStatus.Approved;
-        CompletedAt = completedAt;
-        return Unit.Value;
-    }
+        => TransitionTo(PromotionStatus.Approved, completedAt);
 
     /// <summary>
     /// Rejeita a solicitação de promoção.
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
     public Result<Unit> Reject(DateTimeOffset completedAt)
-    {
-        var result = ValidateTransition(PromotionStatus.Rejected);
-        if (result.IsFailure)
-            return result;
-
-        Status = PromotionStatus.Rejected;
-        CompletedAt = completedAt;
-        return Unit.Value;
-    }
+        => TransitionTo(PromotionStatus.Rejected, completedAt);
 
     /// <summary>
     /// Bloqueia a solicitação de promoção por regra de governança.
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
     public Result<Unit> Block(DateTimeOffset completedAt)
-    {
-        var result = ValidateTransition(PromotionStatus.Blocked);
-        if (result.IsFailure)
-            return result;
-
-        Status = PromotionStatus.Blocked;
-        CompletedAt = completedAt;
-        return Unit.Value;
-    }
+        => TransitionTo(PromotionStatus.Blocked, completedAt);
 
     /// <summary>
     /// Cancela a solicitação de promoção antes de sua conclusão.
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
     public Result<Unit> Cancel(DateTimeOffset completedAt)
-    {
-        var result = ValidateTransition(PromotionStatus.Cancelled);
-        if (result.IsFailure)
-            return result;
-
-        Status = PromotionStatus.Cancelled;
-        CompletedAt = completedAt;
-        return Unit.Value;
-    }
+        => TransitionTo(PromotionStatus.Cancelled, completedAt);
 
     /// <summary>
     /// Inicia o processo de avaliação da solicitação de promoção.
@@ -134,14 +102,7 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     /// Retorna falha se a transição de status for inválida.
     /// </summary>
     public Result<Unit> StartEvaluation()
-    {
-        var result = ValidateTransition(PromotionStatus.InEvaluation);
-        if (result.IsFailure)
-            return result;
-
-        Status = PromotionStatus.InEvaluation;
-        return Unit.Value;
-    }
+        => TransitionTo(PromotionStatus.InEvaluation);
 
     /// <summary>
     /// Define a justificativa para a solicitação de promoção.
@@ -150,6 +111,22 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     {
         Guard.Against.StringTooLong(text, 4000);
         Justification = text;
+    }
+
+    /// <summary>
+    /// Transição centralizada de status — valida a transição, atualiza o estado
+    /// e marca a conclusão quando aplicável.
+    /// Elimina duplicação entre Approve/Reject/Block/Cancel/StartEvaluation (DRY).
+    /// </summary>
+    private Result<Unit> TransitionTo(PromotionStatus newStatus, DateTimeOffset? completedAt = null)
+    {
+        var result = ValidateTransition(newStatus);
+        if (result.IsFailure)
+            return result;
+
+        Status = newStatus;
+        CompletedAt = completedAt;
+        return Unit.Value;
     }
 
     /// <summary>
