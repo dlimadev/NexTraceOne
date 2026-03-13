@@ -240,7 +240,8 @@
     "created": "Criado",
     "locked": "Bloqueado",
     "active": "Ativo",
-    "lock": "Bloquear"
+    "lock": "Bloquear",
+    "lockedViaUi": "Bloqueado via UI"
   },
   "workflow": {
     "title": "Workflow e Aprovações",
@@ -279,6 +280,7 @@
     "loadFailed": "Falha ao carregar solicitações de promoção",
     "noRequests": "Nenhuma solicitação de promoção ainda",
     "promote": "Promover",
+    "rejectedViaUi": "Rejeitado via UI",
     "route": "Rota",
     "release": "Release",
     "status": "Status",

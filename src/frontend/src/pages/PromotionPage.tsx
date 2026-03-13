@@ -198,7 +198,7 @@ export function PromotionPage() {
                       )}
                       <Button
                         variant="danger"
-                        onClick={() => rejectMutation.mutate({ id: req.id, reason: 'Rejected via UI' })}
+                        onClick={() => rejectMutation.mutate({ id: req.id, reason: t('promotion.rejectedViaUi') })}
                         loading={rejectMutation.isPending}
                       >
                         {t('workflow.reject')}

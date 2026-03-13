@@ -240,7 +240,8 @@
     "created": "Created",
     "locked": "Locked",
     "active": "Active",
-    "lock": "Lock"
+    "lock": "Lock",
+    "lockedViaUi": "Locked via UI"
   },
   "workflow": {
     "title": "Workflow & Approvals",
@@ -279,6 +280,7 @@
     "loadFailed": "Failed to load promotion requests",
     "noRequests": "No promotion requests yet",
     "promote": "Promote",
+    "rejectedViaUi": "Rejected via UI",
     "route": "Route",
     "release": "Release",
     "status": "Status",
