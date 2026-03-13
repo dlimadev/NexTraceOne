@@ -1,5 +1,5 @@
 import client from './client';
-import type { ContractVersion, SemanticDiff, ContractProtocol } from '../types';
+import type { ContractVersion, ContractVersionDetail, SignatureVerificationResult, SemanticDiff, ContractProtocol } from '../types';
 
 export const contractsApi = {
   importContract: (data: {
@@ -41,7 +41,7 @@ export const contractsApi = {
 
   getDetail: (contractVersionId: string) =>
     client
-      .get(`/contracts/${contractVersionId}/detail`)
+      .get<ContractVersionDetail>(`/contracts/${contractVersionId}/detail`)
       .then((r) => r.data),
 
   lockVersion: (contractVersionId: string, reason: string) =>
@@ -66,9 +66,9 @@ export const contractsApi = {
 
   verifySignature: (contractVersionId: string) =>
     client
-      .get(`/contracts/${contractVersionId}/verify`)
+      .get<SignatureVerificationResult>(`/contracts/${contractVersionId}/verify`)
       .then((r) => r.data),
 
   exportVersion: (contractVersionId: string) =>
-    client.get(`/contracts/${contractVersionId}/export`).then((r) => r.data),
+    client.get<{ specContent: string; format: string }>(`/contracts/${contractVersionId}/export`).then((r) => r.data),
 };

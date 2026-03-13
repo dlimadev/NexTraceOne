@@ -407,6 +407,57 @@ export interface ChangeEntry {
   description: string;
 }
 
+/** Resultado do diff semântico entre duas versões de contrato. */
+export interface ContractDiffResult {
+  diffId: string;
+  baseVersionId: string;
+  targetVersionId: string;
+  changeLevel: 'Breaking' | 'Additive' | 'NonBreaking';
+  suggestedSemVer: string;
+  breakingChanges: ChangeEntry[];
+  nonBreakingChanges: ChangeEntry[];
+  additiveChanges: ChangeEntry[];
+}
+
+/** Detalhe completo de uma versão de contrato com metadados e proveniência. */
+export interface ContractVersionDetail {
+  id: string;
+  apiAssetId: string;
+  semVer: string;
+  specContent: string;
+  format: string;
+  protocol: ContractProtocol;
+  lifecycleState: ContractLifecycleState;
+  isLocked: boolean;
+  lockedAt?: string;
+  lockedBy?: string;
+  fingerprint?: string;
+  algorithm?: string;
+  signedBy?: string;
+  signedAt?: string;
+  importedFrom?: string;
+  provenance?: ContractProvenance;
+  deprecationNotice?: string;
+  sunsetDate?: string;
+  createdAt: string;
+}
+
+/** Resultado da verificação de integridade da assinatura de um contrato. */
+export interface SignatureVerificationResult {
+  isValid: boolean;
+  message: string;
+}
+
+/** Informação de proveniência da importação de um contrato. */
+export interface ContractProvenance {
+  origin: string;
+  originalFormat: string;
+  parserUsed: string;
+  standardVersion: string;
+  importedBy: string;
+  isAiGenerated: boolean;
+}
+
 // ─── Change Intelligence ─────────────────────────────────────────────────────
 
 export type ChangeLevel = 0 | 1 | 2 | 3 | 4;

@@ -1,12 +1,38 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Lock, RefreshCw, Shield, FileCheck, AlertTriangle, ChevronRight } from 'lucide-react';
+import {
+  Plus, Lock, RefreshCw, Shield, FileCheck, AlertTriangle,
+  X, Eye, GitCompare, Download, CheckCircle, XCircle, ArrowRight,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { contractsApi } from '../api';
-import type { ContractLifecycleState, ContractProtocol } from '../types';
+import type {
+  ContractLifecycleState, ContractProtocol, ContractVersion,
+  ContractVersionDetail, SemanticDiff,
+} from '../types';
+
+/**
+ * Mapa de transições válidas por estado do lifecycle.
+ * Cada entrada define o estado destino e a chave i18n da ação.
+ */
+const allowedTransitions: Record<ContractLifecycleState, { state: ContractLifecycleState; action: string }[]> = {
+  'Draft': [{ state: 'InReview', action: 'lifecycleActions.submitForReview' }],
+  'InReview': [
+    { state: 'Approved', action: 'lifecycleActions.approve' },
+    { state: 'Draft', action: 'lifecycleActions.returnToDraft' },
+  ],
+  'Approved': [
+    { state: 'Locked', action: 'lifecycleActions.lockVersion' },
+    { state: 'InReview', action: 'lifecycleActions.submitForReview' },
+  ],
+  'Locked': [{ state: 'Deprecated', action: 'lifecycleActions.deprecateVersion' }],
+  'Deprecated': [{ state: 'Sunset', action: 'lifecycleActions.startSunset' }],
+  'Sunset': [{ state: 'Retired', action: 'lifecycleActions.retire' }],
+  'Retired': [],
+};
 
 /**
  * Retorna a variante visual do Badge conforme o estado do lifecycle.
@@ -37,9 +63,23 @@ function protocolBadgeVariant(protocol: ContractProtocol): 'success' | 'warning'
   }
 }
 
+/**
+ * Retorna a variante do Badge para o nível de mudança do diff.
+ */
+function changeLevelBadgeVariant(level: string): 'danger' | 'success' | 'warning' {
+  switch (level) {
+    case 'Breaking': return 'danger';
+    case 'Additive': return 'success';
+    case 'NonBreaking': return 'warning';
+    default: return 'warning';
+  }
+}
+
 export function ContractsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+
+  // Estado do filtro e formulário de importação
   const [apiAssetId, setApiAssetId] = useState('');
   const [showImportForm, setShowImportForm] = useState(false);
   const [importForm, setImportForm] = useState({
@@ -49,11 +89,66 @@ export function ContractsPage() {
     protocol: 'OpenApi' as ContractProtocol,
   });
 
+  // Estado do painel de detalhes
+  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
+
+  // Estado do diff semântico
+  const [showDiffPanel, setShowDiffPanel] = useState(false);
+  const [diffBaseId, setDiffBaseId] = useState('');
+  const [diffTargetId, setDiffTargetId] = useState('');
+  const [diffResult, setDiffResult] = useState<SemanticDiff | null>(null);
+
+  // Estado da verificação de assinatura
+  const [verifyStatus, setVerifyStatus] = useState<{ id: string; valid: boolean; message: string } | null>(null);
+
+  // Estado do formulário de deprecação
+  const [showDeprecateForm, setShowDeprecateForm] = useState<string | null>(null);
+  const [deprecateNotice, setDeprecateNotice] = useState('');
+  const [deprecateSunsetDate, setDeprecateSunsetDate] = useState('');
+
+  // Estado do painel de exportação
+  const [exportContent, setExportContent] = useState<{ id: string; specContent: string; format: string } | null>(null);
+
+  // Estado para feedback de notificação inline
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Referência para limpeza do timeout de notificação ao desmontar o componente
+  const notificationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (notificationTimerRef.current) {
+        clearTimeout(notificationTimerRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * Exibe uma notificação temporária que desaparece após 4 segundos.
+   */
+  function showNotification(type: 'success' | 'error', message: string) {
+    setNotification({ type, message });
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+    }
+    notificationTimerRef.current = setTimeout(() => setNotification(null), 4000);
+  }
+
+  // ─── Queries ────────────────────────────────────────────────────────────────
+
   const { data: history, isLoading } = useQuery({
     queryKey: ['contracts', 'history', apiAssetId],
     queryFn: () => contractsApi.getHistory(apiAssetId),
     enabled: !!apiAssetId,
   });
+
+  const { data: detail, isLoading: detailLoading } = useQuery<ContractVersionDetail>({
+    queryKey: ['contracts', 'detail', selectedVersionId],
+    queryFn: () => contractsApi.getDetail(selectedVersionId!),
+    enabled: !!selectedVersionId,
+  });
+
+  // ─── Mutations ──────────────────────────────────────────────────────────────
 
   const importMutation = useMutation({
     mutationFn: contractsApi.importContract,
@@ -75,16 +170,116 @@ export function ContractsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contracts'] }),
   });
 
+  const transitionMutation = useMutation({
+    mutationFn: ({ id, newState }: { id: string; newState: string }) =>
+      contractsApi.transitionLifecycle(id, newState),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      showNotification('success', t('contracts.lifecycleTransition.success'));
+    },
+    onError: () => {
+      showNotification('error', t('contracts.errors.transitionFailed'));
+    },
+  });
+
+  const deprecateMutation = useMutation({
+    mutationFn: ({ id, notice, sunset }: { id: string; notice: string; sunset?: string }) =>
+      contractsApi.deprecateVersion(id, notice, sunset || undefined),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contracts'] });
+      setShowDeprecateForm(null);
+      setDeprecateNotice('');
+      setDeprecateSunsetDate('');
+      showNotification('success', t('contracts.lifecycleTransition.success'));
+    },
+    onError: () => {
+      showNotification('error', t('contracts.errors.deprecateFailed'));
+    },
+  });
+
+  const diffMutation = useMutation({
+    mutationFn: ({ from, to }: { from: string; to: string }) =>
+      contractsApi.computeDiff(from, to),
+    onSuccess: (data) => {
+      setDiffResult(data);
+    },
+    onError: () => {
+      showNotification('error', t('contracts.errors.diffFailed'));
+    },
+  });
+
+  // ─── Handlers ───────────────────────────────────────────────────────────────
+
+  async function handleVerifySignature(versionId: string) {
+    try {
+      const result = await contractsApi.verifySignature(versionId);
+      setVerifyStatus({ id: versionId, valid: result.isValid, message: result.message });
+    } catch {
+      showNotification('error', t('contracts.errors.verifyFailed'));
+    }
+  }
+
+  async function handleExport(versionId: string) {
+    try {
+      const result = await contractsApi.exportVersion(versionId);
+      setExportContent({ id: versionId, specContent: result.specContent, format: result.format });
+    } catch {
+      showNotification('error', t('contracts.errors.importFailed'));
+    }
+  }
+
+  function handleSelectDetail(versionId: string) {
+    setSelectedVersionId((prev) => (prev === versionId ? null : versionId));
+    setVerifyStatus(null);
+    setShowDeprecateForm(null);
+    setExportContent(null);
+  }
+
+  /**
+   * Renderiza a lista de mudanças de um tipo específico do diff.
+   */
+  function renderChangeList(changes: { path: string; changeType: string; description: string }[], color: string) {
+    if (!changes.length) return null;
+    return (
+      <ul className="space-y-1">
+        {changes.map((c, i) => (
+          <li key={i} className={`text-xs ${color} flex items-start gap-2`}>
+            <span className="font-mono shrink-0">{c.path}</span>
+            <span className="text-muted">—</span>
+            <span>{c.description}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
+      {/* Notificação inline */}
+      {notification && (
+        <div className={`mb-4 px-4 py-3 rounded-md text-sm flex items-center gap-2 ${
+          notification.type === 'success'
+            ? 'bg-success/15 text-success border border-success/30'
+            : 'bg-critical/15 text-critical border border-critical/30'
+        }`}>
+          {notification.type === 'success' ? <CheckCircle size={16} /> : <XCircle size={16} />}
+          {notification.message}
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('contracts.title')}</h1>
           <p className="text-muted mt-1">{t('contracts.subtitle')}</p>
         </div>
-        <Button onClick={() => setShowImportForm((v) => !v)}>
-          <Plus size={16} /> {t('contracts.importContract')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => { setShowDiffPanel((v) => !v); setDiffResult(null); }}>
+            <GitCompare size={16} /> {t('contracts.diffCompare.title')}
+          </Button>
+          <Button onClick={() => setShowImportForm((v) => !v)}>
+            <Plus size={16} /> {t('contracts.importContract')}
+          </Button>
+        </div>
       </div>
 
       {/* Import Form */}
@@ -153,6 +348,103 @@ export function ContractsPage() {
         </Card>
       )}
 
+      {/* Semantic Diff Panel */}
+      {showDiffPanel && history && history.length >= 2 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <h2 className="font-semibold text-heading">{t('contracts.diffCompare.title')}</h2>
+              <button onClick={() => { setShowDiffPanel(false); setDiffResult(null); }} className="text-muted hover:text-heading transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <div className="flex gap-4 items-end mb-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-body mb-1">{t('contracts.diffCompare.baseVersion')}</label>
+                <select
+                  value={diffBaseId}
+                  onChange={(e) => setDiffBaseId(e.target.value)}
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                >
+                  <option value="">{t('contracts.diffView.selectBaseVersion')}</option>
+                  {history.map((cv: ContractVersion) => (
+                    <option key={cv.id} value={cv.id}>{cv.version}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-body mb-1">{t('contracts.diffCompare.targetVersion')}</label>
+                <select
+                  value={diffTargetId}
+                  onChange={(e) => setDiffTargetId(e.target.value)}
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                >
+                  <option value="">{t('contracts.diffView.selectTargetVersion')}</option>
+                  {history.map((cv: ContractVersion) => (
+                    <option key={cv.id} value={cv.id}>{cv.version}</option>
+                  ))}
+                </select>
+              </div>
+              <Button
+                onClick={() => diffMutation.mutate({ from: diffBaseId, to: diffTargetId })}
+                loading={diffMutation.isPending}
+                disabled={!diffBaseId || !diffTargetId || diffBaseId === diffTargetId}
+              >
+                <GitCompare size={16} /> {t('contracts.diffCompare.compare')}
+              </Button>
+            </div>
+
+            {/* Resultado do Diff */}
+            {diffResult && (
+              <div className="space-y-4 border-t border-edge pt-4">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-sm font-semibold text-heading">{t('contracts.diffCompare.result')}</h3>
+                  {diffResult.isBreaking !== undefined && (
+                    <Badge variant={changeLevelBadgeVariant(diffResult.isBreaking ? 'Breaking' : 'NonBreaking')}>
+                      {t('contracts.diffCompare.changeLevel')}: {diffResult.isBreaking ? 'Breaking' : 'Non-Breaking'}
+                    </Badge>
+                  )}
+                  <span className="text-xs text-muted">
+                    {t('contracts.diffView.suggestedVersion')}: <span className="font-mono text-heading">{diffResult.suggestedVersion}</span>
+                  </span>
+                </div>
+
+                {/* Mudanças breaking */}
+                {diffResult.changes?.filter((c) => c.isBreaking).length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-critical mb-2">{t('contracts.diffView.breakingChanges')}</h4>
+                    {renderChangeList(diffResult.changes.filter((c) => c.isBreaking), 'text-critical')}
+                  </div>
+                )}
+
+                {/* Mudanças não-breaking */}
+                {diffResult.changes?.filter((c) => !c.isBreaking && c.changeType !== 'Added').length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-warning mb-2">{t('contracts.diffView.nonBreakingChanges')}</h4>
+                    {renderChangeList(diffResult.changes.filter((c) => !c.isBreaking && c.changeType !== 'Added'), 'text-warning')}
+                  </div>
+                )}
+
+                {/* Mudanças aditivas */}
+                {diffResult.changes?.filter((c) => !c.isBreaking && c.changeType === 'Added').length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-success mb-2">{t('contracts.diffView.additiveChanges')}</h4>
+                    {renderChangeList(diffResult.changes.filter((c) => !c.isBreaking && c.changeType === 'Added'), 'text-success')}
+                  </div>
+                )}
+
+                {/* Nenhuma mudança detectada */}
+                {(!diffResult.changes || diffResult.changes.length === 0) && (
+                  <p className="text-sm text-muted">{t('contracts.diffView.noChanges')}</p>
+                )}
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      )}
+
       {/* History Filter */}
       <Card className="mb-6">
         <CardBody>
@@ -204,7 +496,10 @@ export function ContractsPage() {
               </thead>
               <tbody className="divide-y divide-edge">
                 {history.map((cv) => (
-                  <tr key={cv.id} className="hover:bg-hover transition-colors">
+                  <tr
+                    key={cv.id}
+                    className={`hover:bg-hover transition-colors ${selectedVersionId === cv.id ? 'bg-hover' : ''}`}
+                  >
                     <td className="px-4 py-3 font-mono font-medium text-heading">{cv.version}</td>
                     <td className="px-4 py-3">
                       <Badge variant={protocolBadgeVariant(cv.protocol || 'OpenApi')}>
@@ -249,10 +544,18 @@ export function ContractsPage() {
                           </button>
                         )}
                         <button
+                          onClick={() => handleExport(cv.id)}
+                          className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
+                          title={t('contracts.export')}
+                        >
+                          <Download size={12} /> {t('contracts.export')}
+                        </button>
+                        <button
+                          onClick={() => handleSelectDetail(cv.id)}
                           className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent transition-colors"
                           title={t('contracts.detail')}
                         >
-                          <ChevronRight size={12} /> {t('contracts.detail')}
+                          <Eye size={12} /> {t('contracts.detail')}
                         </button>
                       </div>
                     </td>
@@ -263,6 +566,267 @@ export function ContractsPage() {
           )}
         </div>
       </Card>
+
+      {/* Version Detail Panel */}
+      {selectedVersionId && (
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <h2 className="font-semibold text-heading">{t('contracts.detailView.title')}</h2>
+              <button onClick={() => setSelectedVersionId(null)} className="text-muted hover:text-heading transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+          </CardHeader>
+          <CardBody>
+            {detailLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw size={20} className="animate-spin text-muted" />
+              </div>
+            ) : detail ? (
+              <div className="space-y-6">
+                {/* Metadados básicos */}
+                <div>
+                  <h3 className="text-sm font-semibold text-heading mb-3">{t('contracts.detailView.metadata')}</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <span className="block text-xs text-muted mb-1">{t('contracts.version')}</span>
+                      <span className="text-sm font-mono text-heading">{detail.semVer}</span>
+                    </div>
+                    <div>
+                      <span className="block text-xs text-muted mb-1">{t('contracts.protocol')}</span>
+                      <Badge variant={protocolBadgeVariant(detail.protocol)}>
+                        {t(`contracts.protocols.${detail.protocol}`)}
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="block text-xs text-muted mb-1">{t('contracts.lifecycle')}</span>
+                      <Badge variant={lifecycleBadgeVariant(detail.lifecycleState)}>
+                        {t(`contracts.lifecycleStates.${detail.lifecycleState}`)}
+                      </Badge>
+                    </div>
+                    <div>
+                      <span className="block text-xs text-muted mb-1">{t('contracts.format')}</span>
+                      <span className="text-sm text-heading">{detail.format}</span>
+                    </div>
+                    {detail.importedFrom && (
+                      <div>
+                        <span className="block text-xs text-muted mb-1">{t('contracts.importedFrom')}</span>
+                        <span className="text-sm text-heading">{detail.importedFrom}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Informação de assinatura */}
+                {detail.fingerprint && (
+                  <div className="border-t border-edge pt-4">
+                    <h3 className="text-sm font-semibold text-heading mb-3">{t('contracts.signing.signatureStatus')}</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <span className="block text-xs text-muted mb-1">{t('contracts.fingerprint')}</span>
+                        <span className="text-xs font-mono text-heading break-all">{detail.fingerprint}</span>
+                      </div>
+                      {detail.algorithm && (
+                        <div>
+                          <span className="block text-xs text-muted mb-1">{t('contracts.algorithm')}</span>
+                          <span className="text-sm text-heading">{detail.algorithm}</span>
+                        </div>
+                      )}
+                      {detail.signedBy && (
+                        <div>
+                          <span className="block text-xs text-muted mb-1">{t('contracts.signedBy')}</span>
+                          <span className="text-sm text-heading">{detail.signedBy}</span>
+                        </div>
+                      )}
+                      {detail.signedAt && (
+                        <div>
+                          <span className="block text-xs text-muted mb-1">{t('contracts.signedAt')}</span>
+                          <span className="text-xs text-muted">{new Date(detail.signedAt).toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Verificar assinatura */}
+                    <div className="mt-3 flex items-center gap-3">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleVerifySignature(detail.id)}
+                      >
+                        <Shield size={14} /> {t('contracts.signing.verifyIntegrity')}
+                      </Button>
+                      {verifyStatus && verifyStatus.id === detail.id && (
+                        <span className={`inline-flex items-center gap-1 text-xs ${verifyStatus.valid ? 'text-success' : 'text-critical'}`}>
+                          {verifyStatus.valid ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                          {verifyStatus.valid ? t('contracts.verifyResult.valid') : t('contracts.verifyResult.invalid')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Verificar assinatura — contrato sem assinatura */}
+                {!detail.fingerprint && (
+                  <div className="border-t border-edge pt-4">
+                    <span className="text-xs text-muted">{t('contracts.verifyResult.noSignature')}</span>
+                  </div>
+                )}
+
+                {/* Proveniência */}
+                {detail.provenance && (
+                  <div className="border-t border-edge pt-4">
+                    <h3 className="text-sm font-semibold text-heading mb-3">{t('contracts.detailView.provenance')}</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div>
+                        <span className="block text-xs text-muted mb-1">{t('contracts.origin')}</span>
+                        <span className="text-sm text-heading">{detail.provenance.origin}</span>
+                      </div>
+                      <div>
+                        <span className="block text-xs text-muted mb-1">{t('contracts.format')}</span>
+                        <span className="text-sm text-heading">{detail.provenance.originalFormat}</span>
+                      </div>
+                      <div>
+                        <span className="block text-xs text-muted mb-1">
+                          {detail.provenance.isAiGenerated ? t('contracts.aiGenerated') : t('contracts.humanCreated')}
+                        </span>
+                        <Badge variant={detail.provenance.isAiGenerated ? 'warning' : 'info'}>
+                          {detail.provenance.isAiGenerated ? t('contracts.aiGenerated') : t('contracts.humanCreated')}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Deprecação */}
+                {detail.deprecationNotice && (
+                  <div className="border-t border-edge pt-4">
+                    <h3 className="text-sm font-semibold text-heading mb-2">{t('contracts.deprecationNotice')}</h3>
+                    <p className="text-sm text-warning">{detail.deprecationNotice}</p>
+                    {detail.sunsetDate && (
+                      <p className="text-xs text-muted mt-1">
+                        {t('contracts.sunsetDate')}: {new Date(detail.sunsetDate).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Transições de lifecycle */}
+                <div className="border-t border-edge pt-4">
+                  <h3 className="text-sm font-semibold text-heading mb-3">{t('contracts.lifecycleTransition.title')}</h3>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs text-muted">{t('contracts.lifecycleTransition.currentState')}:</span>
+                    <Badge variant={lifecycleBadgeVariant(detail.lifecycleState)}>
+                      {t(`contracts.lifecycleStates.${detail.lifecycleState}`)}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {allowedTransitions[detail.lifecycleState]?.map((tr) => (
+                      <Button
+                        key={tr.state}
+                        variant="secondary"
+                        size="sm"
+                        loading={transitionMutation.isPending}
+                        onClick={() => {
+                          if (tr.state === 'Deprecated') {
+                            setShowDeprecateForm(detail.id);
+                          } else {
+                            transitionMutation.mutate({ id: detail.id, newState: tr.state });
+                          }
+                        }}
+                      >
+                        <ArrowRight size={14} /> {t(`contracts.${tr.action}`)}
+                      </Button>
+                    ))}
+                    {(!allowedTransitions[detail.lifecycleState] || allowedTransitions[detail.lifecycleState].length === 0) && (
+                      <span className="text-xs text-muted">{t('contracts.lifecycleStates.Retired')}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Formulário de deprecação */}
+                {showDeprecateForm === detail.id && (
+                  <div className="border-t border-edge pt-4">
+                    <h3 className="text-sm font-semibold text-heading mb-3">{t('contracts.deprecate')}</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-body mb-1">{t('contracts.deprecationNotice')}</label>
+                        <textarea
+                          value={deprecateNotice}
+                          onChange={(e) => setDeprecateNotice(e.target.value)}
+                          rows={3}
+                          required
+                          className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-body mb-1">{t('contracts.sunsetDate')}</label>
+                        <input
+                          type="date"
+                          value={deprecateSunsetDate}
+                          onChange={(e) => setDeprecateSunsetDate(e.target.value)}
+                          className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-end">
+                        <Button variant="secondary" size="sm" onClick={() => setShowDeprecateForm(null)}>
+                          {t('common.cancel')}
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          loading={deprecateMutation.isPending}
+                          disabled={!deprecateNotice.trim()}
+                          onClick={() => deprecateMutation.mutate({
+                            id: detail.id,
+                            notice: deprecateNotice,
+                            sunset: deprecateSunsetDate || undefined,
+                          })}
+                        >
+                          {t('contracts.lifecycleTransition.confirm')}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Conteúdo da especificação */}
+                <div className="border-t border-edge pt-4">
+                  <h3 className="text-sm font-semibold text-heading mb-3">{t('contracts.detailView.specContent')}</h3>
+                  <pre className="bg-canvas border border-edge rounded-md p-4 text-xs font-mono text-heading overflow-x-auto max-h-64 overflow-y-auto">
+                    {detail.specContent}
+                  </pre>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button variant="secondary" onClick={() => setSelectedVersionId(null)}>
+                    <X size={14} /> {t('contracts.detailView.close')}
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Export Content Panel */}
+      {exportContent && (
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between w-full">
+              <h2 className="font-semibold text-heading">{t('contracts.export')} — {exportContent.format}</h2>
+              <button onClick={() => setExportContent(null)} className="text-muted hover:text-heading transition-colors">
+                <X size={16} />
+              </button>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <pre className="bg-canvas border border-edge rounded-md p-4 text-xs font-mono text-heading overflow-x-auto max-h-80 overflow-y-auto">
+              {exportContent.specContent}
+            </pre>
+          </CardBody>
+        </Card>
+      )}
     </div>
   );
 }

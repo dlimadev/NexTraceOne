@@ -467,6 +467,33 @@
       "transitionFailed": "Failed to transition lifecycle state",
       "verifyFailed": "Failed to verify contract signature",
       "diffFailed": "Failed to compute semantic diff"
+    },
+    "detailView": {
+      "title": "Contract Version Detail",
+      "specContent": "Specification Content",
+      "metadata": "Metadata",
+      "provenance": "Provenance",
+      "close": "Close"
+    },
+    "lifecycleTransition": {
+      "title": "Lifecycle Transition",
+      "currentState": "Current State",
+      "newState": "New State",
+      "confirm": "Confirm Transition",
+      "success": "Lifecycle state updated successfully"
+    },
+    "diffCompare": {
+      "title": "Compare Versions",
+      "baseVersion": "Base Version",
+      "targetVersion": "Target Version",
+      "compare": "Compare",
+      "result": "Diff Result",
+      "changeLevel": "Change Level"
+    },
+    "verifyResult": {
+      "valid": "Signature verification passed",
+      "invalid": "Signature verification failed",
+      "noSignature": "Contract is not signed"
     }
   },
   "workflow": {
