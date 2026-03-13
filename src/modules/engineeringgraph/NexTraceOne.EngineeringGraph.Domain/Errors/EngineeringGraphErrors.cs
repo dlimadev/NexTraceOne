@@ -47,4 +47,36 @@ public static class EngineeringGraphErrors
             consumerName,
             actual,
             minimum);
+
+    // ── Temporal / Snapshot ───────────────────────────────────────────────
+
+    /// <summary>Snapshot do grafo não encontrado pelo identificador.</summary>
+    public static Error GraphSnapshotNotFound(Guid snapshotId)
+        => Error.NotFound("EngineeringGraph.GraphSnapshot.NotFound", "Graph snapshot '{0}' was not found.", snapshotId);
+
+    /// <summary>Snapshot de referência (baseline) não encontrado para comparação temporal.</summary>
+    public static Error BaselineSnapshotNotFound()
+        => Error.NotFound("EngineeringGraph.GraphSnapshot.BaselineNotFound", "No baseline snapshot was found for temporal comparison.");
+
+    // ── Saved Views ──────────────────────────────────────────────────────
+
+    /// <summary>Visão salva do grafo não encontrada.</summary>
+    public static Error SavedViewNotFound(Guid viewId)
+        => Error.NotFound("EngineeringGraph.SavedView.NotFound", "Saved graph view '{0}' was not found.", viewId);
+
+    /// <summary>Usuário não tem permissão para acessar a visão salva.</summary>
+    public static Error SavedViewAccessDenied(Guid viewId)
+        => Error.Forbidden("EngineeringGraph.SavedView.AccessDenied", "Access denied to saved graph view '{0}'.", viewId);
+
+    // ── Impact Propagation ───────────────────────────────────────────────
+
+    /// <summary>Nó raiz para propagação de impacto não encontrado.</summary>
+    public static Error ImpactRootNodeNotFound(Guid nodeId)
+        => Error.NotFound("EngineeringGraph.Impact.RootNotFound", "Impact root node '{0}' was not found.", nodeId);
+
+    // ── Node Health / Overlay ────────────────────────────────────────────
+
+    /// <summary>Dados de saúde não disponíveis para o nó solicitado.</summary>
+    public static Error NodeHealthNotAvailable(Guid nodeId)
+        => Error.NotFound("EngineeringGraph.NodeHealth.NotAvailable", "Health data is not available for node '{0}'.", nodeId);
 }

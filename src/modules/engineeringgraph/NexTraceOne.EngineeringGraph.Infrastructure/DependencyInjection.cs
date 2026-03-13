@@ -14,7 +14,8 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo EngineeringGraph.
-/// Inclui: DbContext, Repositórios, Adapters externos, Quartz Jobs.
+/// Inclui: DbContext, Repositórios (ativos, snapshots, health, saved views),
+/// Adapters externos e integração cross-module via Contracts.
 /// </summary>
 public static class DependencyInjection
 {
@@ -36,8 +37,17 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<EngineeringGraphDbContext>());
+
+        // ── Repositórios de ativos (existentes) ──────────────────────────
         services.AddScoped<IApiAssetRepository, ApiAssetRepository>();
         services.AddScoped<IServiceAssetRepository, ServiceAssetRepository>();
+
+        // ── Repositórios de temporalidade, overlays e saved views ────────
+        services.AddScoped<IGraphSnapshotRepository, GraphSnapshotRepository>();
+        services.AddScoped<INodeHealthRepository, NodeHealthRepository>();
+        services.AddScoped<ISavedGraphViewRepository, SavedGraphViewRepository>();
+
+        // ── Integração cross-module via Contracts ────────────────────────
         services.AddScoped<IEngineeringGraphModule, EngineeringGraphModuleService>();
 
         return services;

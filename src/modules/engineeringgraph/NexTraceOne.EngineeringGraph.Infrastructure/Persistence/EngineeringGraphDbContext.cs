@@ -9,6 +9,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
 /// DbContext do módulo EngineeringGraph.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
+/// Inclui entidades para temporalidade (snapshots), overlays (health) e saved views.
 /// </summary>
 public sealed class EngineeringGraphDbContext(
     DbContextOptions<EngineeringGraphDbContext> options,
@@ -31,6 +32,15 @@ public sealed class EngineeringGraphDbContext(
 
     /// <summary>Fontes de descoberta persistidas do módulo EngineeringGraph.</summary>
     public DbSet<DiscoverySource> DiscoverySources => Set<DiscoverySource>();
+
+    /// <summary>Snapshots temporais materializados do grafo para time-travel e diff.</summary>
+    public DbSet<GraphSnapshot> GraphSnapshots => Set<GraphSnapshot>();
+
+    /// <summary>Registros de saúde/métricas de nós para overlays explicáveis.</summary>
+    public DbSet<NodeHealthRecord> NodeHealthRecords => Set<NodeHealthRecord>();
+
+    /// <summary>Visões salvas do grafo com filtros e overlays persistidos.</summary>
+    public DbSet<SavedGraphView> SavedGraphViews => Set<SavedGraphView>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(EngineeringGraphDbContext).Assembly;
