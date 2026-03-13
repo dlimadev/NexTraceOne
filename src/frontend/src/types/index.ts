@@ -493,6 +493,45 @@ export interface ContractSearchResult {
   pageSize: number;
 }
 
+/** Resultado da validação de integridade estrutural de um contrato. */
+export interface ContractIntegrityResult {
+  isValid: boolean;
+  pathCount: number;
+  endpointCount: number;
+  schemaVersion?: string;
+  validationError?: string;
+}
+
+/** Item individual de sincronização em lote de contratos externos. */
+export interface ContractSyncItem {
+  apiAssetId: string;
+  semVer: string;
+  specContent: string;
+  format: 'json' | 'yaml' | 'xml';
+  importedFrom: string;
+  protocol?: ContractProtocol;
+}
+
+/** Resultado do processamento de um item na sincronização em lote. */
+export interface ContractSyncItemResult {
+  apiAssetId: string;
+  semVer: string;
+  status: 'Created' | 'Skipped' | 'Failed';
+  contractVersionId?: string;
+  errorMessage?: string;
+}
+
+/** Resposta da sincronização em lote de contratos externos (CI/CD). */
+export interface ContractSyncResponse {
+  totalProcessed: number;
+  created: number;
+  skipped: number;
+  failed: number;
+  correlationId?: string;
+  processedAt: string;
+  items: ContractSyncItemResult[];
+}
+
 // ─── Change Intelligence ─────────────────────────────────────────────────────
 
 export type ChangeLevel = 0 | 1 | 2 | 3 | 4;

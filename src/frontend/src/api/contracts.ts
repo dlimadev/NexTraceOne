@@ -1,5 +1,5 @@
 import client from './client';
-import type { ContractVersion, ContractVersionDetail, SignatureVerificationResult, SemanticDiff, ContractProtocol, ContractRuleViolation, ContractSearchResult } from '../types';
+import type { ContractVersion, ContractVersionDetail, SignatureVerificationResult, SemanticDiff, ContractProtocol, ContractRuleViolation, ContractSearchResult, ContractIntegrityResult, ContractSyncItem, ContractSyncResponse } from '../types';
 
 /**
  * Detecta o formato da especificação (json, yaml ou xml) a partir do conteúdo bruto.
@@ -116,4 +116,18 @@ export const contractsApi = {
 
   listRuleViolations: (contractVersionId: string) =>
     client.get<ContractRuleViolation[]>(`/contracts/${contractVersionId}/violations`).then((r) => r.data),
+
+  validateIntegrity: (contractVersionId: string) =>
+    client
+      .get<ContractIntegrityResult>(`/contracts/${contractVersionId}/validate`)
+      .then((r) => r.data),
+
+  syncContracts: (data: {
+    items: ContractSyncItem[];
+    sourceSystem: string;
+    correlationId?: string;
+  }) =>
+    client
+      .post<ContractSyncResponse>('/contracts/sync', data)
+      .then((r) => r.data),
 };

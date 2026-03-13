@@ -346,3 +346,108 @@ GET /api/v1/contracts/{contractVersionId}/violations
   }
 ]
 ```
+
+### Validar Integridade Estrutural
+
+Valida se a especificação do contrato pode ser parseada corretamente conforme seu protocolo.
+Retorna contagens de paths/canais, endpoints/operações e a versão extraída do spec.
+
+```http
+GET /api/v1/contracts/{contractVersionId}/validate
+```
+
+**Resposta (200 OK) — Contrato válido:**
+```json
+{
+  "isValid": true,
+  "pathCount": 5,
+  "endpointCount": 12,
+  "schemaVersion": "3.0.3",
+  "validationError": null
+}
+```
+
+**Resposta (200 OK) — Contrato com erro estrutural:**
+```json
+{
+  "isValid": false,
+  "pathCount": 0,
+  "endpointCount": 0,
+  "schemaVersion": null,
+  "validationError": "The specification content could not be parsed."
+}
+```
+
+### Sincronização em Lote (CI/CD — External Inbound)
+
+Endpoint de sincronização em lote para integração sistema-a-sistema com CI/CD, API Gateways e outras plataformas.
+Permite importar múltiplos contratos em uma única requisição. Idempotente por `apiAssetId + semVer`.
+Itens com falha não bloqueiam os demais (fault isolation por item). Máximo de 50 itens por lote.
+
+```http
+POST /api/v1/contracts/sync
+Authorization: X-Api-Key: <api_key>
+X-Tenant-Id: <tenant_id>
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "apiAssetId": "550e8400-e29b-41d4-a716-446655440000",
+      "semVer": "2.1.0",
+      "specContent": "{ \"openapi\": \"3.0.3\", ... }",
+      "format": "json",
+      "importedFrom": "github-actions/build-123",
+      "protocol": "OpenApi"
+    },
+    {
+      "apiAssetId": "661f9511-f30c-52e5-b827-557766551111",
+      "semVer": "1.0.0",
+      "specContent": "<definitions ...>...</definitions>",
+      "format": "xml",
+      "importedFrom": "jenkins/pipeline-456",
+      "protocol": "Wsdl"
+    }
+  ],
+  "sourceSystem": "github-actions",
+  "correlationId": "build-run-20260313-001"
+}
+```
+
+**Resposta (200 OK):**
+```json
+{
+  "totalProcessed": 2,
+  "created": 1,
+  "skipped": 1,
+  "failed": 0,
+  "correlationId": "build-run-20260313-001",
+  "processedAt": "2026-03-13T22:00:00Z",
+  "items": [
+    {
+      "apiAssetId": "550e8400-e29b-41d4-a716-446655440000",
+      "semVer": "2.1.0",
+      "status": "Created",
+      "contractVersionId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "errorMessage": null
+    },
+    {
+      "apiAssetId": "661f9511-f30c-52e5-b827-557766551111",
+      "semVer": "1.0.0",
+      "status": "Skipped",
+      "contractVersionId": "8d0f8801-g431-62fg-c66d-g29he3g12cg9",
+      "errorMessage": null
+    }
+  ]
+}
+```
+
+**Status por item:**
+- `Created` — versão nova criada com sucesso
+- `Skipped` — versão já existia para o ativo/semVer (idempotência)
+- `Failed` — falha ao importar — detalhes em `errorMessage`
+
+**Limites:**
+- Máximo de 50 itens por lote
+- Cada `specContent` limitado a 5 MB
+- Formatos aceitos: `json`, `yaml`, `xml`
