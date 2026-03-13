@@ -25,7 +25,8 @@ assinatura digital para promoção em produção — com suporte a múltiplos pr
 │  ContractsEndpointModule (13 endpoints REST)                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                     Application Layer                            │
-│  14 Features VSA (Import, Version, Diff, Lock, Sign, Export...) │
+│  16 Features VSA (Import, Version, Diff, Lock, Sign, Export,     │
+│  Search, Violations, Lifecycle, Classification...)               │
 ├─────────────────────────────────────────────────────────────────┤
 │                       Domain Layer                               │
 │  ContractVersion (AR) │ ContractDiff │ ContractArtifact          │
@@ -109,10 +110,21 @@ POST /api/v1/contracts
 - `protocol` — opcional, padrão "OpenApi". Valores: OpenApi, Swagger, Wsdl, AsyncApi, Protobuf, GraphQl
 - `importedFrom` — origem do import: "upload", URL, "ai-generated", "migration"
 
+**Auto-detecção de protocolo (novo):**
+Quando o protocolo é informado como OpenApi (padrão), o sistema tenta detectar automaticamente:
+- Se o conteúdo contém `"swagger"` → utiliza Swagger
+- Se o conteúdo contém `"asyncapi"` → utiliza AsyncApi
+- Se o conteúdo XML contém `<definitions` → utiliza WSDL
+- Caso contrário, mantém o protocolo informado
+
+**Validação de tamanho (novo):**
+O conteúdo da especificação é limitado a 5 MB para prevenir ataques DoS.
+
 1. Valida formato semântico da versão
-2. Verifica se já existe versão com mesmo SemVer para o API Asset
-3. Cria `ContractVersion` com estado `Draft` e protocolo informado
-4. Persiste via `IUnitOfWork`
+2. Auto-detecta protocolo quando possível
+3. Verifica se já existe versão com mesmo SemVer para o API Asset
+4. Cria `ContractVersion` com estado `Draft` e protocolo detectado
+5. Persiste via `IUnitOfWork`
 
 ### Criar Nova Versão
 
@@ -173,7 +185,7 @@ GET /api/v1/contracts/{id}/verify
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| POST | `/api/v1/contracts` | Importar contrato |
+| POST | `/api/v1/contracts` | Importar contrato (com auto-detecção de protocolo) |
 | POST | `/api/v1/contracts/versions` | Criar nova versão |
 | POST | `/api/v1/contracts/diff` | Computar diff semântico |
 | GET | `/api/v1/contracts/{id}/classification` | Classificar mudança |
@@ -181,11 +193,35 @@ GET /api/v1/contracts/{id}/verify
 | GET | `/api/v1/contracts/history/{apiAssetId}` | Histórico de versões |
 | GET | `/api/v1/contracts/{id}/detail` | Detalhes completos |
 | GET | `/api/v1/contracts/{id}/export` | Exportar especificação |
+| GET | `/api/v1/contracts/search` | Pesquisar contratos (paginado, com filtros) |
+| GET | `/api/v1/contracts/{id}/violations` | Listar violações de regras |
 | POST | `/api/v1/contracts/{id}/lock` | Bloquear versão |
 | POST | `/api/v1/contracts/{id}/lifecycle` | Transicionar lifecycle |
 | POST | `/api/v1/contracts/{id}/deprecate` | Depreciar versão |
 | POST | `/api/v1/contracts/{id}/sign` | Assinar versão |
 | GET | `/api/v1/contracts/{id}/verify` | Verificar assinatura |
+
+### Pesquisa de Contratos (novo)
+
+```
+GET /api/v1/contracts/search?protocol=OpenApi&lifecycleState=Draft&searchTerm=1.0&page=1&pageSize=20
+```
+
+Parâmetros opcionais:
+- `protocol` — filtrar por protocolo (OpenApi, Swagger, Wsdl, AsyncApi)
+- `lifecycleState` — filtrar por estado do lifecycle
+- `apiAssetId` — filtrar por ativo de API
+- `searchTerm` — busca textual na versão semântica
+- `page` — página (padrão: 1)
+- `pageSize` — tamanho da página (padrão: 20, máximo: 100)
+
+### Violações de Regras (novo)
+
+```
+GET /api/v1/contracts/{id}/violations
+```
+
+Retorna lista de violações de regras de governança para a versão do contrato.
 
 ## Diff Semântico por Protocolo
 
@@ -253,27 +289,52 @@ sem acessar diretamente o DbContext do módulo.
 ## Frontend
 
 A página de Contracts (`ContractsPage.tsx`) oferece:
-- **Importação** — formulário com protocolo, versão, conteúdo
+- **Importação** — formulário com protocolo, versão, conteúdo (com auto-detecção de formato)
+- **Criação de Versão** — formulário para criar nova versão a partir de versão anterior
 - **Histórico** — tabela com versões filtradas por API Asset
 - **Detalhe** — painel expansível com metadados, proveniência, spec
-- **Diff Semântico** — comparação visual entre versões
+- **Diff Semântico** — comparação visual entre versões com categorização
 - **Lifecycle** — transições de estado com botões contextuais
 - **Assinatura** — assinar, verificar integridade
+- **Violações** — painel de violações de regras com severidade
 - **Exportação** — visualizar conteúdo raw
-- **i18n** — 127 chaves em 4 idiomas (en, pt-BR, pt-PT, es) com paridade perfeita
+- **Rota protegida** — `ProtectedRoute` com permissão `contracts:read`
+- **i18n** — 149+ chaves em 4 idiomas (en, pt-BR, pt-PT, es) com paridade perfeita
 
 ## Testes
 
-- **158+ testes** cobrindo:
+- **175+ testes** cobrindo:
   - Entidades de domínio (ContractVersion, lifecycle, lock, sign)
-  - Value Objects (SemanticVersion, ContractSignature)
+  - Value Objects (SemanticVersion, ContractSignature, segurança timing-safe)
   - Parsers (OpenAPI, Swagger, WSDL, AsyncAPI)
   - Diff Calculators (todos os protocolos + orquestrador)
   - Features de aplicação (import, version, diff, lock, sign, export, lifecycle)
   - Import multi-protocolo (OpenAPI, Swagger, WSDL/XML, AsyncAPI)
+  - Auto-detecção de protocolo (Swagger, AsyncAPI, WSDL a partir do conteúdo)
+  - Validação multi-protocolo (ValidateContractIntegrity por protocolo)
   - Herança de protocolo entre versões
   - Validação de formatos (json, yaml, xml)
+  - Validação de tamanho máximo (5 MB)
   - Canonicalization (JSON key sorting, XML/YAML line normalization)
+  - Segurança de assinatura (timing-safe comparison)
+
+## Segurança
+
+### Assinatura Timing-Safe (novo)
+
+A verificação de assinatura utiliza `CryptographicOperations.FixedTimeEquals` para prevenir
+ataques de timing, onde um atacante poderia inferir o fingerprint correto medindo o tempo
+de resposta da comparação de strings.
+
+### Validação de Tamanho (novo)
+
+O conteúdo da especificação é limitado a 5 MB via FluentValidation `MaximumLength(5_242_880)`,
+aplicado tanto no import quanto na criação de nova versão, prevenindo ataques DoS.
+
+### Rota Protegida (novo)
+
+O acesso à página de contratos é protegido por `ProtectedRoute` com permissão `contracts:read`,
+garantindo que apenas usuários autorizados acessem a funcionalidade.
 
 ## Decisões Arquiteturais
 
@@ -282,10 +343,15 @@ A página de Contracts (`ContractsPage.tsx`) oferece:
 3. **Canonicalização determinística** — garante que assinaturas permanecem válidas após reformatação
 4. **State machine no aggregate** — transições validadas no domínio, não no handler
 5. **Protobuf/GraphQL como evolutivos** — enum definido, parser a implementar quando necessário
+6. **Auto-detecção de protocolo** — inferência automática a partir do conteúdo (Swagger, AsyncAPI, WSDL)
+7. **Verificação timing-safe** — previne ataques de timing na verificação de assinatura
+8. **Pesquisa paginada** — busca com filtros por protocolo, estado, ativo e versão
 
 ## Riscos Residuais
 
 1. **Diff não cobre schemas** — mudanças em request/response body types não são detectadas (apenas paths, métodos e parâmetros)
 2. **YAML parsing heurístico** — para OpenAPI/AsyncAPI em YAML, o parsing é baseado em indentação, não em parser YAML completo
 3. **Sem notificação automática** — depreciação não notifica consumers automaticamente (requer integração com DeveloperPortal)
-4. **Sem batch import** — importação é individual, sem suporte a lote ou scan de repositórios
+4. **Contract Studio não implementado** — edição visual de contratos é funcionalidade evolutiva (P2)
+5. **Design-First Accelerator não implementado** — geração assistida de contratos é funcionalidade evolutiva (P2)
+6. **Protobuf/GraphQL stub** — validação retorna sucesso com 0 counts; parsing completo é evolutivo

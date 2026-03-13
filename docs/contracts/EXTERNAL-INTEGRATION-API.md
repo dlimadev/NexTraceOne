@@ -297,5 +297,52 @@ print(f"Signature valid: {verify.json()['isValid']}")
 - Todas as APIs exigem autenticação
 - Operações de escrita (lock, sign, deprecate) são auditadas
 - Assinaturas usam SHA-256 determinístico via canonicalização
-- Conteúdo é limitado a 10 MB para prevenção de DoS
+- Verificação de assinatura é timing-safe (previne ataques de timing)
+- Conteúdo é limitado a 5 MB para prevenção de DoS
 - Parsing é resiliente a specs malformadas (não lança exceções)
+- Auto-detecção de protocolo disponível no import (Swagger, AsyncAPI, WSDL)
+
+## Novos Endpoints (v2)
+
+### Pesquisar Contratos
+
+```http
+GET /api/v1/contracts/search?protocol=OpenApi&lifecycleState=Draft&page=1&pageSize=20
+```
+
+Parâmetros query opcionais:
+- `protocol` — OpenApi, Swagger, Wsdl, AsyncApi
+- `lifecycleState` — Draft, InReview, Approved, Locked, Deprecated, Sunset, Retired
+- `apiAssetId` — UUID do ativo de API
+- `searchTerm` — busca textual na versão semântica
+- `page` — número da página (padrão: 1)
+- `pageSize` — tamanho da página (padrão: 20, máximo: 100)
+
+**Resposta (200 OK):**
+```json
+{
+  "items": [...],
+  "totalCount": 42,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+### Listar Violações de Regras
+
+```http
+GET /api/v1/contracts/{contractVersionId}/violations
+```
+
+**Resposta (200 OK):**
+```json
+[
+  {
+    "id": "...",
+    "ruleName": "operation-operationId",
+    "severity": "Warning",
+    "message": "Operation must have an operationId.",
+    "path": "/pets/{petId}/GET"
+  }
+]
+```
