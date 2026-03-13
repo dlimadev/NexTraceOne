@@ -71,6 +71,18 @@ public static class ContractsErrors
     public static Error ArtifactNotFound(string id)
         => Error.NotFound("Contracts.Artifact.NotFound", "Contract artifact '{0}' was not found.", id);
 
+    // ── Size Limits ─────────────────────────────────────────────────
+
+    /// <summary>Conteúdo da especificação excede o tamanho máximo permitido.</summary>
+    public static Error SpecContentTooLarge(int maxSizeMb)
+        => Error.Validation("Contracts.ContractVersion.SpecContentTooLarge", "Spec content exceeds maximum allowed size of {0}MB.", maxSizeMb);
+
+    // ── Format Detection ────────────────────────────────────────────
+
+    /// <summary>Formato de arquivo não reconhecido para detecção de protocolo.</summary>
+    public static Error UnrecognizedFormat(string format)
+        => Error.Validation("Contracts.Protocol.UnrecognizedFormat", "Could not recognize the contract format: '{0}'.", format);
+
     // ── Rulesets ────────────────────────────────────────────────────
 
     /// <summary>Nenhum ruleset encontrado para o protocolo informado.</summary>

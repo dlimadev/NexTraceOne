@@ -11,6 +11,18 @@ vi.mock('../../api', () => ({
     getHistory: vi.fn(),
     importContract: vi.fn(),
     lockVersion: vi.fn(),
+    createVersion: vi.fn(),
+    listRuleViolations: vi.fn(),
+    searchContracts: vi.fn(),
+    computeDiff: vi.fn(),
+    getDetail: vi.fn(),
+    signVersion: vi.fn(),
+    verifySignature: vi.fn(),
+    transitionLifecycle: vi.fn(),
+    deprecateVersion: vi.fn(),
+    exportVersion: vi.fn(),
+    getClassification: vi.fn(),
+    suggestVersion: vi.fn(),
   },
 }));
 
@@ -22,7 +34,11 @@ const mockHistory: ContractVersion[] = [
     apiAssetId: 'api-001',
     version: '2.1.0',
     content: '{}',
+    format: 'json',
+    protocol: 'OpenApi',
+    lifecycleState: 'Draft',
     isLocked: false,
+    isAiGenerated: false,
     createdAt: '2024-01-15T10:00:00Z',
   },
   {
@@ -30,7 +46,11 @@ const mockHistory: ContractVersion[] = [
     apiAssetId: 'api-001',
     version: '2.0.0',
     content: '{}',
+    format: 'json',
+    protocol: 'OpenApi',
+    lifecycleState: 'Locked',
     isLocked: true,
+    isAiGenerated: false,
     createdAt: '2024-01-10T08:00:00Z',
   },
 ];
@@ -71,7 +91,7 @@ describe('ContractsPage', () => {
   it('exibe o formulário de importação ao clicar no botão', async () => {
     renderContracts();
     await userEvent.click(screen.getByRole('button', { name: /import contract/i }));
-    expect(screen.getByText('Import OpenAPI Contract')).toBeInTheDocument();
+    expect(screen.getByText('Import Contract', { selector: 'h2' })).toBeInTheDocument();
   });
 
   it('carrega e exibe histórico de contratos ao inserir API Asset ID', async () => {
@@ -88,13 +108,13 @@ describe('ContractsPage', () => {
     });
   });
 
-  it('exibe badge Active para versões não bloqueadas', async () => {
+  it('exibe badge Draft para versões em rascunho', async () => {
     vi.mocked(contractsApi.getHistory).mockResolvedValue(mockHistory);
     renderContracts();
     const input = screen.getByPlaceholderText(/enter uuid to view contract history/i);
     await userEvent.type(input, 'api-001');
     await waitFor(() => {
-      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.getByText('Draft')).toBeInTheDocument();
     });
   });
 
@@ -137,7 +157,7 @@ describe('ContractsPage', () => {
     await userEvent.click(screen.getByRole('button', { name: /import contract/i }));
     await userEvent.type(screen.getByPlaceholderText('UUID'), 'api-abc');
     await userEvent.type(screen.getByPlaceholderText('1.0.0'), '3.0.0');
-    await userEvent.type(screen.getByPlaceholderText(/paste openapi spec here/i), 'openapi-spec-content');
+    await userEvent.type(screen.getByPlaceholderText(/paste your specification here/i), 'openapi-spec-content');
     await userEvent.click(screen.getByRole('button', { name: /^import$/i }));
     await waitFor(() => {
       expect(contractsApi.importContract).toHaveBeenCalled();

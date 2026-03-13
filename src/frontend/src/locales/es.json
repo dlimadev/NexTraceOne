@@ -466,7 +466,11 @@
       "deprecateFailed": "Error al depreciar contrato",
       "transitionFailed": "Error al transicionar estado del ciclo de vida",
       "verifyFailed": "Error al verificar firma del contrato",
-      "diffFailed": "Error al computar diff semántico"
+      "diffFailed": "Error al computar diff semántico",
+      "searchFailed": "Error al buscar contratos",
+      "violationsFailed": "Error al cargar violaciones de reglas",
+      "createVersionFailed": "Error al crear versión del contrato",
+      "exportFailed": "Error al exportar contrato"
     },
     "detailView": {
       "title": "Detalle de Versión del Contrato",
@@ -494,7 +498,25 @@
       "valid": "Verificación de firma aprobada",
       "invalid": "Verificación de firma fallida",
       "noSignature": "Contrato no está firmado"
-    }
+    },
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por versión...",
+    "searchResults": "Resultados de Búsqueda",
+    "totalResults": "Total de Resultados",
+    "page": "Página",
+    "createVersion": "Crear Versión",
+    "createVersionTitle": "Crear Nueva Versión",
+    "createVersionDescription": "Crear una nueva versión a partir de un contrato existente",
+    "suggestedVersion": "Versión Sugerida",
+    "classifyChanges": "Clasificar Cambios",
+    "violations": "Violaciones",
+    "violationsTitle": "Violaciones de Reglas",
+    "noViolationsFound": "No se encontraron violaciones de reglas para esta versión",
+    "violationSeverity": "Severidad",
+    "violationRule": "Regla",
+    "violationMessage": "Mensaje",
+    "violationPath": "Ruta",
+    "createVersionSuccess": "Versión del contrato creada correctamente"
   },
   "workflow": {
     "title": "Workflow y Aprobaciones",

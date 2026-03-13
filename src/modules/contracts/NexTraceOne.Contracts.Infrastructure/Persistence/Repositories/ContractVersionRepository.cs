@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Contracts.Application.Abstractions;
 using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Contracts.Domain.Enums;
 
 namespace NexTraceOne.Contracts.Infrastructure.Persistence.Repositories;
 
@@ -36,4 +37,43 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
             .Where(v => v.ApiAssetId == apiAssetId)
             .OrderByDescending(v => v.CreatedAt)
             .FirstOrDefaultAsync(ct);
+
+    /// <summary>
+    /// Pesquisa versões de contrato com filtros opcionais e paginação.
+    /// Constrói a query de forma incremental conforme os filtros fornecidos,
+    /// executando count e paginação em uma única ida ao banco.
+    /// </summary>
+    public async Task<(IReadOnlyList<ContractVersion> Items, int TotalCount)> SearchAsync(
+        ContractProtocol? protocol,
+        ContractLifecycleState? lifecycleState,
+        Guid? apiAssetId,
+        string? searchTerm,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = context.ContractVersions.AsQueryable();
+
+        if (protocol.HasValue)
+            query = query.Where(v => v.Protocol == protocol.Value);
+
+        if (lifecycleState.HasValue)
+            query = query.Where(v => v.LifecycleState == lifecycleState.Value);
+
+        if (apiAssetId.HasValue)
+            query = query.Where(v => v.ApiAssetId == apiAssetId.Value);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            query = query.Where(v => EF.Functions.ILike(v.SemVer, "%" + searchTerm + "%"));
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderByDescending(v => v.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
 }

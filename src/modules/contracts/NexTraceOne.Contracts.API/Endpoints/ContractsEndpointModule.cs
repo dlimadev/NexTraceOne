@@ -16,6 +16,8 @@ using LockContractVersionFeature = NexTraceOne.Contracts.Application.Features.Lo
 using SignContractVersionFeature = NexTraceOne.Contracts.Application.Features.SignContractVersion.SignContractVersion;
 using SuggestSemanticVersionFeature = NexTraceOne.Contracts.Application.Features.SuggestSemanticVersion.SuggestSemanticVersion;
 using TransitionLifecycleStateFeature = NexTraceOne.Contracts.Application.Features.TransitionLifecycleState.TransitionLifecycleState;
+using ListRuleViolationsFeature = NexTraceOne.Contracts.Application.Features.ListRuleViolations.ListRuleViolations;
+using SearchContractsFeature = NexTraceOne.Contracts.Application.Features.SearchContracts.SearchContracts;
 using VerifySignatureFeature = NexTraceOne.Contracts.Application.Features.VerifySignature.VerifySignature;
 
 namespace NexTraceOne.Contracts.API.Endpoints;
@@ -177,6 +179,36 @@ public sealed class ContractsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new VerifySignatureFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── Search & Filtering ──────────────────────────────────────
+
+        group.MapGet("/search", async (
+            ContractProtocol? protocol,
+            ContractLifecycleState? lifecycleState,
+            Guid? apiAssetId,
+            string? searchTerm,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new SearchContractsFeature.Query(
+                protocol, lifecycleState, apiAssetId, searchTerm, page ?? 1, pageSize ?? 20), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── Rule Violations ─────────────────────────────────────────
+
+        group.MapGet("/{contractVersionId:guid}/violations", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListRuleViolationsFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
         });
     }
