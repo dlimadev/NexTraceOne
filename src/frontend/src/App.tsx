@@ -15,6 +15,10 @@ import { PromotionPage } from './pages/PromotionPage';
 import { LicensingPage } from './pages/LicensingPage';
 import { DeveloperPortalPage } from './pages/DeveloperPortalPage';
 import { AuditPage } from './pages/AuditPage';
+import { BreakGlassPage } from './pages/BreakGlassPage';
+import { JitAccessPage } from './pages/JitAccessPage';
+import { DelegationPage } from './pages/DelegationPage';
+import { AccessReviewPage } from './pages/AccessReviewPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 
 const queryClient = new QueryClient({
@@ -56,6 +60,38 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="audit:read" redirectTo="/unauthorized">
                     <AuditPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/break-glass"
+                element={
+                  <ProtectedRoute permission="identity:sessions:read" redirectTo="/unauthorized">
+                    <BreakGlassPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/jit-access"
+                element={
+                  <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
+                    <JitAccessPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/delegations"
+                element={
+                  <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
+                    <DelegationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/access-reviews"
+                element={
+                  <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
+                    <AccessReviewPage />
                   </ProtectedRoute>
                 }
               />
