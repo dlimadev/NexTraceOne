@@ -187,7 +187,7 @@ public sealed class License : AggregateRoot<LicenseId>
             return LicensingErrors.QuotaNotFound(metricCode);
         }
 
-        quota.Consume(quantity);
+        quota.Consume(quantity, now);
 
         if (quota.IsExceeded())
         {
