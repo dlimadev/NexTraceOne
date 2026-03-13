@@ -32,7 +32,7 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
 
         stopwatch.Stop();
 
-        if (TryGetResultState(response, out var isSuccess, out var error))
+        if (ResultResponseFactory.TryGetResultState(response, out var isSuccess, out var error))
         {
             if (isSuccess)
             {
@@ -59,24 +59,5 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
         }
 
         return response;
-    }
-
-    private static bool TryGetResultState(TResponse response, out bool isSuccess, out Error? error)
-    {
-        var responseType = typeof(TResponse);
-
-        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
-        {
-            isSuccess = false;
-            error = null;
-            return false;
-        }
-
-        isSuccess = (bool)(responseType.GetProperty(nameof(Result<object>.IsSuccess))?.GetValue(response) ?? false);
-        error = isSuccess
-            ? null
-            : responseType.GetProperty(nameof(Result<object>.Error))?.GetValue(response) as Error;
-
-        return true;
     }
 }

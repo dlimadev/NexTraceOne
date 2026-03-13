@@ -25,25 +25,13 @@ public sealed class TransactionBehavior<TRequest, TResponse>(
 
         if (IsCommandRequest())
         {
-            if (IsSuccessfulResult(response))
+            if (ResultResponseFactory.IsSuccessfulResult(response))
             {
                 await unitOfWork.CommitAsync(cancellationToken);
             }
         }
 
         return response;
-    }
-
-    private static bool IsSuccessfulResult(TResponse response)
-    {
-        var responseType = typeof(TResponse);
-
-        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(Result<>))
-        {
-            return true;
-        }
-
-        return (bool)(responseType.GetProperty(nameof(Result<object>.IsSuccess))?.GetValue(response) ?? false);
     }
 
     private static bool IsCommandRequest()
