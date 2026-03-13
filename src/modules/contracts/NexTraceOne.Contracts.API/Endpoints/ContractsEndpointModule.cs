@@ -3,20 +3,28 @@ using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.Contracts.Domain.Enums;
 using ClassifyBreakingChangeFeature = NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange.ClassifyBreakingChange;
 using ComputeSemanticDiffFeature = NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff.ComputeSemanticDiff;
 using CreateContractVersionFeature = NexTraceOne.Contracts.Application.Features.CreateContractVersion.CreateContractVersion;
+using DeprecateContractVersionFeature = NexTraceOne.Contracts.Application.Features.DeprecateContractVersion.DeprecateContractVersion;
 using ExportContractFeature = NexTraceOne.Contracts.Application.Features.ExportContract.ExportContract;
 using GetContractHistoryFeature = NexTraceOne.Contracts.Application.Features.GetContractHistory.GetContractHistory;
+using GetContractVersionDetailFeature = NexTraceOne.Contracts.Application.Features.GetContractVersionDetail.GetContractVersionDetail;
 using ImportContractFeature = NexTraceOne.Contracts.Application.Features.ImportContract.ImportContract;
 using LockContractVersionFeature = NexTraceOne.Contracts.Application.Features.LockContractVersion.LockContractVersion;
+using SignContractVersionFeature = NexTraceOne.Contracts.Application.Features.SignContractVersion.SignContractVersion;
 using SuggestSemanticVersionFeature = NexTraceOne.Contracts.Application.Features.SuggestSemanticVersion.SuggestSemanticVersion;
+using TransitionLifecycleStateFeature = NexTraceOne.Contracts.Application.Features.TransitionLifecycleState.TransitionLifecycleState;
+using VerifySignatureFeature = NexTraceOne.Contracts.Application.Features.VerifySignature.VerifySignature;
 
 namespace NexTraceOne.Contracts.API.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo Contracts.
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
+/// Suporta multi-protocolo: OpenAPI, Swagger, WSDL, AsyncAPI.
+/// Inclui lifecycle management, assinatura digital e verificação de integridade.
 /// </summary>
 public sealed class ContractsEndpointModule
 {
@@ -24,6 +32,8 @@ public sealed class ContractsEndpointModule
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v1/contracts");
+
+        // ── Import & Versioning ─────────────────────────────────
 
         group.MapPost("/", async (
             ImportContractFeature.Command command,
@@ -44,6 +54,8 @@ public sealed class ContractsEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/contracts/{0}", localizer);
         });
+
+        // ── Diff & Classification ───────────────────────────────
 
         group.MapPost("/diff", async (
             ComputeSemanticDiffFeature.Query query,
@@ -76,6 +88,8 @@ public sealed class ContractsEndpointModule
             return result.ToHttpResult(localizer);
         });
 
+        // ── History & Detail ────────────────────────────────────
+
         group.MapGet("/history/{apiAssetId:guid}", async (
             Guid apiAssetId,
             ISender sender,
@@ -85,6 +99,28 @@ public sealed class ContractsEndpointModule
             var result = await sender.Send(new GetContractHistoryFeature.Query(apiAssetId), cancellationToken);
             return result.ToHttpResult(localizer);
         });
+
+        group.MapGet("/{contractVersionId:guid}/detail", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetContractVersionDetailFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapGet("/{contractVersionId:guid}/export", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ExportContractFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── Lifecycle ───────────────────────────────────────────
 
         group.MapPost("/{contractVersionId:guid}/lock", async (
             Guid contractVersionId,
@@ -98,13 +134,49 @@ public sealed class ContractsEndpointModule
             return result.ToHttpResult(localizer);
         });
 
-        group.MapGet("/{contractVersionId:guid}/export", async (
+        group.MapPost("/{contractVersionId:guid}/lifecycle", async (
+            Guid contractVersionId,
+            TransitionLifecycleStateFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ContractVersionId = contractVersionId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapPost("/{contractVersionId:guid}/deprecate", async (
+            Guid contractVersionId,
+            DeprecateContractVersionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ContractVersionId = contractVersionId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ── Signing & Integrity ─────────────────────────────────
+
+        group.MapPost("/{contractVersionId:guid}/sign", async (
             Guid contractVersionId,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new ExportContractFeature.Query(contractVersionId), cancellationToken);
+            var result = await sender.Send(new SignContractVersionFeature.Command(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapGet("/{contractVersionId:guid}/verify", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new VerifySignatureFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
         });
     }

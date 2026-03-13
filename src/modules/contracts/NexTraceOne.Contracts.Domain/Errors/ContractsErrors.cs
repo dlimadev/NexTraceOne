@@ -9,6 +9,8 @@ namespace NexTraceOne.Contracts.Domain.Errors;
 /// </summary>
 public static class ContractsErrors
 {
+    // ── ContractVersion ─────────────────────────────────────────────
+
     /// <summary>Versão de contrato não encontrada.</summary>
     public static Error ContractVersionNotFound(string id)
         => Error.NotFound("Contracts.ContractVersion.NotFound", "Contract version '{0}' was not found.", id);
@@ -25,13 +27,29 @@ public static class ContractsErrors
     public static Error InvalidSemVer(string version)
         => Error.Validation("Contracts.ContractVersion.InvalidSemVer", "'{0}' is not a valid semantic version. Expected format: Major.Minor.Patch.", version);
 
-    /// <summary>Conteúdo da especificação OpenAPI está vazio.</summary>
+    /// <summary>Conteúdo da especificação está vazio.</summary>
     public static Error EmptySpecContent()
-        => Error.Validation("Contracts.ContractVersion.EmptySpecContent", "The OpenAPI spec content cannot be empty.");
+        => Error.Validation("Contracts.ContractVersion.EmptySpecContent", "The spec content cannot be empty.");
 
     /// <summary>Nenhuma versão anterior encontrada para este ativo de API.</summary>
     public static Error NoPreviousVersion(string apiAssetId)
         => Error.Business("Contracts.ContractVersion.NoPreviousVersion", "No previous contract version found for API asset '{0}'.", apiAssetId);
+
+    // ── Lifecycle ───────────────────────────────────────────────────
+
+    /// <summary>Transição de lifecycle inválida entre estados.</summary>
+    public static Error InvalidLifecycleTransition(string fromState, string toState)
+        => Error.Business("Contracts.Lifecycle.InvalidTransition", "Cannot transition from '{0}' to '{1}'.", fromState, toState);
+
+    /// <summary>Não é possível assinar o contrato no estado atual.</summary>
+    public static Error CannotSignInCurrentState(string state)
+        => Error.Business("Contracts.Signing.InvalidState", "Cannot sign contract in state '{0}'. Contract must be Approved or Locked.", state);
+
+    /// <summary>Verificação de integridade da assinatura falhou.</summary>
+    public static Error SignatureVerificationFailed(string contractVersionId)
+        => Error.Business("Contracts.Signing.VerificationFailed", "Signature verification failed for contract version '{0}'.", contractVersionId);
+
+    // ── ContractDiff ────────────────────────────────────────────────
 
     /// <summary>Falha ao computar o diff entre versões de contrato.</summary>
     public static Error DiffComputationFailed(string reason)
@@ -40,4 +58,23 @@ public static class ContractsErrors
     /// <summary>Nenhum diff encontrado para a versão de contrato informada.</summary>
     public static Error DiffNotFound(string contractVersionId)
         => Error.NotFound("Contracts.ContractDiff.NotFound", "No diff found for contract version '{0}'.", contractVersionId);
+
+    // ── Protocol ────────────────────────────────────────────────────
+
+    /// <summary>Protocolo de contrato não suportado.</summary>
+    public static Error UnsupportedProtocol(string protocol)
+        => Error.Validation("Contracts.Protocol.Unsupported", "Protocol '{0}' is not supported.", protocol);
+
+    // ── Artifacts ───────────────────────────────────────────────────
+
+    /// <summary>Artefato não encontrado.</summary>
+    public static Error ArtifactNotFound(string id)
+        => Error.NotFound("Contracts.Artifact.NotFound", "Contract artifact '{0}' was not found.", id);
+
+    // ── Rulesets ────────────────────────────────────────────────────
+
+    /// <summary>Nenhum ruleset encontrado para o protocolo informado.</summary>
+    public static Error NoRulesetsForProtocol(string protocol)
+        => Error.Business("Contracts.Ruleset.NotFound", "No rulesets found for protocol '{0}'.", protocol);
 }
+
