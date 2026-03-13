@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.DeveloperPortal.Application\NexTraceOne.DeveloperPortal.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.DeveloperPortal.Domain\NexTraceOne.DeveloperPortal.Domain.csproj" />
+    <ProjectReference Include="..\NexTraceOne.DeveloperPortal.Contracts\NexTraceOne.DeveloperPortal.Contracts.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />
   </ItemGroup>

@@ -7,6 +7,7 @@ using NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
 using NexTraceOne.Workflow.Infrastructure.Persistence;
 using NexTraceOne.Promotion.Infrastructure.Persistence;
 using NexTraceOne.Audit.Infrastructure.Persistence;
+using NexTraceOne.DeveloperPortal.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace NexTraceOne.ApiHost;
@@ -54,6 +55,7 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<WorkflowDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<PromotionDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
 
             logger.LogInformation(
                 "Migrations applied successfully for: {Contexts}",

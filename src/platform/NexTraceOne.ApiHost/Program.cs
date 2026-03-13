@@ -15,6 +15,8 @@ using NexTraceOne.Workflow.API;
 using NexTraceOne.Promotion.API;
 using NexTraceOne.Audit.API;
 using NexTraceOne.DeveloperPortal.API;
+using Scalar.AspNetCore;
+using System.Threading.RateLimiting;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Sovereign Change Intelligence Platform
@@ -56,7 +58,25 @@ builder.Services.AddOpenApi();
 // [6] CORS — validação de origens e configuração restritiva
 builder.AddCorsConfiguration();
 
-// [7] Tratamento de exceções não capturadas
+// [7] Rate Limiting — proteção contra abuso nas APIs públicas
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Política global: janela fixa de 60s com limite de 100 requisições por IP
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 10
+            }));
+});
+
+// [8] Tratamento de exceções não capturadas
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddProblemDetails();
 
@@ -67,6 +87,7 @@ await app.ApplyDatabaseMigrationsAsync();
 
 // ── Middlewares na ordem correta ──
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseSecurityHeaders();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseGlobalExceptionHandler();
@@ -77,7 +98,14 @@ app.UseAuthorization();
 app.MapAllModuleEndpoints();
 
 if (app.Environment.IsDevelopment())
+{
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "NexTraceOne API";
+        options.Theme = ScalarTheme.BluePlanet;
+    });
+}
 
 app.MapHealthChecks("/health").AllowAnonymous();
 
