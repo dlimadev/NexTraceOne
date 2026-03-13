@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.ChangeGovernance.Domain</RootNamespace>
+    <AssemblyName>NexTraceOne.ChangeGovernance.Domain</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.ChangeGovernance.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+</Project>

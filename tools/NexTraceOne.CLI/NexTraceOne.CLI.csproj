@@ -6,21 +6,14 @@
     <AssemblyName>nex</AssemblyName>
     <SelfContained>false</SelfContained>
   </PropertyGroup>
-  <ItemGroup Label="Módulos (apenas Contracts — consumidor externo)">
-    <ProjectReference Include="..\..\src\modules\identity\NexTraceOne.Identity.Contracts\NexTraceOne.Identity.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\licensing\NexTraceOne.Licensing.Contracts\NexTraceOne.Licensing.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\engineeringgraph\NexTraceOne.EngineeringGraph.Contracts\NexTraceOne.EngineeringGraph.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\developerportal\NexTraceOne.DeveloperPortal.Contracts\NexTraceOne.DeveloperPortal.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\contracts\NexTraceOne.Contracts.Contracts\NexTraceOne.Contracts.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\changeintelligence\NexTraceOne.ChangeIntelligence.Contracts\NexTraceOne.ChangeIntelligence.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\rulesetgovernance\NexTraceOne.RulesetGovernance.Contracts\NexTraceOne.RulesetGovernance.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\workflow\NexTraceOne.Workflow.Contracts\NexTraceOne.Workflow.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\promotion\NexTraceOne.Promotion.Contracts\NexTraceOne.Promotion.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\runtimeintelligence\NexTraceOne.RuntimeIntelligence.Contracts\NexTraceOne.RuntimeIntelligence.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\costintelligence\NexTraceOne.CostIntelligence.Contracts\NexTraceOne.CostIntelligence.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\aiorchestration\NexTraceOne.AiOrchestration.Contracts\NexTraceOne.AiOrchestration.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\externalai\NexTraceOne.ExternalAi.Contracts\NexTraceOne.ExternalAi.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\audit\NexTraceOne.Audit.Contracts\NexTraceOne.Audit.Contracts.csproj" />
+  <ItemGroup Label="Bounded Contexts (Domain — contratos compartilhados absorvidos)">
+    <ProjectReference Include="..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Domain\NexTraceOne.IdentityAccess.Domain.csproj" />
+    <ProjectReference Include="..\..\src\modules\commercialgovernance\NexTraceOne.CommercialGovernance.Domain\NexTraceOne.CommercialGovernance.Domain.csproj" />
+    <ProjectReference Include="..\..\src\modules\catalog\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
+    <ProjectReference Include="..\..\src\modules\changegovernance\NexTraceOne.ChangeGovernance.Domain\NexTraceOne.ChangeGovernance.Domain.csproj" />
+    <ProjectReference Include="..\..\src\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Domain\NexTraceOne.OperationalIntelligence.Domain.csproj" />
+    <ProjectReference Include="..\..\src\modules\aiknowledge\NexTraceOne.AIKnowledge.Domain\NexTraceOne.AIKnowledge.Domain.csproj" />
+    <ProjectReference Include="..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Domain\NexTraceOne.AuditCompliance.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.CommandLine" />

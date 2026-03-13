@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.ChangeGovernance.Application</RootNamespace>
+    <AssemblyName>NexTraceOne.ChangeGovernance.Application</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.ChangeGovernance.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.ChangeGovernance.Domain\NexTraceOne.ChangeGovernance.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>

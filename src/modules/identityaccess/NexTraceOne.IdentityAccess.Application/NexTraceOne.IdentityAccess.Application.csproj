@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.IdentityAccess.Application</RootNamespace>
+    <AssemblyName>NexTraceOne.IdentityAccess.Application</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.IdentityAccess.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.IdentityAccess.Domain\NexTraceOne.IdentityAccess.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Ardalis.GuardClauses" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>

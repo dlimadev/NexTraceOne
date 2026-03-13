@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.Catalog.Application</RootNamespace>
+    <AssemblyName>NexTraceOne.Catalog.Application</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.Catalog.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>
