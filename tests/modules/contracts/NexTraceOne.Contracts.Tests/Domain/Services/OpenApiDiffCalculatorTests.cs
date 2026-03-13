@@ -194,8 +194,8 @@ public sealed class OpenApiDiffCalculatorTests
     [Fact]
     public void ExtractPathsAndMethods_Should_ReturnPaths_When_ValidOpenApiSpec()
     {
-        // Act
-        var paths = OpenApiDiffCalculator.ExtractPathsAndMethods(BaseSpec);
+        // Act — parsing delegado ao OpenApiSpecParser após refatoração SRP
+        var paths = OpenApiSpecParser.ExtractPathsAndMethods(BaseSpec);
 
         // Assert
         paths.Should().ContainKey("/users");
