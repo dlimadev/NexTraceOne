@@ -4,7 +4,6 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features;
 using NexTraceOne.Identity.Domain.Entities;
 using NexTraceOne.Identity.Domain.Errors;
 using NexTraceOne.Identity.Domain.ValueObjects;
@@ -18,14 +17,14 @@ namespace NexTraceOne.Identity.Application.Features.LocalLogin;
 /// 1. Valida credenciais (email + senha) contra o repositório.
 /// 2. Verifica estado de bloqueio da conta.
 /// 3. Resolve o TenantMembership e Role do usuário.
-/// 4. Cria sessão e emite tokens JWT via <see cref="LoginSessionCreator"/>.
-/// 5. Registra eventos de auditoria via <see cref="SecurityAuditRecorder"/>.
+/// 4. Cria sessão e emite tokens JWT via <see cref="ILoginSessionCreator"/>.
+/// 5. Registra eventos de auditoria via <see cref="ISecurityAuditRecorder"/>.
 ///
 /// Delegação de responsabilidades:
-/// - Criação de sessão → <see cref="LoginSessionCreator"/> (SRP).
-/// - Eventos de auditoria → <see cref="SecurityAuditRecorder"/> (SRP).
-/// - Resolução de membership → <see cref="IdentityFeatureSupport"/> (DRY).
-/// - Construção de resposta → <see cref="IdentityFeatureSupport"/> (DRY).
+/// - Criação de sessão → <see cref="ILoginSessionCreator"/> (SRP/DIP).
+/// - Eventos de auditoria → <see cref="ISecurityAuditRecorder"/> (SRP/DIP).
+/// - Resolução de membership → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+/// - Construção de resposta → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
 /// </summary>
 public static class LocalLogin
 {
@@ -50,20 +49,22 @@ public static class LocalLogin
     /// Handler que autentica um usuário local e emite tokens.
     ///
     /// Orquestra o fluxo de autenticação local delegando responsabilidades
-    /// específicas para serviços extraídos:
-    /// - LoginSessionCreator para criação de sessão.
-    /// - SecurityAuditRecorder para registro de eventos de segurança.
+    /// específicas para serviços injetados via DI:
+    /// - ILoginSessionCreator para criação de sessão (DIP).
+    /// - ISecurityAuditRecorder para registro de eventos de segurança (DIP).
+    /// - ILoginResponseBuilder para resolução de membership e construção de resposta (DIP).
+    ///
+    /// Refatoração: reduzido de 9 para 5 dependências diretas via extração
+    /// de serviços injetáveis, melhorando testabilidade e aderência ao SRP.
     /// </summary>
     public sealed class Handler(
         IUserRepository userRepository,
-        ITenantMembershipRepository membershipRepository,
         IRoleRepository roleRepository,
-        ISessionRepository sessionRepository,
         IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        ICurrentTenant currentTenant,
-        ISecurityEventRepository securityEventRepository) : ICommandHandler<Command, LoginResponse>
+        ISecurityAuditRecorder auditRecorder,
+        ILoginSessionCreator sessionCreator,
+        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LoginResponse>
     {
         public async Task<Result<LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -88,9 +89,8 @@ public static class LocalLogin
 
                 if (user.IsLocked(dateTimeProvider.UtcNow))
                 {
-                    SecurityAuditRecorder.RecordAccountLocked(
-                        securityEventRepository, dateTimeProvider,
-                        SecurityAuditRecorder.ResolveTenantIdForAudit(currentTenant),
+                    auditRecorder.RecordAccountLocked(
+                        auditRecorder.ResolveTenantIdForAudit(),
                         user.Id, request.IpAddress, request.UserAgent);
                     return IdentityErrors.AccountLocked(user.LockoutEnd);
                 }
@@ -99,15 +99,11 @@ public static class LocalLogin
                 return IdentityErrors.InvalidCredentials();
             }
 
-            var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
-                currentTenant,
-                membershipRepository,
-                user.Id,
-                cancellationToken);
+            var membership = await responseBuilder.ResolveMembershipAsync(user.Id, cancellationToken);
 
             if (membership is null)
             {
-                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, currentTenant.Id);
+                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, auditRecorder.ResolveTenantIdForAudit().Value);
             }
 
             var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
@@ -118,31 +114,23 @@ public static class LocalLogin
 
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            // Delega criação de sessão para LoginSessionCreator (SRP)
-            var (_, refreshToken) = LoginSessionCreator.CreateSession(
-                jwtTokenGenerator, sessionRepository, dateTimeProvider,
+            // Delega criação de sessão para ILoginSessionCreator (SRP/DIP)
+            var (_, refreshToken) = sessionCreator.CreateSession(
                 user.Id, request.IpAddress, request.UserAgent);
 
-            // Delega registro de evento de sucesso para SecurityAuditRecorder (SRP)
-            SecurityAuditRecorder.RecordAuthenticationSuccess(
-                securityEventRepository, dateTimeProvider,
+            // Delega registro de evento de sucesso para ISecurityAuditRecorder (SRP/DIP)
+            auditRecorder.RecordAuthenticationSuccess(
                 membership.TenantId, user.Id,
                 request.IpAddress, request.UserAgent);
 
-            return IdentityFeatureSupport.CreateLoginResponse(
-                user,
-                membership,
-                role,
-                jwtTokenGenerator,
-                refreshToken);
+            return responseBuilder.CreateLoginResponse(user, membership, role, refreshToken);
         }
 
-        /// <summary>Registra evento de falha de autenticação delegando para SecurityAuditRecorder.</summary>
+        /// <summary>Registra evento de falha de autenticação delegando para ISecurityAuditRecorder.</summary>
         private void RecordAuthFailure(Command request, UserId? userId, string reason)
         {
-            SecurityAuditRecorder.RecordAuthenticationFailure(
-                securityEventRepository, dateTimeProvider,
-                SecurityAuditRecorder.ResolveTenantIdForAudit(currentTenant),
+            auditRecorder.RecordAuthenticationFailure(
+                auditRecorder.ResolveTenantIdForAudit(),
                 userId, reason, request.IpAddress, request.UserAgent);
         }
     }

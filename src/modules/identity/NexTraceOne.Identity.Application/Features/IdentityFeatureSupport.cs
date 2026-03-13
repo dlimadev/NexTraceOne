@@ -6,14 +6,27 @@ using NexTraceOne.Identity.Domain.Entities;
 namespace NexTraceOne.Identity.Application.Features;
 
 /// <summary>
-/// Utilitários internos compartilhados entre features do módulo Identity.
+/// Implementação injetável da construção de respostas padronizadas de login
+/// e resolução de memberships no módulo Identity.
+///
+/// Responsabilidade única: centralizar operações compartilhadas entre múltiplos
+/// handlers de autenticação (LocalLogin, OidcCallback, FederatedLogin, RefreshToken),
+/// eliminando duplicação sem acoplar handlers entre si.
+///
+/// Decisão de design:
+/// - Classe injetável via DI (Scoped) — compartilha contexto do request (ICurrentTenant).
+/// - Dependências recebidas por construtor — respeita DIP, permite mock em testes.
+///
+/// Refatoração: migrado da classe estática IdentityFeatureSupport para serviço injetável,
+/// aderindo ao Dependency Inversion Principle e facilitando testes unitários.
 /// </summary>
-internal static class IdentityFeatureSupport
+internal sealed class LoginResponseBuilder(
+    ICurrentTenant currentTenant,
+    ITenantMembershipRepository membershipRepository,
+    IJwtTokenGenerator jwtTokenGenerator) : ILoginResponseBuilder
 {
-    /// <summary>Resolve o vínculo ativo do usuário com base no tenant atual ou no primeiro vínculo disponível.</summary>
-    public static async Task<TenantMembership?> ResolveMembershipAsync(
-        ICurrentTenant currentTenant,
-        ITenantMembershipRepository membershipRepository,
+    /// <inheritdoc />
+    public async Task<TenantMembership?> ResolveMembershipAsync(
         UserId userId,
         CancellationToken cancellationToken)
     {
@@ -34,12 +47,11 @@ internal static class IdentityFeatureSupport
             .FirstOrDefault(membership => membership.IsActive);
     }
 
-    /// <summary>Cria a resposta padronizada de autenticação para o módulo Identity.</summary>
-    public static LocalLoginFeature.LoginResponse CreateLoginResponse(
+    /// <inheritdoc />
+    public LocalLoginFeature.LoginResponse CreateLoginResponse(
         User user,
         TenantMembership membership,
         Role role,
-        IJwtTokenGenerator jwtTokenGenerator,
         string refreshToken)
     {
         var permissions = Role.GetPermissionsForRole(role.Name);

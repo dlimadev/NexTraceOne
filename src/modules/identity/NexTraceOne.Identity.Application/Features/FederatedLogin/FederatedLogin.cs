@@ -4,7 +4,6 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features;
 using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
 using NexTraceOne.Identity.Domain.Entities;
 using NexTraceOne.Identity.Domain.Errors;
@@ -14,6 +13,15 @@ namespace NexTraceOne.Identity.Application.Features.FederatedLogin;
 
 /// <summary>
 /// Feature: FederatedLogin — autentica um usuário federado com provider externo.
+///
+/// Delegação de responsabilidades:
+/// - Criação de sessão → <see cref="ILoginSessionCreator"/> (SRP/DIP).
+/// - Resolução de membership → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+/// - Construção de resposta → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+///
+/// Refatoração: eliminada duplicação de criação inline de sessão e refresh token,
+/// agora delegada para ILoginSessionCreator como os demais handlers de autenticação.
+/// Reduzido de 7 para 5 dependências diretas via serviços injetáveis.
 /// </summary>
 public static class FederatedLogin
 {
@@ -38,15 +46,22 @@ public static class FederatedLogin
         }
     }
 
-    /// <summary>Handler que autentica ou provisiona um usuário federado.</summary>
+    /// <summary>
+    /// Handler que autentica ou provisiona um usuário federado.
+    ///
+    /// Orquestra o fluxo de autenticação federada delegando responsabilidades
+    /// específicas para serviços injetados via DI:
+    /// - ILoginSessionCreator para criação de sessão (DIP).
+    /// - ILoginResponseBuilder para resolução de membership e construção de resposta (DIP).
+    /// </summary>
     public sealed class Handler(
         IUserRepository userRepository,
         ITenantMembershipRepository membershipRepository,
         IRoleRepository roleRepository,
-        ISessionRepository sessionRepository,
-        IJwtTokenGenerator jwtTokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
+        ICurrentTenant currentTenant,
+        ILoginSessionCreator sessionCreator,
+        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
     {
         public async Task<Result<LocalLoginFeature.LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -73,11 +88,7 @@ public static class FederatedLogin
                 user.LinkFederatedIdentity(request.Provider, request.ExternalId);
             }
 
-            var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
-                currentTenant,
-                membershipRepository,
-                user.Id,
-                cancellationToken);
+            var membership = await responseBuilder.ResolveMembershipAsync(user.Id, cancellationToken);
 
             if (membership is null && currentTenant.Id != Guid.Empty)
             {
@@ -109,22 +120,12 @@ public static class FederatedLogin
 
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
-            var session = Session.Create(
-                user.Id,
-                RefreshTokenHash.Create(refreshToken),
-                dateTimeProvider.UtcNow.AddDays(30),
-                request.IpAddress ?? "unknown",
-                request.UserAgent ?? "unknown");
+            // Delega criação de sessão para ILoginSessionCreator (SRP/DIP)
+            // Elimina duplicação: anteriormente criava Session e RefreshToken inline
+            var (_, refreshToken) = sessionCreator.CreateSession(
+                user.Id, request.IpAddress, request.UserAgent);
 
-            sessionRepository.Add(session);
-
-            return IdentityFeatureSupport.CreateLoginResponse(
-                user,
-                membership,
-                role,
-                jwtTokenGenerator,
-                refreshToken);
+            return responseBuilder.CreateLoginResponse(user, membership, role, refreshToken);
         }
     }
 }
