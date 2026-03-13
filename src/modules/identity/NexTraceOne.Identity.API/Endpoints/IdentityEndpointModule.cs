@@ -6,7 +6,7 @@ namespace NexTraceOne.Identity.API.Endpoints;
 /// Orquestrador de endpoints Minimal API do módulo Identity.
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 /// Delega para ficheiros especializados por domínio funcional:
-/// Auth, Users, RolePermission, BreakGlass, JitAccess, Delegation, Tenant e AccessReview.
+/// Auth, Users, RolePermission, BreakGlass, JitAccess, Delegation, Tenant, AccessReview e Environment.
 /// </summary>
 public sealed class IdentityEndpointModule
 {
@@ -25,5 +25,6 @@ public sealed class IdentityEndpointModule
         DelegationEndpoints.Map(group);
         TenantEndpoints.Map(group);
         AccessReviewEndpoints.Map(group);
+        EnvironmentEndpoints.Map(group);
     }
 }

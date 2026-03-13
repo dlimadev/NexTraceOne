@@ -73,7 +73,7 @@ internal static class AccessReviewEndpoints
                 new DecideAccessReviewItemFeature.Command(campaignId, itemId, body.Approve, body.Comment),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:users:write");
     }
 
     /// <summary>

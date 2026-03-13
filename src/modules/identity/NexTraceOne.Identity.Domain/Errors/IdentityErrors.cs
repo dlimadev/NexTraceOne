@@ -187,4 +187,12 @@ public static class IdentityErrors
     /// <summary>Acesso ao ambiente já existente.</summary>
     public static Error EnvironmentAccessAlreadyExists(Guid userId, Guid environmentId)
         => Error.Conflict("Identity.Environment.AccessAlreadyExists", "User '{0}' already has access to environment '{1}'.", userId, environmentId);
+
+    /// <summary>Ambiente não está ativo — operação não permitida.</summary>
+    public static Error EnvironmentNotActive(Guid environmentId)
+        => Error.Validation("Identity.Environment.NotActive", "Environment '{0}' is not active.", environmentId);
+
+    /// <summary>Nível de acesso ao ambiente inválido.</summary>
+    public static Error InvalidEnvironmentAccessLevel(string accessLevel)
+        => Error.Validation("Identity.Environment.InvalidAccessLevel", "Access level '{0}' is not valid. Valid levels: read, write, admin, none.", accessLevel);
 }
