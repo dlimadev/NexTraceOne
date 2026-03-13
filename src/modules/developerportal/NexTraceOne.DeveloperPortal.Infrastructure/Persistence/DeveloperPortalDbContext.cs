@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.DeveloperPortal.Domain.Entities;
 
 namespace NexTraceOne.DeveloperPortal.Infrastructure.Persistence;
 
@@ -14,10 +15,28 @@ public sealed class DeveloperPortalDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Subscrições de notificações de API.</summary>
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
 
+    /// <summary>Sessões de execução no playground sandbox.</summary>
+    public DbSet<PlaygroundSession> PlaygroundSessions => Set<PlaygroundSession>();
+
+    /// <summary>Registos de geração de código a partir de contratos.</summary>
+    public DbSet<CodeGenerationRecord> CodeGenerationRecords => Set<CodeGenerationRecord>();
+
+    /// <summary>Eventos de analytics de utilização do portal.</summary>
+    public DbSet<PortalAnalyticsEvent> PortalAnalyticsEvents => Set<PortalAnalyticsEvent>();
+
+    /// <summary>Pesquisas salvas no catálogo.</summary>
+    public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
+
+    /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(DeveloperPortalDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

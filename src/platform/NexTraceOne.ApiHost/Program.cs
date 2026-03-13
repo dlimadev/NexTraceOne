@@ -14,6 +14,7 @@ using NexTraceOne.RulesetGovernance.API;
 using NexTraceOne.Workflow.API;
 using NexTraceOne.Promotion.API;
 using NexTraceOne.Audit.API;
+using NexTraceOne.DeveloperPortal.API;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Sovereign Change Intelligence Platform
@@ -47,6 +48,7 @@ builder.Services.AddRulesetGovernanceModule(builder.Configuration);
 builder.Services.AddWorkflowModule(builder.Configuration);
 builder.Services.AddPromotionModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
+builder.Services.AddDeveloperPortalModule(builder.Configuration);
 
 // [5] OpenAPI
 builder.Services.AddOpenApi();
