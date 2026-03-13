@@ -11,6 +11,10 @@ namespace NexTraceOne.Identity.Tests.Application.Features;
 /// <summary>
 /// Testes da feature LocalLogin.
 /// Cobrem cenários de sucesso, falha de credenciais, lockout e geração de eventos de segurança.
+///
+/// Refatoração: testes atualizados para usar interfaces injetáveis (ISecurityAuditRecorder,
+/// ILoginSessionCreator, ILoginResponseBuilder) em vez de classes estáticas,
+/// aderindo ao DIP e melhorando a testabilidade.
 /// </summary>
 public sealed class LocalLoginTests
 {
@@ -22,38 +26,37 @@ public sealed class LocalLoginTests
         var membership = TenantMembership.Create(user.Id, TenantId.From(Guid.NewGuid()), RoleId.New(), now);
         var role = Role.CreateSystem(membership.RoleId, Role.PlatformAdmin, "Administrative access");
         var userRepository = Substitute.For<IUserRepository>();
-        var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
-        var sessionRepository = Substitute.For<ISessionRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
-        var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
-        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
-        var currentTenant = new TestCurrentTenant(membership.TenantId.Value);
+        var auditRecorder = Substitute.For<ISecurityAuditRecorder>();
+        var sessionCreator = Substitute.For<ILoginSessionCreator>();
+        var responseBuilder = Substitute.For<ILoginResponseBuilder>();
         var sut = new LocalLoginFeature.Handler(
             userRepository,
-            membershipRepository,
             roleRepository,
-            sessionRepository,
             passwordHasher,
-            jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            currentTenant,
-            securityEventRepository);
+            auditRecorder,
+            sessionCreator,
+            responseBuilder);
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
-        membershipRepository.GetByUserAndTenantAsync(user.Id, membership.TenantId, Arg.Any<CancellationToken>()).Returns(membership);
+        responseBuilder.ResolveMembershipAsync(user.Id, Arg.Any<CancellationToken>()).Returns(membership);
         roleRepository.GetByIdAsync(membership.RoleId, Arg.Any<CancellationToken>()).Returns(role);
         passwordHasher.Verify("P@ssw0rd123", user.PasswordHash!.Value).Returns(true);
-        jwtTokenGenerator.GenerateRefreshToken().Returns("refresh-token");
-        jwtTokenGenerator.AccessTokenLifetimeSeconds.Returns(3600);
-        jwtTokenGenerator.GenerateAccessToken(user, membership, Arg.Any<IReadOnlyCollection<string>>()).Returns("access-token");
+        sessionCreator.CreateSession(user.Id, Arg.Any<string?>(), Arg.Any<string?>())
+            .Returns((Session.Create(user.Id, RefreshTokenHash.Create("refresh-token"), now.AddDays(30), "unknown", "unknown"), "refresh-token"));
+        responseBuilder.CreateLoginResponse(user, membership, role, "refresh-token")
+            .Returns(new LocalLoginFeature.LoginResponse("access-token", "refresh-token", 3600,
+                new LocalLoginFeature.UserResponse(user.Id.Value, "alice@example.com", "Alice Doe", membership.TenantId.Value, Role.PlatformAdmin, [])));
 
         var result = await sut.Handle(new LocalLoginFeature.Command("alice@example.com", "P@ssw0rd123"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.AccessToken.Should().Be("access-token");
-        sessionRepository.Received(1).Add(Arg.Any<Session>());
-        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.AuthenticationSucceeded));
+        sessionCreator.Received(1).CreateSession(user.Id, Arg.Any<string?>(), Arg.Any<string?>());
+        auditRecorder.Received(1).RecordAuthenticationSuccess(
+            membership.TenantId, user.Id, Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>());
     }
 
     [Fact]
@@ -62,22 +65,20 @@ public sealed class LocalLoginTests
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
         var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
         var userRepository = Substitute.For<IUserRepository>();
-        var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
-        var sessionRepository = Substitute.For<ISessionRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
-        var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
-        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var auditRecorder = Substitute.For<ISecurityAuditRecorder>();
+        var sessionCreator = Substitute.For<ILoginSessionCreator>();
+        var responseBuilder = Substitute.For<ILoginResponseBuilder>();
+        auditRecorder.ResolveTenantIdForAudit().Returns(TenantId.From(Guid.NewGuid()));
         var sut = new LocalLoginFeature.Handler(
             userRepository,
-            membershipRepository,
             roleRepository,
-            sessionRepository,
             passwordHasher,
-            jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            new TestCurrentTenant(Guid.NewGuid()),
-            securityEventRepository);
+            auditRecorder,
+            sessionCreator,
+            responseBuilder);
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         passwordHasher.Verify("wrong-password", user.PasswordHash!.Value).Returns(false);
@@ -86,8 +87,9 @@ public sealed class LocalLoginTests
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Identity.Auth.InvalidCredentials");
-        sessionRepository.DidNotReceive().Add(Arg.Any<Session>());
-        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.AuthenticationFailed));
+        sessionCreator.DidNotReceive().CreateSession(Arg.Any<UserId>(), Arg.Any<string?>(), Arg.Any<string?>());
+        auditRecorder.Received(1).RecordAuthenticationFailure(
+            Arg.Any<TenantId>(), user.Id, Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>());
     }
 
     [Fact]
@@ -101,22 +103,20 @@ public sealed class LocalLoginTests
         }
 
         var userRepository = Substitute.For<IUserRepository>();
-        var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
-        var sessionRepository = Substitute.For<ISessionRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
-        var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
-        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var auditRecorder = Substitute.For<ISecurityAuditRecorder>();
+        var sessionCreator = Substitute.For<ILoginSessionCreator>();
+        var responseBuilder = Substitute.For<ILoginResponseBuilder>();
+        auditRecorder.ResolveTenantIdForAudit().Returns(TenantId.From(Guid.NewGuid()));
         var sut = new LocalLoginFeature.Handler(
             userRepository,
-            membershipRepository,
             roleRepository,
-            sessionRepository,
             passwordHasher,
-            jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            new TestCurrentTenant(Guid.NewGuid()),
-            securityEventRepository);
+            auditRecorder,
+            sessionCreator,
+            responseBuilder);
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         passwordHasher.Verify("wrong-password", user.PasswordHash!.Value).Returns(false);
@@ -125,6 +125,7 @@ public sealed class LocalLoginTests
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Be("Identity.Auth.AccountLocked");
-        securityEventRepository.Received(1).Add(Arg.Is<SecurityEvent>(e => e.EventType == SecurityEventType.AccountLocked));
+        auditRecorder.Received(1).RecordAccountLocked(
+            Arg.Any<TenantId>(), user.Id, Arg.Any<string?>(), Arg.Any<string?>());
     }
 }

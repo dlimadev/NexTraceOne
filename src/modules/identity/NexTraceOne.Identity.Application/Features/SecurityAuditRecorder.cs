@@ -5,30 +5,28 @@ using NexTraceOne.Identity.Domain.Entities;
 namespace NexTraceOne.Identity.Application.Features;
 
 /// <summary>
-/// Serviço utilitário interno para registro centralizado de eventos de segurança (SecurityEvent)
+/// Implementação injetável do registro centralizado de eventos de segurança (SecurityEvent)
 /// no módulo Identity.
-///
-/// Extraído dos handlers LocalLogin e OidcCallback para eliminar a duplicação de lógica
-/// de criação de SecurityEvent espalhada entre múltiplos handlers de autenticação.
 ///
 /// Responsabilidade única: encapsular a criação e persistência de SecurityEvents,
 /// isolando os handlers da mecânica de construção de eventos de auditoria.
 ///
 /// Decisão de design:
-/// - Classe interna (internal) — usada apenas dentro do módulo Identity.
-/// - Sem estado — cada método é autocontido, recebendo todos os parâmetros necessários.
+/// - Classe injetável via DI (Scoped) — compartilha repositórios e contexto do request.
+/// - Dependências recebidas por construtor — respeita DIP, permite mock em testes.
 /// - Sem lógica de negócio — apenas formata e persiste o evento.
-/// - Handlers continuam decidindo QUANDO registrar — este serviço apenas executa o COMO.
+/// - Handlers decidem QUANDO registrar — este serviço executa o COMO.
+///
+/// Refatoração: migrado de classe estática para serviço injetável para aderir
+/// ao Dependency Inversion Principle e facilitar testes unitários dos handlers.
 /// </summary>
-internal static class SecurityAuditRecorder
+internal sealed class SecurityAuditRecorder(
+    ISecurityEventRepository securityEventRepository,
+    IDateTimeProvider dateTimeProvider,
+    ICurrentTenant currentTenant) : ISecurityAuditRecorder
 {
-    /// <summary>
-    /// Registra evento de autenticação bem-sucedida para trilha de auditoria.
-    /// Usado por LocalLogin e OidcCallback após validação completa de credenciais.
-    /// </summary>
-    public static void RecordAuthenticationSuccess(
-        ISecurityEventRepository securityEventRepository,
-        IDateTimeProvider dateTimeProvider,
+    /// <inheritdoc />
+    public void RecordAuthenticationSuccess(
         TenantId tenantId,
         UserId userId,
         string? ipAddress,
@@ -48,13 +46,8 @@ internal static class SecurityAuditRecorder
             dateTimeProvider.UtcNow));
     }
 
-    /// <summary>
-    /// Registra evento de falha de autenticação para detecção de anomalias.
-    /// Usado por LocalLogin quando credenciais são inválidas ou usuário não encontrado.
-    /// </summary>
-    public static void RecordAuthenticationFailure(
-        ISecurityEventRepository securityEventRepository,
-        IDateTimeProvider dateTimeProvider,
+    /// <inheritdoc />
+    public void RecordAuthenticationFailure(
         TenantId tenantId,
         UserId? userId,
         string reason,
@@ -74,13 +67,8 @@ internal static class SecurityAuditRecorder
             dateTimeProvider.UtcNow));
     }
 
-    /// <summary>
-    /// Registra evento de bloqueio de conta por tentativas excessivas de login.
-    /// Risk score elevado (70) pois pode indicar ataque de força bruta.
-    /// </summary>
-    public static void RecordAccountLocked(
-        ISecurityEventRepository securityEventRepository,
-        IDateTimeProvider dateTimeProvider,
+    /// <inheritdoc />
+    public void RecordAccountLocked(
         TenantId tenantId,
         UserId userId,
         string? ipAddress,
@@ -99,13 +87,8 @@ internal static class SecurityAuditRecorder
             dateTimeProvider.UtcNow));
     }
 
-    /// <summary>
-    /// Registra evento de callback OIDC bem-sucedido para trilha de auditoria federada.
-    /// Inclui metadados do provider e identidade externa no evento.
-    /// </summary>
-    public static void RecordOidcCallbackSuccess(
-        ISecurityEventRepository securityEventRepository,
-        IDateTimeProvider dateTimeProvider,
+    /// <inheritdoc />
+    public void RecordOidcCallbackSuccess(
         TenantId tenantId,
         UserId userId,
         SessionId sessionId,
@@ -127,13 +110,8 @@ internal static class SecurityAuditRecorder
             dateTimeProvider.UtcNow));
     }
 
-    /// <summary>
-    /// Registra evento de falha no callback OIDC para detecção de anomalias federadas.
-    /// Risk score moderado (50) pois pode indicar replay attack ou provider comprometido.
-    /// </summary>
-    public static void RecordOidcCallbackFailure(
-        ISecurityEventRepository securityEventRepository,
-        IDateTimeProvider dateTimeProvider,
+    /// <inheritdoc />
+    public void RecordOidcCallbackFailure(
         TenantId tenantId,
         string provider,
         string reason,
@@ -153,12 +131,8 @@ internal static class SecurityAuditRecorder
             dateTimeProvider.UtcNow));
     }
 
-    /// <summary>
-    /// Resolve o TenantId para eventos de segurança quando o tenant pode não estar disponível.
-    /// Usado em cenários de falha de autenticação onde o contexto do tenant pode estar vazio.
-    /// Retorna TenantId.From(Guid.Empty) como fallback seguro.
-    /// </summary>
-    public static TenantId ResolveTenantIdForAudit(ICurrentTenant currentTenant)
+    /// <inheritdoc />
+    public TenantId ResolveTenantIdForAudit()
     {
         return currentTenant.Id != Guid.Empty
             ? TenantId.From(currentTenant.Id)

@@ -19,10 +19,9 @@ public static class GetCurrentUser
     /// <summary>Handler que obtém dados do usuário autenticado a partir do ICurrentUser.</summary>
     public sealed class Handler(
         ICurrentUser currentUser,
-        ICurrentTenant currentTenant,
         IUserRepository userRepository,
-        ITenantMembershipRepository membershipRepository,
-        IRoleRepository roleRepository) : IQueryHandler<Query, Response>
+        IRoleRepository roleRepository,
+        ILoginResponseBuilder responseBuilder) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -39,11 +38,7 @@ public static class GetCurrentUser
                 return IdentityErrors.UserNotFound(userId);
             }
 
-            var membership = await Features.IdentityFeatureSupport.ResolveMembershipAsync(
-                currentTenant,
-                membershipRepository,
-                user.Id,
-                cancellationToken);
+            var membership = await responseBuilder.ResolveMembershipAsync(user.Id, cancellationToken);
 
             string roleName = string.Empty;
             IReadOnlyList<string> permissions = [];

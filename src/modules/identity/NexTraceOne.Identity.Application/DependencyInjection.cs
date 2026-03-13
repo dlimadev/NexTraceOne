@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Identity.Application.Abstractions;
 using NexTraceOne.Identity.Application.Features.ActivateUser;
 using NexTraceOne.Identity.Application.Features.AssignRole;
 using NexTraceOne.Identity.Application.Features.ChangePassword;
@@ -42,6 +43,11 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksApplication(configuration);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        // Serviços de aplicação extraídos dos handlers para aderir ao DIP/SRP
+        services.AddScoped<ISecurityAuditRecorder, Features.SecurityAuditRecorder>();
+        services.AddScoped<ILoginSessionCreator, Features.LoginSessionCreator>();
+        services.AddScoped<ILoginResponseBuilder, Features.LoginResponseBuilder>();
 
         // Autenticação
         services.AddTransient<IValidator<LocalLogin.Command>, LocalLogin.Validator>();

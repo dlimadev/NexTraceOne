@@ -556,3 +556,39 @@ Código que apresente estes sinais deve ser refatorado:
 - Parser retorna estruturas intermediárias; Calculator opera sobre essas estruturas.
 - Benefícios: testabilidade isolada, reutilização do parser, Calculator independente do formato de entrada.
 - Em caso de specs malformadas ou dados inválidos, parsers devem retornar estruturas vazias (não lançar exceções) para não bloquear o processamento.
+
+### 36. Proibição de Classes Estáticas para Lógica com Dependências
+
+- **Nunca** usar classes estáticas (`static class`) para lógica que depende de repositórios, serviços ou qualquer abstração com I/O.
+- Classes estáticas são aceitáveis apenas para:
+  - Cálculos puros sem I/O (ex: `OpenApiDiffCalculator`).
+  - Extension methods genuínos (ex: `WebApplicationExtensions`).
+  - Catálogos/constantes imutáveis (ex: `SecurityEventType`).
+- Toda lógica que receba repositórios ou serviços como parâmetros deve ser refatorada para **interface injetável + implementação via DI**.
+- Exemplo: `SecurityAuditRecorder`, `LoginSessionCreator`, `IdentityFeatureSupport` foram migrados de `static class` para interfaces (`ISecurityAuditRecorder`, `ILoginSessionCreator`, `ILoginResponseBuilder`).
+- Benefícios: respeita DIP, permite mock em testes, reduz acoplamento dos handlers.
+
+### 37. Limite de Dependências por Handler
+
+- Handlers devem ter no máximo **5-7 dependências** injetadas no construtor.
+- Se um handler ultrapassar 7 dependências, considere extrair serviços de aplicação que agrupem responsabilidades relacionadas.
+- Padrão de extração: criar interface em Abstractions + implementação interna em Features + registro Scoped no DI.
+- Exemplo: `OidcCallback.Handler` reduziu de 9 para 6 dependências após extração de `ILoginSessionCreator`, `ISecurityAuditRecorder` e `ILoginResponseBuilder`.
+- Cada serviço extraído deve ter **responsabilidade única e coesa** — não criar "super services" que apenas transferem o problema.
+
+### 38. Validações de Domínio Centralizadas (DRY em Aggregates)
+
+- Quando múltiplos métodos de um aggregate compartilham a mesma pré-condição, extrair para método privado.
+- Padrão: `EnsureUsable()`, `EnsureActive()`, `EnsureNotExpired()` — nomes que expressem a invariante verificada.
+- Exemplo: `License.EnsureUsable()` centraliza a verificação `IsActive + !Expired` usada por `CheckCapability`, `TrackUsage` e `VerifyAt`.
+- Manter o método privado dentro do aggregate — não extrair para Domain Service se a validação é sobre o estado interno.
+- Evitar duplicação de guard clauses entre métodos do mesmo aggregate.
+
+### 39. Convenção de Naming para Serviços de Aplicação Extraídos
+
+- Interfaces devem ter nomes que expressem a **responsabilidade** do serviço, não o padrão técnico.
+- Prefira `ILoginResponseBuilder` sobre `ILoginHelper` ou `ILoginUtils`.
+- Prefira `ISecurityAuditRecorder` sobre `IAuditHelper` ou `IAuditUtils`.
+- Prefira `ILoginSessionCreator` sobre `ISessionHelper` ou `ISessionUtils`.
+- Interfaces ficam em `Application/Abstractions/` — implementações ficam em `Application/Features/` como `internal sealed`.
+- Registro no DI: `services.AddScoped<IInterface, Implementation>()` na Application DependencyInjection.

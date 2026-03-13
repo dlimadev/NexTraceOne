@@ -4,7 +4,6 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
 using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features;
 using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
 using NexTraceOne.Identity.Domain.Errors;
 using NexTraceOne.Identity.Domain.ValueObjects;
@@ -13,6 +12,12 @@ namespace NexTraceOne.Identity.Application.Features.RefreshToken;
 
 /// <summary>
 /// Feature: RefreshToken — rotaciona o refresh token e emite novo access token.
+///
+/// Delegação de responsabilidades:
+/// - Resolução de membership → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+/// - Construção de resposta → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+///
+/// Refatoração: reduzido de 7 para 5 dependências diretas via serviços injetáveis.
 /// </summary>
 public static class RefreshToken
 {
@@ -29,15 +34,20 @@ public static class RefreshToken
         }
     }
 
-    /// <summary>Handler que valida o refresh token, rotaciona a sessão e emite novos tokens.</summary>
+    /// <summary>
+    /// Handler que valida o refresh token, rotaciona a sessão e emite novos tokens.
+    ///
+    /// Orquestra o fluxo de rotação delegando responsabilidades específicas
+    /// para serviços injetados via DI:
+    /// - ILoginResponseBuilder para resolução de membership e construção de resposta (DIP).
+    /// </summary>
     public sealed class Handler(
         ISessionRepository sessionRepository,
         IUserRepository userRepository,
-        ITenantMembershipRepository membershipRepository,
         IRoleRepository roleRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
+        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
     {
         public async Task<Result<LocalLoginFeature.LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -67,15 +77,11 @@ public static class RefreshToken
                 return IdentityErrors.UserNotFound(session.UserId.Value);
             }
 
-            var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
-                currentTenant,
-                membershipRepository,
-                user.Id,
-                cancellationToken);
+            var membership = await responseBuilder.ResolveMembershipAsync(user.Id, cancellationToken);
 
             if (membership is null)
             {
-                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, currentTenant.Id);
+                return IdentityErrors.TenantMembershipNotFound(user.Id.Value, responseBuilder.CurrentTenantId);
             }
 
             var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
@@ -88,12 +94,7 @@ public static class RefreshToken
             session.Rotate(RefreshTokenHash.Create(newRefreshToken), dateTimeProvider.UtcNow.AddDays(30));
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            return IdentityFeatureSupport.CreateLoginResponse(
-                user,
-                membership,
-                role,
-                jwtTokenGenerator,
-                newRefreshToken);
+            return responseBuilder.CreateLoginResponse(user, membership, role, newRefreshToken);
         }
     }
 }

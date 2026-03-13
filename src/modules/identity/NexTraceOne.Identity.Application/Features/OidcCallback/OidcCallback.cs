@@ -20,15 +20,15 @@ namespace NexTraceOne.Identity.Application.Features.OidcCallback;
 /// 3. Troca o code por informações do usuário via IOidcProvider.ExchangeCodeAsync.
 /// 4. Cria ou vincula o usuário interno (User + ExternalIdentity).
 /// 5. Resolve o TenantMembership do usuário.
-/// 6. Cria sessão via <see cref="LoginSessionCreator"/> e emite JWT token.
-/// 7. Registra eventos de auditoria via <see cref="SecurityAuditRecorder"/>.
+/// 6. Cria sessão via <see cref="ILoginSessionCreator"/> e emite JWT token.
+/// 7. Registra eventos de auditoria via <see cref="ISecurityAuditRecorder"/>.
 /// 8. Retorna o token + returnTo para o frontend completar a navegação.
 ///
 /// Delegação de responsabilidades:
-/// - Criação de sessão → <see cref="LoginSessionCreator"/> (SRP).
-/// - Eventos de auditoria → <see cref="SecurityAuditRecorder"/> (SRP).
-/// - Resolução de membership → <see cref="IdentityFeatureSupport"/> (DRY).
-/// - Construção de resposta → <see cref="IdentityFeatureSupport"/> (DRY).
+/// - Criação de sessão → <see cref="ILoginSessionCreator"/> (SRP/DIP).
+/// - Eventos de auditoria → <see cref="ISecurityAuditRecorder"/> (SRP/DIP).
+/// - Resolução de membership → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+/// - Construção de resposta → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
 ///
 /// Tratamento de erros:
 /// - State inválido → CSRF suspeito, rejeita com OidcCallbackFailed event.
@@ -39,6 +39,9 @@ namespace NexTraceOne.Identity.Application.Features.OidcCallback;
 /// Compatibilidade com Deep Link:
 /// O returnTo extraído do state é retornado junto com os tokens para que
 /// o frontend possa restaurar a rota original do usuário após autenticação.
+///
+/// Refatoração: reduzido de 9 para 6 dependências diretas via extração
+/// de serviços injetáveis, melhorando testabilidade e aderência ao SRP/DIP.
 /// </summary>
 public static class OidcCallback
 {
@@ -80,20 +83,21 @@ public static class OidcCallback
     /// Valida o state, troca o code, cria/vincula o usuário e emite o JWT.
     ///
     /// Orquestra o fluxo de autenticação federada delegando responsabilidades
-    /// específicas para serviços extraídos:
-    /// - LoginSessionCreator para criação de sessão.
-    /// - SecurityAuditRecorder para registro de eventos de segurança.
+    /// específicas para serviços injetados via DI:
+    /// - ILoginSessionCreator para criação de sessão (DIP).
+    /// - ISecurityAuditRecorder para registro de eventos de segurança (DIP).
+    /// - ILoginResponseBuilder para resolução de membership e construção de resposta (DIP).
     /// </summary>
     public sealed class Handler(
         IOidcProvider oidcProvider,
         IUserRepository userRepository,
-        ITenantMembershipRepository membershipRepository,
         IRoleRepository roleRepository,
-        ISessionRepository sessionRepository,
-        IJwtTokenGenerator jwtTokenGenerator,
+        ITenantMembershipRepository membershipRepository,
         IDateTimeProvider dateTimeProvider,
         ICurrentTenant currentTenant,
-        ISecurityEventRepository securityEventRepository) : ICommandHandler<Command, Response>
+        ISecurityAuditRecorder auditRecorder,
+        ILoginSessionCreator sessionCreator,
+        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, Response>
     {
         /// <summary>URI de callback — deve ser idêntico ao usado em StartOidcLogin.</summary>
         private const string CallbackPath = "/api/v1/identity/auth/oidc/callback";
@@ -122,9 +126,8 @@ public static class OidcCallback
             catch (Exception ex)
             {
                 // Falha no token exchange — pode ser code expirado, inválido ou provider indisponível
-                SecurityAuditRecorder.RecordOidcCallbackFailure(
-                    securityEventRepository, dateTimeProvider,
-                    SecurityAuditRecorder.ResolveTenantIdForAudit(currentTenant),
+                auditRecorder.RecordOidcCallbackFailure(
+                    auditRecorder.ResolveTenantIdForAudit(),
                     request.Provider, $"Token exchange failed: {ex.Message}",
                     request.IpAddress, request.UserAgent);
                 return IdentityErrors.OidcCallbackFailed(request.Provider);
@@ -135,11 +138,7 @@ public static class OidcCallback
                 request.Provider, userInfo, cancellationToken);
 
             // Resolve o TenantMembership do usuário no tenant corrente
-            var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
-                currentTenant,
-                membershipRepository,
-                user.Id,
-                cancellationToken);
+            var membership = await responseBuilder.ResolveMembershipAsync(user.Id, cancellationToken);
 
             if (membership is null && currentTenant.Id != Guid.Empty)
             {
@@ -164,24 +163,18 @@ public static class OidcCallback
 
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            // Delega criação de sessão para LoginSessionCreator (SRP)
-            var (session, refreshToken) = LoginSessionCreator.CreateSession(
-                jwtTokenGenerator, sessionRepository, dateTimeProvider,
+            // Delega criação de sessão para ILoginSessionCreator (SRP/DIP)
+            var (session, refreshToken) = sessionCreator.CreateSession(
                 user.Id, request.IpAddress, request.UserAgent);
 
-            // Delega registro de callback bem-sucedido para SecurityAuditRecorder (SRP)
-            SecurityAuditRecorder.RecordOidcCallbackSuccess(
-                securityEventRepository, dateTimeProvider,
+            // Delega registro de callback bem-sucedido para ISecurityAuditRecorder (SRP/DIP)
+            auditRecorder.RecordOidcCallbackSuccess(
                 membership.TenantId, user.Id, session.Id,
                 request.Provider, userInfo.ExternalId,
                 request.IpAddress, request.UserAgent);
 
-            var loginResponse = IdentityFeatureSupport.CreateLoginResponse(
-                user,
-                membership,
-                role,
-                jwtTokenGenerator,
-                refreshToken);
+            var loginResponse = responseBuilder.CreateLoginResponse(
+                user, membership, role, refreshToken);
 
             return new Response(
                 loginResponse.AccessToken,

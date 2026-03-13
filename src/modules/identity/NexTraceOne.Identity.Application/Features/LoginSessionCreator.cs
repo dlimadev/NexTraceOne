@@ -6,38 +6,27 @@ using NexTraceOne.Identity.Domain.ValueObjects;
 namespace NexTraceOne.Identity.Application.Features;
 
 /// <summary>
-/// Serviço utilitário interno para criação de sessões de autenticação no módulo Identity.
-///
-/// Extraído dos handlers LocalLogin e OidcCallback para eliminar a duplicação de lógica
-/// de criação de Session (refresh token hash, expiração, metadados de dispositivo)
-/// espalhada entre múltiplos handlers de autenticação.
+/// Implementação injetável da criação centralizada de sessões de autenticação no módulo Identity.
 ///
 /// Responsabilidade única: encapsular a criação e persistência de sessões,
-/// garantindo que todos os fluxos de autenticação (local, OIDC, refresh)
+/// garantindo que todos os fluxos de autenticação (local, OIDC, federado, refresh)
 /// criem sessões de forma consistente.
 ///
-/// Parâmetros padronizados:
-/// - Duração de sessão: 30 dias (configurável em evolução futura).
-/// - IP e User-Agent: capturados para rastreabilidade — "unknown" quando não disponível.
+/// Decisão de design:
+/// - Classe injetável via DI (Scoped) — compartilha repositórios do request corrente.
+/// - Dependências recebidas por construtor — respeita DIP, permite mock em testes.
+/// - Parâmetros padronizados: duração de 30 dias, "unknown" para IP/UA ausentes.
+///
+/// Refatoração: migrado de classe estática para serviço injetável para aderir
+/// ao Dependency Inversion Principle e facilitar testes unitários dos handlers.
 /// </summary>
-internal static class LoginSessionCreator
+internal sealed class LoginSessionCreator(
+    IJwtTokenGenerator jwtTokenGenerator,
+    ISessionRepository sessionRepository,
+    IDateTimeProvider dateTimeProvider) : ILoginSessionCreator
 {
-    /// <summary>
-    /// Cria uma nova sessão de autenticação, persiste no repositório e retorna o refresh token em texto plano.
-    /// O refresh token é gerado pelo IJwtTokenGenerator e hasheado antes de persistir.
-    ///
-    /// Fluxo:
-    /// 1. Gera refresh token aleatório via IJwtTokenGenerator.
-    /// 2. Cria hash do refresh token para armazenamento seguro.
-    /// 3. Cria entidade Session com expiração de 30 dias.
-    /// 4. Persiste a sessão via ISessionRepository.
-    /// 5. Retorna o refresh token em texto plano para envio ao cliente.
-    /// </summary>
-    /// <returns>Tupla com a sessão criada e o refresh token em texto plano.</returns>
-    public static (Session Session, string RefreshToken) CreateSession(
-        IJwtTokenGenerator jwtTokenGenerator,
-        ISessionRepository sessionRepository,
-        IDateTimeProvider dateTimeProvider,
+    /// <inheritdoc />
+    public (Session Session, string RefreshToken) CreateSession(
         UserId userId,
         string? ipAddress,
         string? userAgent)
