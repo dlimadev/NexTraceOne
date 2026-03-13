@@ -1,4 +1,5 @@
 using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Contracts.Domain.Enums;
 
 namespace NexTraceOne.Contracts.Application.Abstractions;
 
@@ -21,4 +22,17 @@ public interface IContractVersionRepository
 
     /// <summary>Retorna a versão de contrato mais recente de um ativo de API.</summary>
     Task<ContractVersion?> GetLatestByApiAssetAsync(Guid apiAssetId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Pesquisa versões de contrato com filtros opcionais e paginação.
+    /// Retorna os itens da página solicitada e o total de registros que atendem aos filtros.
+    /// </summary>
+    Task<(IReadOnlyList<ContractVersion> Items, int TotalCount)> SearchAsync(
+        ContractProtocol? protocol,
+        ContractLifecycleState? lifecycleState,
+        Guid? apiAssetId,
+        string? searchTerm,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
 }
