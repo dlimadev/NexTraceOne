@@ -167,39 +167,44 @@ public sealed class MultiProtocolImportTests
 
     // ── Diff multi-protocolo ────────────────────────────────────
 
+    // ── Specs de teste para diff multi-protocolo ──────────────
+
+    private const string BaseWsdlSpec =
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="TestService">
+          <portType name="TestPortType">
+            <operation name="GetUser">
+              <input message="tns:GetUserRequest"/>
+            </operation>
+          </portType>
+        </definitions>
+        """;
+
+    private const string AdditiveWsdlSpec =
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="TestService">
+          <portType name="TestPortType">
+            <operation name="GetUser">
+              <input message="tns:GetUserRequest"/>
+            </operation>
+            <operation name="CreateUser">
+              <input message="tns:CreateUserRequest"/>
+            </operation>
+          </portType>
+        </definitions>
+        """;
+
+    private const string BaseAsyncApiSpec = """{"asyncapi":"2.0.0","info":{"title":"Events","version":"1.0.0"},"channels":{"user/created":{"publish":{"message":{"payload":{"type":"object","properties":{"userId":{"type":"string"}}}}}}}}""";
+    private const string AdditiveAsyncApiSpec = """{"asyncapi":"2.0.0","info":{"title":"Events","version":"1.1.0"},"channels":{"user/created":{"publish":{"message":{"payload":{"type":"object","properties":{"userId":{"type":"string"}}}}}},"order/placed":{"subscribe":{"message":{"payload":{"type":"object","properties":{"orderId":{"type":"string"}}}}}}}}""";
+
     [Fact]
     public async Task ComputeSemanticDiff_Should_UseWsdlCalculator_WhenProtocolIsWsdl()
     {
         var apiAssetId = Guid.NewGuid();
-        var baseWsdl =
-            """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="TestService">
-              <portType name="TestPortType">
-                <operation name="GetUser">
-                  <input message="tns:GetUserRequest"/>
-                </operation>
-              </portType>
-            </definitions>
-            """;
-
-        var targetWsdl =
-            """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="TestService">
-              <portType name="TestPortType">
-                <operation name="GetUser">
-                  <input message="tns:GetUserRequest"/>
-                </operation>
-                <operation name="CreateUser">
-                  <input message="tns:CreateUserRequest"/>
-                </operation>
-              </portType>
-            </definitions>
-            """;
-
-        var baseVersion = ContractVersion.Import(apiAssetId, "1.0.0", baseWsdl, "xml", "upload", ContractProtocol.Wsdl).Value;
-        var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", targetWsdl, "xml", "upload", ContractProtocol.Wsdl).Value;
+        var baseVersion = ContractVersion.Import(apiAssetId, "1.0.0", BaseWsdlSpec, "xml", "upload", ContractProtocol.Wsdl).Value;
+        var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", AdditiveWsdlSpec, "xml", "upload", ContractProtocol.Wsdl).Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
@@ -225,11 +230,8 @@ public sealed class MultiProtocolImportTests
     public async Task ComputeSemanticDiff_Should_UseAsyncApiCalculator_WhenProtocolIsAsyncApi()
     {
         var apiAssetId = Guid.NewGuid();
-        var baseAsync = """{"asyncapi":"2.0.0","info":{"title":"Events","version":"1.0.0"},"channels":{"user/created":{"publish":{"message":{"payload":{"type":"object","properties":{"userId":{"type":"string"}}}}}}}}""";
-        var targetAsync = """{"asyncapi":"2.0.0","info":{"title":"Events","version":"1.1.0"},"channels":{"user/created":{"publish":{"message":{"payload":{"type":"object","properties":{"userId":{"type":"string"}}}}}},"order/placed":{"subscribe":{"message":{"payload":{"type":"object","properties":{"orderId":{"type":"string"}}}}}}}}""";
-
-        var baseVersion = ContractVersion.Import(apiAssetId, "1.0.0", baseAsync, "json", "upload", ContractProtocol.AsyncApi).Value;
-        var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", targetAsync, "json", "upload", ContractProtocol.AsyncApi).Value;
+        var baseVersion = ContractVersion.Import(apiAssetId, "1.0.0", BaseAsyncApiSpec, "json", "upload", ContractProtocol.AsyncApi).Value;
+        var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", AdditiveAsyncApiSpec, "json", "upload", ContractProtocol.AsyncApi).Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
         var unitOfWork = Substitute.For<IUnitOfWork>();

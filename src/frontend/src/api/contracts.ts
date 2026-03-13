@@ -4,9 +4,11 @@ import type { ContractVersion, ContractVersionDetail, SignatureVerificationResul
 /**
  * Detecta o formato da especificação (json, yaml ou xml) a partir do conteúdo bruto.
  * Utilizado para preencher automaticamente o campo format ao importar contratos.
+ * Retorna 'yaml' como fallback para conteúdo vazio ou não reconhecido.
  */
 function detectFormat(content: string): 'json' | 'yaml' | 'xml' {
-  const trimmed = content.trim();
+  const trimmed = (content || '').trim();
+  if (!trimmed) return 'json';
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) return 'json';
   if (trimmed.startsWith('<') || trimmed.startsWith('<?xml')) return 'xml';
   return 'yaml';
