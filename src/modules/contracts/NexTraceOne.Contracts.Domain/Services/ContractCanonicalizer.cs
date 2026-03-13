@@ -36,12 +36,16 @@ public static class ContractCanonicalizer
     /// <summary>
     /// Canonicaliza JSON: parse e re-serializa com chaves ordenadas, sem indentação.
     /// Garante que JSONs semanticamente iguais produzam o mesmo hash.
+    /// Limita o tamanho para evitar alocação excessiva de memória (DoS).
     /// </summary>
     private static string CanonicalizeJson(string content)
     {
+        if (content.Length > MaxContentLength)
+            return CanonicalizeText(content);
+
         try
         {
-            using var doc = JsonDocument.Parse(content);
+            using var doc = JsonDocument.Parse(content, SafeJsonOptions);
             var sortedElement = SortJsonElement(doc.RootElement);
             return JsonSerializer.Serialize(sortedElement, CanonicalJsonOptions);
         }
@@ -95,4 +99,12 @@ public static class ContractCanonicalizer
         WriteIndented = false,
         PropertyNamingPolicy = null
     };
+
+    private static readonly JsonDocumentOptions SafeJsonOptions = new()
+    {
+        MaxDepth = 64
+    };
+
+    /// <summary>Limite máximo de conteúdo para parsing JSON (10 MB) — proteção contra DoS.</summary>
+    private const int MaxContentLength = 10_000_000;
 }
