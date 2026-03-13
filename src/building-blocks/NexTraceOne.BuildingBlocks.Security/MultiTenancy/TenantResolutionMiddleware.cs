@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -6,26 +7,45 @@ namespace NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 
 /// <summary>
 /// Middleware que resolve o tenant ativo para cada requisição HTTP.
-/// Prioridade: 1) JWT claim "tenant_id" 2) Header "X-Tenant-Id" 3) Subdomínio.
-/// Requisições sem tenant → 401 (exceto endpoints públicos).
+///
+/// Prioridade de resolução:
+/// 1) JWT claim "tenant_id" — fonte de verdade após autenticação.
+/// 2) Header "X-Tenant-Id" — usado antes do login estar completo (ex: seleção de tenant).
+/// 3) Subdomínio — resolução por convenção de host.
+///
+/// Segurança:
+/// - O header X-Tenant-Id é aceito apenas como fallback quando JWT não está presente.
+///   O backend DEVE validar que o tenant resolvido pertence ao usuário autenticado
+///   nos behaviors de pipeline (TenantIsolationBehavior).
+/// - Subdomínios geram IDs determinísticos via SHA-256 — previsíveis, mas validados
+///   no pipeline antes do acesso a dados.
+/// - Requisições sem tenant → processadas sem contexto de tenant.
+///   Endpoints que exigem tenant são bloqueados pelo TenantIsolationBehavior.
 /// </summary>
 public sealed class TenantResolutionMiddleware(
     RequestDelegate next,
-    CurrentTenantAccessor currentTenant)
+    CurrentTenantAccessor currentTenant,
+    ILogger<TenantResolutionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
         if (TryResolveFromJwt(context, out var jwtTenantId))
         {
             currentTenant.Set(jwtTenantId, slug: jwtTenantId.ToString("N"), name: "JWT Tenant", isActive: true);
+            logger.LogDebug("Tenant resolved from JWT claim: {TenantId}", jwtTenantId);
         }
         else if (TryResolveFromHeader(context, out var headerTenantId))
         {
+            // Segurança: o header é aceito como fallback, mas sem JWT o request só terá
+            // acesso a endpoints públicos. O TenantIsolationBehavior impede acesso a dados
+            // sem autenticação adequada. Registrar para fins de auditoria e troubleshooting.
             currentTenant.Set(headerTenantId, slug: headerTenantId.ToString("N"), name: "Header Tenant", isActive: true);
+            logger.LogDebug("Tenant resolved from X-Tenant-Id header: {TenantId}", headerTenantId);
         }
         else if (TryResolveFromSubdomain(context, out var subdomain, out var deterministicTenantId))
         {
             currentTenant.Set(deterministicTenantId, subdomain, subdomain, isActive: true);
+            logger.LogDebug("Tenant resolved from subdomain '{Subdomain}': {TenantId}", subdomain, deterministicTenantId);
         }
 
         await next(context);

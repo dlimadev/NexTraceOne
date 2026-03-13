@@ -37,9 +37,25 @@ public static class DependencyInjection
             ?? configuration["Security:Jwt:Audience"]
             ?? "NexTraceOne.Clients";
 
+        // Segurança: a chave JWT DEVE ser configurada externamente em ambientes não-Development.
+        // Em Development, permite fallback para chave conhecida — apenas para conveniência local.
+        // Em qualquer outro ambiente, a ausência da chave impede a inicialização para evitar
+        // que tokens possam ser forjados com uma chave publicamente conhecida.
         var signingKey = configuration["Jwt:Secret"]
-            ?? configuration["Security:Jwt:SigningKey"]
-            ?? "development-signing-key-development-signing-key-1234567890";
+            ?? configuration["Security:Jwt:SigningKey"];
+
+        if (string.IsNullOrWhiteSpace(signingKey))
+        {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+            if (!string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(
+                    "JWT signing key is not configured. Set 'Jwt:Secret' or 'Security:Jwt:SigningKey' in configuration, " +
+                    "or define it via environment variables. A signing key is mandatory in non-development environments.");
+            }
+
+            signingKey = "development-signing-key-development-signing-key-1234567890";
+        }
 
         services.AddHttpContextAccessor();
         services.AddScoped<JwtTokenService>();

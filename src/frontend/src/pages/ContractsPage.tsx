@@ -159,7 +159,7 @@ export function ContractsPage() {
                     <td className="px-6 py-3">
                       {!cv.isLocked && (
                         <button
-                          onClick={() => lockMutation.mutate({ id: cv.id, reason: 'Locked via UI' })}
+                          onClick={() => lockMutation.mutate({ id: cv.id, reason: t('contracts.lockedViaUi') })}
                           className="inline-flex items-center gap-1 text-xs text-muted hover:text-critical transition-colors"
                         >
                           <Lock size={12} /> {t('contracts.lock')}

@@ -19,7 +19,30 @@ public sealed class JwtTokenService(
 {
     private readonly string _issuer = configuration["Security:Jwt:Issuer"] ?? "NexTraceOne";
     private readonly string _audience = configuration["Security:Jwt:Audience"] ?? "NexTraceOne.Clients";
-    private readonly string _signingKey = configuration["Security:Jwt:SigningKey"] ?? "development-signing-key-development-signing-key-1234567890";
+    // Segurança: a chave JWT DEVE ser configurada externamente em produção.
+    // Em Development, permite fallback para chave conhecida — apenas para conveniência local.
+    // A ausência da chave em ambientes não-Development impede a inicialização, evitando
+    // que tokens possam ser forjados usando uma chave publicamente conhecida.
+    private readonly string _signingKey = ResolveSigningKey(configuration);
+
+    private static string ResolveSigningKey(IConfiguration configuration)
+    {
+        var key = configuration["Security:Jwt:SigningKey"]
+            ?? configuration["Jwt:Secret"];
+
+        if (!string.IsNullOrWhiteSpace(key))
+            return key;
+
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        if (!string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "JWT signing key is not configured. Set 'Security:Jwt:SigningKey' or 'Jwt:Secret'. " +
+                "A signing key is mandatory in non-development environments.");
+        }
+
+        return "development-signing-key-development-signing-key-1234567890";
+    }
     private readonly int _accessTokenLifetimeMinutes = int.TryParse(configuration["Security:Jwt:AccessTokenLifetimeMinutes"], out var minutes)
         ? minutes
         : 60;

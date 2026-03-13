@@ -66,8 +66,21 @@ builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddOpenApi();
 
 // [6] CORS para frontend — restringido a métodos e headers necessários
+// Segurança: validar que nenhuma origem contém wildcard (*) quando AllowCredentials está ativo.
+// Wildcard + Credentials é proibido pela spec CORS e pode causar falhas silenciosas.
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:5173", "http://localhost:3000"];
+
+foreach (var origin in corsOrigins)
+{
+    if (origin.Contains('*'))
+    {
+        throw new InvalidOperationException(
+            $"CORS origin '{origin}' contains a wildcard. Wildcards are not allowed when AllowCredentials is enabled. " +
+            "Configure explicit origins in 'Cors:AllowedOrigins'.");
+    }
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -174,10 +187,19 @@ app.Use(async (context, next) =>
     headers["X-XSS-Protection"] = "0";
     headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
+    // Content-Security-Policy para endpoints API: restringe ao mínimo necessário.
+    // O frontend SPA deve ter seu próprio CSP configurado no servidor/proxy que o serve.
+    headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";
+    // Impede cache de respostas sensíveis (API responses com dados de autenticação/tenant)
+    headers["Cache-Control"] = "no-store";
+    headers["Pragma"] = "no-cache";
 
     if (!app.Environment.IsDevelopment())
     {
-        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+        // HSTS com preload: indica ao navegador que o site deve ser acessado apenas via HTTPS.
+        // includeSubDomains garante cobertura para subdomínios de tenant.
+        // preload permite inclusão em listas de pré-carregamento dos navegadores.
+        headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload";
     }
 
     await next();
