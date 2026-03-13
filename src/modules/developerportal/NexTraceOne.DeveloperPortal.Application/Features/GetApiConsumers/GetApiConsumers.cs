@@ -1,25 +1,67 @@
-using MediatR;
+using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.DeveloperPortal.Application.Abstractions;
 
 namespace NexTraceOne.DeveloperPortal.Application.Features.GetApiConsumers;
 
 /// <summary>
-/// Feature: GetApiConsumers — Módulo: DeveloperPortal.
-/// Estrutura VSA: Command/Query + Handler + Validator + Response em um único arquivo.
-/// TODO: Implementar lógica de negócio desta feature.
+/// Feature: GetApiConsumers — lista consumidores formais de uma API.
+/// Combina subscrições do portal com dados do EngineeringGraph.
+/// Permite ao produtor ver quem consome e como.
 /// </summary>
 public static class GetApiConsumers
 {
-    // ── COMMAND / QUERY ───────────────────────────────────────────────────
-    // TODO: Implementar record Command ou Query com dados de entrada
+    /// <summary>Query para listar consumidores de uma API.</summary>
+    public sealed record Query(Guid ApiAssetId) : IQuery<Response>;
 
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
-    // TODO: Implementar AbstractValidator<Command> com FluentValidation
+    /// <summary>Valida os parâmetros da consulta de consumidores.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ApiAssetId).NotEmpty();
+        }
+    }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-    // TODO: Implementar handler herdando CommandHandlerBase ou QueryHandlerBase
+    /// <summary>
+    /// Handler que retorna consumidores de uma API via subscrições registadas.
+    /// Em produção, complementa com dados do EngineeringGraph para dependências reais.
+    /// </summary>
+    public sealed class Handler(ISubscriptionRepository repository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-    // TODO: Implementar record Response com dados de saída
+            var subscriptions = await repository.GetByApiAssetAsync(request.ApiAssetId, cancellationToken);
+
+            var consumers = subscriptions.Select(s => new ConsumerDto(
+                s.SubscriberId,
+                s.SubscriberEmail,
+                s.ConsumerServiceName,
+                s.ConsumerServiceVersion,
+                s.Level.ToString(),
+                s.Channel.ToString(),
+                s.IsActive,
+                s.CreatedAt)).ToList();
+
+            return new Response(consumers, consumers.Count);
+        }
+    }
+
+    /// <summary>DTO de consumidor de API com dados de subscrição.</summary>
+    public sealed record ConsumerDto(
+        Guid SubscriberId,
+        string SubscriberEmail,
+        string ConsumerServiceName,
+        string ConsumerServiceVersion,
+        string SubscriptionLevel,
+        string NotificationChannel,
+        bool IsActive,
+        DateTimeOffset SubscribedAt);
+
+    /// <summary>Resposta com lista de consumidores da API.</summary>
+    public sealed record Response(IReadOnlyList<ConsumerDto> Consumers, int TotalCount);
 }
