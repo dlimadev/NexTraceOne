@@ -13,9 +13,10 @@ using NexTraceOne.Contracts.Domain.ValueObjects;
 namespace NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff;
 
 /// <summary>
-/// Feature: ComputeSemanticDiff — computa o diff semântico entre duas versões de contrato OpenAPI.
+/// Feature: ComputeSemanticDiff — computa o diff semântico entre duas versões de contrato.
+/// Suporta múltiplos protocolos (OpenAPI, Swagger, AsyncAPI, WSDL) via delegação ao
+/// <see cref="ContractDiffCalculator"/>, que seleciona o calculador específico do protocolo.
 /// Detecta mudanças breaking, aditivas e non-breaking e sugere a próxima versão semântica.
-/// Delega o cálculo de diff puro ao serviço de domínio <see cref="OpenApiDiffCalculator"/>.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ComputeSemanticDiff
@@ -34,8 +35,9 @@ public static class ComputeSemanticDiff
     }
 
     /// <summary>
-    /// Handler que orquestra a computação do diff semântico.
-    /// Carrega as versões do repositório, delega o cálculo ao serviço de domínio
+    /// Handler que orquestra a computação do diff semântico multi-protocolo.
+    /// Carrega as versões do repositório, delega o cálculo ao <see cref="ContractDiffCalculator"/>
+    /// que seleciona o calculador específico do protocolo da versão alvo,
     /// e persiste o resultado na versão alvo.
     /// </summary>
     public sealed class Handler(
@@ -55,7 +57,8 @@ public static class ComputeSemanticDiff
             if (targetVersion is null)
                 return ContractsErrors.ContractVersionNotFound(request.TargetVersionId.ToString());
 
-            var diffResult = OpenApiDiffCalculator.ComputeDiff(baseVersion.SpecContent, targetVersion.SpecContent);
+            var diffResult = ContractDiffCalculator.ComputeDiff(
+                baseVersion.SpecContent, targetVersion.SpecContent, targetVersion.Protocol);
 
             var baseSemVer = SemanticVersion.Parse(baseVersion.SemVer);
             var suggestedSemVer = baseSemVer is null
