@@ -10,6 +10,19 @@ namespace NexTraceOne.Licensing.Domain.Entities;
 /// <summary>
 /// Aggregate Root que representa uma licença ativa da plataforma.
 /// Controla ativação em hardware, capabilities e quotas de consumo.
+///
+/// Responsabilidades (coesas ao conceito de licença):
+/// - Gestão do ciclo de vida (ativa/desativa).
+/// - Verificação de validade temporal e hardware binding.
+/// - Controle de ativações (máximo permitido).
+/// - Verificação de capabilities habilitadas.
+/// - Rastreamento de quotas de uso.
+///
+/// Decisão de design:
+/// - Validação de estado (ativa + não expirada) centralizada no método privado
+///   EnsureUsable() para eliminar duplicação entre CheckCapability, TrackUsage e VerifyAt.
+/// - Aggregate Root mantém invariantes de todas as sub-entidades (activations, capabilities, quotas)
+///   pois elas existem exclusivamente no contexto de uma licença.
 /// </summary>
 public sealed class License : AggregateRoot<LicenseId>
 {
@@ -121,14 +134,10 @@ public sealed class License : AggregateRoot<LicenseId>
     /// <summary>Verifica se a licença está utilizável para o hardware informado.</summary>
     public Result<Unit> VerifyAt(DateTimeOffset now, string hardwareFingerprint)
     {
-        if (!IsActive)
+        var usableCheck = EnsureUsable(now);
+        if (usableCheck.IsFailure)
         {
-            return LicensingErrors.LicenseInactive();
-        }
-
-        if (ExpiresAt <= now)
-        {
-            return LicensingErrors.LicenseExpired(ExpiresAt);
+            return usableCheck.Error;
         }
 
         if (HardwareBinding is null)
@@ -148,14 +157,10 @@ public sealed class License : AggregateRoot<LicenseId>
     /// <summary>Verifica se a licença possui a capability solicitada.</summary>
     public Result<LicenseCapability> CheckCapability(string capabilityCode, DateTimeOffset now)
     {
-        if (!IsActive)
+        var usableCheck = EnsureUsable(now);
+        if (usableCheck.IsFailure)
         {
-            return LicensingErrors.LicenseInactive();
-        }
-
-        if (ExpiresAt <= now)
-        {
-            return LicensingErrors.LicenseExpired(ExpiresAt);
+            return usableCheck.Error;
         }
 
         var capability = _capabilities.SingleOrDefault(x => string.Equals(x.Code, capabilityCode, StringComparison.OrdinalIgnoreCase));
@@ -170,14 +175,10 @@ public sealed class License : AggregateRoot<LicenseId>
     /// <summary>Registra consumo em uma quota de uso da licença.</summary>
     public Result<UsageQuota> TrackUsage(string metricCode, long quantity, DateTimeOffset now)
     {
-        if (!IsActive)
+        var usableCheck = EnsureUsable(now);
+        if (usableCheck.IsFailure)
         {
-            return LicensingErrors.LicenseInactive();
-        }
-
-        if (ExpiresAt <= now)
-        {
-            return LicensingErrors.LicenseExpired(ExpiresAt);
+            return usableCheck.Error;
         }
 
         var quota = _usageQuotas.SingleOrDefault(x => string.Equals(x.MetricCode, metricCode, StringComparison.OrdinalIgnoreCase));
@@ -198,6 +199,26 @@ public sealed class License : AggregateRoot<LicenseId>
 
     /// <summary>Desativa a licença para impedir novos usos e ativações.</summary>
     public void Deactivate() => IsActive = false;
+
+    /// <summary>
+    /// Valida pré-condição comum: licença deve estar ativa e não expirada.
+    /// Centraliza a verificação de estado para eliminar duplicação entre
+    /// CheckCapability, TrackUsage e VerifyAt (DRY).
+    /// </summary>
+    private Result<Unit> EnsureUsable(DateTimeOffset now)
+    {
+        if (!IsActive)
+        {
+            return LicensingErrors.LicenseInactive();
+        }
+
+        if (ExpiresAt <= now)
+        {
+            return LicensingErrors.LicenseExpired(ExpiresAt);
+        }
+
+        return Unit.Value;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de License.</summary>
