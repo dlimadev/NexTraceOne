@@ -88,8 +88,11 @@ internal sealed class OidcProviderService(
     /// Processo:
     /// 1. Chama o token endpoint do provider com o code.
     /// 2. Obtém access_token e id_token.
-    /// 3. Decodifica o id_token (JWT) para extrair claims do usuário.
+    /// 3. Delega a decodificação do id_token para <see cref="IdTokenDecoder"/>.
     /// 4. Retorna OidcUserInfo com sub, email e name.
+    ///
+    /// A separação entre comunicação HTTP (esta classe) e decodificação JWT
+    /// (IdTokenDecoder) permite testar cada responsabilidade isoladamente.
     /// </summary>
     public async Task<OidcUserInfo> ExchangeCodeAsync(
         string provider,
@@ -102,6 +105,25 @@ internal sealed class OidcProviderService(
         var clientId = section["ClientId"] ?? throw new InvalidOperationException($"OIDC clientId not configured for provider '{provider}'.");
         var clientSecret = section["ClientSecret"] ?? throw new InvalidOperationException($"OIDC clientSecret not configured for provider '{provider}'.");
 
+        var idToken = await ExchangeCodeForIdTokenAsync(
+            provider, code, redirectUri, authority, clientId, clientSecret, cancellationToken);
+
+        return ExtractUserInfoFromIdToken(idToken, provider);
+    }
+
+    /// <summary>
+    /// Executa a chamada HTTP ao token endpoint do provider OIDC e retorna o id_token bruto.
+    /// Responsabilidade isolada: comunicação com o provider — sem parsing de JWT.
+    /// </summary>
+    private async Task<string> ExchangeCodeForIdTokenAsync(
+        string provider,
+        string code,
+        string redirectUri,
+        string authority,
+        string clientId,
+        string clientSecret,
+        CancellationToken cancellationToken)
+    {
         // Token endpoint padrão — para produção, descobrir via discovery document
         var tokenEndpoint = $"{authority.TrimEnd('/')}/token";
 
@@ -146,8 +168,6 @@ internal sealed class OidcProviderService(
         var tokenJson = await tokenResponse.Content.ReadFromJsonAsync<JsonDocument>(cancellationToken: cancellationToken)
             ?? throw new InvalidOperationException($"Empty token response from provider '{provider}'.");
 
-        // Extrai as claims do id_token (JWT) sem verificação de assinatura (confiar no TLS + provider)
-        // Para produção: validar assinatura do id_token com as chaves públicas do provider
         var idToken = tokenJson.RootElement.TryGetProperty("id_token", out var idTokenElement)
             ? idTokenElement.GetString()
             : null;
@@ -157,7 +177,17 @@ internal sealed class OidcProviderService(
             throw new InvalidOperationException($"No id_token returned by provider '{provider}'.");
         }
 
-        var claims = DecodeIdTokenClaims(idToken);
+        return idToken;
+    }
+
+    /// <summary>
+    /// Extrai informações do usuário a partir do id_token JWT decodificado.
+    /// Delega a decodificação de claims para <see cref="IdTokenDecoder"/> (SRP).
+    /// Valida que as claims obrigatórias (sub, email) estão presentes.
+    /// </summary>
+    private static OidcUserInfo ExtractUserInfoFromIdToken(string idToken, string provider)
+    {
+        var claims = IdTokenDecoder.DecodeClaims(idToken);
 
         var sub = claims.TryGetValue("sub", out var subVal) ? subVal : null;
         var email = claims.TryGetValue("email", out var emailVal) ? emailVal : null;
@@ -170,39 +200,5 @@ internal sealed class OidcProviderService(
         }
 
         return new OidcUserInfo(sub, email, name ?? email, provider);
-    }
-
-    /// <summary>
-    /// Decodifica o payload do id_token JWT sem validação de assinatura.
-    /// Para MVP1, confiamos no TLS e na resposta direta do token endpoint do provider.
-    /// Para produção, validar a assinatura com JWK do provider.
-    /// </summary>
-    private static Dictionary<string, string> DecodeIdTokenClaims(string idToken)
-    {
-        var parts = idToken.Split('.');
-        if (parts.Length < 2)
-            return [];
-
-        var payload = parts[1];
-
-        // Padding Base64
-        var padding = payload.Length % 4;
-        if (padding > 0)
-            payload += new string('=', 4 - padding);
-
-        var payloadBytes = Convert.FromBase64String(payload.Replace('-', '+').Replace('_', '/'));
-        var payloadJson = System.Text.Encoding.UTF8.GetString(payloadBytes);
-
-        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        using var doc = JsonDocument.Parse(payloadJson);
-        foreach (var prop in doc.RootElement.EnumerateObject())
-        {
-            if (prop.Value.ValueKind == JsonValueKind.String)
-            {
-                result[prop.Name] = prop.Value.GetString() ?? string.Empty;
-            }
-        }
-
-        return result;
     }
 }

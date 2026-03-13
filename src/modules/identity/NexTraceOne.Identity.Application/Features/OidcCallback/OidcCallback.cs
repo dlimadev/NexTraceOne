@@ -20,8 +20,15 @@ namespace NexTraceOne.Identity.Application.Features.OidcCallback;
 /// 3. Troca o code por informações do usuário via IOidcProvider.ExchangeCodeAsync.
 /// 4. Cria ou vincula o usuário interno (User + ExternalIdentity).
 /// 5. Resolve o TenantMembership do usuário.
-/// 6. Gera sessão e JWT token.
-/// 7. Retorna o token + returnTo para o frontend completar a navegação.
+/// 6. Cria sessão via <see cref="LoginSessionCreator"/> e emite JWT token.
+/// 7. Registra eventos de auditoria via <see cref="SecurityAuditRecorder"/>.
+/// 8. Retorna o token + returnTo para o frontend completar a navegação.
+///
+/// Delegação de responsabilidades:
+/// - Criação de sessão → <see cref="LoginSessionCreator"/> (SRP).
+/// - Eventos de auditoria → <see cref="SecurityAuditRecorder"/> (SRP).
+/// - Resolução de membership → <see cref="IdentityFeatureSupport"/> (DRY).
+/// - Construção de resposta → <see cref="IdentityFeatureSupport"/> (DRY).
 ///
 /// Tratamento de erros:
 /// - State inválido → CSRF suspeito, rejeita com OidcCallbackFailed event.
@@ -71,6 +78,11 @@ public static class OidcCallback
     /// <summary>
     /// Handler que processa o callback OIDC de ponta a ponta.
     /// Valida o state, troca o code, cria/vincula o usuário e emite o JWT.
+    ///
+    /// Orquestra o fluxo de autenticação federada delegando responsabilidades
+    /// específicas para serviços extraídos:
+    /// - LoginSessionCreator para criação de sessão.
+    /// - SecurityAuditRecorder para registro de eventos de segurança.
     /// </summary>
     public sealed class Handler(
         IOidcProvider oidcProvider,
@@ -110,33 +122,17 @@ public static class OidcCallback
             catch (Exception ex)
             {
                 // Falha no token exchange — pode ser code expirado, inválido ou provider indisponível
-                RecordCallbackFailedEvent(request, $"Token exchange failed: {ex.Message}");
+                SecurityAuditRecorder.RecordOidcCallbackFailure(
+                    securityEventRepository, dateTimeProvider,
+                    SecurityAuditRecorder.ResolveTenantIdForAudit(currentTenant),
+                    request.Provider, $"Token exchange failed: {ex.Message}",
+                    request.IpAddress, request.UserAgent);
                 return IdentityErrors.OidcCallbackFailed(request.Provider);
             }
 
             // Localiza ou cria o usuário interno vinculado à identidade federada
-            var user = await userRepository.GetByFederatedIdentityAsync(
-                request.Provider,
-                userInfo.ExternalId,
-                cancellationToken);
-
-            user ??= await userRepository.GetByEmailAsync(Email.Create(userInfo.Email), cancellationToken);
-
-            if (user is null)
-            {
-                // Provisiona novo usuário federado automaticamente (Just-in-Time provisioning)
-                user = User.CreateFederated(
-                    Email.Create(userInfo.Email),
-                    FullName.FromDisplayName(userInfo.DisplayName),
-                    request.Provider,
-                    userInfo.ExternalId);
-                userRepository.Add(user);
-            }
-            else
-            {
-                // Vincula a identidade externa ao usuário existente se ainda não vinculada
-                user.LinkFederatedIdentity(request.Provider, userInfo.ExternalId);
-            }
+            var user = await ResolveOrProvisionUserAsync(
+                request.Provider, userInfo, cancellationToken);
 
             // Resolve o TenantMembership do usuário no tenant corrente
             var membership = await IdentityFeatureSupport.ResolveMembershipAsync(
@@ -148,19 +144,11 @@ public static class OidcCallback
             if (membership is null && currentTenant.Id != Guid.Empty)
             {
                 // Auto-provisiona o usuário como Viewer no tenant se não tiver membership
-                var viewerRole = await roleRepository.GetByNameAsync(Role.Viewer, cancellationToken);
-                if (viewerRole is null)
+                membership = await AutoProvisionMembershipAsync(user.Id, cancellationToken);
+                if (membership is null)
                 {
                     return IdentityErrors.RoleNotFound(Guid.Empty);
                 }
-
-                membership = TenantMembership.Create(
-                    user.Id,
-                    TenantId.From(currentTenant.Id),
-                    viewerRole.Id,
-                    dateTimeProvider.UtcNow);
-
-                membershipRepository.Add(membership);
             }
 
             if (membership is null)
@@ -176,29 +164,17 @@ public static class OidcCallback
 
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            // Cria sessão e emite tokens JWT
-            var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
-            var session = Session.Create(
-                user.Id,
-                RefreshTokenHash.Create(refreshToken),
-                dateTimeProvider.UtcNow.AddDays(30),
-                request.IpAddress ?? "unknown",
-                request.UserAgent ?? "unknown");
+            // Delega criação de sessão para LoginSessionCreator (SRP)
+            var (session, refreshToken) = LoginSessionCreator.CreateSession(
+                jwtTokenGenerator, sessionRepository, dateTimeProvider,
+                user.Id, request.IpAddress, request.UserAgent);
 
-            sessionRepository.Add(session);
-
-            // Registra callback bem-sucedido para trilha de auditoria
-            securityEventRepository.Add(SecurityEvent.Create(
-                membership.TenantId,
-                user.Id,
-                session.Id,
-                SecurityEventType.OidcCallbackSuccess,
-                $"OIDC callback processed successfully for provider '{request.Provider}', user '{user.Id.Value}'.",
-                riskScore: 0,
-                request.IpAddress,
-                request.UserAgent,
-                $"{{\"provider\":\"{request.Provider}\",\"externalId\":\"{userInfo.ExternalId}\"}}",
-                dateTimeProvider.UtcNow));
+            // Delega registro de callback bem-sucedido para SecurityAuditRecorder (SRP)
+            SecurityAuditRecorder.RecordOidcCallbackSuccess(
+                securityEventRepository, dateTimeProvider,
+                membership.TenantId, user.Id, session.Id,
+                request.Provider, userInfo.ExternalId,
+                request.IpAddress, request.UserAgent);
 
             var loginResponse = IdentityFeatureSupport.CreateLoginResponse(
                 user,
@@ -213,6 +189,66 @@ public static class OidcCallback
                 loginResponse.ExpiresIn,
                 loginResponse.User,
                 returnTo);
+        }
+
+        /// <summary>
+        /// Localiza o usuário por identidade federada ou email.
+        /// Se não encontrado, provisiona automaticamente (JIT provisioning).
+        /// Se encontrado sem vínculo federado, vincula a identidade externa.
+        /// </summary>
+        private async Task<User> ResolveOrProvisionUserAsync(
+            string provider,
+            OidcUserInfo userInfo,
+            CancellationToken cancellationToken)
+        {
+            var user = await userRepository.GetByFederatedIdentityAsync(
+                provider,
+                userInfo.ExternalId,
+                cancellationToken);
+
+            user ??= await userRepository.GetByEmailAsync(Email.Create(userInfo.Email), cancellationToken);
+
+            if (user is null)
+            {
+                // Provisiona novo usuário federado automaticamente (Just-in-Time provisioning)
+                user = User.CreateFederated(
+                    Email.Create(userInfo.Email),
+                    FullName.FromDisplayName(userInfo.DisplayName),
+                    provider,
+                    userInfo.ExternalId);
+                userRepository.Add(user);
+            }
+            else
+            {
+                // Vincula a identidade externa ao usuário existente se ainda não vinculada
+                user.LinkFederatedIdentity(provider, userInfo.ExternalId);
+            }
+
+            return user;
+        }
+
+        /// <summary>
+        /// Auto-provisiona o usuário como Viewer no tenant corrente quando não existe membership.
+        /// Usado no fluxo OIDC para garantir acesso mínimo ao primeiro login federado.
+        /// </summary>
+        private async Task<TenantMembership?> AutoProvisionMembershipAsync(
+            UserId userId,
+            CancellationToken cancellationToken)
+        {
+            var viewerRole = await roleRepository.GetByNameAsync(Role.Viewer, cancellationToken);
+            if (viewerRole is null)
+            {
+                return null;
+            }
+
+            var membership = TenantMembership.Create(
+                userId,
+                TenantId.From(currentTenant.Id),
+                viewerRole.Id,
+                dateTimeProvider.UtcNow);
+
+            membershipRepository.Add(membership);
+            return membership;
         }
 
         /// <summary>
@@ -238,25 +274,6 @@ public static class OidcCallback
             }
 
             return "/";
-        }
-
-        private void RecordCallbackFailedEvent(Command request, string reason)
-        {
-            var tenantId = currentTenant.Id != Guid.Empty
-                ? TenantId.From(currentTenant.Id)
-                : TenantId.From(Guid.Empty);
-
-            securityEventRepository.Add(SecurityEvent.Create(
-                tenantId,
-                userId: null,
-                sessionId: null,
-                SecurityEventType.OidcCallbackFailed,
-                $"OIDC callback failed for provider '{request.Provider}': {reason}",
-                riskScore: 50,
-                request.IpAddress,
-                request.UserAgent,
-                $"{{\"provider\":\"{request.Provider}\"}}",
-                dateTimeProvider.UtcNow));
         }
     }
 }
