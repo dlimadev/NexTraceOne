@@ -9,7 +9,8 @@ using NexTraceOne.Licensing.Domain.Errors;
 namespace NexTraceOne.Licensing.Application.Features.GetLicenseStatus;
 
 /// <summary>
-/// Feature: GetLicenseStatus — obtém o estado atual da licença.
+/// Feature: GetLicenseStatus — obtém o estado atual consolidado da licença.
+/// Inclui informações sobre tipo, edição, trial, grace period e contadores.
 /// </summary>
 public static class GetLicenseStatus
 {
@@ -40,13 +41,22 @@ public static class GetLicenseStatus
                 return LicensingErrors.LicenseKeyNotFound(request.LicenseKey);
             }
 
+            var now = dateTimeProvider.UtcNow;
+
             return new Response(
                 license.Id.Value,
                 license.LicenseKey,
                 license.CustomerName,
                 license.IsActive,
                 license.ExpiresAt,
-                license.ExpiresAt <= dateTimeProvider.UtcNow,
+                license.IsExpired(now),
+                license.IsInGracePeriod(now),
+                license.DaysUntilExpiration(now),
+                license.Type.ToString(),
+                license.Edition.ToString(),
+                license.IsTrial,
+                license.TrialConverted,
+                license.GracePeriodDays,
                 license.Capabilities.Count,
                 license.UsageQuotas.Count,
                 license.Activations.Count);
@@ -61,6 +71,13 @@ public static class GetLicenseStatus
         bool IsActive,
         DateTimeOffset ExpiresAt,
         bool IsExpired,
+        bool IsInGracePeriod,
+        int DaysRemaining,
+        string LicenseType,
+        string Edition,
+        bool IsTrial,
+        bool TrialConverted,
+        int GracePeriodDays,
         int CapabilityCount,
         int QuotaCount,
         int ActivationCount);

@@ -3,26 +3,33 @@ using MediatR;
 using NexTraceOne.BuildingBlocks.Domain;
 using NexTraceOne.BuildingBlocks.Domain.Primitives;
 using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.Licensing.Domain.Enums;
 using NexTraceOne.Licensing.Domain.Errors;
 
 namespace NexTraceOne.Licensing.Domain.Entities;
 
 /// <summary>
 /// Aggregate Root que representa uma licença ativa da plataforma.
-/// Controla ativação em hardware, capabilities e quotas de consumo.
+/// Controla ativação em hardware, capabilities, quotas de consumo,
+/// tipo de licença (Standard/Trial/Enterprise), edição comercial e grace period.
 ///
 /// Responsabilidades (coesas ao conceito de licença):
-/// - Gestão do ciclo de vida (ativa/desativa).
+/// - Gestão do ciclo de vida (ativa/desativa/trial/conversão).
 /// - Verificação de validade temporal e hardware binding.
 /// - Controle de ativações (máximo permitido).
 /// - Verificação de capabilities habilitadas.
-/// - Rastreamento de quotas de uso.
+/// - Rastreamento de quotas de uso com enforcement configurável.
+/// - Suporte a trial estruturado com conversão para licença full.
+/// - Cálculo de saúde da licença (License Health Score).
 ///
 /// Decisão de design:
 /// - Validação de estado (ativa + não expirada) centralizada no método privado
 ///   EnsureUsable() para eliminar duplicação entre CheckCapability, TrackUsage e VerifyAt.
 /// - Aggregate Root mantém invariantes de todas as sub-entidades (activations, capabilities, quotas)
 ///   pois elas existem exclusivamente no contexto de uma licença.
+/// - LicenseType e Edition adicionados para suportar múltiplos modelos comerciais
+///   sem alterar o ciclo de vida fundamental do aggregate.
+/// - GracePeriodDays define tolerância operacional após expiração.
 /// </summary>
 public sealed class License : AggregateRoot<LicenseId>
 {
@@ -50,6 +57,28 @@ public sealed class License : AggregateRoot<LicenseId>
     /// <summary>Indica se a licença está ativa.</summary>
     public bool IsActive { get; private set; }
 
+    /// <summary>Tipo da licença (Trial, Standard, Enterprise).</summary>
+    public LicenseType Type { get; private set; }
+
+    /// <summary>Edição comercial (Community, Professional, Enterprise, Unlimited).</summary>
+    public LicenseEdition Edition { get; private set; }
+
+    /// <summary>
+    /// Dias de tolerância após expiração.
+    /// Durante o grace period, a licença opera em modo degradado (read-only)
+    /// sem bloquear recursos já ativos.
+    /// </summary>
+    public int GracePeriodDays { get; private set; }
+
+    /// <summary>Indica se o trial já foi convertido para licença full.</summary>
+    public bool TrialConverted { get; private set; }
+
+    /// <summary>Data/hora UTC da conversão do trial (null se não convertido).</summary>
+    public DateTimeOffset? TrialConvertedAt { get; private set; }
+
+    /// <summary>Número de extensões de trial já concedidas.</summary>
+    public int TrialExtensionCount { get; private set; }
+
     /// <summary>Vínculo atual do hardware autorizado.</summary>
     public HardwareBinding? HardwareBinding { get; private set; }
 
@@ -70,11 +99,19 @@ public sealed class License : AggregateRoot<LicenseId>
         DateTimeOffset expiresAt,
         int maxActivations,
         IEnumerable<LicenseCapability>? capabilities = null,
-        IEnumerable<UsageQuota>? usageQuotas = null)
+        IEnumerable<UsageQuota>? usageQuotas = null,
+        LicenseType type = LicenseType.Standard,
+        LicenseEdition edition = LicenseEdition.Professional,
+        int gracePeriodDays = 0)
     {
         if (maxActivations <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(maxActivations), "Max activations must be greater than zero.");
+        }
+
+        if (gracePeriodDays < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(gracePeriodDays), "Grace period must be zero or positive.");
         }
 
         var license = new License
@@ -85,7 +122,10 @@ public sealed class License : AggregateRoot<LicenseId>
             IssuedAt = issuedAt,
             ExpiresAt = expiresAt,
             MaxActivations = maxActivations,
-            IsActive = true
+            IsActive = true,
+            Type = type,
+            Edition = edition,
+            GracePeriodDays = gracePeriodDays
         };
 
         if (capabilities is not null)
@@ -99,6 +139,119 @@ public sealed class License : AggregateRoot<LicenseId>
         }
 
         return license;
+    }
+
+    /// <summary>
+    /// Cria uma licença de trial com limites padrão para avaliação.
+    /// Duração padrão: 30 dias. Limites: 25 APIs, 2 ambientes, 5 usuários.
+    /// Todas as capabilities ficam habilitadas para maximizar avaliação.
+    /// </summary>
+    public static License CreateTrial(
+        string licenseKey,
+        string customerName,
+        DateTimeOffset issuedAt,
+        int trialDays = 30,
+        IEnumerable<LicenseCapability>? capabilities = null,
+        IEnumerable<UsageQuota>? usageQuotas = null)
+    {
+        if (trialDays <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(trialDays), "Trial days must be greater than zero.");
+        }
+
+        var expiresAt = issuedAt.AddDays(trialDays);
+
+        var defaultQuotas = usageQuotas?.ToList() ?? [];
+        if (defaultQuotas.Count == 0)
+        {
+            defaultQuotas.Add(UsageQuota.Create("api.count", 25, enforcementLevel: EnforcementLevel.Hard));
+            defaultQuotas.Add(UsageQuota.Create("environment.count", 2, enforcementLevel: EnforcementLevel.Hard));
+            defaultQuotas.Add(UsageQuota.Create("user.count", 5, enforcementLevel: EnforcementLevel.Hard));
+        }
+
+        return Create(
+            licenseKey,
+            customerName,
+            issuedAt,
+            expiresAt,
+            maxActivations: 1,
+            capabilities,
+            defaultQuotas,
+            type: LicenseType.Trial,
+            edition: LicenseEdition.Professional,
+            gracePeriodDays: 7);
+    }
+
+    /// <summary>
+    /// Estende o trial por dias adicionais. Máximo de 1 extensão permitida.
+    /// Extensão padrão: 15 dias. Requer que a licença seja do tipo Trial e esteja ativa.
+    /// </summary>
+    public Result<Unit> ExtendTrial(int additionalDays, DateTimeOffset now)
+    {
+        if (Type != LicenseType.Trial)
+        {
+            return LicensingErrors.NotTrialLicense();
+        }
+
+        if (!IsActive)
+        {
+            return LicensingErrors.LicenseInactive();
+        }
+
+        if (TrialConverted)
+        {
+            return LicensingErrors.TrialAlreadyConverted();
+        }
+
+        if (TrialExtensionCount >= 1)
+        {
+            return LicensingErrors.TrialExtensionLimitReached();
+        }
+
+        if (additionalDays <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(additionalDays), "Additional days must be greater than zero.");
+        }
+
+        ExpiresAt = ExpiresAt.AddDays(additionalDays);
+        TrialExtensionCount++;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Converte um trial para licença full preservando dados e ativações existentes.
+    /// Atualiza tipo, edição, expiração, limites e grace period.
+    /// </summary>
+    public Result<Unit> ConvertTrial(
+        LicenseEdition edition,
+        DateTimeOffset newExpiresAt,
+        int newMaxActivations,
+        int gracePeriodDays,
+        DateTimeOffset convertedAt)
+    {
+        if (Type != LicenseType.Trial)
+        {
+            return LicensingErrors.NotTrialLicense();
+        }
+
+        if (TrialConverted)
+        {
+            return LicensingErrors.TrialAlreadyConverted();
+        }
+
+        if (newMaxActivations <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(newMaxActivations), "Max activations must be greater than zero.");
+        }
+
+        Type = LicenseType.Standard;
+        Edition = edition;
+        ExpiresAt = newExpiresAt;
+        MaxActivations = newMaxActivations;
+        GracePeriodDays = gracePeriodDays;
+        TrialConverted = true;
+        TrialConvertedAt = convertedAt;
+        return Unit.Value;
     }
 
     /// <summary>Ativa a licença para o hardware informado.</summary>
@@ -189,7 +342,7 @@ public sealed class License : AggregateRoot<LicenseId>
 
         quota.Consume(quantity, now);
 
-        if (quota.IsExceeded())
+        if (quota.ShouldBlock(now))
         {
             return LicensingErrors.QuotaExceeded(metricCode, quota.CurrentUsage, quota.Limit);
         }
@@ -200,10 +353,67 @@ public sealed class License : AggregateRoot<LicenseId>
     /// <summary>Desativa a licença para impedir novos usos e ativações.</summary>
     public void Deactivate() => IsActive = false;
 
+    /// <summary>Indica se a licença é do tipo trial.</summary>
+    public bool IsTrial => Type == LicenseType.Trial;
+
+    /// <summary>Indica se a licença expirou considerando o instante informado.</summary>
+    public bool IsExpired(DateTimeOffset now) => ExpiresAt <= now;
+
+    /// <summary>
+    /// Indica se a licença está em grace period.
+    /// Licença expirada mas dentro do período de tolerância configurado.
+    /// </summary>
+    public bool IsInGracePeriod(DateTimeOffset now)
+        => IsExpired(now) && GracePeriodDays > 0 && now <= ExpiresAt.AddDays(GracePeriodDays);
+
+    /// <summary>Dias restantes até a expiração (negativo se já expirou).</summary>
+    public int DaysUntilExpiration(DateTimeOffset now) => (int)(ExpiresAt - now).TotalDays;
+
+    /// <summary>
+    /// Calcula o License Health Score (0.0 a 1.0).
+    /// Considera: expiração, consumo de quotas, status de ativação e conectividade.
+    ///
+    /// Score composto:
+    /// - 40% tempo restante até expiração
+    /// - 40% média de consumo das quotas (invertido: menos consumo = melhor)
+    /// - 20% estado geral (ativo, hardware bound)
+    /// </summary>
+    public decimal CalculateHealthScore(DateTimeOffset now)
+    {
+        if (!IsActive) return 0.0m;
+
+        // Componente temporal (40%): 1.0 se > 90 dias, 0.0 se expirado
+        var daysLeft = DaysUntilExpiration(now);
+        var timeScore = daysLeft switch
+        {
+            <= 0 => IsInGracePeriod(now) ? 0.1m : 0.0m,
+            <= 7 => 0.2m,
+            <= 30 => 0.5m,
+            <= 90 => 0.8m,
+            _ => 1.0m
+        };
+
+        // Componente de consumo (40%): média invertida do uso das quotas
+        var consumptionScore = 1.0m;
+        if (_usageQuotas.Count > 0)
+        {
+            var avgUsage = _usageQuotas.Average(q => q.UsagePercentage);
+            consumptionScore = Math.Max(0, 1.0m - avgUsage);
+        }
+
+        // Componente de estado (20%): ativo + hardware vinculado
+        var stateScore = 0.0m;
+        if (IsActive) stateScore += 0.5m;
+        if (HardwareBinding is not null) stateScore += 0.5m;
+
+        return Math.Round(timeScore * 0.4m + consumptionScore * 0.4m + stateScore * 0.2m, 2);
+    }
+
     /// <summary>
     /// Valida pré-condição comum: licença deve estar ativa e não expirada.
     /// Centraliza a verificação de estado para eliminar duplicação entre
     /// CheckCapability, TrackUsage e VerifyAt (DRY).
+    /// Considera grace period: licença expirada em grace period ainda é usável.
     /// </summary>
     private Result<Unit> EnsureUsable(DateTimeOffset now)
     {
@@ -212,7 +422,7 @@ public sealed class License : AggregateRoot<LicenseId>
             return LicensingErrors.LicenseInactive();
         }
 
-        if (ExpiresAt <= now)
+        if (ExpiresAt <= now && !IsInGracePeriod(now))
         {
             return LicensingErrors.LicenseExpired(ExpiresAt);
         }
