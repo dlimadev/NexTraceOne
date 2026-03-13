@@ -90,4 +90,21 @@ export const engineeringGraphApi = {
         params: { overlayMode },
       })
       .then((r) => r.data),
+
+  /** Sincroniza consumidores vindos de integração externa (sistema-a-sistema). */
+  syncConsumers: (data: {
+    items: Array<{
+      apiAssetId: string;
+      consumerName: string;
+      consumerKind: string;
+      consumerEnvironment: string;
+      externalReference: string;
+      confidenceScore: number;
+    }>;
+    sourceSystem: string;
+    correlationId?: string;
+  }) =>
+    client
+      .post('/engineeringgraph/integration/v1/consumers/sync', data)
+      .then((r) => r.data),
 };

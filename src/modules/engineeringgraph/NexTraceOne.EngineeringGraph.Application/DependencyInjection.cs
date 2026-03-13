@@ -15,6 +15,7 @@ using NexTraceOne.EngineeringGraph.Application.Features.MapConsumerRelationship;
 using NexTraceOne.EngineeringGraph.Application.Features.RegisterApiAsset;
 using NexTraceOne.EngineeringGraph.Application.Features.RegisterServiceAsset;
 using NexTraceOne.EngineeringGraph.Application.Features.SearchAssets;
+using NexTraceOne.EngineeringGraph.Application.Features.SyncConsumers;
 using NexTraceOne.EngineeringGraph.Application.Features.UpdateAssetMetadata;
 using NexTraceOne.EngineeringGraph.Application.Features.ValidateDiscoveredDependency;
 
@@ -58,6 +59,9 @@ public static class DependencyInjection
 
         // ── Saved Views ──────────────────────────────────────────────────
         services.AddTransient<IValidator<CreateSavedView.Command>, CreateSavedView.Validator>();
+
+        // ── Integração Inbound Externa ───────────────────────────────────
+        services.AddTransient<IValidator<SyncConsumers.Command>, SyncConsumers.Validator>();
 
         return services;
     }
