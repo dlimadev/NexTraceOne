@@ -92,6 +92,9 @@ var app = builder.Build();
 // ── Auto-migrations ──
 await app.ApplyDatabaseMigrationsAsync();
 
+// ── Seed data de desenvolvimento (idempotente, apenas em Development) ──
+await app.SeedDevelopmentDataAsync();
+
 // ── Middlewares na ordem correta ──
 app.UseHttpsRedirection();
 app.UseRateLimiter();

@@ -15,7 +15,7 @@ internal sealed class ContractsDbContextDesignTimeFactory : IDesignTimeDbContext
     {
         var optionsBuilder = new DbContextOptionsBuilder<ContractsDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+            ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=ouro18";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(ContractsDbContext).Assembly.FullName));

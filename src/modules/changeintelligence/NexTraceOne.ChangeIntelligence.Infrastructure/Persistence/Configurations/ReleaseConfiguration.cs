@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NexTraceOne.BuildingBlocks.Domain.Enums;
 using NexTraceOne.ChangeIntelligence.Domain.Entities;
 
 namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Configurations;
@@ -21,7 +22,7 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.Property(x => x.PipelineSource).HasMaxLength(500).IsRequired();
         builder.Property(x => x.CommitSha).HasMaxLength(100).IsRequired();
         builder.Property(x => x.ChangeLevel).HasColumnType("integer").IsRequired();
-        builder.Property(x => x.Status).HasColumnType("integer").IsRequired().HasDefaultValue(0);
+        builder.Property(x => x.Status).HasColumnType("integer").IsRequired().HasDefaultValue(DeploymentStatus.Pending);
         builder.Property(x => x.ChangeScore)
             .HasColumnType("numeric(5,4)")
             .HasPrecision(5, 4)

@@ -24,10 +24,14 @@ namespace NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 /// </summary>
 public sealed class TenantResolutionMiddleware(
     RequestDelegate next,
-    CurrentTenantAccessor currentTenant,
     ILogger<TenantResolutionMiddleware> logger)
 {
-    public async Task InvokeAsync(HttpContext context)
+    /// <summary>
+    /// Resolve o tenant ativo para cada requisição HTTP.
+    /// CurrentTenantAccessor é scoped e deve ser injetado via parâmetro do InvokeAsync,
+    /// pois o middleware é singleton e não pode receber dependências scoped no construtor.
+    /// </summary>
+    public async Task InvokeAsync(HttpContext context, CurrentTenantAccessor currentTenant)
     {
         if (TryResolveFromJwt(context, out var jwtTenantId))
         {

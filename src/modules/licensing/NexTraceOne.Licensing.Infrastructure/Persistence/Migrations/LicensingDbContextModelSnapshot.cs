@@ -99,8 +99,14 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("Edition")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("GracePeriodDays")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -114,6 +120,18 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<int>("MaxActivations")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("TrialConverted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("TrialConvertedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TrialExtensionCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -195,6 +213,12 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                     b.Property<long>("CurrentUsage")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("EnforcementLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GracePeriodDays")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("LicenseId")
                         .HasColumnType("uuid");
 
@@ -205,6 +229,9 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("OverageDetectedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

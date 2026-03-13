@@ -8,14 +8,17 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de usuários persistidos via EF Core.
-/// Busca por email usa o Value do VO para tradução correta em SQL.
+/// Queries por email comparam o Value Object diretamente — o EF Core aplica
+/// o ValueConverter registrado em HasConversion para gerar o parâmetro SQL
+/// corretamente. Não usar .Value no LINQ (não traduz) nem EF.Property com
+/// tipo divergente do converter (causa InvalidCastException no Sanitize).
 /// </summary>
 internal sealed class UserRepository(IdentityDbContext context)
     : RepositoryBase<User, UserId>(context), IUserRepository
 {
     /// <inheritdoc />
     public async Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken)
-        => await context.Users.SingleOrDefaultAsync(x => x.Email.Value == email.Value, cancellationToken);
+        => await context.Users.SingleOrDefaultAsync(x => x.Email == email, cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> GetByFederatedIdentityAsync(string provider, string externalId, CancellationToken cancellationToken)
@@ -25,7 +28,7 @@ internal sealed class UserRepository(IdentityDbContext context)
 
     /// <inheritdoc />
     public Task<bool> ExistsAsync(Email email, CancellationToken cancellationToken)
-        => context.Users.AnyAsync(x => x.Email.Value == email.Value, cancellationToken);
+        => context.Users.AnyAsync(x => x.Email == email, cancellationToken);
 
     /// <inheritdoc />
     public async Task<IReadOnlyDictionary<UserId, User>> GetByIdsAsync(IReadOnlyCollection<UserId> ids, CancellationToken cancellationToken)
