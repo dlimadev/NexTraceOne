@@ -592,3 +592,60 @@ Código que apresente estes sinais deve ser refatorado:
 - Prefira `ILoginSessionCreator` sobre `ISessionHelper` ou `ISessionUtils`.
 - Interfaces ficam em `Application/Abstractions/` — implementações ficam em `Application/Features/` como `internal sealed`.
 - Registro no DI: `services.AddScoped<IInterface, Implementation>()` na Application DependencyInjection.
+
+## Diretrizes Arquiteturais — Modular Monolith Consolidado
+
+Estas diretrizes são obrigatórias para toda evolução da plataforma NexTraceOne.
+
+### 1. Arquitetura Modular Monolith
+A arquitetura atual é um **modular monolith** com 7 bounded contexts consolidados. Cada contexto é uma unidade de deployment potencial, mas hoje tudo roda em um processo único via ApiHost.
+
+### 2. Não criar microserviços prematuramente
+Novos componentes devem ser integrados dentro dos bounded contexts existentes. Só criar novos deployables quando houver justificativa clara (escala independente, equipe dedicada, ciclo de vida diferente).
+
+### 3. Separar responsabilidades antes de separar deployables
+Antes de extrair um serviço, garantir que as fronteiras internas (namespaces, portas, contratos) estejam bem definidas. A extração deve ser consequência de fronteiras maduras, não o contrário.
+
+### 4. Novos módulos entram no bounded context correto
+Novos subdomínios devem ser adicionados como subcontextos (namespaces) dentro dos 7 contextos existentes:
+- **IdentityAccess** — autenticação, autorização, sessões, SSO
+- **CommercialGovernance** — licenciamento, capacidades, billing
+- **Catalog** — catálogo de APIs, contratos, portal
+- **ChangeGovernance** — releases, workflows, promoção, regras
+- **OperationalIntelligence** — runtime, custos, correlação
+- **AIKnowledge** — IA interna, routing externo, knowledge
+- **AuditCompliance** — auditoria, integridade, compliance
+
+### 5. Cada contexto deve ter no máximo Domain/Application/Infrastructure
+Evitar projetos adicionais (Contracts, API, Validators, Policies, DTOs separados). Se necessário, criar subnamespaces dentro dos 3 projetos existentes. Exceções requerem justificativa forte documentada.
+
+### 6. Evitar csproj artificiais
+Não criar projetos separados para: Validators, Policies, DTOs, Mappers, Queries, Handlers, Authorization, Helpers, Utilities, Factories. Esses artefatos pertencem a Application ou Infrastructure.
+
+### 7. Usar portas, contratos e eventos para preparar extrações futuras
+Cada fronteira interna deve ter:
+- **Portas (interfaces)** no Domain para dependências externas
+- **Integration Events** para comunicação assíncrona cross-contexto
+- **SharedContracts** (ServiceInterfaces) para consultas síncronas cross-contexto
+
+### 8. Não acoplar domínio a providers externos
+Domain NUNCA referencia infraestrutura, HTTP clients, ou SDKs externos. Usar ports (interfaces) no Domain e adapters na Infrastructure.
+
+### 9. Ingestion.Api é o entry point externo
+Integrações externas (CI/CD webhooks, runtime signals, contract sync) devem entrar via `NexTraceOne.Ingestion.Api`, não pelo ApiHost principal. O ApiHost é para a UI interna e operações do portal.
+
+### 10. Frontend organizado por bounded context
+O frontend deve seguir estrutura por features alinhada com os bounded contexts:
+```
+src/features/{context}/pages/
+src/features/{context}/api/
+src/features/{context}/components/
+```
+Componentes, hooks e utils compartilhados ficam em `src/shared/`.
+
+### 11. Documentação em português, logs em inglês, exceptions em inglês, i18n no frontend
+- **Documentação XML e inline**: português
+- **Logs**: inglês (structured, sem PII)
+- **Exceptions**: inglês (mensagem técnica)
+- **Frontend**: i18n obrigatório para toda mensagem exibida ao usuário
+- **Error codes**: chaves i18n estáveis (ex: `catalog.contracts.not_found`)
