@@ -36,4 +36,12 @@ public static class ChangeIntelligenceErrors
     /// <summary>Status de deployment inválido.</summary>
     public static Error InvalidDeploymentStatus(string status)
         => Error.Validation("ChangeIntelligence.Release.InvalidDeploymentStatus", "'{0}' is not a valid deployment status.", status);
+
+    /// <summary>Já existe uma review pós-release para esta release.</summary>
+    public static Error PostReleaseReviewAlreadyExists(string releaseId)
+        => Error.Conflict("ChangeIntelligence.PostReleaseReview.AlreadyExists", "A post-release review already exists for release '{0}'.", releaseId);
+
+    /// <summary>Review pós-release não encontrada para a release informada.</summary>
+    public static Error PostReleaseReviewNotFound(string releaseId)
+        => Error.NotFound("ChangeIntelligence.PostReleaseReview.NotFound", "Post-release review for release '{0}' was not found.", releaseId);
 }
