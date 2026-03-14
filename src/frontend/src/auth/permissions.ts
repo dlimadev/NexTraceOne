@@ -26,6 +26,7 @@ export type AppRole =
 
 // Permissões granulares por módulo (códigos idênticos ao catálogo do backend)
 export type Permission =
+  // ── Identity & Access ──
   | 'identity:users:read'
   | 'identity:users:write'
   | 'identity:roles:read'
@@ -33,34 +34,51 @@ export type Permission =
   | 'identity:sessions:read'
   | 'identity:sessions:revoke'
   | 'identity:permissions:read'
+  // ── Engineering Graph ──
   | 'engineering-graph:assets:read'
   | 'engineering-graph:assets:write'
+  // ── Contracts ──
   | 'contracts:read'
   | 'contracts:write'
   | 'contracts:import'
+  // ── Developer Portal ──
+  | 'developer-portal:read'
+  | 'developer-portal:write'
+  // ── Change Intelligence ──
   | 'change-intelligence:releases:read'
   | 'change-intelligence:releases:write'
   | 'change-intelligence:blast-radius:read'
+  // ── Workflow ──
   | 'workflow:read'
   | 'workflow:write'
   | 'workflow:approve'
+  // ── Promotion ──
   | 'promotion:read'
   | 'promotion:write'
   | 'promotion:promote'
+  // ── Ruleset Governance ──
   | 'ruleset-governance:read'
   | 'ruleset-governance:write'
+  // ── Audit ──
   | 'audit:read'
   | 'audit:export'
+  // ── Licensing ──
   | 'licensing:read'
   | 'licensing:write'
   | 'licensing:vendor:license:read'
   | 'licensing:vendor:license:create'
+  | 'licensing:vendor:license:revoke'
+  | 'licensing:vendor:license:rehost'
   | 'licensing:vendor:license:manage'
+  | 'licensing:vendor:key:generate'
+  | 'licensing:vendor:trial:extend'
+  | 'licensing:vendor:activation:issue'
+  | 'licensing:vendor:tenant:manage'
+  | 'licensing:vendor:telemetry:view'
   | 'licensing:vendor:plan:read'
   | 'licensing:vendor:plan:create'
   | 'licensing:vendor:featurepack:read'
   | 'licensing:vendor:featurepack:create'
-  | 'developer-portal:read'
-  | 'developer-portal:write'
+  // ── Platform ──
   | 'platform:settings:read'
   | 'platform:settings:write';
