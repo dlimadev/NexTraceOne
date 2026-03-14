@@ -867,7 +867,9 @@
       "catalog": "Catalog",
       "subscriptions": "Subscriptions",
       "playground": "Playground",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "myConsumption": "My Consumption",
+      "inbox": "Inbox"
     },
     "catalog": {
       "title": "API Catalog",
@@ -956,6 +958,33 @@
       "type": "Type",
       "generatedCode": "Generated Code",
       "copy": "Copy to Clipboard"
+    },
+    "myConsumption": {
+      "title": "My API Consumption",
+      "consuming": "APIs I Consume",
+      "myApis": "My APIs",
+      "noConsuming": "You are not consuming any APIs yet.",
+      "noMyApis": "You do not own any APIs yet.",
+      "versionsInUse": "Versions in Use",
+      "pendingActions": "Pending Actions",
+      "breakingChangesCount": "Breaking Changes",
+      "deprecationsCount": "Deprecations"
+    },
+    "inbox": {
+      "title": "Inbox & Change Awareness",
+      "description": "Stay informed about changes to APIs you consume. Notifications are based on your active subscriptions.",
+      "breakingChanges": "Breaking Changes",
+      "breakingChangesDescription": "Critical changes that require consumer updates. Tracked via your subscriptions with \"Breaking Changes Only\" or \"All Changes\" levels.",
+      "deprecations": "Deprecations",
+      "deprecationsDescription": "APIs or endpoints scheduled for retirement. Includes sunset dates and migration timelines.",
+      "migrations": "Migration Campaigns",
+      "migrationsDescription": "Active migration campaigns requiring action from your team. Includes deadlines and progress tracking.",
+      "newVersions": "New Versions",
+      "newVersionsDescription": "New API versions available for adoption. Includes semantic diff and impact analysis.",
+      "activeSubscriptions": "Active Notification Subscriptions",
+      "noSubscriptions": "No active subscriptions. Subscribe to APIs in the Subscriptions tab to receive change notifications.",
+      "noPendingActions": "No pending actions at this time.",
+      "viewDetails": "View Details"
     }
   }
 }

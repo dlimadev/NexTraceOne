@@ -867,7 +867,9 @@
       "catalog": "Catálogo",
       "subscriptions": "Subscrições",
       "playground": "Playground",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "myConsumption": "Meu Consumo",
+      "inbox": "Caixa de Entrada"
     },
     "catalog": {
       "title": "Catálogo de APIs",
@@ -956,6 +958,33 @@
       "type": "Tipo",
       "generatedCode": "Código Gerado",
       "copy": "Copiar para a Área de Transferência"
+    },
+    "myConsumption": {
+      "title": "Meu Consumo de APIs",
+      "consuming": "APIs que Consumo",
+      "myApis": "As Minhas APIs",
+      "noConsuming": "Ainda não consome nenhuma API.",
+      "noMyApis": "Ainda não é proprietário de nenhuma API.",
+      "versionsInUse": "Versões em Uso",
+      "pendingActions": "Ações Pendentes",
+      "breakingChangesCount": "Breaking Changes",
+      "deprecationsCount": "Depreciações"
+    },
+    "inbox": {
+      "title": "Caixa de Entrada e Consciência de Alterações",
+      "description": "Mantenha-se informado sobre alterações nas APIs que consome. As notificações baseiam-se nas suas subscrições ativas.",
+      "breakingChanges": "Breaking Changes",
+      "breakingChangesDescription": "Alterações críticas que exigem atualização dos consumidores. Rastreadas via subscrições com nível \"Apenas Breaking Changes\" ou \"Todas as Alterações\".",
+      "deprecations": "Depreciações",
+      "deprecationsDescription": "APIs ou endpoints agendados para descontinuação. Inclui datas de sunset e cronogramas de migração.",
+      "migrations": "Campanhas de Migração",
+      "migrationsDescription": "Campanhas de migração ativas que requerem ação da sua equipa. Inclui prazos e acompanhamento de progresso.",
+      "newVersions": "Novas Versões",
+      "newVersionsDescription": "Novas versões de API disponíveis para adoção. Inclui diff semântico e análise de impacto.",
+      "activeSubscriptions": "Subscrições de Notificação Ativas",
+      "noSubscriptions": "Nenhuma subscrição ativa. Subscreva APIs no separador Subscrições para receber notificações de alterações.",
+      "noPendingActions": "Nenhuma ação pendente de momento.",
+      "viewDetails": "Ver Detalhes"
     }
   }
 }

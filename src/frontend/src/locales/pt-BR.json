@@ -867,7 +867,9 @@
       "catalog": "Catálogo",
       "subscriptions": "Subscrições",
       "playground": "Playground",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "myConsumption": "Meu Consumo",
+      "inbox": "Caixa de Entrada"
     },
     "catalog": {
       "title": "Catálogo de APIs",
@@ -956,6 +958,33 @@
       "type": "Tipo",
       "generatedCode": "Código Gerado",
       "copy": "Copiar para Área de Transferência"
+    },
+    "myConsumption": {
+      "title": "Meu Consumo de APIs",
+      "consuming": "APIs que Consumo",
+      "myApis": "Minhas APIs",
+      "noConsuming": "Você ainda não consome nenhuma API.",
+      "noMyApis": "Você ainda não é dono de nenhuma API.",
+      "versionsInUse": "Versões em Uso",
+      "pendingActions": "Ações Pendentes",
+      "breakingChangesCount": "Breaking Changes",
+      "deprecationsCount": "Depreciações"
+    },
+    "inbox": {
+      "title": "Caixa de Entrada e Consciência de Mudanças",
+      "description": "Fique informado sobre mudanças nas APIs que você consome. As notificações são baseadas nas suas assinaturas ativas.",
+      "breakingChanges": "Breaking Changes",
+      "breakingChangesDescription": "Mudanças críticas que exigem atualização dos consumidores. Rastreadas via assinaturas com nível \"Apenas Breaking Changes\" ou \"Todas as Mudanças\".",
+      "deprecations": "Depreciações",
+      "deprecationsDescription": "APIs ou endpoints agendados para descontinuação. Inclui datas de sunset e cronogramas de migração.",
+      "migrations": "Campanhas de Migração",
+      "migrationsDescription": "Campanhas de migração ativas que requerem ação da sua equipe. Inclui prazos e acompanhamento de progresso.",
+      "newVersions": "Novas Versões",
+      "newVersionsDescription": "Novas versões de API disponíveis para adoção. Inclui diff semântico e análise de impacto.",
+      "activeSubscriptions": "Assinaturas de Notificação Ativas",
+      "noSubscriptions": "Nenhuma assinatura ativa. Assine APIs na aba Assinaturas para receber notificações de mudanças.",
+      "noPendingActions": "Nenhuma ação pendente no momento.",
+      "viewDetails": "Ver Detalhes"
     }
   }
 }

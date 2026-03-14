@@ -1,24 +1,23 @@
+
 # .NET
-bin/
-obj/
-*.user
+# Docker
+# Frontend
+# NexTraceOne
+*.license
 *.suo
+*.user
+.env.local
+.idea/
 .vs/
 .vscode/
-.idea/
 TestResults/
-
-# NexTraceOne
-logs/
+bin/
 build/artifacts/
-*.license
 hardware.fingerprint
+logs/
+node_modules/
+obj/
 sign.pfx
-
-# Docker
-.env.local
-
-# Frontend
-src/frontend/node_modules/
-src/frontend/dist/
 src/frontend/.vite/
+src/frontend/dist/
+src/frontend/node_modules/

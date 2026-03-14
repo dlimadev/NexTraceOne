@@ -867,7 +867,9 @@
       "catalog": "Catálogo",
       "subscriptions": "Suscripciones",
       "playground": "Playground",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "myConsumption": "Mi Consumo",
+      "inbox": "Bandeja de Entrada"
     },
     "catalog": {
       "title": "Catálogo de APIs",
@@ -956,6 +958,33 @@
       "type": "Tipo",
       "generatedCode": "Código Generado",
       "copy": "Copiar al Portapapeles"
+    },
+    "myConsumption": {
+      "title": "Mi Consumo de APIs",
+      "consuming": "APIs que Consumo",
+      "myApis": "Mis APIs",
+      "noConsuming": "Aún no consume ninguna API.",
+      "noMyApis": "Aún no es propietario de ninguna API.",
+      "versionsInUse": "Versiones en Uso",
+      "pendingActions": "Acciones Pendientes",
+      "breakingChangesCount": "Breaking Changes",
+      "deprecationsCount": "Depreciaciones"
+    },
+    "inbox": {
+      "title": "Bandeja de Entrada y Conciencia de Cambios",
+      "description": "Manténgase informado sobre cambios en las APIs que consume. Las notificaciones se basan en sus suscripciones activas.",
+      "breakingChanges": "Breaking Changes",
+      "breakingChangesDescription": "Cambios críticos que requieren actualización de consumidores. Rastreados via suscripciones con nivel \"Solo Breaking Changes\" o \"Todos los Cambios\".",
+      "deprecations": "Depreciaciones",
+      "deprecationsDescription": "APIs o endpoints programados para descontinuación. Incluye fechas de sunset y cronogramas de migración.",
+      "migrations": "Campañas de Migración",
+      "migrationsDescription": "Campañas de migración activas que requieren acción de su equipo. Incluye plazos y seguimiento de progreso.",
+      "newVersions": "Nuevas Versiones",
+      "newVersionsDescription": "Nuevas versiones de API disponibles para adopción. Incluye diff semántico y análisis de impacto.",
+      "activeSubscriptions": "Suscripciones de Notificación Activas",
+      "noSubscriptions": "Ninguna suscripción activa. Suscríbase a APIs en la pestaña Suscripciones para recibir notificaciones de cambios.",
+      "noPendingActions": "Ninguna acción pendiente en este momento.",
+      "viewDetails": "Ver Detalles"
     }
   }
 }

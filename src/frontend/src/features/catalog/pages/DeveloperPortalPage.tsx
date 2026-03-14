@@ -17,6 +17,12 @@ import {
   Trash2,
   Plus,
   RefreshCw,
+  Package,
+  Inbox,
+  AlertTriangle,
+  Clock,
+  ExternalLink,
+  Code,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -30,7 +36,7 @@ import type {
   NotificationChannel,
 } from '../../../types';
 
-type Tab = 'catalog' | 'subscriptions' | 'playground' | 'analytics';
+type Tab = 'catalog' | 'subscriptions' | 'playground' | 'analytics' | 'myConsumption' | 'inbox';
 
 /** Formulário de criação de subscription. */
 interface SubscriptionForm {
@@ -129,6 +135,28 @@ export function DeveloperPortalPage() {
     staleTime: 30_000,
   });
 
+  /**
+   * Query para APIs que o utilizador consome — alimenta a aba "My Consumption".
+   * Usa endpoint getConsuming que retorna APIs filtradas pelo consumidor autenticado.
+   */
+  const consumingQuery = useQuery({
+    queryKey: ['developerPortal', 'consuming'],
+    queryFn: () => developerPortalApi.getConsuming(1, 50),
+    enabled: activeTab === 'myConsumption',
+    staleTime: 15_000,
+  });
+
+  /**
+   * Query para "My APIs" — APIs de propriedade do utilizador.
+   * Reutilizada tanto no catálogo "My APIs" como na aba de consumo cruzado.
+   */
+  const myApisQuery = useQuery({
+    queryKey: ['developerPortal', 'myApis'],
+    queryFn: () => developerPortalApi.getMyApis(1, 50),
+    enabled: activeTab === 'myConsumption',
+    staleTime: 15_000,
+  });
+
   // ── Mutations ───────────────────────────────────────────────────────────────
 
   const createSubMutation = useMutation({
@@ -181,6 +209,8 @@ export function DeveloperPortalPage() {
     { key: 'catalog', label: t('developerPortal.tabs.catalog'), icon: <Search size={16} /> },
     { key: 'subscriptions', label: t('developerPortal.tabs.subscriptions'), icon: <Bell size={16} /> },
     { key: 'playground', label: t('developerPortal.tabs.playground'), icon: <Play size={16} /> },
+    { key: 'myConsumption', label: t('developerPortal.tabs.myConsumption'), icon: <Package size={16} /> },
+    { key: 'inbox', label: t('developerPortal.tabs.inbox'), icon: <Inbox size={16} /> },
     { key: 'analytics', label: t('developerPortal.tabs.analytics'), icon: <BarChart3 size={16} /> },
   ];
 
@@ -725,6 +755,238 @@ export function DeveloperPortalPage() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Tab: My Consumption ────────────────────────────────────────────── */}
+      {activeTab === 'myConsumption' && (
+        <div className="space-y-6">
+          {/* APIs que o utilizador consome */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-heading">
+                {t('developerPortal.myConsumption.consuming')}
+              </h2>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  queryClient.invalidateQueries({ queryKey: ['developerPortal', 'consuming'] })
+                }
+              >
+                <RefreshCw size={16} className="mr-1" />
+                {t('common.refresh')}
+              </Button>
+            </div>
+
+            {consumingQuery.isLoading && (
+              <p className="text-muted text-sm">{t('common.loading')}</p>
+            )}
+            {consumingQuery.isError && (
+              <p className="text-critical text-sm">{t('common.error')}</p>
+            )}
+            {consumingQuery.data && consumingQuery.data.items.length === 0 && (
+              <Card>
+                <CardBody>
+                  <p className="text-muted text-sm text-center py-4">
+                    {t('developerPortal.myConsumption.noConsuming')}
+                  </p>
+                </CardBody>
+              </Card>
+            )}
+            {consumingQuery.data && consumingQuery.data.items.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {consumingQuery.data.items.map((item: CatalogItem) => (
+                  <Card key={item.apiAssetId}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-semibold text-heading">{item.apiName}</h3>
+                        <Badge variant={item.healthStatus === 'Healthy' ? 'success' : 'warning'}>
+                          {item.healthStatus}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardBody>
+                      <p className="text-sm text-muted mb-2">{item.description}</p>
+                      <div className="flex justify-between text-xs text-muted">
+                        <span>{t('developerPortal.catalog.owner')}: {item.ownerServiceName}</span>
+                        <span>{t('developerPortal.catalog.version')}: {item.version}</span>
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* APIs que o utilizador é dono */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-heading">
+              {t('developerPortal.myConsumption.myApis')}
+            </h2>
+            {myApisQuery.isLoading && (
+              <p className="text-muted text-sm">{t('common.loading')}</p>
+            )}
+            {myApisQuery.data && myApisQuery.data.items.length === 0 && (
+              <Card>
+                <CardBody>
+                  <p className="text-muted text-sm text-center py-4">
+                    {t('developerPortal.myConsumption.noMyApis')}
+                  </p>
+                </CardBody>
+              </Card>
+            )}
+            {myApisQuery.data && myApisQuery.data.items.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {myApisQuery.data.items.map((item: CatalogItem) => (
+                  <Card key={item.apiAssetId}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-semibold text-heading">{item.apiName}</h3>
+                        <Badge variant={item.healthStatus === 'Healthy' ? 'success' : 'warning'}>
+                          {item.healthStatus}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardBody>
+                      <p className="text-sm text-muted mb-2">{item.description}</p>
+                      <div className="flex justify-between text-xs text-muted">
+                        <span>{t('developerPortal.catalog.owner')}: {item.ownerServiceName}</span>
+                        <span>{t('developerPortal.catalog.version')}: {item.version}</span>
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab: Inbox / Change Awareness ──────────────────────────────────── */}
+      {activeTab === 'inbox' && (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-heading">
+              {t('developerPortal.inbox.title')}
+            </h2>
+          </div>
+          <p className="text-sm text-muted">
+            {t('developerPortal.inbox.description')}
+          </p>
+
+          {/* Painel de notificações — alimentado pelas subscriptions ativas */}
+          {subscriptionsQuery.isLoading && (
+            <p className="text-muted text-sm">{t('common.loading')}</p>
+          )}
+
+          {/* Cards informativos sobre tipos de notificações que o utilizador receberá */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <AlertTriangle size={18} className="text-warning" />
+                  <h3 className="font-semibold text-heading">
+                    {t('developerPortal.inbox.breakingChanges')}
+                  </h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <p className="text-sm text-muted">
+                  {t('developerPortal.inbox.breakingChangesDescription')}
+                </p>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Clock size={18} className="text-info" />
+                  <h3 className="font-semibold text-heading">
+                    {t('developerPortal.inbox.deprecations')}
+                  </h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <p className="text-sm text-muted">
+                  {t('developerPortal.inbox.deprecationsDescription')}
+                </p>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <ExternalLink size={18} className="text-accent" />
+                  <h3 className="font-semibold text-heading">
+                    {t('developerPortal.inbox.migrations')}
+                  </h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <p className="text-sm text-muted">
+                  {t('developerPortal.inbox.migrationsDescription')}
+                </p>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Code size={18} className="text-success" />
+                  <h3 className="font-semibold text-heading">
+                    {t('developerPortal.inbox.newVersions')}
+                  </h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <p className="text-sm text-muted">
+                  {t('developerPortal.inbox.newVersionsDescription')}
+                </p>
+              </CardBody>
+            </Card>
+          </div>
+
+          {/* Lista de subscriptions ativas que geram notificações */}
+          <Card>
+            <CardHeader>
+              <h3 className="font-semibold text-heading">
+                {t('developerPortal.inbox.activeSubscriptions')}
+              </h3>
+            </CardHeader>
+            <CardBody>
+              {subscriptionsQuery.data && subscriptionsQuery.data.length > 0 ? (
+                <div className="space-y-2">
+                  {subscriptionsQuery.data
+                    .filter((sub: Subscription) => sub.isActive)
+                    .map((sub: Subscription) => (
+                      <div
+                        key={sub.id}
+                        className="flex items-center justify-between p-3 bg-surface rounded-lg border border-edge/50"
+                      >
+                        <div>
+                          <span className="font-medium text-body">{sub.apiName}</span>
+                          <div className="flex gap-2 mt-1">
+                            <Badge variant="info">
+                              {t(`developerPortal.subscriptions.levels.${sub.level}`)}
+                            </Badge>
+                            <Badge variant="default">
+                              {t(`developerPortal.subscriptions.channels.${sub.channel}`)}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Badge variant="success">
+                          {t('developerPortal.subscriptions.active')}
+                        </Badge>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-muted text-sm text-center py-4">
+                  {t('developerPortal.inbox.noSubscriptions')}
+                </p>
+              )}
+            </CardBody>
+          </Card>
         </div>
       )}
     </div>

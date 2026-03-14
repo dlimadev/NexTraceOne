@@ -57,7 +57,14 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/portal" element={<DeveloperPortalPage />} />
+              <Route
+                path="/portal"
+                element={
+                  <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
+                    <DeveloperPortalPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/users"
                 element={
