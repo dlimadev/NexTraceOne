@@ -20,6 +20,8 @@ namespace NexTraceOne.Contracts.Application.Features.GenerateEvidencePack;
 /// </summary>
 public static class GenerateEvidencePack
 {
+    /// <summary>Limiar de risco acima do qual aprovação de workflow é obrigatória.</summary>
+    private const decimal WorkflowApprovalRiskThreshold = 0.5m;
     /// <summary>Query para geração do evidence pack de uma versão de contrato.</summary>
     public sealed record Query(
         Guid ContractVersionId,
@@ -66,7 +68,7 @@ public static class GenerateEvidencePack
             var nonBreakingCount = latestDiff?.NonBreakingChanges.Count ?? 0;
             var recommendedVersion = latestDiff?.SuggestedSemVer ?? version.SemVer;
 
-            var requiresApproval = changeLevel == ChangeLevel.Breaking || scorecard.RiskScore > 0.5m;
+            var requiresApproval = changeLevel == ChangeLevel.Breaking || scorecard.RiskScore > WorkflowApprovalRiskThreshold;
             var requiresNotification = changeLevel == ChangeLevel.Breaking;
 
             var executiveSummary = BuildExecutiveSummary(version, changeLevel, breakingCount, scorecard.OverallScore);

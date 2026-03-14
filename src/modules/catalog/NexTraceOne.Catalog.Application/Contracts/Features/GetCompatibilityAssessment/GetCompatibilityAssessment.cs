@@ -20,6 +20,8 @@ namespace NexTraceOne.Contracts.Application.Features.GetCompatibilityAssessment;
 /// </summary>
 public static class GetCompatibilityAssessment
 {
+    /// <summary>Limiar de risco acima do qual aprovação de workflow é obrigatória.</summary>
+    private const decimal WorkflowApprovalRiskThreshold = 0.5m;
     /// <summary>Query para avaliação de compatibilidade entre duas versões de contrato.</summary>
     public sealed record Query(Guid BaseVersionId, Guid TargetVersionId) : IQuery<Response>;
 
@@ -79,7 +81,7 @@ public static class GetCompatibilityAssessment
                 };
 
             var isBackwardCompatible = diffResult.ChangeLevel != ChangeLevel.Breaking;
-            var requiresApproval = diffResult.ChangeLevel == ChangeLevel.Breaking || scorecard.RiskScore > 0.5m;
+            var requiresApproval = diffResult.ChangeLevel == ChangeLevel.Breaking || scorecard.RiskScore > WorkflowApprovalRiskThreshold;
             var requiresNotification = diffResult.ChangeLevel == ChangeLevel.Breaking;
 
             var summary = BuildSummary(diffResult, scorecard, isBackwardCompatible);

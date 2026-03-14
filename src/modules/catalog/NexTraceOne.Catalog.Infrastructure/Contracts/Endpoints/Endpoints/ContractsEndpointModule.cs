@@ -256,12 +256,13 @@ public sealed class ContractsEndpointModule
 
         group.MapGet("/{contractVersionId:guid}/evidence-pack", async (
             Guid contractVersionId,
-            string generatedBy,
+            string? generatedBy,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new GenerateEvidencePackFeature.Query(contractVersionId, generatedBy), cancellationToken);
+            var result = await sender.Send(
+                new GenerateEvidencePackFeature.Query(contractVersionId, generatedBy ?? string.Empty), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
 
