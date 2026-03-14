@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using ActivateLicenseFeature = NexTraceOne.Licensing.Application.Features.ActivateLicense.ActivateLicense;
 using AlertLicenseThresholdFeature = NexTraceOne.Licensing.Application.Features.AlertLicenseThreshold.AlertLicenseThreshold;
 using CheckCapabilityFeature = NexTraceOne.Licensing.Application.Features.CheckCapability.CheckCapability;
@@ -9,6 +10,10 @@ using ConvertTrialFeature = NexTraceOne.Licensing.Application.Features.ConvertTr
 using ExtendTrialFeature = NexTraceOne.Licensing.Application.Features.ExtendTrial.ExtendTrial;
 using GetLicenseHealthFeature = NexTraceOne.Licensing.Application.Features.GetLicenseHealth.GetLicenseHealth;
 using GetLicenseStatusFeature = NexTraceOne.Licensing.Application.Features.GetLicenseStatus.GetLicenseStatus;
+using IssueLicenseFeature = NexTraceOne.Licensing.Application.Features.IssueLicense.IssueLicense;
+using ListLicensesFeature = NexTraceOne.Licensing.Application.Features.ListLicenses.ListLicenses;
+using RehostLicenseFeature = NexTraceOne.Licensing.Application.Features.RehostLicense.RehostLicense;
+using RevokeLicenseFeature = NexTraceOne.Licensing.Application.Features.RevokeLicense.RevokeLicense;
 using StartTrialFeature = NexTraceOne.Licensing.Application.Features.StartTrial.StartTrial;
 using TrackUsageMetricFeature = NexTraceOne.Licensing.Application.Features.TrackUsageMetric.TrackUsageMetric;
 using VerifyLicenseOnStartupFeature = NexTraceOne.Licensing.Application.Features.VerifyLicenseOnStartup.VerifyLicenseOnStartup;
@@ -20,9 +25,9 @@ namespace NexTraceOne.Licensing.API.Endpoints;
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 ///
 /// Grupos de endpoints:
-/// - Licenciamento core: activate, verify, status, capabilities, usage, thresholds
+/// - Tenant licensing: activate, verify, status, capabilities, usage, thresholds, health
 /// - Trial: start, extend, convert
-/// - Observabilidade: health
+/// - Vendor operations: issue, revoke, rehost, list (backoffice interno NexTraceOne)
 /// </summary>
 public sealed class LicensingEndpointModule
 {
@@ -31,7 +36,7 @@ public sealed class LicensingEndpointModule
     {
         var group = app.MapGroup("/api/v1/licensing");
 
-        // ─── Licenciamento core ─────────────────────────────────────
+        // ─── Tenant licensing core ──────────────────────────────────
 
         group.MapPost("/activate", async (
             ActivateLicenseFeature.Command command,
@@ -137,5 +142,48 @@ public sealed class LicensingEndpointModule
             var result = await sender.Send(new GetLicenseHealthFeature.Query(licenseKey), cancellationToken);
             return result.ToHttpResult(localizer);
         });
+
+        // ─── Vendor operations (backoffice interno) ─────────────────
+
+        group.MapPost("/vendor/issue", async (
+            IssueLicenseFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:license:create");
+
+        group.MapPost("/vendor/revoke", async (
+            RevokeLicenseFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:license:revoke");
+
+        group.MapPost("/vendor/rehost", async (
+            RehostLicenseFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:license:rehost");
+
+        group.MapGet("/vendor/licenses", async (
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListLicensesFeature.Query(page, pageSize), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:license:read");
     }
 }

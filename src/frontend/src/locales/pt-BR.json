@@ -70,6 +70,7 @@
     "workflow": "Workflow",
     "promotion": "Promoção",
     "licensing": "Licenciamento",
+    "vendorLicensing": "Licenciamento Vendor",
     "developerPortal": "Portal do Desenvolvedor",
     "users": "Usuários",
     "breakGlass": "Acesso Emergencial",
@@ -660,6 +661,43 @@
       "quotas": "Quotas",
       "trial": "Trial"
     }
+  },
+  "vendorLicensing": {
+    "title": "Operações de Licenciamento Vendor",
+    "subtitle": "Gestão interna de licenças, emissão, revogação e operações de tenants",
+    "tabs": {
+      "licenses": "Licenças",
+      "issue": "Emitir Licença"
+    },
+    "licenseList": "Gestão de Licenças",
+    "loadFailed": "Falha ao carregar licenças.",
+    "noLicenses": "Nenhuma licença encontrada.",
+    "customer": "Cliente",
+    "licenseKeyCol": "Chave da Licença",
+    "typeCol": "Tipo / Edição",
+    "deploymentCol": "Deployment",
+    "statusCol": "Status",
+    "expiresCol": "Expira",
+    "rehost": "Rehost",
+    "revoke": "Revogar",
+    "confirmRevoke": "Tem certeza que deseja revogar permanentemente esta licença?",
+    "totalLicenses": "{{count}} licença(s) no total",
+    "issueLicense": "Emitir Nova Licença",
+    "customerNameLabel": "Nome do Cliente",
+    "customerNamePlaceholder": "Acme Corporation",
+    "durationDays": "Duração (dias)",
+    "maxActivationsLabel": "Máx. Ativações",
+    "editionLabel": "Edição",
+    "deploymentModelLabel": "Modelo de Deployment",
+    "deploymentModels": {
+      "saas": "SaaS",
+      "selfHosted": "Self-Hosted",
+      "onPremise": "On-Premise"
+    },
+    "gracePeriodDaysLabel": "Período de Carência (dias)",
+    "issueFailed": "Falha ao emitir licença.",
+    "issueSuccess": "Licença emitida com sucesso!",
+    "issueButton": "Emitir Licença"
   },
   "developerPortal": {
     "title": "Portal do Desenvolvedor",

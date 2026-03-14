@@ -81,4 +81,10 @@ public static class LicensingErrors
     /// <summary>Trial expirado sem conversão — acesso restrito.</summary>
     public static Error TrialExpired()
         => Error.Business("Licensing.Trial.Expired", "Trial period has expired. Convert to a full license to continue.");
+
+    // ─── Vendor Operations ──────────────────────────────────────────
+
+    /// <summary>Licença já revogada — operação não permitida.</summary>
+    public static Error LicenseAlreadyRevoked()
+        => Error.Conflict("Licensing.License.AlreadyRevoked", "License has already been revoked.");
 }

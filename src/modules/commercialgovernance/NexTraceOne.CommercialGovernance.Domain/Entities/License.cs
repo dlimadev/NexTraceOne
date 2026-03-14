@@ -79,6 +79,21 @@ public sealed class License : AggregateRoot<LicenseId>
     /// <summary>Número de extensões de trial já concedidas.</summary>
     public int TrialExtensionCount { get; private set; }
 
+    /// <summary>Modelo de deployment: SaaS, SelfHosted ou OnPremise.</summary>
+    public DeploymentModel DeploymentModel { get; private set; }
+
+    /// <summary>Modo de ativação: Online, Offline ou Hybrid.</summary>
+    public ActivationMode ActivationMode { get; private set; }
+
+    /// <summary>Modelo comercial: Perpetual, Subscription, UsageBased, Trial ou Internal.</summary>
+    public CommercialModel CommercialModel { get; private set; }
+
+    /// <summary>Modo de medição de uso: RealTime, Periodic, Manual ou Disabled.</summary>
+    public MeteringMode MeteringMode { get; private set; }
+
+    /// <summary>Status operacional da licença para exibição e auditoria.</summary>
+    public LicenseStatus Status { get; private set; }
+
     /// <summary>Vínculo atual do hardware autorizado.</summary>
     public HardwareBinding? HardwareBinding { get; private set; }
 
@@ -102,7 +117,11 @@ public sealed class License : AggregateRoot<LicenseId>
         IEnumerable<UsageQuota>? usageQuotas = null,
         LicenseType type = LicenseType.Standard,
         LicenseEdition edition = LicenseEdition.Professional,
-        int gracePeriodDays = 0)
+        int gracePeriodDays = 0,
+        DeploymentModel deploymentModel = DeploymentModel.SaaS,
+        ActivationMode activationMode = ActivationMode.Online,
+        CommercialModel commercialModel = CommercialModel.Subscription,
+        MeteringMode meteringMode = MeteringMode.RealTime)
     {
         if (maxActivations <= 0)
         {
@@ -125,7 +144,12 @@ public sealed class License : AggregateRoot<LicenseId>
             IsActive = true,
             Type = type,
             Edition = edition,
-            GracePeriodDays = gracePeriodDays
+            GracePeriodDays = gracePeriodDays,
+            DeploymentModel = deploymentModel,
+            ActivationMode = activationMode,
+            CommercialModel = commercialModel,
+            MeteringMode = meteringMode,
+            Status = LicenseStatus.PendingActivation
         };
 
         if (capabilities is not null)
@@ -281,6 +305,7 @@ public sealed class License : AggregateRoot<LicenseId>
 
         var activation = LicenseActivation.Create(hardwareFingerprint, activatedBy, activatedAt);
         _activations.Add(activation);
+        Status = LicenseStatus.Active;
         return activation;
     }
 
@@ -351,7 +376,38 @@ public sealed class License : AggregateRoot<LicenseId>
     }
 
     /// <summary>Desativa a licença para impedir novos usos e ativações.</summary>
-    public void Deactivate() => IsActive = false;
+    public void Deactivate()
+    {
+        IsActive = false;
+        Status = LicenseStatus.Suspended;
+    }
+
+    /// <summary>
+    /// Revoga a licença permanentemente. Operação irreversível.
+    /// Usada por vendor ops para revogar licenças comprometidas ou canceladas.
+    /// </summary>
+    public void Revoke()
+    {
+        IsActive = false;
+        Status = LicenseStatus.Revoked;
+    }
+
+    /// <summary>
+    /// Rehost da licença: remove o hardware binding atual para permitir
+    /// ativação em novo hardware. Usado em migrações de servidor.
+    /// Preserva histórico de ativações para auditoria.
+    /// </summary>
+    public Result<Unit> Rehost()
+    {
+        if (!IsActive)
+        {
+            return LicensingErrors.LicenseInactive();
+        }
+
+        HardwareBinding = null;
+        Status = LicenseStatus.PendingActivation;
+        return Unit.Value;
+    }
 
     /// <summary>Indica se a licença é do tipo trial.</summary>
     public bool IsTrial => Type == LicenseType.Trial;

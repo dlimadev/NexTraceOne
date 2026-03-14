@@ -4,7 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
-import { LicensingPage } from './features/commercial-governance';
+import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
 import { ContractsPage, EngineeringGraphPage, DeveloperPortalPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
@@ -41,7 +41,22 @@ export default function App() {
               />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />
-              <Route path="/licensing" element={<LicensingPage />} />
+              <Route
+                path="/licensing"
+                element={
+                  <ProtectedRoute permission="licensing:read" redirectTo="/unauthorized">
+                    <LicensingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/vendor/licensing"
+                element={
+                  <ProtectedRoute permission="licensing:vendor:license:read" redirectTo="/unauthorized">
+                    <VendorLicensingPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/portal" element={<DeveloperPortalPage />} />
               <Route
                 path="/users"
