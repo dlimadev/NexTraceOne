@@ -12,21 +12,21 @@ import type {
 export const serviceCatalogApi = {
   /** Obtém o grafo completo de ativos e relacionamentos. */
   getGraph: () =>
-    client.get<AssetGraph>('/engineeringgraph/graph').then((r) => r.data),
+    client.get<AssetGraph>('/catalog/graph').then((r) => r.data),
 
   /** Obtém detalhe de um ativo de API específico. */
   getApiAsset: (id: string) =>
-    client.get(`/engineeringgraph/apis/${id}`).then((r) => r.data),
+    client.get(`/catalog/apis/${id}`).then((r) => r.data),
 
   /** Pesquisa ativos de API por termo. */
   searchApis: (searchTerm: string) =>
     client
-      .get('/engineeringgraph/apis/search', { params: { searchTerm } })
+      .get('/catalog/apis/search', { params: { searchTerm } })
       .then((r) => r.data),
 
   /** Registra um novo serviço no catálogo. */
   registerService: (data: { name: string; team: string; description?: string }) =>
-    client.post<{ id: string }>('/engineeringgraph/services', data).then((r) => r.data),
+    client.post<{ id: string }>('/catalog/services', data).then((r) => r.data),
 
   /** Registra um novo ativo de API. */
   registerApi: (data: {
@@ -34,7 +34,7 @@ export const serviceCatalogApi = {
     baseUrl: string;
     ownerServiceId: string;
     description?: string;
-  }) => client.post<{ id: string }>('/engineeringgraph/apis', data).then((r) => r.data),
+  }) => client.post<{ id: string }>('/catalog/apis', data).then((r) => r.data),
 
   /** Mapeia uma relação de consumo para uma API. */
   mapConsumer: (
@@ -42,13 +42,13 @@ export const serviceCatalogApi = {
     data: { consumerServiceId: string; trustLevel: string }
   ) =>
     client
-      .post(`/engineeringgraph/apis/${apiAssetId}/consumers`, data)
+      .post(`/catalog/apis/${apiAssetId}/consumers`, data)
       .then((r) => r.data),
 
   /** Calcula a propagação de impacto (blast radius) a partir de um nó raiz. */
   getImpactPropagation: (rootNodeId: string, maxDepth = 3) =>
     client
-      .get<ImpactPropagationResult>(`/engineeringgraph/impact/${rootNodeId}`, {
+      .get<ImpactPropagationResult>(`/catalog/impact/${rootNodeId}`, {
         params: { maxDepth },
       })
       .then((r) => r.data),
@@ -56,7 +56,7 @@ export const serviceCatalogApi = {
   /** Obtém um subgrafo contextual centrado em um nó. */
   getSubgraph: (rootNodeId: string, maxDepth = 2, maxNodes = 50) =>
     client
-      .get<SubgraphResult>(`/engineeringgraph/subgraph/${rootNodeId}`, {
+      .get<SubgraphResult>(`/catalog/subgraph/${rootNodeId}`, {
         params: { maxDepth, maxNodes },
       })
       .then((r) => r.data),
@@ -64,7 +64,7 @@ export const serviceCatalogApi = {
   /** Lista snapshots temporais do grafo. */
   listSnapshots: (limit = 50) =>
     client
-      .get<{ items: GraphSnapshotSummary[] }>('/engineeringgraph/snapshots', {
+      .get<{ items: GraphSnapshotSummary[] }>('/catalog/snapshots', {
         params: { limit },
       })
       .then((r) => r.data),
@@ -72,13 +72,13 @@ export const serviceCatalogApi = {
   /** Cria um snapshot temporal do estado atual do grafo. */
   createSnapshot: (label: string) =>
     client
-      .post<GraphSnapshotSummary>('/engineeringgraph/snapshots', { label })
+      .post<GraphSnapshotSummary>('/catalog/snapshots', { label })
       .then((r) => r.data),
 
   /** Calcula o diff entre dois snapshots temporais. */
   getTemporalDiff: (fromSnapshotId: string, toSnapshotId: string) =>
     client
-      .get<TemporalDiffResult>('/engineeringgraph/snapshots/diff', {
+      .get<TemporalDiffResult>('/catalog/snapshots/diff', {
         params: { fromSnapshotId, toSnapshotId },
       })
       .then((r) => r.data),
@@ -86,7 +86,7 @@ export const serviceCatalogApi = {
   /** Obtém dados de saúde/overlay para os nós do grafo. */
   getNodeHealth: (overlayMode: string) =>
     client
-      .get<NodeHealthResult>('/engineeringgraph/health', {
+      .get<NodeHealthResult>('/catalog/health', {
         params: { overlayMode },
       })
       .then((r) => r.data),
@@ -105,6 +105,6 @@ export const serviceCatalogApi = {
     correlationId?: string;
   }) =>
     client
-      .post('/engineeringgraph/integration/v1/consumers/sync', data)
+      .post('/catalog/integration/v1/consumers/sync', data)
       .then((r) => r.data),
 };

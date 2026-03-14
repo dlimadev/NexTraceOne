@@ -35,8 +35,8 @@ export type Permission =
   | 'identity:sessions:revoke'
   | 'identity:permissions:read'
   // ── Engineering Graph / Service Catalog ──
-  | 'engineering-graph:assets:read'
-  | 'engineering-graph:assets:write'
+  | 'catalog:assets:read'
+  | 'catalog:assets:write'
   // ── Contracts ──
   | 'contracts:read'
   | 'contracts:write'

@@ -60,7 +60,7 @@ const navItems: NavItem[] = [
   // ── Home ──
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
   // ── Services ──
-  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={18} />, permission: 'engineering-graph:assets:read', section: 'services' },
+  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'services' },
   // ── Contracts ──
   { labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },

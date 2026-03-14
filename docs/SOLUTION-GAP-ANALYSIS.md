@@ -5,7 +5,7 @@
 Este documento detalha a aderência da solução atual à visão oficial do NexTraceOne,
 classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar do zero**.
 
-Última atualização: 2026-03-14 (segunda onda de limpeza executada)
+Última atualização: 2026-03-14 (Fase 3 — renaming e reposicionamento semântico executado)
 
 ---
 
@@ -15,7 +15,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 |------|--------|-------|
 | Arquitetura modular monolítica | OK | 7 bounded contexts com DDD, CQRS, Result pattern, strongly typed IDs |
 | IdentityAccess | OK | RBAC, sessões, break glass, JIT, delegações, revisão de acessos (186 testes) |
-| Catalog — ServiceCatalog (ex-EngineeringGraph) | OK | ServiceAsset, ApiAsset, consumers, discovery, health, snapshots (387 testes) |
+| Catalog — ServiceCatalog | OK | Namespaces renomeados de EngineeringGraph para Catalog.Graph; API route /api/v1/catalog (387 testes) |
 | Catalog — Contracts | OK | ContractVersion, diffs, artifacts, scorecard, provenance, locking |
 | Catalog — DeveloperPortal | OK | Subscriptions, playground, code gen, analytics, saved searches |
 | ChangeGovernance — ChangeIntelligence | OK | Release, blast radius, scoring, baseline, rollback, markers (155 testes) |
@@ -47,6 +47,18 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | ✅ Nomes de menu | "Engineering Graph", "Releases" | "Service Catalog", "Change Intelligence" | Concluído |
 | ✅ CommandPalette | Itens antigos (/graph, labels legados) | Espelha sidebar com 8 seções | Concluído |
 | ✅ EngineeringGraphPage.tsx (nome) | "EngineeringGraphPage" | "ServiceCatalogPage" | Concluído |
+| ✅ Backend namespaces (96 ficheiros) | NexTraceOne.EngineeringGraph.* | NexTraceOne.Catalog.*.Graph.* | Concluído — Fase 3 |
+| ✅ API route group | /api/v1/engineeringgraph | /api/v1/catalog | Concluído — Fase 3 |
+| ✅ DbContext | EngineeringGraphDbContext | CatalogGraphDbContext | Concluído — Fase 3 |
+| ✅ Endpoint module | EngineeringGraphEndpointModule | ServiceCatalogEndpointModule | Concluído — Fase 3 |
+| ✅ Error class | EngineeringGraphErrors | CatalogGraphErrors | Concluído — Fase 3 |
+| ✅ DI method | AddEngineeringGraphModule | AddCatalogGraphModule | Concluído — Fase 3 |
+| ✅ Cross-module interface | IEngineeringGraphModule | ICatalogGraphModule | Concluído — Fase 3 |
+| ✅ Module service | EngineeringGraphModuleService | CatalogGraphModuleService | Concluído — Fase 3 |
+| ✅ Permission keys | engineering-graph:assets:* | catalog:assets:* | Concluído — Fase 3 |
+| ✅ Connection string key | EngineeringGraphDatabase | CatalogDatabase | Concluído — Fase 3 |
+| ✅ Frontend API routes | /engineeringgraph/* | /catalog/* | Concluído — Fase 3 |
+| ✅ i18n subtitles | Linguagem genérica | Source of Truth, governança, auditoria | Concluído — Fase 3 |
 
 ## 3. Refatorar
 
@@ -96,14 +108,31 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | engineeringGraph.ts → serviceCatalog.ts | RENAME | API client module renomeado para alinhar com produto | 0 — URLs backend inalterados |
 | i18n engineeringGraph → serviceCatalog | RENAME | Chaves i18n renomeadas; title "Engineering Graph" → "Service Catalog" | 0 — 4 locales atualizados |
 
+### Fase 3 — Renaming e Reposicionamento Semântico
+
+| Item | Classificação | Motivo | Impacto |
+|------|--------------|--------|---------|
+| Backend namespaces NexTraceOne.EngineeringGraph.* (96 ficheiros, 451 linhas) | RENAME | Namespaces não alinhados com o nome do projeto (Catalog) nem com produto | 0 — testes mantidos |
+| EngineeringGraphEndpointModule → ServiceCatalogEndpointModule | RENAME | Módulo de endpoint com nome antigo do produto | 0 — rotas atualizadas |
+| EngineeringGraphDbContext → CatalogGraphDbContext | RENAME | DbContext com nome que causava confusão semântica | 0 — migrations preservadas |
+| EngineeringGraphErrors → CatalogGraphErrors | RENAME | Classe de erros do domínio com nome antigo | 0 — error codes atualizados |
+| IEngineeringGraphModule → ICatalogGraphModule | RENAME | Interface de contrato cross-módulo com nome antigo | 0 — backward-compat |
+| AddEngineeringGraphModule → AddCatalogGraphModule | RENAME | Método DI com nome antigo | 0 |
+| Permission engineering-graph:assets:* → catalog:assets:* | RENAME | Permissões com nome antigo afetavam RBAC semântico | 0 — frontend+backend |
+| Connection string EngineeringGraphDatabase → CatalogDatabase | RENAME | Chave de connection string desalinhada com módulo | 0 |
+| API route /api/v1/engineeringgraph → /api/v1/catalog | RENAME | URL pública com nome antigo do produto | 0 — frontend atualizado |
+| Frontend API routes serviceCatalog.ts | RENAME | Todas as URLs atualizadas de /engineeringgraph/ para /catalog/ | 0 |
+| Frontend permission keys | RENAME | engineering-graph:assets:* → catalog:assets:* em permissions.ts, Sidebar, CommandPalette | 0 |
+| i18n subtitles (4 locales) | IMPROVE | Reforçar linguagem de Source of Truth, governança e auditoria | 0 |
+
 ---
 
 ## Aderência por documento de referência
 
 | Documento | Aderência | Gaps principais |
 |-----------|-----------|----------------|
-| PRODUCT-VISION.md | 75% | Falta Source of Truth views, persona-aware UI |
-| PRODUCT-SCOPE.md | 70% | MVP core existe, faltam Operations e AI Hub UI |
+| PRODUCT-VISION.md | 80% | Falta Source of Truth views, persona-aware UI |
+| PRODUCT-SCOPE.md | 75% | MVP core existe, faltam Operations e AI Hub UI |
 | PERSONA-MATRIX.md | 30% | UI não segmentada por persona |
 | MODULES-AND-PAGES.md | 70% | Navegação alinhada; placeholder pages criados; faltam implementações reais |
 | SERVICE-CONTRACT-GOVERNANCE.md | 80% | Domain rico; falta Contract Studio UI e approval workflow UI |
@@ -112,8 +141,8 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | AI-ASSISTED-OPERATIONS.md | 40% | Domain existe; falta UI e integração contextual |
 | AI-GOVERNANCE.md | 40% | Policies e providers no domain; falta UI e token governance |
 | DESIGN.md | 75% | Visual consistente; tagline corrigido; falta persona-aware layouts |
-| FRONTEND-ARCHITECTURE.md | 85% | Feature-based, i18n, reusables; CommandPalette alinhado; dead code removido |
-| BACKEND-MODULE-GUIDELINES.md | 90% | DDD, CQRS, Result, strongly typed IDs seguidos; dead code removido |
+| FRONTEND-ARCHITECTURE.md | 90% | Feature-based, i18n, reusables; CommandPalette alinhado; dead code removido; naming alinhado |
+| BACKEND-MODULE-GUIDELINES.md | 95% | DDD, CQRS, Result, strongly typed IDs seguidos; namespaces alinhados com módulo |
 
 ---
 
@@ -130,15 +159,23 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 ## Sequência recomendada de refatoração
 
-### Núcleo obrigatório (Fase 1)
+### Núcleo obrigatório (Fase 1 — concluída)
 1. ✅ Reestruturar navegação frontend — MODULES-AND-PAGES.md
 2. ✅ Alinhar narrativa de produto — auth.tagline, CommandPalette, sidebar
 3. ✅ Remover código morto comprovado — Notifications, StatusPill, Skeleton, i18n stale keys
 4. ✅ Remover domínio órfão VersionCommunication — zero consumidores
 5. ✅ Renomear EngineeringGraphPage → ServiceCatalogPage + i18n namespace
 6. ✅ Limpar placeholder tests redundantes — 10 ficheiros removidos
-7. Contract Studio — expandir Contracts page com editor visual
-8. Change Confidence — consolidar vista de confiança em mudanças
+
+### Renaming e Reposicionamento (Fase 3 — concluída)
+7. ✅ Renomear namespaces backend NexTraceOne.EngineeringGraph.* → NexTraceOne.Catalog.*.Graph.* (96 ficheiros)
+8. ✅ Renomear API route /api/v1/engineeringgraph → /api/v1/catalog
+9. ✅ Renomear DbContext, EndpointModule, ErrorClass, DI, Interface, Service
+10. ✅ Renomear permission keys engineering-graph:* → catalog:*
+11. ✅ Atualizar frontend API routes e permission references
+12. ✅ Reforçar i18n subtitles para linguagem de governança e Source of Truth
+13. Contract Studio — expandir Contracts page com editor visual
+14. Change Confidence — consolidar vista de confiança em mudanças
 
 ### Confiabilidade operacional (Fase 2)
 7. Incidents & Mitigation — domain + application + UI

@@ -44,7 +44,7 @@ const paletteItems: PaletteItem[] = [
   // ── Home ──
   { id: 'dashboard', labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={16} />, group: 'commandPalette.navigation' },
   // ── Services ──
-  { id: 'services', labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={16} />, group: 'commandPalette.services', permission: 'engineering-graph:assets:read' },
+  { id: 'services', labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
   { id: 'portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.services', permission: 'developer-portal:read' },
   // ── Contracts ──
   { id: 'contracts', labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
