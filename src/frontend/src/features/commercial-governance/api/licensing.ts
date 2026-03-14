@@ -6,6 +6,54 @@ import type {
   LicenseThresholdAlert,
 } from '../../../types';
 
+/** Tipos para operações de vendor ops. */
+export interface VendorLicenseItem {
+  licenseId: string;
+  licenseKey: string;
+  customerName: string;
+  isActive: boolean;
+  licenseType: string;
+  edition: string;
+  deploymentModel: string;
+  status: string;
+  issuedAt: string;
+  expiresAt: string;
+  activationCount: number;
+  isTrial: boolean;
+  trialConverted: boolean;
+}
+
+export interface VendorLicenseList {
+  items: VendorLicenseItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface IssueLicenseRequest {
+  customerName: string;
+  durationDays: number;
+  maxActivations: number;
+  type?: number;
+  edition?: number;
+  gracePeriodDays?: number;
+  deploymentModel?: number;
+  activationMode?: number;
+  commercialModel?: number;
+  meteringMode?: number;
+}
+
+export interface IssueLicenseResponse {
+  licenseId: string;
+  licenseKey: string;
+  customerName: string;
+  issuedAt: string;
+  expiresAt: string;
+  licenseType: string;
+  edition: string;
+  deploymentModel: string;
+}
+
 /** API do módulo de Licensing — ativação, verificação, quotas e trial. */
 export const licensingApi = {
   activate: (data: { licenseKey: string; hardwareFingerprint: string }) =>
@@ -68,5 +116,33 @@ export const licensingApi = {
   getHealth: (licenseKey: string) =>
     client
       .get<LicenseHealthResult>('/licensing/health', { params: { licenseKey } })
+      .then((r) => r.data),
+
+  // ─── Vendor Operations (backoffice interno) ─────────────────────
+
+  vendorListLicenses: (page: number = 1, pageSize: number = 20) =>
+    client
+      .get<VendorLicenseList>('/licensing/vendor/licenses', { params: { page, pageSize } })
+      .then((r) => r.data),
+
+  vendorIssueLicense: (data: IssueLicenseRequest) =>
+    client
+      .post<IssueLicenseResponse>('/licensing/vendor/issue', data)
+      .then((r) => r.data),
+
+  vendorRevokeLicense: (licenseKey: string) =>
+    client
+      .post<{ licenseId: string; licenseKey: string; customerName: string }>(
+        '/licensing/vendor/revoke',
+        { licenseKey },
+      )
+      .then((r) => r.data),
+
+  vendorRehostLicense: (licenseKey: string) =>
+    client
+      .post<{ licenseId: string; licenseKey: string; customerName: string }>(
+        '/licensing/vendor/rehost',
+        { licenseKey },
+      )
       .then((r) => r.data),
 };

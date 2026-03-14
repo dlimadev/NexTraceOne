@@ -70,6 +70,7 @@
     "workflow": "Workflow",
     "promotion": "Promotion",
     "licensing": "Licensing",
+    "vendorLicensing": "Vendor Licensing",
     "developerPortal": "Developer Portal",
     "users": "Users",
     "breakGlass": "Break Glass",
@@ -660,6 +661,43 @@
       "quotas": "Quotas",
       "trial": "Trial"
     }
+  },
+  "vendorLicensing": {
+    "title": "Vendor Licensing Operations",
+    "subtitle": "Internal license management, issuance, revocation and tenant operations",
+    "tabs": {
+      "licenses": "Licenses",
+      "issue": "Issue License"
+    },
+    "licenseList": "License Management",
+    "loadFailed": "Failed to load licenses.",
+    "noLicenses": "No licenses found.",
+    "customer": "Customer",
+    "licenseKeyCol": "License Key",
+    "typeCol": "Type / Edition",
+    "deploymentCol": "Deployment",
+    "statusCol": "Status",
+    "expiresCol": "Expires",
+    "rehost": "Rehost",
+    "revoke": "Revoke",
+    "confirmRevoke": "Are you sure you want to permanently revoke this license?",
+    "totalLicenses": "{{count}} license(s) total",
+    "issueLicense": "Issue New License",
+    "customerNameLabel": "Customer Name",
+    "customerNamePlaceholder": "Acme Corporation",
+    "durationDays": "Duration (days)",
+    "maxActivationsLabel": "Max Activations",
+    "editionLabel": "Edition",
+    "deploymentModelLabel": "Deployment Model",
+    "deploymentModels": {
+      "saas": "SaaS",
+      "selfHosted": "Self-Hosted",
+      "onPremise": "On-Premise"
+    },
+    "gracePeriodDaysLabel": "Grace Period (days)",
+    "issueFailed": "Failed to issue license.",
+    "issueSuccess": "License issued successfully!",
+    "issueButton": "Issue License"
   },
   "developerPortal": {
     "title": "Developer Portal",
