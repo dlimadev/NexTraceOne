@@ -3,17 +3,17 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { AuditPage } from '../../pages/AuditPage';
+import { AuditPage } from '../../features/audit-compliance/pages/AuditPage';
 import type { AuditEvent, PagedList } from '../../types';
 
-vi.mock('../../api', () => ({
+vi.mock('../../features/audit-compliance/api', () => ({
   auditApi: {
     listEvents: vi.fn(),
     verifyIntegrity: vi.fn(),
   },
 }));
 
-import { auditApi } from '../../api';
+import { auditApi } from '../../features/audit-compliance/api';
 
 const mockEvents: PagedList<AuditEvent> = {
   items: [

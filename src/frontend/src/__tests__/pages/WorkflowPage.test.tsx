@@ -3,10 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { WorkflowPage } from '../../pages/WorkflowPage';
+import { WorkflowPage } from '../../features/change-governance/pages/WorkflowPage';
 import type { WorkflowInstance, WorkflowTemplate, PagedList } from '../../types';
 
-vi.mock('../../api', () => ({
+vi.mock('../../features/change-governance/api', () => ({
   workflowApi: {
     listTemplates: vi.fn(),
     listInstances: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock('../../api', () => ({
   },
 }));
 
-import { workflowApi } from '../../api';
+import { workflowApi } from '../../features/change-governance/api';
 
 const mockTemplates: WorkflowTemplate[] = [
   {

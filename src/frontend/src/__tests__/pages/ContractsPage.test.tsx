@@ -3,10 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { ContractsPage } from '../../pages/ContractsPage';
+import { ContractsPage } from '../../features/catalog/pages/ContractsPage';
 import type { ContractVersion } from '../../types';
 
-vi.mock('../../api', () => ({
+vi.mock('../../features/catalog/api', () => ({
   contractsApi: {
     getHistory: vi.fn(),
     importContract: vi.fn(),
@@ -26,7 +26,7 @@ vi.mock('../../api', () => ({
   },
 }));
 
-import { contractsApi } from '../../api';
+import { contractsApi } from '../../features/catalog/api';
 
 const mockHistory: ContractVersion[] = [
   {

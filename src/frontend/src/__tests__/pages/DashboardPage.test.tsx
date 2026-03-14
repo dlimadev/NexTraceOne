@@ -2,15 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { DashboardPage } from '../../pages/DashboardPage';
+import { DashboardPage } from '../../features/shared/pages/DashboardPage';
 
-vi.mock('../../api', () => ({
+vi.mock('../../features/catalog/api/engineeringGraph', () => ({
   engineeringGraphApi: {
     getGraph: vi.fn(),
   },
 }));
 
-import { engineeringGraphApi } from '../../api';
+import { engineeringGraphApi } from '../../features/catalog/api/engineeringGraph';
 
 function renderDashboard() {
   const queryClient = new QueryClient({

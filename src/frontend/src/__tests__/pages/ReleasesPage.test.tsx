@@ -3,17 +3,17 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { ReleasesPage } from '../../pages/ReleasesPage';
+import { ReleasesPage } from '../../features/change-governance/pages/ReleasesPage';
 import type { Release, PagedList } from '../../types';
 
-vi.mock('../../api', () => ({
+vi.mock('../../features/change-governance/api', () => ({
   changeIntelligenceApi: {
     listReleases: vi.fn(),
     notifyDeployment: vi.fn(),
   },
 }));
 
-import { changeIntelligenceApi } from '../../api';
+import { changeIntelligenceApi } from '../../features/change-governance/api';
 
 const mockReleases: PagedList<Release> = {
   items: [

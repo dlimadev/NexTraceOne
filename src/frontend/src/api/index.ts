@@ -1,10 +1,14 @@
-export { identityApi } from './identity';
-export { engineeringGraphApi } from './engineeringGraph';
-export { contractsApi } from './contracts';
-export { changeIntelligenceApi } from './changeIntelligence';
-export { workflowApi } from './workflow';
-export { auditApi } from './audit';
-export { promotionApi } from './promotion';
-export { licensingApi } from './licensing';
-export { developerPortalApi } from './developerPortal';
+/**
+ * Barrel export centralizado — re-exporta APIs de cada bounded context
+ * para manter compatibilidade com importações existentes.
+ */
+export { identityApi } from '../features/identity-access/api/identity';
+export { engineeringGraphApi } from '../features/catalog/api/engineeringGraph';
+export { contractsApi } from '../features/catalog/api/contracts';
+export { changeIntelligenceApi } from '../features/change-governance/api/changeIntelligence';
+export { workflowApi } from '../features/change-governance/api/workflow';
+export { auditApi } from '../features/audit-compliance/api/audit';
+export { promotionApi } from '../features/change-governance/api/promotion';
+export { licensingApi } from '../features/commercial-governance/api/licensing';
+export { developerPortalApi } from '../features/catalog/api/developerPortal';
 export { default as apiClient } from './client';
