@@ -1,256 +1,272 @@
-# NexTraceOne — Arquitetura Visual & Design System
+# DESIGN.md
 
-> **Sovereign Change Intelligence Platform**
-> Identidade visual dark-first, enterprise-grade, inspirada em plataformas de observabilidade.
+## Objetivo
 
----
+Definir a identidade visual oficial do NexTraceOne para garantir
+consistência entre login, Home, módulos, fluxos administrativos,
+experiências por persona e interfaces assistidas por IA.
 
-## 1. Filosofia de Design
+------------------------------------------------------------------------
 
-O frontend da NexTraceOne segue princípios de plataformas enterprise de análise e observabilidade:
+## Princípios visuais
 
-- **Dark-first** — superfícies escuras em camadas para uso prolongado e alta densidade informacional
-- **Hierarquia visual forte** — cada nível de superfície, texto e borda é semanticamente distinto
-- **Densidade controlada** — muita informação acessível sem sobrecarregar visualmente
-- **Status operacional imediato** — cores semânticas + ícones + texto para comunicar estado
-- **Acessibilidade AA** — contraste mínimo 4.5:1, foco visível, navegação completa por teclado
-- **Identidade da marca** — azul elétrico (#15AFF6) → índigo (#4379EE) → roxo (#9039E8) como gradiente de destaque
+A interface do NexTraceOne deve ser:
 
----
+-   enterprise
+-   sóbria
+-   premium
+-   clara
+-   consistente
+-   confiável
+-   orientada à decisão
+-   preparada para alta densidade de informação sem poluição visual
 
-## 2. Design Tokens
+A experiência visual não deve parecer:
 
-Todos os tokens estão em `src/frontend/src/index.css` usando a diretiva `@theme {}` do Tailwind CSS v4.
-Cada `--color-nome` gera automaticamente utilitários `bg-nome`, `text-nome`, `border-nome`.
+-   gamer
+-   cyberpunk
+-   sci-fi exagerada
+-   marketing landing page
+-   dashboard genérico de observabilidade
 
-### 2.1 Superfícies (layering system)
+------------------------------------------------------------------------
 
-| Token        | Hex       | Uso                                              |
-|-------------|-----------|--------------------------------------------------|
-| `canvas`    | `#0A0C18` | Fundo base da aplicação (`<html>`, fundo geral)  |
-| `panel`     | `#0E1220` | Sidebar, header, painéis fixos                   |
-| `card`      | `#12182A` | Cards, formulários, seções elevadas              |
-| `elevated`  | `#1A2236` | Elementos sobre cards (dropdowns, tabs inativas) |
-| `hover`     | `#1E2840` | Estado hover de linhas, botões ghost             |
-| `active`    | `#243050` | Estado ativo/pressionado                         |
+## Direção estética
 
-### 2.2 Texto
+O NexTraceOne deve seguir uma identidade **dark enterprise** com:
 
-| Token     | Hex       | Uso                                  |
-|----------|-----------|--------------------------------------|
-| `heading`| `#FDFDFE` | Títulos, valores de destaque, texto primário |
-| `body`   | `#D9DEE8` | Texto de corpo, parágrafos, labels   |
-| `muted`  | `#92939C` | Texto secundário, captions, hints    |
-| `faded`  | `#5C6478` | Labels de seção, texto ultra-sutil   |
+-   fundo escuro elegante
+-   gradientes suaves
+-   grid discreto
+-   brilho sutil em pontos de destaque
+-   cards limpos
+-   bordas discretas
+-   hierarquia tipográfica forte
+-   espaçamento generoso
+-   sensação de produto corporativo real
 
-### 2.3 Bordas
+------------------------------------------------------------------------
 
-| Token         | Hex       | Uso                          |
-|--------------|-----------|------------------------------|
-| `edge`       | `#2A3348` | Divisores padrão, bordas leves |
-| `edge-strong`| `#3A4762` | Bordas de foco, separadores fortes |
+## Fundo oficial da aplicação
 
-### 2.4 Marca
+O fundo visual deve manter consistência com a tela de login aprovada.
 
-| Token          | Hex       | Uso                            |
-|---------------|-----------|--------------------------------|
-| `brand`       | `#4379EE` | Cor primária da marca          |
-| `brand-blue`  | `#15AFF6` | Azul elétrico (informação, início do gradiente) |
-| `brand-purple`| `#9039E8` | Roxo (fim do gradiente, destaques) |
-| `accent`      | `#4379EE` | Elementos interativos (botões, links, estados ativos) |
-| `accent-hover`| `#5A8FFF` | Hover sobre elementos accent   |
+### Características obrigatórias
 
-### 2.5 Status Semânticos
+-   base em azul marinho muito escuro / azul petróleo
+-   gradientes suaves em azul, ciano e verde/teal
+-   glow muito sutil
+-   grid técnico discreto
+-   profundidade visual leve
+-   sem divisórias agressivas
+-   sem texturas chamativas
 
-| Token      | Hex       | Uso                            |
-|-----------|-----------|--------------------------------|
-| `success` | `#24B47E` | Healthy, aprovado, ok          |
-| `warning` | `#E6A23C` | Degraded, atenção, alerta      |
-| `critical`| `#E15241` | Critical, erro, falha          |
-| `info`    | `#15AFF6` | Informativo, em progresso      |
+### Regra obrigatória
 
-### 2.6 Gradiente da Marca
+Login, Home e módulos devem compartilhar a mesma família visual de
+fundo.
 
-```css
-linear-gradient(90deg, #15AFF6 0%, #4379EE 45%, #9039E8 100%)
-```
+------------------------------------------------------------------------
 
-Aplicar apenas em pontos de foco: brand stripe no topo da sidebar, barras de progresso, CTAs premium.
-Nunca em fundos grandes ou preenchimentos dominantes.
+## Paleta principal
 
-### 2.7 Tipografia
+### Base
 
-- **Sans-serif**: Inter (400–700) — toda a interface
-- **Monospace**: JetBrains Mono (400–500) — código, hashes, UUIDs, shortcuts
+-   `#040D19`
+-   `#061527`
+-   `#0A1D33`
+-   `#0D1F38`
 
-Escala tipográfica:
-- Display: 32–40px
-- Page title: 24–28px
-- Section title: 18–20px
-- Card title: 14–16px
-- Body: 14–15px
-- Caption: 12–13px
+### Superfícies / cards
 
-### 2.8 Sombras
+-   `#0F1B2E`
+-   `#132238`
+-   `rgba(16, 29, 53, 0.76)`
+-   `rgba(10, 21, 40, 0.82)`
 
-Sombras escuras para superfícies dark:
-- `shadow-xs` a `shadow-xl` — profundidades crescentes
-- `shadow-glow` — halo sutil azul para estados hover premium (ex.: cards de tenant)
+### Texto
 
----
+-   Primário: `#E7EEF8`
+-   Secundário: `#B2BFD0`
+-   Terciário: `#8FA0B7`
 
-## 3. Arquitetura do Shell
+### Acentos
 
-```
-┌──────────────────────────────────────────────────────┐
-│  Sidebar (w-64, bg-panel, fixed left)                │
-│  ┌────────────────────────────────────────────┐      │
-│  │  Brand gradient stripe (h-1)               │      │
-│  │  Logo + "Change Intelligence"              │      │
-│  │  ─────────────────────────────             │      │
-│  │  PLATFORM                                  │      │
-│  │    Dashboard                               │      │
-│  │    Releases                                │      │
-│  │    Engineering Graph                       │      │
-│  │    Contracts                               │      │
-│  │    Workflow                                │      │
-│  │    Promotion                               │      │
-│  │  ADMINISTRATION                            │      │
-│  │    Users                                   │      │
-│  │    Audit                                   │      │
-│  │  ─────────────────────────────             │      │
-│  │  User avatar + role + logout               │      │
-│  └────────────────────────────────────────────┘      │
-│                                                      │
-│  Main Column (ml-64, flex-col)                       │
-│  ┌────────────────────────────────────────────┐      │
-│  │  AppHeader (h-14, bg-panel)                │      │
-│  │    [🔍 Search pages, actions… ⌘K]  🌐 🔔 ⚙ [U]│  │
-│  ├────────────────────────────────────────────┤      │
-│  │  Content (flex-1, overflow-y-auto)         │      │
-│  │    <Outlet /> — páginas da aplicação       │      │
-│  └────────────────────────────────────────────┘      │
-└──────────────────────────────────────────────────────┘
-```
+-   Cyan: `#22D3EE`
+-   Teal: `#14B8A6`
+-   Green: `#34D399`
+-   Blue accent: `#60A5FA`
 
-### Componentes do Shell
+### Estados
 
-| Componente       | Arquivo                | Responsabilidade                       |
-|-----------------|------------------------|----------------------------------------|
-| `AppLayout`     | `AppLayout.tsx`        | Shell autenticado com Cmd+K global     |
-| `Sidebar`       | `Sidebar.tsx`          | Navegação principal, seções, logout    |
-| `AppHeader`     | `AppHeader.tsx`        | Busca, idioma, notificações, avatar    |
-| `CommandPalette`| `CommandPalette.tsx`   | Modal Cmd+K com busca e teclado        |
+-   Success: `#34D399`
+-   Warning: `#F59E0B`
+-   Error: `#F87171`
+-   Info: `#93C5FD`
 
----
+------------------------------------------------------------------------
 
-## 4. Inventário de Componentes
+## Tipografia
 
-### 4.1 Layout & Shell
-- `AppLayout` — shell autenticado
-- `Sidebar` — navegação principal
-- `AppHeader` — header global
-- `CommandPalette` — busca/navegação rápida
+### Fontes recomendadas
 
-### 4.2 Feedback & Status
-- `StatusPill` — indicador com dot colorido + label (7 status kinds)
-- `Badge` — badge semântico translúcido
-- `EmptyState` — estado vazio com ícone, título, descrição e ação
-- `Skeleton` / `SkeletonLine` / `SkeletonCard` / `SkeletonTable` — loading states
+-   Inter
+-   Segoe UI
+-   IBM Plex Sans
 
-### 4.3 Data Display
-- `Card` / `CardHeader` / `CardContent` — container de conteúdo
-- `StatCard` — métrica com título, valor, ícone e tendência
-- `Button` — primário, secundário, danger, ghost
+### Regras
 
----
+-   títulos com peso forte e legibilidade alta
+-   corpo com leitura confortável
+-   evitar tipografia futurista
+-   evitar excesso de contraste visual
+-   priorizar clareza e contexto
 
-## 5. Padrões de Implementação
+------------------------------------------------------------------------
 
-### 5.1 Formulários (inputs)
+## Componentes base
 
-```
-bg-canvas border border-edge text-heading placeholder:text-muted
-focus:ring-2 focus:ring-accent focus:border-accent rounded-md
-```
+### Cards
 
-### 5.2 Tabelas
+-   cantos arredondados
+-   bordas discretas
+-   fundo escuro translúcido/controlado
+-   sombra suave
+-   cabeçalho claro
+-   rodapé opcional para ações
 
-```
-thead: bg-panel border-b border-edge
-th: text-muted text-xs font-medium uppercase tracking-wider
-tbody: divide-y divide-edge
-tr: hover:bg-hover transition-colors
-td: text-body
-```
+### Tabelas
 
-### 5.3 Badges Semânticos (translúcidos)
+-   alta legibilidade
+-   linhas discretas
+-   densidade controlada
+-   filtros claros
+-   paginação simples
+-   sem visual "planilha antiga"
 
-```
-bg-success/15 text-success   → healthy, aprovado
-bg-warning/15 text-warning   → degraded, alerta
-bg-critical/15 text-critical → crítico, erro
-bg-info/15 text-info         → informativo, em progresso
-bg-brand-purple/15 text-brand-purple → mudança recente
-```
+### Formulários
 
-### 5.4 Botões
+-   campos altos e legíveis
+-   ícones discretos
+-   foco visível
+-   estados de erro consistentes
+-   labels sempre via i18n
 
-| Variante    | Classes                                          |
-|------------|--------------------------------------------------|
-| Primary    | `bg-accent text-white hover:bg-accent-hover`     |
-| Secondary  | `bg-card border border-edge text-body hover:bg-hover` |
-| Danger     | `bg-critical text-white hover:bg-critical/90`    |
-| Ghost      | `text-muted hover:bg-hover hover:text-body`      |
+### Menu lateral
 
-### 5.5 Focus Ring
+-   flat e corporativo
+-   item ativo com destaque lateral sutil
+-   sem glow exagerado
+-   grupos bem definidos
+-   ordem adaptável por persona
 
-Todos os elementos interativos usam `focus-visible:ring-2 focus-visible:ring-accent` para acessibilidade.
+### Top bar
 
----
+-   search contextual
+-   ambiente
+-   período
+-   perfil
+-   ações rápidas
+-   design discreto
 
-## 6. Acessibilidade
+------------------------------------------------------------------------
 
-- **Contraste**: mínimo AA (4.5:1 para texto, 3:1 para UI)
-- **Foco visível**: `outline: 2px solid accent` com `outline-offset: 2px`
-- **Cor nunca é o único indicador**: `StatusPill` usa dot + texto; badges usam label textual
-- **Navegação por teclado**: `CommandPalette` com ↑↓ Enter Escape
-- **Reduced motion**: animações desabilitadas via `prefers-reduced-motion: reduce`
-- **ARIA**: `role="status"` em StatusPill, `role="dialog" aria-modal` em CommandPalette
+## Design por persona
 
----
+A identidade visual é a mesma para todos, mas o conteúdo muda por
+persona.
 
-## 7. Internacionalização (i18n)
+### Engineer / Tech Lead
 
-- Dois idiomas: `en.json` e `pt-BR.json`
-- Toda string de UI vem de i18n — zero texto hardcoded
-- Alternância de idioma no AppHeader
-- Namespaces: `common.*`, `auth.*`, `sidebar.*`, `header.*`, `commandPalette.*`, `dashboard.*`, `users.*`, etc.
-- Detecção automática do idioma do navegador via `i18next-browser-languageDetector`
+-   mais contexto operacional
+-   mais densidade
+-   ações rápidas visíveis
 
----
+### Architect
 
-## 8. Gradiente da Marca — Regras de Uso
+-   mais visão estrutural
+-   dependências e consistência em evidência
 
-| ✅ Usar em                        | ❌ Não usar em                    |
-|----------------------------------|----------------------------------|
-| Brand stripe (sidebar topo)      | Fundo de páginas inteiras        |
-| Barra de progresso premium       | Background de cards comuns       |
-| Logo/identidade contextual       | Textos longos                    |
-| CTA principal (quando destaque)  | Bordas generalizadas             |
-| Chip/tag selecionado             | Ícones repetitivos               |
+### Product / Executive
 
----
+-   linguagem menos técnica
+-   foco em risco, impacto e evolução
+-   simplificação de ruído técnico
 
-## 9. Stack Técnica
+### Platform Admin / Auditor
 
-| Camada       | Tecnologia                     |
-|-------------|--------------------------------|
-| Framework   | React 19 + TypeScript 5.9      |
-| Build       | Vite 7                         |
-| Styling     | Tailwind CSS v4 (`@theme {}`)  |
-| Routing     | react-router-dom v7            |
-| Data        | TanStack Query v5              |
-| i18n        | react-i18next v16              |
-| Ícones      | lucide-react v0.577            |
-| Fontes      | Inter + JetBrains Mono (Google Fonts) |
+-   layouts orientados a governança, políticas e evidência
+
+------------------------------------------------------------------------
+
+## Padrões para IA na UI
+
+### Chat / Assistant
+
+A experiência de IA deve lembrar interfaces modernas de copiloto, mas
+com identidade própria.
+
+#### Regras
+
+-   layout limpo
+-   conversas com forte contexto
+-   destaque claro para fontes/artefatos usados
+-   separação entre prompt, resposta, evidência e ação
+-   escolha de modelo apenas para perfis autorizados
+-   mostrar quando a resposta usa IA interna ou externa, se aplicável
+
+### Contract Studio
+
+O editor de contratos pode se inspirar na clareza do Swagger Editor, mas
+deve manter a identidade do NexTraceOne.
+
+#### Regras
+
+-   modo assistido por IA
+-   modo manual
+-   boa leitura de schemas
+-   diff claro
+-   exemplos visíveis
+-   versão e compatibilidade em destaque
+
+------------------------------------------------------------------------
+
+## Responsividade
+
+### Desktop
+
+Experiência principal.
+
+### Tablet
+
+Redução de densidade mantendo hierarquia.
+
+### Mobile
+
+Visual consistente, porém com simplificação forte. Nem todos os módulos
+precisam ter a mesma profundidade funcional em mobile.
+
+------------------------------------------------------------------------
+
+## Regras obrigatórias
+
+-   Toda UI deve usar i18n.
+-   Nenhuma tela deve quebrar a identidade visual comum.
+-   Não misturar estilos conflitantes entre módulos.
+-   Toda nova tela deve parecer parte do mesmo produto.
+-   Observabilidade visual nunca deve dominar a narrativa da plataforma.
+-   O design deve reforçar governança, contratos, confiança em mudança e
+    consistência operacional.
+
+------------------------------------------------------------------------
+
+## Critério de aceite visual
+
+Uma tela do NexTraceOne está visualmente correta apenas se:
+
+-   parecer enterprise real
+-   estiver alinhada ao login aprovado
+-   mantiver coerência com Home e módulos
+-   usar a paleta oficial
+-   preservar clareza e foco
+-   não parecer cópia direta de Dynatrace, Datadog ou Grafana
