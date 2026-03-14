@@ -25,6 +25,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { licensingApi } from '../api';
 import type { TelemetryConsentResponse } from '../api/licensing';
+import { useAuth } from '../../../contexts/AuthContext';
 import type {
   LicenseStatus,
   LicenseHealthResult,
@@ -79,6 +80,7 @@ const emptyConvertForm: TrialConvertForm = {
 
 export function LicensingPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('status');
   const [licenseKey, setLicenseKey] = useState('');
@@ -815,7 +817,7 @@ export function LicensingPage() {
                         updateTelemetryMutation.mutate({
                           licenseKey,
                           action: 'grant',
-                          updatedBy: 'tenant-admin',
+                          updatedBy: user?.email ?? 'unknown',
                           reason: 'Full consent granted',
                         })
                       }
@@ -833,7 +835,7 @@ export function LicensingPage() {
                         updateTelemetryMutation.mutate({
                           licenseKey,
                           action: 'partial',
-                          updatedBy: 'tenant-admin',
+                          updatedBy: user?.email ?? 'unknown',
                           allowUsageMetrics: true,
                           allowPerformanceData: false,
                           allowErrorDiagnostics: false,
@@ -852,7 +854,7 @@ export function LicensingPage() {
                           updateTelemetryMutation.mutate({
                             licenseKey,
                             action: 'deny',
-                            updatedBy: 'tenant-admin',
+                            updatedBy: user?.email ?? 'unknown',
                             reason: 'Consent denied by tenant administrator',
                           });
                         }
