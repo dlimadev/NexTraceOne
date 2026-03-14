@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.ChangeIntelligence.Domain.Entities;
 
 namespace NexTraceOne.ChangeIntelligence.Tests.Domain.Entities;

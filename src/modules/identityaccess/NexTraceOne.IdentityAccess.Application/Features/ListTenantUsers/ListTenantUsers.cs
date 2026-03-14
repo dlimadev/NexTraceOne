@@ -2,7 +2,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Application.Pagination;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Identity.Application.Abstractions;
 using NexTraceOne.Identity.Domain.Entities;
 

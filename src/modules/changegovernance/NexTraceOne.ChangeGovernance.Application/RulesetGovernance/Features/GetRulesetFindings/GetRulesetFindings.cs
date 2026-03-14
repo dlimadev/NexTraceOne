@@ -1,7 +1,7 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.RulesetGovernance.Application.Abstractions;
 using NexTraceOne.RulesetGovernance.Domain.Entities;
 using NexTraceOne.RulesetGovernance.Domain.Errors;

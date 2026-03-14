@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Contracts.Domain.Enums;
 using ClassifyBreakingChangeFeature = NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange.ClassifyBreakingChange;

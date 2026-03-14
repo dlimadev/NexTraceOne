@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain;
+using NexTraceOne.BuildingBlocks.Core;
 
 namespace NexTraceOne.Licensing.Contracts.IntegrationEvents;
 

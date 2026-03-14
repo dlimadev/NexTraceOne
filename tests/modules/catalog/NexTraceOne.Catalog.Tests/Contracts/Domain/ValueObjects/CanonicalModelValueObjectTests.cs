@@ -43,7 +43,7 @@ public sealed class CanonicalModelValueObjectTests
     public void CompatibilityAssessment_Should_StoreAllProperties()
     {
         var assessment = new CompatibilityAssessment(
-            NexTraceOne.BuildingBlocks.Domain.Enums.ChangeLevel.Breaking,
+            NexTraceOne.BuildingBlocks.Core.Enums.ChangeLevel.Breaking,
             false, "2.0.0", 0.7m, 3, 1, 0,
             true, true, "Breaking change detected",
             ContractProtocol.OpenApi);

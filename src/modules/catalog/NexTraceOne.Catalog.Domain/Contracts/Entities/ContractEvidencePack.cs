@@ -1,7 +1,7 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Domain;
-using NexTraceOne.BuildingBlocks.Domain.Enums;
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Enums;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.Contracts.Domain.Enums;
 
 namespace NexTraceOne.Contracts.Domain.Entities;

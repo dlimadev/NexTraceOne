@@ -6,7 +6,6 @@
   </PropertyGroup>
   <ItemGroup Label="Building Blocks">
     <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj" />
     <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
   </ItemGroup>
   <ItemGroup Label="Bounded Contexts (Infrastructure)">

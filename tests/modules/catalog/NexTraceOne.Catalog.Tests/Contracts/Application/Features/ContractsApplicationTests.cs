@@ -1,5 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Contracts.Application.Abstractions;
 using NexTraceOne.Contracts.Domain.Entities;
 using ComputeSemanticDiffFeature = NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff.ComputeSemanticDiff;

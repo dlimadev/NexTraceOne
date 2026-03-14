@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using System.Diagnostics;
 
 namespace NexTraceOne.BuildingBlocks.Application.Behaviors;

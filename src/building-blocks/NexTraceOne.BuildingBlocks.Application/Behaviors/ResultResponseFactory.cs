@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reflection;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Behaviors;
 

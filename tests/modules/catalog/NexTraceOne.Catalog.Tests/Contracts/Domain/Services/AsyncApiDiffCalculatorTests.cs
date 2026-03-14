@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Contracts.Domain.Services;
 
 namespace NexTraceOne.Contracts.Tests.Domain.Services;

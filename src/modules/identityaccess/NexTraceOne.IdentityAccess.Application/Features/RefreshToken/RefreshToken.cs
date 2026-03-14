@@ -2,7 +2,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Identity.Application.Abstractions;
 using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
 using NexTraceOne.Identity.Domain.Errors;

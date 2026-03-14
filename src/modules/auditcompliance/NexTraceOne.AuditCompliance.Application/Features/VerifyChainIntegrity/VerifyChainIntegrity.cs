@@ -1,6 +1,6 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Audit.Application.Abstractions;
 using NexTraceOne.Audit.Domain.Errors;
 

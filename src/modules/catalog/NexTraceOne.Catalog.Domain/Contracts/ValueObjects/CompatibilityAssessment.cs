@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Contracts.Domain.Enums;
 
 namespace NexTraceOne.Contracts.Domain.ValueObjects;

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Localization;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Localization;
 

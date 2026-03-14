@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
-    <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

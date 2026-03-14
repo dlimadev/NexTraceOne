@@ -7,13 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "building-blocks", "building-blocks", "{C13E73B6-616D-3195-CD22-1E55A7D1F969}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Domain", "src\building-blocks\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj", "{CBFB6752-A9A5-46AB-83A0-440AEFF13AC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Core", "src\building-blocks\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj", "{CBFB6752-A9A5-46AB-83A0-440AEFF13AC9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "building-blocks", "building-blocks", "{A451FE7C-BC83-C13E-8611-AC3C420FE233}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Domain.Tests", "tests\building-blocks\NexTraceOne.BuildingBlocks.Domain.Tests\NexTraceOne.BuildingBlocks.Domain.Tests.csproj", "{C1D93804-A05B-4A86-AFE6-87A7A81D1861}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Core.Tests", "tests\building-blocks\NexTraceOne.BuildingBlocks.Core.Tests\NexTraceOne.BuildingBlocks.Core.Tests.csproj", "{C1D93804-A05B-4A86-AFE6-87A7A81D1861}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Application", "src\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj", "{58370875-77A4-455F-82A2-0336423F3D79}"
 EndProject
@@ -22,10 +22,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Infrastructure", "src\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj", "{A3D79C4F-7517-4F38-86C4-E8A9DD59CA4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Infrastructure.Tests", "tests\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure.Tests\NexTraceOne.BuildingBlocks.Infrastructure.Tests.csproj", "{6DD18540-3F5A-44A8-9F96-EDDA1DAB49AE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.EventBus", "src\building-blocks\NexTraceOne.BuildingBlocks.EventBus\NexTraceOne.BuildingBlocks.EventBus.csproj", "{406A62F8-A92C-4140-A5E4-5E3831F193DD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.EventBus.Tests", "tests\building-blocks\NexTraceOne.BuildingBlocks.EventBus.Tests\NexTraceOne.BuildingBlocks.EventBus.Tests.csproj", "{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.BuildingBlocks.Observability", "src\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj", "{4267BB4C-FA29-4195-B475-CDEE247817A9}"
 EndProject
@@ -227,30 +223,6 @@ Global
 		{6DD18540-3F5A-44A8-9F96-EDDA1DAB49AE}.Release|x64.Build.0 = Release|Any CPU
 		{6DD18540-3F5A-44A8-9F96-EDDA1DAB49AE}.Release|x86.ActiveCfg = Release|Any CPU
 		{6DD18540-3F5A-44A8-9F96-EDDA1DAB49AE}.Release|x86.Build.0 = Release|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Debug|x64.Build.0 = Debug|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Debug|x86.Build.0 = Debug|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Release|x64.ActiveCfg = Release|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Release|x64.Build.0 = Release|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Release|x86.ActiveCfg = Release|Any CPU
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD}.Release|x86.Build.0 = Release|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Debug|x64.Build.0 = Debug|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Debug|x86.Build.0 = Debug|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Release|x64.ActiveCfg = Release|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Release|x64.Build.0 = Release|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Release|x86.ActiveCfg = Release|Any CPU
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197}.Release|x86.Build.0 = Release|Any CPU
 		{4267BB4C-FA29-4195-B475-CDEE247817A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4267BB4C-FA29-4195-B475-CDEE247817A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4267BB4C-FA29-4195-B475-CDEE247817A9}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -726,8 +698,6 @@ Global
 		{553ABCBA-259B-4080-9DE6-58C288EC2FF0} = {A451FE7C-BC83-C13E-8611-AC3C420FE233}
 		{A3D79C4F-7517-4F38-86C4-E8A9DD59CA4C} = {C13E73B6-616D-3195-CD22-1E55A7D1F969}
 		{6DD18540-3F5A-44A8-9F96-EDDA1DAB49AE} = {A451FE7C-BC83-C13E-8611-AC3C420FE233}
-		{406A62F8-A92C-4140-A5E4-5E3831F193DD} = {C13E73B6-616D-3195-CD22-1E55A7D1F969}
-		{0F3116F4-5ED1-4724-8ADF-9C94B5D21197} = {A451FE7C-BC83-C13E-8611-AC3C420FE233}
 		{4267BB4C-FA29-4195-B475-CDEE247817A9} = {C13E73B6-616D-3195-CD22-1E55A7D1F969}
 		{1FB5431B-0AAE-41E6-A9BD-030518FEF9E7} = {A451FE7C-BC83-C13E-8611-AC3C420FE233}
 		{51A299D5-23A6-47C6-81E7-8A0C888DC104} = {C13E73B6-616D-3195-CD22-1E55A7D1F969}

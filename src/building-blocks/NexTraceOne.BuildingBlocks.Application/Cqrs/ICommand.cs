@@ -1,5 +1,5 @@
 using MediatR;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Cqrs;
 

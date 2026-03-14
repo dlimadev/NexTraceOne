@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.CommercialCatalog.Domain.Errors;
 using NexTraceOne.Licensing.Application.Abstractions;
 using NexTraceOne.Licensing.Domain.Entities;
