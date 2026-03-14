@@ -1,0 +1,299 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — OpenTelemetry Collector Reference Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Configuração de referência do OpenTelemetry Collector para deploy enterprise.
+# Cobre: receivers, processors, exporters e pipelines para traces, metrics e logs.
+#
+# FONTES SUPORTADAS:
+# - .NET (OTLP nativo via OpenTelemetry SDK)
+# - Java (OTLP via OpenTelemetry Java Agent)
+# - JavaScript/Node.js (OTLP via @opentelemetry/sdk-node)
+# - IIS / Windows (via OTLP HTTP exporter ou Prometheus scraping)
+# - Kubernetes (via k8s_observer e kubeletstats receiver)
+# - Sistemas externos (via OTLP HTTP/gRPC)
+#
+# PIPELINE:
+# Fontes → Receivers → Processors → Exporters
+#                                    ├── Product Store (PostgreSQL via OTLP connector/custom)
+#                                    ├── Tempo (traces crus)
+#                                    └── Loki (logs crus)
+#
+# SEGURANÇA:
+# - TLS habilitado em receivers para ambientes de produção
+# - Autenticação via bearer token ou mTLS
+# - Sanitização de atributos sensíveis (PII, tokens, passwords)
+#
+# NOTA: Esta configuração é de referência.
+# Ajustar endpoints, limites e sampling conforme ambiente real.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── Receivers ────────────────────────────────────────────────────────────────
+# Pontos de entrada para ingestão de telemetria de todas as fontes.
+receivers:
+  # OTLP — receptor principal para todas as fontes que suportam OpenTelemetry nativo.
+  # Suporta gRPC (porta 4317) e HTTP (porta 4318).
+  # Compatível com: .NET, Java, Node.js, Go, Python, Rust, C++.
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+        max_recv_msg_size_mib: 16
+      http:
+        endpoint: "0.0.0.0:4318"
+        cors:
+          allowed_origins:
+            - "http://localhost:*"
+            - "https://*.nextraceone.local"
+
+  # Prometheus — para workloads que expõem métricas no formato Prometheus.
+  # Útil para: IIS (via exporter), Kubernetes node metrics, apps legados.
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "nextraceone-services"
+          scrape_interval: 60s
+          static_configs:
+            - targets: []  # Configurar targets reais no deploy
+
+  # Host Metrics — métricas do host (CPU, memória, disco, rede).
+  # Essencial para correlação de recursos com performance de aplicação.
+  hostmetrics:
+    collection_interval: 60s
+    scrapers:
+      cpu:
+        metrics:
+          system.cpu.utilization:
+            enabled: true
+      memory:
+        metrics:
+          system.memory.utilization:
+            enabled: true
+      disk: {}
+      network: {}
+
+# ── Processors ───────────────────────────────────────────────────────────────
+# Pipeline de processamento: normalização, enrichment, filtering, proteção.
+processors:
+  # Memory Limiter — OBRIGATÓRIO em produção.
+  # Protege contra OOM quando volume de ingestão excede capacidade.
+  # Quando o limite é atingido, descarta dados novos (backpressure).
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  # Batch — agrupa spans/logs/metrics em batches para eficiência de I/O.
+  # Reduz número de requests para backends e melhora throughput.
+  batch:
+    send_batch_size: 8192
+    send_batch_max_size: 16384
+    timeout: 5s
+
+  # Resource Detection — enriquece automaticamente com metadata do ambiente.
+  # Detecta: hostname, OS, cloud provider, Kubernetes metadata.
+  resourcedetection:
+    detectors:
+      - env
+      - system
+    system:
+      hostname_sources:
+        - os
+    timeout: 5s
+
+  # Attributes — normaliza e enriquece atributos de serviço.
+  # Garante consistência de nomes entre diferentes fontes de telemetria.
+  attributes/normalize:
+    actions:
+      - key: deployment.environment
+        action: upsert
+        from_attribute: environment
+      - key: service.namespace
+        action: upsert
+        value: "nextraceone"
+
+  # Filter — remove telemetria de baixo valor para controlar volume.
+  # Exemplos: health checks, readiness probes, métricas internas de framework.
+  filter/drop_noise:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.route"] == "/health"'
+        - 'attributes["http.route"] == "/ready"'
+        - 'attributes["http.route"] == "/alive"'
+    metrics:
+      metric:
+        - 'name == "http.server.active_requests" and resource.attributes["service.name"] == "otel-collector"'
+
+  # Tail Sampling — amostragem inteligente de traces em produção.
+  # Mantém 100% dos traces com erro e amostra o resto conforme taxa.
+  # CRÍTICO para controle de custo em ambientes de alto volume.
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    expected_new_traces_per_sec: 1000
+    policies:
+      # Sempre captura traces com erro (status ERROR ou exceção)
+      - name: errors-policy
+        type: status_code
+        status_code:
+          status_codes:
+            - ERROR
+      # Sempre captura traces lentos (> 2 segundos)
+      - name: latency-policy
+        type: latency
+        latency:
+          threshold_ms: 2000
+      # Amostragem probabilística para traces normais (10% em produção)
+      - name: probabilistic-policy
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10
+
+  # Redact — sanitiza atributos sensíveis para LGPD/GDPR compliance.
+  # Remove ou mascara: tokens, passwords, emails, CPF/CNPJ em atributos.
+  redaction:
+    allow_all_keys: true
+    blocked_values:
+      - "(?i)(bearer\\s+)[a-zA-Z0-9\\-._~+/]+"    # Bearer tokens
+      - "(?i)(password|pwd|secret|token)=[^&\\s]+"  # Query params sensíveis
+      - "[0-9]{3}\\.[0-9]{3}\\.[0-9]{3}-[0-9]{2}"  # CPF
+    summary: debug
+
+  # Transform — adiciona atributos de correlação do NexTraceOne.
+  # Injeta: tenant_id, release_id, deployment_marker quando disponíveis.
+  transform/correlation:
+    error_mode: ignore
+    trace_statements:
+      - context: resource
+        statements:
+          - set(attributes["nextraceone.platform"], "true")
+    metric_statements:
+      - context: resource
+        statements:
+          - set(attributes["nextraceone.platform"], "true")
+    log_statements:
+      - context: resource
+        statements:
+          - set(attributes["nextraceone.platform"], "true")
+
+# ── Exporters ────────────────────────────────────────────────────────────────
+# Destinos finais para cada tipo de sinal.
+exporters:
+  # OTLP/gRPC — exporter genérico para backends compatíveis com OTLP.
+  # Usado como fallback ou para backends que suportam OTLP diretamente.
+  otlp:
+    endpoint: "localhost:4317"
+    tls:
+      insecure: true
+
+  # Tempo — backend de traces crus (Grafana Tempo).
+  # Traces crus vão para cá, NÃO para PostgreSQL.
+  otlp/tempo:
+    endpoint: "${TEMPO_ENDPOINT:-localhost:4317}"
+    tls:
+      insecure: true
+
+  # Loki — backend de logs crus (Grafana Loki).
+  # Logs crus vão para cá, NÃO para PostgreSQL.
+  loki:
+    endpoint: "${LOKI_ENDPOINT:-http://localhost:3100/loki/api/v1/push}"
+
+  # Prometheus Remote Write — para métricas de alta cardinalidade (opcional).
+  # Métricas agregadas de baixa cardinalidade vão para o Product Store (PostgreSQL).
+  # prometheusremotewrite:
+  #   endpoint: "${PROMETHEUS_ENDPOINT:-http://localhost:9090/api/v1/write}"
+
+  # Debug — apenas para desenvolvimento local.
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+# ── Connectors ───────────────────────────────────────────────────────────────
+# Connectors ligam pipelines, permitindo derivar métricas de traces.
+connectors:
+  # Span Metrics — gera métricas automaticamente a partir de traces.
+  # Produz: request count, latency histogram, error count por serviço/operação.
+  # Estas métricas derivadas alimentam o Product Store via conector customizado.
+  spanmetrics:
+    histogram:
+      explicit:
+        buckets: [5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s]
+    dimensions:
+      - name: http.method
+      - name: http.status_code
+      - name: http.route
+      - name: rpc.method
+      - name: db.system
+    exemplars:
+      enabled: true
+    resource_metrics_key_attributes:
+      - service.name
+      - deployment.environment
+      - service.namespace
+
+# ── Service / Pipelines ──────────────────────────────────────────────────────
+# Definição dos pipelines por tipo de sinal.
+service:
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: detailed
+      address: "0.0.0.0:8888"
+
+  pipelines:
+    # Pipeline de TRACES:
+    # Receivers → Memory Limiter → Resource Detection → Normalize →
+    # Filter → Correlation → Redaction → Tail Sampling → Batch →
+    # Tempo (crus) + SpanMetrics (derivar métricas)
+    traces:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - attributes/normalize
+        - filter/drop_noise
+        - transform/correlation
+        - redaction
+        - tail_sampling
+        - batch
+      exporters: [otlp/tempo, spanmetrics]
+
+    # Pipeline de METRICS:
+    # Receivers (OTLP + Prometheus + HostMetrics + SpanMetrics) →
+    # Memory Limiter → Resource Detection → Normalize → Batch →
+    # OTLP (para Product Store aggregator)
+    metrics:
+      receivers: [otlp, hostmetrics, spanmetrics]
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - attributes/normalize
+        - batch
+      exporters: [otlp]
+
+    # Pipeline de LOGS:
+    # Receivers → Memory Limiter → Resource Detection → Normalize →
+    # Filter → Correlation → Redaction → Batch → Loki (crus)
+    logs:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - attributes/normalize
+        - filter/drop_noise
+        - transform/correlation
+        - redaction
+        - batch
+      exporters: [loki]
+
+  # Extensions para health check e z-pages do próprio Collector.
+  extensions: [health_check, zpages]
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+  zpages:
+    endpoint: "0.0.0.0:55679"

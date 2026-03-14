@@ -1,0 +1,88 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Docker Compose para stack de observabilidade
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Stack completa para desenvolvimento e POC:
+# - OpenTelemetry Collector (pipeline central de ingestão)
+# - Grafana Tempo (Telemetry Store — traces crus)
+# - Grafana Loki (Telemetry Store — logs crus)
+# - Grafana (visualização — opcional)
+#
+# O PostgreSQL do produto (Product Store) é externo a este compose.
+# Métricas agregadas são escritas no PostgreSQL pelo application layer,
+# não diretamente pelo Collector.
+#
+# USO:
+# docker compose -f build/otel-collector/docker-compose.telemetry.yaml up -d
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+  # ── OpenTelemetry Collector ──────────────────────────────────────────
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.115.0
+    container_name: nextraceone-otel-collector
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./otel-collector.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8888:8888"   # Prometheus metrics (Collector self-monitoring)
+      - "13133:13133" # Health check
+    environment:
+      - TEMPO_ENDPOINT=tempo:4317
+      - LOKI_ENDPOINT=http://loki:3100/loki/api/v1/push
+    depends_on:
+      - tempo
+      - loki
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # ── Grafana Tempo (Telemetry Store — Traces) ────────────────────────
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: nextraceone-tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200"   # Tempo API
+      - "4317"        # OTLP gRPC (interno, recebe do Collector)
+    restart: unless-stopped
+
+  # ── Grafana Loki (Telemetry Store — Logs) ───────────────────────────
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: nextraceone-loki
+    command: ["-config.file=/etc/loki.yaml"]
+    volumes:
+      - ./loki.yaml:/etc/loki.yaml:ro
+      - loki-data:/var/loki
+    ports:
+      - "3100:3100"   # Loki API
+    restart: unless-stopped
+
+  # ── Grafana (Visualização — Opcional) ───────────────────────────────
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: nextraceone-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - tempo
+      - loki
+    restart: unless-stopped
+
+volumes:
+  tempo-data:
+  loki-data:
+  grafana-data:
