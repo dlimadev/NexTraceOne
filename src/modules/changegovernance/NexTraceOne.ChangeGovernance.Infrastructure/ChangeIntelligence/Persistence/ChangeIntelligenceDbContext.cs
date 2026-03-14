@@ -29,6 +29,24 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Eventos de mudança persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<ChangeEvent> ChangeEvents => Set<ChangeEvent>();
 
+    /// <summary>Marcadores externos de ferramentas CI/CD persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ExternalMarker> ExternalMarkers => Set<ExternalMarker>();
+
+    /// <summary>Janelas de freeze persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<FreezeWindow> FreezeWindows => Set<FreezeWindow>();
+
+    /// <summary>Baselines de indicadores pré-release persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ReleaseBaseline> ReleaseBaselines => Set<ReleaseBaseline>();
+
+    /// <summary>Janelas de observação pós-release persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<ObservationWindow> ObservationWindows => Set<ObservationWindow>();
+
+    /// <summary>Reviews automáticas pós-release persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<PostReleaseReview> PostReleaseReviews => Set<PostReleaseReview>();
+
+    /// <summary>Avaliações de viabilidade de rollback persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<RollbackAssessment> RollbackAssessments => Set<RollbackAssessment>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

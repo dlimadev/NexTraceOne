@@ -8,6 +8,107 @@ import type {
   ChangeLevel,
 } from '../../../types';
 
+// ─── Intelligence Summary DTOs ───────────────────────────────────────────────
+
+export interface IntelligenceSummary {
+  release: ReleaseDto;
+  score: ScoreDto | null;
+  blastRadius: BlastRadiusDto | null;
+  markers: MarkerDto[];
+  baseline: BaselineDto | null;
+  postReleaseReview: ReviewDto | null;
+  rollbackAssessment: RollbackDto | null;
+  timeline: TimelineEventDto[];
+}
+
+export interface ReleaseDto {
+  id: string;
+  apiAssetId: string;
+  serviceName: string;
+  version: string;
+  environment: string;
+  status: string;
+  changeLevel: string;
+  changeScore: number;
+  workItemReference: string | null;
+  createdAt: string;
+}
+
+export interface ScoreDto {
+  score: number;
+  breakingChangeWeight: number;
+  blastRadiusWeight: number;
+  environmentWeight: number;
+  computedAt: string;
+}
+
+export interface BlastRadiusDto {
+  totalAffectedConsumers: number;
+  directConsumers: string[];
+  transitiveConsumers: string[];
+  calculatedAt: string;
+}
+
+export interface MarkerDto {
+  id: string;
+  markerType: string;
+  sourceSystem: string;
+  externalId: string;
+  occurredAt: string;
+}
+
+export interface BaselineDto {
+  requestsPerMinute: number;
+  errorRate: number;
+  avgLatencyMs: number;
+  p95LatencyMs: number;
+  p99LatencyMs: number;
+  throughput: number;
+  collectedFrom: string;
+  collectedTo: string;
+}
+
+export interface ReviewDto {
+  currentPhase: string;
+  outcome: string;
+  confidenceScore: number;
+  summary: string;
+  isCompleted: boolean;
+  startedAt: string;
+  completedAt: string | null;
+}
+
+export interface RollbackDto {
+  isViable: boolean;
+  readinessScore: number;
+  previousVersion: string | null;
+  hasReversibleMigrations: boolean;
+  consumersAlreadyMigrated: number;
+  totalConsumersImpacted: number;
+  recommendation: string;
+  assessedAt: string;
+}
+
+export interface TimelineEventDto {
+  id: string;
+  eventType: string;
+  description: string;
+  source: string;
+  occurredAt: string;
+}
+
+export interface FreezeWindowDto {
+  id: string;
+  name: string;
+  reason: string;
+  scope: string;
+  scopeValue: string | null;
+  startsAt: string;
+  endsAt: string;
+}
+
+// ─── API Client ──────────────────────────────────────────────────────────────
+
 export const changeIntelligenceApi = {
   notifyDeployment: (data: {
     apiAssetId: string;
@@ -66,7 +167,54 @@ export const changeIntelligenceApi = {
 
   attachWorkItem: (
     releaseId: string,
-    data: { provider: string; workItemId: string; url: string }
+    data: { provider: string; workItemId: string; url: string },
   ) =>
     client.put(`/releases/${releaseId}/workitem`, { releaseId, ...data }).then((r) => r.data),
+
+  getIntelligenceSummary: (releaseId: string) =>
+    client
+      .get<IntelligenceSummary>(`/releases/${releaseId}/intelligence`)
+      .then((r) => r.data),
+
+  registerMarker: (
+    releaseId: string,
+    data: {
+      markerType: string;
+      sourceSystem: string;
+      externalId: string;
+      payload?: string;
+      occurredAt: string;
+    },
+  ) =>
+    client.post(`/releases/${releaseId}/markers`, data).then((r) => r.data),
+
+  recordBaseline: (
+    releaseId: string,
+    data: {
+      requestsPerMinute: number;
+      errorRate: number;
+      avgLatencyMs: number;
+      p95LatencyMs: number;
+      p99LatencyMs: number;
+      throughput: number;
+      collectedFrom: string;
+      collectedTo: string;
+    },
+  ) =>
+    client.post(`/releases/${releaseId}/baseline`, data).then((r) => r.data),
+
+  startReview: (releaseId: string) =>
+    client
+      .post(`/releases/${releaseId}/review/start`, { releaseId })
+      .then((r) => r.data),
+
+  checkFreezeConflict: (at: string, environment?: string) => {
+    const params = new URLSearchParams({ at });
+    if (environment) params.append('environment', environment);
+    return client
+      .get<{ hasConflict: boolean; activeFreezes: FreezeWindowDto[] }>(
+        `/freeze-windows/check?${params.toString()}`,
+      )
+      .then((r) => r.data);
+  },
 };

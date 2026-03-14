@@ -267,7 +267,102 @@
     },
     "apiAssetPlaceholder": "UUID do ativo de API",
     "versionPlaceholder": "ex. 1.2.3",
-    "commitPlaceholder": "abc1234"
+    "commitPlaceholder": "abc1234",
+    "tabs": {
+      "overview": "Visão Geral",
+      "intelligence": "Inteligência",
+      "timeline": "Timeline",
+      "freeze": "Calendário de Freeze"
+    },
+    "intelligence": {
+      "title": "Resumo de Inteligência da Mudança",
+      "selectRelease": "Selecione uma release para visualizar a inteligência",
+      "score": {
+        "title": "Score de Risco",
+        "breakingChange": "Peso Breaking Change",
+        "blastRadius": "Peso Blast Radius",
+        "environment": "Peso Ambiente",
+        "computedAt": "Calculado em",
+        "low": "Risco Baixo",
+        "medium": "Risco Médio",
+        "high": "Risco Alto"
+      },
+      "blastRadius": {
+        "title": "Blast Radius",
+        "totalAffected": "Total de Consumers Afetados",
+        "direct": "Consumers Diretos",
+        "transitive": "Consumers Transitivos",
+        "calculatedAt": "Calculado em"
+      },
+      "markers": {
+        "title": "Marcadores Externos",
+        "noMarkers": "Nenhum marcador externo registrado",
+        "source": "Origem",
+        "type": "Tipo",
+        "externalId": "ID Externo",
+        "occurredAt": "Ocorrido em"
+      },
+      "baseline": {
+        "title": "Baseline da Release (Antes)",
+        "noBaseline": "Nenhum baseline registrado",
+        "requestsPerMinute": "Req/min",
+        "errorRate": "Taxa de Erro",
+        "avgLatency": "Latência Média (ms)",
+        "p95Latency": "Latência P95 (ms)",
+        "p99Latency": "Latência P99 (ms)",
+        "throughput": "Throughput",
+        "period": "Período de Coleta"
+      },
+      "review": {
+        "title": "Review Pós-Release",
+        "noReview": "Nenhuma review iniciada",
+        "phase": "Fase Atual",
+        "outcome": "Resultado",
+        "confidence": "Confiança",
+        "summary": "Resumo",
+        "completed": "Concluída",
+        "inProgress": "Em Progresso",
+        "startReview": "Iniciar Review"
+      },
+      "rollback": {
+        "title": "Avaliação de Rollback",
+        "noAssessment": "Nenhuma avaliação de rollback",
+        "viable": "Rollback Viável",
+        "notViable": "Rollback Inviável",
+        "readiness": "Score de Readiness",
+        "previousVersion": "Versão Anterior",
+        "reversibleMigrations": "Migrações Reversíveis",
+        "consumersMigrated": "Consumers Já Migrados",
+        "consumersImpacted": "Total de Consumers Impactados",
+        "recommendation": "Recomendação"
+      }
+    },
+    "timeline": {
+      "title": "Timeline da Mudança",
+      "noEvents": "Nenhum evento na timeline",
+      "event": "Evento",
+      "description": "Descrição",
+      "source": "Origem",
+      "occurredAt": "Ocorrido em"
+    },
+    "freeze": {
+      "title": "Calendário de Freeze",
+      "create": "Criar Janela de Freeze",
+      "noWindows": "Nenhuma janela de freeze configurada",
+      "name": "Nome",
+      "reason": "Motivo",
+      "scope": "Escopo",
+      "scopeValue": "Valor do Escopo",
+      "startsAt": "Início",
+      "endsAt": "Fim",
+      "status": "Status",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "createSuccess": "Janela de freeze criada com sucesso",
+      "checkConflict": "Verificar Conflito",
+      "conflict": "Conflito detectado — janela de freeze ativa",
+      "noConflict": "Sem conflito de freeze"
+    }
   },
   "engineeringGraph": {
     "title": "Grafo de Engenharia",

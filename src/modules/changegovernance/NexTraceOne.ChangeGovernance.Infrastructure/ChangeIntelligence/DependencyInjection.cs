@@ -38,6 +38,13 @@ public static class DependencyInjection
         services.AddScoped<IReleaseRepository, ReleaseRepository>();
         services.AddScoped<IBlastRadiusRepository, BlastRadiusRepository>();
         services.AddScoped<IChangeScoreRepository, ChangeScoreRepository>();
+        services.AddScoped<IChangeEventRepository, ChangeEventRepository>();
+        services.AddScoped<IExternalMarkerRepository, ExternalMarkerRepository>();
+        services.AddScoped<IFreezeWindowRepository, FreezeWindowRepository>();
+        services.AddScoped<IReleaseBaselineRepository, ReleaseBaselineRepository>();
+        services.AddScoped<IObservationWindowRepository, ObservationWindowRepository>();
+        services.AddScoped<IPostReleaseReviewRepository, PostReleaseReviewRepository>();
+        services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
 
         return services;
     }
