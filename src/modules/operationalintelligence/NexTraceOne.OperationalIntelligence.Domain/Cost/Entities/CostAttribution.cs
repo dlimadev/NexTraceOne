@@ -83,12 +83,21 @@ public sealed class CostAttribution : AuditableEntity<CostAttributionId>
     }
 
     /// <summary>
-    /// Recalcula o custo por requisição com base nos valores atuais de custo total
-    /// e contagem de requisições. Retorna zero se não houver requisições no período.
+    /// Atualiza os valores de custo e requisições deste período.
+    /// Recalcula automaticamente o custo por requisição.
+    /// Retorna erro se os novos valores forem inválidos.
     /// </summary>
-    public void RecalculateCostPerRequest()
+    public Result<Unit> UpdateCosts(decimal totalCost, long requestCount)
     {
-        CostPerRequest = RequestCount > 0 ? TotalCost / RequestCount : 0m;
+        if (totalCost < 0)
+            return CostIntelligenceErrors.NegativeCost(totalCost);
+
+        Guard.Against.Negative(requestCount);
+
+        TotalCost = totalCost;
+        RequestCount = requestCount;
+        CostPerRequest = requestCount > 0 ? totalCost / requestCount : 0m;
+        return Unit.Value;
     }
 }
 

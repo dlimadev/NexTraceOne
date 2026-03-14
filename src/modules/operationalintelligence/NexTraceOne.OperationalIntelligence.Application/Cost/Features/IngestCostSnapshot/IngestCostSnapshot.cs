@@ -61,7 +61,7 @@ public static class IngestCostSnapshot
         {
             Guard.Against.Null(request);
 
-            var snapshot = CostSnapshot.Create(
+            var snapshotResult = CostSnapshot.Create(
                 request.ServiceName,
                 request.Environment,
                 request.TotalCost,
@@ -74,9 +74,10 @@ public static class IngestCostSnapshot
                 request.Period,
                 request.Currency);
 
-            var validation = snapshot.Validate();
-            if (validation.IsFailure)
-                return validation.Error;
+            if (snapshotResult.IsFailure)
+                return snapshotResult.Error;
+
+            var snapshot = snapshotResult.Value;
 
             repository.Add(snapshot);
             await unitOfWork.CommitAsync(cancellationToken);

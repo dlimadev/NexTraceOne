@@ -13,7 +13,14 @@ namespace NexTraceOne.RuntimeIntelligence.Domain.Entities;
 /// e os valores reais de runtime de um serviço. Cada finding corresponde a uma métrica
 /// específica que ultrapassou o limiar de tolerância, com severidade calculada
 /// automaticamente pelo percentual de desvio.
+///
+/// Ciclo de vida: Detected → (Acknowledged | Resolved).
 /// Pode ser opcionalmente correlacionado a uma release para análise de impacto.
+///
+/// Invariantes:
+/// - Severidade é derivada do desvio percentual — não pode ser definida externamente.
+/// - Acknowledge e Resolve são idempotent-safe (retornam erro em duplicidade).
+/// - Resolução requer justificativa (comentário obrigatório).
 /// </summary>
 public sealed class DriftFinding : AuditableEntity<DriftFindingId>
 {
@@ -61,9 +68,22 @@ public sealed class DriftFinding : AuditableEntity<DriftFindingId>
     /// <summary>Indica se o drift foi reconhecido/aceito pela equipe responsável.</summary>
     public bool IsAcknowledged { get; private set; }
 
+    /// <summary>Indica se o drift foi resolvido (remediado ou aceito como novo normal).</summary>
+    public bool IsResolved { get; private set; }
+
+    /// <summary>Comentário de resolução fornecido pela equipe ao resolver o drift.</summary>
+    public string? ResolutionComment { get; private set; }
+
+    /// <summary>Data/hora UTC em que o drift foi resolvido. Null se ainda aberto.</summary>
+    public DateTimeOffset? ResolvedAt { get; private set; }
+
+    /// <summary>Indica se o drift ainda está aberto (nem reconhecido, nem resolvido).</summary>
+    public bool IsOpen => !IsAcknowledged && !IsResolved;
+
     /// <summary>
     /// Detecta e registra um novo drift finding com validações de guarda.
     /// Calcula automaticamente o percentual de desvio e a severidade correspondente.
+    /// REGRA DDD: A severidade é encapsulada — calculada apenas pelo factory method.
     /// </summary>
     public static DriftFinding Detect(
         string serviceName,
@@ -93,21 +113,25 @@ public sealed class DriftFinding : AuditableEntity<DriftFindingId>
             DeviationPercent = Math.Round(deviationPercent, 2),
             DetectedAt = detectedAt,
             ReleaseId = releaseId,
-            IsAcknowledged = false
+            IsAcknowledged = false,
+            IsResolved = false
         };
 
-        finding.CalculateSeverity();
+        finding.DeriveServerity();
 
         return finding;
     }
 
     /// <summary>
     /// Marca o drift finding como reconhecido pela equipe.
-    /// Retorna erro de conflito se já foi reconhecido anteriormente.
+    /// Retorna erro de conflito se já foi reconhecido ou resolvido.
     /// </summary>
     public Result<Unit> Acknowledge()
     {
         if (IsAcknowledged)
+            return RuntimeIntelligenceErrors.AlreadyAcknowledged(Id.Value.ToString());
+
+        if (IsResolved)
             return RuntimeIntelligenceErrors.AlreadyAcknowledged(Id.Value.ToString());
 
         IsAcknowledged = true;
@@ -115,13 +139,45 @@ public sealed class DriftFinding : AuditableEntity<DriftFindingId>
     }
 
     /// <summary>
-    /// Calcula a severidade do drift com base no percentual de desvio:
-    /// - Critical: desvio ≥ 50%
-    /// - High: desvio ≥ 25%
-    /// - Medium: desvio ≥ 10%
-    /// - Low: desvio &lt; 10%
+    /// Resolve o drift finding com justificativa obrigatória.
+    /// Registra a data de resolução e o comentário explicativo.
+    /// Retorna erro se já estiver resolvido.
     /// </summary>
-    public void CalculateSeverity()
+    public Result<Unit> Resolve(string resolutionComment, DateTimeOffset resolvedAt)
+    {
+        Guard.Against.NullOrWhiteSpace(resolutionComment);
+
+        if (IsResolved)
+            return RuntimeIntelligenceErrors.AlreadyAcknowledged(Id.Value.ToString());
+
+        IsResolved = true;
+        IsAcknowledged = true;
+        ResolutionComment = resolutionComment;
+        ResolvedAt = resolvedAt;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Correlaciona este drift finding com uma release específica.
+    /// Permite análise de impacto pós-deploy — verificar se a release causou o desvio.
+    /// Retorna erro se já estiver correlacionado com outra release.
+    /// </summary>
+    public Result<Unit> CorrelateWithRelease(Guid releaseId)
+    {
+        Guard.Against.Default(releaseId);
+
+        if (ReleaseId.HasValue)
+            return RuntimeIntelligenceErrors.DriftNotFound(Id.Value.ToString());
+
+        ReleaseId = releaseId;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Calcula a severidade do drift com base no percentual de desvio.
+    /// Encapsulado: chamado apenas pelo factory method para garantir invariante.
+    /// </summary>
+    private void DeriveServerity()
     {
         Severity = DeviationPercent switch
         {

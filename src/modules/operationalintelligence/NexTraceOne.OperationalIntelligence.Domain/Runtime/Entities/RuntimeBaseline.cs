@@ -119,6 +119,41 @@ public sealed class RuntimeBaseline : AuditableEntity<RuntimeBaselineId>
         var deviation = Math.Abs(actual - expected) / expected;
         return deviation <= factor;
     }
+
+    /// <summary>
+    /// Verifica se o score de confiança da baseline é suficiente para detecção de drift.
+    /// Baselines com poucos dados (< 0.5 de confiança) podem gerar falsos positivos.
+    /// </summary>
+    public bool IsConfident => ConfidenceScore >= 0.5m;
+
+    /// <summary>
+    /// Atualiza a baseline com novos valores de referência, recalculando o score de confiança.
+    /// Usado quando há dados históricos suficientes para estabelecer uma baseline mais precisa.
+    /// </summary>
+    public void Refresh(
+        decimal expectedAvgLatencyMs,
+        decimal expectedP99LatencyMs,
+        decimal expectedErrorRate,
+        decimal expectedRequestsPerSecond,
+        DateTimeOffset refreshedAt,
+        int newDataPointCount,
+        decimal newConfidenceScore)
+    {
+        Guard.Against.Negative(expectedAvgLatencyMs);
+        Guard.Against.Negative(expectedP99LatencyMs);
+        Guard.Against.Negative(expectedErrorRate);
+        Guard.Against.Negative(expectedRequestsPerSecond);
+        Guard.Against.NegativeOrZero(newDataPointCount);
+        Guard.Against.Negative(newConfidenceScore);
+
+        ExpectedAvgLatencyMs = expectedAvgLatencyMs;
+        ExpectedP99LatencyMs = expectedP99LatencyMs;
+        ExpectedErrorRate = Math.Clamp(expectedErrorRate, 0m, 1m);
+        ExpectedRequestsPerSecond = expectedRequestsPerSecond;
+        EstablishedAt = refreshedAt;
+        DataPointCount = newDataPointCount;
+        ConfidenceScore = Math.Clamp(newConfidenceScore, 0m, 1m);
+    }
 }
 
 /// <summary>Identificador fortemente tipado de RuntimeBaseline.</summary>

@@ -61,8 +61,21 @@ public sealed class ObservabilityProfile : AuditableEntity<ObservabilityProfileI
     public DateTimeOffset LastAssessedAt { get; private set; }
 
     /// <summary>
+    /// Indica se o serviço possui observabilidade mínima adequada (score ≥ 0.6).
+    /// Serviços abaixo deste limiar têm dívida de observabilidade significativa.
+    /// </summary>
+    public bool HasAdequateObservability => ObservabilityScore >= 0.60m;
+
+    /// <summary>
+    /// Conta o número de capacidades de observabilidade presentes.
+    /// </summary>
+    public int CapabilityCount =>
+        (HasTracing ? 1 : 0) + (HasMetrics ? 1 : 0) + (HasLogging ? 1 : 0) +
+        (HasAlerting ? 1 : 0) + (HasDashboard ? 1 : 0);
+
+    /// <summary>
     /// Cria uma nova avaliação de perfil de observabilidade para um serviço e ambiente.
-    /// Calcula o score automaticamente com base nas capacidades informadas.
+    /// Calcula o score automaticamente — encapsulado no factory method.
     /// </summary>
     public static ObservabilityProfile Assess(
         string serviceName,
@@ -90,17 +103,37 @@ public sealed class ObservabilityProfile : AuditableEntity<ObservabilityProfileI
             LastAssessedAt = assessedAt
         };
 
-        profile.RecalculateScore();
+        profile.DeriveScore();
 
         return profile;
     }
 
     /// <summary>
-    /// Recalcula o score de observabilidade como soma ponderada das capacidades presentes.
-    /// Pesos: tracing=0.25, metrics=0.25, logging=0.20, alerting=0.15, dashboard=0.15.
-    /// Score resultante é arredondado para 2 casas decimais.
+    /// Atualiza as capacidades de observabilidade do serviço e recalcula o score.
+    /// Permite reavaliação incremental conforme novas capacidades são adicionadas.
     /// </summary>
-    public void RecalculateScore()
+    public void UpdateCapabilities(
+        bool hasTracing,
+        bool hasMetrics,
+        bool hasLogging,
+        bool hasAlerting,
+        bool hasDashboard,
+        DateTimeOffset assessedAt)
+    {
+        HasTracing = hasTracing;
+        HasMetrics = hasMetrics;
+        HasLogging = hasLogging;
+        HasAlerting = hasAlerting;
+        HasDashboard = hasDashboard;
+        LastAssessedAt = assessedAt;
+        DeriveScore();
+    }
+
+    /// <summary>
+    /// Calcula o score de observabilidade como soma ponderada das capacidades presentes.
+    /// Encapsulado: chamado pelo factory e pelo UpdateCapabilities para garantir consistência.
+    /// </summary>
+    private void DeriveScore()
     {
         var score = 0m;
 

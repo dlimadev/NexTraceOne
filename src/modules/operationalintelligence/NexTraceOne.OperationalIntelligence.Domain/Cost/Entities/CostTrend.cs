@@ -51,9 +51,25 @@ public sealed class CostTrend : AuditableEntity<CostTrendId>
     public int DataPointCount { get; private set; }
 
     /// <summary>
+    /// Indica se a tendência representa uma variação significativa de custo.
+    /// Tendências Rising ou Declining são consideradas significativas — podem exigir ação.
+    /// </summary>
+    public bool IsSignificant => TrendDirection != TrendDirection.Stable;
+
+    /// <summary>
+    /// Indica se a tendência representa aumento de custo acima do limiar de estabilidade.
+    /// </summary>
+    public bool IsRising => TrendDirection == TrendDirection.Rising;
+
+    /// <summary>
+    /// Indica se a tendência representa redução de custo abaixo do limiar de estabilidade.
+    /// </summary>
+    public bool IsDeclining => TrendDirection == TrendDirection.Declining;
+
+    /// <summary>
     /// Cria uma nova análise de tendência de custo para um serviço e período específicos.
     /// Valida consistência do período e valores numéricos.
-    /// A classificação da direção é feita automaticamente com base na variação percentual.
+    /// A classificação da direção é encapsulada — feita automaticamente pelo factory.
     /// </summary>
     public static Result<CostTrend> Create(
         string serviceName,
@@ -87,16 +103,16 @@ public sealed class CostTrend : AuditableEntity<CostTrendId>
             DataPointCount = dataPointCount
         };
 
-        trend.Classify();
+        trend.DeriveDirection();
 
         return trend;
     }
 
     /// <summary>
-    /// Classifica a direção da tendência com base na variação percentual:
-    /// acima de +5% = Rising, abaixo de -5% = Declining, caso contrário Stable.
+    /// Classifica a direção da tendência com base na variação percentual.
+    /// Encapsulado: chamado apenas pelo factory method para garantir invariante.
     /// </summary>
-    public void Classify()
+    private void DeriveDirection()
     {
         TrendDirection = PercentageChange switch
         {

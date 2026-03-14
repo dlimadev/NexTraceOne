@@ -10,7 +10,14 @@ namespace NexTraceOne.RuntimeIntelligence.Domain.Entities;
 /// Aggregate Root que representa um snapshot pontual de saúde e performance de um serviço em runtime.
 /// Captura métricas operacionais (latência, taxa de erro, throughput, recursos)
 /// num instante específico, permitindo análise histórica, detecção de drift e correlação com releases.
-/// A classificação de saúde é determinada automaticamente com base em limiares de erro e latência.
+///
+/// A classificação de saúde é determinada automaticamente pelo factory method com base em
+/// limiares de erro e latência — não existe snapshot com estado de saúde inconsistente.
+///
+/// Invariantes:
+/// - ErrorRate sempre entre 0 e 1 (clamp aplicado).
+/// - CpuUsagePercent sempre entre 0 e 100 (clamp aplicado).
+/// - HealthStatus é derivado das métricas — não pode ser definido externamente.
 /// </summary>
 public sealed class RuntimeSnapshot : AuditableEntity<RuntimeSnapshotId>
 {
@@ -64,10 +71,21 @@ public sealed class RuntimeSnapshot : AuditableEntity<RuntimeSnapshotId>
     /// <summary>Fonte dos dados de runtime (ex: "Prometheus", "Datadog", "CloudWatch").</summary>
     public string Source { get; private set; } = string.Empty;
 
+    /// <summary>Indica se o serviço está operando normalmente — derivado do HealthStatus.</summary>
+    public bool IsHealthy => HealthStatus == HealthStatus.Healthy;
+
+    /// <summary>Indica se o serviço está degradado — derivado do HealthStatus.</summary>
+    public bool IsDegraded => HealthStatus == HealthStatus.Degraded;
+
+    /// <summary>Indica se o serviço está com falha — derivado do HealthStatus.</summary>
+    public bool IsUnhealthy => HealthStatus == HealthStatus.Unhealthy;
+
     /// <summary>
     /// Cria um novo snapshot de runtime com validações de guarda nos campos obrigatórios.
     /// Métricas percentuais são validadas dentro dos limites aceitos.
-    /// A classificação de saúde é executada automaticamente após a criação.
+    /// A classificação de saúde é executada automaticamente — invariante garantida pelo factory.
+    ///
+    /// REGRA DDD: A classificação de saúde é encapsulada — não pode ser chamada externamente.
     /// </summary>
     public static RuntimeSnapshot Create(
         string serviceName,
@@ -115,13 +133,30 @@ public sealed class RuntimeSnapshot : AuditableEntity<RuntimeSnapshotId>
     }
 
     /// <summary>
-    /// Classifica automaticamente o estado de saúde do serviço com base na taxa de erro
-    /// e na latência P99. O status mais severo entre os dois indicadores prevalece:
-    /// - Unhealthy: ErrorRate ≥ 10% ou P99 ≥ 3000ms
-    /// - Degraded: ErrorRate ≥ 5% ou P99 ≥ 1000ms
-    /// - Healthy: caso contrário
+    /// Calcula o desvio percentual de cada métrica em relação a uma baseline.
+    /// Retorna um dicionário nome_metrica→desvio_percentual para uso em detecção de drift.
+    /// Valores positivos indicam piora; valores negativos indicam melhora.
     /// </summary>
-    public void ClassifyHealth()
+    public IDictionary<string, decimal> CalculateDeviationsFrom(RuntimeBaseline baseline)
+    {
+        Guard.Against.Null(baseline);
+
+        var deviations = new Dictionary<string, decimal>();
+
+        AddDeviation(deviations, "AvgLatencyMs", baseline.ExpectedAvgLatencyMs, AvgLatencyMs);
+        AddDeviation(deviations, "P99LatencyMs", baseline.ExpectedP99LatencyMs, P99LatencyMs);
+        AddDeviation(deviations, "ErrorRate", baseline.ExpectedErrorRate, ErrorRate);
+        AddDeviation(deviations, "RequestsPerSecond", baseline.ExpectedRequestsPerSecond, RequestsPerSecond);
+
+        return deviations;
+    }
+
+    /// <summary>
+    /// Classifica automaticamente o estado de saúde do serviço com base na taxa de erro
+    /// e na latência P99. O status mais severo entre os dois indicadores prevalece.
+    /// Encapsulado: chamado apenas pelo factory method para garantir invariante.
+    /// </summary>
+    private void ClassifyHealth()
     {
         if (ErrorRate >= UnhealthyErrorRateThreshold || P99LatencyMs >= UnhealthyLatencyThresholdMs)
         {
@@ -136,6 +171,16 @@ public sealed class RuntimeSnapshot : AuditableEntity<RuntimeSnapshotId>
         }
 
         HealthStatus = HealthStatus.Healthy;
+    }
+
+    /// <summary>Calcula desvio percentual de uma métrica individual.</summary>
+    private static void AddDeviation(IDictionary<string, decimal> deviations, string metric, decimal expected, decimal actual)
+    {
+        var deviation = expected == 0m
+            ? (actual == 0m ? 0m : 100m)
+            : Math.Round((actual - expected) / Math.Abs(expected) * 100m, 2);
+
+        deviations[metric] = deviation;
     }
 }
 

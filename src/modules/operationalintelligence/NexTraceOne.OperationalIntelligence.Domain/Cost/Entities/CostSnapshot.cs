@@ -11,6 +11,13 @@ namespace NexTraceOne.CostIntelligence.Domain.Entities;
 /// Aggregate Root que representa um snapshot pontual de custo de infraestrutura de um serviço.
 /// Captura os custos totais e a distribuição por componente (CPU, memória, rede, storage)
 /// num instante específico, permitindo análise histórica e detecção de anomalias.
+///
+/// Invariantes:
+/// - Soma das parcelas (CPU + memória + rede + storage) nunca excede o custo total.
+/// - Custo total e parcelas são sempre não-negativos.
+/// - ServiceName, Environment, Source e Period são obrigatórios.
+///
+/// REGRA DDD: A validação de invariantes ocorre no factory method — não há estado inválido.
 /// </summary>
 public sealed class CostSnapshot : AuditableEntity<CostSnapshotId>
 {
@@ -50,10 +57,23 @@ public sealed class CostSnapshot : AuditableEntity<CostSnapshotId>
     public string Period { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Cria um novo snapshot de custo com validações de guarda nos campos obrigatórios.
-    /// A validação das shares vs custo total é feita sob demanda via <see cref="Validate"/>.
+    /// Soma das parcelas de custo — propriedade computada, sem persistência.
+    /// Facilita verificação de consistência sem recalcular a cada acesso.
     /// </summary>
-    public static CostSnapshot Create(
+    public decimal SharesSum => CpuCostShare + MemoryCostShare + NetworkCostShare + StorageCostShare;
+
+    /// <summary>
+    /// Indica se há custo não atribuído a nenhum componente (CPU, memória, rede, storage).
+    /// Valores positivos indicam custo "invisível" — pode sinalizar omissão na instrumentação.
+    /// </summary>
+    public decimal UnattributedCost => TotalCost - SharesSum;
+
+    /// <summary>
+    /// Factory method para criação de um snapshot de custo validado.
+    /// Garante todas as invariantes do aggregate — não existe CostSnapshot em estado inválido.
+    /// Retorna Result com erro se a soma das parcelas exceder o custo total.
+    /// </summary>
+    public static Result<CostSnapshot> Create(
         string serviceName,
         string environment,
         decimal totalCost,
@@ -77,6 +97,10 @@ public sealed class CostSnapshot : AuditableEntity<CostSnapshotId>
         Guard.Against.NullOrWhiteSpace(period);
         Guard.Against.NullOrWhiteSpace(currency);
 
+        var sharesSum = cpuCostShare + memoryCostShare + networkCostShare + storageCostShare;
+        if (sharesSum > totalCost)
+            return CostIntelligenceErrors.InvalidCostShares(sharesSum, totalCost);
+
         return new CostSnapshot
         {
             Id = CostSnapshotId.New(),
@@ -95,17 +119,33 @@ public sealed class CostSnapshot : AuditableEntity<CostSnapshotId>
     }
 
     /// <summary>
-    /// Valida que a soma das parcelas de custo (CPU + memória + rede + storage)
-    /// não excede o custo total informado. Retorna erro de validação se exceder.
+    /// Verifica se o custo atual representa uma anomalia em relação a um custo esperado.
+    /// Uma anomalia é detectada quando o custo real ultrapassa o esperado pelo limiar percentual.
+    /// Exemplo: com threshold=20 e expectedCost=100, custo acima de 120 é anomalia.
     /// </summary>
-    public Result<Unit> Validate()
+    /// <param name="expectedCost">Custo esperado com base em histórico/baseline.</param>
+    /// <param name="thresholdPercent">Percentual de desvio tolerado (ex: 20 = ±20%).</param>
+    /// <returns>True se o custo total excede o limiar de anomalia.</returns>
+    public bool IsAnomaly(decimal expectedCost, decimal thresholdPercent)
     {
-        var sharesSum = CpuCostShare + MemoryCostShare + NetworkCostShare + StorageCostShare;
+        if (expectedCost <= 0m || thresholdPercent <= 0m)
+            return false;
 
-        if (sharesSum > TotalCost)
-            return CostIntelligenceErrors.InvalidCostShares(sharesSum, TotalCost);
+        var upperBound = expectedCost * (1m + thresholdPercent / 100m);
+        return TotalCost > upperBound;
+    }
 
-        return Unit.Value;
+    /// <summary>
+    /// Calcula o percentual de desvio do custo real em relação ao esperado.
+    /// Retorna zero quando o custo esperado é zero para evitar divisão por zero.
+    /// Valor positivo indica custo acima do esperado, negativo indica abaixo.
+    /// </summary>
+    public decimal CalculateDeviationPercent(decimal expectedCost)
+    {
+        if (expectedCost == 0m)
+            return TotalCost == 0m ? 0m : 100m;
+
+        return Math.Round((TotalCost - expectedCost) / expectedCost * 100m, 2);
     }
 }
 

@@ -117,6 +117,40 @@ public sealed class ServiceCostProfile : AuditableEntity<ServiceCostProfileId>
 
         return Unit.Value;
     }
+
+    /// <summary>
+    /// Percentual do orçamento consumido no mês corrente.
+    /// Retorna null se nenhum orçamento estiver definido.
+    /// Permite visualização rápida do consumo relativo ao limite.
+    /// </summary>
+    public decimal? BudgetUsagePercent =>
+        MonthlyBudget.HasValue && MonthlyBudget.Value > 0m
+            ? Math.Round(CurrentMonthCost / MonthlyBudget.Value * 100m, 2)
+            : null;
+
+    /// <summary>
+    /// Reseta o custo acumulado para um novo ciclo mensal.
+    /// Deve ser chamado pelo job de virada de mês para limpar o acúmulo anterior.
+    /// </summary>
+    public void ResetMonthlyCycle(DateTimeOffset now)
+    {
+        CurrentMonthCost = 0m;
+        LastUpdatedAt = now;
+    }
+
+    /// <summary>
+    /// Atualiza o limiar de alerta de custo (percentual do orçamento).
+    /// O valor deve estar entre 0 e 100.
+    /// </summary>
+    public Result<Unit> UpdateAlertThreshold(decimal newThresholdPercent, DateTimeOffset now)
+    {
+        if (newThresholdPercent < 0m || newThresholdPercent > 100m)
+            return CostIntelligenceErrors.NegativeCost(newThresholdPercent);
+
+        AlertThresholdPercent = newThresholdPercent;
+        LastUpdatedAt = now;
+        return Unit.Value;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de ServiceCostProfile.</summary>
