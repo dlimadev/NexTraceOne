@@ -22,15 +22,17 @@ assinatura digital para promoção em produção — com suporte a múltiplos pr
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        API Layer                                 │
-│  ContractsEndpointModule (17 endpoints REST)                     │
+│  ContractsEndpointModule (21 endpoints REST)                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                     Application Layer                            │
-│  17 Features VSA (Import, Version, Diff, Lock, Sign, Export,     │
-│  Search, Violations, Lifecycle, Classification, Sync, Validate)  │
+│  21 Features VSA (Import, Version, Diff, Lock, Sign, Export,     │
+│  Search, Violations, Lifecycle, Classification, Sync, Validate,  │
+│  GenerateScorecard, GenerateEvidencePack, EvaluateContractRules, │
+│  GetCompatibilityAssessment)                                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                       Domain Layer                               │
 │  ContractVersion (AR) │ ContractDiff │ ContractArtifact          │
-│  ContractRuleViolation │ ContractLock │ OpenApiSchema            │
+│  ContractRuleViolation │ ContractScorecard │ ContractEvidencePack│
 │  ──────────────────────────────────────────                      │
 │  Domain Services:                                                │
 │  OpenApiSpecParser │ SwaggerSpecParser │ AsyncApiSpecParser       │
@@ -38,9 +40,16 @@ assinatura digital para promoção em produção — com suporte a múltiplos pr
 │  OpenApiDiffCalculator │ SwaggerDiffCalculator                   │
 │  AsyncApiDiffCalculator │ WsdlDiffCalculator                     │
 │  ContractDiffCalculator (orquestrador multi-protocolo)           │
+│  CanonicalModelBuilder │ ContractScorecardCalculator             │
+│  ContractRuleEngine                                              │
 │  ──────────────────────────────────────────                      │
 │  Value Objects: SemanticVersion │ ContractSignature               │
-│  ContractProvenance │ ChangeEntry                                │
+│  ContractProvenance │ ChangeEntry │ ContractCanonicalModel       │
+│  ContractOperation │ ContractSchemaElement                       │
+│  CompatibilityAssessment │ SchemaRegistryBinding                 │
+│  InteroperabilityProfile │ SchemaEvolutionRule                   │
+│  ──────────────────────────────────────────                      │
+│  Enums: KafkaSchemaCompatibility                                 │
 ├─────────────────────────────────────────────────────────────────┤
 │                   Infrastructure Layer                            │
 │  ContractsDbContext │ ContractVersionRepository                   │
@@ -202,6 +211,10 @@ GET /api/v1/contracts/{id}/verify
 | POST | `/api/v1/contracts/{id}/deprecate` | Depreciar versão |
 | POST | `/api/v1/contracts/{id}/sign` | Assinar versão |
 | GET | `/api/v1/contracts/{id}/verify` | Verificar assinatura |
+| GET | `/api/v1/contracts/{id}/scorecard` | Gerar scorecard técnico |
+| GET | `/api/v1/contracts/{id}/evidence-pack` | Gerar evidence pack para workflow |
+| GET | `/api/v1/contracts/{id}/rules` | Avaliar regras determinísticas |
+| POST | `/api/v1/contracts/compatibility` | Avaliar compatibilidade entre versões |
 
 ### Pesquisa de Contratos (novo)
 
@@ -258,6 +271,90 @@ Sugestão automática baseada no nível de mudança:
 | Additive | Bump Minor | 1.2.3 → 1.3.0 |
 | NonBreaking | Bump Patch | 1.2.3 → 1.2.4 |
 
+## Modelo Canônico Interno
+
+O módulo possui um modelo canônico interno (`ContractCanonicalModel`) que abstrai as diferenças
+entre protocolos, permitindo raciocínio unificado sobre contratos independentemente do formato original.
+
+### Componentes do Modelo Canônico
+
+| Tipo | Descrição |
+|------|-----------|
+| `ContractCanonicalModel` | Representação normalizada: operações, schemas, metadados, segurança |
+| `ContractOperation` | Operação normalizada (REST path+method, SOAP operation, AsyncAPI channel) |
+| `ContractSchemaElement` | Elemento de schema com tipo, nome, obrigatoriedade e hierarquia |
+
+O `CanonicalModelBuilder` constrói o modelo a partir de qualquer protocolo suportado:
+- **OpenAPI/Swagger**: extrai paths, operações, schemas, securitySchemes, servers, tags
+- **AsyncAPI**: extrai channels (publish/subscribe), schemas, servers
+- **WSDL**: extrai portTypes, operações, elementos XSD
+
+## Scorecard Técnico
+
+O `ContractScorecard` fornece avaliação multi-dimensional da qualidade de um contrato:
+
+| Dimensão | Peso | O que avalia |
+|----------|------|-------------|
+| **Quality** | 30% | Presença de descrições, segurança, naming |
+| **Completeness** | 25% | Operações documentadas, schemas definidos, exemplos |
+| **Compatibility** | 25% | Ausência de violações, conformidade com regras |
+| **Risk** | 20% | Inversão: segurança ausente, violações, operações sem documentação |
+
+Cada dimensão produz um score de 0.0 a 1.0 com justificativa textual. O `OverallScore` é a
+média ponderada. Calculado pelo `ContractScorecardCalculator` a partir do modelo canônico.
+
+## Evidence Pack para Workflow
+
+O `ContractEvidencePack` agrega todas as evidências técnicas necessárias para decisões de
+governança em um único pacote auditável:
+
+- Nível de mudança (Breaking/Additive/NonBreaking)
+- Contagem de breaking, aditivas e non-breaking changes
+- Versão semântica recomendada
+- Scores de qualidade e risco
+- Contagem de violações de regras
+- Resumo executivo e técnico
+- Lista de consumers potencialmente impactados
+- Flags: `RequiresWorkflowApproval`, `RequiresChangeNotification`
+
+Gerado pela feature `GenerateEvidencePack`, alimenta o módulo de Workflow & Approval.
+
+## Motor de Regras Determinísticas
+
+O `ContractRuleEngine` avalia regras de conformidade organizacional sobre o modelo canônico:
+
+| Regra | Severidade | O que verifica |
+|-------|-----------|----------------|
+| `SecurityDefinition` | Error | Presença de esquemas de autenticação |
+| `OperationDescription` | Warning | Descrição em todas as operações |
+| `NamingConvention` | Warning | Nomes sem espaços ou caracteres especiais |
+| `SchemaCompleteness` | Warning | Todos os schemas com tipo definido |
+| `ExamplesCoverage` | Info | Presença de exemplos |
+| `DeprecationDocumentation` | Warning | Operações depreciadas com documentação |
+| `VersioningConvention` | Warning | Formato SemVer válido |
+
+Cada violação inclui nome da regra, severidade, mensagem explicativa, path e sugestão de correção.
+
+## Kafka / Schema Registry Readiness
+
+O módulo está preparado para integração com Kafka e Schema Registry:
+
+### Tipos de Domínio
+
+| Tipo | Descrição |
+|------|-----------|
+| `SchemaRegistryBinding` | Vinculação de contrato a subject/versão/topic do Schema Registry |
+| `KafkaSchemaCompatibility` | Enum: None, Backward, BackwardTransitive, Forward, ForwardTransitive, Full, FullTransitive |
+| `SchemaEvolutionRule` | Regra de evolução de schema com severidade e sugestão de correção |
+| `InteroperabilityProfile` | Perfil de capacidades: formatos de export, conversão, round-trip |
+
+### Integração Futura
+
+- Importação direta de schemas do Confluent Schema Registry
+- Validação de compatibilidade por modo (BACKWARD, FORWARD, FULL)
+- Tracking de subjects, versões e relações topic↔producer↔consumer
+- Diffs e impactos em consumers tratados como mudanças de contrato de primeira classe
+
 ## Assinatura e Integridade
 
 ### Canonicalização
@@ -282,11 +379,14 @@ public interface IContractsModule
 {
     Task<ChangeLevel?> GetLatestChangeLevelAsync(Guid apiAssetId, CancellationToken ct);
     Task<bool> HasContractVersionAsync(Guid apiAssetId, CancellationToken ct);
+    Task<decimal?> GetLatestOverallScoreAsync(Guid apiAssetId, CancellationToken ct);
+    Task<bool> RequiresWorkflowApprovalAsync(Guid apiAssetId, CancellationToken ct);
 }
 ```
 
-Permite que outros módulos (EngineeringGraph, ChangeIntelligence) consultem dados de contratos
-sem acessar diretamente o DbContext do módulo.
+Permite que outros módulos (EngineeringGraph, ChangeIntelligence, Workflow) consultem dados de contratos
+sem acessar diretamente o DbContext do módulo. Os novos métodos `GetLatestOverallScoreAsync` e
+`RequiresWorkflowApprovalAsync` suportam integração com o motor de workflow e governança de mudanças.
 
 ## Frontend
 
@@ -305,18 +405,17 @@ A página de Contracts (`ContractsPage.tsx`) oferece:
 
 ## Testes
 
-- **175+ testes** cobrindo:
-  - Entidades de domínio (ContractVersion, lifecycle, lock, sign)
-  - Value Objects (SemanticVersion, ContractSignature, segurança timing-safe)
+- **216+ testes** cobrindo:
+  - Entidades de domínio (ContractVersion, lifecycle, lock, sign, ContractScorecard, ContractEvidencePack)
+  - Value Objects (SemanticVersion, ContractSignature, ContractCanonicalModel, ContractOperation, ContractSchemaElement, CompatibilityAssessment, SchemaRegistryBinding, InteroperabilityProfile, SchemaEvolutionRule)
   - Parsers (OpenAPI, Swagger, WSDL, AsyncAPI)
   - Diff Calculators (todos os protocolos + orquestrador)
-  - Features de aplicação (import, version, diff, lock, sign, export, lifecycle)
+  - Domain Services (CanonicalModelBuilder, ContractScorecardCalculator, ContractRuleEngine)
+  - Features de aplicação (import, version, diff, lock, sign, export, lifecycle, scorecard, evidence pack, rules, compatibility)
   - Import multi-protocolo (OpenAPI, Swagger, WSDL/XML, AsyncAPI)
   - Auto-detecção de protocolo (Swagger, AsyncAPI, WSDL a partir do conteúdo)
   - Validação multi-protocolo (ValidateContractIntegrity por protocolo)
   - Herança de protocolo entre versões
-  - Validação de formatos (json, yaml, xml)
-  - Validação de tamanho máximo (5 MB)
   - Canonicalization (JSON key sorting, XML/YAML line normalization)
   - Segurança de assinatura (timing-safe comparison)
 
@@ -348,6 +447,11 @@ garantindo que apenas usuários autorizados acessem a funcionalidade.
 6. **Auto-detecção de protocolo** — inferência automática a partir do conteúdo (Swagger, AsyncAPI, WSDL)
 7. **Verificação timing-safe** — previne ataques de timing na verificação de assinatura
 8. **Pesquisa paginada** — busca com filtros por protocolo, estado, ativo e versão
+9. **Modelo canônico internal** — `ContractCanonicalModel` abstrai diferenças entre protocolos para raciocínio unificado
+10. **Scorecard multi-dimensional** — 4 dimensões ponderadas com justificativas textuais auditáveis
+11. **Evidence pack auto-gerado** — agrega diff + scorecard + regras em pacote único para workflow
+12. **Motor de regras determinístico** — `ContractRuleEngine` avalia regras sem IA, resultados reproduzíveis
+13. **Kafka/Schema Registry como tipos de domínio** — readiness via value objects, sem dependência de runtime client
 
 ## Riscos Residuais
 
@@ -357,3 +461,19 @@ garantindo que apenas usuários autorizados acessem a funcionalidade.
 4. **Contract Studio não implementado** — edição visual de contratos é funcionalidade evolutiva (P2)
 5. **Design-First Accelerator não implementado** — geração assistida de contratos é funcionalidade evolutiva (P2)
 6. **Protobuf/GraphQL stub** — validação retorna sucesso com 0 counts; parsing completo é evolutivo
+7. **Schema Registry client** — tipos de domínio prontos, mas sem client HTTP para Confluent Schema Registry (P2)
+8. **EF migration pendente** — `ContractScorecard` e `ContractEvidencePack` requerem migration para persistência
+
+## Scripts SQL de Mock (Dev/Debug)
+
+Disponíveis em `database/seeds/contracts/`:
+
+| Script | Conteúdo |
+|--------|----------|
+| `00-reset.sql` | Cleanup de todos os dados de seed |
+| `01-rest-contracts.sql` | 4 contratos REST (OpenAPI 3.1 + Swagger 2.0) |
+| `02-soap-wsdl-contracts.sql` | 3 contratos SOAP (WSDL 1.1 com cenários breaking/non-breaking) |
+| `03-asyncapi-kafka-contracts.sql` | 4 contratos event-driven (AsyncAPI 2.6 para Kafka) |
+| `04-diffs-and-scenarios.sql` | 6 diffs pré-computados (aditivo/breaking por protocolo) |
+
+Detalhes completos em `database/seeds/contracts/README.md`.
