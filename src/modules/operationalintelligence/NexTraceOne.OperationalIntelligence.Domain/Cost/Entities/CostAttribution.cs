@@ -1,16 +1,95 @@
+using Ardalis.GuardClauses;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.CostIntelligence.Domain.Errors;
 
 namespace NexTraceOne.CostIntelligence.Domain.Entities;
 
 /// <summary>
-/// Aggregate Root / Entidade do módulo CostIntelligence.
-/// TODO: Implementar regras de domínio, invariantes e domain events de CostAttribution.
+/// Entidade que atribui custo a uma API/serviço específico para um determinado período.
+/// Permite correlacionar custos de infraestrutura com ativos do catálogo de APIs,
+/// calculando o custo por requisição para análise de eficiência.
 /// </summary>
 public sealed class CostAttribution : AuditableEntity<CostAttributionId>
 {
-    // TODO: Implementar propriedades, construtor privado e factory methods
     private CostAttribution() { }
+
+    /// <summary>Identificador do ativo de API no catálogo ao qual o custo é atribuído.</summary>
+    public Guid ApiAssetId { get; private set; }
+
+    /// <summary>Nome do serviço responsável pelo custo.</summary>
+    public string ServiceName { get; private set; } = string.Empty;
+
+    /// <summary>Início do período de atribuição de custo.</summary>
+    public DateTimeOffset PeriodStart { get; private set; }
+
+    /// <summary>Fim do período de atribuição de custo.</summary>
+    public DateTimeOffset PeriodEnd { get; private set; }
+
+    /// <summary>Custo total atribuído ao serviço/API neste período.</summary>
+    public decimal TotalCost { get; private set; }
+
+    /// <summary>Número de requisições processadas pelo serviço/API neste período.</summary>
+    public long RequestCount { get; private set; }
+
+    /// <summary>Custo por requisição, calculado a partir do custo total e contagem de requisições.</summary>
+    public decimal CostPerRequest { get; private set; }
+
+    /// <summary>Ambiente onde o custo foi apurado (dev, staging, prod).</summary>
+    public string Environment { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Cria uma nova atribuição de custo para um serviço/API num período específico.
+    /// Valida que o período é consistente (início antes do fim) e que os valores são positivos.
+    /// O custo por requisição é calculado automaticamente se houver requisições.
+    /// </summary>
+    public static Result<CostAttribution> Attribute(
+        Guid apiAssetId,
+        string serviceName,
+        DateTimeOffset periodStart,
+        DateTimeOffset periodEnd,
+        decimal totalCost,
+        long requestCount,
+        string environment)
+    {
+        Guard.Against.Default(apiAssetId);
+        Guard.Against.NullOrWhiteSpace(serviceName);
+        Guard.Against.NullOrWhiteSpace(environment);
+
+        if (periodStart >= periodEnd)
+            return CostIntelligenceErrors.InvalidPeriod(periodStart, periodEnd);
+
+        if (totalCost < 0)
+            return CostIntelligenceErrors.NegativeCost(totalCost);
+
+        Guard.Against.Negative(requestCount);
+
+        var attribution = new CostAttribution
+        {
+            Id = CostAttributionId.New(),
+            ApiAssetId = apiAssetId,
+            ServiceName = serviceName,
+            PeriodStart = periodStart,
+            PeriodEnd = periodEnd,
+            TotalCost = totalCost,
+            RequestCount = requestCount,
+            Environment = environment,
+            CostPerRequest = requestCount > 0 ? totalCost / requestCount : 0m
+        };
+
+        return attribution;
+    }
+
+    /// <summary>
+    /// Recalcula o custo por requisição com base nos valores atuais de custo total
+    /// e contagem de requisições. Retorna zero se não houver requisições no período.
+    /// </summary>
+    public void RecalculateCostPerRequest()
+    {
+        CostPerRequest = RequestCount > 0 ? TotalCost / RequestCount : 0m;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de CostAttribution.</summary>
