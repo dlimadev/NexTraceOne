@@ -55,6 +55,7 @@ dotnet ef database update \
 | 03 | `03-seed-code-generation.sql` | Registos de geração de código em 5 linguagens e 4 tipos de artefacto | 6 registos |
 | 04 | `04-seed-analytics-events.sql` | Eventos de analytics cobrindo todos os tipos de interação | 15 eventos |
 | 05 | `05-seed-saved-searches.sql` | Pesquisas salvas com critérios e filtros variados | 4 pesquisas |
+| 06 | `06-seed-multi-protocol-analytics.sql` | Analytics multi-protocolo: SOAP/WSDL e Kafka/AsyncAPI | 10 eventos |
 
 ---
 
@@ -65,7 +66,7 @@ dotnet ef database update \
 | `d1` | Subscriptions | `d1000000-...-000000000001` a `d1000000-...-000000000008` |
 | `d2` | PlaygroundSessions | `d2000000-...-000000000001` a `d2000000-...-00000000000a` |
 | `d3` | CodeGenerationRecords | `d3000000-...-000000000001` a `d3000000-...-000000000006` |
-| `d4` | PortalAnalyticsEvents | `d4000000-...-000000000001` a `d4000000-...-00000000000f` |
+| `d4` | PortalAnalyticsEvents | `d4000000-...-000000000001` a `d4000000-...-000000000025` |
 | `d5` | SavedSearches | `d5000000-...-000000000001` a `d5000000-...-000000000004` |
 
 ---
