@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, UnauthorizedPage } from './features/identity-access';
+import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage } from './features/commercial-governance';
 import { ContractsPage, EngineeringGraphPage, DeveloperPortalPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
@@ -88,6 +88,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
                     <AccessReviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-sessions"
+                element={
+                  <ProtectedRoute permission="identity:sessions:read" redirectTo="/unauthorized">
+                    <MySessionsPage />
                   </ProtectedRoute>
                 }
               />

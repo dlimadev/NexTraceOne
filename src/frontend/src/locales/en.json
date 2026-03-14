@@ -34,7 +34,11 @@
     "notAuthenticated": "Authentication is required to access this resource.",
     "ssoSignIn": "Sign in with SSO",
     "tagline": "Sovereign Change Intelligence Platform",
-    "selfHosted": "Self-hosted · Enterprise · Auditable"
+    "selfHosted": "Self-hosted · Enterprise · Auditable",
+    "ssoDescription": "Recommended for corporate accounts",
+    "orDivider": "or sign in with credentials",
+    "ssoRedirecting": "Redirecting to identity provider...",
+    "ssoError": "SSO authentication failed. Please try again or use credentials."
   },
   "tenants": {
     "selectTenant": "Select Organization",
@@ -75,7 +79,8 @@
     "audit": "Audit",
     "changeIntelligence": "Change Intelligence",
     "sectionPlatform": "Platform",
-    "sectionAdmin": "Administration"
+    "sectionAdmin": "Administration",
+    "mySessions": "My Sessions"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -139,7 +144,19 @@
     "revoke": "Revoke",
     "ipAddress": "IP Address",
     "userAgent": "User Agent",
-    "expiresAt": "Expires At"
+    "expiresAt": "Expires",
+    "subtitle": "Manage your active login sessions",
+    "noSessions": "No active sessions found.",
+    "revokeSession": "Revoke",
+    "revokeConfirm": "Are you sure you want to end this session?",
+    "revokedSuccess": "Session revoked successfully.",
+    "currentSession": "Current Session",
+    "browser": "Browser",
+    "createdAt": "Started",
+    "status": "Status",
+    "active": "Active",
+    "expired": "Expired",
+    "revoked": "Revoked"
   },
   "identity": {
     "breakGlass": {

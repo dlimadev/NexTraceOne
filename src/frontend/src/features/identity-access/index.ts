@@ -5,6 +5,7 @@ export { BreakGlassPage } from './pages/BreakGlassPage';
 export { JitAccessPage } from './pages/JitAccessPage';
 export { DelegationPage } from './pages/DelegationPage';
 export { AccessReviewPage } from './pages/AccessReviewPage';
+export { MySessionsPage } from './pages/MySessionsPage';
 export { TenantSelectionPage } from './pages/TenantSelectionPage';
 export { UnauthorizedPage } from './pages/UnauthorizedPage';
 export { identityApi } from './api/identity';

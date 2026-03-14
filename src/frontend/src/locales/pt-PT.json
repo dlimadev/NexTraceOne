@@ -34,7 +34,11 @@
     "notAuthenticated": "É necessária autenticação para aceder a este recurso.",
     "ssoSignIn": "Iniciar sessão com SSO",
     "tagline": "Plataforma Soberana de Inteligência de Mudanças",
-    "selfHosted": "Self-hosted · Empresarial · Auditável"
+    "selfHosted": "Self-hosted · Empresarial · Auditável",
+    "ssoDescription": "Recomendado para contas empresariais",
+    "orDivider": "ou inicie sessão com credenciais",
+    "ssoRedirecting": "A redirecionar para o fornecedor de identidade...",
+    "ssoError": "Falha na autenticação SSO. Tente novamente ou utilize credenciais."
   },
   "tenants": {
     "selectTenant": "Selecionar Organização",
@@ -75,7 +79,8 @@
     "audit": "Auditoria",
     "changeIntelligence": "Inteligência de Mudanças",
     "sectionPlatform": "Plataforma",
-    "sectionAdmin": "Administração"
+    "sectionAdmin": "Administração",
+    "mySessions": "As Minhas Sessões"
   },
   "header": {
     "toggleLanguage": "Alternar idioma",
@@ -139,7 +144,19 @@
     "revoke": "Revogar",
     "ipAddress": "Endereço IP",
     "userAgent": "User Agent",
-    "expiresAt": "Expira Em"
+    "expiresAt": "Expira em",
+    "subtitle": "Gerir as suas sessões de login ativas",
+    "noSessions": "Nenhuma sessão ativa encontrada.",
+    "revokeSession": "Revogar",
+    "revokeConfirm": "Tem a certeza de que pretende terminar esta sessão?",
+    "revokedSuccess": "Sessão revogada com sucesso.",
+    "currentSession": "Sessão Atual",
+    "browser": "Navegador",
+    "createdAt": "Iniciada em",
+    "status": "Estado",
+    "active": "Ativa",
+    "expired": "Expirada",
+    "revoked": "Revogada"
   },
   "identity": {
     "breakGlass": {
