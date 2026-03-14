@@ -267,7 +267,102 @@
     },
     "apiAssetPlaceholder": "UUID of the API asset",
     "versionPlaceholder": "e.g. 1.2.3",
-    "commitPlaceholder": "abc1234"
+    "commitPlaceholder": "abc1234",
+    "tabs": {
+      "overview": "Overview",
+      "intelligence": "Intelligence",
+      "timeline": "Timeline",
+      "freeze": "Freeze Calendar"
+    },
+    "intelligence": {
+      "title": "Change Intelligence Summary",
+      "selectRelease": "Select a release to view intelligence",
+      "score": {
+        "title": "Risk Score",
+        "breakingChange": "Breaking Change Weight",
+        "blastRadius": "Blast Radius Weight",
+        "environment": "Environment Weight",
+        "computedAt": "Computed At",
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk"
+      },
+      "blastRadius": {
+        "title": "Blast Radius",
+        "totalAffected": "Total Affected Consumers",
+        "direct": "Direct Consumers",
+        "transitive": "Transitive Consumers",
+        "calculatedAt": "Calculated At"
+      },
+      "markers": {
+        "title": "External Markers",
+        "noMarkers": "No external markers registered",
+        "source": "Source",
+        "type": "Type",
+        "externalId": "External ID",
+        "occurredAt": "Occurred At"
+      },
+      "baseline": {
+        "title": "Release Baseline (Before)",
+        "noBaseline": "No baseline recorded",
+        "requestsPerMinute": "Req/min",
+        "errorRate": "Error Rate",
+        "avgLatency": "Avg Latency (ms)",
+        "p95Latency": "P95 Latency (ms)",
+        "p99Latency": "P99 Latency (ms)",
+        "throughput": "Throughput",
+        "period": "Collection Period"
+      },
+      "review": {
+        "title": "Post-Release Review",
+        "noReview": "No review started",
+        "phase": "Current Phase",
+        "outcome": "Outcome",
+        "confidence": "Confidence",
+        "summary": "Summary",
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "startReview": "Start Review"
+      },
+      "rollback": {
+        "title": "Rollback Assessment",
+        "noAssessment": "No rollback assessment",
+        "viable": "Rollback Viable",
+        "notViable": "Rollback Not Viable",
+        "readiness": "Readiness Score",
+        "previousVersion": "Previous Version",
+        "reversibleMigrations": "Reversible Migrations",
+        "consumersMigrated": "Consumers Already Migrated",
+        "consumersImpacted": "Total Consumers Impacted",
+        "recommendation": "Recommendation"
+      }
+    },
+    "timeline": {
+      "title": "Change Timeline",
+      "noEvents": "No timeline events",
+      "event": "Event",
+      "description": "Description",
+      "source": "Source",
+      "occurredAt": "Occurred At"
+    },
+    "freeze": {
+      "title": "Freeze Calendar",
+      "create": "Create Freeze Window",
+      "noWindows": "No freeze windows configured",
+      "name": "Name",
+      "reason": "Reason",
+      "scope": "Scope",
+      "scopeValue": "Scope Value",
+      "startsAt": "Starts At",
+      "endsAt": "Ends At",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "createSuccess": "Freeze window created successfully",
+      "checkConflict": "Check Conflict",
+      "conflict": "Conflict detected - freeze window active",
+      "noConflict": "No freeze conflict"
+    }
   },
   "engineeringGraph": {
     "title": "Engineering Graph",
