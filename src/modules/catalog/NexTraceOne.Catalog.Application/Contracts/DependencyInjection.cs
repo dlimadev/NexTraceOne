@@ -5,7 +5,11 @@ using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange;
 using NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff;
 using NexTraceOne.Contracts.Application.Features.CreateContractVersion;
+using NexTraceOne.Contracts.Application.Features.EvaluateContractRules;
 using NexTraceOne.Contracts.Application.Features.ExportContract;
+using NexTraceOne.Contracts.Application.Features.GenerateEvidencePack;
+using NexTraceOne.Contracts.Application.Features.GenerateScorecard;
+using NexTraceOne.Contracts.Application.Features.GetCompatibilityAssessment;
 using NexTraceOne.Contracts.Application.Features.GetContractHistory;
 using NexTraceOne.Contracts.Application.Features.ImportContract;
 using NexTraceOne.Contracts.Application.Features.LockContractVersion;
@@ -37,6 +41,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<LockContractVersion.Command>, LockContractVersion.Validator>();
         services.AddTransient<IValidator<ExportContract.Query>, ExportContract.Validator>();
         services.AddTransient<IValidator<ValidateContractIntegrity.Query>, ValidateContractIntegrity.Validator>();
+        services.AddTransient<IValidator<GenerateScorecard.Query>, GenerateScorecard.Validator>();
+        services.AddTransient<IValidator<GenerateEvidencePack.Query>, GenerateEvidencePack.Validator>();
+        services.AddTransient<IValidator<EvaluateContractRules.Query>, EvaluateContractRules.Validator>();
+        services.AddTransient<IValidator<GetCompatibilityAssessment.Query>, GetCompatibilityAssessment.Validator>();
 
         return services;
     }

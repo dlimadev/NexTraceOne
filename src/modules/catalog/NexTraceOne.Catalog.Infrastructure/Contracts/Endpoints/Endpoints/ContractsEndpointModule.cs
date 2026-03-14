@@ -22,6 +22,10 @@ using SearchContractsFeature = NexTraceOne.Contracts.Application.Features.Search
 using SyncContractsFeature = NexTraceOne.Contracts.Application.Features.SyncContracts.SyncContracts;
 using ValidateContractIntegrityFeature = NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity.ValidateContractIntegrity;
 using VerifySignatureFeature = NexTraceOne.Contracts.Application.Features.VerifySignature.VerifySignature;
+using GenerateScorecardFeature = NexTraceOne.Contracts.Application.Features.GenerateScorecard.GenerateScorecard;
+using GenerateEvidencePackFeature = NexTraceOne.Contracts.Application.Features.GenerateEvidencePack.GenerateEvidencePack;
+using EvaluateContractRulesFeature = NexTraceOne.Contracts.Application.Features.EvaluateContractRules.EvaluateContractRules;
+using GetCompatibilityAssessmentFeature = NexTraceOne.Contracts.Application.Features.GetCompatibilityAssessment.GetCompatibilityAssessment;
 
 namespace NexTraceOne.Contracts.API.Endpoints;
 
@@ -235,6 +239,49 @@ public sealed class ContractsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new ValidateContractIntegrityFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Scorecard, Evidence Pack, Rules & Compatibility ────────────
+
+        group.MapGet("/{contractVersionId:guid}/scorecard", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GenerateScorecardFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{contractVersionId:guid}/evidence-pack", async (
+            Guid contractVersionId,
+            string generatedBy,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GenerateEvidencePackFeature.Query(contractVersionId, generatedBy), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{contractVersionId:guid}/rules", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new EvaluateContractRulesFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapPost("/compatibility", async (
+            GetCompatibilityAssessmentFeature.Query query,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
 
