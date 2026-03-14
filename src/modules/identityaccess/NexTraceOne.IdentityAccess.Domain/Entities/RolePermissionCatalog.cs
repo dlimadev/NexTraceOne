@@ -63,6 +63,11 @@ public static class RolePermissionCatalog
                 "licensing:vendor:activation:issue",
                 "licensing:vendor:tenant:manage",
                 "licensing:vendor:telemetry:view",
+                "licensing:vendor:plan:create",
+                "licensing:vendor:plan:read",
+                "licensing:vendor:featurepack:create",
+                "licensing:vendor:featurepack:read",
+                "licensing:vendor:license:manage",
                 "platform:settings:read",
                 "platform:settings:write"],
             Role.TechLead => [
