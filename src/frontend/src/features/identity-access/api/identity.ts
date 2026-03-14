@@ -45,6 +45,12 @@ export const identityApi = {
   changePassword: (currentPassword: string, newPassword: string) =>
     client.put('/identity/auth/password', { currentPassword, newPassword }),
 
+  // ── OIDC / SSO ────────────────────────────────────────────────
+  startOidcLogin: (provider = 'default', returnTo?: string) =>
+    client
+      .post<{ authorizationUrl: string }>('/identity/auth/oidc/start', { provider, returnTo })
+      .then((r) => r.data),
+
   // ── Tenants ──────────────────────────────────────────────────
   listMyTenants: () =>
     client.get<TenantInfo[]>('/identity/tenants/mine').then((r) => r.data),

@@ -23,6 +23,8 @@ internal static class JitAccessEndpoints
     {
         var jitGroup = group.MapGroup("/jit-access");
 
+        // Qualquer usuário autenticado pode solicitar acesso JIT. O handler valida
+        // o scope e a aprovação é feita por endpoint separado com permissão específica.
         jitGroup.MapPost("/", async (
             RequestJitAccessFeature.Command command,
             ISender sender,

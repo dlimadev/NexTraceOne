@@ -1,14 +1,23 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../../components/Button';
+import { identityApi } from '../api';
 import { resolveApiError } from '../../../utils/apiErrors';
 
 /**
- * Página de login — autentica com email e senha sem exigir GUID de tenant.
+ * Página de login — OIDC-first com fallback para email e senha.
  *
- * Após autenticação bem-sucedida:
+ * A experiência prioriza SSO corporativo (botão proeminente no topo).
+ * Abaixo, um divisor visual ("or") separa o formulário de credenciais locais.
+ *
+ * Fluxo SSO:
+ * 1. Chama POST /identity/auth/oidc/start com provider "default" e returnTo.
+ * 2. Redireciona o browser para a authorizationUrl retornada pelo backend.
+ *
+ * Fluxo local (fallback):
  * - Se o usuário possuir apenas 1 tenant ativo, redireciona ao dashboard.
  * - Se possuir múltiplos tenants, redireciona à tela de seleção.
  */
@@ -16,13 +25,29 @@ export function LoginPage() {
   const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [ssoLoading, setSsoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  };
+
+  /** Inicia o fluxo OIDC/SSO redirecionando ao identity provider. */
+  const handleSsoLogin = async () => {
+    setError(null);
+    setSsoLoading(true);
+    try {
+      const returnTo = searchParams.get('returnTo') ?? undefined;
+      const { authorizationUrl } = await identityApi.startOidcLogin('default', returnTo);
+      window.location.href = authorizationUrl;
+    } catch (err) {
+      setError(t('auth.ssoError'));
+      setSsoLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,6 +92,32 @@ export function LoginPage() {
             </div>
           )}
 
+          {/* SSO — experiência OIDC-first */}
+          <div className="mb-6">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="w-full"
+              loading={ssoLoading}
+              onClick={handleSsoLogin}
+            >
+              <ShieldCheck size={18} />
+              {ssoLoading ? t('auth.ssoRedirecting') : t('auth.ssoSignIn')}
+            </Button>
+            <p className="text-xs text-muted text-center mt-2">{t('auth.ssoDescription')}</p>
+          </div>
+
+          {/* Divisor visual entre SSO e credenciais locais */}
+          <div className="relative flex items-center mb-6">
+            <div className="flex-1 border-t border-edge" />
+            <span className="px-3 text-xs text-faded uppercase tracking-wide">
+              {t('auth.orDivider')}
+            </span>
+            <div className="flex-1 border-t border-edge" />
+          </div>
+
+          {/* Formulário de credenciais locais (fallback) */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-body mb-1" htmlFor="email">

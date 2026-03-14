@@ -23,6 +23,8 @@ internal static class DelegationEndpoints
     {
         var delGroup = group.MapGroup("/delegations");
 
+        // Qualquer usuário autenticado pode criar delegação — o handler valida que o
+        // delegante possui as permissões que deseja delegar (ScopeExceedsGrantor).
         delGroup.MapPost("/", async (
             CreateDelegationFeature.Command command,
             ISender sender,
