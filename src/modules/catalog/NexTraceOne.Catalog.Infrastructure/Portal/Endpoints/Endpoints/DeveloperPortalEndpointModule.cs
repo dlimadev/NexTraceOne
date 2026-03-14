@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.DeveloperPortal.Domain.Enums;
 using CreateSubscriptionFeature = NexTraceOne.DeveloperPortal.Application.Features.CreateSubscription.CreateSubscription;
 using DeleteSubscriptionFeature = NexTraceOne.DeveloperPortal.Application.Features.DeleteSubscription.DeleteSubscription;
@@ -26,6 +27,10 @@ namespace NexTraceOne.DeveloperPortal.API.Endpoints;
 /// Registra todos os endpoints Minimal API do módulo DeveloperPortal.
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 /// Endpoints organizados por funcionalidade: catálogo, subscrições, playground, geração de código e analytics.
+///
+/// Política de autorização:
+/// - Endpoints de leitura do catálogo exigem "developer-portal:read".
+/// - Endpoints de escrita (subscrições, playground, codegen, analytics) exigem "developer-portal:write".
 /// </summary>
 public sealed class DeveloperPortalEndpointModule
 {
@@ -52,7 +57,7 @@ public sealed class DeveloperPortalEndpointModule
                 new SearchCatalogFeature.Query(searchTerm ?? string.Empty, typeFilter, statusFilter, ownerFilter, page, pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/my-apis — APIs que o utilizador é dono
         group.MapGet("/catalog/my-apis", async (
@@ -67,7 +72,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetMyApisFeature.Query(ownerId, page, pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/consuming — APIs que o utilizador consome
         group.MapGet("/catalog/consuming", async (
@@ -82,7 +87,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetApisIConsumeFeature.Query(userId, page, pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/{apiAssetId} — Detalhe de uma API
         group.MapGet("/catalog/{apiAssetId:guid}", async (
@@ -95,7 +100,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetApiDetailFeature.Query(apiAssetId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/{apiAssetId}/health — Saúde de uma API
         group.MapGet("/catalog/{apiAssetId:guid}/health", async (
@@ -108,7 +113,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetApiHealthFeature.Query(apiAssetId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/{apiAssetId}/timeline — Timeline de uma API
         group.MapGet("/catalog/{apiAssetId:guid}/timeline", async (
@@ -123,7 +128,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetAssetTimelineFeature.Query(apiAssetId, page, pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/{apiAssetId}/consumers — Consumidores de uma API
         group.MapGet("/catalog/{apiAssetId:guid}/consumers", async (
@@ -136,7 +141,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetApiConsumersFeature.Query(apiAssetId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // GET /api/v1/developerportal/catalog/{apiAssetId}/contract — Contrato OpenAPI renderizado
         group.MapGet("/catalog/{apiAssetId:guid}/contract", async (
@@ -150,7 +155,7 @@ public sealed class DeveloperPortalEndpointModule
                 new RenderOpenApiContractFeature.Query(apiAssetId, version),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // ── Subscrições ──
 
@@ -163,7 +168,7 @@ public sealed class DeveloperPortalEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:write");
 
         // GET /api/v1/developerportal/subscriptions — Listar subscrições do utilizador
         group.MapGet("/subscriptions", async (
@@ -176,7 +181,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetSubscriptionsFeature.Query(subscriberId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // DELETE /api/v1/developerportal/subscriptions/{subscriptionId} — Remover subscrição
         group.MapDelete("/subscriptions/{subscriptionId:guid}", async (
@@ -190,7 +195,7 @@ public sealed class DeveloperPortalEndpointModule
                 new DeleteSubscriptionFeature.Command(subscriptionId, requesterId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:write");
 
         // ── Playground ──
 
@@ -203,7 +208,7 @@ public sealed class DeveloperPortalEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:write");
 
         // GET /api/v1/developerportal/playground/history — Histórico de sessões do playground
         group.MapGet("/playground/history", async (
@@ -218,7 +223,7 @@ public sealed class DeveloperPortalEndpointModule
                 new GetPlaygroundHistoryFeature.Query(userId, page, pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
 
         // ── Geração de Código ──
 
@@ -231,7 +236,7 @@ public sealed class DeveloperPortalEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:write");
 
         // ── Analytics ──
 
@@ -244,7 +249,7 @@ public sealed class DeveloperPortalEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:write");
 
         // GET /api/v1/developerportal/analytics — Obter métricas de analytics
         group.MapGet("/analytics", async (
@@ -257,6 +262,6 @@ public sealed class DeveloperPortalEndpointModule
                 new GetPortalAnalyticsFeature.Query(daysBack),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("developer-portal:read");
     }
 }

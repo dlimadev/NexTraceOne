@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.EngineeringGraph.Domain.Enums;
 using CreateGraphSnapshotFeature = NexTraceOne.EngineeringGraph.Application.Features.CreateGraphSnapshot.CreateGraphSnapshot;
 using CreateSavedViewFeature = NexTraceOne.EngineeringGraph.Application.Features.CreateSavedView.CreateSavedView;
@@ -26,6 +27,12 @@ namespace NexTraceOne.EngineeringGraph.API.Endpoints;
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 /// Inclui endpoints para ativos, subgrafo contextual, temporalidade,
 /// propagação de impacto, overlays e saved views.
+///
+/// Política de autorização:
+/// - Endpoints de leitura exigem "engineering-graph:assets:read".
+/// - Endpoints de escrita exigem "engineering-graph:assets:write".
+/// - Endpoint de integração externa exige "engineering-graph:assets:write"
+///   pois modifica o grafo a partir de fontes externas.
 /// </summary>
 public sealed class EngineeringGraphEndpointModule
 {
@@ -44,7 +51,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/engineeringgraph/services/{0}", localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:write");
 
         group.MapPost("/apis", async (
             RegisterApiAssetFeature.Command command,
@@ -54,7 +61,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/engineeringgraph/apis/{0}", localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:write");
 
         group.MapPost("/apis/{apiAssetId:guid}/consumers", async (
             Guid apiAssetId,
@@ -66,7 +73,7 @@ public sealed class EngineeringGraphEndpointModule
             var updatedCommand = command with { ApiAssetId = apiAssetId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:write");
 
         group.MapGet("/graph", async (
             ISender sender,
@@ -75,7 +82,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(new GetAssetGraphFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         group.MapGet("/apis/{apiAssetId:guid}", async (
             Guid apiAssetId,
@@ -85,7 +92,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(new GetAssetDetailFeature.Query(apiAssetId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         group.MapGet("/apis/search", async (
             string searchTerm,
@@ -95,7 +102,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(new SearchAssetsFeature.Query(searchTerm), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         // ── Subgrafo Contextual (mini-grafos) ────────────────────────────
 
@@ -110,7 +117,7 @@ public sealed class EngineeringGraphEndpointModule
             var query = new GetSubgraphFeature.Query(rootNodeId, maxDepth ?? 2, maxNodes ?? 50);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         // ── Propagação de Impacto ────────────────────────────────────────
 
@@ -124,7 +131,7 @@ public sealed class EngineeringGraphEndpointModule
             var query = new GetImpactPropagationFeature.Query(rootNodeId, maxDepth ?? 3);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         // ── Temporalidade (Snapshots e Diff) ─────────────────────────────
 
@@ -136,7 +143,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/engineeringgraph/snapshots/{0}", localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:write");
 
         group.MapGet("/snapshots", async (
             int? limit,
@@ -147,7 +154,7 @@ public sealed class EngineeringGraphEndpointModule
             var query = new ListSnapshotsFeature.Query(limit ?? 50);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         group.MapGet("/snapshots/diff", async (
             Guid fromSnapshotId,
@@ -159,7 +166,7 @@ public sealed class EngineeringGraphEndpointModule
             var query = new GetTemporalDiffFeature.Query(fromSnapshotId, toSnapshotId);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         // ── Overlays e Saúde ─────────────────────────────────────────────
 
@@ -172,7 +179,7 @@ public sealed class EngineeringGraphEndpointModule
             var query = new GetNodeHealthFeature.Query(overlayMode);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         // ── Saved Views ──────────────────────────────────────────────────
 
@@ -184,7 +191,7 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/engineeringgraph/views/{0}", localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:write");
 
         group.MapGet("/views", async (
             ISender sender,
@@ -193,11 +200,12 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(new ListSavedViewsFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:read");
 
         // ── Integração Inbound Externa ───────────────────────────────────
         // Endpoint para sincronização de consumidores vindos de sistemas externos.
         // Suporta autenticação sistema-a-sistema e upsert em lote.
+        // Exige permissão de escrita pois modifica o grafo a partir de fontes externas.
 
         group.MapPost("/integration/v1/consumers/sync", async (
             SyncConsumersFeature.Command command,
@@ -207,6 +215,6 @@ public sealed class EngineeringGraphEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("engineering-graph:assets:write");
     }
 }

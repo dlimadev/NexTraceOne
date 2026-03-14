@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Contracts.Domain.Enums;
 using ClassifyBreakingChangeFeature = NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange.ClassifyBreakingChange;
 using ComputeSemanticDiffFeature = NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff.ComputeSemanticDiff;
@@ -29,6 +30,13 @@ namespace NexTraceOne.Contracts.API.Endpoints;
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 /// Suporta multi-protocolo: OpenAPI, Swagger, WSDL, AsyncAPI.
 /// Inclui lifecycle management, assinatura digital e verificação de integridade.
+///
+/// Política de autorização:
+/// - Endpoints de leitura (history, detail, export, classification, search, verify, validate)
+///   exigem "contracts:read".
+/// - Endpoints de escrita (import, create version, lock, lifecycle, deprecate, sign, sync)
+///   exigem "contracts:write".
+/// - Endpoint de importação exige "contracts:import" para manter distinção granular.
 /// </summary>
 public sealed class ContractsEndpointModule
 {
@@ -47,7 +55,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/contracts/{0}", localizer);
-        });
+        }).RequirePermission("contracts:import");
 
         group.MapPost("/versions", async (
             CreateContractVersionFeature.Command command,
@@ -57,7 +65,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/contracts/{0}", localizer);
-        });
+        }).RequirePermission("contracts:write");
 
         // ── Diff & Classification ───────────────────────────────
 
@@ -69,7 +77,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         group.MapGet("/{contractVersionId:guid}/classification", async (
             Guid contractVersionId,
@@ -79,7 +87,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new ClassifyBreakingChangeFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         group.MapGet("/suggest-version", async (
             Guid apiAssetId,
@@ -90,7 +98,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new SuggestSemanticVersionFeature.Query(apiAssetId, changeLevel), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         // ── History & Detail ────────────────────────────────────
 
@@ -102,7 +110,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new GetContractHistoryFeature.Query(apiAssetId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         group.MapGet("/{contractVersionId:guid}/detail", async (
             Guid contractVersionId,
@@ -112,7 +120,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new GetContractVersionDetailFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         group.MapGet("/{contractVersionId:guid}/export", async (
             Guid contractVersionId,
@@ -122,7 +130,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new ExportContractFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         // ── Lifecycle ───────────────────────────────────────────
 
@@ -136,7 +144,7 @@ public sealed class ContractsEndpointModule
             var updatedCommand = command with { ContractVersionId = contractVersionId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:write");
 
         group.MapPost("/{contractVersionId:guid}/lifecycle", async (
             Guid contractVersionId,
@@ -148,7 +156,7 @@ public sealed class ContractsEndpointModule
             var updatedCommand = command with { ContractVersionId = contractVersionId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:write");
 
         group.MapPost("/{contractVersionId:guid}/deprecate", async (
             Guid contractVersionId,
@@ -160,7 +168,7 @@ public sealed class ContractsEndpointModule
             var updatedCommand = command with { ContractVersionId = contractVersionId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:write");
 
         // ── Signing & Integrity ─────────────────────────────────
 
@@ -172,7 +180,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new SignContractVersionFeature.Command(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:write");
 
         group.MapGet("/{contractVersionId:guid}/verify", async (
             Guid contractVersionId,
@@ -182,7 +190,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new VerifySignatureFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         // ── Search & Filtering ──────────────────────────────────────
 
@@ -200,7 +208,7 @@ public sealed class ContractsEndpointModule
             var result = await sender.Send(new SearchContractsFeature.Query(
                 protocol, lifecycleState, apiAssetId, searchTerm, page ?? 1, pageSize ?? 20), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         // ── Rule Violations ─────────────────────────────────────────
 
@@ -212,7 +220,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new ListRuleViolationsFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         // ── Validation & Integrity ───────────────────────────────────
 
@@ -228,7 +236,7 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(new ValidateContractIntegrityFeature.Query(contractVersionId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:read");
 
         // ── External Inbound (CI/CD Integration) ─────────────────────
 
@@ -236,6 +244,7 @@ public sealed class ContractsEndpointModule
         /// Endpoint de sincronização em lote para sistemas externos (CI/CD, API Gateways).
         /// Permite importar múltiplos contratos em uma única requisição autenticada sistema-a-sistema.
         /// Máximo de 50 itens por lote; retorna resultado por item com erros não-bloqueantes.
+        /// Exige permissão de importação para controle de acesso granular.
         /// </summary>
         group.MapPost("/sync", async (
             SyncContractsFeature.Command command,
@@ -245,6 +254,6 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("contracts:import");
     }
 }
