@@ -15,6 +15,10 @@ import {
   GitBranch,
   Shield,
   X,
+  Activity,
+  TrendingUp,
+  Timer,
+  BarChart3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -28,6 +32,7 @@ import type {
   ImpactPropagationResult,
   GraphSnapshotSummary,
   TemporalDiffResult,
+  NodeHealthResult,
 } from '../../../types';
 
 /** Mapeamento de confiança para variantes visuais de badge. */
@@ -44,12 +49,13 @@ const nodeColors = {
   api: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-300 dark:border-emerald-700' },
 };
 
-type Tab = 'services' | 'apis' | 'graph' | 'impact' | 'temporal';
+type Tab = 'overview' | 'services' | 'apis' | 'graph' | 'impact' | 'temporal';
 
 export function EngineeringGraphPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [tab, setTab] = useState<Tab>('graph');
+  const [tab, setTab] = useState<Tab>('overview');
+  const [selectedDetailNode, setSelectedDetailNode] = useState<string | null>(null);
   const [showServiceForm, setShowServiceForm] = useState(false);
   const [showApiForm, setShowApiForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,6 +92,12 @@ export function EngineeringGraphPage() {
     queryKey: ['temporal-diff', selectedFromSnapshot, selectedToSnapshot],
     queryFn: () => engineeringGraphApi.getTemporalDiff(selectedFromSnapshot, selectedToSnapshot),
     enabled: !!selectedFromSnapshot && !!selectedToSnapshot && selectedFromSnapshot !== selectedToSnapshot,
+    staleTime: 30_000,
+  });
+
+  const { data: healthData } = useQuery({
+    queryKey: ['node-health'],
+    queryFn: () => engineeringGraphApi.getNodeHealth('Health'),
     staleTime: 30_000,
   });
 
@@ -149,6 +161,7 @@ export function EngineeringGraphPage() {
   const snapshots: GraphSnapshotSummary[] = snapshotsData?.items ?? [];
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
+    { key: 'overview', label: t('engineeringGraph.tabs.overview'), icon: <BarChart3 size={14} /> },
     { key: 'graph', label: t('engineeringGraph.tabs.graph'), icon: <GitBranch size={14} /> },
     { key: 'services', label: t('engineeringGraph.tabs.services'), icon: <Server size={14} /> },
     { key: 'apis', label: t('engineeringGraph.tabs.apis'), icon: <Globe size={14} /> },
@@ -305,8 +318,119 @@ export function EngineeringGraphPage() {
         </div>
       ) : (
         <>
+          {/* ── Aba: Visão Operacional ──────────────────────────────── */}
+          {tab === 'overview' && (
+            <div className="space-y-6">
+              {/* KPI cards — métricas operacionais resumidas */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: t('engineeringGraph.overview.requestsPerMin'), value: '—', icon: <Activity size={18} />, color: 'text-blue-500' },
+                  { label: t('engineeringGraph.overview.throughput'), value: '—', icon: <TrendingUp size={18} />, color: 'text-emerald-500' },
+                  { label: t('engineeringGraph.overview.avgLatency'), value: '—', icon: <Timer size={18} />, color: 'text-amber-500' },
+                  { label: t('engineeringGraph.overview.errorRate'), value: '—', icon: <AlertTriangle size={18} />, color: 'text-red-500' },
+                ].map((kpi) => (
+                  <Card key={kpi.label}>
+                    <CardBody className="flex items-center gap-3">
+                      <div className={kpi.color}>{kpi.icon}</div>
+                      <div>
+                        <p className="text-2xl font-bold text-heading">{kpi.value}</p>
+                        <p className="text-xs text-muted">{kpi.label}</p>
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Resumo de saúde dos nós */}
+              <Card>
+                <CardHeader>
+                  <h2 className="font-semibold text-heading">{t('engineeringGraph.overview.serviceHealth')}</h2>
+                </CardHeader>
+                <CardBody>
+                  {healthData?.items && healthData.items.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {(['healthy', 'degraded', 'unhealthy', 'unknown'] as const).map((status) => {
+                        const count = healthData.items.filter((h) => h.status.toLowerCase() === status).length;
+                        const colors = {
+                          healthy: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                          degraded: 'bg-amber-50 text-amber-700 border-amber-200',
+                          unhealthy: 'bg-red-50 text-red-700 border-red-200',
+                          unknown: 'bg-gray-50 text-gray-500 border-gray-200',
+                        };
+                        return (
+                          <div key={status} className={`rounded-lg border p-4 text-center ${colors[status]}`}>
+                            <p className="text-3xl font-bold">{count}</p>
+                            <p className="text-xs font-medium mt-1">{t(`engineeringGraph.overview.${status}`)}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center">
+                      <Activity size={32} className="mx-auto text-muted mb-3" />
+                      <p className="text-sm text-muted">{t('engineeringGraph.overview.noMetrics')}</p>
+                      <p className="text-xs text-muted mt-1">{t('engineeringGraph.overview.noMetricsHint')}</p>
+                    </div>
+                  )}
+                </CardBody>
+              </Card>
+
+              {/* Principais consumidores e anomalias */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.overview.topConsumers')}</h3>
+                  </CardHeader>
+                  <CardBody className="p-0">
+                    {graph?.apis && graph.apis.some(a => (a.consumers?.length ?? 0) > 0) ? (
+                      <ul className="divide-y divide-edge">
+                        {graph.apis
+                          .filter(a => (a.consumers?.length ?? 0) > 0)
+                          .sort((a, b) => (b.consumers?.length ?? 0) - (a.consumers?.length ?? 0))
+                          .slice(0, 5)
+                          .map(api => (
+                            <li key={api.apiAssetId} className="px-4 py-3 flex items-center justify-between hover:bg-hover transition-colors">
+                              <div>
+                                <p className="text-sm font-medium text-heading">{api.name}</p>
+                                <p className="text-xs text-muted font-mono">{api.routePattern}</p>
+                              </div>
+                              <Badge variant="info">{api.consumers?.length ?? 0} {t('engineeringGraph.consumers')}</Badge>
+                            </li>
+                          ))}
+                      </ul>
+                    ) : (
+                      <p className="px-4 py-6 text-sm text-muted text-center">{t('engineeringGraph.noDependencies')}</p>
+                    )}
+                  </CardBody>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.overview.anomalies')}</h3>
+                  </CardHeader>
+                  <CardBody className="py-8 text-center">
+                    <Shield size={32} className="mx-auto text-muted mb-3" />
+                    <p className="text-sm text-muted">{t('engineeringGraph.overview.noAnomalies')}</p>
+                  </CardBody>
+                </Card>
+              </div>
+            </div>
+          )}
+
           {/* ── Aba: Grafo Visual ──────────────────────────────────── */}
-          {tab === 'graph' && graph && <GraphVisualization graph={graph} onSelectNode={selectNodeForImpact} />}
+          {tab === 'graph' && graph && (
+            <div className="relative">
+              <GraphVisualization graph={graph} onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }} />
+              {selectedDetailNode && (
+                <ServiceDetailPanel
+                  graph={graph}
+                  nodeId={selectedDetailNode}
+                  healthData={healthData ?? null}
+                  onClose={() => setSelectedDetailNode(null)}
+                />
+              )}
+            </div>
+          )}
 
           {/* ── Aba: Serviços ──────────────────────────────────────── */}
           {tab === 'services' && (
@@ -852,6 +976,136 @@ function TemporalPanel({
           </Card>
         </div>
       )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Componente: Painel de detalhe de serviço/API com contexto operacional
+// ═══════════════════════════════════════════════════════════════════════
+
+/** Variantes de badge para status de saúde dos nós. */
+const healthBadgeVariant = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
+  switch (status.toLowerCase()) {
+    case 'healthy': return 'success';
+    case 'degraded': return 'warning';
+    case 'unhealthy': return 'danger';
+    default: return 'default';
+  }
+};
+
+/** Painel lateral de detalhe que mostra contexto operacional de um serviço ou API selecionado. */
+function ServiceDetailPanel({
+  graph,
+  nodeId,
+  healthData,
+  onClose,
+}: {
+  graph: AssetGraph;
+  nodeId: string;
+  healthData: NodeHealthResult | null;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+
+  const service = graph.services.find((s) => s.serviceAssetId === nodeId);
+  const api = graph.apis.find((a) => a.apiAssetId === nodeId);
+  const nodeName = service?.name ?? api?.name ?? nodeId;
+  const nodeHealth = healthData?.items?.find((h) => h.nodeId === nodeId);
+  const healthStatus = nodeHealth?.status ?? 'Unknown';
+
+  const consumerCount = api?.consumers?.length ?? 0;
+  const dependencyCount = service
+    ? graph.apis.filter((a) => a.consumers?.some((c) => c.consumerServiceId === nodeId)).length
+    : 0;
+
+  return (
+    <div className="absolute top-0 right-0 w-80 z-10 animate-fade-in">
+      <Card className="shadow-lg border-edge">
+        <CardHeader className="flex items-center justify-between">
+          <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.detail.title')}</h3>
+          <button onClick={onClose} className="text-muted hover:text-body transition-colors" aria-label={t('engineeringGraph.detail.close')}>
+            <X size={16} />
+          </button>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          {/* Nome e saúde */}
+          <div>
+            <p className="font-medium text-heading">{nodeName}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant={healthBadgeVariant(healthStatus)}>
+                {t(`engineeringGraph.overview.${healthStatus.toLowerCase()}`)}
+              </Badge>
+              {nodeHealth && <span className="text-xs text-muted">{t('engineeringGraph.overview.healthScore')}: {nodeHealth.score.toFixed(2)}</span>}
+            </div>
+          </div>
+
+          {/* Metadados do serviço */}
+          {service && (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted">{t('engineeringGraph.detail.domain')}</span>
+                <span className="text-heading">{service.domain}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">{t('engineeringGraph.detail.team')}</span>
+                <span className="text-heading">{service.teamName}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Metadados da API */}
+          {api && (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted">{t('engineeringGraph.detail.version')}</span>
+                <span className="text-heading">v{api.version}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Contadores */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-md bg-elevated p-3 text-center">
+              <p className="text-lg font-bold text-heading">{consumerCount}</p>
+              <p className="text-xs text-muted">{t('engineeringGraph.detail.consumerCount')}</p>
+            </div>
+            <div className="rounded-md bg-elevated p-3 text-center">
+              <p className="text-lg font-bold text-heading">{dependencyCount}</p>
+              <p className="text-xs text-muted">{t('engineeringGraph.detail.dependencyCount')}</p>
+            </div>
+          </div>
+
+          {/* Proveniência dos dados */}
+          <div>
+            <p className="text-xs font-medium text-heading mb-2">{t('engineeringGraph.detail.dataProvenance')}</p>
+            <div className="space-y-1 text-xs text-muted">
+              <div className="flex justify-between">
+                <span>{t('engineeringGraph.overview.provenance')}</span>
+                <Badge variant="default">{t('engineeringGraph.overview.catalogImport')}</Badge>
+              </div>
+              <div className="flex justify-between">
+                <span>{t('engineeringGraph.overview.confidence')}</span>
+                <span>—</span>
+              </div>
+              <div className="flex justify-between">
+                <span>{t('engineeringGraph.overview.freshness')}</span>
+                <span>—</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Issues críticas */}
+          <div>
+            <p className="text-xs font-medium text-heading mb-1">{t('engineeringGraph.detail.criticalIssues')}</p>
+            <p className="text-xs text-muted">{t('engineeringGraph.detail.noCriticalIssues')}</p>
+          </div>
+
+          <Button variant="secondary" className="w-full" onClick={onClose}>
+            {t('engineeringGraph.detail.close')}
+          </Button>
+        </CardBody>
+      </Card>
     </div>
   );
 }
