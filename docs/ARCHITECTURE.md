@@ -1,7 +1,7 @@
 # NexTraceOne — Arquitetura Definitiva v3 (Archon Pattern — Consolidado)
 
-> **Versão:** 3.0 — Consolidação de 14 módulos originais em 7 bounded contexts coesos.
-> **Última atualização:** Julho 2025
+> **Versão:** 3.1 — Consolidação completa: backend (7 BC × 3 layers) + frontend organizado por bounded context.
+> **Última atualização:** Março 2026
 
 ---
 
@@ -750,41 +750,80 @@ de boundaries é necessário.
 
 ---
 
-## 12. Frontend — Organizado por Feature
+## 12. Frontend — Organizado por Bounded Context
 
-O frontend React + TypeScript está organizado por áreas funcionais, com estrutura
-preparada para evolução por bounded context.
+O frontend React + TypeScript está organizado por **bounded context** na pasta `features/`,
+espelhando a estrutura do backend. Cada feature agrupa páginas e chamadas de API relacionadas
+a um contexto de domínio, facilitando a navegação, manutenção e futura extração modular.
 
 ```
 src/frontend/
-├── public/                      ← Assets estáticos
+├── public/                                ← Assets estáticos
 ├── src/
-│   ├── api/                     ← API client centralizado + interceptors
-│   ├── auth/                    ← Autenticação, guards, token management
-│   ├── components/              ← Componentes compartilhados (UI library)
-│   ├── contexts/                ← React contexts (tema, tenant, sessão)
-│   ├── hooks/                   ← Hooks compartilhados (usePermissions, etc.)
-│   ├── locales/                 ← Catálogos i18n (pt-BR, en)
-│   ├── pages/                   ← Páginas organizadas por área funcional
-│   ├── types/                   ← TypeScript types compartilhados
-│   ├── utils/                   ← Utilitários (sanitize, navigation, etc.)
-│   └── __tests__/               ← Testes unitários espelhando a estrutura
+│   ├── features/                          ← Organizado por bounded context
+│   │   ├── identity-access/              ← Autenticação, utilizadores, sessões, SSO
+│   │   │   ├── pages/                     (Login, Users, BreakGlass, JIT, Delegation, AccessReview)
+│   │   │   ├── api/                       (identity.ts)
+│   │   │   └── index.ts                   (barrel export)
+│   │   ├── commercial-governance/        ← Licenciamento, capacidades
+│   │   │   ├── pages/                     (LicensingPage)
+│   │   │   ├── api/                       (licensing.ts)
+│   │   │   └── index.ts
+│   │   ├── catalog/                      ← Catálogo de APIs, contratos, portal
+│   │   │   ├── pages/                     (Contracts, EngineeringGraph, DeveloperPortal)
+│   │   │   ├── api/                       (contracts.ts, engineeringGraph.ts, developerPortal.ts)
+│   │   │   └── index.ts
+│   │   ├── change-governance/            ← Releases, workflows, promoção
+│   │   │   ├── pages/                     (Releases, Workflow, Promotion)
+│   │   │   ├── api/                       (changeIntelligence.ts, workflow.ts, promotion.ts)
+│   │   │   └── index.ts
+│   │   ├── audit-compliance/             ← Auditoria e compliance
+│   │   │   ├── pages/                     (AuditPage)
+│   │   │   ├── api/                       (audit.ts)
+│   │   │   └── index.ts
+│   │   └── shared/                       ← Páginas cross-context
+│   │       ├── pages/                     (DashboardPage)
+│   │       └── index.ts
+│   ├── api/                               ← API client centralizado + barrel re-export
+│   │   ├── client.ts                      (instância Axios configurada)
+│   │   └── index.ts                       (re-exporta APIs de cada feature)
+│   ├── auth/                              ← Autenticação, guards, token management
+│   ├── components/                        ← Componentes compartilhados (UI library)
+│   ├── contexts/                          ← React contexts (tema, tenant, sessão)
+│   ├── hooks/                             ← Hooks compartilhados (usePermissions, etc.)
+│   ├── locales/                           ← Catálogos i18n (pt-BR, pt-PT, en, es)
+│   ├── types/                             ← TypeScript types compartilhados
+│   ├── utils/                             ← Utilitários (sanitize, navigation, etc.)
+│   └── __tests__/                         ← Testes unitários espelhando a estrutura
 │       ├── components/
 │       ├── auth/
 │       ├── contexts/
 │       ├── hooks/
 │       ├── pages/
 │       └── utils/
-└── e2e/                         ← Testes end-to-end (Playwright)
+└── e2e/                                   ← Testes end-to-end (Playwright)
 ```
+
+### Mapeamento Frontend → Backend (Bounded Contexts)
+
+| Feature Frontend         | Bounded Context Backend       | Subdomínios                                        |
+|--------------------------|-------------------------------|----------------------------------------------------|
+| `identity-access`        | IdentityAccess                | Identity, Sessions, FederatedLogin, RBAC           |
+| `commercial-governance`  | CommercialGovernance          | Licensing, Entitlements, HardwareBinding           |
+| `catalog`                | Catalog                       | Contracts, EngineeringGraph, DeveloperPortal       |
+| `change-governance`      | ChangeGovernance              | ChangeIntelligence, Workflow, RulesetGovernance    |
+| `audit-compliance`       | AuditCompliance               | AuditTrail, Integrity, EvidencePack                |
+| `shared`                 | Cross-context                 | Dashboard agregando dados de múltiplos contextos   |
 
 ### Regras do Frontend
 
 - **i18n obrigatório** — todo texto visível ao usuário vem de catálogos de tradução.
+- **Organização por bounded context** — cada feature agrupa pages + api do mesmo domínio.
 - **API client centralizado** — nunca montar URLs concatenando strings.
 - **Token security** — refresh token em memória (closure), access token em sessionStorage.
 - **CSP-compatible** — sem `eval()`, `new Function()` ou `unsafe-inline`.
 - **ErrorBoundary global** — captura erros sem expor detalhes técnicos em produção.
+- **Barrel exports** — cada feature expõe páginas e APIs via `index.ts`.
 
 ---
 
@@ -874,6 +913,20 @@ NexTraceOne/
 │   │
 │   └── frontend/                        ← React + TypeScript + Vite
 │       ├── src/
+│       │   ├── features/                ← Organizado por bounded context
+│       │   │   ├── identity-access/     (pages + api)
+│       │   │   ├── commercial-governance/
+│       │   │   ├── catalog/
+│       │   │   ├── change-governance/
+│       │   │   ├── audit-compliance/
+│       │   │   └── shared/
+│       │   ├── api/                     ← Client centralizado + barrel re-export
+│       │   ├── components/              ← Componentes shared
+│       │   ├── contexts/                ← React contexts
+│       │   ├── hooks/                   ← Hooks compartilhados
+│       │   ├── locales/                 ← i18n (pt-BR, pt-PT, en, es)
+│       │   ├── types/                   ← TypeScript types
+│       │   └── utils/                   ← Utilitários
 │       └── e2e/
 │
 ├── tools/
