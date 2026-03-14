@@ -54,6 +54,15 @@ public static class RolePermissionCatalog
                 "audit:export",
                 "licensing:read",
                 "licensing:write",
+                "licensing:vendor:license:create",
+                "licensing:vendor:license:revoke",
+                "licensing:vendor:license:rehost",
+                "licensing:vendor:license:read",
+                "licensing:vendor:key:generate",
+                "licensing:vendor:trial:extend",
+                "licensing:vendor:activation:issue",
+                "licensing:vendor:tenant:manage",
+                "licensing:vendor:telemetry:view",
                 "platform:settings:read",
                 "platform:settings:write"],
             Role.TechLead => [
@@ -75,6 +84,7 @@ public static class RolePermissionCatalog
                 "promotion:write",
                 "promotion:promote",
                 "ruleset-governance:read",
+                "licensing:read",
                 "audit:read",
                 "audit:export"],
             Role.Developer => [
