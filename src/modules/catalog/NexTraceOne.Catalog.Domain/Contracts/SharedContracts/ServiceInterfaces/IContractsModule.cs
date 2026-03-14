@@ -14,4 +14,10 @@ public interface IContractsModule
 
     /// <summary>Verifica se existe alguma versão de contrato para um ativo.</summary>
     Task<bool> HasContractVersionAsync(Guid apiAssetId, CancellationToken ct = default);
+
+    /// <summary>Retorna o score consolidado do scorecard técnico do contrato mais recente de um ativo.</summary>
+    Task<decimal?> GetLatestOverallScoreAsync(Guid apiAssetId, CancellationToken ct = default);
+
+    /// <summary>Verifica se a mudança mais recente de um ativo requer aprovação de workflow.</summary>
+    Task<bool> RequiresWorkflowApprovalAsync(Guid apiAssetId, CancellationToken ct = default);
 }
