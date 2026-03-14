@@ -357,7 +357,7 @@ export function ContractsPage() {
                     onChange={(e) => setImportForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                     required
                     className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder="UUID"
+                    placeholder={t('contracts.uuidPlaceholder')}
                   />
                 </div>
                 <div>
@@ -368,7 +368,7 @@ export function ContractsPage() {
                     onChange={(e) => setImportForm((f) => ({ ...f, version: e.target.value }))}
                     required
                     className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder="1.0.0"
+                    placeholder={t('contracts.versionExample')}
                   />
                 </div>
                 <div>
@@ -424,7 +424,7 @@ export function ContractsPage() {
                     onChange={(e) => setCreateVersionForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                     required
                     className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder="UUID"
+                    placeholder={t('contracts.uuidPlaceholder')}
                   />
                 </div>
                 <div>
@@ -435,7 +435,7 @@ export function ContractsPage() {
                     onChange={(e) => setCreateVersionForm((f) => ({ ...f, version: e.target.value }))}
                     required
                     className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder="2.0.0"
+                    placeholder={t('contracts.versionExample')}
                   />
                 </div>
               </div>

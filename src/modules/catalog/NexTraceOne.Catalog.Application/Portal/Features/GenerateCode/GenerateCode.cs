@@ -105,7 +105,19 @@ public static class GenerateCode
 
                         public {{SanitizeName(apiName)}}Client(HttpClient http) => _http = http;
 
-                        // TODO: Add API methods based on OpenAPI contract
+                        public async Task<string> GetAsync(string path, CancellationToken cancellationToken = default)
+                        {
+                            var response = await _http.GetAsync(path, cancellationToken);
+                            response.EnsureSuccessStatusCode();
+                            return await response.Content.ReadAsStringAsync(cancellationToken);
+                        }
+
+                        public async Task<string> PostAsync(string path, HttpContent content, CancellationToken cancellationToken = default)
+                        {
+                            var response = await _http.PostAsync(path, content, cancellationToken);
+                            response.EnsureSuccessStatusCode();
+                            return await response.Content.ReadAsStringAsync(cancellationToken);
+                        }
                     }
                     """,
 
@@ -117,22 +129,36 @@ public static class GenerateCode
                     export class {{SanitizeName(apiName)}}Client {
                       constructor(private readonly baseUrl: string) {}
 
-                      // TODO: Add API methods based on OpenAPI contract
+                      async get(path: string): Promise<Response> {
+                        return fetch(`${this.baseUrl}${path}`);
+                      }
+
+                      async post(path: string, body: unknown): Promise<Response> {
+                        return fetch(`${this.baseUrl}${path}`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(body),
+                        });
+                      }
                     }
                     """,
 
                 ("Python", GenerationType.SdkClient) =>
-                    $"""
-                    # Auto-generated SDK client for {apiName} v{version}
+                    $$"""
+                    # Auto-generated SDK client for {{apiName}} v{{version}}
                     # Review before use — this is a generated artifact.
 
                     import requests
 
-                    class {SanitizeName(apiName)}Client:
+                    class {{SanitizeName(apiName)}}Client:
                         def __init__(self, base_url: str):
                             self.base_url = base_url
 
-                        # TODO: Add API methods based on OpenAPI contract
+                        def get(self, path: str) -> requests.Response:
+                            return requests.get(f"{self.base_url}{path}")
+
+                        def post(self, path: str, data: dict) -> requests.Response:
+                            return requests.post(f"{self.base_url}{path}", json=data)
                     """,
 
                 ("Java", GenerationType.SdkClient) =>
@@ -140,14 +166,34 @@ public static class GenerateCode
                     // Auto-generated SDK client for {{apiName}} v{{version}}
                     // Review before use — this is a generated artifact.
 
+                    import java.net.http.HttpClient;
+                    import java.net.http.HttpRequest;
+                    import java.net.http.HttpResponse;
+                    import java.net.URI;
+
                     public class {{SanitizeName(apiName)}}Client {
                         private final String baseUrl;
+                        private final HttpClient httpClient;
 
                         public {{SanitizeName(apiName)}}Client(String baseUrl) {
                             this.baseUrl = baseUrl;
+                            this.httpClient = HttpClient.newHttpClient();
                         }
 
-                        // TODO: Add API methods based on OpenAPI contract
+                        public HttpResponse<String> get(String path) throws Exception {
+                            var request = HttpRequest.newBuilder()
+                                .uri(URI.create(baseUrl + path))
+                                .GET().build();
+                            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                        }
+
+                        public HttpResponse<String> post(String path, String body) throws Exception {
+                            var request = HttpRequest.newBuilder()
+                                .uri(URI.create(baseUrl + path))
+                                .header("Content-Type", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString(body)).build();
+                            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                        }
                     }
                     """,
 
@@ -158,11 +204,33 @@ public static class GenerateCode
 
                     package client
 
+                    import (
+                    	"bytes"
+                    	"net/http"
+                    )
+
+                    // {{SanitizeName(apiName)}}Client provides HTTP methods for the API.
                     type {{SanitizeName(apiName)}}Client struct {
-                    	BaseURL string
+                    	BaseURL    string
+                    	HttpClient *http.Client
                     }
 
-                    // TODO: Add API methods based on OpenAPI contract
+                    // New{{SanitizeName(apiName)}}Client creates a new API client.
+                    func New{{SanitizeName(apiName)}}Client(baseURL string) *{{SanitizeName(apiName)}}Client {
+                    	c := &{{SanitizeName(apiName)}}Client{BaseURL: baseURL}
+                    	c.HttpClient = &http.Client{}
+                    	return c
+                    }
+
+                    // Get performs a GET request to the specified path.
+                    func (c *{{SanitizeName(apiName)}}Client) Get(path string) (*http.Response, error) {
+                    	return c.HttpClient.Get(c.BaseURL + path)
+                    }
+
+                    // Post performs a POST request to the specified path.
+                    func (c *{{SanitizeName(apiName)}}Client) Post(path string, body []byte) (*http.Response, error) {
+                    	return c.HttpClient.Post(c.BaseURL+path, "application/json", bytes.NewReader(body))
+                    }
                     """,
 
                 (_, GenerationType.IntegrationExample) =>
