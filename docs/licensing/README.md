@@ -181,3 +181,198 @@ Scripts SQL em `database/seeds/commercial-governance/` com massa de teste cobrin
 - Consentimentos de telemetria (granted, partial, denied, not requested)
 
 Ver `database/seeds/commercial-governance/README.md` para detalhes.
+
+---
+
+## Catálogo Comercial (CommercialCatalog)
+
+### Descrição do Subdomínio
+
+O CommercialCatalog é o subdomínio responsável pela definição e gestão do catálogo de planos comerciais, pacotes de funcionalidades (feature packs) e seus itens. Funciona como a **fonte de verdade para a oferta comercial** da plataforma, permitindo que a equipa vendor configure quais capabilities estão disponíveis em cada plano.
+
+A relação central do subdomínio é:
+
+```
+Plan ──(N:N via PlanFeaturePackMapping)──▶ FeaturePack ──(1:N)──▶ FeaturePackItem
+```
+
+Cada `FeaturePackItem` mapeia diretamente para um **código de capability** que é verificado em runtime pelo `License.CheckCapability`. Isto permite que a composição comercial (quais funcionalidades pertencem a qual plano) seja completamente configurável sem alterações de código.
+
+### Entidades
+
+| Entidade | Tipo | Descrição |
+|----------|------|-----------|
+| `Plan` | Aggregate Root | Representa um plano comercial (ex: Community, Professional, Enterprise). Contém nome, descrição, edição e estado ativo/inativo. |
+| `FeaturePack` | Aggregate Root | Agrupamento lógico de funcionalidades (ex: "Core Features", "Advanced Analytics"). Permite composição modular de capabilities. |
+| `FeaturePackItem` | Entity (child de FeaturePack) | Item individual dentro de um FeaturePack. Mapeia para um código de capability (`capabilityCode`) verificado pelo `License.CheckCapability`. |
+| `PlanFeaturePackMapping` | Entity (join) | Associação N:N entre Plan e FeaturePack. Permite que o mesmo FeaturePack seja reutilizado em múltiplos planos. |
+
+### Diagrama de Relações
+
+```
+┌──────────┐       ┌──────────────────────┐       ┌───────────────┐
+│   Plan   │──N:N──│ PlanFeaturePackMapping│──N:N──│  FeaturePack  │
+│ (Aggr.)  │       │       (Join)          │       │   (Aggr.)     │
+└──────────┘       └──────────────────────┘       └───────┬───────┘
+                                                          │ 1:N
+                                                  ┌───────▼───────┐
+                                                  │FeaturePackItem │
+                                                  │(capabilityCode)│
+                                                  └───────────────┘
+                                                          │
+                                                          ▼
+                                               License.CheckCapability
+```
+
+## Geração de Chaves (GenerateLicenseKey)
+
+### Descrição
+
+A feature `GenerateLicenseKey` permite à equipa vendor gerar chaves de licença criptograficamente seguras para distribuição a clientes. A geração utiliza `RandomNumberGenerator` (CSPRNG do .NET) para garantir entropia adequada e resistência a ataques de predição.
+
+### Especificações Técnicas
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Algoritmo** | `RandomNumberGenerator` (CSPRNG) |
+| **Entropia** | 256-bit (32 bytes aleatórios) |
+| **Formato** | `NXKEY-XXXX-XXXX-XXXX-XXXX` |
+| **Charset** | Alfanumérico maiúsculo (A-Z, 0-9) |
+| **Permissão** | `licensing:vendor:license:manage` |
+
+### Fluxo
+
+1. Vendor autenticado envia `POST /api/v1/licensing/vendor/generate-key`
+2. Handler valida permissão `licensing:vendor:license:manage`
+3. `RandomNumberGenerator` gera 32 bytes aleatórios
+4. Bytes são codificados no formato `NXKEY-XXXX-XXXX-XXXX-XXXX`
+5. Chave é retornada ao vendor (não é persistida — o vendor associa à licença no momento da emissão)
+
+## Novas Permissões do Catálogo
+
+As seguintes permissões foram adicionadas para controlo de acesso ao catálogo comercial:
+
+| Permissão | Descrição |
+|-----------|-----------|
+| `licensing:vendor:plan:create` | Criar novos planos comerciais |
+| `licensing:vendor:plan:read` | Consultar planos existentes |
+| `licensing:vendor:featurepack:create` | Criar novos feature packs e seus itens |
+| `licensing:vendor:featurepack:read` | Consultar feature packs existentes |
+| `licensing:vendor:license:manage` | Gestão avançada de licenças (inclui geração de chaves) |
+
+Todas as permissões pertencem ao contexto **Vendor Operations** e requerem autenticação com role de administrador ou operador comercial.
+
+## Endpoints do Catálogo
+
+### Vendor Catalog (5 endpoints)
+
+| Método | Path | Permissão | Descrição |
+|--------|------|-----------|-----------|
+| POST | `/api/v1/licensing/vendor/plans` | `licensing:vendor:plan:create` | Criar novo plano comercial |
+| GET | `/api/v1/licensing/vendor/plans` | `licensing:vendor:plan:read` | Listar planos comerciais (paginado) |
+| POST | `/api/v1/licensing/vendor/feature-packs` | `licensing:vendor:featurepack:create` | Criar novo feature pack com itens |
+| GET | `/api/v1/licensing/vendor/feature-packs` | `licensing:vendor:featurepack:read` | Listar feature packs com itens (paginado) |
+| POST | `/api/v1/licensing/vendor/generate-key` | `licensing:vendor:license:manage` | Gerar chave de licença criptograficamente segura |
+
+### Exemplos de Payload
+
+**Criar Plano:**
+```json
+{
+  "name": "Professional",
+  "description": "Plano para equipas de desenvolvimento",
+  "edition": "Professional",
+  "featurePackIds": ["<featurepack-id-1>", "<featurepack-id-2>"]
+}
+```
+
+**Criar Feature Pack:**
+```json
+{
+  "name": "Core Features",
+  "description": "Funcionalidades base da plataforma",
+  "items": [
+    { "capabilityCode": "catalog:import", "description": "Importação de contratos" },
+    { "capabilityCode": "catalog:diff", "description": "Diff semântico de contratos" }
+  ]
+}
+```
+
+**Resposta Generate Key:**
+```json
+{
+  "licenseKey": "NXKEY-A7K2-M9PX-R4WL-B6QT"
+}
+```
+
+## Frontend — Catálogo Comercial
+
+### Novas Tabs
+
+A secção Vendor (`/vendor/licensing`) foi expandida com três novos separadores:
+
+| Tab | Rota | Descrição |
+|-----|------|-----------|
+| **Plans** | `/vendor/licensing/plans` | Listagem e criação de planos comerciais com associação de feature packs |
+| **Feature Packs** | `/vendor/licensing/feature-packs` | Listagem e criação de feature packs com gestão de itens (capabilities) |
+| **Generate Key** | `/vendor/licensing/generate-key` | Interface para geração de chaves de licença com cópia para clipboard |
+
+### i18n
+
+Chaves de tradução adicionadas no namespace `vendorCatalog.*` nos 4 idiomas suportados (en, pt-BR, pt-PT, es):
+
+```
+vendorCatalog.plans.title
+vendorCatalog.plans.create
+vendorCatalog.plans.name
+vendorCatalog.plans.description
+vendorCatalog.plans.edition
+vendorCatalog.plans.featurePacks
+vendorCatalog.plans.empty
+vendorCatalog.featurePacks.title
+vendorCatalog.featurePacks.create
+vendorCatalog.featurePacks.name
+vendorCatalog.featurePacks.description
+vendorCatalog.featurePacks.items
+vendorCatalog.featurePacks.capabilityCode
+vendorCatalog.featurePacks.empty
+vendorCatalog.generateKey.title
+vendorCatalog.generateKey.generate
+vendorCatalog.generateKey.copyToClipboard
+vendorCatalog.generateKey.copied
+vendorCatalog.generateKey.description
+```
+
+## SQL Seeds — Catálogo Comercial
+
+Scripts de seed adicionados em `database/seeds/commercial-governance/` para popular o catálogo em ambientes de desenvolvimento e teste:
+
+### 06-seed-plans.sql (5 planos)
+
+| Plano | Edição | Descrição |
+|-------|--------|-----------|
+| Community | Community | Plano gratuito com funcionalidades base |
+| Professional | Professional | Para equipas de desenvolvimento |
+| Enterprise | Enterprise | Para organizações com governança avançada |
+| Unlimited | Unlimited | Acesso completo a todas as funcionalidades |
+| Trial | Professional | Plano de avaliação com duração limitada |
+
+### 07-seed-feature-packs.sql (3 packs + 14 itens)
+
+| Feature Pack | Itens | Capabilities |
+|--------------|-------|-------------|
+| **Core Features** | 5 itens | `catalog:import`, `catalog:diff`, `catalog:browse`, `change:create`, `change:view` |
+| **Governance Features** | 5 itens | `workflow:create`, `workflow:approve`, `ruleset:manage`, `promotion:request`, `promotion:approve` |
+| **Intelligence Features** | 4 itens | `blast-radius:calculate`, `change-score:compute`, `ai:consult`, `audit:export` |
+
+### 08-seed-plan-featurepack-mappings.sql (11 mapeamentos)
+
+| Plano | Feature Packs Associados |
+|-------|--------------------------|
+| Community | Core Features |
+| Professional | Core Features, Governance Features |
+| Enterprise | Core Features, Governance Features, Intelligence Features |
+| Unlimited | Core Features, Governance Features, Intelligence Features |
+| Trial | Core Features, Governance Features |
+
+Esta estrutura de seeds permite testar cenários de licenciamento com diferentes combinações de plano e capabilities desde o primeiro momento de desenvolvimento.

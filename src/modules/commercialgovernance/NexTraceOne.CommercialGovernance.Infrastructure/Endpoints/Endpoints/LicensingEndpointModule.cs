@@ -19,6 +19,11 @@ using StartTrialFeature = NexTraceOne.Licensing.Application.Features.StartTrial.
 using TrackUsageMetricFeature = NexTraceOne.Licensing.Application.Features.TrackUsageMetric.TrackUsageMetric;
 using UpdateTelemetryConsentFeature = NexTraceOne.Licensing.Application.Features.UpdateTelemetryConsent.UpdateTelemetryConsent;
 using VerifyLicenseOnStartupFeature = NexTraceOne.Licensing.Application.Features.VerifyLicenseOnStartup.VerifyLicenseOnStartup;
+using CreatePlanFeature = NexTraceOne.CommercialCatalog.Application.Features.CreatePlan.CreatePlan;
+using ListPlansFeature = NexTraceOne.CommercialCatalog.Application.Features.ListPlans.ListPlans;
+using CreateFeaturePackFeature = NexTraceOne.CommercialCatalog.Application.Features.CreateFeaturePack.CreateFeaturePack;
+using ListFeaturePacksFeature = NexTraceOne.CommercialCatalog.Application.Features.ListFeaturePacks.ListFeaturePacks;
+using GenerateLicenseKeyFeature = NexTraceOne.CommercialCatalog.Application.Features.GenerateLicenseKey.GenerateLicenseKey;
 
 namespace NexTraceOne.Licensing.API.Endpoints;
 
@@ -210,5 +215,57 @@ public sealed class LicensingEndpointModule
             var result = await sender.Send(new ListLicensesFeature.Query(page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("licensing:vendor:license:read");
+
+        // ─── Commercial Catalog (Vendor Operations) ─────────────────
+
+        group.MapPost("/vendor/plans", async (
+            CreatePlanFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:plan:create");
+
+        group.MapGet("/vendor/plans", async (
+            bool? activeOnly,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListPlansFeature.Query(activeOnly), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:plan:read");
+
+        group.MapPost("/vendor/feature-packs", async (
+            CreateFeaturePackFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:featurepack:create");
+
+        group.MapGet("/vendor/feature-packs", async (
+            bool? activeOnly,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListFeaturePacksFeature.Query(activeOnly), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:featurepack:read");
+
+        group.MapPost("/vendor/generate-key", async (
+            GenerateLicenseKeyFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("licensing:vendor:license:manage");
     }
 }
