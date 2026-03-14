@@ -10,6 +10,8 @@ namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
 /// - <see cref="DeploymentEndpoints"/> — notificações de deployment, estado e rollback.
 /// - <see cref="ReleaseQueryEndpoints"/> — consulta de releases e histórico.
 /// - <see cref="AnalysisEndpoints"/> — classificação, blast radius, score e work items.
+/// - <see cref="IntelligenceEndpoints"/> — marcadores externos, sumário, baseline, review e rollback assessment.
+/// - <see cref="FreezeEndpoints"/> — gestão de janelas de freeze.
 ///
 /// Este padrão segue a mesma abordagem do módulo Identity, reduzindo o tamanho
 /// de cada ficheiro e agrupando endpoints por responsabilidade funcional (SRP).
@@ -26,5 +28,8 @@ public sealed class ChangeIntelligenceEndpointModule
         DeploymentEndpoints.Map(group);
         ReleaseQueryEndpoints.Map(group);
         AnalysisEndpoints.Map(group);
+        IntelligenceEndpoints.Map(group);
+
+        FreezeEndpoints.Map(app);
     }
 }
