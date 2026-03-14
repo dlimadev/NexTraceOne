@@ -132,7 +132,7 @@ public sealed class VendorOpsApplicationTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("Licensing.License.AlreadyRevoked");
+        result.Error.Code.Should().Be("Licensing.License.Inactive");
     }
 
     // ─── RehostLicense ────────────────────────────────────────────────

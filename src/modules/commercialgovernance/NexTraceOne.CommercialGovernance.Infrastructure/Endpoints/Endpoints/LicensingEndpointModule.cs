@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using ActivateLicenseFeature = NexTraceOne.Licensing.Application.Features.ActivateLicense.ActivateLicense;
 using AlertLicenseThresholdFeature = NexTraceOne.Licensing.Application.Features.AlertLicenseThreshold.AlertLicenseThreshold;
 using CheckCapabilityFeature = NexTraceOne.Licensing.Application.Features.CheckCapability.CheckCapability;
@@ -152,7 +153,7 @@ public sealed class LicensingEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("licensing:vendor:license:create");
 
         group.MapPost("/vendor/revoke", async (
             RevokeLicenseFeature.Command command,
@@ -162,7 +163,7 @@ public sealed class LicensingEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("licensing:vendor:license:revoke");
 
         group.MapPost("/vendor/rehost", async (
             RehostLicenseFeature.Command command,
@@ -172,7 +173,7 @@ public sealed class LicensingEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("licensing:vendor:license:rehost");
 
         group.MapGet("/vendor/licenses", async (
             int page,
@@ -183,6 +184,6 @@ public sealed class LicensingEndpointModule
         {
             var result = await sender.Send(new ListLicensesFeature.Query(page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("licensing:vendor:license:read");
     }
 }

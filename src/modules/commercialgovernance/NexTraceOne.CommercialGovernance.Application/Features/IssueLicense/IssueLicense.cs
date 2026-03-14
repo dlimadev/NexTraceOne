@@ -80,7 +80,6 @@ public static class IssueLicense
                 request.MeteringMode);
 
             licenseRepository.Add(license);
-            await Task.CompletedTask;
 
             return new Response(
                 license.Id.Value,

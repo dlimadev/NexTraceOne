@@ -48,7 +48,7 @@ public static class RevokeLicense
 
             if (!license.IsActive)
             {
-                return LicensingErrors.LicenseAlreadyRevoked();
+                return LicensingErrors.LicenseInactive();
             }
 
             license.Revoke();
