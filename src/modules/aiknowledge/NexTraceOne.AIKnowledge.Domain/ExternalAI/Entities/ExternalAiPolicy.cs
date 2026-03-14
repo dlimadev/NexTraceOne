@@ -45,7 +45,8 @@ public sealed class ExternalAiPolicy : AuditableEntity<ExternalAiPolicyId>
     /// <summary>
     /// Cria uma nova política de governança de IA com validações de invariantes.
     /// A política inicia ativa e pronta para avaliação.
-    /// A data de criação é registrada via AuditableEntity.CreatedAt herdado.
+    /// Os campos de auditoria (CreatedAt, CreatedBy) são preenchidos automaticamente
+    /// pelo AuditInterceptor do DbContext — não é responsabilidade do domínio.
     /// </summary>
     public static ExternalAiPolicy Create(
         string name,
@@ -62,7 +63,7 @@ public sealed class ExternalAiPolicy : AuditableEntity<ExternalAiPolicyId>
         Guard.Against.NegativeOrZero(maxTokensPerDay);
         Guard.Against.NullOrWhiteSpace(allowedContexts);
 
-        var policy = new ExternalAiPolicy
+        return new ExternalAiPolicy
         {
             Id = ExternalAiPolicyId.New(),
             Name = name,
@@ -73,9 +74,6 @@ public sealed class ExternalAiPolicy : AuditableEntity<ExternalAiPolicyId>
             AllowedContexts = allowedContexts,
             IsActive = true
         };
-
-        policy.SetCreated(createdAt, "system");
-        return policy;
     }
 
     /// <summary>
