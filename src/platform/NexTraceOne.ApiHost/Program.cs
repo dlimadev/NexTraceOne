@@ -1,5 +1,5 @@
 using NexTraceOne.BuildingBlocks.Security.Integrity;
-using NexTraceOne.BuildingBlocks.EventBus;
+using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.BuildingBlocks.Observability.Logging;
 using NexTraceOne.BuildingBlocks.Security;

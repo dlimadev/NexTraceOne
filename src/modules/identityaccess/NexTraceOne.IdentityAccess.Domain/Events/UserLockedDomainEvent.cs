@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain;
+using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.Identity.Domain.Entities;
 
 namespace NexTraceOne.Identity.Domain.Events;

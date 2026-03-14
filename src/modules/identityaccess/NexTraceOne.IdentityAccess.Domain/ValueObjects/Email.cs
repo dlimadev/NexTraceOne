@@ -1,5 +1,5 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
 using System.Net.Mail;
 
 namespace NexTraceOne.Identity.Domain.ValueObjects;

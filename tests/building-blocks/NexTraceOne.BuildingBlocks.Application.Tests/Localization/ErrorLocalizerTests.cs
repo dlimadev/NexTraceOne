@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Localization;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NSubstitute;
 
 namespace NexTraceOne.BuildingBlocks.Application.Tests.Localization;

@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.Workflow.Domain.Errors;
 

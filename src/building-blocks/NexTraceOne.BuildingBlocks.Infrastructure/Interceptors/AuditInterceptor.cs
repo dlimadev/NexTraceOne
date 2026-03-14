@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
 
 namespace NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 

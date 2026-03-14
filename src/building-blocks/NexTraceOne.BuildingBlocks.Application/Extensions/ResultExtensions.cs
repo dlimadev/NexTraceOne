@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Extensions;
 

@@ -1,5 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Behaviors;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Tests.Behaviors;
 

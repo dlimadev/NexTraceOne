@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.CostIntelligence.Domain.Entities;
 
 namespace NexTraceOne.CostIntelligence.Infrastructure.Persistence;
 
 /// <summary>
 /// DbContext do módulo CostIntelligence.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
+/// Base de dados isolada por serviço — cada módulo possui sua própria connection string.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>
 public sealed class CostIntelligenceDbContext(
@@ -14,10 +16,25 @@ public sealed class CostIntelligenceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Snapshots de custo de infraestrutura capturados periodicamente.</summary>
+    public DbSet<CostSnapshot> CostSnapshots => Set<CostSnapshot>();
 
+    /// <summary>Atribuições de custo a serviços/APIs específicos por período.</summary>
+    public DbSet<CostAttribution> CostAttributions => Set<CostAttribution>();
+
+    /// <summary>Análises de tendência de custo ao longo do tempo.</summary>
+    public DbSet<CostTrend> CostTrends => Set<CostTrend>();
+
+    /// <summary>Perfis de custo de serviços com orçamento e alertas.</summary>
+    public DbSet<ServiceCostProfile> ServiceCostProfiles => Set<ServiceCostProfile>();
+
+    /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CostIntelligenceDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

@@ -1,5 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.ChangeIntelligence.Application.Abstractions;
 using NexTraceOne.ChangeIntelligence.Domain.Entities;
 using CalculateBlastRadiusFeature = NexTraceOne.ChangeIntelligence.Application.Features.CalculateBlastRadius.CalculateBlastRadius;

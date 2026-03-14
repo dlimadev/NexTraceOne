@@ -1,5 +1,5 @@
-using NexTraceOne.BuildingBlocks.Domain.Notifications;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Notifications;
+using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.BuildingBlocks.Application.Notifications;
 

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.BuildingBlocks.Core</RootNamespace>
+    <AssemblyName>NexTraceOne.BuildingBlocks.Core</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Ardalis.GuardClauses" />
+  </ItemGroup>
+</Project>

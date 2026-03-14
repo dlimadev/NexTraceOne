@@ -1,4 +1,4 @@
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
 
 namespace NexTraceOne.Contracts.Domain.ValueObjects;
 

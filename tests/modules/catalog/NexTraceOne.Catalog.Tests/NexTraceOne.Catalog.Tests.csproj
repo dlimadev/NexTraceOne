@@ -7,6 +7,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Application\NexTraceOne.Catalog.Application.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

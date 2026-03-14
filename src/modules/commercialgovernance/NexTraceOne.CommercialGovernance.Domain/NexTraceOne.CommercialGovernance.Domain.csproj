@@ -8,7 +8,8 @@
     <InternalsVisibleTo Include="NexTraceOne.CommercialGovernance.Tests" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
+    <ProjectReference Include="..\NexTraceOne.CommercialGovernance.Contracts\NexTraceOne.CommercialGovernance.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />

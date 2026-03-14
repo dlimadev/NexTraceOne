@@ -2,7 +2,7 @@ using NexTraceOne.BackgroundWorkers;
 using NexTraceOne.BackgroundWorkers.Jobs;
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.EventBus;
+using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.Identity.Infrastructure;
 
 // ═══════════════════════════════════════════════════════════════════════════════

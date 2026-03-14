@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Domain;
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
+using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
 
 namespace NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 

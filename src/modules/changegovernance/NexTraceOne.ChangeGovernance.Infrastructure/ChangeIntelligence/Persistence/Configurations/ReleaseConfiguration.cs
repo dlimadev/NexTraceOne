@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.BuildingBlocks.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.ChangeIntelligence.Domain.Entities;
 
 namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Configurations;

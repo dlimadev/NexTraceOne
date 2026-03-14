@@ -1,7 +1,7 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Workflow.Application.Abstractions;
 using NexTraceOne.Workflow.Domain.Enums;
 

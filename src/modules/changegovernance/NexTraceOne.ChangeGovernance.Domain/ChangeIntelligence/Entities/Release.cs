@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Domain;
-using NexTraceOne.BuildingBlocks.Domain.Enums;
-using NexTraceOne.BuildingBlocks.Domain.Primitives;
-using NexTraceOne.BuildingBlocks.Domain.Results;
+using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Enums;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeIntelligence.Domain.Errors;
 
 namespace NexTraceOne.ChangeIntelligence.Domain.Entities;

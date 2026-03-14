@@ -5,7 +5,7 @@
     <AssemblyName>NexTraceOne.BuildingBlocks.Application</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Domain\NexTraceOne.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="NexTraceOne.BuildingBlocks.Application.Tests" />

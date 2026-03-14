@@ -1,0 +1,136 @@
+using MediatR;
+using Microsoft.AspNetCore.Builder;
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using IngestRuntimeSnapshotFeature = NexTraceOne.RuntimeIntelligence.Application.Features.IngestRuntimeSnapshot.IngestRuntimeSnapshot;
+using GetRuntimeHealthFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetRuntimeHealth.GetRuntimeHealth;
+using GetObservabilityScoreFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetObservabilityScore.GetObservabilityScore;
+using ComputeObservabilityDebtFeature = NexTraceOne.RuntimeIntelligence.Application.Features.ComputeObservabilityDebt.ComputeObservabilityDebt;
+using DetectRuntimeDriftFeature = NexTraceOne.RuntimeIntelligence.Application.Features.DetectRuntimeDrift.DetectRuntimeDrift;
+using GetDriftFindingsFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetDriftFindings.GetDriftFindings;
+using GetReleaseHealthTimelineFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetReleaseHealthTimeline.GetReleaseHealthTimeline;
+using CompareReleaseRuntimeFeature = NexTraceOne.RuntimeIntelligence.Application.Features.CompareReleaseRuntime.CompareReleaseRuntime;
+
+namespace NexTraceOne.RuntimeIntelligence.API.Endpoints;
+
+/// <summary>
+/// Registra todos os endpoints Minimal API do módulo RuntimeIntelligence.
+/// Agrupa endpoints por responsabilidade: saúde, observabilidade, drift e comparação.
+///
+/// Endpoints disponíveis:
+/// - POST   /snapshots              → Ingerir snapshot de runtime
+/// - GET    /health                  → Saúde atual do serviço
+/// - GET    /observability           → Score de observabilidade
+/// - POST   /observability/assess    → Avaliar dívida de observabilidade
+/// - POST   /drift/detect           → Detectar drift contra baseline
+/// - GET    /drift                   → Listar findings de drift
+/// - GET    /timeline               → Timeline de saúde por release
+/// - GET    /compare                → Comparar runtime entre releases
+/// </summary>
+public sealed class RuntimeIntelligenceEndpointModule
+{
+    /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
+    public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/runtime");
+
+        group.MapPost("/snapshots", async (
+            IngestRuntimeSnapshotFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToCreatedResult("/api/v1/runtime/snapshots/{0}", localizer);
+        });
+
+        group.MapGet("/health", async (
+            string serviceName,
+            string environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetRuntimeHealthFeature.Query(serviceName, environment);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapGet("/observability", async (
+            string serviceName,
+            string environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetObservabilityScoreFeature.Query(serviceName, environment);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapPost("/observability/assess", async (
+            ComputeObservabilityDebtFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToCreatedResult("/api/v1/runtime/observability/{0}", localizer);
+        });
+
+        group.MapPost("/drift/detect", async (
+            DetectRuntimeDriftFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapGet("/drift", async (
+            string serviceName,
+            string environment,
+            bool? unacknowledgedOnly,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetDriftFindingsFeature.Query(serviceName, environment, unacknowledgedOnly ?? false, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapGet("/timeline", async (
+            string serviceName,
+            string environment,
+            DateTimeOffset windowStart,
+            DateTimeOffset windowEnd,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetReleaseHealthTimelineFeature.Query(serviceName, environment, windowStart, windowEnd);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapGet("/compare", async (
+            string serviceName,
+            string environment,
+            DateTimeOffset beforeStart,
+            DateTimeOffset beforeEnd,
+            DateTimeOffset afterStart,
+            DateTimeOffset afterEnd,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new CompareReleaseRuntimeFeature.Query(serviceName, environment, beforeStart, beforeEnd, afterStart, afterEnd);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        });
+    }
+}
