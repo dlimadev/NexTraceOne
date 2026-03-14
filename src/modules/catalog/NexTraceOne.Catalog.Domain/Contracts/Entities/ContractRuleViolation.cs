@@ -17,8 +17,12 @@ public sealed class ContractRuleViolation : Entity<ContractRuleViolationId>
     /// <summary>Identificador da versão de contrato onde a violação foi encontrada.</summary>
     public ContractVersionId ContractVersionId { get; private set; } = null!;
 
-    /// <summary>Identificador do ruleset que gerou a violação.</summary>
-    public Guid RulesetId { get; private set; }
+    /// <summary>
+    /// Identificador do ruleset que gerou a violação.
+    /// Null quando a violação é gerada pelo motor de regras interno (ContractRuleEngine),
+    /// que opera sem ruleset externo. Não-null quando associada a um ruleset organizacional.
+    /// </summary>
+    public Guid? RulesetId { get; private set; }
 
     /// <summary>Nome da regra violada (ex: "naming-convention", "required-examples").</summary>
     public string RuleName { get; private set; } = string.Empty;
@@ -43,7 +47,7 @@ public sealed class ContractRuleViolation : Entity<ContractRuleViolationId>
     /// </summary>
     public static ContractRuleViolation Create(
         ContractVersionId contractVersionId,
-        Guid rulesetId,
+        Guid? rulesetId,
         string ruleName,
         string severity,
         string message,
@@ -52,7 +56,6 @@ public sealed class ContractRuleViolation : Entity<ContractRuleViolationId>
         string? suggestedFix = null)
     {
         Guard.Against.Null(contractVersionId);
-        Guard.Against.Default(rulesetId);
         Guard.Against.NullOrWhiteSpace(ruleName);
         Guard.Against.NullOrWhiteSpace(severity);
         Guard.Against.NullOrWhiteSpace(message);
