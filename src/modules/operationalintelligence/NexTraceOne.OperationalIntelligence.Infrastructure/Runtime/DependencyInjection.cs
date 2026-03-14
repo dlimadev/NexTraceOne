@@ -1,19 +1,46 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
+using NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence;
+using NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence.Repositories;
 
 namespace NexTraceOne.RuntimeIntelligence.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo RuntimeIntelligence.
-/// Inclui: DbContext, Repositórios, Adapters externos, Quartz Jobs.
+/// Inclui: DbContext com connection string isolada, repositórios e UnitOfWork.
+/// Cada módulo possui sua própria base de dados — sem compartilhamento.
 /// </summary>
 public static class DependencyInjection
 {
+    /// <summary>Adiciona os serviços de infraestrutura do módulo RuntimeIntelligence ao container DI.</summary>
     public static IServiceCollection AddRuntimeIntelligenceInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar DbContext, repositórios, adapters
+        services.AddBuildingBlocksInfrastructure(configuration);
+
+        var connectionString = configuration.GetConnectionString("RuntimeIntelligenceDatabase")
+            ?? configuration.GetConnectionString("NexTraceOne")
+            ?? configuration.GetConnectionString("DefaultConnection")
+            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+
+        services.AddDbContext<RuntimeIntelligenceDbContext>((serviceProvider, options) =>
+            options.UseNpgsql(connectionString)
+                .AddInterceptors(
+                    serviceProvider.GetRequiredService<AuditInterceptor>(),
+                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<RuntimeIntelligenceDbContext>());
+        services.AddScoped<IRuntimeSnapshotRepository, RuntimeSnapshotRepository>();
+        services.AddScoped<IRuntimeBaselineRepository, RuntimeBaselineRepository>();
+        services.AddScoped<IDriftFindingRepository, DriftFindingRepository>();
+        services.AddScoped<IObservabilityProfileRepository, ObservabilityProfileRepository>();
+
         return services;
     }
 }
