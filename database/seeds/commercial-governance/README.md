@@ -19,6 +19,7 @@ Estes scripts devem ser usados **APENAS em ambiente de desenvolvimento/debug**.
 | 02 | `02-seed-capabilities.sql` | Associa capabilities às licenças por edição |
 | 03 | `03-seed-quotas.sql` | Cria quotas de uso com consumo variado |
 | 04 | `04-seed-activations.sql` | Registra ativações e hardware bindings |
+| 05 | `05-seed-telemetry-consent.sql` | Registra consentimentos de telemetria por licença |
 
 ## Ordem de Execução
 
@@ -37,6 +38,9 @@ psql -d nextraceone -f database/seeds/commercial-governance/03-seed-quotas.sql
 
 # 5. Criar ativações
 psql -d nextraceone -f database/seeds/commercial-governance/04-seed-activations.sql
+
+# 6. Criar consentimentos de telemetria
+psql -d nextraceone -f database/seeds/commercial-governance/05-seed-telemetry-consent.sql
 ```
 
 ## Cenários de Teste Cobertos

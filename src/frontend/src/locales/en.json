@@ -659,7 +659,32 @@
       "status": "Status",
       "capabilities": "Capabilities",
       "quotas": "Quotas",
-      "trial": "Trial"
+      "trial": "Trial",
+      "telemetry": "Telemetry"
+    },
+    "telemetry": {
+      "title": "Telemetry Consent",
+      "description": "Control what usage and diagnostic data is collected from your environment. Changes are auditable and comply with LGPD/GDPR.",
+      "status": "Consent Status",
+      "usageMetrics": "Usage Metrics",
+      "performanceData": "Performance Data",
+      "errorDiagnostics": "Error Diagnostics",
+      "lastUpdatedBy": "Last Updated By",
+      "lastUpdatedAt": "Last Updated At",
+      "reason": "Reason",
+      "actions": "Manage Consent",
+      "grantAll": "Grant Full Consent",
+      "grantPartial": "Grant Partial",
+      "denyAll": "Deny All",
+      "confirmDeny": "Are you sure you want to deny all telemetry collection?",
+      "updateFailed": "Failed to update telemetry consent.",
+      "updateSuccess": "Telemetry consent updated successfully.",
+      "statuses": {
+        "notRequested": "Not Requested",
+        "granted": "Granted",
+        "denied": "Denied",
+        "partial": "Partial"
+      }
     }
   },
   "vendorLicensing": {

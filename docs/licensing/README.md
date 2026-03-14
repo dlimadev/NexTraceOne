@@ -58,14 +58,16 @@ CommercialGovernance/
 │   │   ├── IssueLicense/               ← Vendor: emissão
 │   │   ├── RevokeLicense/              ← Vendor: revogação
 │   │   ├── RehostLicense/              ← Vendor: rehost
-│   │   └── ListLicenses/               ← Vendor: listagem
+│   │   ├── ListLicenses/               ← Vendor: listagem
+│   │   ├── GetTelemetryConsent/         ← Consulta consentimento
+│   │   └── UpdateTelemetryConsent/      ← Altera consentimento
 │   └── Abstractions/
 │       ├── ILicenseRepository.cs
 │       ├── IHardwareBindingRepository.cs
 │       └── IHardwareFingerprintProvider.cs
 └── Infrastructure/
     ├── Endpoints/
-    │   └── LicensingEndpointModule.cs  ← 14 endpoints Minimal API
+    │   └── LicensingEndpointModule.cs  ← 16 endpoints Minimal API
     ├── Persistence/
     │   ├── LicensingDbContext.cs
     │   └── Repositories/
@@ -98,6 +100,7 @@ Cobertura:
 - Trial (status, dias restantes, extensão, conversão)
 - Health score da licença
 - Alertas e warnings proativos
+- Consentimento de telemetria (grant total, parcial, deny — LGPD/GDPR)
 
 ### 2. Vendor Licensing Operations
 
@@ -130,7 +133,7 @@ Cobertura:
 
 ## API Endpoints
 
-### Tenant Licensing (10 endpoints)
+### Tenant Licensing (12 endpoints)
 | Método | Path | Descrição |
 |--------|------|-----------|
 | POST | `/api/v1/licensing/activate` | Ativar licença |
@@ -143,6 +146,8 @@ Cobertura:
 | POST | `/api/v1/licensing/trial/extend` | Estender trial |
 | POST | `/api/v1/licensing/trial/convert` | Converter trial |
 | GET | `/api/v1/licensing/health` | Health score |
+| GET | `/api/v1/licensing/telemetry-consent` | Consultar consentimento de telemetria |
+| POST | `/api/v1/licensing/telemetry-consent` | Atualizar consentimento de telemetria |
 
 ### Vendor Operations (4 endpoints)
 | Método | Path | Descrição |
@@ -154,9 +159,9 @@ Cobertura:
 
 ## Testes
 
-92 testes unitários cobrindo:
+105 testes unitários cobrindo:
 - **Domain** (67 testes): License aggregate, capabilities, quotas, trial, health score, revoke, rehost, TelemetryConsent, enums
-- **Application** (25 testes): Handlers de ativação, status, capability, trial, vendor ops
+- **Application** (38 testes): Handlers de ativação, status, capability, trial, vendor ops, telemetry consent (get, update grant/deny/partial, validators)
 
 ## i18n
 
@@ -173,5 +178,6 @@ Scripts SQL em `database/seeds/commercial-governance/` com massa de teste cobrin
 - Grace period
 - Licença revogada
 - Thresholds próximos do limite
+- Consentimentos de telemetria (granted, partial, denied, not requested)
 
 Ver `database/seeds/commercial-governance/README.md` para detalhes.

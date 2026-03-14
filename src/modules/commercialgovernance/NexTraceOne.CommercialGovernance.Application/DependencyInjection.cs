@@ -6,11 +6,13 @@ using NexTraceOne.Licensing.Application.Features.ActivateLicense;
 using NexTraceOne.Licensing.Application.Features.AlertLicenseThreshold;
 using NexTraceOne.Licensing.Application.Features.CheckCapability;
 using NexTraceOne.Licensing.Application.Features.GetLicenseStatus;
+using NexTraceOne.Licensing.Application.Features.GetTelemetryConsent;
 using NexTraceOne.Licensing.Application.Features.IssueLicense;
 using NexTraceOne.Licensing.Application.Features.ListLicenses;
 using NexTraceOne.Licensing.Application.Features.RehostLicense;
 using NexTraceOne.Licensing.Application.Features.RevokeLicense;
 using NexTraceOne.Licensing.Application.Features.TrackUsageMetric;
+using NexTraceOne.Licensing.Application.Features.UpdateTelemetryConsent;
 using NexTraceOne.Licensing.Application.Features.VerifyLicenseOnStartup;
 
 namespace NexTraceOne.Licensing.Application;
@@ -42,6 +44,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RevokeLicense.Command>, RevokeLicense.Validator>();
         services.AddTransient<IValidator<RehostLicense.Command>, RehostLicense.Validator>();
         services.AddTransient<IValidator<ListLicenses.Query>, ListLicenses.Validator>();
+
+        // ─── Telemetry consent validators ────────────────────────────
+        services.AddTransient<IValidator<GetTelemetryConsent.Query>, GetTelemetryConsent.Validator>();
+        services.AddTransient<IValidator<UpdateTelemetryConsent.Command>, UpdateTelemetryConsent.Validator>();
 
         return services;
     }

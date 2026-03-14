@@ -18,11 +18,14 @@ import {
   XCircle,
   RefreshCw,
   Heart,
+  Radio,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { licensingApi } from '../api';
+import type { TelemetryConsentResponse } from '../api/licensing';
+import { useAuth } from '../../../contexts/AuthContext';
 import type {
   LicenseStatus,
   LicenseHealthResult,
@@ -31,7 +34,7 @@ import type {
   LicenseThresholdAlert,
 } from '../../../types';
 
-type Tab = 'status' | 'capabilities' | 'quotas' | 'trial';
+type Tab = 'status' | 'capabilities' | 'quotas' | 'trial' | 'telemetry';
 
 /** Mapeia o nível de aviso para variante visual do Badge. */
 function warningVariant(level: string): 'default' | 'success' | 'warning' | 'danger' | 'info' {
@@ -77,6 +80,7 @@ const emptyConvertForm: TrialConvertForm = {
 
 export function LicensingPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('status');
   const [licenseKey, setLicenseKey] = useState('');
@@ -138,12 +142,27 @@ export function LicensingPage() {
     },
   });
 
+  const { data: telemetryConsent, isLoading: telemetryLoading } = useQuery({
+    queryKey: ['licensing', 'telemetry-consent', licenseKey],
+    queryFn: () => licensingApi.getTelemetryConsent(licenseKey),
+    enabled: !!licenseKey && tab === 'telemetry',
+    staleTime: 30_000,
+  });
+
+  const updateTelemetryMutation = useMutation({
+    mutationFn: licensingApi.updateTelemetryConsent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['licensing', 'telemetry-consent'] });
+    },
+  });
+
   // ── Definição das tabs ──────────────────────────────────────────────
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'status', label: t('licensing.tabs.status'), icon: <Shield size={14} /> },
     { key: 'capabilities', label: t('licensing.tabs.capabilities'), icon: <Key size={14} /> },
     { key: 'quotas', label: t('licensing.tabs.quotas'), icon: <BarChart3 size={14} /> },
     { key: 'trial', label: t('licensing.tabs.trial'), icon: <FlaskConical size={14} /> },
+    { key: 'telemetry', label: t('licensing.tabs.telemetry'), icon: <Radio size={14} /> },
   ];
 
   return (
@@ -658,6 +677,211 @@ export function LicensingPage() {
               </form>
             </CardBody>
           </Card>
+        </div>
+      )}
+
+      {/* ── Tab: Telemetry Consent ────────────────────────────────── */}
+      {tab === 'telemetry' && (
+        <div className="space-y-6">
+          {!licenseKey ? (
+            <Card>
+              <CardBody>
+                <p className="text-sm text-muted text-center py-8">
+                  {t('licensing.enterKeyPrompt')}
+                </p>
+              </CardBody>
+            </Card>
+          ) : telemetryLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw size={20} className="animate-spin text-muted" />
+            </div>
+          ) : (
+            <>
+              {/* Estado atual do consentimento */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Radio size={16} className="text-accent" />
+                    <h2 className="font-semibold text-heading">
+                      {t('licensing.telemetry.title')}
+                    </h2>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <p className="text-sm text-muted mb-4">
+                    {t('licensing.telemetry.description')}
+                  </p>
+                  <dl className="space-y-3">
+                    <div className="flex justify-between">
+                      <dt className="text-sm text-muted">{t('licensing.telemetry.status')}</dt>
+                      <dd>
+                        <Badge
+                          variant={
+                            telemetryConsent?.status === 'Granted'
+                              ? 'success'
+                              : telemetryConsent?.status === 'Partial'
+                                ? 'warning'
+                                : telemetryConsent?.status === 'Denied'
+                                  ? 'danger'
+                                  : 'default'
+                          }
+                        >
+                          {telemetryConsent?.status === 'Granted'
+                            ? t('licensing.telemetry.statuses.granted')
+                            : telemetryConsent?.status === 'Partial'
+                              ? t('licensing.telemetry.statuses.partial')
+                              : telemetryConsent?.status === 'Denied'
+                                ? t('licensing.telemetry.statuses.denied')
+                                : t('licensing.telemetry.statuses.notRequested')}
+                        </Badge>
+                      </dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-sm text-muted">
+                        {t('licensing.telemetry.usageMetrics')}
+                      </dt>
+                      <dd>
+                        {telemetryConsent?.allowUsageMetrics ? (
+                          <CheckCircle size={16} className="text-success" />
+                        ) : (
+                          <XCircle size={16} className="text-critical" />
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-sm text-muted">
+                        {t('licensing.telemetry.performanceData')}
+                      </dt>
+                      <dd>
+                        {telemetryConsent?.allowPerformanceData ? (
+                          <CheckCircle size={16} className="text-success" />
+                        ) : (
+                          <XCircle size={16} className="text-critical" />
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-sm text-muted">
+                        {t('licensing.telemetry.errorDiagnostics')}
+                      </dt>
+                      <dd>
+                        {telemetryConsent?.allowErrorDiagnostics ? (
+                          <CheckCircle size={16} className="text-success" />
+                        ) : (
+                          <XCircle size={16} className="text-critical" />
+                        )}
+                      </dd>
+                    </div>
+                    {telemetryConsent?.updatedBy && (
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-muted">
+                          {t('licensing.telemetry.lastUpdatedBy')}
+                        </dt>
+                        <dd className="text-sm text-heading">{telemetryConsent.updatedBy}</dd>
+                      </div>
+                    )}
+                    {telemetryConsent?.updatedAt && (
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-muted">
+                          {t('licensing.telemetry.lastUpdatedAt')}
+                        </dt>
+                        <dd className="text-sm text-heading">
+                          {new Date(telemetryConsent.updatedAt).toLocaleString()}
+                        </dd>
+                      </div>
+                    )}
+                    {telemetryConsent?.reason && (
+                      <div className="flex justify-between">
+                        <dt className="text-sm text-muted">
+                          {t('licensing.telemetry.reason')}
+                        </dt>
+                        <dd className="text-sm text-heading">{telemetryConsent.reason}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </CardBody>
+              </Card>
+
+              {/* Ações de consentimento */}
+              <Card>
+                <CardHeader>
+                  <h2 className="font-semibold text-heading">
+                    {t('licensing.telemetry.actions')}
+                  </h2>
+                </CardHeader>
+                <CardBody>
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant="primary"
+                      onClick={() =>
+                        updateTelemetryMutation.mutate({
+                          licenseKey,
+                          action: 'grant',
+                          updatedBy: user?.email ?? 'unknown',
+                          reason: 'Full consent granted',
+                        })
+                      }
+                      disabled={
+                        updateTelemetryMutation.isPending ||
+                        telemetryConsent?.status === 'Granted'
+                      }
+                    >
+                      <CheckCircle size={14} />
+                      {t('licensing.telemetry.grantAll')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        updateTelemetryMutation.mutate({
+                          licenseKey,
+                          action: 'partial',
+                          updatedBy: user?.email ?? 'unknown',
+                          allowUsageMetrics: true,
+                          allowPerformanceData: false,
+                          allowErrorDiagnostics: false,
+                          reason: 'Partial consent — aggregated metrics only',
+                        })
+                      }
+                      disabled={updateTelemetryMutation.isPending}
+                    >
+                      <AlertTriangle size={14} />
+                      {t('licensing.telemetry.grantPartial')}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => {
+                        if (window.confirm(t('licensing.telemetry.confirmDeny'))) {
+                          updateTelemetryMutation.mutate({
+                            licenseKey,
+                            action: 'deny',
+                            updatedBy: user?.email ?? 'unknown',
+                            reason: 'Consent denied by tenant administrator',
+                          });
+                        }
+                      }}
+                      disabled={
+                        updateTelemetryMutation.isPending ||
+                        telemetryConsent?.status === 'Denied'
+                      }
+                    >
+                      <XCircle size={14} />
+                      {t('licensing.telemetry.denyAll')}
+                    </Button>
+                  </div>
+                  {updateTelemetryMutation.isError && (
+                    <p className="text-sm text-critical mt-3">
+                      {t('licensing.telemetry.updateFailed')}
+                    </p>
+                  )}
+                  {updateTelemetryMutation.isSuccess && (
+                    <p className="text-sm text-success mt-3">
+                      {t('licensing.telemetry.updateSuccess')}
+                    </p>
+                  )}
+                </CardBody>
+              </Card>
+            </>
+          )}
         </div>
       )}
     </div>

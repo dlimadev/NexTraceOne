@@ -54,7 +54,30 @@ export interface IssueLicenseResponse {
   deploymentModel: string;
 }
 
-/** API do módulo de Licensing — ativação, verificação, quotas e trial. */
+/** Tipos para consentimento de telemetria. */
+export interface TelemetryConsentResponse {
+  licenseId: string;
+  licenseKey: string;
+  status: string;
+  allowUsageMetrics: boolean;
+  allowPerformanceData: boolean;
+  allowErrorDiagnostics: boolean;
+  updatedBy?: string;
+  updatedAt?: string;
+  reason?: string;
+}
+
+export interface UpdateTelemetryConsentRequest {
+  licenseKey: string;
+  action: 'grant' | 'deny' | 'partial';
+  updatedBy: string;
+  reason?: string;
+  allowUsageMetrics?: boolean;
+  allowPerformanceData?: boolean;
+  allowErrorDiagnostics?: boolean;
+}
+
+/** API do módulo de Licensing — ativação, verificação, quotas, trial e telemetria. */
 export const licensingApi = {
   activate: (data: { licenseKey: string; hardwareFingerprint: string }) =>
     client
@@ -116,6 +139,20 @@ export const licensingApi = {
   getHealth: (licenseKey: string) =>
     client
       .get<LicenseHealthResult>('/licensing/health', { params: { licenseKey } })
+      .then((r) => r.data),
+
+  // ─── Telemetry Consent (LGPD/GDPR) ─────────────────────────────
+
+  getTelemetryConsent: (licenseKey: string) =>
+    client
+      .get<TelemetryConsentResponse>('/licensing/telemetry-consent', {
+        params: { licenseKey },
+      })
+      .then((r) => r.data),
+
+  updateTelemetryConsent: (data: UpdateTelemetryConsentRequest) =>
+    client
+      .post<TelemetryConsentResponse>('/licensing/telemetry-consent', data)
       .then((r) => r.data),
 
   // ─── Vendor Operations (backoffice interno) ─────────────────────

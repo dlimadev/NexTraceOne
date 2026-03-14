@@ -4,7 +4,8 @@ namespace NexTraceOne.Licensing.Application.Abstractions;
 
 /// <summary>
 /// Repositório de licenças do módulo Licensing.
-/// Inclui operações de leitura e escrita para o aggregate License.
+/// Inclui operações de leitura e escrita para o aggregate License
+/// e entidades relacionadas (TelemetryConsent).
 /// </summary>
 public interface ILicenseRepository
 {
@@ -22,4 +23,11 @@ public interface ILicenseRepository
 
     /// <summary>Adiciona uma nova licença para persistência.</summary>
     void Add(License license);
+
+    /// <summary>Obtém o consentimento de telemetria associado a uma licença.</summary>
+    Task<TelemetryConsent?> GetTelemetryConsentByLicenseIdAsync(
+        LicenseId licenseId, CancellationToken cancellationToken);
+
+    /// <summary>Adiciona um novo registro de consentimento de telemetria.</summary>
+    void AddTelemetryConsent(TelemetryConsent consent);
 }

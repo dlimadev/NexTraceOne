@@ -7,7 +7,8 @@ namespace NexTraceOne.Licensing.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de licenças com eager loading completo do aggregate.
-/// Inclui suporte a listagem paginada para vendor operations.
+/// Inclui suporte a listagem paginada para vendor operations
+/// e gestão de consentimento de telemetria.
 /// </summary>
 internal sealed class LicenseRepository(LicensingDbContext context)
     : RepositoryBase<License, LicenseId>(context), ILicenseRepository
@@ -36,6 +37,16 @@ internal sealed class LicenseRepository(LicensingDbContext context)
 
         return (items.AsReadOnly(), totalCount);
     }
+
+    /// <summary>Obtém o consentimento de telemetria associado a uma licença.</summary>
+    public async Task<TelemetryConsent?> GetTelemetryConsentByLicenseIdAsync(
+        LicenseId licenseId, CancellationToken cancellationToken)
+        => await context.TelemetryConsents
+            .SingleOrDefaultAsync(c => c.LicenseId == licenseId, cancellationToken);
+
+    /// <summary>Adiciona um novo registro de consentimento de telemetria.</summary>
+    public void AddTelemetryConsent(TelemetryConsent consent)
+        => context.TelemetryConsents.Add(consent);
 
     private static IQueryable<License> IncludeGraph(IQueryable<License> query)
         => query
