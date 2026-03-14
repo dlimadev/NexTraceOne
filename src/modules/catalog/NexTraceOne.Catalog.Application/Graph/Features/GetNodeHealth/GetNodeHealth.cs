@@ -2,10 +2,10 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Enums;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.GetNodeHealth;
+namespace NexTraceOne.Catalog.Application.Graph.Features.GetNodeHealth;
 
 /// <summary>
 /// Feature: GetNodeHealth — obtém dados de saúde/métricas para overlay explicável.

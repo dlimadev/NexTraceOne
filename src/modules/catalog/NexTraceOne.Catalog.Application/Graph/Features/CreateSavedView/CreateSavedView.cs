@@ -3,10 +3,10 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.CreateSavedView;
+namespace NexTraceOne.Catalog.Application.Graph.Features.CreateSavedView;
 
 /// <summary>
 /// Feature: CreateSavedView — persiste uma configuração de visualização do grafo

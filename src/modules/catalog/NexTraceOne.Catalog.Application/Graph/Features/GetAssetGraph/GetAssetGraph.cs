@@ -2,11 +2,11 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.GetAssetGraph;
+namespace NexTraceOne.Catalog.Application.Graph.Features.GetAssetGraph;
 
 /// <summary>
 /// Feature: GetAssetGraph — obtém o grafo completo de ativos e suas relações de consumo.

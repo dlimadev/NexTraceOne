@@ -1,11 +1,11 @@
 using FluentAssertions;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using GetImpactPropagationFeature = NexTraceOne.EngineeringGraph.Application.Features.GetImpactPropagation.GetImpactPropagation;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using GetImpactPropagationFeature = NexTraceOne.Catalog.Application.Graph.Features.GetImpactPropagation.GetImpactPropagation;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler GetImpactPropagation que calcula a propagação de impacto
@@ -108,7 +108,7 @@ public sealed class GetImpactPropagationTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.Impact.RootNotFound");
+        result.Error.Code.Should().Be("CatalogGraph.Impact.RootNotFound");
     }
 
     [Fact]

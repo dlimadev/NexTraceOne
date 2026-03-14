@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.RegisterApiAsset;
+namespace NexTraceOne.Catalog.Application.Graph.Features.RegisterApiAsset;
 
 /// <summary>
 /// Feature: RegisterApiAsset — registra uma nova API no grafo de engenharia.
@@ -50,13 +50,13 @@ public static class RegisterApiAsset
             var ownerService = await serviceAssetRepository.GetByIdAsync(ownerServiceId, cancellationToken);
             if (ownerService is null)
             {
-                return EngineeringGraphErrors.ServiceAssetNotFound(request.OwnerServiceAssetId.ToString());
+                return CatalogGraphErrors.ServiceAssetNotFound(request.OwnerServiceAssetId.ToString());
             }
 
             var existing = await apiAssetRepository.GetByNameAndOwnerAsync(request.Name, ownerServiceId, cancellationToken);
             if (existing is not null)
             {
-                return EngineeringGraphErrors.ApiAssetAlreadyExists(request.Name);
+                return CatalogGraphErrors.ApiAssetAlreadyExists(request.Name);
             }
 
             var apiAsset = ApiAsset.Register(request.Name, request.RoutePattern, request.Version, request.Visibility, ownerService);

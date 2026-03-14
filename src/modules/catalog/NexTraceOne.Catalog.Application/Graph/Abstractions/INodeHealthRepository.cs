@@ -1,7 +1,7 @@
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
-namespace NexTraceOne.EngineeringGraph.Application.Abstractions;
+namespace NexTraceOne.Catalog.Application.Graph.Abstractions;
 
 /// <summary>
 /// Repositório de registros de saúde/métricas de nós do grafo.

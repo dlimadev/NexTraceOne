@@ -1,11 +1,11 @@
 using FluentAssertions;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using ImportFromKongFeature = NexTraceOne.EngineeringGraph.Application.Features.ImportFromKongGateway.ImportFromKongGateway;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using ImportFromKongFeature = NexTraceOne.Catalog.Application.Graph.Features.ImportFromKongGateway.ImportFromKongGateway;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler ImportFromKongGateway para importação de serviços e rotas do Kong.

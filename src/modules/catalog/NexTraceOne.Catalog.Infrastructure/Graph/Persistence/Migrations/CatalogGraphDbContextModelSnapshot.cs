@@ -3,15 +3,15 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
 {
-    [DbContext(typeof(EngineeringGraphDbContext))]
-    partial class EngineeringGraphDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CatalogGraphDbContext))]
+    partial class CatalogGraphDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -62,7 +62,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ApiAsset", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -100,7 +100,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("eg_api_assets", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ConsumerAsset", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ConsumerAsset", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -125,7 +125,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("eg_consumer_assets", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ConsumerRelationship", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ConsumerRelationship", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -163,7 +163,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("eg_consumer_relationships", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.DiscoverySource", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoverySource", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -195,7 +195,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("eg_discovery_sources", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.GraphSnapshot", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.GraphSnapshot", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -235,7 +235,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("graph_snapshots", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.NodeHealthRecord", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.NodeHealthRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -284,7 +284,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("node_health_records", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.SavedGraphView", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.SavedGraphView", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -323,7 +323,7 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("saved_graph_views", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ServiceAsset", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceAsset", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -351,9 +351,9 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.ToTable("eg_service_assets", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ApiAsset", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", b =>
                 {
-                    b.HasOne("NexTraceOne.EngineeringGraph.Domain.Entities.ServiceAsset", "OwnerService")
+                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceAsset", "OwnerService")
                         .WithMany()
                         .HasForeignKey("OwnerServiceId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -362,25 +362,25 @@ namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
                     b.Navigation("OwnerService");
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ConsumerRelationship", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ConsumerRelationship", b =>
                 {
-                    b.HasOne("NexTraceOne.EngineeringGraph.Domain.Entities.ApiAsset", null)
+                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", null)
                         .WithMany("ConsumerRelationships")
                         .HasForeignKey("ApiAssetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.DiscoverySource", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoverySource", b =>
                 {
-                    b.HasOne("NexTraceOne.EngineeringGraph.Domain.Entities.ApiAsset", null)
+                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", null)
                         .WithMany("DiscoverySources")
                         .HasForeignKey("ApiAssetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NexTraceOne.EngineeringGraph.Domain.Entities.ApiAsset", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", b =>
                 {
                     b.Navigation("ConsumerRelationships");
 

@@ -2,9 +2,9 @@ using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.ListSavedViews;
+namespace NexTraceOne.Catalog.Application.Graph.Features.ListSavedViews;
 
 /// <summary>
 /// Feature: ListSavedViews — lista visões salvas do grafo para o usuário corrente.

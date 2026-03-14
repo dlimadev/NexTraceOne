@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.MapConsumerRelationship;
+namespace NexTraceOne.Catalog.Application.Graph.Features.MapConsumerRelationship;
 
 /// <summary>
 /// Feature: MapConsumerRelationship — mapeia ou actualiza a relação de consumo de uma API.
@@ -54,7 +54,7 @@ public static class MapConsumerRelationship
             var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
             if (apiAsset is null)
             {
-                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+                return CatalogGraphErrors.ApiAssetNotFound(request.ApiAssetId);
             }
 
             var consumerAsset = ConsumerAsset.Create(request.ConsumerName, request.ConsumerKind, request.ConsumerEnvironment);

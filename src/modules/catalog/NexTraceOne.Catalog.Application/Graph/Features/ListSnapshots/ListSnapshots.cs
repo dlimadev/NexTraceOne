@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.ListSnapshots;
+namespace NexTraceOne.Catalog.Application.Graph.Features.ListSnapshots;
 
 /// <summary>
 /// Feature: ListSnapshots — lista os snapshots temporais do grafo, ordenados do mais recente ao mais antigo.

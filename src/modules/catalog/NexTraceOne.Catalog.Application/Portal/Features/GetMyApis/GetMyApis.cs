@@ -28,7 +28,7 @@ public static class GetMyApis
 
     /// <summary>
     /// Handler que retorna APIs de um owner.
-    /// Em produção, consulta EngineeringGraph para APIs com ownership atribuído.
+    /// Em produção, consulta Catalog Graph para APIs com ownership atribuído.
     /// </summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {

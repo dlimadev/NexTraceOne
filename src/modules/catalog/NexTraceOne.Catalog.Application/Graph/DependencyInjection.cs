@@ -2,33 +2,33 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.EngineeringGraph.Application.Features.CreateGraphSnapshot;
-using NexTraceOne.EngineeringGraph.Application.Features.CreateSavedView;
-using NexTraceOne.EngineeringGraph.Application.Features.DecommissionAsset;
-using NexTraceOne.EngineeringGraph.Application.Features.GetAssetDetail;
-using NexTraceOne.EngineeringGraph.Application.Features.GetImpactPropagation;
-using NexTraceOne.EngineeringGraph.Application.Features.GetNodeHealth;
-using NexTraceOne.EngineeringGraph.Application.Features.GetSubgraph;
-using NexTraceOne.EngineeringGraph.Application.Features.GetTemporalDiff;
-using NexTraceOne.EngineeringGraph.Application.Features.InferDependencyFromOtel;
-using NexTraceOne.EngineeringGraph.Application.Features.MapConsumerRelationship;
-using NexTraceOne.EngineeringGraph.Application.Features.RegisterApiAsset;
-using NexTraceOne.EngineeringGraph.Application.Features.RegisterServiceAsset;
-using NexTraceOne.EngineeringGraph.Application.Features.SearchAssets;
-using NexTraceOne.EngineeringGraph.Application.Features.SyncConsumers;
-using NexTraceOne.EngineeringGraph.Application.Features.UpdateAssetMetadata;
-using NexTraceOne.EngineeringGraph.Application.Features.ValidateDiscoveredDependency;
+using NexTraceOne.Catalog.Application.Graph.Features.CreateGraphSnapshot;
+using NexTraceOne.Catalog.Application.Graph.Features.CreateSavedView;
+using NexTraceOne.Catalog.Application.Graph.Features.DecommissionAsset;
+using NexTraceOne.Catalog.Application.Graph.Features.GetAssetDetail;
+using NexTraceOne.Catalog.Application.Graph.Features.GetImpactPropagation;
+using NexTraceOne.Catalog.Application.Graph.Features.GetNodeHealth;
+using NexTraceOne.Catalog.Application.Graph.Features.GetSubgraph;
+using NexTraceOne.Catalog.Application.Graph.Features.GetTemporalDiff;
+using NexTraceOne.Catalog.Application.Graph.Features.InferDependencyFromOtel;
+using NexTraceOne.Catalog.Application.Graph.Features.MapConsumerRelationship;
+using NexTraceOne.Catalog.Application.Graph.Features.RegisterApiAsset;
+using NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset;
+using NexTraceOne.Catalog.Application.Graph.Features.SearchAssets;
+using NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers;
+using NexTraceOne.Catalog.Application.Graph.Features.UpdateAssetMetadata;
+using NexTraceOne.Catalog.Application.Graph.Features.ValidateDiscoveredDependency;
 
-namespace NexTraceOne.EngineeringGraph.Application;
+namespace NexTraceOne.Catalog.Application.Graph;
 
 /// <summary>
-/// Registra serviços da camada Application do módulo EngineeringGraph.
+/// Registra serviços da camada Application do módulo Catalog Graph.
 /// Inclui: MediatR handlers, FluentValidation validators para todas as features,
 /// incluindo temporalidade, propagação de impacto, overlays e saved views.
 /// </summary>
 public static class DependencyInjection
 {
-    public static IServiceCollection AddEngineeringGraphApplication(
+    public static IServiceCollection AddCatalogGraphApplication(
         this IServiceCollection services,
         IConfiguration configuration)
     {

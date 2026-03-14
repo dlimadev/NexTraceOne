@@ -16,7 +16,7 @@ public sealed class Release : AggregateRoot<ReleaseId>
 {
     private Release() { }
 
-    /// <summary>Identificador do ativo de API correspondente no módulo EngineeringGraph.</summary>
+    /// <summary>Identificador do ativo de API correspondente no módulo Catalog Graph.</summary>
     public Guid ApiAssetId { get; private set; }
 
     /// <summary>Nome do serviço que gerou a release.</summary>

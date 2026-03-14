@@ -8,7 +8,7 @@ namespace NexTraceOne.DeveloperPortal.Application.Features.GetApiConsumers;
 
 /// <summary>
 /// Feature: GetApiConsumers — lista consumidores formais de uma API.
-/// Combina subscrições do portal com dados do EngineeringGraph.
+/// Combina subscrições do portal com dados do Catalog Graph.
 /// Permite ao produtor ver quem consome e como.
 /// </summary>
 public static class GetApiConsumers
@@ -27,7 +27,7 @@ public static class GetApiConsumers
 
     /// <summary>
     /// Handler que retorna consumidores de uma API via subscrições registadas.
-    /// Em produção, complementa com dados do EngineeringGraph para dependências reais.
+    /// Em produção, complementa com dados do Catalog Graph para dependências reais.
     /// </summary>
     public sealed class Handler(ISubscriptionRepository repository) : IQueryHandler<Query, Response>
     {

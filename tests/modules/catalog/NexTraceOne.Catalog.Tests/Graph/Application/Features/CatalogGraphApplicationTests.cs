@@ -1,19 +1,19 @@
 using FluentAssertions;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using RegisterApiAssetFeature = NexTraceOne.EngineeringGraph.Application.Features.RegisterApiAsset.RegisterApiAsset;
-using RegisterServiceAssetFeature = NexTraceOne.EngineeringGraph.Application.Features.RegisterServiceAsset.RegisterServiceAsset;
-using MapConsumerRelationshipFeature = NexTraceOne.EngineeringGraph.Application.Features.MapConsumerRelationship.MapConsumerRelationship;
-using GetAssetGraphFeature = NexTraceOne.EngineeringGraph.Application.Features.GetAssetGraph.GetAssetGraph;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using RegisterApiAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterApiAsset.RegisterApiAsset;
+using RegisterServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset.RegisterServiceAsset;
+using MapConsumerRelationshipFeature = NexTraceOne.Catalog.Application.Graph.Features.MapConsumerRelationship.MapConsumerRelationship;
+using GetAssetGraphFeature = NexTraceOne.Catalog.Application.Graph.Features.GetAssetGraph.GetAssetGraph;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
-/// Testes de handlers da camada Application do módulo EngineeringGraph.
+/// Testes de handlers da camada Application do módulo Catalog Graph.
 /// </summary>
-public sealed class EngineeringGraphApplicationTests
+public sealed class CatalogGraphApplicationTests
 {
     // ── RegisterServiceAsset ──────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ public sealed class EngineeringGraphApplicationTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.ServiceAsset.AlreadyExists");
+        result.Error.Code.Should().Be("CatalogGraph.ServiceAsset.AlreadyExists");
         repository.DidNotReceive().Add(Arg.Any<ServiceAsset>());
     }
 
@@ -96,7 +96,7 @@ public sealed class EngineeringGraphApplicationTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.ServiceAsset.NotFound");
+        result.Error.Code.Should().Be("CatalogGraph.ServiceAsset.NotFound");
         apiAssetRepository.DidNotReceive().Add(Arg.Any<ApiAsset>());
     }
 
@@ -118,7 +118,7 @@ public sealed class EngineeringGraphApplicationTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.ApiAsset.AlreadyExists");
+        result.Error.Code.Should().Be("CatalogGraph.ApiAsset.AlreadyExists");
     }
 
     // ── MapConsumerRelationship ───────────────────────────────────────────
@@ -176,7 +176,7 @@ public sealed class EngineeringGraphApplicationTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.ApiAsset.NotFound");
+        result.Error.Code.Should().Be("CatalogGraph.ApiAsset.NotFound");
     }
 
     // ── GetAssetGraph ─────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 using FluentAssertions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Graph.Domain.Entities;
 
 /// <summary>
 /// Testes de domínio para a entidade ConsumerRelationship que representa

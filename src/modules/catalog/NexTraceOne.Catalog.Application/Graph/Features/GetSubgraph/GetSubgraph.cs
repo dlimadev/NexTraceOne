@@ -2,10 +2,10 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.GetSubgraph;
+namespace NexTraceOne.Catalog.Application.Graph.Features.GetSubgraph;
 
 /// <summary>
 /// Feature: GetSubgraph — obtém um subgrafo focado em um nó raiz com profundidade configurável.
@@ -50,7 +50,7 @@ public static class GetSubgraph
 
             if (rootApi is null && rootService is null)
             {
-                return Domain.Errors.EngineeringGraphErrors.ImpactRootNodeNotFound(request.RootNodeId);
+                return NexTraceOne.Catalog.Domain.Graph.Errors.CatalogGraphErrors.ImpactRootNodeNotFound(request.RootNodeId);
             }
 
             var serviceNodes = new List<SubgraphServiceNode>();

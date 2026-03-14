@@ -2,10 +2,10 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.GetTemporalDiff;
+namespace NexTraceOne.Catalog.Application.Graph.Features.GetTemporalDiff;
 
 /// <summary>
 /// Feature: GetTemporalDiff — compara dois snapshots do grafo e retorna as diferenças.
@@ -39,14 +39,14 @@ public static class GetTemporalDiff
             Guard.Against.Null(request);
 
             var from = await snapshotRepository.GetByIdAsync(
-                Domain.Entities.GraphSnapshotId.From(request.FromSnapshotId), cancellationToken);
+                NexTraceOne.Catalog.Domain.Graph.Entities.GraphSnapshotId.From(request.FromSnapshotId), cancellationToken);
             if (from is null)
-                return EngineeringGraphErrors.GraphSnapshotNotFound(request.FromSnapshotId);
+                return CatalogGraphErrors.GraphSnapshotNotFound(request.FromSnapshotId);
 
             var to = await snapshotRepository.GetByIdAsync(
-                Domain.Entities.GraphSnapshotId.From(request.ToSnapshotId), cancellationToken);
+                NexTraceOne.Catalog.Domain.Graph.Entities.GraphSnapshotId.From(request.ToSnapshotId), cancellationToken);
             if (to is null)
-                return EngineeringGraphErrors.GraphSnapshotNotFound(request.ToSnapshotId);
+                return CatalogGraphErrors.GraphSnapshotNotFound(request.ToSnapshotId);
 
             var nodesAdded = Math.Max(0, to.NodeCount - from.NodeCount);
             var nodesRemoved = Math.Max(0, from.NodeCount - to.NodeCount);

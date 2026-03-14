@@ -1,4 +1,4 @@
-namespace NexTraceOne.EngineeringGraph.Domain.Enums;
+namespace NexTraceOne.Catalog.Domain.Graph.Enums;
 
 /// <summary>
 /// Status de saúde de um nó no grafo de engenharia.

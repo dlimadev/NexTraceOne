@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 using System.Text.Json;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.CreateGraphSnapshot;
+namespace NexTraceOne.Catalog.Application.Graph.Features.CreateGraphSnapshot;
 
 /// <summary>
 /// Feature: CreateGraphSnapshot — materializa o estado atual do grafo como snapshot temporal.

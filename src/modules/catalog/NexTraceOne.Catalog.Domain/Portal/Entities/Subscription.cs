@@ -18,7 +18,7 @@ public sealed class Subscription : AggregateRoot<SubscriptionId>
 {
     private Subscription() { }
 
-    /// <summary>Identificador do ativo de API subscrito no módulo EngineeringGraph.</summary>
+    /// <summary>Identificador do ativo de API subscrito no módulo Catalog Graph.</summary>
     public Guid ApiAssetId { get; private set; }
 
     /// <summary>Nome legível da API subscrita.</summary>

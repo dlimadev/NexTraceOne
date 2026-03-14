@@ -1,9 +1,9 @@
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Application.Abstractions;
+namespace NexTraceOne.Catalog.Application.Graph.Abstractions;
 
 /// <summary>
-/// Repositório de ativos de serviço do módulo EngineeringGraph.
+/// Repositório de ativos de serviço do módulo Catalog Graph.
 /// </summary>
 public interface IServiceAssetRepository
 {

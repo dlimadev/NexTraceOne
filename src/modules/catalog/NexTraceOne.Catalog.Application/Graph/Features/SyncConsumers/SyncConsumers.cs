@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.SyncConsumers;
+namespace NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers;
 
 /// <summary>
 /// Feature: SyncConsumers — endpoint externo seguro para ingestão de consumidores
@@ -95,7 +95,7 @@ public static class SyncConsumers
                         item.ApiAssetId,
                         item.ConsumerName,
                         SyncOutcome.Failed,
-                        "EngineeringGraph.ApiAsset.NotFound"));
+                        "CatalogGraph.ApiAsset.NotFound"));
                     failed++;
                     continue;
                 }
@@ -106,7 +106,7 @@ public static class SyncConsumers
                         item.ApiAssetId,
                         item.ConsumerName,
                         SyncOutcome.Failed,
-                        "EngineeringGraph.ApiAsset.Decommissioned"));
+                        "CatalogGraph.ApiAsset.Decommissioned"));
                     failed++;
                     continue;
                 }

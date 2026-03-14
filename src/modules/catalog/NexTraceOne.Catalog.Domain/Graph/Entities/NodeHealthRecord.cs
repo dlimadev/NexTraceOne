@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.EngineeringGraph.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
-namespace NexTraceOne.EngineeringGraph.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Graph.Entities;
 
 /// <summary>
 /// Registro de saúde/métricas de um nó do grafo para overlays explicáveis.

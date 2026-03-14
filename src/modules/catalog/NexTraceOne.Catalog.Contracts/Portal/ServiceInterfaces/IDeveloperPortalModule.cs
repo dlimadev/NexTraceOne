@@ -21,7 +21,7 @@ public interface IDeveloperPortalModule
 
     /// <summary>
     /// Obtém o número total de subscrições ativas para um dado API asset.
-    /// Permite ao módulo EngineeringGraph ou Contracts exibir informações
+    /// Permite ao módulo Catalog Graph ou Contracts exibir informações
     /// de popularidade de uma API no catálogo.
     /// </summary>
     Task<int> GetActiveSubscriptionCountAsync(Guid apiAssetId, CancellationToken cancellationToken);

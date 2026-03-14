@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Configurations;
 
 internal sealed class ApiAssetConfiguration : IEntityTypeConfiguration<ApiAsset>
 {

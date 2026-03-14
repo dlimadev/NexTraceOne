@@ -538,15 +538,15 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c010"),
-                            Code = "engineering-graph:assets:read",
-                            Module = "EngineeringGraph",
+                            Code = "catalog:assets:read",
+                            Module = "Catalog",
                             Name = "View service and API assets"
                         },
                         new
                         {
                             Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c011"),
-                            Code = "engineering-graph:assets:write",
-                            Module = "EngineeringGraph",
+                            Code = "catalog:assets:write",
+                            Module = "Catalog",
                             Name = "Create and update assets"
                         },
                         new

@@ -1,11 +1,11 @@
 using FluentAssertions;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using SyncConsumersFeature = NexTraceOne.EngineeringGraph.Application.Features.SyncConsumers.SyncConsumers;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using SyncConsumersFeature = NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers.SyncConsumers;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler SyncConsumers para integração inbound externa.
@@ -114,7 +114,7 @@ public sealed class SyncConsumersTests
         result.Value.Created.Should().Be(0);
         result.Value.Results.Should().ContainSingle(r =>
             r.Outcome == SyncConsumersFeature.SyncOutcome.Failed
-            && r.ErrorCode == "EngineeringGraph.ApiAsset.NotFound");
+            && r.ErrorCode == "CatalogGraph.ApiAsset.NotFound");
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public sealed class SyncConsumersTests
         result.Value.Failed.Should().Be(1);
         result.Value.Results.Should().ContainSingle(r =>
             r.Outcome == SyncConsumersFeature.SyncOutcome.Failed
-            && r.ErrorCode == "EngineeringGraph.ApiAsset.Decommissioned");
+            && r.ErrorCode == "CatalogGraph.ApiAsset.Decommissioned");
     }
 
     [Fact]

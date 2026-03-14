@@ -1,10 +1,10 @@
 using FluentAssertions;
 using NSubstitute;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using GetSubgraphFeature = NexTraceOne.EngineeringGraph.Application.Features.GetSubgraph.GetSubgraph;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using GetSubgraphFeature = NexTraceOne.Catalog.Application.Graph.Features.GetSubgraph.GetSubgraph;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler GetSubgraph que constrói mini-grafos contextuais
@@ -86,7 +86,7 @@ public sealed class GetSubgraphTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.Impact.RootNotFound");
+        result.Error.Code.Should().Be("CatalogGraph.Impact.RootNotFound");
     }
 
     [Fact]

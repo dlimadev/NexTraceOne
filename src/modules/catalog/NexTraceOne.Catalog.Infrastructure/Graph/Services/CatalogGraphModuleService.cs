@@ -1,16 +1,16 @@
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Contracts.ServiceInterfaces;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Infrastructure.Services;
+namespace NexTraceOne.Catalog.Infrastructure.Graph.Services;
 
 /// <summary>
-/// Implementação do contrato público do módulo EngineeringGraph.
+/// Implementação do contrato público do módulo Catalog Graph.
 /// Outros módulos consomem esta interface — nunca o DbContext ou repositórios directamente.
 /// </summary>
-internal sealed class EngineeringGraphModuleService(
+internal sealed class CatalogGraphModuleService(
     IApiAssetRepository apiAssetRepository,
-    IServiceAssetRepository serviceAssetRepository) : IEngineeringGraphModule
+    IServiceAssetRepository serviceAssetRepository) : ICatalogGraphModule
 {
     /// <inheritdoc />
     public async Task<bool> ApiAssetExistsAsync(Guid apiAssetId, CancellationToken cancellationToken)

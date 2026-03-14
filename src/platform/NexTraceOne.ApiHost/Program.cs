@@ -7,7 +7,7 @@ using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Identity.API;
 using NexTraceOne.Licensing.API;
-using NexTraceOne.EngineeringGraph.API;
+using NexTraceOne.Catalog.API.Graph;
 using NexTraceOne.Contracts.API;
 using NexTraceOne.ChangeIntelligence.API;
 using NexTraceOne.RulesetGovernance.API;
@@ -43,7 +43,7 @@ builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddLicensingModule(builder.Configuration);
-builder.Services.AddEngineeringGraphModule(builder.Configuration);
+builder.Services.AddCatalogGraphModule(builder.Configuration);
 builder.Services.AddContractsModule(builder.Configuration);
 builder.Services.AddChangeIntelligenceModule(builder.Configuration);
 builder.Services.AddRulesetGovernanceModule(builder.Configuration);

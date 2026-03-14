@@ -1,11 +1,11 @@
-namespace NexTraceOne.EngineeringGraph.Contracts.ServiceInterfaces;
+namespace NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 
 /// <summary>
-/// Interface pública do módulo EngineeringGraph.
+/// Interface pública do módulo Catalog Graph.
 /// Outros módulos que precisarem de dados deste módulo devem usar
 /// este contrato — nunca acessar o DbContext ou repositórios diretamente.
 /// </summary>
-public interface IEngineeringGraphModule
+public interface ICatalogGraphModule
 {
     /// <summary>Verifica se um ativo de API existe pelo seu identificador.</summary>
     Task<bool> ApiAssetExistsAsync(Guid apiAssetId, CancellationToken cancellationToken);

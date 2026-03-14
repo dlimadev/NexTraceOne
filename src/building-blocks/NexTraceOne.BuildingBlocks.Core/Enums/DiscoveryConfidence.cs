@@ -2,7 +2,7 @@ namespace NexTraceOne.BuildingBlocks.Core.Enums;
 
 /// <summary>
 /// Modelo de confiança para dependências descobertas entre serviços.
-/// Usado pelo módulo EngineeringGraph para classificar a qualidade da descoberta.
+/// Usado pelo módulo Catalog Graph para classificar a qualidade da descoberta.
 /// </summary>
 public enum DiscoveryConfidence
 {

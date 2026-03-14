@@ -2,25 +2,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
-namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
+namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 
 /// <summary>
 /// Fábrica de DbContext para uso em tempo de design (EF Core migrations).
 /// Fornece implementações mínimas de ICurrentTenant, ICurrentUser e IDateTimeProvider.
 /// </summary>
-internal sealed class EngineeringGraphDbContextDesignTimeFactory : IDesignTimeDbContextFactory<EngineeringGraphDbContext>
+internal sealed class CatalogGraphDbContextDesignTimeFactory : IDesignTimeDbContextFactory<CatalogGraphDbContext>
 {
-    /// <summary>Cria instância do EngineeringGraphDbContext configurada para geração de migrations.</summary>
-    public EngineeringGraphDbContext CreateDbContext(string[] args)
+    /// <summary>Cria instância do CatalogGraphDbContext configurada para geração de migrations.</summary>
+    public CatalogGraphDbContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<EngineeringGraphDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<CatalogGraphDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
             ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=ouro18";
 
         optionsBuilder.UseNpgsql(connectionString,
-            npgsql => npgsql.MigrationsAssembly(typeof(EngineeringGraphDbContext).Assembly.FullName));
+            npgsql => npgsql.MigrationsAssembly(typeof(CatalogGraphDbContext).Assembly.FullName));
 
-        return new EngineeringGraphDbContext(
+        return new CatalogGraphDbContext(
             optionsBuilder.Options,
             new DesignTimeCurrentTenant(),
             new DesignTimeCurrentUser(),
