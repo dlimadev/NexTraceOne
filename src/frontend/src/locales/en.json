@@ -51,7 +51,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Overview of your change intelligence platform",
+    "subtitle": "Source of truth for services, contracts, changes and operational knowledge",
     "activeServices": "Active Services",
     "registeredApis": "Registered APIs",
     "consumerRelations": "Consumer Relations",
@@ -81,7 +81,25 @@
     "changeIntelligence": "Change Intelligence",
     "sectionPlatform": "Platform",
     "sectionAdmin": "Administration",
-    "mySessions": "My Sessions"
+    "mySessions": "My Sessions",
+    "tagline": "Engineering Governance Platform",
+    "serviceCatalog": "Service Catalog",
+    "apiContracts": "API Contracts",
+    "incidents": "Incidents",
+    "runbooks": "Runbooks",
+    "aiAssistant": "AI Assistant",
+    "modelRegistry": "Model Registry",
+    "aiPolicies": "AI Policies",
+    "reports": "Reports",
+    "riskCenter": "Risk Center",
+    "compliance": "Compliance",
+    "finops": "FinOps",
+    "sectionServices": "Services",
+    "sectionContracts": "Contracts",
+    "sectionChanges": "Changes",
+    "sectionOperations": "Operations",
+    "sectionAiHub": "AI Hub",
+    "sectionGovernance": "Governance"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -1083,5 +1101,49 @@
       "noPendingActions": "No pending actions at this time.",
       "viewDetails": "View Details"
     }
+  },
+  "incidents": {
+    "title": "Incidents",
+    "subtitle": "Correlate incidents with services, changes and contracts",
+    "emptyTitle": "No incidents recorded",
+    "emptyDescription": "Incident tracking and correlation will be available here."
+  },
+  "runbooks": {
+    "title": "Runbooks",
+    "subtitle": "Operational procedures and mitigation guides",
+    "emptyTitle": "No runbooks available",
+    "emptyDescription": "Operational runbooks and mitigation playbooks will be managed here."
+  },
+  "aiHub": {
+    "assistantTitle": "AI Assistant",
+    "assistantSubtitle": "Context-aware assistant for services, contracts and incidents",
+    "assistantEmptyTitle": "AI Assistant coming soon",
+    "assistantEmptyDescription": "The AI assistant will provide context-aware help grounded in your services, contracts and operational data.",
+    "modelsTitle": "Model Registry",
+    "modelsSubtitle": "Manage internal and external AI models",
+    "modelsEmptyTitle": "No models registered",
+    "modelsEmptyDescription": "Register and govern AI models used across the platform.",
+    "policiesTitle": "AI Policies",
+    "policiesSubtitle": "Govern AI access, tokens and model usage",
+    "policiesEmptyTitle": "No policies defined",
+    "policiesEmptyDescription": "Define AI governance policies for access control, token budgets and model restrictions."
+  },
+  "governance": {
+    "reportsTitle": "Reports",
+    "reportsSubtitle": "Persona-segmented reports and operational analytics",
+    "reportsEmptyTitle": "No reports available",
+    "reportsEmptyDescription": "Reports segmented by persona and operational context will appear here.",
+    "riskTitle": "Risk Center",
+    "riskSubtitle": "Operational risk analysis contextualized by service and change",
+    "riskEmptyTitle": "No risk assessments",
+    "riskEmptyDescription": "Risk analysis linked to services, changes and contracts will be available here.",
+    "complianceTitle": "Compliance",
+    "complianceSubtitle": "Regulatory compliance and governance policies",
+    "complianceEmptyTitle": "No compliance data",
+    "complianceEmptyDescription": "Compliance tracking and governance policy management will be available here.",
+    "finopsTitle": "FinOps",
+    "finopsSubtitle": "Cost optimization by service, team, domain and operation",
+    "finopsEmptyTitle": "No cost data available",
+    "finopsEmptyDescription": "Contextual cost analysis and optimization recommendations will be available here."
   }
 }
