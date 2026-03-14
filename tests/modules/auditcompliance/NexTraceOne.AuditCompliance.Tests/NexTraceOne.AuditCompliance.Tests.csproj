@@ -7,6 +7,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Domain\NexTraceOne.AuditCompliance.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Application\NexTraceOne.AuditCompliance.Application.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Infrastructure\NexTraceOne.AuditCompliance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.API\NexTraceOne.AuditCompliance.API.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Contracts\NexTraceOne.AuditCompliance.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

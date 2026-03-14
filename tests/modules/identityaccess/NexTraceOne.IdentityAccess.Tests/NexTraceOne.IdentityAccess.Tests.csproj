@@ -7,6 +7,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Domain\NexTraceOne.IdentityAccess.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Application\NexTraceOne.IdentityAccess.Application.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Infrastructure\NexTraceOne.IdentityAccess.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.API\NexTraceOne.IdentityAccess.API.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

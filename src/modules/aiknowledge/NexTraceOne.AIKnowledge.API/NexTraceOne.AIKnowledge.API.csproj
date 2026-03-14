@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.AIKnowledge.Application\NexTraceOne.AIKnowledge.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.AIKnowledge.Infrastructure\NexTraceOne.AIKnowledge.Infrastructure.csproj" />
+    <ProjectReference Include="..\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Mapster" />
+  </ItemGroup>
+</Project>

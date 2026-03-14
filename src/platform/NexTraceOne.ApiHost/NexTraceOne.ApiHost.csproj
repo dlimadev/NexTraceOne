@@ -11,13 +11,13 @@
     <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
   </ItemGroup>
   <ItemGroup Label="Bounded Contexts (Infrastructure inclui endpoints)">
-    <ProjectReference Include="..\..\modules\identityaccess\NexTraceOne.IdentityAccess.Infrastructure\NexTraceOne.IdentityAccess.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\commercialgovernance\NexTraceOne.CommercialGovernance.Infrastructure\NexTraceOne.CommercialGovernance.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Infrastructure\NexTraceOne.OperationalIntelligence.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\aiknowledge\NexTraceOne.AIKnowledge.Infrastructure\NexTraceOne.AIKnowledge.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\auditcompliance\NexTraceOne.AuditCompliance.Infrastructure\NexTraceOne.AuditCompliance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\identityaccess\NexTraceOne.IdentityAccess.API\NexTraceOne.IdentityAccess.API.csproj" />
+    <ProjectReference Include="..\..\modules\commercialgovernance\NexTraceOne.CommercialGovernance.API\NexTraceOne.CommercialGovernance.API.csproj" />
+    <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
+    <ProjectReference Include="..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.API\NexTraceOne.ChangeGovernance.API.csproj" />
+    <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.API\NexTraceOne.OperationalIntelligence.API.csproj" />
+    <ProjectReference Include="..\..\modules\aiknowledge\NexTraceOne.AIKnowledge.API\NexTraceOne.AIKnowledge.API.csproj" />
+    <ProjectReference Include="..\..\modules\auditcompliance\NexTraceOne.AuditCompliance.API\NexTraceOne.AuditCompliance.API.csproj" />
   </ItemGroup>
   <ItemGroup Label="Seed Data">
     <Content Include="SeedData\**" CopyToOutputDirectory="PreserveNewest" />

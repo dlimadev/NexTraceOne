@@ -10,9 +10,9 @@
     <ProjectReference Include="..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
   </ItemGroup>
   <ItemGroup Label="Bounded Contexts">
-    <ProjectReference Include="..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Infrastructure\NexTraceOne.OperationalIntelligence.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.API\NexTraceOne.ChangeGovernance.API.csproj" />
+    <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
+    <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.API\NexTraceOne.OperationalIntelligence.API.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" />

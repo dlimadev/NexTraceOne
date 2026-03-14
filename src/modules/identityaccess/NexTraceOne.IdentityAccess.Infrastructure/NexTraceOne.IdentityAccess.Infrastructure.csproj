@@ -12,7 +12,7 @@
     <ProjectReference Include="..\NexTraceOne.IdentityAccess.Domain\NexTraceOne.IdentityAccess.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
-    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Domain\NexTraceOne.AuditCompliance.Domain.csproj" />
+    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Contracts\NexTraceOne.AuditCompliance.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
