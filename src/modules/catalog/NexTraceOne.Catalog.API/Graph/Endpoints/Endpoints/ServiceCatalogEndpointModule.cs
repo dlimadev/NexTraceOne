@@ -10,15 +10,21 @@ using GetAssetDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.Get
 using GetAssetGraphFeature = NexTraceOne.Catalog.Application.Graph.Features.GetAssetGraph.GetAssetGraph;
 using GetImpactPropagationFeature = NexTraceOne.Catalog.Application.Graph.Features.GetImpactPropagation.GetImpactPropagation;
 using GetNodeHealthFeature = NexTraceOne.Catalog.Application.Graph.Features.GetNodeHealth.GetNodeHealth;
+using GetServiceDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceDetail.GetServiceDetail;
+using GetServicesSummaryFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServicesSummary.GetServicesSummary;
 using GetSubgraphFeature = NexTraceOne.Catalog.Application.Graph.Features.GetSubgraph.GetSubgraph;
 using GetTemporalDiffFeature = NexTraceOne.Catalog.Application.Graph.Features.GetTemporalDiff.GetTemporalDiff;
 using ListSavedViewsFeature = NexTraceOne.Catalog.Application.Graph.Features.ListSavedViews.ListSavedViews;
+using ListServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.ListServices.ListServices;
 using ListSnapshotsFeature = NexTraceOne.Catalog.Application.Graph.Features.ListSnapshots.ListSnapshots;
 using MapConsumerRelationshipFeature = NexTraceOne.Catalog.Application.Graph.Features.MapConsumerRelationship.MapConsumerRelationship;
 using RegisterApiAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterApiAsset.RegisterApiAsset;
 using RegisterServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset.RegisterServiceAsset;
 using SearchAssetsFeature = NexTraceOne.Catalog.Application.Graph.Features.SearchAssets.SearchAssets;
+using SearchServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.SearchServices.SearchServices;
 using SyncConsumersFeature = NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers.SyncConsumers;
+using UpdateServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceAsset.UpdateServiceAsset;
+using UpdateServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceOwnership.UpdateServiceOwnership;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints;
 
@@ -101,6 +107,93 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new SearchAssetsFeature.Query(searchTerm), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Catálogo de Serviços: Listagem, Detalhe e Gestão ────────────
+
+        group.MapGet("/services", async (
+            string? teamName,
+            string? domain,
+            ServiceType? serviceType,
+            Criticality? criticality,
+            LifecycleStatus? lifecycleStatus,
+            ExposureType? exposureType,
+            string? search,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ListServicesFeature.Query(
+                teamName, domain, serviceType, criticality,
+                lifecycleStatus, exposureType, search);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/services/{serviceId:guid}", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetServiceDetailFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapPut("/services/{serviceId:guid}", async (
+            Guid serviceId,
+            UpdateServiceAssetFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapGet("/services/{serviceId:guid}/ownership", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetServiceDetailFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapPatch("/services/{serviceId:guid}/ownership", async (
+            Guid serviceId,
+            UpdateServiceOwnershipFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapGet("/services/summary", async (
+            string? teamName,
+            string? domain,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetServicesSummaryFeature.Query(teamName, domain);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/services/search", async (
+            string q,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new SearchServicesFeature.Query(q), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
 
