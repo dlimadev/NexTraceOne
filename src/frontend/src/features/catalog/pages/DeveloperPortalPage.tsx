@@ -17,7 +17,6 @@ import {
   Trash2,
   Plus,
   RefreshCw,
-  Copy,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -509,7 +508,7 @@ export function DeveloperPortalPage() {
                     {t('developerPortal.playground.form.requestBody')}
                   </label>
                   <textarea
-                    className={`${inputClass} h-24 font-mono`}
+                    className={`${fieldClass} h-24 font-mono`}
                     value={playForm.requestBody}
                     onChange={(e) => setPlayForm({ ...playForm, requestBody: e.target.value })}
                   />
