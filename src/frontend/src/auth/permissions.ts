@@ -34,7 +34,7 @@ export type Permission =
   | 'identity:sessions:read'
   | 'identity:sessions:revoke'
   | 'identity:permissions:read'
-  // ── Engineering Graph ──
+  // ── Engineering Graph / Service Catalog ──
   | 'engineering-graph:assets:read'
   | 'engineering-graph:assets:write'
   // ── Contracts ──
@@ -59,6 +59,22 @@ export type Permission =
   // ── Ruleset Governance ──
   | 'ruleset-governance:read'
   | 'ruleset-governance:write'
+  // ── Operations ──
+  | 'operations:incidents:read'
+  | 'operations:incidents:write'
+  | 'operations:runbooks:read'
+  | 'operations:runbooks:write'
+  // ── AI Hub ──
+  | 'ai:assistant:read'
+  | 'ai:models:read'
+  | 'ai:models:write'
+  | 'ai:policies:read'
+  | 'ai:policies:write'
+  // ── Governance ──
+  | 'governance:reports:read'
+  | 'governance:risk:read'
+  | 'governance:compliance:read'
+  | 'governance:finops:read'
   // ── Audit ──
   | 'audit:read'
   | 'audit:export'

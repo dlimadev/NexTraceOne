@@ -51,7 +51,7 @@
   },
   "dashboard": {
     "title": "Panel",
-    "subtitle": "Resumen de la plataforma de inteligencia de cambios",
+    "subtitle": "Fuente de verdad para servicios, contratos, cambios y conocimiento operacional",
     "activeServices": "Servicios Activos",
     "registeredApis": "APIs Registradas",
     "consumerRelations": "Relaciones de Consumo",
@@ -81,7 +81,25 @@
     "changeIntelligence": "Inteligencia de Cambios",
     "sectionPlatform": "Plataforma",
     "sectionAdmin": "Administración",
-    "mySessions": "Mis Sesiones"
+    "mySessions": "Mis Sesiones",
+    "tagline": "Plataforma de Gobernanza de Ingeniería",
+    "serviceCatalog": "Catálogo de Servicios",
+    "apiContracts": "Contratos de API",
+    "incidents": "Incidentes",
+    "runbooks": "Runbooks",
+    "aiAssistant": "Asistente IA",
+    "modelRegistry": "Registro de Modelos",
+    "aiPolicies": "Políticas de IA",
+    "reports": "Informes",
+    "riskCenter": "Centro de Riesgo",
+    "compliance": "Cumplimiento",
+    "finops": "FinOps",
+    "sectionServices": "Servicios",
+    "sectionContracts": "Contratos",
+    "sectionChanges": "Cambios",
+    "sectionOperations": "Operaciones",
+    "sectionAiHub": "Hub de IA",
+    "sectionGovernance": "Gobernanza"
   },
   "header": {
     "toggleLanguage": "Cambiar idioma",
@@ -1083,5 +1101,49 @@
       "noPendingActions": "Ninguna acción pendiente en este momento.",
       "viewDetails": "Ver Detalles"
     }
+  },
+  "incidents": {
+    "title": "Incidentes",
+    "subtitle": "Correlacione incidentes con servicios, cambios y contratos",
+    "emptyTitle": "Sin incidentes registrados",
+    "emptyDescription": "El seguimiento y correlación de incidentes estará disponible aquí."
+  },
+  "runbooks": {
+    "title": "Runbooks",
+    "subtitle": "Procedimientos operacionales y guías de mitigación",
+    "emptyTitle": "Sin runbooks disponibles",
+    "emptyDescription": "Runbooks operacionales y playbooks de mitigación se gestionarán aquí."
+  },
+  "aiHub": {
+    "assistantTitle": "Asistente IA",
+    "assistantSubtitle": "Asistente contextualizado con servicios, contratos e incidentes",
+    "assistantEmptyTitle": "Asistente IA próximamente",
+    "assistantEmptyDescription": "El asistente IA proporcionará ayuda contextualizada basada en sus servicios, contratos y datos operacionales.",
+    "modelsTitle": "Registro de Modelos",
+    "modelsSubtitle": "Gestionar modelos IA internos y externos",
+    "modelsEmptyTitle": "Sin modelos registrados",
+    "modelsEmptyDescription": "Registre y gobierne modelos IA usados en la plataforma.",
+    "policiesTitle": "Políticas de IA",
+    "policiesSubtitle": "Gobernar acceso, tokens y uso de modelos IA",
+    "policiesEmptyTitle": "Sin políticas definidas",
+    "policiesEmptyDescription": "Defina políticas de gobernanza IA para control de acceso, presupuesto de tokens y restricciones de modelos."
+  },
+  "governance": {
+    "reportsTitle": "Informes",
+    "reportsSubtitle": "Informes segmentados por persona y analítica operacional",
+    "reportsEmptyTitle": "Sin informes disponibles",
+    "reportsEmptyDescription": "Informes segmentados por persona y contexto operacional aparecerán aquí.",
+    "riskTitle": "Centro de Riesgo",
+    "riskSubtitle": "Análisis de riesgo operacional contextualizado por servicio y cambio",
+    "riskEmptyTitle": "Sin evaluaciones de riesgo",
+    "riskEmptyDescription": "Análisis de riesgo vinculado a servicios, cambios y contratos estará disponible aquí.",
+    "complianceTitle": "Cumplimiento",
+    "complianceSubtitle": "Cumplimiento regulatorio y políticas de gobernanza",
+    "complianceEmptyTitle": "Sin datos de cumplimiento",
+    "complianceEmptyDescription": "Seguimiento de cumplimiento y gestión de políticas de gobernanza estará disponible aquí.",
+    "finopsTitle": "FinOps",
+    "finopsSubtitle": "Optimización de costos por servicio, equipo, dominio y operación",
+    "finopsEmptyTitle": "Sin datos de costo disponibles",
+    "finopsEmptyDescription": "Análisis de costos contextual y recomendaciones de optimización estarán disponibles aquí."
   }
 }

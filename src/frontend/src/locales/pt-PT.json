@@ -51,7 +51,7 @@
   },
   "dashboard": {
     "title": "Painel",
-    "subtitle": "Visão geral da plataforma de inteligência de mudanças",
+    "subtitle": "Fonte de verdade para serviços, contratos, mudanças e conhecimento operacional",
     "activeServices": "Serviços Ativos",
     "registeredApis": "APIs Registadas",
     "consumerRelations": "Relações de Consumo",
@@ -81,7 +81,25 @@
     "changeIntelligence": "Inteligência de Mudanças",
     "sectionPlatform": "Plataforma",
     "sectionAdmin": "Administração",
-    "mySessions": "As Minhas Sessões"
+    "mySessions": "As Minhas Sessões",
+    "tagline": "Plataforma de Governança de Engenharia",
+    "serviceCatalog": "Catálogo de Serviços",
+    "apiContracts": "Contratos de API",
+    "incidents": "Incidentes",
+    "runbooks": "Runbooks",
+    "aiAssistant": "Assistente IA",
+    "modelRegistry": "Registo de Modelos",
+    "aiPolicies": "Políticas de IA",
+    "reports": "Relatórios",
+    "riskCenter": "Centro de Risco",
+    "compliance": "Conformidade",
+    "finops": "FinOps",
+    "sectionServices": "Serviços",
+    "sectionContracts": "Contratos",
+    "sectionChanges": "Mudanças",
+    "sectionOperations": "Operações",
+    "sectionAiHub": "Hub de IA",
+    "sectionGovernance": "Governança"
   },
   "header": {
     "toggleLanguage": "Alternar idioma",
@@ -1083,5 +1101,49 @@
       "noPendingActions": "Nenhuma ação pendente de momento.",
       "viewDetails": "Ver Detalhes"
     }
+  },
+  "incidents": {
+    "title": "Incidentes",
+    "subtitle": "Correlacione incidentes com serviços, mudanças e contratos",
+    "emptyTitle": "Nenhum incidente registado",
+    "emptyDescription": "O rastreamento e correlação de incidentes estará disponível aqui."
+  },
+  "runbooks": {
+    "title": "Runbooks",
+    "subtitle": "Procedimentos operacionais e guias de mitigação",
+    "emptyTitle": "Nenhum runbook disponível",
+    "emptyDescription": "Runbooks operacionais e playbooks de mitigação serão geridos aqui."
+  },
+  "aiHub": {
+    "assistantTitle": "Assistente IA",
+    "assistantSubtitle": "Assistente contextualizado com serviços, contratos e incidentes",
+    "assistantEmptyTitle": "Assistente IA em breve",
+    "assistantEmptyDescription": "O assistente IA fornecerá ajuda contextualizada com base nos seus serviços, contratos e dados operacionais.",
+    "modelsTitle": "Registo de Modelos",
+    "modelsSubtitle": "Gerir modelos IA internos e externos",
+    "modelsEmptyTitle": "Nenhum modelo registado",
+    "modelsEmptyDescription": "Registe e governe modelos IA usados na plataforma.",
+    "policiesTitle": "Políticas de IA",
+    "policiesSubtitle": "Governar acesso, tokens e uso de modelos IA",
+    "policiesEmptyTitle": "Nenhuma política definida",
+    "policiesEmptyDescription": "Defina políticas de governança IA para controlo de acesso, orçamento de tokens e restrições de modelos."
+  },
+  "governance": {
+    "reportsTitle": "Relatórios",
+    "reportsSubtitle": "Relatórios segmentados por persona e analítica operacional",
+    "reportsEmptyTitle": "Nenhum relatório disponível",
+    "reportsEmptyDescription": "Relatórios segmentados por persona e contexto operacional aparecerão aqui.",
+    "riskTitle": "Centro de Risco",
+    "riskSubtitle": "Análise de risco operacional contextualizado por serviço e mudança",
+    "riskEmptyTitle": "Nenhuma avaliação de risco",
+    "riskEmptyDescription": "Análise de risco ligada a serviços, mudanças e contratos estará disponível aqui.",
+    "complianceTitle": "Conformidade",
+    "complianceSubtitle": "Conformidade regulatória e políticas de governança",
+    "complianceEmptyTitle": "Sem dados de conformidade",
+    "complianceEmptyDescription": "Rastreamento de conformidade e gestão de políticas de governança estará disponível aqui.",
+    "finopsTitle": "FinOps",
+    "finopsSubtitle": "Otimização de custos por serviço, equipa, domínio e operação",
+    "finopsEmptyTitle": "Sem dados de custo disponíveis",
+    "finopsEmptyDescription": "Análise de custos contextual e recomendações de otimização estarão disponíveis aqui."
   }
 }

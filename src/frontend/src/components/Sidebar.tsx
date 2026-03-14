@@ -17,10 +17,20 @@ import {
   UserCheck,
   ClipboardCheck,
   Monitor,
+  Bot,
+  Database,
+  ShieldCheck,
+  ShieldAlert,
+  BarChart3,
+  Scale,
+  DollarSign,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
+
+/** Seções de navegação alinhadas com MODULES-AND-PAGES.md. */
+type NavSection = 'home' | 'services' | 'contracts' | 'changes' | 'operations' | 'aiHub' | 'governance' | 'admin';
 
 interface NavItem {
   /** Chave i18n para o label exibido na sidebar. */
@@ -28,23 +38,48 @@ interface NavItem {
   to: string;
   icon: React.ReactNode;
   permission?: Permission;
-  /** Seção à qual o item pertence (PLATFORM ou ADMIN). */
-  section: 'platform' | 'admin';
+  /** Seção à qual o item pertence, alinhada aos módulos oficiais do produto. */
+  section: NavSection;
 }
 
 /**
- * Itens de navegação da sidebar com códigos de permissão alinhados ao catálogo real do backend.
- * As permissões usam o formato modular: "modulo:recurso:ação".
- * Organizados em seções para hierarquia visual clara.
+ * Itens de navegação da sidebar alinhados com MODULES-AND-PAGES.md.
+ *
+ * Estrutura oficial do produto:
+ * - Home: Dashboard
+ * - Services: Service Catalog, Developer Portal
+ * - Contracts: API Contracts, Contract Studio (futuro)
+ * - Changes: Change Intelligence, Workflow, Promotion
+ * - Operations: Incidents, Runbooks
+ * - AI Hub: AI Assistant, Model Registry, AI Policies
+ * - Governance: Reports, Risk, Compliance, FinOps
+ * - Admin: Users, Licensing, Break Glass, etc.
  */
 const navItems: NavItem[] = [
-  { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'platform' },
-  { labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:releases:read', section: 'platform' },
-  { labelKey: 'sidebar.engineeringGraph', to: '/graph', icon: <GitBranch size={18} />, permission: 'engineering-graph:assets:read', section: 'platform' },
-  { labelKey: 'sidebar.contracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'platform' },
-  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'platform' },
-  { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read', section: 'platform' },
-  { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read', section: 'platform' },
+  // ── Home ──
+  { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
+  // ── Services ──
+  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={18} />, permission: 'engineering-graph:assets:read', section: 'services' },
+  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'services' },
+  // ── Contracts ──
+  { labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
+  // ── Changes ──
+  { labelKey: 'sidebar.changeIntelligence', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:releases:read', section: 'changes' },
+  { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read', section: 'changes' },
+  { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read', section: 'changes' },
+  // ── Operations ──
+  { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
+  { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <BookOpen size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
+  // ── AI Hub ──
+  { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
+  { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:models:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={18} />, permission: 'ai:policies:read', section: 'aiHub' },
+  // ── Governance ──
+  { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
+  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={18} />, permission: 'governance:risk:read', section: 'governance' },
+  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={18} />, permission: 'governance:compliance:read', section: 'governance' },
+  { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
+  // ── Admin ──
   { labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={18} />, permission: 'licensing:read', section: 'admin' },
   { labelKey: 'sidebar.vendorLicensing', to: '/vendor/licensing', icon: <Shield size={18} />, permission: 'licensing:vendor:license:read', section: 'admin' },
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },
@@ -54,6 +89,18 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.accessReview', to: '/access-reviews', icon: <ClipboardCheck size={18} />, permission: 'identity:users:read', section: 'admin' },
   { labelKey: 'sidebar.mySessions', to: '/my-sessions', icon: <Monitor size={18} />, permission: 'identity:sessions:read', section: 'admin' },
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read', section: 'admin' },
+];
+
+/** Ordem de exibição das seções na sidebar, alinhada com MODULES-AND-PAGES.md. */
+const sectionOrder: { key: NavSection; labelKey: string }[] = [
+  { key: 'home', labelKey: '' },
+  { key: 'services', labelKey: 'sidebar.sectionServices' },
+  { key: 'contracts', labelKey: 'sidebar.sectionContracts' },
+  { key: 'changes', labelKey: 'sidebar.sectionChanges' },
+  { key: 'operations', labelKey: 'sidebar.sectionOperations' },
+  { key: 'aiHub', labelKey: 'sidebar.sectionAiHub' },
+  { key: 'governance', labelKey: 'sidebar.sectionGovernance' },
+  { key: 'admin', labelKey: 'sidebar.sectionAdmin' },
 ];
 
 export function Sidebar() {
@@ -71,17 +118,16 @@ export function Sidebar() {
     (item) => !item.permission || can(item.permission)
   );
 
-  const platformItems = visibleItems.filter((i) => i.section === 'platform');
-  const adminItems = visibleItems.filter((i) => i.section === 'admin');
-
   /** Renderiza um grupo de items de navegação. */
   const renderSection = (label: string, items: NavItem[]) => {
     if (items.length === 0) return null;
     return (
       <div className="mb-4">
-        <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-faded">
-          {label}
-        </p>
+        {label && (
+          <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-faded">
+            {label}
+          </p>
+        )}
         <ul className="space-y-0.5">
           {items.map((item) => (
             <li key={item.to}>
@@ -119,15 +165,17 @@ export function Sidebar() {
           </div>
           <div>
             <span className="font-semibold text-base text-heading tracking-tight">NexTraceOne</span>
-            <p className="text-[11px] text-muted leading-tight">{t('sidebar.changeIntelligence')}</p>
+            <p className="text-[11px] text-muted leading-tight">{t('sidebar.tagline')}</p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation — seções alinhadas com MODULES-AND-PAGES.md */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        {renderSection(t('sidebar.sectionPlatform'), platformItems)}
-        {renderSection(t('sidebar.sectionAdmin'), adminItems)}
+        {sectionOrder.map(({ key, labelKey }) => {
+          const sectionItems = visibleItems.filter((i) => i.section === key);
+          return renderSection(labelKey ? t(labelKey) : '', sectionItems);
+        })}
       </nav>
 
       {/* User info */}
