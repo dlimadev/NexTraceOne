@@ -2,10 +2,10 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.SearchAssets;
+namespace NexTraceOne.Catalog.Application.Graph.Features.SearchAssets;
 
 /// <summary>
 /// Feature: SearchAssets — pesquisa ativos de API pelo nome ou rota.

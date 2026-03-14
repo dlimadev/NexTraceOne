@@ -2,7 +2,7 @@ using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.EngineeringGraph.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Graph.Entities;
 
 /// <summary>
 /// Consumidor conhecido de uma API no grafo de engenharia.

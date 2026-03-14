@@ -1,10 +1,10 @@
 using FluentAssertions;
 using NSubstitute;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using GetTemporalDiffFeature = NexTraceOne.EngineeringGraph.Application.Features.GetTemporalDiff.GetTemporalDiff;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using GetTemporalDiffFeature = NexTraceOne.Catalog.Application.Graph.Features.GetTemporalDiff.GetTemporalDiff;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler GetTemporalDiff que compara dois snapshots do grafo
@@ -100,7 +100,7 @@ public sealed class GetTemporalDiffTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.GraphSnapshot.NotFound");
+        result.Error.Code.Should().Be("CatalogGraph.GraphSnapshot.NotFound");
     }
 
     [Fact]
@@ -135,6 +135,6 @@ public sealed class GetTemporalDiffTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.GraphSnapshot.NotFound");
+        result.Error.Code.Should().Be("CatalogGraph.GraphSnapshot.NotFound");
     }
 }

@@ -2,11 +2,11 @@ using FluentAssertions;
 using MediatR;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using DecommissionAssetFeature = NexTraceOne.EngineeringGraph.Application.Features.DecommissionAsset.DecommissionAsset;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using DecommissionAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.DecommissionAsset.DecommissionAsset;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler DecommissionAsset que marca um ativo de API como descomissionado,
@@ -65,7 +65,7 @@ public sealed class DecommissionAssetTests
 
         // Assert — segundo descomissionamento retorna erro de conflito
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.ApiAsset.Decommissioned");
+        result.Error.Code.Should().Be("CatalogGraph.ApiAsset.Decommissioned");
         await _unitOfWork.DidNotReceive().CommitAsync(Arg.Any<CancellationToken>());
     }
 
@@ -84,7 +84,7 @@ public sealed class DecommissionAssetTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Be("EngineeringGraph.ApiAsset.NotFound");
+        result.Error.Code.Should().Be("CatalogGraph.ApiAsset.NotFound");
         await _unitOfWork.DidNotReceive().CommitAsync(Arg.Any<CancellationToken>());
     }
 }

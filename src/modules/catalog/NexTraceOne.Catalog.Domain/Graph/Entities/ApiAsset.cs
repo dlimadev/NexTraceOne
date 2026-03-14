@@ -3,9 +3,9 @@ using MediatR;
 using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Graph.Entities;
 
 /// <summary>
 /// Aggregate Root que representa uma API publicada no grafo de engenharia.
@@ -61,7 +61,7 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
 
         if (duplicateExists)
         {
-            return EngineeringGraphErrors.DuplicateDiscoverySource(discoverySource.SourceType, discoverySource.ExternalReference);
+            return CatalogGraphErrors.DuplicateDiscoverySource(discoverySource.SourceType, discoverySource.ExternalReference);
         }
 
         _discoverySources.Add(discoverySource);
@@ -75,7 +75,7 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
         Guard.Against.Null(discoverySource);
 
         var addDiscoverySourceResult = AddDiscoverySource(discoverySource);
-        if (addDiscoverySourceResult.IsFailure && addDiscoverySourceResult.Error.Code != "EngineeringGraph.DiscoverySource.Duplicate")
+        if (addDiscoverySourceResult.IsFailure && addDiscoverySourceResult.Error.Code != "CatalogGraph.DiscoverySource.Duplicate")
         {
             return addDiscoverySourceResult.Error;
         }
@@ -113,7 +113,7 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
     {
         if (IsDecommissioned)
         {
-            return EngineeringGraphErrors.ApiAssetDecommissioned(Id.Value);
+            return CatalogGraphErrors.ApiAssetDecommissioned(Id.Value);
         }
 
         Name = Guard.Against.NullOrWhiteSpace(name);
@@ -128,7 +128,7 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
     {
         if (IsDecommissioned)
         {
-            return EngineeringGraphErrors.ApiAssetDecommissioned(Id.Value);
+            return CatalogGraphErrors.ApiAssetDecommissioned(Id.Value);
         }
 
         IsDecommissioned = true;
@@ -141,12 +141,12 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
         var relationship = _consumerRelationships.SingleOrDefault(item => item.Id == relationshipId);
         if (relationship is null)
         {
-            return EngineeringGraphErrors.ConsumerRelationshipNotFound(relationshipId.Value);
+            return CatalogGraphErrors.ConsumerRelationshipNotFound(relationshipId.Value);
         }
 
         if (relationship.ConfidenceScore < minimumConfidence)
         {
-            return EngineeringGraphErrors.LowConfidenceDependency(relationship.ConsumerName, relationship.ConfidenceScore, minimumConfidence);
+            return CatalogGraphErrors.LowConfidenceDependency(relationship.ConsumerName, relationship.ConfidenceScore, minimumConfidence);
         }
 
         return relationship;

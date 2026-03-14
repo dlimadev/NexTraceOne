@@ -1,8 +1,8 @@
 using FluentAssertions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using ApiAssetAggregate = NexTraceOne.EngineeringGraph.Domain.Entities.ApiAsset;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using ApiAssetAggregate = NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Graph.Domain.Entities;
 
 /// <summary>
 /// Testes de domínio para o aggregate ApiAsset.
@@ -29,7 +29,7 @@ public sealed class ApiAssetTests
 
         firstResult.IsSuccess.Should().BeTrue();
         secondResult.IsFailure.Should().BeTrue();
-        secondResult.Error.Code.Should().Be("EngineeringGraph.DiscoverySource.Duplicate");
+        secondResult.Error.Code.Should().Be("CatalogGraph.DiscoverySource.Duplicate");
     }
 
     [Fact]

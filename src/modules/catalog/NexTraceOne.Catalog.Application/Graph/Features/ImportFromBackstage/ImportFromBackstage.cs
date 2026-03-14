@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.ImportFromBackstage;
+namespace NexTraceOne.Catalog.Application.Graph.Features.ImportFromBackstage;
 
 /// <summary>
 /// Feature: ImportFromBackstage — importa entidades do Backstage.io para o grafo.
@@ -123,7 +123,7 @@ public static class ImportFromBackstage
                     skipped++;
                     results.Add(new ImportItemResult(
                         entity.Kind, entity.Name, ImportOutcome.Skipped,
-                        "EngineeringGraph.ServiceAsset.AlreadyExists"));
+                        "CatalogGraph.ServiceAsset.AlreadyExists"));
                     continue;
                 }
 
@@ -145,7 +145,7 @@ public static class ImportFromBackstage
                     failed++;
                     results.Add(new ImportItemResult(
                         entity.Kind, entity.Name, ImportOutcome.Failed,
-                        "EngineeringGraph.Backstage.ApiSpecMissing"));
+                        "CatalogGraph.Backstage.ApiSpecMissing"));
                     continue;
                 }
 
@@ -168,7 +168,7 @@ public static class ImportFromBackstage
                     skipped++;
                     results.Add(new ImportItemResult(
                         entity.Kind, entity.Name, ImportOutcome.Skipped,
-                        "EngineeringGraph.ApiAsset.AlreadyExists"));
+                        "CatalogGraph.ApiAsset.AlreadyExists"));
                     continue;
                 }
 

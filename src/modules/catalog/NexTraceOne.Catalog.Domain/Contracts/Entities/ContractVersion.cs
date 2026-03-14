@@ -24,7 +24,7 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
 
     private ContractVersion() { }
 
-    /// <summary>Identificador do ativo de API correspondente no módulo EngineeringGraph.</summary>
+    /// <summary>Identificador do ativo de API correspondente no módulo Catalog Graph.</summary>
     public Guid ApiAssetId { get; private set; }
 
     /// <summary>Versão semântica do contrato, ex: "1.2.3".</summary>

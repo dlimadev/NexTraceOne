@@ -4,11 +4,11 @@ using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.DecommissionAsset;
+namespace NexTraceOne.Catalog.Application.Graph.Features.DecommissionAsset;
 
 /// <summary>
 /// Feature: DecommissionAsset — marca um ativo de API como descomissionado.
@@ -40,7 +40,7 @@ public static class DecommissionAsset
             var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
             if (apiAsset is null)
             {
-                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+                return CatalogGraphErrors.ApiAssetNotFound(request.ApiAssetId);
             }
 
             var result = apiAsset.Decommission();

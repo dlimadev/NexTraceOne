@@ -9,7 +9,7 @@ namespace NexTraceOne.BuildingBlocks.Application.Cqrs;
 /// <code>
 /// public sealed record Command(...) : ICommand&lt;Guid&gt;, IRequiresCapability
 /// {
-///     public string RequiredCapability => "engineering-graph:write";
+///     public string RequiredCapability => "catalog:write";
 /// }
 /// </code>
 /// </summary>
@@ -17,7 +17,7 @@ public interface IRequiresCapability
 {
     /// <summary>
     /// Código da capability exigida pela licença para executar este request.
-    /// Códigos seguem o formato "módulo:ação" (ex.: "engineering-graph:write").
+    /// Códigos seguem o formato "módulo:ação" (ex.: "catalog:write").
     /// </summary>
     string RequiredCapability { get; }
 }

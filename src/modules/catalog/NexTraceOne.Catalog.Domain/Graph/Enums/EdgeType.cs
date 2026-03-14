@@ -1,4 +1,4 @@
-namespace NexTraceOne.EngineeringGraph.Domain.Enums;
+namespace NexTraceOne.Catalog.Domain.Graph.Enums;
 
 /// <summary>
 /// Tipos semânticos de arestas no grafo de engenharia.

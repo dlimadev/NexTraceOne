@@ -170,7 +170,7 @@ test.describe('Dashboard (autenticado)', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
     // Intercepta chamadas à API do engineering graph para não falhar sem backend
-    await page.route('**/api/v1/engineering-graph/graph', (route) =>
+    await page.route('**/api/v1/catalog/graph', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',

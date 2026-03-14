@@ -4,13 +4,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { DashboardPage } from '../../features/shared/pages/DashboardPage';
 
-vi.mock('../../features/catalog/api/engineeringGraph', () => ({
-  engineeringGraphApi: {
+vi.mock('../../features/catalog/api/serviceCatalog', () => ({
+  serviceCatalogApi: {
     getGraph: vi.fn(),
   },
 }));
 
-import { engineeringGraphApi } from '../../features/catalog/api/engineeringGraph';
+import { serviceCatalogApi } from '../../features/catalog/api/serviceCatalog';
 
 function renderDashboard() {
   const queryClient = new QueryClient({
@@ -31,7 +31,7 @@ describe('DashboardPage', () => {
   });
 
   it('exibe o título do dashboard', () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
       relationships: [],
@@ -41,7 +41,7 @@ describe('DashboardPage', () => {
   });
 
   it('exibe os stat cards com labels corretos', () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
       relationships: [],
@@ -55,7 +55,7 @@ describe('DashboardPage', () => {
   });
 
   it('exibe serviços e APIs carregados do grafo', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [
         { id: 's1', name: 'payments-service', team: 'Payments', createdAt: '2024-01-01' },
         { id: 's2', name: 'auth-service', team: 'Identity', createdAt: '2024-01-01' },
@@ -74,7 +74,7 @@ describe('DashboardPage', () => {
   });
 
   it('exibe mensagem quando não há serviços registados', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
       relationships: [],
@@ -86,7 +86,7 @@ describe('DashboardPage', () => {
   });
 
   it('exibe mensagem quando não há APIs registadas', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
       relationships: [],

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialEngineeringGraphSchema : Migration

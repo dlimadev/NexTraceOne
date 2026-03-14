@@ -1,22 +1,22 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.EngineeringGraph.Application;
-using NexTraceOne.EngineeringGraph.Infrastructure;
+using NexTraceOne.Catalog.Application.Graph;
+using NexTraceOne.Catalog.Infrastructure.Graph;
 
-namespace NexTraceOne.EngineeringGraph.API;
+namespace NexTraceOne.Catalog.API.Graph;
 
 /// <summary>
-/// Registra serviços específicos da camada API do módulo EngineeringGraph.
+/// Registra serviços específicos da camada API do módulo Catalog Graph.
 /// Compõe Application + Infrastructure layers.
 /// </summary>
 public static class DependencyInjection
 {
-    public static IServiceCollection AddEngineeringGraphModule(
+    public static IServiceCollection AddCatalogGraphModule(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddEngineeringGraphApplication(configuration);
-        services.AddEngineeringGraphInfrastructure(configuration);
+        services.AddCatalogGraphApplication(configuration);
+        services.AddCatalogGraphInfrastructure(configuration);
         return services;
     }
 }

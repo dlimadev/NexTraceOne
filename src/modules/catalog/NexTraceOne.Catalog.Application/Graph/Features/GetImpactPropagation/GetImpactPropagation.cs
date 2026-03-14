@@ -2,10 +2,10 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.GetImpactPropagation;
+namespace NexTraceOne.Catalog.Application.Graph.Features.GetImpactPropagation;
 
 /// <summary>
 /// Feature: GetImpactPropagation — calcula e retorna a propagação de impacto
@@ -48,7 +48,7 @@ public static class GetImpactPropagation
             var rootApi = allApis.FirstOrDefault(a => a.Id.Value == request.RootNodeId);
             if (rootApi is null)
             {
-                return Domain.Errors.EngineeringGraphErrors.ImpactRootNodeNotFound(request.RootNodeId);
+                return NexTraceOne.Catalog.Domain.Graph.Errors.CatalogGraphErrors.ImpactRootNodeNotFound(request.RootNodeId);
             }
 
             var impactedNodes = new List<ImpactedNode>();

@@ -27,7 +27,7 @@ public static class GetApisIConsume
 
     /// <summary>
     /// Handler que retorna APIs consumidas com status e alertas.
-    /// Em produção, agrega dados do EngineeringGraph e ChangeIntelligence.
+    /// Em produção, agrega dados do Catalog Graph e ChangeIntelligence.
     /// </summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {

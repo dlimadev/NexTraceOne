@@ -129,10 +129,10 @@ public sealed class RolePermissionCatalogTests
         var viewerPerms = RolePermissionCatalog.GetPermissionsForRole(Role.Viewer);
 
         // Assert — escrita no grafo limitada a PlatformAdmin e TechLead
-        adminPerms.Should().Contain("engineering-graph:assets:write");
-        techLeadPerms.Should().Contain("engineering-graph:assets:write");
-        developerPerms.Should().NotContain("engineering-graph:assets:write");
-        viewerPerms.Should().NotContain("engineering-graph:assets:write");
+        adminPerms.Should().Contain("catalog:assets:write");
+        techLeadPerms.Should().Contain("catalog:assets:write");
+        developerPerms.Should().NotContain("catalog:assets:write");
+        viewerPerms.Should().NotContain("catalog:assets:write");
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public sealed class RolePermissionCatalogTests
         foreach (var role in rolesWithGraphRead)
         {
             var permissions = RolePermissionCatalog.GetPermissionsForRole(role);
-            permissions.Should().Contain("engineering-graph:assets:read",
+            permissions.Should().Contain("catalog:assets:read",
                 because: $"'{role}' deve ter leitura do grafo para visualização de dependências");
         }
     }

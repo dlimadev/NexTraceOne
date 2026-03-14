@@ -2,11 +2,11 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.ValidateDiscoveredDependency;
+namespace NexTraceOne.Catalog.Application.Graph.Features.ValidateDiscoveredDependency;
 
 /// <summary>
 /// Feature: ValidateDiscoveredDependency — valida confiança mínima de uma dependência descoberta.
@@ -38,7 +38,7 @@ public static class ValidateDiscoveredDependency
             var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
             if (apiAsset is null)
             {
-                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+                return CatalogGraphErrors.ApiAssetNotFound(request.ApiAssetId);
             }
 
             var relationshipId = ConsumerRelationshipId.From(request.RelationshipId);

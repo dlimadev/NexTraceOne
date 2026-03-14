@@ -5,10 +5,13 @@ import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, EngineeringGraphPage, DeveloperPortalPage } from './features/catalog';
+import { ContractsPage, ServiceCatalogPage, DeveloperPortalPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
+import { IncidentsPage, RunbooksPage } from './features/operations';
+import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage } from './features/ai-hub';
+import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage } from './features/governance';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,9 +31,20 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/select-tenant" element={<TenantSelectionPage />} />
             <Route element={<AppLayout />}>
+              {/* ── Home ── */}
               <Route path="/" element={<DashboardPage />} />
-              <Route path="/releases" element={<ReleasesPage />} />
-              <Route path="/graph" element={<EngineeringGraphPage />} />
+              {/* ── Services ── */}
+              <Route path="/services" element={<ServiceCatalogPage />} />
+              <Route path="/graph" element={<Navigate to="/services" replace />} />
+              <Route
+                path="/portal"
+                element={
+                  <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
+                    <DeveloperPortalPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Contracts ── */}
               <Route
                 path="/contracts"
                 element={
@@ -39,8 +53,23 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* ── Changes ── */}
+              <Route path="/releases" element={<ReleasesPage />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />
+              {/* ── Operations ── */}
+              <Route path="/operations/incidents" element={<IncidentsPage />} />
+              <Route path="/operations/runbooks" element={<RunbooksPage />} />
+              {/* ── AI Hub ── */}
+              <Route path="/ai/assistant" element={<AiAssistantPage />} />
+              <Route path="/ai/models" element={<ModelRegistryPage />} />
+              <Route path="/ai/policies" element={<AiPoliciesPage />} />
+              {/* ── Governance ── */}
+              <Route path="/governance/reports" element={<ReportsPage />} />
+              <Route path="/governance/risk" element={<RiskCenterPage />} />
+              <Route path="/governance/compliance" element={<CompliancePage />} />
+              <Route path="/governance/finops" element={<FinOpsPage />} />
+              {/* ── Admin ── */}
               <Route
                 path="/licensing"
                 element={
@@ -54,14 +83,6 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="licensing:vendor:license:read" redirectTo="/unauthorized">
                     <VendorLicensingPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/portal"
-                element={
-                  <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
-                    <DeveloperPortalPage />
                   </ProtectedRoute>
                 }
               />

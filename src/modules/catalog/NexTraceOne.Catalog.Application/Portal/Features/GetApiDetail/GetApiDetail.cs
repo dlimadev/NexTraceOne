@@ -26,7 +26,7 @@ public static class GetApiDetail
 
     /// <summary>
     /// Handler que retorna detalhes enriquecidos de uma API.
-    /// Em produção, agrega dados do EngineeringGraph, Contracts e ChangeIntelligence.
+    /// Em produção, agrega dados do Catalog Graph, Contracts e ChangeIntelligence.
     /// </summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
@@ -34,7 +34,7 @@ public static class GetApiDetail
         {
             Guard.Against.Null(request);
 
-            // MVP1: retorna erro de não encontrado — em produção consulta EngineeringGraph.
+            // MVP1: retorna erro de não encontrado — em produção consulta Catalog Graph.
             return Task.FromResult<Result<Response>>(
                 DeveloperPortalErrors.ApiNotFound(request.ApiAssetId.ToString()));
         }

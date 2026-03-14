@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.RegisterServiceAsset;
+namespace NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset;
 
 /// <summary>
 /// Feature: RegisterServiceAsset — registra um novo serviço no grafo de engenharia.
@@ -41,7 +41,7 @@ public static class RegisterServiceAsset
             var existing = await serviceAssetRepository.GetByNameAsync(request.Name, cancellationToken);
             if (existing is not null)
             {
-                return EngineeringGraphErrors.ServiceAssetAlreadyExists(request.Name);
+                return CatalogGraphErrors.ServiceAssetAlreadyExists(request.Name);
             }
 
             var serviceAsset = ServiceAsset.Create(request.Name, request.Domain, request.TeamName);

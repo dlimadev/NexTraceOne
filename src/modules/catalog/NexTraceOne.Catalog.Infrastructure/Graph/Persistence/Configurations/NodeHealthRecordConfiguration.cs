@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
-namespace NexTraceOne.EngineeringGraph.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para NodeHealthRecord.

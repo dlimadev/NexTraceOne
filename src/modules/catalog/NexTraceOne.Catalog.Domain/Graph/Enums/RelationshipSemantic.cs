@@ -1,4 +1,4 @@
-namespace NexTraceOne.EngineeringGraph.Domain.Enums;
+namespace NexTraceOne.Catalog.Domain.Graph.Enums;
 
 /// <summary>
 /// Semântica da proveniência de uma relação no grafo de engenharia.

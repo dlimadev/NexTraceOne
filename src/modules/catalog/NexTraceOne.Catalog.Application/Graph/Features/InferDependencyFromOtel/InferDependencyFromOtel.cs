@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.InferDependencyFromOtel;
+namespace NexTraceOne.Catalog.Application.Graph.Features.InferDependencyFromOtel;
 
 /// <summary>
 /// Feature: InferDependencyFromOtel — infere dependência a partir de telemetria OpenTelemetry.
@@ -49,7 +49,7 @@ public static class InferDependencyFromOtel
             var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
             if (apiAsset is null)
             {
-                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+                return CatalogGraphErrors.ApiAssetNotFound(request.ApiAssetId);
             }
 
             var result = apiAsset.InferDependencyFromOtel(

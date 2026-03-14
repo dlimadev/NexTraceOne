@@ -1,11 +1,11 @@
 using FluentAssertions;
 using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using ImportFromBackstageFeature = NexTraceOne.EngineeringGraph.Application.Features.ImportFromBackstage.ImportFromBackstage;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using ImportFromBackstageFeature = NexTraceOne.Catalog.Application.Graph.Features.ImportFromBackstage.ImportFromBackstage;
 
-namespace NexTraceOne.EngineeringGraph.Tests.Application.Features;
+namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 
 /// <summary>
 /// Testes do handler ImportFromBackstage para importação de entidades do catálogo Backstage.io.

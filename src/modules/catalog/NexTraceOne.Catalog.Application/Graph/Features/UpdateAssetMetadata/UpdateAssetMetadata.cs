@@ -4,11 +4,11 @@ using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.UpdateAssetMetadata;
+namespace NexTraceOne.Catalog.Application.Graph.Features.UpdateAssetMetadata;
 
 /// <summary>
 /// Feature: UpdateAssetMetadata — atualiza metadados de um ativo de API existente.
@@ -49,7 +49,7 @@ public static class UpdateAssetMetadata
             var apiAsset = await apiAssetRepository.GetByIdAsync(apiAssetId, cancellationToken);
             if (apiAsset is null)
             {
-                return EngineeringGraphErrors.ApiAssetNotFound(request.ApiAssetId);
+                return CatalogGraphErrors.ApiAssetNotFound(request.ApiAssetId);
             }
 
             var result = apiAsset.UpdateMetadata(request.Name, request.RoutePattern, request.Version, request.Visibility);

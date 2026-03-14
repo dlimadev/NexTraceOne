@@ -3,11 +3,11 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.EngineeringGraph.Application.Abstractions;
-using NexTraceOne.EngineeringGraph.Domain.Entities;
-using NexTraceOne.EngineeringGraph.Domain.Errors;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
-namespace NexTraceOne.EngineeringGraph.Application.Features.ImportFromKongGateway;
+namespace NexTraceOne.Catalog.Application.Graph.Features.ImportFromKongGateway;
 
 /// <summary>
 /// Feature: ImportFromKongGateway — importa serviços e rotas do Kong Gateway para o grafo.
@@ -131,7 +131,7 @@ public static class ImportFromKongGateway
                             svc.ServiceName,
                             route.Name,
                             ImportOutcome.Skipped,
-                            "EngineeringGraph.ApiAsset.AlreadyExists"));
+                            "CatalogGraph.ApiAsset.AlreadyExists"));
                         continue;
                     }
 

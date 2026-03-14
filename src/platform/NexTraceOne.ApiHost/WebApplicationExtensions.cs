@@ -1,6 +1,6 @@
 using NexTraceOne.Identity.Infrastructure.Persistence;
 using NexTraceOne.Licensing.Infrastructure.Persistence;
-using NexTraceOne.EngineeringGraph.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.Contracts.Infrastructure.Persistence;
 using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
 using NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
@@ -48,7 +48,7 @@ public static class WebApplicationExtensions
 
             await MigrateContextAsync<IdentityDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<LicensingDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<EngineeringGraphDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<CatalogGraphDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ContractsDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<RulesetGovernanceDbContext>(migrationScope, pendingContexts);

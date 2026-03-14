@@ -1,4 +1,4 @@
-namespace NexTraceOne.EngineeringGraph.Domain.Enums;
+namespace NexTraceOne.Catalog.Domain.Graph.Enums;
 
 /// <summary>
 /// Modos de overlay disponíveis no grafo de engenharia.

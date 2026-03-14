@@ -33,8 +33,8 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C007")), "identity:permissions:read", "View available permissions", "Identity"),
 
             // Engineering Graph
-            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C010")), "engineering-graph:assets:read", "View service and API assets", "EngineeringGraph"),
-            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C011")), "engineering-graph:assets:write", "Create and update assets", "EngineeringGraph"),
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C010")), "catalog:assets:read", "View service and API assets", "Catalog"),
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C011")), "catalog:assets:write", "Create and update assets", "Catalog"),
 
             // Contracts
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C020")), "contracts:read", "View contract versions and diffs", "Contracts"),
