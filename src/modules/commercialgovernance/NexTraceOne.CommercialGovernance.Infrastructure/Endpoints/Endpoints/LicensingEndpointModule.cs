@@ -10,12 +10,14 @@ using ConvertTrialFeature = NexTraceOne.Licensing.Application.Features.ConvertTr
 using ExtendTrialFeature = NexTraceOne.Licensing.Application.Features.ExtendTrial.ExtendTrial;
 using GetLicenseHealthFeature = NexTraceOne.Licensing.Application.Features.GetLicenseHealth.GetLicenseHealth;
 using GetLicenseStatusFeature = NexTraceOne.Licensing.Application.Features.GetLicenseStatus.GetLicenseStatus;
+using GetTelemetryConsentFeature = NexTraceOne.Licensing.Application.Features.GetTelemetryConsent.GetTelemetryConsent;
 using IssueLicenseFeature = NexTraceOne.Licensing.Application.Features.IssueLicense.IssueLicense;
 using ListLicensesFeature = NexTraceOne.Licensing.Application.Features.ListLicenses.ListLicenses;
 using RehostLicenseFeature = NexTraceOne.Licensing.Application.Features.RehostLicense.RehostLicense;
 using RevokeLicenseFeature = NexTraceOne.Licensing.Application.Features.RevokeLicense.RevokeLicense;
 using StartTrialFeature = NexTraceOne.Licensing.Application.Features.StartTrial.StartTrial;
 using TrackUsageMetricFeature = NexTraceOne.Licensing.Application.Features.TrackUsageMetric.TrackUsageMetric;
+using UpdateTelemetryConsentFeature = NexTraceOne.Licensing.Application.Features.UpdateTelemetryConsent.UpdateTelemetryConsent;
 using VerifyLicenseOnStartupFeature = NexTraceOne.Licensing.Application.Features.VerifyLicenseOnStartup.VerifyLicenseOnStartup;
 
 namespace NexTraceOne.Licensing.API.Endpoints;
@@ -27,6 +29,7 @@ namespace NexTraceOne.Licensing.API.Endpoints;
 /// Grupos de endpoints:
 /// - Tenant licensing: activate, verify, status, capabilities, usage, thresholds, health
 /// - Trial: start, extend, convert
+/// - Telemetry consent: get, update (gestão de consentimento LGPD/GDPR)
 /// - Vendor operations: issue, revoke, rehost, list (backoffice interno NexTraceOne)
 /// </summary>
 public sealed class LicensingEndpointModule
@@ -140,6 +143,28 @@ public sealed class LicensingEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new GetLicenseHealthFeature.Query(licenseKey), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        // ─── Telemetry consent (LGPD/GDPR) ─────────────────────────
+
+        group.MapGet("/telemetry-consent", async (
+            string licenseKey,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetTelemetryConsentFeature.Query(licenseKey), cancellationToken);
+            return result.ToHttpResult(localizer);
+        });
+
+        group.MapPost("/telemetry-consent", async (
+            UpdateTelemetryConsentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         });
 

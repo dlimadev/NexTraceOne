@@ -32,6 +32,9 @@ public sealed class LicensingDbContext(
     /// <summary>Bindings de hardware persistidos do módulo Licensing.</summary>
     public DbSet<HardwareBinding> HardwareBindings => Set<HardwareBinding>();
 
+    /// <summary>Registros de consentimento de telemetria por licença.</summary>
+    public DbSet<TelemetryConsent> TelemetryConsents => Set<TelemetryConsent>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(LicensingDbContext).Assembly;
 
