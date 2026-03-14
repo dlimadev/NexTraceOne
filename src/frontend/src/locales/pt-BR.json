@@ -724,6 +724,78 @@
     "issueSuccess": "Licença emitida com sucesso!",
     "issueButton": "Emitir Licença"
   },
+  "vendorCatalog": {
+    "title": "Catálogo Comercial",
+    "subtitle": "Gerenciar planos comerciais, pacotes de funcionalidades e geração de chaves",
+    "tabs": {
+      "plans": "Planos",
+      "featurePacks": "Pacotes de Funcionalidades",
+      "generateKey": "Gerar Chave"
+    },
+    "plans": {
+      "title": "Planos Comerciais",
+      "noPlans": "Nenhum plano encontrado.",
+      "loadFailed": "Falha ao carregar planos.",
+      "code": "Código",
+      "name": "Nome",
+      "commercialModel": "Modelo Comercial",
+      "deploymentModel": "Modelo de Deployment",
+      "maxActivations": "Máx. Ativações",
+      "gracePeriod": "Período de Carência (dias)",
+      "trialDuration": "Duração do Trial (dias)",
+      "priceTag": "Preço",
+      "status": "Status",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "createPlan": "Criar Plano",
+      "createSuccess": "Plano criado com sucesso.",
+      "createFailed": "Falha ao criar plano.",
+      "codePlaceholder": "ex. saas-enterprise",
+      "namePlaceholder": "ex. SaaS Enterprise",
+      "descriptionPlaceholder": "Descrição do plano..."
+    },
+    "featurePacks": {
+      "title": "Pacotes de Funcionalidades",
+      "noPacks": "Nenhum pacote encontrado.",
+      "loadFailed": "Falha ao carregar pacotes.",
+      "code": "Código",
+      "name": "Nome",
+      "items": "Funcionalidades",
+      "itemCount": "{{count}} funcionalidade(s)",
+      "status": "Status",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "createPack": "Criar Pacote",
+      "createSuccess": "Pacote criado com sucesso.",
+      "createFailed": "Falha ao criar pacote.",
+      "codePlaceholder": "ex. api-governance-pack",
+      "namePlaceholder": "ex. API Governance Pack",
+      "descriptionPlaceholder": "Descrição do pacote...",
+      "addItem": "Adicionar Funcionalidade",
+      "removeItem": "Remover",
+      "capabilityCode": "Código da Funcionalidade",
+      "capabilityName": "Nome da Funcionalidade",
+      "defaultLimit": "Limite Padrão"
+    },
+    "generateKey": {
+      "title": "Gerar Chave de Licença",
+      "licenseId": "ID da Licença",
+      "licenseIdPlaceholder": "Insira o UUID da licença",
+      "generate": "Gerar Chave",
+      "newKey": "Chave Gerada",
+      "copyKey": "Copiar Chave",
+      "keyCopied": "Chave copiada para a área de transferência.",
+      "generateSuccess": "Chave de licença gerada com sucesso.",
+      "generateFailed": "Falha ao gerar chave."
+    },
+    "commercialModels": {
+      "perpetual": "Perpétua",
+      "subscription": "Assinatura",
+      "usageBased": "Baseado em Uso",
+      "trial": "Trial",
+      "internal": "Interno"
+    }
+  },
   "developerPortal": {
     "title": "Portal do Desenvolvedor",
     "description": "Catálogo de APIs, playground, subscriptions e analytics",

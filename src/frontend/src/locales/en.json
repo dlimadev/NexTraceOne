@@ -724,6 +724,78 @@
     "issueSuccess": "License issued successfully!",
     "issueButton": "Issue License"
   },
+  "vendorCatalog": {
+    "title": "Commercial Catalog",
+    "subtitle": "Manage commercial plans, feature packs and key generation",
+    "tabs": {
+      "plans": "Plans",
+      "featurePacks": "Feature Packs",
+      "generateKey": "Generate Key"
+    },
+    "plans": {
+      "title": "Commercial Plans",
+      "noPlans": "No plans found.",
+      "loadFailed": "Failed to load plans.",
+      "code": "Code",
+      "name": "Name",
+      "commercialModel": "Commercial Model",
+      "deploymentModel": "Deployment Model",
+      "maxActivations": "Max Activations",
+      "gracePeriod": "Grace Period (days)",
+      "trialDuration": "Trial Duration (days)",
+      "priceTag": "Price Tag",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "createPlan": "Create Plan",
+      "createSuccess": "Plan created successfully.",
+      "createFailed": "Failed to create plan.",
+      "codePlaceholder": "e.g. saas-enterprise",
+      "namePlaceholder": "e.g. SaaS Enterprise",
+      "descriptionPlaceholder": "Plan description..."
+    },
+    "featurePacks": {
+      "title": "Feature Packs",
+      "noPacks": "No feature packs found.",
+      "loadFailed": "Failed to load feature packs.",
+      "code": "Code",
+      "name": "Name",
+      "items": "Capabilities",
+      "itemCount": "{{count}} capability(ies)",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "createPack": "Create Feature Pack",
+      "createSuccess": "Feature pack created successfully.",
+      "createFailed": "Failed to create feature pack.",
+      "codePlaceholder": "e.g. api-governance-pack",
+      "namePlaceholder": "e.g. API Governance Pack",
+      "descriptionPlaceholder": "Feature pack description...",
+      "addItem": "Add Capability",
+      "removeItem": "Remove",
+      "capabilityCode": "Capability Code",
+      "capabilityName": "Capability Name",
+      "defaultLimit": "Default Limit"
+    },
+    "generateKey": {
+      "title": "Generate License Key",
+      "licenseId": "License ID",
+      "licenseIdPlaceholder": "Enter license UUID",
+      "generate": "Generate Key",
+      "newKey": "Generated Key",
+      "copyKey": "Copy Key",
+      "keyCopied": "Key copied to clipboard.",
+      "generateSuccess": "License key generated successfully.",
+      "generateFailed": "Failed to generate key."
+    },
+    "commercialModels": {
+      "perpetual": "Perpetual",
+      "subscription": "Subscription",
+      "usageBased": "Usage-Based",
+      "trial": "Trial",
+      "internal": "Internal"
+    }
+  },
   "developerPortal": {
     "title": "Developer Portal",
     "description": "API catalog, playground, subscriptions and analytics",

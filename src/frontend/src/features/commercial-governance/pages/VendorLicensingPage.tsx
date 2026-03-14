@@ -18,14 +18,17 @@ import {
   Key,
   Building2,
   AlertTriangle,
+  Package,
+  Layers,
+  Key as KeyIcon,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { licensingApi } from '../api';
-import type { VendorLicenseItem } from '../api/licensing';
+import type { VendorLicenseItem, PlanItem, FeaturePackItem as FeaturePackItemType } from '../api/licensing';
 
-type Tab = 'licenses' | 'issue';
+type Tab = 'licenses' | 'issue' | 'plans' | 'featurePacks' | 'generateKey';
 
 /** Mapeia o status da licença para variante visual do Badge. */
 function statusVariant(status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' {
@@ -87,9 +90,31 @@ export function VendorLicensingPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['vendor-licenses'] }),
   });
 
+  const plansQuery = useQuery({
+    queryKey: ['vendor-plans'],
+    queryFn: () => licensingApi.vendorListPlans(),
+    staleTime: 30_000,
+  });
+
+  const featurePacksQuery = useQuery({
+    queryKey: ['vendor-feature-packs'],
+    queryFn: () => licensingApi.vendorListFeaturePacks(),
+    staleTime: 30_000,
+  });
+
+  const generateKeyMutation = useMutation({
+    mutationFn: licensingApi.vendorGenerateKey,
+  });
+
+  const [generateKeyForm, setGenerateKeyForm] = useState({ licenseId: '' });
+  const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+
   const tabs = [
     { key: 'licenses' as Tab, label: t('vendorLicensing.tabs.licenses'), icon: Key },
     { key: 'issue' as Tab, label: t('vendorLicensing.tabs.issue'), icon: Plus },
+    { key: 'plans' as Tab, label: t('vendorCatalog.tabs.plans'), icon: Layers },
+    { key: 'featurePacks' as Tab, label: t('vendorCatalog.tabs.featurePacks'), icon: Package },
+    { key: 'generateKey' as Tab, label: t('vendorCatalog.tabs.generateKey'), icon: KeyIcon },
   ];
 
   return (
@@ -404,6 +429,169 @@ export function VendorLicensingPage() {
               <Button type="submit" disabled={issueMutation.isPending}>
                 <Plus className="h-4 w-4 mr-1" />
                 {t('vendorLicensing.issueButton')}
+              </Button>
+            </form>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Tab: Plans */}
+      {activeTab === 'plans' && (
+        <Card>
+          <CardHeader>
+            <h2 className="text-lg font-semibold">{t('vendorCatalog.plans.title')}</h2>
+          </CardHeader>
+          <CardBody>
+            {plansQuery.isLoading && <p className="text-gray-500">{t('common.loading')}</p>}
+            {plansQuery.isError && <p className="text-red-600">{t('vendorCatalog.plans.loadFailed')}</p>}
+            {plansQuery.data && plansQuery.data.length === 0 && (
+              <p className="text-gray-500">{t('vendorCatalog.plans.noPlans')}</p>
+            )}
+            {plansQuery.data && plansQuery.data.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.code')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.name')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.commercialModel')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.deploymentModel')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.maxActivations')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.priceTag')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {plansQuery.data.map((plan: PlanItem) => (
+                      <tr key={plan.planId}>
+                        <td className="px-4 py-3 text-sm font-mono">{plan.code}</td>
+                        <td className="px-4 py-3 text-sm font-medium">{plan.name}</td>
+                        <td className="px-4 py-3 text-sm">{plan.commercialModel}</td>
+                        <td className="px-4 py-3 text-sm">{plan.deploymentModel}</td>
+                        <td className="px-4 py-3 text-sm">{plan.maxActivations}</td>
+                        <td className="px-4 py-3 text-sm">{plan.priceTag || '—'}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge variant={plan.isActive ? 'success' : 'default'}>
+                            {plan.isActive ? t('vendorCatalog.plans.active') : t('vendorCatalog.plans.inactive')}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Tab: Feature Packs */}
+      {activeTab === 'featurePacks' && (
+        <Card>
+          <CardHeader>
+            <h2 className="text-lg font-semibold">{t('vendorCatalog.featurePacks.title')}</h2>
+          </CardHeader>
+          <CardBody>
+            {featurePacksQuery.isLoading && <p className="text-gray-500">{t('common.loading')}</p>}
+            {featurePacksQuery.isError && <p className="text-red-600">{t('vendorCatalog.featurePacks.loadFailed')}</p>}
+            {featurePacksQuery.data && featurePacksQuery.data.length === 0 && (
+              <p className="text-gray-500">{t('vendorCatalog.featurePacks.noPacks')}</p>
+            )}
+            {featurePacksQuery.data && featurePacksQuery.data.length > 0 && (
+              <div className="space-y-4">
+                {featurePacksQuery.data.map((pack: FeaturePackItemType) => (
+                  <div key={pack.featurePackId} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <h3 className="text-sm font-semibold">{pack.name}</h3>
+                        <span className="text-xs font-mono text-gray-500">{pack.code}</span>
+                      </div>
+                      <Badge variant={pack.isActive ? 'success' : 'default'}>
+                        {pack.isActive ? t('vendorCatalog.featurePacks.active') : t('vendorCatalog.featurePacks.inactive')}
+                      </Badge>
+                    </div>
+                    {pack.description && <p className="text-sm text-gray-600 mb-2">{pack.description}</p>}
+                    <div className="text-xs text-gray-500">
+                      {t('vendorCatalog.featurePacks.itemCount', { count: pack.items?.length || 0 })}
+                    </div>
+                    {pack.items && pack.items.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {pack.items.map((item) => (
+                          <Badge key={item.capabilityCode} variant="info">
+                            {item.capabilityName}
+                            {item.defaultLimit != null && ` (≤${item.defaultLimit})`}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Tab: Generate Key */}
+      {activeTab === 'generateKey' && (
+        <Card>
+          <CardHeader>
+            <h2 className="text-lg font-semibold">{t('vendorCatalog.generateKey.title')}</h2>
+          </CardHeader>
+          <CardBody>
+            <form
+              className="space-y-4 max-w-lg"
+              onSubmit={(e) => {
+                e.preventDefault();
+                generateKeyMutation.mutate(
+                  { licenseId: generateKeyForm.licenseId },
+                  {
+                    onSuccess: (data) => setGeneratedKey(data.newLicenseKey),
+                  },
+                );
+              }}
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('vendorCatalog.generateKey.licenseId')}
+                </label>
+                <input
+                  type="text"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={generateKeyForm.licenseId}
+                  onChange={(e) => setGenerateKeyForm({ licenseId: e.target.value })}
+                  placeholder={t('vendorCatalog.generateKey.licenseIdPlaceholder')}
+                  required
+                />
+              </div>
+
+              {generateKeyMutation.isError && (
+                <p className="text-sm text-red-600">{t('vendorCatalog.generateKey.generateFailed')}</p>
+              )}
+
+              {generatedKey && (
+                <div className="rounded-md bg-green-50 p-4">
+                  <p className="text-sm text-green-800 mb-2">{t('vendorCatalog.generateKey.generateSuccess')}</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-sm font-mono bg-white px-3 py-2 rounded border flex-1">
+                      {generatedKey}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedKey);
+                      }}
+                    >
+                      {t('vendorCatalog.generateKey.copyKey')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <Button type="submit" disabled={generateKeyMutation.isPending}>
+                <KeyIcon className="h-4 w-4 mr-1" />
+                {t('vendorCatalog.generateKey.generate')}
               </Button>
             </form>
           </CardBody>

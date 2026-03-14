@@ -77,6 +77,67 @@ export interface UpdateTelemetryConsentRequest {
   allowErrorDiagnostics?: boolean;
 }
 
+/** Tipos para Commercial Catalog — planos e feature packs. */
+export interface PlanItem {
+  planId: string;
+  code: string;
+  name: string;
+  description?: string;
+  commercialModel: string;
+  deploymentModel: string;
+  isActive: boolean;
+  trialDurationDays?: number;
+  gracePeriodDays: number;
+  maxActivations: number;
+  priceTag?: string;
+}
+
+export interface CreatePlanRequest {
+  code: string;
+  name: string;
+  commercialModel: number;
+  deploymentModel: number;
+  maxActivations: number;
+  gracePeriodDays: number;
+  description?: string;
+  trialDurationDays?: number;
+  priceTag?: string;
+}
+
+export interface CreatePlanResponse {
+  planId: string;
+  code: string;
+  name: string;
+}
+
+export interface FeaturePackItemType {
+  capabilityCode: string;
+  capabilityName: string;
+  defaultLimit?: number;
+}
+
+export interface FeaturePackItem {
+  featurePackId: string;
+  code: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  items: FeaturePackItemType[];
+}
+
+export interface CreateFeaturePackRequest {
+  code: string;
+  name: string;
+  description?: string;
+  items: { capabilityCode: string; capabilityName: string; defaultLimit?: number }[];
+}
+
+export interface CreateFeaturePackResponse {
+  featurePackId: string;
+  code: string;
+  name: string;
+}
+
 /** API do módulo de Licensing — ativação, verificação, quotas, trial e telemetria. */
 export const licensingApi = {
   activate: (data: { licenseKey: string; hardwareFingerprint: string }) =>
@@ -181,5 +242,32 @@ export const licensingApi = {
         '/licensing/vendor/rehost',
         { licenseKey },
       )
+      .then((r) => r.data),
+
+  // ─── Commercial Catalog (Vendor Operations) ──────────────────────
+
+  vendorListPlans: (activeOnly?: boolean) =>
+    client
+      .get<PlanItem[]>('/licensing/vendor/plans', { params: { activeOnly } })
+      .then((r) => r.data),
+
+  vendorCreatePlan: (data: CreatePlanRequest) =>
+    client
+      .post<CreatePlanResponse>('/licensing/vendor/plans', data)
+      .then((r) => r.data),
+
+  vendorListFeaturePacks: (activeOnly?: boolean) =>
+    client
+      .get<FeaturePackItem[]>('/licensing/vendor/feature-packs', { params: { activeOnly } })
+      .then((r) => r.data),
+
+  vendorCreateFeaturePack: (data: CreateFeaturePackRequest) =>
+    client
+      .post<CreateFeaturePackResponse>('/licensing/vendor/feature-packs', data)
+      .then((r) => r.data),
+
+  vendorGenerateKey: (data: { licenseId: string; keyFormat?: string }) =>
+    client
+      .post<{ licenseId: string; newLicenseKey: string }>('/licensing/vendor/generate-key', data)
       .then((r) => r.data),
 };
