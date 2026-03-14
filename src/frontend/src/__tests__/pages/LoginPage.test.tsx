@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { LoginPage } from '../../pages/LoginPage';
+import { LoginPage } from '../../features/identity-access/pages/LoginPage';
 import { AuthContext } from '../../contexts/AuthContext';
 
 // Helper para criar um valor de contexto de autenticação fake

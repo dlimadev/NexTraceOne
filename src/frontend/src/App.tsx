@@ -3,23 +3,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { LoginPage } from './pages/LoginPage';
-import { TenantSelectionPage } from './pages/TenantSelectionPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { ReleasesPage } from './pages/ReleasesPage';
-import { EngineeringGraphPage } from './pages/EngineeringGraphPage';
-import { ContractsPage } from './pages/ContractsPage';
-import { UsersPage } from './pages/UsersPage';
-import { WorkflowPage } from './pages/WorkflowPage';
-import { PromotionPage } from './pages/PromotionPage';
-import { LicensingPage } from './pages/LicensingPage';
-import { DeveloperPortalPage } from './pages/DeveloperPortalPage';
-import { AuditPage } from './pages/AuditPage';
-import { BreakGlassPage } from './pages/BreakGlassPage';
-import { JitAccessPage } from './pages/JitAccessPage';
-import { DelegationPage } from './pages/DelegationPage';
-import { AccessReviewPage } from './pages/AccessReviewPage';
-import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, UnauthorizedPage } from './features/identity-access';
+import { LicensingPage } from './features/commercial-governance';
+import { ContractsPage, EngineeringGraphPage, DeveloperPortalPage } from './features/catalog';
+import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
+import { AuditPage } from './features/audit-compliance';
+import { DashboardPage } from './features/shared';
 
 const queryClient = new QueryClient({
   defaultOptions: {

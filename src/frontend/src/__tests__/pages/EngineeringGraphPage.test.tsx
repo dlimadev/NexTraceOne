@@ -3,10 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { EngineeringGraphPage } from '../../pages/EngineeringGraphPage';
+import { EngineeringGraphPage } from '../../features/catalog/pages/EngineeringGraphPage';
 import type { AssetGraph } from '../../types';
 
-vi.mock('../../api', () => ({
+vi.mock('../../features/catalog/api', () => ({
   engineeringGraphApi: {
     getGraph: vi.fn(),
     registerService: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock('../../api', () => ({
   },
 }));
 
-import { engineeringGraphApi } from '../../api';
+import { engineeringGraphApi } from '../../features/catalog/api';
 
 const mockGraph: AssetGraph = {
   services: [
