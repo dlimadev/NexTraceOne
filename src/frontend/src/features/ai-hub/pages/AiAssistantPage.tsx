@@ -4,8 +4,9 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 
 /**
- * Página do AI Assistant — assistente contextualizado com serviços, contratos e incidentes.
- * Parte do módulo AI Hub do NexTraceOne.
+ * Página do AI Assistant — placeholder para o assistente IA contextualizado.
+ * A implementação completa integrará serviços, contratos, incidentes e runbooks
+ * conforme definido em AI-ASSISTED-OPERATIONS.md.
  */
 export function AiAssistantPage() {
   const { t } = useTranslation();

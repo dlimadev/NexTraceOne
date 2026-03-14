@@ -4,8 +4,9 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 
 /**
- * Página de FinOps — otimização de custos contextualizada por serviço, equipa e operação.
- * Parte do módulo Governance do NexTraceOne.
+ * Página de FinOps — placeholder para otimização de custos contextual.
+ * A implementação completa integrará dados de OperationalIntelligence.Cost
+ * contextualizados por serviço, equipa, domínio e operação.
  */
 export function FinOpsPage() {
   const { t } = useTranslation();

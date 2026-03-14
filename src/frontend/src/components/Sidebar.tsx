@@ -24,6 +24,7 @@ import {
   BarChart3,
   Scale,
   DollarSign,
+  FileCode,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -69,7 +70,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read', section: 'changes' },
   // ── Operations ──
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
-  { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <BookOpen size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
+  { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
   // ── AI Hub ──
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
   { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:models:read', section: 'aiHub' },
