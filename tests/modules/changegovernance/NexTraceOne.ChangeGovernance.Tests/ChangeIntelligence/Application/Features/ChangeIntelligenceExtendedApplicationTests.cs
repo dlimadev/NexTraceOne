@@ -83,7 +83,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var clock = Substitute.For<IDateTimeProvider>();
         var currentUser = Substitute.For<ICurrentUser>();
         clock.UtcNow.Returns(FixedNow);
-        currentUser.UserId.Returns("admin-user");
+        currentUser.Id.Returns("admin-user");
 
         var sut = new CreateFreezeWindowFeature.Handler(freezeRepo, unitOfWork, clock, currentUser);
 
@@ -203,7 +203,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(release);
-        reviewRepo.GetByReleaseAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+        reviewRepo.GetByReleaseIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns((PostReleaseReview?)null);
 
         var sut = new StartPostReleaseReviewFeature.Handler(releaseRepo, reviewRepo, unitOfWork, clock);
@@ -230,7 +230,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(release);
-        reviewRepo.GetByReleaseAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+        reviewRepo.GetByReleaseIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(existing);
 
         var sut = new StartPostReleaseReviewFeature.Handler(releaseRepo, reviewRepo, unitOfWork, clock);
@@ -274,7 +274,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
-        reviewRepo.GetByReleaseAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+        reviewRepo.GetByReleaseIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(review);
 
         var sut = new ProgressPostReleaseReviewFeature.Handler(reviewRepo, unitOfWork, clock);
@@ -297,7 +297,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
-        reviewRepo.GetByReleaseAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+        reviewRepo.GetByReleaseIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns((PostReleaseReview?)null);
 
         var sut = new ProgressPostReleaseReviewFeature.Handler(reviewRepo, unitOfWork, clock);
