@@ -120,7 +120,7 @@ public sealed class RolePermissionCatalogTests
     // ── Testes de permissões do Engineering Graph ─────────────────────────
 
     [Fact]
-    public void GetPermissionsForRole_Should_IncludeGraphWriteOnly_When_TechLeadOrAbove()
+    public void GetPermissionsForRole_Should_IncludeGraphWrite_When_AdminOrTechLead()
     {
         // Act
         var adminPerms = RolePermissionCatalog.GetPermissionsForRole(Role.PlatformAdmin);
