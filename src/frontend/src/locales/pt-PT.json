@@ -659,7 +659,32 @@
       "status": "Estado",
       "capabilities": "Capabilities",
       "quotas": "Quotas",
-      "trial": "Trial"
+      "trial": "Trial",
+      "telemetry": "Telemetria"
+    },
+    "telemetry": {
+      "title": "Consentimento de Telemetria",
+      "description": "Controle quais dados de utilização e diagnóstico são recolhidos do seu ambiente. As alterações são auditáveis e compatíveis com LGPD/RGPD.",
+      "status": "Estado do Consentimento",
+      "usageMetrics": "Métricas de Utilização",
+      "performanceData": "Dados de Desempenho",
+      "errorDiagnostics": "Diagnóstico de Erros",
+      "lastUpdatedBy": "Atualizado Por",
+      "lastUpdatedAt": "Atualizado Em",
+      "reason": "Motivo",
+      "actions": "Gerir Consentimento",
+      "grantAll": "Conceder Consentimento Total",
+      "grantPartial": "Consentimento Parcial",
+      "denyAll": "Negar Tudo",
+      "confirmDeny": "Tem a certeza que pretende negar toda a recolha de telemetria?",
+      "updateFailed": "Falha ao atualizar consentimento de telemetria.",
+      "updateSuccess": "Consentimento de telemetria atualizado com sucesso.",
+      "statuses": {
+        "notRequested": "Não Solicitado",
+        "granted": "Concedido",
+        "denied": "Negado",
+        "partial": "Parcial"
+      }
     }
   },
   "vendorLicensing": {

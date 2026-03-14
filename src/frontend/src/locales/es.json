@@ -659,7 +659,32 @@
       "status": "Estado",
       "capabilities": "Capabilities",
       "quotas": "Cuotas",
-      "trial": "Trial"
+      "trial": "Trial",
+      "telemetry": "Telemetría"
+    },
+    "telemetry": {
+      "title": "Consentimiento de Telemetría",
+      "description": "Controle qué datos de uso y diagnóstico se recopilan de su entorno. Los cambios son auditables y cumplen con LGPD/GDPR.",
+      "status": "Estado del Consentimiento",
+      "usageMetrics": "Métricas de Uso",
+      "performanceData": "Datos de Rendimiento",
+      "errorDiagnostics": "Diagnóstico de Errores",
+      "lastUpdatedBy": "Actualizado Por",
+      "lastUpdatedAt": "Actualizado En",
+      "reason": "Motivo",
+      "actions": "Gestionar Consentimiento",
+      "grantAll": "Conceder Consentimiento Total",
+      "grantPartial": "Consentimiento Parcial",
+      "denyAll": "Negar Todo",
+      "confirmDeny": "¿Está seguro de que desea negar toda la recopilación de telemetría?",
+      "updateFailed": "Error al actualizar el consentimiento de telemetría.",
+      "updateSuccess": "Consentimiento de telemetría actualizado con éxito.",
+      "statuses": {
+        "notRequested": "No Solicitado",
+        "granted": "Concedido",
+        "denied": "Negado",
+        "partial": "Parcial"
+      }
     }
   },
   "vendorLicensing": {
