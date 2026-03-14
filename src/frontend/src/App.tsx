@@ -5,7 +5,7 @@ import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, EngineeringGraphPage, DeveloperPortalPage } from './features/catalog';
+import { ContractsPage, ServiceCatalogPage, DeveloperPortalPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
@@ -34,7 +34,7 @@ export default function App() {
               {/* ── Home ── */}
               <Route path="/" element={<DashboardPage />} />
               {/* ── Services ── */}
-              <Route path="/services" element={<EngineeringGraphPage />} />
+              <Route path="/services" element={<ServiceCatalogPage />} />
               <Route path="/graph" element={<Navigate to="/services" replace />} />
               <Route
                 path="/portal"

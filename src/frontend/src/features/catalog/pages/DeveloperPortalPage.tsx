@@ -1,7 +1,7 @@
 /**
  * Página do Developer Portal — catálogo de APIs, subscriptions, playground e analytics.
  *
- * Organizada em tabs seguindo o padrão de EngineeringGraphPage e LicensingPage.
+ * Organizada em tabs seguindo o padrão de ServiceCatalogPage e LicensingPage.
  * Todo texto visível usa i18n via t('developerPortal.*').
  * Mutations invalidam as queries relacionadas para manter a UI consistente.
  */

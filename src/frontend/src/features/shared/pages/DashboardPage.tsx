@@ -4,7 +4,7 @@ import { Zap, GitBranch, FileText, CheckSquare, Activity } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
-import { engineeringGraphApi } from '../../catalog/api/engineeringGraph';
+import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 
 /**
  * Página principal do dashboard — exibe visão geral da plataforma.
@@ -15,7 +15,7 @@ export function DashboardPage() {
 
   const { data: graph } = useQuery({
     queryKey: ['graph'],
-    queryFn: () => engineeringGraphApi.getGraph(),
+    queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 30_000,
   });
 

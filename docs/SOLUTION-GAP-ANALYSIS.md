@@ -5,7 +5,7 @@
 Este documento detalha a aderência da solução atual à visão oficial do NexTraceOne,
 classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar do zero**.
 
-Última atualização: 2026-03-14 (limpeza arquitetural executada)
+Última atualização: 2026-03-14 (segunda onda de limpeza executada)
 
 ---
 
@@ -15,10 +15,10 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 |------|--------|-------|
 | Arquitetura modular monolítica | OK | 7 bounded contexts com DDD, CQRS, Result pattern, strongly typed IDs |
 | IdentityAccess | OK | RBAC, sessões, break glass, JIT, delegações, revisão de acessos (186 testes) |
-| Catalog — ServiceCatalog (ex-EngineeringGraph) | OK | ServiceAsset, ApiAsset, consumers, discovery, health, snapshots (388 testes) |
+| Catalog — ServiceCatalog (ex-EngineeringGraph) | OK | ServiceAsset, ApiAsset, consumers, discovery, health, snapshots (387 testes) |
 | Catalog — Contracts | OK | ContractVersion, diffs, artifacts, scorecard, provenance, locking |
 | Catalog — DeveloperPortal | OK | Subscriptions, playground, code gen, analytics, saved searches |
-| ChangeGovernance — ChangeIntelligence | OK | Release, blast radius, scoring, baseline, rollback, markers (171 testes) |
+| ChangeGovernance — ChangeIntelligence | OK | Release, blast radius, scoring, baseline, rollback, markers (155 testes) |
 | ChangeGovernance — Workflow | OK | Templates, stages, approvals, evidence packs, SLA policies |
 | ChangeGovernance — Promotion | OK | Promotion requests, gates, evaluation, freeze windows |
 | ChangeGovernance — RulesetGovernance | OK | Rulesets, lint execution, bindings, default installs |
@@ -28,12 +28,12 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | AIKnowledge — ExternalAI | OK | Providers, policies, consultations, knowledge capture (47 testes) |
 | AIKnowledge — Orchestration | OK | Conversations, test generation, version suggestion, classification |
 | AuditCompliance | OK | Audit log base |
-| BuildingBlocks | OK | Core, Application, Infrastructure, Observability, Security (118 testes) |
+| BuildingBlocks | OK | Core, Application, Infrastructure, Observability, Security (103 testes) |
 | Frontend — Sidebar | OK | 8 seções alinhadas com MODULES-AND-PAGES.md |
 | Frontend — CommandPalette | OK | Espelha sidebar com todos os módulos do produto |
 | Frontend — i18n | OK | 4 locales (en, pt-BR, pt-PT, es); auth.tagline alinhado |
 | Frontend — auth | OK | RBAC, ProtectedRoute, permissões visuais |
-| 1095 testes backend | OK | Todos a passar sem falhas |
+| 1072 testes backend | OK | Todos a passar sem falhas |
 
 ## 2. Reposicionar
 
@@ -46,7 +46,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | ✅ Dashboard subtitle | "change intelligence platform" | "Source of truth..." | Concluído |
 | ✅ Nomes de menu | "Engineering Graph", "Releases" | "Service Catalog", "Change Intelligence" | Concluído |
 | ✅ CommandPalette | Itens antigos (/graph, labels legados) | Espelha sidebar com 8 seções | Concluído |
-| EngineeringGraphPage.tsx (nome) | "EngineeringGraphPage" | "ServiceCatalogPage" | Pendente — renomear ficheiro |
+| ✅ EngineeringGraphPage.tsx (nome) | "EngineeringGraphPage" | "ServiceCatalogPage" | Concluído |
 
 ## 3. Refatorar
 
@@ -57,7 +57,6 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | Source of Truth views | Criar vista consolidada de serviços+contratos+ownership+dependências | Alta |
 | Observabilidade contextual | Vincular métricas a serviços, equipas e mudanças | Média |
 | Persona-aware UI | Variar home, menu, widgets e nível de detalhe por persona | Média |
-| VersionCommunication (domínio órfão) | Conectar ao application/infrastructure layer ou remover | Média |
 | Ingestion.Api (stubs) | Implementar endpoints ou integrar no ApiHost | Baixa |
 
 ## 4. Criar do zero
@@ -91,6 +90,11 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | i18n sidebar.engineeringGraph | REMOVE | Substituído por sidebar.serviceCatalog | 0 |
 | i18n sidebar.contracts | REMOVE | Substituído por sidebar.apiContracts | 0 |
 | i18n sidebar.sectionPlatform | REMOVE | Substituído por seções granulares (Services, Contracts, etc.) | 0 |
+| VersionCommunication domain (6 files + tests) | REMOVE | Domínio completamente órfão — zero consumidores em Application/Infrastructure/API | -13 testes (de 1095 para 1082) |
+| Placeholder tests redundantes (10 files) | REMOVE | Assert.True(true) em diretórios com testes reais — inflavam count sem testar nada | -10 testes (de 1082 para 1072) |
+| EngineeringGraphPage → ServiceCatalogPage | RENAME | Página servia rota /services mas nome antigo causava confusão semântica | 0 — backward-compat mantido |
+| engineeringGraph.ts → serviceCatalog.ts | RENAME | API client module renomeado para alinhar com produto | 0 — URLs backend inalterados |
+| i18n engineeringGraph → serviceCatalog | RENAME | Chaves i18n renomeadas; title "Engineering Graph" → "Service Catalog" | 0 — 4 locales atualizados |
 
 ---
 
@@ -117,12 +121,10 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 | Item | Classificação | Motivo | Risco |
 |------|--------------|--------|-------|
-| VersionCommunication (ChangeGovernance.Domain) | DEPRECATE | Domínio órfão sem Application/Infrastructure/API layers | Baixo — isolado no domain |
 | Ingestion.Api endpoints (5 stubs) | REFACTOR | Endpoints retornam strings placeholder | Baixo — projeto separado |
 | AIKnowledge features (16 handlers) | REFACTOR | Handlers com TODO stubs, sem implementação real | Médio — domínio está bom |
-| EngineeringGraphPage.tsx (nome) | RENAME | Ficheiro ainda chamado "EngineeringGraph" mas rota é /services | Baixo — apenas naming |
 | sanitize.ts, navigation.ts (utils) | KEEP | Utilitários de segurança sem consumidores mas com testes — devem ser integrados | Nenhum |
-| Placeholder tests (Assert.True(true)) | REFACTOR | 5+ projetos de teste só com placeholder | Baixo — não dão falsos positivos perigosos |
+| Placeholder tests restantes (5 projetos) | KEEP | São o único teste nos projetos AuditCompliance, E2E, Integration, Security, Infrastructure — manter até testes reais | Nenhum |
 
 ---
 
@@ -132,9 +134,11 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 1. ✅ Reestruturar navegação frontend — MODULES-AND-PAGES.md
 2. ✅ Alinhar narrativa de produto — auth.tagline, CommandPalette, sidebar
 3. ✅ Remover código morto comprovado — Notifications, StatusPill, Skeleton, i18n stale keys
-4. Service Catalog — reposicionar EngineeringGraphPage como ServiceCatalogPage + Source of Truth view
-5. Contract Studio — expandir Contracts page com editor visual
-6. Change Confidence — consolidar vista de confiança em mudanças
+4. ✅ Remover domínio órfão VersionCommunication — zero consumidores
+5. ✅ Renomear EngineeringGraphPage → ServiceCatalogPage + i18n namespace
+6. ✅ Limpar placeholder tests redundantes — 10 ficheiros removidos
+7. Contract Studio — expandir Contracts page com editor visual
+8. Change Confidence — consolidar vista de confiança em mudanças
 
 ### Confiabilidade operacional (Fase 2)
 7. Incidents & Mitigation — domain + application + UI

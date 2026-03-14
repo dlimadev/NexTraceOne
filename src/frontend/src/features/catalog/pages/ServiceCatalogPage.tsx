@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
-import { engineeringGraphApi } from '../api';
+import { serviceCatalogApi } from '../api';
 import type {
   AssetGraph,
   ApiNode,
@@ -51,7 +51,7 @@ const nodeColors = {
 
 type Tab = 'overview' | 'services' | 'apis' | 'graph' | 'impact' | 'temporal';
 
-export function EngineeringGraphPage() {
+export function ServiceCatalogPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('overview');
@@ -70,40 +70,40 @@ export function EngineeringGraphPage() {
   // ── Queries principais ──────────────────────────────────────────────
   const { data: graph, isLoading } = useQuery({
     queryKey: ['graph'],
-    queryFn: () => engineeringGraphApi.getGraph(),
+    queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 30_000,
   });
 
   const { data: impactResult, isLoading: impactLoading } = useQuery({
     queryKey: ['impact', selectedNodeId, impactDepth],
-    queryFn: () => engineeringGraphApi.getImpactPropagation(selectedNodeId!, impactDepth),
+    queryFn: () => serviceCatalogApi.getImpactPropagation(selectedNodeId!, impactDepth),
     enabled: !!selectedNodeId && tab === 'impact',
     staleTime: 15_000,
   });
 
   const { data: snapshotsData } = useQuery({
     queryKey: ['snapshots'],
-    queryFn: () => engineeringGraphApi.listSnapshots(20),
+    queryFn: () => serviceCatalogApi.listSnapshots(20),
     enabled: tab === 'temporal',
     staleTime: 60_000,
   });
 
   const { data: diffResult, isLoading: diffLoading } = useQuery({
     queryKey: ['temporal-diff', selectedFromSnapshot, selectedToSnapshot],
-    queryFn: () => engineeringGraphApi.getTemporalDiff(selectedFromSnapshot, selectedToSnapshot),
+    queryFn: () => serviceCatalogApi.getTemporalDiff(selectedFromSnapshot, selectedToSnapshot),
     enabled: !!selectedFromSnapshot && !!selectedToSnapshot && selectedFromSnapshot !== selectedToSnapshot,
     staleTime: 30_000,
   });
 
   const { data: healthData } = useQuery({
     queryKey: ['node-health'],
-    queryFn: () => engineeringGraphApi.getNodeHealth('Health'),
+    queryFn: () => serviceCatalogApi.getNodeHealth('Health'),
     staleTime: 30_000,
   });
 
   // ── Mutations ───────────────────────────────────────────────────────
   const registerService = useMutation({
-    mutationFn: engineeringGraphApi.registerService,
+    mutationFn: serviceCatalogApi.registerService,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['graph'] });
       setShowServiceForm(false);
@@ -112,7 +112,7 @@ export function EngineeringGraphPage() {
   });
 
   const registerApi = useMutation({
-    mutationFn: engineeringGraphApi.registerApi,
+    mutationFn: serviceCatalogApi.registerApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['graph'] });
       setShowApiForm(false);
@@ -121,7 +121,7 @@ export function EngineeringGraphPage() {
   });
 
   const createSnapshot = useMutation({
-    mutationFn: (label: string) => engineeringGraphApi.createSnapshot(label),
+    mutationFn: (label: string) => serviceCatalogApi.createSnapshot(label),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['snapshots'] });
     },
@@ -161,12 +161,12 @@ export function EngineeringGraphPage() {
   const snapshots: GraphSnapshotSummary[] = snapshotsData?.items ?? [];
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'overview', label: t('engineeringGraph.tabs.overview'), icon: <BarChart3 size={14} /> },
-    { key: 'graph', label: t('engineeringGraph.tabs.graph'), icon: <GitBranch size={14} /> },
-    { key: 'services', label: t('engineeringGraph.tabs.services'), icon: <Server size={14} /> },
-    { key: 'apis', label: t('engineeringGraph.tabs.apis'), icon: <Globe size={14} /> },
-    { key: 'impact', label: t('engineeringGraph.tabs.impact'), icon: <Zap size={14} /> },
-    { key: 'temporal', label: t('engineeringGraph.tabs.temporal'), icon: <Clock size={14} /> },
+    { key: 'overview', label: t('serviceCatalog.tabs.overview'), icon: <BarChart3 size={14} /> },
+    { key: 'graph', label: t('serviceCatalog.tabs.graph'), icon: <GitBranch size={14} /> },
+    { key: 'services', label: t('serviceCatalog.tabs.services'), icon: <Server size={14} /> },
+    { key: 'apis', label: t('serviceCatalog.tabs.apis'), icon: <Globe size={14} /> },
+    { key: 'impact', label: t('serviceCatalog.tabs.impact'), icon: <Zap size={14} /> },
+    { key: 'temporal', label: t('serviceCatalog.tabs.temporal'), icon: <Clock size={14} /> },
   ];
 
   return (
@@ -174,15 +174,15 @@ export function EngineeringGraphPage() {
       {/* ── Cabeçalho ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-heading">{t('engineeringGraph.title')}</h1>
-          <p className="text-muted mt-1">{t('engineeringGraph.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('serviceCatalog.title')}</h1>
+          <p className="text-muted mt-1">{t('serviceCatalog.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => setShowServiceForm((v) => !v)}>
-            <Plus size={16} /> {t('engineeringGraph.registerService')}
+            <Plus size={16} /> {t('serviceCatalog.registerService')}
           </Button>
           <Button onClick={() => setShowApiForm((v) => !v)}>
-            <Plus size={16} /> {t('engineeringGraph.registerApi')}
+            <Plus size={16} /> {t('serviceCatalog.registerApi')}
           </Button>
         </div>
       </div>
@@ -190,10 +190,10 @@ export function EngineeringGraphPage() {
       {/* ── Estatísticas resumidas ──────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: t('engineeringGraph.stats.services'), value: graphStats.services, icon: <Server size={18} />, color: 'text-blue-500' },
-          { label: t('engineeringGraph.stats.apis'), value: graphStats.apis, icon: <Globe size={18} />, color: 'text-emerald-500' },
-          { label: t('engineeringGraph.stats.edges'), value: graphStats.edges, icon: <GitBranch size={18} />, color: 'text-purple-500' },
-          { label: t('engineeringGraph.stats.domains'), value: graphStats.domains, icon: <Layers size={18} />, color: 'text-amber-500' },
+          { label: t('serviceCatalog.stats.services'), value: graphStats.services, icon: <Server size={18} />, color: 'text-blue-500' },
+          { label: t('serviceCatalog.stats.apis'), value: graphStats.apis, icon: <Globe size={18} />, color: 'text-emerald-500' },
+          { label: t('serviceCatalog.stats.edges'), value: graphStats.edges, icon: <GitBranch size={18} />, color: 'text-purple-500' },
+          { label: t('serviceCatalog.stats.domains'), value: graphStats.domains, icon: <Layers size={18} />, color: 'text-amber-500' },
         ].map((stat) => (
           <Card key={stat.label}>
             <CardBody className="flex items-center gap-3">
@@ -210,16 +210,16 @@ export function EngineeringGraphPage() {
       {/* ── Formulário de registro de serviço ───────────────────────── */}
       {showServiceForm && (
         <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-heading">{t('engineeringGraph.registerServiceTitle')}</h2></CardHeader>
+          <CardHeader><h2 className="font-semibold text-heading">{t('serviceCatalog.registerServiceTitle')}</h2></CardHeader>
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); registerService.mutate(serviceForm); }}
               className="grid grid-cols-3 gap-4"
             >
               {([
-                { field: 'name' as const, key: 'engineeringGraph.name' },
-                { field: 'team' as const, key: 'engineeringGraph.team' },
-                { field: 'description' as const, key: 'engineeringGraph.description' },
+                { field: 'name' as const, key: 'serviceCatalog.name' },
+                { field: 'team' as const, key: 'serviceCatalog.team' },
+                { field: 'description' as const, key: 'serviceCatalog.description' },
               ]).map(({ field, key }) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-body mb-1">{t(key)}</label>
@@ -234,7 +234,7 @@ export function EngineeringGraphPage() {
               ))}
               <div className="col-span-3 flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowServiceForm(false)}>{t('common.cancel')}</Button>
-                <Button type="submit" loading={registerService.isPending}>{t('engineeringGraph.register')}</Button>
+                <Button type="submit" loading={registerService.isPending}>{t('serviceCatalog.register')}</Button>
               </div>
             </form>
           </CardBody>
@@ -244,17 +244,17 @@ export function EngineeringGraphPage() {
       {/* ── Formulário de registro de API ────────────────────────────── */}
       {showApiForm && (
         <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-heading">{t('engineeringGraph.registerApiTitle')}</h2></CardHeader>
+          <CardHeader><h2 className="font-semibold text-heading">{t('serviceCatalog.registerApiTitle')}</h2></CardHeader>
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); registerApi.mutate(apiForm); }}
               className="grid grid-cols-2 gap-4"
             >
               {([
-                { field: 'name' as const, label: t('engineeringGraph.name') },
-                { field: 'baseUrl' as const, label: t('engineeringGraph.baseUrl') },
-                { field: 'ownerServiceId' as const, label: t('engineeringGraph.ownerServiceId') },
-                { field: 'description' as const, label: t('engineeringGraph.description') },
+                { field: 'name' as const, label: t('serviceCatalog.name') },
+                { field: 'baseUrl' as const, label: t('serviceCatalog.baseUrl') },
+                { field: 'ownerServiceId' as const, label: t('serviceCatalog.ownerServiceId') },
+                { field: 'description' as const, label: t('serviceCatalog.description') },
               ]).map(({ field, label }) => (
                 <div key={field}>
                   <label className="block text-sm font-medium text-body mb-1">{label}</label>
@@ -269,7 +269,7 @@ export function EngineeringGraphPage() {
               ))}
               <div className="col-span-2 flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowApiForm(false)}>{t('common.cancel')}</Button>
-                <Button type="submit" loading={registerApi.isPending}>{t('engineeringGraph.register')}</Button>
+                <Button type="submit" loading={registerApi.isPending}>{t('serviceCatalog.register')}</Button>
               </div>
             </form>
           </CardBody>
@@ -282,7 +282,7 @@ export function EngineeringGraphPage() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
           <input
             type="text"
-            placeholder={t('engineeringGraph.searchPlaceholder')}
+            placeholder={t('serviceCatalog.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-3 py-2 rounded-md bg-canvas border border-edge text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
@@ -324,10 +324,10 @@ export function EngineeringGraphPage() {
               {/* KPI cards — métricas operacionais resumidas */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: t('engineeringGraph.overview.requestsPerMin'), value: '—', icon: <Activity size={18} />, color: 'text-blue-500' },
-                  { label: t('engineeringGraph.overview.throughput'), value: '—', icon: <TrendingUp size={18} />, color: 'text-emerald-500' },
-                  { label: t('engineeringGraph.overview.avgLatency'), value: '—', icon: <Timer size={18} />, color: 'text-amber-500' },
-                  { label: t('engineeringGraph.overview.errorRate'), value: '—', icon: <AlertTriangle size={18} />, color: 'text-red-500' },
+                  { label: t('serviceCatalog.overview.requestsPerMin'), value: '—', icon: <Activity size={18} />, color: 'text-blue-500' },
+                  { label: t('serviceCatalog.overview.throughput'), value: '—', icon: <TrendingUp size={18} />, color: 'text-emerald-500' },
+                  { label: t('serviceCatalog.overview.avgLatency'), value: '—', icon: <Timer size={18} />, color: 'text-amber-500' },
+                  { label: t('serviceCatalog.overview.errorRate'), value: '—', icon: <AlertTriangle size={18} />, color: 'text-red-500' },
                 ].map((kpi) => (
                   <Card key={kpi.label}>
                     <CardBody className="flex items-center gap-3">
@@ -344,7 +344,7 @@ export function EngineeringGraphPage() {
               {/* Resumo de saúde dos nós */}
               <Card>
                 <CardHeader>
-                  <h2 className="font-semibold text-heading">{t('engineeringGraph.overview.serviceHealth')}</h2>
+                  <h2 className="font-semibold text-heading">{t('serviceCatalog.overview.serviceHealth')}</h2>
                 </CardHeader>
                 <CardBody>
                   {healthData?.items && healthData.items.length > 0 ? (
@@ -360,7 +360,7 @@ export function EngineeringGraphPage() {
                         return (
                           <div key={status} className={`rounded-lg border p-4 text-center ${colors[status]}`}>
                             <p className="text-3xl font-bold">{count}</p>
-                            <p className="text-xs font-medium mt-1">{t(`engineeringGraph.overview.${status}`)}</p>
+                            <p className="text-xs font-medium mt-1">{t(`serviceCatalog.overview.${status}`)}</p>
                           </div>
                         );
                       })}
@@ -368,8 +368,8 @@ export function EngineeringGraphPage() {
                   ) : (
                     <div className="py-8 text-center">
                       <Activity size={32} className="mx-auto text-muted mb-3" />
-                      <p className="text-sm text-muted">{t('engineeringGraph.overview.noMetrics')}</p>
-                      <p className="text-xs text-muted mt-1">{t('engineeringGraph.overview.noMetricsHint')}</p>
+                      <p className="text-sm text-muted">{t('serviceCatalog.overview.noMetrics')}</p>
+                      <p className="text-xs text-muted mt-1">{t('serviceCatalog.overview.noMetricsHint')}</p>
                     </div>
                   )}
                 </CardBody>
@@ -379,7 +379,7 @@ export function EngineeringGraphPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card>
                   <CardHeader>
-                    <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.overview.topConsumers')}</h3>
+                    <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.overview.topConsumers')}</h3>
                   </CardHeader>
                   <CardBody className="p-0">
                     {graph?.apis && graph.apis.some(a => (a.consumers?.length ?? 0) > 0) ? (
@@ -394,23 +394,23 @@ export function EngineeringGraphPage() {
                                 <p className="text-sm font-medium text-heading">{api.name}</p>
                                 <p className="text-xs text-muted font-mono">{api.routePattern}</p>
                               </div>
-                              <Badge variant="info">{api.consumers?.length ?? 0} {t('engineeringGraph.consumers')}</Badge>
+                              <Badge variant="info">{api.consumers?.length ?? 0} {t('serviceCatalog.consumers')}</Badge>
                             </li>
                           ))}
                       </ul>
                     ) : (
-                      <p className="px-4 py-6 text-sm text-muted text-center">{t('engineeringGraph.noDependencies')}</p>
+                      <p className="px-4 py-6 text-sm text-muted text-center">{t('serviceCatalog.noDependencies')}</p>
                     )}
                   </CardBody>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.overview.anomalies')}</h3>
+                    <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.overview.anomalies')}</h3>
                   </CardHeader>
                   <CardBody className="py-8 text-center">
                     <Shield size={32} className="mx-auto text-muted mb-3" />
-                    <p className="text-sm text-muted">{t('engineeringGraph.overview.noAnomalies')}</p>
+                    <p className="text-sm text-muted">{t('serviceCatalog.overview.noAnomalies')}</p>
                   </CardBody>
                 </Card>
               </div>
@@ -437,7 +437,7 @@ export function EngineeringGraphPage() {
             <Card>
               <CardBody className="p-0">
                 {!filteredServices.length ? (
-                  <p className="px-6 py-12 text-sm text-muted text-center">{t('engineeringGraph.noServices')}</p>
+                  <p className="px-6 py-12 text-sm text-muted text-center">{t('serviceCatalog.noServices')}</p>
                 ) : (
                   <ul className="divide-y divide-edge">
                     {filteredServices.map((svc) => (
@@ -464,7 +464,7 @@ export function EngineeringGraphPage() {
             <Card>
               <CardBody className="p-0">
                 {!filteredApis.length ? (
-                  <p className="px-6 py-12 text-sm text-muted text-center">{t('engineeringGraph.noApis')}</p>
+                  <p className="px-6 py-12 text-sm text-muted text-center">{t('serviceCatalog.noApis')}</p>
                 ) : (
                   <ul className="divide-y divide-edge">
                     {filteredApis.map((api) => (
@@ -478,7 +478,7 @@ export function EngineeringGraphPage() {
                         </div>
                         <div className="text-right">
                           <Badge variant={api.visibility === 'Public' ? 'success' : 'default'}>{api.visibility}</Badge>
-                          <p className="text-xs text-muted mt-1">v{api.version} · {api.consumers?.length ?? 0} {t('engineeringGraph.consumers')}</p>
+                          <p className="text-xs text-muted mt-1">v{api.version} · {api.consumers?.length ?? 0} {t('serviceCatalog.consumers')}</p>
                         </div>
                         <ChevronRight size={16} className="text-muted" />
                       </li>
@@ -538,7 +538,7 @@ function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSele
       <Card>
         <CardBody className="py-12 text-center">
           <GitBranch size={40} className="mx-auto text-muted mb-4" />
-          <p className="text-muted">{t('engineeringGraph.emptyGraph')}</p>
+          <p className="text-muted">{t('serviceCatalog.emptyGraph')}</p>
         </CardBody>
       </Card>
     );
@@ -571,18 +571,18 @@ function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSele
       {/* ── Legenda ───────────────────────────────────────────── */}
       <Card>
         <CardBody className="flex items-center gap-6 py-2">
-          <span className="text-xs font-medium text-muted">{t('engineeringGraph.legend')}:</span>
+          <span className="text-xs font-medium text-muted">{t('serviceCatalog.legend')}:</span>
           <span className="flex items-center gap-1.5 text-xs">
             <span className={`w-3 h-3 rounded ${nodeColors.service.bg} ${nodeColors.service.border} border`} />
-            {t('engineeringGraph.legendService')}
+            {t('serviceCatalog.legendService')}
           </span>
           <span className="flex items-center gap-1.5 text-xs">
             <span className={`w-3 h-3 rounded ${nodeColors.api.bg} ${nodeColors.api.border} border`} />
-            {t('engineeringGraph.legendApi')}
+            {t('serviceCatalog.legendApi')}
           </span>
           <span className="flex items-center gap-1.5 text-xs">
             <ArrowRight size={12} className="text-muted" />
-            {t('engineeringGraph.legendDependency')}
+            {t('serviceCatalog.legendDependency')}
           </span>
         </CardBody>
       </Card>
@@ -602,7 +602,7 @@ function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSele
             </CardHeader>
             <CardBody className="p-3 space-y-2">
               {apis.length === 0 ? (
-                <p className="text-xs text-muted italic">{t('engineeringGraph.noApisForService')}</p>
+                <p className="text-xs text-muted italic">{t('serviceCatalog.noApisForService')}</p>
               ) : (
                 apis.map((api) => (
                   <div
@@ -641,15 +641,15 @@ function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSele
       {crossServiceEdges.length > 0 && (
         <Card>
           <CardHeader>
-            <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.crossServiceDependencies')}</h3>
+            <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.crossServiceDependencies')}</h3>
           </CardHeader>
           <CardBody className="p-0">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-edge bg-panel text-left">
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.sourceApi')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.consumerService')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.confidence')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.sourceApi')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.consumerService')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.confidence')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
@@ -698,13 +698,13 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
         <CardBody>
           <div className="flex items-end gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-body mb-1">{t('engineeringGraph.impact.selectNode')}</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.impact.selectNode')}</label>
               <select
                 value={selectedNodeId ?? ''}
                 onChange={(e) => onSelectNode(e.target.value)}
                 className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
               >
-                <option value="">{t('engineeringGraph.impact.selectNodePlaceholder')}</option>
+                <option value="">{t('serviceCatalog.impact.selectNodePlaceholder')}</option>
                 {graph?.apis?.map((api) => (
                   <option key={api.apiAssetId} value={api.apiAssetId}>
                     API: {api.name} ({api.routePattern})
@@ -718,7 +718,7 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
               </select>
             </div>
             <div className="w-32">
-              <label className="block text-sm font-medium text-body mb-1">{t('engineeringGraph.impact.maxDepth')}</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.impact.maxDepth')}</label>
               <select
                 value={impactDepth}
                 onChange={(e) => onChangeDepth(Number(e.target.value))}
@@ -738,7 +738,7 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
         <Card>
           <CardBody className="py-12 text-center">
             <Zap size={40} className="mx-auto text-muted mb-4" />
-            <p className="text-muted">{t('engineeringGraph.impact.selectNodeHint')}</p>
+            <p className="text-muted">{t('serviceCatalog.impact.selectNodeHint')}</p>
           </CardBody>
         </Card>
       )}
@@ -747,7 +747,7 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
       {selectedNodeId && impactLoading && (
         <div className="flex items-center justify-center py-12">
           <RefreshCw size={20} className="animate-spin text-muted" />
-          <span className="ml-2 text-muted">{t('engineeringGraph.impact.calculating')}</span>
+          <span className="ml-2 text-muted">{t('serviceCatalog.impact.calculating')}</span>
         </div>
       )}
 
@@ -758,19 +758,19 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
             <Card>
               <CardBody className="text-center">
                 <p className="text-3xl font-bold text-heading">{impactResult.directCount + impactResult.transitiveCount}</p>
-                <p className="text-xs text-muted">{t('engineeringGraph.impact.totalImpacted')}</p>
+                <p className="text-xs text-muted">{t('serviceCatalog.impact.totalImpacted')}</p>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center">
                 <p className="text-3xl font-bold text-amber-600">{impactResult.directCount}</p>
-                <p className="text-xs text-muted">{t('engineeringGraph.impact.directConsumers')}</p>
+                <p className="text-xs text-muted">{t('serviceCatalog.impact.directConsumers')}</p>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center">
                 <p className="text-3xl font-bold text-red-600">{impactResult.transitiveCount}</p>
-                <p className="text-xs text-muted">{t('engineeringGraph.impact.transitiveConsumers')}</p>
+                <p className="text-xs text-muted">{t('serviceCatalog.impact.transitiveConsumers')}</p>
               </CardBody>
             </Card>
           </div>
@@ -778,16 +778,16 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
           {impactResult.impactedNodes.length > 0 && (
             <Card>
               <CardHeader>
-                <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.impact.impactedNodes')}</h3>
+                <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.impact.impactedNodes')}</h3>
               </CardHeader>
               <CardBody className="p-0">
                 <table className="min-w-full text-sm">
                   <thead>
                     <tr className="border-b border-edge bg-panel text-left">
-                      <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.impact.node')}</th>
-                      <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.impact.depth')}</th>
-                      <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.confidence')}</th>
-                      <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.impact.path')}</th>
+                      <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.impact.node')}</th>
+                      <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.impact.depth')}</th>
+                      <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.confidence')}</th>
+                      <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.impact.path')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-edge">
@@ -855,31 +855,31 @@ function TemporalPanel({
         <CardBody>
           <div className="flex items-end gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-body mb-1">{t('engineeringGraph.temporal.fromSnapshot')}</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.temporal.fromSnapshot')}</label>
               <select
                 value={selectedFrom}
                 onChange={(e) => onSelectFrom(e.target.value)}
                 className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
               >
-                <option value="">{t('engineeringGraph.temporal.selectSnapshot')}</option>
+                <option value="">{t('serviceCatalog.temporal.selectSnapshot')}</option>
                 {snapshots.map((s) => (
                   <option key={s.snapshotId} value={s.snapshotId}>
-                    {s.label} — {new Date(s.capturedAt).toLocaleDateString()} ({s.nodeCount} {t('engineeringGraph.temporal.nodes')}, {s.edgeCount} {t('engineeringGraph.temporal.edges')})
+                    {s.label} — {new Date(s.capturedAt).toLocaleDateString()} ({s.nodeCount} {t('serviceCatalog.temporal.nodes')}, {s.edgeCount} {t('serviceCatalog.temporal.edges')})
                   </option>
                 ))}
               </select>
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-body mb-1">{t('engineeringGraph.temporal.toSnapshot')}</label>
+              <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.temporal.toSnapshot')}</label>
               <select
                 value={selectedTo}
                 onChange={(e) => onSelectTo(e.target.value)}
                 className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent"
               >
-                <option value="">{t('engineeringGraph.temporal.selectSnapshot')}</option>
+                <option value="">{t('serviceCatalog.temporal.selectSnapshot')}</option>
                 {snapshots.map((s) => (
                   <option key={s.snapshotId} value={s.snapshotId}>
-                    {s.label} — {new Date(s.capturedAt).toLocaleDateString()} ({s.nodeCount} {t('engineeringGraph.temporal.nodes')}, {s.edgeCount} {t('engineeringGraph.temporal.edges')})
+                    {s.label} — {new Date(s.capturedAt).toLocaleDateString()} ({s.nodeCount} {t('serviceCatalog.temporal.nodes')}, {s.edgeCount} {t('serviceCatalog.temporal.edges')})
                   </option>
                 ))}
               </select>
@@ -889,7 +889,7 @@ function TemporalPanel({
               onClick={onCreateSnapshot}
               loading={createSnapshotPending}
             >
-              <Clock size={16} /> {t('engineeringGraph.temporal.createSnapshot')}
+              <Clock size={16} /> {t('serviceCatalog.temporal.createSnapshot')}
             </Button>
           </div>
         </CardBody>
@@ -900,8 +900,8 @@ function TemporalPanel({
         <Card>
           <CardBody className="py-12 text-center">
             <Clock size={40} className="mx-auto text-muted mb-4" />
-            <p className="text-muted">{t('engineeringGraph.temporal.noSnapshots')}</p>
-            <p className="text-xs text-muted mt-2">{t('engineeringGraph.temporal.createFirst')}</p>
+            <p className="text-muted">{t('serviceCatalog.temporal.noSnapshots')}</p>
+            <p className="text-xs text-muted mt-2">{t('serviceCatalog.temporal.createFirst')}</p>
           </CardBody>
         </Card>
       )}
@@ -910,17 +910,17 @@ function TemporalPanel({
       {snapshots.length > 0 && (
         <Card>
           <CardHeader>
-            <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.temporal.snapshotHistory')}</h3>
+            <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.temporal.snapshotHistory')}</h3>
           </CardHeader>
           <CardBody className="p-0">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-edge bg-panel text-left">
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.temporal.label')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.temporal.capturedAt')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.temporal.nodes')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.temporal.edges')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('engineeringGraph.temporal.createdBy')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.temporal.label')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.temporal.capturedAt')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.temporal.nodes')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.temporal.edges')}</th>
+                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.temporal.createdBy')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
@@ -943,7 +943,7 @@ function TemporalPanel({
       {diffLoading && (
         <div className="flex items-center justify-center py-8">
           <RefreshCw size={20} className="animate-spin text-muted" />
-          <span className="ml-2 text-muted">{t('engineeringGraph.temporal.calculatingDiff')}</span>
+          <span className="ml-2 text-muted">{t('serviceCatalog.temporal.calculatingDiff')}</span>
         </div>
       )}
 
@@ -953,25 +953,25 @@ function TemporalPanel({
           <Card>
             <CardBody className="text-center">
               <p className="text-2xl font-bold text-emerald-600">+{diffResult.addedNodesCount}</p>
-              <p className="text-xs text-muted">{t('engineeringGraph.temporal.addedNodes')}</p>
+              <p className="text-xs text-muted">{t('serviceCatalog.temporal.addedNodes')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-center">
               <p className="text-2xl font-bold text-red-600">-{diffResult.removedNodesCount}</p>
-              <p className="text-xs text-muted">{t('engineeringGraph.temporal.removedNodes')}</p>
+              <p className="text-xs text-muted">{t('serviceCatalog.temporal.removedNodes')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-center">
               <p className="text-2xl font-bold text-emerald-600">+{diffResult.addedEdgesCount}</p>
-              <p className="text-xs text-muted">{t('engineeringGraph.temporal.addedEdges')}</p>
+              <p className="text-xs text-muted">{t('serviceCatalog.temporal.addedEdges')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-center">
               <p className="text-2xl font-bold text-red-600">-{diffResult.removedEdgesCount}</p>
-              <p className="text-xs text-muted">{t('engineeringGraph.temporal.removedEdges')}</p>
+              <p className="text-xs text-muted">{t('serviceCatalog.temporal.removedEdges')}</p>
             </CardBody>
           </Card>
         </div>
@@ -1023,8 +1023,8 @@ function ServiceDetailPanel({
     <div className="absolute top-0 right-0 w-80 z-10 animate-fade-in">
       <Card className="shadow-lg border-edge">
         <CardHeader className="flex items-center justify-between">
-          <h3 className="font-semibold text-heading text-sm">{t('engineeringGraph.detail.title')}</h3>
-          <button onClick={onClose} className="text-muted hover:text-body transition-colors" aria-label={t('engineeringGraph.detail.close')}>
+          <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.detail.title')}</h3>
+          <button onClick={onClose} className="text-muted hover:text-body transition-colors" aria-label={t('serviceCatalog.detail.close')}>
             <X size={16} />
           </button>
         </CardHeader>
@@ -1034,9 +1034,9 @@ function ServiceDetailPanel({
             <p className="font-medium text-heading">{nodeName}</p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant={healthBadgeVariant(healthStatus)}>
-                {t(`engineeringGraph.overview.${healthStatus.toLowerCase()}`)}
+                {t(`serviceCatalog.overview.${healthStatus.toLowerCase()}`)}
               </Badge>
-              {nodeHealth && <span className="text-xs text-muted">{t('engineeringGraph.overview.healthScore')}: {nodeHealth.score.toFixed(2)}</span>}
+              {nodeHealth && <span className="text-xs text-muted">{t('serviceCatalog.overview.healthScore')}: {nodeHealth.score.toFixed(2)}</span>}
             </div>
           </div>
 
@@ -1044,11 +1044,11 @@ function ServiceDetailPanel({
           {service && (
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted">{t('engineeringGraph.detail.domain')}</span>
+                <span className="text-muted">{t('serviceCatalog.detail.domain')}</span>
                 <span className="text-heading">{service.domain}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted">{t('engineeringGraph.detail.team')}</span>
+                <span className="text-muted">{t('serviceCatalog.detail.team')}</span>
                 <span className="text-heading">{service.teamName}</span>
               </div>
             </div>
@@ -1058,7 +1058,7 @@ function ServiceDetailPanel({
           {api && (
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted">{t('engineeringGraph.detail.version')}</span>
+                <span className="text-muted">{t('serviceCatalog.detail.version')}</span>
                 <span className="text-heading">v{api.version}</span>
               </div>
             </div>
@@ -1068,28 +1068,28 @@ function ServiceDetailPanel({
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-md bg-elevated p-3 text-center">
               <p className="text-lg font-bold text-heading">{consumerCount}</p>
-              <p className="text-xs text-muted">{t('engineeringGraph.detail.consumerCount')}</p>
+              <p className="text-xs text-muted">{t('serviceCatalog.detail.consumerCount')}</p>
             </div>
             <div className="rounded-md bg-elevated p-3 text-center">
               <p className="text-lg font-bold text-heading">{dependencyCount}</p>
-              <p className="text-xs text-muted">{t('engineeringGraph.detail.dependencyCount')}</p>
+              <p className="text-xs text-muted">{t('serviceCatalog.detail.dependencyCount')}</p>
             </div>
           </div>
 
           {/* Proveniência dos dados */}
           <div>
-            <p className="text-xs font-medium text-heading mb-2">{t('engineeringGraph.detail.dataProvenance')}</p>
+            <p className="text-xs font-medium text-heading mb-2">{t('serviceCatalog.detail.dataProvenance')}</p>
             <div className="space-y-1 text-xs text-muted">
               <div className="flex justify-between">
-                <span>{t('engineeringGraph.overview.provenance')}</span>
-                <Badge variant="default">{t('engineeringGraph.overview.catalogImport')}</Badge>
+                <span>{t('serviceCatalog.overview.provenance')}</span>
+                <Badge variant="default">{t('serviceCatalog.overview.catalogImport')}</Badge>
               </div>
               <div className="flex justify-between">
-                <span>{t('engineeringGraph.overview.confidence')}</span>
+                <span>{t('serviceCatalog.overview.confidence')}</span>
                 <span>—</span>
               </div>
               <div className="flex justify-between">
-                <span>{t('engineeringGraph.overview.freshness')}</span>
+                <span>{t('serviceCatalog.overview.freshness')}</span>
                 <span>—</span>
               </div>
             </div>
@@ -1097,12 +1097,12 @@ function ServiceDetailPanel({
 
           {/* Issues críticas */}
           <div>
-            <p className="text-xs font-medium text-heading mb-1">{t('engineeringGraph.detail.criticalIssues')}</p>
-            <p className="text-xs text-muted">{t('engineeringGraph.detail.noCriticalIssues')}</p>
+            <p className="text-xs font-medium text-heading mb-1">{t('serviceCatalog.detail.criticalIssues')}</p>
+            <p className="text-xs text-muted">{t('serviceCatalog.detail.noCriticalIssues')}</p>
           </div>
 
           <Button variant="secondary" className="w-full" onClick={onClose}>
-            {t('engineeringGraph.detail.close')}
+            {t('serviceCatalog.detail.close')}
           </Button>
         </CardBody>
       </Card>

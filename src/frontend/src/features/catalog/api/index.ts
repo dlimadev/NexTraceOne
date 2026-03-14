@@ -1,3 +1,3 @@
 export { contractsApi } from './contracts';
-export { engineeringGraphApi } from './engineeringGraph';
+export { serviceCatalogApi } from './serviceCatalog';
 export { developerPortalApi } from './developerPortal';

@@ -3,7 +3,7 @@
  * para manter compatibilidade com importações existentes.
  */
 export { identityApi } from '../features/identity-access/api/identity';
-export { engineeringGraphApi } from '../features/catalog/api/engineeringGraph';
+export { serviceCatalogApi } from '../features/catalog/api/serviceCatalog';
 export { contractsApi } from '../features/catalog/api/contracts';
 export { changeIntelligenceApi } from '../features/change-governance/api/changeIntelligence';
 export { workflowApi } from '../features/change-governance/api/workflow';

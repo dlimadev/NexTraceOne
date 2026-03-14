@@ -3,11 +3,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { EngineeringGraphPage } from '../../features/catalog/pages/EngineeringGraphPage';
+import { ServiceCatalogPage } from '../../features/catalog/pages/ServiceCatalogPage';
 import type { AssetGraph } from '../../types';
 
 vi.mock('../../features/catalog/api', () => ({
-  engineeringGraphApi: {
+  serviceCatalogApi: {
     getGraph: vi.fn(),
     registerService: vi.fn(),
     registerApi: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock('../../features/catalog/api', () => ({
   },
 }));
 
-import { engineeringGraphApi } from '../../features/catalog/api';
+import { serviceCatalogApi } from '../../features/catalog/api';
 
 const mockGraph: AssetGraph = {
   services: [
@@ -47,25 +47,25 @@ function renderGraph() {
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter>
-        <EngineeringGraphPage />
+        <ServiceCatalogPage />
       </MemoryRouter>
     </QueryClientProvider>
   );
 }
 
-describe('EngineeringGraphPage', () => {
+describe('ServiceCatalogPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('exibe o título da página', () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    expect(screen.getByRole('heading', { name: /engineering graph/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /service catalog/i })).toBeInTheDocument();
   });
 
   it('exibe as abas de navegação incluindo novas abas', () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
     expect(screen.getByRole('button', { name: /services/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /apis/i })).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('EngineeringGraphPage', () => {
   });
 
   it('exibe os serviços carregados na aba Services', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
     await userEvent.click(screen.getByRole('button', { name: /services/i }));
     await waitFor(() => {
@@ -85,7 +85,7 @@ describe('EngineeringGraphPage', () => {
   });
 
   it('navega para a aba APIs e exibe as APIs', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
     await userEvent.click(screen.getByRole('button', { name: /apis/i }));
     await waitFor(() => {
@@ -95,7 +95,7 @@ describe('EngineeringGraphPage', () => {
   });
 
   it('exibe formulário de serviço ao clicar em Register Service', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
     const serviceBtn = screen.getAllByRole('button').find(
       (btn) => btn.textContent?.includes('Register Service')
@@ -108,7 +108,7 @@ describe('EngineeringGraphPage', () => {
   });
 
   it('exibe formulário de API ao clicar em Register API', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
     const apiBtn = screen.getAllByRole('button').find(
       (btn) => btn.textContent?.includes('Register API')
@@ -120,8 +120,8 @@ describe('EngineeringGraphPage', () => {
   });
 
   it('chama registerService ao submeter o formulário de serviço', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({ services: [], apis: [] });
-    vi.mocked(engineeringGraphApi.registerService).mockResolvedValue({ id: 's-new' });
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({ services: [], apis: [] });
+    vi.mocked(serviceCatalogApi.registerService).mockResolvedValue({ id: 's-new' });
     renderGraph();
     const serviceBtn = screen.getAllByRole('button').find(
       (btn) => btn.textContent?.includes('Register Service')
@@ -131,14 +131,14 @@ describe('EngineeringGraphPage', () => {
     await userEvent.type(screen.getAllByRole('textbox')[1], 'Platform');
     await userEvent.click(screen.getByRole('button', { name: /register$/i }));
     await waitFor(() => {
-      expect(engineeringGraphApi.registerService).toHaveBeenCalled();
-      const [firstArg] = vi.mocked(engineeringGraphApi.registerService).mock.calls[0];
+      expect(serviceCatalogApi.registerService).toHaveBeenCalled();
+      const [firstArg] = vi.mocked(serviceCatalogApi.registerService).mock.calls[0];
       expect(firstArg).toMatchObject({ name: 'new-service', team: 'Platform' });
     });
   });
 
   it('exibe mensagem quando não há serviços registados', async () => {
-    vi.mocked(engineeringGraphApi.getGraph).mockResolvedValue({ services: [], apis: [] });
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({ services: [], apis: [] });
     renderGraph();
     await userEvent.click(screen.getByRole('button', { name: /services/i }));
     await waitFor(() => {

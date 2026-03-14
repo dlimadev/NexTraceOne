@@ -2,7 +2,7 @@
  * Página de Licensing — visualização do estado da licença, capabilities,
  * quotas de uso e gestão de trial.
  *
- * Segue o padrão de tabs do EngineeringGraphPage e a estrutura de formulários
+ * Segue o padrão de tabs do ServiceCatalogPage e a estrutura de formulários
  * do PromotionPage. Todo texto visível usa i18n via t('licensing.*').
  */
 import { useState } from 'react';

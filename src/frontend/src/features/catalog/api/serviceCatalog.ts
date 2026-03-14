@@ -8,8 +8,8 @@ import type {
   NodeHealthResult,
 } from '../../../types';
 
-/** Cliente de API para o módulo Engineering Graph. */
-export const engineeringGraphApi = {
+/** Cliente de API para o módulo Service Catalog (Engineering Graph backend). */
+export const serviceCatalogApi = {
   /** Obtém o grafo completo de ativos e relacionamentos. */
   getGraph: () =>
     client.get<AssetGraph>('/engineeringgraph/graph').then((r) => r.data),
