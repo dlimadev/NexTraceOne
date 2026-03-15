@@ -22,6 +22,9 @@ public static class ListSuggestedPrompts
     /// <summary>Handler que retorna prompts sugeridos filtrados por persona e categoria.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
+        /// <summary>Valor especial de persona que indica aplicabilidade a todas as personas.</summary>
+        private const string AllPersonas = "all";
+
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -33,7 +36,7 @@ public static class ListSuggestedPrompts
             if (!string.IsNullOrWhiteSpace(request.Persona))
                 filtered = filtered.Where(p =>
                     p.Personas.Contains(request.Persona, StringComparer.OrdinalIgnoreCase) ||
-                    p.Personas.Contains("all", StringComparer.OrdinalIgnoreCase));
+                    p.Personas.Contains(AllPersonas, StringComparer.OrdinalIgnoreCase));
 
             if (!string.IsNullOrWhiteSpace(request.Category))
                 filtered = filtered.Where(p =>
