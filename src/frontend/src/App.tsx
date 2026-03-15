@@ -11,7 +11,7 @@ import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDet
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
 import { IncidentsPage, IncidentDetailPage, RunbooksPage, TeamReliabilityPage, ServiceReliabilityDetailPage } from './features/operations';
-import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage } from './features/ai-hub';
+import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage, IdeIntegrationsPage } from './features/ai-hub';
 import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage } from './features/governance';
 
 const queryClient = new QueryClient({
@@ -156,6 +156,7 @@ export default function App() {
               <Route path="/ai/assistant" element={<AiAssistantPage />} />
               <Route path="/ai/models" element={<ModelRegistryPage />} />
               <Route path="/ai/policies" element={<AiPoliciesPage />} />
+              <Route path="/ai/ide" element={<IdeIntegrationsPage />} />
               {/* ── Governance ── */}
               <Route path="/governance/reports" element={<ReportsPage />} />
               <Route path="/governance/risk" element={<RiskCenterPage />} />
