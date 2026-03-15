@@ -58,7 +58,7 @@ public static class GetMitigationWorkflow
                     CompletedAt: null,
                     Outcome: null,
                     OutcomeNotes: null,
-                    LinkedRunbookId: Guid.Parse("rb000001-0001-0000-0000-000000000001"),
+                    LinkedRunbookId: Guid.Parse("bb000001-0001-0000-0000-000000000001"),
                     Steps: new[]
                     {
                         new WorkflowStepDto(1, "Trigger rollback pipeline", "Initiate the CI/CD rollback to v2.13.2", true, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:36:00Z"), null),
@@ -91,7 +91,7 @@ public static class GetMitigationWorkflow
                     CompletedAt: null,
                     Outcome: null,
                     OutcomeNotes: null,
-                    LinkedRunbookId: Guid.Parse("rb000002-0001-0000-0000-000000000001"),
+                    LinkedRunbookId: Guid.Parse("bb000002-0001-0000-0000-000000000001"),
                     Steps: new[]
                     {
                         new WorkflowStepDto(1, "Check vendor status page", "Verify current status of external provider", false, null, null, null),

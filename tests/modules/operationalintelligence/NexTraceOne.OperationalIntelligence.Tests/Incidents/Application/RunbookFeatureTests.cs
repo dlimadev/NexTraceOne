@@ -79,7 +79,7 @@ public sealed class RunbookFeatureTests
     public async Task GetRunbookDetail_KnownRunbook_ShouldReturnDetailWithSteps()
     {
         var handler = new GetRunbookDetail.Handler();
-        var query = new GetRunbookDetail.Query("rb000001-0001-0000-0000-000000000001");
+        var query = new GetRunbookDetail.Query("bb000001-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
 

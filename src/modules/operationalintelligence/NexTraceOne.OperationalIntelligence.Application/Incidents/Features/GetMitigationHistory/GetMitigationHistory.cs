@@ -45,7 +45,7 @@ public static class GetMitigationHistory
                     Entries: new[]
                     {
                         new MitigationAuditEntryDto(
-                            EntryId: Guid.Parse("audit0001-0001-0000-0000-000000000001"),
+                            EntryId: Guid.Parse("aad10001-0001-0000-0000-000000000001"),
                             WorkflowId: Guid.Parse("00000001-0001-0000-0000-000000000001"),
                             Action: "workflow-created",
                             PerformedBy: "ai-assistant",
@@ -55,7 +55,7 @@ public static class GetMitigationHistory
                             ValidationResult: null,
                             LinkedEvidence: new[] { "deployment-diff:v2.13.2..v2.14.0", "error-rate-spike:14.2%" }),
                         new MitigationAuditEntryDto(
-                            EntryId: Guid.Parse("audit0001-0002-0000-0000-000000000002"),
+                            EntryId: Guid.Parse("aad10001-0002-0000-0000-000000000002"),
                             WorkflowId: Guid.Parse("00000001-0001-0000-0000-000000000001"),
                             Action: "approved",
                             PerformedBy: "tech-lead@nextraceone.io",
@@ -65,7 +65,7 @@ public static class GetMitigationHistory
                             ValidationResult: null,
                             LinkedEvidence: Array.Empty<string>()),
                         new MitigationAuditEntryDto(
-                            EntryId: Guid.Parse("audit0001-0003-0000-0000-000000000003"),
+                            EntryId: Guid.Parse("aad10001-0003-0000-0000-000000000003"),
                             WorkflowId: Guid.Parse("00000001-0001-0000-0000-000000000001"),
                             Action: "rollback-triggered",
                             PerformedBy: "ops-engineer@nextraceone.io",
@@ -75,7 +75,7 @@ public static class GetMitigationHistory
                             ValidationResult: "Deployment reverted successfully",
                             LinkedEvidence: new[] { "pipeline-run:12345" }),
                         new MitigationAuditEntryDto(
-                            EntryId: Guid.Parse("audit0001-0004-0000-0000-000000000004"),
+                            EntryId: Guid.Parse("aad10001-0004-0000-0000-000000000004"),
                             WorkflowId: Guid.Parse("00000001-0001-0000-0000-000000000001"),
                             Action: "step-completed",
                             PerformedBy: "ops-engineer@nextraceone.io",
@@ -94,7 +94,7 @@ public static class GetMitigationHistory
                     Entries: new[]
                     {
                         new MitigationAuditEntryDto(
-                            EntryId: Guid.Parse("audit0002-0001-0000-0000-000000000001"),
+                            EntryId: Guid.Parse("aad10002-0001-0000-0000-000000000001"),
                             WorkflowId: Guid.Parse("00000002-0001-0000-0000-000000000001"),
                             Action: "workflow-created",
                             PerformedBy: "ai-assistant",
@@ -104,7 +104,7 @@ public static class GetMitigationHistory
                             ValidationResult: null,
                             LinkedEvidence: new[] { "connection-timeout:catalog-sync-provider" }),
                         new MitigationAuditEntryDto(
-                            EntryId: Guid.Parse("audit0002-0002-0000-0000-000000000002"),
+                            EntryId: Guid.Parse("aad10002-0002-0000-0000-000000000002"),
                             WorkflowId: null,
                             Action: "recommendation-generated",
                             PerformedBy: "ai-assistant",

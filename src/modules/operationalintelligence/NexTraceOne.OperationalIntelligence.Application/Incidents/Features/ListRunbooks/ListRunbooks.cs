@@ -30,7 +30,7 @@ public static class ListRunbooks
         private static readonly List<RunbookSummaryDto> AllRunbooks = new()
         {
             new RunbookSummaryDto(
-                RunbookId: Guid.Parse("rb000001-0001-0000-0000-000000000001"),
+                RunbookId: Guid.Parse("bb000001-0001-0000-0000-000000000001"),
                 Title: "Payment Gateway Rollback Procedure",
                 Summary: "Step-by-step guide for rolling back the payment-service deployment.",
                 LinkedServiceId: "payment-service",
@@ -38,7 +38,7 @@ public static class ListRunbooks
                 StepCount: 6,
                 CreatedAt: DateTimeOffset.Parse("2024-01-15T09:00:00Z")),
             new RunbookSummaryDto(
-                RunbookId: Guid.Parse("rb000002-0001-0000-0000-000000000001"),
+                RunbookId: Guid.Parse("bb000002-0001-0000-0000-000000000001"),
                 Title: "Catalog Sync Manual Recovery",
                 Summary: "Steps for manually recovering catalog synchronization.",
                 LinkedServiceId: "catalog-service",
@@ -46,7 +46,7 @@ public static class ListRunbooks
                 StepCount: 4,
                 CreatedAt: DateTimeOffset.Parse("2024-02-10T11:00:00Z")),
             new RunbookSummaryDto(
-                RunbookId: Guid.Parse("rb000003-0001-0000-0000-000000000001"),
+                RunbookId: Guid.Parse("bb000003-0001-0000-0000-000000000001"),
                 Title: "Generic Service Restart Procedure",
                 Summary: "Standard procedure for performing a controlled restart of a service.",
                 LinkedServiceId: null,

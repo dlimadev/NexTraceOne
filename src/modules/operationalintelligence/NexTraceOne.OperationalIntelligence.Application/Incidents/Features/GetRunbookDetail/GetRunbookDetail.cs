@@ -37,7 +37,7 @@ public static class GetRunbookDetail
 
         private static Response? FindRunbook(string runbookId)
         {
-            if (runbookId.Equals("rb000001-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
+            if (runbookId.Equals("bb000001-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
             {
                 return new Response(
                     RunbookId: Guid.Parse(runbookId),
@@ -66,7 +66,7 @@ public static class GetRunbookDetail
                     UpdatedAt: DateTimeOffset.Parse("2024-05-20T14:30:00Z"));
             }
 
-            if (runbookId.Equals("rb000002-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
+            if (runbookId.Equals("bb000002-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
             {
                 return new Response(
                     RunbookId: Guid.Parse(runbookId),
@@ -92,7 +92,7 @@ public static class GetRunbookDetail
                     UpdatedAt: null);
             }
 
-            if (runbookId.Equals("rb000003-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
+            if (runbookId.Equals("bb000003-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
             {
                 return new Response(
                     RunbookId: Guid.Parse(runbookId),

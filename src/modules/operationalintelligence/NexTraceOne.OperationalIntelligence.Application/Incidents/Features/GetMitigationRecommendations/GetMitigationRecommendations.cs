@@ -45,7 +45,7 @@ public static class GetMitigationRecommendations
                     Recommendations: new[]
                     {
                         new MitigationRecommendationDto(
-                            RecommendationId: Guid.Parse("rec00001-0001-0000-0000-000000000001"),
+                            RecommendationId: Guid.Parse("bec00001-0001-0000-0000-000000000001"),
                             Title: "Rollback deployment to v2.13.2",
                             Summary: "Revert the latest deployment that introduced the payment processing regression.",
                             RecommendedActionType: MitigationActionType.RollbackCandidate,
@@ -53,10 +53,10 @@ public static class GetMitigationRecommendations
                             EvidenceSummary: "Error rate increased from 0.1% to 12.4% within 15 minutes of deployment.",
                             RequiresApproval: true,
                             RiskLevel: RiskLevel.Medium,
-                            LinkedRunbookIds: new[] { Guid.Parse("rb000001-0001-0000-0000-000000000001") },
+                            LinkedRunbookIds: new[] { Guid.Parse("bb000001-0001-0000-0000-000000000001") },
                             SuggestedValidationSteps: new[] { "Monitor error rate for 30 minutes post-rollback", "Verify payment success rate returns to baseline" }),
                         new MitigationRecommendationDto(
-                            RecommendationId: Guid.Parse("rec00001-0002-0000-0000-000000000002"),
+                            RecommendationId: Guid.Parse("bec00001-0002-0000-0000-000000000002"),
                             Title: "Notify downstream teams of degradation",
                             Summary: "Alert downstream consumers of the payment service about current issues.",
                             RecommendedActionType: MitigationActionType.Escalate,
@@ -67,7 +67,7 @@ public static class GetMitigationRecommendations
                             LinkedRunbookIds: Array.Empty<Guid>(),
                             SuggestedValidationSteps: new[] { "Confirm notification received by all downstream teams" }),
                         new MitigationRecommendationDto(
-                            RecommendationId: Guid.Parse("rec00001-0003-0000-0000-000000000003"),
+                            RecommendationId: Guid.Parse("bec00001-0003-0000-0000-000000000003"),
                             Title: "Investigate contract compatibility impact",
                             Summary: "Review if the deployment introduced breaking changes in the payment API contract.",
                             RecommendedActionType: MitigationActionType.ContractImpactReview,
@@ -87,7 +87,7 @@ public static class GetMitigationRecommendations
                     Recommendations: new[]
                     {
                         new MitigationRecommendationDto(
-                            RecommendationId: Guid.Parse("rec00002-0001-0000-0000-000000000001"),
+                            RecommendationId: Guid.Parse("bec00002-0001-0000-0000-000000000001"),
                             Title: "Verify external dependency health",
                             Summary: "Check the status of the external catalog sync provider.",
                             RecommendedActionType: MitigationActionType.VerifyDependency,
@@ -95,10 +95,10 @@ public static class GetMitigationRecommendations
                             EvidenceSummary: "Connection timeout errors observed since 14:30 UTC.",
                             RequiresApproval: false,
                             RiskLevel: RiskLevel.Low,
-                            LinkedRunbookIds: new[] { Guid.Parse("rb000002-0001-0000-0000-000000000001") },
+                            LinkedRunbookIds: new[] { Guid.Parse("bb000002-0001-0000-0000-000000000001") },
                             SuggestedValidationSteps: new[] { "Check vendor status page", "Attempt manual sync request" }),
                         new MitigationRecommendationDto(
-                            RecommendationId: Guid.Parse("rec00002-0002-0000-0000-000000000002"),
+                            RecommendationId: Guid.Parse("bec00002-0002-0000-0000-000000000002"),
                             Title: "Enable manual sync fallback",
                             Summary: "Activate the manual sync fallback to maintain catalog availability.",
                             RecommendedActionType: MitigationActionType.ExecuteRunbook,
@@ -106,7 +106,7 @@ public static class GetMitigationRecommendations
                             EvidenceSummary: null,
                             RequiresApproval: true,
                             RiskLevel: RiskLevel.Medium,
-                            LinkedRunbookIds: new[] { Guid.Parse("rb000002-0001-0000-0000-000000000001") },
+                            LinkedRunbookIds: new[] { Guid.Parse("bb000002-0001-0000-0000-000000000001") },
                             SuggestedValidationSteps: new[] { "Verify catalog data freshness after manual sync", "Monitor sync error rate" }),
                     });
             }
