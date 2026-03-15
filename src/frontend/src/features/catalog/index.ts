@@ -13,3 +13,4 @@ export { contractsApi } from './api/contracts';
 export { serviceCatalogApi } from './api/serviceCatalog';
 export { developerPortalApi } from './api/developerPortal';
 export { sourceOfTruthApi } from './api/sourceOfTruth';
+export { contractStudioApi } from './api/contractStudio';
