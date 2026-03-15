@@ -21,7 +21,10 @@ public static class GlobalSearch
     private static readonly string[] ValidScopes =
         ["all", "services", "contracts", "changes", "incidents", "runbooks", "docs"];
 
-    /// <summary>Query de pesquisa global unificada.</summary>
+    /// <summary>
+    /// Query de pesquisa global unificada.
+    /// O parâmetro Persona é reservado para filtragem persona-aware futura.
+    /// </summary>
     public sealed record Query(
         string SearchTerm,
         string? Scope = null,
@@ -63,7 +66,9 @@ public static class GlobalSearch
             // Pesquisar serviços
             if (scopeAll || request.Scope == "services")
             {
-                var services = await serviceRepository.SearchAsync(term, cancellationToken);
+                var found = await serviceRepository.SearchAsync(term, cancellationToken);
+                var services = found.Take(request.MaxResults).ToList();
+
                 foreach (var s in services)
                 {
                     var score = CalculateRelevance(term, s.Name, s.DisplayName);
@@ -78,7 +83,7 @@ public static class GlobalSearch
                         score));
                 }
 
-                facetCounts["services"] = services.Count;
+                facetCounts["services"] = found.Count;
             }
 
             // Pesquisar contratos
@@ -94,7 +99,7 @@ public static class GlobalSearch
                         c.Id.Value,
                         "contract",
                         $"{c.Protocol} v{c.SemVer}",
-                        $"API Asset {c.ApiAssetId:N}",
+                        c.LifecycleState.ToString(),
                         null,
                         c.LifecycleState.ToString(),
                         $"/contracts?versionId={c.Id.Value}",
@@ -115,7 +120,9 @@ public static class GlobalSearch
                 };
 
                 var references = await referenceRepository.SearchAsync(term, refType, cancellationToken);
-                foreach (var r in references)
+                var referenceList = references.Take(request.MaxResults).ToList();
+
+                foreach (var r in referenceList)
                 {
                     var entityType = r.ReferenceType == LinkedReferenceType.Runbook ? "runbook" : "doc";
                     var score = CalculateRelevance(term, r.Title, r.Description);
@@ -132,12 +139,13 @@ public static class GlobalSearch
 
                 if (scopeAll)
                 {
-                    facetCounts["docs"] = references.Count(r => r.ReferenceType != LinkedReferenceType.Runbook);
-                    facetCounts["runbooks"] = references.Count(r => r.ReferenceType == LinkedReferenceType.Runbook);
+                    var runbookCount = referenceList.Count(r => r.ReferenceType == LinkedReferenceType.Runbook);
+                    facetCounts["runbooks"] = runbookCount;
+                    facetCounts["docs"] = referenceList.Count - runbookCount;
                 }
                 else
                 {
-                    facetCounts[request.Scope!] = references.Count;
+                    facetCounts[request.Scope!] = referenceList.Count;
                 }
             }
 
@@ -167,23 +175,20 @@ public static class GlobalSearch
             string? secondaryField)
         {
             var score = 0.0;
-            var termUpper = searchTerm.ToUpperInvariant();
 
             if (!string.IsNullOrWhiteSpace(primaryField))
             {
-                var primary = primaryField.ToUpperInvariant();
-                if (primary == termUpper)
+                if (primaryField.Equals(searchTerm, StringComparison.OrdinalIgnoreCase))
                     score += 1.0;
-                else if (primary.Contains(termUpper, StringComparison.Ordinal))
+                else if (primaryField.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                     score += 0.7;
             }
 
             if (!string.IsNullOrWhiteSpace(secondaryField))
             {
-                var secondary = secondaryField.ToUpperInvariant();
-                if (secondary == termUpper)
+                if (secondaryField.Equals(searchTerm, StringComparison.OrdinalIgnoreCase))
                     score += 0.5;
-                else if (secondary.Contains(termUpper, StringComparison.Ordinal))
+                else if (secondaryField.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                     score += 0.3;
             }
 
