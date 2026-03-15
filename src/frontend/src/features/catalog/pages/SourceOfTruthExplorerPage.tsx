@@ -12,6 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { OnboardingHints } from '../../../components/OnboardingHints';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 
 /** Delay de debounce para a pesquisa (ms). */
@@ -80,6 +81,9 @@ export function SourceOfTruthExplorerPage() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
+      {/* Onboarding hints — orientação contextual para Source of Truth */}
+      <OnboardingHints module="knowledge" />
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
