@@ -22,6 +22,8 @@ import {
   Database,
   Eye,
   Link2,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -54,6 +56,13 @@ interface ChatMessage {
   groundingSources?: string[];
   contextReferences?: string[];
   correlationId?: string;
+  useCaseType?: string;
+  routingPath?: string;
+  confidenceLevel?: string;
+  costClass?: string;
+  routingRationale?: string;
+  sourceWeightingSummary?: string;
+  escalationReason?: string;
   timestamp: string;
 }
 
@@ -118,6 +127,13 @@ const mockMessagesMap: Record<string, ChatMessage[]> = {
       groundingSources: ['Service Catalog', 'Contract Registry'],
       contextReferences: [],
       correlationId: 'init-001',
+      useCaseType: 'General',
+      routingPath: 'InternalOnly',
+      confidenceLevel: 'High',
+      costClass: 'low',
+      routingRationale: 'Default welcome message served by internal model with full catalog access.',
+      sourceWeightingSummary: 'ServiceCatalog:50%,ContractRegistry:50%',
+      escalationReason: 'None',
       timestamp: '2026-03-15T10:00:00Z',
     },
     {
@@ -140,6 +156,13 @@ const mockMessagesMap: Record<string, ChatMessage[]> = {
       groundingSources: ['Service Catalog', 'Incident History', 'Change Intelligence'],
       contextReferences: ['service:payment-service', 'incident:INC-2847', 'change:CHG-1923'],
       correlationId: 'resp-002',
+      useCaseType: 'IncidentExplanation',
+      routingPath: 'InternalOnly',
+      confidenceLevel: 'High',
+      costClass: 'low',
+      routingRationale: 'Incident data fully available internally; no external escalation needed.',
+      sourceWeightingSummary: 'Incident:40%,Change:25%,Runbook:20%,TelemetrySummary:15%',
+      escalationReason: 'None',
       timestamp: '2026-03-15T10:05:02Z',
     },
     {
@@ -162,6 +185,13 @@ const mockMessagesMap: Record<string, ChatMessage[]> = {
       groundingSources: ['Runbook Library', 'Service Catalog', 'Change Intelligence'],
       contextReferences: ['runbook:RB-PAY-003', 'change:CHG-1923'],
       correlationId: 'resp-003',
+      useCaseType: 'MitigationGuidance',
+      routingPath: 'InternalOnly',
+      confidenceLevel: 'High',
+      costClass: 'low',
+      routingRationale: 'Runbook and change data available internally; mitigation steps grounded in verified sources.',
+      sourceWeightingSummary: 'Runbook:45%,Change:30%,ServiceCatalog:25%',
+      escalationReason: 'None',
       timestamp: '2026-03-15T10:10:03Z',
     },
   ],
@@ -176,6 +206,13 @@ const mockMessagesMap: Record<string, ChatMessage[]> = {
       groundingSources: ['Contract Registry'],
       contextReferences: [],
       correlationId: 'init-002',
+      useCaseType: 'ContractExplanation',
+      routingPath: 'InternalOnly',
+      confidenceLevel: 'High',
+      costClass: 'low',
+      routingRationale: 'Contract analysis scoped to internal registry; no external model required.',
+      sourceWeightingSummary: 'ContractRegistry:100%',
+      escalationReason: 'None',
       timestamp: '2026-03-14T14:00:00Z',
     },
   ],
@@ -190,6 +227,13 @@ const mockMessagesMap: Record<string, ChatMessage[]> = {
       groundingSources: ['Incident History', 'Change Intelligence'],
       contextReferences: [],
       correlationId: 'init-003',
+      useCaseType: 'IncidentExplanation',
+      routingPath: 'InternalOnly',
+      confidenceLevel: 'Medium',
+      costClass: 'low',
+      routingRationale: 'Incident correlation initiated with partial context; awaiting user query for full grounding.',
+      sourceWeightingSummary: 'Incident:50%,Change:50%',
+      escalationReason: 'None',
       timestamp: '2026-03-13T09:00:00Z',
     },
   ],
@@ -287,6 +331,13 @@ export function AiAssistantPage() {
         }),
         contextReferences: [],
         correlationId: `resp-${Date.now()}`,
+        useCaseType: 'General',
+        routingPath: 'InternalOnly',
+        confidenceLevel: 'Medium',
+        costClass: 'low',
+        routingRationale: 'Default internal routing applied for general query.',
+        sourceWeightingSummary: activeContexts.map(c => `${c}:25%`).join(','),
+        escalationReason: 'None',
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, assistantMsg]);
@@ -435,6 +486,42 @@ export function AiAssistantPage() {
                           </div>
                         </Badge>
                       )}
+                      {msg.confidenceLevel && (
+                        <Badge
+                          variant={
+                            msg.confidenceLevel === 'High'
+                              ? 'success'
+                              : msg.confidenceLevel === 'Medium'
+                                ? 'warning'
+                                : 'default'
+                          }
+                        >
+                          <div className="flex items-center gap-1">
+                            <CheckCircle2 size={10} aria-hidden="true" />
+                            {msg.confidenceLevel === 'High'
+                              ? t('aiHub.trustGrounded')
+                              : msg.confidenceLevel === 'Medium'
+                                ? t('aiHub.trustPartialContext')
+                                : t('aiHub.trustLimitedContext')}
+                          </div>
+                        </Badge>
+                      )}
+                      {msg.isInternalModel && (
+                        <Badge variant="info">
+                          <div className="flex items-center gap-1">
+                            <Shield size={10} />
+                            {t('aiHub.trustInternalOnly')}
+                          </div>
+                        </Badge>
+                      )}
+                      {msg.escalationReason && msg.escalationReason !== 'None' && (
+                        <Badge variant="warning">
+                          <div className="flex items-center gap-1">
+                            <AlertCircle size={10} aria-hidden="true" />
+                            {t('aiHub.trustExternalUsed')}
+                          </div>
+                        </Badge>
+                      )}
                       <span className="text-[10px] text-faded">{formatTime(msg.timestamp)}</span>
                     </div>
                   )}
@@ -509,7 +596,25 @@ export function AiAssistantPage() {
                             <span className="text-body">{msg.appliedPolicyName ?? t('aiHub.metaNoneApplied')}</span>
                             <span className="text-muted">{t('aiHub.metaCorrelation')}:</span>
                             <span className="text-body font-mono text-[10px]">{msg.correlationId}</span>
+                            <span className="text-muted">{t('aiHub.metaUseCase')}:</span>
+                            <span className="text-body">{msg.useCaseType ?? '—'}</span>
+                            <span className="text-muted">{t('aiHub.metaRoutingPath')}:</span>
+                            <span className="text-body">{msg.routingPath ?? '—'}</span>
+                            <span className="text-muted">{t('aiHub.metaConfidence')}:</span>
+                            <span className="text-body">{msg.confidenceLevel ?? '—'}</span>
+                            <span className="text-muted">{t('aiHub.metaCostClass')}:</span>
+                            <span className="text-body">{msg.costClass ?? '—'}</span>
+                            <span className="text-muted">{t('aiHub.metaSourceWeights')}:</span>
+                            <span className="text-body">{msg.sourceWeightingSummary ?? '—'}</span>
+                            <span className="text-muted">{t('aiHub.metaEscalation')}:</span>
+                            <span className="text-body">{msg.escalationReason ?? '—'}</span>
                           </div>
+                          {msg.routingRationale && (
+                            <div className="mt-2 pt-2 border-t border-edge">
+                              <span className="text-muted">{t('aiHub.metaRoutingRationale')}:</span>
+                              <p className="text-body mt-0.5">{msg.routingRationale}</p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
