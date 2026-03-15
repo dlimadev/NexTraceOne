@@ -9,7 +9,7 @@ import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetai
 import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDetailPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
-import { IncidentsPage, RunbooksPage, TeamReliabilityPage, ServiceReliabilityDetailPage } from './features/operations';
+import { IncidentsPage, IncidentDetailPage, RunbooksPage, TeamReliabilityPage, ServiceReliabilityDetailPage } from './features/operations';
 import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage } from './features/ai-hub';
 import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage } from './features/governance';
 
@@ -117,7 +117,22 @@ export default function App() {
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />
               {/* ── Operations ── */}
-              <Route path="/operations/incidents" element={<IncidentsPage />} />
+              <Route
+                path="/operations/incidents"
+                element={
+                  <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+                    <IncidentsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operations/incidents/:incidentId"
+                element={
+                  <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+                    <IncidentDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/operations/runbooks" element={<RunbooksPage />} />
               <Route
                 path="/operations/reliability"
