@@ -247,6 +247,97 @@ export interface ServiceNode {
   name: string;
   domain: string;
   teamName: string;
+  serviceType: string;
+  criticality: string;
+  lifecycleStatus: string;
+}
+
+/** Tipo de serviço no catálogo. */
+export type ServiceType = 'RestApi' | 'SoapService' | 'KafkaProducer' | 'KafkaConsumer' | 'BackgroundService' | 'ScheduledProcess' | 'IntegrationComponent' | 'SharedPlatformService';
+
+/** Nível de criticidade do serviço. */
+export type Criticality = 'Low' | 'Medium' | 'High' | 'Critical';
+
+/** Estado do ciclo de vida do serviço. */
+export type LifecycleStatus = 'Planning' | 'Development' | 'Staging' | 'Active' | 'Deprecating' | 'Deprecated' | 'Retired';
+
+/** Tipo de exposição do serviço. */
+export type ExposureType = 'Internal' | 'External' | 'Partner';
+
+/** Item de serviço na listagem do catálogo. */
+export interface ServiceListItem {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  serviceType: ServiceType;
+  domain: string;
+  systemArea: string;
+  teamName: string;
+  technicalOwner: string;
+  criticality: Criticality;
+  lifecycleStatus: LifecycleStatus;
+  exposureType: ExposureType;
+}
+
+/** Resposta da listagem de serviços. */
+export interface ServiceListResponse {
+  items: ServiceListItem[];
+  totalCount: number;
+}
+
+/** Resumo de API associada a um serviço. */
+export interface ServiceApiSummary {
+  apiId: string;
+  name: string;
+  routePattern: string;
+  version: string;
+  visibility: string;
+  isDecommissioned: boolean;
+  consumerCount: number;
+}
+
+/** Detalhe completo de um serviço do catálogo. */
+export interface ServiceDetail {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  serviceType: ServiceType;
+  domain: string;
+  systemArea: string;
+  teamName: string;
+  technicalOwner: string;
+  businessOwner: string;
+  criticality: Criticality;
+  lifecycleStatus: LifecycleStatus;
+  exposureType: ExposureType;
+  documentationUrl: string;
+  repositoryUrl: string;
+  apis: ServiceApiSummary[];
+  apiCount: number;
+  totalConsumers: number;
+}
+
+/** Contagem agrupada para resumos. */
+export interface GroupCount {
+  key: string;
+  count: number;
+}
+
+/** Resposta do resumo agregado de serviços. */
+export interface ServicesSummary {
+  totalCount: number;
+  criticalCount: number;
+  highCriticalityCount: number;
+  activeCount: number;
+  deprecatedCount: number;
+  retiredCount: number;
+  byServiceType: GroupCount[];
+  byCriticality: GroupCount[];
+  byLifecycle: GroupCount[];
+  byDomain: GroupCount[];
+  byTeam: GroupCount[];
 }
 
 /** Nó de API no grafo de engenharia. */

@@ -1147,5 +1147,111 @@
       "outcome": "Resultado",
       "errorCode": "Código de Erro"
     }
+  },
+  "catalog": {
+    "title": "Catálogo de Serviços",
+    "subtitle": "Registro central de serviços, ownership e governança",
+    "search": {
+      "placeholder": "Pesquisar serviços por nome, equipe, domínio..."
+    },
+    "filters": {
+      "serviceType": "Tipo de Serviço",
+      "criticality": "Criticidade",
+      "lifecycleStatus": "Estado do Ciclo de Vida",
+      "exposureType": "Tipo de Exposição",
+      "domain": "Domínio",
+      "team": "Equipe",
+      "all": "Todos"
+    },
+    "columns": {
+      "name": "Nome",
+      "displayName": "Nome de Exibição",
+      "serviceType": "Tipo",
+      "domain": "Domínio",
+      "team": "Equipe",
+      "criticality": "Criticidade",
+      "lifecycle": "Ciclo de Vida",
+      "exposure": "Exposição",
+      "actions": "Ações"
+    },
+    "summary": {
+      "total": "Total de Serviços",
+      "critical": "Críticos",
+      "high": "Alta Criticidade",
+      "active": "Ativos",
+      "deprecated": "Depreciados",
+      "retired": "Aposentados"
+    },
+    "badges": {
+      "criticality": {
+        "Critical": "Crítico",
+        "High": "Alto",
+        "Medium": "Médio",
+        "Low": "Baixo"
+      },
+      "lifecycle": {
+        "Planning": "Planejamento",
+        "Development": "Desenvolvimento",
+        "Staging": "Staging",
+        "Active": "Ativo",
+        "Deprecating": "Em Depreciação",
+        "Deprecated": "Depreciado",
+        "Retired": "Aposentado"
+      },
+      "type": {
+        "RestApi": "API REST",
+        "SoapService": "Serviço SOAP",
+        "KafkaProducer": "Kafka Producer",
+        "KafkaConsumer": "Kafka Consumer",
+        "BackgroundService": "Serviço em Background",
+        "ScheduledProcess": "Processo Agendado",
+        "IntegrationComponent": "Componente de Integração",
+        "SharedPlatformService": "Serviço de Plataforma Compartilhado"
+      },
+      "exposure": {
+        "Internal": "Interno",
+        "External": "Externo",
+        "Partner": "Parceiro"
+      }
+    },
+    "empty": {
+      "title": "Nenhum serviço encontrado",
+      "description": "Nenhum serviço corresponde aos filtros atuais. Tente ajustar os critérios de pesquisa."
+    },
+    "detail": {
+      "title": "Detalhe do Serviço",
+      "overview": "Visão Geral",
+      "ownership": "Ownership",
+      "classification": "Classificação",
+      "apis": "APIs",
+      "links": "Links",
+      "description": "Descrição",
+      "systemArea": "Área do Sistema",
+      "team": "Equipe",
+      "technicalOwner": "Owner Técnico",
+      "businessOwner": "Owner de Negócio",
+      "criticality": "Criticidade",
+      "lifecycleStatus": "Estado do Ciclo de Vida",
+      "exposureType": "Tipo de Exposição",
+      "documentationUrl": "Documentação",
+      "repositoryUrl": "Repositório",
+      "noApis": "Nenhuma API associada a este serviço.",
+      "apiCount_one": "{{count}} API",
+      "apiCount_other": "{{count}} APIs",
+      "apiCount": "{{count}} APIs",
+      "consumers": "consumidores",
+      "version": "Versão",
+      "routePattern": "Rota",
+      "visibility": "Visibilidade",
+      "decommissioned": "Desativado",
+      "active": "Ativo",
+      "status": "Status"
+    },
+    "actions": {
+      "viewDetail": "Ver Detalhe",
+      "viewGraph": "Ver Grafo",
+      "edit": "Editar",
+      "updateOwnership": "Atualizar Ownership"
+    }
   }
 }

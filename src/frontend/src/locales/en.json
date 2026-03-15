@@ -1147,5 +1147,111 @@
       "outcome": "Outcome",
       "errorCode": "Error Code"
     }
+  },
+  "catalog": {
+    "title": "Service Catalog",
+    "subtitle": "Central registry of services, ownership and governance",
+    "search": {
+      "placeholder": "Search services by name, team, domain..."
+    },
+    "filters": {
+      "serviceType": "Service Type",
+      "criticality": "Criticality",
+      "lifecycleStatus": "Lifecycle Status",
+      "exposureType": "Exposure Type",
+      "domain": "Domain",
+      "team": "Team",
+      "all": "All"
+    },
+    "columns": {
+      "name": "Name",
+      "displayName": "Display Name",
+      "serviceType": "Type",
+      "domain": "Domain",
+      "team": "Team",
+      "criticality": "Criticality",
+      "lifecycle": "Lifecycle",
+      "exposure": "Exposure",
+      "actions": "Actions"
+    },
+    "summary": {
+      "total": "Total Services",
+      "critical": "Critical",
+      "high": "High Criticality",
+      "active": "Active",
+      "deprecated": "Deprecated",
+      "retired": "Retired"
+    },
+    "badges": {
+      "criticality": {
+        "Critical": "Critical",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low"
+      },
+      "lifecycle": {
+        "Planning": "Planning",
+        "Development": "Development",
+        "Staging": "Staging",
+        "Active": "Active",
+        "Deprecating": "Deprecating",
+        "Deprecated": "Deprecated",
+        "Retired": "Retired"
+      },
+      "type": {
+        "RestApi": "REST API",
+        "SoapService": "SOAP Service",
+        "KafkaProducer": "Kafka Producer",
+        "KafkaConsumer": "Kafka Consumer",
+        "BackgroundService": "Background Service",
+        "ScheduledProcess": "Scheduled Process",
+        "IntegrationComponent": "Integration Component",
+        "SharedPlatformService": "Shared Platform Service"
+      },
+      "exposure": {
+        "Internal": "Internal",
+        "External": "External",
+        "Partner": "Partner"
+      }
+    },
+    "empty": {
+      "title": "No services found",
+      "description": "No services match the current filters. Try adjusting your search criteria."
+    },
+    "detail": {
+      "title": "Service Detail",
+      "overview": "Overview",
+      "ownership": "Ownership",
+      "classification": "Classification",
+      "apis": "APIs",
+      "links": "Links",
+      "description": "Description",
+      "systemArea": "System Area",
+      "team": "Team",
+      "technicalOwner": "Technical Owner",
+      "businessOwner": "Business Owner",
+      "criticality": "Criticality",
+      "lifecycleStatus": "Lifecycle Status",
+      "exposureType": "Exposure Type",
+      "documentationUrl": "Documentation",
+      "repositoryUrl": "Repository",
+      "noApis": "No APIs associated with this service.",
+      "apiCount_one": "{{count}} API",
+      "apiCount_other": "{{count}} APIs",
+      "apiCount": "{{count}} APIs",
+      "consumers": "consumers",
+      "version": "Version",
+      "routePattern": "Route",
+      "visibility": "Visibility",
+      "decommissioned": "Decommissioned",
+      "active": "Active",
+      "status": "Status"
+    },
+    "actions": {
+      "viewDetail": "View Detail",
+      "viewGraph": "View Graph",
+      "edit": "Edit",
+      "updateOwnership": "Update Ownership"
+    }
   }
 }

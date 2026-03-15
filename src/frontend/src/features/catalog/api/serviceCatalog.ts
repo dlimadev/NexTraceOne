@@ -6,6 +6,9 @@ import type {
   GraphSnapshotSummary,
   TemporalDiffResult,
   NodeHealthResult,
+  ServiceListResponse,
+  ServiceDetail,
+  ServicesSummary,
 } from '../../../types';
 
 /** Cliente de API para o módulo Service Catalog (Engineering Graph backend). */
@@ -106,5 +109,59 @@ export const serviceCatalogApi = {
   }) =>
     client
       .post('/catalog/integration/v1/consumers/sync', data)
+      .then((r) => r.data),
+
+  /** Lista serviços do catálogo com filtros opcionais. */
+  listServices: (params?: {
+    teamName?: string;
+    domain?: string;
+    serviceType?: string;
+    criticality?: string;
+    lifecycleStatus?: string;
+    exposureType?: string;
+    search?: string;
+  }) =>
+    client
+      .get<ServiceListResponse>('/catalog/services', { params })
+      .then((r) => r.data),
+
+  /** Obtém o detalhe completo de um serviço. */
+  getServiceDetail: (serviceId: string) =>
+    client
+      .get<ServiceDetail>(`/catalog/services/${serviceId}`)
+      .then((r) => r.data),
+
+  /** Atualiza detalhes e classificação de um serviço. */
+  updateService: (serviceId: string, data: {
+    displayName: string;
+    description: string;
+    serviceType: string;
+    systemArea: string;
+    criticality: string;
+    lifecycleStatus: string;
+    exposureType: string;
+    documentationUrl: string;
+    repositoryUrl: string;
+  }) =>
+    client.put(`/catalog/services/${serviceId}`, data).then((r) => r.data),
+
+  /** Atualiza o ownership de um serviço. */
+  updateOwnership: (serviceId: string, data: {
+    teamName: string;
+    technicalOwner: string;
+    businessOwner: string;
+  }) =>
+    client.patch(`/catalog/services/${serviceId}/ownership`, data).then((r) => r.data),
+
+  /** Obtém resumos agregados de serviços por equipa ou domínio. */
+  getServicesSummary: (params?: { teamName?: string; domain?: string }) =>
+    client
+      .get<ServicesSummary>('/catalog/services/summary', { params })
+      .then((r) => r.data),
+
+  /** Pesquisa serviços do catálogo por termo textual. */
+  searchServices: (q: string) =>
+    client
+      .get('/catalog/services/search', { params: { q } })
       .then((r) => r.data),
 };
