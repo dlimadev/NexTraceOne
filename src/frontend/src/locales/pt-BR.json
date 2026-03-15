@@ -111,7 +111,8 @@
     "benchmarking": "Benchmarking",
     "policyCatalog": "Catálogo de Políticas",
     "evidencePackages": "Pacotes de Evidência",
-    "enterpriseControls": "Controles Enterprise"
+    "enterpriseControls": "Controles Enterprise",
+    "executiveFinOps": "FinOps Executivo"
   },
   "header": {
     "toggleLanguage": "Alternar idioma",
