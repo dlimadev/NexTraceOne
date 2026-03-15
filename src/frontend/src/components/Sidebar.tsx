@@ -93,6 +93,9 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={18} />, permission: 'governance:risk:read', section: 'governance' },
   { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={18} />, permission: 'governance:compliance:read', section: 'governance' },
+  { labelKey: 'sidebar.policyCatalog', to: '/governance/policies', icon: <Shield size={18} />, permission: 'governance:policies:read', section: 'governance' },
+  { labelKey: 'sidebar.evidencePackages', to: '/governance/evidence', icon: <ClipboardList size={18} />, permission: 'governance:evidence:read', section: 'governance' },
+  { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
   // ── Admin ──
   { labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={18} />, permission: 'licensing:read', section: 'admin' },
