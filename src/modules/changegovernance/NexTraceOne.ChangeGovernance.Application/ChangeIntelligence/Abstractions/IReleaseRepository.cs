@@ -1,4 +1,5 @@
 using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeIntelligence.Domain.Enums;
 
 namespace NexTraceOne.ChangeIntelligence.Application.Abstractions;
 
@@ -19,4 +20,53 @@ public interface IReleaseRepository
 
     /// <summary>Adiciona uma nova Release ao repositório.</summary>
     void Add(Release release);
+
+    /// <summary>Lista mudanças com filtros avançados para o catálogo de changes.</summary>
+    Task<IReadOnlyList<Release>> ListFilteredAsync(
+        string? serviceName,
+        string? teamName,
+        string? environment,
+        ChangeType? changeType,
+        ConfidenceStatus? confidenceStatus,
+        DeploymentStatus? deploymentStatus,
+        string? searchTerm,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Conta mudanças com filtros avançados.</summary>
+    Task<int> CountFilteredAsync(
+        string? serviceName,
+        string? teamName,
+        string? environment,
+        ChangeType? changeType,
+        ConfidenceStatus? confidenceStatus,
+        DeploymentStatus? deploymentStatus,
+        string? searchTerm,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Lista releases por nome de serviço.</summary>
+    Task<IReadOnlyList<Release>> ListByServiceNameAsync(
+        string serviceName,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Conta releases por nome de serviço.</summary>
+    Task<int> CountByServiceNameAsync(
+        string serviceName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Obtém contadores agregados de mudanças.</summary>
+    Task<(int total, int validated, int needsAttention, int suspectedRegressions, int correlatedWithIncidents)>
+        GetSummaryCountsAsync(
+            string? teamName,
+            string? environment,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            CancellationToken cancellationToken = default);
 }

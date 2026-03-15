@@ -79,4 +79,10 @@ public static class CatalogGraphErrors
     /// <summary>Dados de saúde não disponíveis para o nó solicitado.</summary>
     public static Error NodeHealthNotAvailable(Guid nodeId)
         => Error.NotFound("CatalogGraph.NodeHealth.NotAvailable", "Health data is not available for node '{0}'.", nodeId);
+
+    // ── Service Catalog ───────────────────────────────────────────────────
+
+    /// <summary>Ativo de serviço não encontrado pelo identificador.</summary>
+    public static Error ServiceAssetNotFoundById(Guid serviceAssetId)
+        => Error.NotFound("CatalogGraph.ServiceAsset.NotFoundById", "Service asset with id '{0}' was not found.", serviceAssetId);
 }

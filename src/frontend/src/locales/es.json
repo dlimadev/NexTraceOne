@@ -95,7 +95,12 @@
     "sectionChanges": "Cambios",
     "sectionOperations": "Operaciones",
     "sectionAiHub": "Hub de IA",
-    "sectionGovernance": "Gobernanza"
+    "sectionGovernance": "Gobernanza",
+    "dependencyGraph": "Grafo de Dependencias",
+    "contractStudio": "Estudio de Contratos",
+    "sourceOfTruth": "Fuente de Verdad",
+    "sectionKnowledge": "Conocimiento",
+    "changeConfidence": "Confianza en Cambios"
   },
   "header": {
     "toggleLanguage": "Cambiar idioma",
@@ -117,7 +122,8 @@
     "admin": "Administración",
     "navigate": "navegar",
     "select": "seleccionar",
-    "close": "cerrar"
+    "close": "cerrar",
+    "knowledge": "Conocimiento"
   },
   "users": {
     "title": "Usuarios",
@@ -1146,6 +1152,365 @@
       "total": "Total",
       "outcome": "Resultado",
       "errorCode": "Código de Error"
+    }
+  },
+  "catalog": {
+    "title": "Catálogo de Servicios",
+    "subtitle": "Registro central de servicios, propiedad y gobernanza",
+    "search": {
+      "placeholder": "Buscar servicios por nombre, equipo, dominio..."
+    },
+    "filters": {
+      "serviceType": "Tipo de Servicio",
+      "criticality": "Criticidad",
+      "lifecycleStatus": "Estado del Ciclo de Vida",
+      "exposureType": "Tipo de Exposición",
+      "domain": "Dominio",
+      "team": "Equipo",
+      "all": "Todos"
+    },
+    "columns": {
+      "name": "Nombre",
+      "displayName": "Nombre de Visualización",
+      "serviceType": "Tipo",
+      "domain": "Dominio",
+      "team": "Equipo",
+      "criticality": "Criticidad",
+      "lifecycle": "Ciclo de Vida",
+      "exposure": "Exposición",
+      "actions": "Acciones"
+    },
+    "summary": {
+      "total": "Total de Servicios",
+      "critical": "Críticos",
+      "high": "Alta Criticidad",
+      "active": "Activos",
+      "deprecated": "Deprecados",
+      "retired": "Retirados"
+    },
+    "badges": {
+      "criticality": {
+        "Critical": "Crítico",
+        "High": "Alto",
+        "Medium": "Medio",
+        "Low": "Bajo"
+      },
+      "lifecycle": {
+        "Planning": "Planificación",
+        "Development": "Desarrollo",
+        "Staging": "Staging",
+        "Active": "Activo",
+        "Deprecating": "En Deprecación",
+        "Deprecated": "Deprecado",
+        "Retired": "Retirado"
+      },
+      "type": {
+        "RestApi": "API REST",
+        "SoapService": "Servicio SOAP",
+        "KafkaProducer": "Kafka Producer",
+        "KafkaConsumer": "Kafka Consumer",
+        "BackgroundService": "Servicio en Background",
+        "ScheduledProcess": "Proceso Programado",
+        "IntegrationComponent": "Componente de Integración",
+        "SharedPlatformService": "Servicio de Plataforma Compartido"
+      },
+      "exposure": {
+        "Internal": "Interno",
+        "External": "Externo",
+        "Partner": "Socio"
+      }
+    },
+    "empty": {
+      "title": "Ningún servicio encontrado",
+      "description": "Ningún servicio coincide con los filtros actuales. Intente ajustar los criterios de búsqueda."
+    },
+    "detail": {
+      "title": "Detalle del Servicio",
+      "overview": "Visión General",
+      "ownership": "Propiedad",
+      "classification": "Clasificación",
+      "apis": "APIs",
+      "links": "Enlaces",
+      "description": "Descripción",
+      "systemArea": "Área del Sistema",
+      "team": "Equipo",
+      "technicalOwner": "Propietario Técnico",
+      "businessOwner": "Propietario de Negocio",
+      "criticality": "Criticidad",
+      "lifecycleStatus": "Estado del Ciclo de Vida",
+      "exposureType": "Tipo de Exposición",
+      "documentationUrl": "Documentación",
+      "repositoryUrl": "Repositorio",
+      "noApis": "No hay APIs asociadas a este servicio.",
+      "apiCount_one": "{{count}} API",
+      "apiCount_other": "{{count}} APIs",
+      "apiCount": "{{count}} APIs",
+      "consumers": "consumidores",
+      "version": "Versión",
+      "routePattern": "Ruta",
+      "visibility": "Visibilidad",
+      "decommissioned": "Desactivado",
+      "active": "Activo",
+      "status": "Estado",
+      "separator": "·",
+      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumidores"
+    },
+    "actions": {
+      "viewDetail": "Ver Detalle",
+      "viewGraph": "Ver Grafo",
+      "edit": "Editar",
+      "updateOwnership": "Actualizar Propiedad"
+    },
+    "totalCount": "({{count}} total)"
+  },
+  "contractGov": {
+    "title": "Gobernanza de Contratos",
+    "subtitle": "Gobernanza, versionado y cumplimiento de contratos de servicio",
+    "search": {
+      "placeholder": "Buscar contratos por versión, API..."
+    },
+    "filters": {
+      "protocol": "Protocolo",
+      "lifecycleState": "Estado del Ciclo de Vida",
+      "all": "Todos"
+    },
+    "columns": {
+      "api": "Activo de API",
+      "version": "Versión",
+      "protocol": "Protocolo",
+      "lifecycle": "Ciclo de Vida",
+      "format": "Formato",
+      "signed": "Firmado",
+      "locked": "Bloqueado",
+      "importedFrom": "Origen",
+      "createdAt": "Creado",
+      "actions": "Acciones"
+    },
+    "summary": {
+      "totalVersions": "Total de Versiones",
+      "distinctContracts": "Contratos Distintos",
+      "draft": "Borradores",
+      "inReview": "En Revisión",
+      "approved": "Aprobados",
+      "locked": "Bloqueados",
+      "deprecated": "Deprecados"
+    },
+    "badges": {
+      "protocols": {
+        "OpenApi": "OpenAPI",
+        "Swagger": "Swagger",
+        "Wsdl": "WSDL",
+        "AsyncApi": "AsyncAPI",
+        "Protobuf": "Protobuf",
+        "GraphQl": "GraphQL"
+      },
+      "lifecycle": {
+        "Draft": "Borrador",
+        "InReview": "En Revisión",
+        "Approved": "Aprobado",
+        "Locked": "Bloqueado",
+        "Deprecated": "Deprecado",
+        "Sunset": "Sunset",
+        "Retired": "Retirado"
+      },
+      "signed": "Firmado",
+      "unsigned": "Sin firmar",
+      "lockedLabel": "Bloqueado",
+      "unlockedLabel": "Desbloqueado"
+    },
+    "empty": {
+      "title": "No se encontraron contratos",
+      "description": "Importe o cree contratos para comenzar a gobernar sus integraciones."
+    },
+    "actions": {
+      "viewDetail": "Ver Detalle",
+      "goToStudio": "Abrir Estudio"
+    },
+    "detail": {
+      "title": "Detalle del Contrato",
+      "backToList": "Volver a Contratos",
+      "overview": "Visión General",
+      "governance": "Gobernanza",
+      "provenance": "Proveniencia",
+      "specPreview": "Vista Previa de la Especificación",
+      "format": "Formato",
+      "importedFrom": "Importado desde",
+      "lifecycleState": "Estado del Ciclo de Vida",
+      "isLocked": "Estado de Bloqueo",
+      "isSigned": "Estado de Firma",
+      "deprecationDate": "Fecha de Deprecación",
+      "sunsetDate": "Fecha de Sunset",
+      "deprecationNotice": "Aviso de Deprecación",
+      "importedBy": "Importado por",
+      "parsedBy": "Analizado por",
+      "aiGenerated": "Generado por IA",
+      "yes": "Sí",
+      "no": "No",
+      "notAvailable": "No disponible",
+      "lockedAt": "Bloqueado en",
+      "lockedBy": "Bloqueado por",
+      "fingerprint": "Huella Digital",
+      "algorithm": "Algoritmo",
+      "apiAssetId": "ID del Activo de API",
+      "version": "Versión",
+      "protocol": "Protocolo"
+    }
+  },
+  "sourceOfTruth": {
+    "title": "Fuente de Verdad",
+    "subtitle": "Descubra y explore servicios, contratos, documentación y conocimiento operacional",
+    "search": {
+      "placeholder": "Buscar servicios, contratos, docs, runbooks...",
+      "scope": "Ámbito",
+      "all": "Todos",
+      "services": "Servicios",
+      "contracts": "Contratos",
+      "docs": "Docs",
+      "runbooks": "Runbooks"
+    },
+    "results": {
+      "services": "Servicios",
+      "contracts": "Contratos",
+      "references": "Referencias",
+      "noResults": "No se encontraron resultados",
+      "noResultsDescription": "Intente con un término de búsqueda o ámbito diferente.",
+      "totalResults": "resultados encontrados"
+    },
+    "service": {
+      "title": "Fuente de Verdad del Servicio",
+      "backToExplorer": "Volver a Fuente de Verdad",
+      "viewServiceDetail": "Ver Detalle del Servicio",
+      "overview": "Visión General",
+      "ownership": "Ownership",
+      "apis": "APIs",
+      "contracts": "Contratos",
+      "references": "Referencias y Documentación",
+      "quickLinks": "Enlaces Rápidos",
+      "coverage": "Cobertura",
+      "coverageScore": "Score de Cobertura",
+      "description": "Descripción",
+      "serviceType": "Tipo de Servicio",
+      "systemArea": "Área del Sistema",
+      "exposureType": "Tipo de Exposición",
+      "team": "Equipo",
+      "technicalOwner": "Owner Técnico",
+      "businessOwner": "Owner de Negocio",
+      "documentationUrl": "Documentación",
+      "repositoryUrl": "Repositorio",
+      "noApis": "Sin APIs registradas",
+      "noContracts": "Sin contratos disponibles",
+      "noReferences": "Sin referencias vinculadas",
+      "indicators": {
+        "hasOwner": "Owner Definido",
+        "hasContracts": "Contratos Publicados",
+        "hasDocumentation": "Documentación Disponible",
+        "hasRunbook": "Runbook Disponible",
+        "hasRecentChangeHistory": "Historial de Cambios Presente",
+        "hasDependenciesMapped": "Dependencias Mapeadas",
+        "hasEventTopics": "Tópicos de Eventos Definidos"
+      }
+    },
+    "contract": {
+      "title": "Fuente de Verdad del Contrato",
+      "backToExplorer": "Volver a Fuente de Verdad",
+      "viewContractDetail": "Ver Detalle del Contrato",
+      "overview": "Visión General",
+      "governance": "Gobernanza",
+      "metrics": "Métricas",
+      "references": "Referencias",
+      "apiAssetId": "ID del Activo de API",
+      "format": "Formato",
+      "importedFrom": "Importado desde",
+      "lifecycleState": "Estado del Ciclo de Vida",
+      "lockStatus": "Estado de Bloqueo",
+      "signedStatus": "Estado de Firma",
+      "deprecationNotice": "Aviso de Deprecación",
+      "deprecationDate": "Fecha de Deprecación",
+      "sunsetDate": "Fecha de Sunset",
+      "artifacts": "Artefactos",
+      "diffs": "Diffs",
+      "violations": "Violaciones",
+      "noReferences": "Sin referencias vinculadas"
+    },
+    "empty": {
+      "title": "Explorador de Fuente de Verdad",
+      "description": "Busque servicios, contratos, documentación y conocimiento operacional."
+    }
+  },
+  "changeConfidence": {
+    "title": "Confianza en Cambios",
+    "subtitle": "Rastree, valide y analice cambios en sus servicios",
+    "summary": {
+      "totalChanges": "Total de Cambios",
+      "validatedChanges": "Validados",
+      "changesNeedingAttention": "Necesitan Atención",
+      "suspectedRegressions": "Regresiones Sospechosas",
+      "correlatedWithIncidents": "Correlacionados con Incidentes"
+    },
+    "filters": {
+      "serviceName": "Servicio",
+      "environment": "Entorno",
+      "changeType": "Tipo de Cambio",
+      "confidenceStatus": "Confianza",
+      "searchPlaceholder": "Buscar cambios...",
+      "allEnvironments": "Todos los Entornos",
+      "allTypes": "Todos los Tipos",
+      "allStatuses": "Todos los Estados"
+    },
+    "table": {
+      "service": "Servicio",
+      "version": "Versión",
+      "environment": "Entorno",
+      "changeType": "Tipo",
+      "deploymentStatus": "Estado",
+      "confidence": "Confianza",
+      "score": "Score",
+      "date": "Fecha",
+      "noChanges": "No se encontraron cambios",
+      "noChangesDescription": "Ajuste sus filtros o espere nuevos despliegues."
+    },
+    "confidenceStatus": {
+      "NotAssessed": "No Evaluado",
+      "Validated": "Validado",
+      "NeedsAttention": "Necesita Atención",
+      "SuspectedRegression": "Regresión Sospechosa",
+      "CorrelatedWithIncident": "Correlacionado con Incidente",
+      "Mitigated": "Mitigado"
+    },
+    "changeType": {
+      "Deployment": "Despliegue",
+      "ConfigurationChange": "Configuración",
+      "ContractChange": "Contrato",
+      "SchemaChange": "Schema",
+      "DependencyChange": "Dependencia",
+      "PolicyChange": "Política",
+      "OperationalChange": "Operacional"
+    },
+    "detail": {
+      "title": "Detalle del Cambio",
+      "backToCatalog": "Volver a Confianza en Cambios",
+      "overview": "Visión General",
+      "riskAndConfidence": "Riesgo y Confianza",
+      "blastRadius": "Radio de Impacto",
+      "validation": "Validación y Evidencias",
+      "timeline": "Timeline",
+      "quickLinks": "Enlaces Rápidos",
+      "description": "Descripción",
+      "changeType": "Tipo de Cambio",
+      "commitSha": "Commit SHA",
+      "pipelineSource": "Pipeline de Origen",
+      "workItem": "Work Item",
+      "changeScore": "Score de Cambio",
+      "confidenceStatus": "Estado de Confianza",
+      "validationStatus": "Estado de Validación",
+      "totalAffected": "Total de Consumidores Afectados",
+      "directConsumers": "Consumidores Directos",
+      "transitiveConsumers": "Consumidores Transitivos",
+      "noBlastRadius": "Radio de impacto aún no calculado",
+      "noValidation": "Sin evidencia de validación disponible",
+      "noTimeline": "Sin eventos de timeline registrados",
+      "viewServiceSot": "Ver Servicio en Source of Truth",
+      "viewInReleases": "Ver en Releases"
     }
   }
 }

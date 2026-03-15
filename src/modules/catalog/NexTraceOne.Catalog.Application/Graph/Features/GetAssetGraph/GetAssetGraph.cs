@@ -30,7 +30,14 @@ public static class GetAssetGraph
             var services = await serviceAssetRepository.ListAllAsync(cancellationToken);
 
             var serviceNodes = services
-                .Select(svc => new ServiceNode(svc.Id.Value, svc.Name, svc.Domain, svc.TeamName))
+                .Select(svc => new ServiceNode(
+                    svc.Id.Value,
+                    svc.Name,
+                    svc.Domain,
+                    svc.TeamName,
+                    svc.ServiceType.ToString(),
+                    svc.Criticality.ToString(),
+                    svc.LifecycleStatus.ToString()))
                 .ToList();
 
             var apiNodes = apiAssets
@@ -59,7 +66,14 @@ public static class GetAssetGraph
         IReadOnlyList<ApiNode> Apis);
 
     /// <summary>Nó representando um serviço no grafo.</summary>
-    public sealed record ServiceNode(Guid ServiceAssetId, string Name, string Domain, string TeamName);
+    public sealed record ServiceNode(
+        Guid ServiceAssetId,
+        string Name,
+        string Domain,
+        string TeamName,
+        string ServiceType,
+        string Criticality,
+        string LifecycleStatus);
 
     /// <summary>Nó representando uma API com seus consumidores conhecidos.</summary>
     public sealed record ApiNode(

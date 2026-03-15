@@ -5,17 +5,18 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
 
 namespace NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset;
 
 /// <summary>
-/// Feature: RegisterServiceAsset — registra um novo serviço no grafo de engenharia.
+/// Feature: RegisterServiceAsset — registra um novo serviço no catálogo.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class RegisterServiceAsset
 {
-    /// <summary>Comando de registo de um ativo de serviço.</summary>
+    /// <summary>Comando de registo de um serviço no catálogo.</summary>
     public sealed record Command(string Name, string Domain, string TeamName) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de registo de serviço.</summary>
@@ -29,7 +30,7 @@ public static class RegisterServiceAsset
         }
     }
 
-    /// <summary>Handler que regista um novo ativo de serviço no grafo.</summary>
+    /// <summary>Handler que regista um novo serviço no catálogo.</summary>
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
         IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
@@ -49,10 +50,26 @@ public static class RegisterServiceAsset
 
             await unitOfWork.CommitAsync(cancellationToken);
 
-            return new Response(serviceAsset.Id.Value, serviceAsset.Name, serviceAsset.Domain, serviceAsset.TeamName);
+            return new Response(
+                serviceAsset.Id.Value,
+                serviceAsset.Name,
+                serviceAsset.Domain,
+                serviceAsset.TeamName,
+                serviceAsset.DisplayName,
+                serviceAsset.ServiceType.ToString(),
+                serviceAsset.Criticality.ToString(),
+                serviceAsset.LifecycleStatus.ToString());
         }
     }
 
-    /// <summary>Resposta do registo do ativo de serviço.</summary>
-    public sealed record Response(Guid ServiceAssetId, string Name, string Domain, string TeamName);
+    /// <summary>Resposta do registo do serviço no catálogo.</summary>
+    public sealed record Response(
+        Guid ServiceAssetId,
+        string Name,
+        string Domain,
+        string TeamName,
+        string DisplayName,
+        string ServiceType,
+        string Criticality,
+        string LifecycleStatus);
 }

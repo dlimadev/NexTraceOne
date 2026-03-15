@@ -247,6 +247,97 @@ export interface ServiceNode {
   name: string;
   domain: string;
   teamName: string;
+  serviceType: string;
+  criticality: string;
+  lifecycleStatus: string;
+}
+
+/** Tipo de serviço no catálogo. */
+export type ServiceType = 'RestApi' | 'SoapService' | 'KafkaProducer' | 'KafkaConsumer' | 'BackgroundService' | 'ScheduledProcess' | 'IntegrationComponent' | 'SharedPlatformService';
+
+/** Nível de criticidade do serviço. */
+export type Criticality = 'Low' | 'Medium' | 'High' | 'Critical';
+
+/** Estado do ciclo de vida do serviço. */
+export type LifecycleStatus = 'Planning' | 'Development' | 'Staging' | 'Active' | 'Deprecating' | 'Deprecated' | 'Retired';
+
+/** Tipo de exposição do serviço. */
+export type ExposureType = 'Internal' | 'External' | 'Partner';
+
+/** Item de serviço na listagem do catálogo. */
+export interface ServiceListItem {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  serviceType: ServiceType;
+  domain: string;
+  systemArea: string;
+  teamName: string;
+  technicalOwner: string;
+  criticality: Criticality;
+  lifecycleStatus: LifecycleStatus;
+  exposureType: ExposureType;
+}
+
+/** Resposta da listagem de serviços. */
+export interface ServiceListResponse {
+  items: ServiceListItem[];
+  totalCount: number;
+}
+
+/** Resumo de API associada a um serviço. */
+export interface ServiceApiSummary {
+  apiId: string;
+  name: string;
+  routePattern: string;
+  version: string;
+  visibility: string;
+  isDecommissioned: boolean;
+  consumerCount: number;
+}
+
+/** Detalhe completo de um serviço do catálogo. */
+export interface ServiceDetail {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  serviceType: ServiceType;
+  domain: string;
+  systemArea: string;
+  teamName: string;
+  technicalOwner: string;
+  businessOwner: string;
+  criticality: Criticality;
+  lifecycleStatus: LifecycleStatus;
+  exposureType: ExposureType;
+  documentationUrl: string;
+  repositoryUrl: string;
+  apis: ServiceApiSummary[];
+  apiCount: number;
+  totalConsumers: number;
+}
+
+/** Contagem agrupada para resumos. */
+export interface GroupCount {
+  key: string;
+  count: number;
+}
+
+/** Resposta do resumo agregado de serviços. */
+export interface ServicesSummary {
+  totalCount: number;
+  criticalCount: number;
+  highCriticalityCount: number;
+  activeCount: number;
+  deprecatedCount: number;
+  retiredCount: number;
+  byServiceType: GroupCount[];
+  byCriticality: GroupCount[];
+  byLifecycle: GroupCount[];
+  byDomain: GroupCount[];
+  byTeam: GroupCount[];
 }
 
 /** Nó de API no grafo de engenharia. */
@@ -530,6 +621,69 @@ export interface ContractSyncResponse {
   correlationId?: string;
   processedAt: string;
   items: ContractSyncItemResult[];
+}
+
+// ─── Contract Governance ─────────────────────────────────────────────────────
+
+/** Item de contrato na listagem de governança. */
+export interface ContractListItem {
+  versionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+  isLocked: boolean;
+  format: string;
+  importedFrom: string;
+  createdAt: string;
+  deprecationDate: string | null;
+  isSigned: boolean;
+}
+
+/** Resposta paginada da listagem de contratos. */
+export interface ContractListResponse {
+  items: ContractListItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Contagem por protocolo no resumo de contratos. */
+export interface ContractProtocolCount {
+  protocol: string;
+  count: number;
+}
+
+/** Resposta do resumo agregado de contratos. */
+export interface ContractsSummary {
+  totalVersions: number;
+  distinctContracts: number;
+  draftCount: number;
+  inReviewCount: number;
+  approvedCount: number;
+  lockedCount: number;
+  deprecatedCount: number;
+  byProtocol: ContractProtocolCount[];
+}
+
+/** Contrato associado a um serviço. */
+export interface ServiceContractItem {
+  versionId: string;
+  apiAssetId: string;
+  apiName: string;
+  apiRoutePattern: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+  isLocked: boolean;
+  createdAt: string;
+}
+
+/** Resposta da listagem de contratos de um serviço. */
+export interface ServiceContractsResponse {
+  serviceId: string;
+  contracts: ServiceContractItem[];
+  totalCount: number;
 }
 
 // ─── Change Intelligence ─────────────────────────────────────────────────────
@@ -828,4 +982,197 @@ export interface DashboardStats {
   activeServices: number;
   totalContracts: number;
   recentReleases: Release[];
+}
+
+// ─── Source of Truth ─────────────────────────────────────────────────────────
+
+/** Indicadores de cobertura/completude de um serviço no Source of Truth. */
+export interface CoverageIndicators {
+  hasOwner: boolean;
+  hasContracts: boolean;
+  hasDocumentation: boolean;
+  hasRunbook: boolean;
+  hasRecentChangeHistory: boolean;
+  hasDependenciesMapped: boolean;
+  hasEventTopics: boolean;
+}
+
+/** Resumo de API associada a um serviço no Source of Truth. */
+export interface SotApiSummary {
+  apiAssetId: string;
+  name: string;
+  routePattern: string;
+  version: string;
+  visibility: string;
+  consumerCount: number;
+}
+
+/** Resumo de contrato associado a um serviço no Source of Truth. */
+export interface SotContractSummary {
+  versionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+  isLocked: boolean;
+  createdAt: string;
+}
+
+/** Referência vinculada no Source of Truth. */
+export interface SotReferenceSummary {
+  referenceId: string;
+  referenceType: string;
+  title: string;
+  description: string;
+  url: string | null;
+}
+
+/** Visão consolidada de Source of Truth de um serviço. */
+export interface ServiceSourceOfTruth {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  serviceType: string;
+  domain: string;
+  systemArea: string;
+  teamName: string;
+  technicalOwner: string;
+  businessOwner: string;
+  criticality: string;
+  lifecycleStatus: string;
+  exposureType: string;
+  documentationUrl: string | null;
+  repositoryUrl: string | null;
+  apis: SotApiSummary[];
+  contracts: SotContractSummary[];
+  references: SotReferenceSummary[];
+  coverage: CoverageIndicators;
+  totalApis: number;
+  totalContracts: number;
+  totalReferences: number;
+}
+
+/** Resumo de governança de contrato no Source of Truth. */
+export interface SotGovernanceSummary {
+  lifecycleState: string;
+  isLocked: boolean;
+  lockedAt: string | null;
+  lockedBy: string | null;
+  isSigned: boolean;
+  deprecationNotice: string | null;
+  deprecationDate: string | null;
+  sunsetDate: string | null;
+}
+
+/** Visão consolidada de Source of Truth de um contrato. */
+export interface ContractSourceOfTruth {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  format: string;
+  importedFrom: string;
+  governance: SotGovernanceSummary;
+  references: SotReferenceSummary[];
+  artifactCount: number;
+  diffCount: number;
+  violationCount: number;
+  hasDocumentation: boolean;
+  hasRelatedChanges: boolean;
+}
+
+/** Resposta de cobertura de um serviço. */
+export interface ServiceCoverageResponse {
+  serviceId: string;
+  serviceName: string;
+  hasOwner: boolean;
+  hasContracts: boolean;
+  hasDocumentation: boolean;
+  hasRunbook: boolean;
+  hasRecentChangeHistory: boolean;
+  hasDependenciesMapped: boolean;
+  hasEventTopics: boolean;
+  coverageScore: number;
+  totalIndicators: number;
+  metIndicators: number;
+}
+
+/** Resultado de pesquisa de serviço no Source of Truth. */
+export interface SotServiceSearchResult {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  domain: string;
+  teamName: string;
+  criticality: string;
+  lifecycleStatus: string;
+}
+
+/** Resultado de pesquisa de contrato no Source of Truth. */
+export interface SotContractSearchResult {
+  versionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+}
+
+/** Resultado de pesquisa de referência no Source of Truth. */
+export interface SotReferenceSearchResult {
+  referenceId: string;
+  assetId: string;
+  assetType: string;
+  referenceType: string;
+  title: string;
+  description: string;
+  url: string | null;
+}
+
+/** Resposta de pesquisa unificada do Source of Truth. */
+export interface SourceOfTruthSearchResponse {
+  services: SotServiceSearchResult[];
+  contracts: SotContractSearchResult[];
+  references: SotReferenceSearchResult[];
+  totalResults: number;
+}
+
+// ─── Change Confidence ───────────────────────────────────────────────────────
+
+/** DTO de mudança para o catálogo de Change Confidence. */
+export interface ChangeDto {
+  changeId: string;
+  apiAssetId: string;
+  serviceName: string;
+  version: string;
+  environment: string;
+  changeType: string;
+  deploymentStatus: string;
+  changeLevel: string;
+  confidenceStatus: string;
+  validationStatus: string;
+  changeScore: number;
+  teamName: string | null;
+  domain: string | null;
+  description: string | null;
+  workItemReference: string | null;
+  commitSha: string;
+  createdAt: string;
+}
+
+/** Resposta paginada do catálogo de mudanças. */
+export interface ChangesListResponse {
+  changes: ChangeDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Resposta de resumo agregado de mudanças. */
+export interface ChangesSummaryResponse {
+  totalChanges: number;
+  validatedChanges: number;
+  changesNeedingAttention: number;
+  suspectedRegressions: number;
+  changesCorrelatedWithIncidents: number;
 }

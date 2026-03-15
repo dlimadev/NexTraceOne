@@ -12,7 +12,10 @@ using DeprecateContractVersionFeature = NexTraceOne.Contracts.Application.Featur
 using ExportContractFeature = NexTraceOne.Contracts.Application.Features.ExportContract.ExportContract;
 using GetContractHistoryFeature = NexTraceOne.Contracts.Application.Features.GetContractHistory.GetContractHistory;
 using GetContractVersionDetailFeature = NexTraceOne.Contracts.Application.Features.GetContractVersionDetail.GetContractVersionDetail;
+using GetContractsSummaryFeature = NexTraceOne.Contracts.Application.Features.GetContractsSummary.GetContractsSummary;
 using ImportContractFeature = NexTraceOne.Contracts.Application.Features.ImportContract.ImportContract;
+using ListContractsFeature = NexTraceOne.Contracts.Application.Features.ListContracts.ListContracts;
+using ListContractsByServiceFeature = NexTraceOne.Contracts.Application.Features.ListContractsByService.ListContractsByService;
 using LockContractVersionFeature = NexTraceOne.Contracts.Application.Features.LockContractVersion.LockContractVersion;
 using SignContractVersionFeature = NexTraceOne.Contracts.Application.Features.SignContractVersion.SignContractVersion;
 using SuggestSemanticVersionFeature = NexTraceOne.Contracts.Application.Features.SuggestSemanticVersion.SuggestSemanticVersion;
@@ -48,6 +51,42 @@ public sealed class ContractsEndpointModule
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v1/contracts");
+
+        // ── Contract Catalog (Governança) ───────────────────────
+
+        group.MapGet("/list", async (
+            ContractProtocol? protocol,
+            ContractLifecycleState? lifecycleState,
+            string? searchTerm,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListContractsFeature.Query(
+                protocol, lifecycleState, searchTerm, page ?? 1, pageSize ?? 20), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/summary", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetContractsSummaryFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/by-service/{serviceId:guid}", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListContractsByServiceFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
 
         // ── Import & Versioning ─────────────────────────────────
 

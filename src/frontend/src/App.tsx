@@ -5,8 +5,8 @@ import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, ServiceCatalogPage, DeveloperPortalPage } from './features/catalog';
-import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
+import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage, SourceOfTruthExplorerPage, ServiceSourceOfTruthPage, ContractSourceOfTruthPage } from './features/catalog';
+import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDetailPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
 import { IncidentsPage, RunbooksPage } from './features/operations';
@@ -33,9 +33,36 @@ export default function App() {
             <Route element={<AppLayout />}>
               {/* ── Home ── */}
               <Route path="/" element={<DashboardPage />} />
+              {/* ── Source of Truth ── */}
+              <Route
+                path="/source-of-truth"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <SourceOfTruthExplorerPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/source-of-truth/services/:serviceId"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ServiceSourceOfTruthPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/source-of-truth/contracts/:contractVersionId"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ContractSourceOfTruthPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── Services ── */}
-              <Route path="/services" element={<ServiceCatalogPage />} />
-              <Route path="/graph" element={<Navigate to="/services" replace />} />
+              <Route path="/services" element={<ServiceCatalogListPage />} />
+              <Route path="/services/graph" element={<ServiceCatalogPage />} />
+              <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
+              <Route path="/graph" element={<Navigate to="/services/graph" replace />} />
               <Route
                 path="/portal"
                 element={
@@ -49,11 +76,43 @@ export default function App() {
                 path="/contracts"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/studio"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
                     <ContractsPage />
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/contracts/:contractVersionId"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── Changes ── */}
+              <Route
+                path="/changes"
+                element={
+                  <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+                    <ChangeCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/changes/:changeId"
+                element={
+                  <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+                    <ChangeDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/releases" element={<ReleasesPage />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />

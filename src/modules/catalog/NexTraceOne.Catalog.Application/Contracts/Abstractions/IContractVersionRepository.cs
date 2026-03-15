@@ -35,4 +35,47 @@ public interface IContractVersionRepository
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista versões de contrato mais recentes para cada ApiAssetId distinto,
+    /// com filtros opcionais por protocolo, ciclo de vida e paginação.
+    /// Usado para a visão de catálogo de contratos.
+    /// </summary>
+    Task<(IReadOnlyList<ContractVersion> Items, int TotalCount)> ListLatestPerApiAssetAsync(
+        ContractProtocol? protocol,
+        ContractLifecycleState? lifecycleState,
+        string? searchTerm,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista versões de contrato para um conjunto de ApiAssetIds.
+    /// Usado para obter contratos relacionados a um serviço específico.
+    /// </summary>
+    Task<IReadOnlyList<ContractVersion>> ListByApiAssetIdsAsync(
+        IEnumerable<Guid> apiAssetIds,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém contagens agregadas de contratos por protocolo e ciclo de vida.
+    /// Usado para o dashboard de governança de contratos.
+    /// </summary>
+    Task<ContractSummaryData> GetSummaryAsync(CancellationToken cancellationToken = default);
 }
+
+/// <summary>
+/// Dados agregados de resumo de contratos para o dashboard de governança.
+/// </summary>
+public sealed record ContractSummaryData(
+    int TotalVersions,
+    int DistinctContracts,
+    int DraftCount,
+    int InReviewCount,
+    int ApprovedCount,
+    int LockedCount,
+    int DeprecatedCount,
+    IReadOnlyList<ProtocolCount> ByProtocol);
+
+/// <summary>Contagem agrupada por protocolo.</summary>
+public sealed record ProtocolCount(string Protocol, int Count);

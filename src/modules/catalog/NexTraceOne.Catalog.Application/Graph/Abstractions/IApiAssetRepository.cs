@@ -16,6 +16,9 @@ public interface IApiAssetRepository
     /// <summary>Lista todos os ativos de API com seus grafos de consumidores.</summary>
     Task<IReadOnlyList<ApiAsset>> ListAllAsync(CancellationToken cancellationToken);
 
+    /// <summary>Lista ativos de API pertencentes a um serviço específico.</summary>
+    Task<IReadOnlyList<ApiAsset>> ListByServiceIdAsync(ServiceAssetId serviceId, CancellationToken cancellationToken);
+
     /// <summary>Pesquisa ativos de API pelo nome ou rota.</summary>
     Task<IReadOnlyList<ApiAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken);
 

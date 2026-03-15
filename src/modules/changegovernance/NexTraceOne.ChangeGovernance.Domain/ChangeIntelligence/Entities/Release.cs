@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.ChangeIntelligence.Domain.Enums;
 using NexTraceOne.ChangeIntelligence.Domain.Errors;
 
 namespace NexTraceOne.ChangeIntelligence.Domain.Entities;
@@ -51,6 +52,24 @@ public sealed class Release : AggregateRoot<ReleaseId>
 
     /// <summary>Data/hora UTC em que a release foi criada.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
+
+    /// <summary>Tipo de mudança classificado.</summary>
+    public ChangeType ChangeType { get; private set; } = ChangeType.Deployment;
+
+    /// <summary>Status de confiança operacional da mudança.</summary>
+    public ConfidenceStatus ConfidenceStatus { get; private set; } = ConfidenceStatus.NotAssessed;
+
+    /// <summary>Status de validação pós-mudança.</summary>
+    public ValidationStatus ValidationStatus { get; private set; } = ValidationStatus.Pending;
+
+    /// <summary>Nome da equipa responsável pelo serviço/mudança.</summary>
+    public string? TeamName { get; private set; }
+
+    /// <summary>Domínio funcional da mudança.</summary>
+    public string? Domain { get; private set; }
+
+    /// <summary>Descrição ou sumário da mudança.</summary>
+    public string? Description { get; private set; }
 
     /// <summary>
     /// Cria uma nova release a partir de um evento de deployment recebido do CI/CD.
@@ -140,6 +159,32 @@ public sealed class Release : AggregateRoot<ReleaseId>
     {
         Guard.Against.NullOrWhiteSpace(workItemRef);
         WorkItemReference = workItemRef;
+    }
+
+    /// <summary>Atualiza o status de confiança da mudança.</summary>
+    public void UpdateConfidenceStatus(ConfidenceStatus status)
+    {
+        ConfidenceStatus = status;
+    }
+
+    /// <summary>Atualiza o status de validação da mudança.</summary>
+    public void UpdateValidationStatus(ValidationStatus status)
+    {
+        ValidationStatus = status;
+    }
+
+    /// <summary>Define o tipo de mudança.</summary>
+    public void SetChangeType(ChangeType changeType)
+    {
+        ChangeType = changeType;
+    }
+
+    /// <summary>Define metadados adicionais da mudança.</summary>
+    public void SetMetadata(string? teamName, string? domain, string? description)
+    {
+        TeamName = teamName;
+        Domain = domain;
+        Description = description;
     }
 
     /// <summary>

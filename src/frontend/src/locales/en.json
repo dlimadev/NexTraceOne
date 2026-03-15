@@ -95,7 +95,12 @@
     "sectionChanges": "Changes",
     "sectionOperations": "Operations",
     "sectionAiHub": "AI Hub",
-    "sectionGovernance": "Governance"
+    "sectionGovernance": "Governance",
+    "dependencyGraph": "Dependency Graph",
+    "contractStudio": "Contract Studio",
+    "sourceOfTruth": "Source of Truth",
+    "sectionKnowledge": "Knowledge",
+    "changeConfidence": "Change Confidence"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -117,7 +122,8 @@
     "admin": "Administration",
     "navigate": "navigate",
     "select": "select",
-    "close": "close"
+    "close": "close",
+    "knowledge": "Knowledge"
   },
   "users": {
     "title": "Users",
@@ -1146,6 +1152,365 @@
       "total": "Total",
       "outcome": "Outcome",
       "errorCode": "Error Code"
+    }
+  },
+  "catalog": {
+    "title": "Service Catalog",
+    "subtitle": "Central registry of services, ownership and governance",
+    "search": {
+      "placeholder": "Search services by name, team, domain..."
+    },
+    "filters": {
+      "serviceType": "Service Type",
+      "criticality": "Criticality",
+      "lifecycleStatus": "Lifecycle Status",
+      "exposureType": "Exposure Type",
+      "domain": "Domain",
+      "team": "Team",
+      "all": "All"
+    },
+    "columns": {
+      "name": "Name",
+      "displayName": "Display Name",
+      "serviceType": "Type",
+      "domain": "Domain",
+      "team": "Team",
+      "criticality": "Criticality",
+      "lifecycle": "Lifecycle",
+      "exposure": "Exposure",
+      "actions": "Actions"
+    },
+    "summary": {
+      "total": "Total Services",
+      "critical": "Critical",
+      "high": "High Criticality",
+      "active": "Active",
+      "deprecated": "Deprecated",
+      "retired": "Retired"
+    },
+    "badges": {
+      "criticality": {
+        "Critical": "Critical",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low"
+      },
+      "lifecycle": {
+        "Planning": "Planning",
+        "Development": "Development",
+        "Staging": "Staging",
+        "Active": "Active",
+        "Deprecating": "Deprecating",
+        "Deprecated": "Deprecated",
+        "Retired": "Retired"
+      },
+      "type": {
+        "RestApi": "REST API",
+        "SoapService": "SOAP Service",
+        "KafkaProducer": "Kafka Producer",
+        "KafkaConsumer": "Kafka Consumer",
+        "BackgroundService": "Background Service",
+        "ScheduledProcess": "Scheduled Process",
+        "IntegrationComponent": "Integration Component",
+        "SharedPlatformService": "Shared Platform Service"
+      },
+      "exposure": {
+        "Internal": "Internal",
+        "External": "External",
+        "Partner": "Partner"
+      }
+    },
+    "empty": {
+      "title": "No services found",
+      "description": "No services match the current filters. Try adjusting your search criteria."
+    },
+    "detail": {
+      "title": "Service Detail",
+      "overview": "Overview",
+      "ownership": "Ownership",
+      "classification": "Classification",
+      "apis": "APIs",
+      "links": "Links",
+      "description": "Description",
+      "systemArea": "System Area",
+      "team": "Team",
+      "technicalOwner": "Technical Owner",
+      "businessOwner": "Business Owner",
+      "criticality": "Criticality",
+      "lifecycleStatus": "Lifecycle Status",
+      "exposureType": "Exposure Type",
+      "documentationUrl": "Documentation",
+      "repositoryUrl": "Repository",
+      "noApis": "No APIs associated with this service.",
+      "apiCount_one": "{{count}} API",
+      "apiCount_other": "{{count}} APIs",
+      "apiCount": "{{count}} APIs",
+      "consumers": "consumers",
+      "version": "Version",
+      "routePattern": "Route",
+      "visibility": "Visibility",
+      "decommissioned": "Decommissioned",
+      "active": "Active",
+      "status": "Status",
+      "separator": "·",
+      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumers"
+    },
+    "actions": {
+      "viewDetail": "View Detail",
+      "viewGraph": "View Graph",
+      "edit": "Edit",
+      "updateOwnership": "Update Ownership"
+    },
+    "totalCount": "({{count}} total)"
+  },
+  "contractGov": {
+    "title": "Contract Governance",
+    "subtitle": "Governance, versioning and compliance of service contracts",
+    "search": {
+      "placeholder": "Search contracts by version, API..."
+    },
+    "filters": {
+      "protocol": "Protocol",
+      "lifecycleState": "Lifecycle State",
+      "all": "All"
+    },
+    "columns": {
+      "api": "API Asset",
+      "version": "Version",
+      "protocol": "Protocol",
+      "lifecycle": "Lifecycle",
+      "format": "Format",
+      "signed": "Signed",
+      "locked": "Locked",
+      "importedFrom": "Source",
+      "createdAt": "Created",
+      "actions": "Actions"
+    },
+    "summary": {
+      "totalVersions": "Total Versions",
+      "distinctContracts": "Distinct Contracts",
+      "draft": "Drafts",
+      "inReview": "In Review",
+      "approved": "Approved",
+      "locked": "Locked",
+      "deprecated": "Deprecated"
+    },
+    "badges": {
+      "protocols": {
+        "OpenApi": "OpenAPI",
+        "Swagger": "Swagger",
+        "Wsdl": "WSDL",
+        "AsyncApi": "AsyncAPI",
+        "Protobuf": "Protobuf",
+        "GraphQl": "GraphQL"
+      },
+      "lifecycle": {
+        "Draft": "Draft",
+        "InReview": "In Review",
+        "Approved": "Approved",
+        "Locked": "Locked",
+        "Deprecated": "Deprecated",
+        "Sunset": "Sunset",
+        "Retired": "Retired"
+      },
+      "signed": "Signed",
+      "unsigned": "Unsigned",
+      "lockedLabel": "Locked",
+      "unlockedLabel": "Unlocked"
+    },
+    "empty": {
+      "title": "No contracts found",
+      "description": "Import or create contracts to start governing your service integrations."
+    },
+    "actions": {
+      "viewDetail": "View Detail",
+      "goToStudio": "Open Studio"
+    },
+    "detail": {
+      "title": "Contract Detail",
+      "backToList": "Back to Contracts",
+      "overview": "Overview",
+      "governance": "Governance",
+      "provenance": "Provenance",
+      "specPreview": "Specification Preview",
+      "format": "Format",
+      "importedFrom": "Imported From",
+      "lifecycleState": "Lifecycle State",
+      "isLocked": "Lock Status",
+      "isSigned": "Signature Status",
+      "deprecationDate": "Deprecation Date",
+      "sunsetDate": "Sunset Date",
+      "deprecationNotice": "Deprecation Notice",
+      "importedBy": "Imported By",
+      "parsedBy": "Parsed By",
+      "aiGenerated": "AI Generated",
+      "yes": "Yes",
+      "no": "No",
+      "notAvailable": "Not available",
+      "lockedAt": "Locked At",
+      "lockedBy": "Locked By",
+      "fingerprint": "Fingerprint",
+      "algorithm": "Algorithm",
+      "apiAssetId": "API Asset ID",
+      "version": "Version",
+      "protocol": "Protocol"
+    }
+  },
+  "sourceOfTruth": {
+    "title": "Source of Truth",
+    "subtitle": "Discover and explore services, contracts, documentation and operational knowledge",
+    "search": {
+      "placeholder": "Search services, contracts, docs, runbooks...",
+      "scope": "Scope",
+      "all": "All",
+      "services": "Services",
+      "contracts": "Contracts",
+      "docs": "Docs",
+      "runbooks": "Runbooks"
+    },
+    "results": {
+      "services": "Services",
+      "contracts": "Contracts",
+      "references": "References",
+      "noResults": "No results found",
+      "noResultsDescription": "Try a different search term or scope.",
+      "totalResults": "results found"
+    },
+    "service": {
+      "title": "Service Source of Truth",
+      "backToExplorer": "Back to Source of Truth",
+      "viewServiceDetail": "View Service Detail",
+      "overview": "Overview",
+      "ownership": "Ownership",
+      "apis": "APIs",
+      "contracts": "Contracts",
+      "references": "References & Documentation",
+      "quickLinks": "Quick Links",
+      "coverage": "Coverage",
+      "coverageScore": "Coverage Score",
+      "description": "Description",
+      "serviceType": "Service Type",
+      "systemArea": "System Area",
+      "exposureType": "Exposure Type",
+      "team": "Team",
+      "technicalOwner": "Technical Owner",
+      "businessOwner": "Business Owner",
+      "documentationUrl": "Documentation",
+      "repositoryUrl": "Repository",
+      "noApis": "No APIs registered",
+      "noContracts": "No contracts available",
+      "noReferences": "No references linked",
+      "indicators": {
+        "hasOwner": "Owner Defined",
+        "hasContracts": "Contracts Published",
+        "hasDocumentation": "Documentation Available",
+        "hasRunbook": "Runbook Available",
+        "hasRecentChangeHistory": "Change History Present",
+        "hasDependenciesMapped": "Dependencies Mapped",
+        "hasEventTopics": "Event Topics Defined"
+      }
+    },
+    "contract": {
+      "title": "Contract Source of Truth",
+      "backToExplorer": "Back to Source of Truth",
+      "viewContractDetail": "View Contract Detail",
+      "overview": "Overview",
+      "governance": "Governance",
+      "metrics": "Metrics",
+      "references": "References",
+      "apiAssetId": "API Asset ID",
+      "format": "Format",
+      "importedFrom": "Imported From",
+      "lifecycleState": "Lifecycle State",
+      "lockStatus": "Lock Status",
+      "signedStatus": "Signed Status",
+      "deprecationNotice": "Deprecation Notice",
+      "deprecationDate": "Deprecation Date",
+      "sunsetDate": "Sunset Date",
+      "artifacts": "Artifacts",
+      "diffs": "Diffs",
+      "violations": "Violations",
+      "noReferences": "No references linked"
+    },
+    "empty": {
+      "title": "Source of Truth Explorer",
+      "description": "Search for services, contracts, documentation and operational knowledge."
+    }
+  },
+  "changeConfidence": {
+    "title": "Change Confidence",
+    "subtitle": "Track, validate and analyze changes across your services",
+    "summary": {
+      "totalChanges": "Total Changes",
+      "validatedChanges": "Validated",
+      "changesNeedingAttention": "Needs Attention",
+      "suspectedRegressions": "Suspected Regressions",
+      "correlatedWithIncidents": "Incident-Correlated"
+    },
+    "filters": {
+      "serviceName": "Service",
+      "environment": "Environment",
+      "changeType": "Change Type",
+      "confidenceStatus": "Confidence",
+      "searchPlaceholder": "Search changes...",
+      "allEnvironments": "All Environments",
+      "allTypes": "All Types",
+      "allStatuses": "All Statuses"
+    },
+    "table": {
+      "service": "Service",
+      "version": "Version",
+      "environment": "Environment",
+      "changeType": "Type",
+      "deploymentStatus": "Status",
+      "confidence": "Confidence",
+      "score": "Score",
+      "date": "Date",
+      "noChanges": "No changes found",
+      "noChangesDescription": "Adjust your filters or wait for new deployments."
+    },
+    "confidenceStatus": {
+      "NotAssessed": "Not Assessed",
+      "Validated": "Validated",
+      "NeedsAttention": "Needs Attention",
+      "SuspectedRegression": "Suspected Regression",
+      "CorrelatedWithIncident": "Incident-Correlated",
+      "Mitigated": "Mitigated"
+    },
+    "changeType": {
+      "Deployment": "Deployment",
+      "ConfigurationChange": "Configuration",
+      "ContractChange": "Contract",
+      "SchemaChange": "Schema",
+      "DependencyChange": "Dependency",
+      "PolicyChange": "Policy",
+      "OperationalChange": "Operational"
+    },
+    "detail": {
+      "title": "Change Detail",
+      "backToCatalog": "Back to Change Confidence",
+      "overview": "Overview",
+      "riskAndConfidence": "Risk & Confidence",
+      "blastRadius": "Blast Radius",
+      "validation": "Validation & Evidence",
+      "timeline": "Timeline",
+      "quickLinks": "Quick Links",
+      "description": "Description",
+      "changeType": "Change Type",
+      "commitSha": "Commit SHA",
+      "pipelineSource": "Pipeline Source",
+      "workItem": "Work Item",
+      "changeScore": "Change Score",
+      "confidenceStatus": "Confidence Status",
+      "validationStatus": "Validation Status",
+      "totalAffected": "Total Affected Consumers",
+      "directConsumers": "Direct Consumers",
+      "transitiveConsumers": "Transitive Consumers",
+      "noBlastRadius": "Blast radius not yet calculated",
+      "noValidation": "No validation evidence available",
+      "noTimeline": "No timeline events recorded",
+      "viewServiceSot": "View Service in Source of Truth",
+      "viewInReleases": "View in Releases"
     }
   }
 }

@@ -82,13 +82,13 @@ export function DashboardPage() {
             ) : (
               <ul className="divide-y divide-edge">
                 {graph.services.slice(0, 5).map((svc) => (
-                  <li key={svc.id} className="px-6 py-3 flex items-center gap-3 hover:bg-hover transition-colors">
+                  <li key={svc.serviceAssetId} className="px-6 py-3 flex items-center gap-3 hover:bg-hover transition-colors">
                     <div className="w-8 h-8 rounded bg-accent/15 flex items-center justify-center text-accent font-semibold text-sm">
                       {svc.name[0]}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-heading">{svc.name}</p>
-                      <p className="text-xs text-muted">{svc.team}</p>
+                      <p className="text-xs text-muted">{svc.teamName}</p>
                     </div>
                   </li>
                 ))}
@@ -110,10 +110,10 @@ export function DashboardPage() {
             ) : (
               <ul className="divide-y divide-edge">
                 {graph.apis.slice(0, 5).map((api) => (
-                  <li key={api.id} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
+                  <li key={api.apiAssetId} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
                     <div>
                       <p className="text-sm font-medium text-heading">{api.name}</p>
-                      <p className="text-xs text-muted font-mono">{api.baseUrl}</p>
+                      <p className="text-xs text-muted font-mono">{api.routePattern}</p>
                     </div>
                   </li>
                 ))}

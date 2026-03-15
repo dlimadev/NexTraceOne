@@ -2,7 +2,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
-  GitBranch,
   FileText,
   Zap,
   Users,
@@ -25,13 +24,17 @@ import {
   Scale,
   DollarSign,
   FileCode,
+  Share2,
+  Server,
+  Layers,
+  Globe,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
 
 /** Seções de navegação alinhadas com MODULES-AND-PAGES.md. */
-type NavSection = 'home' | 'services' | 'contracts' | 'changes' | 'operations' | 'aiHub' | 'governance' | 'admin';
+type NavSection = 'home' | 'services' | 'knowledge' | 'contracts' | 'changes' | 'operations' | 'aiHub' | 'governance' | 'admin';
 
 interface NavItem {
   /** Chave i18n para o label exibido na sidebar. */
@@ -60,11 +63,16 @@ const navItems: NavItem[] = [
   // ── Home ──
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
   // ── Services ──
-  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'services' },
+  // ── Knowledge ──
+  { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
   // ── Contracts ──
   { labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
+  { labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={18} />, permission: 'contracts:read', section: 'contracts' },
   // ── Changes ──
+  { labelKey: 'sidebar.changeConfidence', to: '/changes', icon: <ShieldCheck size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.changeIntelligence', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:releases:read', section: 'changes' },
   { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:read', section: 'changes' },
   { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read', section: 'changes' },
@@ -96,6 +104,7 @@ const navItems: NavItem[] = [
 const sectionOrder: { key: NavSection; labelKey: string }[] = [
   { key: 'home', labelKey: '' },
   { key: 'services', labelKey: 'sidebar.sectionServices' },
+  { key: 'knowledge', labelKey: 'sidebar.sectionKnowledge' },
   { key: 'contracts', labelKey: 'sidebar.sectionContracts' },
   { key: 'changes', labelKey: 'sidebar.sectionChanges' },
   { key: 'operations', labelKey: 'sidebar.sectionOperations' },
