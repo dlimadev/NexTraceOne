@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using NexTraceOne.AiGovernance.Application.Abstractions;
 using NexTraceOne.AiGovernance.Domain.Entities;
 using NexTraceOne.AiGovernance.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -22,7 +23,8 @@ public static class GetConversation
     /// <summary>Handler que obtém conversa e mensagens com metadados completos.</summary>
     public sealed class Handler(
         IAiAssistantConversationRepository conversationRepository,
-        IAiMessageRepository messageRepository) : IQueryHandler<Query, Response>
+        IAiMessageRepository messageRepository,
+        ICurrentUser currentUser) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -32,6 +34,10 @@ public static class GetConversation
             var conversation = await conversationRepository.GetByIdAsync(conversationId, cancellationToken);
 
             if (conversation is null)
+                return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
+
+            // Validar que o utilizador autenticado é o proprietário da conversa
+            if (!string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase))
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
             var messages = await messageRepository.ListByConversationAsync(

@@ -3,6 +3,7 @@ using FluentValidation;
 using NexTraceOne.AiGovernance.Application.Abstractions;
 using NexTraceOne.AiGovernance.Domain.Entities;
 using NexTraceOne.AiGovernance.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using MediatR;
@@ -35,7 +36,8 @@ public static class UpdateConversation
 
     /// <summary>Handler que atualiza metadados da conversa.</summary>
     public sealed class Handler(
-        IAiAssistantConversationRepository conversationRepository) : ICommandHandler<Command, Response>
+        IAiAssistantConversationRepository conversationRepository,
+        ICurrentUser currentUser) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -45,6 +47,10 @@ public static class UpdateConversation
             var conversation = await conversationRepository.GetByIdAsync(conversationId, cancellationToken);
 
             if (conversation is null)
+                return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
+
+            // Validar que o utilizador autenticado é o proprietário da conversa
+            if (!string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase))
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
             if (!string.IsNullOrWhiteSpace(request.Title))

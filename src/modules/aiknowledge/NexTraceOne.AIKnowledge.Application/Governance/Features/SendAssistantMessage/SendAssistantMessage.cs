@@ -167,7 +167,7 @@ public static class SendAssistantMessage
             if (string.IsNullOrWhiteSpace(contextScope))
                 return ["Service Catalog", "Contract Registry"];
 
-            var scopes = contextScope.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var scopes = contextScope.Split(',', 20, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var sources = new List<string>();
 
             foreach (var scope in scopes)
