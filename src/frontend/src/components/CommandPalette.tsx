@@ -27,6 +27,10 @@ import {
   Layers,
   Globe,
   Activity,
+  Gauge,
+  Grid3X3,
+  Award,
+  GitCompare,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
@@ -70,6 +74,10 @@ const paletteItems: PaletteItem[] = [
   { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={16} />, group: 'commandPalette.aiHub', permission: 'ai:models:read' },
   { id: 'ai-policies', labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.aiHub', permission: 'ai:policies:read' },
   // ── Governance ──
+  { id: 'executive-overview', labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Gauge size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
+  { id: 'risk-heatmap', labelKey: 'sidebar.riskHeatmap', to: '/governance/executive/heatmap', icon: <Grid3X3 size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read' },
+  { id: 'maturity-scorecards', labelKey: 'sidebar.maturityScorecards', to: '/governance/executive/maturity', icon: <Award size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
+  { id: 'benchmarking', labelKey: 'sidebar.benchmarking', to: '/governance/executive/benchmarking', icon: <GitCompare size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
   { id: 'reports', labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
   { id: 'risk', labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read' },
   { id: 'compliance', labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={16} />, group: 'commandPalette.governance', permission: 'governance:compliance:read' },

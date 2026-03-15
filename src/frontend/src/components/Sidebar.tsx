@@ -30,6 +30,10 @@ import {
   Globe,
   Activity,
   Plug,
+  Gauge,
+  Grid3X3,
+  Award,
+  GitCompare,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -82,6 +86,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={18} />, permission: 'ai:policies:read', section: 'aiHub' },
   { labelKey: 'sidebar.ideIntegrations', to: '/ai/ide', icon: <Plug size={18} />, permission: 'ai:ide:read', section: 'aiHub' },
   // ── Governance ──
+  { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Gauge size={18} />, permission: 'governance:reports:read', section: 'governance' },
+  { labelKey: 'sidebar.riskHeatmap', to: '/governance/executive/heatmap', icon: <Grid3X3 size={18} />, permission: 'governance:risk:read', section: 'governance' },
+  { labelKey: 'sidebar.maturityScorecards', to: '/governance/executive/maturity', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'governance' },
+  { labelKey: 'sidebar.benchmarking', to: '/governance/executive/benchmarking', icon: <GitCompare size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={18} />, permission: 'governance:risk:read', section: 'governance' },
   { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={18} />, permission: 'governance:compliance:read', section: 'governance' },
