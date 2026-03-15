@@ -30,6 +30,15 @@ public sealed class ContractsDbContext(
     /// <summary>Artefatos gerados a partir de versões de contrato (testes, scaffolds, evidências).</summary>
     public DbSet<ContractArtifact> ContractArtifacts => Set<ContractArtifact>();
 
+    /// <summary>Drafts de contrato em edição no Contract Studio.</summary>
+    public DbSet<ContractDraft> Drafts => Set<ContractDraft>();
+
+    /// <summary>Revisões de drafts de contrato para rastreabilidade do fluxo de aprovação.</summary>
+    public DbSet<ContractReview> Reviews => Set<ContractReview>();
+
+    /// <summary>Exemplos associados a drafts ou versões publicadas de contrato.</summary>
+    public DbSet<ContractExample> Examples => Set<ContractExample>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
