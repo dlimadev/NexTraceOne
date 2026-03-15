@@ -54,8 +54,7 @@ internal sealed class ContractDraftRepository(ContractsDbContext context)
 
     /// <summary>Lista drafts de contrato por estado.</summary>
     public async Task<IReadOnlyList<ContractDraft>> ListByStatusAsync(DraftStatus status, CancellationToken ct = default)
-        => await context.Drafts
-            .Where(d => d.Status == status)
+        => await BuildFilteredQuery(status, null, null)
             .OrderByDescending(d => d.CreatedAt)
             .ToListAsync(ct);
 
