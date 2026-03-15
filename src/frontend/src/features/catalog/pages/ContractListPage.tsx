@@ -59,6 +59,10 @@ const emptyFilters: ContractFilters = {
 };
 
 /** Página principal de governança de contratos — listagem, filtros e resumo. */
+/** Intervalo de debounce para pesquisa (ms). */
+const SEARCH_DEBOUNCE_MS = 350;
+
+/** Página principal de governança de contratos. */
 export function ContractListPage() {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<ContractFilters>(emptyFilters);
@@ -66,7 +70,7 @@ export function ContractListPage() {
 
   /** Debounce da pesquisa para evitar chamadas excessivas à API. */
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(filters.search), 350);
+    const timer = setTimeout(() => setDebouncedSearch(filters.search), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [filters.search]);
 

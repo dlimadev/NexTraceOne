@@ -88,6 +88,9 @@ const emptyFilters: ServiceFilters = {
   teamName: '',
 };
 
+/** Intervalo de debounce para pesquisa (ms). */
+const SEARCH_DEBOUNCE_MS = 350;
+
 /** Página principal de listagem do catálogo de serviços. */
 export function ServiceCatalogListPage() {
   const { t } = useTranslation();
@@ -96,7 +99,7 @@ export function ServiceCatalogListPage() {
 
   /** Debounce da pesquisa para evitar chamadas excessivas à API. */
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(filters.search), 350);
+    const timer = setTimeout(() => setDebouncedSearch(filters.search), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [filters.search]);
 

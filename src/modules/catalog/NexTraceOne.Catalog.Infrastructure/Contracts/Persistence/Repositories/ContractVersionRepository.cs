@@ -64,7 +64,10 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
             query = query.Where(v => v.ApiAssetId == apiAssetId.Value);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-            query = query.Where(v => EF.Functions.Like(v.SemVer, "%" + searchTerm + "%"));
+        {
+            var pattern = $"%{searchTerm}%";
+            query = query.Where(v => EF.Functions.Like(v.SemVer, pattern));
+        }
 
         var totalCount = await query.CountAsync(cancellationToken);
 
