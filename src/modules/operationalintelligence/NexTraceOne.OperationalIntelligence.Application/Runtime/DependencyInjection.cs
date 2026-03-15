@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.OperationalIntelligence.Application.Incidents;
 using NexTraceOne.OperationalIntelligence.Application.Reliability;
 using NexTraceOne.RuntimeIntelligence.Application.Features.CompareReleaseRuntime;
 using NexTraceOne.RuntimeIntelligence.Application.Features.ComputeObservabilityDebt;
@@ -17,7 +18,7 @@ namespace NexTraceOne.RuntimeIntelligence.Application;
 /// <summary>
 /// Registra serviços da camada Application do módulo RuntimeIntelligence.
 /// Inclui: MediatR handlers, FluentValidation validators.
-/// Compõe também o subdomínio Reliability (Team-owned Service Reliability).
+/// Compõe também os subdomínios Reliability e Incidents.
 /// </summary>
 public static class DependencyInjection
 {
@@ -41,6 +42,9 @@ public static class DependencyInjection
 
         // ── Reliability (Team-owned Service Reliability) validators ──
         services.AddReliabilityApplication(configuration);
+
+        // ── Incidents (Incident Correlation & Mitigation) validators ──
+        services.AddIncidentsApplication(configuration);
 
         return services;
     }
