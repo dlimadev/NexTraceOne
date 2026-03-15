@@ -11,4 +11,5 @@ export { auditApi } from '../features/audit-compliance/api/audit';
 export { promotionApi } from '../features/change-governance/api/promotion';
 export { licensingApi } from '../features/commercial-governance/api/licensing';
 export { developerPortalApi } from '../features/catalog/api/developerPortal';
+export { globalSearchApi } from '../features/catalog/api/globalSearch';
 export { default as apiClient } from './client';

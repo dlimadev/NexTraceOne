@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Search,
   LayoutDashboard,
@@ -31,9 +32,14 @@ import {
   Grid3X3,
   Award,
   GitCompare,
+  Loader2,
+  ArrowRight,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
+import { globalSearchApi } from '../features/catalog/api/globalSearch';
+import type { SearchResultItem } from '../features/catalog/api/globalSearch';
+import { usePersona } from '../contexts/PersonaContext';
 
 interface PaletteItem {
   id: string;
@@ -88,6 +94,42 @@ const paletteItems: PaletteItem[] = [
   { id: 'audit', labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={16} />, group: 'commandPalette.admin', permission: 'audit:read' },
 ];
 
+/** Ícone por tipo de entidade retornada pela pesquisa global. */
+const entityTypeIcons: Record<string, React.ReactNode> = {
+  service: <GitBranch size={16} />,
+  contract: <FileText size={16} />,
+  runbook: <FileCode size={16} />,
+  doc: <BookOpen size={16} />,
+};
+
+/** Chave i18n de label por tipo de entidade. */
+const entityTypeLabelKeys: Record<string, string> = {
+  service: 'commandPalette.entityService',
+  contract: 'commandPalette.entityContract',
+  runbook: 'commandPalette.entityRunbook',
+  doc: 'commandPalette.entityDoc',
+};
+
+/** Cores de badge por status de entidade. */
+const STATUS_COLOR_DEFAULT = 'bg-slate-500/20 text-slate-400';
+const statusColors: Record<string, string> = {
+  active: 'bg-emerald-500/20 text-emerald-400',
+  healthy: 'bg-emerald-500/20 text-emerald-400',
+  degraded: 'bg-amber-500/20 text-amber-400',
+  draft: STATUS_COLOR_DEFAULT,
+  deprecated: 'bg-red-500/20 text-red-400',
+};
+
+/** Hook utilitário para debounce de valor. */
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+  return debounced;
+}
+
 interface CommandPaletteProps {
   open: boolean;
   onClose: () => void;
@@ -98,17 +140,32 @@ interface CommandPaletteProps {
  *
  * Funcionalidades:
  * - Filtro textual sobre itens de navegação
+ * - Pesquisa global de entidades (serviços, contratos, runbooks, docs) com ≥3 chars
  * - Navegação por teclado (↑ ↓ Enter Escape)
- * - Agrupamento por seção (Navigation / Admin)
+ * - Agrupamento por seção (Navigation / Search Results)
  * - Respeita permissões do usuário autenticado
  */
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { can } = usePermissions();
+  const { persona } = usePersona();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const debouncedQuery = useDebouncedValue(query, 300);
+  const shouldSearchEntities = debouncedQuery.trim().length >= 3;
+
+  const { data: searchData, isFetching: isSearching } = useQuery({
+    queryKey: ['globalSearch', debouncedQuery, persona],
+    queryFn: () =>
+      globalSearchApi.search({ q: debouncedQuery.trim(), persona, maxResults: 8 }),
+    enabled: open && shouldSearchEntities,
+    staleTime: 30_000,
+  });
+
+  const entityResults = searchData?.items ?? [];
 
   const visibleItems = useMemo(
     () => paletteItems.filter((item) => !item.permission || can(item.permission)),
@@ -134,7 +191,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     return map;
   }, [filtered]);
 
-  const flatItems = useMemo(() => filtered, [filtered]);
+  /** Total de itens selecionáveis (navegação + entidades + "see all"). */
+  const totalSelectableCount = useMemo(() => {
+    const entityCount = shouldSearchEntities ? entityResults.length : 0;
+    const seeAllCount = shouldSearchEntities && entityResults.length > 0 ? 1 : 0;
+    return filtered.length + entityCount + seeAllCount;
+  }, [filtered.length, entityResults.length, shouldSearchEntities]);
 
   useEffect(() => {
     if (open) {
@@ -144,7 +206,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     }
   }, [open]);
 
-  const handleSelect = useCallback(
+  const handleSelectNavItem = useCallback(
     (item: PaletteItem) => {
       onClose();
       navigate(item.to);
@@ -152,22 +214,48 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     [onClose, navigate],
   );
 
+  const handleSelectEntity = useCallback(
+    (item: SearchResultItem) => {
+      onClose();
+      navigate(item.route);
+    },
+    [onClose, navigate],
+  );
+
+  const handleSeeAll = useCallback(() => {
+    onClose();
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+  }, [onClose, navigate, query]);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setActiveIndex((i) => (i + 1) % flatItems.length);
+        setActiveIndex((i) => (totalSelectableCount > 0 ? (i + 1) % totalSelectableCount : 0));
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setActiveIndex((i) => (i - 1 + flatItems.length) % flatItems.length);
-      } else if (e.key === 'Enter' && flatItems[activeIndex]) {
+        setActiveIndex((i) =>
+          totalSelectableCount > 0 ? (i - 1 + totalSelectableCount) % totalSelectableCount : 0,
+        );
+      } else if (e.key === 'Enter') {
         e.preventDefault();
-        handleSelect(flatItems[activeIndex]);
+        const navCount = filtered.length;
+        if (activeIndex < navCount) {
+          const item = filtered[activeIndex];
+          if (item) handleSelectNavItem(item);
+        } else {
+          const entityIndex = activeIndex - navCount;
+          if (entityIndex < entityResults.length) {
+            handleSelectEntity(entityResults[entityIndex]);
+          } else {
+            handleSeeAll();
+          }
+        }
       } else if (e.key === 'Escape') {
         onClose();
       }
     },
-    [flatItems, activeIndex, handleSelect, onClose],
+    [totalSelectableCount, filtered, activeIndex, entityResults, handleSelectNavItem, handleSelectEntity, handleSeeAll, onClose],
   );
 
   useEffect(() => {
@@ -177,6 +265,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   if (!open) return null;
 
   let itemCounter = 0;
+  const navCount = filtered.length;
 
   return (
     <div
@@ -207,6 +296,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             className="flex-1 bg-transparent text-heading text-sm placeholder:text-muted outline-none"
             aria-label={t('commandPalette.placeholder')}
           />
+          {isSearching && (
+            <Loader2 size={16} className="text-muted animate-spin shrink-0" />
+          )}
           <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-edge px-1.5 py-0.5 text-[10px] text-muted font-mono">
             ESC
           </kbd>
@@ -214,38 +306,123 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
         {/* Results */}
         <div className="max-h-72 overflow-y-auto p-2">
-          {flatItems.length === 0 ? (
+          {/* Navigation results */}
+          {filtered.length === 0 && !shouldSearchEntities ? (
             <p className="py-8 text-center text-sm text-muted">{t('common.noResults')}</p>
           ) : (
-            Array.from(groups.entries()).map(([group, items]) => (
-              <div key={group} className="mb-2 last:mb-0">
-                <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-faded">
-                  {t(group)}
-                </p>
-                {items.map((item) => {
-                  const index = itemCounter++;
-                  return (
+            <>
+              {Array.from(groups.entries()).map(([group, items]) => (
+                <div key={group} className="mb-2 last:mb-0">
+                  <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-faded">
+                    {t(group)}
+                  </p>
+                  {items.map((item) => {
+                    const index = itemCounter++;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleSelectNavItem(item)}
+                        className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm transition-colors ${
+                          index === activeIndex
+                            ? 'bg-accent/15 text-accent'
+                            : 'text-body hover:bg-hover'
+                        }`}
+                        role="option"
+                        aria-selected={index === activeIndex}
+                      >
+                        <span className="shrink-0 opacity-70">{item.icon}</span>
+                        <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
+                        {index === activeIndex && (
+                          <CornerDownLeft size={14} className="shrink-0 opacity-50" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+
+              {/* Entity search results */}
+              {shouldSearchEntities && (
+                <div className="mb-2">
+                  <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-faded">
+                    {t('commandPalette.searchResults')}
+                  </p>
+
+                  {isSearching && entityResults.length === 0 && (
+                    <p className="flex items-center gap-2 px-3 py-3 text-sm text-muted">
+                      <Loader2 size={14} className="animate-spin" />
+                      {t('commandPalette.loading')}
+                    </p>
+                  )}
+
+                  {!isSearching && entityResults.length === 0 && (
+                    <p className="px-3 py-3 text-sm text-muted">
+                      {t('commandPalette.noEntityResults')}
+                    </p>
+                  )}
+
+                  {entityResults.map((entity, entityIdx) => {
+                    const index = navCount + entityIdx;
+                    return (
+                      <button
+                        key={entity.entityId}
+                        onClick={() => handleSelectEntity(entity)}
+                        className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm transition-colors ${
+                          index === activeIndex
+                            ? 'bg-accent/15 text-accent'
+                            : 'text-body hover:bg-hover'
+                        }`}
+                        role="option"
+                        aria-selected={index === activeIndex}
+                      >
+                        <span className="shrink-0 opacity-70">
+                          {entityTypeIcons[entity.entityType] ?? <Search size={16} />}
+                        </span>
+                        <span className="flex-1 text-left min-w-0">
+                          <span className="block truncate">{entity.title}</span>
+                          <span className="block truncate text-[11px] text-muted">
+                            {entity.subtitle ??
+                              t(entityTypeLabelKeys[entity.entityType] ?? '', entity.entityType)}
+                          </span>
+                        </span>
+                        {entity.status && (
+                          <span
+                            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                              statusColors[entity.status] ?? STATUS_COLOR_DEFAULT
+                            }`}
+                          >
+                            {entity.status}
+                          </span>
+                        )}
+                        {index === activeIndex && (
+                          <CornerDownLeft size={14} className="shrink-0 opacity-50" />
+                        )}
+                      </button>
+                    );
+                  })}
+
+                  {/* See all results link */}
+                  {entityResults.length > 0 && (
                     <button
-                      key={item.id}
-                      onClick={() => handleSelect(item)}
+                      onClick={handleSeeAll}
                       className={`flex items-center gap-3 w-full px-3 py-2 rounded-md text-sm transition-colors ${
-                        index === activeIndex
+                        navCount + entityResults.length === activeIndex
                           ? 'bg-accent/15 text-accent'
-                          : 'text-body hover:bg-hover'
+                          : 'text-accent/70 hover:bg-hover'
                       }`}
                       role="option"
-                      aria-selected={index === activeIndex}
+                      aria-selected={navCount + entityResults.length === activeIndex}
                     >
-                      <span className="shrink-0 opacity-70">{item.icon}</span>
-                      <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
-                      {index === activeIndex && (
+                      <ArrowRight size={16} className="shrink-0 opacity-70" />
+                      <span className="flex-1 text-left">{t('commandPalette.seeAllResults')}</span>
+                      {navCount + entityResults.length === activeIndex && (
                         <CornerDownLeft size={14} className="shrink-0 opacity-50" />
                       )}
                     </button>
-                  );
-                })}
-              </div>
-            ))
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
 

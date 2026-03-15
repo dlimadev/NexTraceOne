@@ -131,7 +131,29 @@
     "navigate": "navegar",
     "select": "selecionar",
     "close": "fechar",
-    "knowledge": "Conhecimento"
+    "knowledge": "Conhecimento",
+    "searchResults": "Resultados da Pesquisa",
+    "loading": "Pesquisando...",
+    "seeAllResults": "Ver todos os resultados",
+    "noEntityResults": "Nenhuma entidade encontrada",
+    "entityService": "Serviço",
+    "entityContract": "Contrato",
+    "entityRunbook": "Runbook",
+    "entityDoc": "Documentação",
+    "globalSearch": {
+      "title": "Pesquisa Global",
+      "subtitle": "Pesquise em todos os serviços, contratos, runbooks e documentação",
+      "searchPlaceholder": "Pesquisar serviços, contratos, runbooks...",
+      "scopeAll": "Todos",
+      "scopeServices": "Serviços",
+      "scopeContracts": "Contratos",
+      "scopeRunbooks": "Runbooks",
+      "scopeDocs": "Documentação",
+      "resultCount": "{{count}} resultados encontrados",
+      "noResults": "Nenhum resultado encontrado para sua pesquisa",
+      "noResultsHint": "Tente palavras-chave diferentes ou ajuste o filtro de escopo",
+      "goToEntity": "Abrir"
+    }
   },
   "users": {
     "title": "Usuários",
@@ -2146,6 +2168,45 @@
         "prompt2": "Quais modelos de IA foram usados e por quem esta semana?",
         "prompt3": "Existem lacunas de conformidade nas mudanças recentes?"
       }
+    }
+  },
+  "breadcrumbs": {
+    "home": "Início"
+  },
+  "onboarding": {
+    "hintsTitle": "O que você pode fazer aqui",
+    "dismiss": "Dispensar",
+    "services": {
+      "hint1Title": "Explorar Catálogo de Serviços",
+      "hint1Desc": "Veja todos os serviços registrados, seus proprietários e dependências",
+      "hint2Title": "Ver Grafo de Dependências",
+      "hint2Desc": "Visualize as dependências e topologia dos serviços",
+      "hint3Title": "Verificar Saúde do Serviço",
+      "hint3Desc": "Monitore o estado de confiabilidade dos seus serviços"
+    },
+    "contracts": {
+      "hint1Title": "Navegar Contratos de API",
+      "hint1Desc": "Veja todos os contratos de API com histórico de versões e estado do ciclo de vida",
+      "hint2Title": "Criar no Contract Studio",
+      "hint2Desc": "Use o estúdio assistido por IA para criar e validar contratos",
+      "hint3Title": "Comparar Versões",
+      "hint3Desc": "Compare versões de contratos para entender as mudanças"
+    },
+    "changes": {
+      "hint1Title": "Rastrear Mudanças em Produção",
+      "hint1Desc": "Monitore implantações e mudanças com pontuação de confiança",
+      "hint2Title": "Monitorar Raio de Impacto",
+      "hint2Desc": "Entenda o escopo de impacto das mudanças em produção",
+      "hint3Title": "Revisar Confiança na Mudança",
+      "hint3Desc": "Avalie a prontidão da mudança antes de implantar em produção"
+    },
+    "operations": {
+      "hint1Title": "Gerenciar Incidentes",
+      "hint1Desc": "Rastreie e resolva incidentes com contexto completo de correlação",
+      "hint2Title": "Acessar Runbooks",
+      "hint2Desc": "Encontre e execute procedimentos operacionais para cenários comuns",
+      "hint3Title": "Monitorar Confiabilidade",
+      "hint3Desc": "Acompanhe métricas de confiabilidade e SLOs dos serviços da equipe"
     }
   }
 }

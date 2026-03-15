@@ -7,6 +7,7 @@ using GetServiceSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfT
 using GetContractSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetContractSourceOfTruth.GetContractSourceOfTruth;
 using GetServiceCoverageFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceCoverage.GetServiceCoverage;
 using SearchSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.SearchSourceOfTruth.SearchSourceOfTruth;
+using GlobalSearchFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GlobalSearch.GlobalSearch;
 
 namespace NexTraceOne.Catalog.API.SourceOfTruth.Endpoints;
 
@@ -76,6 +77,22 @@ public sealed class SourceOfTruthEndpointModule
         {
             var result = await sender.Send(
                 new SearchSourceOfTruthFeature.Query(q, scope, maxResults ?? 20), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Pesquisa global unificada ───────────────────────────────
+
+        group.MapGet("/global-search", async (
+            string q,
+            string? scope,
+            string? persona,
+            int? maxResults,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GlobalSearchFeature.Query(q, scope, persona, maxResults ?? 25), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
     }
