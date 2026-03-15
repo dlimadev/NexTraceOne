@@ -5,7 +5,7 @@
 Este documento detalha a aderência da solução atual à visão oficial do NexTraceOne,
 classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar do zero**.
 
-Última atualização: 2026-03-14 (Fase 3 — renaming e reposicionamento semântico executado)
+Última atualização: 2026-03-15 (Fase Final — Hardening, Final Alignment & Refoundation Closure)
 
 ---
 
@@ -13,27 +13,38 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 | Área | Estado | Notas |
 |------|--------|-------|
-| Arquitetura modular monolítica | OK | 7 bounded contexts com DDD, CQRS, Result pattern, strongly typed IDs |
+| Arquitetura modular monolítica | OK | 8 bounded contexts com DDD, CQRS, Result pattern, strongly typed IDs |
 | IdentityAccess | OK | RBAC, sessões, break glass, JIT, delegações, revisão de acessos (186 testes) |
-| Catalog — ServiceCatalog | OK | Namespaces renomeados de EngineeringGraph para Catalog.Graph; API route /api/v1/catalog (387 testes) |
-| Catalog — Contracts | OK | ContractVersion, diffs, artifacts, scorecard, provenance, locking |
+| Catalog — ServiceCatalog | OK | Namespaces renomeados; API route /api/v1/catalog (430 testes) |
+| Catalog — Contracts | OK | ContractVersion, diffs, artifacts, scorecard, provenance, locking, multi-protocol |
 | Catalog — DeveloperPortal | OK | Subscriptions, playground, code gen, analytics, saved searches |
-| ChangeGovernance — ChangeIntelligence | OK | Release, blast radius, scoring, baseline, rollback, markers (155 testes) |
+| Catalog — SourceOfTruth | OK | Vista consolidada serviços+contratos+ownership+coverage |
+| ChangeGovernance — ChangeIntelligence | OK | Release, blast radius, scoring, baseline, rollback, markers (179 testes) |
 | ChangeGovernance — Workflow | OK | Templates, stages, approvals, evidence packs, SLA policies |
-| ChangeGovernance — Promotion | OK | Promotion requests, gates, evaluation, freeze windows |
-| ChangeGovernance — RulesetGovernance | OK | Rulesets, lint execution, bindings, default installs |
+| ChangeGovernance — Promotion | OK | Promotion requests, gates, evaluation, freeze windows. RequirePermission enforced |
+| ChangeGovernance — RulesetGovernance | OK | Rulesets, lint execution, bindings, default installs. RequirePermission enforced |
 | CommercialGovernance | OK | Licensing, vendor ops, telemetry consent (124 testes) |
-| OperationalIntelligence — Runtime | OK | Snapshots, baselines, drift detection, observability profiles (71 testes) |
-| OperationalIntelligence — Cost | OK | Cost snapshots, attribution, trends, anomaly alerts |
-| AIKnowledge — ExternalAI | OK | Providers, policies, consultations, knowledge capture (47 testes) |
+| OperationalIntelligence — Runtime | OK | Snapshots, baselines, drift detection, observability profiles. RequirePermission enforced |
+| OperationalIntelligence — Cost | OK | Cost snapshots, attribution, trends, anomaly alerts. RequirePermission enforced |
+| OperationalIntelligence — Incidents | OK | Domain, queries, correlation, evidence, mitigation (164 testes) |
+| OperationalIntelligence — Reliability | OK | Team reliability, service reliability detail |
+| AIKnowledge — ExternalAI | OK | Providers, policies, consultations, knowledge capture (75 testes) |
 | AIKnowledge — Orchestration | OK | Conversations, test generation, version suggestion, classification |
-| AuditCompliance | OK | Audit log base |
+| AIKnowledge — Governance | OK | Model registry, AI policies, access policies, token/budget governance, audit. RequirePermission enforced |
+| AuditCompliance | OK | Audit log, trail, search, verify chain, compliance report. RequirePermission enforced |
+| Governance | OK | Reports por persona, Risk Center, Compliance, FinOps contextual. RequirePermission enforced |
 | BuildingBlocks | OK | Core, Application, Infrastructure, Observability, Security (103 testes) |
-| Frontend — Sidebar | OK | 8 seções alinhadas com MODULES-AND-PAGES.md |
+| Frontend — Sidebar | OK | 9 seções alinhadas com MODULES-AND-PAGES.md, persona-aware ordering |
 | Frontend — CommandPalette | OK | Espelha sidebar com todos os módulos do produto |
-| Frontend — i18n | OK | 4 locales (en, pt-BR, pt-PT, es); auth.tagline alinhado |
-| Frontend — auth | OK | RBAC, ProtectedRoute, permissões visuais |
-| 1072 testes backend | OK | Todos a passar sem falhas |
+| Frontend — i18n | OK | 4 locales (en, pt-BR, pt-PT, es); 1,629+ chaves; zero hardcoded strings visíveis |
+| Frontend — auth | OK | RBAC, ProtectedRoute, persona derivation, permissões visuais |
+| Frontend — Persona-aware UX | OK | 7 personas, PersonaContext, config por persona, home adaptativa |
+| Frontend — Dark Enterprise Theme | OK | Identidade visual única; VendorLicensing alinhado |
+| Frontend — AI Hub | OK | AI Assistant, Model Registry, AI Policies, Token Budget, AI Audit pages |
+| Frontend — Operations | OK | Incidents, Runbooks, Reliability pages com domain connection |
+| Frontend — Governance | OK | Reports (persona-aware), Risk Center, Compliance, FinOps pages |
+| 1,159 testes backend | OK | Todos a passar sem falhas |
+| Segurança — RequirePermission | OK | Todas as 22 endpoint modules com RequirePermission enforced |
 
 ## 2. Reposicionar
 
@@ -62,32 +73,33 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 ## 3. Refatorar
 
-| Área | O que refatorar | Prioridade |
-|------|----------------|-----------|
-| Dashboard | Adicionar segmentação por persona (Engineer, Tech Lead, Executive) | Alta |
-| Contract Studio | Expandir Contracts page com editor de contratos assistido por IA | Alta |
-| Source of Truth views | Criar vista consolidada de serviços+contratos+ownership+dependências | Alta |
-| Observabilidade contextual | Vincular métricas a serviços, equipas e mudanças | Média |
-| Persona-aware UI | Variar home, menu, widgets e nível de detalhe por persona | Média |
-| Ingestion.Api (stubs) | Implementar endpoints ou integrar no ApiHost | Baixa |
+| Área | O que refatorar | Prioridade | Estado |
+|------|----------------|-----------|--------|
+| ✅ Dashboard | Segmentação por persona (Engineer, Tech Lead, Executive) | Alta | Concluído |
+| ✅ Source of Truth views | Vista consolidada de serviços+contratos+ownership+dependências | Alta | Concluído |
+| ✅ Persona-aware UI | Variar home, menu, widgets e nível de detalhe por persona | Média | Concluído |
+| Contract Studio | Expandir Contracts page com editor de contratos assistido por IA | Alta | Parcial — Backend pronto, UI básica |
+| Observabilidade contextual | Vincular métricas a serviços, equipas e mudanças | Média | Parcial — Runtime/Cost implementados |
+| Ingestion.Api (stubs) | Implementar endpoints ou integrar no ApiHost | Baixa | Pendente |
 
 ## 4. Criar do zero
 
-| Área | Módulo produto | Bounded context backend | Prioridade |
-|------|---------------|------------------------|-----------|
-| Incidents & Mitigation | Operations | OperationalIntelligence (novo sub-context) | Alta |
-| Runbooks | Operations | OperationalIntelligence (novo sub-context) | Média |
-| AI Assistant (contextualizado) | AI Hub | AIKnowledge | Alta |
-| Model Registry UI | AI Hub | AIKnowledge | Média |
-| AI Policies UI | AI Hub | AIKnowledge | Média |
-| Token & Budget Governance UI | AI Hub | AIKnowledge | Média |
-| Reports por persona | Governance | Novo módulo ou query layer | Média |
-| Risk Center | Governance | Novo módulo | Baixa |
-| Compliance packs | Governance | AuditCompliance (expandir) | Baixa |
-| FinOps contextual UI | Governance | OperationalIntelligence.Cost | Baixa |
-| Contract Studio (editor) | Contracts | Catalog.Contracts (expandir) | Alta |
-| IDE integrations | AI Hub | AIKnowledge (expandir) | Baixa |
-| Executive views | Governance | Query layer cross-module | Baixa |
+| Área | Módulo produto | Bounded context backend | Prioridade | Estado |
+|------|---------------|------------------------|-----------|--------|
+| ✅ Incidents & Mitigation | Operations | OperationalIntelligence.Incidents | Alta | Concluído — domain, application, API, UI, 58 testes |
+| ✅ Runbooks | Operations | OperationalIntelligence | Média | Concluído — UI com mock data |
+| ✅ AI Assistant (contextualizado) | AI Hub | AIKnowledge | Alta | Concluído — UI + governance |
+| ✅ Model Registry UI | AI Hub | AIKnowledge.Governance | Média | Concluído |
+| ✅ AI Policies UI | AI Hub | AIKnowledge.Governance | Média | Concluído |
+| ✅ Token & Budget Governance UI | AI Hub | AIKnowledge.Governance | Média | Concluído |
+| ✅ Reports por persona | Governance | Governance module | Média | Concluído — persona-aware views |
+| ✅ Risk Center | Governance | Governance module | Baixa | Concluído |
+| ✅ Compliance | Governance | Governance module | Baixa | Concluído |
+| ✅ FinOps contextual UI | Governance | Governance module | Baixa | Concluído |
+| ✅ Reliability (Team + Service) | Operations | OperationalIntelligence.Reliability | Alta | Concluído — domain, application, API, UI, 37 testes |
+| Contract Studio (editor avançado) | Contracts | Catalog.Contracts (expandir) | Alta | Parcial — DEFER para roadmap |
+| IDE integrations | AI Hub | AIKnowledge (expandir) | Baixa | DEFER para roadmap |
+| Executive views (avançado) | Governance | Query layer cross-module | Baixa | Parcial — ReportsPage com persona-aware |
 
 ## 5. Código removido (limpeza executada)
 
@@ -131,18 +143,20 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 | Documento | Aderência | Gaps principais |
 |-----------|-----------|----------------|
-| PRODUCT-VISION.md | 80% | Falta Source of Truth views, persona-aware UI |
-| PRODUCT-SCOPE.md | 75% | MVP core existe, faltam Operations e AI Hub UI |
-| PERSONA-MATRIX.md | 30% | UI não segmentada por persona |
-| MODULES-AND-PAGES.md | 70% | Navegação alinhada; placeholder pages criados; faltam implementações reais |
-| SERVICE-CONTRACT-GOVERNANCE.md | 80% | Domain rico; falta Contract Studio UI e approval workflow UI |
-| SOURCE-OF-TRUTH-STRATEGY.md | 60% | Dados existem; falta vista consolidada |
-| CHANGE-CONFIDENCE.md | 85% | Release, blast radius, scoring, rollback implementados |
-| AI-ASSISTED-OPERATIONS.md | 40% | Domain existe; falta UI e integração contextual |
-| AI-GOVERNANCE.md | 40% | Policies e providers no domain; falta UI e token governance |
-| DESIGN.md | 75% | Visual consistente; tagline corrigido; falta persona-aware layouts |
-| FRONTEND-ARCHITECTURE.md | 90% | Feature-based, i18n, reusables; CommandPalette alinhado; dead code removido; naming alinhado |
-| BACKEND-MODULE-GUIDELINES.md | 95% | DDD, CQRS, Result, strongly typed IDs seguidos; namespaces alinhados com módulo |
+| PRODUCT-VISION.md | 90% | Falta Contract Studio editor avançado, IDE integrations |
+| PRODUCT-SCOPE.md | 85% | Core implementado; Operations e AI Hub com UI funcional |
+| PERSONA-MATRIX.md | 80% | UI segmentada por persona; PersonaContext ativo; faltam customizações avançadas |
+| MODULES-AND-PAGES.md | 90% | Navegação alinhada; todas as páginas core implementadas |
+| SERVICE-CONTRACT-GOVERNANCE.md | 85% | Domain rico; Contract Studio parcial; approval workflow backend pronto |
+| SOURCE-OF-TRUTH-STRATEGY.md | 85% | Vista consolidada implementada; search e explorer funcionais |
+| CHANGE-CONFIDENCE.md | 90% | Release, blast radius, scoring, rollback, timeline implementados |
+| AI-ASSISTED-OPERATIONS.md | 70% | Governance completa; AI Assistant UI funcional; falta grounding profundo |
+| AI-GOVERNANCE.md | 80% | Model registry, policies, token budget, audit implementados |
+| DESIGN.md | 90% | Visual enterprise dark theme consistente; persona-aware layouts |
+| FRONTEND-ARCHITECTURE.md | 95% | Feature-based, i18n maduro, reusáveis, persona-aware, dark theme consistente |
+| BACKEND-MODULE-GUIDELINES.md | 95% | DDD, CQRS, Result, RequirePermission enforced em todos os endpoints |
+| SECURITY-ARCHITECTURE.md | 85% | RequirePermission em todos os endpoints; RBAC funcional; falta encryption at rest |
+| I18N-STRATEGY.md | 95% | 4 locales, 1629+ chaves, zero hardcoded strings |
 
 ---
 
@@ -151,9 +165,12 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | Item | Classificação | Motivo | Risco |
 |------|--------------|--------|-------|
 | Ingestion.Api endpoints (5 stubs) | REFACTOR | Endpoints retornam strings placeholder | Baixo — projeto separado |
-| AIKnowledge features (16 handlers) | REFACTOR | Handlers com TODO stubs, sem implementação real | Médio — domínio está bom |
-| sanitize.ts, navigation.ts (utils) | KEEP | Utilitários de segurança sem consumidores mas com testes — devem ser integrados | Nenhum |
+| AIKnowledge — AiOrchestration endpoints (stub) | REFACTOR | EndpointModule com TODO, sem endpoints mapeados | Baixo — governance endpoints funcionais |
+| AIKnowledge — ExternalAI endpoints (stub) | REFACTOR | EndpointModule com TODO, sem endpoints mapeados | Baixo — providers geridos via governance |
+| sanitize.ts, navigation.ts (utils) | KEEP | Utilitários de segurança com testes — devem ser integrados | Nenhum |
 | Placeholder tests restantes (5 projetos) | KEEP | São o único teste nos projetos AuditCompliance, E2E, Integration, Security, Infrastructure — manter até testes reais | Nenhum |
+| Frontend — error/loading state patterns | DOCUMENT | 2 padrões diferentes (EmptyState vs inline text) — consolidar | Baixo |
+| Governance module — mock data | REFACTOR | 4 endpoints retornam dados estáticos; conectar a queries cross-module | Médio |
 
 ---
 
@@ -174,18 +191,110 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 10. ✅ Renomear permission keys engineering-graph:* → catalog:*
 11. ✅ Atualizar frontend API routes e permission references
 12. ✅ Reforçar i18n subtitles para linguagem de governança e Source of Truth
-13. Contract Studio — expandir Contracts page com editor visual
-14. Change Confidence — consolidar vista de confiança em mudanças
 
-### Confiabilidade operacional (Fase 2)
-7. Incidents & Mitigation — domain + application + UI
-8. Runbooks — domain + application + UI
-9. AI Assistant — UI contextualizada com serviços, contratos, incidentes
-10. Operational Consistency — métricas operacionais por equipa
+### Persona-aware UX e Source of Truth (Fase 4 — concluída)
+13. ✅ PersonaContext com 7 personas e segmentação de menu/home/widgets
+14. ✅ Source of Truth Explorer com search e vista consolidada
+15. ✅ Service e Contract Source of Truth detail pages
 
-### Governança e otimização (Fase 3)
-11. Reports por persona — views segmentadas
-12. Compliance — expandir AuditCompliance
-13. Risk Center — novo módulo
-14. FinOps contextual — UI sobre OperationalIntelligence.Cost
-15. AI Governance — Model Registry UI, policies UI, token budgets, IDE integrations
+### Camada Operacional (Fases 5-6 — concluídas)
+16. ✅ Reliability — domain, application, API, endpoints, UI (37 testes)
+17. ✅ Incidents — domain, application, API, endpoints, UI (58 testes)
+18. ✅ Runbooks — UI com mock data
+
+### AI Governance & Developer Acceleration (Fase 7 — concluída)
+19. ✅ AI Governance endpoints com RequirePermission
+20. ✅ Model Registry, AI Policies, Token Budget, AI Audit pages
+21. ✅ AI Assistant page
+
+### UX Refinement (Fase 8 — concluída)
+22. ✅ Dark enterprise theme consolidado
+23. ✅ Login, Home, e módulos com mesma família visual
+24. ✅ i18n maduro com 4 locales
+
+### Reporting & Governance (Fase 9 — concluída)
+25. ✅ Governance module com 4 endpoints
+26. ✅ Reports persona-aware, Risk Center, Compliance, FinOps pages
+27. ✅ Audit page funcional
+
+### Hardening & Refoundation Closure (Fase Final — concluída)
+28. ✅ i18n: Eliminar todas as hardcoded strings residuais (14 corrigidas)
+29. ✅ Segurança: RequirePermission em todos os 40 endpoints desprotegidos
+30. ✅ Visual: VendorLicensingPage alinhada ao dark enterprise theme
+31. ✅ Visual: Health status badges corrigidos para dark theme
+32. ✅ Documentação: SOLUTION-GAP-ANALYSIS.md atualizado
+
+### Próximos épicos pós-refoundation (Recomendação)
+33. Contract Studio editor avançado com IA assistida
+34. Change Confidence — consolidar vista de confiança em mudanças
+35. AI grounding profundo — conectar IA a serviços/contratos/incidentes/runbooks reais
+36. Governance module — conectar a queries cross-module reais
+37. Frontend — consolidar padrão error/loading state com componente PageErrorState
+38. IDE Extensions — VS Code e Visual Studio extensions
+39. Encryption at rest para dados sensíveis
+40. Testes de integração e E2E para fluxos críticos
+
+---
+
+## Fase Final — Hardening Gap Analysis
+
+### Diagnóstico por área
+
+#### Produto
+- ✅ Identidade como Source of Truth para serviços, contratos, mudanças e conhecimento operacional
+- ✅ Contratos como first-class citizens com governance, versioning e diff
+- ✅ 8 bounded contexts coesos com DDD/CQRS
+- ⚠️ Governance module retorna dados estáticos (mock) — necessita conexão a queries reais
+
+#### Frontend
+- ✅ i18n completo — zero hardcoded strings visíveis ao utilizador
+- ✅ Dark enterprise theme consistente em todas as páginas
+- ✅ Persona-aware navigation e home page
+- ✅ 43 páginas implementadas em 9 feature modules
+- ⚠️ Error/loading state patterns divergem entre EmptyState e inline text
+- ⚠️ Algumas páginas com mock data não têm loading/error handling
+
+#### Backend
+- ✅ RequirePermission enforced em todas as 22 endpoint modules (130+ endpoints)
+- ✅ DI pattern consistente em 56 ficheiros
+- ✅ VSA pattern seguido em todas as features
+- ✅ 1,159 testes a passar sem falhas
+- ⚠️ AiOrchestration e ExternalAI endpoint modules são stubs com TODO
+- ⚠️ NuGet NU1510 warnings (packages que não serão pruned)
+
+#### Segurança
+- ✅ RBAC com permissões granulares em todos os endpoints
+- ✅ PersonaContext derivado de roles
+- ⚠️ Falta encryption at rest
+- ⚠️ Falta validação de tokens/sessions mais robusta
+
+#### IA
+- ✅ Model registry, policies, token/budget governance implementados
+- ✅ AI Governance com RequirePermission
+- ⚠️ AI Assistant usa mock data — falta grounding em domínio real
+- ⚠️ AiOrchestration endpoints não mapeados
+
+#### Documentação
+- ✅ SOLUTION-GAP-ANALYSIS.md atualizado para fase final
+- ✅ Docs de referência existentes (22 documentos)
+- ⚠️ Alguns docs focam nas fases iniciais e não refletem implementação completa
+
+#### Testes
+- ✅ 1,159 testes backend a passar
+- ✅ Cobertura em todos os módulos core (Catalog, ChangeGovernance, IdentityAccess, OperationalIntelligence, AIKnowledge, CommercialGovernance)
+- ⚠️ Frontend tests limitados
+- ⚠️ E2E/Integration tests são placeholder
+
+### Classificação de pendências por severidade
+
+| Severidade | Item | Classificação |
+|------------|------|--------------|
+| Média | Governance module mock data | REFACTOR |
+| Média | AI Assistant grounding | REFACTOR |
+| Média | Error/loading state pattern consolidation | REFACTOR |
+| Baixa | AiOrchestration/ExternalAI stubs | REFACTOR |
+| Baixa | Ingestion.Api stubs | REFACTOR |
+| Baixa | Frontend E2E tests | TEST |
+| Baixa | Encryption at rest | FIX |
+| Baixa | NU1510 NuGet warnings | FIX |
+| Info | Docs alignment with final state | DOCUMENT |
