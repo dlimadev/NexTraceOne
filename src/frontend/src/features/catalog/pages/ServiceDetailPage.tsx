@@ -146,7 +146,7 @@ export function ServiceDetailPage() {
                   </h2>
                 </div>
                 <span className="text-xs text-muted">
-                  {t('catalog.detail.apiCount', { count: service.apiCount })} · {service.totalConsumers}{' '}
+                  {t('catalog.detail.apiCount', { count: service.apiCount })} {t('catalog.detail.separator')} {service.totalConsumers}{' '}
                   {t('catalog.detail.consumers')}
                 </span>
               </div>

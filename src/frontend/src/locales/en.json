@@ -1245,13 +1245,15 @@
       "visibility": "Visibility",
       "decommissioned": "Decommissioned",
       "active": "Active",
-      "status": "Status"
+      "status": "Status",
+      "separator": "·"
     },
     "actions": {
       "viewDetail": "View Detail",
       "viewGraph": "View Graph",
       "edit": "Edit",
       "updateOwnership": "Update Ownership"
-    }
+    },
+    "totalCount": "({{count}} total)"
   }
 }

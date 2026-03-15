@@ -248,7 +248,7 @@ export function ServiceCatalogListPage() {
               <h2 className="text-base font-semibold text-heading">{t('catalog.title')}</h2>
               {data && (
                 <span className="text-xs text-muted ml-1">
-                  ({data.totalCount} {t('common.total')})
+                  {t('catalog.totalCount', { count: data.totalCount })}
                 </span>
               )}
             </div>
