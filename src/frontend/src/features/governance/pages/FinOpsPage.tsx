@@ -10,10 +10,11 @@ import { StatCard } from '../../../components/StatCard';
 import type { FinOpsSummaryResponse, CostEfficiencyType } from '../../../types';
 
 /**
- * Formata valores monetários com separadores de milhar.
+ * Formata valores monetários respeitando o locale ativo.
+ * Utiliza Intl.NumberFormat para formatação internacionalizada.
  */
-function formatCurrency(value: number): string {
-  return `$${value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+function formatCurrency(value: number, locale = 'en-US'): string {
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 }
 
 /**
@@ -133,9 +134,10 @@ const trendIcon = (dir: string) => {
  * Parte do módulo Governance do NexTraceOne.
  */
 export function FinOpsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<EfficiencyFilter>('all');
   const [search, setSearch] = useState('');
+  const fmt = (v: number) => formatCurrency(v, i18n.language);
 
   const d = mockFinOps;
 
@@ -164,8 +166,8 @@ export function FinOpsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('governance.finops.totalMonthlyCost')} value={formatCurrency(d.totalMonthlyCost)} icon={<DollarSign size={20} />} color="text-accent" />
-        <StatCard title={t('governance.finops.totalWaste')} value={formatCurrency(d.totalWaste)} icon={<AlertTriangle size={20} />} color="text-critical" />
+        <StatCard title={t('governance.finops.totalMonthlyCost')} value={fmt(d.totalMonthlyCost)} icon={<DollarSign size={20} />} color="text-accent" />
+        <StatCard title={t('governance.finops.totalWaste')} value={fmt(d.totalWaste)} icon={<AlertTriangle size={20} />} color="text-critical" />
         <StatCard
           title={t('governance.finops.overallEfficiency')}
           value={t(`governance.finops.efficiency.${d.overallEfficiency}`)}
@@ -232,7 +234,7 @@ export function FinOpsPage() {
                       {trendIcon(svc.trend)}
                       {t(`governance.finops.trend.${svc.trend}`)}
                     </div>
-                    <span className="text-sm font-mono font-medium text-heading w-24 text-right">{formatCurrency(svc.monthlyCost)}</span>
+                    <span className="text-sm font-mono font-medium text-heading w-24 text-right">{fmt(svc.monthlyCost)}</span>
                   </div>
                   <div className="hidden md:flex items-center gap-3 ml-7 mt-1 text-xs text-muted">
                     <span>{svc.domain}</span>
@@ -242,7 +244,7 @@ export function FinOpsPage() {
                       <>
                         <span>•</span>
                         <Badge variant="danger" className="text-[10px]">
-                          {t('governance.finops.wasteAmount')}: {formatCurrency(svc.wasteSignals.reduce((sum, ws) => sum + ws.estimatedWaste, 0))}
+                          {t('governance.finops.wasteAmount')}: {fmt(svc.wasteSignals.reduce((sum, ws) => sum + ws.estimatedWaste, 0))}
                         </Badge>
                       </>
                     )}
@@ -273,7 +275,7 @@ export function FinOpsPage() {
                       <p className="text-sm text-heading">{ws.description}</p>
                       <p className="text-xs text-muted">{ws.serviceName} — {ws.pattern}</p>
                     </div>
-                    <span className="text-sm font-mono font-medium text-critical shrink-0">{formatCurrency(ws.estimatedWaste)}</span>
+                    <span className="text-sm font-mono font-medium text-critical shrink-0">{fmt(ws.estimatedWaste)}</span>
                   </div>
                 </div>
               ))}

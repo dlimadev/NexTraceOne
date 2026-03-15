@@ -69,7 +69,12 @@ export function ReportsPage() {
   const ownerPct = Math.round((d.servicesWithOwner / d.totalServices) * 100);
   const contractPct = Math.round((d.servicesWithContract / d.totalServices) * 100);
 
-  const personaFocusKey = `governance.reports.${persona.charAt(0).toLowerCase() + persona.slice(1)}.focus`;
+  const personaKeyMap: Record<string, string> = {
+    Engineer: 'engineer', TechLead: 'techLead', Architect: 'architect',
+    Product: 'product', Executive: 'executive', PlatformAdmin: 'platformAdmin', Auditor: 'auditor',
+  };
+  const personaKey = personaKeyMap[persona] ?? 'engineer';
+  const personaFocusKey = `governance.reports.${personaKey}.focus`;
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
