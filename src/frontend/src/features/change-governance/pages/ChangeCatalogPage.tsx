@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { OnboardingHints } from '../../../components/OnboardingHints';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import type { ChangesFilterParams } from '../api/changeConfidence';
 import type { ChangeDto } from '../../../types';
@@ -148,6 +149,9 @@ export function ChangeCatalogPage() {
         <h1 className="text-2xl font-bold text-heading">{t('changeConfidence.title')}</h1>
         <p className="text-sm text-muted mt-1">{t('changeConfidence.subtitle')}</p>
       </div>
+
+      {/* Onboarding hints — orientação contextual para novos utilizadores */}
+      <OnboardingHints module="changes" />
 
       {/* ── Summary cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

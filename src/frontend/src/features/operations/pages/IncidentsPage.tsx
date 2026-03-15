@@ -9,6 +9,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { OnboardingHints } from '../../../components/OnboardingHints';
 
 /**
  * Dados simulados de incidentes — alinhados com o backend ListIncidents.
@@ -178,6 +179,9 @@ export function IncidentsPage() {
         <h1 className="text-2xl font-bold text-heading">{t('incidents.title')}</h1>
         <p className="text-muted mt-1">{t('incidents.subtitle')}</p>
       </div>
+
+      {/* Onboarding hints — orientação contextual para novos utilizadores */}
+      <OnboardingHints module="operations" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">

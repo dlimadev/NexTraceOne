@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
 import type {
   AssetGraph,
@@ -171,6 +172,9 @@ export function ServiceCatalogPage() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
+      {/* Onboarding hints — orientação contextual para novos utilizadores */}
+      <OnboardingHints module="services" />
+
       {/* ── Cabeçalho ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-6">
         <div>
