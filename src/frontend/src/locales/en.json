@@ -83,6 +83,7 @@
     "apiContracts": "API Contracts",
     "incidents": "Incidents",
     "runbooks": "Runbooks",
+    "reliability": "Service Reliability",
     "aiAssistant": "AI Assistant",
     "modelRegistry": "Model Registry",
     "aiPolicies": "AI Policies",
@@ -965,6 +966,84 @@
     "subtitle": "Operational procedures and mitigation guides",
     "emptyTitle": "No runbooks available",
     "emptyDescription": "Operational runbooks and mitigation playbooks will be managed here."
+  },
+  "reliability": {
+    "title": "Service Reliability",
+    "subtitle": "Team-owned service reliability overview — health, trends and operational context",
+    "totalServices": "Total Services",
+    "healthyServices": "Healthy",
+    "degradedServices": "Degraded",
+    "needsAttention": "Attention Required",
+    "searchPlaceholder": "Search services...",
+    "serviceList": "Services",
+    "changeImpact": "Change Impact",
+    "incidentActive": "Incident",
+    "filter": {
+      "all": "All",
+      "Healthy": "Healthy",
+      "Degraded": "Degraded",
+      "Unavailable": "Unavailable",
+      "NeedsAttention": "Needs Attention"
+    },
+    "status": {
+      "Healthy": "Healthy",
+      "Degraded": "Degraded",
+      "Unavailable": "Unavailable",
+      "NeedsAttention": "Needs Attention"
+    },
+    "trend": {
+      "Improving": "Improving",
+      "Stable": "Stable",
+      "Declining": "Declining"
+    },
+    "mock": {
+      "orderApiSummary": "Service operating within expected parameters. All health checks passing.",
+      "paymentGwSummary": "Elevated error rate (5.2%) detected since last deployment.",
+      "notificationSummary": "Processing within expected parameters.",
+      "inventorySummary": "Consumer lag increasing — needs attention.",
+      "userSvcSummary": "All systems operational.",
+      "catalogSyncSummary": "Integration partner unreachable.",
+      "reportSchedulerSummary": "Coverage gap detected — missing runbook.",
+      "authGwSummary": "All authentication flows healthy.",
+      "noAnomalies": "No anomalies detected in the last 24 hours.",
+      "orderApiTrend": "All indicators stable over the last 7 days.",
+      "paymentGwTrend": "Error rate increased 40% after deployment v3.1.0.",
+      "paymentGwAnomaly": "Error rate anomaly detected: 5.2% vs expected 1.0%. Correlated with recent change v3.1.0.",
+      "catalogSyncTrend": "Connectivity lost 2 hours ago.",
+      "catalogSyncAnomaly": "Complete service failure — dependency unavailable."
+    },
+    "detail": {
+      "backToOverview": "Back to Reliability Overview",
+      "notFound": "Service not found. Please check the service identifier.",
+      "availability": "Availability",
+      "latencyP99": "Latency (P99)",
+      "errorRate": "Error Rate",
+      "throughput": "Throughput",
+      "operationalSummary": "Operational Summary",
+      "anomalySummary": "Anomaly Summary",
+      "ownership": "Ownership",
+      "team": "Team",
+      "criticality": "Criticality",
+      "recentChanges": "Recent Changes",
+      "noRecentChanges": "No recent changes affecting this service.",
+      "linkedIncidents": "Linked Incidents",
+      "noIncidents": "No incidents linked to this service.",
+      "dependencies": "Dependencies",
+      "noDependencies": "No dependencies mapped.",
+      "linkedContracts": "Linked Contracts",
+      "noContracts": "No contracts linked to this service.",
+      "runbooks": "Runbooks & Notes",
+      "noRunbooks": "No runbooks available for this service.",
+      "coverage": "Operational Coverage"
+    },
+    "coverage": {
+      "signals": "Signals",
+      "runbook": "Runbook",
+      "owner": "Owner",
+      "deps": "Dependencies",
+      "changes": "Changes",
+      "incidents": "Incidents"
+    }
   },
   "aiHub": {
     "assistantTitle": "AI Assistant",
