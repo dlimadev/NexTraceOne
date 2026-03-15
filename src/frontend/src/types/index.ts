@@ -1136,3 +1136,43 @@ export interface SourceOfTruthSearchResponse {
   references: SotReferenceSearchResult[];
   totalResults: number;
 }
+
+// ─── Change Confidence ───────────────────────────────────────────────────────
+
+/** DTO de mudança para o catálogo de Change Confidence. */
+export interface ChangeDto {
+  changeId: string;
+  apiAssetId: string;
+  serviceName: string;
+  version: string;
+  environment: string;
+  changeType: string;
+  deploymentStatus: string;
+  changeLevel: string;
+  confidenceStatus: string;
+  validationStatus: string;
+  changeScore: number;
+  teamName: string | null;
+  domain: string | null;
+  description: string | null;
+  workItemReference: string | null;
+  commitSha: string;
+  createdAt: string;
+}
+
+/** Resposta paginada do catálogo de mudanças. */
+export interface ChangesListResponse {
+  changes: ChangeDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Resposta de resumo agregado de mudanças. */
+export interface ChangesSummaryResponse {
+  totalChanges: number;
+  validatedChanges: number;
+  changesNeedingAttention: number;
+  suspectedRegressions: number;
+  changesCorrelatedWithIncidents: number;
+}

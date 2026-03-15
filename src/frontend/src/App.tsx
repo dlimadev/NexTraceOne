@@ -6,7 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
 import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage, SourceOfTruthExplorerPage, ServiceSourceOfTruthPage, ContractSourceOfTruthPage } from './features/catalog';
-import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
+import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDetailPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
 import { IncidentsPage, RunbooksPage } from './features/operations';
@@ -97,6 +97,22 @@ export default function App() {
                 }
               />
               {/* ── Changes ── */}
+              <Route
+                path="/changes"
+                element={
+                  <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+                    <ChangeCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/changes/:changeId"
+                element={
+                  <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+                    <ChangeDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/releases" element={<ReleasesPage />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/promotion" element={<PromotionPage />} />

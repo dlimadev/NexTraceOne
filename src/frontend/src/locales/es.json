@@ -99,7 +99,8 @@
     "dependencyGraph": "Grafo de Dependencias",
     "contractStudio": "Estudio de Contratos",
     "sourceOfTruth": "Fuente de Verdad",
-    "sectionKnowledge": "Conocimiento"
+    "sectionKnowledge": "Conocimiento",
+    "changeConfidence": "Confianza en Cambios"
   },
   "header": {
     "toggleLanguage": "Cambiar idioma",
@@ -1434,6 +1435,82 @@
     "empty": {
       "title": "Explorador de Fuente de Verdad",
       "description": "Busque servicios, contratos, documentación y conocimiento operacional."
+    }
+  },
+  "changeConfidence": {
+    "title": "Confianza en Cambios",
+    "subtitle": "Rastree, valide y analice cambios en sus servicios",
+    "summary": {
+      "totalChanges": "Total de Cambios",
+      "validatedChanges": "Validados",
+      "changesNeedingAttention": "Necesitan Atención",
+      "suspectedRegressions": "Regresiones Sospechosas",
+      "correlatedWithIncidents": "Correlacionados con Incidentes"
+    },
+    "filters": {
+      "serviceName": "Servicio",
+      "environment": "Entorno",
+      "changeType": "Tipo de Cambio",
+      "confidenceStatus": "Confianza",
+      "searchPlaceholder": "Buscar cambios...",
+      "allEnvironments": "Todos los Entornos",
+      "allTypes": "Todos los Tipos",
+      "allStatuses": "Todos los Estados"
+    },
+    "table": {
+      "service": "Servicio",
+      "version": "Versión",
+      "environment": "Entorno",
+      "changeType": "Tipo",
+      "deploymentStatus": "Estado",
+      "confidence": "Confianza",
+      "score": "Score",
+      "date": "Fecha",
+      "noChanges": "No se encontraron cambios",
+      "noChangesDescription": "Ajuste sus filtros o espere nuevos despliegues."
+    },
+    "confidenceStatus": {
+      "NotAssessed": "No Evaluado",
+      "Validated": "Validado",
+      "NeedsAttention": "Necesita Atención",
+      "SuspectedRegression": "Regresión Sospechosa",
+      "CorrelatedWithIncident": "Correlacionado con Incidente",
+      "Mitigated": "Mitigado"
+    },
+    "changeType": {
+      "Deployment": "Despliegue",
+      "ConfigurationChange": "Configuración",
+      "ContractChange": "Contrato",
+      "SchemaChange": "Schema",
+      "DependencyChange": "Dependencia",
+      "PolicyChange": "Política",
+      "OperationalChange": "Operacional"
+    },
+    "detail": {
+      "title": "Detalle del Cambio",
+      "backToCatalog": "Volver a Confianza en Cambios",
+      "overview": "Visión General",
+      "riskAndConfidence": "Riesgo y Confianza",
+      "blastRadius": "Radio de Impacto",
+      "validation": "Validación y Evidencias",
+      "timeline": "Timeline",
+      "quickLinks": "Enlaces Rápidos",
+      "description": "Descripción",
+      "changeType": "Tipo de Cambio",
+      "commitSha": "Commit SHA",
+      "pipelineSource": "Pipeline de Origen",
+      "workItem": "Work Item",
+      "changeScore": "Score de Cambio",
+      "confidenceStatus": "Estado de Confianza",
+      "validationStatus": "Estado de Validación",
+      "totalAffected": "Total de Consumidores Afectados",
+      "directConsumers": "Consumidores Directos",
+      "transitiveConsumers": "Consumidores Transitivos",
+      "noBlastRadius": "Radio de impacto aún no calculado",
+      "noValidation": "Sin evidencia de validación disponible",
+      "noTimeline": "Sin eventos de timeline registrados",
+      "viewServiceSot": "Ver Servicio en Source of Truth",
+      "viewInReleases": "Ver en Releases"
     }
   }
 }

@@ -45,6 +45,7 @@ export type Permission =
   | 'developer-portal:read'
   | 'developer-portal:write'
   // ── Change Intelligence ──
+  | 'change-intelligence:read'
   | 'change-intelligence:releases:read'
   | 'change-intelligence:releases:write'
   | 'change-intelligence:blast-radius:read'

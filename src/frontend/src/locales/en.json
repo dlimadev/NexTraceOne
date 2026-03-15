@@ -99,7 +99,8 @@
     "dependencyGraph": "Dependency Graph",
     "contractStudio": "Contract Studio",
     "sourceOfTruth": "Source of Truth",
-    "sectionKnowledge": "Knowledge"
+    "sectionKnowledge": "Knowledge",
+    "changeConfidence": "Change Confidence"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -1434,6 +1435,82 @@
     "empty": {
       "title": "Source of Truth Explorer",
       "description": "Search for services, contracts, documentation and operational knowledge."
+    }
+  },
+  "changeConfidence": {
+    "title": "Change Confidence",
+    "subtitle": "Track, validate and analyze changes across your services",
+    "summary": {
+      "totalChanges": "Total Changes",
+      "validatedChanges": "Validated",
+      "changesNeedingAttention": "Needs Attention",
+      "suspectedRegressions": "Suspected Regressions",
+      "correlatedWithIncidents": "Incident-Correlated"
+    },
+    "filters": {
+      "serviceName": "Service",
+      "environment": "Environment",
+      "changeType": "Change Type",
+      "confidenceStatus": "Confidence",
+      "searchPlaceholder": "Search changes...",
+      "allEnvironments": "All Environments",
+      "allTypes": "All Types",
+      "allStatuses": "All Statuses"
+    },
+    "table": {
+      "service": "Service",
+      "version": "Version",
+      "environment": "Environment",
+      "changeType": "Type",
+      "deploymentStatus": "Status",
+      "confidence": "Confidence",
+      "score": "Score",
+      "date": "Date",
+      "noChanges": "No changes found",
+      "noChangesDescription": "Adjust your filters or wait for new deployments."
+    },
+    "confidenceStatus": {
+      "NotAssessed": "Not Assessed",
+      "Validated": "Validated",
+      "NeedsAttention": "Needs Attention",
+      "SuspectedRegression": "Suspected Regression",
+      "CorrelatedWithIncident": "Incident-Correlated",
+      "Mitigated": "Mitigated"
+    },
+    "changeType": {
+      "Deployment": "Deployment",
+      "ConfigurationChange": "Configuration",
+      "ContractChange": "Contract",
+      "SchemaChange": "Schema",
+      "DependencyChange": "Dependency",
+      "PolicyChange": "Policy",
+      "OperationalChange": "Operational"
+    },
+    "detail": {
+      "title": "Change Detail",
+      "backToCatalog": "Back to Change Confidence",
+      "overview": "Overview",
+      "riskAndConfidence": "Risk & Confidence",
+      "blastRadius": "Blast Radius",
+      "validation": "Validation & Evidence",
+      "timeline": "Timeline",
+      "quickLinks": "Quick Links",
+      "description": "Description",
+      "changeType": "Change Type",
+      "commitSha": "Commit SHA",
+      "pipelineSource": "Pipeline Source",
+      "workItem": "Work Item",
+      "changeScore": "Change Score",
+      "confidenceStatus": "Confidence Status",
+      "validationStatus": "Validation Status",
+      "totalAffected": "Total Affected Consumers",
+      "directConsumers": "Direct Consumers",
+      "transitiveConsumers": "Transitive Consumers",
+      "noBlastRadius": "Blast radius not yet calculated",
+      "noValidation": "No validation evidence available",
+      "noTimeline": "No timeline events recorded",
+      "viewServiceSot": "View Service in Source of Truth",
+      "viewInReleases": "View in Releases"
     }
   }
 }
