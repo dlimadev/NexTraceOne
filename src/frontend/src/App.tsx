@@ -9,7 +9,7 @@ import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetai
 import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDetailPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
-import { IncidentsPage, RunbooksPage } from './features/operations';
+import { IncidentsPage, RunbooksPage, TeamReliabilityPage, ServiceReliabilityDetailPage } from './features/operations';
 import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage } from './features/ai-hub';
 import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage } from './features/governance';
 
@@ -119,6 +119,22 @@ export default function App() {
               {/* ── Operations ── */}
               <Route path="/operations/incidents" element={<IncidentsPage />} />
               <Route path="/operations/runbooks" element={<RunbooksPage />} />
+              <Route
+                path="/operations/reliability"
+                element={
+                  <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+                    <TeamReliabilityPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operations/reliability/:serviceId"
+                element={
+                  <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+                    <ServiceReliabilityDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── AI Hub ── */}
               <Route path="/ai/assistant" element={<AiAssistantPage />} />
               <Route path="/ai/models" element={<ModelRegistryPage />} />

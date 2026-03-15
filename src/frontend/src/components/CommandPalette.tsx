@@ -26,6 +26,7 @@ import {
   Share2,
   Layers,
   Globe,
+  Activity,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
@@ -63,6 +64,7 @@ const paletteItems: PaletteItem[] = [
   // ── Operations ──
   { id: 'incidents', labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },
   { id: 'runbooks', labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={16} />, group: 'commandPalette.operations', permission: 'operations:runbooks:read' },
+  { id: 'reliability', labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read' },
   // ── AI Hub ──
   { id: 'ai-assistant', labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={16} />, group: 'commandPalette.aiHub', permission: 'ai:assistant:read' },
   { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={16} />, group: 'commandPalette.aiHub', permission: 'ai:models:read' },

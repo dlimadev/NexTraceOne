@@ -83,6 +83,7 @@
     "apiContracts": "Contratos de API",
     "incidents": "Incidentes",
     "runbooks": "Runbooks",
+    "reliability": "Fiabilidad de Servicios",
     "aiAssistant": "Asistente IA",
     "modelRegistry": "Registro de Modelos",
     "aiPolicies": "Políticas de IA",
@@ -965,6 +966,84 @@
     "subtitle": "Procedimientos operacionales y guías de mitigación",
     "emptyTitle": "Sin runbooks disponibles",
     "emptyDescription": "Runbooks operacionales y playbooks de mitigación se gestionarán aquí."
+  },
+  "reliability": {
+    "title": "Fiabilidad de Servicios",
+    "subtitle": "Vista de fiabilidad por equipo — salud, tendencias y contexto operacional",
+    "totalServices": "Total de Servicios",
+    "healthyServices": "Saludables",
+    "degradedServices": "Degradados",
+    "needsAttention": "Atención Requerida",
+    "searchPlaceholder": "Buscar servicios...",
+    "serviceList": "Servicios",
+    "changeImpact": "Impacto de Cambio",
+    "incidentActive": "Incidente",
+    "filter": {
+      "all": "Todos",
+      "Healthy": "Saludable",
+      "Degraded": "Degradado",
+      "Unavailable": "No disponible",
+      "NeedsAttention": "Atención"
+    },
+    "status": {
+      "Healthy": "Saludable",
+      "Degraded": "Degradado",
+      "Unavailable": "No disponible",
+      "NeedsAttention": "Atención"
+    },
+    "trend": {
+      "Improving": "Mejorando",
+      "Stable": "Estable",
+      "Declining": "En declive"
+    },
+    "mock": {
+      "orderApiSummary": "Servicio operando dentro de los parámetros esperados. Todos los health checks pasando.",
+      "paymentGwSummary": "Tasa de error elevada (5.2%) detectada desde la última implementación.",
+      "notificationSummary": "Procesamiento dentro de los parámetros esperados.",
+      "inventorySummary": "Retraso del consumidor aumentando — requiere atención.",
+      "userSvcSummary": "Todos los sistemas operacionales.",
+      "catalogSyncSummary": "Socio de integración inaccesible.",
+      "reportSchedulerSummary": "Brecha de cobertura detectada — falta runbook.",
+      "authGwSummary": "Todos los flujos de autenticación saludables.",
+      "noAnomalies": "No se detectaron anomalías en las últimas 24 horas.",
+      "orderApiTrend": "Todos los indicadores estables en los últimos 7 días.",
+      "paymentGwTrend": "Tasa de error aumentó 40% después del despliegue v3.1.0.",
+      "paymentGwAnomaly": "Anomalía de tasa de error: 5.2% vs esperado 1.0%. Correlacionado con cambio reciente v3.1.0.",
+      "catalogSyncTrend": "Conectividad perdida hace 2 horas.",
+      "catalogSyncAnomaly": "Fallo completo del servicio — dependencia no disponible."
+    },
+    "detail": {
+      "backToOverview": "Volver a Vista de Fiabilidad",
+      "notFound": "Servicio no encontrado. Verifique el identificador del servicio.",
+      "availability": "Disponibilidad",
+      "latencyP99": "Latencia (P99)",
+      "errorRate": "Tasa de Error",
+      "throughput": "Rendimiento",
+      "operationalSummary": "Resumen Operacional",
+      "anomalySummary": "Resumen de Anomalías",
+      "ownership": "Propiedad",
+      "team": "Equipo",
+      "criticality": "Criticidad",
+      "recentChanges": "Cambios Recientes",
+      "noRecentChanges": "Sin cambios recientes que afecten este servicio.",
+      "linkedIncidents": "Incidentes Vinculados",
+      "noIncidents": "Sin incidentes vinculados a este servicio.",
+      "dependencies": "Dependencias",
+      "noDependencies": "Sin dependencias mapeadas.",
+      "linkedContracts": "Contratos Vinculados",
+      "noContracts": "Sin contratos vinculados a este servicio.",
+      "runbooks": "Runbooks y Notas",
+      "noRunbooks": "Sin runbooks disponibles para este servicio.",
+      "coverage": "Cobertura Operacional"
+    },
+    "coverage": {
+      "signals": "Señales",
+      "runbook": "Runbook",
+      "owner": "Propietario",
+      "deps": "Dependencias",
+      "changes": "Cambios",
+      "incidents": "Incidentes"
+    }
   },
   "aiHub": {
     "assistantTitle": "Asistente IA",
