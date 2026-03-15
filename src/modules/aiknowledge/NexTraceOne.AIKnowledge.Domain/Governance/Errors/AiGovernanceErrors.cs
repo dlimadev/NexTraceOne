@@ -85,4 +85,11 @@ public static class AiGovernanceErrors
             "AiGovernance.Conversation.NotActive",
             "AI assistant conversation '{0}' is not active.",
             conversationId);
+
+    /// <summary>Tipo de cliente IDE inválido ou não suportado.</summary>
+    public static Error InvalidIdeClientType(string clientType)
+        => Error.Validation(
+            "AiGovernance.IDE.InvalidClientType",
+            "IDE client type '{0}' is not valid. Expected 'VsCode' or 'VisualStudio'.",
+            clientType);
 }

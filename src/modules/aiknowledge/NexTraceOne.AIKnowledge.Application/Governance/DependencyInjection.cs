@@ -8,6 +8,7 @@ using NexTraceOne.AiGovernance.Application.Features.SendAssistantMessage;
 using NexTraceOne.AiGovernance.Application.Features.UpdateBudget;
 using NexTraceOne.AiGovernance.Application.Features.UpdateConversation;
 using NexTraceOne.AiGovernance.Application.Features.UpdateModel;
+using NexTraceOne.AiGovernance.Application.Features.RegisterIdeClient;
 using NexTraceOne.AiGovernance.Application.Features.UpdatePolicy;
 using NexTraceOne.BuildingBlocks.Application;
 
@@ -43,6 +44,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SendAssistantMessage.Command>, SendAssistantMessage.Validator>();
         services.AddTransient<IValidator<CreateConversation.Command>, CreateConversation.Validator>();
         services.AddTransient<IValidator<UpdateConversation.Command>, UpdateConversation.Validator>();
+
+        // ── IDE Integrations ─────────────────────────────────────────────
+        services.AddTransient<IValidator<RegisterIdeClient.Command>, RegisterIdeClient.Validator>();
 
         return services;
     }
