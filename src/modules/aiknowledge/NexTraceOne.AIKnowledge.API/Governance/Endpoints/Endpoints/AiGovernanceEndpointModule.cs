@@ -16,6 +16,11 @@ using ListAuditEntriesFeature = NexTraceOne.AiGovernance.Application.Features.Li
 using ListKnowledgeSourcesFeature = NexTraceOne.AiGovernance.Application.Features.ListKnowledgeSources.ListKnowledgeSources;
 using SendAssistantMessageFeature = NexTraceOne.AiGovernance.Application.Features.SendAssistantMessage.SendAssistantMessage;
 using ListConversationsFeature = NexTraceOne.AiGovernance.Application.Features.ListConversations.ListConversations;
+using CreateConversationFeature = NexTraceOne.AiGovernance.Application.Features.CreateConversation.CreateConversation;
+using GetConversationFeature = NexTraceOne.AiGovernance.Application.Features.GetConversation.GetConversation;
+using UpdateConversationFeature = NexTraceOne.AiGovernance.Application.Features.UpdateConversation.UpdateConversation;
+using ListMessagesFeature = NexTraceOne.AiGovernance.Application.Features.ListMessages.ListMessages;
+using ListSuggestedPromptsFeature = NexTraceOne.AiGovernance.Application.Features.ListSuggestedPrompts.ListSuggestedPrompts;
 using NexTraceOne.AiGovernance.Domain.Enums;
 
 namespace NexTraceOne.AiGovernance.API.Endpoints;
@@ -23,13 +28,13 @@ namespace NexTraceOne.AiGovernance.API.Endpoints;
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo AI Governance.
 /// Fornece acesso ao Model Registry, Access Policies, Budgets, Audit,
-/// Knowledge Sources e AI Assistant com governança integrada.
+/// Knowledge Sources e AI Assistant maduro com governança integrada.
 ///
 /// Política de autorização:
 /// - Leitura: "ai:governance:read" para endpoints de consulta.
 /// - Escrita: "ai:governance:write" para endpoints de criação e atualização.
-/// - Assistente leitura: "ai:assistant:read" para listagem de conversas.
-/// - Assistente escrita: "ai:assistant:write" para envio de mensagens.
+/// - Assistente leitura: "ai:assistant:read" para listagem de conversas e mensagens.
+/// - Assistente escrita: "ai:assistant:write" para envio de mensagens e criação de conversas.
 /// </summary>
 public sealed class AiGovernanceEndpointModule
 {
@@ -254,12 +259,13 @@ public sealed class AiGovernanceEndpointModule
         }).RequirePermission("ai:governance:read");
     }
 
-    // ── AI Assistant ────────────────────────────────────────────────────
+    // ── AI Assistant (Mature) ───────────────────────────────────────────
 
     private static void MapAssistantEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v1/ai/assistant");
 
+        // ── Chat — envio de mensagem com contexto completo ──────────────
         group.MapPost("/chat", async (
             SendAssistantMessageFeature.Command command,
             ISender sender,
@@ -270,6 +276,7 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:write");
 
+        // ── Conversations — CRUD de conversas ───────────────────────────
         group.MapGet("/conversations", async (
             string? userId,
             int? pageSize,
@@ -279,6 +286,73 @@ public sealed class AiGovernanceEndpointModule
         {
             var result = await sender.Send(
                 new ListConversationsFeature.Query(userId, pageSize ?? 20),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+
+        group.MapGet("/conversations/{conversationId:guid}", async (
+            Guid conversationId,
+            int? messagePageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetConversationFeature.Query(conversationId, messagePageSize ?? 50),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+
+        group.MapPost("/conversations", async (
+            CreateConversationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:write");
+
+        group.MapPatch("/conversations/{conversationId:guid}", async (
+            Guid conversationId,
+            UpdateConversationRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateConversationFeature.Command(
+                conversationId,
+                body.Title,
+                body.Tags,
+                body.Archive);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:write");
+
+        // ── Messages — listagem de mensagens de uma conversa ────────────
+        group.MapGet("/conversations/{conversationId:guid}/messages", async (
+            Guid conversationId,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListMessagesFeature.Query(conversationId, pageSize ?? 50),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+
+        // ── Suggested Prompts — sugestões contextuais por persona ───────
+        group.MapGet("/prompts", async (
+            string? persona,
+            string? category,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListSuggestedPromptsFeature.Query(persona, category),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:read");
@@ -308,3 +382,9 @@ public sealed record UpdateBudgetRequest(
     long? MaxTokens,
     int? MaxRequests,
     string? Period);
+
+/// <summary>Corpo de pedido para atualização de uma conversa do assistente de IA.</summary>
+public sealed record UpdateConversationRequest(
+    string? Title,
+    string? Tags,
+    bool? Archive);

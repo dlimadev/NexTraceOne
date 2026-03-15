@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using NexTraceOne.AiGovernance.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -6,8 +7,8 @@ namespace NexTraceOne.AiGovernance.Application.Features.ListConversations;
 
 /// <summary>
 /// Feature: ListConversations — lista resumos de conversas do assistente de IA.
+/// Retorna conversas com metadados de persona, modelo e escopo de contexto.
 /// Estrutura VSA: Query + Handler + Response num único ficheiro.
-/// Stub: retorna lista vazia enquanto a persistência de conversas é implementada.
 /// </summary>
 public static class ListConversations
 {
@@ -16,16 +17,39 @@ public static class ListConversations
         string? UserId,
         int PageSize = 20) : IQuery<Response>;
 
-    /// <summary>Handler que lista resumos de conversas — stub retorna lista vazia.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que lista resumos de conversas maduras do assistente.</summary>
+    public sealed class Handler(
+        IAiAssistantConversationRepository conversationRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            // Stub: persistência de conversas ainda não implementada
-            var items = new List<ConversationSummary>();
-            return Task.FromResult(Result<Response>.Success(new Response(items, 0)));
+            var conversations = await conversationRepository.ListAsync(
+                request.UserId,
+                isActive: null,
+                request.PageSize,
+                cancellationToken);
+
+            var totalCount = await conversationRepository.CountAsync(
+                request.UserId,
+                isActive: null,
+                cancellationToken);
+
+            var items = conversations.Select(c => new ConversationSummary(
+                c.Id.Value,
+                c.Title,
+                c.Persona,
+                c.ClientType.ToString(),
+                c.DefaultContextScope,
+                c.LastModelUsed,
+                c.CreatedBy,
+                c.MessageCount,
+                c.Tags,
+                c.IsActive,
+                c.LastMessageAt)).ToList();
+
+            return new Response(items, totalCount);
         }
     }
 
@@ -34,12 +58,17 @@ public static class ListConversations
         IReadOnlyList<ConversationSummary> Items,
         int TotalCount);
 
-    /// <summary>Resumo de uma conversa com o assistente de IA.</summary>
+    /// <summary>Resumo maduro de uma conversa com o assistente de IA.</summary>
     public sealed record ConversationSummary(
         Guid Id,
-        string Topic,
-        string? ServiceName,
-        DateTimeOffset StartedAt,
-        int TurnCount,
-        string Status);
+        string Title,
+        string Persona,
+        string ClientType,
+        string DefaultContextScope,
+        string? LastModelUsed,
+        string CreatedBy,
+        int MessageCount,
+        string Tags,
+        bool IsActive,
+        DateTimeOffset? LastMessageAt);
 }

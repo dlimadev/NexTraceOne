@@ -71,4 +71,18 @@ public static class AiGovernanceErrors
             "AiGovernance.KnowledgeSource.NotFound",
             "AI knowledge source '{0}' was not found.",
             sourceId);
+
+    /// <summary>Conversa do assistente de IA não encontrada pelo identificador informado.</summary>
+    public static Error ConversationNotFound(string conversationId)
+        => Error.NotFound(
+            "AiGovernance.Conversation.NotFound",
+            "AI assistant conversation '{0}' was not found.",
+            conversationId);
+
+    /// <summary>Conversa do assistente de IA não está ativa.</summary>
+    public static Error ConversationNotActive(string conversationId)
+        => Error.Business(
+            "AiGovernance.Conversation.NotActive",
+            "AI assistant conversation '{0}' is not active.",
+            conversationId);
 }
