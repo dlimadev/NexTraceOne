@@ -1306,6 +1306,225 @@ export interface ReportsSummaryResponse {
   generatedAt: string;
 }
 
+// ─── Executive Governance — Overview, Heatmap, Scorecards, Benchmarking, Trends, Drill-down ──
+
+/** Tendência operacional com estabilidade e resolução de incidentes. */
+export interface OperationalTrendDto {
+  stabilityTrend: GovernanceTrendDirection;
+  incidentRateChange: number;
+  avgResolutionHours: number;
+}
+
+/** Resumo de risco executivo. */
+export interface ExecutiveRiskSummaryDto {
+  overallRisk: RiskLevel;
+  criticalDomains: number;
+  highRiskServices: number;
+  riskTrend: GovernanceTrendDirection;
+}
+
+/** Resumo de maturidade executiva. */
+export interface ExecutiveMaturitySummaryDto {
+  overallMaturity: MaturityLevelType;
+  ownershipCoverage: number;
+  contractCoverage: number;
+  documentationCoverage: number;
+  runbookCoverage: number;
+}
+
+/** Área de foco crítico que requer atenção executiva. */
+export interface FocusAreaDto {
+  areaName: string;
+  severity: RiskLevel;
+  description: string;
+  affectedServices: number;
+}
+
+/** Resumo de segurança de mudanças. */
+export interface ChangeSafetySummaryDto {
+  safeChanges: number;
+  riskyChanges: number;
+  rollbacks: number;
+  confidenceTrend: GovernanceTrendDirection;
+}
+
+/** Resumo de tendência de incidentes. */
+export interface IncidentTrendSummaryDto {
+  openIncidents: number;
+  resolvedLast30Days: number;
+  avgResolutionHours: number;
+  recurrenceRate: number;
+  trend: GovernanceTrendDirection;
+}
+
+/** Resumo de cobertura de compliance executivo. */
+export interface ComplianceCoverageSummaryDto {
+  overallScore: number;
+  compliantPct: number;
+  gapCount: number;
+  trend: GovernanceTrendDirection;
+}
+
+/** Domínio que requer atenção executiva. */
+export interface DomainAttentionDto {
+  domainId: string;
+  domainName: string;
+  riskLevel: RiskLevel;
+  reason: string;
+}
+
+/** Resposta da visão executiva expandida. */
+export interface ExecutiveOverviewResponse {
+  operationalTrend: OperationalTrendDto;
+  riskSummary: ExecutiveRiskSummaryDto;
+  maturitySummary: ExecutiveMaturitySummaryDto;
+  criticalFocusAreas: FocusAreaDto[];
+  changeSafetySummary: ChangeSafetySummaryDto;
+  incidentTrendSummary: IncidentTrendSummaryDto;
+  complianceCoverageSummary: ComplianceCoverageSummaryDto;
+  topDomainsRequiringAttention: DomainAttentionDto[];
+  generatedAt: string;
+}
+
+/** Célula do heatmap de risco com indicadores multidimensionais. */
+export interface RiskHeatmapCellDto {
+  groupId: string;
+  groupName: string;
+  riskLevel: RiskLevel;
+  riskScore: number;
+  incidents: number;
+  changeFailures: number;
+  reliabilityDegradation: boolean;
+  contractGaps: number;
+  documentationGaps: number;
+  runbookGaps: number;
+  dependencyFragility: number;
+  regressionCount: number;
+  explanation: string;
+}
+
+/** Resposta do heatmap de risco. */
+export interface RiskHeatmapResponse {
+  dimension: string;
+  cells: RiskHeatmapCellDto[];
+  generatedAt: string;
+}
+
+/** Score de dimensão de maturidade. */
+export interface MaturityDimensionScoreDto {
+  dimension: string;
+  level: MaturityLevelType;
+  score: number;
+  maxScore: number;
+  explanation: string;
+}
+
+/** Scorecard de maturidade por grupo. */
+export interface MaturityScorecardDto {
+  groupId: string;
+  groupName: string;
+  overallMaturity: MaturityLevelType;
+  dimensions: MaturityDimensionScoreDto[];
+}
+
+/** Resposta dos scorecards de maturidade. */
+export interface MaturityScorecardsResponse {
+  dimension: string;
+  scorecards: MaturityScorecardDto[];
+  generatedAt: string;
+}
+
+/** Comparação de benchmarking por grupo. */
+export interface BenchmarkComparisonDto {
+  groupId: string;
+  groupName: string;
+  serviceCount: number;
+  criticality: string;
+  reliabilityScore: number;
+  reliabilityTrend: GovernanceTrendDirection;
+  changeSafetyScore: number;
+  incidentRecurrenceRate: number;
+  maturityScore: number;
+  riskScore: number;
+  finopsEfficiency: CostEfficiencyType;
+  strengths: string[];
+  gaps: string[];
+  context: string;
+}
+
+/** Resposta do benchmarking. */
+export interface BenchmarkingResponse {
+  dimension: string;
+  comparisons: BenchmarkComparisonDto[];
+  generatedAt: string;
+}
+
+/** Ponto de dados de tendência. */
+export interface TrendDataPointDto {
+  period: string;
+  value: number;
+}
+
+/** Série de tendência. */
+export interface TrendSeriesDto {
+  name: string;
+  direction: GovernanceTrendDirection;
+  dataPoints: TrendDataPointDto[];
+}
+
+/** Insight de tendência com recomendação. */
+export interface TrendInsightDto {
+  insight: string;
+  impact: string;
+  recommendation: string;
+}
+
+/** Resposta de tendências executivas. */
+export interface ExecutiveTrendsResponse {
+  category: string;
+  series: TrendSeriesDto[];
+  insights: TrendInsightDto[];
+  generatedAt: string;
+}
+
+/** Indicador-chave do drill-down. */
+export interface KeyIndicatorDto {
+  name: string;
+  value: string;
+  trend: GovernanceTrendDirection;
+  explanation: string;
+}
+
+/** Serviço crítico no drill-down. */
+export interface CriticalServiceDto {
+  serviceId: string;
+  serviceName: string;
+  riskLevel: RiskLevel;
+  mainIssue: string;
+}
+
+/** Gap identificado no drill-down. */
+export interface ExecutiveGapDto {
+  area: string;
+  severity: RiskLevel;
+  description: string;
+  recommendation: string;
+}
+
+/** Resposta do drill-down executivo. */
+export interface ExecutiveDrillDownResponse {
+  entityType: string;
+  entityId: string;
+  entityName: string;
+  riskLevel: RiskLevel;
+  maturityLevel: MaturityLevelType;
+  keyIndicators: KeyIndicatorDto[];
+  criticalServices: CriticalServiceDto[];
+  topGaps: ExecutiveGapDto[];
+  recommendedFocus: string[];
+  generatedAt: string;
+}
+
 // ── Contract Studio Types ───────────────────────────────────────
 
 export type ContractType = 'RestApi' | 'Soap' | 'Event' | 'BackgroundService' | 'SharedSchema';

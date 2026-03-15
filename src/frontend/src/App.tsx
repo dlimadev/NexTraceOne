@@ -12,7 +12,7 @@ import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
 import { IncidentsPage, IncidentDetailPage, RunbooksPage, TeamReliabilityPage, ServiceReliabilityDetailPage } from './features/operations';
 import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage, IdeIntegrationsPage } from './features/ai-hub';
-import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage } from './features/governance';
+import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage, ExecutiveOverviewPage, RiskHeatmapPage, MaturityScorecardsPage, BenchmarkingPage, ExecutiveDrillDownPage } from './features/governance';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -162,6 +162,11 @@ export default function App() {
               <Route path="/governance/risk" element={<RiskCenterPage />} />
               <Route path="/governance/compliance" element={<CompliancePage />} />
               <Route path="/governance/finops" element={<FinOpsPage />} />
+              <Route path="/governance/executive" element={<ExecutiveOverviewPage />} />
+              <Route path="/governance/executive/heatmap" element={<RiskHeatmapPage />} />
+              <Route path="/governance/executive/maturity" element={<MaturityScorecardsPage />} />
+              <Route path="/governance/executive/benchmarking" element={<BenchmarkingPage />} />
+              <Route path="/governance/executive/drilldown/:entityType/:entityId" element={<ExecutiveDrillDownPage />} />
               {/* ── Admin ── */}
               <Route
                 path="/licensing"
