@@ -10,6 +10,8 @@ using NexTraceOne.AiGovernance.Application.Features.UpdateConversation;
 using NexTraceOne.AiGovernance.Application.Features.UpdateModel;
 using NexTraceOne.AiGovernance.Application.Features.RegisterIdeClient;
 using NexTraceOne.AiGovernance.Application.Features.UpdatePolicy;
+using NexTraceOne.AiGovernance.Application.Features.PlanExecution;
+using NexTraceOne.AiGovernance.Application.Features.EnrichContext;
 using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AiGovernance.Application;
@@ -47,6 +49,10 @@ public static class DependencyInjection
 
         // ── IDE Integrations ─────────────────────────────────────────────
         services.AddTransient<IValidator<RegisterIdeClient.Command>, RegisterIdeClient.Validator>();
+
+        // ── AI Routing & Enrichment ──────────────────────────────────────
+        services.AddTransient<IValidator<PlanExecution.Command>, PlanExecution.Validator>();
+        services.AddTransient<IValidator<EnrichContext.Command>, EnrichContext.Validator>();
 
         return services;
     }
