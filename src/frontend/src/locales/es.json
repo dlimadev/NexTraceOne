@@ -957,9 +957,123 @@
   },
   "incidents": {
     "title": "Incidentes",
-    "subtitle": "Correlacione incidentes con servicios, cambios y contratos",
-    "emptyTitle": "Sin incidentes registrados",
-    "emptyDescription": "El seguimiento y correlación de incidentes estará disponible aquí."
+    "subtitle": "Correlacionar incidentes con servicios, cambios y contratos",
+    "emptyTitle": "No hay incidentes registrados",
+    "emptyDescription": "El seguimiento y correlación de incidentes estará disponible aquí.",
+    "overview": "Resumen de Incidentes",
+    "totalOpen": "Incidentes Abiertos",
+    "critical": "Críticos",
+    "withCorrelation": "Con Cambios Correlacionados",
+    "withMitigation": "Mitigación Disponible",
+    "servicesImpacted": "Servicios Impactados",
+    "searchPlaceholder": "Buscar incidentes...",
+    "filter": {
+      "all": "Todos",
+      "Open": "Abierto",
+      "Investigating": "Investigando",
+      "Mitigating": "Mitigando",
+      "Monitoring": "Monitoreando",
+      "Resolved": "Resuelto",
+      "Closed": "Cerrado"
+    },
+    "severity": {
+      "Warning": "Alerta",
+      "Minor": "Menor",
+      "Major": "Mayor",
+      "Critical": "Crítico"
+    },
+    "status": {
+      "Open": "Abierto",
+      "Investigating": "Investigando",
+      "Mitigating": "Mitigando",
+      "Monitoring": "Monitoreando",
+      "Resolved": "Resuelto",
+      "Closed": "Cerrado"
+    },
+    "type": {
+      "ServiceDegradation": "Degradación de Servicio",
+      "AvailabilityIssue": "Problema de Disponibilidad",
+      "DependencyFailure": "Fallo de Dependencia",
+      "ContractImpact": "Impacto en Contrato",
+      "MessagingIssue": "Problema de Mensajería",
+      "BackgroundProcessingIssue": "Fallo en Procesamiento Background",
+      "OperationalRegression": "Regresión Operacional"
+    },
+    "correlation": {
+      "title": "Correlación",
+      "confidence": "Confianza de Correlación",
+      "reason": "Razón de Correlación",
+      "relatedChanges": "Cambios Relacionados",
+      "relatedServices": "Servicios Relacionados",
+      "relatedDependencies": "Dependencias Relacionadas",
+      "impactedContracts": "Contratos Posiblemente Impactados",
+      "noChanges": "No se identificaron cambios correlacionados",
+      "noServices": "No se identificaron servicios relacionados",
+      "noDependencies": "No se identificaron dependencias relacionadas",
+      "noContracts": "No se identificaron contratos impactados",
+      "confidenceLevel": {
+        "NotAssessed": "No Evaluado",
+        "Low": "Baja",
+        "Medium": "Media",
+        "High": "Alta",
+        "Confirmed": "Confirmada"
+      }
+    },
+    "evidence": {
+      "title": "Evidencias",
+      "operationalSignals": "Señales Operacionales",
+      "degradationSummary": "Resumen de Degradación",
+      "observations": "Observaciones",
+      "anomalySummary": "Resumen de Anomalías",
+      "notes": "Notas",
+      "noObservations": "No hay observaciones registradas"
+    },
+    "mitigation": {
+      "title": "Mitigación",
+      "status": "Estado de Mitigación",
+      "suggestedActions": "Acciones Sugeridas",
+      "rollbackGuidance": "Guía de Rollback",
+      "rollbackRelevant": "Rollback Relevante",
+      "escalationGuidance": "Guía de Escalamiento",
+      "noActions": "No hay acciones de mitigación definidas",
+      "mitigationStatus": {
+        "NotStarted": "No Iniciada",
+        "InProgress": "En Progreso",
+        "Applied": "Aplicada",
+        "Verified": "Verificada",
+        "Failed": "Falló"
+      }
+    },
+    "runbooks": {
+      "title": "Runbooks",
+      "recommended": "Runbooks Recomendados",
+      "noRunbooks": "No hay runbooks vinculados"
+    },
+    "detail": {
+      "overview": "Resumen",
+      "impactedServices": "Servicios Impactados",
+      "severityAndStatus": "Severidad y Estado",
+      "timeline": "Línea de Tiempo",
+      "relatedChanges": "Cambios Relacionados",
+      "relatedContracts": "Contratos Relacionados",
+      "notes": "Notas y Referencias",
+      "backToList": "Volver a Incidentes",
+      "notFound": "Incidente no encontrado",
+      "notFoundDescription": "El incidente solicitado no fue encontrado."
+    },
+    "list": {
+      "title": "Lista de Incidentes",
+      "correlationIndicator": "Correlacionado",
+      "mitigationIndicator": "Mitigación"
+    },
+    "mock": {
+      "paymentIncidentTitle": "Payment Gateway — tasa de errores elevada",
+      "catalogIncidentTitle": "Catalog Sync — socio de integración inaccesible",
+      "inventoryIncidentTitle": "Inventory Consumer — pico en el lag del consumidor",
+      "orderIncidentTitle": "Order API — regresión de latencia después del deploy",
+      "notificationIncidentTitle": "Notification Worker — fallos en jobs background",
+      "authIncidentTitle": "Auth Gateway — incompatibilidad de schema de contrato"
+    }
   },
   "runbooks": {
     "title": "Runbooks",

@@ -959,7 +959,121 @@
     "title": "Incidents",
     "subtitle": "Correlate incidents with services, changes and contracts",
     "emptyTitle": "No incidents recorded",
-    "emptyDescription": "Incident tracking and correlation will be available here."
+    "emptyDescription": "Incident tracking and correlation will be available here.",
+    "overview": "Incidents Overview",
+    "totalOpen": "Open Incidents",
+    "critical": "Critical",
+    "withCorrelation": "With Correlated Changes",
+    "withMitigation": "Mitigation Available",
+    "servicesImpacted": "Services Impacted",
+    "searchPlaceholder": "Search incidents...",
+    "filter": {
+      "all": "All",
+      "Open": "Open",
+      "Investigating": "Investigating",
+      "Mitigating": "Mitigating",
+      "Monitoring": "Monitoring",
+      "Resolved": "Resolved",
+      "Closed": "Closed"
+    },
+    "severity": {
+      "Warning": "Warning",
+      "Minor": "Minor",
+      "Major": "Major",
+      "Critical": "Critical"
+    },
+    "status": {
+      "Open": "Open",
+      "Investigating": "Investigating",
+      "Mitigating": "Mitigating",
+      "Monitoring": "Monitoring",
+      "Resolved": "Resolved",
+      "Closed": "Closed"
+    },
+    "type": {
+      "ServiceDegradation": "Service Degradation",
+      "AvailabilityIssue": "Availability Issue",
+      "DependencyFailure": "Dependency Failure",
+      "ContractImpact": "Contract Impact",
+      "MessagingIssue": "Messaging Issue",
+      "BackgroundProcessingIssue": "Background Processing Issue",
+      "OperationalRegression": "Operational Regression"
+    },
+    "correlation": {
+      "title": "Correlation",
+      "confidence": "Correlation Confidence",
+      "reason": "Correlation Reason",
+      "relatedChanges": "Related Changes",
+      "relatedServices": "Related Services",
+      "relatedDependencies": "Related Dependencies",
+      "impactedContracts": "Possibly Impacted Contracts",
+      "noChanges": "No correlated changes identified",
+      "noServices": "No related services identified",
+      "noDependencies": "No related dependencies identified",
+      "noContracts": "No impacted contracts identified",
+      "confidenceLevel": {
+        "NotAssessed": "Not Assessed",
+        "Low": "Low",
+        "Medium": "Medium",
+        "High": "High",
+        "Confirmed": "Confirmed"
+      }
+    },
+    "evidence": {
+      "title": "Evidence",
+      "operationalSignals": "Operational Signals",
+      "degradationSummary": "Degradation Summary",
+      "observations": "Observations",
+      "anomalySummary": "Anomaly Summary",
+      "notes": "Notes",
+      "noObservations": "No observations recorded"
+    },
+    "mitigation": {
+      "title": "Mitigation",
+      "status": "Mitigation Status",
+      "suggestedActions": "Suggested Actions",
+      "rollbackGuidance": "Rollback Guidance",
+      "rollbackRelevant": "Rollback Relevant",
+      "escalationGuidance": "Escalation Guidance",
+      "noActions": "No mitigation actions defined",
+      "mitigationStatus": {
+        "NotStarted": "Not Started",
+        "InProgress": "In Progress",
+        "Applied": "Applied",
+        "Verified": "Verified",
+        "Failed": "Failed"
+      }
+    },
+    "runbooks": {
+      "title": "Runbooks",
+      "recommended": "Recommended Runbooks",
+      "noRunbooks": "No runbooks linked"
+    },
+    "detail": {
+      "overview": "Overview",
+      "impactedServices": "Impacted Services",
+      "severityAndStatus": "Severity & Status",
+      "timeline": "Timeline",
+      "relatedChanges": "Related Changes",
+      "relatedContracts": "Related Contracts",
+      "notes": "Notes & References",
+      "backToList": "Back to Incidents",
+      "notFound": "Incident not found",
+      "notFoundDescription": "The requested incident could not be found."
+    },
+    "list": {
+      "title": "Incident List",
+      "correlationIndicator": "Correlated",
+      "mitigationIndicator": "Mitigation"
+    },
+    "mock": {
+      "paymentIncidentTitle": "Payment Gateway — elevated error rate",
+      "catalogIncidentTitle": "Catalog Sync — integration partner unreachable",
+      "inventoryIncidentTitle": "Inventory Consumer — consumer lag spike",
+      "orderIncidentTitle": "Order API — latency regression after deploy",
+      "notificationIncidentTitle": "Notification Worker — background job failures",
+      "authIncidentTitle": "Auth Gateway — contract schema mismatch"
+    }
   },
   "runbooks": {
     "title": "Runbooks",
