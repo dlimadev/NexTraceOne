@@ -29,4 +29,25 @@ public static class IncidentErrors
             "Incidents.Team.NotFound",
             "Team '{0}' was not found.",
             teamId);
+
+    /// <summary>Workflow de mitigação não encontrado pelo identificador informado.</summary>
+    public static Error WorkflowNotFound(string workflowId)
+        => Error.NotFound(
+            "Incidents.Workflow.NotFound",
+            "Mitigation workflow '{0}' was not found.",
+            workflowId);
+
+    /// <summary>Runbook não encontrado pelo identificador informado.</summary>
+    public static Error RunbookNotFound(string runbookId)
+        => Error.NotFound(
+            "Incidents.Runbook.NotFound",
+            "Runbook '{0}' was not found.",
+            runbookId);
+
+    /// <summary>Ação inválida para workflow de mitigação.</summary>
+    public static Error InvalidWorkflowAction(string action)
+        => Error.Validation(
+            "Incidents.Workflow.InvalidAction",
+            "Action '{0}' is not a valid workflow action.",
+            action);
 }
