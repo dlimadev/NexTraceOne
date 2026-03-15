@@ -67,12 +67,12 @@ const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 
 };
 
 /** Mapeia GovernanceTrendDirection para variante do Badge. */
-const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'warning' | 'danger' => {
+const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'info' | 'danger' => {
   switch (dir) {
     case 'Improving': return 'success';
-    case 'Stable': return 'warning';
+    case 'Stable': return 'info';
     case 'Declining': return 'danger';
-    default: return 'warning';
+    default: return 'info';
   }
 };
 
@@ -116,16 +116,16 @@ export function ExecutiveDrillDownPage() {
         <div className="flex items-center gap-3 mt-3">
           <div className="flex items-center gap-2">
             <ShieldAlert size={14} className="text-muted" />
-            <span className="text-xs text-muted">{t('governance.executive.riskLevelLabel')}</span>
+            <span className="text-xs text-muted">{t('governance.executive.drillDownRiskLevel')}</span>
             <Badge variant={riskBadgeVariant(d.riskLevel)}>
-              {t(`governance.executive.riskLevel.${d.riskLevel}`)}
+              {t(`governance.risk.level.${d.riskLevel}`)}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
             <Award size={14} className="text-muted" />
-            <span className="text-xs text-muted">{t('governance.executive.maturityLevelLabel')}</span>
+            <span className="text-xs text-muted">{t('governance.executive.drillDownMaturity')}</span>
             <Badge variant={maturityBadgeVariant(d.maturityLevel)}>
-              {t(`governance.executive.maturityLevel.${d.maturityLevel}`)}
+              {t(`governance.maturity.${d.maturityLevel}`)}
             </Badge>
           </div>
         </div>
@@ -136,7 +136,7 @@ export function ExecutiveDrillDownPage() {
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
             <BarChart3 size={16} className="text-accent" />
-            {t('governance.executive.keyIndicators')}
+            {t('governance.executive.drillDownKeyIndicators')}
           </h2>
         </CardHeader>
         <CardBody>
@@ -146,7 +146,7 @@ export function ExecutiveDrillDownPage() {
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-xs font-medium text-heading">{ind.name}</p>
                   <Badge variant={trendBadgeVariant(ind.trend)}>
-                    {t(`governance.executive.trend.${ind.trend}`)}
+                    {t(`governance.trend.${ind.trend}`)}
                   </Badge>
                 </div>
                 <p className="text-xl font-bold text-heading mb-1">{ind.value}</p>
@@ -162,7 +162,7 @@ export function ExecutiveDrillDownPage() {
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
             <AlertTriangle size={16} className="text-accent" />
-            {t('governance.executive.criticalServices')}
+            {t('governance.executive.drillDownCriticalServices')}
           </h2>
         </CardHeader>
         <CardBody className="p-0">
@@ -173,7 +173,7 @@ export function ExecutiveDrillDownPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-medium text-heading">{svc.serviceName}</span>
                     <Badge variant={riskBadgeVariant(svc.riskLevel)}>
-                      {t(`governance.executive.riskLevel.${svc.riskLevel}`)}
+                      {t(`governance.risk.level.${svc.riskLevel}`)}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted">{svc.mainIssue}</p>
@@ -189,7 +189,7 @@ export function ExecutiveDrillDownPage() {
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
             <AlertCircle size={16} className="text-accent" />
-            {t('governance.executive.topGaps')}
+            {t('governance.executive.drillDownTopGaps')}
           </h2>
         </CardHeader>
         <CardBody>
@@ -199,7 +199,7 @@ export function ExecutiveDrillDownPage() {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-medium text-heading">{gap.area}</span>
                   <Badge variant={riskBadgeVariant(gap.severity)}>
-                    {t(`governance.executive.riskLevel.${gap.severity}`)}
+                    {t(`governance.risk.level.${gap.severity}`)}
                   </Badge>
                 </div>
                 <p className="text-xs text-body mb-2">{gap.description}</p>
@@ -215,7 +215,7 @@ export function ExecutiveDrillDownPage() {
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
             <Crosshair size={16} className="text-accent" />
-            {t('governance.executive.recommendedFocus')}
+            {t('governance.executive.drillDownRecommendedFocus')}
           </h2>
         </CardHeader>
         <CardBody>

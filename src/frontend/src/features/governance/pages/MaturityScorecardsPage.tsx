@@ -128,8 +128,8 @@ export function MaturityScorecardsPage() {
     <div className="p-6 lg:p-8 animate-fade-in">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.executive.maturityTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.executive.maturitySubtitle')}</p>
+        <h1 className="text-2xl font-bold text-heading">{t('governance.executive.scorecardsTitle')}</h1>
+        <p className="text-muted mt-1">{t('governance.executive.scorecardsSubtitle')}</p>
       </div>
 
       {/* Dimension Selector */}
@@ -144,7 +144,7 @@ export function MaturityScorecardsPage() {
                 : 'bg-surface text-muted border-edge hover:text-body'
             }`}
           >
-            {t(`governance.executive.dimensionGroup.${dim}`)}
+            {t(`governance.executive.scorecardsDimension${dim.charAt(0).toUpperCase()}${dim.slice(1)}`)}
           </button>
         ))}
       </div>
@@ -158,7 +158,7 @@ export function MaturityScorecardsPage() {
                 <Award size={16} className="text-accent" />
                 <span className="text-sm font-semibold text-heading">{sc.groupName}</span>
                 <Badge variant={maturityBadgeVariant(sc.overallMaturity)}>
-                  {t(`governance.executive.maturityLevel.${sc.overallMaturity}`)}
+                  {t(`governance.maturity.${sc.overallMaturity}`)}
                 </Badge>
               </div>
             </CardHeader>
@@ -168,10 +168,10 @@ export function MaturityScorecardsPage() {
                   <div key={dim.dimension} className="bg-surface/50 rounded-md p-3 border border-edge/50">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-xs font-medium text-heading">
-                        {t(`governance.executive.dim.${dim.dimension}`)}
+                        {t(`governance.executive.scorecards${dim.dimension.charAt(0).toUpperCase()}${dim.dimension.slice(1)}`)}
                       </p>
                       <Badge variant={maturityBadgeVariant(dim.level)}>
-                        {t(`governance.executive.maturityLevel.${dim.level}`)}
+                        {t(`governance.maturity.${dim.level}`)}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between mb-1">

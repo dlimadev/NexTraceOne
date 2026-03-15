@@ -82,7 +82,7 @@ export function RiskHeatmapPage() {
                 : 'bg-surface text-muted border-edge hover:text-body'
             }`}
           >
-            {t(`governance.executive.dimension.${dim}`)}
+            {t(`governance.executive.heatmapDimension${dim.charAt(0).toUpperCase()}${dim.slice(1)}`)}
           </button>
         ))}
       </div>
@@ -98,11 +98,11 @@ export function RiskHeatmapPage() {
                   <span className="text-sm font-medium text-heading">{cell.groupName}</span>
                 </div>
                 <Badge variant={riskBadgeVariant(cell.riskLevel)}>
-                  {t(`governance.executive.riskLevel.${cell.riskLevel}`)}
+                  {t(`governance.risk.level.${cell.riskLevel}`)}
                 </Badge>
               </div>
               <p className="text-xs text-muted mt-1">
-                {t('governance.executive.riskScore')}: <span className="font-medium text-heading">{cell.riskScore}</span>
+                {t('governance.executive.heatmapRiskScore')}: <span className="font-medium text-heading">{cell.riskScore}</span>
               </p>
             </CardHeader>
             <CardBody>
@@ -110,45 +110,45 @@ export function RiskHeatmapPage() {
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="flex items-center gap-1.5 text-xs">
                   <AlertCircle size={12} className="text-critical shrink-0" />
-                  <span className="text-muted">{t('governance.executive.incidents')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapIncidents')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.incidents}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <AlertTriangle size={12} className="text-orange-400 shrink-0" />
-                  <span className="text-muted">{t('governance.executive.changeFailures')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapChangeFailures')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.changeFailures}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <FileWarning size={12} className="text-amber-400 shrink-0" />
-                  <span className="text-muted">{t('governance.executive.contractGaps')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapContractGaps')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.contractGaps}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <BookOpen size={12} className="text-amber-400 shrink-0" />
-                  <span className="text-muted">{t('governance.executive.docGaps')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapDocumentationGaps')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.documentationGaps}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <ShieldAlert size={12} className="text-orange-400 shrink-0" />
-                  <span className="text-muted">{t('governance.executive.runbookGaps')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapRunbookGaps')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.runbookGaps}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <GitBranch size={12} className="text-muted shrink-0" />
-                  <span className="text-muted">{t('governance.executive.depFragility')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapDependencyFragility')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.dependencyFragility}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
                   <RotateCcw size={12} className="text-muted shrink-0" />
-                  <span className="text-muted">{t('governance.executive.regressions')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapRegressions')}</span>
                   <span className="font-medium text-heading ml-auto">{cell.regressionCount}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-muted">{t('governance.executive.reliabilityDeg')}</span>
+                  <span className="text-muted">{t('governance.executive.heatmapReliabilityDegradation')}</span>
                   <Badge variant={cell.reliabilityDegradation ? 'danger' : 'success'} className="ml-auto">
                     {cell.reliabilityDegradation
-                      ? t('governance.executive.yes')
-                      : t('governance.executive.no')}
+                      ? t('governance.executive.heatmapYes')
+                      : t('governance.executive.heatmapNo')}
                   </Badge>
                 </div>
               </div>

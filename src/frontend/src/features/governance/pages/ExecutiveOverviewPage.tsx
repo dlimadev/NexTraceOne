@@ -82,12 +82,12 @@ const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 
 };
 
 /** Mapeia GovernanceTrendDirection para variante do Badge. */
-const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'warning' | 'danger' => {
+const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'info' | 'danger' => {
   switch (dir) {
     case 'Improving': return 'success';
-    case 'Stable': return 'info' as 'warning';
+    case 'Stable': return 'info';
     case 'Declining': return 'danger';
-    default: return 'warning';
+    default: return 'info';
   }
 };
 
@@ -127,7 +127,7 @@ export function ExecutiveOverviewPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
               title={t('governance.executive.stabilityTrend')}
-              value={t(`governance.executive.trend.${d.operationalTrend.stabilityTrend}`)}
+              value={t(`governance.trend.${d.operationalTrend.stabilityTrend}`)}
               icon={<Activity size={20} />}
               color="text-accent"
             />
@@ -160,7 +160,7 @@ export function ExecutiveOverviewPage() {
             <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
               <p className="text-xs text-muted mb-1">{t('governance.executive.overallRisk')}</p>
               <Badge variant={riskBadgeVariant(d.riskSummary.overallRisk)}>
-                {t(`governance.executive.riskLevel.${d.riskSummary.overallRisk}`)}
+                {t(`governance.risk.level.${d.riskSummary.overallRisk}`)}
               </Badge>
             </div>
             <StatCard
@@ -178,7 +178,7 @@ export function ExecutiveOverviewPage() {
             <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
               <p className="text-xs text-muted mb-1">{t('governance.executive.riskTrend')}</p>
               <Badge variant={trendBadgeVariant(d.riskSummary.riskTrend)}>
-                {t(`governance.executive.trend.${d.riskSummary.riskTrend}`)}
+                {t(`governance.trend.${d.riskSummary.riskTrend}`)}
               </Badge>
             </div>
           </div>
@@ -247,7 +247,7 @@ export function ExecutiveOverviewPage() {
             <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
               <p className="text-xs text-muted mb-1">{t('governance.executive.confidenceTrend')}</p>
               <Badge variant={trendBadgeVariant(d.changeSafetySummary.confidenceTrend)}>
-                {t(`governance.executive.trend.${d.changeSafetySummary.confidenceTrend}`)}
+                {t(`governance.trend.${d.changeSafetySummary.confidenceTrend}`)}
               </Badge>
             </div>
           </div>
@@ -277,7 +277,7 @@ export function ExecutiveOverviewPage() {
               color="text-emerald-500"
             />
             <StatCard
-              title={t('governance.executive.avgResolution')}
+              title={t('governance.executive.avgResolutionHours')}
               value={`${d.incidentTrendSummary.avgResolutionHours}h`}
               icon={<Clock size={20} />}
               color="text-accent"
@@ -289,9 +289,9 @@ export function ExecutiveOverviewPage() {
               color="text-amber-500"
             />
             <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
-              <p className="text-xs text-muted mb-1">{t('governance.executive.incidentTrendLabel')}</p>
+              <p className="text-xs text-muted mb-1">{t('governance.executive.incidentTrend')}</p>
               <Badge variant={trendBadgeVariant(d.incidentTrendSummary.trend)}>
-                {t(`governance.executive.trend.${d.incidentTrendSummary.trend}`)}
+                {t(`governance.trend.${d.incidentTrendSummary.trend}`)}
               </Badge>
             </div>
           </div>
@@ -314,7 +314,7 @@ export function ExecutiveOverviewPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-medium text-heading">{area.areaName}</span>
                     <Badge variant={riskBadgeVariant(area.severity)}>
-                      {t(`governance.executive.riskLevel.${area.severity}`)}
+                      {t(`governance.risk.level.${area.severity}`)}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted">{area.description}</p>
@@ -333,7 +333,7 @@ export function ExecutiveOverviewPage() {
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
             <ShieldAlert size={16} className="text-accent" />
-            {t('governance.executive.topDomains')}
+            {t('governance.executive.topDomainsAttention')}
           </h2>
         </CardHeader>
         <CardBody className="p-0">
@@ -344,7 +344,7 @@ export function ExecutiveOverviewPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-medium text-heading">{domain.domainName}</span>
                     <Badge variant={riskBadgeVariant(domain.riskLevel)}>
-                      {t(`governance.executive.riskLevel.${domain.riskLevel}`)}
+                      {t(`governance.risk.level.${domain.riskLevel}`)}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted">{domain.reason}</p>

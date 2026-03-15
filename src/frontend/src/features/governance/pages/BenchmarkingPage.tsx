@@ -117,11 +117,11 @@ const finopsBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'd
 };
 
 /** Mapeia criticality para variante do Badge. */
-const criticalityBadgeVariant = (crit: string): 'success' | 'warning' | 'danger' | 'default' => {
+const criticalityBadgeVariant = (crit: string): 'success' | 'warning' | 'danger' | 'info' | 'default' => {
   switch (crit) {
     case 'Critical': return 'danger';
     case 'High': return 'warning';
-    case 'Medium': return 'info' as 'warning';
+    case 'Medium': return 'info';
     case 'Low': return 'success';
     default: return 'default';
   }
@@ -158,7 +158,7 @@ export function BenchmarkingPage() {
                 : 'bg-surface text-muted border-edge hover:text-body'
             }`}
           >
-            {t(`governance.executive.benchDimension.${dim}`)}
+            {t(`governance.executive.benchmarkingDimension${dim.charAt(0).toUpperCase()}${dim.slice(1)}`)}
           </button>
         ))}
       </div>
@@ -177,7 +177,7 @@ export function BenchmarkingPage() {
                   </Badge>
                 </div>
                 <span className="text-xs text-muted">
-                  {comp.serviceCount} {t('governance.executive.services')}
+                  {comp.serviceCount} {t('governance.executive.benchmarkingServiceCount')}
                 </span>
               </div>
             </CardHeader>
@@ -185,44 +185,44 @@ export function BenchmarkingPage() {
               {/* Metrics Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
                 <StatCard
-                  title={t('governance.executive.reliability')}
+                  title={t('governance.executive.benchmarkingReliability')}
                   value={comp.reliabilityScore}
                   icon={<Shield size={16} />}
                   color="text-accent"
                   trend={{
                     direction: comp.reliabilityTrend === 'Declining' ? 'down' as const : 'up' as const,
-                    label: t(`governance.executive.trend.${comp.reliabilityTrend}`),
+                    label: t(`governance.trend.${comp.reliabilityTrend}`),
                   }}
                 />
                 <StatCard
-                  title={t('governance.executive.changeSafetyScore')}
+                  title={t('governance.executive.benchmarkingChangeSafety')}
                   value={comp.changeSafetyScore}
                   icon={<Activity size={16} />}
                   color="text-accent"
                 />
                 <StatCard
-                  title={t('governance.executive.incidentRecurrence')}
+                  title={t('governance.executive.benchmarkingIncidentRecurrence')}
                   value={`${comp.incidentRecurrenceRate}%`}
                   icon={<RefreshCw size={16} />}
                   color={comp.incidentRecurrenceRate > 15 ? 'text-critical' : 'text-amber-500'}
                 />
                 <StatCard
-                  title={t('governance.executive.maturityScoreLabel')}
+                  title={t('governance.executive.benchmarkingMaturity')}
                   value={comp.maturityScore}
                   icon={<Award size={16} />}
                   color="text-accent"
                 />
                 <StatCard
-                  title={t('governance.executive.riskScoreLabel')}
+                  title={t('governance.executive.benchmarkingRisk')}
                   value={comp.riskScore}
                   icon={<TrendingUp size={16} />}
                   color={comp.riskScore > 60 ? 'text-critical' : 'text-amber-500'}
                 />
                 <div className="bg-card rounded-lg shadow-sm border border-edge p-3 flex flex-col items-center justify-center">
                   <DollarSign size={16} className="text-accent mb-1" />
-                  <p className="text-xs text-muted mb-1">{t('governance.executive.finopsEfficiency')}</p>
+                  <p className="text-xs text-muted mb-1">{t('governance.executive.benchmarkingFinOps')}</p>
                   <Badge variant={finopsBadgeVariant(comp.finopsEfficiency)}>
-                    {t(`governance.executive.efficiency.${comp.finopsEfficiency}`)}
+                    {t(`governance.finops.efficiency.${comp.finopsEfficiency}`)}
                   </Badge>
                 </div>
               </div>
@@ -230,7 +230,7 @@ export function BenchmarkingPage() {
               {/* Strengths & Gaps */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                 <div>
-                  <p className="text-xs font-medium text-heading mb-2">{t('governance.executive.strengths')}</p>
+                  <p className="text-xs font-medium text-heading mb-2">{t('governance.executive.benchmarkingStrengths')}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {comp.strengths.map((s, i) => (
                       <Badge key={i} variant="success">{s}</Badge>
@@ -238,7 +238,7 @@ export function BenchmarkingPage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-heading mb-2">{t('governance.executive.gaps')}</p>
+                  <p className="text-xs font-medium text-heading mb-2">{t('governance.executive.benchmarkingGaps')}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {comp.gaps.map((g, i) => (
                       <Badge key={i} variant="warning">{g}</Badge>
