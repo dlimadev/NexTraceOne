@@ -1705,5 +1705,157 @@
       "viewServiceSot": "Ver Serviço no Source of Truth",
       "viewInReleases": "Ver em Releases"
     }
+  },
+  "persona": {
+    "quickActions": "Ações Rápidas",
+    "widgetComingSoon": "Dados estarão disponíveis quando conectados aos serviços do backend",
+    "Engineer": {
+      "label": "Engenheiro",
+      "homeSubtitle": "Visão operacional dos seus serviços, incidentes e contratos",
+      "widgets": {
+        "myServices": "Meus Serviços",
+        "recentChanges": "Mudanças Recentes",
+        "openIncidents": "Incidentes Abertos",
+        "contracts": "Meus Contratos"
+      },
+      "actions": {
+        "investigateService": "Investigar Serviço",
+        "openRunbook": "Abrir Runbook",
+        "viewContract": "Ver Contrato",
+        "analyzeIncident": "Analisar Incidente"
+      },
+      "ai": {
+        "prompt1": "Quais problemas estão afetando meus serviços agora?",
+        "prompt2": "Mostre as últimas alterações de contrato dos meus serviços",
+        "prompt3": "Ajude-me a investigar o último incidente"
+      }
+    },
+    "TechLead": {
+      "label": "Tech Lead",
+      "homeSubtitle": "Visão da equipa: serviços, risco, confiabilidade e impacto de mudanças",
+      "widgets": {
+        "teamServices": "Serviços da Equipa",
+        "changeRisk": "Risco de Mudanças",
+        "teamReliability": "Confiabilidade da Equipa",
+        "teamIncidents": "Incidentes da Equipa",
+        "ownershipGaps": "Lacunas de Ownership"
+      },
+      "actions": {
+        "reviewTeamRisk": "Revisar Risco da Equipa",
+        "inspectChanges": "Inspecionar Mudanças Recentes",
+        "assignOwner": "Atribuir Responsável",
+        "openTeamServices": "Abrir Serviços da Equipa"
+      },
+      "ai": {
+        "prompt1": "Qual o nível de risco atual dos serviços da minha equipa?",
+        "prompt2": "Mostre mudanças recentes que podem afetar a confiabilidade da equipa",
+        "prompt3": "Quais serviços da minha equipa não têm ownership adequado?"
+      }
+    },
+    "Architect": {
+      "label": "Arquiteto",
+      "homeSubtitle": "Visão estrutural: dependências, contratos e impacto transversal",
+      "widgets": {
+        "dependencies": "Dependências Cross-Service",
+        "contractConsistency": "Consistência de Contratos",
+        "architecturalRisk": "Risco Arquitetural",
+        "crossTeamChanges": "Mudanças Cross-Team"
+      },
+      "actions": {
+        "inspectDependencyMap": "Inspecionar Mapa de Dependências",
+        "reviewCrossImpact": "Revisar Impacto Cross-Domain",
+        "analyzeContractCompatibility": "Analisar Compatibilidade de Contratos",
+        "sourceOfTruth": "Fonte de Verdade"
+      },
+      "ai": {
+        "prompt1": "Existem riscos de fragilidade de dependências entre serviços?",
+        "prompt2": "Mostre incompatibilidades de contrato entre domínios",
+        "prompt3": "Quais as mudanças cross-team mais impactantes esta semana?"
+      }
+    },
+    "Product": {
+      "label": "Produto",
+      "homeSubtitle": "Impacto funcional: confiança da release, risco e saúde dos serviços",
+      "widgets": {
+        "releaseConfidence": "Confiança da Release",
+        "criticalServices": "Serviços Críticos do Produto",
+        "operationalRisk": "Risco Operacional",
+        "recentIncidents": "Incidentes Recentes com Impacto"
+      },
+      "actions": {
+        "reviewReleaseConfidence": "Revisar Confiança da Release",
+        "viewCriticalServiceStatus": "Ver Status dos Serviços Críticos",
+        "inspectProductIncidents": "Inspecionar Incidentes do Produto",
+        "viewReports": "Ver Relatórios"
+      },
+      "ai": {
+        "prompt1": "Qual o nível de confiança da próxima release?",
+        "prompt2": "Existem incidentes impactando fluxos críticos do produto?",
+        "prompt3": "Mostre um resumo do risco operacional dos serviços principais"
+      }
+    },
+    "Executive": {
+      "label": "Executivo",
+      "homeSubtitle": "Visão estratégica: tendências, maturidade, risco e indicadores de confiança",
+      "widgets": {
+        "operationalTrend": "Tendência Operacional",
+        "criticalDomains": "Domínios Críticos",
+        "riskOverview": "Visão de Risco",
+        "confidenceIndicators": "Indicadores de Confiança"
+      },
+      "actions": {
+        "openExecutiveOverview": "Visão Executiva",
+        "reviewOperationalTrend": "Revisar Tendência Operacional",
+        "inspectCriticalDomains": "Inspecionar Domínios Críticos",
+        "viewCompliance": "Ver Conformidade"
+      },
+      "ai": {
+        "prompt1": "Dê-me um resumo executivo da saúde operacional",
+        "prompt2": "Quais as principais tendências de risco este mês?",
+        "prompt3": "Mostre os indicadores de maturidade geral entre domínios"
+      }
+    },
+    "PlatformAdmin": {
+      "label": "Admin Plataforma",
+      "homeSubtitle": "Governança da plataforma: políticas, modelos IA, integrações e cobertura",
+      "widgets": {
+        "policyHealth": "Saúde das Políticas",
+        "platformCoverage": "Cobertura da Plataforma",
+        "aiGovernance": "Governança IA",
+        "integrations": "Integrações"
+      },
+      "actions": {
+        "managePolicies": "Gerenciar Políticas",
+        "manageAiModels": "Gerenciar Modelos IA",
+        "configureIntegrations": "Configurar Integrações",
+        "reviewPlatformCoverage": "Revisar Cobertura da Plataforma"
+      },
+      "ai": {
+        "prompt1": "Qual o estado atual das políticas de governança de IA?",
+        "prompt2": "Existem problemas de saúde nas integrações?",
+        "prompt3": "Mostre lacunas de cobertura da plataforma entre serviços"
+      }
+    },
+    "Auditor": {
+      "label": "Auditor",
+      "homeSubtitle": "Rastreabilidade e evidências: trilhas de auditoria, aprovações e conformidade",
+      "widgets": {
+        "auditActivity": "Atividade de Auditoria",
+        "approvalTraceability": "Rastreabilidade de Aprovações",
+        "evidenceExports": "Exportações de Evidências",
+        "aiUsageAudit": "Auditoria de Uso de IA"
+      },
+      "actions": {
+        "inspectAuditTrail": "Inspecionar Trilha de Auditoria",
+        "exportEvidence": "Exportar Evidências",
+        "reviewApprovalHistory": "Revisar Histórico de Aprovações",
+        "auditAiUsage": "Auditar Uso de IA"
+      },
+      "ai": {
+        "prompt1": "Mostre trilhas de auditoria de aprovações recentes",
+        "prompt2": "Quais modelos de IA foram usados e por quem esta semana?",
+        "prompt3": "Existem lacunas de conformidade nas mudanças recentes?"
+      }
+    }
   }
 }

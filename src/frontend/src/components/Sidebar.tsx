@@ -32,10 +32,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
+import { usePersona } from '../contexts/PersonaContext';
 import type { Permission } from '../auth/permissions';
-
-/** Seções de navegação alinhadas com MODULES-AND-PAGES.md. */
-type NavSection = 'home' | 'services' | 'knowledge' | 'contracts' | 'changes' | 'operations' | 'aiHub' | 'governance' | 'admin';
+import type { NavSection } from '../auth/persona';
 
 interface NavItem {
   /** Chave i18n para o label exibido na sidebar. */
@@ -50,15 +49,10 @@ interface NavItem {
 /**
  * Itens de navegação da sidebar alinhados com MODULES-AND-PAGES.md.
  *
- * Estrutura oficial do produto:
- * - Home: Dashboard
- * - Services: Service Catalog, Developer Portal
- * - Contracts: API Contracts, Contract Studio (futuro)
- * - Changes: Change Intelligence, Workflow, Promotion
- * - Operations: Incidents, Runbooks
- * - AI Hub: AI Assistant, Model Registry, AI Policies
- * - Governance: Reports, Risk, Compliance, FinOps
- * - Admin: Users, Licensing, Break Glass, etc.
+ * A ordem dos itens DENTRO de cada secção é fixa.
+ * A ordem das SECÇÕES é determinada pela persona do utilizador.
+ *
+ * @see docs/PERSONA-UX-MAPPING.md — prioridade de módulos por persona
  */
 const navItems: NavItem[] = [
   // ── Home ──
@@ -102,24 +96,34 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read', section: 'admin' },
 ];
 
-/** Ordem de exibição das seções na sidebar, alinhada com MODULES-AND-PAGES.md. */
-const sectionOrder: { key: NavSection; labelKey: string }[] = [
-  { key: 'home', labelKey: '' },
-  { key: 'services', labelKey: 'sidebar.sectionServices' },
-  { key: 'knowledge', labelKey: 'sidebar.sectionKnowledge' },
-  { key: 'contracts', labelKey: 'sidebar.sectionContracts' },
-  { key: 'changes', labelKey: 'sidebar.sectionChanges' },
-  { key: 'operations', labelKey: 'sidebar.sectionOperations' },
-  { key: 'aiHub', labelKey: 'sidebar.sectionAiHub' },
-  { key: 'governance', labelKey: 'sidebar.sectionGovernance' },
-  { key: 'admin', labelKey: 'sidebar.sectionAdmin' },
-];
+/** Mapeamento de chave de secção para label i18n. */
+const sectionLabels: Record<NavSection, string> = {
+  home: '',
+  services: 'sidebar.sectionServices',
+  knowledge: 'sidebar.sectionKnowledge',
+  contracts: 'sidebar.sectionContracts',
+  changes: 'sidebar.sectionChanges',
+  operations: 'sidebar.sectionOperations',
+  aiHub: 'sidebar.sectionAiHub',
+  governance: 'sidebar.sectionGovernance',
+  admin: 'sidebar.sectionAdmin',
+};
 
+/**
+ * Sidebar com navegação persona-aware.
+ *
+ * A ordem das secções adapta-se à persona do utilizador (definida em persona.ts).
+ * As secções destacadas recebem indicador visual (borda accent).
+ * A filtragem por permissão continua a funcionar normalmente.
+ *
+ * @see docs/PERSONA-UX-MAPPING.md
+ */
 export function Sidebar() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { can, roleName } = usePermissions();
+  const { persona, config } = usePersona();
 
   const handleLogout = () => {
     logout();
@@ -130,14 +134,20 @@ export function Sidebar() {
     (item) => !item.permission || can(item.permission)
   );
 
+  /** Verifica se uma secção é destacada para a persona actual. */
+  const isHighlighted = (section: NavSection): boolean =>
+    config.highlightedSections.includes(section);
+
   /** Renderiza um grupo de items de navegação. */
-  const renderSection = (label: string, items: NavItem[]) => {
+  const renderSection = (sectionKey: NavSection, items: NavItem[]) => {
     if (items.length === 0) return null;
+    const labelKey = sectionLabels[sectionKey];
+    const highlighted = isHighlighted(sectionKey);
     return (
-      <div className="mb-4">
-        {label && (
-          <p className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-faded">
-            {label}
+      <div key={sectionKey} className={`mb-4 ${highlighted ? 'pl-0.5 border-l-2 border-accent/30' : ''}`}>
+        {labelKey && (
+          <p className={`px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider ${highlighted ? 'text-accent' : 'text-faded'}`}>
+            {t(labelKey)}
           </p>
         )}
         <ul className="space-y-0.5">
@@ -182,15 +192,15 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation — seções alinhadas com MODULES-AND-PAGES.md */}
+      {/* Navigation — secções ordenadas por persona */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        {sectionOrder.map(({ key, labelKey }) => {
-          const sectionItems = visibleItems.filter((i) => i.section === key);
-          return renderSection(labelKey ? t(labelKey) : '', sectionItems);
+        {config.sectionOrder.map((sectionKey) => {
+          const sectionItems = visibleItems.filter((i) => i.section === sectionKey);
+          return renderSection(sectionKey, sectionItems);
         })}
       </nav>
 
-      {/* User info */}
+      {/* User info — inclui badge da persona */}
       <div className="px-4 py-3 border-t border-edge">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-semibold shrink-0">
@@ -198,7 +208,9 @@ export function Sidebar() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-heading truncate">{user?.email ?? 'User'}</p>
-            <p className="text-xs text-muted truncate">{roleName || 'Developer'}</p>
+            <p className="text-xs text-muted truncate">
+              {t(`persona.${persona}.label`)} · {roleName || 'Developer'}
+            </p>
           </div>
           <button
             onClick={handleLogout}

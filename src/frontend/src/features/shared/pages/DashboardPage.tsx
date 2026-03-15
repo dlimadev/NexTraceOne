@@ -4,14 +4,28 @@ import { Zap, GitBranch, FileText, CheckSquare, Activity } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { QuickActions } from '../../../components/QuickActions';
+import { HomeWidgetCard } from '../../../components/HomeWidgetCard';
+import { usePersona } from '../../../contexts/PersonaContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 
 /**
- * Página principal do dashboard — exibe visão geral da plataforma.
- * Todos os textos resolvidos via i18n (chaves em dashboard.*).
+ * Página principal do dashboard — experiência persona-aware.
+ *
+ * Adapta conteúdo, ordem e linguagem com base na persona do utilizador:
+ * - Engineer: foco operacional nos próprios serviços
+ * - Tech Lead: visão da equipa e risco
+ * - Architect: dependências e consistência
+ * - Product: impacto funcional e confiança de release
+ * - Executive: visão agregada e estratégica
+ * - Platform Admin: governança e administração
+ * - Auditor: rastreabilidade e evidências
+ *
+ * @see docs/PERSONA-UX-MAPPING.md
  */
 export function DashboardPage() {
   const { t } = useTranslation();
+  const { persona, config } = usePersona();
 
   const { data: graph } = useQuery({
     queryKey: ['graph'],
@@ -54,20 +68,35 @@ export function DashboardPage() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
-      {/* Page title */}
+      {/* Page title — persona-aware subtitle */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('dashboard.title')}</h1>
-        <p className="text-muted mt-1">{t('dashboard.subtitle')}</p>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-heading">{t('dashboard.title')}</h1>
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-accent/10 text-accent">
+            {t(`persona.${persona}.label`)}
+          </span>
+        </div>
+        <p className="text-muted mt-1">{t(config.homeSubtitleKey)}</p>
       </div>
 
-      {/* KPI Stats */}
+      {/* Quick Actions — adaptadas à persona */}
+      <QuickActions />
+
+      {/* KPI Stats — comuns a todas as personas */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {stats.map((s) => (
           <StatCard key={s.title} {...s} />
         ))}
       </div>
 
-      {/* Services & APIs overview */}
+      {/* Persona-specific widgets */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {config.homeWidgets.map((widget) => (
+          <HomeWidgetCard key={widget.id} widget={widget} />
+        ))}
+      </div>
+
+      {/* Services & APIs overview — mantido para contexto geral */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>

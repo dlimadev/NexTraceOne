@@ -1705,5 +1705,157 @@
       "viewServiceSot": "View Service in Source of Truth",
       "viewInReleases": "View in Releases"
     }
+  },
+  "persona": {
+    "quickActions": "Quick Actions",
+    "widgetComingSoon": "Data will be available when connected to backend services",
+    "Engineer": {
+      "label": "Engineer",
+      "homeSubtitle": "Operational view of your services, incidents, and contracts",
+      "widgets": {
+        "myServices": "My Services",
+        "recentChanges": "Recent Changes",
+        "openIncidents": "Open Incidents",
+        "contracts": "My Contracts"
+      },
+      "actions": {
+        "investigateService": "Investigate Service",
+        "openRunbook": "Open Runbook",
+        "viewContract": "View Contract",
+        "analyzeIncident": "Analyze Incident"
+      },
+      "ai": {
+        "prompt1": "What issues are affecting my services right now?",
+        "prompt2": "Show me the latest contract changes for my services",
+        "prompt3": "Help me troubleshoot the latest incident"
+      }
+    },
+    "TechLead": {
+      "label": "Tech Lead",
+      "homeSubtitle": "Team overview: services, risk, reliability, and change impact",
+      "widgets": {
+        "teamServices": "Team Services",
+        "changeRisk": "Change Risk",
+        "teamReliability": "Team Reliability",
+        "teamIncidents": "Team Incidents",
+        "ownershipGaps": "Ownership Gaps"
+      },
+      "actions": {
+        "reviewTeamRisk": "Review Team Risk",
+        "inspectChanges": "Inspect Recent Changes",
+        "assignOwner": "Assign Owner",
+        "openTeamServices": "Open Team Services"
+      },
+      "ai": {
+        "prompt1": "What is the current risk level for my team's services?",
+        "prompt2": "Show me recent changes that may affect team reliability",
+        "prompt3": "Which services in my team lack proper ownership?"
+      }
+    },
+    "Architect": {
+      "label": "Architect",
+      "homeSubtitle": "Structural view: dependencies, contracts, and cross-team impact",
+      "widgets": {
+        "dependencies": "Cross-Service Dependencies",
+        "contractConsistency": "Contract Consistency",
+        "architecturalRisk": "Architectural Risk",
+        "crossTeamChanges": "Cross-Team Changes"
+      },
+      "actions": {
+        "inspectDependencyMap": "Inspect Dependency Map",
+        "reviewCrossImpact": "Review Cross-Domain Impact",
+        "analyzeContractCompatibility": "Analyze Contract Compatibility",
+        "sourceOfTruth": "Source of Truth"
+      },
+      "ai": {
+        "prompt1": "Are there any dependency fragility risks across services?",
+        "prompt2": "Show me contract incompatibilities across domains",
+        "prompt3": "What are the most impactful cross-team changes this week?"
+      }
+    },
+    "Product": {
+      "label": "Product",
+      "homeSubtitle": "Functional impact: release confidence, risk, and service health",
+      "widgets": {
+        "releaseConfidence": "Release Confidence",
+        "criticalServices": "Critical Product Services",
+        "operationalRisk": "Operational Risk",
+        "recentIncidents": "Recent Incidents Impacting Flows"
+      },
+      "actions": {
+        "reviewReleaseConfidence": "Review Release Confidence",
+        "viewCriticalServiceStatus": "View Critical Service Status",
+        "inspectProductIncidents": "Inspect Product Incidents",
+        "viewReports": "View Reports"
+      },
+      "ai": {
+        "prompt1": "What is the confidence level for the next release?",
+        "prompt2": "Are there any incidents impacting critical product flows?",
+        "prompt3": "Show me a summary of operational risk for key services"
+      }
+    },
+    "Executive": {
+      "label": "Executive",
+      "homeSubtitle": "Strategic overview: trends, maturity, risk, and confidence indicators",
+      "widgets": {
+        "operationalTrend": "Operational Trend",
+        "criticalDomains": "Critical Domains",
+        "riskOverview": "Risk Overview",
+        "confidenceIndicators": "Confidence Indicators"
+      },
+      "actions": {
+        "openExecutiveOverview": "Executive Overview",
+        "reviewOperationalTrend": "Review Operational Trend",
+        "inspectCriticalDomains": "Inspect Critical Domains",
+        "viewCompliance": "View Compliance"
+      },
+      "ai": {
+        "prompt1": "Give me an executive summary of operational health",
+        "prompt2": "What are the key risk trends this month?",
+        "prompt3": "Show me overall maturity indicators across domains"
+      }
+    },
+    "PlatformAdmin": {
+      "label": "Platform Admin",
+      "homeSubtitle": "Platform governance: policies, AI models, integrations, and coverage",
+      "widgets": {
+        "policyHealth": "Policy Health",
+        "platformCoverage": "Platform Coverage",
+        "aiGovernance": "AI Governance",
+        "integrations": "Integrations"
+      },
+      "actions": {
+        "managePolicies": "Manage Policies",
+        "manageAiModels": "Manage AI Models",
+        "configureIntegrations": "Configure Integrations",
+        "reviewPlatformCoverage": "Review Platform Coverage"
+      },
+      "ai": {
+        "prompt1": "What is the current state of AI governance policies?",
+        "prompt2": "Are there any integration health issues?",
+        "prompt3": "Show me platform coverage gaps across services"
+      }
+    },
+    "Auditor": {
+      "label": "Auditor",
+      "homeSubtitle": "Traceability and evidence: audit trails, approvals, and compliance",
+      "widgets": {
+        "auditActivity": "Audit Activity",
+        "approvalTraceability": "Approval Traceability",
+        "evidenceExports": "Evidence Exports",
+        "aiUsageAudit": "AI Usage Audit"
+      },
+      "actions": {
+        "inspectAuditTrail": "Inspect Audit Trail",
+        "exportEvidence": "Export Evidence",
+        "reviewApprovalHistory": "Review Approval History",
+        "auditAiUsage": "Audit AI Usage"
+      },
+      "ai": {
+        "prompt1": "Show me recent approval audit trails",
+        "prompt2": "What AI models were used and by whom this week?",
+        "prompt3": "Are there any compliance gaps in recent changes?"
+      }
+    }
   }
 }
