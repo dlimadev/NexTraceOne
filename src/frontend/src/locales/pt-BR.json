@@ -139,7 +139,21 @@
     "entityService": "Serviço",
     "entityContract": "Contrato",
     "entityRunbook": "Runbook",
-    "entityDoc": "Documentação"
+    "entityDoc": "Documentação",
+    "globalSearch": {
+      "title": "Pesquisa Global",
+      "subtitle": "Pesquise em todos os serviços, contratos, runbooks e documentação",
+      "searchPlaceholder": "Pesquisar serviços, contratos, runbooks...",
+      "scopeAll": "Todos",
+      "scopeServices": "Serviços",
+      "scopeContracts": "Contratos",
+      "scopeRunbooks": "Runbooks",
+      "scopeDocs": "Documentação",
+      "resultCount": "{{count}} resultados encontrados",
+      "noResults": "Nenhum resultado encontrado para sua pesquisa",
+      "noResultsHint": "Tente palavras-chave diferentes ou ajuste o filtro de escopo",
+      "goToEntity": "Abrir"
+    }
   },
   "users": {
     "title": "Usuários",

@@ -6,7 +6,7 @@ import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage, SourceOfTruthExplorerPage, ServiceSourceOfTruthPage, ContractSourceOfTruthPage } from './features/catalog';
+import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage, SourceOfTruthExplorerPage, ServiceSourceOfTruthPage, ContractSourceOfTruthPage, GlobalSearchPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDetailPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
@@ -35,6 +35,15 @@ export default function App() {
             <Route element={<AppLayout />}>
               {/* ── Home ── */}
               <Route path="/" element={<DashboardPage />} />
+              {/* ── Global Search ── */}
+              <Route
+                path="/search"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <GlobalSearchPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── Source of Truth ── */}
               <Route
                 path="/source-of-truth"
