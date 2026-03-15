@@ -1,0 +1,30 @@
+import client from '../../../api/client';
+
+export const aiGovernanceApi = {
+  listModels: (params?: { provider?: string; modelType?: string; status?: string; isInternal?: boolean }) =>
+    client.get('/ai/models', { params }).then(r => r.data),
+  getModel: (modelId: string) =>
+    client.get(`/ai/models/${modelId}`).then(r => r.data),
+  registerModel: (data: unknown) =>
+    client.post('/ai/models', data).then(r => r.data),
+  updateModel: (modelId: string, data: unknown) =>
+    client.patch(`/ai/models/${modelId}`, data).then(r => r.data),
+  listPolicies: (params?: { scope?: string; isActive?: boolean }) =>
+    client.get('/ai/policies', { params }).then(r => r.data),
+  createPolicy: (data: unknown) =>
+    client.post('/ai/policies', data).then(r => r.data),
+  updatePolicy: (policyId: string, data: unknown) =>
+    client.patch(`/ai/policies/${policyId}`, data).then(r => r.data),
+  listBudgets: (params?: { scope?: string; isActive?: boolean }) =>
+    client.get('/ai/budgets', { params }).then(r => r.data),
+  updateBudget: (budgetId: string, data: unknown) =>
+    client.patch(`/ai/budgets/${budgetId}`, data).then(r => r.data),
+  listAuditEntries: (params?: Record<string, unknown>) =>
+    client.get('/ai/audit', { params }).then(r => r.data),
+  listKnowledgeSources: (params?: { sourceType?: string; isActive?: boolean }) =>
+    client.get('/ai/knowledge-sources', { params }).then(r => r.data),
+  sendMessage: (data: { conversationId?: string; message: string; contextScope?: string; persona?: string; preferredModelId?: string; clientType?: string }) =>
+    client.post('/ai/assistant/chat', data).then(r => r.data),
+  listConversations: (params?: { userId?: string; pageSize?: number }) =>
+    client.get('/ai/assistant/conversations', { params }).then(r => r.data),
+};
