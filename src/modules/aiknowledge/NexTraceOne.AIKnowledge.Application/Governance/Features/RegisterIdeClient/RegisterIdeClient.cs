@@ -3,6 +3,7 @@ using FluentValidation;
 using NexTraceOne.AiGovernance.Application.Abstractions;
 using NexTraceOne.AiGovernance.Domain.Entities;
 using NexTraceOne.AiGovernance.Domain.Enums;
+using NexTraceOne.AiGovernance.Domain.Errors;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -40,9 +41,11 @@ public static class RegisterIdeClient
         {
             Guard.Against.Null(request);
 
-            var clientType = Enum.TryParse<AIClientType>(request.ClientType, ignoreCase: true, out var ct)
-                ? ct
-                : AIClientType.Api;
+            if (!Enum.TryParse<AIClientType>(request.ClientType, ignoreCase: true, out var clientType)
+                || (clientType != AIClientType.VsCode && clientType != AIClientType.VisualStudio))
+            {
+                return AiGovernanceErrors.InvalidIdeClientType(request.ClientType);
+            }
 
             var registration = AIIDEClientRegistration.Register(
                 currentUser.Id,

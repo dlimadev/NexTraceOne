@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.AiGovernance.Application.Abstractions;
 using NexTraceOne.AiGovernance.Domain.Enums;
+using NexTraceOne.AiGovernance.Domain.Errors;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -27,9 +28,11 @@ public static class GetIdeCapabilities
             Guard.Against.Null(request);
             Guard.Against.NullOrWhiteSpace(request.ClientType);
 
-            var clientType = Enum.TryParse<AIClientType>(request.ClientType, ignoreCase: true, out var ct)
-                ? ct
-                : AIClientType.Web;
+            if (!Enum.TryParse<AIClientType>(request.ClientType, ignoreCase: true, out var clientType)
+                || (clientType != AIClientType.VsCode && clientType != AIClientType.VisualStudio))
+            {
+                return AiGovernanceErrors.InvalidIdeClientType(request.ClientType);
+            }
 
             var policy = await capabilityPolicyRepository.GetByClientTypeAndPersonaAsync(
                 clientType, request.Persona, cancellationToken);
