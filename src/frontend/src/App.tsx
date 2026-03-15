@@ -5,7 +5,7 @@ import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage } from './features/catalog';
+import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage, SourceOfTruthExplorerPage, ServiceSourceOfTruthPage, ContractSourceOfTruthPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
@@ -33,6 +33,31 @@ export default function App() {
             <Route element={<AppLayout />}>
               {/* ── Home ── */}
               <Route path="/" element={<DashboardPage />} />
+              {/* ── Source of Truth ── */}
+              <Route
+                path="/source-of-truth"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <SourceOfTruthExplorerPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/source-of-truth/services/:serviceId"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ServiceSourceOfTruthPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/source-of-truth/contracts/:contractVersionId"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ContractSourceOfTruthPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── Services ── */}
               <Route path="/services" element={<ServiceCatalogListPage />} />
               <Route path="/services/graph" element={<ServiceCatalogPage />} />

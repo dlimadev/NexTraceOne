@@ -97,7 +97,9 @@
     "sectionAiHub": "Hub de IA",
     "sectionGovernance": "Governança",
     "dependencyGraph": "Grafo de Dependências",
-    "contractStudio": "Estúdio de Contratos"
+    "contractStudio": "Estúdio de Contratos",
+    "sourceOfTruth": "Fonte de Verdade",
+    "sectionKnowledge": "Conhecimento"
   },
   "header": {
     "toggleLanguage": "Alternar idioma",
@@ -119,7 +121,8 @@
     "admin": "Administração",
     "navigate": "navegar",
     "select": "selecionar",
-    "close": "fechar"
+    "close": "fechar",
+    "knowledge": "Conhecimento"
   },
   "users": {
     "title": "Usuários",
@@ -1350,6 +1353,87 @@
       "apiAssetId": "ID do Ativo de API",
       "version": "Versão",
       "protocol": "Protocolo"
+    }
+  },
+  "sourceOfTruth": {
+    "title": "Fonte de Verdade",
+    "subtitle": "Descubra e explore serviços, contratos, documentação e conhecimento operacional",
+    "search": {
+      "placeholder": "Pesquisar serviços, contratos, docs, runbooks...",
+      "scope": "Escopo",
+      "all": "Todos",
+      "services": "Serviços",
+      "contracts": "Contratos",
+      "docs": "Docs",
+      "runbooks": "Runbooks"
+    },
+    "results": {
+      "services": "Serviços",
+      "contracts": "Contratos",
+      "references": "Referências",
+      "noResults": "Nenhum resultado encontrado",
+      "noResultsDescription": "Tente um termo de busca ou escopo diferente.",
+      "totalResults": "resultados encontrados"
+    },
+    "service": {
+      "title": "Fonte de Verdade do Serviço",
+      "backToExplorer": "Voltar para Fonte de Verdade",
+      "viewServiceDetail": "Ver Detalhe do Serviço",
+      "overview": "Visão Geral",
+      "ownership": "Ownership",
+      "apis": "APIs",
+      "contracts": "Contratos",
+      "references": "Referências e Documentação",
+      "quickLinks": "Links Rápidos",
+      "coverage": "Cobertura",
+      "coverageScore": "Score de Cobertura",
+      "description": "Descrição",
+      "serviceType": "Tipo de Serviço",
+      "systemArea": "Área do Sistema",
+      "exposureType": "Tipo de Exposição",
+      "team": "Equipe",
+      "technicalOwner": "Owner Técnico",
+      "businessOwner": "Owner de Negócio",
+      "documentationUrl": "Documentação",
+      "repositoryUrl": "Repositório",
+      "noApis": "Nenhuma API registrada",
+      "noContracts": "Nenhum contrato disponível",
+      "noReferences": "Nenhuma referência vinculada",
+      "indicators": {
+        "hasOwner": "Owner Definido",
+        "hasContracts": "Contratos Publicados",
+        "hasDocumentation": "Documentação Disponível",
+        "hasRunbook": "Runbook Disponível",
+        "hasRecentChangeHistory": "Histórico de Mudanças Presente",
+        "hasDependenciesMapped": "Dependências Mapeadas",
+        "hasEventTopics": "Tópicos de Eventos Definidos"
+      }
+    },
+    "contract": {
+      "title": "Fonte de Verdade do Contrato",
+      "backToExplorer": "Voltar para Fonte de Verdade",
+      "viewContractDetail": "Ver Detalhe do Contrato",
+      "overview": "Visão Geral",
+      "governance": "Governança",
+      "metrics": "Métricas",
+      "references": "Referências",
+      "apiAssetId": "ID do Ativo de API",
+      "format": "Formato",
+      "importedFrom": "Importado de",
+      "lifecycleState": "Estado do Ciclo de Vida",
+      "lockStatus": "Status de Bloqueio",
+      "signedStatus": "Status de Assinatura",
+      "deprecationNotice": "Aviso de Depreciação",
+      "deprecationDate": "Data de Depreciação",
+      "sunsetDate": "Data de Sunset",
+      "artifacts": "Artefatos",
+      "diffs": "Diffs",
+      "violations": "Violações",
+      "noReferences": "Nenhuma referência vinculada"
+    },
+    "empty": {
+      "title": "Explorador de Fonte de Verdade",
+      "description": "Pesquise serviços, contratos, documentação e conhecimento operacional."
     }
   }
 }

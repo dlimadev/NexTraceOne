@@ -97,7 +97,9 @@
     "sectionAiHub": "AI Hub",
     "sectionGovernance": "Governance",
     "dependencyGraph": "Dependency Graph",
-    "contractStudio": "Contract Studio"
+    "contractStudio": "Contract Studio",
+    "sourceOfTruth": "Source of Truth",
+    "sectionKnowledge": "Knowledge"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -119,7 +121,8 @@
     "admin": "Administration",
     "navigate": "navigate",
     "select": "select",
-    "close": "close"
+    "close": "close",
+    "knowledge": "Knowledge"
   },
   "users": {
     "title": "Users",
@@ -1350,6 +1353,87 @@
       "apiAssetId": "API Asset ID",
       "version": "Version",
       "protocol": "Protocol"
+    }
+  },
+  "sourceOfTruth": {
+    "title": "Source of Truth",
+    "subtitle": "Discover and explore services, contracts, documentation and operational knowledge",
+    "search": {
+      "placeholder": "Search services, contracts, docs, runbooks...",
+      "scope": "Scope",
+      "all": "All",
+      "services": "Services",
+      "contracts": "Contracts",
+      "docs": "Docs",
+      "runbooks": "Runbooks"
+    },
+    "results": {
+      "services": "Services",
+      "contracts": "Contracts",
+      "references": "References",
+      "noResults": "No results found",
+      "noResultsDescription": "Try a different search term or scope.",
+      "totalResults": "results found"
+    },
+    "service": {
+      "title": "Service Source of Truth",
+      "backToExplorer": "Back to Source of Truth",
+      "viewServiceDetail": "View Service Detail",
+      "overview": "Overview",
+      "ownership": "Ownership",
+      "apis": "APIs",
+      "contracts": "Contracts",
+      "references": "References & Documentation",
+      "quickLinks": "Quick Links",
+      "coverage": "Coverage",
+      "coverageScore": "Coverage Score",
+      "description": "Description",
+      "serviceType": "Service Type",
+      "systemArea": "System Area",
+      "exposureType": "Exposure Type",
+      "team": "Team",
+      "technicalOwner": "Technical Owner",
+      "businessOwner": "Business Owner",
+      "documentationUrl": "Documentation",
+      "repositoryUrl": "Repository",
+      "noApis": "No APIs registered",
+      "noContracts": "No contracts available",
+      "noReferences": "No references linked",
+      "indicators": {
+        "hasOwner": "Owner Defined",
+        "hasContracts": "Contracts Published",
+        "hasDocumentation": "Documentation Available",
+        "hasRunbook": "Runbook Available",
+        "hasRecentChangeHistory": "Change History Present",
+        "hasDependenciesMapped": "Dependencies Mapped",
+        "hasEventTopics": "Event Topics Defined"
+      }
+    },
+    "contract": {
+      "title": "Contract Source of Truth",
+      "backToExplorer": "Back to Source of Truth",
+      "viewContractDetail": "View Contract Detail",
+      "overview": "Overview",
+      "governance": "Governance",
+      "metrics": "Metrics",
+      "references": "References",
+      "apiAssetId": "API Asset ID",
+      "format": "Format",
+      "importedFrom": "Imported From",
+      "lifecycleState": "Lifecycle State",
+      "lockStatus": "Lock Status",
+      "signedStatus": "Signed Status",
+      "deprecationNotice": "Deprecation Notice",
+      "deprecationDate": "Deprecation Date",
+      "sunsetDate": "Sunset Date",
+      "artifacts": "Artifacts",
+      "diffs": "Diffs",
+      "violations": "Violations",
+      "noReferences": "No references linked"
+    },
+    "empty": {
+      "title": "Source of Truth Explorer",
+      "description": "Search for services, contracts, documentation and operational knowledge."
     }
   }
 }

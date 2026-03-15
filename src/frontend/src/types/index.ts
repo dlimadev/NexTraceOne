@@ -983,3 +983,156 @@ export interface DashboardStats {
   totalContracts: number;
   recentReleases: Release[];
 }
+
+// ─── Source of Truth ─────────────────────────────────────────────────────────
+
+/** Indicadores de cobertura/completude de um serviço no Source of Truth. */
+export interface CoverageIndicators {
+  hasOwner: boolean;
+  hasContracts: boolean;
+  hasDocumentation: boolean;
+  hasRunbook: boolean;
+  hasRecentChangeHistory: boolean;
+  hasDependenciesMapped: boolean;
+  hasEventTopics: boolean;
+}
+
+/** Resumo de API associada a um serviço no Source of Truth. */
+export interface SotApiSummary {
+  apiAssetId: string;
+  name: string;
+  routePattern: string;
+  version: string;
+  visibility: string;
+  consumerCount: number;
+}
+
+/** Resumo de contrato associado a um serviço no Source of Truth. */
+export interface SotContractSummary {
+  versionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+  isLocked: boolean;
+  createdAt: string;
+}
+
+/** Referência vinculada no Source of Truth. */
+export interface SotReferenceSummary {
+  referenceId: string;
+  referenceType: string;
+  title: string;
+  description: string;
+  url: string | null;
+}
+
+/** Visão consolidada de Source of Truth de um serviço. */
+export interface ServiceSourceOfTruth {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  serviceType: string;
+  domain: string;
+  systemArea: string;
+  teamName: string;
+  technicalOwner: string;
+  businessOwner: string;
+  criticality: string;
+  lifecycleStatus: string;
+  exposureType: string;
+  documentationUrl: string | null;
+  repositoryUrl: string | null;
+  apis: SotApiSummary[];
+  contracts: SotContractSummary[];
+  references: SotReferenceSummary[];
+  coverage: CoverageIndicators;
+  totalApis: number;
+  totalContracts: number;
+  totalReferences: number;
+}
+
+/** Resumo de governança de contrato no Source of Truth. */
+export interface SotGovernanceSummary {
+  lifecycleState: string;
+  isLocked: boolean;
+  lockedAt: string | null;
+  lockedBy: string | null;
+  isSigned: boolean;
+  deprecationNotice: string | null;
+  deprecationDate: string | null;
+  sunsetDate: string | null;
+}
+
+/** Visão consolidada de Source of Truth de um contrato. */
+export interface ContractSourceOfTruth {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  format: string;
+  importedFrom: string;
+  governance: SotGovernanceSummary;
+  references: SotReferenceSummary[];
+  artifactCount: number;
+  diffCount: number;
+  violationCount: number;
+  hasDocumentation: boolean;
+  hasRelatedChanges: boolean;
+}
+
+/** Resposta de cobertura de um serviço. */
+export interface ServiceCoverageResponse {
+  serviceId: string;
+  serviceName: string;
+  hasOwner: boolean;
+  hasContracts: boolean;
+  hasDocumentation: boolean;
+  hasRunbook: boolean;
+  hasRecentChangeHistory: boolean;
+  hasDependenciesMapped: boolean;
+  hasEventTopics: boolean;
+  coverageScore: number;
+  totalIndicators: number;
+  metIndicators: number;
+}
+
+/** Resultado de pesquisa de serviço no Source of Truth. */
+export interface SotServiceSearchResult {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  domain: string;
+  teamName: string;
+  criticality: string;
+  lifecycleStatus: string;
+}
+
+/** Resultado de pesquisa de contrato no Source of Truth. */
+export interface SotContractSearchResult {
+  versionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+}
+
+/** Resultado de pesquisa de referência no Source of Truth. */
+export interface SotReferenceSearchResult {
+  referenceId: string;
+  assetId: string;
+  assetType: string;
+  referenceType: string;
+  title: string;
+  description: string;
+  url: string | null;
+}
+
+/** Resposta de pesquisa unificada do Source of Truth. */
+export interface SourceOfTruthSearchResponse {
+  services: SotServiceSearchResult[];
+  contracts: SotContractSearchResult[];
+  references: SotReferenceSearchResult[];
+  totalResults: number;
+}
