@@ -1016,7 +1016,7 @@ function ServiceDetailPanel({
 
   const consumerCount = api?.consumers?.length ?? 0;
   const dependencyCount = service
-    ? graph.apis.filter((a) => a.consumers?.some((c) => c.consumerServiceId === nodeId)).length
+    ? graph.apis.filter((a) => a.consumers?.some((c) => c.consumerName === nodeId)).length
     : 0;
 
   return (

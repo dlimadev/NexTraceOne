@@ -34,7 +34,6 @@ describe('DashboardPage', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
-      relationships: [],
     });
     renderDashboard();
     expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument();
@@ -44,7 +43,6 @@ describe('DashboardPage', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
-      relationships: [],
     });
     renderDashboard();
     expect(screen.getByText('Active Services')).toBeInTheDocument();
@@ -57,13 +55,12 @@ describe('DashboardPage', () => {
   it('exibe serviços e APIs carregados do grafo', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [
-        { id: 's1', name: 'payments-service', team: 'Payments', createdAt: '2024-01-01' },
-        { id: 's2', name: 'auth-service', team: 'Identity', createdAt: '2024-01-01' },
+        { serviceAssetId: 's1', name: 'payments-service', teamName: 'Payments', domain: 'Payments', serviceType: 'RestApi', criticality: 'High', lifecycleStatus: 'Active' },
+        { serviceAssetId: 's2', name: 'auth-service', teamName: 'Identity', domain: 'Identity', serviceType: 'RestApi', criticality: 'Critical', lifecycleStatus: 'Active' },
       ],
       apis: [
-        { id: 'a1', name: 'Payments API', baseUrl: '/api/payments', ownerServiceId: 's1', createdAt: '2024-01-01' },
+        { apiAssetId: 'a1', name: 'Payments API', routePattern: '/api/payments', version: '1.0.0', visibility: 'Public', ownerServiceAssetId: 's1', consumers: [] },
       ],
-      relationships: [],
     });
     renderDashboard();
     await waitFor(() => {
@@ -77,7 +74,6 @@ describe('DashboardPage', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
-      relationships: [],
     });
     renderDashboard();
     await waitFor(() => {
@@ -89,7 +85,6 @@ describe('DashboardPage', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
-      relationships: [],
     });
     renderDashboard();
     await waitFor(() => {

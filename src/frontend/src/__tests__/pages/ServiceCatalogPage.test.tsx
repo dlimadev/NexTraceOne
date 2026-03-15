@@ -22,8 +22,8 @@ import { serviceCatalogApi } from '../../features/catalog/api';
 
 const mockGraph: AssetGraph = {
   services: [
-    { serviceAssetId: 's1', name: 'payments-service', teamName: 'Payments', domain: 'Payments' },
-    { serviceAssetId: 's2', name: 'auth-service', teamName: 'Identity', domain: 'Identity' },
+    { serviceAssetId: 's1', name: 'payments-service', teamName: 'Payments', domain: 'Payments', serviceType: 'RestApi', criticality: 'High', lifecycleStatus: 'Active' },
+    { serviceAssetId: 's2', name: 'auth-service', teamName: 'Identity', domain: 'Identity', serviceType: 'RestApi', criticality: 'Critical', lifecycleStatus: 'Active' },
   ],
   apis: [
     {

@@ -35,8 +35,8 @@ export default function App() {
               <Route path="/" element={<DashboardPage />} />
               {/* ── Services ── */}
               <Route path="/services" element={<ServiceCatalogListPage />} />
-              <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
               <Route path="/services/graph" element={<ServiceCatalogPage />} />
+              <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
               <Route path="/graph" element={<Navigate to="/services/graph" replace />} />
               <Route
                 path="/portal"
