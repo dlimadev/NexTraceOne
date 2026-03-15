@@ -5,6 +5,7 @@ import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { QuickActions } from '../../../components/QuickActions';
+import { PersonaQuickstart } from '../../../components/PersonaQuickstart';
 import { HomeWidgetCard } from '../../../components/HomeWidgetCard';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
@@ -82,6 +83,9 @@ export function DashboardPage() {
       {/* Quick Actions — adaptadas à persona */}
       <QuickActions />
 
+      {/* Quickstart persona-aware — orientação para novos utilizadores */}
+      <PersonaQuickstart />
+
       {/* KPI Stats — comuns a todas as personas */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {stats.map((s) => (
@@ -107,6 +111,7 @@ export function DashboardPage() {
               <EmptyState
                 icon={<Activity size={20} />}
                 title={t('dashboard.noServices')}
+                description={t('productPolish.emptyServices')}
               />
             ) : (
               <ul className="divide-y divide-edge">
@@ -135,6 +140,7 @@ export function DashboardPage() {
               <EmptyState
                 icon={<GitBranch size={20} />}
                 title={t('dashboard.noApis')}
+                description={t('productPolish.emptyContracts')}
               />
             ) : (
               <ul className="divide-y divide-edge">

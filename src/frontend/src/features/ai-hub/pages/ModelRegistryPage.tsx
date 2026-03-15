@@ -14,6 +14,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { Button } from '../../../components/Button';
+import { OnboardingHints } from '../../../components/OnboardingHints';
 
 interface Model {
   id: string;
@@ -77,6 +78,9 @@ export function ModelRegistryPage() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
+      {/* Onboarding hints — orientação contextual para novos utilizadores */}
+      <OnboardingHints module="aiHub" />
+
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('aiHub.modelsTitle')}</h1>

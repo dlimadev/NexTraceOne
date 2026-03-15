@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { OnboardingHints } from '../../../components/OnboardingHints';
 import { contractsApi } from '../api';
 import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
@@ -309,6 +310,9 @@ export function ContractsPage() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
+      {/* Onboarding hints — orientação contextual para novos utilizadores */}
+      <OnboardingHints module="contracts" />
+
       {/* Notificação inline */}
       {notification && (
         <div className={`mb-4 px-4 py-3 rounded-md text-sm flex items-center gap-2 ${

@@ -20,7 +20,20 @@
     "retry": "Reintentar",
     "refresh": "Actualizar",
     "user": "Usuario",
-    "defaultRole": "Desarrollador"
+    "defaultRole": "Desarrollador",
+    "view": "Ver",
+    "viewAll": "Ver todo",
+    "open": "Abrir",
+    "explore": "Explorar",
+    "getStarted": "Comenzar",
+    "learnMore": "Más información",
+    "configure": "Configurar",
+    "goTo": "Ir a",
+    "notConfigured": "No configurado",
+    "comingSoon": "Próximamente",
+    "noData": "Sin datos disponibles",
+    "blocked": "Acceso bloqueado",
+    "quotaExceeded": "Cuota excedida"
   },
   "auth": {
     "signIn": "Iniciar sesión en su cuenta",
@@ -2319,6 +2332,122 @@
       "hint2Desc": "Encuentre y ejecute procedimientos operacionales para escenarios comunes",
       "hint3Title": "Monitorear Confiabilidad",
       "hint3Desc": "Acompañe métricas de confiabilidad y SLOs de los servicios del equipo"
+    },
+    "aiHub": {
+      "hint1Title": "Asistente IA",
+      "hint1Desc": "Obtenga insights potenciados por IA sobre sus servicios, contratos e incidentes",
+      "hint2Title": "Registro de Modelos",
+      "hint2Desc": "Explore y gestione los modelos IA registrados y sus configuraciones",
+      "hint3Title": "Integraciones IDE",
+      "hint3Desc": "Conecte su IDE a NexTraceOne para asistencia IA gobernada en desarrollo"
+    },
+    "governance": {
+      "hint1Title": "Reportes Ejecutivos",
+      "hint1Desc": "Acceda a dashboards ejecutivos con datos de riesgo, madurez y benchmarking",
+      "hint2Title": "Centro de Riesgo",
+      "hint2Desc": "Monitoree el riesgo operacional en servicios, equipos y dominios",
+      "hint3Title": "Seguimiento de Cumplimiento",
+      "hint3Desc": "Rastree el estado de cumplimiento y gestione la aplicación de políticas"
+    },
+    "knowledge": {
+      "hint1Title": "Source of Truth",
+      "hint1Desc": "Su referencia central para todos los servicios, contratos y conocimiento operacional",
+      "hint2Title": "Pista de Auditoría",
+      "hint2Desc": "Rastree todos los cambios, aprobaciones y decisiones operacionales"
     }
+  },
+  "productPolish": {
+    "welcomeTitle": "Bienvenido a NexTraceOne",
+    "welcomeSubtitle": "La fuente de verdad para servicios, contratos, cambios y conocimiento operacional",
+    "quickstartTitle": "Primeros pasos",
+    "quickstartSubtitle": "Próximos pasos recomendados según su rol",
+    "emptyStateDefault": "Nada aquí aún",
+    "emptyStateAction": "Comience explorando las opciones a continuación",
+    "moduleGuidanceTitle": "Acerca de este módulo",
+    "notConfiguredTitle": "Aún no configurado",
+    "notConfiguredDesc": "Esta funcionalidad requiere configuración antes de poder ser utilizada",
+    "notConfiguredAction": "Configurar ahora",
+    "blockedTitle": "Acceso restringido",
+    "blockedDesc": "No tiene permiso para acceder a este recurso. Contacte a su administrador.",
+    "quotaExceededTitle": "Cuota excedida",
+    "quotaExceededDesc": "Su cuota de uso para esta funcionalidad ha sido excedida. Contacte a su administrador.",
+    "noResultsTitle": "Sin resultados",
+    "noResultsDesc": "Intente ajustar sus criterios de búsqueda o filtros",
+    "errorTitle": "Algo salió mal",
+    "errorDesc": "Ocurrió un error inesperado. Intente nuevamente.",
+    "errorAction": "Reintentar",
+    "successTitle": "Éxito",
+    "loadingTitle": "Cargando...",
+    "loadingDesc": "Obteniendo sus datos",
+    "guidanceServices": "El Catálogo de Servicios es su fuente de verdad para todos los servicios registrados, sus propietarios, dependencias y estado operacional.",
+    "guidanceContracts": "La Gobernanza de Contratos permite explorar, crear, versionar y validar contratos de API con gestión completa del ciclo de vida.",
+    "guidanceChanges": "Change Intelligence rastrea cambios en producción, puntuación de confianza, radio de impacto y correlación cambio-incidente.",
+    "guidanceOperations": "Operaciones centraliza gestión de incidentes, runbooks y métricas de confiabilidad de servicios por equipo.",
+    "guidanceAiHub": "AI Hub proporciona asistencia IA gobernada, gestión de modelos, políticas e integraciones IDE para su equipo.",
+    "guidanceGovernance": "Gobernanza ofrece reportes ejecutivos, análisis de riesgo, seguimiento de cumplimiento y controles empresariales.",
+    "guidanceAdmin": "Administración cubre gestión de usuarios, controles de acceso, licencias y auditoría.",
+    "guidanceKnowledge": "Source of Truth es su referencia central para todos los servicios, contratos y conocimiento operacional.",
+    "quickstart": {
+      "Engineer": {
+        "step1": "Explore sus servicios en el Catálogo de Servicios",
+        "step2": "Revise los cambios recientes en producción",
+        "step3": "Verifique los incidentes abiertos que afectan sus servicios",
+        "step4": "Navegue los contratos de API de sus servicios"
+      },
+      "TechLead": {
+        "step1": "Revise la propiedad de servicios de su equipo",
+        "step2": "Verifique el riesgo de cambios de su equipo",
+        "step3": "Monitoree la confiabilidad de servicios del equipo",
+        "step4": "Revise los incidentes abiertos de su equipo"
+      },
+      "Architect": {
+        "step1": "Explore el grafo de dependencias de servicios",
+        "step2": "Revise la consistencia de contratos entre servicios",
+        "step3": "Analice el impacto de cambios entre equipos",
+        "step4": "Verifique indicadores de riesgo arquitectural"
+      },
+      "Product": {
+        "step1": "Revise las puntuaciones de confianza de releases",
+        "step2": "Verifique el estado de servicios críticos",
+        "step3": "Monitoree tendencias de riesgo operacional",
+        "step4": "Vea el impacto de incidentes recientes"
+      },
+      "Executive": {
+        "step1": "Abra el panel ejecutivo",
+        "step2": "Revise tendencias de riesgo operacional",
+        "step3": "Inspeccione dominios de negocio críticos",
+        "step4": "Verifique el estado de cumplimiento"
+      },
+      "PlatformAdmin": {
+        "step1": "Revise las políticas y controles de la plataforma",
+        "step2": "Gestione el registro de modelos IA",
+        "step3": "Configure las integraciones",
+        "step4": "Verifique las métricas de cobertura"
+      },
+      "Auditor": {
+        "step1": "Inspeccione la pista de auditoría",
+        "step2": "Revise los paquetes de evidencia",
+        "step3": "Verifique el historial de aprobaciones",
+        "step4": "Audite los patrones de uso de IA"
+      }
+    },
+    "emptyServices": "No hay servicios registrados aún. Comience agregando su primer servicio al catálogo.",
+    "emptyServicesAction": "Agregar servicio",
+    "emptyContracts": "No se encontraron contratos. Cree su primer contrato de API usando el Contract Studio.",
+    "emptyContractsAction": "Abrir Contract Studio",
+    "emptyChanges": "No hay cambios registrados aún. Los cambios aparecerán aquí cuando se detecten despliegues.",
+    "emptyIncidents": "No hay incidentes reportados. Los incidentes aparecerán aquí cuando sean detectados.",
+    "emptyRunbooks": "No hay runbooks disponibles. Cree runbooks para documentar procedimientos operacionales.",
+    "emptyRunbooksAction": "Crear runbook",
+    "emptyReliability": "Sin datos de confiabilidad aún. Los datos de SLO aparecerán cuando los servicios reporten métricas.",
+    "emptyAiConversations": "Sin conversaciones aún. Inicie una conversación con el Asistente IA.",
+    "emptyAiConversationsAction": "Iniciar conversación",
+    "emptyModels": "No hay modelos IA registrados. Configure su registro de modelos para habilitar funcionalidades de IA.",
+    "emptyPolicies": "Sin políticas configuradas aún. Cree políticas para gobernar el uso y acceso de IA.",
+    "emptyReports": "Sin datos de reportes disponibles aún. Los reportes se generarán según sus datos operacionales.",
+    "emptyEvidence": "Sin paquetes de evidencia encontrados. La evidencia se recopilará según se ejecuten verificaciones de cumplimiento.",
+    "emptyFinOps": "Sin datos de FinOps aún. Los datos de costos aparecerán cuando los servicios reporten uso de recursos.",
+    "aiAssistantHint": "Haga preguntas sobre sus servicios, contratos, incidentes o cambios",
+    "aiAssistantPersonaHint": "Los prompts sugeridos están personalizados para su rol"
   }
 }

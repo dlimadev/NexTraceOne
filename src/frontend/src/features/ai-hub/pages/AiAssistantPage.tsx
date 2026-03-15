@@ -536,10 +536,11 @@ export function AiAssistantPage() {
             {/* ── Suggested Prompts (shown only when conversation has few messages) ── */}
             {messages.length <= 2 && (
               <div className="pt-4">
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2">
                   <Sparkles size={14} className="text-accent" />
-                  <p className="text-xs text-muted">{t('aiHub.suggestedPrompts')}</p>
+                  <p className="text-xs font-medium text-heading">{t('aiHub.suggestedPrompts')}</p>
                 </div>
+                <p className="text-xs text-muted mb-3">{t('productPolish.aiAssistantPersonaHint')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {config.aiSuggestedPromptKeys.map((promptKey, idx) => (
                     <button
@@ -584,7 +585,7 @@ export function AiAssistantPage() {
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={t('aiHub.inputPlaceholder')}
+                placeholder={t('productPolish.aiAssistantHint')}
                 className="flex-1 bg-elevated border border-edge rounded-lg px-4 py-2.5 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
                 disabled={isTyping}
               />
