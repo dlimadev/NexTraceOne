@@ -92,4 +92,48 @@ public static class AiGovernanceErrors
             "AiGovernance.IDE.InvalidClientType",
             "IDE client type '{0}' is not valid. Expected 'VsCode' or 'VisualStudio'.",
             clientType);
+
+    // ── AI Routing & Enrichment ────────────────────────────────────────────
+
+    /// <summary>Estratégia de roteamento de IA não encontrada.</summary>
+    public static Error RoutingStrategyNotFound(string strategyId)
+        => Error.NotFound(
+            "AiGovernance.RoutingStrategy.NotFound",
+            "AI routing strategy '{0}' was not found.",
+            strategyId);
+
+    /// <summary>Decisão de roteamento de IA não encontrada.</summary>
+    public static Error RoutingDecisionNotFound(string decisionId)
+        => Error.NotFound(
+            "AiGovernance.RoutingDecision.NotFound",
+            "AI routing decision '{0}' was not found.",
+            decisionId);
+
+    /// <summary>Nenhuma estratégia de roteamento aplicável ao contexto.</summary>
+    public static Error NoApplicableRoutingStrategy(string persona, string useCase)
+        => Error.Business(
+            "AiGovernance.Routing.NoApplicableStrategy",
+            "No applicable routing strategy found for persona '{0}' and use case '{1}'.",
+            persona, useCase);
+
+    /// <summary>Execução bloqueada por política de roteamento.</summary>
+    public static Error RoutingBlocked(string reason)
+        => Error.Forbidden(
+            "AiGovernance.Routing.Blocked",
+            "AI execution blocked by routing policy: {0}.",
+            reason);
+
+    /// <summary>Escalonamento externo não permitido pela estratégia ativa.</summary>
+    public static Error ExternalEscalationNotAllowed(string strategyName)
+        => Error.Forbidden(
+            "AiGovernance.Routing.ExternalEscalationNotAllowed",
+            "External AI escalation is not allowed by strategy '{0}'.",
+            strategyName);
+
+    /// <summary>Plano de execução de IA não encontrado.</summary>
+    public static Error ExecutionPlanNotFound(string planId)
+        => Error.NotFound(
+            "AiGovernance.ExecutionPlan.NotFound",
+            "AI execution plan '{0}' was not found.",
+            planId);
 }
