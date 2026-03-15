@@ -1,0 +1,210 @@
+using Ardalis.GuardClauses;
+using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
+using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
+using NexTraceOne.Contracts.Application.Abstractions;
+
+namespace NexTraceOne.Catalog.Application.SourceOfTruth.Features.GlobalSearch;
+
+/// <summary>
+/// Feature: GlobalSearch — pesquisa global unificada do NexTraceOne.
+/// Endpoint único que permite encontrar serviços, contratos, referências documentais,
+/// runbooks e outros artefatos a partir de um termo de busca, devolvendo uma lista
+/// homogénea de resultados com facetas e relevância calculada.
+/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// </summary>
+public static class GlobalSearch
+{
+    private static readonly string[] ValidScopes =
+        ["all", "services", "contracts", "changes", "incidents", "runbooks", "docs"];
+
+    /// <summary>Query de pesquisa global unificada.</summary>
+    public sealed record Query(
+        string SearchTerm,
+        string? Scope = null,
+        string? Persona = null,
+        int MaxResults = 25) : IQuery<Response>;
+
+    /// <summary>Valida a entrada da query de pesquisa global.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.SearchTerm).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.MaxResults).InclusiveBetween(1, 100);
+            RuleFor(x => x.Scope)
+                .Must(s => ValidScopes.Contains(s))
+                .When(x => x.Scope is not null)
+                .WithMessage("Scope must be one of: all, services, contracts, changes, incidents, runbooks, docs.");
+        }
+    }
+
+    /// <summary>
+    /// Handler que pesquisa serviços, contratos e referências, devolvendo
+    /// resultados unificados com facetas e ordenação por relevância.
+    /// </summary>
+    public sealed class Handler(
+        IServiceAssetRepository serviceRepository,
+        IContractVersionRepository contractRepository,
+        ILinkedReferenceRepository referenceRepository) : IQueryHandler<Query, Response>
+    {
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request);
+
+            var items = new List<SearchResultItem>();
+            var facetCounts = new Dictionary<string, int>();
+            var scopeAll = string.IsNullOrWhiteSpace(request.Scope) || request.Scope == "all";
+            var term = request.SearchTerm;
+
+            // Pesquisar serviços
+            if (scopeAll || request.Scope == "services")
+            {
+                var services = await serviceRepository.SearchAsync(term, cancellationToken);
+                foreach (var s in services)
+                {
+                    var score = CalculateRelevance(term, s.Name, s.DisplayName);
+                    items.Add(new SearchResultItem(
+                        s.Id.Value,
+                        "service",
+                        s.DisplayName,
+                        $"{s.Domain} · {s.TeamName}",
+                        s.TeamName,
+                        s.LifecycleStatus.ToString(),
+                        $"/services/{s.Id.Value}",
+                        score));
+                }
+
+                facetCounts["services"] = services.Count;
+            }
+
+            // Pesquisar contratos
+            if (scopeAll || request.Scope == "contracts")
+            {
+                var (contracts, totalContracts) = await contractRepository.SearchAsync(
+                    null, null, null, term, 1, request.MaxResults, cancellationToken);
+
+                foreach (var c in contracts)
+                {
+                    var score = CalculateRelevance(term, c.SemVer, c.Protocol.ToString());
+                    items.Add(new SearchResultItem(
+                        c.Id.Value,
+                        "contract",
+                        $"{c.Protocol} v{c.SemVer}",
+                        $"API Asset {c.ApiAssetId:N}",
+                        null,
+                        c.LifecycleState.ToString(),
+                        $"/contracts?versionId={c.Id.Value}",
+                        score));
+                }
+
+                facetCounts["contracts"] = totalContracts;
+            }
+
+            // Pesquisar referências documentais e runbooks
+            if (scopeAll || request.Scope == "docs" || request.Scope == "runbooks")
+            {
+                LinkedReferenceType? refType = request.Scope switch
+                {
+                    "docs" => LinkedReferenceType.Documentation,
+                    "runbooks" => LinkedReferenceType.Runbook,
+                    _ => null
+                };
+
+                var references = await referenceRepository.SearchAsync(term, refType, cancellationToken);
+                foreach (var r in references)
+                {
+                    var entityType = r.ReferenceType == LinkedReferenceType.Runbook ? "runbook" : "doc";
+                    var score = CalculateRelevance(term, r.Title, r.Description);
+                    items.Add(new SearchResultItem(
+                        r.Id.Value,
+                        entityType,
+                        r.Title,
+                        r.Description,
+                        null,
+                        r.IsActive ? "Active" : "Inactive",
+                        $"/knowledge/references/{r.Id.Value}",
+                        score));
+                }
+
+                if (scopeAll)
+                {
+                    facetCounts["docs"] = references.Count(r => r.ReferenceType != LinkedReferenceType.Runbook);
+                    facetCounts["runbooks"] = references.Count(r => r.ReferenceType == LinkedReferenceType.Runbook);
+                }
+                else
+                {
+                    facetCounts[request.Scope!] = references.Count;
+                }
+            }
+
+            // Escopos futuros — ainda sem repositórios implementados
+            if (scopeAll || request.Scope == "changes")
+                facetCounts.TryAdd("changes", 0);
+
+            if (scopeAll || request.Scope == "incidents")
+                facetCounts.TryAdd("incidents", 0);
+
+            // Ordenar por relevância descendente e limitar ao máximo solicitado
+            var sorted = items
+                .OrderByDescending(i => i.RelevanceScore)
+                .Take(request.MaxResults)
+                .ToList();
+
+            return new Response(sorted, facetCounts, TotalResults: items.Count);
+        }
+
+        /// <summary>
+        /// Calcula relevância simples: correspondência exata no campo primário gera
+        /// pontuação mais alta; correspondência parcial gera pontuação intermédia.
+        /// </summary>
+        private static double CalculateRelevance(
+            string searchTerm,
+            string primaryField,
+            string? secondaryField)
+        {
+            var score = 0.0;
+            var termUpper = searchTerm.ToUpperInvariant();
+
+            if (!string.IsNullOrWhiteSpace(primaryField))
+            {
+                var primary = primaryField.ToUpperInvariant();
+                if (primary == termUpper)
+                    score += 1.0;
+                else if (primary.Contains(termUpper, StringComparison.Ordinal))
+                    score += 0.7;
+            }
+
+            if (!string.IsNullOrWhiteSpace(secondaryField))
+            {
+                var secondary = secondaryField.ToUpperInvariant();
+                if (secondary == termUpper)
+                    score += 0.5;
+                else if (secondary.Contains(termUpper, StringComparison.Ordinal))
+                    score += 0.3;
+            }
+
+            return score;
+        }
+    }
+
+    /// <summary>Item individual de resultado da pesquisa global.</summary>
+    public sealed record SearchResultItem(
+        Guid EntityId,
+        string EntityType,
+        string Title,
+        string? Subtitle,
+        string? Owner,
+        string? Status,
+        string Route,
+        double RelevanceScore);
+
+    /// <summary>Resposta da pesquisa global unificada com facetas e contagem total.</summary>
+    public sealed record Response(
+        IReadOnlyList<SearchResultItem> Items,
+        IReadOnlyDictionary<string, int> FacetCounts,
+        int TotalResults);
+}
