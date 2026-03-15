@@ -36,6 +36,8 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ContractsDbContext>());
         services.AddScoped<IContractVersionRepository, ContractVersionRepository>();
+        services.AddScoped<IContractDraftRepository, ContractDraftRepository>();
+        services.AddScoped<IContractReviewRepository, ContractReviewRepository>();
 
         return services;
     }

@@ -1305,3 +1305,55 @@ export interface ReportsSummaryResponse {
   costEfficiency: CostEfficiencyType;
   generatedAt: string;
 }
+
+// ── Contract Studio Types ───────────────────────────────────────
+
+export type ContractType = 'RestApi' | 'Soap' | 'Event' | 'BackgroundService' | 'SharedSchema';
+export type DraftStatus = 'Editing' | 'InReview' | 'Approved' | 'Published' | 'Discarded';
+export type ReviewDecision = 'Approved' | 'Rejected';
+
+export interface ContractDraft {
+  id: string;
+  title: string;
+  description: string;
+  serviceId?: string;
+  contractType: ContractType;
+  protocol: ContractProtocol;
+  specContent: string;
+  format: string;
+  proposedVersion: string;
+  status: DraftStatus;
+  author: string;
+  baseContractVersionId?: string;
+  isAiGenerated: boolean;
+  aiGenerationPrompt?: string;
+  lastEditedAt?: string;
+  lastEditedBy?: string;
+  examples: ContractDraftExample[];
+  createdAt: string;
+}
+
+export interface ContractDraftExample {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
+  contentFormat: string;
+  exampleType: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface ContractReviewEntry {
+  id: string;
+  draftId: string;
+  reviewedBy: string;
+  decision: ReviewDecision;
+  comment: string;
+  reviewedAt: string;
+}
+
+export interface DraftListResponse {
+  items: ContractDraft[];
+  totalCount: number;
+}
