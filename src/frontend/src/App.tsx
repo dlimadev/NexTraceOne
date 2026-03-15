@@ -1,18 +1,84 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
-import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage, SourceOfTruthExplorerPage, ServiceSourceOfTruthPage, ContractSourceOfTruthPage, GlobalSearchPage } from './features/catalog';
-import { ReleasesPage, WorkflowPage, PromotionPage, ChangeCatalogPage, ChangeDetailPage } from './features/change-governance';
-import { AuditPage } from './features/audit-compliance';
-import { DashboardPage } from './features/shared';
-import { IncidentsPage, IncidentDetailPage, RunbooksPage, TeamReliabilityPage, ServiceReliabilityDetailPage } from './features/operations';
-import { AiAssistantPage, ModelRegistryPage, AiPoliciesPage, IdeIntegrationsPage } from './features/ai-hub';
-import { ReportsPage, RiskCenterPage, CompliancePage, FinOpsPage, ExecutiveOverviewPage, RiskHeatmapPage, MaturityScorecardsPage, BenchmarkingPage, ExecutiveDrillDownPage } from './features/governance';
+
+// Eager imports — critical for fast first paint
+import { LoginPage, TenantSelectionPage } from './features/identity-access';
+
+// ── Identity-access (lazy) ──
+const UsersPage = lazy(() => import('./features/identity-access/pages/UsersPage').then(m => ({ default: m.UsersPage })));
+const BreakGlassPage = lazy(() => import('./features/identity-access/pages/BreakGlassPage').then(m => ({ default: m.BreakGlassPage })));
+const JitAccessPage = lazy(() => import('./features/identity-access/pages/JitAccessPage').then(m => ({ default: m.JitAccessPage })));
+const DelegationPage = lazy(() => import('./features/identity-access/pages/DelegationPage').then(m => ({ default: m.DelegationPage })));
+const AccessReviewPage = lazy(() => import('./features/identity-access/pages/AccessReviewPage').then(m => ({ default: m.AccessReviewPage })));
+const MySessionsPage = lazy(() => import('./features/identity-access/pages/MySessionsPage').then(m => ({ default: m.MySessionsPage })));
+const UnauthorizedPage = lazy(() => import('./features/identity-access/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
+
+// ── Commercial-governance (lazy) ──
+const LicensingPage = lazy(() => import('./features/commercial-governance/pages/LicensingPage').then(m => ({ default: m.LicensingPage })));
+const VendorLicensingPage = lazy(() => import('./features/commercial-governance/pages/VendorLicensingPage').then(m => ({ default: m.VendorLicensingPage })));
+
+// ── Catalog (lazy) ──
+const ContractsPage = lazy(() => import('./features/catalog/pages/ContractsPage').then(m => ({ default: m.ContractsPage })));
+const ServiceCatalogPage = lazy(() => import('./features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
+const ServiceCatalogListPage = lazy(() => import('./features/catalog/pages/ServiceCatalogListPage').then(m => ({ default: m.ServiceCatalogListPage })));
+const ServiceDetailPage = lazy(() => import('./features/catalog/pages/ServiceDetailPage').then(m => ({ default: m.ServiceDetailPage })));
+const DeveloperPortalPage = lazy(() => import('./features/catalog/pages/DeveloperPortalPage').then(m => ({ default: m.DeveloperPortalPage })));
+const ContractListPage = lazy(() => import('./features/catalog/pages/ContractListPage').then(m => ({ default: m.ContractListPage })));
+const ContractDetailPage = lazy(() => import('./features/catalog/pages/ContractDetailPage').then(m => ({ default: m.ContractDetailPage })));
+const SourceOfTruthExplorerPage = lazy(() => import('./features/catalog/pages/SourceOfTruthExplorerPage').then(m => ({ default: m.SourceOfTruthExplorerPage })));
+const ServiceSourceOfTruthPage = lazy(() => import('./features/catalog/pages/ServiceSourceOfTruthPage').then(m => ({ default: m.ServiceSourceOfTruthPage })));
+const ContractSourceOfTruthPage = lazy(() => import('./features/catalog/pages/ContractSourceOfTruthPage').then(m => ({ default: m.ContractSourceOfTruthPage })));
+const GlobalSearchPage = lazy(() => import('./features/catalog/pages/GlobalSearchPage').then(m => ({ default: m.GlobalSearchPage })));
+
+// ── Change-governance (lazy) ──
+const ReleasesPage = lazy(() => import('./features/change-governance/pages/ReleasesPage').then(m => ({ default: m.ReleasesPage })));
+const WorkflowPage = lazy(() => import('./features/change-governance/pages/WorkflowPage').then(m => ({ default: m.WorkflowPage })));
+const PromotionPage = lazy(() => import('./features/change-governance/pages/PromotionPage').then(m => ({ default: m.PromotionPage })));
+const ChangeCatalogPage = lazy(() => import('./features/change-governance/pages/ChangeCatalogPage').then(m => ({ default: m.ChangeCatalogPage })));
+const ChangeDetailPage = lazy(() => import('./features/change-governance/pages/ChangeDetailPage').then(m => ({ default: m.ChangeDetailPage })));
+
+// ── Audit-compliance (lazy) ──
+const AuditPage = lazy(() => import('./features/audit-compliance/pages/AuditPage').then(m => ({ default: m.AuditPage })));
+
+// ── Shared (lazy) ──
+const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+
+// ── Operations (lazy) ──
+const IncidentsPage = lazy(() => import('./features/operations/pages/IncidentsPage').then(m => ({ default: m.IncidentsPage })));
+const IncidentDetailPage = lazy(() => import('./features/operations/pages/IncidentDetailPage').then(m => ({ default: m.IncidentDetailPage })));
+const RunbooksPage = lazy(() => import('./features/operations/pages/RunbooksPage').then(m => ({ default: m.RunbooksPage })));
+const TeamReliabilityPage = lazy(() => import('./features/operations/pages/TeamReliabilityPage').then(m => ({ default: m.TeamReliabilityPage })));
+const ServiceReliabilityDetailPage = lazy(() => import('./features/operations/pages/ServiceReliabilityDetailPage').then(m => ({ default: m.ServiceReliabilityDetailPage })));
+
+// ── AI Hub (lazy) ──
+const AiAssistantPage = lazy(() => import('./features/ai-hub/pages/AiAssistantPage').then(m => ({ default: m.AiAssistantPage })));
+const ModelRegistryPage = lazy(() => import('./features/ai-hub/pages/ModelRegistryPage').then(m => ({ default: m.ModelRegistryPage })));
+const AiPoliciesPage = lazy(() => import('./features/ai-hub/pages/AiPoliciesPage').then(m => ({ default: m.AiPoliciesPage })));
+const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegrationsPage').then(m => ({ default: m.IdeIntegrationsPage })));
+
+// ── Governance (lazy) ──
+const ReportsPage = lazy(() => import('./features/governance/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
+const RiskCenterPage = lazy(() => import('./features/governance/pages/RiskCenterPage').then(m => ({ default: m.RiskCenterPage })));
+const CompliancePage = lazy(() => import('./features/governance/pages/CompliancePage').then(m => ({ default: m.CompliancePage })));
+const FinOpsPage = lazy(() => import('./features/governance/pages/FinOpsPage').then(m => ({ default: m.FinOpsPage })));
+const ExecutiveOverviewPage = lazy(() => import('./features/governance/pages/ExecutiveOverviewPage').then(m => ({ default: m.ExecutiveOverviewPage })));
+const RiskHeatmapPage = lazy(() => import('./features/governance/pages/RiskHeatmapPage').then(m => ({ default: m.RiskHeatmapPage })));
+const MaturityScorecardsPage = lazy(() => import('./features/governance/pages/MaturityScorecardsPage').then(m => ({ default: m.MaturityScorecardsPage })));
+const BenchmarkingPage = lazy(() => import('./features/governance/pages/BenchmarkingPage').then(m => ({ default: m.BenchmarkingPage })));
+const ExecutiveDrillDownPage = lazy(() => import('./features/governance/pages/ExecutiveDrillDownPage').then(m => ({ default: m.ExecutiveDrillDownPage })));
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[50vh]">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+    </div>
+  );
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +95,7 @@ export default function App() {
       <AuthProvider>
         <PersonaProvider>
           <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/select-tenant" element={<TenantSelectionPage />} />
@@ -253,6 +320,7 @@ export default function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </Suspense>
           </BrowserRouter>
         </PersonaProvider>
       </AuthProvider>
