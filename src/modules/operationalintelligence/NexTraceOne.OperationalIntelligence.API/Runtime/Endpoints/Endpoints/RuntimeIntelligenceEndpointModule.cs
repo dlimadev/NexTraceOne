@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using IngestRuntimeSnapshotFeature = NexTraceOne.RuntimeIntelligence.Application.Features.IngestRuntimeSnapshot.IngestRuntimeSnapshot;
 using GetRuntimeHealthFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetRuntimeHealth.GetRuntimeHealth;
 using GetObservabilityScoreFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetObservabilityScore.GetObservabilityScore;
@@ -42,7 +43,8 @@ public sealed class RuntimeIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToCreatedResult("/api/v1/runtime/snapshots/{0}", localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:write");
 
         group.MapGet("/health", async (
             string serviceName,
@@ -54,7 +56,8 @@ public sealed class RuntimeIntelligenceEndpointModule
             var query = new GetRuntimeHealthFeature.Query(serviceName, environment);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:read");
 
         group.MapGet("/observability", async (
             string serviceName,
@@ -66,7 +69,8 @@ public sealed class RuntimeIntelligenceEndpointModule
             var query = new GetObservabilityScoreFeature.Query(serviceName, environment);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:read");
 
         group.MapPost("/observability/assess", async (
             ComputeObservabilityDebtFeature.Command command,
@@ -76,7 +80,8 @@ public sealed class RuntimeIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToCreatedResult("/api/v1/runtime/observability/{0}", localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:write");
 
         group.MapPost("/drift/detect", async (
             DetectRuntimeDriftFeature.Command command,
@@ -86,7 +91,8 @@ public sealed class RuntimeIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:write");
 
         group.MapGet("/drift", async (
             string serviceName,
@@ -101,7 +107,8 @@ public sealed class RuntimeIntelligenceEndpointModule
             var query = new GetDriftFindingsFeature.Query(serviceName, environment, unacknowledgedOnly ?? false, page, pageSize);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:read");
 
         group.MapGet("/timeline", async (
             string serviceName,
@@ -115,7 +122,8 @@ public sealed class RuntimeIntelligenceEndpointModule
             var query = new GetReleaseHealthTimelineFeature.Query(serviceName, environment, windowStart, windowEnd);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:read");
 
         group.MapGet("/compare", async (
             string serviceName,
@@ -131,6 +139,7 @@ public sealed class RuntimeIntelligenceEndpointModule
             var query = new CompareReleaseRuntimeFeature.Query(serviceName, environment, beforeStart, beforeEnd, afterStart, afterEnd);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:runtime:read");
     }
 }

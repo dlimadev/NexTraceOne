@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using UploadRulesetFeature = NexTraceOne.RulesetGovernance.Application.Features.UploadRuleset.UploadRuleset;
 using ListRulesetsFeature = NexTraceOne.RulesetGovernance.Application.Features.ListRulesets.ListRulesets;
 using ArchiveRulesetFeature = NexTraceOne.RulesetGovernance.Application.Features.ArchiveRuleset.ArchiveRuleset;
@@ -33,7 +34,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/rulesets/{0}", localizer);
-        });
+        })
+        .RequirePermission("rulesets:write");
 
         group.MapGet("/", async (
             int page,
@@ -44,7 +46,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(new ListRulesetsFeature.Query(page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("rulesets:read");
 
         group.MapPut("/{rulesetId:guid}/archive", async (
             Guid rulesetId,
@@ -54,7 +57,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(new ArchiveRulesetFeature.Command(rulesetId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("rulesets:write");
 
         group.MapPost("/{rulesetId:guid}/bindings", async (
             Guid rulesetId,
@@ -66,7 +70,8 @@ public sealed class RulesetGovernanceEndpointModule
             var updatedCommand = command with { RulesetId = rulesetId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToCreatedResult("/api/v1/rulesets/{0}/bindings", localizer);
-        });
+        })
+        .RequirePermission("rulesets:write");
 
         group.MapPost("/lint", async (
             ExecuteLintForReleaseFeature.Command command,
@@ -76,7 +81,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/rulesets/findings/{0}", localizer);
-        });
+        })
+        .RequirePermission("rulesets:execute");
 
         group.MapGet("/findings/{releaseId:guid}", async (
             Guid releaseId,
@@ -86,7 +92,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(new GetRulesetFindingsFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("rulesets:read");
 
         group.MapGet("/score/{releaseId:guid}", async (
             Guid releaseId,
@@ -96,7 +103,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(new GetRulesetScoreFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("rulesets:read");
 
         group.MapPost("/install-defaults", async (
             ISender sender,
@@ -105,7 +113,8 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(new InstallDefaultRulesetsFeature.Command(), cancellationToken);
             return result.ToCreatedResult("/api/v1/rulesets/{0}", localizer);
-        });
+        })
+        .RequirePermission("rulesets:write");
 
         group.MapPost("/compute-score", async (
             ComputeRulesetScoreFeature.Command command,
@@ -115,6 +124,7 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("rulesets:execute");
     }
 }

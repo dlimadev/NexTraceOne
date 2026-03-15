@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using ExportAuditReportFeature = NexTraceOne.Audit.Application.Features.ExportAuditReport.ExportAuditReport;
 using GetAuditTrailFeature = NexTraceOne.Audit.Application.Features.GetAuditTrail.GetAuditTrail;
 using GetComplianceReportFeature = NexTraceOne.Audit.Application.Features.GetComplianceReport.GetComplianceReport;
@@ -29,7 +30,8 @@ public sealed class AuditEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("audit:events:write");
 
         group.MapGet("/trail", async (
             string resourceType,
@@ -40,7 +42,8 @@ public sealed class AuditEndpointModule
         {
             var result = await sender.Send(new GetAuditTrailFeature.Query(resourceType, resourceId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("audit:trail:read");
 
         group.MapGet("/search", async (
             string? sourceModule,
@@ -55,7 +58,8 @@ public sealed class AuditEndpointModule
         {
             var result = await sender.Send(new SearchAuditLogFeature.Query(sourceModule, actionType, from, to, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("audit:trail:read");
 
         group.MapGet("/verify-chain", async (
             ISender sender,
@@ -64,7 +68,8 @@ public sealed class AuditEndpointModule
         {
             var result = await sender.Send(new VerifyChainIntegrityFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("audit:trail:read");
 
         group.MapGet("/report", async (
             DateTimeOffset from,
@@ -75,7 +80,8 @@ public sealed class AuditEndpointModule
         {
             var result = await sender.Send(new ExportAuditReportFeature.Query(from, to), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("audit:reports:read");
 
         group.MapGet("/compliance", async (
             DateTimeOffset from,
@@ -86,6 +92,7 @@ public sealed class AuditEndpointModule
         {
             var result = await sender.Send(new GetComplianceReportFeature.Query(from, to), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("audit:compliance:read");
     }
 }
