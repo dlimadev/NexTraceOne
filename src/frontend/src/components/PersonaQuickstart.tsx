@@ -25,8 +25,12 @@ const stepRoutes: Record<Persona, string[]> = {
 };
 
 function getCompleted(): Set<string> {
-  const raw = sessionStorage.getItem(STORAGE_KEY);
-  return raw ? new Set<string>(JSON.parse(raw) as string[]) : new Set<string>();
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    return raw ? new Set<string>(JSON.parse(raw) as string[]) : new Set<string>();
+  } catch {
+    return new Set<string>();
+  }
 }
 
 function persistCompleted(ids: Set<string>): void {

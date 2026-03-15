@@ -19,10 +19,20 @@ import { Card, CardHeader, CardBody } from './Card';
 import type { HomeWidget } from '../auth/persona';
 
 /**
+ * Metadados visuais e de navegação para cada tipo de widget.
+ */
+interface WidgetMetadata {
+  icon: React.ReactNode;
+  color: string;
+  route: string;
+  descKey: string;
+}
+
+/**
  * Mapeamento de tipo de widget para ícone, cor e rota de destino.
  * Fornece identidade visual e navegação contextual consistentes.
  */
-const widgetMeta: Record<HomeWidget['type'], { icon: React.ReactNode; color: string; route: string; descKey: string }> = {
+const widgetMeta: Record<HomeWidget['type'], WidgetMetadata> = {
   services: { icon: <Server size={18} />, color: 'text-brand-blue', route: '/services', descKey: 'productPolish.guidanceServices' },
   changes: { icon: <Zap size={18} />, color: 'text-warning', route: '/changes', descKey: 'productPolish.guidanceChanges' },
   incidents: { icon: <AlertTriangle size={18} />, color: 'text-critical', route: '/operations/incidents', descKey: 'productPolish.guidanceOperations' },

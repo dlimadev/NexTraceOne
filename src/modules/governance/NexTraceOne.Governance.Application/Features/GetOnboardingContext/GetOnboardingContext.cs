@@ -17,6 +17,10 @@ public static class GetOnboardingContext
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // Nota: cancellationToken não é utilizado porque a computação é puramente in-memory.
+            // Quando a lógica evoluir para consultar repositórios, o token deve ser propagado.
+            _ = cancellationToken;
+
             var persona = request.Persona ?? "Engineer";
             var quickstartItems = BuildQuickstart(persona);
             var recommendations = BuildRecommendations(persona);

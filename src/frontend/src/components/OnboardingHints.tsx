@@ -210,8 +210,12 @@ const hintsByModule: Record<string, OnboardingHint[]> = {
 };
 
 function getDismissedIds(): Set<string> {
-  const raw = sessionStorage.getItem(`${STORAGE_PREFIX}ids`);
-  return raw ? new Set<string>(JSON.parse(raw) as string[]) : new Set<string>();
+  try {
+    const raw = sessionStorage.getItem(`${STORAGE_PREFIX}ids`);
+    return raw ? new Set<string>(JSON.parse(raw) as string[]) : new Set<string>();
+  } catch {
+    return new Set<string>();
+  }
 }
 
 function persistDismissedId(id: string): void {

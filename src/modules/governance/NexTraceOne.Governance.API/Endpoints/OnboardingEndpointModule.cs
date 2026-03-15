@@ -47,7 +47,6 @@ public sealed class OnboardingEndpointModule
         // ── Acções recomendadas por contexto ──
         group.MapGet("/recommendations", async (
             string? persona,
-            string? scope,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
