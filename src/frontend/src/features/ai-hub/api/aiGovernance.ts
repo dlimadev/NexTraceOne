@@ -23,8 +23,40 @@ export const aiGovernanceApi = {
     client.get('/ai/audit', { params }).then(r => r.data),
   listKnowledgeSources: (params?: { sourceType?: string; isActive?: boolean }) =>
     client.get('/ai/knowledge-sources', { params }).then(r => r.data),
-  sendMessage: (data: { conversationId?: string; message: string; contextScope?: string; persona?: string; preferredModelId?: string; clientType?: string }) =>
+  sendMessage: (data: {
+    conversationId?: string;
+    message: string;
+    contextScope?: string;
+    persona?: string;
+    preferredModelId?: string;
+    clientType?: string;
+    serviceId?: string;
+    contractId?: string;
+    incidentId?: string;
+    teamId?: string;
+    domainId?: string;
+  }) =>
     client.post('/ai/assistant/chat', data).then(r => r.data),
   listConversations: (params?: { userId?: string; pageSize?: number }) =>
     client.get('/ai/assistant/conversations', { params }).then(r => r.data),
+  getConversation: (conversationId: string, params?: { messagePageSize?: number }) =>
+    client.get(`/ai/assistant/conversations/${conversationId}`, { params }).then(r => r.data),
+  createConversation: (data: {
+    title: string;
+    persona?: string;
+    clientType?: string;
+    defaultContextScope?: string;
+    tags?: string;
+    serviceId?: string;
+    contractId?: string;
+    incidentId?: string;
+    teamId?: string;
+  }) =>
+    client.post('/ai/assistant/conversations', data).then(r => r.data),
+  updateConversation: (conversationId: string, data: { title?: string; tags?: string; archive?: boolean }) =>
+    client.patch(`/ai/assistant/conversations/${conversationId}`, data).then(r => r.data),
+  listMessages: (conversationId: string, params?: { pageSize?: number }) =>
+    client.get(`/ai/assistant/conversations/${conversationId}/messages`, { params }).then(r => r.data),
+  listSuggestedPrompts: (params?: { persona?: string; category?: string }) =>
+    client.get('/ai/assistant/prompts', { params }).then(r => r.data),
 };
