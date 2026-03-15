@@ -20,7 +20,20 @@
     "retry": "Retry",
     "refresh": "Refresh",
     "user": "User",
-    "defaultRole": "Developer"
+    "defaultRole": "Developer",
+    "view": "View",
+    "viewAll": "View all",
+    "open": "Open",
+    "explore": "Explore",
+    "getStarted": "Get started",
+    "learnMore": "Learn more",
+    "configure": "Configure",
+    "goTo": "Go to",
+    "notConfigured": "Not configured",
+    "comingSoon": "Coming soon",
+    "noData": "No data available",
+    "blocked": "Access blocked",
+    "quotaExceeded": "Quota exceeded"
   },
   "auth": {
     "signIn": "Sign in to your account",
@@ -2320,5 +2333,99 @@
       "hint3Title": "Monitor Reliability",
       "hint3Desc": "Track team-owned service reliability metrics and SLOs"
     }
+  },
+  "productPolish": {
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "welcomeSubtitle": "The source of truth for services, contracts, changes and operational knowledge",
+    "quickstartTitle": "Get started",
+    "quickstartSubtitle": "Recommended next steps based on your role",
+    "emptyStateDefault": "Nothing here yet",
+    "emptyStateAction": "Get started by exploring the options below",
+    "moduleGuidanceTitle": "About this module",
+    "notConfiguredTitle": "Not configured yet",
+    "notConfiguredDesc": "This feature requires configuration before it can be used",
+    "notConfiguredAction": "Configure now",
+    "blockedTitle": "Access restricted",
+    "blockedDesc": "You don't have permission to access this resource. Contact your administrator.",
+    "quotaExceededTitle": "Quota exceeded",
+    "quotaExceededDesc": "Your usage quota for this feature has been exceeded. Please contact your administrator.",
+    "noResultsTitle": "No results found",
+    "noResultsDesc": "Try adjusting your search criteria or filters",
+    "errorTitle": "Something went wrong",
+    "errorDesc": "An unexpected error occurred. Please try again.",
+    "errorAction": "Try again",
+    "successTitle": "Success",
+    "loadingTitle": "Loading...",
+    "loadingDesc": "Fetching your data",
+    "guidanceServices": "The Service Catalog is your source of truth for all registered services, their owners, dependencies, and operational status.",
+    "guidanceContracts": "Contract Governance lets you browse, create, version, and validate API contracts with full lifecycle management.",
+    "guidanceChanges": "Change Intelligence tracks production changes, confidence scoring, blast radius, and change-to-incident correlation.",
+    "guidanceOperations": "Operations centralizes incident management, runbooks, and team-owned service reliability metrics.",
+    "guidanceAiHub": "AI Hub provides governed AI assistance, model management, policies, and IDE integrations for your team.",
+    "guidanceGovernance": "Governance delivers executive reporting, risk analysis, compliance tracking, and enterprise controls.",
+    "guidanceAdmin": "Administration covers user management, access controls, licensing, and audit trails.",
+    "guidanceKnowledge": "Source of Truth is your central reference for all services, contracts, and operational knowledge.",
+    "quickstart": {
+      "Engineer": {
+        "step1": "Explore your services in the Service Catalog",
+        "step2": "Review recent production changes",
+        "step3": "Check open incidents affecting your services",
+        "step4": "Browse API contracts for your services"
+      },
+      "TechLead": {
+        "step1": "Review your team's service ownership",
+        "step2": "Check change risk for your team",
+        "step3": "Monitor team service reliability",
+        "step4": "Review open incidents for your team"
+      },
+      "Architect": {
+        "step1": "Explore the service dependency graph",
+        "step2": "Review contract consistency across services",
+        "step3": "Analyze cross-team change impact",
+        "step4": "Check architectural risk indicators"
+      },
+      "Product": {
+        "step1": "Review release confidence scores",
+        "step2": "Check critical service status",
+        "step3": "Monitor operational risk trends",
+        "step4": "View recent incident impact"
+      },
+      "Executive": {
+        "step1": "Open the executive overview dashboard",
+        "step2": "Review operational risk trends",
+        "step3": "Inspect critical business domains",
+        "step4": "Check compliance status"
+      },
+      "PlatformAdmin": {
+        "step1": "Review platform policies and controls",
+        "step2": "Manage AI model registry",
+        "step3": "Configure integrations",
+        "step4": "Check platform coverage metrics"
+      },
+      "Auditor": {
+        "step1": "Inspect the audit trail",
+        "step2": "Review evidence packages",
+        "step3": "Check approval history",
+        "step4": "Audit AI usage patterns"
+      }
+    },
+    "emptyServices": "No services registered yet. Start by adding your first service to the catalog.",
+    "emptyServicesAction": "Add service",
+    "emptyContracts": "No contracts found. Create your first API contract using the Contract Studio.",
+    "emptyContractsAction": "Open Contract Studio",
+    "emptyChanges": "No changes tracked yet. Changes will appear here as deployments are detected.",
+    "emptyIncidents": "No incidents reported. Incidents will appear here when detected.",
+    "emptyRunbooks": "No runbooks available. Create runbooks to document operational procedures.",
+    "emptyRunbooksAction": "Create runbook",
+    "emptyReliability": "No reliability data yet. SLO data will appear as services report metrics.",
+    "emptyAiConversations": "No conversations yet. Start a conversation with the AI Assistant.",
+    "emptyAiConversationsAction": "Start conversation",
+    "emptyModels": "No AI models registered. Configure your model registry to enable AI features.",
+    "emptyPolicies": "No policies configured yet. Create policies to govern AI usage and access.",
+    "emptyReports": "No report data available yet. Reports will be generated based on your operational data.",
+    "emptyEvidence": "No evidence packages found. Evidence will be collected as compliance checks run.",
+    "emptyFinOps": "No FinOps data yet. Cost data will appear as services report resource usage.",
+    "aiAssistantHint": "Ask questions about your services, contracts, incidents, or changes",
+    "aiAssistantPersonaHint": "Suggested prompts are personalized for your role"
   }
 }
