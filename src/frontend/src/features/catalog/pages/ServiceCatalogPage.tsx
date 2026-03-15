@@ -352,10 +352,10 @@ export function ServiceCatalogPage() {
                       {(['healthy', 'degraded', 'unhealthy', 'unknown'] as const).map((status) => {
                         const count = healthData.items.filter((h) => h.status.toLowerCase() === status).length;
                         const colors = {
-                          healthy: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                          degraded: 'bg-amber-50 text-amber-700 border-amber-200',
-                          unhealthy: 'bg-red-50 text-red-700 border-red-200',
-                          unknown: 'bg-gray-50 text-gray-500 border-gray-200',
+                          healthy: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50',
+                          degraded: 'bg-amber-900/40 text-amber-300 border-amber-700/50',
+                          unhealthy: 'bg-red-900/40 text-red-300 border-red-700/50',
+                          unknown: 'bg-slate-800/40 text-slate-300 border-slate-700/50',
                         };
                         return (
                           <div key={status} className={`rounded-lg border p-4 text-center ${colors[status]}`}>

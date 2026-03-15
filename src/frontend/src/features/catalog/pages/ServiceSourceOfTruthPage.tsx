@@ -211,11 +211,11 @@ export function ServiceSourceOfTruthPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-edge text-xs text-muted">
-                        <th className="px-6 py-3 text-left font-medium">API</th>
-                        <th className="px-6 py-3 text-left font-medium">Route</th>
-                        <th className="px-6 py-3 text-left font-medium">Version</th>
-                        <th className="px-6 py-3 text-left font-medium">Visibility</th>
-                        <th className="px-6 py-3 text-right font-medium">Consumers</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.api')}</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.route')}</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.version')}</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.visibility')}</th>
+                        <th className="px-6 py-3 text-right font-medium">{t('sourceOfTruth.table.consumers')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-edge">
@@ -258,10 +258,10 @@ export function ServiceSourceOfTruthPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-edge text-xs text-muted">
-                        <th className="px-6 py-3 text-left font-medium">API</th>
-                        <th className="px-6 py-3 text-left font-medium">Version</th>
-                        <th className="px-6 py-3 text-left font-medium">Protocol</th>
-                        <th className="px-6 py-3 text-left font-medium">Lifecycle</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.api')}</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.version')}</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.protocol')}</th>
+                        <th className="px-6 py-3 text-left font-medium">{t('sourceOfTruth.table.lifecycle')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-edge">

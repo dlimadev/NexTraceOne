@@ -18,7 +18,9 @@
     "no": "No",
     "close": "Close",
     "retry": "Retry",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "user": "User",
+    "defaultRole": "Developer"
   },
   "auth": {
     "signIn": "Sign in to your account",
@@ -389,6 +391,11 @@
       "checkConflict": "Check Conflict",
       "conflict": "Conflict detected - freeze window active",
       "noConflict": "No freeze conflict"
+    },
+    "environments": {
+      "development": "Development",
+      "staging": "Staging",
+      "production": "Production"
     }
   },
   "contracts": {
@@ -1730,6 +1737,15 @@
     "empty": {
       "title": "Source of Truth Explorer",
       "description": "Search for services, contracts, documentation and operational knowledge."
+    },
+    "table": {
+      "api": "API",
+      "route": "Route",
+      "version": "Version",
+      "visibility": "Visibility",
+      "consumers": "Consumers",
+      "protocol": "Protocol",
+      "lifecycle": "Lifecycle"
     }
   },
   "changeConfidence": {
@@ -1805,7 +1821,9 @@
       "noValidation": "No validation evidence available",
       "noTimeline": "No timeline events recorded",
       "viewServiceSot": "View Service in Source of Truth",
-      "viewInReleases": "View in Releases"
+      "viewInReleases": "View in Releases",
+      "baselineMetrics": "Baseline Metrics",
+      "reviewStatus": "Review Status"
     }
   },
   "persona": {

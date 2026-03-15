@@ -120,15 +120,15 @@ export function VendorLicensingPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Shield className="h-8 w-8 text-indigo-600" />
+        <Shield className="h-8 w-8 text-accent" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('vendorLicensing.title')}</h1>
-          <p className="text-sm text-gray-500">{t('vendorLicensing.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-heading">{t('vendorLicensing.title')}</h1>
+          <p className="text-sm text-muted">{t('vendorLicensing.subtitle')}</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-edge">
         <nav className="-mb-px flex space-x-8">
           {tabs.map(({ key, label, icon: Icon }) => (
             <button
@@ -136,8 +136,8 @@ export function VendorLicensingPage() {
               onClick={() => setActiveTab(key)}
               className={`flex items-center gap-2 border-b-2 py-3 px-1 text-sm font-medium ${
                 activeTab === key
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-muted hover:border-edge hover:text-heading'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -165,53 +165,53 @@ export function VendorLicensingPage() {
           </CardHeader>
           <CardBody>
             {licensesQuery.isLoading && (
-              <p className="text-gray-500">{t('common.loading')}</p>
+              <p className="text-muted">{t('common.loading')}</p>
             )}
             {licensesQuery.isError && (
-              <p className="text-red-600">{t('vendorLicensing.loadFailed')}</p>
+              <p className="text-red-400">{t('vendorLicensing.loadFailed')}</p>
             )}
             {licensesQuery.data && licensesQuery.data.items.length === 0 && (
-              <p className="text-gray-500">{t('vendorLicensing.noLicenses')}</p>
+              <p className="text-muted">{t('vendorLicensing.noLicenses')}</p>
             )}
             {licensesQuery.data && licensesQuery.data.items.length > 0 && (
               <>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-edge">
+                    <thead className="bg-panel">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('vendorLicensing.customer')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('vendorLicensing.licenseKeyCol')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('vendorLicensing.typeCol')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('vendorLicensing.deploymentCol')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('vendorLicensing.statusCol')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('vendorLicensing.expiresCol')}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                           {t('common.actions')}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-edge">
                       {licensesQuery.data.items.map((lic: VendorLicenseItem) => (
                         <tr key={lic.licenseId}>
                           <td className="px-4 py-3 text-sm">
                             <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-gray-400" />
+                              <Building2 className="h-4 w-4 text-muted" />
                               {lic.customerName}
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-sm font-mono text-gray-600">
+                          <td className="px-4 py-3 text-sm font-mono text-muted">
                             {lic.licenseKey}
                           </td>
                           <td className="px-4 py-3 text-sm">
@@ -270,7 +270,7 @@ export function VendorLicensingPage() {
 
                 {/* Paginação */}
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted">
                     {t('vendorLicensing.totalLicenses', { count: licensesQuery.data.totalCount })}
                   </span>
                   <div className="flex gap-2">
@@ -323,12 +323,12 @@ export function VendorLicensingPage() {
               }}
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-body">
                   {t('vendorLicensing.customerNameLabel')}
                 </label>
                 <input
                   type="text"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                   value={issueForm.customerName}
                   onChange={(e) => setIssueForm({ ...issueForm, customerName: e.target.value })}
                   placeholder={t('vendorLicensing.customerNamePlaceholder')}
@@ -338,12 +338,12 @@ export function VendorLicensingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-body">
                     {t('vendorLicensing.durationDays')}
                   </label>
                   <input
                     type="number"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                     value={issueForm.durationDays}
                     onChange={(e) =>
                       setIssueForm({ ...issueForm, durationDays: Number(e.target.value) })
@@ -353,12 +353,12 @@ export function VendorLicensingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-body">
                     {t('vendorLicensing.maxActivationsLabel')}
                   </label>
                   <input
                     type="number"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                     value={issueForm.maxActivations}
                     onChange={(e) =>
                       setIssueForm({ ...issueForm, maxActivations: Number(e.target.value) })
@@ -370,11 +370,11 @@ export function VendorLicensingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-body">
                     {t('vendorLicensing.editionLabel')}
                   </label>
                   <select
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                     value={issueForm.edition}
                     onChange={(e) =>
                       setIssueForm({ ...issueForm, edition: Number(e.target.value) })
@@ -387,11 +387,11 @@ export function VendorLicensingPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-body">
                     {t('vendorLicensing.deploymentModelLabel')}
                   </label>
                   <select
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                     value={issueForm.deploymentModel}
                     onChange={(e) =>
                       setIssueForm({ ...issueForm, deploymentModel: Number(e.target.value) })
@@ -405,12 +405,12 @@ export function VendorLicensingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-body">
                   {t('vendorLicensing.gracePeriodDaysLabel')}
                 </label>
                 <input
                   type="number"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                   value={issueForm.gracePeriodDays}
                   onChange={(e) =>
                     setIssueForm({ ...issueForm, gracePeriodDays: Number(e.target.value) })
@@ -420,10 +420,10 @@ export function VendorLicensingPage() {
               </div>
 
               {issueMutation.isError && (
-                <p className="text-sm text-red-600">{t('vendorLicensing.issueFailed')}</p>
+                <p className="text-sm text-red-400">{t('vendorLicensing.issueFailed')}</p>
               )}
               {issueMutation.isSuccess && (
-                <p className="text-sm text-green-600">{t('vendorLicensing.issueSuccess')}</p>
+                <p className="text-sm text-success">{t('vendorLicensing.issueSuccess')}</p>
               )}
 
               <Button type="submit" disabled={issueMutation.isPending}>
@@ -442,26 +442,26 @@ export function VendorLicensingPage() {
             <h2 className="text-lg font-semibold">{t('vendorCatalog.plans.title')}</h2>
           </CardHeader>
           <CardBody>
-            {plansQuery.isLoading && <p className="text-gray-500">{t('common.loading')}</p>}
-            {plansQuery.isError && <p className="text-red-600">{t('vendorCatalog.plans.loadFailed')}</p>}
+            {plansQuery.isLoading && <p className="text-muted">{t('common.loading')}</p>}
+            {plansQuery.isError && <p className="text-red-400">{t('vendorCatalog.plans.loadFailed')}</p>}
             {plansQuery.data && plansQuery.data.length === 0 && (
-              <p className="text-gray-500">{t('vendorCatalog.plans.noPlans')}</p>
+              <p className="text-muted">{t('vendorCatalog.plans.noPlans')}</p>
             )}
             {plansQuery.data && plansQuery.data.length > 0 && (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-edge">
+                  <thead className="bg-panel">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.code')}</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.name')}</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.commercialModel')}</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.deploymentModel')}</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.maxActivations')}</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.priceTag')}</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('vendorCatalog.plans.status')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.code')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.name')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.commercialModel')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.deploymentModel')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.maxActivations')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.priceTag')}</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">{t('vendorCatalog.plans.status')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-edge">
                     {plansQuery.data.map((plan: PlanItem) => (
                       <tr key={plan.planId}>
                         <td className="px-4 py-3 text-sm font-mono">{plan.code}</td>
@@ -492,10 +492,10 @@ export function VendorLicensingPage() {
             <h2 className="text-lg font-semibold">{t('vendorCatalog.featurePacks.title')}</h2>
           </CardHeader>
           <CardBody>
-            {featurePacksQuery.isLoading && <p className="text-gray-500">{t('common.loading')}</p>}
-            {featurePacksQuery.isError && <p className="text-red-600">{t('vendorCatalog.featurePacks.loadFailed')}</p>}
+            {featurePacksQuery.isLoading && <p className="text-muted">{t('common.loading')}</p>}
+            {featurePacksQuery.isError && <p className="text-red-400">{t('vendorCatalog.featurePacks.loadFailed')}</p>}
             {featurePacksQuery.data && featurePacksQuery.data.length === 0 && (
-              <p className="text-gray-500">{t('vendorCatalog.featurePacks.noPacks')}</p>
+              <p className="text-muted">{t('vendorCatalog.featurePacks.noPacks')}</p>
             )}
             {featurePacksQuery.data && featurePacksQuery.data.length > 0 && (
               <div className="space-y-4">
@@ -504,14 +504,14 @@ export function VendorLicensingPage() {
                     <div className="flex items-center justify-between mb-2">
                       <div>
                         <h3 className="text-sm font-semibold">{pack.name}</h3>
-                        <span className="text-xs font-mono text-gray-500">{pack.code}</span>
+                        <span className="text-xs font-mono text-muted">{pack.code}</span>
                       </div>
                       <Badge variant={pack.isActive ? 'success' : 'default'}>
                         {pack.isActive ? t('vendorCatalog.featurePacks.active') : t('vendorCatalog.featurePacks.inactive')}
                       </Badge>
                     </div>
-                    {pack.description && <p className="text-sm text-gray-600 mb-2">{pack.description}</p>}
-                    <div className="text-xs text-gray-500">
+                    {pack.description && <p className="text-sm text-muted mb-2">{pack.description}</p>}
+                    <div className="text-xs text-muted">
                       {t('vendorCatalog.featurePacks.itemCount', { count: pack.items?.length || 0 })}
                     </div>
                     {pack.items && pack.items.length > 0 && (
@@ -552,12 +552,12 @@ export function VendorLicensingPage() {
               }}
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-body">
                   {t('vendorCatalog.generateKey.licenseId')}
                 </label>
                 <input
                   type="text"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-edge bg-elevated text-body shadow-sm focus:border-accent focus:ring-accent sm:text-sm"
                   value={generateKeyForm.licenseId}
                   onChange={(e) => setGenerateKeyForm({ licenseId: e.target.value })}
                   placeholder={t('vendorCatalog.generateKey.licenseIdPlaceholder')}
@@ -566,14 +566,14 @@ export function VendorLicensingPage() {
               </div>
 
               {generateKeyMutation.isError && (
-                <p className="text-sm text-red-600">{t('vendorCatalog.generateKey.generateFailed')}</p>
+                <p className="text-sm text-red-400">{t('vendorCatalog.generateKey.generateFailed')}</p>
               )}
 
               {generatedKey && (
-                <div className="rounded-md bg-green-50 p-4">
-                  <p className="text-sm text-green-800 mb-2">{t('vendorCatalog.generateKey.generateSuccess')}</p>
+                <div className="rounded-md bg-success/10 p-4">
+                  <p className="text-sm text-success mb-2">{t('vendorCatalog.generateKey.generateSuccess')}</p>
                   <div className="flex items-center gap-2">
-                    <code className="text-sm font-mono bg-white px-3 py-2 rounded border flex-1">
+                    <code className="text-sm font-mono bg-elevated px-3 py-2 rounded border flex-1">
                       {generatedKey}
                     </code>
                     <Button

@@ -112,7 +112,7 @@ export function AppHeader({ onOpenCommandPalette }: AppHeaderProps) {
           </div>
           <div className="hidden lg:block">
             <p className="text-sm font-medium text-heading leading-tight truncate max-w-[140px]">
-              {user?.fullName || user?.email || 'User'}
+              {user?.fullName || user?.email || t('common.user')}
             </p>
             <p className="text-[11px] text-muted leading-tight truncate max-w-[140px]">
               {user?.roleName ?? ''}

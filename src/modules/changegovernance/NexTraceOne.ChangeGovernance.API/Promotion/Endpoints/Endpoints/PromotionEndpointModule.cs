@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using ApprovePromotionFeature = NexTraceOne.Promotion.Application.Features.ApprovePromotion.ApprovePromotion;
 using BlockPromotionFeature = NexTraceOne.Promotion.Application.Features.BlockPromotion.BlockPromotion;
 using ConfigureEnvironmentFeature = NexTraceOne.Promotion.Application.Features.ConfigureEnvironment.ConfigureEnvironment;
@@ -33,7 +34,8 @@ public sealed class PromotionEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/promotion/environments/{0}", localizer);
-        });
+        })
+        .RequirePermission("promotion:environments:write");
 
         group.MapPost("/requests", async (
             CreatePromotionRequestFeature.Command command,
@@ -43,7 +45,8 @@ public sealed class PromotionEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/promotion/requests/{0}", localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:write");
 
         group.MapPost("/requests/{id:guid}/evaluate-gates", async (
             Guid id,
@@ -55,7 +58,8 @@ public sealed class PromotionEndpointModule
             var updated = command with { PromotionRequestId = id };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:write");
 
         group.MapPost("/requests/{id:guid}/approve", async (
             Guid id,
@@ -67,7 +71,8 @@ public sealed class PromotionEndpointModule
             var updated = command with { PromotionRequestId = id };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:write");
 
         group.MapPost("/requests/{id:guid}/block", async (
             Guid id,
@@ -79,7 +84,8 @@ public sealed class PromotionEndpointModule
             var updated = command with { PromotionRequestId = id };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:write");
 
         group.MapGet("/requests/{id:guid}/status", async (
             Guid id,
@@ -89,7 +95,8 @@ public sealed class PromotionEndpointModule
         {
             var result = await sender.Send(new GetPromotionStatusFeature.Query(id), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:read");
 
         group.MapGet("/requests/{id:guid}/gate-evaluations", async (
             Guid id,
@@ -99,7 +106,8 @@ public sealed class PromotionEndpointModule
         {
             var result = await sender.Send(new GetGateEvaluationFeature.Query(id), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:read");
 
         group.MapGet("/requests", async (
             string? statusFilter,
@@ -113,7 +121,8 @@ public sealed class PromotionEndpointModule
                 new ListPromotionRequestsFeature.Query(statusFilter, page, pageSize),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:requests:read");
 
         group.MapPost("/gate-evaluations/{id:guid}/override", async (
             Guid id,
@@ -125,6 +134,7 @@ public sealed class PromotionEndpointModule
             var updated = command with { GateEvaluationId = id };
             var result = await sender.Send(updated, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("promotion:gates:override");
     }
 }

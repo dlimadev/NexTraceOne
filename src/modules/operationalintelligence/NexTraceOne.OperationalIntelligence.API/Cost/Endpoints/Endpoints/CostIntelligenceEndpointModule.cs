@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 using IngestCostSnapshotFeature = NexTraceOne.CostIntelligence.Application.Features.IngestCostSnapshot.IngestCostSnapshot;
 using GetCostReportFeature = NexTraceOne.CostIntelligence.Application.Features.GetCostReport.GetCostReport;
 using GetCostByReleaseFeature = NexTraceOne.CostIntelligence.Application.Features.GetCostByRelease.GetCostByRelease;
@@ -42,7 +43,8 @@ public sealed class CostIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToCreatedResult("/api/v1/cost/snapshots/{0}", localizer);
-        });
+        })
+        .RequirePermission("operations:cost:write");
 
         group.MapGet("/report", async (
             string serviceName,
@@ -56,7 +58,8 @@ public sealed class CostIntelligenceEndpointModule
             var query = new GetCostReportFeature.Query(serviceName, environment, page, pageSize);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:cost:read");
 
         group.MapGet("/by-release/{releaseId:guid}", async (
             Guid releaseId,
@@ -69,7 +72,8 @@ public sealed class CostIntelligenceEndpointModule
             var query = new GetCostByReleaseFeature.Query(releaseId, periodStart, periodEnd);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:cost:read");
 
         group.MapGet("/by-route", async (
             string serviceName,
@@ -83,7 +87,8 @@ public sealed class CostIntelligenceEndpointModule
             var query = new GetCostByRouteFeature.Query(serviceName, environment, page, pageSize);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:cost:read");
 
         group.MapGet("/delta", async (
             string serviceName,
@@ -99,7 +104,8 @@ public sealed class CostIntelligenceEndpointModule
             var query = new GetCostDeltaFeature.Query(serviceName, environment, currentStart, currentEnd, previousStart, previousEnd);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:cost:read");
 
         group.MapPost("/attributions", async (
             AttributeCostToServiceFeature.Command command,
@@ -109,7 +115,8 @@ public sealed class CostIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToCreatedResult("/api/v1/cost/attributions/{0}", localizer);
-        });
+        })
+        .RequirePermission("operations:cost:write");
 
         group.MapPost("/trends", async (
             ComputeCostTrendFeature.Command command,
@@ -119,7 +126,8 @@ public sealed class CostIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToCreatedResult("/api/v1/cost/trends/{0}", localizer);
-        });
+        })
+        .RequirePermission("operations:cost:write");
 
         group.MapPost("/anomaly-check", async (
             AlertCostAnomalyFeature.Command command,
@@ -129,6 +137,7 @@ public sealed class CostIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToHttpResult(localizer);
-        });
+        })
+        .RequirePermission("operations:cost:write");
     }
 }

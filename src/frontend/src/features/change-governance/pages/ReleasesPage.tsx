@@ -240,9 +240,9 @@ export function ReleasesPage() {
                       onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
                       className={INPUT_CLS}
                     >
-                      <option value="development">Development</option>
-                      <option value="staging">Staging</option>
-                      <option value="production">Production</option>
+                      <option value="development">{t('releases.environments.development')}</option>
+                      <option value="staging">{t('releases.environments.staging')}</option>
+                      <option value="production">{t('releases.environments.production')}</option>
                     </select>
                   </div>
                   <div>

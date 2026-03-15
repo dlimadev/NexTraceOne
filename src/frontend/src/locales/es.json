@@ -18,7 +18,9 @@
     "no": "No",
     "close": "Cerrar",
     "retry": "Reintentar",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "user": "Usuario",
+    "defaultRole": "Desarrollador"
   },
   "auth": {
     "signIn": "Iniciar sesión en su cuenta",
@@ -389,6 +391,11 @@
       "checkConflict": "Verificar Conflicto",
       "conflict": "Conflicto detectado — ventana de freeze activa",
       "noConflict": "Sin conflicto de freeze"
+    },
+    "environments": {
+      "development": "Desarrollo",
+      "staging": "Preproducción",
+      "production": "Producción"
     }
   },
   "contracts": {
@@ -1730,6 +1737,15 @@
     "empty": {
       "title": "Explorador de Fuente de Verdad",
       "description": "Busque servicios, contratos, documentación y conocimiento operacional."
+    },
+    "table": {
+      "api": "API",
+      "route": "Ruta",
+      "version": "Versión",
+      "visibility": "Visibilidad",
+      "consumers": "Consumidores",
+      "protocol": "Protocolo",
+      "lifecycle": "Ciclo de Vida"
     }
   },
   "changeConfidence": {
@@ -1805,7 +1821,9 @@
       "noValidation": "Sin evidencia de validación disponible",
       "noTimeline": "Sin eventos de timeline registrados",
       "viewServiceSot": "Ver Servicio en Source of Truth",
-      "viewInReleases": "Ver en Releases"
+      "viewInReleases": "Ver en Releases",
+      "baselineMetrics": "Métricas de Línea Base",
+      "reviewStatus": "Estado de Revisión"
     }
   },
   "persona": {
