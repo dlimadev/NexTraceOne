@@ -71,6 +71,9 @@ const RiskHeatmapPage = lazy(() => import('./features/governance/pages/RiskHeatm
 const MaturityScorecardsPage = lazy(() => import('./features/governance/pages/MaturityScorecardsPage').then(m => ({ default: m.MaturityScorecardsPage })));
 const BenchmarkingPage = lazy(() => import('./features/governance/pages/BenchmarkingPage').then(m => ({ default: m.BenchmarkingPage })));
 const ExecutiveDrillDownPage = lazy(() => import('./features/governance/pages/ExecutiveDrillDownPage').then(m => ({ default: m.ExecutiveDrillDownPage })));
+const PolicyCatalogPage = lazy(() => import('./features/governance/pages/PolicyCatalogPage').then(m => ({ default: m.PolicyCatalogPage })));
+const EvidencePackagesPage = lazy(() => import('./features/governance/pages/EvidencePackagesPage').then(m => ({ default: m.EvidencePackagesPage })));
+const EnterpriseControlsPage = lazy(() => import('./features/governance/pages/EnterpriseControlsPage').then(m => ({ default: m.EnterpriseControlsPage })));
 
 function PageLoader() {
   return (
@@ -243,6 +246,30 @@ export default function App() {
               <Route path="/governance/executive/maturity" element={<MaturityScorecardsPage />} />
               <Route path="/governance/executive/benchmarking" element={<BenchmarkingPage />} />
               <Route path="/governance/executive/drilldown/:entityType/:entityId" element={<ExecutiveDrillDownPage />} />
+              <Route
+                path="/governance/policies"
+                element={
+                  <ProtectedRoute permission="governance:policies:read" redirectTo="/unauthorized">
+                    <PolicyCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/evidence"
+                element={
+                  <ProtectedRoute permission="governance:evidence:read" redirectTo="/unauthorized">
+                    <EvidencePackagesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/controls"
+                element={
+                  <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
+                    <EnterpriseControlsPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── Admin ── */}
               <Route
                 path="/licensing"

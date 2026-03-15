@@ -79,6 +79,9 @@ export type Permission =
   | 'governance:risk:read'
   | 'governance:compliance:read'
   | 'governance:finops:read'
+  | 'governance:policies:read'
+  | 'governance:evidence:read'
+  | 'governance:controls:read'
   // ── Audit ──
   | 'audit:read'
   | 'audit:export'

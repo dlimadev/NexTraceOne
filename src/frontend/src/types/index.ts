@@ -1576,3 +1576,172 @@ export interface DraftListResponse {
   items: ContractDraft[];
   totalCount: number;
 }
+
+// ─── Governance — Advanced Compliance & Enterprise Controls ─────────────────
+
+/** Categoria da política de governança. */
+export type PolicyCategoryType = 'ServiceGovernance' | 'ContractGovernance' | 'ChangeGovernance' | 'OperationalReadiness' | 'AiGovernance' | 'SecurityCompliance' | 'DocumentationStandards';
+
+/** Estado de uma política de governança. */
+export type PolicyStatusType = 'Draft' | 'Active' | 'Inactive' | 'Deprecated';
+
+/** Modo de aplicação de uma política. */
+export type PolicyEnforcementModeType = 'Advisory' | 'SoftEnforce' | 'HardEnforce';
+
+/** Severidade da política de governança. */
+export type PolicySeverityType = 'Low' | 'Medium' | 'High' | 'Critical';
+
+/** Resultado de um check de compliance. */
+export type ComplianceCheckStatusType = 'Passed' | 'Failed' | 'Warning' | 'Skipped' | 'Error';
+
+/** Dimensão de controlo enterprise. */
+export type ControlDimensionType = 'ContractGovernance' | 'SourceOfTruthCompleteness' | 'ChangeGovernance' | 'IncidentMitigationEvidence' | 'AiGovernance' | 'DocumentationRunbookReadiness' | 'OwnershipCoverage';
+
+/** Tipo de evidência. */
+export type EvidenceTypeValue = 'Approval' | 'ChangeHistory' | 'ContractPublication' | 'MitigationRecord' | 'AiUsageRecord' | 'PolicyDecision' | 'ComplianceResult' | 'AuditReference';
+
+/** Estado de um pacote de evidência. */
+export type EvidencePackageStatusType = 'Draft' | 'Sealed' | 'Exported';
+
+/** DTO de política de governança. */
+export interface PolicyDto {
+  policyId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: PolicyCategoryType;
+  scope: string;
+  status: PolicyStatusType;
+  severity: PolicySeverityType;
+  enforcementMode: PolicyEnforcementModeType;
+  effectiveEnvironments: string[];
+  affectedAssetsCount: number;
+  violationCount: number;
+  createdAt: string;
+}
+
+/** Resposta da lista de políticas. */
+export interface PolicyListResponse {
+  totalPolicies: number;
+  activeCount: number;
+  draftCount: number;
+  policies: PolicyDto[];
+}
+
+/** DTO de resultado de check de compliance. */
+export interface ComplianceCheckResultDto {
+  checkId: string;
+  checkName: string;
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  domain: string;
+  status: ComplianceCheckStatusType;
+  policyId: string;
+  detail: string;
+  evaluatedAt: string;
+}
+
+/** Resposta de compliance checks. */
+export interface ComplianceChecksResponse {
+  totalChecks: number;
+  passedCount: number;
+  failedCount: number;
+  warningCount: number;
+  results: ComplianceCheckResultDto[];
+  executedAt: string;
+}
+
+/** DTO de gap de compliance avançado. */
+export interface AdvancedComplianceGapDto {
+  gapId: string;
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  domain: string;
+  description: string;
+  severity: PolicySeverityType;
+  violatedPolicyIds: string[];
+  violationCount: number;
+  detectedAt: string;
+}
+
+/** Resposta de gaps de compliance. */
+export interface ComplianceGapsResponse {
+  totalGaps: number;
+  criticalCount: number;
+  highCount: number;
+  mediumCount: number;
+  lowCount: number;
+  gaps: AdvancedComplianceGapDto[];
+  generatedAt: string;
+}
+
+/** DTO de pacote de evidência. */
+export interface EvidencePackageDto {
+  packageId: string;
+  name: string;
+  description: string;
+  scope: string;
+  status: EvidencePackageStatusType;
+  itemCount: number;
+  includedTypes: string[];
+  createdBy: string;
+  createdAt: string;
+  sealedAt: string | null;
+}
+
+/** Resposta da lista de pacotes de evidência. */
+export interface EvidencePackageListResponse {
+  totalPackages: number;
+  sealedCount: number;
+  exportedCount: number;
+  draftCount: number;
+  packages: EvidencePackageDto[];
+}
+
+/** DTO de item de evidência. */
+export interface EvidenceItemDto {
+  itemId: string;
+  type: EvidenceTypeValue;
+  title: string;
+  description: string;
+  sourceModule: string;
+  referenceId: string;
+  recordedBy: string;
+  recordedAt: string;
+}
+
+/** Detalhe de pacote de evidência. */
+export interface EvidencePackageDetailResponse {
+  packageId: string;
+  name: string;
+  description: string;
+  scope: string;
+  status: EvidencePackageStatusType;
+  createdBy: string;
+  createdAt: string;
+  sealedAt: string | null;
+  items: EvidenceItemDto[];
+}
+
+/** DTO de dimensão de controle enterprise. */
+export interface ControlDimensionDto {
+  dimension: ControlDimensionType;
+  coveragePercent: number;
+  totalAssessed: number;
+  gapCount: number;
+  maturity: MaturityLevelType;
+  trend: GovernanceTrendDirection;
+  summary: string;
+}
+
+/** Resposta de resumo de controles enterprise. */
+export interface ControlsSummaryResponse {
+  overallCoverage: number;
+  overallMaturity: MaturityLevelType;
+  totalDimensions: number;
+  criticalGapCount: number;
+  dimensions: ControlDimensionDto[];
+  generatedAt: string;
+}
