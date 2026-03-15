@@ -1745,3 +1745,285 @@ export interface ControlsSummaryResponse {
   dimensions: ControlDimensionDto[];
   generatedAt: string;
 }
+
+// ─── FinOps Maturity — Service, Team, Domain, Waste, Efficiency, Trends ──
+
+/** Tipo de sinal de desperdício operacional. */
+export type WasteSignalType =
+  | 'ExcessiveRetries'
+  | 'RepeatedFailures'
+  | 'IdleCostlyResource'
+  | 'RepeatedReprocessing'
+  | 'UnstableConsumer'
+  | 'NoisyService'
+  | 'DegradedCostAmplification'
+  | 'QueueBacklogInefficiency'
+  | 'OverProvisioned'
+  | 'ChangeRelatedInstability';
+
+/** Categoria de eficiência operacional. */
+export type EfficiencyCategory =
+  | 'ResourceUtilization'
+  | 'RequestEfficiency'
+  | 'ErrorRate'
+  | 'ThroughputOptimization'
+  | 'CostPerTransaction'
+  | 'ScalingEfficiency';
+
+/** Dimensão de custo contextual. */
+export type CostDimension = 'Service' | 'Team' | 'Domain';
+
+/** Correlação de confiabilidade com custo. */
+export interface ReliabilityCorrelationDto {
+  reliabilityScore: number;
+  recentIncidents: number;
+  reliabilityTrend: GovernanceTrendDirection;
+}
+
+/** Sinal de desperdício com tipo e timestamp. */
+export interface WasteSignalDetailDto {
+  signalId: string;
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  type: WasteSignalType;
+  description: string;
+  pattern: string;
+  estimatedWaste: number;
+  severity: string;
+  detectedAt: string;
+  correlatedCause: string | null;
+}
+
+/** Driver principal de custo. */
+export interface CostDriverDto {
+  serviceId: string;
+  serviceName: string;
+  monthlyCost: number;
+  efficiency: CostEfficiencyType;
+}
+
+/** Oportunidade de otimização. */
+export interface OptimizationOpportunityDto {
+  serviceId: string;
+  serviceName: string;
+  potentialSavings: number;
+  priority: string;
+  recommendation: string;
+}
+
+/** Resumo de FinOps contextual enriquecido. */
+export interface FinOpsSummaryEnrichedResponse {
+  totalMonthlyCost: number;
+  totalWaste: number;
+  overallEfficiency: CostEfficiencyType;
+  costTrend: GovernanceTrendDirection;
+  services: ServiceCostEnrichedDto[];
+  topCostDrivers: CostDriverDto[];
+  topWasteSignals: WasteSignalTypedDto[];
+  optimizationOpportunities: OptimizationOpportunityDto[];
+  generatedAt: string;
+}
+
+/** Sinal de desperdício com tipo. */
+export interface WasteSignalTypedDto {
+  description: string;
+  pattern: string;
+  type: WasteSignalType;
+  estimatedWaste: number;
+}
+
+/** Custo contextual por serviço enriquecido. */
+export interface ServiceCostEnrichedDto {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  efficiency: CostEfficiencyType;
+  monthlyCost: number;
+  trend: GovernanceTrendDirection;
+  wasteSignals: WasteSignalTypedDto[];
+  reliabilityCorrelation: ReliabilityCorrelationDto | null;
+}
+
+/** Indicador de eficiência. */
+export interface EfficiencyMetricDto {
+  name: string;
+  category: EfficiencyCategory;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  assessment: string;
+}
+
+/** Impacto de mudança no custo. */
+export interface ChangeImpactDto {
+  changeId: string;
+  description: string;
+  appliedAt: string;
+  costImpact: number;
+  explanation: string;
+}
+
+/** Otimização sugerida. */
+export interface OptimizationDto {
+  recommendation: string;
+  potentialSavings: number;
+  priority: string;
+  rationale: string;
+}
+
+/** Perfil de FinOps de um serviço. */
+export interface ServiceFinOpsResponse {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  monthlyCost: number;
+  previousMonthCost: number;
+  costTrend: GovernanceTrendDirection;
+  efficiency: CostEfficiencyType;
+  wasteSignals: WasteSignalDetailDto[];
+  totalWaste: number;
+  efficiencyIndicators: EfficiencyMetricDto[];
+  reliabilityScore: number;
+  recentIncidents: number;
+  reliabilityTrend: GovernanceTrendDirection;
+  changeImpacts: ChangeImpactDto[];
+  optimizations: OptimizationDto[];
+  totalPotentialSavings: number;
+  generatedAt: string;
+}
+
+/** Custo de serviço dentro de equipa. */
+export interface TeamServiceCostDto {
+  serviceId: string;
+  serviceName: string;
+  efficiency: CostEfficiencyType;
+  monthlyCost: number;
+  trend: GovernanceTrendDirection;
+  wasteAmount: number;
+  reliabilityScore: number;
+}
+
+/** Ponto de série temporal de custo. */
+export interface TrendPointDto {
+  period: string;
+  cost: number;
+}
+
+/** Perfil de FinOps de uma equipa. */
+export interface TeamFinOpsResponse {
+  teamId: string;
+  teamName: string;
+  domain: string;
+  totalMonthlyCost: number;
+  previousMonthCost: number;
+  costTrend: GovernanceTrendDirection;
+  overallEfficiency: CostEfficiencyType;
+  totalWaste: number;
+  serviceCount: number;
+  services: TeamServiceCostDto[];
+  trendSeries: TrendPointDto[];
+  avgReliabilityScore: number;
+  totalRecentIncidents: number;
+  topOptimizationFocus: string;
+  generatedAt: string;
+}
+
+/** Custo de equipa dentro de domínio. */
+export interface DomainTeamCostDto {
+  teamId: string;
+  teamName: string;
+  serviceCount: number;
+  monthlyCost: number;
+  wasteAmount: number;
+  efficiency: CostEfficiencyType;
+  avgReliabilityScore: number;
+}
+
+/** Serviço com maior desperdício no domínio. */
+export interface WasteServiceDto {
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  wasteAmount: number;
+  efficiency: CostEfficiencyType;
+}
+
+/** Perfil de FinOps de um domínio. */
+export interface DomainFinOpsResponse {
+  domainId: string;
+  domainName: string;
+  totalMonthlyCost: number;
+  previousMonthCost: number;
+  costTrend: GovernanceTrendDirection;
+  overallEfficiency: CostEfficiencyType;
+  totalWaste: number;
+  teamCount: number;
+  serviceCount: number;
+  teams: DomainTeamCostDto[];
+  topWasteServices: WasteServiceDto[];
+  trendSeries: TrendPointDto[];
+  avgReliabilityScore: number;
+  generatedAt: string;
+}
+
+/** Desperdício agregado por tipo. */
+export interface WasteByTypeDto {
+  type: WasteSignalType;
+  count: number;
+  totalWaste: number;
+}
+
+/** Resposta de sinais de desperdício. */
+export interface WasteSignalsResponse {
+  totalWaste: number;
+  signalCount: number;
+  signals: WasteSignalDetailDto[];
+  byType: WasteByTypeDto[];
+  generatedAt: string;
+}
+
+/** Eficiência de serviço. */
+export interface ServiceEfficiencyDto {
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  efficiency: CostEfficiencyType;
+  metrics: EfficiencyMetricDto[];
+}
+
+/** Resposta de indicadores de eficiência. */
+export interface EfficiencyIndicatorsResponse {
+  overallEfficiencyScore: number;
+  serviceCount: number;
+  services: ServiceEfficiencyDto[];
+  generatedAt: string;
+}
+
+/** Ponto de dados de tendência. */
+export interface TrendDataPointDto {
+  period: string;
+  cost: number;
+}
+
+/** Série temporal de custo. */
+export interface TrendSeriesDto {
+  entityId: string;
+  entityName: string;
+  dataPoints: TrendDataPointDto[];
+  direction: GovernanceTrendDirection;
+  changePercent: number;
+}
+
+/** Resposta de tendências de custo. */
+export interface FinOpsTrendsResponse {
+  dimension: CostDimension;
+  series: TrendSeriesDto[];
+  aggregatedTrend: TrendDataPointDto[];
+  overallDirection: GovernanceTrendDirection;
+  overallChangePercent: number;
+  generatedAt: string;
+}

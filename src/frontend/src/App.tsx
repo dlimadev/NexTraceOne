@@ -66,6 +66,10 @@ const ReportsPage = lazy(() => import('./features/governance/pages/ReportsPage')
 const RiskCenterPage = lazy(() => import('./features/governance/pages/RiskCenterPage').then(m => ({ default: m.RiskCenterPage })));
 const CompliancePage = lazy(() => import('./features/governance/pages/CompliancePage').then(m => ({ default: m.CompliancePage })));
 const FinOpsPage = lazy(() => import('./features/governance/pages/FinOpsPage').then(m => ({ default: m.FinOpsPage })));
+const ServiceFinOpsPage = lazy(() => import('./features/governance/pages/ServiceFinOpsPage').then(m => ({ default: m.ServiceFinOpsPage })));
+const TeamFinOpsPage = lazy(() => import('./features/governance/pages/TeamFinOpsPage').then(m => ({ default: m.TeamFinOpsPage })));
+const DomainFinOpsPage = lazy(() => import('./features/governance/pages/DomainFinOpsPage').then(m => ({ default: m.DomainFinOpsPage })));
+const ExecutiveFinOpsPage = lazy(() => import('./features/governance/pages/ExecutiveFinOpsPage').then(m => ({ default: m.ExecutiveFinOpsPage })));
 const ExecutiveOverviewPage = lazy(() => import('./features/governance/pages/ExecutiveOverviewPage').then(m => ({ default: m.ExecutiveOverviewPage })));
 const RiskHeatmapPage = lazy(() => import('./features/governance/pages/RiskHeatmapPage').then(m => ({ default: m.RiskHeatmapPage })));
 const MaturityScorecardsPage = lazy(() => import('./features/governance/pages/MaturityScorecardsPage').then(m => ({ default: m.MaturityScorecardsPage })));
@@ -241,6 +245,10 @@ export default function App() {
               <Route path="/governance/risk" element={<RiskCenterPage />} />
               <Route path="/governance/compliance" element={<CompliancePage />} />
               <Route path="/governance/finops" element={<FinOpsPage />} />
+              <Route path="/governance/finops/services/:serviceId" element={<ServiceFinOpsPage />} />
+              <Route path="/governance/finops/teams/:teamId" element={<TeamFinOpsPage />} />
+              <Route path="/governance/finops/domains/:domainId" element={<DomainFinOpsPage />} />
+              <Route path="/governance/finops/executive" element={<ExecutiveFinOpsPage />} />
               <Route path="/governance/executive" element={<ExecutiveOverviewPage />} />
               <Route path="/governance/executive/heatmap" element={<RiskHeatmapPage />} />
               <Route path="/governance/executive/maturity" element={<MaturityScorecardsPage />} />
