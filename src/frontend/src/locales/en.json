@@ -2169,5 +2169,44 @@
         "prompt3": "Are there any compliance gaps in recent changes?"
       }
     }
+  },
+  "breadcrumbs": {
+    "home": "Home"
+  },
+  "onboarding": {
+    "hintsTitle": "What you can do here",
+    "dismiss": "Dismiss",
+    "services": {
+      "hint1Title": "Explore Service Catalog",
+      "hint1Desc": "View all registered services, their owners, and dependencies",
+      "hint2Title": "View Dependency Graph",
+      "hint2Desc": "Visualize service dependencies and topology",
+      "hint3Title": "Check Service Health",
+      "hint3Desc": "Monitor the reliability status of your services"
+    },
+    "contracts": {
+      "hint1Title": "Browse API Contracts",
+      "hint1Desc": "View all API contracts with version history and lifecycle status",
+      "hint2Title": "Create in Contract Studio",
+      "hint2Desc": "Use the AI-assisted studio to create and validate contracts",
+      "hint3Title": "Compare Versions",
+      "hint3Desc": "Diff contract versions to understand changes"
+    },
+    "changes": {
+      "hint1Title": "Track Production Changes",
+      "hint1Desc": "Monitor deployments and changes with confidence scoring",
+      "hint2Title": "Monitor Blast Radius",
+      "hint2Desc": "Understand the impact scope of production changes",
+      "hint3Title": "Review Change Confidence",
+      "hint3Desc": "Evaluate change readiness before deploying to production"
+    },
+    "operations": {
+      "hint1Title": "Manage Incidents",
+      "hint1Desc": "Track and resolve incidents with full correlation context",
+      "hint2Title": "Access Runbooks",
+      "hint2Desc": "Find and execute operational procedures for common scenarios",
+      "hint3Title": "Monitor Reliability",
+      "hint3Desc": "Track team-owned service reliability metrics and SLOs"
+    }
   }
 }

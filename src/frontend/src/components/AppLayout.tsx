@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { AppHeader } from './AppHeader';
 import { CommandPalette } from './CommandPalette';
+import { Breadcrumbs } from './Breadcrumbs';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
@@ -13,6 +14,7 @@ import { useAuth } from '../contexts/AuthContext';
  */
 export function AppLayout() {
   const { isAuthenticated } = useAuth();
+  const { pathname } = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);
@@ -39,6 +41,7 @@ export function AppLayout() {
       <Sidebar />
       <div className="flex-1 ml-64 flex flex-col min-h-0">
         <AppHeader onOpenCommandPalette={openPalette} />
+        {pathname !== '/' && <Breadcrumbs />}
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
