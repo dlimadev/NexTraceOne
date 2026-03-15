@@ -131,7 +131,15 @@
     "navigate": "navegar",
     "select": "seleccionar",
     "close": "cerrar",
-    "knowledge": "Conocimiento"
+    "knowledge": "Conocimiento",
+    "searchResults": "Resultados de Búsqueda",
+    "loading": "Buscando...",
+    "seeAllResults": "Ver todos los resultados",
+    "noEntityResults": "No se encontraron entidades",
+    "entityService": "Servicio",
+    "entityContract": "Contrato",
+    "entityRunbook": "Runbook",
+    "entityDoc": "Documentación"
   },
   "users": {
     "title": "Usuarios",

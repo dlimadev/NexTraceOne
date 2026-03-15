@@ -131,7 +131,15 @@
     "navigate": "navigate",
     "select": "select",
     "close": "close",
-    "knowledge": "Knowledge"
+    "knowledge": "Knowledge",
+    "searchResults": "Search Results",
+    "loading": "Searching...",
+    "seeAllResults": "See all results",
+    "noEntityResults": "No matching entities found",
+    "entityService": "Service",
+    "entityContract": "Contract",
+    "entityRunbook": "Runbook",
+    "entityDoc": "Documentation"
   },
   "users": {
     "title": "Users",
