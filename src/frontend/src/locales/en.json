@@ -2332,6 +2332,28 @@
       "hint2Desc": "Find and execute operational procedures for common scenarios",
       "hint3Title": "Monitor Reliability",
       "hint3Desc": "Track team-owned service reliability metrics and SLOs"
+    },
+    "aiHub": {
+      "hint1Title": "AI Assistant",
+      "hint1Desc": "Get AI-powered insights about your services, contracts, and incidents",
+      "hint2Title": "Model Registry",
+      "hint2Desc": "Browse and manage registered AI models and their configurations",
+      "hint3Title": "IDE Integrations",
+      "hint3Desc": "Connect your IDE to NexTraceOne for governed AI assistance in development"
+    },
+    "governance": {
+      "hint1Title": "Executive Reports",
+      "hint1Desc": "Access executive dashboards with risk, maturity, and benchmarking data",
+      "hint2Title": "Risk Center",
+      "hint2Desc": "Monitor operational risk across services, teams, and domains",
+      "hint3Title": "Compliance Tracking",
+      "hint3Desc": "Track compliance status and manage policy enforcement"
+    },
+    "knowledge": {
+      "hint1Title": "Source of Truth",
+      "hint1Desc": "Your central reference for all services, contracts, and operational knowledge",
+      "hint2Title": "Audit Trail",
+      "hint2Desc": "Track all changes, approvals, and operational decisions"
     }
   },
   "productPolish": {

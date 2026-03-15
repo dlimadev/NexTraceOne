@@ -2332,6 +2332,28 @@
       "hint2Desc": "Encontre e execute procedimentos operacionais para cenários comuns",
       "hint3Title": "Monitorar Confiabilidade",
       "hint3Desc": "Acompanhe métricas de confiabilidade e SLOs dos serviços da equipe"
+    },
+    "aiHub": {
+      "hint1Title": "Assistente IA",
+      "hint1Desc": "Obtenha insights potencializados por IA sobre seus serviços, contratos e incidentes",
+      "hint2Title": "Registro de Modelos",
+      "hint2Desc": "Navegue e gerencie os modelos IA registrados e suas configurações",
+      "hint3Title": "Integrações IDE",
+      "hint3Desc": "Conecte seu IDE ao NexTraceOne para assistência IA governada no desenvolvimento"
+    },
+    "governance": {
+      "hint1Title": "Relatórios Executivos",
+      "hint1Desc": "Acesse dashboards executivos com dados de risco, maturidade e benchmarking",
+      "hint2Title": "Centro de Risco",
+      "hint2Desc": "Monitore o risco operacional em serviços, equipes e domínios",
+      "hint3Title": "Acompanhamento de Conformidade",
+      "hint3Desc": "Acompanhe o status de conformidade e gerencie a aplicação de políticas"
+    },
+    "knowledge": {
+      "hint1Title": "Source of Truth",
+      "hint1Desc": "Sua referência central para todos os serviços, contratos e conhecimento operacional",
+      "hint2Title": "Trilha de Auditoria",
+      "hint2Desc": "Rastreie todas as mudanças, aprovações e decisões operacionais"
     }
   },
   "productPolish": {
