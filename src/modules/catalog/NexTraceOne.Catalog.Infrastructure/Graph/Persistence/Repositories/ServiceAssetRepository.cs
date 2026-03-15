@@ -52,13 +52,13 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var term = searchTerm.ToLowerInvariant();
+            var pattern = $"%{searchTerm}%";
             query = query.Where(s =>
-                s.Name.ToLower().Contains(term) ||
-                s.DisplayName.ToLower().Contains(term) ||
-                s.Domain.ToLower().Contains(term) ||
-                s.TeamName.ToLower().Contains(term) ||
-                s.Description.ToLower().Contains(term));
+                EF.Functions.Like(s.Name, pattern) ||
+                EF.Functions.Like(s.DisplayName, pattern) ||
+                EF.Functions.Like(s.Domain, pattern) ||
+                EF.Functions.Like(s.TeamName, pattern) ||
+                EF.Functions.Like(s.Description, pattern));
         }
 
         return await query.OrderBy(s => s.Name).ToListAsync(cancellationToken);
@@ -66,14 +66,14 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
 
     public async Task<IReadOnlyList<ServiceAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken)
     {
-        var term = searchTerm.ToLowerInvariant();
+        var pattern = $"%{searchTerm}%";
         return await _context.ServiceAssets
             .Where(s =>
-                s.Name.ToLower().Contains(term) ||
-                s.DisplayName.ToLower().Contains(term) ||
-                s.Domain.ToLower().Contains(term) ||
-                s.TeamName.ToLower().Contains(term) ||
-                s.Description.ToLower().Contains(term))
+                EF.Functions.Like(s.Name, pattern) ||
+                EF.Functions.Like(s.DisplayName, pattern) ||
+                EF.Functions.Like(s.Domain, pattern) ||
+                EF.Functions.Like(s.TeamName, pattern) ||
+                EF.Functions.Like(s.Description, pattern))
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
     }

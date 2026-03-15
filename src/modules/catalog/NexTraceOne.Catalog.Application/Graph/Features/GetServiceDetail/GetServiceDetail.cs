@@ -42,11 +42,9 @@ public static class GetServiceDetail
             if (service is null)
                 return CatalogGraphErrors.ServiceAssetNotFoundById(request.ServiceId);
 
-            // Obter APIs associadas a este serviço
-            var allApis = await apiAssetRepository.ListAllAsync(cancellationToken);
-            var serviceApis = allApis
-                .Where(api => api.OwnerService.Id == service.Id)
-                .ToList();
+            // Obter APIs associadas a este serviço via query filtrada no banco
+            var serviceApis = await apiAssetRepository.ListByServiceIdAsync(
+                service.Id, cancellationToken);
 
             var apiSummaries = serviceApis
                 .Select(api => new ApiSummary(

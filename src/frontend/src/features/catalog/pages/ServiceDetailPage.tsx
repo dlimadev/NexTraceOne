@@ -146,8 +146,10 @@ export function ServiceDetailPage() {
                   </h2>
                 </div>
                 <span className="text-xs text-muted">
-                  {t('catalog.detail.apiCount', { count: service.apiCount })} {t('catalog.detail.separator')} {service.totalConsumers}{' '}
-                  {t('catalog.detail.consumers')}
+                  {t('catalog.detail.apiAndConsumerSummary', {
+                    apiCount: service.apiCount,
+                    consumerCount: service.totalConsumers,
+                  })}
                 </span>
               </div>
             </CardHeader>

@@ -23,6 +23,11 @@ internal sealed class ApiAssetRepository(CatalogGraphDbContext context)
     public async Task<IReadOnlyList<ApiAsset>> ListAllAsync(CancellationToken cancellationToken)
         => await IncludeGraph(_context.ApiAssets).ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<ApiAsset>> ListByServiceIdAsync(ServiceAssetId serviceId, CancellationToken cancellationToken)
+        => await IncludeGraph(_context.ApiAssets)
+            .Where(asset => EF.Property<Guid>(asset, "OwnerServiceId") == serviceId.Value)
+            .ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<ApiAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken)
         => await IncludeGraph(_context.ApiAssets)
             .Where(asset =>

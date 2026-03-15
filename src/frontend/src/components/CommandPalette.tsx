@@ -23,6 +23,7 @@ import {
   BarChart3,
   Scale,
   DollarSign,
+  Share2,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
@@ -45,6 +46,7 @@ const paletteItems: PaletteItem[] = [
   { id: 'dashboard', labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={16} />, group: 'commandPalette.navigation' },
   // ── Services ──
   { id: 'services', labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
+  { id: 'dependency-graph', labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
   { id: 'portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.services', permission: 'developer-portal:read' },
   // ── Contracts ──
   { id: 'contracts', labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },

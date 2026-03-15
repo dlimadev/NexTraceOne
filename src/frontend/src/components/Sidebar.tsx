@@ -25,6 +25,8 @@ import {
   Scale,
   DollarSign,
   FileCode,
+  Share2,
+  Server,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -60,7 +62,8 @@ const navItems: NavItem[] = [
   // ── Home ──
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
   // ── Services ──
-  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'services' },
   // ── Contracts ──
   { labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },

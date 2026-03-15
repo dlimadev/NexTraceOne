@@ -95,7 +95,8 @@
     "sectionChanges": "Changes",
     "sectionOperations": "Operations",
     "sectionAiHub": "AI Hub",
-    "sectionGovernance": "Governance"
+    "sectionGovernance": "Governance",
+    "dependencyGraph": "Dependency Graph"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -1246,7 +1247,8 @@
       "decommissioned": "Decommissioned",
       "active": "Active",
       "status": "Status",
-      "separator": "·"
+      "separator": "·",
+      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumers"
     },
     "actions": {
       "viewDetail": "View Detail",

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
@@ -92,11 +92,18 @@ const emptyFilters: ServiceFilters = {
 export function ServiceCatalogListPage() {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<ServiceFilters>(emptyFilters);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  /** Debounce da pesquisa para evitar chamadas excessivas à API. */
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(filters.search), 350);
+    return () => clearTimeout(timer);
+  }, [filters.search]);
 
   /** Parâmetros enviados à API — omite chaves vazias. */
   const queryParams = useMemo(() => {
     const p: Record<string, string> = {};
-    if (filters.search) p.search = filters.search;
+    if (debouncedSearch) p.search = debouncedSearch;
     if (filters.serviceType) p.serviceType = filters.serviceType;
     if (filters.criticality) p.criticality = filters.criticality;
     if (filters.lifecycleStatus) p.lifecycleStatus = filters.lifecycleStatus;
@@ -104,7 +111,7 @@ export function ServiceCatalogListPage() {
     if (filters.domain) p.domain = filters.domain;
     if (filters.teamName) p.teamName = filters.teamName;
     return p;
-  }, [filters]);
+  }, [debouncedSearch, filters.serviceType, filters.criticality, filters.lifecycleStatus, filters.exposureType, filters.domain, filters.teamName]);
 
   const {
     data,
