@@ -625,7 +625,7 @@ export function DeveloperPortalPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-edge text-left text-muted">
-                        <th className="py-2 px-3">API</th>
+                        <th className="py-2 px-3">{t('sourceOfTruth.table.api')}</th>
                         <th className="py-2 px-3">
                           {t('developerPortal.playground.form.httpMethod')}
                         </th>

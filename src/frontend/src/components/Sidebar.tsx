@@ -207,9 +207,9 @@ export function Sidebar() {
             {user?.email?.[0]?.toUpperCase() ?? 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-heading truncate">{user?.email ?? 'User'}</p>
+            <p className="text-sm font-medium text-heading truncate">{user?.email ?? t('common.user')}</p>
             <p className="text-xs text-muted truncate">
-              {t(`persona.${persona}.label`)} · {roleName || 'Developer'}
+              {t(`persona.${persona}.label`)} · {roleName || t('common.defaultRole')}
             </p>
           </div>
           <button

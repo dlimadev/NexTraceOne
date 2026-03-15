@@ -244,14 +244,14 @@ export function ChangeDetailPage() {
               <div className="space-y-3">
                 {validation.baselineMetrics && (
                   <div>
-                    <p className="text-xs text-muted mb-1">Baseline Metrics</p>
+                    <p className="text-xs text-muted mb-1">{t('changeConfidence.detail.baselineMetrics')}</p>
                     <pre className="text-xs bg-elevated rounded-md p-3 overflow-x-auto text-body">
                       {JSON.stringify(validation.baselineMetrics, null, 2)}
                     </pre>
                   </div>
                 )}
                 {validation.reviewStatus && (
-                  <DetailRow label="Review Status" value={validation.reviewStatus} />
+                  <DetailRow label={t('changeConfidence.detail.reviewStatus')} value={validation.reviewStatus} />
                 )}
               </div>
             ) : (
