@@ -24,6 +24,7 @@ import {
   Scale,
   DollarSign,
   Share2,
+  Layers,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
@@ -50,6 +51,7 @@ const paletteItems: PaletteItem[] = [
   { id: 'portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.services', permission: 'developer-portal:read' },
   // ── Contracts ──
   { id: 'contracts', labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
+  { id: 'contract-studio', labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
   // ── Changes ──
   { id: 'releases', labelKey: 'sidebar.changeIntelligence', to: '/releases', icon: <Zap size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:releases:read' },
   { id: 'workflow', labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={16} />, group: 'commandPalette.changes', permission: 'workflow:read' },

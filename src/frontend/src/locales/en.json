@@ -96,7 +96,8 @@
     "sectionOperations": "Operations",
     "sectionAiHub": "AI Hub",
     "sectionGovernance": "Governance",
-    "dependencyGraph": "Dependency Graph"
+    "dependencyGraph": "Dependency Graph",
+    "contractStudio": "Contract Studio"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -1257,5 +1258,98 @@
       "updateOwnership": "Update Ownership"
     },
     "totalCount": "({{count}} total)"
+  },
+  "contractGov": {
+    "title": "Contract Governance",
+    "subtitle": "Governance, versioning and compliance of service contracts",
+    "search": {
+      "placeholder": "Search contracts by version, API..."
+    },
+    "filters": {
+      "protocol": "Protocol",
+      "lifecycleState": "Lifecycle State",
+      "all": "All"
+    },
+    "columns": {
+      "api": "API Asset",
+      "version": "Version",
+      "protocol": "Protocol",
+      "lifecycle": "Lifecycle",
+      "format": "Format",
+      "signed": "Signed",
+      "locked": "Locked",
+      "importedFrom": "Source",
+      "createdAt": "Created",
+      "actions": "Actions"
+    },
+    "summary": {
+      "totalVersions": "Total Versions",
+      "distinctContracts": "Distinct Contracts",
+      "draft": "Drafts",
+      "inReview": "In Review",
+      "approved": "Approved",
+      "locked": "Locked",
+      "deprecated": "Deprecated"
+    },
+    "badges": {
+      "protocols": {
+        "OpenApi": "OpenAPI",
+        "Swagger": "Swagger",
+        "Wsdl": "WSDL",
+        "AsyncApi": "AsyncAPI",
+        "Protobuf": "Protobuf",
+        "GraphQl": "GraphQL"
+      },
+      "lifecycle": {
+        "Draft": "Draft",
+        "InReview": "In Review",
+        "Approved": "Approved",
+        "Locked": "Locked",
+        "Deprecated": "Deprecated",
+        "Sunset": "Sunset",
+        "Retired": "Retired"
+      },
+      "signed": "Signed",
+      "unsigned": "Unsigned",
+      "lockedLabel": "Locked",
+      "unlockedLabel": "Unlocked"
+    },
+    "empty": {
+      "title": "No contracts found",
+      "description": "Import or create contracts to start governing your service integrations."
+    },
+    "actions": {
+      "viewDetail": "View Detail",
+      "goToStudio": "Open Studio"
+    },
+    "detail": {
+      "title": "Contract Detail",
+      "backToList": "Back to Contracts",
+      "overview": "Overview",
+      "governance": "Governance",
+      "provenance": "Provenance",
+      "specPreview": "Specification Preview",
+      "format": "Format",
+      "importedFrom": "Imported From",
+      "lifecycleState": "Lifecycle State",
+      "isLocked": "Lock Status",
+      "isSigned": "Signature Status",
+      "deprecationDate": "Deprecation Date",
+      "sunsetDate": "Sunset Date",
+      "deprecationNotice": "Deprecation Notice",
+      "importedBy": "Imported By",
+      "parsedBy": "Parsed By",
+      "aiGenerated": "AI Generated",
+      "yes": "Yes",
+      "no": "No",
+      "notAvailable": "Not available",
+      "lockedAt": "Locked At",
+      "lockedBy": "Locked By",
+      "fingerprint": "Fingerprint",
+      "algorithm": "Algorithm",
+      "apiAssetId": "API Asset ID",
+      "version": "Version",
+      "protocol": "Protocol"
+    }
   }
 }

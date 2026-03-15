@@ -5,7 +5,7 @@ import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage, TenantSelectionPage, UsersPage, BreakGlassPage, JitAccessPage, DelegationPage, AccessReviewPage, MySessionsPage, UnauthorizedPage } from './features/identity-access';
 import { LicensingPage, VendorLicensingPage } from './features/commercial-governance';
-import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage } from './features/catalog';
+import { ContractsPage, ServiceCatalogPage, ServiceCatalogListPage, ServiceDetailPage, DeveloperPortalPage, ContractListPage, ContractDetailPage } from './features/catalog';
 import { ReleasesPage, WorkflowPage, PromotionPage } from './features/change-governance';
 import { AuditPage } from './features/audit-compliance';
 import { DashboardPage } from './features/shared';
@@ -51,7 +51,23 @@ export default function App() {
                 path="/contracts"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/studio"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
                     <ContractsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/:contractVersionId"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractDetailPage />
                   </ProtectedRoute>
                 }
               />

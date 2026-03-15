@@ -96,7 +96,8 @@
     "sectionOperations": "Operaciones",
     "sectionAiHub": "Hub de IA",
     "sectionGovernance": "Gobernanza",
-    "dependencyGraph": "Grafo de Dependencias"
+    "dependencyGraph": "Grafo de Dependencias",
+    "contractStudio": "Estudio de Contratos"
   },
   "header": {
     "toggleLanguage": "Cambiar idioma",
@@ -1257,5 +1258,98 @@
       "updateOwnership": "Actualizar Propiedad"
     },
     "totalCount": "({{count}} total)"
+  },
+  "contractGov": {
+    "title": "Gobernanza de Contratos",
+    "subtitle": "Gobernanza, versionado y cumplimiento de contratos de servicio",
+    "search": {
+      "placeholder": "Buscar contratos por versión, API..."
+    },
+    "filters": {
+      "protocol": "Protocolo",
+      "lifecycleState": "Estado del Ciclo de Vida",
+      "all": "Todos"
+    },
+    "columns": {
+      "api": "Activo de API",
+      "version": "Versión",
+      "protocol": "Protocolo",
+      "lifecycle": "Ciclo de Vida",
+      "format": "Formato",
+      "signed": "Firmado",
+      "locked": "Bloqueado",
+      "importedFrom": "Origen",
+      "createdAt": "Creado",
+      "actions": "Acciones"
+    },
+    "summary": {
+      "totalVersions": "Total de Versiones",
+      "distinctContracts": "Contratos Distintos",
+      "draft": "Borradores",
+      "inReview": "En Revisión",
+      "approved": "Aprobados",
+      "locked": "Bloqueados",
+      "deprecated": "Deprecados"
+    },
+    "badges": {
+      "protocols": {
+        "OpenApi": "OpenAPI",
+        "Swagger": "Swagger",
+        "Wsdl": "WSDL",
+        "AsyncApi": "AsyncAPI",
+        "Protobuf": "Protobuf",
+        "GraphQl": "GraphQL"
+      },
+      "lifecycle": {
+        "Draft": "Borrador",
+        "InReview": "En Revisión",
+        "Approved": "Aprobado",
+        "Locked": "Bloqueado",
+        "Deprecated": "Deprecado",
+        "Sunset": "Sunset",
+        "Retired": "Retirado"
+      },
+      "signed": "Firmado",
+      "unsigned": "Sin firmar",
+      "lockedLabel": "Bloqueado",
+      "unlockedLabel": "Desbloqueado"
+    },
+    "empty": {
+      "title": "No se encontraron contratos",
+      "description": "Importe o cree contratos para comenzar a gobernar sus integraciones."
+    },
+    "actions": {
+      "viewDetail": "Ver Detalle",
+      "goToStudio": "Abrir Estudio"
+    },
+    "detail": {
+      "title": "Detalle del Contrato",
+      "backToList": "Volver a Contratos",
+      "overview": "Visión General",
+      "governance": "Gobernanza",
+      "provenance": "Proveniencia",
+      "specPreview": "Vista Previa de la Especificación",
+      "format": "Formato",
+      "importedFrom": "Importado desde",
+      "lifecycleState": "Estado del Ciclo de Vida",
+      "isLocked": "Estado de Bloqueo",
+      "isSigned": "Estado de Firma",
+      "deprecationDate": "Fecha de Deprecación",
+      "sunsetDate": "Fecha de Sunset",
+      "deprecationNotice": "Aviso de Deprecación",
+      "importedBy": "Importado por",
+      "parsedBy": "Analizado por",
+      "aiGenerated": "Generado por IA",
+      "yes": "Sí",
+      "no": "No",
+      "notAvailable": "No disponible",
+      "lockedAt": "Bloqueado en",
+      "lockedBy": "Bloqueado por",
+      "fingerprint": "Huella Digital",
+      "algorithm": "Algoritmo",
+      "apiAssetId": "ID del Activo de API",
+      "version": "Versión",
+      "protocol": "Protocolo"
+    }
   }
 }

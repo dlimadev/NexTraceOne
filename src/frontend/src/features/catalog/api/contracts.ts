@@ -1,5 +1,5 @@
 import client from '../../../api/client';
-import type { ContractVersion, ContractVersionDetail, SignatureVerificationResult, SemanticDiff, ContractProtocol, ContractRuleViolation, ContractSearchResult, ContractIntegrityResult, ContractSyncItem, ContractSyncResponse } from '../../../types';
+import type { ContractVersion, ContractVersionDetail, SignatureVerificationResult, SemanticDiff, ContractProtocol, ContractRuleViolation, ContractSearchResult, ContractIntegrityResult, ContractSyncItem, ContractSyncResponse, ContractListResponse, ContractsSummary, ServiceContractsResponse } from '../../../types';
 
 /**
  * Detecta o formato da especificação (json, yaml ou xml) a partir do conteúdo bruto.
@@ -130,4 +130,22 @@ export const contractsApi = {
     client
       .post<ContractSyncResponse>('/contracts/sync', data)
       .then((r) => r.data),
+
+  /** Lista contratos do catálogo de governança com filtros opcionais. */
+  listContracts: (params?: {
+    protocol?: string;
+    lifecycleState?: string;
+    searchTerm?: string;
+    page?: number;
+    pageSize?: number;
+  }) =>
+    client.get<ContractListResponse>('/contracts/list', { params }).then((r) => r.data),
+
+  /** Obtém resumos agregados de contratos. */
+  getContractsSummary: () =>
+    client.get<ContractsSummary>('/contracts/summary').then((r) => r.data),
+
+  /** Lista contratos associados a um serviço específico. */
+  listContractsByService: (serviceId: string) =>
+    client.get<ServiceContractsResponse>(`/contracts/by-service/${serviceId}`).then((r) => r.data),
 };

@@ -623,6 +623,69 @@ export interface ContractSyncResponse {
   items: ContractSyncItemResult[];
 }
 
+// ─── Contract Governance ─────────────────────────────────────────────────────
+
+/** Item de contrato na listagem de governança. */
+export interface ContractListItem {
+  versionId: string;
+  apiAssetId: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+  isLocked: boolean;
+  format: string;
+  importedFrom: string;
+  createdAt: string;
+  deprecationDate: string | null;
+  isSigned: boolean;
+}
+
+/** Resposta paginada da listagem de contratos. */
+export interface ContractListResponse {
+  items: ContractListItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Contagem por protocolo no resumo de contratos. */
+export interface ContractProtocolCount {
+  protocol: string;
+  count: number;
+}
+
+/** Resposta do resumo agregado de contratos. */
+export interface ContractsSummary {
+  totalVersions: number;
+  distinctContracts: number;
+  draftCount: number;
+  inReviewCount: number;
+  approvedCount: number;
+  lockedCount: number;
+  deprecatedCount: number;
+  byProtocol: ContractProtocolCount[];
+}
+
+/** Contrato associado a um serviço. */
+export interface ServiceContractItem {
+  versionId: string;
+  apiAssetId: string;
+  apiName: string;
+  apiRoutePattern: string;
+  semVer: string;
+  protocol: string;
+  lifecycleState: string;
+  isLocked: boolean;
+  createdAt: string;
+}
+
+/** Resposta da listagem de contratos de um serviço. */
+export interface ServiceContractsResponse {
+  serviceId: string;
+  contracts: ServiceContractItem[];
+  totalCount: number;
+}
+
 // ─── Change Intelligence ─────────────────────────────────────────────────────
 
 export type ChangeLevel = 0 | 1 | 2 | 3 | 4;
