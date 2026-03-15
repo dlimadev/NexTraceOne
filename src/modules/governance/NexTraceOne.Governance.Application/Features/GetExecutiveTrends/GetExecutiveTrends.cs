@@ -12,14 +12,14 @@ public static class GetExecutiveTrends
 {
     /// <summary>Query de tendências executivas. Categoria: operations, changes, incidents ou maturity.</summary>
     public sealed record Query(
-        string? Category = null) : IQuery<Response>;
+        string Category) : IQuery<Response>;
 
     /// <summary>Handler que computa séries temporais e insights para tendências executivas.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var category = request.Category ?? "operations";
+            var category = request.Category;
 
             var series = new List<TrendSeriesDto>
             {

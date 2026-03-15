@@ -12,14 +12,14 @@ public static class GetBenchmarking
 {
     /// <summary>Query de benchmarking. Dimensão: teams ou domains.</summary>
     public sealed record Query(
-        string? Dimension = null) : IQuery<Response>;
+        string Dimension) : IQuery<Response>;
 
     /// <summary>Handler que computa comparações de benchmarking contextualizadas.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var dimension = request.Dimension ?? "teams";
+            var dimension = request.Dimension;
 
             var comparisons = new List<BenchmarkComparisonDto>
             {
