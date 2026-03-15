@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.API\NexTraceOne.OperationalIntelligence.API.csproj" />
     <ProjectReference Include="..\..\modules\aiknowledge\NexTraceOne.AIKnowledge.API\NexTraceOne.AIKnowledge.API.csproj" />
     <ProjectReference Include="..\..\modules\auditcompliance\NexTraceOne.AuditCompliance.API\NexTraceOne.AuditCompliance.API.csproj" />
+    <ProjectReference Include="..\..\modules\governance\NexTraceOne.Governance.API\NexTraceOne.Governance.API.csproj" />
   </ItemGroup>
   <ItemGroup Label="Seed Data">
     <Content Include="SeedData\**" CopyToOutputDirectory="PreserveNewest" />

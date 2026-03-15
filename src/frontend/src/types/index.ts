@@ -1176,3 +1176,132 @@ export interface ChangesSummaryResponse {
   suspectedRegressions: number;
   changesCorrelatedWithIncidents: number;
 }
+
+// ─── Governance — Reports, Risk, Compliance, FinOps ─────────────────────────
+
+/** Nível de risco operacional. */
+export type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
+
+/** Dimensão de risco operacional avaliada. */
+export type RiskDimensionType = 'Operational' | 'Change' | 'Contract' | 'Dependency' | 'Ownership' | 'Documentation' | 'IncidentRecurrence' | 'AiGovernance';
+
+/** Estado de compliance técnico-operacional. */
+export type ComplianceStatusType = 'Compliant' | 'PartiallyCompliant' | 'NonCompliant' | 'NotApplicable';
+
+/** Nível de maturidade operacional. */
+export type MaturityLevelType = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
+
+/** Classificação de eficiência de custo. */
+export type CostEfficiencyType = 'Efficient' | 'Acceptable' | 'Inefficient' | 'Wasteful';
+
+/** Direção de tendência. */
+export type GovernanceTrendDirection = 'Improving' | 'Stable' | 'Declining';
+
+/** Dimensão de risco individual com explicação. */
+export interface RiskDimensionDto {
+  dimension: RiskDimensionType;
+  level: RiskLevel;
+  explanation: string;
+}
+
+/** Indicador de risco por serviço. */
+export interface RiskIndicatorDto {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  riskLevel: RiskLevel;
+  dimensions: RiskDimensionDto[];
+}
+
+/** Resumo de risco operacional. */
+export interface RiskSummaryResponse {
+  overallRiskLevel: RiskLevel;
+  totalServicesAssessed: number;
+  criticalCount: number;
+  highCount: number;
+  mediumCount: number;
+  lowCount: number;
+  indicators: RiskIndicatorDto[];
+  generatedAt: string;
+}
+
+/** Indicadores de cobertura de compliance. */
+export interface CoverageIndicatorsDto {
+  ownerDefined: number;
+  contractDefined: number;
+  versioningPresent: number;
+  documentationAvailable: number;
+  runbookAvailable: number;
+  dependenciesMapped: number;
+  publicationUpToDate: number;
+}
+
+/** Gap de compliance identificado. */
+export interface ComplianceGapDto {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  status: ComplianceStatusType;
+  description: string;
+}
+
+/** Resumo de compliance. */
+export interface ComplianceSummaryResponse {
+  overallScore: number;
+  totalServicesAssessed: number;
+  compliantCount: number;
+  partiallyCompliantCount: number;
+  nonCompliantCount: number;
+  coverage: CoverageIndicatorsDto;
+  gaps: ComplianceGapDto[];
+  generatedAt: string;
+}
+
+/** Sinal de desperdício operacional. */
+export interface WasteSignalDto {
+  description: string;
+  pattern: string;
+  estimatedWaste: number;
+}
+
+/** Custo contextual por serviço. */
+export interface ServiceCostDto {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  efficiency: CostEfficiencyType;
+  monthlyCost: number;
+  trend: GovernanceTrendDirection;
+  wasteSignals: WasteSignalDto[];
+}
+
+/** Resumo de FinOps contextual. */
+export interface FinOpsSummaryResponse {
+  totalMonthlyCost: number;
+  totalWaste: number;
+  overallEfficiency: CostEfficiencyType;
+  costTrend: GovernanceTrendDirection;
+  services: ServiceCostDto[];
+  generatedAt: string;
+}
+
+/** Resumo executivo de relatórios. */
+export interface ReportsSummaryResponse {
+  totalServices: number;
+  servicesWithOwner: number;
+  servicesWithContract: number;
+  servicesWithDocumentation: number;
+  servicesWithRunbook: number;
+  overallRiskLevel: RiskLevel;
+  overallMaturity: MaturityLevelType;
+  changeConfidenceTrend: GovernanceTrendDirection;
+  reliabilityTrend: GovernanceTrendDirection;
+  openIncidents: number;
+  recentChanges: number;
+  complianceScore: number;
+  costEfficiency: CostEfficiencyType;
+  generatedAt: string;
+}
