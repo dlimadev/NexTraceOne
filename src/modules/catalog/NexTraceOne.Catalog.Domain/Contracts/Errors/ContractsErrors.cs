@@ -88,5 +88,31 @@ public static class ContractsErrors
     /// <summary>Nenhum ruleset encontrado para o protocolo informado.</summary>
     public static Error NoRulesetsForProtocol(string protocol)
         => Error.Business("Contracts.Ruleset.NotFound", "No rulesets found for protocol '{0}'.", protocol);
+
+    // ── ContractDraft ───────────────────────────────────────────────
+
+    /// <summary>Draft de contrato não encontrado.</summary>
+    public static Error DraftNotFound(string id)
+        => Error.NotFound("Contracts.Draft.NotFound", "Contract draft '{0}' was not found.", id);
+
+    /// <summary>Draft não pode ser editado no estado atual.</summary>
+    public static Error DraftNotEditable(string id)
+        => Error.Business("Contracts.Draft.NotEditable", "Contract draft '{0}' cannot be edited in its current state.", id);
+
+    /// <summary>Transição de estado de draft inválida.</summary>
+    public static Error InvalidDraftTransition(string fromStatus, string toStatus)
+        => Error.Business("Contracts.Draft.InvalidTransition", "Cannot transition draft from '{0}' to '{1}'.", fromStatus, toStatus);
+
+    // ── ContractExample ─────────────────────────────────────────────
+
+    /// <summary>Exemplo de contrato não encontrado.</summary>
+    public static Error ExampleNotFound(string id)
+        => Error.NotFound("Contracts.Example.NotFound", "Contract example '{0}' was not found.", id);
+
+    // ── ContractReview ──────────────────────────────────────────────
+
+    /// <summary>Revisão de contrato não encontrada.</summary>
+    public static Error ReviewNotFound(string id)
+        => Error.NotFound("Contracts.Review.NotFound", "Contract review '{0}' was not found.", id);
 }
 
