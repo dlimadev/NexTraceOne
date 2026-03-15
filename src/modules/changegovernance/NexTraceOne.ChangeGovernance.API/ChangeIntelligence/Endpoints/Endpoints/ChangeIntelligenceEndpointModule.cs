@@ -12,9 +12,10 @@ namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
 /// - <see cref="AnalysisEndpoints"/> — classificação, blast radius, score e work items.
 /// - <see cref="IntelligenceEndpoints"/> — marcadores externos, sumário, baseline, review e rollback assessment.
 /// - <see cref="FreezeEndpoints"/> — gestão de janelas de freeze.
+/// - <see cref="ChangeConfidenceEndpoints"/> — catálogo de mudanças, resumo e Change Confidence.
 ///
 /// Este padrão segue a mesma abordagem do módulo Identity, reduzindo o tamanho
-/// de cada ficheiro e agrupando endpoints por responsabilidade funcional (SRP).
+/// de cada ficheiro individual e melhorando a navegabilidade do código.
 /// </summary>
 public sealed class ChangeIntelligenceEndpointModule
 {
@@ -31,5 +32,6 @@ public sealed class ChangeIntelligenceEndpointModule
         IntelligenceEndpoints.Map(group);
 
         FreezeEndpoints.Map(app);
+        ChangeConfidenceEndpoints.Map(app);
     }
 }

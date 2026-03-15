@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.ChangeIntelligence.Application.Abstractions;
 using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeIntelligence.Domain.Enums;
 
 namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Repositories;
 
@@ -36,4 +37,114 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
     public async Task<int> CountByApiAssetAsync(Guid apiAssetId, CancellationToken cancellationToken = default)
         => await context.Releases
             .CountAsync(r => r.ApiAssetId == apiAssetId, cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Release>> ListFilteredAsync(
+        string? serviceName, string? teamName, string? environment,
+        ChangeType? changeType, ConfidenceStatus? confidenceStatus,
+        DeploymentStatus? deploymentStatus, string? searchTerm,
+        DateTimeOffset? from, DateTimeOffset? to,
+        int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var query = ApplyFilters(
+            serviceName, teamName, environment, changeType,
+            confidenceStatus, deploymentStatus, searchTerm, from, to);
+
+        return await query
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<int> CountFilteredAsync(
+        string? serviceName, string? teamName, string? environment,
+        ChangeType? changeType, ConfidenceStatus? confidenceStatus,
+        DeploymentStatus? deploymentStatus, string? searchTerm,
+        DateTimeOffset? from, DateTimeOffset? to,
+        CancellationToken cancellationToken = default)
+    {
+        var query = ApplyFilters(
+            serviceName, teamName, environment, changeType,
+            confidenceStatus, deploymentStatus, searchTerm, from, to);
+
+        return await query.CountAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Release>> ListByServiceNameAsync(
+        string serviceName, int page, int pageSize,
+        CancellationToken cancellationToken = default)
+        => await context.Releases
+            .Where(r => r.ServiceName == serviceName)
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<int> CountByServiceNameAsync(
+        string serviceName, CancellationToken cancellationToken = default)
+        => await context.Releases
+            .CountAsync(r => r.ServiceName == serviceName, cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<(int total, int validated, int needsAttention, int suspectedRegressions, int correlatedWithIncidents)>
+        GetSummaryCountsAsync(
+            string? teamName, string? environment,
+            DateTimeOffset? from, DateTimeOffset? to,
+            CancellationToken cancellationToken = default)
+    {
+        var query = context.Releases.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(teamName))
+            query = query.Where(r => r.TeamName == teamName);
+        if (!string.IsNullOrWhiteSpace(environment))
+            query = query.Where(r => r.Environment == environment);
+        if (from.HasValue)
+            query = query.Where(r => r.CreatedAt >= from.Value);
+        if (to.HasValue)
+            query = query.Where(r => r.CreatedAt <= to.Value);
+
+        var total = await query.CountAsync(cancellationToken);
+        var validated = await query.CountAsync(r => r.ConfidenceStatus == ConfidenceStatus.Validated, cancellationToken);
+        var needsAttention = await query.CountAsync(r => r.ConfidenceStatus == ConfidenceStatus.NeedsAttention, cancellationToken);
+        var suspectedRegressions = await query.CountAsync(r => r.ConfidenceStatus == ConfidenceStatus.SuspectedRegression, cancellationToken);
+        var correlatedWithIncidents = await query.CountAsync(r => r.ConfidenceStatus == ConfidenceStatus.CorrelatedWithIncident, cancellationToken);
+
+        return (total, validated, needsAttention, suspectedRegressions, correlatedWithIncidents);
+    }
+
+    private IQueryable<Release> ApplyFilters(
+        string? serviceName, string? teamName, string? environment,
+        ChangeType? changeType, ConfidenceStatus? confidenceStatus,
+        DeploymentStatus? deploymentStatus, string? searchTerm,
+        DateTimeOffset? from, DateTimeOffset? to)
+    {
+        var query = context.Releases.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(serviceName))
+            query = query.Where(r => r.ServiceName == serviceName);
+        if (!string.IsNullOrWhiteSpace(teamName))
+            query = query.Where(r => r.TeamName == teamName);
+        if (!string.IsNullOrWhiteSpace(environment))
+            query = query.Where(r => r.Environment == environment);
+        if (changeType.HasValue)
+            query = query.Where(r => r.ChangeType == changeType.Value);
+        if (confidenceStatus.HasValue)
+            query = query.Where(r => r.ConfidenceStatus == confidenceStatus.Value);
+        if (deploymentStatus.HasValue)
+            query = query.Where(r => r.Status == deploymentStatus.Value);
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            query = query.Where(r => r.ServiceName.Contains(searchTerm)
+                || (r.Description != null && r.Description.Contains(searchTerm))
+                || r.Version.Contains(searchTerm));
+        if (from.HasValue)
+            query = query.Where(r => r.CreatedAt >= from.Value);
+        if (to.HasValue)
+            query = query.Where(r => r.CreatedAt <= to.Value);
+
+        return query;
+    }
 }
