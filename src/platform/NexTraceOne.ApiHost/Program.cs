@@ -15,6 +15,7 @@ using NexTraceOne.Workflow.API;
 using NexTraceOne.Promotion.API;
 using NexTraceOne.Audit.API;
 using NexTraceOne.DeveloperPortal.API;
+using NexTraceOne.Governance.API;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
 
@@ -51,6 +52,7 @@ builder.Services.AddWorkflowModule(builder.Configuration);
 builder.Services.AddPromotionModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
+builder.Services.AddGovernanceModule(builder.Configuration);
 
 // [5] OpenAPI
 builder.Services.AddOpenApi();

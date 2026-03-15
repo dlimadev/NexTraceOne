@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.Governance.Infrastructure</RootNamespace>
+    <AssemblyName>NexTraceOne.Governance.Infrastructure</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Governance.Application\NexTraceOne.Governance.Application.csproj" />
+  </ItemGroup>
+</Project>
