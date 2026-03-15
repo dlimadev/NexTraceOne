@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { usePersona } from '../../../contexts/PersonaContext';
 
 interface Conversation {
   id: string;
@@ -54,13 +55,17 @@ const contextScopes = ['Services', 'Contracts', 'Incidents', 'Changes', 'Runbook
 
 /**
  * Página do AI Assistant — assistente IA contextualizado estilo Copilot.
- * Integra serviços, contratos, incidentes e runbooks conforme definido
- * em AI-ASSISTED-OPERATIONS.md.
+ * A experiência adapta-se à persona do utilizador: contextos padrão,
+ * prompts sugeridos e escopo de IA variam por perfil.
+ *
+ * @see docs/AI-ASSISTED-OPERATIONS.md
+ * @see docs/PERSONA-UX-MAPPING.md — secção de IA por persona
  */
 export function AiAssistantPage() {
   const { t } = useTranslation();
+  const { persona, config } = usePersona();
   const [selectedConversation, setSelectedConversation] = useState<string>('1');
-  const [activeContexts, setActiveContexts] = useState<string[]>(['Services', 'Contracts']);
+  const [activeContexts, setActiveContexts] = useState<string[]>(config.aiContextScopes);
   const [inputValue, setInputValue] = useState('');
 
   const toggleContext = (ctx: string) => {
@@ -127,7 +132,7 @@ export function AiAssistantPage() {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 <User size={14} className="text-muted" />
-                <span className="text-xs text-muted">{t('aiHub.persona')}: Engineer</span>
+                <span className="text-xs text-muted">{t('aiHub.persona')}: {t(`persona.${persona}.label`)}</span>
               </div>
               <Badge variant="info">
                 <div className="flex items-center gap-1">
@@ -172,22 +177,17 @@ export function AiAssistantPage() {
               </div>
             ))}
 
-            {/* Prompts sugeridos */}
+            {/* Prompts sugeridos — adaptados à persona */}
             <div className="pt-4">
               <p className="text-xs text-muted mb-3">{t('aiHub.suggestedPrompts')}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {[
-                  t('aiHub.prompt1'),
-                  t('aiHub.prompt2'),
-                  t('aiHub.prompt3'),
-                  t('aiHub.prompt4'),
-                ].map((prompt, idx) => (
+                {config.aiSuggestedPromptKeys.map((promptKey, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setInputValue(prompt)}
+                    onClick={() => setInputValue(t(promptKey))}
                     className="text-left px-3 py-2 rounded-md border border-edge text-sm text-body hover:bg-hover transition-colors"
                   >
-                    {prompt}
+                    {t(promptKey)}
                   </button>
                 ))}
               </div>
