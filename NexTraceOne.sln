@@ -181,6 +181,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Governance.Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Governance.API", "src\modules\governance\NexTraceOne.Governance.API\NexTraceOne.Governance.API.csproj", "{EA339BD1-9125-463E-9D42-F733BB4DCC23}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "governance", "governance", "{A7BD1B43-3E27-8E24-1F72-C560E0F26199}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Governance.Tests", "tests\modules\governance\NexTraceOne.Governance.Tests\NexTraceOne.Governance.Tests.csproj", "{B19182A8-0981-466F-86DD-D2D0D9A141AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -953,6 +957,18 @@ Global
 		{EA339BD1-9125-463E-9D42-F733BB4DCC23}.Release|x64.Build.0 = Release|Any CPU
 		{EA339BD1-9125-463E-9D42-F733BB4DCC23}.Release|x86.ActiveCfg = Release|Any CPU
 		{EA339BD1-9125-463E-9D42-F733BB4DCC23}.Release|x86.Build.0 = Release|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Debug|x64.Build.0 = Debug|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Debug|x86.Build.0 = Debug|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Release|x64.Build.0 = Release|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1043,6 +1059,8 @@ Global
 		{5636F7BF-D36E-4193-B1D6-D9BF96B164F8} = {7D332C09-6C29-D401-3D21-27BC44A9423B}
 		{3F3EB169-BF2C-4E9F-B104-AA19930BF168} = {7D332C09-6C29-D401-3D21-27BC44A9423B}
 		{EA339BD1-9125-463E-9D42-F733BB4DCC23} = {7D332C09-6C29-D401-3D21-27BC44A9423B}
+		{A7BD1B43-3E27-8E24-1F72-C560E0F26199} = {D7DC9B74-6BC4-2470-2038-1E57C2DCB73B}
+		{B19182A8-0981-466F-86DD-D2D0D9A141AD} = {A7BD1B43-3E27-8E24-1F72-C560E0F26199}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DFF94D6C-02B3-46BC-9488-BE53A9C29BAD}
