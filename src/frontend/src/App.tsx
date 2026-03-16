@@ -84,6 +84,12 @@ const PolicyCatalogPage = lazy(() => import('./features/governance/pages/PolicyC
 const EvidencePackagesPage = lazy(() => import('./features/governance/pages/EvidencePackagesPage').then(m => ({ default: m.EvidencePackagesPage })));
 const EnterpriseControlsPage = lazy(() => import('./features/governance/pages/EnterpriseControlsPage').then(m => ({ default: m.EnterpriseControlsPage })));
 
+// ── Governance Packs (lazy) ──
+const GovernancePacksOverviewPage = lazy(() => import('./features/governance/pages/GovernancePacksOverviewPage').then(m => ({ default: m.GovernancePacksOverviewPage })));
+const GovernancePackDetailPage = lazy(() => import('./features/governance/pages/GovernancePackDetailPage').then(m => ({ default: m.GovernancePackDetailPage })));
+const PackSimulationPage = lazy(() => import('./features/governance/pages/PackSimulationPage').then(m => ({ default: m.PackSimulationPage })));
+const WaiversPage = lazy(() => import('./features/governance/pages/WaiversPage').then(m => ({ default: m.WaiversPage })));
+
 // ── Organization Governance (lazy) ──
 const TeamsOverviewPage = lazy(() => import('./features/governance/pages/TeamsOverviewPage').then(m => ({ default: m.TeamsOverviewPage })));
 const TeamDetailPage = lazy(() => import('./features/governance/pages/TeamDetailPage').then(m => ({ default: m.TeamDetailPage })));
@@ -327,6 +333,39 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
                     <EnterpriseControlsPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Governance Packs ── */}
+              <Route
+                path="/governance/packs"
+                element={
+                  <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
+                    <GovernancePacksOverviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/packs/:packId"
+                element={
+                  <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
+                    <GovernancePackDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/packs/:packId/simulate"
+                element={
+                  <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
+                    <PackSimulationPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/waivers"
+                element={
+                  <ProtectedRoute permission="governance:waivers:read" redirectTo="/unauthorized">
+                    <WaiversPage />
                   </ProtectedRoute>
                 }
               />
