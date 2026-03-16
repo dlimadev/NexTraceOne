@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 
@@ -26,82 +27,15 @@ public static class GetMitigationWorkflow
     }
 
     /// <summary>Handler que compõe o detalhe do workflow de mitigação.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = FindWorkflow(request.IncidentId, request.WorkflowId);
+            var response = store.GetMitigationWorkflow(request.IncidentId, request.WorkflowId);
             if (response is null)
                 return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
             return Task.FromResult(Result<Response>.Success(response));
-        }
-
-        private static Response? FindWorkflow(string incidentId, string workflowId)
-        {
-            if (incidentId.Equals("a1b2c3d4-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase)
-                && workflowId.Equals("wf-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
-            {
-                return new Response(
-                    WorkflowId: Guid.Parse("00000001-0001-0000-0000-000000000001"),
-                    IncidentId: Guid.Parse("a1b2c3d4-0001-0000-0000-000000000001"),
-                    Title: "Rollback payment-service to v2.13.2",
-                    Status: MitigationWorkflowStatus.InProgress,
-                    ActionType: MitigationActionType.RollbackCandidate,
-                    RiskLevel: RiskLevel.Medium,
-                    RequiresApproval: true,
-                    ApprovedBy: "tech-lead@nextraceone.io",
-                    ApprovedAt: DateTimeOffset.Parse("2024-06-15T10:30:00Z"),
-                    CreatedBy: "ai-assistant",
-                    CreatedAt: DateTimeOffset.Parse("2024-06-15T10:15:00Z"),
-                    StartedAt: DateTimeOffset.Parse("2024-06-15T10:35:00Z"),
-                    CompletedAt: null,
-                    Outcome: null,
-                    OutcomeNotes: null,
-                    LinkedRunbookId: Guid.Parse("bb000001-0001-0000-0000-000000000001"),
-                    Steps: new[]
-                    {
-                        new WorkflowStepDto(1, "Trigger rollback pipeline", "Initiate the CI/CD rollback to v2.13.2", true, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:36:00Z"), null),
-                        new WorkflowStepDto(2, "Validate deployment status", "Confirm rollback deployment completed successfully", true, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:42:00Z"), "Deployment verified via health check"),
-                        new WorkflowStepDto(3, "Monitor error rate recovery", "Observe error rate for 30 minutes post-rollback", false, null, null, null),
-                        new WorkflowStepDto(4, "Confirm resolution", "Verify incident is resolved and close workflow", false, null, null, null),
-                    },
-                    Decisions: new[]
-                    {
-                        new WorkflowDecisionDto(MitigationDecisionType.Approved, "tech-lead@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:30:00Z"), "Approved based on correlation evidence and low risk of rollback."),
-                    });
-            }
-
-            if (incidentId.Equals("a1b2c3d4-0002-0000-0000-000000000002", StringComparison.OrdinalIgnoreCase)
-                && workflowId.Equals("wf-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
-            {
-                return new Response(
-                    WorkflowId: Guid.Parse("00000002-0001-0000-0000-000000000001"),
-                    IncidentId: Guid.Parse("a1b2c3d4-0002-0000-0000-000000000002"),
-                    Title: "Verify external catalog sync dependency",
-                    Status: MitigationWorkflowStatus.AwaitingApproval,
-                    ActionType: MitigationActionType.VerifyDependency,
-                    RiskLevel: RiskLevel.Low,
-                    RequiresApproval: true,
-                    ApprovedBy: null,
-                    ApprovedAt: null,
-                    CreatedBy: "ai-assistant",
-                    CreatedAt: DateTimeOffset.Parse("2024-06-15T14:45:00Z"),
-                    StartedAt: null,
-                    CompletedAt: null,
-                    Outcome: null,
-                    OutcomeNotes: null,
-                    LinkedRunbookId: Guid.Parse("bb000002-0001-0000-0000-000000000001"),
-                    Steps: new[]
-                    {
-                        new WorkflowStepDto(1, "Check vendor status page", "Verify current status of external provider", false, null, null, null),
-                        new WorkflowStepDto(2, "Attempt manual sync request", "Test connectivity with a manual sync attempt", false, null, null, null),
-                        new WorkflowStepDto(3, "Enable fallback mode", "Activate manual sync fallback if vendor is down", false, null, null, null),
-                    },
-                    Decisions: Array.Empty<WorkflowDecisionDto>());
-            }
-
-            return null;
         }
     }
 

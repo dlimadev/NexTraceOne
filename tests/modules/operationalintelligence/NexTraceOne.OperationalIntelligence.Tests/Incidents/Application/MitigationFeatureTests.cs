@@ -6,6 +6,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMiti
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 
@@ -15,12 +16,14 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 /// </summary>
 public sealed class MitigationFeatureTests
 {
+    private readonly InMemoryIncidentStore _store = new();
+
     // ── GetMitigationRecommendations ─────────────────────────────────
 
     [Fact]
     public async Task GetMitigationRecommendations_KnownIncident_ShouldReturnRecommendations()
     {
-        var handler = new GetMitigationRecommendations.Handler();
+        var handler = new GetMitigationRecommendations.Handler(_store);
         var query = new GetMitigationRecommendations.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -38,7 +41,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationRecommendations_UnknownIncident_ShouldReturnError()
     {
-        var handler = new GetMitigationRecommendations.Handler();
+        var handler = new GetMitigationRecommendations.Handler(_store);
         var query = new GetMitigationRecommendations.Query("nonexistent-incident-id");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -63,7 +66,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationWorkflow_KnownIncidentAndWorkflow_ShouldReturnWorkflowDetail()
     {
-        var handler = new GetMitigationWorkflow.Handler();
+        var handler = new GetMitigationWorkflow.Handler(_store);
         var query = new GetMitigationWorkflow.Query("a1b2c3d4-0001-0000-0000-000000000001", "wf-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -86,7 +89,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationWorkflow_UnknownIncident_ShouldReturnError()
     {
-        var handler = new GetMitigationWorkflow.Handler();
+        var handler = new GetMitigationWorkflow.Handler(_store);
         var query = new GetMitigationWorkflow.Query("nonexistent", "wf-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -112,7 +115,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task CreateMitigationWorkflow_ValidInputs_ShouldReturnDraftWorkflow()
     {
-        var handler = new CreateMitigationWorkflow.Handler();
+        var handler = new CreateMitigationWorkflow.Handler(_store);
         var command = new CreateMitigationWorkflow.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             Title: "Test workflow",
@@ -132,7 +135,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task CreateMitigationWorkflow_UnknownIncident_ShouldReturnError()
     {
-        var handler = new CreateMitigationWorkflow.Handler();
+        var handler = new CreateMitigationWorkflow.Handler(_store);
         var command = new CreateMitigationWorkflow.Command(
             IncidentId: "nonexistent-incident-id",
             Title: "Test workflow",
@@ -177,7 +180,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task UpdateMitigationWorkflowAction_ValidApproveAction_ShouldReturnApprovedStatus()
     {
-        var handler = new UpdateMitigationWorkflowAction.Handler();
+        var handler = new UpdateMitigationWorkflowAction.Handler(_store);
         var command = new UpdateMitigationWorkflowAction.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             WorkflowId: "wf-0001-0000-0000-000000000001",
@@ -196,7 +199,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task UpdateMitigationWorkflowAction_InvalidAction_ShouldReturnError()
     {
-        var handler = new UpdateMitigationWorkflowAction.Handler();
+        var handler = new UpdateMitigationWorkflowAction.Handler(_store);
         var command = new UpdateMitigationWorkflowAction.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             WorkflowId: "wf-0001-0000-0000-000000000001",
@@ -229,7 +232,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationHistory_KnownIncident_ShouldReturnHistoryEntries()
     {
-        var handler = new GetMitigationHistory.Handler();
+        var handler = new GetMitigationHistory.Handler(_store);
         var query = new GetMitigationHistory.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -245,7 +248,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationHistory_UnknownIncident_ShouldReturnError()
     {
-        var handler = new GetMitigationHistory.Handler();
+        var handler = new GetMitigationHistory.Handler(_store);
         var query = new GetMitigationHistory.Query("nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -270,7 +273,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationValidation_KnownWorkflow_ShouldReturnValidationData()
     {
-        var handler = new GetMitigationValidation.Handler();
+        var handler = new GetMitigationValidation.Handler(_store);
         var query = new GetMitigationValidation.Query("a1b2c3d4-0001-0000-0000-000000000001", "wf-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -287,7 +290,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task GetMitigationValidation_UnknownWorkflow_ShouldReturnError()
     {
-        var handler = new GetMitigationValidation.Handler();
+        var handler = new GetMitigationValidation.Handler(_store);
         var query = new GetMitigationValidation.Query("nonexistent", "wf-nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -301,7 +304,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task RecordMitigationValidation_ValidInputs_ShouldRecordSuccessfully()
     {
-        var handler = new RecordMitigationValidation.Handler();
+        var handler = new RecordMitigationValidation.Handler(_store);
         var command = new RecordMitigationValidation.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             WorkflowId: "wf-0001-0000-0000-000000000001",
@@ -322,7 +325,7 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task RecordMitigationValidation_UnknownIncident_ShouldReturnError()
     {
-        var handler = new RecordMitigationValidation.Handler();
+        var handler = new RecordMitigationValidation.Handler(_store);
         var command = new RecordMitigationValidation.Command(
             IncidentId: "nonexistent",
             WorkflowId: "wf-001",

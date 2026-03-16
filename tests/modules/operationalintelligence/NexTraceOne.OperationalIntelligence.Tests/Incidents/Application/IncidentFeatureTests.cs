@@ -8,6 +8,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using Xunit;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
@@ -18,12 +19,14 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 /// </summary>
 public sealed class IncidentFeatureTests
 {
+    private readonly InMemoryIncidentStore _store = new();
+
     // ── ListIncidents ────────────────────────────────────────────────
 
     [Fact]
     public async Task ListIncidents_WithNoFilters_ShouldReturnAllItems()
     {
-        var handler = new ListIncidents.Handler();
+        var handler = new ListIncidents.Handler(_store);
         var query = new ListIncidents.Query(null, null, null, null, null, null, null, null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -36,7 +39,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidents_FilterBySeverity_ShouldReturnFiltered()
     {
-        var handler = new ListIncidents.Handler();
+        var handler = new ListIncidents.Handler(_store);
         var query = new ListIncidents.Query(null, null, null, IncidentSeverity.Critical, null, null, null, null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -48,7 +51,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidents_FilterByStatus_ShouldReturnFiltered()
     {
-        var handler = new ListIncidents.Handler();
+        var handler = new ListIncidents.Handler(_store);
         var query = new ListIncidents.Query(null, null, null, null, IncidentStatus.Mitigating, null, null, null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -60,7 +63,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidents_FilterByTeam_ShouldReturnFiltered()
     {
-        var handler = new ListIncidents.Handler();
+        var handler = new ListIncidents.Handler(_store);
         var query = new ListIncidents.Query("order-squad", null, null, null, null, null, null, null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -72,7 +75,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidents_FilterBySearch_ShouldReturnMatching()
     {
-        var handler = new ListIncidents.Handler();
+        var handler = new ListIncidents.Handler(_store);
         var query = new ListIncidents.Query(null, null, null, null, null, null, "payment", null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -108,7 +111,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentDetail_KnownIncident_ShouldReturnDetail()
     {
-        var handler = new GetIncidentDetail.Handler();
+        var handler = new GetIncidentDetail.Handler(_store);
         var query = new GetIncidentDetail.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -127,7 +130,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentDetail_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new GetIncidentDetail.Handler();
+        var handler = new GetIncidentDetail.Handler(_store);
         var query = new GetIncidentDetail.Query("nonexistent-incident-id");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -152,7 +155,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentCorrelation_KnownIncident_ShouldReturnCorrelation()
     {
-        var handler = new GetIncidentCorrelation.Handler();
+        var handler = new GetIncidentCorrelation.Handler(_store);
         var query = new GetIncidentCorrelation.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -166,7 +169,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentCorrelation_LowConfidenceIncident_ShouldReturnLowConfidence()
     {
-        var handler = new GetIncidentCorrelation.Handler();
+        var handler = new GetIncidentCorrelation.Handler(_store);
         var query = new GetIncidentCorrelation.Query("a1b2c3d4-0002-0000-0000-000000000002");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -179,7 +182,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentCorrelation_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new GetIncidentCorrelation.Handler();
+        var handler = new GetIncidentCorrelation.Handler(_store);
         var query = new GetIncidentCorrelation.Query("nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -192,7 +195,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentEvidence_KnownIncident_ShouldReturnEvidence()
     {
-        var handler = new GetIncidentEvidence.Handler();
+        var handler = new GetIncidentEvidence.Handler(_store);
         var query = new GetIncidentEvidence.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -206,7 +209,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentEvidence_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new GetIncidentEvidence.Handler();
+        var handler = new GetIncidentEvidence.Handler(_store);
         var query = new GetIncidentEvidence.Query("nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -219,7 +222,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentMitigation_KnownIncident_ShouldReturnMitigation()
     {
-        var handler = new GetIncidentMitigation.Handler();
+        var handler = new GetIncidentMitigation.Handler(_store);
         var query = new GetIncidentMitigation.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -234,7 +237,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentMitigation_ExternalFailure_ShouldNotRecommendRollback()
     {
-        var handler = new GetIncidentMitigation.Handler();
+        var handler = new GetIncidentMitigation.Handler(_store);
         var query = new GetIncidentMitigation.Query("a1b2c3d4-0002-0000-0000-000000000002");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -247,7 +250,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentMitigation_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new GetIncidentMitigation.Handler();
+        var handler = new GetIncidentMitigation.Handler(_store);
         var query = new GetIncidentMitigation.Query("nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -260,7 +263,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentSummary_ShouldReturnAggregatedMetrics()
     {
-        var handler = new GetIncidentSummary.Handler();
+        var handler = new GetIncidentSummary.Handler(_store);
         var query = new GetIncidentSummary.Query(null, null, null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -289,7 +292,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidentsByService_KnownService_ShouldReturnItems()
     {
-        var handler = new ListIncidentsByService.Handler();
+        var handler = new ListIncidentsByService.Handler(_store);
         var query = new ListIncidentsByService.Query("svc-payment-gateway", null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -302,7 +305,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidentsByService_UnknownService_ShouldReturnEmpty()
     {
-        var handler = new ListIncidentsByService.Handler();
+        var handler = new ListIncidentsByService.Handler(_store);
         var query = new ListIncidentsByService.Query("svc-nonexistent", null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -327,7 +330,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidentsByTeam_KnownTeam_ShouldReturnItems()
     {
-        var handler = new ListIncidentsByTeam.Handler();
+        var handler = new ListIncidentsByTeam.Handler(_store);
         var query = new ListIncidentsByTeam.Query("order-squad", null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -340,7 +343,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task ListIncidentsByTeam_UnknownTeam_ShouldReturnEmpty()
     {
-        var handler = new ListIncidentsByTeam.Handler();
+        var handler = new ListIncidentsByTeam.Handler(_store);
         var query = new ListIncidentsByTeam.Query("unknown-squad", null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
