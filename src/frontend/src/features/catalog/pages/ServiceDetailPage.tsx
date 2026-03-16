@@ -12,6 +12,8 @@ import {
   Layers,
   Eye,
   Lock,
+  GitCommit,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -452,10 +454,53 @@ export function ServiceDetailPage() {
               </div>
             </CardBody>
           </Card>
+
+          {/* Related Changes */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <GitCommit size={16} className="text-accent" />
+                <h2 className="text-base font-semibold text-heading">
+                  {t('catalog.detail.recentChanges')}
+                </h2>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <p className="text-xs text-muted mb-3">{t('catalog.detail.recentChangesDescription')}</p>
+              <Link
+                to={`/changes?serviceName=${encodeURIComponent(service.name)}`}
+                className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+              >
+                <ExternalLink size={12} />
+                {t('catalog.detail.viewChange')}
+              </Link>
+            </CardBody>
+          </Card>
+
+          {/* Related Incidents */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={16} className="text-accent" />
+                <h2 className="text-base font-semibold text-heading">
+                  {t('catalog.detail.relatedIncidents')}
+                </h2>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <p className="text-xs text-muted mb-3">{t('catalog.detail.relatedIncidentsDescription')}</p>
+              <Link
+                to="/operations/incidents"
+                className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+              >
+                <ExternalLink size={12} />
+                {t('catalog.detail.viewIncident')}
+              </Link>
+            </CardBody>
+          </Card>
         </div>
       </div>
 
-      {/* ── AI Assistant Panel ── */}
       <div className="mt-6">
         <AssistantPanel
           contextType="service"

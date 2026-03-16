@@ -160,7 +160,7 @@ export function AiRoutingPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => toggleExpand(strategy.id)}
-                  aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                  aria-label={isExpanded ? t('common.collapse') : t('common.expand')}
                 >
                   {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </Button>

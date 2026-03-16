@@ -8,6 +8,7 @@ import {
   BookOpen,
   ExternalLink,
   Globe,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
@@ -58,7 +59,7 @@ export function SourceOfTruthExplorerPage() {
     return () => clearTimeout(timer);
   }, [rawQuery]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['source-of-truth-search', debouncedQuery, scope],
     queryFn: () =>
       sourceOfTruthApi.search({
@@ -78,6 +79,7 @@ export function SourceOfTruthExplorerPage() {
   );
 
   const showEmpty = debouncedQuery.trim().length > 0 && !isLoading && !hasResults;
+  const showError = isError && debouncedQuery.trim().length > 0;
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
@@ -156,6 +158,15 @@ export function SourceOfTruthExplorerPage() {
           icon={<Search size={24} />}
           title={t('sourceOfTruth.results.noResults')}
           description={t('sourceOfTruth.results.noResultsDescription')}
+        />
+      )}
+
+      {/* Error */}
+      {showError && (
+        <EmptyState
+          icon={<AlertTriangle size={24} />}
+          title={t('common.error')}
+          description={t('common.errorDescription')}
         />
       )}
 

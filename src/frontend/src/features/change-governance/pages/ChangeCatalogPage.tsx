@@ -259,6 +259,13 @@ export function ChangeCatalogPage() {
                     {t('common.loading')}
                   </td>
                 </tr>
+              ) : changesQuery.isError ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-12 text-center">
+                    <p className="text-critical font-medium">{t('common.error')}</p>
+                    <p className="text-xs text-muted mt-1">{t('common.errorDescription')}</p>
+                  </td>
+                </tr>
               ) : changes.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-12 text-center">

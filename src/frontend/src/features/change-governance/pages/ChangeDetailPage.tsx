@@ -713,7 +713,7 @@ export function ChangeDetailPage() {
                   <p className="text-xs text-muted">{change.domain ?? change.teamName ?? '—'}</p>
                 </div>
                 <Link
-                  to={`/catalog/services`}
+                  to="/services"
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md bg-surface border border-edge text-xs text-accent hover:border-accent transition-colors"
                 >
                   <ExternalLink size={12} />
@@ -732,7 +732,7 @@ export function ChangeDetailPage() {
                   <div key={consumer} className="flex items-center gap-3 p-2 rounded-md bg-elevated border border-edge mb-1.5">
                     <span className="text-sm text-body flex-1">{consumer}</span>
                     <Link
-                      to={`/catalog/services`}
+                      to="/services"
                       className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-accent hover:underline"
                     >
                       <ExternalLink size={10} />
@@ -775,6 +775,13 @@ export function ChangeDetailPage() {
             >
               <ExternalLink size={14} />
               {t('changeConfidence.detail.viewInReleases')}
+            </Link>
+            <Link
+              to="/operations/incidents"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-elevated border border-edge text-sm text-body hover:text-heading hover:border-accent transition-colors"
+            >
+              <ExternalLink size={14} />
+              {t('changeConfidence.detail.viewIncidents')}
             </Link>
           </div>
         </CardBody>
