@@ -33,6 +33,7 @@ export const aiGovernanceApi = {
     serviceId?: string;
     contractId?: string;
     incidentId?: string;
+    changeId?: string;
     teamId?: string;
     domainId?: string;
   }) =>
@@ -50,6 +51,7 @@ export const aiGovernanceApi = {
     serviceId?: string;
     contractId?: string;
     incidentId?: string;
+    changeId?: string;
     teamId?: string;
   }) =>
     client.post('/ai/assistant/conversations', data).then(r => r.data),
@@ -70,6 +72,7 @@ export const aiGovernanceApi = {
     serviceId?: string;
     contractId?: string;
     incidentId?: string;
+    changeId?: string;
   }) =>
     client.post('/ai/assistant/plan-execution', data).then(r => r.data),
   listRoutingStrategies: (params?: { isActive?: boolean }) =>
@@ -86,6 +89,7 @@ export const aiGovernanceApi = {
     serviceId?: string;
     contractId?: string;
     incidentId?: string;
+    changeId?: string;
   }) =>
     client.post('/ai/context/enrich', data).then(r => r.data),
 };

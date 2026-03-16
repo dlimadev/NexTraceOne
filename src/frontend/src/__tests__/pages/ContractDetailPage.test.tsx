@@ -1,9 +1,36 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ContractDetailPage } from '../../features/catalog/pages/ContractDetailPage';
 import type { ContractVersionDetail, ContractVersion } from '../../types';
+
+beforeAll(() => {
+  Element.prototype.scrollIntoView = vi.fn();
+});
+
+vi.mock('../../contexts/PersonaContext', () => ({
+  usePersona: vi.fn().mockReturnValue({
+    persona: 'Engineer',
+    config: {
+      aiContextScopes: ['services', 'contracts', 'incidents'],
+      aiSuggestedPromptKeys: [],
+      sectionOrder: [],
+      highlightedSections: [],
+      homeSubtitleKey: '',
+      homeWidgets: [],
+      quickActions: [],
+    },
+  }),
+}));
+
+vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
+  aiGovernanceApi: { sendMessage: vi.fn().mockRejectedValue(new Error('API not available')) },
+}));
+
+vi.mock('../../api/client', () => ({
+  default: { get: vi.fn(), post: vi.fn(), patch: vi.fn() },
+}));
 
 vi.mock('../../features/catalog/api/contracts', () => ({
   contractsApi: {

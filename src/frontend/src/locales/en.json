@@ -3075,5 +3075,89 @@
       "approve": "Approve",
       "reject": "Reject"
     }
+  },
+  "assistantPanel": {
+    "title": "AI Assistant",
+    "quickQuestions": "Quick questions",
+    "tryAsking": "Try asking",
+    "suggestedActions": "Suggested next steps",
+    "contextHint": {
+      "service": "Ask about {{name}} — contracts, dependencies, changes",
+      "contract": "Ask about {{name}} — versions, compatibility, consumers",
+      "change": "Ask about {{name}} — risk, blast radius, rollback",
+      "incident": "Ask about {{name}} — root cause, mitigation, runbook"
+    },
+    "contextLabel": {
+      "service": "Service",
+      "contract": "Contract",
+      "change": "Change",
+      "incident": "Incident"
+    },
+    "welcome": {
+      "service": "I can help you understand the **{{name}}** service — its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth.",
+      "contract": "I can help you analyze the **{{name}}** contract — its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
+      "change": "I can help you assess the **{{name}}** change — its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
+      "incident": "I can help you investigate the **{{name}}** incident — potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge."
+    },
+    "placeholder": {
+      "service": "Ask about this service...",
+      "contract": "Ask about this contract...",
+      "change": "Ask about this change...",
+      "incident": "Ask about this incident..."
+    },
+    "prompts": {
+      "service": {
+        "overview": "What is the current status and overview of {{name}}?",
+        "contracts": "What contracts does {{name}} expose or consume?",
+        "dependencies": "What are the dependencies and consumers of {{name}}?",
+        "recentChanges": "What recent changes have been deployed to {{name}}?"
+      },
+      "contract": {
+        "explain": "Explain the current version of {{name}} and its key endpoints",
+        "compatibility": "Is {{name}} compatible with all registered consumers?",
+        "versionDiff": "What changed between the latest versions of {{name}}?",
+        "consumers": "Which services consume {{name}}?"
+      },
+      "change": {
+        "riskAnalysis": "What is the risk analysis for {{name}}?",
+        "blastRadius": "What is the blast radius of {{name}}?",
+        "rollback": "Is {{name}} eligible for rollback?",
+        "correlatedIncidents": "Are there any incidents correlated with {{name}}?"
+      },
+      "incident": {
+        "rootCause": "What is the likely root cause of {{name}}?",
+        "mitigation": "What mitigation steps should I take for {{name}}?",
+        "relatedChanges": "What recent changes could have caused {{name}}?",
+        "runbook": "Is there a runbook applicable to {{name}}?"
+      }
+    },
+    "actions": {
+      "viewContracts": "View contracts for this service",
+      "viewDependencies": "View dependency graph",
+      "viewRecentChanges": "View recent changes",
+      "viewVersionHistory": "View version history",
+      "checkCompatibility": "Check contract compatibility",
+      "viewOwnerService": "View owner service",
+      "viewBlastRadius": "View blast radius details",
+      "correlateIncidents": "Correlate with incidents",
+      "checkRollbackReadiness": "Check rollback readiness",
+      "findRunbook": "Find applicable runbook",
+      "correlateChanges": "Correlate with recent changes",
+      "suggestMitigation": "Get mitigation suggestions"
+    },
+    "response": {
+      "serviceAnalysis": "Based on the Service Catalog and related sources, here is the analysis for",
+      "contractAnalysis": "Based on the Contract Registry and version history, here is the analysis for",
+      "changeAnalysis": "Based on Change Intelligence and correlated data, here is the analysis for",
+      "incidentAnalysis": "Based on Incident History and operational knowledge, here is the analysis for",
+      "additionalContext": "Additional context",
+      "serviceGroundingNote": "This analysis is grounded in the Service Catalog, Contract Registry, and Dependency Graph. For deeper investigation, use the suggested actions below.",
+      "contractGroundingNote": "This analysis is grounded in the Contract Registry and Version History. Use the suggested actions to explore compatibility or consumer details.",
+      "changeGroundingNote": "This analysis is grounded in Change Intelligence data and correlated incident history. Use the suggested actions to assess blast radius or rollback eligibility.",
+      "incidentGroundingNote": "This analysis is grounded in Incident History, correlated changes, and runbook library. Use the suggested actions to explore mitigation options."
+    },
+    "meta": {
+      "contextualRouting": "Query routed to internal model with contextual grounding from the relevant Source of Truth domain."
+    }
   }
 }

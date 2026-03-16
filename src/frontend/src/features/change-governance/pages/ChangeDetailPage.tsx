@@ -22,6 +22,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { useAuth } from '../../../contexts/AuthContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
+import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { AdvisoryFactorDto, ChangeAdvisoryResponse, DecisionHistoryItemDto } from '../../../types';
 
 /** Mapeia status de confiança para variante visual do Badge. */
@@ -778,6 +779,23 @@ export function ChangeDetailPage() {
           </div>
         </CardBody>
       </Card>
+
+      {/* ── AI Assistant Panel ── */}
+      <AssistantPanel
+        contextType="change"
+        contextId={changeId!}
+        contextSummary={{
+          name: `${change.serviceName} — ${change.version}`,
+          description: change.description,
+          status: change.confidenceStatus,
+          additionalInfo: {
+            ...(change.changeType ? { changeType: change.changeType } : {}),
+            ...(change.environment ? { environment: change.environment } : {}),
+            ...(change.teamName ? { team: change.teamName } : {}),
+            ...(change.changeScore != null ? { score: String(change.changeScore) } : {}),
+          },
+        }}
+      />
     </div>
   );
 }

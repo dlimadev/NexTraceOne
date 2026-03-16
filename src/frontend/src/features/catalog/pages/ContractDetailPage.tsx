@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { contractsApi } from '../api/contracts';
+import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -356,6 +357,24 @@ export function ContractDetailPage() {
             </CardBody>
           </Card>
         </div>
+      </div>
+
+      {/* ── AI Assistant Panel ── */}
+      <div className="mt-6">
+        <AssistantPanel
+          contextType="contract"
+          contextId={contractVersionId!}
+          contextSummary={{
+            name: detail.serviceName ? `${detail.serviceName} — ${detail.protocol}` : detail.contractVersionId,
+            description: detail.specPreview,
+            status: detail.lifecycleState,
+            additionalInfo: {
+              ...(detail.protocol ? { protocol: detail.protocol } : {}),
+              ...(detail.version ? { version: detail.version } : {}),
+              ...(detail.serviceName ? { service: detail.serviceName } : {}),
+            },
+          }}
+        />
       </div>
     </div>
   );
