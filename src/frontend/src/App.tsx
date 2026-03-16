@@ -54,6 +54,9 @@ const IncidentDetailPage = lazy(() => import('./features/operations/pages/Incide
 const RunbooksPage = lazy(() => import('./features/operations/pages/RunbooksPage').then(m => ({ default: m.RunbooksPage })));
 const TeamReliabilityPage = lazy(() => import('./features/operations/pages/TeamReliabilityPage').then(m => ({ default: m.TeamReliabilityPage })));
 const ServiceReliabilityDetailPage = lazy(() => import('./features/operations/pages/ServiceReliabilityDetailPage').then(m => ({ default: m.ServiceReliabilityDetailPage })));
+const AutomationWorkflowsPage = lazy(() => import('./features/operations/pages/AutomationWorkflowsPage').then(m => ({ default: m.AutomationWorkflowsPage })));
+const AutomationWorkflowDetailPage = lazy(() => import('./features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
+const AutomationAdminPage = lazy(() => import('./features/operations/pages/AutomationAdminPage').then(m => ({ default: m.AutomationAdminPage })));
 
 // ── AI Hub (lazy) ──
 const AiAssistantPage = lazy(() => import('./features/ai-hub/pages/AiAssistantPage').then(m => ({ default: m.AiAssistantPage })));
@@ -233,6 +236,30 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
                     <ServiceReliabilityDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operations/automation"
+                element={
+                  <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
+                    <AutomationWorkflowsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operations/automation/admin"
+                element={
+                  <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
+                    <AutomationAdminPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operations/automation/:workflowId"
+                element={
+                  <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
+                    <AutomationWorkflowDetailPage />
                   </ProtectedRoute>
                 }
               />
