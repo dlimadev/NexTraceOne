@@ -106,6 +106,9 @@ export type Permission =
   | 'licensing:vendor:plan:create'
   | 'licensing:vendor:featurepack:read'
   | 'licensing:vendor:featurepack:create'
+  // ── Integrations ──
+  | 'integrations:read'
+  | 'integrations:write'
   // ── Platform ──
   | 'platform:settings:read'
   | 'platform:settings:write';
