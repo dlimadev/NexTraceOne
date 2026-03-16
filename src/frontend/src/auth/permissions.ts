@@ -126,3 +126,42 @@ export type Permission =
   | 'platform:settings:read'
   | 'platform:settings:write'
   | 'platform:admin:read';
+
+// ── Helpers para UI gating e testes ──────────────────────────────────────────
+// Mapeamento client-side simplificado de role→permissões para controle visual.
+// O backend continua sendo a fonte de verdade para enforcement real.
+
+const rolePermissions: Record<string, string[]> = {
+  Admin: [
+    'users:read', 'users:write', 'releases:read', 'releases:write',
+    'contracts:read', 'contracts:write', 'audit:read', 'audit:export',
+    'workflow:approve',
+  ],
+  Developer: [
+    'releases:read', 'releases:write', 'contracts:read', 'contracts:write',
+  ],
+  Viewer: [
+    'releases:read', 'contracts:read',
+  ],
+  Auditor: [
+    'audit:read', 'audit:export', 'releases:read', 'contracts:read',
+  ],
+  Manager: [
+    'users:read', 'releases:read', 'contracts:read', 'workflow:approve',
+  ],
+};
+
+export function getPermissionsForRoles(roles: string[]): Set<string> {
+  const perms = new Set<string>();
+  for (const role of roles) {
+    const rolePerms = rolePermissions[role];
+    if (rolePerms) {
+      for (const p of rolePerms) perms.add(p);
+    }
+  }
+  return perms;
+}
+
+export function hasPermission(roles: string[], permission: string): boolean {
+  return getPermissionsForRoles(roles).has(permission);
+}

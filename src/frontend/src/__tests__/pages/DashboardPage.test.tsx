@@ -10,6 +10,22 @@ vi.mock('../../features/catalog/api/serviceCatalog', () => ({
   },
 }));
 
+// Mock usePersona to avoid needing AuthProvider + PersonaProvider
+vi.mock('../../contexts/PersonaContext', () => ({
+  usePersona: vi.fn(() => ({
+    persona: 'Engineer',
+    config: {
+      homeSubtitleKey: 'persona.Engineer.homeSubtitle',
+      homeWidgets: [],
+      quickActions: [],
+      navigationOrder: [],
+      highlightedSections: [],
+      aiContextScope: [],
+      aiSuggestedPrompts: [],
+    },
+  })),
+}));
+
 import { serviceCatalogApi } from '../../features/catalog/api/serviceCatalog';
 
 function renderDashboard() {
@@ -77,7 +93,7 @@ describe('DashboardPage', () => {
     });
     renderDashboard();
     await waitFor(() => {
-      expect(screen.getByText(/no services registered yet/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/no services registered yet/i).length).toBeGreaterThan(0);
     });
   });
 

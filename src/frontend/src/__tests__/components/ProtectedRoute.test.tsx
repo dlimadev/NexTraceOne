@@ -2,7 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
-import type { UserProfile } from '../../types';
+import type { CurrentUserProfile } from '../../types';
+import { getPermissionsForRoles } from '../../auth/permissions';
 
 // Mock dos hooks necessários
 vi.mock('../../contexts/AuthContext', () => ({
@@ -11,25 +12,38 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 import { useAuth } from '../../contexts/AuthContext';
 
-function mockUser(roles: string[]): UserProfile {
+function mockUser(roles: string[]): CurrentUserProfile {
+  const permissions = [...getPermissionsForRoles(roles)];
   return {
     id: 'user-1',
     email: 'test@acme.com',
+    firstName: 'Test',
+    lastName: 'User',
     fullName: 'Test User',
-    roles,
+    isActive: true,
+    lastLoginAt: null,
     tenantId: 'tenant-1',
+    roleName: roles[0] || '',
+    permissions,
   };
 }
 
-function renderProtectedRoute(permission: Parameters<typeof ProtectedRoute>[0]['permission'], roles: string[]) {
-  vi.mocked(useAuth).mockReturnValue({
+function mockAuthValue(roles: string[]) {
+  return {
     isAuthenticated: true,
     accessToken: 'token',
     user: mockUser(roles),
     tenantId: 'tenant-1',
+    requiresTenantSelection: false,
+    availableTenants: [],
     login: vi.fn(),
+    selectTenant: vi.fn(),
     logout: vi.fn(),
-  });
+  };
+}
+
+function renderProtectedRoute(permission: Parameters<typeof ProtectedRoute>[0]['permission'], roles: string[]) {
+  vi.mocked(useAuth).mockReturnValue(mockAuthValue(roles));
 
   return render(
     <MemoryRouter initialEntries={['/protected']}>
@@ -62,14 +76,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('redireciona para rota customizada quando especificada', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      accessToken: 'token',
-      user: mockUser(['Developer']),
-      tenantId: 'tenant-1',
-      login: vi.fn(),
-      logout: vi.fn(),
-    });
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['Developer']));
 
     render(
       <MemoryRouter initialEntries={['/protected']}>
@@ -117,7 +124,10 @@ describe('ProtectedRoute', () => {
       accessToken: 'token',
       user: null,
       tenantId: 'tenant-1',
+      requiresTenantSelection: false,
+      availableTenants: [],
       login: vi.fn(),
+      selectTenant: vi.fn(),
       logout: vi.fn(),
     });
 
