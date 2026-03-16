@@ -60,6 +60,7 @@ const AiAssistantPage = lazy(() => import('./features/ai-hub/pages/AiAssistantPa
 const ModelRegistryPage = lazy(() => import('./features/ai-hub/pages/ModelRegistryPage').then(m => ({ default: m.ModelRegistryPage })));
 const AiPoliciesPage = lazy(() => import('./features/ai-hub/pages/AiPoliciesPage').then(m => ({ default: m.AiPoliciesPage })));
 const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegrationsPage').then(m => ({ default: m.IdeIntegrationsPage })));
+const AiRoutingPage = lazy(() => import('./features/ai-hub/pages/AiRoutingPage').then(m => ({ default: m.AiRoutingPage })));
 
 // ── Governance (lazy) ──
 const ReportsPage = lazy(() => import('./features/governance/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
@@ -240,6 +241,7 @@ export default function App() {
               <Route path="/ai/models" element={<ModelRegistryPage />} />
               <Route path="/ai/policies" element={<AiPoliciesPage />} />
               <Route path="/ai/ide" element={<IdeIntegrationsPage />} />
+              <Route path="/ai/routing" element={<AiRoutingPage />} />
               {/* ── Governance ── */}
               <Route path="/governance/reports" element={<ReportsPage />} />
               <Route path="/governance/risk" element={<RiskCenterPage />} />

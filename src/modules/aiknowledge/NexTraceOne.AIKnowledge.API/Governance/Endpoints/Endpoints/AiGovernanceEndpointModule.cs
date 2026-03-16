@@ -21,6 +21,11 @@ using GetConversationFeature = NexTraceOne.AiGovernance.Application.Features.Get
 using UpdateConversationFeature = NexTraceOne.AiGovernance.Application.Features.UpdateConversation.UpdateConversation;
 using ListMessagesFeature = NexTraceOne.AiGovernance.Application.Features.ListMessages.ListMessages;
 using ListSuggestedPromptsFeature = NexTraceOne.AiGovernance.Application.Features.ListSuggestedPrompts.ListSuggestedPrompts;
+using ListRoutingStrategiesFeature = NexTraceOne.AiGovernance.Application.Features.ListRoutingStrategies.ListRoutingStrategies;
+using GetRoutingDecisionFeature = NexTraceOne.AiGovernance.Application.Features.GetRoutingDecision.GetRoutingDecision;
+using PlanExecutionFeature = NexTraceOne.AiGovernance.Application.Features.PlanExecution.PlanExecution;
+using ListKnowledgeSourceWeightsFeature = NexTraceOne.AiGovernance.Application.Features.ListKnowledgeSourceWeights.ListKnowledgeSourceWeights;
+using EnrichContextFeature = NexTraceOne.AiGovernance.Application.Features.EnrichContext.EnrichContext;
 using NexTraceOne.AiGovernance.Domain.Enums;
 
 namespace NexTraceOne.AiGovernance.API.Endpoints;
@@ -28,7 +33,8 @@ namespace NexTraceOne.AiGovernance.API.Endpoints;
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo AI Governance.
 /// Fornece acesso ao Model Registry, Access Policies, Budgets, Audit,
-/// Knowledge Sources e AI Assistant maduro com governança integrada.
+/// Knowledge Sources, AI Assistant, AI Routing e Knowledge Enrichment
+/// com governança integrada.
 ///
 /// Política de autorização:
 /// - Leitura: "ai:governance:read" para endpoints de consulta.
@@ -47,6 +53,8 @@ public sealed class AiGovernanceEndpointModule
         MapAuditEndpoints(app);
         MapKnowledgeSourceEndpoints(app);
         MapAssistantEndpoints(app);
+        MapRoutingEndpoints(app);
+        MapEnrichmentEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -257,6 +265,18 @@ public sealed class AiGovernanceEndpointModule
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/weights", async (
+            string? useCaseType,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListKnowledgeSourceWeightsFeature.Query(useCaseType),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
     }
 
     // ── AI Assistant (Mature) ───────────────────────────────────────────
@@ -356,6 +376,65 @@ public sealed class AiGovernanceEndpointModule
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:read");
+
+        // ── Plan Execution — planeamento de execução com roteamento ─────
+        group.MapPost("/plan-execution", async (
+            PlanExecutionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:write");
+    }
+
+    // ── AI Routing ──────────────────────────────────────────────────────
+
+    private static void MapRoutingEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/routing");
+
+        group.MapGet("/strategies", async (
+            bool? isActive,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListRoutingStrategiesFeature.Query(isActive),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/decisions/{decisionId:guid}", async (
+            Guid decisionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetRoutingDecisionFeature.Query(decisionId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    // ── Knowledge Enrichment ────────────────────────────────────────────
+
+    private static void MapEnrichmentEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/context");
+
+        group.MapPost("/enrich", async (
+            EnrichContextFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:write");
     }
 }
 

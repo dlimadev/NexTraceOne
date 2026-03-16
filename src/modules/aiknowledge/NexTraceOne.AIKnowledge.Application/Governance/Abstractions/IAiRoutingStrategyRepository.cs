@@ -1,0 +1,22 @@
+using NexTraceOne.AiGovernance.Domain.Entities;
+using NexTraceOne.AiGovernance.Domain.Enums;
+
+namespace NexTraceOne.AiGovernance.Application.Abstractions;
+
+/// <summary>
+/// Repositório de estratégias de roteamento de IA.
+/// Suporta listagem e consulta por contexto de execução.
+/// </summary>
+public interface IAiRoutingStrategyRepository
+{
+    /// <summary>Lista estratégias de roteamento com filtros opcionais.</summary>
+    Task<IReadOnlyList<AIRoutingStrategy>> ListAsync(
+        bool? isActive,
+        CancellationToken ct);
+
+    /// <summary>Obtém estratégia por identificador.</summary>
+    Task<AIRoutingStrategy?> GetByIdAsync(AIRoutingStrategyId id, CancellationToken ct);
+
+    /// <summary>Adiciona nova estratégia de roteamento.</summary>
+    Task AddAsync(AIRoutingStrategy strategy, CancellationToken ct);
+}

@@ -59,4 +59,33 @@ export const aiGovernanceApi = {
     client.get(`/ai/assistant/conversations/${conversationId}/messages`, { params }).then(r => r.data),
   listSuggestedPrompts: (params?: { persona?: string; category?: string }) =>
     client.get('/ai/assistant/prompts', { params }).then(r => r.data),
+
+  // ── AI Routing & Enrichment ────────────────────────────────────────
+  planExecution: (data: {
+    inputQuery: string;
+    persona?: string;
+    contextScope?: string;
+    clientType: string;
+    preferredModelId?: string;
+    serviceId?: string;
+    contractId?: string;
+    incidentId?: string;
+  }) =>
+    client.post('/ai/assistant/plan-execution', data).then(r => r.data),
+  listRoutingStrategies: (params?: { isActive?: boolean }) =>
+    client.get('/ai/routing/strategies', { params }).then(r => r.data),
+  getRoutingDecision: (decisionId: string) =>
+    client.get(`/ai/routing/decisions/${decisionId}`).then(r => r.data),
+  listKnowledgeSourceWeights: (params?: { useCaseType?: string }) =>
+    client.get('/ai/knowledge-sources/weights', { params }).then(r => r.data),
+  enrichContext: (data: {
+    inputQuery: string;
+    persona?: string;
+    useCaseType?: string;
+    targetScope?: string;
+    serviceId?: string;
+    contractId?: string;
+    incidentId?: string;
+  }) =>
+    client.post('/ai/context/enrich', data).then(r => r.data),
 };
