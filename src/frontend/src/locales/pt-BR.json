@@ -131,7 +131,13 @@
     "sectionIntegrations": "Integrações",
     "integrationHub": "Hub de Integrações",
     "ingestionExecutions": "Execuções de Ingestão",
-    "ingestionFreshness": "Frescura e Saúde"
+    "ingestionFreshness": "Frescura e Saúde",
+    "sectionAnalytics": "Analytics",
+    "analyticsOverview": "Visão Geral de Analytics",
+    "moduleAdoption": "Adoção por Módulo",
+    "personaUsage": "Uso por Persona",
+    "journeyFunnels": "Jornadas e Funis",
+    "valueTracking": "Acompanhamento de Valor"
   },
   "header": {
     "toggleLanguage": "Alternar idioma",
@@ -2736,5 +2742,89 @@
     "partialSuccess": "Sucesso Parcial",
     "backToHub": "Voltar ao Hub de Integrações",
     "connectorNotFound": "Conector não encontrado"
+  },
+  "analytics": {
+    "title": "Analytics de Produto",
+    "subtitle": "Adoção, valor, fricção e análise de jornadas em toda a plataforma",
+    "adoptionScore": "Score de Adoção",
+    "valueScore": "Score de Valor",
+    "frictionScore": "Score de Fricção",
+    "uniqueUsers": "Utilizadores Únicos",
+    "timeToFirstValue": "Tempo até Primeiro Valor",
+    "timeToFirstValueDesc": "Tempo médio do primeiro login até a primeira ação significativa",
+    "timeToCoreValue": "Tempo até Valor Principal",
+    "timeToCoreValueDesc": "Tempo médio do primeiro login até o primeiro fluxo completo",
+    "topModules": "Módulos Mais Utilizados",
+    "actions": "ações",
+    "users": "utilizadores",
+    "minutes": "min",
+    "trendImproving": "Melhorando",
+    "trendStable": "Estável",
+    "trendDeclining": "Declinando",
+    "viewModuleAdoption": "Adoção por Módulo",
+    "viewPersonaUsage": "Uso por Persona",
+    "viewJourneys": "Jornadas e Funis",
+    "viewValueTracking": "Acompanhamento de Valor",
+    "trend": {
+      "Improving": "Melhorando",
+      "Stable": "Estável",
+      "Declining": "Declinando"
+    },
+    "adoption": {
+      "title": "Adoção por Módulo",
+      "subtitle": "Profundidade de adoção e padrões de uso por módulo",
+      "searchPlaceholder": "Pesquisar módulos ou funcionalidades...",
+      "depthScore": "Profundidade",
+      "noResults": "Nenhum módulo encontrado para a pesquisa."
+    },
+    "persona": {
+      "title": "Uso por Persona",
+      "subtitle": "Perfis de uso, profundidade de adoção e fricção por persona",
+      "all": "Todas as Personas",
+      "depth": "profundidade",
+      "topModules": "Módulos Principais",
+      "milestonesReached": "Marcos Alcançados",
+      "frictionPoints": "Pontos de Fricção",
+      "role": {
+        "Engineer": "Engenheiro",
+        "TechLead": "Líder Técnico",
+        "Architect": "Arquiteto",
+        "Product": "Produto",
+        "Executive": "Executivo",
+        "PlatformAdmin": "Admin. Plataforma",
+        "Auditor": "Auditor"
+      }
+    },
+    "journey": {
+      "title": "Jornadas e Funis",
+      "subtitle": "Jornadas-chave do produto com taxas de conclusão e análise de abandono",
+      "all": "Todas as Jornadas",
+      "completion": "conclusão",
+      "biggestDropOff": "Maior abandono"
+    },
+    "value": {
+      "title": "Acompanhamento de Valor",
+      "subtitle": "Tempo até marcos de valor e progressão dos utilizadores nos momentos-chave do produto",
+      "avgCompletion": "Conclusão Média",
+      "totalMilestones": "Total de Marcos",
+      "milestoneProgress": "Progresso dos Marcos"
+    },
+    "milestone": {
+      "FirstSearchSuccess": "Primeira Pesquisa com Sucesso",
+      "FirstServiceLookup": "Primeira Consulta de Serviço",
+      "FirstContractView": "Primeira Visualização de Contrato",
+      "FirstContractDraftCreated": "Primeiro Rascunho de Contrato",
+      "FirstContractPublished": "Primeiro Contrato Publicado",
+      "FirstAiUsefulInteraction": "Primeira Interação Útil com IA",
+      "FirstIncidentInvestigation": "Primeira Investigação de Incidente",
+      "FirstMitigationCompleted": "Primeira Mitigação Concluída",
+      "FirstExecutiveOverviewConsumed": "Primeira Vista Executiva",
+      "FirstRunbookConsulted": "Primeiro Runbook Consultado",
+      "FirstSourceOfTruthUsed": "Primeiro Uso do Source of Truth",
+      "FirstEvidenceExported": "Primeira Evidência Exportada",
+      "FirstReportGenerated": "Primeiro Relatório Gerado",
+      "FirstReliabilityViewed": "Primeira Vista de Confiabilidade",
+      "FirstAutomationCreated": "Primeira Automação Criada"
+    }
   }
 }
