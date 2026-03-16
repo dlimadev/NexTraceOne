@@ -2027,3 +2027,248 @@ export interface FinOpsTrendsResponse {
   overallChangePercent: number;
   generatedAt: string;
 }
+
+// ─── Multi-Team / Multi-Domain Governance ────────────────────────────────────
+
+export interface TeamSummary {
+  teamId: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  status: string;
+  serviceCount: number;
+  contractCount: number;
+  memberCount: number;
+  maturityLevel: string;
+  parentOrganizationUnit?: string;
+}
+
+export interface TeamDetail {
+  teamId: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  status: string;
+  parentOrganizationUnit?: string;
+  serviceCount: number;
+  contractCount: number;
+  activeIncidentCount: number;
+  recentChangeCount: number;
+  maturityLevel: string;
+  reliabilityScore: number;
+  services: TeamServiceDto[];
+  contracts: TeamContractDto[];
+  crossTeamDependencies: CrossTeamDependencyDto[];
+  createdAt: string;
+}
+
+export interface TeamServiceDto {
+  serviceId: string;
+  name: string;
+  domain: string;
+  criticality: string;
+  ownershipType: string;
+}
+
+export interface TeamContractDto {
+  contractId: string;
+  name: string;
+  type: string;
+  version: string;
+  status: string;
+}
+
+export interface CrossTeamDependencyDto {
+  dependencyId: string;
+  sourceServiceName: string;
+  targetServiceName: string;
+  targetTeamId: string;
+  targetTeamName: string;
+  dependencyType: string;
+}
+
+export interface DomainSummary {
+  domainId: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  criticality: string;
+  teamCount: number;
+  serviceCount: number;
+  contractCount: number;
+  maturityLevel: string;
+  capabilityClassification?: string;
+}
+
+export interface DomainDetail {
+  domainId: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  criticality: string;
+  capabilityClassification?: string;
+  teamCount: number;
+  serviceCount: number;
+  activeIncidentCount: number;
+  recentChangeCount: number;
+  maturityLevel: string;
+  reliabilityScore: number;
+  teams: DomainTeamDto[];
+  services: DomainServiceDto[];
+  crossDomainDependencies: CrossDomainDependencyDto[];
+  createdAt: string;
+}
+
+export interface DomainTeamDto {
+  teamId: string;
+  name: string;
+  displayName: string;
+  serviceCount: number;
+  ownershipType: string;
+}
+
+export interface DomainServiceDto {
+  serviceId: string;
+  name: string;
+  teamName: string;
+  criticality: string;
+  status: string;
+}
+
+export interface CrossDomainDependencyDto {
+  dependencyId: string;
+  sourceServiceName: string;
+  sourceDomainName: string;
+  targetServiceName: string;
+  targetDomainId: string;
+  targetDomainName: string;
+  dependencyType: string;
+}
+
+export interface GovernanceSummary {
+  entityId: string;
+  entityName: string;
+  overallMaturity: string;
+  ownershipCoverage: number;
+  contractCoverage: number;
+  documentationCoverage: number;
+  reliabilityScore: number;
+  openRiskCount: number;
+  policyViolationCount: number;
+  dimensions: GovernanceDimensionDto[];
+}
+
+export interface GovernanceDimensionDto {
+  dimension: string;
+  level: string;
+  score: number;
+  trend: string;
+}
+
+export interface ScopedContext {
+  userId: string;
+  defaultTeamId: string;
+  defaultTeamName: string;
+  defaultDomainId?: string;
+  defaultDomainName?: string;
+  allowedTeams: AllowedScopeDto[];
+  allowedDomains: AllowedScopeDto[];
+  adminScopes: string[];
+  isCentralAdmin: boolean;
+  personaHint: string;
+}
+
+export interface AllowedScopeDto {
+  id: string;
+  name: string;
+  displayName: string;
+  role: string;
+}
+
+export interface DelegatedAdminDto {
+  delegationId: string;
+  granteeUserId: string;
+  granteeDisplayName: string;
+  scope: string;
+  teamId?: string;
+  teamName?: string;
+  domainId?: string;
+  domainName?: string;
+  reason: string;
+  isActive: boolean;
+  grantedAt: string;
+  expiresAt?: string;
+}
+
+export interface CrossTeamDependencies {
+  teamId: string;
+  teamName: string;
+  outbound: OutboundTeamDependency[];
+  inbound: InboundTeamDependency[];
+}
+
+export interface OutboundTeamDependency {
+  serviceName: string;
+  targetServiceName: string;
+  targetTeamId: string;
+  targetTeamName: string;
+  dependencyType: string;
+}
+
+export interface InboundTeamDependency {
+  serviceName: string;
+  sourceServiceName: string;
+  sourceTeamId: string;
+  sourceTeamName: string;
+  dependencyType: string;
+}
+
+export interface CrossDomainDependencies {
+  domainId: string;
+  domainName: string;
+  outbound: OutboundDomainDependency[];
+  inbound: InboundDomainDependency[];
+}
+
+export interface OutboundDomainDependency {
+  serviceName: string;
+  sourceDomainName: string;
+  targetServiceName: string;
+  targetDomainId: string;
+  targetDomainName: string;
+  dependencyType: string;
+}
+
+export interface InboundDomainDependency {
+  serviceName: string;
+  targetDomainName: string;
+  sourceServiceName: string;
+  sourceDomainId: string;
+  sourceDomainName: string;
+  dependencyType: string;
+}
+
+export interface CreateTeamRequest {
+  name: string;
+  displayName: string;
+  description?: string;
+  parentOrganizationUnit?: string;
+}
+
+export interface CreateDomainRequest {
+  name: string;
+  displayName: string;
+  description?: string;
+  criticality: string;
+  capabilityClassification?: string;
+}
+
+export interface CreateDelegationRequest {
+  granteeUserId: string;
+  granteeDisplayName: string;
+  scope: string;
+  teamId?: string;
+  domainId?: string;
+  reason: string;
+  expiresAt?: string;
+}
