@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.OperationalIntelligence.Application.Automation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents;
 using NexTraceOne.OperationalIntelligence.Application.Reliability;
 using NexTraceOne.RuntimeIntelligence.Application.Features.CompareReleaseRuntime;
@@ -45,6 +46,9 @@ public static class DependencyInjection
 
         // ── Incidents (Incident Correlation & Mitigation) validators ──
         services.AddIncidentsApplication(configuration);
+
+        // ── Automation (Operational Automation Workflows) validators ──
+        services.AddAutomationApplication(configuration);
 
         return services;
     }
