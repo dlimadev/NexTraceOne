@@ -11,6 +11,9 @@ using ListChangesByServiceFeature = NexTraceOne.ChangeIntelligence.Application.F
 using GetReleaseFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetRelease.GetRelease;
 using GetBlastRadiusFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetBlastRadiusReport.GetBlastRadiusReport;
 using GetIntelligenceSummaryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
+using GetChangeAdvisoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeAdvisory.GetChangeAdvisory;
+using RecordChangeDecisionFeature = NexTraceOne.ChangeIntelligence.Application.Features.RecordChangeDecision.RecordChangeDecision;
+using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
 
 namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
 
@@ -131,6 +134,48 @@ internal static class ChangeConfidenceEndpoints
         {
             var result = await sender.Send(
                 new GetIntelligenceSummaryFeature.Query(changeId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        // ── Advisory de confiança da mudança ────────────────────────
+
+        group.MapGet("/{changeId:guid}/advisory", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetChangeAdvisoryFeature.Query(changeId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        // ── Registar decisão de governança ──────────────────────────
+
+        group.MapPost("/{changeId:guid}/decision", async (
+            Guid changeId,
+            RecordChangeDecisionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var effectiveCommand = command with { ReleaseId = changeId };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:write");
+
+        // ── Histórico de decisões de governança ─────────────────────
+
+        group.MapGet("/{changeId:guid}/decisions", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetChangeDecisionHistoryFeature.Query(changeId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
