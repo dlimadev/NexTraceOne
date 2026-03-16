@@ -11,9 +11,13 @@ import {
   Bot,
   Clock,
   Fingerprint,
+  History,
+  GitCompare,
+  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { EmptyState } from '../../../components/EmptyState';
 import { contractsApi } from '../api/contracts';
 
 /** Variantes visuais para badges de protocolo. */
@@ -48,6 +52,18 @@ export function ContractDetailPage() {
     enabled: !!contractVersionId,
   });
 
+  const { data: versionHistory } = useQuery({
+    queryKey: ['contract-history', detail?.apiAssetId],
+    queryFn: () => contractsApi.getHistory(detail!.apiAssetId),
+    enabled: !!detail?.apiAssetId,
+  });
+
+  const { data: violations } = useQuery({
+    queryKey: ['contract-violations', contractVersionId],
+    queryFn: () => contractsApi.listRuleViolations(contractVersionId!),
+    enabled: !!contractVersionId,
+  });
+
   if (isLoading) {
     return (
       <div className="p-6 lg:p-8 animate-fade-in">
@@ -61,12 +77,21 @@ export function ContractDetailPage() {
   if (isError || !detail) {
     return (
       <div className="p-6 lg:p-8 animate-fade-in">
-        <div className="flex items-center justify-center py-24">
-          <p className="text-sm text-red-400">{t('common.error')}</p>
-        </div>
+        <EmptyState
+          icon={<FileText size={24} />}
+          title={t('common.error')}
+          description={t('common.errorDescription')}
+          action={
+            <Link to="/contracts" className="text-sm text-accent hover:underline">
+              {t('contractGov.detail.backToList')}
+            </Link>
+          }
+        />
       </div>
     );
   }
+
+  const otherVersions = versionHistory?.filter((v) => v.id !== contractVersionId) ?? [];
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
@@ -98,153 +123,239 @@ export function ContractDetailPage() {
         <p className="text-muted mt-1">{t('contractGov.detail.title')}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ── Visão Geral ── */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <FileText size={18} className="text-accent" />
-              <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.overview')}</h2>
-            </div>
-          </CardHeader>
-          <CardBody>
-            <dl className="space-y-4">
-              <DetailRow label={t('contractGov.detail.apiAssetId')} value={detail.apiAssetId} />
-              <DetailRow label={t('contractGov.detail.version')} value={detail.semVer} mono />
-              <DetailRow label={t('contractGov.detail.protocol')} value={t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)} />
-              <DetailRow label={t('contractGov.detail.format')} value={detail.format} />
-              <DetailRow label={t('contractGov.detail.importedFrom')} value={detail.importedFrom ?? t('contractGov.detail.notAvailable')} />
-              <div>
-                <dt className="text-xs text-muted mb-1">{t('contractGov.detail.specPreview')}</dt>
-                <dd className="bg-elevated border border-edge rounded-md p-3 max-h-48 overflow-y-auto">
-                  <pre className="text-xs text-heading font-mono whitespace-pre-wrap break-all">
-                    {detail.specContent
-                      ? detail.specContent.length > 2000
-                        ? detail.specContent.slice(0, 2000) + '…'
-                        : detail.specContent
-                      : t('contractGov.detail.notAvailable')}
-                  </pre>
-                </dd>
-              </div>
-            </dl>
-          </CardBody>
-        </Card>
-
-        {/* ── Governança ── */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Shield size={18} className="text-accent" />
-              <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.governance')}</h2>
-            </div>
-          </CardHeader>
-          <CardBody>
-            <dl className="space-y-4">
-              <DetailRow
-                label={t('contractGov.detail.lifecycleState')}
-                value={t(`contractGov.badges.lifecycle.${detail.lifecycleState}`, detail.lifecycleState)}
-              />
-              <div>
-                <dt className="text-xs text-muted mb-1">{t('contractGov.detail.isLocked')}</dt>
-                <dd className="flex items-center gap-1.5 text-sm">
-                  {detail.isLocked ? (
-                    <>
-                      <Lock size={14} className="text-purple-400" />
-                      <span className="text-purple-300">{t('contractGov.badges.lockedLabel')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Unlock size={14} className="text-muted" />
-                      <span className="text-muted">{t('contractGov.badges.unlockedLabel')}</span>
-                    </>
-                  )}
-                </dd>
-              </div>
-              {detail.lockedAt && (
-                <DetailRow label={t('contractGov.detail.lockedAt')} value={new Date(detail.lockedAt).toLocaleString()} />
-              )}
-              {detail.lockedBy && (
-                <DetailRow label={t('contractGov.detail.lockedBy')} value={detail.lockedBy} />
-              )}
-              <div>
-                <dt className="text-xs text-muted mb-1">{t('contractGov.detail.isSigned')}</dt>
-                <dd className="flex items-center gap-1.5 text-sm">
-                  {detail.signedBy ? (
-                    <>
-                      <CheckCircle size={14} className="text-emerald-400" />
-                      <span className="text-emerald-300">{t('contractGov.badges.signed')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle size={14} className="text-muted" />
-                      <span className="text-muted">{t('contractGov.badges.unsigned')}</span>
-                    </>
-                  )}
-                </dd>
-              </div>
-              {detail.fingerprint && (
-                <DetailRow
-                  label={t('contractGov.detail.fingerprint')}
-                  value={detail.fingerprint}
-                  mono
-                />
-              )}
-              {detail.algorithm && (
-                <DetailRow label={t('contractGov.detail.algorithm')} value={detail.algorithm} />
-              )}
-              {detail.deprecationNotice && (
-                <DetailRow label={t('contractGov.detail.deprecationNotice')} value={detail.deprecationNotice} />
-              )}
-              {detail.sunsetDate && (
-                <DetailRow label={t('contractGov.detail.sunsetDate')} value={new Date(detail.sunsetDate).toLocaleDateString()} />
-              )}
-              <DetailRow
-                label={t('contractGov.columns.createdAt')}
-                value={new Date(detail.createdAt).toLocaleString()}
-              />
-            </dl>
-          </CardBody>
-        </Card>
-
-        {/* ── Proveniência ── */}
-        {detail.provenance && (
-          <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* ── Coluna principal (2/3) ── */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          {/* ── Visão Geral ── */}
+          <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Fingerprint size={18} className="text-accent" />
-                <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.provenance')}</h2>
+                <FileText size={18} className="text-accent" />
+                <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.overview')}</h2>
               </div>
             </CardHeader>
             <CardBody>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <dl className="space-y-4">
-                  <DetailRow label={t('contractGov.detail.importedBy')} value={detail.provenance.importedBy} />
-                </dl>
-                <dl className="space-y-4">
-                  <DetailRow label={t('contractGov.detail.parsedBy')} value={detail.provenance.parserUsed} />
-                </dl>
-                <dl className="space-y-4">
-                  <div>
-                    <dt className="text-xs text-muted mb-1">{t('contractGov.detail.aiGenerated')}</dt>
-                    <dd className="flex items-center gap-1.5 text-sm">
-                      {detail.provenance.isAiGenerated ? (
-                        <>
-                          <Bot size={14} className="text-accent" />
-                          <span className="text-accent">{t('contractGov.detail.yes')}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Clock size={14} className="text-muted" />
-                          <span className="text-muted">{t('contractGov.detail.no')}</span>
-                        </>
-                      )}
-                    </dd>
-                  </div>
-                </dl>
+              <dl className="space-y-4">
+                <DetailRow label={t('contractGov.detail.apiAssetId')} value={detail.apiAssetId} />
+                <DetailRow label={t('contractGov.detail.version')} value={detail.semVer} mono />
+                <DetailRow label={t('contractGov.detail.protocol')} value={t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)} />
+                <DetailRow label={t('contractGov.detail.format')} value={detail.format} />
+                <DetailRow label={t('contractGov.detail.importedFrom')} value={detail.importedFrom ?? t('contractGov.detail.notAvailable')} />
+                <div>
+                  <dt className="text-xs text-muted mb-1">{t('contractGov.detail.specPreview')}</dt>
+                  <dd className="bg-elevated border border-edge rounded-md p-3 max-h-48 overflow-y-auto">
+                    <pre className="text-xs text-heading font-mono whitespace-pre-wrap break-all">
+                      {detail.specContent
+                        ? detail.specContent.length > 2000
+                          ? detail.specContent.slice(0, 2000) + '…'
+                          : detail.specContent
+                        : t('contractGov.detail.notAvailable')}
+                    </pre>
+                  </dd>
+                </div>
+              </dl>
+            </CardBody>
+          </Card>
+
+          {/* ── Governança ── */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Shield size={18} className="text-accent" />
+                <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.governance')}</h2>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <dl className="space-y-4">
+                <DetailRow
+                  label={t('contractGov.detail.lifecycleState')}
+                  value={t(`contractGov.badges.lifecycle.${detail.lifecycleState}`, detail.lifecycleState)}
+                />
+                <div>
+                  <dt className="text-xs text-muted mb-1">{t('contractGov.detail.isLocked')}</dt>
+                  <dd className="flex items-center gap-1.5 text-sm">
+                    {detail.isLocked ? (
+                      <>
+                        <Lock size={14} className="text-purple-400" />
+                        <span className="text-purple-300">{t('contractGov.badges.lockedLabel')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Unlock size={14} className="text-muted" />
+                        <span className="text-muted">{t('contractGov.badges.unlockedLabel')}</span>
+                      </>
+                    )}
+                  </dd>
+                </div>
+                {detail.lockedAt && (
+                  <DetailRow label={t('contractGov.detail.lockedAt')} value={new Date(detail.lockedAt).toLocaleString()} />
+                )}
+                {detail.lockedBy && (
+                  <DetailRow label={t('contractGov.detail.lockedBy')} value={detail.lockedBy} />
+                )}
+                <div>
+                  <dt className="text-xs text-muted mb-1">{t('contractGov.detail.isSigned')}</dt>
+                  <dd className="flex items-center gap-1.5 text-sm">
+                    {detail.signedBy ? (
+                      <>
+                        <CheckCircle size={14} className="text-emerald-400" />
+                        <span className="text-emerald-300">{t('contractGov.badges.signed')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={14} className="text-muted" />
+                        <span className="text-muted">{t('contractGov.badges.unsigned')}</span>
+                      </>
+                    )}
+                  </dd>
+                </div>
+                {detail.fingerprint && (
+                  <DetailRow
+                    label={t('contractGov.detail.fingerprint')}
+                    value={detail.fingerprint}
+                    mono
+                  />
+                )}
+                {detail.algorithm && (
+                  <DetailRow label={t('contractGov.detail.algorithm')} value={detail.algorithm} />
+                )}
+                {detail.deprecationNotice && (
+                  <DetailRow label={t('contractGov.detail.deprecationNotice')} value={detail.deprecationNotice} />
+                )}
+                {detail.sunsetDate && (
+                  <DetailRow label={t('contractGov.detail.sunsetDate')} value={new Date(detail.sunsetDate).toLocaleDateString()} />
+                )}
+                <DetailRow
+                  label={t('contractGov.columns.createdAt')}
+                  value={new Date(detail.createdAt).toLocaleString()}
+                />
+              </dl>
+            </CardBody>
+          </Card>
+
+          {/* ── Proveniência ── */}
+          {detail.provenance && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Fingerprint size={18} className="text-accent" />
+                  <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.provenance')}</h2>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <dl className="space-y-4">
+                    <DetailRow label={t('contractGov.detail.importedBy')} value={detail.provenance.importedBy} />
+                  </dl>
+                  <dl className="space-y-4">
+                    <DetailRow label={t('contractGov.detail.parsedBy')} value={detail.provenance.parserUsed} />
+                  </dl>
+                  <dl className="space-y-4">
+                    <div>
+                      <dt className="text-xs text-muted mb-1">{t('contractGov.detail.aiGenerated')}</dt>
+                      <dd className="flex items-center gap-1.5 text-sm">
+                        {detail.provenance.isAiGenerated ? (
+                          <>
+                            <Bot size={14} className="text-accent" />
+                            <span className="text-accent">{t('contractGov.detail.yes')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Clock size={14} className="text-muted" />
+                            <span className="text-muted">{t('contractGov.detail.no')}</span>
+                          </>
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+        </div>
+
+        {/* ── Barra lateral (1/3) ── */}
+        <div className="flex flex-col gap-6">
+          {/* ── Versões ── */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <History size={16} className="text-accent" />
+                <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.versionHistory')}</h2>
+              </div>
+            </CardHeader>
+            <CardBody>
+              {otherVersions.length === 0 ? (
+                <p className="text-xs text-muted">{t('contractGov.detail.noOtherVersions')}</p>
+              ) : (
+                <ul className="space-y-2">
+                  {otherVersions.slice(0, 10).map((v) => (
+                    <li key={v.id}>
+                      <Link
+                        to={`/contracts/${v.id}`}
+                        className="flex items-center justify-between p-2 rounded-md hover:bg-elevated border border-transparent hover:border-edge transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-mono text-heading">v{v.version}</span>
+                          <span className={`inline-flex text-[10px] px-1.5 py-0.5 rounded-full ${lifecycleColors[v.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                            {t(`contractGov.badges.lifecycle.${v.lifecycleState}`, v.lifecycleState)}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-muted">{new Date(v.createdAt).toLocaleDateString()}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="mt-3 pt-3 border-t border-edge">
+                <Link
+                  to="/contracts/studio"
+                  className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
+                >
+                  <GitCompare size={12} />
+                  {t('contractGov.detail.compareVersions')}
+                </Link>
               </div>
             </CardBody>
           </Card>
-        )}
+
+          {/* ── Violações ── */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={16} className="text-accent" />
+                <h2 className="text-base font-semibold text-heading">{t('contractGov.detail.violations')}</h2>
+              </div>
+            </CardHeader>
+            <CardBody>
+              {!violations || violations.length === 0 ? (
+                <div className="flex items-center gap-2 text-sm">
+                  <CheckCircle size={14} className="text-emerald-400" />
+                  <span className="text-emerald-300">{t('contractGov.detail.noViolations')}</span>
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {violations.slice(0, 5).map((v, idx) => (
+                    <li key={idx} className="p-2 rounded-md bg-elevated border border-edge">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle size={12} className={v.severity === 'Error' ? 'text-red-400 mt-0.5' : 'text-amber-400 mt-0.5'} />
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-heading">{v.ruleName}</p>
+                          <p className="text-[11px] text-muted truncate">{v.message}</p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                  {violations.length > 5 && (
+                    <p className="text-[11px] text-muted text-center pt-1">
+                      +{violations.length - 5} {t('contractGov.detail.moreViolations')}
+                    </p>
+                  )}
+                </ul>
+              )}
+            </CardBody>
+          </Card>
+        </div>
       </div>
     </div>
   );

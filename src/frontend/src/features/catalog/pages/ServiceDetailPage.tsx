@@ -11,12 +11,14 @@ import {
   ExternalLink,
   Layers,
   Eye,
+  Lock,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { serviceCatalogApi } from '../api';
-import type { Criticality, LifecycleStatus, ServiceApiSummary } from '../../../types';
+import { contractsApi } from '../api/contracts';
+import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
@@ -37,6 +39,27 @@ const lifecycleColors: Record<LifecycleStatus, string> = {
   Retired: 'bg-slate-900/40 text-slate-400 border border-slate-700/50',
 };
 
+/** Variantes visuais para badges de protocolo de contrato. */
+const protocolColors: Record<string, string> = {
+  OpenApi: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
+  Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
+  AsyncApi: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
+  Protobuf: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
+  GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
+};
+
+/** Variantes visuais para badges de ciclo de vida de contrato. */
+const contractLifecycleColors: Record<string, string> = {
+  Draft: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
+  InReview: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
+  Approved: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  Locked: 'bg-purple-900/40 text-purple-300 border border-purple-700/50',
+  Deprecated: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
+  Sunset: 'bg-red-900/40 text-red-300 border border-red-700/50',
+  Retired: 'bg-slate-900/40 text-slate-400 border border-slate-700/50',
+};
+
 /** Página de detalhe de um serviço do catálogo. */
 export function ServiceDetailPage() {
   const { t } = useTranslation();
@@ -45,6 +68,12 @@ export function ServiceDetailPage() {
   const { data: service, isLoading, isError } = useQuery({
     queryKey: ['catalog-service-detail', serviceId],
     queryFn: () => serviceCatalogApi.getServiceDetail(serviceId!),
+    enabled: !!serviceId,
+  });
+
+  const { data: serviceContracts } = useQuery({
+    queryKey: ['catalog-service-contracts', serviceId],
+    queryFn: () => contractsApi.listContractsByService(serviceId!),
     enabled: !!serviceId,
   });
 
@@ -215,6 +244,95 @@ export function ServiceDetailPage() {
               )}
             </CardBody>
           </Card>
+
+          {/* Contratos associados */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText size={16} className="text-accent" />
+                  <h2 className="text-base font-semibold text-heading">
+                    {t('catalog.detail.contracts')}
+                  </h2>
+                </div>
+                {serviceContracts && (
+                  <span className="text-xs text-muted">
+                    {serviceContracts.totalCount} {t('catalog.detail.contractsCount')}
+                  </span>
+                )}
+              </div>
+            </CardHeader>
+            <CardBody className="p-0">
+              {!serviceContracts || serviceContracts.contracts.length === 0 ? (
+                <div className="py-10 text-center">
+                  <p className="text-sm text-muted">{t('catalog.detail.noContracts')}</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-edge text-left">
+                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                          {t('catalog.columns.name')}
+                        </th>
+                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                          {t('catalog.detail.version')}
+                        </th>
+                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                          {t('contractGov.columns.protocol')}
+                        </th>
+                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                          {t('contractGov.columns.lifecycle')}
+                        </th>
+                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                          {t('contractGov.columns.locked')}
+                        </th>
+                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                          {t('catalog.columns.actions')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-edge">
+                      {serviceContracts.contracts.map((contract: ServiceContractItem) => (
+                        <tr key={contract.versionId} className="hover:bg-elevated/50 transition-colors">
+                          <td className="px-4 py-3">
+                            <span className="font-medium text-heading">{contract.apiName}</span>
+                            <span className="block text-xs text-muted font-mono">{contract.apiRoutePattern}</span>
+                          </td>
+                          <td className="px-4 py-3 text-muted font-mono text-xs">v{contract.semVer}</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[contract.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                              {t(`contractGov.badges.protocols.${contract.protocol}`, contract.protocol)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex text-xs px-2 py-0.5 rounded-full ${contractLifecycleColors[contract.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                              {t(`contractGov.badges.lifecycle.${contract.lifecycleState}`, contract.lifecycleState)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {contract.isLocked ? (
+                              <Lock size={14} className="text-purple-400" />
+                            ) : (
+                              <span className="text-xs text-muted">—</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <Link
+                              to={`/contracts/${contract.versionId}`}
+                              className="text-xs text-accent hover:underline"
+                            >
+                              {t('catalog.detail.viewContract')}
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardBody>
+          </Card>
         </div>
 
         {/* ── Barra lateral ── */}
@@ -311,7 +429,7 @@ export function ServiceDetailPage() {
                   </a>
                 ) : (
                   <span className="text-muted text-xs">
-                    {t('catalog.detail.documentationUrl')}: —
+                    {t('catalog.detail.documentationUrl')}: {t('common.noData')}
                   </span>
                 )}
                 {service.repositoryUrl ? (
@@ -327,7 +445,7 @@ export function ServiceDetailPage() {
                   </a>
                 ) : (
                   <span className="text-muted text-xs">
-                    {t('catalog.detail.repositoryUrl')}: —
+                    {t('catalog.detail.repositoryUrl')}: {t('common.noData')}
                   </span>
                 )}
               </div>
@@ -343,10 +461,11 @@ export function ServiceDetailPage() {
 
 /** Campo de detalhe reutilizável (label + valor). */
 function DetailField({ label, value }: { label: string; value: string | undefined | null }) {
+  const { t } = useTranslation();
   return (
     <div>
       <dt className="text-xs text-muted mb-0.5">{label}</dt>
-      <dd className="text-heading">{value || '—'}</dd>
+      <dd className="text-heading">{value || t('common.noData')}</dd>
     </div>
   );
 }

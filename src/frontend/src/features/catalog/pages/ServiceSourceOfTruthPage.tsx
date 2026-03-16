@@ -126,11 +126,11 @@ export function ServiceSourceOfTruthPage() {
             <span className="text-sm text-muted">{sot.domain}</span>
             {sot.criticality && (
               <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[sot.criticality] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-                {sot.criticality}
+                {t(`catalog.badges.criticality.${sot.criticality}`, sot.criticality)}
               </span>
             )}
             <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.lifecycleStatus] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-              {sot.lifecycleStatus}
+              {t(`catalog.badges.lifecycle.${sot.lifecycleStatus}`, sot.lifecycleStatus)}
             </span>
           </div>
         </div>
@@ -148,19 +148,19 @@ export function ServiceSourceOfTruthPage() {
               <dl className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.description')}</dt>
-                  <dd className="text-body">{sot.description || '—'}</dd>
+                  <dd className="text-body">{sot.description || t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.serviceType')}</dt>
-                  <dd className="text-body">{sot.serviceType || '—'}</dd>
+                  <dd className="text-body">{sot.serviceType ? t(`catalog.badges.type.${sot.serviceType}`, sot.serviceType) : t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.systemArea')}</dt>
-                  <dd className="text-body">{sot.systemArea || '—'}</dd>
+                  <dd className="text-body">{sot.systemArea || t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.exposureType')}</dt>
-                  <dd className="text-body">{sot.exposureType || '—'}</dd>
+                  <dd className="text-body">{sot.exposureType ? t(`catalog.badges.exposure.${sot.exposureType}`, sot.exposureType) : t('common.noData')}</dd>
                 </div>
               </dl>
             </CardBody>
@@ -178,15 +178,15 @@ export function ServiceSourceOfTruthPage() {
               <dl className="grid sm:grid-cols-3 gap-4 text-sm">
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.team')}</dt>
-                  <dd className="text-body font-medium">{sot.teamName || '—'}</dd>
+                  <dd className="text-body font-medium">{sot.teamName || t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.technicalOwner')}</dt>
-                  <dd className="text-body">{sot.technicalOwner || '—'}</dd>
+                  <dd className="text-body">{sot.technicalOwner || t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.businessOwner')}</dt>
-                  <dd className="text-body">{sot.businessOwner || '—'}</dd>
+                  <dd className="text-body">{sot.businessOwner || t('common.noData')}</dd>
                 </div>
               </dl>
             </CardBody>
@@ -226,7 +226,7 @@ export function ServiceSourceOfTruthPage() {
                           <td className="px-6 py-3 text-muted">{api.version}</td>
                           <td className="px-6 py-3">
                             <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                              {api.visibility}
+                              {t(`catalog.badges.exposure.${api.visibility}`, api.visibility)}
                             </span>
                           </td>
                           <td className="px-6 py-3 text-right text-muted">{api.consumerCount}</td>
@@ -275,12 +275,12 @@ export function ServiceSourceOfTruthPage() {
                           <td className="px-6 py-3 text-muted">v{c.semVer}</td>
                           <td className="px-6 py-3">
                             <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-                              {c.protocol}
+                              {t(`contractGov.badges.protocols.${c.protocol}`, c.protocol)}
                             </span>
                           </td>
                           <td className="px-6 py-3">
                             <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                              {c.lifecycleState}
+                              {t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState)}
                             </span>
                           </td>
                         </tr>
@@ -313,7 +313,7 @@ export function ServiceSourceOfTruthPage() {
                         <p className="text-sm font-medium text-heading truncate">{ref.title}</p>
                         <p className="text-xs text-muted line-clamp-2">{ref.description}</p>
                         <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {ref.referenceType}
+                          {t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType)}
                         </span>
                       </div>
                       {ref.url && (
@@ -362,7 +362,7 @@ export function ServiceSourceOfTruthPage() {
                 </svg>
                 <p className="text-xs text-muted">
                   {t('sourceOfTruth.service.coverageScore')}
-                  {coverage ? ` — ${coverage.metIndicators}/${coverage.totalIndicators}` : ''}
+                  {coverage ? ` · ${coverage.metIndicators}/${coverage.totalIndicators}` : ''}
                 </p>
               </div>
 
@@ -421,7 +421,7 @@ export function ServiceSourceOfTruthPage() {
                   </li>
                 )}
                 {!sot.documentationUrl && !sot.repositoryUrl && (
-                  <p className="text-xs text-muted">—</p>
+                  <p className="text-xs text-muted">{t('common.noData')}</p>
                 )}
               </ul>
             </CardBody>

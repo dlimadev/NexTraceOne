@@ -1975,7 +1975,11 @@
       "active": "Activo",
       "status": "Estado",
       "separator": "·",
-      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumidores"
+      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumidores",
+      "contracts": "Contratos Vinculados",
+      "contractsCount": "contratos",
+      "noContracts": "No hay contratos vinculados a este servicio.",
+      "viewContract": "Ver Contrato"
     },
     "actions": {
       "viewDetail": "Ver Detalle",
@@ -2075,7 +2079,13 @@
       "algorithm": "Algoritmo",
       "apiAssetId": "ID del Activo de API",
       "version": "Versión",
-      "protocol": "Protocolo"
+      "protocol": "Protocolo",
+      "versionHistory": "Historial de Versiones",
+      "noOtherVersions": "No hay otras versiones disponibles.",
+      "compareVersions": "Comparar Versiones",
+      "violations": "Violaciones de Reglas",
+      "noViolations": "No se detectaron violaciones",
+      "moreViolations": "más"
     }
   },
   "sourceOfTruth": {
@@ -2166,6 +2176,21 @@
       "consumers": "Consumidores",
       "protocol": "Protocolo",
       "lifecycle": "Ciclo de Vida"
+    },
+    "referenceTypes": {
+      "Documentation": "Documentación",
+      "Runbook": "Runbook",
+      "Wiki": "Wiki",
+      "ADR": "ADR",
+      "ExternalLink": "Enlace Externo",
+      "Diagram": "Diagrama",
+      "Contract": "Contrato"
+    },
+    "assetTypes": {
+      "Service": "Servicio",
+      "Contract": "Contrato",
+      "Api": "API",
+      "Documentation": "Documentación"
     }
   },
   "changeConfidence": {
