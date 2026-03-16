@@ -34,7 +34,9 @@
     "noData": "Sem dados disponíveis",
     "blocked": "Acesso bloqueado",
     "quotaExceeded": "Quota excedida",
-    "errorDescription": "Algo deu errado. Tente novamente mais tarde."
+    "errorDescription": "Algo deu errado. Tente novamente mais tarde.",
+    "collapse": "Recolher",
+    "expand": "Expandir"
   },
   "auth": {
     "signIn": "Entrar na sua conta",
@@ -507,7 +509,8 @@
       "development": "Desenvolvimento",
       "staging": "Homologação",
       "production": "Produção"
-    }
+    },
+    "freezeEnvironmentPlaceholder": "produção"
   },
   "contracts": {
     "active": "Ativo",
@@ -755,7 +758,8 @@
     "timestamp": "Data/Hora",
     "hash": "Hash",
     "previous": "Anterior",
-    "pageOf": "Página {{page}} de {{totalPages}}"
+    "pageOf": "Página {{page}} de {{totalPages}}",
+    "hashLabel": "Hash: {{hash}}"
   },
   "licensing": {
     "title": "Licenciamento",
@@ -1979,7 +1983,15 @@
       "contracts": "Contratos Vinculados",
       "contractsCount": "contratos",
       "noContracts": "Nenhum contrato vinculado a este serviço.",
-      "viewContract": "Ver Contrato"
+      "viewContract": "Ver Contrato",
+      "recentChanges": "Mudanças Recentes",
+      "recentChangesDescription": "Mudanças recentes implantadas neste serviço",
+      "noRecentChanges": "Nenhuma mudança recente registrada",
+      "viewChange": "Ver mudança",
+      "relatedIncidents": "Incidentes Relacionados",
+      "relatedIncidentsDescription": "Incidentes ativos impactando este serviço",
+      "noRelatedIncidents": "Nenhum incidente ativo",
+      "viewIncident": "Ver incidente"
     },
     "actions": {
       "viewDetail": "Ver Detalhe",
@@ -2085,7 +2097,9 @@
       "compareVersions": "Comparar Versões",
       "violations": "Violações de Regras",
       "noViolations": "Nenhuma violação detectada",
-      "moreViolations": "mais"
+      "moreViolations": "mais",
+      "ownerService": "Serviço Proprietário",
+      "viewServiceDetail": "Ver serviço"
     }
   },
   "sourceOfTruth": {
@@ -2323,7 +2337,9 @@
       "viewService": "Ver Serviço",
       "viewContract": "Ver Contrato",
       "noAffectedServices": "Nenhum serviço ou contrato vinculado",
-      "noAdvisory": "Recomendação ainda não disponível"
+      "noAdvisory": "Recomendação ainda não disponível",
+      "viewIncidents": "Ver Incidentes",
+      "viewIncidentsDescription": "Ver incidentes correlacionados com esta mudança"
     }
   },
   "persona": {

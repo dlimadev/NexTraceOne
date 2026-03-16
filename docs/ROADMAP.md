@@ -1,6 +1,6 @@
 # ROADMAP.md — Plano de execução e evolução pós-PR-16
 
-> **Última atualização:** Março 2026
+> **Última atualização:** Março 2026 (pós-finalização Onda 1)
 >
 > **Princípio diretor:** Parar a expansão conceitual, consolidar o que existe,
 > fechar os fluxos centrais de valor, e só depois retomar evolução avançada de forma seletiva.
@@ -51,6 +51,11 @@ O foco deve voltar para os pilares centrais do NexTraceOne:
 
 ## Onda 1 — Fechar os fluxos centrais do produto (4-6 semanas)
 
+> **Estado:** Finalização transversal concluída (i18n, UX states, navegação, testes).
+> Backend dos fluxos 1-2 estão completos com persistência real.
+> Backend dos fluxos 3-4 estão com domain/application/API prontos, handlers ainda com dados mock.
+> Frontend está conectado via API client em todos os 4 fluxos.
+
 ### Fluxo 1 — Contrato e Source of Truth
 
 **Objetivo:** NexTraceOne é de fato a fonte de verdade de APIs/serviços/eventos.
@@ -62,10 +67,14 @@ O foco deve voltar para os pilares centrais do NexTraceOne:
 | Diff semântico | Sprint 1 | ✅ Real |
 | Compatibilidade | Sprint 1 | ✅ Real |
 | Ownership | Sprint 1 | ✅ Real |
-| Busca e navegação confiável | Sprint 1 | ⚠️ SearchCatalog é stub |
+| Busca e navegação confiável | Sprint 1 | ✅ Explorer funcional via API |
 | Documentação operacional mínima | Sprint 2 | ⚠️ Parcial |
 | Visualização por serviço/contrato/tópico | Sprint 2 | ✅ Real |
 | Contract Studio utilizável | Sprint 2 | ⚠️ Precisa polish |
+| i18n — textos hardcoded removidos | Sprint W1 | ✅ Concluído |
+| Error states — SourceOfTruthExplorer | Sprint W1 | ✅ Concluído |
+| Navegação serviço ↔ contrato bidirecional | Sprint W1 | ✅ Concluído |
+| Testes frontend (5 testes SoT Explorer) | Sprint W1 | ✅ Concluído |
 
 **Critério de sucesso:**
 - Um dev importa/edita/publica contrato sem sair do NexTraceOne
@@ -86,6 +95,10 @@ O foco deve voltar para os pilares centrais do NexTraceOne:
 | Approval/reject/conditional | Sprint 3 | ✅ Real |
 | Readiness de rollout | Sprint 3 | ✅ Real |
 | Trilha de decisão | Sprint 3 | ✅ Real |
+| Error state — ChangeCatalogPage | Sprint W1 | ✅ Concluído |
+| Navegação change → serviço específico | Sprint W1 | ✅ Corrigido (/services em vez de /catalog/services) |
+| Navegação change → incidentes | Sprint W1 | ✅ Quick link adicionado |
+| Testes frontend (16 testes existentes) | Sprint 3 | ✅ Concluído |
 
 **Critério de sucesso:**
 - Uma mudança sai de proposta até decisão com contexto completo
@@ -97,17 +110,22 @@ O foco deve voltar para os pilares centrais do NexTraceOne:
 
 | Item | Sprint | Estado atual |
 |------|--------|-------------|
-| Correlação incidente ↔ changes ↔ serviços | Sprint 4 | ❌ Mock |
-| Painel de troubleshooting | Sprint 4 | ❌ Mock |
-| Mitigação guiada | Sprint 4 | ❌ Mock |
-| Runbooks | Sprint 4 | ❌ Mock |
-| Validação pós-ação | Sprint 4 | ❌ Mock |
-| Histórico de mitigação | Sprint 4 | ❌ Mock |
-| Frontend conectado à API | Sprint 4 | ❌ Mock inline |
+| Correlação incidente ↔ changes ↔ serviços | Sprint 4 | ⚠️ Domain pronto, handlers mock |
+| Painel de troubleshooting | Sprint 4 | ⚠️ UI funcional via API, dados mock |
+| Mitigação guiada | Sprint 4 | ⚠️ UI funcional via API, dados mock |
+| Runbooks | Sprint 4 | ⚠️ UI funcional via API, dados mock |
+| Validação pós-ação | Sprint 4 | ⚠️ UI funcional via API, dados mock |
+| Histórico de mitigação | Sprint 4 | ⚠️ UI funcional via API, dados mock |
+| Frontend conectado à API | Sprint 4 | ✅ Conectado (API retorna mock) |
+| Navegação incident → serviço e contrato | Sprint W1 | ✅ Links diretos |
+| Testes frontend (13 testes novos) | Sprint W1 | ✅ Concluído |
 
 **Critério de sucesso:**
 - Num incidente, a equipa chega mais rápido em hipótese, impacto e ação
 - Dados persistidos e consultáveis, não hardcoded
+
+> **Gap remanescente:** Handlers de incidentes ainda retornam dados mock.
+> Persistência real requer EF migrations e stores — planeado para Onda 2.
 
 ### Fluxo 4 — AI Assistant útil de verdade
 
@@ -115,23 +133,31 @@ O foco deve voltar para os pilares centrais do NexTraceOne:
 
 | Item | Sprint | Estado atual |
 |------|--------|-------------|
-| Grounding em contratos | Sprint 5 | ⚠️ API existe, não validado |
-| Grounding em serviços | Sprint 5 | ⚠️ API existe, não validado |
-| Grounding em incidents | Sprint 5 | ❌ Depende de incidents reais |
-| Grounding em runbooks | Sprint 5 | ❌ Depende de runbooks reais |
-| Grounding em changes | Sprint 5 | ⚠️ Changes reais, grounding não validado |
-| Explicação de fontes | Sprint 5 | ⚠️ API suporta, não validado E2E |
-| Prompts por persona | Sprint 5 | ⚠️ Estrutura existe |
-| Troubleshooting assistido | Sprint 5 | ❌ Depende de incidents reais |
+| Grounding em contratos | Sprint 5 | ⚠️ API existe, grounding estrutural |
+| Grounding em serviços | Sprint 5 | ⚠️ API existe, grounding estrutural |
+| Grounding em incidents | Sprint 5 | ⚠️ Estrutura pronta, depende de dados reais |
+| Grounding em runbooks | Sprint 5 | ⚠️ Estrutura pronta, depende de dados reais |
+| Grounding em changes | Sprint 5 | ⚠️ Changes reais, grounding estrutural |
+| Explicação de fontes | Sprint 5 | ✅ UI mostra fontes usadas |
+| Prompts por persona | Sprint 5 | ✅ Estrutura funcional, 4 contextos |
+| Troubleshooting assistido | Sprint 5 | ⚠️ UI pronta, depende de dados reais |
+| AssistantPanel contextual (4 entidades) | Sprint W1 | ✅ Concluído |
+| Testes frontend (5 testes novos) | Sprint W1 | ✅ Concluído |
 
 **Critério de sucesso:**
 - O assistant responde perguntas úteis sobre problema real de serviço
 - A resposta tem contexto, fonte e explicação
 - A IA não parece genérica
 
+> **Gap remanescente:** Grounding profundo depende de integração com modelo real.
+> UI e routing estão prontos. Validação E2E depende de modelo configurado.
+
 ---
 
 ## Onda 2 — Productização e adoção real (3-5 semanas)
+
+> **Nota:** Alguns itens de product polish (empty states, error states, breadcrumbs, navegação
+> cross-entity) foram antecipados e resolvidos na finalização da Onda 1.
 
 ### UX por persona
 

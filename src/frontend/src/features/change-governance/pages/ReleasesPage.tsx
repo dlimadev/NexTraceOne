@@ -832,7 +832,7 @@ export function ReleasesPage() {
                     value={freezeCheckEnv}
                     onChange={(e) => setFreezeCheckEnv(e.target.value)}
                     className={INPUT_CLS}
-                    placeholder="production"
+                    placeholder={t('releases.freezeEnvironmentPlaceholder')}
                   />
                 </div>
                 <Button

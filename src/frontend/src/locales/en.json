@@ -34,7 +34,9 @@
     "noData": "No data available",
     "blocked": "Access blocked",
     "quotaExceeded": "Quota exceeded",
-    "errorDescription": "Something went wrong. Please try again later."
+    "errorDescription": "Something went wrong. Please try again later.",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "auth": {
     "signIn": "Sign in to your account",
@@ -507,7 +509,8 @@
       "development": "Development",
       "staging": "Staging",
       "production": "Production"
-    }
+    },
+    "freezeEnvironmentPlaceholder": "production"
   },
   "contracts": {
     "active": "Active",
@@ -755,7 +758,8 @@
     "timestamp": "Timestamp",
     "hash": "Hash",
     "previous": "Previous",
-    "pageOf": "Page {{page}} of {{totalPages}}"
+    "pageOf": "Page {{page}} of {{totalPages}}",
+    "hashLabel": "Hash: {{hash}}"
   },
   "licensing": {
     "title": "Licensing",
@@ -1979,7 +1983,15 @@
       "contracts": "Linked Contracts",
       "contractsCount": "contracts",
       "noContracts": "No contracts linked to this service.",
-      "viewContract": "View Contract"
+      "viewContract": "View Contract",
+      "recentChanges": "Recent Changes",
+      "recentChangesDescription": "Recent changes deployed to this service",
+      "noRecentChanges": "No recent changes recorded",
+      "viewChange": "View change",
+      "relatedIncidents": "Related Incidents",
+      "relatedIncidentsDescription": "Active incidents impacting this service",
+      "noRelatedIncidents": "No active incidents",
+      "viewIncident": "View incident"
     },
     "actions": {
       "viewDetail": "View Detail",
@@ -2085,7 +2097,9 @@
       "compareVersions": "Compare Versions",
       "violations": "Rule Violations",
       "noViolations": "No violations detected",
-      "moreViolations": "more"
+      "moreViolations": "more",
+      "ownerService": "Owner Service",
+      "viewServiceDetail": "View service"
     }
   },
   "sourceOfTruth": {
@@ -2323,7 +2337,9 @@
       "viewService": "View Service",
       "viewContract": "View Contract",
       "noAffectedServices": "No linked services or contracts",
-      "noAdvisory": "Advisory not available yet"
+      "noAdvisory": "Advisory not available yet",
+      "viewIncidents": "View Incidents",
+      "viewIncidentsDescription": "View incidents correlated with this change"
     }
   },
   "persona": {

@@ -136,7 +136,7 @@ export function AuditPage() {
                     <td
                       className="px-6 py-3 font-mono text-xs text-faded truncate max-w-[120px]"
                       title={e.hash}
-                      aria-label={`Hash: ${e.hash}`}
+                      aria-label={t('audit.hashLabel', { hash: e.hash })}
                     >
                       {e.hash.slice(0, 12)}…
                     </td>

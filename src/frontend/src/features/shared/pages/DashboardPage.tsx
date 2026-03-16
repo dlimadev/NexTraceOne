@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Zap, GitBranch, FileText, CheckSquare, Activity } from 'lucide-react';
+import { Zap, GitBranch, FileText, CheckSquare, Activity, AlertTriangle } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -28,7 +28,7 @@ export function DashboardPage() {
   const { t } = useTranslation();
   const { persona, config } = usePersona();
 
-  const { data: graph } = useQuery({
+  const { data: graph, isLoading: graphLoading, isError: graphError } = useQuery({
     queryKey: ['graph'],
     queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 30_000,
@@ -37,19 +37,19 @@ export function DashboardPage() {
   const stats = [
     {
       title: t('dashboard.activeServices'),
-      value: graph?.services?.length ?? '—',
+      value: graphLoading ? '…' : (graph?.services?.length ?? '—'),
       icon: <Activity size={24} />,
       color: 'text-brand-blue',
     },
     {
       title: t('dashboard.registeredApis'),
-      value: graph?.apis?.length ?? '—',
+      value: graphLoading ? '…' : (graph?.apis?.length ?? '—'),
       icon: <GitBranch size={24} />,
       color: 'text-accent',
     },
     {
       title: t('dashboard.consumerRelations'),
-      value: graph?.apis?.reduce((sum: number, a: { consumers?: unknown[] }) => sum + (a.consumers?.length ?? 0), 0) ?? '—',
+      value: graphLoading ? '…' : (graph?.apis?.reduce((sum: number, a: { consumers?: unknown[] }) => sum + (a.consumers?.length ?? 0), 0) ?? '—'),
       icon: <Zap size={24} />,
       color: 'text-warning',
     },
@@ -85,6 +85,21 @@ export function DashboardPage() {
 
       {/* Quickstart persona-aware — orientação para novos utilizadores */}
       <PersonaQuickstart />
+
+      {/* Error state */}
+      {graphError && (
+        <Card className="mb-8">
+          <CardBody>
+            <div className="flex items-center gap-3 py-2">
+              <AlertTriangle size={20} className="text-critical shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-critical">{t('common.error')}</p>
+                <p className="text-xs text-muted">{t('common.errorDescription')}</p>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       {/* KPI Stats — comuns a todas as personas */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">

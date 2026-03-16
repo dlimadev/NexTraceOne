@@ -14,6 +14,7 @@ import {
   History,
   GitCompare,
   AlertTriangle,
+  ExternalLink,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -142,6 +143,20 @@ export function ContractDetailPage() {
                 <DetailRow label={t('contractGov.detail.protocol')} value={t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)} />
                 <DetailRow label={t('contractGov.detail.format')} value={detail.format} />
                 <DetailRow label={t('contractGov.detail.importedFrom')} value={detail.importedFrom ?? t('contractGov.detail.notAvailable')} />
+                {detail.serviceName && (
+                  <div>
+                    <dt className="text-xs text-muted mb-1">{t('contractGov.detail.ownerService')}</dt>
+                    <dd>
+                      <Link
+                        to="/services"
+                        className="text-sm text-accent hover:underline inline-flex items-center gap-1"
+                      >
+                        {detail.serviceName}
+                        <ExternalLink size={12} />
+                      </Link>
+                    </dd>
+                  </div>
+                )}
                 <div>
                   <dt className="text-xs text-muted mb-1">{t('contractGov.detail.specPreview')}</dt>
                   <dd className="bg-elevated border border-edge rounded-md p-3 max-h-48 overflow-y-auto">
