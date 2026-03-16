@@ -36,6 +36,9 @@ import {
   GitCompare,
   Route,
   Cable,
+  Building2,
+  Boxes,
+  ShieldPlus,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';

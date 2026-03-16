@@ -83,6 +83,13 @@ const PolicyCatalogPage = lazy(() => import('./features/governance/pages/PolicyC
 const EvidencePackagesPage = lazy(() => import('./features/governance/pages/EvidencePackagesPage').then(m => ({ default: m.EvidencePackagesPage })));
 const EnterpriseControlsPage = lazy(() => import('./features/governance/pages/EnterpriseControlsPage').then(m => ({ default: m.EnterpriseControlsPage })));
 
+// ── Organization Governance (lazy) ──
+const TeamsOverviewPage = lazy(() => import('./features/governance/pages/TeamsOverviewPage').then(m => ({ default: m.TeamsOverviewPage })));
+const TeamDetailPage = lazy(() => import('./features/governance/pages/TeamDetailPage').then(m => ({ default: m.TeamDetailPage })));
+const DomainsOverviewPage = lazy(() => import('./features/governance/pages/DomainsOverviewPage').then(m => ({ default: m.DomainsOverviewPage })));
+const DomainDetailPage = lazy(() => import('./features/governance/pages/DomainDetailPage').then(m => ({ default: m.DomainDetailPage })));
+const DelegatedAdminPage = lazy(() => import('./features/governance/pages/DelegatedAdminPage').then(m => ({ default: m.DelegatedAdminPage })));
+
 // ── Integrations (lazy) ──
 const IntegrationHubPage = lazy(() => import('./features/integrations/pages/IntegrationHubPage').then(m => ({ default: m.IntegrationHubPage })));
 const ConnectorDetailPage = lazy(() => import('./features/integrations/pages/ConnectorDetailPage').then(m => ({ default: m.ConnectorDetailPage })));
@@ -310,6 +317,47 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
                     <EnterpriseControlsPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Organization Governance ── */}
+              <Route
+                path="/governance/teams"
+                element={
+                  <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
+                    <TeamsOverviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/teams/:teamId"
+                element={
+                  <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
+                    <TeamDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/domains"
+                element={
+                  <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
+                    <DomainsOverviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/domains/:domainId"
+                element={
+                  <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
+                    <DomainDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/governance/delegated-admin"
+                element={
+                  <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
+                    <DelegatedAdminPage />
                   </ProtectedRoute>
                 }
               />
