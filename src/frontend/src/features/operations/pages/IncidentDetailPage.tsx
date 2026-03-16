@@ -1,152 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useParams, NavLink } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   AlertTriangle, ArrowLeft, ShieldAlert, AlertCircle, Eye,
   CheckCircle, XCircle, Clock, Search, Wrench,
   GitBranch, FileText, BookOpen, Shield, Activity,
-  ExternalLink,
+  ExternalLink, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
-
-/**
- * Dados simulados de detalhe de incidente — alinhados com o backend GetIncidentDetail.
- * Em produção, estes dados virão da API /api/v1/incidents/{incidentId}.
- */
-const mockDetails: Record<string, IncidentDetail> = {
-  'a1b2c3d4-0001-0000-0000-000000000001': {
-    identity: {
-      incidentId: 'a1b2c3d4-0001-0000-0000-000000000001',
-      reference: 'INC-2026-0042',
-      title: 'Payment Gateway — elevated error rate',
-      summary: 'Error rate increased to 8.2% after deployment of v2.14.0. Multiple payment flows affected.',
-      incidentType: 'ServiceDegradation',
-      severity: 'Critical',
-      status: 'Mitigating',
-      createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-      updatedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    },
-    linkedServices: [
-      { serviceId: 'svc-payment-gateway', displayName: 'Payment Gateway', serviceType: 'RestApi', criticality: 'Critical' },
-      { serviceId: 'svc-order-api', displayName: 'Order API', serviceType: 'RestApi', criticality: 'Critical' },
-    ],
-    ownerTeam: 'payment-squad',
-    impactedDomain: 'Payments',
-    impactedEnvironment: 'Production',
-    timeline: [
-      { timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), description: 'Incident detected — error rate threshold breached' },
-      { timestamp: new Date(Date.now() - 2.5 * 60 * 60 * 1000).toISOString(), description: 'Investigation started — payment-squad notified' },
-      { timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: 'Root cause identified — v2.14.0 introduced regression in payment validation' },
-      { timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: 'Mitigation started — rollback initiated' },
-      { timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(), description: 'Rollback deployed — monitoring recovery' },
-    ],
-    correlation: {
-      confidence: 'High',
-      reason: 'Deployment of v2.14.0 strongly correlated with error rate increase. Temporal proximity and blast radius match.',
-      relatedChanges: [
-        { changeId: '1', description: 'Deploy v2.14.0 to Payment Gateway', changeType: 'Deployment', confidenceStatus: 'SuspectedRegression', deployedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString() },
-      ],
-      relatedServices: [
-        { serviceId: 'svc-order-api', displayName: 'Order API', impactDescription: 'Downstream payment calls failing' },
-      ],
-    },
-    evidence: {
-      operationalSignalsSummary: 'Error rate: 1.2% → 8.2%. P99 latency: 120ms → 890ms. Timeout rate increased 5x.',
-      degradationSummary: 'Error rate crossed 5% threshold. P99 latency exceeded SLO. Payment success rate dropped to 91.8%.',
-      observations: [
-        { title: 'Error rate spike', description: 'Error rate increased from 1.2% to 8.2% within 15 minutes of deployment' },
-        { title: 'Latency degradation', description: 'P99 latency increased from 120ms to 890ms' },
-        { title: 'Downstream impact', description: 'Order API reporting payment timeouts' },
-      ],
-      anomalySummary: 'Clear before/after pattern: all key metrics degraded immediately post-deployment.',
-    },
-    relatedContracts: [
-      { contractVersionId: '1', name: 'Payment Processing API', version: 'v2.14.0', protocol: 'REST', lifecycleState: 'Active' },
-    ],
-    runbooks: [
-      { title: 'Payment Gateway Rollback Procedure', url: 'https://docs.internal/runbooks/payment-rollback' },
-      { title: 'Payment Error Rate Troubleshooting', url: 'https://docs.internal/runbooks/payment-errors' },
-    ],
-    mitigation: {
-      status: 'InProgress',
-      actions: [
-        { description: 'Rollback to v2.13.2', status: 'Applied', completed: true },
-        { description: 'Monitor error rate recovery', status: 'In progress', completed: false },
-        { description: 'Notify affected downstream teams', status: 'Completed', completed: true },
-      ],
-      rollbackGuidance: 'Rollback to v2.13.2 is the primary mitigation. Monitoring recovery.',
-      rollbackRelevant: true,
-      escalationGuidance: 'Escalate to payments-lead if error rate does not recover within 30 minutes post-rollback.',
-    },
-  },
-  'a1b2c3d4-0002-0000-0000-000000000002': {
-    identity: {
-      incidentId: 'a1b2c3d4-0002-0000-0000-000000000002',
-      reference: 'INC-2026-0041',
-      title: 'Catalog Sync — integration partner unreachable',
-      summary: 'External catalog provider API returning 503. Product sync stalled.',
-      incidentType: 'DependencyFailure',
-      severity: 'Major',
-      status: 'Investigating',
-      createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    },
-    linkedServices: [
-      { serviceId: 'svc-catalog-sync', displayName: 'Catalog Sync', serviceType: 'IntegrationComponent', criticality: 'Medium' },
-    ],
-    ownerTeam: 'platform-squad',
-    impactedDomain: 'Catalog',
-    impactedEnvironment: 'Production',
-    timeline: [
-      { timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), description: 'External API health check failed — 503 responses' },
-      { timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: 'Investigation started — platform-squad notified' },
-      { timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: 'Vendor contacted — awaiting response' },
-    ],
-    correlation: {
-      confidence: 'Low',
-      reason: 'No internal changes correlated. External dependency failure suspected.',
-      relatedChanges: [],
-      relatedServices: [],
-    },
-    evidence: {
-      operationalSignalsSummary: 'External API returning 503 since 06:00 UTC. Retry queue depth: 1,247.',
-      degradationSummary: 'Product catalog sync halted. Stale data risk for product listings.',
-      observations: [
-        { title: 'External API failure', description: '503 Service Unavailable from catalog-provider.example.com' },
-        { title: 'Queue buildup', description: 'Sync retry queue depth at 1,247 messages' },
-      ],
-      anomalySummary: 'External dependency failure — no internal anomalies detected.',
-    },
-    relatedContracts: [],
-    runbooks: [
-      { title: 'Catalog Sync Manual Recovery', url: 'https://docs.internal/runbooks/catalog-sync-recovery' },
-    ],
-    mitigation: {
-      status: 'NotStarted',
-      actions: [],
-      rollbackGuidance: 'Not applicable — external dependency failure.',
-      rollbackRelevant: false,
-      escalationGuidance: 'Escalate to platform-lead if vendor does not respond within 2 hours.',
-    },
-  },
-};
-
-// ── Types ────────────────────────────────────────────────────────────
-
-interface IncidentDetail {
-  identity: { incidentId: string; reference: string; title: string; summary: string; incidentType: string; severity: string; status: string; createdAt: string; updatedAt: string };
-  linkedServices: { serviceId: string; displayName: string; serviceType: string; criticality: string }[];
-  ownerTeam: string;
-  impactedDomain: string;
-  impactedEnvironment: string;
-  timeline: { timestamp: string; description: string }[];
-  correlation: { confidence: string; reason: string; relatedChanges: { changeId: string; description: string; changeType: string; confidenceStatus: string; deployedAt: string }[]; relatedServices: { serviceId: string; displayName: string; impactDescription: string }[] };
-  evidence: { operationalSignalsSummary: string; degradationSummary: string; observations: { title: string; description: string }[]; anomalySummary: string };
-  relatedContracts: { contractVersionId: string; name: string; version: string; protocol: string; lifecycleState: string }[];
-  runbooks: { title: string; url?: string }[];
-  mitigation: { status: string; actions: { description: string; status: string; completed: boolean }[]; rollbackGuidance?: string; rollbackRelevant: boolean; escalationGuidance?: string };
-}
+import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -204,7 +68,53 @@ function formatDate(dateStr: string): string {
 export function IncidentDetailPage() {
   const { t } = useTranslation();
   const { incidentId } = useParams<{ incidentId: string }>();
-  const detail = incidentId ? mockDetails[incidentId] : undefined;
+
+  const detailQuery = useQuery({
+    queryKey: ['incident-detail', incidentId],
+    queryFn: () => incidentsApi.getIncidentDetail(incidentId!),
+    enabled: !!incidentId,
+  });
+
+  // Loading state
+  if (detailQuery.isLoading) {
+    return (
+      <div className="p-6 lg:p-8 animate-fade-in">
+        <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
+          <ArrowLeft size={14} /> {t('incidents.detail.backToList')}
+        </NavLink>
+        <Card>
+          <CardBody>
+            <div className="flex items-center justify-center gap-2 py-12 text-muted">
+              <Loader2 size={20} className="animate-spin" />
+              {t('common.loading')}
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
+
+  // Error state
+  if (detailQuery.isError) {
+    return (
+      <div className="p-6 lg:p-8 animate-fade-in">
+        <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
+          <ArrowLeft size={14} /> {t('incidents.detail.backToList')}
+        </NavLink>
+        <Card>
+          <CardBody>
+            <EmptyState
+              icon={<AlertTriangle size={24} />}
+              title={t('incidents.detail.notFound')}
+              description={t('incidents.detail.notFoundDescription')}
+            />
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
+
+  const detail: IncidentDetailResponse | undefined = detailQuery.data;
 
   if (!detail) {
     return (
@@ -373,10 +283,6 @@ export function IncidentDetailPage() {
                     </div>
                   </div>
                 )}
-                <div>
-                  <p className="text-xs text-muted mb-1">{t('incidents.evidence.anomalySummary')}</p>
-                  <p className="text-sm text-body">{evidence.anomalySummary}</p>
-                </div>
               </div>
             </CardBody>
           </Card>

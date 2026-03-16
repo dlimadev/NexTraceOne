@@ -13,4 +13,5 @@ export { licensingApi } from '../features/commercial-governance/api/licensing';
 export { developerPortalApi } from '../features/catalog/api/developerPortal';
 export { globalSearchApi } from '../features/catalog/api/globalSearch';
 export { organizationGovernanceApi } from '../features/governance/api/organizationGovernance';
+export { incidentsApi } from '../features/operations/api/incidents';
 export { default as apiClient } from './client';

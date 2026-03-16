@@ -33,7 +33,8 @@
     "comingSoon": "Coming soon",
     "noData": "No data available",
     "blocked": "Access blocked",
-    "quotaExceeded": "Quota exceeded"
+    "quotaExceeded": "Quota exceeded",
+    "errorDescription": "Something went wrong. Please try again later."
   },
   "auth": {
     "signIn": "Sign in to your account",
