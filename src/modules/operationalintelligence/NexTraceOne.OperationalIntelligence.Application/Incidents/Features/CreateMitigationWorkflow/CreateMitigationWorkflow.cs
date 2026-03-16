@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 
@@ -37,24 +38,22 @@ public static class CreateMitigationWorkflow
         }
     }
 
-    /// <summary>Handler que cria o workflow de mitigação com dados simulados.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que cria o workflow de mitigação via store.</summary>
+    public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
     {
-        private static readonly HashSet<string> KnownIncidentIds = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "a1b2c3d4-0001-0000-0000-000000000001",
-            "a1b2c3d4-0002-0000-0000-000000000002",
-        };
-
         public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!KnownIncidentIds.Contains(request.IncidentId))
+            if (!store.IncidentExists(request.IncidentId))
                 return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
-            var response = new Response(
-                WorkflowId: Guid.NewGuid(),
-                Status: MitigationWorkflowStatus.Draft,
-                CreatedAt: DateTimeOffset.UtcNow);
+            var response = store.CreateMitigationWorkflow(
+                request.IncidentId,
+                request.Title,
+                request.ActionType,
+                request.RiskLevel,
+                request.RequiresApproval,
+                request.LinkedRunbookId,
+                request.Steps);
 
             return Task.FromResult(Result<Response>.Success(response));
         }

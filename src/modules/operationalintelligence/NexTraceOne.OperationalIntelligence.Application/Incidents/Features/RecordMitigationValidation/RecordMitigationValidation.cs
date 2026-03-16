@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 
@@ -35,24 +36,24 @@ public static class RecordMitigationValidation
         }
     }
 
-    /// <summary>Handler que regista a validação do workflow de mitigação com dados simulados.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que regista a validação do workflow de mitigação via store.</summary>
+    public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
     {
-        private static readonly HashSet<string> KnownIncidentIds = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "a1b2c3d4-0001-0000-0000-000000000001",
-            "a1b2c3d4-0002-0000-0000-000000000002",
-        };
-
         public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!KnownIncidentIds.Contains(request.IncidentId))
+            if (!store.IncidentExists(request.IncidentId))
                 return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
-            var response = new Response(
-                WorkflowId: Guid.TryParse(request.WorkflowId, out var wfId) ? wfId : Guid.NewGuid(),
-                Status: request.Status,
-                ValidatedAt: DateTimeOffset.UtcNow);
+            var response = store.RecordMitigationValidation(
+                request.IncidentId,
+                request.WorkflowId,
+                request.Status,
+                request.ObservedOutcome,
+                request.ValidatedBy,
+                request.Checks);
+
+            if (response is null)
+                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
             return Task.FromResult(Result<Response>.Success(response));
         }

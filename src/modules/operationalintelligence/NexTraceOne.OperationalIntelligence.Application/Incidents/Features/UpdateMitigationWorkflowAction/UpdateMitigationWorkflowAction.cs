@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 
@@ -49,17 +50,11 @@ public static class UpdateMitigationWorkflowAction
     }
 
     /// <summary>Handler que processa a ação sobre o workflow de mitigação.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
     {
-        private static readonly HashSet<string> KnownIncidentIds = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "a1b2c3d4-0001-0000-0000-000000000001",
-            "a1b2c3d4-0002-0000-0000-000000000002",
-        };
-
         public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!KnownIncidentIds.Contains(request.IncidentId))
+            if (!store.IncidentExists(request.IncidentId))
                 return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
             if (!AllowedActions.Contains(request.Action))
@@ -67,11 +62,17 @@ public static class UpdateMitigationWorkflowAction
 
             var newStatus = ActionStatusMap[request.Action];
 
-            var response = new Response(
-                WorkflowId: Guid.TryParse(request.WorkflowId, out var wfId) ? wfId : Guid.NewGuid(),
-                NewStatus: newStatus,
-                ActionPerformed: request.Action,
-                PerformedAt: DateTimeOffset.UtcNow);
+            var response = store.UpdateMitigationWorkflowAction(
+                request.IncidentId,
+                request.WorkflowId,
+                request.Action,
+                newStatus,
+                request.PerformedBy,
+                request.Reason,
+                request.Notes);
+
+            if (response is null)
+                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
             return Task.FromResult(Result<Response>.Success(response));
         }

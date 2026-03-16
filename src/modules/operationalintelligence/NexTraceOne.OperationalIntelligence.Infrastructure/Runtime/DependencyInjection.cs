@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
 using NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence;
 using NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence.Repositories;
@@ -40,6 +41,9 @@ public static class DependencyInjection
         services.AddScoped<IRuntimeBaselineRepository, RuntimeBaselineRepository>();
         services.AddScoped<IDriftFindingRepository, DriftFindingRepository>();
         services.AddScoped<IObservabilityProfileRepository, ObservabilityProfileRepository>();
+
+        // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
+        services.AddIncidentsInfrastructure(configuration);
 
         return services;
     }

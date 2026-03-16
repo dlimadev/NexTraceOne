@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 
@@ -24,40 +25,12 @@ public static class ListRunbooks
         }
     }
 
-    /// <summary>Handler que retorna a lista simulada de runbooks.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que retorna a lista de runbooks via store.</summary>
+    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
     {
-        private static readonly List<RunbookSummaryDto> AllRunbooks = new()
-        {
-            new RunbookSummaryDto(
-                RunbookId: Guid.Parse("bb000001-0001-0000-0000-000000000001"),
-                Title: "Payment Gateway Rollback Procedure",
-                Summary: "Step-by-step guide for rolling back the payment-service deployment.",
-                LinkedServiceId: "payment-service",
-                LinkedIncidentType: "ServiceDegradation",
-                StepCount: 6,
-                CreatedAt: DateTimeOffset.Parse("2024-01-15T09:00:00Z")),
-            new RunbookSummaryDto(
-                RunbookId: Guid.Parse("bb000002-0001-0000-0000-000000000001"),
-                Title: "Catalog Sync Manual Recovery",
-                Summary: "Steps for manually recovering catalog synchronization.",
-                LinkedServiceId: "catalog-service",
-                LinkedIncidentType: "DependencyFailure",
-                StepCount: 4,
-                CreatedAt: DateTimeOffset.Parse("2024-02-10T11:00:00Z")),
-            new RunbookSummaryDto(
-                RunbookId: Guid.Parse("bb000003-0001-0000-0000-000000000001"),
-                Title: "Generic Service Restart Procedure",
-                Summary: "Standard procedure for performing a controlled restart of a service.",
-                LinkedServiceId: null,
-                LinkedIncidentType: null,
-                StepCount: 4,
-                CreatedAt: DateTimeOffset.Parse("2024-03-01T08:00:00Z")),
-        };
-
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var filtered = AllRunbooks.AsEnumerable();
+            var filtered = store.GetRunbooks().AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(request.ServiceId))
                 filtered = filtered.Where(r =>

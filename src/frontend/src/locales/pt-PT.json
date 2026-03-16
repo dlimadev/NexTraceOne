@@ -33,7 +33,8 @@
     "comingSoon": "Em breve",
     "noData": "Sem dados disponíveis",
     "blocked": "Acesso bloqueado",
-    "quotaExceeded": "Quota excedida"
+    "quotaExceeded": "Quota excedida",
+    "errorDescription": "Algo correu mal. Tente novamente mais tarde."
   },
   "auth": {
     "signIn": "Iniciar sessão na sua conta",

@@ -1,6 +1,8 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
@@ -31,11 +33,22 @@ public static class ListIncidentsByTeam
     }
 
     /// <summary>Handler que compõe a listagem de incidentes por equipa.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var items = GenerateSimulatedItems(request);
+            var filtered = store.GetIncidentListItems()
+                .Where(i => i.OwnerTeam.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase))
+                .Select(i => new TeamIncidentItem(
+                    i.IncidentId, i.Reference, i.Title, i.IncidentType,
+                    i.Severity, i.Status, i.ServiceId, i.ServiceDisplayName,
+                    i.OwnerTeam, i.CreatedAt, i.HasCorrelatedChanges, i.MitigationStatus))
+                .AsEnumerable();
+
+            if (request.Status.HasValue)
+                filtered = filtered.Where(i => i.Status == request.Status.Value);
+
+            var items = filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
 
             var response = new Response(
                 TeamId: request.TeamId,
@@ -45,45 +58,6 @@ public static class ListIncidentsByTeam
                 PageSize: request.PageSize);
 
             return Task.FromResult(Result<Response>.Success(response));
-        }
-
-        private static IReadOnlyList<TeamIncidentItem> GenerateSimulatedItems(Query request)
-        {
-            var now = DateTimeOffset.UtcNow;
-            var allItems = new List<TeamIncidentItem>
-            {
-                new(Guid.Parse("a1b2c3d4-0001-0000-0000-000000000001"),
-                    "INC-2026-0042", "Payment Gateway — elevated error rate",
-                    IncidentType.ServiceDegradation, IncidentSeverity.Critical, IncidentStatus.Mitigating,
-                    "svc-payment-gateway", "Payment Gateway", "payment-squad",
-                    now.AddHours(-3), true, MitigationStatus.InProgress),
-
-                new(Guid.Parse("a1b2c3d4-0002-0000-0000-000000000002"),
-                    "INC-2026-0041", "Catalog Sync — integration partner unreachable",
-                    IncidentType.DependencyFailure, IncidentSeverity.Major, IncidentStatus.Investigating,
-                    "svc-catalog-sync", "Catalog Sync", "platform-squad",
-                    now.AddHours(-6), false, MitigationStatus.NotStarted),
-
-                new(Guid.Parse("a1b2c3d4-0003-0000-0000-000000000003"),
-                    "INC-2026-0040", "Inventory Consumer — consumer lag spike",
-                    IncidentType.MessagingIssue, IncidentSeverity.Major, IncidentStatus.Monitoring,
-                    "svc-inventory-consumer", "Inventory Consumer", "order-squad",
-                    now.AddDays(-1), true, MitigationStatus.Applied),
-
-                new(Guid.Parse("a1b2c3d4-0004-0000-0000-000000000004"),
-                    "INC-2026-0039", "Order API — latency regression after deploy",
-                    IncidentType.OperationalRegression, IncidentSeverity.Minor, IncidentStatus.Resolved,
-                    "svc-order-api", "Order API", "order-squad",
-                    now.AddDays(-3), true, MitigationStatus.Verified),
-            };
-
-            var filtered = allItems
-                .Where(i => i.OwnerTeam.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase));
-
-            if (request.Status.HasValue)
-                filtered = filtered.Where(i => i.Status == request.Status.Value);
-
-            return filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
         }
     }
 

@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
@@ -44,66 +45,13 @@ public static class ListIncidents
 
     /// <summary>
     /// Handler que compõe a listagem de incidentes.
-    /// Simula composição cross-module até integração completa.
+    /// Delega ao IIncidentStore para obter os dados.
     /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var items = GenerateSimulatedItems(request);
-
-            var response = new Response(
-                Items: items,
-                TotalCount: items.Count,
-                Page: request.Page,
-                PageSize: request.PageSize);
-
-            return Task.FromResult(Result<Response>.Success(response));
-        }
-
-        private static IReadOnlyList<IncidentListItem> GenerateSimulatedItems(Query request)
-        {
-            var now = DateTimeOffset.UtcNow;
-            var allItems = new List<IncidentListItem>
-            {
-                new(Guid.Parse("a1b2c3d4-0001-0000-0000-000000000001"),
-                    "INC-2026-0042", "Payment Gateway — elevated error rate",
-                    IncidentType.ServiceDegradation, IncidentSeverity.Critical, IncidentStatus.Mitigating,
-                    "svc-payment-gateway", "Payment Gateway", "payment-squad",
-                    "Production", now.AddHours(-3), true, CorrelationConfidence.High, MitigationStatus.InProgress),
-
-                new(Guid.Parse("a1b2c3d4-0002-0000-0000-000000000002"),
-                    "INC-2026-0041", "Catalog Sync — integration partner unreachable",
-                    IncidentType.DependencyFailure, IncidentSeverity.Major, IncidentStatus.Investigating,
-                    "svc-catalog-sync", "Catalog Sync", "platform-squad",
-                    "Production", now.AddHours(-6), false, CorrelationConfidence.Low, MitigationStatus.NotStarted),
-
-                new(Guid.Parse("a1b2c3d4-0003-0000-0000-000000000003"),
-                    "INC-2026-0040", "Inventory Consumer — consumer lag spike",
-                    IncidentType.MessagingIssue, IncidentSeverity.Major, IncidentStatus.Monitoring,
-                    "svc-inventory-consumer", "Inventory Consumer", "order-squad",
-                    "Production", now.AddDays(-1), true, CorrelationConfidence.Medium, MitigationStatus.Applied),
-
-                new(Guid.Parse("a1b2c3d4-0004-0000-0000-000000000004"),
-                    "INC-2026-0039", "Order API — latency regression after deploy",
-                    IncidentType.OperationalRegression, IncidentSeverity.Minor, IncidentStatus.Resolved,
-                    "svc-order-api", "Order API", "order-squad",
-                    "Production", now.AddDays(-3), true, CorrelationConfidence.Confirmed, MitigationStatus.Verified),
-
-                new(Guid.Parse("a1b2c3d4-0005-0000-0000-000000000005"),
-                    "INC-2026-0038", "Notification Worker — background job failures",
-                    IncidentType.BackgroundProcessingIssue, IncidentSeverity.Warning, IncidentStatus.Closed,
-                    "svc-notification-worker", "Notification Worker", "platform-squad",
-                    "Production", now.AddDays(-7), false, CorrelationConfidence.NotAssessed, MitigationStatus.Verified),
-
-                new(Guid.Parse("a1b2c3d4-0006-0000-0000-000000000006"),
-                    "INC-2026-0037", "Auth Gateway — contract schema mismatch",
-                    IncidentType.ContractImpact, IncidentSeverity.Major, IncidentStatus.Resolved,
-                    "svc-auth-gateway", "Auth Gateway", "identity-squad",
-                    "Staging", now.AddDays(-5), true, CorrelationConfidence.High, MitigationStatus.Verified),
-            };
-
-            var filtered = allItems.AsEnumerable();
+            var filtered = store.GetIncidentListItems().AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(request.TeamId))
                 filtered = filtered.Where(i => i.OwnerTeam.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase));
@@ -135,7 +83,15 @@ public static class ListIncidents
             if (request.To.HasValue)
                 filtered = filtered.Where(i => i.CreatedAt <= request.To.Value);
 
-            return filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
+            var items = filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
+
+            var response = new Response(
+                Items: items,
+                TotalCount: items.Count,
+                Page: request.Page,
+                PageSize: request.PageSize);
+
+            return Task.FromResult(Result<Response>.Success(response));
         }
     }
 

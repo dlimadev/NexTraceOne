@@ -1,5 +1,6 @@
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 
@@ -9,12 +10,14 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 /// </summary>
 public sealed class RunbookFeatureTests
 {
+    private readonly InMemoryIncidentStore _store = new();
+
     // ── ListRunbooks ─────────────────────────────────────────────────
 
     [Fact]
     public async Task ListRunbooks_NoFilters_ShouldReturnAllRunbooks()
     {
-        var handler = new ListRunbooks.Handler();
+        var handler = new ListRunbooks.Handler(_store);
         var query = new ListRunbooks.Query(null, null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -26,7 +29,7 @@ public sealed class RunbookFeatureTests
     [Fact]
     public async Task ListRunbooks_FilterBySearchTerm_ShouldReturnMatching()
     {
-        var handler = new ListRunbooks.Handler();
+        var handler = new ListRunbooks.Handler(_store);
         var query = new ListRunbooks.Query(null, null, "Payment");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -39,7 +42,7 @@ public sealed class RunbookFeatureTests
     [Fact]
     public async Task ListRunbooks_FilterByService_ShouldReturnFiltered()
     {
-        var handler = new ListRunbooks.Handler();
+        var handler = new ListRunbooks.Handler(_store);
         var query = new ListRunbooks.Query("catalog-service", null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -52,7 +55,7 @@ public sealed class RunbookFeatureTests
     [Fact]
     public async Task ListRunbooks_FilterByIncidentType_ShouldReturnFiltered()
     {
-        var handler = new ListRunbooks.Handler();
+        var handler = new ListRunbooks.Handler(_store);
         var query = new ListRunbooks.Query(null, "DependencyFailure", null);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -78,7 +81,7 @@ public sealed class RunbookFeatureTests
     [Fact]
     public async Task GetRunbookDetail_KnownRunbook_ShouldReturnDetailWithSteps()
     {
-        var handler = new GetRunbookDetail.Handler();
+        var handler = new GetRunbookDetail.Handler(_store);
         var query = new GetRunbookDetail.Query("bb000001-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -95,7 +98,7 @@ public sealed class RunbookFeatureTests
     [Fact]
     public async Task GetRunbookDetail_UnknownRunbook_ShouldReturnError()
     {
-        var handler = new GetRunbookDetail.Handler();
+        var handler = new GetRunbookDetail.Handler(_store);
         var query = new GetRunbookDetail.Query("nonexistent-runbook-id");
 
         var result = await handler.Handle(query, CancellationToken.None);

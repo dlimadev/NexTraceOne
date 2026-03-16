@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentSummary;
@@ -29,30 +30,56 @@ public static class GetIncidentSummary
         }
     }
 
-    /// <summary>Handler que compõe o resumo agregado.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que compõe o resumo agregado a partir do store.</summary>
+    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Simulated aggregation — será calculado via repositório em produção.
+            var items = store.GetIncidentListItems().AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(request.TeamId))
+                items = items.Where(i => i.OwnerTeam.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(request.Environment))
+                items = items.Where(i => i.Environment.Equals(request.Environment, StringComparison.OrdinalIgnoreCase));
+
+            if (request.From.HasValue)
+                items = items.Where(i => i.CreatedAt >= request.From.Value);
+
+            if (request.To.HasValue)
+                items = items.Where(i => i.CreatedAt <= request.To.Value);
+
+            var materialized = items.ToList();
+
+            var openStatuses = new[]
+            {
+                IncidentStatus.Open,
+                IncidentStatus.Investigating,
+                IncidentStatus.Mitigating,
+                IncidentStatus.Monitoring,
+            };
+
+            var openItems = materialized.Where(i => openStatuses.Contains(i.Status)).ToList();
+
             var response = new Response(
-                TotalOpen: 3,
-                CriticalIncidents: 1,
-                WithCorrelatedChanges: 2,
-                WithMitigationAvailable: 2,
-                ServicesImpacted: 3,
+                TotalOpen: openItems.Count,
+                CriticalIncidents: openItems.Count(i => i.Severity == IncidentSeverity.Critical),
+                WithCorrelatedChanges: openItems.Count(i => i.HasCorrelatedChanges),
+                WithMitigationAvailable: openItems.Count(i =>
+                    i.MitigationStatus is MitigationStatus.InProgress or MitigationStatus.Applied or MitigationStatus.Verified),
+                ServicesImpacted: openItems.Select(i => i.ServiceId).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
                 SeverityBreakdown: new SeverityBreakdown(
-                    Critical: 1,
-                    Major: 1,
-                    Minor: 0,
-                    Warning: 1),
+                    Critical: openItems.Count(i => i.Severity == IncidentSeverity.Critical),
+                    Major: openItems.Count(i => i.Severity == IncidentSeverity.Major),
+                    Minor: openItems.Count(i => i.Severity == IncidentSeverity.Minor),
+                    Warning: openItems.Count(i => i.Severity == IncidentSeverity.Warning)),
                 StatusBreakdown: new StatusBreakdown(
-                    Open: 0,
-                    Investigating: 1,
-                    Mitigating: 1,
-                    Monitoring: 1,
-                    Resolved: 0,
-                    Closed: 0));
+                    Open: materialized.Count(i => i.Status == IncidentStatus.Open),
+                    Investigating: materialized.Count(i => i.Status == IncidentStatus.Investigating),
+                    Mitigating: materialized.Count(i => i.Status == IncidentStatus.Mitigating),
+                    Monitoring: materialized.Count(i => i.Status == IncidentStatus.Monitoring),
+                    Resolved: materialized.Count(i => i.Status == IncidentStatus.Resolved),
+                    Closed: materialized.Count(i => i.Status == IncidentStatus.Closed)));
 
             return Task.FromResult(Result<Response>.Success(response));
         }
