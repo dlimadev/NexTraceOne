@@ -99,6 +99,7 @@
     "incidents": "Incidents",
     "runbooks": "Runbooks",
     "reliability": "Service Reliability",
+    "automation": "Automation",
     "aiAssistant": "AI Assistant",
     "modelRegistry": "Model Registry",
     "aiPolicies": "AI Policies",
@@ -2486,5 +2487,161 @@
     "emptyFinOps": "No FinOps data yet. Cost data will appear as services report resource usage.",
     "aiAssistantHint": "Ask questions about your services, contracts, incidents, or changes",
     "aiAssistantPersonaHint": "Suggested prompts are personalized for your role"
+  },
+  "automation": {
+    "title": "Workflow Automation",
+    "subtitle": "Operational automation with safety controls, approvals, and audit",
+    "emptyTitle": "No automation workflows",
+    "emptyDescription": "Operational automation workflows will appear here when created.",
+    "catalog": {
+      "title": "Action Catalog",
+      "subtitle": "Available automation actions with safety controls",
+      "actionType": "Action Type",
+      "riskLevel": "Risk Level",
+      "requiresApproval": "Requires Approval",
+      "allowedPersonas": "Allowed Personas",
+      "allowedEnvironments": "Allowed Environments",
+      "preconditions": "Preconditions",
+      "postValidation": "Post-Execution Validation",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "workflows": {
+      "title": "Automation Workflows",
+      "subtitle": "Active and recent automation workflows",
+      "create": "New Workflow",
+      "noWorkflows": "No workflows found",
+      "status": "Status",
+      "action": "Action",
+      "service": "Service",
+      "requestedBy": "Requested By",
+      "createdAt": "Created At",
+      "riskLevel": "Risk Level"
+    },
+    "detail": {
+      "title": "Workflow Detail",
+      "rationale": "Rationale",
+      "scope": "Scope",
+      "environment": "Environment",
+      "linkedIncident": "Linked Incident",
+      "linkedChange": "Linked Change",
+      "linkedService": "Linked Service",
+      "requestedBy": "Requested By",
+      "approvedBy": "Approved By",
+      "createdAt": "Created",
+      "updatedAt": "Last Updated"
+    },
+    "preconditions": {
+      "title": "Preconditions",
+      "subtitle": "Conditions that must be met before execution",
+      "evaluate": "Evaluate Preconditions",
+      "allPassed": "All preconditions passed",
+      "someFailedOrPending": "Some preconditions pending or failed",
+      "status": {
+        "Pending": "Pending",
+        "Passed": "Passed",
+        "Failed": "Failed"
+      }
+    },
+    "approval": {
+      "title": "Approval",
+      "subtitle": "Approval required before execution",
+      "requestApproval": "Request Approval",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pending": "Pending Approval",
+      "notRequired": "Approval not required",
+      "reason": "Reason",
+      "reasonPlaceholder": "Provide reason for your decision"
+    },
+    "execution": {
+      "title": "Execution",
+      "subtitle": "Execution steps and progress",
+      "execute": "Execute",
+      "cancel": "Cancel Execution",
+      "completeStep": "Complete Step",
+      "steps": "Execution Steps",
+      "noSteps": "No execution steps recorded"
+    },
+    "validation": {
+      "title": "Post-Execution Validation",
+      "subtitle": "Verify the outcome of the automation",
+      "recordValidation": "Record Validation",
+      "observedOutcome": "Observed Outcome",
+      "validatedBy": "Validated By",
+      "checks": "Validation Checks",
+      "noValidation": "No validation recorded yet",
+      "status": {
+        "Pending": "Pending",
+        "InProgress": "In Progress",
+        "Passed": "Passed",
+        "Failed": "Failed",
+        "Skipped": "Skipped"
+      }
+    },
+    "audit": {
+      "title": "Audit Trail",
+      "subtitle": "Complete history of workflow actions",
+      "performedBy": "Performed By",
+      "performedAt": "Performed At",
+      "details": "Details",
+      "action": {
+        "WorkflowCreated": "Workflow Created",
+        "PreconditionsEvaluated": "Preconditions Evaluated",
+        "ApprovalRequested": "Approval Requested",
+        "ApprovalGranted": "Approval Granted",
+        "ApprovalRejected": "Approval Rejected",
+        "ExecutionStarted": "Execution Started",
+        "StepCompleted": "Step Completed",
+        "ExecutionCompleted": "Execution Completed",
+        "ExecutionFailed": "Execution Failed",
+        "ValidationRecorded": "Validation Recorded",
+        "WorkflowCancelled": "Workflow Cancelled",
+        "EscalationTriggered": "Escalation Triggered"
+      }
+    },
+    "admin": {
+      "title": "Automation Controls",
+      "subtitle": "Manage automation actions, policies, and safety controls",
+      "actionCatalog": "Action Catalog",
+      "safetyPolicies": "Safety Policies",
+      "approvalRules": "Approval Rules",
+      "usageOverview": "Usage Overview",
+      "totalActions": "Total Actions",
+      "activeWorkflows": "Active Workflows",
+      "pendingApprovals": "Pending Approvals",
+      "completedToday": "Completed Today"
+    },
+    "risk": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "workflowStatus": {
+      "Draft": "Draft",
+      "PendingPreconditions": "Pending Preconditions",
+      "AwaitingApproval": "Awaiting Approval",
+      "Approved": "Approved",
+      "ReadyToExecute": "Ready to Execute",
+      "Executing": "Executing",
+      "AwaitingValidation": "Awaiting Validation",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "Cancelled": "Cancelled",
+      "Rejected": "Rejected"
+    },
+    "actionType": {
+      "RestartControlled": "Restart (Controlled)",
+      "ReprocessControlled": "Reprocess (Controlled)",
+      "ExecuteRunbookStep": "Execute Runbook Step",
+      "RollbackReadinessReview": "Rollback Readiness Review",
+      "ObserveAndValidate": "Observe & Validate",
+      "EscalateWithContext": "Escalate with Context",
+      "VerifyDependencyState": "Verify Dependency State",
+      "ValidatePostChangeState": "Validate Post-Change State"
+    }
   }
 }
