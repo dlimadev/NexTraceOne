@@ -57,6 +57,7 @@ const ServiceReliabilityDetailPage = lazy(() => import('./features/operations/pa
 const AutomationWorkflowsPage = lazy(() => import('./features/operations/pages/AutomationWorkflowsPage').then(m => ({ default: m.AutomationWorkflowsPage })));
 const AutomationWorkflowDetailPage = lazy(() => import('./features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
 const AutomationAdminPage = lazy(() => import('./features/operations/pages/AutomationAdminPage').then(m => ({ default: m.AutomationAdminPage })));
+const PlatformOperationsPage = lazy(() => import('./features/operations/pages/PlatformOperationsPage').then(m => ({ default: m.PlatformOperationsPage })));
 
 // ── AI Hub (lazy) ──
 const AiAssistantPage = lazy(() => import('./features/ai-hub/pages/AiAssistantPage').then(m => ({ default: m.AiAssistantPage })));
@@ -115,7 +116,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 10_000,
+      staleTime: 30_000,
+      gcTime: 300_000,
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -514,6 +517,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
                     <ValueTrackingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/platform/operations"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <PlatformOperationsPage />
                   </ProtectedRoute>
                 }
               />

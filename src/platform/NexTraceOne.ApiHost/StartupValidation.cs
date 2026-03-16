@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace NexTraceOne.ApiHost;
@@ -7,6 +8,8 @@ namespace NexTraceOne.ApiHost;
 /// <summary>
 /// Validação de configuração crítica durante o arranque da aplicação.
 /// Garante que secções obrigatórias existem antes do host aceitar tráfego.
+/// Em ambientes não-Development, valida também que Jwt:Secret está preenchido
+/// e que connection strings não estão vazias.
 /// </summary>
 public static class StartupValidation
 {
@@ -26,6 +29,7 @@ public static class StartupValidation
         logger.LogInformation("Validating startup configuration...");
 
         var missingCritical = new List<string>();
+        var validationWarnings = new List<string>();
 
         foreach (var section in CriticalSections)
         {
@@ -53,7 +57,39 @@ public static class StartupValidation
                 "Ensure appsettings.json and environment variables are configured correctly.");
         }
 
-        logger.LogInformation("Startup configuration validation completed successfully.");
+        // Validação de Jwt:Secret em ambientes não-Development
+        if (!app.Environment.IsDevelopment())
+        {
+            var jwtSecret = configuration["Jwt:Secret"];
+            if (string.IsNullOrWhiteSpace(jwtSecret))
+            {
+                validationWarnings.Add("Jwt:Secret");
+                logger.LogWarning("Jwt:Secret is empty in non-Development environment. Authentication may fail.");
+            }
+        }
+
+        // Validação básica de connection strings — apenas verifica se não estão vazias
+        var connectionStrings = configuration.GetSection("ConnectionStrings");
+        if (connectionStrings.Exists())
+        {
+            foreach (var child in connectionStrings.GetChildren())
+            {
+                if (string.IsNullOrWhiteSpace(child.Value))
+                {
+                    validationWarnings.Add($"ConnectionStrings:{child.Key}");
+                    logger.LogWarning("Connection string '{Key}' is empty.", child.Key);
+                }
+            }
+        }
+
+        var moduleCount = CriticalSections.Length + OptionalSections.Length;
+        var validationResult = validationWarnings.Count == 0 ? "Passed" : $"Passed with {validationWarnings.Count} warning(s)";
+
+        logger.LogInformation(
+            "Startup validation summary — Environment: {Environment}, ConfigSectionsChecked: {ModuleCount}, Result: {ValidationResult}",
+            app.Environment.EnvironmentName,
+            moduleCount,
+            validationResult);
 
         return app;
     }

@@ -10,11 +10,12 @@ using GetPlatformJobsFeature = NexTraceOne.Governance.Application.Features.GetPl
 using GetPlatformQueuesFeature = NexTraceOne.Governance.Application.Features.GetPlatformQueues.GetPlatformQueues;
 using GetPlatformConfigFeature = NexTraceOne.Governance.Application.Features.GetPlatformConfig.GetPlatformConfig;
 using GetPlatformEventsFeature = NexTraceOne.Governance.Application.Features.GetPlatformEvents.GetPlatformEvents;
+using GetPlatformReadinessFeature = NexTraceOne.Governance.Application.Features.GetPlatformReadiness.GetPlatformReadiness;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
 /// <summary>
-/// Endpoints de Platform Status — saúde, jobs, filas, configuração e eventos operacionais.
+/// Endpoints de Platform Status — saúde, jobs, filas, configuração, readiness e eventos operacionais.
 /// Destinados a Platform Admins e operadores para monitorização e diagnóstico da plataforma.
 /// </summary>
 public sealed class PlatformStatusEndpointModule
@@ -77,6 +78,16 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetPlatformEventsFeature.Query(severity, subsystem, page, pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/readiness", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPlatformReadinessFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");

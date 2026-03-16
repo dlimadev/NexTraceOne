@@ -119,4 +119,5 @@ export type Permission =
   | 'integrations:write'
   // ── Platform ──
   | 'platform:settings:read'
-  | 'platform:settings:write';
+  | 'platform:settings:write'
+  | 'platform:admin:read';
