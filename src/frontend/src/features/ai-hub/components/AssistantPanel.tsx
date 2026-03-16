@@ -141,9 +141,9 @@ const contextScopeIcons: Record<AssistantContextType, React.ReactNode> = {
 function generateContextualResponse(
   contextType: AssistantContextType,
   contextSummary: ContextSummary,
-  userMessage: string,
+  _userMessage: string,
   t: (key: string) => string,
-): { content: string; useCaseType: string; sources: string[]; refs: string[]; confidence: string; weightSummary: string; actions: SuggestedAction[]; contextId: string } {
+): { content: string; useCaseType: string; sources: string[]; refs: string[]; confidence: string; weightSummary: string } {
   const sources = contextGroundingSources[contextType];
 
   const baseInfo = contextSummary.additionalInfo
@@ -196,8 +196,6 @@ function generateContextualResponse(
     incident: 'IncidentHistory:35%,ChangeIntelligence:25%,RunbookLibrary:25%,ServiceCatalog:15%',
   };
 
-  void userMessage;
-
   return {
     content,
     useCaseType,
@@ -205,8 +203,6 @@ function generateContextualResponse(
     refs,
     confidence,
     weightSummary: weightMap[contextType],
-    actions: [],
-    contextId: '',
   };
 }
 
