@@ -5,7 +5,11 @@
 Este documento detalha a aderência da solução atual à visão oficial do NexTraceOne,
 classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar do zero**.
 
-Última atualização: 2026-03-15 (Fase Final — Hardening, Final Alignment & Refoundation Closure)
+Última atualização: 2026-03-16 (Pós-PR-16 — Rebaseline)
+
+> **Nota importante:** "OK" nesta análise significa que a *arquitetura e contratos* estão alinhados
+> com a visão do produto. Não significa que a feature tem persistência real ou está pronta para
+> produção. Para o estado real de persistência (real vs mock), consultar [REBASELINE.md](./REBASELINE.md).
 
 ---
 
@@ -26,8 +30,8 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | CommercialGovernance | OK | Licensing, vendor ops, telemetry consent (124 testes) |
 | OperationalIntelligence — Runtime | OK | Snapshots, baselines, drift detection, observability profiles. RequirePermission enforced |
 | OperationalIntelligence — Cost | OK | Cost snapshots, attribution, trends, anomaly alerts. RequirePermission enforced |
-| OperationalIntelligence — Incidents | OK | Domain, queries, correlation, evidence, mitigation (164 testes) |
-| OperationalIntelligence — Reliability | OK | Team reliability, service reliability detail |
+| OperationalIntelligence — Incidents | OK | Domain, queries, correlation, evidence, mitigation (164 testes). **⚠️ Handlers usam dados mock — sem persistência real.** Ver REBASELINE.md |
+| OperationalIntelligence — Reliability | OK | Team reliability, service reliability detail. **⚠️ Dados mock hardcoded — sem persistência real.** |
 | AIKnowledge — ExternalAI | OK | Providers, policies, consultations, knowledge capture (75 testes) |
 | AIKnowledge — Orchestration | OK | Conversations, test generation, version suggestion, classification |
 | AIKnowledge — Governance | OK | Model registry, AI policies, access policies, token/budget governance, audit. RequirePermission enforced |
@@ -43,7 +47,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | Frontend — AI Hub | OK | AI Assistant, Model Registry, AI Policies, Token Budget, AI Audit pages |
 | Frontend — Operations | OK | Incidents, Runbooks, Reliability pages com domain connection |
 | Frontend — Governance | OK | Reports (persona-aware), Risk Center, Compliance, FinOps pages |
-| 1,159 testes backend | OK | Todos a passar sem falhas |
+| 1,447 testes backend | OK | Todos a passar sem falhas (atualizado pós-PR-16) |
 | Segurança — RequirePermission | OK | Todas as 22 endpoint modules com RequirePermission enforced |
 
 ## 2. Reposicionar
@@ -280,7 +284,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 - ⚠️ Alguns docs focam nas fases iniciais e não refletem implementação completa
 
 #### Testes
-- ✅ 1,159 testes backend a passar
+- ✅ 1,447 testes backend a passar (atualizado pós-PR-16)
 - ✅ Cobertura em todos os módulos core (Catalog, ChangeGovernance, IdentityAccess, OperationalIntelligence, AIKnowledge, CommercialGovernance)
 - ⚠️ Frontend tests limitados
 - ⚠️ E2E/Integration tests são placeholder
@@ -289,8 +293,10 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 | Severidade | Item | Classificação |
 |------------|------|--------------|
+| **Alta** | **Incidents/Automation/Reliability handlers mock — sem persistência** | **REFACTOR** |
+| **Alta** | **IncidentsPage frontend usa mock inline** | **REFACTOR** |
 | Média | Governance module mock data | REFACTOR |
-| Média | AI Assistant grounding | REFACTOR |
+| Média | AI Assistant grounding validation E2E | REFACTOR |
 | Média | Error/loading state pattern consolidation | REFACTOR |
 | Baixa | AiOrchestration/ExternalAI stubs | REFACTOR |
 | Baixa | Ingestion.Api stubs | REFACTOR |
