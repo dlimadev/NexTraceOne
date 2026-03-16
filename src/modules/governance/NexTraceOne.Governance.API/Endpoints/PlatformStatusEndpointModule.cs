@@ -1,0 +1,84 @@
+using MediatR;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+using GetPlatformHealthFeature = NexTraceOne.Governance.Application.Features.GetPlatformHealth.GetPlatformHealth;
+using GetPlatformJobsFeature = NexTraceOne.Governance.Application.Features.GetPlatformJobs.GetPlatformJobs;
+using GetPlatformQueuesFeature = NexTraceOne.Governance.Application.Features.GetPlatformQueues.GetPlatformQueues;
+using GetPlatformConfigFeature = NexTraceOne.Governance.Application.Features.GetPlatformConfig.GetPlatformConfig;
+using GetPlatformEventsFeature = NexTraceOne.Governance.Application.Features.GetPlatformEvents.GetPlatformEvents;
+
+namespace NexTraceOne.Governance.API.Endpoints;
+
+/// <summary>
+/// Endpoints de Platform Status — saúde, jobs, filas, configuração e eventos operacionais.
+/// Destinados a Platform Admins e operadores para monitorização e diagnóstico da plataforma.
+/// </summary>
+public sealed class PlatformStatusEndpointModule
+{
+    /// <summary>Registra endpoints de status da plataforma no roteador do ASP.NET Core.</summary>
+    public static void MapEndpoints(IEndpointRouteBuilder app)
+    {
+        var platform = app.MapGroup("/api/v1/platform");
+
+        platform.MapGet("/health", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPlatformHealthFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/jobs", async (
+            string? status,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPlatformJobsFeature.Query(status, page, pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/queues", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPlatformQueuesFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/config", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPlatformConfigFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/events", async (
+            string? severity,
+            string? subsystem,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPlatformEventsFeature.Query(severity, subsystem, page, pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+    }
+}
