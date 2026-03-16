@@ -91,10 +91,18 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddProblemDetails();
 
+// [9] Compressão de respostas — melhoria de performance nas APIs
+builder.Services.AddResponseCompression();
+
 var app = builder.Build();
 
 // ── Validação de configuração crítica ──
 app.ValidateStartupConfiguration();
+
+// ── Lifecycle logging — registo de arranque e encerramento gracioso ──
+var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+lifetime.ApplicationStarted.Register(() => app.Logger.LogInformation("NexTraceOne API host started successfully. Environment: {Environment}", app.Environment.EnvironmentName));
+lifetime.ApplicationStopping.Register(() => app.Logger.LogInformation("NexTraceOne API host is shutting down gracefully..."));
 
 // ── Auto-migrations ──
 await app.ApplyDatabaseMigrationsAsync();
@@ -103,6 +111,7 @@ await app.ApplyDatabaseMigrationsAsync();
 await app.SeedDevelopmentDataAsync();
 
 // ── Middlewares na ordem correta ──
+app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseSecurityHeaders();

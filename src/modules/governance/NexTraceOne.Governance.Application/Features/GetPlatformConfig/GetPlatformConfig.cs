@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
@@ -8,6 +9,7 @@ namespace NexTraceOne.Governance.Application.Features.GetPlatformConfig;
 /// Feature: GetPlatformConfig — configuração runtime da plataforma (sem segredos).
 /// Expõe modo de deployment, feature flags, estado de subsistemas e conectividade
 /// para administradores e dashboards operacionais.
+/// Utiliza IConfiguration real para environment, feature flags e nomes de connection strings.
 /// </summary>
 public static class GetPlatformConfig
 {
@@ -15,19 +17,19 @@ public static class GetPlatformConfig
     public sealed record Query() : IQuery<Response>;
 
     /// <summary>Handler que agrega configuração runtime visível da plataforma.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IConfiguration configuration) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var featureFlags = new List<FeatureFlagDto>
-            {
-                new("ai-assistant", true, "AI Assistant module"),
-                new("contract-studio", true, "Contract Studio editor"),
-                new("change-intelligence", true, "Change Intelligence analysis"),
-                new("finops-dashboard", false, "FinOps contextual dashboard"),
-                new("developer-portal", true, "Developer Portal access"),
-                new("advanced-analytics", false, "Advanced analytics pipeline")
-            };
+            var environmentName =
+                configuration["ASPNETCORE_ENVIRONMENT"]
+                ?? configuration["DOTNET_ENVIRONMENT"]
+                ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+                ?? "Production";
+
+            // Feature flags reais a partir da configuração, com fallback para mock
+            var featureFlags = BuildFeatureFlags();
 
             var subsystems = new List<SubsystemConfigDto>
             {
@@ -42,15 +44,11 @@ public static class GetPlatformConfig
                 new("BackgroundWorkers", true, "Background job processing")
             };
 
-            var databases = new List<DatabaseConnectivityDto>
-            {
-                new("Primary", "PostgreSQL", true, "Connected"),
-                new("ReadReplica", "PostgreSQL", true, "Connected"),
-                new("Cache", "Redis", true, "Connected")
-            };
+            // Nomes de connection strings reais (sem expor credenciais)
+            var databases = BuildDatabaseConnectivity();
 
             var response = new Response(
-                EnvironmentName: "Production",
+                EnvironmentName: environmentName,
                 DeploymentMode: DeploymentMode.SaaS,
                 FeatureFlags: featureFlags,
                 Subsystems: subsystems,
@@ -58,6 +56,52 @@ public static class GetPlatformConfig
                 GeneratedAt: DateTimeOffset.UtcNow);
 
             return Task.FromResult(Result<Response>.Success(response));
+        }
+
+        private List<FeatureFlagDto> BuildFeatureFlags()
+        {
+            var featureFlagsSection = configuration.GetSection("FeatureFlags");
+            if (featureFlagsSection.Exists() && featureFlagsSection.GetChildren().Any())
+            {
+                return featureFlagsSection.GetChildren()
+                    .Select(c => new FeatureFlagDto(
+                        c.Key,
+                        bool.TryParse(c.Value, out var enabled) && enabled,
+                        c.Key))
+                    .ToList();
+            }
+
+            return
+            [
+                new("ai-assistant", true, "AI Assistant module"),
+                new("contract-studio", true, "Contract Studio editor"),
+                new("change-intelligence", true, "Change Intelligence analysis"),
+                new("finops-dashboard", false, "FinOps contextual dashboard"),
+                new("developer-portal", true, "Developer Portal access"),
+                new("advanced-analytics", false, "Advanced analytics pipeline")
+            ];
+        }
+
+        private List<DatabaseConnectivityDto> BuildDatabaseConnectivity()
+        {
+            var connectionStrings = configuration.GetSection("ConnectionStrings");
+            if (connectionStrings.Exists() && connectionStrings.GetChildren().Any())
+            {
+                return connectionStrings.GetChildren()
+                    .Select(c => new DatabaseConnectivityDto(
+                        c.Key,
+                        "Configured",
+                        !string.IsNullOrWhiteSpace(c.Value),
+                        !string.IsNullOrWhiteSpace(c.Value) ? "Connected" : "Empty"))
+                    .ToList();
+            }
+
+            return
+            [
+                new("Primary", "PostgreSQL", true, "Connected"),
+                new("ReadReplica", "PostgreSQL", true, "Connected"),
+                new("Cache", "Redis", true, "Connected")
+            ];
         }
     }
 

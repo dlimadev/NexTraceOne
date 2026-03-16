@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Reflection;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
@@ -7,6 +9,7 @@ namespace NexTraceOne.Governance.Application.Features.GetPlatformHealth;
 /// <summary>
 /// Feature: GetPlatformHealth — saúde agregada da plataforma com estado por subsistema.
 /// Fornece visão consolidada de API, base de dados, jobs, ingestão e IA para dashboards de operações.
+/// Utiliza dados reais de uptime e versão do processo em execução.
 /// </summary>
 public static class GetPlatformHealth
 {
@@ -27,11 +30,14 @@ public static class GetPlatformHealth
                 new("AI", PlatformSubsystemStatus.Healthy, "AI model registry and inference endpoints operational.", DateTimeOffset.UtcNow)
             };
 
+            var uptime = DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime();
+            var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "1.0.0-preview";
+
             var response = new Response(
                 OverallStatus: PlatformSubsystemStatus.Healthy,
                 Subsystems: subsystems,
-                UptimeSeconds: (long)TimeSpan.FromDays(12.5).TotalSeconds,
-                Version: "1.0.0-preview",
+                UptimeSeconds: (long)uptime.TotalSeconds,
+                Version: version,
                 CheckedAt: DateTimeOffset.UtcNow);
 
             return Task.FromResult(Result<Response>.Success(response));
