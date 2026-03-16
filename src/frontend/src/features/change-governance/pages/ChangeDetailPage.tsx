@@ -802,6 +802,50 @@ export function ChangeDetailPage() {
             ...(change.changeScore != null ? { score: String(change.changeScore) } : {}),
           },
         }}
+        contextData={{
+          entityType: 'change',
+          entityName: `${change.serviceName} — ${change.version}`,
+          entityStatus: change.confidenceStatus,
+          entityDescription: change.description,
+          properties: {
+            ...(change.changeType ? { changeType: change.changeType } : {}),
+            ...(change.environment ? { environment: change.environment } : {}),
+            ...(change.teamName ? { team: change.teamName } : {}),
+            ...(change.changeScore != null ? { score: String(change.changeScore) } : {}),
+            ...(change.deploymentStatus ? { deploymentStatus: change.deploymentStatus } : {}),
+            ...(change.changeLevel != null ? { changeLevel: String(change.changeLevel) } : {}),
+            ...(change.validationStatus ? { validationStatus: change.validationStatus } : {}),
+            ...(advisory?.recommendation ? { advisory: advisory.recommendation } : {}),
+            ...(advisory?.overallConfidence != null ? { confidence: String(advisory.overallConfidence) } : {}),
+            ...(change.commitSha ? { commitSha: change.commitSha } : {}),
+          },
+          relations: [
+            ...(advisory?.factors?.map(f => ({
+              relationType: 'Advisory Factors',
+              entityType: 'factor',
+              name: f.factorName,
+              status: f.status,
+              properties: {
+                ...(f.description ? { description: f.description } : {}),
+                ...(f.weight != null ? { weight: String(f.weight) } : {}),
+              },
+            })) || []),
+            ...(decisions?.map(d => ({
+              relationType: 'Decision History',
+              entityType: 'decision',
+              name: d.description || d.eventType,
+              status: d.eventType,
+              properties: {
+                ...(d.source ? { source: d.source } : {}),
+                ...(d.occurredAt ? { date: new Date(d.occurredAt).toLocaleDateString() } : {}),
+              },
+            })) || []),
+          ],
+          caveats: [
+            ...(!advisory ? ['No advisory data available'] : []),
+            ...(!decisions?.length ? ['No decision history'] : []),
+          ].filter(Boolean),
+        }}
       />
     </div>
   );

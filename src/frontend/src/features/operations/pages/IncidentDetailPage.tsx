@@ -444,6 +444,61 @@ export function IncidentDetailPage() {
               ...(correlation.primaryChangeId ? { correlatedChange: correlation.primaryChangeId } : {}),
             },
           }}
+          contextData={{
+            entityType: 'incident',
+            entityName: `${identity.reference} — ${identity.title}`,
+            entityStatus: identity.status,
+            entityDescription: identity.summary,
+            properties: {
+              severity: identity.severity,
+              ...(ownerTeam ? { team: ownerTeam } : {}),
+              ...(impactedDomain ? { domain: impactedDomain } : {}),
+              ...(impactedEnvironment ? { environment: impactedEnvironment } : {}),
+              ...(correlation.confidence ? { correlationConfidence: correlation.confidence } : {}),
+              ...(correlation.reason ? { correlationReason: correlation.reason } : {}),
+              ...(mitigation.status ? { mitigationStatus: mitigation.status } : {}),
+              ...(evidence.operationalSignalsSummary ? { operationalSignals: evidence.operationalSignalsSummary } : {}),
+            },
+            relations: [
+              ...(linkedServices?.map(s => ({
+                relationType: 'Affected Services',
+                entityType: 'service',
+                name: s.displayName,
+                status: s.criticality,
+                properties: {
+                  ...(s.serviceType ? { type: s.serviceType } : {}),
+                },
+              })) || []),
+              ...(relatedContracts?.map(c => ({
+                relationType: 'Related Contracts',
+                entityType: 'contract',
+                name: c.name,
+                status: c.lifecycleState,
+                properties: {
+                  ...(c.version ? { version: c.version } : {}),
+                  ...(c.protocol ? { protocol: c.protocol } : {}),
+                },
+              })) || []),
+              ...(runbooks?.map(r => ({
+                relationType: 'Runbooks',
+                entityType: 'runbook',
+                name: r.title,
+                properties: {
+                  ...(r.url ? { url: r.url } : {}),
+                },
+              })) || []),
+              ...(correlation.relatedChanges?.map(c => ({
+                relationType: 'Correlated Changes',
+                entityType: 'change',
+                name: c.description || c.changeId,
+              })) || []),
+            ],
+            caveats: [
+              ...(!linkedServices?.length ? ['No linked services'] : []),
+              ...(!runbooks?.length ? ['No runbooks associated'] : []),
+              ...(!correlation.relatedChanges?.length ? ['No correlated changes identified'] : []),
+            ].filter(Boolean),
+          }}
         />
       </div>
     </div>

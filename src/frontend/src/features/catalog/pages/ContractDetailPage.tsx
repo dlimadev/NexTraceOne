@@ -389,6 +389,46 @@ export function ContractDetailPage() {
               ...(detail.serviceName ? { service: detail.serviceName } : {}),
             },
           }}
+          contextData={{
+            entityType: 'contract',
+            entityName: detail.serviceName ? `${detail.serviceName} — ${detail.protocol}` : detail.apiAssetId,
+            entityStatus: detail.lifecycleState,
+            entityDescription: detail.specContent ? detail.specContent.slice(0, 200) : undefined, // truncated for context bundle
+            properties: {
+              ...(detail.protocol ? { protocol: detail.protocol } : {}),
+              ...(detail.semVer ? { version: detail.semVer } : {}),
+              ...(detail.serviceName ? { service: detail.serviceName } : {}),
+              ...(detail.format ? { format: detail.format } : {}),
+              ...(detail.isLocked ? { locked: 'Yes' } : {}),
+              ...(detail.fingerprint ? { fingerprint: detail.fingerprint } : {}),
+              ...(detail.provenance?.origin ? { origin: detail.provenance.origin } : {}),
+              ...(detail.provenance?.isAiGenerated ? { aiGenerated: 'Yes' } : {}),
+            },
+            relations: [
+              ...(versionHistory?.map(v => ({
+                relationType: 'Version History',
+                entityType: 'version',
+                name: `v${v.version || v.id}`,
+                status: v.lifecycleState,
+                properties: {
+                  ...(v.format ? { format: v.format } : {}),
+                },
+              })) || []),
+              ...(violations?.map(v => ({
+                relationType: 'Violations',
+                entityType: 'violation',
+                name: v.ruleName,
+                status: v.severity,
+                properties: {
+                  ...(v.message ? { message: v.message } : {}),
+                  ...(v.path ? { path: v.path } : {}),
+                },
+              })) || []),
+            ],
+            caveats: [
+              ...(!versionHistory?.length ? ['No version history available'] : []),
+            ].filter(Boolean),
+          }}
         />
       </div>
     </div>

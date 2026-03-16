@@ -515,6 +515,37 @@ export function ServiceDetailPage() {
               ...(service.domain ? { domain: service.domain } : {}),
             },
           }}
+          contextData={{
+            entityType: 'service',
+            entityName: service.displayName || service.name,
+            entityStatus: service.lifecycleStatus,
+            entityDescription: service.description,
+            properties: {
+              ...(service.criticality ? { criticality: service.criticality } : {}),
+              ...(service.teamName ? { team: service.teamName } : {}),
+              ...(service.domain ? { domain: service.domain } : {}),
+              ...(service.serviceType ? { serviceType: service.serviceType } : {}),
+              ...(service.technicalOwner ? { technicalOwner: service.technicalOwner } : {}),
+              ...(service.exposureType ? { exposure: service.exposureType } : {}),
+              ...(service.apiCount != null ? { apiCount: String(service.apiCount) } : {}),
+              ...(service.totalConsumers != null ? { consumers: String(service.totalConsumers) } : {}),
+            },
+            relations: [
+              ...(serviceContracts?.contracts?.map(c => ({
+                relationType: 'Contracts',
+                entityType: 'contract',
+                name: c.apiName || c.versionId,
+                status: c.lifecycleState,
+                properties: {
+                  ...(c.protocol ? { protocol: c.protocol } : {}),
+                  ...(c.semVer ? { version: c.semVer } : {}),
+                },
+              })) || []),
+            ],
+            caveats: [
+              ...(!serviceContracts?.contracts?.length ? ['No contracts loaded'] : []),
+            ].filter(Boolean),
+          }}
         />
       </div>
     </div>

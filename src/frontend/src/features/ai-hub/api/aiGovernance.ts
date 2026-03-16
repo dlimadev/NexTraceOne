@@ -36,6 +36,7 @@ export const aiGovernanceApi = {
     changeId?: string;
     teamId?: string;
     domainId?: string;
+    contextBundle?: string;
   }) =>
     client.post('/ai/assistant/chat', data).then(r => r.data),
   listConversations: (params?: { userId?: string; pageSize?: number }) =>
