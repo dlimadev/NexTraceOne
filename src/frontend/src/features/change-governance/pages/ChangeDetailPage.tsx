@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { useAuth } from '../../../contexts/AuthContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import type { AdvisoryFactorDto, ChangeAdvisoryResponse, DecisionHistoryItemDto } from '../../../types';
 
@@ -63,6 +64,20 @@ function recommendationVariant(rec: string): 'default' | 'success' | 'warning' |
   }
 }
 
+/** Mapeia factor status para variante visual do Badge. */
+function factorStatusVariant(status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' {
+  switch (status) {
+    case 'Pass':
+      return 'success';
+    case 'Warning':
+      return 'warning';
+    case 'Fail':
+      return 'danger';
+    default:
+      return 'default';
+  }
+}
+
 /** Ícone para status de factor advisory. */
 function FactorStatusIcon({ status }: { status: string }) {
   switch (status) {
@@ -87,6 +102,7 @@ function FactorStatusIcon({ status }: { status: string }) {
 export function ChangeDetailPage() {
   const { changeId } = useParams<{ changeId: string }>();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   // ── Decision form state ──
@@ -126,7 +142,7 @@ export function ChangeDetailPage() {
     mutationFn: () =>
       changeConfidenceApi.recordDecision(changeId!, {
         decision: selectedDecision as 'Approved' | 'Rejected' | 'ApprovedConditionally',
-        decidedBy: 'current-user',
+        decidedBy: user?.email ?? user?.fullName ?? 'unknown',
         rationale: decisionRationale,
         conditions: decisionConditions || undefined,
       }),
@@ -363,7 +379,7 @@ export function ChangeDetailPage() {
                       <span className="text-xs text-body flex-1">
                         {t(`changeConfidence.detail.factorName.${factor.factorName}`) || factor.factorName}
                       </span>
-                      <Badge variant={factor.status === 'Pass' ? 'success' : factor.status === 'Warning' ? 'warning' : factor.status === 'Fail' ? 'danger' : 'default'}>
+                      <Badge variant={factorStatusVariant(factor.status)}>
                         {t(`changeConfidence.detail.factorStatus.${factor.status}`) || factor.status}
                       </Badge>
                     </div>
@@ -431,7 +447,7 @@ export function ChangeDetailPage() {
                         </p>
                         <p className="text-xs text-muted">{factor.description}</p>
                       </div>
-                      <Badge variant={factor.status === 'Pass' ? 'success' : factor.status === 'Warning' ? 'warning' : factor.status === 'Fail' ? 'danger' : 'default'}>
+                      <Badge variant={factorStatusVariant(factor.status)}>
                         {t(`changeConfidence.detail.factorStatus.${factor.status}`) || factor.status}
                       </Badge>
                     </div>

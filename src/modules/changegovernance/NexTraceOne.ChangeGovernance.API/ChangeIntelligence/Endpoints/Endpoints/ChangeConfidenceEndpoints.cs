@@ -164,7 +164,7 @@ internal static class ChangeConfidenceEndpoints
             var effectiveCommand = command with { ReleaseId = changeId };
             var result = await sender.Send(effectiveCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("change-intelligence:read");
+        }).RequirePermission("change-intelligence:write");
 
         // ── Histórico de decisões de governança ─────────────────────
 

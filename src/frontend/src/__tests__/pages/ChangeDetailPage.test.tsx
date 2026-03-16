@@ -15,6 +15,17 @@ vi.mock('../../features/change-governance/api/changeConfidence', () => ({
   },
 }));
 
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: vi.fn().mockReturnValue({
+    isAuthenticated: true,
+    accessToken: 'test-token',
+    user: { id: 'u1', email: 'test@example.com', fullName: 'Test User', roleName: 'Engineer', permissions: [] },
+    tenantId: 'tenant-1',
+    login: vi.fn(),
+    logout: vi.fn(),
+  }),
+}));
+
 import { changeConfidenceApi } from '../../features/change-governance/api/changeConfidence';
 
 const mockChange = {
