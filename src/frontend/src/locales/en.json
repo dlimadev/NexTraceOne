@@ -3186,6 +3186,15 @@
     "suggestedSteps": "Recommended next steps",
     "caveatsLabel": "Context limitations",
     "noContextWarning": "Limited context available. Response may not reflect the current state of this entity.",
-    "groundedIn": "Analysis grounded in real entity data from"
+    "groundedIn": "Analysis grounded in real entity data from",
+    "contextCaveats": {
+      "noLinkedServices": "No linked services",
+      "noRunbooks": "No runbooks associated",
+      "noCorrelatedChanges": "No correlated changes identified",
+      "noAdvisoryData": "No advisory data available",
+      "noDecisionHistory": "No decision history",
+      "noContractsLoaded": "No contracts loaded",
+      "noVersionHistory": "No version history available"
+    }
   }
 }

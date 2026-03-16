@@ -543,7 +543,7 @@ export function ServiceDetailPage() {
               })) || []),
             ],
             caveats: [
-              ...(!serviceContracts?.contracts?.length ? ['No contracts loaded'] : []),
+              ...(!serviceContracts?.contracts?.length ? [t('assistantPanel.contextCaveats.noContractsLoaded')] : []),
             ].filter(Boolean),
           }}
         />

@@ -494,9 +494,9 @@ export function IncidentDetailPage() {
               })) || []),
             ],
             caveats: [
-              ...(!linkedServices?.length ? ['No linked services'] : []),
-              ...(!runbooks?.length ? ['No runbooks associated'] : []),
-              ...(!correlation.relatedChanges?.length ? ['No correlated changes identified'] : []),
+              ...(!linkedServices?.length ? [t('assistantPanel.contextCaveats.noLinkedServices')] : []),
+              ...(!runbooks?.length ? [t('assistantPanel.contextCaveats.noRunbooks')] : []),
+              ...(!correlation.relatedChanges?.length ? [t('assistantPanel.contextCaveats.noCorrelatedChanges')] : []),
             ].filter(Boolean),
           }}
         />
