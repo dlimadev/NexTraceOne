@@ -99,6 +99,7 @@
     "incidents": "Incidentes",
     "runbooks": "Runbooks",
     "reliability": "Confiabilidade de Serviços",
+    "automation": "Automação",
     "aiAssistant": "Assistente IA",
     "modelRegistry": "Registo de Modelos",
     "aiPolicies": "Políticas de IA",
@@ -2486,5 +2487,161 @@
     "emptyFinOps": "Sem dados de FinOps ainda. Dados de custo aparecerão quando serviços reportarem uso de recursos.",
     "aiAssistantHint": "Faça perguntas sobre seus serviços, contratos, incidentes ou mudanças",
     "aiAssistantPersonaHint": "Prompts sugeridos são personalizados para o seu perfil"
+  },
+  "automation": {
+    "title": "Automação de Workflows",
+    "subtitle": "Automação operacional com controles de segurança, aprovações e auditoria",
+    "emptyTitle": "Nenhum workflow de automação",
+    "emptyDescription": "Workflows de automação operacional aparecerão aqui quando criados.",
+    "catalog": {
+      "title": "Catálogo de Ações",
+      "subtitle": "Ações de automação disponíveis com controles de segurança",
+      "actionType": "Tipo de Ação",
+      "riskLevel": "Nível de Risco",
+      "requiresApproval": "Requer Aprovação",
+      "allowedPersonas": "Personas Permitidas",
+      "allowedEnvironments": "Ambientes Permitidos",
+      "preconditions": "Pré-condições",
+      "postValidation": "Validação Pós-Execução",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "workflows": {
+      "title": "Workflows de Automação",
+      "subtitle": "Workflows de automação ativos e recentes",
+      "create": "Novo Workflow",
+      "noWorkflows": "Nenhum workflow encontrado",
+      "status": "Status",
+      "action": "Ação",
+      "service": "Serviço",
+      "requestedBy": "Solicitado Por",
+      "createdAt": "Criado Em",
+      "riskLevel": "Nível de Risco"
+    },
+    "detail": {
+      "title": "Detalhe do Workflow",
+      "rationale": "Justificativa",
+      "scope": "Escopo",
+      "environment": "Ambiente",
+      "linkedIncident": "Incidente Vinculado",
+      "linkedChange": "Mudança Vinculada",
+      "linkedService": "Serviço Vinculado",
+      "requestedBy": "Solicitado Por",
+      "approvedBy": "Aprovado Por",
+      "createdAt": "Criado",
+      "updatedAt": "Última Atualização"
+    },
+    "preconditions": {
+      "title": "Pré-condições",
+      "subtitle": "Condições que devem ser atendidas antes da execução",
+      "evaluate": "Avaliar Pré-condições",
+      "allPassed": "Todas as pré-condições atendidas",
+      "someFailedOrPending": "Algumas pré-condições pendentes ou falharam",
+      "status": {
+        "Pending": "Pendente",
+        "Passed": "Aprovada",
+        "Failed": "Falhou"
+      }
+    },
+    "approval": {
+      "title": "Aprovação",
+      "subtitle": "Aprovação necessária antes da execução",
+      "requestApproval": "Solicitar Aprovação",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "approved": "Aprovado",
+      "rejected": "Rejeitado",
+      "pending": "Aprovação Pendente",
+      "notRequired": "Aprovação não necessária",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Forneça o motivo da sua decisão"
+    },
+    "execution": {
+      "title": "Execução",
+      "subtitle": "Etapas de execução e progresso",
+      "execute": "Executar",
+      "cancel": "Cancelar Execução",
+      "completeStep": "Concluir Etapa",
+      "steps": "Etapas de Execução",
+      "noSteps": "Nenhuma etapa de execução registrada"
+    },
+    "validation": {
+      "title": "Validação Pós-Execução",
+      "subtitle": "Verifique o resultado da automação",
+      "recordValidation": "Registrar Validação",
+      "observedOutcome": "Resultado Observado",
+      "validatedBy": "Validado Por",
+      "checks": "Verificações de Validação",
+      "noValidation": "Nenhuma validação registrada ainda",
+      "status": {
+        "Pending": "Pendente",
+        "InProgress": "Em Progresso",
+        "Passed": "Aprovada",
+        "Failed": "Falhou",
+        "Skipped": "Ignorada"
+      }
+    },
+    "audit": {
+      "title": "Trilha de Auditoria",
+      "subtitle": "Histórico completo de ações do workflow",
+      "performedBy": "Realizado Por",
+      "performedAt": "Realizado Em",
+      "details": "Detalhes",
+      "action": {
+        "WorkflowCreated": "Workflow Criado",
+        "PreconditionsEvaluated": "Pré-condições Avaliadas",
+        "ApprovalRequested": "Aprovação Solicitada",
+        "ApprovalGranted": "Aprovação Concedida",
+        "ApprovalRejected": "Aprovação Rejeitada",
+        "ExecutionStarted": "Execução Iniciada",
+        "StepCompleted": "Etapa Concluída",
+        "ExecutionCompleted": "Execução Concluída",
+        "ExecutionFailed": "Execução Falhou",
+        "ValidationRecorded": "Validação Registrada",
+        "WorkflowCancelled": "Workflow Cancelado",
+        "EscalationTriggered": "Escalação Acionada"
+      }
+    },
+    "admin": {
+      "title": "Controles de Automação",
+      "subtitle": "Gerencie ações de automação, políticas e controles de segurança",
+      "actionCatalog": "Catálogo de Ações",
+      "safetyPolicies": "Políticas de Segurança",
+      "approvalRules": "Regras de Aprovação",
+      "usageOverview": "Visão de Utilização",
+      "totalActions": "Total de Ações",
+      "activeWorkflows": "Workflows Ativos",
+      "pendingApprovals": "Aprovações Pendentes",
+      "completedToday": "Concluídos Hoje"
+    },
+    "risk": {
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "workflowStatus": {
+      "Draft": "Rascunho",
+      "PendingPreconditions": "Pré-condições Pendentes",
+      "AwaitingApproval": "Aguardando Aprovação",
+      "Approved": "Aprovado",
+      "ReadyToExecute": "Pronto para Executar",
+      "Executing": "Executando",
+      "AwaitingValidation": "Aguardando Validação",
+      "Completed": "Concluído",
+      "Failed": "Falhou",
+      "Cancelled": "Cancelado",
+      "Rejected": "Rejeitado"
+    },
+    "actionType": {
+      "RestartControlled": "Reinício (Controlado)",
+      "ReprocessControlled": "Reprocessamento (Controlado)",
+      "ExecuteRunbookStep": "Executar Etapa do Runbook",
+      "RollbackReadinessReview": "Revisão de Prontidão de Rollback",
+      "ObserveAndValidate": "Observar e Validar",
+      "EscalateWithContext": "Escalar com Contexto",
+      "VerifyDependencyState": "Verificar Estado de Dependência",
+      "ValidatePostChangeState": "Validar Estado Pós-Mudança"
+    }
   }
 }
