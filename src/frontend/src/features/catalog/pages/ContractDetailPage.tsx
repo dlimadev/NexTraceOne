@@ -426,7 +426,7 @@ export function ContractDetailPage() {
               })) || []),
             ],
             caveats: [
-              ...(!versionHistory?.length ? ['No version history available'] : []),
+              ...(!versionHistory?.length ? [t('assistantPanel.contextCaveats.noVersionHistory')] : []),
             ].filter(Boolean),
           }}
         />

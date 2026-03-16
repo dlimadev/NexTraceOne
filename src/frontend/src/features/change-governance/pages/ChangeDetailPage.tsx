@@ -17,6 +17,7 @@ import {
   History,
   ClipboardCheck,
   Link2,
+  Loader2,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -172,7 +173,17 @@ export function ChangeDetailPage() {
   if (changeQuery.isLoading) {
     return (
       <div className="p-6 lg:p-8 animate-fade-in">
-        <p className="text-muted">{t('common.loading')}</p>
+        <Link to="/changes" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
+          <ArrowLeft size={14} /> {t('changeConfidence.detail.backToCatalog')}
+        </Link>
+        <Card>
+          <CardBody>
+            <div className="flex items-center justify-center gap-2 py-12 text-muted">
+              <Loader2 size={20} className="animate-spin" />
+              {t('common.loading')}
+            </div>
+          </CardBody>
+        </Card>
       </div>
     );
   }
@@ -842,8 +853,8 @@ export function ChangeDetailPage() {
             })) || []),
           ],
           caveats: [
-            ...(!advisory ? ['No advisory data available'] : []),
-            ...(!decisions?.length ? ['No decision history'] : []),
+            ...(!advisory ? [t('assistantPanel.contextCaveats.noAdvisoryData')] : []),
+            ...(!decisions?.length ? [t('assistantPanel.contextCaveats.noDecisionHistory')] : []),
           ].filter(Boolean),
         }}
       />

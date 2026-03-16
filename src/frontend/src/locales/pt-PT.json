@@ -3186,6 +3186,15 @@
     "suggestedSteps": "Próximos passos recomendados",
     "caveatsLabel": "Limitações de contexto",
     "noContextWarning": "Contexto limitado disponível. A resposta pode não refletir o estado atual desta entidade.",
-    "groundedIn": "Análise fundamentada em dados reais da entidade de"
+    "groundedIn": "Análise fundamentada em dados reais da entidade de",
+    "contextCaveats": {
+      "noLinkedServices": "Sem serviços vinculados",
+      "noRunbooks": "Sem runbooks associados",
+      "noCorrelatedChanges": "Sem alterações correlacionadas identificadas",
+      "noAdvisoryData": "Sem dados de advisory disponíveis",
+      "noDecisionHistory": "Sem histórico de decisões",
+      "noContractsLoaded": "Sem contratos carregados",
+      "noVersionHistory": "Sem histórico de versões disponível"
+    }
   }
 }
