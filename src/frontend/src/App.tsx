@@ -83,6 +83,12 @@ const PolicyCatalogPage = lazy(() => import('./features/governance/pages/PolicyC
 const EvidencePackagesPage = lazy(() => import('./features/governance/pages/EvidencePackagesPage').then(m => ({ default: m.EvidencePackagesPage })));
 const EnterpriseControlsPage = lazy(() => import('./features/governance/pages/EnterpriseControlsPage').then(m => ({ default: m.EnterpriseControlsPage })));
 
+// ── Integrations (lazy) ──
+const IntegrationHubPage = lazy(() => import('./features/integrations/pages/IntegrationHubPage').then(m => ({ default: m.IntegrationHubPage })));
+const ConnectorDetailPage = lazy(() => import('./features/integrations/pages/ConnectorDetailPage').then(m => ({ default: m.ConnectorDetailPage })));
+const IngestionExecutionsPage = lazy(() => import('./features/integrations/pages/IngestionExecutionsPage').then(m => ({ default: m.IngestionExecutionsPage })));
+const IngestionFreshnessPage = lazy(() => import('./features/integrations/pages/IngestionFreshnessPage').then(m => ({ default: m.IngestionFreshnessPage })));
+
 function PageLoader() {
   return (
     <div className="flex items-center justify-center h-full min-h-[50vh]">
@@ -304,6 +310,39 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
                     <EnterpriseControlsPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Integrations ── */}
+              <Route
+                path="/integrations"
+                element={
+                  <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
+                    <IntegrationHubPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/integrations/connectors/:connectorId"
+                element={
+                  <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
+                    <ConnectorDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/integrations/executions"
+                element={
+                  <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
+                    <IngestionExecutionsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/integrations/freshness"
+                element={
+                  <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
+                    <IngestionFreshnessPage />
                   </ProtectedRoute>
                 }
               />

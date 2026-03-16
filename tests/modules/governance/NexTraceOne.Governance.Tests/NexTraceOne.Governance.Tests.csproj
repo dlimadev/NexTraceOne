@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Domain\NexTraceOne.Governance.Domain.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Application\NexTraceOne.Governance.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Infrastructure\NexTraceOne.Governance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.API\NexTraceOne.Governance.API.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Contracts\NexTraceOne.Governance.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="Bogus" />
+  </ItemGroup>
+</Project>

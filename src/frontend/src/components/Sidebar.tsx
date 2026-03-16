@@ -35,6 +35,7 @@ import {
   Award,
   GitCompare,
   Route,
+  Cable,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -101,6 +102,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
   { labelKey: 'sidebar.executiveFinOps', to: '/governance/finops/executive', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
+  // ── Integrations ──
+  { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
+  { labelKey: 'sidebar.ingestionExecutions', to: '/integrations/executions', icon: <Activity size={18} />, permission: 'integrations:read', section: 'integrations' },
+  { labelKey: 'sidebar.ingestionFreshness', to: '/integrations/freshness', icon: <Gauge size={18} />, permission: 'integrations:read', section: 'integrations' },
   // ── Admin ──
   { labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={18} />, permission: 'licensing:read', section: 'admin' },
   { labelKey: 'sidebar.vendorLicensing', to: '/vendor/licensing', icon: <Shield size={18} />, permission: 'licensing:vendor:license:read', section: 'admin' },
@@ -123,6 +128,7 @@ const sectionLabels: Record<NavSection, string> = {
   operations: 'sidebar.sectionOperations',
   aiHub: 'sidebar.sectionAiHub',
   governance: 'sidebar.sectionGovernance',
+  integrations: 'sidebar.sectionIntegrations',
   admin: 'sidebar.sectionAdmin',
 };
 
