@@ -95,10 +95,10 @@ export function ContractSourceOfTruthPage() {
             <span className="text-sm text-muted">{sot.apiAssetId}</span>
             <span className="text-sm text-muted">v{sot.semVer}</span>
             <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[sot.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-              {sot.protocol}
+              {t(`contractGov.badges.protocols.${sot.protocol}`, sot.protocol)}
             </span>
             <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-              {sot.governance.lifecycleState}
+              {t(`contractGov.badges.lifecycle.${sot.governance.lifecycleState}`, sot.governance.lifecycleState)}
             </span>
           </div>
         </div>
@@ -120,11 +120,11 @@ export function ContractSourceOfTruthPage() {
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.format')}</dt>
-                  <dd className="text-body">{sot.format || '—'}</dd>
+                  <dd className="text-body">{sot.format || t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.importedFrom')}</dt>
-                  <dd className="text-body">{sot.importedFrom || '—'}</dd>
+                  <dd className="text-body">{sot.importedFrom || t('common.noData')}</dd>
                 </div>
               </dl>
             </CardBody>
@@ -144,7 +144,7 @@ export function ContractSourceOfTruthPage() {
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.lifecycleState')}</dt>
                   <dd>
                     <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-                      {sot.governance.lifecycleState}
+                      {t(`contractGov.badges.lifecycle.${sot.governance.lifecycleState}`, sot.governance.lifecycleState)}
                     </span>
                   </dd>
                 </div>
@@ -210,7 +210,7 @@ export function ContractSourceOfTruthPage() {
                         <p className="text-sm font-medium text-heading truncate">{ref.title}</p>
                         <p className="text-xs text-muted line-clamp-2">{ref.description}</p>
                         <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {ref.referenceType}
+                          {t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType)}
                         </span>
                       </div>
                       {ref.url && (

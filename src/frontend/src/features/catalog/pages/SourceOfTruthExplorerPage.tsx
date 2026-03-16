@@ -196,11 +196,11 @@ export function SourceOfTruthExplorerPage() {
                           </span>
                           {svc.criticality && (
                             <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[svc.criticality] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-                              {svc.criticality}
+                              {t(`catalog.badges.criticality.${svc.criticality}`, svc.criticality)}
                             </span>
                           )}
                           <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                            {svc.lifecycleStatus}
+                            {t(`catalog.badges.lifecycle.${svc.lifecycleStatus}`, svc.lifecycleStatus)}
                           </span>
                         </div>
                       </CardBody>
@@ -238,10 +238,10 @@ export function SourceOfTruthExplorerPage() {
                             v{c.semVer}
                           </span>
                           <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-                            {c.protocol}
+                            {t(`contractGov.badges.protocols.${c.protocol}`, c.protocol)}
                           </span>
                           <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                            {c.lifecycleState}
+                            {t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState)}
                           </span>
                         </div>
                       </CardBody>
@@ -279,10 +279,10 @@ export function SourceOfTruthExplorerPage() {
                       <p className="text-xs text-muted mb-3 line-clamp-2">{ref.description}</p>
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {ref.referenceType}
+                          {t(`sourceOfTruth.assetTypes.${ref.assetType}`, ref.assetType)}
                         </span>
                         <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {ref.assetType}
+                          {t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType)}
                         </span>
                       </div>
                     </CardBody>
