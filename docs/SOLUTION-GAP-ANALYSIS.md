@@ -5,7 +5,7 @@
 Este documento detalha a aderência da solução atual à visão oficial do NexTraceOne,
 classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar do zero**.
 
-Última atualização: 2026-03-16 (Pós-PR-16 — Rebaseline)
+Última atualização: 2026-03-16 (Pós-finalização Onda 1)
 
 > **Nota importante:** "OK" nesta análise significa que a *arquitetura e contratos* estão alinhados
 > com a visão do produto. Não significa que a feature tem persistência real ou está pronta para
@@ -40,7 +40,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | BuildingBlocks | OK | Core, Application, Infrastructure, Observability, Security (103 testes) |
 | Frontend — Sidebar | OK | 9 seções alinhadas com MODULES-AND-PAGES.md, persona-aware ordering |
 | Frontend — CommandPalette | OK | Espelha sidebar com todos os módulos do produto |
-| Frontend — i18n | OK | 4 locales (en, pt-BR, pt-PT, es); 1,629+ chaves; zero hardcoded strings visíveis |
+| Frontend — i18n | OK | 4 locales (en, pt-BR, pt-PT, es); 1,650+ chaves; zero hardcoded strings visíveis nas áreas críticas |
 | Frontend — auth | OK | RBAC, ProtectedRoute, persona derivation, permissões visuais |
 | Frontend — Persona-aware UX | OK | 7 personas, PersonaContext, config por persona, home adaptativa |
 | Frontend — Dark Enterprise Theme | OK | Identidade visual única; VendorLicensing alinhado |
@@ -48,6 +48,9 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | Frontend — Operations | OK | Incidents, Runbooks, Reliability pages com domain connection |
 | Frontend — Governance | OK | Reports (persona-aware), Risk Center, Compliance, FinOps pages |
 | 1,447 testes backend | OK | Todos a passar sem falhas (atualizado pós-PR-16) |
+| Frontend — 23 testes core flows | OK | SoT Explorer (5), IncidentDetail (8), IncidentsPage (5), AiAssistant (5) |
+| Frontend — Navegação cross-entity | OK | Links bidirecionais: serviço ↔ contrato ↔ change ↔ incident |
+| Frontend — Error/Loading states | OK | Error states em ChangeCatalog, SoT Explorer, Dashboard; Loading em todas as páginas |
 | Segurança — RequirePermission | OK | Todas as 22 endpoint modules com RequirePermission enforced |
 
 ## 2. Reposicionar
@@ -160,7 +163,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | FRONTEND-ARCHITECTURE.md | 95% | Feature-based, i18n maduro, reusáveis, persona-aware, dark theme consistente |
 | BACKEND-MODULE-GUIDELINES.md | 95% | DDD, CQRS, Result, RequirePermission enforced em todos os endpoints |
 | SECURITY-ARCHITECTURE.md | 85% | RequirePermission em todos os endpoints; RBAC funcional; falta encryption at rest |
-| I18N-STRATEGY.md | 95% | 4 locales, 1629+ chaves, zero hardcoded strings |
+| I18N-STRATEGY.md | 95% | 4 locales, 1650+ chaves, zero hardcoded strings nas áreas críticas |
 
 ---
 
@@ -173,7 +176,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | AIKnowledge — ExternalAI endpoints (stub) | REFACTOR | EndpointModule com TODO, sem endpoints mapeados | Baixo — providers geridos via governance |
 | sanitize.ts, navigation.ts (utils) | KEEP | Utilitários de segurança com testes — devem ser integrados | Nenhum |
 | Placeholder tests restantes (5 projetos) | KEEP | São o único teste nos projetos AuditCompliance, E2E, Integration, Security, Infrastructure — manter até testes reais | Nenhum |
-| Frontend — error/loading state patterns | DOCUMENT | 2 padrões diferentes (EmptyState vs inline text) — consolidar | Baixo |
+| Frontend — error/loading state patterns | DOCUMENT | Consolidado: EmptyState para entidade não encontrada, inline text para loading, Card com AlertTriangle para erros na DashboardPage | Resolvido |
 | Governance module — mock data | REFACTOR | 4 endpoints retornam dados estáticos; conectar a queries cross-module | Médio |
 
 ---
