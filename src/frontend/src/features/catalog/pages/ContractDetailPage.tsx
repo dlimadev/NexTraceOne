@@ -393,7 +393,7 @@ export function ContractDetailPage() {
             entityType: 'contract',
             entityName: detail.serviceName ? `${detail.serviceName} — ${detail.protocol}` : detail.apiAssetId,
             entityStatus: detail.lifecycleState,
-            entityDescription: detail.specContent ? detail.specContent.slice(0, 200) : undefined, // truncated for context bundle
+            entityDescription: detail.specContent ? detail.specContent.slice(0, 200) : undefined, // Spec content truncated to 200 chars to keep context bundle lightweight
             properties: {
               ...(detail.protocol ? { protocol: detail.protocol } : {}),
               ...(detail.semVer ? { version: detail.semVer } : {}),

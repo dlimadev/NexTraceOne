@@ -161,6 +161,16 @@ const contextScopeIcons: Record<AssistantContextType, React.ReactNode> = {
   incident: <AlertTriangle size={14} />,
 };
 
+// ── Context assessment constants ─────────────────────────────────────
+// Min property and relation counts to classify context richness.
+// These thresholds align with typical entity data: detail pages usually
+// provide 3-8 properties and 0-5 relation groups.
+const CONTEXT_STRONG_MIN_PROPS = 3;
+const CONTEXT_STRONG_MIN_RELS = 2;
+const CONTEXT_GOOD_MIN_PROPS = 3;
+const CONTEXT_GOOD_MIN_RELS = 1;
+const MAX_DISPLAYED_RELATIONS = 5;
+
 // ── Mock contextual response generator ──────────────────────────────
 
 function assessContextStrength(contextData?: ContextData): string {
@@ -168,9 +178,8 @@ function assessContextStrength(contextData?: ContextData): string {
   const propCount = Object.keys(contextData.properties ?? {}).length;
   const relCount = (contextData.relations ?? []).length;
   const hasCaveats = (contextData.caveats ?? []).length > 0;
-  // Thresholds aligned: strong requires rich data with no gaps
-  if (propCount >= 3 && relCount >= 2 && !hasCaveats) return 'strong';
-  if (propCount >= 3 && relCount >= 1) return 'good';
+  if (propCount >= CONTEXT_STRONG_MIN_PROPS && relCount >= CONTEXT_STRONG_MIN_RELS && !hasCaveats) return 'strong';
+  if (propCount >= CONTEXT_GOOD_MIN_PROPS && relCount >= CONTEXT_GOOD_MIN_RELS) return 'good';
   if (propCount >= 1 || relCount >= 1) return 'partial';
   return 'weak';
 }
@@ -208,12 +217,12 @@ function buildGroundedContent(
 
   relationGroups.forEach((rels, groupName) => {
     lines.push(`\n**${groupName}** (${rels.length}):`);
-    rels.slice(0, 5).forEach(r => {
+    rels.slice(0, MAX_DISPLAYED_RELATIONS).forEach(r => {
       const relProps = r.properties ? Object.entries(r.properties).map(([k, v]) => `${k}: ${v}`).join(', ') : '';
       lines.push(`• ${r.name}${r.status ? ` [${r.status}]` : ''}${relProps ? ` — ${relProps}` : ''}`);
     });
-    if (rels.length > 5) {
-      lines.push(`  … +${rels.length - 5} more`);
+    if (rels.length > MAX_DISPLAYED_RELATIONS) {
+      lines.push(`  … +${rels.length - MAX_DISPLAYED_RELATIONS} more`);
     }
   });
 

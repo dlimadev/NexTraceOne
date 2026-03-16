@@ -156,6 +156,7 @@ public static class SendAssistantMessage
 
             // ── Desserializar context bundle (se disponível) ──────────────
             ContextBundleData? contextBundle = null;
+            var bundleParseError = false;
             if (!string.IsNullOrWhiteSpace(request.ContextBundle))
             {
                 try
@@ -165,7 +166,8 @@ public static class SendAssistantMessage
                 }
                 catch (JsonException)
                 {
-                    // Invalid JSON — proceed without bundle
+                    // Invalid JSON — proceed without bundle, flag for caveat
+                    bundleParseError = true;
                 }
             }
 
@@ -191,6 +193,13 @@ public static class SendAssistantMessage
                             contextRefs.Add(refStr);
                     }
                 }
+            }
+
+            // Add caveat if context bundle was provided but could not be parsed
+            if (bundleParseError)
+            {
+                caveats ??= [];
+                caveats.Add("Context bundle could not be parsed; response may lack entity-specific detail.");
             }
 
             // ── Persistir mensagem do assistente ──────────────────────────
