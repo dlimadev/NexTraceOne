@@ -15,6 +15,9 @@ using NexTraceOne.ChangeIntelligence.Application.Features.NotifyDeployment;
 using NexTraceOne.ChangeIntelligence.Application.Features.RegisterRollback;
 using NexTraceOne.ChangeIntelligence.Application.Features.SyncJiraWorkItems;
 using NexTraceOne.ChangeIntelligence.Application.Features.UpdateDeploymentState;
+using NexTraceOne.ChangeIntelligence.Application.Features.GetChangeAdvisory;
+using NexTraceOne.ChangeIntelligence.Application.Features.RecordChangeDecision;
+using NexTraceOne.ChangeIntelligence.Application.Features.GetChangeDecisionHistory;
 
 namespace NexTraceOne.ChangeIntelligence.Application;
 
@@ -45,6 +48,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetChangeScore.Query>, GetChangeScore.Validator>();
         services.AddTransient<IValidator<AttachWorkItemContext.Command>, AttachWorkItemContext.Validator>();
         services.AddTransient<IValidator<SyncJiraWorkItems.Command>, SyncJiraWorkItems.Validator>();
+        services.AddTransient<IValidator<GetChangeAdvisory.Query>, GetChangeAdvisory.Validator>();
+        services.AddTransient<IValidator<RecordChangeDecision.Command>, RecordChangeDecision.Validator>();
+        services.AddTransient<IValidator<GetChangeDecisionHistory.Query>, GetChangeDecisionHistory.Validator>();
 
         return services;
     }
