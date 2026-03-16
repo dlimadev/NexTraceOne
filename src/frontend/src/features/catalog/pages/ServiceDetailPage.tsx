@@ -461,10 +461,11 @@ export function ServiceDetailPage() {
 
 /** Campo de detalhe reutilizável (label + valor). */
 function DetailField({ label, value }: { label: string; value: string | undefined | null }) {
+  const { t } = useTranslation();
   return (
     <div>
       <dt className="text-xs text-muted mb-0.5">{label}</dt>
-      <dd className="text-heading">{value || '–'}</dd>
+      <dd className="text-heading">{value || t('common.noData')}</dd>
     </div>
   );
 }
