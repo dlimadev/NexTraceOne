@@ -67,7 +67,7 @@ public static class GetPlatformConfig
                     .Select(c => new FeatureFlagDto(
                         c.Key,
                         bool.TryParse(c.Value, out var enabled) && enabled,
-                        c.Key))
+                        $"Feature flag: {c.Key}"))
                     .ToList();
             }
 
@@ -90,7 +90,7 @@ public static class GetPlatformConfig
                 return connectionStrings.GetChildren()
                     .Select(c => new DatabaseConnectivityDto(
                         c.Key,
-                        "Configured",
+                        InferProvider(c.Value),
                         !string.IsNullOrWhiteSpace(c.Value),
                         !string.IsNullOrWhiteSpace(c.Value) ? "Connected" : "Empty"))
                     .ToList();
@@ -102,6 +102,20 @@ public static class GetPlatformConfig
                 new("ReadReplica", "PostgreSQL", true, "Connected"),
                 new("Cache", "Redis", true, "Connected")
             ];
+        }
+
+        private static string InferProvider(string? connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString)) return "Unknown";
+            if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase) ||
+                connectionString.Contains("Npgsql", StringComparison.OrdinalIgnoreCase))
+                return "PostgreSQL";
+            if (connectionString.Contains("redis", StringComparison.OrdinalIgnoreCase))
+                return "Redis";
+            if (connectionString.Contains("Server=", StringComparison.OrdinalIgnoreCase) ||
+                connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase))
+                return "SQL Server";
+            return "Configured";
         }
     }
 
