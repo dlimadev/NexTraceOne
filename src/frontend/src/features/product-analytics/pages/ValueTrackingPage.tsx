@@ -23,21 +23,21 @@ import { StatCard } from '../../../components/StatCard';
 /* ── Dados de demonstração (MVP) ── */
 
 const mockMilestones = [
-  { type: 'FirstSearchSuccess', name: 'First Search Success', completionRate: 94.2, avgTimeMinutes: 3.2, usersReached: 221, trend: 'Stable' as const },
-  { type: 'FirstServiceLookup', name: 'First Service Lookup', completionRate: 88.5, avgTimeMinutes: 5.8, usersReached: 208, trend: 'Improving' as const },
-  { type: 'FirstContractView', name: 'First Contract View', completionRate: 82.1, avgTimeMinutes: 8.4, usersReached: 193, trend: 'Stable' as const },
-  { type: 'FirstSourceOfTruthUsed', name: 'First Source of Truth Used', completionRate: 86.2, avgTimeMinutes: 7.2, usersReached: 202, trend: 'Improving' as const },
-  { type: 'FirstExecutiveOverviewConsumed', name: 'First Executive Overview', completionRate: 78.6, avgTimeMinutes: 6.1, usersReached: 184, trend: 'Improving' as const },
-  { type: 'FirstAiUsefulInteraction', name: 'First AI Useful Interaction', completionRate: 72.4, avgTimeMinutes: 12.3, usersReached: 170, trend: 'Improving' as const },
-  { type: 'FirstIncidentInvestigation', name: 'First Incident Investigation', completionRate: 58.1, avgTimeMinutes: 28.6, usersReached: 136, trend: 'Stable' as const },
-  { type: 'FirstContractDraftCreated', name: 'First Contract Draft Created', completionRate: 52.3, avgTimeMinutes: 42.5, usersReached: 123, trend: 'Improving' as const },
-  { type: 'FirstReliabilityViewed', name: 'First Reliability Viewed', completionRate: 48.7, avgTimeMinutes: 22.8, usersReached: 114, trend: 'Declining' as const },
-  { type: 'FirstReportGenerated', name: 'First Report Generated', completionRate: 45.2, avgTimeMinutes: 48.0, usersReached: 106, trend: 'Stable' as const },
-  { type: 'FirstMitigationCompleted', name: 'First Mitigation Completed', completionRate: 42.3, avgTimeMinutes: 95.4, usersReached: 99, trend: 'Stable' as const },
-  { type: 'FirstRunbookConsulted', name: 'First Runbook Consulted', completionRate: 38.4, avgTimeMinutes: 35.2, usersReached: 90, trend: 'Declining' as const },
-  { type: 'FirstContractPublished', name: 'First Contract Published', completionRate: 34.8, avgTimeMinutes: 168.0, usersReached: 82, trend: 'Improving' as const },
-  { type: 'FirstAutomationCreated', name: 'First Automation Created', completionRate: 28.1, avgTimeMinutes: 180.0, usersReached: 66, trend: 'Improving' as const },
-  { type: 'FirstEvidenceExported', name: 'First Evidence Exported', completionRate: 18.6, avgTimeMinutes: 210.0, usersReached: 44, trend: 'Stable' as const },
+  { type: 'FirstSearchSuccess', completionRate: 94.2, avgTimeMinutes: 3.2, usersReached: 221, trend: 'Stable' as const },
+  { type: 'FirstServiceLookup', completionRate: 88.5, avgTimeMinutes: 5.8, usersReached: 208, trend: 'Improving' as const },
+  { type: 'FirstContractView', completionRate: 82.1, avgTimeMinutes: 8.4, usersReached: 193, trend: 'Stable' as const },
+  { type: 'FirstSourceOfTruthUsed', completionRate: 86.2, avgTimeMinutes: 7.2, usersReached: 202, trend: 'Improving' as const },
+  { type: 'FirstExecutiveOverviewConsumed', completionRate: 78.6, avgTimeMinutes: 6.1, usersReached: 184, trend: 'Improving' as const },
+  { type: 'FirstAiUsefulInteraction', completionRate: 72.4, avgTimeMinutes: 12.3, usersReached: 170, trend: 'Improving' as const },
+  { type: 'FirstIncidentInvestigation', completionRate: 58.1, avgTimeMinutes: 28.6, usersReached: 136, trend: 'Stable' as const },
+  { type: 'FirstContractDraftCreated', completionRate: 52.3, avgTimeMinutes: 42.5, usersReached: 123, trend: 'Improving' as const },
+  { type: 'FirstReliabilityViewed', completionRate: 48.7, avgTimeMinutes: 22.8, usersReached: 114, trend: 'Declining' as const },
+  { type: 'FirstReportGenerated', completionRate: 45.2, avgTimeMinutes: 48.0, usersReached: 106, trend: 'Stable' as const },
+  { type: 'FirstMitigationCompleted', completionRate: 42.3, avgTimeMinutes: 95.4, usersReached: 99, trend: 'Stable' as const },
+  { type: 'FirstRunbookConsulted', completionRate: 38.4, avgTimeMinutes: 35.2, usersReached: 90, trend: 'Declining' as const },
+  { type: 'FirstContractPublished', completionRate: 34.8, avgTimeMinutes: 168.0, usersReached: 82, trend: 'Improving' as const },
+  { type: 'FirstAutomationCreated', completionRate: 28.1, avgTimeMinutes: 180.0, usersReached: 66, trend: 'Improving' as const },
+  { type: 'FirstEvidenceExported', completionRate: 18.6, avgTimeMinutes: 210.0, usersReached: 44, trend: 'Stable' as const },
 ];
 
 function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {

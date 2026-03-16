@@ -31,6 +31,7 @@ public static class RecordAnalyticsEvent
         {
             // MVP: evento aceite e registado em memória.
             // Em produção, persistir em store dedicado com retenção e agregação.
+            // NOTA: em produção, usar IClock/ISystemClock para obter o timestamp.
             var eventId = Guid.NewGuid().ToString("N")[..12];
             var timestamp = DateTimeOffset.UtcNow;
 
