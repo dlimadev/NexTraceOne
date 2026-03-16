@@ -76,6 +76,8 @@ public static class SendAssistantMessage
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -159,8 +161,7 @@ public static class SendAssistantMessage
                 try
                 {
                     contextBundle = JsonSerializer.Deserialize<ContextBundleData>(
-                        request.ContextBundle,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        request.ContextBundle, JsonOptions);
                 }
                 catch (JsonException)
                 {
