@@ -17,6 +17,11 @@ using NexTraceOne.Promotion.API;
 using NexTraceOne.Audit.API;
 using NexTraceOne.DeveloperPortal.API;
 using NexTraceOne.Governance.API;
+using NexTraceOne.RuntimeIntelligence.API;
+using NexTraceOne.CostIntelligence.API;
+using NexTraceOne.AiGovernance.API;
+using NexTraceOne.ExternalAi.API;
+using NexTraceOne.AiOrchestration.API;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
@@ -55,6 +60,11 @@ builder.Services.AddPromotionModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddGovernanceModule(builder.Configuration);
+builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
+builder.Services.AddCostIntelligenceModule(builder.Configuration);
+builder.Services.AddAiGovernanceModule(builder.Configuration);
+builder.Services.AddExternalAiModule(builder.Configuration);
+builder.Services.AddAiOrchestrationModule(builder.Configuration);
 
 // [5] OpenAPI
 builder.Services.AddOpenApi();
