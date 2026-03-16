@@ -1177,6 +1177,58 @@ export interface ChangesSummaryResponse {
   changesCorrelatedWithIncidents: number;
 }
 
+// ─── Change Confidence — Advisory, Decision, Evidence Readiness ──────────────
+
+/** Factor individual da recomendação de confiança. */
+export interface AdvisoryFactorDto {
+  factorName: string;
+  status: 'Pass' | 'Warning' | 'Fail' | 'Unknown';
+  description: string;
+  weight: number | null;
+}
+
+/** Resposta da advisory/recomendação de confiança. */
+export interface ChangeAdvisoryResponse {
+  releaseId: string;
+  recommendation: 'Approve' | 'Reject' | 'ApproveConditionally' | 'NeedsMoreEvidence';
+  rationale: string;
+  overallConfidence: number;
+  factors: AdvisoryFactorDto[];
+  generatedAt: string;
+}
+
+/** Comando para registar uma decisão de governança. */
+export interface RecordDecisionRequest {
+  decision: 'Approved' | 'Rejected' | 'ApprovedConditionally';
+  decidedBy: string;
+  rationale: string;
+  conditions?: string;
+}
+
+/** Resposta do registo de decisão. */
+export interface RecordDecisionResponse {
+  decisionId: string;
+  releaseId: string;
+  decision: string;
+  decidedBy: string;
+  decidedAt: string;
+}
+
+/** Item do histórico de decisões. */
+export interface DecisionHistoryItemDto {
+  eventId: string;
+  eventType: string;
+  description: string;
+  source: string;
+  occurredAt: string;
+}
+
+/** Resposta do histórico de decisões. */
+export interface DecisionHistoryResponse {
+  releaseId: string;
+  decisions: DecisionHistoryItemDto[];
+}
+
 // ─── Governance — Reports, Risk, Compliance, FinOps ─────────────────────────
 
 /** Nível de risco operacional. */

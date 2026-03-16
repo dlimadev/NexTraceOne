@@ -2,6 +2,10 @@ import client from '../../../api/client';
 import type {
   ChangesListResponse,
   ChangesSummaryResponse,
+  ChangeAdvisoryResponse,
+  RecordDecisionRequest,
+  RecordDecisionResponse,
+  DecisionHistoryResponse,
 } from '../../../types';
 
 /** Parâmetros de filtro para o catálogo de mudanças. */
@@ -48,4 +52,16 @@ export const changeConfidenceApi = {
   /** Obtém intelligence summary de uma mudança. */
   getIntelligence: (changeId: string) =>
     client.get(`/changes/${changeId}/intelligence`).then((r) => r.data),
+
+  /** Obtém advisory/recomendação de confiança de uma mudança. */
+  getAdvisory: (changeId: string) =>
+    client.get<ChangeAdvisoryResponse>(`/changes/${changeId}/advisory`).then((r) => r.data),
+
+  /** Regista uma decisão de governança sobre uma mudança. */
+  recordDecision: (changeId: string, data: RecordDecisionRequest) =>
+    client.post<RecordDecisionResponse>(`/changes/${changeId}/decision`, data).then((r) => r.data),
+
+  /** Obtém o histórico de decisões de uma mudança. */
+  getDecisionHistory: (changeId: string) =>
+    client.get<DecisionHistoryResponse>(`/changes/${changeId}/decisions`).then((r) => r.data),
 };
