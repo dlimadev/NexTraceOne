@@ -55,8 +55,8 @@ export function TeamsOverviewPage() {
     if (!search) return true;
     const q = search.toLowerCase();
     return team.displayName.toLowerCase().includes(q)
-      || team.description.toLowerCase().includes(q)
-      || team.parentOrganizationUnit.toLowerCase().includes(q);
+      || team.description?.toLowerCase().includes(q)
+      || team.parentOrganizationUnit?.toLowerCase().includes(q);
   });
 
   return (
