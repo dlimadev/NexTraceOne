@@ -155,8 +155,8 @@ describe('ContractsPage', () => {
     vi.mocked(contractsApi.importContract).mockResolvedValue({ id: 'cv-new' });
     renderContracts();
     await userEvent.click(screen.getByRole('button', { name: /import contract/i }));
-    await userEvent.type(screen.getByPlaceholderText('UUID'), 'api-abc');
-    await userEvent.type(screen.getByPlaceholderText('1.0.0'), '3.0.0');
+    await userEvent.type(screen.getByPlaceholderText(/550e8400/), 'api-abc');
+    await userEvent.type(screen.getByPlaceholderText(/e\.g\., 1\.0\.0/), '3.0.0');
     await userEvent.type(screen.getByPlaceholderText(/paste your specification here/i), 'openapi-spec-content');
     await userEvent.click(screen.getByRole('button', { name: /^import$/i }));
     await waitFor(() => {

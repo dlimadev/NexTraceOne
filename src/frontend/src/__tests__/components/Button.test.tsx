@@ -36,19 +36,19 @@ describe('Button', () => {
   it('aplica a variante primary por padrão', () => {
     render(<Button>Primary</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('bg-indigo-600');
+    expect(btn).toHaveClass('bg-accent');
   });
 
   it('aplica a variante secondary', () => {
     render(<Button variant="secondary">Secondary</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('bg-white', 'text-gray-700');
+    expect(btn).toHaveClass('bg-card', 'text-body');
   });
 
   it('aplica a variante danger', () => {
     render(<Button variant="danger">Delete</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('bg-red-600');
+    expect(btn).toHaveClass('bg-critical');
   });
 
   it('aplica o tamanho sm', () => {

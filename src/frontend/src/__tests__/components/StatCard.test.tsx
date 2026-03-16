@@ -47,7 +47,7 @@ describe('StatCard', () => {
     );
     // O contêiner do ícone deve ter a classe de cor padrão
     const iconWrapper = screen.getByTestId('icon').parentElement;
-    expect(iconWrapper).toHaveClass('text-indigo-600');
+    expect(iconWrapper).toHaveClass('text-accent');
   });
 
   it('aplica a cor customizada', () => {

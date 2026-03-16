@@ -832,7 +832,7 @@ export function ChangeDetailPage() {
           },
           relations: [
             ...(advisory?.factors?.map(f => ({
-              relationType: 'Advisory Factors',
+              relationType: t('changeConfidence.detail.advisoryFactors'),
               entityType: 'factor',
               name: f.factorName,
               status: f.status,
@@ -842,7 +842,7 @@ export function ChangeDetailPage() {
               },
             })) || []),
             ...(decisions?.map(d => ({
-              relationType: 'Decision History',
+              relationType: t('changeConfidence.detail.decisionHistory'),
               entityType: 'decision',
               name: d.description || d.eventType,
               status: d.eventType,

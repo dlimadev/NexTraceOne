@@ -15,7 +15,7 @@ describe('Card', () => {
 
   it('possui estilo de card padrão', () => {
     render(<Card data-testid="card">Texto</Card>);
-    expect(screen.getByTestId('card')).toHaveClass('bg-white', 'rounded-lg');
+    expect(screen.getByTestId('card')).toHaveClass('bg-card', 'rounded-lg');
   });
 });
 

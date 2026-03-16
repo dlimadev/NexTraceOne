@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { usePermissions } from '../../hooks/usePermissions';
-import type { UserProfile } from '../../types';
+import type { CurrentUserProfile } from '../../types';
+import { getPermissionsForRoles } from '../../auth/permissions';
 
 // Mock do AuthContext
 vi.mock('../../contexts/AuthContext', () => ({
@@ -10,26 +11,39 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 import { useAuth } from '../../contexts/AuthContext';
 
-function mockUser(roles: string[]): UserProfile {
+function mockUser(roles: string[]): CurrentUserProfile {
+  const permissions = [...getPermissionsForRoles(roles)];
   return {
     id: 'user-1',
     email: 'test@acme.com',
+    firstName: 'Test',
+    lastName: 'User',
     fullName: 'Test User',
-    roles,
+    isActive: true,
+    lastLoginAt: null,
     tenantId: 'tenant-1',
+    roleName: roles[0] || '',
+    permissions,
+  };
+}
+
+function mockAuthValue(roles: string[]) {
+  return {
+    isAuthenticated: true,
+    accessToken: 'token',
+    user: mockUser(roles),
+    tenantId: 'tenant-1',
+    requiresTenantSelection: false,
+    availableTenants: [],
+    login: vi.fn(),
+    selectTenant: vi.fn(),
+    logout: vi.fn(),
   };
 }
 
 describe('usePermissions', () => {
   it('Admin pode acessar users:read e users:write', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      accessToken: 'token',
-      user: mockUser(['Admin']),
-      tenantId: 'tenant-1',
-      login: vi.fn(),
-      logout: vi.fn(),
-    });
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['Admin']));
 
     const { result } = renderHook(() => usePermissions());
     expect(result.current.can('users:read')).toBe(true);
@@ -39,14 +53,7 @@ describe('usePermissions', () => {
   });
 
   it('Developer não pode acessar users:read', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      accessToken: 'token',
-      user: mockUser(['Developer']),
-      tenantId: 'tenant-1',
-      login: vi.fn(),
-      logout: vi.fn(),
-    });
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['Developer']));
 
     const { result } = renderHook(() => usePermissions());
     expect(result.current.can('users:read')).toBe(false);
@@ -55,14 +62,7 @@ describe('usePermissions', () => {
   });
 
   it('Viewer não pode escrever em nenhum módulo', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      accessToken: 'token',
-      user: mockUser(['Viewer']),
-      tenantId: 'tenant-1',
-      login: vi.fn(),
-      logout: vi.fn(),
-    });
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['Viewer']));
 
     const { result } = renderHook(() => usePermissions());
     expect(result.current.can('releases:write')).toBe(false);
@@ -71,18 +71,11 @@ describe('usePermissions', () => {
     expect(result.current.can('releases:read')).toBe(true);
   });
 
-  it('retorna roles do usuário corretamente', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      isAuthenticated: true,
-      accessToken: 'token',
-      user: mockUser(['Admin', 'Auditor']),
-      tenantId: 'tenant-1',
-      login: vi.fn(),
-      logout: vi.fn(),
-    });
+  it('retorna roleName do usuário corretamente', () => {
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['Admin']));
 
     const { result } = renderHook(() => usePermissions());
-    expect(result.current.roles).toEqual(['Admin', 'Auditor']);
+    expect(result.current.roleName).toBe('Admin');
   });
 
   it('usuário sem perfil carregado não tem permissões', () => {
@@ -91,12 +84,15 @@ describe('usePermissions', () => {
       accessToken: 'token',
       user: null,
       tenantId: 'tenant-1',
+      requiresTenantSelection: false,
+      availableTenants: [],
       login: vi.fn(),
+      selectTenant: vi.fn(),
       logout: vi.fn(),
     });
 
     const { result } = renderHook(() => usePermissions());
     expect(result.current.can('releases:read')).toBe(false);
-    expect(result.current.roles).toEqual([]);
+    expect(result.current.roleName).toBe('');
   });
 });
