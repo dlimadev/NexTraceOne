@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
@@ -26,7 +27,10 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 /// Consulta IncidentDbContext para todas as operações de leitura e escrita,
 /// mapeando entidades de domínio para os DTOs esperados pelos handlers.
 /// </summary>
-internal sealed class EfIncidentStore(IncidentDbContext db) : IIncidentStore
+internal sealed class EfIncidentStore(
+    IncidentDbContext db,
+    IDateTimeProvider clock,
+    ICurrentUser currentUser) : IIncidentStore
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
