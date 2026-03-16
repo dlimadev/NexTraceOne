@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Security.Integrity;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.BuildingBlocks.Observability.Logging;
+using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.ApiHost;
@@ -16,6 +17,7 @@ using NexTraceOne.Promotion.API;
 using NexTraceOne.Audit.API;
 using NexTraceOne.DeveloperPortal.API;
 using NexTraceOne.Governance.API;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
 
@@ -91,6 +93,9 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
+// ── Validação de configuração crítica ──
+app.ValidateStartupConfiguration();
+
 // ── Auto-migrations ──
 await app.ApplyDatabaseMigrationsAsync();
 
@@ -120,5 +125,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapHealthChecks("/health").AllowAnonymous();
+
+app.MapHealthChecks("/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = HealthCheckResponseWriter.WriteResponse
+}).AllowAnonymous();
+
+app.MapHealthChecks("/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live"),
+    ResponseWriter = HealthCheckResponseWriter.WriteResponse
+}).AllowAnonymous();
 
 app.Run();

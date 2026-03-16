@@ -5,6 +5,9 @@
     <AssemblyName>NexTraceOne.BuildingBlocks.Observability</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
