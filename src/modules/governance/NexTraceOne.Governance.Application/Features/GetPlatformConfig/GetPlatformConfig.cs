@@ -104,17 +104,21 @@ public static class GetPlatformConfig
             ];
         }
 
+        /// <summary>
+        /// Inferência best-effort do provider de base de dados a partir da connection string.
+        /// Não é determinístico em todos os cenários — destina-se apenas a enriquecer
+        /// a visão operacional sem expor credenciais ou detalhes sensíveis.
+        /// </summary>
         private static string InferProvider(string? connectionString)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) return "Unknown";
-            if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase) ||
-                connectionString.Contains("Npgsql", StringComparison.OrdinalIgnoreCase))
+            if (connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase) &&
+                connectionString.Contains("Port=", StringComparison.OrdinalIgnoreCase))
+                return "PostgreSQL";
+            if (connectionString.Contains("Npgsql", StringComparison.OrdinalIgnoreCase))
                 return "PostgreSQL";
             if (connectionString.Contains("redis", StringComparison.OrdinalIgnoreCase))
                 return "Redis";
-            if (connectionString.Contains("Server=", StringComparison.OrdinalIgnoreCase) ||
-                connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase))
-                return "SQL Server";
             return "Configured";
         }
     }
