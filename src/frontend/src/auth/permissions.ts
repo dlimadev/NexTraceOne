@@ -130,6 +130,12 @@ export type Permission =
 // ── Helpers para UI gating e testes ──────────────────────────────────────────
 // Mapeamento client-side simplificado de role→permissões para controle visual.
 // O backend continua sendo a fonte de verdade para enforcement real.
+//
+// NOTA: Em produção, as permissões efetivas do usuário vêm do servidor via
+// CurrentUserProfile.permissions (endpoint /auth/me). Este mapeamento é usado
+// apenas para fallback visual quando o perfil ainda não foi carregado, e para
+// testes unitários dos componentes de UI que dependem de roles.
+// Sincronização: manter alinhado com IdentityAccess.Application/Roles/.
 
 const rolePermissions: Record<string, string[]> = {
   Admin: [
