@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialPromotionSchema : Migration
@@ -180,6 +180,8 @@ namespace NexTraceOne.Promotion.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"DROP TABLE IF EXISTS outbox_messages;");
+
             migrationBuilder.DropTable(
                 name: "prm_deployment_environments");
 

@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.Contracts.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 {
     [DbContext(typeof(ContractsDbContext))]
     partial class ContractsDbContextModelSnapshot : ModelSnapshot
@@ -172,6 +172,200 @@ namespace NexTraceOne.Contracts.Infrastructure.Persistence.Migrations
                     b.ToTable("ct_contract_diffs", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractDraft", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AiGenerationPrompt")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("BaseContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContractType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<bool>("IsAiGenerated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("LastEditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastEditedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ProposedVersion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Protocol")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("OpenApi");
+
+                    b.Property<Guid?>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SpecContent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Editing");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Author");
+
+                    b.HasIndex("Protocol");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("ct_contract_drafts", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractExample", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentFormat")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid?>("DraftId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ExampleType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractVersionId");
+
+                    b.HasIndex("DraftId");
+
+                    b.ToTable("ct_contract_examples", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("DraftId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReviewedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DraftId");
+
+                    b.ToTable("ct_contract_reviews", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractRuleViolation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -333,6 +527,14 @@ namespace NexTraceOne.Contracts.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractExample", b =>
+                {
+                    b.HasOne("NexTraceOne.Contracts.Domain.Entities.ContractDraft", null)
+                        .WithMany("Examples")
+                        .HasForeignKey("DraftId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractRuleViolation", b =>
                 {
                     b.HasOne("NexTraceOne.Contracts.Domain.Entities.ContractVersion", null)
@@ -434,6 +636,11 @@ namespace NexTraceOne.Contracts.Infrastructure.Persistence.Migrations
                     b.Navigation("Provenance");
 
                     b.Navigation("Signature");
+                });
+
+            modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractDraft", b =>
+                {
+                    b.Navigation("Examples");
                 });
 
             modelBuilder.Entity("NexTraceOne.Contracts.Domain.Entities.ContractVersion", b =>

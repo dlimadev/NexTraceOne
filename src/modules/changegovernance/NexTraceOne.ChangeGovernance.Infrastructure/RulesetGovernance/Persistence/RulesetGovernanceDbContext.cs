@@ -31,6 +31,10 @@ public sealed class RulesetGovernanceDbContext(
         => typeof(RulesetGovernanceDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.RulesetGovernance.Infrastructure";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

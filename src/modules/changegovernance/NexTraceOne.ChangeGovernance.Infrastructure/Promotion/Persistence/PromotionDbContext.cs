@@ -34,6 +34,10 @@ public sealed class PromotionDbContext(
         => typeof(PromotionDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.Promotion.Infrastructure";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

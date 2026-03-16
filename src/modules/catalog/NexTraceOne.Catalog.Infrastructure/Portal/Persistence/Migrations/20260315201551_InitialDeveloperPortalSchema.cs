@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NexTraceOne.DeveloperPortal.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialDeveloperPortalSchema : Migration
@@ -206,6 +206,8 @@ namespace NexTraceOne.DeveloperPortal.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "dp_subscriptions");
+
+            migrationBuilder.Sql(@"DROP TABLE IF EXISTS outbox_messages;");
         }
     }
 }

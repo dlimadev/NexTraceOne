@@ -37,6 +37,10 @@ public sealed class DeveloperPortalDbContext(
         => typeof(DeveloperPortalDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.DeveloperPortal.Infrastructure";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

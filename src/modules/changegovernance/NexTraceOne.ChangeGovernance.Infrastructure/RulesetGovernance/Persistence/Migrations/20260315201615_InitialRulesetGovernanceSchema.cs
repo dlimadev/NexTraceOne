@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialRulesetGovernanceSchema : Migration
@@ -107,6 +107,8 @@ namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"DROP TABLE IF EXISTS outbox_messages;");
+
             migrationBuilder.DropTable(
                 name: "rg_lint_results");
 

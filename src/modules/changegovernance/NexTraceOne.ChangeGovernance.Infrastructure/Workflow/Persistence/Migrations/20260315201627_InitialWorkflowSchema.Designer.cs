@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.Workflow.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migrations
 {
     [DbContext(typeof(WorkflowDbContext))]
-    [Migration("20260313211620_InitialWorkflowSchema")]
+    [Migration("20260315201627_InitialWorkflowSchema")]
     partial class InitialWorkflowSchema
     {
         /// <inheritdoc />

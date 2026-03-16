@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migrations
 {
     [DbContext(typeof(PromotionDbContext))]
-    [Migration("20260313211631_InitialPromotionSchema")]
+    [Migration("20260315201640_InitialPromotionSchema")]
     partial class InitialPromotionSchema
     {
         /// <inheritdoc />

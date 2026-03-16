@@ -3,12 +3,12 @@ using Npgsql;
 namespace NexTraceOne.ApiHost;
 
 /// <summary>
-/// Extension method para semear dados de desenvolvimento no banco de dados PostgreSQL.
+/// Extension method para semear dados de desenvolvimento nos bancos de dados PostgreSQL.
 /// Executado automaticamente em ambiente Development após as migrações.
 ///
-/// O script SQL é idempotente (usa ON CONFLICT DO NOTHING) e pode ser re-executado
-/// sem efeitos colaterais. Insere dados mockados em todas as tabelas dos módulos
-/// para permitir navegação completa no frontend com dados realistas.
+/// Cada módulo possui seu próprio ficheiro SQL de seed, executado contra a base de dados
+/// correspondente. Os scripts são idempotentes (ON CONFLICT DO NOTHING) e podem ser
+/// re-executados sem efeitos colaterais.
 ///
 /// Usuários criados:
 /// - admin@nextraceone.dev (PlatformAdmin) — senha: Admin@123
@@ -18,8 +18,17 @@ namespace NexTraceOne.ApiHost;
 /// </summary>
 public static class DevelopmentSeedDataExtensions
 {
+    private static readonly (string ConnectionStringName, string SqlFileName)[] SeedTargets =
+    [
+        ("IdentityDatabase", "seed-identity.sql"),
+        ("LicensingDatabase", "seed-licensing.sql"),
+        ("CatalogDatabase", "seed-catalog.sql"),
+        ("ChangeIntelligenceDatabase", "seed-changegovernance.sql"),
+        ("AuditDatabase", "seed-audit.sql"),
+    ];
+
     /// <summary>
-    /// Aplica o script SQL de seed data para desenvolvimento.
+    /// Aplica os scripts SQL de seed data para desenvolvimento, um por base de dados.
     /// Requer que as migrações já tenham sido executadas com sucesso.
     /// Ignora execução silenciosamente em ambientes que não sejam Development.
     /// </summary>
@@ -30,40 +39,47 @@ public static class DevelopmentSeedDataExtensions
 
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
         var configuration = app.Services.GetRequiredService<IConfiguration>();
-        var connectionString = configuration.GetConnectionString("NexTraceOne");
 
-        if (string.IsNullOrWhiteSpace(connectionString))
+        logger.LogInformation("Applying development seed data...");
+
+        foreach (var (connectionStringName, sqlFileName) in SeedTargets)
         {
-            logger.LogWarning("Connection string 'NexTraceOne' not configured. Skipping seed data.");
-            return;
+            var connectionString = configuration.GetConnectionString(connectionStringName);
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                logger.LogWarning("Connection string '{Name}' not configured. Skipping seed for {File}.",
+                    connectionStringName, sqlFileName);
+                continue;
+            }
+
+            var sqlPath = Path.Combine(AppContext.BaseDirectory, "SeedData", sqlFileName);
+
+            if (!File.Exists(sqlPath))
+            {
+                logger.LogWarning("Seed data file not found at {Path}. Skipping.", sqlPath);
+                continue;
+            }
+
+            try
+            {
+                var sql = await File.ReadAllTextAsync(sqlPath);
+
+                await using var connection = new NpgsqlConnection(connectionString);
+                await connection.OpenAsync();
+
+                await using var command = new NpgsqlCommand(sql, connection);
+                command.CommandTimeout = 60;
+                await command.ExecuteNonQueryAsync();
+
+                logger.LogInformation("Seed data applied for {Database}.", connectionStringName);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error applying seed data for {Database}.", connectionStringName);
+            }
         }
 
-        var sqlPath = Path.Combine(AppContext.BaseDirectory, "SeedData", "seed-development.sql");
-
-        if (!File.Exists(sqlPath))
-        {
-            logger.LogWarning("Seed data file not found at {Path}. Skipping.", sqlPath);
-            return;
-        }
-
-        try
-        {
-            logger.LogInformation("Applying development seed data...");
-
-            var sql = await File.ReadAllTextAsync(sqlPath);
-
-            await using var connection = new NpgsqlConnection(connectionString);
-            await connection.OpenAsync();
-
-            await using var command = new NpgsqlCommand(sql, connection);
-            command.CommandTimeout = 60;
-            await command.ExecuteNonQueryAsync();
-
-            logger.LogInformation("Development seed data applied successfully.");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error applying development seed data.");
-        }
+        logger.LogInformation("Development seed data process completed.");
     }
 }

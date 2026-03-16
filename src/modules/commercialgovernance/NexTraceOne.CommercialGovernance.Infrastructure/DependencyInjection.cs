@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.CommercialCatalog.Application.Abstractions;
 using NexTraceOne.Licensing.Application.Abstractions;
 using NexTraceOne.Licensing.Contracts.ServiceInterfaces;
 using NexTraceOne.Licensing.Infrastructure.Persistence;
@@ -41,6 +42,8 @@ public static class DependencyInjection
         services.AddScoped<IHardwareFingerprintProvider, HardwareFingerprintProvider>();
         services.AddScoped<ILicensingModule, LicensingModuleService>();
         services.AddScoped<ILicenseCapabilityChecker, LicenseCapabilityCheckerService>();
+        services.AddScoped<IPlanRepository, PlanRepository>();
+        services.AddScoped<IFeaturePackRepository, FeaturePackRepository>();
 
         return services;
     }

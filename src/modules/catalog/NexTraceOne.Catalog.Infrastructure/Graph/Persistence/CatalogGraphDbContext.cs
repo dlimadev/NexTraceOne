@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 
@@ -42,8 +43,15 @@ public sealed class CatalogGraphDbContext(
     /// <summary>Visões salvas do grafo com filtros e overlays persistidos.</summary>
     public DbSet<SavedGraphView> SavedGraphViews => Set<SavedGraphView>();
 
+    /// <summary>Referências vinculadas a ativos no Source of Truth.</summary>
+    public DbSet<LinkedReference> LinkedReferences => Set<LinkedReference>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CatalogGraphDbContext).Assembly;
+
+    /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.Catalog.Infrastructure.Graph";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

@@ -15,7 +15,7 @@ internal sealed class WorkflowDbContextDesignTimeFactory : IDesignTimeDbContextF
     {
         var optionsBuilder = new DbContextOptionsBuilder<WorkflowDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=ouro18";
+            ?? "Host=localhost;Port=5432;Database=nextraceone_changegovernance;Username=nextraceone;Password=ouro18";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(WorkflowDbContext).Assembly.FullName));

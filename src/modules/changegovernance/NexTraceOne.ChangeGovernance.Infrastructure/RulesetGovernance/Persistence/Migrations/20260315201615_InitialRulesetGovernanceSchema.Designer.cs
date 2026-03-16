@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Migrations
 {
     [DbContext(typeof(RulesetGovernanceDbContext))]
-    [Migration("20260313210313_InitialRulesetGovernanceSchema")]
+    [Migration("20260315201615_InitialRulesetGovernanceSchema")]
     partial class InitialRulesetGovernanceSchema
     {
         /// <inheritdoc />

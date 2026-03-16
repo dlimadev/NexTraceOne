@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.CommercialCatalog.Domain.Entities;
 using NexTraceOne.Licensing.Domain.Entities;
 
 namespace NexTraceOne.Licensing.Infrastructure.Persistence;
@@ -34,6 +35,15 @@ public sealed class LicensingDbContext(
 
     /// <summary>Registros de consentimento de telemetria por licença.</summary>
     public DbSet<TelemetryConsent> TelemetryConsents => Set<TelemetryConsent>();
+
+    /// <summary>Planos comerciais do subdomínio CommercialCatalog.</summary>
+    public DbSet<Plan> Plans => Set<Plan>();
+
+    /// <summary>Pacotes de funcionalidades do subdomínio CommercialCatalog.</summary>
+    public DbSet<FeaturePack> FeaturePacks => Set<FeaturePack>();
+
+    /// <summary>Itens de pacotes de funcionalidades do subdomínio CommercialCatalog.</summary>
+    public DbSet<FeaturePackItem> FeaturePackItems => Set<FeaturePackItem>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(LicensingDbContext).Assembly;

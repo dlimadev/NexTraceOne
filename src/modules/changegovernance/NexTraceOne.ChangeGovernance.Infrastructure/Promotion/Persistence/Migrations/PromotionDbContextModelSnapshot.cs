@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migrations
 {
     [DbContext(typeof(PromotionDbContext))]
     partial class PromotionDbContextModelSnapshot : ModelSnapshot

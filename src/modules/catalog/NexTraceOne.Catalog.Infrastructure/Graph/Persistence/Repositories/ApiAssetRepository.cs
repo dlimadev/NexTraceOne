@@ -17,7 +17,7 @@ internal sealed class ApiAssetRepository(CatalogGraphDbContext context)
     public async Task<ApiAsset?> GetByNameAndOwnerAsync(string name, ServiceAssetId ownerServiceId, CancellationToken cancellationToken)
         => await IncludeGraph(_context.ApiAssets)
             .SingleOrDefaultAsync(
-                asset => asset.Name == name && EF.Property<Guid>(asset, "OwnerServiceId") == ownerServiceId.Value,
+                asset => asset.Name == name && asset.OwnerService.Id == ownerServiceId,
                 cancellationToken);
 
     public async Task<IReadOnlyList<ApiAsset>> ListAllAsync(CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ internal sealed class ApiAssetRepository(CatalogGraphDbContext context)
 
     public async Task<IReadOnlyList<ApiAsset>> ListByServiceIdAsync(ServiceAssetId serviceId, CancellationToken cancellationToken)
         => await IncludeGraph(_context.ApiAssets)
-            .Where(asset => EF.Property<Guid>(asset, "OwnerServiceId") == serviceId.Value)
+            .Where(asset => asset.OwnerService.Id == serviceId)
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<ApiAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken)

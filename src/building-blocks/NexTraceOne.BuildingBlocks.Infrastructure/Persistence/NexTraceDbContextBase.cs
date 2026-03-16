@@ -21,6 +21,14 @@ public abstract class NexTraceDbContextBase(
     /// <summary>Assembly com as configurações IEntityTypeConfiguration deste DbContext.</summary>
     protected abstract System.Reflection.Assembly ConfigurationsAssembly { get; }
 
+    /// <summary>
+    /// Prefixo de namespace para filtrar configurações ao carregar de um assembly partilhado.
+    /// Quando múltiplos DbContexts partilham o mesmo assembly, cada um deve sobrescrever
+    /// esta propriedade para carregar apenas as suas configurações.
+    /// Se null, todas as configurações do assembly são carregadas.
+    /// </summary>
+    protected virtual string? ConfigurationsNamespace => null;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<OutboxMessage>(builder =>
@@ -35,7 +43,18 @@ public abstract class NexTraceDbContextBase(
             builder.HasIndex(x => x.ProcessedAt);
         });
 
-        modelBuilder.ApplyConfigurationsFromAssembly(ConfigurationsAssembly);
+        var ns = ConfigurationsNamespace;
+        if (ns is not null)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(
+                ConfigurationsAssembly,
+                type => type.Namespace is not null && type.Namespace.StartsWith(ns, StringComparison.Ordinal));
+        }
+        else
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(ConfigurationsAssembly);
+        }
+
         ApplyGlobalSoftDeleteFilter(modelBuilder);
 
         base.OnModelCreating(modelBuilder);

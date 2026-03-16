@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Configurations;
 
@@ -17,7 +18,7 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
         builder.Property(x => x.DisplayName).HasMaxLength(300).HasDefaultValue(string.Empty);
         builder.Property(x => x.Description).HasMaxLength(2000).HasDefaultValue(string.Empty);
-        builder.Property(x => x.ServiceType).HasConversion<string>().HasMaxLength(50).HasDefaultValue("RestApi");
+        builder.Property(x => x.ServiceType).HasConversion<string>().HasMaxLength(50).HasDefaultValue(ServiceType.RestApi);
         builder.Property(x => x.Domain).HasMaxLength(200).IsRequired();
         builder.Property(x => x.SystemArea).HasMaxLength(200).HasDefaultValue(string.Empty);
 
@@ -27,9 +28,9 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         builder.Property(x => x.BusinessOwner).HasMaxLength(200).HasDefaultValue(string.Empty);
 
         // ── Classificação ─────────────────────────────────────────────
-        builder.Property(x => x.Criticality).HasConversion<string>().HasMaxLength(50).HasDefaultValue("Medium");
-        builder.Property(x => x.LifecycleStatus).HasConversion<string>().HasMaxLength(50).HasDefaultValue("Active");
-        builder.Property(x => x.ExposureType).HasConversion<string>().HasMaxLength(50).HasDefaultValue("Internal");
+        builder.Property(x => x.Criticality).HasConversion<string>().HasMaxLength(50).HasDefaultValue(Criticality.Medium);
+        builder.Property(x => x.LifecycleStatus).HasConversion<string>().HasMaxLength(50).HasDefaultValue(LifecycleStatus.Active);
+        builder.Property(x => x.ExposureType).HasConversion<string>().HasMaxLength(50).HasDefaultValue(ExposureType.Internal);
 
         // ── Governança ────────────────────────────────────────────────
         builder.Property(x => x.DocumentationUrl).HasMaxLength(1000).HasDefaultValue(string.Empty);

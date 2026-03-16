@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.Workflow.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migrations
 {
     [DbContext(typeof(WorkflowDbContext))]
     partial class WorkflowDbContextModelSnapshot : ModelSnapshot

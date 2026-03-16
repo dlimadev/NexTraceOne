@@ -15,7 +15,7 @@ internal sealed class IdentityDbContextDesignTimeFactory : IDesignTimeDbContextF
     {
         var optionsBuilder = new DbContextOptionsBuilder<IdentityDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=ouro18";
+            ?? "Host=localhost;Port=5432;Database=nextraceone_identity;Username=nextraceone;Password=ouro18";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName));

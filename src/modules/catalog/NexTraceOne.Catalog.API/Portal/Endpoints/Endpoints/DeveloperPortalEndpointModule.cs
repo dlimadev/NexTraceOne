@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -61,13 +62,14 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/catalog/my-apis — APIs que o utilizador é dono
         group.MapGet("/catalog/my-apis", async (
-            Guid ownerId,
             int page,
             int pageSize,
+            ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            var ownerId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
                 new GetMyApisFeature.Query(ownerId, page, pageSize),
                 cancellationToken);
@@ -76,13 +78,14 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/catalog/consuming — APIs que o utilizador consome
         group.MapGet("/catalog/consuming", async (
-            Guid userId,
             int page,
             int pageSize,
+            ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            var userId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
                 new GetApisIConsumeFeature.Query(userId, page, pageSize),
                 cancellationToken);
@@ -172,11 +175,12 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/subscriptions — Listar subscrições do utilizador
         group.MapGet("/subscriptions", async (
-            Guid subscriberId,
+            ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            var subscriberId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
                 new GetSubscriptionsFeature.Query(subscriberId),
                 cancellationToken);
@@ -186,11 +190,12 @@ public sealed class DeveloperPortalEndpointModule
         // DELETE /api/v1/developerportal/subscriptions/{subscriptionId} — Remover subscrição
         group.MapDelete("/subscriptions/{subscriptionId:guid}", async (
             Guid subscriptionId,
-            Guid requesterId,
+            ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            var requesterId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
                 new DeleteSubscriptionFeature.Command(subscriptionId, requesterId),
                 cancellationToken);
@@ -212,13 +217,14 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/playground/history — Histórico de sessões do playground
         group.MapGet("/playground/history", async (
-            Guid userId,
             int page,
             int pageSize,
+            ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            var userId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
                 new GetPlaygroundHistoryFeature.Query(userId, page, pageSize),
                 cancellationToken);

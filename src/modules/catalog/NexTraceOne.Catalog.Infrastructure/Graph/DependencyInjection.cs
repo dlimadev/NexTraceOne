@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
@@ -46,6 +47,9 @@ public static class DependencyInjection
         services.AddScoped<IGraphSnapshotRepository, GraphSnapshotRepository>();
         services.AddScoped<INodeHealthRepository, NodeHealthRepository>();
         services.AddScoped<ISavedGraphViewRepository, SavedGraphViewRepository>();
+
+        // ── Repositório de Source of Truth ───────────────────────────────
+        services.AddScoped<ILinkedReferenceRepository, LinkedReferenceRepository>();
 
         // ── Integração cross-module via Contracts ────────────────────────
         services.AddScoped<ICatalogGraphModule, CatalogGraphModuleService>();
