@@ -11,6 +11,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
+import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -425,6 +426,25 @@ export function IncidentDetailPage() {
             </Card>
           )}
         </div>
+      </div>
+
+      {/* ── AI Assistant Panel ── */}
+      <div className="mt-6">
+        <AssistantPanel
+          contextType="incident"
+          contextId={incidentId!}
+          contextSummary={{
+            name: `${identity.reference} — ${identity.title}`,
+            description: identity.description,
+            status: identity.status,
+            additionalInfo: {
+              severity: identity.severity,
+              ...(ownerTeam ? { team: ownerTeam } : {}),
+              ...(impactedDomain ? { domain: impactedDomain } : {}),
+              ...(correlation.primaryChangeId ? { correlatedChange: correlation.primaryChangeId } : {}),
+            },
+          }}
+        />
       </div>
     </div>
   );

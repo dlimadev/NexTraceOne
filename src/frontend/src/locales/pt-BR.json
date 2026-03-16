@@ -3075,5 +3075,89 @@
       "approve": "Aprovar",
       "reject": "Rejeitar"
     }
+  },
+  "assistantPanel": {
+    "title": "Assistente IA",
+    "quickQuestions": "Perguntas rápidas",
+    "tryAsking": "Tente perguntar",
+    "suggestedActions": "Próximos passos sugeridos",
+    "contextHint": {
+      "service": "Pergunte sobre {{name}} — contratos, dependências, mudanças",
+      "contract": "Pergunte sobre {{name}} — versões, compatibilidade, consumidores",
+      "change": "Pergunte sobre {{name}} — risco, raio de impacto, rollback",
+      "incident": "Pergunte sobre {{name}} — causa raiz, mitigação, runbook"
+    },
+    "contextLabel": {
+      "service": "Serviço",
+      "contract": "Contrato",
+      "change": "Mudança",
+      "incident": "Incidente"
+    },
+    "welcome": {
+      "service": "Posso ajudá-lo a entender o serviço **{{name}}** — seus contratos, dependências, mudanças recentes e status operacional. Todas as respostas são fundamentadas na Fonte de Verdade do NexTraceOne.",
+      "contract": "Posso ajudá-lo a analisar o contrato **{{name}}** — suas versões, compatibilidade, consumidores e status de governança. Todas as respostas são fundamentadas no Registro de Contratos.",
+      "change": "Posso ajudá-lo a avaliar a mudança **{{name}}** — seu perfil de risco, raio de impacto, incidentes correlacionados e prontidão para rollback. Todas as respostas são fundamentadas em dados de Inteligência de Mudanças.",
+      "incident": "Posso ajudá-lo a investigar o incidente **{{name}}** — causas raiz potenciais, mudanças correlacionadas, passos de mitigação e runbooks aplicáveis. Todas as respostas são fundamentadas no Histórico de Incidentes e conhecimento operacional."
+    },
+    "placeholder": {
+      "service": "Pergunte sobre este serviço...",
+      "contract": "Pergunte sobre este contrato...",
+      "change": "Pergunte sobre esta mudança...",
+      "incident": "Pergunte sobre este incidente..."
+    },
+    "prompts": {
+      "service": {
+        "overview": "Qual é o status atual e visão geral de {{name}}?",
+        "contracts": "Quais contratos {{name}} expõe ou consome?",
+        "dependencies": "Quais são as dependências e consumidores de {{name}}?",
+        "recentChanges": "Quais mudanças recentes foram implantadas em {{name}}?"
+      },
+      "contract": {
+        "explain": "Explique a versão atual de {{name}} e seus endpoints principais",
+        "compatibility": "{{name}} é compatível com todos os consumidores registrados?",
+        "versionDiff": "O que mudou entre as últimas versões de {{name}}?",
+        "consumers": "Quais serviços consomem {{name}}?"
+      },
+      "change": {
+        "riskAnalysis": "Qual é a análise de risco de {{name}}?",
+        "blastRadius": "Qual é o raio de impacto de {{name}}?",
+        "rollback": "{{name}} é elegível para rollback?",
+        "correlatedIncidents": "Existem incidentes correlacionados com {{name}}?"
+      },
+      "incident": {
+        "rootCause": "Qual é a causa raiz provável de {{name}}?",
+        "mitigation": "Quais passos de mitigação devo tomar para {{name}}?",
+        "relatedChanges": "Quais mudanças recentes podem ter causado {{name}}?",
+        "runbook": "Existe um runbook aplicável a {{name}}?"
+      }
+    },
+    "actions": {
+      "viewContracts": "Ver contratos deste serviço",
+      "viewDependencies": "Ver grafo de dependências",
+      "viewRecentChanges": "Ver mudanças recentes",
+      "viewVersionHistory": "Ver histórico de versões",
+      "checkCompatibility": "Verificar compatibilidade do contrato",
+      "viewOwnerService": "Ver serviço proprietário",
+      "viewBlastRadius": "Ver detalhes do raio de impacto",
+      "correlateIncidents": "Correlacionar com incidentes",
+      "checkRollbackReadiness": "Verificar prontidão para rollback",
+      "findRunbook": "Encontrar runbook aplicável",
+      "correlateChanges": "Correlacionar com mudanças recentes",
+      "suggestMitigation": "Obter sugestões de mitigação"
+    },
+    "response": {
+      "serviceAnalysis": "Com base no Catálogo de Serviços e fontes relacionadas, aqui está a análise para",
+      "contractAnalysis": "Com base no Registro de Contratos e histórico de versões, aqui está a análise para",
+      "changeAnalysis": "Com base em Inteligência de Mudanças e dados correlacionados, aqui está a análise para",
+      "incidentAnalysis": "Com base no Histórico de Incidentes e conhecimento operacional, aqui está a análise para",
+      "additionalContext": "Contexto adicional",
+      "serviceGroundingNote": "Esta análise é fundamentada no Catálogo de Serviços, Registro de Contratos e Grafo de Dependências. Para investigação mais profunda, use as ações sugeridas abaixo.",
+      "contractGroundingNote": "Esta análise é fundamentada no Registro de Contratos e Histórico de Versões. Use as ações sugeridas para explorar compatibilidade ou detalhes dos consumidores.",
+      "changeGroundingNote": "Esta análise é fundamentada em dados de Inteligência de Mudanças e histórico de incidentes correlacionados. Use as ações sugeridas para avaliar raio de impacto ou elegibilidade para rollback.",
+      "incidentGroundingNote": "Esta análise é fundamentada no Histórico de Incidentes, mudanças correlacionadas e biblioteca de runbooks. Use as ações sugeridas para explorar opções de mitigação."
+    },
+    "meta": {
+      "contextualRouting": "Consulta roteada para modelo interno com fundamentação contextual do domínio relevante da Fonte de Verdade."
+    }
   }
 }

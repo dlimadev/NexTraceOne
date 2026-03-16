@@ -18,6 +18,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { serviceCatalogApi } from '../api';
 import { contractsApi } from '../api/contracts';
+import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 
 /** Variantes visuais para badges de criticidade. */
@@ -452,6 +453,24 @@ export function ServiceDetailPage() {
             </CardBody>
           </Card>
         </div>
+      </div>
+
+      {/* ── AI Assistant Panel ── */}
+      <div className="mt-6">
+        <AssistantPanel
+          contextType="service"
+          contextId={serviceId!}
+          contextSummary={{
+            name: service.displayName || service.name,
+            description: service.description,
+            status: service.lifecycleStatus,
+            additionalInfo: {
+              ...(service.criticality ? { criticality: service.criticality } : {}),
+              ...(service.teamName ? { team: service.teamName } : {}),
+              ...(service.domain ? { domain: service.domain } : {}),
+            },
+          }}
+        />
       </div>
     </div>
   );
