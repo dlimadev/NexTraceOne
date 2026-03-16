@@ -39,11 +39,32 @@ export interface ContextSummary {
   additionalInfo?: Record<string, string>;
 }
 
+/** Relação contextual entre entidades para grounding. */
+export interface ContextDataRelation {
+  relationType: string;
+  entityType: string;
+  name: string;
+  status?: string;
+  properties?: Record<string, string>;
+}
+
+/** Dados ricos da entidade para fundamentar respostas da IA. */
+export interface ContextData {
+  entityType: string;
+  entityName: string;
+  entityStatus?: string;
+  entityDescription?: string;
+  properties?: Record<string, string>;
+  relations?: ContextDataRelation[];
+  caveats?: string[];
+}
+
 /** Propriedades do AssistantPanel. */
 export interface AssistantPanelProps {
   contextType: AssistantContextType;
   contextId: string;
   contextSummary: ContextSummary;
+  contextData?: ContextData;
 }
 
 interface ChatMessage {
@@ -67,6 +88,10 @@ interface ChatMessage {
   sourceWeightingSummary?: string;
   escalationReason?: string;
   suggestedActions?: SuggestedAction[];
+  contextStrength?: string;
+  suggestedSteps?: string[];
+  caveats?: string[];
+  contextSummaryText?: string;
   timestamp: string;
 }
 
@@ -136,57 +161,124 @@ const contextScopeIcons: Record<AssistantContextType, React.ReactNode> = {
   incident: <AlertTriangle size={14} />,
 };
 
+// ── Context assessment constants ─────────────────────────────────────
+// Min property and relation counts to classify context richness.
+// These thresholds align with typical entity data: detail pages usually
+// provide 3-8 properties and 0-5 relation groups.
+const CONTEXT_STRONG_MIN_PROPS = 3;
+const CONTEXT_STRONG_MIN_RELS = 2;
+const CONTEXT_GOOD_MIN_PROPS = 3;
+const CONTEXT_GOOD_MIN_RELS = 1;
+const MAX_DISPLAYED_RELATIONS = 5;
+
 // ── Mock contextual response generator ──────────────────────────────
+
+function assessContextStrength(contextData?: ContextData): string {
+  if (!contextData) return 'none';
+  const propCount = Object.keys(contextData.properties ?? {}).length;
+  const relCount = (contextData.relations ?? []).length;
+  const hasCaveats = (contextData.caveats ?? []).length > 0;
+  if (propCount >= CONTEXT_STRONG_MIN_PROPS && relCount >= CONTEXT_STRONG_MIN_RELS && !hasCaveats) return 'strong';
+  if (propCount >= CONTEXT_GOOD_MIN_PROPS && relCount >= CONTEXT_GOOD_MIN_RELS) return 'good';
+  if (propCount >= 1 || relCount >= 1) return 'partial';
+  return 'weak';
+}
+
+function buildGroundedContent(
+  contextType: AssistantContextType,
+  contextData: ContextData,
+  t: (key: string) => string,
+): { content: string; suggestedSteps: string[]; contextSummaryText: string } {
+  const props = contextData.properties ?? {};
+  const relations = contextData.relations ?? [];
+  const lines: string[] = [];
+  let suggestedSteps: string[] = [];
+
+  lines.push(`${t(`assistantPanel.response.${contextType}Analysis`)} **${contextData.entityName}**${contextData.entityStatus ? ` (${contextData.entityStatus})` : ''}.`);
+
+  if (contextData.entityDescription) {
+    lines.push(`\n${contextData.entityDescription}`);
+  }
+
+  // Properties section
+  const propEntries = Object.entries(props);
+  if (propEntries.length > 0) {
+    lines.push(`\n**${t('assistantPanel.response.additionalContext')}:**`);
+    propEntries.forEach(([k, v]) => lines.push(`• ${k}: ${v}`));
+  }
+
+  // Relations section grouped by relationType
+  const relationGroups = new Map<string, ContextDataRelation[]>();
+  relations.forEach(r => {
+    const group = relationGroups.get(r.relationType) ?? [];
+    group.push(r);
+    relationGroups.set(r.relationType, group);
+  });
+
+  relationGroups.forEach((rels, groupName) => {
+    lines.push(`\n**${groupName}** (${rels.length}):`);
+    rels.slice(0, MAX_DISPLAYED_RELATIONS).forEach(r => {
+      const relProps = r.properties ? Object.entries(r.properties).map(([k, v]) => `${k}: ${v}`).join(', ') : '';
+      lines.push(`• ${r.name}${r.status ? ` [${r.status}]` : ''}${relProps ? ` — ${relProps}` : ''}`);
+    });
+    if (rels.length > MAX_DISPLAYED_RELATIONS) {
+      lines.push(`  … +${rels.length - MAX_DISPLAYED_RELATIONS} more`);
+    }
+  });
+
+  lines.push(`\n${t(`assistantPanel.response.${contextType}GroundingNote`)}`);
+
+  // Entity-specific suggested steps
+  switch (contextType) {
+    case 'service':
+      suggestedSteps = [
+        ...(relations.some(r => r.relationType === 'Contracts') ? [] : ['Review and register service contracts']),
+        ...(!props.team ? ['Assign team ownership'] : []),
+        ...(!props.criticality ? ['Define service criticality'] : []),
+      ];
+      break;
+    case 'contract':
+      suggestedSteps = [
+        ...(relations.some(r => r.relationType === 'Violations') ? ['Address contract violations'] : []),
+        ...(!props.version ? ['Set semantic version'] : []),
+        ...(contextData.entityStatus === 'Draft' ? ['Submit contract for review'] : []),
+      ];
+      break;
+    case 'change':
+      suggestedSteps = [
+        ...(props.validationStatus !== 'Validated' ? ['Complete validation checks'] : []),
+        ...(!props.advisory ? ['Wait for advisory recommendation'] : []),
+        ...(props.advisory === 'Reject' ? ['Address rejection factors before resubmission'] : []),
+      ];
+      break;
+    case 'incident':
+      suggestedSteps = [
+        ...(props.mitigationStatus !== 'Verified' ? ['Execute mitigation actions'] : []),
+        ...(!relations.some(r => r.relationType === 'Runbooks') ? ['Associate applicable runbooks'] : []),
+        ...(!relations.some(r => r.relationType === 'Correlated Changes') ? ['Investigate potential correlated changes'] : []),
+      ];
+      break;
+  }
+
+  const sourceLabels = contextGroundingSources[contextType];
+  const contextSummaryText = `${t('assistantPanel.groundedIn')} ${contextData.entityType}: ${contextData.entityName} (${sourceLabels.join(', ')})`;
+
+  return {
+    content: lines.join('\n'),
+    suggestedSteps: suggestedSteps.filter(Boolean),
+    contextSummaryText,
+  };
+}
 
 function generateContextualResponse(
   contextType: AssistantContextType,
   contextSummary: ContextSummary,
   _userMessage: string,
   t: (key: string) => string,
-): { content: string; useCaseType: string; sources: string[]; refs: string[]; confidence: string; weightSummary: string } {
+  contextData?: ContextData,
+): { content: string; useCaseType: string; sources: string[]; refs: string[]; confidence: string; weightSummary: string; contextStrength: string; suggestedSteps: string[]; caveats: string[]; contextSummaryText: string } {
   const sources = contextGroundingSources[contextType];
-
-  const baseInfo = contextSummary.additionalInfo
-    ? Object.entries(contextSummary.additionalInfo)
-        .map(([k, v]) => `${k}: ${v}`)
-        .join(', ')
-    : '';
-
-  const contextLabel = contextSummary.name;
-  const statusInfo = contextSummary.status ? ` (${contextSummary.status})` : '';
-  const descInfo = contextSummary.description ? ` — ${contextSummary.description}` : '';
-
-  let content: string;
-  let useCaseType: string;
-  let confidence: string;
-  let refs: string[];
-
-  switch (contextType) {
-    case 'service':
-      content = `${t('assistantPanel.response.serviceAnalysis')} **${contextLabel}**${statusInfo}${descInfo}. ${baseInfo ? `${t('assistantPanel.response.additionalContext')}: ${baseInfo}. ` : ''}${t('assistantPanel.response.serviceGroundingNote')}`;
-      useCaseType = 'ServiceLookup';
-      confidence = 'High';
-      refs = [`service:${contextLabel}`];
-      break;
-    case 'contract':
-      content = `${t('assistantPanel.response.contractAnalysis')} **${contextLabel}**${statusInfo}${descInfo}. ${baseInfo ? `${t('assistantPanel.response.additionalContext')}: ${baseInfo}. ` : ''}${t('assistantPanel.response.contractGroundingNote')}`;
-      useCaseType = 'ContractExplanation';
-      confidence = 'High';
-      refs = [`contract:${contextLabel}`];
-      break;
-    case 'change':
-      content = `${t('assistantPanel.response.changeAnalysis')} **${contextLabel}**${statusInfo}${descInfo}. ${baseInfo ? `${t('assistantPanel.response.additionalContext')}: ${baseInfo}. ` : ''}${t('assistantPanel.response.changeGroundingNote')}`;
-      useCaseType = 'ChangeAnalysis';
-      confidence = 'Medium';
-      refs = [`change:${contextLabel}`];
-      break;
-    case 'incident':
-      content = `${t('assistantPanel.response.incidentAnalysis')} **${contextLabel}**${statusInfo}${descInfo}. ${baseInfo ? `${t('assistantPanel.response.additionalContext')}: ${baseInfo}. ` : ''}${t('assistantPanel.response.incidentGroundingNote')}`;
-      useCaseType = 'IncidentExplanation';
-      confidence = 'Medium';
-      refs = [`incident:${contextLabel}`];
-      break;
-  }
+  const contextStrength = assessContextStrength(contextData);
 
   // Weight summary based on context type
   const weightMap: Record<AssistantContextType, string> = {
@@ -196,13 +288,62 @@ function generateContextualResponse(
     incident: 'IncidentHistory:35%,ChangeIntelligence:25%,RunbookLibrary:25%,ServiceCatalog:15%',
   };
 
+  const useCaseMap: Record<AssistantContextType, string> = {
+    service: 'ServiceLookup',
+    contract: 'ContractExplanation',
+    change: 'ChangeAnalysis',
+    incident: 'IncidentExplanation',
+  };
+
+  // Grounded response when contextData is available
+  if (contextData && contextStrength !== 'none') {
+    const { content, suggestedSteps, contextSummaryText } = buildGroundedContent(contextType, contextData, t);
+
+    const refs: string[] = [`${contextType}:${contextData.entityName}`];
+    (contextData.relations ?? []).forEach(r => {
+      refs.push(`${r.entityType}:${r.name}`);
+    });
+
+    const confidence = contextStrength === 'strong' || contextStrength === 'good' ? 'High' : 'Medium';
+
+    return {
+      content,
+      useCaseType: useCaseMap[contextType],
+      sources,
+      refs: refs.slice(0, 8),
+      confidence,
+      weightSummary: weightMap[contextType],
+      contextStrength,
+      suggestedSteps,
+      caveats: contextData.caveats ?? [],
+      contextSummaryText,
+    };
+  }
+
+  // Fallback: template-based response without rich context
+  // Low confidence + weak contextStrength: no entity data available, response is template-only
+  const contextLabel = contextSummary.name;
+  const statusInfo = contextSummary.status ? ` (${contextSummary.status})` : '';
+  const descInfo = contextSummary.description ? ` — ${contextSummary.description}` : '';
+  const baseInfo = contextSummary.additionalInfo
+    ? Object.entries(contextSummary.additionalInfo)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(', ')
+    : '';
+
+  const content = `${t(`assistantPanel.response.${contextType}Analysis`)} **${contextLabel}**${statusInfo}${descInfo}. ${baseInfo ? `${t('assistantPanel.response.additionalContext')}: ${baseInfo}. ` : ''}${t(`assistantPanel.response.${contextType}GroundingNote`)}`;
+
   return {
     content,
-    useCaseType,
+    useCaseType: useCaseMap[contextType],
     sources,
-    refs,
-    confidence,
+    refs: [`${contextType}:${contextLabel}`],
+    confidence: 'Low',
     weightSummary: weightMap[contextType],
+    contextStrength: 'weak',
+    suggestedSteps: [],
+    caveats: [t('assistantPanel.noContextWarning')],
+    contextSummaryText: '',
   };
 }
 
@@ -213,7 +354,7 @@ function generateContextualResponse(
  *
  * @see docs/AI-ASSISTED-OPERATIONS.md
  */
-export function AssistantPanel({ contextType, contextId, contextSummary }: AssistantPanelProps) {
+export function AssistantPanel({ contextType, contextId, contextSummary, contextData }: AssistantPanelProps) {
   const { t } = useTranslation();
   const { persona } = usePersona();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -301,6 +442,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary }: Assis
         persona,
         clientType: 'Web',
         ...contextPayload,
+        contextBundle: contextData ? JSON.stringify(contextData) : undefined,
       })
       .then(response => {
         const assistantMsg: ChatMessage = {
@@ -332,11 +474,12 @@ export function AssistantPanel({ contextType, contextId, contextSummary }: Assis
       .catch(() => {
         // Fallback: contextual mock response
         setTimeout(() => {
-          const { content, useCaseType, sources, refs, confidence, weightSummary } = generateContextualResponse(
+          const { content, useCaseType, sources, refs, confidence, weightSummary, contextStrength, suggestedSteps, caveats, contextSummaryText } = generateContextualResponse(
             contextType,
             contextSummary,
             text,
             t,
+            contextData,
           );
           const assistantMsg: ChatMessage = {
             id: `a-${Date.now()}`,
@@ -359,6 +502,10 @@ export function AssistantPanel({ contextType, contextId, contextSummary }: Assis
             sourceWeightingSummary: weightSummary,
             escalationReason: 'None',
             suggestedActions: suggestedActions,
+            contextStrength,
+            suggestedSteps,
+            caveats,
+            contextSummaryText,
             timestamp: new Date().toISOString(),
           };
           setMessages(prev => [...prev, assistantMsg]);
@@ -534,6 +681,21 @@ export function AssistantPanel({ contextType, contextId, contextSummary }: Assis
                       </div>
                     </Badge>
                   )}
+                  {msg.contextStrength && (
+                    <Badge
+                      variant={
+                        msg.contextStrength === 'strong'
+                          ? 'success'
+                          : msg.contextStrength === 'good'
+                            ? 'info'
+                            : msg.contextStrength === 'partial'
+                              ? 'warning'
+                              : 'default'
+                      }
+                    >
+                      {t(`assistantPanel.contextStrength.${msg.contextStrength}`)}
+                    </Badge>
+                  )}
                   <span className="text-[10px] text-faded">{formatTime(msg.timestamp)}</span>
                 </div>
               )}
@@ -573,6 +735,27 @@ export function AssistantPanel({ contextType, contextId, contextSummary }: Assis
                 </div>
               )}
 
+              {/* Context Summary */}
+              {msg.contextSummaryText && (
+                <div className="mt-1.5">
+                  <span className="text-[10px] text-muted italic">
+                    {t('assistantPanel.contextSummaryLabel')}: {msg.contextSummaryText}
+                  </span>
+                </div>
+              )}
+
+              {/* Caveats */}
+              {msg.caveats && msg.caveats.length > 0 && (
+                <div className="mt-2 p-2 rounded bg-amber-900/20 border border-amber-700/30">
+                  <span className="text-[10px] font-medium text-amber-300">{t('assistantPanel.caveatsLabel')}:</span>
+                  <ul className="mt-0.5 space-y-0.5">
+                    {msg.caveats.map((caveat, idx) => (
+                      <li key={idx} className="text-[10px] text-amber-200/80">• {caveat}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* Suggested Actions */}
               {msg.role === 'assistant' && msg.suggestedActions && msg.suggestedActions.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-edge">
@@ -597,6 +780,21 @@ export function AssistantPanel({ contextType, contextId, contextSummary }: Assis
                       </button>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Suggested Steps (from grounded response) */}
+              {msg.role === 'assistant' && msg.suggestedSteps && msg.suggestedSteps.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-edge">
+                  <div className="flex items-center gap-1 mb-1">
+                    <CheckCircle2 size={10} className="text-emerald-400" />
+                    <span className="text-[10px] font-medium text-muted">{t('assistantPanel.suggestedSteps')}</span>
+                  </div>
+                  <ul className="space-y-0.5">
+                    {msg.suggestedSteps.map((step, idx) => (
+                      <li key={idx} className="text-[10px] text-body pl-3">• {step}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
 

@@ -3174,6 +3174,18 @@
     },
     "meta": {
       "contextualRouting": "Query routed to internal model with contextual grounding from the relevant Source of Truth domain."
-    }
+    },
+    "contextStrength": {
+      "strong": "Strong Context",
+      "good": "Good Context",
+      "partial": "Partial Context",
+      "weak": "Limited Context",
+      "none": "No Context"
+    },
+    "contextSummaryLabel": "Scope consulted",
+    "suggestedSteps": "Recommended next steps",
+    "caveatsLabel": "Context limitations",
+    "noContextWarning": "Limited context available. Response may not reflect the current state of this entity.",
+    "groundedIn": "Analysis grounded in real entity data from"
   }
 }

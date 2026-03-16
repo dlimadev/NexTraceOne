@@ -3174,6 +3174,18 @@
     },
     "meta": {
       "contextualRouting": "Consulta encaminhada para modelo interno com fundamentação contextual do domínio relevante da Fonte de Verdade."
-    }
+    },
+    "contextStrength": {
+      "strong": "Contexto Forte",
+      "good": "Bom Contexto",
+      "partial": "Contexto Parcial",
+      "weak": "Contexto Limitado",
+      "none": "Sem Contexto"
+    },
+    "contextSummaryLabel": "Âmbito consultado",
+    "suggestedSteps": "Próximos passos recomendados",
+    "caveatsLabel": "Limitações de contexto",
+    "noContextWarning": "Contexto limitado disponível. A resposta pode não refletir o estado atual desta entidade.",
+    "groundedIn": "Análise fundamentada em dados reais da entidade de"
   }
 }

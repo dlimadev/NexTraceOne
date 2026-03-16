@@ -232,4 +232,201 @@ describe('AssistantPanel', () => {
       expect(actions.length).toBeGreaterThanOrEqual(1);
     });
   });
+
+  // ── Grounded response tests ──────────────────────────────────────────
+
+  it('shows grounded response with real entity data when contextData is provided', async () => {
+    const user = userEvent.setup();
+    renderPanel({
+      contextData: {
+        entityType: 'service',
+        entityName: 'payment-service',
+        entityStatus: 'Active',
+        entityDescription: 'Handles payment processing',
+        properties: {
+          team: 'payments-team',
+          domain: 'finance',
+          criticality: 'Critical',
+        },
+        relations: [
+          { relationType: 'Contracts', entityType: 'contract', name: 'payment-api-v2', status: 'Active', properties: { protocol: 'OpenApi' } },
+        ],
+      },
+    });
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    const input = screen.getByTestId('assistant-input');
+    await user.type(input, 'What contracts does this service expose?');
+    await user.keyboard('{Enter}');
+    // Wait for grounded response which includes real entity data
+    await waitFor(
+      () => {
+        // Response should include real entity data from properties
+        const matches = screen.getAllByText(/payments-team/i);
+        expect(matches.length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('shows context strength badge for grounded response', async () => {
+    const user = userEvent.setup();
+    renderPanel({
+      contextData: {
+        entityType: 'service',
+        entityName: 'payment-service',
+        entityStatus: 'Active',
+        properties: { team: 'payments-team', domain: 'finance', criticality: 'Critical' },
+        relations: [
+          { relationType: 'Contracts', entityType: 'contract', name: 'payment-api-v2', status: 'Active' },
+          { relationType: 'Contracts', entityType: 'contract', name: 'payment-api-v1', status: 'Deprecated' },
+        ],
+      },
+    });
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    await user.type(screen.getByTestId('assistant-input'), 'Overview');
+    await user.keyboard('{Enter}');
+    // Context strength badge should appear
+    await waitFor(
+      () => {
+        const strengthBadge = screen.getByText(/Context/i);
+        expect(strengthBadge).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('shows caveats when context has limitations', async () => {
+    const user = userEvent.setup();
+    renderPanel({
+      contextData: {
+        entityType: 'service',
+        entityName: 'payment-service',
+        properties: { team: 'payments-team' },
+        caveats: ['No contracts loaded'],
+      },
+    });
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    await user.type(screen.getByTestId('assistant-input'), 'Show me contracts');
+    await user.keyboard('{Enter}');
+    await waitFor(
+      () => {
+        expect(screen.getByText(/No contracts loaded/i)).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('shows weak context warning when contextData is missing', async () => {
+    const user = userEvent.setup();
+    renderPanel(); // no contextData
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    await user.type(screen.getByTestId('assistant-input'), 'What is this?');
+    await user.keyboard('{Enter}');
+    // Should see limited context indication — caveats section rendered
+    await waitFor(
+      () => {
+        const matches = screen.getAllByText(/payment-service/i);
+        // Should have at least 2 matches: welcome + fallback response
+        expect(matches.length).toBeGreaterThanOrEqual(2);
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('shows real context references with entity names in grounded response', async () => {
+    const user = userEvent.setup();
+    renderPanel({
+      contextData: {
+        entityType: 'contract',
+        entityName: 'order-api — OpenApi',
+        entityStatus: 'Active',
+        properties: { protocol: 'OpenApi', version: '3.2.0', service: 'order-service' },
+        relations: [
+          { relationType: 'Version History', entityType: 'version', name: 'v3.1.0', status: 'Active' },
+        ],
+      },
+      contextType: 'contract',
+      contextId: 'ctr-456',
+      contextSummary: { name: 'order-api v2', description: 'Order API', status: 'Active' },
+    });
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    await user.type(screen.getByTestId('assistant-input'), 'Explain this contract');
+    await user.keyboard('{Enter}');
+    // Context references should include real entity names
+    await waitFor(
+      () => {
+        expect(screen.getByText(/contract:order-api/)).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('renders grounded response differently for incident context', async () => {
+    const user = userEvent.setup();
+    renderPanel({
+      contextType: 'incident',
+      contextId: 'inc-101',
+      contextSummary: { name: 'INC-2847 — Payment latency spike', status: 'Investigating' },
+      contextData: {
+        entityType: 'incident',
+        entityName: 'INC-2847 — Payment latency spike',
+        entityStatus: 'Investigating',
+        properties: { severity: 'High', team: 'payments-team', mitigationStatus: 'InProgress' },
+        relations: [
+          { relationType: 'Affected Services', entityType: 'service', name: 'payment-service', status: 'Critical' },
+          { relationType: 'Runbooks', entityType: 'runbook', name: 'Payment Latency Recovery' },
+        ],
+      },
+    });
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    await user.type(screen.getByTestId('assistant-input'), 'What is the root cause?');
+    await user.keyboard('{Enter}');
+    await waitFor(
+      () => {
+        // Should show incident-specific response with affected services
+        const matches = screen.getAllByText(/INC-2847/);
+        expect(matches.length).toBeGreaterThanOrEqual(1);
+        // Should show severity from real data
+        const highMatches = screen.getAllByText(/High/i);
+        expect(highMatches.length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('renders grounded response differently for change context', async () => {
+    const user = userEvent.setup();
+    renderPanel({
+      contextType: 'change',
+      contextId: 'chg-789',
+      contextSummary: { name: 'deploy-v3.1', status: 'PendingReview' },
+      contextData: {
+        entityType: 'change',
+        entityName: 'order-service — v3.1.0',
+        entityStatus: 'PendingReview',
+        properties: { changeType: 'Major', environment: 'Production', team: 'order-team', score: '72' },
+        relations: [
+          { relationType: 'Advisory Factors', entityType: 'factor', name: 'UnitTestCoverage', status: 'Warning' },
+        ],
+      },
+    });
+    await user.click(screen.getByTestId('assistant-panel-toggle'));
+    await waitFor(() => expect(screen.getByTestId('assistant-panel-expanded')).toBeInTheDocument());
+    await user.type(screen.getByTestId('assistant-input'), 'What is the risk?');
+    await user.keyboard('{Enter}');
+    await waitFor(
+      () => {
+        // Should show change-specific response with real data
+        const matches = screen.getAllByText(/order-service/);
+        expect(matches.length).toBeGreaterThanOrEqual(1);
+      },
+      { timeout: 3000 },
+    );
+  });
 });

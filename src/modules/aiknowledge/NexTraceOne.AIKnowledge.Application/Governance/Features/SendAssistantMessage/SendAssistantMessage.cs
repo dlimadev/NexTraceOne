@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.AiGovernance.Application.Abstractions;
@@ -30,7 +31,30 @@ public static class SendAssistantMessage
         Guid? ContractId,
         Guid? IncidentId,
         Guid? TeamId,
-        Guid? DomainId) : ICommand<Response>;
+        Guid? DomainId,
+        string? ContextBundle = null) : ICommand<Response>;
+
+    /// <summary>
+    /// Bundle de contexto rico enviado pelo frontend com dados reais da entidade em análise.
+    /// Estrutura JSON com propriedades específicas por tipo de contexto (service, contract, change, incident).
+    /// Permite ao handler produzir respostas grounded sem necessidade de cross-module queries.
+    /// </summary>
+    public sealed record ContextBundleData(
+        string EntityType,
+        string EntityName,
+        string? EntityStatus,
+        string? EntityDescription,
+        Dictionary<string, string>? Properties,
+        List<ContextBundleRelation>? Relations,
+        List<string>? Caveats);
+
+    /// <summary>Relação com entidade associada dentro do context bundle.</summary>
+    public sealed record ContextBundleRelation(
+        string RelationType,
+        string EntityType,
+        string Name,
+        string? Status,
+        Dictionary<string, string>? Properties);
 
     /// <summary>Valida a entrada do comando de envio de mensagem.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -52,6 +76,8 @@ public static class SendAssistantMessage
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -128,16 +154,58 @@ public static class SendAssistantMessage
                 ? AIEscalationReason.None.ToString()
                 : AIEscalationReason.ComplexityRequiresAdvancedModel.ToString();
 
-            // ── Stub: gerar resposta da IA (LLM integration em evolução) ─
+            // ── Desserializar context bundle (se disponível) ──────────────
+            ContextBundleData? contextBundle = null;
+            var bundleParseError = false;
+            if (!string.IsNullOrWhiteSpace(request.ContextBundle))
+            {
+                try
+                {
+                    contextBundle = JsonSerializer.Deserialize<ContextBundleData>(
+                        request.ContextBundle, JsonOptions);
+                }
+                catch (JsonException)
+                {
+                    // Invalid JSON — proceed without bundle, flag for caveat
+                    bundleParseError = true;
+                }
+            }
+
+            // ── Gerar resposta grounded (com context bundle ou stub) ─────
             const int stubPromptTokens = 0;
             const int stubCompletionTokens = 0;
 
-            var stubResponse = GenerateStubResponse(request.Message, persona, useCaseType, groundingSources);
+            var (grounded, contextSummary, suggestedSteps, caveats, contextStrength) =
+                contextBundle is not null
+                    ? GenerateGroundedResponse(request.Message, persona, useCaseType, groundingSources, contextBundle)
+                    : (GenerateStubResponse(request.Message, persona, useCaseType, groundingSources),
+                       (string?)null, (List<string>?)null, (List<string>?)null, "none");
+
+            // Merge bundle caveats and context references
+            if (contextBundle is not null)
+            {
+                if (contextBundle.Relations is { Count: > 0 })
+                {
+                    foreach (var rel in contextBundle.Relations)
+                    {
+                        var refStr = $"{rel.EntityType}:{rel.Name}";
+                        if (!contextRefs.Contains(refStr))
+                            contextRefs.Add(refStr);
+                    }
+                }
+            }
+
+            // Add caveat if context bundle was provided but could not be parsed
+            if (bundleParseError)
+            {
+                caveats ??= [];
+                caveats.Add("Context bundle could not be parsed; response may lack entity-specific detail.");
+            }
 
             // ── Persistir mensagem do assistente ──────────────────────────
             var assistantMsg = AiMessage.AssistantMessage(
                 conversationId,
-                stubResponse,
+                grounded,
                 selectedModel,
                 selectedProvider,
                 isInternal: isInternal,
@@ -177,7 +245,7 @@ public static class SendAssistantMessage
             return new Response(
                 conversationId,
                 assistantMsg.Id.Value,
-                stubResponse,
+                grounded,
                 selectedModel,
                 selectedProvider,
                 IsInternalModel: isInternal,
@@ -189,11 +257,15 @@ public static class SendAssistantMessage
                 CorrelationId: correlationId,
                 UseCaseType: useCaseType.ToString(),
                 RoutingPath: routingPath.ToString(),
-                ConfidenceLevel: confidenceLevel,
+                ConfidenceLevel: contextBundle is not null ? "High" : confidenceLevel,
                 CostClass: costClass,
                 RoutingRationale: routingRationale,
                 SourceWeightingSummary: sourceWeightingSummary,
-                EscalationReason: escalationReason);
+                EscalationReason: escalationReason,
+                ContextSummary: contextSummary,
+                SuggestedNextSteps: suggestedSteps,
+                ContextCaveats: caveats,
+                ContextStrength: contextStrength);
         }
 
         /// <summary>
@@ -420,6 +492,125 @@ public static class SendAssistantMessage
                    "and source-weighted responses will be available in upcoming iterations. " +
                    "This response demonstrates the routing, enrichment and explainability framework.";
         }
+
+        /// <summary>
+        /// Gera resposta grounded com dados reais do context bundle.
+        /// O bundle contém informação real da entidade enviada pelo frontend.
+        /// </summary>
+        private static (string Response, string? ContextSummary, List<string>? Steps, List<string>? Caveats, string Strength)
+            GenerateGroundedResponse(
+                string message, string persona, AIUseCaseType useCaseType,
+                List<string> groundingSources, ContextBundleData bundle)
+        {
+            var parts = new List<string>();
+            var steps = new List<string>();
+            var caveats = new List<string>();
+            var contextProps = new List<string>();
+
+            // ── Entity identity ─────────────────────────────────────────
+            parts.Add($"**{bundle.EntityType}: {bundle.EntityName}**");
+            if (!string.IsNullOrWhiteSpace(bundle.EntityStatus))
+                parts.Add($"Status: {bundle.EntityStatus}");
+            if (!string.IsNullOrWhiteSpace(bundle.EntityDescription))
+                parts.Add(bundle.EntityDescription);
+
+            // ── Properties (real data) ──────────────────────────────────
+            if (bundle.Properties is { Count: > 0 })
+            {
+                var propLines = bundle.Properties
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Value))
+                    .Select(p => $"• {p.Key}: {p.Value}")
+                    .ToList();
+
+                if (propLines.Count > 0)
+                {
+                    parts.Add("\n" + string.Join("\n", propLines));
+                    foreach (var prop in bundle.Properties.Keys)
+                        contextProps.Add(prop);
+                }
+            }
+
+            // ── Relations (real cross-entity data) ──────────────────────
+            if (bundle.Relations is { Count: > 0 })
+            {
+                var grouped = bundle.Relations.GroupBy(r => r.RelationType);
+                foreach (var group in grouped)
+                {
+                    parts.Add($"\n**{group.Key}:**");
+                    foreach (var rel in group.Take(5))
+                    {
+                        var relInfo = $"• {rel.Name}";
+                        if (!string.IsNullOrWhiteSpace(rel.Status))
+                            relInfo += $" ({rel.Status})";
+                        if (rel.Properties is { Count: > 0 })
+                        {
+                            var extras = rel.Properties
+                                .Where(p => !string.IsNullOrWhiteSpace(p.Value))
+                                .Take(3)
+                                .Select(p => $"{p.Key}: {p.Value}");
+                            relInfo += " — " + string.Join(", ", extras);
+                        }
+                        parts.Add(relInfo);
+                    }
+                    if (group.Count() > 5)
+                        parts.Add($"  ... and {group.Count() - 5} more");
+                }
+            }
+
+            // ── Entity-specific next steps ──────────────────────────────
+            switch (bundle.EntityType.ToLowerInvariant())
+            {
+                case "service":
+                    steps.Add("Review associated contracts for compliance");
+                    steps.Add("Check dependency health and recent changes");
+                    steps.Add("Verify operational readiness and monitoring");
+                    break;
+                case "contract":
+                    steps.Add("Validate compatibility with registered consumers");
+                    steps.Add("Review version history for breaking changes");
+                    steps.Add("Verify ownership and governance status");
+                    break;
+                case "change":
+                    steps.Add("Assess blast radius and affected services");
+                    steps.Add("Validate evidence completeness before approval");
+                    steps.Add("Check for correlated incidents post-deployment");
+                    break;
+                case "incident":
+                    steps.Add("Correlate with recent changes and deployments");
+                    steps.Add("Review applicable runbooks and mitigation steps");
+                    steps.Add("Assess service dependencies and blast radius");
+                    break;
+            }
+
+            // ── Caveats ─────────────────────────────────────────────────
+            if (bundle.Caveats is { Count: > 0 })
+                caveats.AddRange(bundle.Caveats);
+
+            if (bundle.Relations is null || bundle.Relations.Count == 0)
+                caveats.Add("Limited cross-entity context available");
+
+            // ── Context strength assessment ──────────────────────────────
+            var propCount = bundle.Properties?.Count ?? 0;
+            var relCount = bundle.Relations?.Count ?? 0;
+            var strength = (propCount, relCount) switch
+            {
+                ( >= 3, >= 2) => "strong",
+                ( >= 2, >= 1) => "good",
+                ( >= 1, _) => "partial",
+                _ => "weak"
+            };
+
+            // ── Context summary ─────────────────────────────────────────
+            var contextSummary = $"Consulted: {bundle.EntityType} ({bundle.EntityName})"
+                + (contextProps.Count > 0 ? $" with {contextProps.Count} properties" : "")
+                + (relCount > 0 ? $", {relCount} related entities" : "")
+                + $". Sources: {string.Join(", ", groundingSources.Take(3))}";
+
+            // ── Grounding source note ───────────────────────────────────
+            parts.Add($"\n---\n*Grounded in {string.Join(", ", groundingSources.Take(3))}. Context strength: {strength}.*");
+
+            return (string.Join("\n", parts), contextSummary, steps, caveats, strength);
+        }
     }
 
     /// <summary>Resposta madura do envio de mensagem com metadados de roteamento e enriquecimento.</summary>
@@ -442,5 +633,9 @@ public static class SendAssistantMessage
         string CostClass,
         string RoutingRationale,
         string SourceWeightingSummary,
-        string EscalationReason);
+        string EscalationReason,
+        string? ContextSummary = null,
+        List<string>? SuggestedNextSteps = null,
+        List<string>? ContextCaveats = null,
+        string? ContextStrength = null);
 }
