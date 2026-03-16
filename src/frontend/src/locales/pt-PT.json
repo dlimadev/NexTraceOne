@@ -72,11 +72,8 @@
     "subtitle": "Fonte de verdade para serviços, contratos, mudanças e conhecimento operacional",
     "activeServices": "Serviços Ativos",
     "registeredApis": "APIs Registadas",
-    "consumerRelations": "Relações de Consumo",
     "totalContracts": "Total de Contratos",
-    "pendingApprovals": "Aprovações Pendentes",
     "recentServices": "Serviços Recentes",
-    "registeredApisTitle": "APIs Registadas",
     "noServices": "Nenhum serviço registado ainda",
     "noApis": "Nenhuma API registada ainda",
     "recentChanges": "Mudanças Recentes",
@@ -161,7 +158,11 @@
     "valueTracking": "Acompanhamento de Valor",
     "platformOperations": "Operações da Plataforma",
     "governancePacks": "Packs de Governança",
-    "waivers": "Exceções e Isenções"
+    "waivers": "Exceções e Isenções",
+    "sectionOrganization": "Organização",
+    "teams": "Equipas",
+    "domains": "Domínios",
+    "delegatedAdmin": "Admin Delegado"
   },
   "platformOps": {
     "title": "Operações da Plataforma",

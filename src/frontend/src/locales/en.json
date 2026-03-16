@@ -72,11 +72,8 @@
     "subtitle": "Source of truth for services, contracts, changes and operational knowledge",
     "activeServices": "Active Services",
     "registeredApis": "Registered APIs",
-    "consumerRelations": "Consumer Relations",
     "totalContracts": "Total Contracts",
-    "pendingApprovals": "Pending Approvals",
     "recentServices": "Recent Services",
-    "registeredApisTitle": "Registered APIs",
     "noServices": "No services registered yet",
     "noApis": "No APIs registered yet",
     "recentChanges": "Recent Changes",
@@ -161,7 +158,11 @@
     "valueTracking": "Value Tracking",
     "platformOperations": "Platform Operations",
     "governancePacks": "Governance Packs",
-    "waivers": "Waivers & Exceptions"
+    "waivers": "Waivers & Exceptions",
+    "sectionOrganization": "Organization",
+    "teams": "Teams",
+    "domains": "Domains",
+    "delegatedAdmin": "Delegated Admin"
   },
   "platformOps": {
     "title": "Platform Operations",

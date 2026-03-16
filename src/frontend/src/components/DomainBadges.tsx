@@ -21,7 +21,7 @@ function confidenceVariant(level: ConfidenceLevel): 'success' | 'warning' | 'dan
     case 'high': return 'success';
     case 'medium': return 'warning';
     case 'low': return 'danger';
-    default: return 'info';
+    case 'unknown': return 'info';
   }
 }
 
@@ -44,7 +44,7 @@ function compatibilityVariant(level: CompatibilityLevel): 'success' | 'danger' |
     case 'compatible': return 'success';
     case 'additive': return 'warning';
     case 'breaking': return 'danger';
-    default: return 'info';
+    case 'unknown': return 'info';
   }
 }
 
@@ -68,7 +68,7 @@ function riskVariant(level: RiskLevel): 'danger' | 'warning' | 'success' | 'info
     case 'high': return 'danger';
     case 'medium': return 'warning';
     case 'low': return 'success';
-    default: return 'info';
+    case 'none': return 'info';
   }
 }
 
@@ -91,7 +91,7 @@ function freshnessVariant(level: FreshnessLevel): 'success' | 'warning' | 'dange
     case 'fresh': return 'success';
     case 'stale': return 'warning';
     case 'outdated': return 'danger';
-    default: return 'info';
+    case 'unknown': return 'info';
   }
 }
 
@@ -114,7 +114,7 @@ function severityVariant(sev: IncidentSeverity): 'danger' | 'warning' | 'info' |
     case 'critical': return 'danger';
     case 'major': return 'warning';
     case 'minor': return 'info';
-    default: return 'default';
+    case 'informational': return 'default';
   }
 }
 
