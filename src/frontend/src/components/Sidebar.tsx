@@ -39,6 +39,8 @@ import {
   Building2,
   Boxes,
   ShieldPlus,
+  TrendingUp,
+  Target,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -105,6 +107,12 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
   { labelKey: 'sidebar.executiveFinOps', to: '/governance/finops/executive', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
+  // ── Analytics ──
+  { labelKey: 'sidebar.analyticsOverview', to: '/analytics', icon: <TrendingUp size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
+  { labelKey: 'sidebar.moduleAdoption', to: '/analytics/adoption', icon: <BarChart3 size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
+  { labelKey: 'sidebar.personaUsage', to: '/analytics/personas', icon: <Users size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
+  { labelKey: 'sidebar.journeyFunnels', to: '/analytics/journeys', icon: <Target size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
+  { labelKey: 'sidebar.valueTracking', to: '/analytics/value', icon: <Award size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
   // ── Integrations ──
   { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
   { labelKey: 'sidebar.ingestionExecutions', to: '/integrations/executions', icon: <Activity size={18} />, permission: 'integrations:read', section: 'integrations' },
@@ -131,6 +139,7 @@ const sectionLabels: Record<NavSection, string> = {
   operations: 'sidebar.sectionOperations',
   aiHub: 'sidebar.sectionAiHub',
   governance: 'sidebar.sectionGovernance',
+  analytics: 'sidebar.sectionAnalytics',
   integrations: 'sidebar.sectionIntegrations',
   admin: 'sidebar.sectionAdmin',
 };

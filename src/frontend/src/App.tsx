@@ -96,6 +96,13 @@ const ConnectorDetailPage = lazy(() => import('./features/integrations/pages/Con
 const IngestionExecutionsPage = lazy(() => import('./features/integrations/pages/IngestionExecutionsPage').then(m => ({ default: m.IngestionExecutionsPage })));
 const IngestionFreshnessPage = lazy(() => import('./features/integrations/pages/IngestionFreshnessPage').then(m => ({ default: m.IngestionFreshnessPage })));
 
+// ── Product Analytics (lazy) ──
+const ProductAnalyticsOverviewPage = lazy(() => import('./features/product-analytics/pages/ProductAnalyticsOverviewPage').then(m => ({ default: m.ProductAnalyticsOverviewPage })));
+const ModuleAdoptionPage = lazy(() => import('./features/product-analytics/pages/ModuleAdoptionPage').then(m => ({ default: m.ModuleAdoptionPage })));
+const PersonaUsagePage = lazy(() => import('./features/product-analytics/pages/PersonaUsagePage').then(m => ({ default: m.PersonaUsagePage })));
+const JourneyFunnelPage = lazy(() => import('./features/product-analytics/pages/JourneyFunnelPage').then(m => ({ default: m.JourneyFunnelPage })));
+const ValueTrackingPage = lazy(() => import('./features/product-analytics/pages/ValueTrackingPage').then(m => ({ default: m.ValueTrackingPage })));
+
 function PageLoader() {
   return (
     <div className="flex items-center justify-center h-full min-h-[50vh]">
@@ -468,6 +475,48 @@ export default function App() {
                 }
               />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+              {/* ── Product Analytics ── */}
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
+                    <ProductAnalyticsOverviewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics/adoption"
+                element={
+                  <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
+                    <ModuleAdoptionPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics/personas"
+                element={
+                  <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
+                    <PersonaUsagePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics/journeys"
+                element={
+                  <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
+                    <JourneyFunnelPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics/value"
+                element={
+                  <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
+                    <ValueTrackingPage />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -86,6 +86,9 @@ export type Permission =
   | 'governance:policies:read'
   | 'governance:evidence:read'
   | 'governance:controls:read'
+  // ── Product Analytics ──
+  | 'governance:analytics:read'
+  | 'governance:analytics:write'
   // ── Organization Governance ──
   | 'governance:teams:read'
   | 'governance:teams:write'
