@@ -78,7 +78,25 @@
     "recentServices": "Serviços Recentes",
     "registeredApisTitle": "APIs Registadas",
     "noServices": "Nenhum serviço registado ainda",
-    "noApis": "Nenhuma API registada ainda"
+    "noApis": "Nenhuma API registada ainda",
+    "recentChanges": "Mudanças Recentes",
+    "openIncidents": "Incidentes Abertos",
+    "contractHealth": "Saúde dos Contratos",
+    "contractDrafts": "Rascunhos",
+    "contractInReview": "Em Revisão",
+    "contractApproved": "Aprovados",
+    "contractDeprecated": "Depreciados",
+    "changeOverview": "Confiança em Mudanças",
+    "changePending": "Pendente",
+    "changeApproved": "Aprovadas",
+    "changeRejected": "Rejeitadas",
+    "incidentOverview": "Visão de Incidentes",
+    "incidentOpen": "Abertos",
+    "incidentMitigating": "Em Mitigação",
+    "incidentResolved": "Resolvidos",
+    "noChanges": "Nenhuma mudança registada ainda",
+    "noIncidents": "Nenhum incidente registado",
+    "noContracts": "Nenhum contrato importado ainda"
   },
   "sidebar": {
     "dashboard": "Painel",
@@ -697,7 +715,10 @@
     "violationRule": "Regra",
     "violationSeverity": "Severidade",
     "violations": "Violações",
-    "violationsTitle": "Violações de Regras"
+    "violationsTitle": "Violações de Regras",
+    "selectApiAsset": "Selecione um ativo de API…",
+    "selectApiAssetLabel": "Ativo de API:",
+    "selectApiAssetPrompt": "Selecione um ativo de API acima para visualizar o histórico de contratos."
   },
   "workflow": {
     "title": "Workflow e Aprovações",
@@ -3195,6 +3216,39 @@
       "noDecisionHistory": "Sem histórico de decisões",
       "noContractsLoaded": "Sem contratos carregados",
       "noVersionHistory": "Sem histórico de versões disponível"
+    }
+  },
+  "domainBadges": {
+    "confidence": {
+      "high": "Confiança Alta",
+      "medium": "Confiança Média",
+      "low": "Confiança Baixa",
+      "unknown": "Desconhecido"
+    },
+    "compatibility": {
+      "compatible": "Compatível",
+      "breaking": "Quebra de Contrato",
+      "additive": "Aditivo",
+      "unknown": "Desconhecido"
+    },
+    "risk": {
+      "critical": "Risco Crítico",
+      "high": "Risco Alto",
+      "medium": "Risco Médio",
+      "low": "Risco Baixo",
+      "none": "Sem Risco"
+    },
+    "freshness": {
+      "fresh": "Atualizado",
+      "stale": "Desatualizado",
+      "outdated": "Obsoleto",
+      "unknown": "Desconhecido"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "major": "Maior",
+      "minor": "Menor",
+      "informational": "Informativo"
     }
   }
 }

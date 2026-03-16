@@ -78,7 +78,25 @@
     "recentServices": "Recent Services",
     "registeredApisTitle": "Registered APIs",
     "noServices": "No services registered yet",
-    "noApis": "No APIs registered yet"
+    "noApis": "No APIs registered yet",
+    "recentChanges": "Recent Changes",
+    "openIncidents": "Open Incidents",
+    "contractHealth": "Contract Health",
+    "contractDrafts": "Drafts",
+    "contractInReview": "In Review",
+    "contractApproved": "Approved",
+    "contractDeprecated": "Deprecated",
+    "changeOverview": "Change Confidence",
+    "changePending": "Pending Review",
+    "changeApproved": "Approved",
+    "changeRejected": "Rejected",
+    "incidentOverview": "Incident Overview",
+    "incidentOpen": "Open",
+    "incidentMitigating": "Mitigating",
+    "incidentResolved": "Resolved",
+    "noChanges": "No changes recorded yet",
+    "noIncidents": "No incidents recorded",
+    "noContracts": "No contracts imported yet"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -697,7 +715,10 @@
     "violationRule": "Rule",
     "violationSeverity": "Severity",
     "violations": "Violations",
-    "violationsTitle": "Rule Violations"
+    "violationsTitle": "Rule Violations",
+    "selectApiAsset": "Select an API asset…",
+    "selectApiAssetLabel": "API Asset:",
+    "selectApiAssetPrompt": "Select an API asset above to view its contract history."
   },
   "workflow": {
     "title": "Workflow & Approvals",
@@ -3195,6 +3216,39 @@
       "noDecisionHistory": "No decision history",
       "noContractsLoaded": "No contracts loaded",
       "noVersionHistory": "No version history available"
+    }
+  },
+  "domainBadges": {
+    "confidence": {
+      "high": "High Confidence",
+      "medium": "Medium Confidence",
+      "low": "Low Confidence",
+      "unknown": "Unknown"
+    },
+    "compatibility": {
+      "compatible": "Compatible",
+      "breaking": "Breaking",
+      "additive": "Additive",
+      "unknown": "Unknown"
+    },
+    "risk": {
+      "critical": "Critical Risk",
+      "high": "High Risk",
+      "medium": "Medium Risk",
+      "low": "Low Risk",
+      "none": "No Risk"
+    },
+    "freshness": {
+      "fresh": "Fresh",
+      "stale": "Stale",
+      "outdated": "Outdated",
+      "unknown": "Unknown"
+    },
+    "severity": {
+      "critical": "Critical",
+      "major": "Major",
+      "minor": "Minor",
+      "informational": "Informational"
     }
   }
 }
