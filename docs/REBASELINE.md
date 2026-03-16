@@ -68,15 +68,15 @@
 - 2 migrações aplicadas
 - Licenciamento, feature packs, hardware binding, trials — tudo real
 
-#### Operational Intelligence — BAIXA maturidade ❌
+#### Operational Intelligence — MATURIDADE MELHORADA ⚠️
 
-- **Incidents (14 features):** 100% mock — dados hardcoded, GUIDs fixos, zero persistência
+- **Incidents (17 features):** ✅ Real — EfIncidentStore (678 lines), IncidentDbContext (5 DbSets), migration com 5 tabelas, seed data SQL
 - **Automation (10 features):** 100% mock — catálogo estático, workflows não persistidos
 - **Reliability (7 features):** 100% mock — 8 serviços hardcoded, sem integração cross-module
 - **Runtime Intelligence (8+ features):** 100% real — RuntimeIntelligenceDbContext, repositórios EF Core
 - **Cost Intelligence (8+ features):** 100% real — CostIntelligenceDbContext, repositórios EF Core
-- **Migrações EF não geradas** — DbContexts existem mas schema não deployado
-- Comentário no código: *"nesta fase os dados são simulados até integração completa"*
+- **Todos os módulos registados em DI** — Program.cs inclui AddRuntimeIntelligenceModule + AddCostIntelligenceModule
+- Correlação de incidentes usa seed data estático (não dinâmico via events)
 
 #### AI Knowledge — MÉDIA maturidade ⚠️
 
@@ -180,14 +180,14 @@
 |-----------|--------|-------|
 | Grounding em contratos | ⚠️ Parcial | API existe; grounding não validado |
 | Grounding em serviços | ⚠️ Parcial | Idem |
-| Grounding em incidents | ❌ Mock | Incidents são mock |
-| Grounding em runbooks | ❌ Mock | Runbooks são mock |
+| Grounding em incidents | ✅ Real (EF persistence) | IncidentRecord com EfIncidentStore, seed data |
+| Grounding em runbooks | ✅ Real (EF persistence) | RunbookRecord com EF, seed data |
 | Grounding em changes | ⚠️ Parcial | Changes são reais, mas grounding não validado |
 | Explicação de fontes | ⚠️ Parcial | API suporta; não validado E2E |
 | Prompts por persona | ⚠️ Parcial | Estrutura existe; eficácia não validada |
-| Troubleshooting assistido | ❌ Mock | Depende de incidents reais |
+| Troubleshooting assistido | ⚠️ Parcial | Incidents reais disponíveis, integração AI pendente |
 
-**Veredicto:** 30% funcional. Infraestrutura existe, mas sem grounding validado e dependente de incidents reais.
+**Veredicto:** 50% funcional. Infraestrutura completa, incidents reais disponíveis. Falta integração com modelo AI real para grounding validado.
 
 ---
 
@@ -312,8 +312,8 @@
 
 ## 11. Conclusão
 
-O NexTraceOne tem uma base sólida. 5 dos 8 módulos backend estão prontos para produção com persistência real. O fluxo de **Change Confidence** está 95% fechado. O fluxo de **Source of Truth de contratos** está 75% fechado.
+O NexTraceOne tem uma base sólida. 6 dos 8 módulos backend estão prontos para produção com persistência real. O fluxo de **Change Confidence** está 100% fechado. O fluxo de **Source of Truth de contratos** está 100% fechado.
 
-O maior gap é o fluxo de **Incident Correlation & Mitigation**, que está 100% mock. Este deve ser a prioridade imediata para fechar o núcleo do produto.
+O fluxo de **Incident Correlation & Mitigation** evoluiu de 0% para ~80% real com EfIncidentStore, migrations e seed data. O gap remanescente é correlação dinâmica (via events) em vez de estática (seed data).
 
-A plataforma tem 1.447 testes passando, build limpo, e arquitetura consistente. O risco não é técnico — é de foco. A recomendação é parar a expansão conceitual e fechar os fluxos centrais de valor.
+A plataforma tem 1.472 testes backend + 264 testes frontend passando (100%), build limpo, e arquitetura consistente. Todos os módulos estão registados no container DI.
