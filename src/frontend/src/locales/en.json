@@ -138,7 +138,9 @@
     "personaUsage": "Persona Usage",
     "journeyFunnels": "Journeys & Funnels",
     "valueTracking": "Value Tracking",
-    "platformOperations": "Platform Operations"
+    "platformOperations": "Platform Operations",
+    "governancePacks": "Governance Packs",
+    "waivers": "Waivers & Exceptions"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -2877,6 +2879,120 @@
       "FirstReportGenerated": "First Report Generated",
       "FirstReliabilityViewed": "First Reliability Viewed",
       "FirstAutomationCreated": "First Automation Created"
+    }
+  },
+  "governancePacks": {
+    "title": "Governance Packs",
+    "subtitle": "Reusable, versioned governance rule packs for enterprise-wide standardization",
+    "totalPacks": "Total Packs",
+    "published": "Published",
+    "draft": "Draft",
+    "deprecated": "Deprecated",
+    "searchPlaceholder": "Search packs...",
+    "filterAll": "All",
+    "scopes": "Scopes",
+    "rules": "Rules",
+    "status": {
+      "Draft": "Draft",
+      "Published": "Published",
+      "Deprecated": "Deprecated"
+    },
+    "category": {
+      "Contracts": "Contracts",
+      "SourceOfTruth": "Source of Truth",
+      "Changes": "Changes",
+      "Incidents": "Incidents",
+      "AIGovernance": "AI Governance",
+      "Reliability": "Reliability",
+      "Operations": "Operations"
+    },
+    "detail": {
+      "backToPacks": "Back to Packs",
+      "version": "Version",
+      "waiverCount": "Active Waivers",
+      "tabOverview": "Overview",
+      "tabRules": "Rules",
+      "tabScopes": "Scopes",
+      "tabVersions": "Versions",
+      "tabCoverage": "Coverage",
+      "tabWaivers": "Waivers",
+      "tabSimulation": "Simulation",
+      "overviewTitle": "Pack Overview",
+      "packName": "Pack Name",
+      "category": "Category",
+      "status": "Status",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "rulesTitle": "Included Rules",
+      "rulesDescription": "Rules enforced by this governance pack",
+      "enforcement": {
+        "Advisory": "Advisory",
+        "SoftEnforce": "Required",
+        "HardEnforce": "Blocking"
+      },
+      "scopesTitle": "Applied Scopes",
+      "scopesDescription": "Scopes where this pack is applied",
+      "scopeType": {
+        "Team": "Team",
+        "Domain": "Domain",
+        "Service": "Service",
+        "Environment": "Environment",
+        "Global": "Global"
+      },
+      "versionsTitle": "Version History",
+      "coverageTitle": "Coverage Summary",
+      "coverageDescription": "Compliance coverage by scope",
+      "waiversTitle": "Active Waivers",
+      "simulationTitle": "Simulation",
+      "simulationDescription": "Run a simulation to preview the impact of this pack before rollout",
+      "runSimulation": "Run Simulation",
+      "expiresAt": "Expires"
+    },
+    "simulation": {
+      "backToPack": "Back to Pack",
+      "title": "Pack Simulation",
+      "subtitle": "Preview the impact of applying this governance pack",
+      "totalAffected": "Total Affected",
+      "compliant": "Compliant",
+      "nonCompliant": "Non-Compliant",
+      "blockingImpacts": "Blocking Impacts",
+      "impactByTeam": "Impact by Team",
+      "affected": "Affected",
+      "blocking": "Blocking",
+      "impactByDomain": "Impact by Domain",
+      "impactedEntities": "Impacted Entities",
+      "impactedEntitiesDescription": "Detailed list of entities impacted by this simulation",
+      "entityName": "Entity Name",
+      "entityType": "Entity Type",
+      "currentStatus": "Current Status",
+      "projectedStatus": "Projected Status",
+      "blockingLabel": "Blocking",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "waivers": {
+      "title": "Waivers & Exceptions",
+      "subtitle": "Manage governance waivers, exceptions and temporary overrides with full audit trail",
+      "totalWaivers": "Total Waivers",
+      "pendingApproval": "Pending Approval",
+      "approved": "Approved",
+      "expired": "Expired",
+      "searchPlaceholder": "Search waivers...",
+      "filterAll": "All",
+      "status": {
+        "Pending": "Pending",
+        "Approved": "Approved",
+        "Rejected": "Rejected",
+        "Expired": "Expired",
+        "Revoked": "Revoked"
+      },
+      "listTitle": "Waiver List",
+      "listDescription": "All governance waivers and their current status",
+      "scope": "Scope",
+      "requestedBy": "Requested By",
+      "expiresAt": "Expires At",
+      "approve": "Approve",
+      "reject": "Reject"
     }
   }
 }
