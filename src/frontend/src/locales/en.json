@@ -131,7 +131,13 @@
     "sectionIntegrations": "Integrations",
     "integrationHub": "Integration Hub",
     "ingestionExecutions": "Ingestion Executions",
-    "ingestionFreshness": "Freshness & Health"
+    "ingestionFreshness": "Freshness & Health",
+    "sectionAnalytics": "Analytics",
+    "analyticsOverview": "Analytics Overview",
+    "moduleAdoption": "Module Adoption",
+    "personaUsage": "Persona Usage",
+    "journeyFunnels": "Journeys & Funnels",
+    "valueTracking": "Value Tracking"
   },
   "header": {
     "toggleLanguage": "Toggle language",
@@ -2736,5 +2742,89 @@
     "partialSuccess": "Partial Success",
     "backToHub": "Back to Integration Hub",
     "connectorNotFound": "Connector not found"
+  },
+  "analytics": {
+    "title": "Product Analytics",
+    "subtitle": "Adoption, value, friction and journey analytics across the platform",
+    "adoptionScore": "Adoption Score",
+    "valueScore": "Value Score",
+    "frictionScore": "Friction Score",
+    "uniqueUsers": "Unique Users",
+    "timeToFirstValue": "Time to First Value",
+    "timeToFirstValueDesc": "Average time from first login to first meaningful action",
+    "timeToCoreValue": "Time to Core Value",
+    "timeToCoreValueDesc": "Average time from first login to first complete workflow",
+    "topModules": "Top Modules by Usage",
+    "actions": "actions",
+    "users": "users",
+    "minutes": "min",
+    "trendImproving": "Improving",
+    "trendStable": "Stable",
+    "trendDeclining": "Declining",
+    "viewModuleAdoption": "Module Adoption",
+    "viewPersonaUsage": "Persona Usage",
+    "viewJourneys": "Journeys & Funnels",
+    "viewValueTracking": "Value Tracking",
+    "trend": {
+      "Improving": "Improving",
+      "Stable": "Stable",
+      "Declining": "Declining"
+    },
+    "adoption": {
+      "title": "Module Adoption",
+      "subtitle": "Adoption depth and usage patterns per module",
+      "searchPlaceholder": "Search modules or features...",
+      "depthScore": "Depth",
+      "noResults": "No modules found matching your search."
+    },
+    "persona": {
+      "title": "Persona Usage",
+      "subtitle": "Usage profiles, adoption depth and friction per persona",
+      "all": "All Personas",
+      "depth": "depth",
+      "topModules": "Top Modules",
+      "milestonesReached": "Milestones Reached",
+      "frictionPoints": "Friction Points",
+      "role": {
+        "Engineer": "Engineer",
+        "TechLead": "Tech Lead",
+        "Architect": "Architect",
+        "Product": "Product",
+        "Executive": "Executive",
+        "PlatformAdmin": "Platform Admin",
+        "Auditor": "Auditor"
+      }
+    },
+    "journey": {
+      "title": "Journeys & Funnels",
+      "subtitle": "Key product journeys with completion rates and drop-off analysis",
+      "all": "All Journeys",
+      "completion": "completion",
+      "biggestDropOff": "Biggest drop-off"
+    },
+    "value": {
+      "title": "Value Tracking",
+      "subtitle": "Time to value milestones and user progression through key product moments",
+      "avgCompletion": "Avg Completion",
+      "totalMilestones": "Total Milestones",
+      "milestoneProgress": "Milestone Progress"
+    },
+    "milestone": {
+      "FirstSearchSuccess": "First Search Success",
+      "FirstServiceLookup": "First Service Lookup",
+      "FirstContractView": "First Contract View",
+      "FirstContractDraftCreated": "First Contract Draft",
+      "FirstContractPublished": "First Contract Published",
+      "FirstAiUsefulInteraction": "First AI Useful Interaction",
+      "FirstIncidentInvestigation": "First Incident Investigation",
+      "FirstMitigationCompleted": "First Mitigation Completed",
+      "FirstExecutiveOverviewConsumed": "First Executive Overview",
+      "FirstRunbookConsulted": "First Runbook Consulted",
+      "FirstSourceOfTruthUsed": "First Source of Truth Used",
+      "FirstEvidenceExported": "First Evidence Exported",
+      "FirstReportGenerated": "First Report Generated",
+      "FirstReliabilityViewed": "First Reliability Viewed",
+      "FirstAutomationCreated": "First Automation Created"
+    }
   }
 }
