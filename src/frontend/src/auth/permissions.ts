@@ -94,6 +94,11 @@ export type Permission =
   | 'governance:teams:write'
   | 'governance:domains:read'
   | 'governance:domains:write'
+  // ── Governance Packs ──
+  | 'governance:packs:read'
+  | 'governance:packs:write'
+  | 'governance:waivers:read'
+  | 'governance:waivers:write'
   // ── Audit ──
   | 'audit:read'
   | 'audit:export'

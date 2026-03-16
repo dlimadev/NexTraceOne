@@ -41,6 +41,8 @@ import {
   ShieldPlus,
   TrendingUp,
   Target,
+  Package,
+  FileCheck,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -107,6 +109,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
   { labelKey: 'sidebar.executiveFinOps', to: '/governance/finops/executive', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
+  { labelKey: 'sidebar.governancePacks', to: '/governance/packs', icon: <Package size={18} />, permission: 'governance:packs:read' as Permission, section: 'governance' },
+  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <FileCheck size={18} />, permission: 'governance:waivers:read' as Permission, section: 'governance' },
   // ── Analytics ──
   { labelKey: 'sidebar.analyticsOverview', to: '/analytics', icon: <TrendingUp size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
   { labelKey: 'sidebar.moduleAdoption', to: '/analytics/adoption', icon: <BarChart3 size={18} />, permission: 'governance:analytics:read', section: 'analytics' },

@@ -138,7 +138,9 @@
     "personaUsage": "Uso por Persona",
     "journeyFunnels": "Jornadas e Funis",
     "valueTracking": "Acompanhamento de Valor",
-    "platformOperations": "Operações da Plataforma"
+    "platformOperations": "Operações da Plataforma",
+    "governancePacks": "Packs de Governança",
+    "waivers": "Exceções e Isenções"
   },
   "platformOps": {
     "title": "Operações da Plataforma",
@@ -2877,6 +2879,120 @@
       "FirstReportGenerated": "Primeiro Relatório Gerado",
       "FirstReliabilityViewed": "Primeira Vista de Confiabilidade",
       "FirstAutomationCreated": "Primeira Automação Criada"
+    }
+  },
+  "governancePacks": {
+    "title": "Packs de Governança",
+    "subtitle": "Packs reutilizáveis e versionados de regras de governança para padronização corporativa",
+    "totalPacks": "Total de Packs",
+    "published": "Publicados",
+    "draft": "Rascunho",
+    "deprecated": "Descontinuados",
+    "searchPlaceholder": "Pesquisar packs...",
+    "filterAll": "Todos",
+    "scopes": "Escopos",
+    "rules": "Regras",
+    "status": {
+      "Draft": "Rascunho",
+      "Published": "Publicado",
+      "Deprecated": "Descontinuado"
+    },
+    "category": {
+      "Contracts": "Contratos",
+      "SourceOfTruth": "Source of Truth",
+      "Changes": "Mudanças",
+      "Incidents": "Incidentes",
+      "AIGovernance": "Governança de IA",
+      "Reliability": "Confiabilidade",
+      "Operations": "Operações"
+    },
+    "detail": {
+      "backToPacks": "Voltar aos Packs",
+      "version": "Versão",
+      "waiverCount": "Isenções Ativas",
+      "tabOverview": "Visão Geral",
+      "tabRules": "Regras",
+      "tabScopes": "Escopos",
+      "tabVersions": "Versões",
+      "tabCoverage": "Cobertura",
+      "tabWaivers": "Isenções",
+      "tabSimulation": "Simulação",
+      "overviewTitle": "Visão Geral do Pack",
+      "packName": "Nome do Pack",
+      "category": "Categoria",
+      "status": "Status",
+      "createdAt": "Criado em",
+      "updatedAt": "Atualizado em",
+      "rulesTitle": "Regras Incluídas",
+      "rulesDescription": "Regras aplicadas por este pack de governança",
+      "enforcement": {
+        "Advisory": "Consultivo",
+        "SoftEnforce": "Obrigatório",
+        "HardEnforce": "Bloqueante"
+      },
+      "scopesTitle": "Escopos Aplicados",
+      "scopesDescription": "Escopos onde este pack está aplicado",
+      "scopeType": {
+        "Team": "Equipe",
+        "Domain": "Domínio",
+        "Service": "Serviço",
+        "Environment": "Ambiente",
+        "Global": "Global"
+      },
+      "versionsTitle": "Histórico de Versões",
+      "coverageTitle": "Resumo de Cobertura",
+      "coverageDescription": "Cobertura de conformidade por escopo",
+      "waiversTitle": "Isenções Ativas",
+      "simulationTitle": "Simulação",
+      "simulationDescription": "Execute uma simulação para visualizar o impacto deste pack antes do rollout",
+      "runSimulation": "Executar Simulação",
+      "expiresAt": "Expira em"
+    },
+    "simulation": {
+      "backToPack": "Voltar ao Pack",
+      "title": "Simulação do Pack",
+      "subtitle": "Visualize o impacto de aplicar este pack de governança",
+      "totalAffected": "Total Afetado",
+      "compliant": "Conforme",
+      "nonCompliant": "Não Conforme",
+      "blockingImpacts": "Impactos Bloqueantes",
+      "impactByTeam": "Impacto por Equipe",
+      "affected": "Afetados",
+      "blocking": "Bloqueantes",
+      "impactByDomain": "Impacto por Domínio",
+      "impactedEntities": "Entidades Impactadas",
+      "impactedEntitiesDescription": "Lista detalhada de entidades impactadas por esta simulação",
+      "entityName": "Nome da Entidade",
+      "entityType": "Tipo da Entidade",
+      "currentStatus": "Status Atual",
+      "projectedStatus": "Status Projetado",
+      "blockingLabel": "Bloqueante",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "waivers": {
+      "title": "Exceções e Isenções",
+      "subtitle": "Gerencie isenções de governança, exceções e sobrescritas temporárias com trilha de auditoria completa",
+      "totalWaivers": "Total de Isenções",
+      "pendingApproval": "Aprovação Pendente",
+      "approved": "Aprovadas",
+      "expired": "Expiradas",
+      "searchPlaceholder": "Pesquisar isenções...",
+      "filterAll": "Todos",
+      "status": {
+        "Pending": "Pendente",
+        "Approved": "Aprovada",
+        "Rejected": "Rejeitada",
+        "Expired": "Expirada",
+        "Revoked": "Revogada"
+      },
+      "listTitle": "Lista de Isenções",
+      "listDescription": "Todas as isenções de governança e seus status atuais",
+      "scope": "Escopo",
+      "requestedBy": "Solicitado por",
+      "expiresAt": "Expira em",
+      "approve": "Aprovar",
+      "reject": "Rejeitar"
     }
   }
 }

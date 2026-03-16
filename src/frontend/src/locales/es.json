@@ -138,7 +138,9 @@
     "personaUsage": "Uso por Persona",
     "journeyFunnels": "Jornadas y Embudos",
     "valueTracking": "Seguimiento de Valor",
-    "platformOperations": "Operaciones de la Plataforma"
+    "platformOperations": "Operaciones de la Plataforma",
+    "governancePacks": "Packs de Gobernanza",
+    "waivers": "Excepciones y Exenciones"
   },
   "platformOps": {
     "title": "Operaciones de la Plataforma",
@@ -2877,6 +2879,120 @@
       "FirstReportGenerated": "Primer Informe Generado",
       "FirstReliabilityViewed": "Primera Vista de Confiabilidad",
       "FirstAutomationCreated": "Primera Automatización Creada"
+    }
+  },
+  "governancePacks": {
+    "title": "Packs de Gobernanza",
+    "subtitle": "Packs reutilizables y versionados de reglas de gobernanza para estandarización empresarial",
+    "totalPacks": "Total de Packs",
+    "published": "Publicados",
+    "draft": "Borrador",
+    "deprecated": "Descontinuados",
+    "searchPlaceholder": "Buscar packs...",
+    "filterAll": "Todos",
+    "scopes": "Ámbitos",
+    "rules": "Reglas",
+    "status": {
+      "Draft": "Borrador",
+      "Published": "Publicado",
+      "Deprecated": "Descontinuado"
+    },
+    "category": {
+      "Contracts": "Contratos",
+      "SourceOfTruth": "Source of Truth",
+      "Changes": "Cambios",
+      "Incidents": "Incidentes",
+      "AIGovernance": "Gobernanza de IA",
+      "Reliability": "Fiabilidad",
+      "Operations": "Operaciones"
+    },
+    "detail": {
+      "backToPacks": "Volver a Packs",
+      "version": "Versión",
+      "waiverCount": "Exenciones Activas",
+      "tabOverview": "Visión General",
+      "tabRules": "Reglas",
+      "tabScopes": "Ámbitos",
+      "tabVersions": "Versiones",
+      "tabCoverage": "Cobertura",
+      "tabWaivers": "Exenciones",
+      "tabSimulation": "Simulación",
+      "overviewTitle": "Visión General del Pack",
+      "packName": "Nombre del Pack",
+      "category": "Categoría",
+      "status": "Estado",
+      "createdAt": "Creado el",
+      "updatedAt": "Actualizado el",
+      "rulesTitle": "Reglas Incluidas",
+      "rulesDescription": "Reglas aplicadas por este pack de gobernanza",
+      "enforcement": {
+        "Advisory": "Consultivo",
+        "SoftEnforce": "Obligatorio",
+        "HardEnforce": "Bloqueante"
+      },
+      "scopesTitle": "Ámbitos Aplicados",
+      "scopesDescription": "Ámbitos donde este pack está aplicado",
+      "scopeType": {
+        "Team": "Equipo",
+        "Domain": "Dominio",
+        "Service": "Servicio",
+        "Environment": "Entorno",
+        "Global": "Global"
+      },
+      "versionsTitle": "Historial de Versiones",
+      "coverageTitle": "Resumen de Cobertura",
+      "coverageDescription": "Cobertura de conformidad por ámbito",
+      "waiversTitle": "Exenciones Activas",
+      "simulationTitle": "Simulación",
+      "simulationDescription": "Ejecute una simulación para ver el impacto de este pack antes del despliegue",
+      "runSimulation": "Ejecutar Simulación",
+      "expiresAt": "Expira el"
+    },
+    "simulation": {
+      "backToPack": "Volver al Pack",
+      "title": "Simulación del Pack",
+      "subtitle": "Visualice el impacto de aplicar este pack de gobernanza",
+      "totalAffected": "Total Afectado",
+      "compliant": "Conforme",
+      "nonCompliant": "No Conforme",
+      "blockingImpacts": "Impactos Bloqueantes",
+      "impactByTeam": "Impacto por Equipo",
+      "affected": "Afectados",
+      "blocking": "Bloqueantes",
+      "impactByDomain": "Impacto por Dominio",
+      "impactedEntities": "Entidades Impactadas",
+      "impactedEntitiesDescription": "Lista detallada de entidades impactadas por esta simulación",
+      "entityName": "Nombre de Entidad",
+      "entityType": "Tipo de Entidad",
+      "currentStatus": "Estado Actual",
+      "projectedStatus": "Estado Proyectado",
+      "blockingLabel": "Bloqueante",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "waivers": {
+      "title": "Excepciones y Exenciones",
+      "subtitle": "Gestione exenciones de gobernanza, excepciones y anulaciones temporales con pista de auditoría completa",
+      "totalWaivers": "Total de Exenciones",
+      "pendingApproval": "Aprobación Pendiente",
+      "approved": "Aprobadas",
+      "expired": "Expiradas",
+      "searchPlaceholder": "Buscar exenciones...",
+      "filterAll": "Todos",
+      "status": {
+        "Pending": "Pendiente",
+        "Approved": "Aprobada",
+        "Rejected": "Rechazada",
+        "Expired": "Expirada",
+        "Revoked": "Revocada"
+      },
+      "listTitle": "Lista de Exenciones",
+      "listDescription": "Todas las exenciones de gobernanza y su estado actual",
+      "scope": "Ámbito",
+      "requestedBy": "Solicitado por",
+      "expiresAt": "Expira el",
+      "approve": "Aprobar",
+      "reject": "Rechazar"
     }
   }
 }
