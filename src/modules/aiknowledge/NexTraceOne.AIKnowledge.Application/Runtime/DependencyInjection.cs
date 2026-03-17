@@ -13,7 +13,8 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // MediatR handlers are auto-discovered by assembly scanning in the Governance DI
+        // MediatR handlers in this assembly are auto-discovered via AddMediatR assembly scanning
+        // registered in the module's root DependencyInjection (same assembly as Governance handlers).
         return services;
     }
 }

@@ -93,8 +93,12 @@ public static class ExecuteAiChat
 
             if (conversation is null)
             {
+                var title = request.Message.Length > 80
+                    ? string.Concat(request.Message.AsSpan(0, 77), "...")
+                    : request.Message;
+
                 conversation = AiAssistantConversation.Start(
-                    "AI Chat",
+                    title,
                     "default",
                     AIClientType.Web,
                     "general",
@@ -134,18 +138,18 @@ public static class ExecuteAiChat
             if (result.Success && result.Content is not null)
             {
                 var assistantMessage = AiMessage.AssistantMessage(
-                    conversation.Id.Value,
-                    result.Content,
-                    result.ModelId,
-                    result.ProviderId,
-                    resolvedModel.IsInternal,
-                    result.PromptTokens,
-                    result.CompletionTokens,
-                    null,
-                    string.Empty,
-                    string.Empty,
-                    correlationId,
-                    endTime);
+                    conversationId: conversation.Id.Value,
+                    content: result.Content,
+                    modelName: result.ModelId,
+                    provider: result.ProviderId,
+                    isInternal: resolvedModel.IsInternal,
+                    promptTokens: result.PromptTokens,
+                    completionTokens: result.CompletionTokens,
+                    appliedPolicyName: null,
+                    groundingSources: string.Empty,
+                    contextReferences: string.Empty,
+                    correlationId: correlationId,
+                    timestamp: endTime);
                 await messageRepository.AddAsync(assistantMessage, cancellationToken);
                 conversation.RecordMessage(result.ModelId, endTime);
             }
