@@ -16,6 +16,7 @@ using System.Threading.RateLimiting;
 using NexTraceOne.AIKnowledge.API.ExternalAI.Endpoints;
 using NexTraceOne.AIKnowledge.API.Governance.Endpoints;
 using NexTraceOne.AIKnowledge.API.Orchestration.Endpoints;
+using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
 using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Catalog.API.Contracts.Endpoints;
 using NexTraceOne.Catalog.API.Graph.Endpoints;
@@ -66,6 +67,7 @@ builder.Services.AddCostIntelligenceModule(builder.Configuration);
 builder.Services.AddAiGovernanceModule(builder.Configuration);
 builder.Services.AddExternalAiModule(builder.Configuration);
 builder.Services.AddAiOrchestrationModule(builder.Configuration);
+builder.Services.AddAiRuntimeModule(builder.Configuration);
 
 // [5] JSON — serialização de enums como strings para Minimal API
 builder.Services.ConfigureHttpJsonOptions(options =>

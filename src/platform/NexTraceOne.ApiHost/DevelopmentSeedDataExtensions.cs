@@ -25,6 +25,7 @@ public static class DevelopmentSeedDataExtensions
         ("ChangeIntelligenceDatabase", "seed-changegovernance.sql"),
         ("AuditDatabase", "seed-audit.sql"),
         ("IncidentDatabase", "seed-incidents.sql"),
+        ("AiGovernanceDatabase", "seed-aiknowledge.sql"),
     ];
 
     /// <summary>
