@@ -3,16 +3,19 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Building2, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Button } from '../../../components/Button';
+import { Button } from '../../../shared/ui';
 import { resolveApiError } from '../../../utils/apiErrors';
+import { AuthShell } from '../components/AuthShell';
+import { AuthCard } from '../components/AuthCard';
+import { AuthFeedback } from '../components/AuthFeedback';
 import type { TenantInfo } from '../../../types';
 
 /**
  * Página de seleção de tenant — exibida após login quando o usuário
  * possui múltiplos tenants ativos.
  *
+ * Usa AuthShell para manter consistência visual com o domínio de auth.
  * Apresenta lista amigável com nome, slug e papel do usuário em cada tenant.
- * Após seleção, emite novo JWT com contexto do tenant escolhido e redireciona ao dashboard.
  */
 export function TenantSelectionPage() {
   const { t } = useTranslation();
@@ -40,22 +43,17 @@ export function TenantSelectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas flex items-center justify-center p-4">
-      <div className="w-full max-w-lg animate-fade-in">
-        {/* Header */}
+    <AuthShell cardMaxWidth="max-w-lg">
+      <AuthCard>
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-accent/15 mb-4">
             <Building2 size={28} className="text-accent" />
           </div>
-          <h1 className="text-2xl font-bold text-heading">{t('tenants.selectTenant')}</h1>
+          <h2 className="text-2xl font-bold text-heading">{t('tenants.selectTenant')}</h2>
           <p className="text-muted mt-1">{t('tenants.selectTenantDescription')}</p>
         </div>
 
-        {error && (
-          <div className="mb-4 rounded-md bg-critical/10 border border-critical/30 px-4 py-3 text-sm text-critical">
-            {error}
-          </div>
-        )}
+        {error && <AuthFeedback variant="error" message={error} className="mb-4" />}
 
         {/* Tenant List */}
         <div className="space-y-3">
@@ -64,9 +62,9 @@ export function TenantSelectionPage() {
               key={tenant.id}
               onClick={() => handleSelect(tenant)}
               disabled={!tenant.isActive || loading !== null}
-              className={`w-full bg-card rounded-xl border px-6 py-4 flex items-center gap-4 text-left transition-all ${
+              className={`w-full bg-elevated rounded-xl border px-6 py-4 flex items-center gap-4 text-left transition-all duration-[var(--nto-motion-base)] ${
                 tenant.isActive
-                  ? 'border-edge hover:border-accent/40 hover:shadow-glow cursor-pointer'
+                  ? 'border-edge hover:border-accent/40 hover:shadow-glow-sm cursor-pointer'
                   : 'border-edge opacity-50 cursor-not-allowed'
               }`}
             >
@@ -103,7 +101,7 @@ export function TenantSelectionPage() {
             </Button>
           </div>
         )}
-      </div>
-    </div>
+      </AuthCard>
+    </AuthShell>
   );
 }

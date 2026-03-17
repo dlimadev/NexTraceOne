@@ -1,13 +1,14 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './contexts/AuthContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Eager imports — critical for fast first paint
-import { LoginPage, TenantSelectionPage } from './features/identity-access';
+import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, ActivationPage, MfaPage, InvitationPage } from './features/identity-access';
 
 // ── Identity-access (lazy) ──
 const UsersPage = lazy(() => import('./features/identity-access/pages/UsersPage').then(m => ({ default: m.UsersPage })));
@@ -140,6 +141,11 @@ export default function App() {
           <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/activate" element={<ActivationPage />} />
+            <Route path="/mfa" element={<MfaPage />} />
+            <Route path="/invitation" element={<InvitationPage />} />
             <Route path="/select-tenant" element={<TenantSelectionPage />} />
             <Route element={<AppLayout />}>
               {/* ── Home ── */}
@@ -595,6 +601,7 @@ export default function App() {
           </BrowserRouter>
         </PersonaProvider>
       </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider>
   );
 }

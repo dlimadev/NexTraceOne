@@ -249,7 +249,97 @@ body {
   background: var(--nto-gradient-accent);
 }
 
-/* ─── Skeleton Loader Utility ────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   Typography Scale — DESIGN-SYSTEM.md §2.3
+   Classes compostas de tipografia para uso direto em componentes e páginas.
+   Cada classe agrupa font-size, weight, line-height e letter-spacing.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.type-display-01 {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.type-display-02 {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.type-heading-01 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.type-heading-02 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.type-title-01 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.type-title-02 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.type-body-lg {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.type-body-md {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.type-body-sm {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.type-caption {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.type-mono-sm {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+  font-family: var(--font-mono);
+}
+
+.type-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.type-overline {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ─── Skeleton Shimmer ─────────────────────────────────────────────────────── */
 
 .skeleton {
   background: linear-gradient(
@@ -260,7 +350,6 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 10px;
 }
 
 /* ─── Reduced Motion ─────────────────────────────────────────────────────────── */

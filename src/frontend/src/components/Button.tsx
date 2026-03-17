@@ -2,7 +2,7 @@ import type { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '../lib/cn';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   children: ReactNode;
@@ -16,7 +16,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * - danger: fundo crítico translúcido, para ações destrutivas
  * - ghost: sem fundo, texto muted — hover revela superfície
  */
-const variantClasses: Record<string, string> = {
+const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary:
     'cta-gradient text-on-accent shadow-sm hover:brightness-110 hover:shadow-glow-sm disabled:opacity-40',
   secondary:
@@ -24,10 +24,12 @@ const variantClasses: Record<string, string> = {
   danger:
     'bg-critical/15 text-critical border border-critical/25 hover:bg-critical/20 disabled:opacity-40',
   ghost:
-    'text-muted hover:bg-hover hover:text-body',
+    'text-muted hover:bg-hover hover:text-body disabled:opacity-40',
+  subtle:
+    'bg-accent-muted text-body hover:bg-accent/15 hover:text-heading disabled:opacity-40',
 };
 
-const sizeClasses: Record<string, string> = {
+const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
   sm: 'h-9 px-4 text-sm',
   md: 'h-11 px-5 text-sm',
   lg: 'h-14 px-6 text-base font-bold',

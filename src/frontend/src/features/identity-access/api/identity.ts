@@ -45,6 +45,36 @@ export const identityApi = {
   changePassword: (currentPassword: string, newPassword: string) =>
     client.put('/identity/auth/password', { currentPassword, newPassword }),
 
+  // ── Password Recovery & Account Activation ─────────────────────
+  forgotPassword: (email: string) =>
+    client.post('/identity/auth/forgot-password', { email }),
+
+  resetPassword: (token: string, newPassword: string) =>
+    client.post('/identity/auth/reset-password', { token, newPassword }),
+
+  activateAccount: (token: string, password: string) =>
+    client.post('/identity/auth/activate', { token, password }),
+
+  // ── MFA ────────────────────────────────────────────────────────
+  verifyMfa: (code: string, sessionId: string) =>
+    client
+      .post<{ accessToken: string; refreshToken: string }>('/identity/auth/mfa/verify', { code, sessionId })
+      .then((r) => r.data),
+
+  resendMfaCode: (sessionId: string) =>
+    client.post('/identity/auth/mfa/resend', { sessionId }),
+
+  // ── Invitation ────────────────────────────────────────────────
+  getInvitationDetails: (token: string) =>
+    client
+      .get<{ email: string; organizationName: string; roleName: string; expiresAt: string }>(
+        `/identity/invitations/${encodeURIComponent(token)}`,
+      )
+      .then((r) => r.data),
+
+  acceptInvitation: (token: string, password: string) =>
+    client.post('/identity/invitations/accept', { token, password }),
+
   // ── OIDC / SSO ────────────────────────────────────────────────
   startOidcLogin: (provider = 'default', returnTo?: string) =>
     client

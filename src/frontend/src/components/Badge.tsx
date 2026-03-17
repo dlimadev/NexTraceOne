@@ -3,7 +3,7 @@ import { cn } from '../lib/cn';
 
 interface BadgeProps {
   children: ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
+  variant?: 'default' | 'neutral' | 'success' | 'warning' | 'danger' | 'info';
   className?: string;
 }
 
@@ -12,8 +12,9 @@ interface BadgeProps {
  * Radius pill, fundo translúcido tonal por variante semântica.
  * Altura: 24-28px, peso 500-600.
  */
-const variantClasses: Record<string, string> = {
+const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
   default: 'bg-elevated text-body',
+  neutral: 'bg-elevated text-body',
   success: 'bg-success/15 text-success',
   warning: 'bg-warning/15 text-warning',
   danger: 'bg-critical/15 text-critical',
