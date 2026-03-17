@@ -29,6 +29,11 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AIIDECapabilityPolicy> IdeCapabilityPolicies => Set<AIIDECapabilityPolicy>();
     public DbSet<AIRoutingDecision> RoutingDecisions => Set<AIRoutingDecision>();
     public DbSet<AIRoutingStrategy> RoutingStrategies => Set<AIRoutingStrategy>();
+    public DbSet<AiProvider> Providers => Set<AiProvider>();
+    public DbSet<AiSource> Sources => Set<AiSource>();
+    public DbSet<AiTokenQuotaPolicy> TokenQuotaPolicies => Set<AiTokenQuotaPolicy>();
+    public DbSet<AiTokenUsageLedger> TokenUsageLedger => Set<AiTokenUsageLedger>();
+    public DbSet<AiExternalInferenceRecord> ExternalInferenceRecords => Set<AiExternalInferenceRecord>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
