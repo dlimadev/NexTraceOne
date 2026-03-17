@@ -7,6 +7,7 @@ import { AppTopbar } from './AppTopbar';
 import { AppContentFrame } from './AppContentFrame';
 import { MobileDrawer } from './MobileDrawer';
 import { cn } from '../../lib/cn';
+import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
 
 export function AppShell() {
   const { isAuthenticated } = useAuth();
@@ -62,7 +63,7 @@ export function AppShell() {
           'flex-1 flex flex-col min-h-0 min-w-0',
           'transition-[margin] duration-[var(--nto-motion-medium)] ease-[var(--ease-standard)]',
         )}
-        style={{ marginLeft: sidebarCollapsed ? 64 : 272 }}
+        style={{ marginLeft: sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED }}
         data-testid="app-shell-main"
       >
         <AppTopbar

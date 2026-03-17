@@ -11,6 +11,7 @@ import { AppSidebarItem } from './AppSidebarItem';
 import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
+import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
 import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
   Shield, ClipboardList, BookOpen, AlertTriangle, Clock, UserCheck,
@@ -66,8 +67,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
   { labelKey: 'sidebar.executiveFinOps', to: '/governance/finops/executive', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance' },
-  { labelKey: 'sidebar.governancePacks', to: '/governance/packs', icon: <Package size={18} />, permission: 'governance:packs:read' as Permission, section: 'governance' },
-  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <FileCheck size={18} />, permission: 'governance:waivers:read' as Permission, section: 'governance' },
+  { labelKey: 'sidebar.governancePacks', to: '/governance/packs', icon: <Package size={18} />, permission: 'governance:packs:read', section: 'governance' },
+  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <FileCheck size={18} />, permission: 'governance:waivers:read', section: 'governance' },
   { labelKey: 'sidebar.analyticsOverview', to: '/analytics', icon: <TrendingUp size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
   { labelKey: 'sidebar.moduleAdoption', to: '/analytics/adoption', icon: <BarChart3 size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
   { labelKey: 'sidebar.personaUsage', to: '/analytics/personas', icon: <Users size={18} />, permission: 'governance:analytics:read', section: 'analytics' },
@@ -76,8 +77,9 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
   { labelKey: 'sidebar.ingestionExecutions', to: '/integrations/executions', icon: <Activity size={18} />, permission: 'integrations:read', section: 'integrations' },
   { labelKey: 'sidebar.ingestionFreshness', to: '/integrations/freshness', icon: <Gauge size={18} />, permission: 'integrations:read', section: 'integrations' },
-  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read' as Permission, section: 'organization' },
-  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Building2 size={18} />, permission: 'governance:domains:read' as Permission, section: 'organization' },
+  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read', section: 'organization' },
+  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Building2 size={18} />, permission: 'governance:domains:read', section: 'organization' },
+  // governance:delegated:read not yet in Permission type — cast until permission model is extended
   { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:delegated:read' as Permission, section: 'organization' },
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },
   { labelKey: 'sidebar.breakGlass', to: '/break-glass', icon: <AlertTriangle size={18} />, permission: 'identity:sessions:read', section: 'admin' },
@@ -145,7 +147,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         mobile && 'w-[272px]',
         className,
       )}
-      style={!mobile ? { width: collapsed ? 64 : 272 } : undefined}
+      style={!mobile ? { width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED } : undefined}
       role="navigation"
       aria-label={t('shell.sidebarNav')}
     >
