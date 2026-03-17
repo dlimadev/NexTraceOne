@@ -28,8 +28,6 @@ const ALLOWED_INTERNAL_PATHS = [
   '/operations',
   '/ai',
   '/governance',
-  '/licensing',
-  '/vendor',
   '/users',
   '/audit',
   '/break-glass',

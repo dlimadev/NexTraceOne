@@ -89,7 +89,6 @@ const paletteItems: PaletteItem[] = [
   { id: 'compliance', labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={16} />, group: 'commandPalette.governance', permission: 'governance:compliance:read' },
   { id: 'finops', labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={16} />, group: 'commandPalette.governance', permission: 'governance:finops:read' },
   // ── Admin ──
-  { id: 'licensing', labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={16} />, group: 'commandPalette.admin', permission: 'licensing:read' },
   { id: 'users', labelKey: 'sidebar.users', to: '/users', icon: <Users size={16} />, group: 'commandPalette.admin', permission: 'identity:users:read' },
   { id: 'audit', labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={16} />, group: 'commandPalette.admin', permission: 'audit:read' },
 ];

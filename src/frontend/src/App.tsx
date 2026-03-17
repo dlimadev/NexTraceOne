@@ -18,10 +18,6 @@ const AccessReviewPage = lazy(() => import('./features/identity-access/pages/Acc
 const MySessionsPage = lazy(() => import('./features/identity-access/pages/MySessionsPage').then(m => ({ default: m.MySessionsPage })));
 const UnauthorizedPage = lazy(() => import('./features/identity-access/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
 
-// ── Commercial-governance (lazy) ──
-const LicensingPage = lazy(() => import('./features/commercial-governance/pages/LicensingPage').then(m => ({ default: m.LicensingPage })));
-const VendorLicensingPage = lazy(() => import('./features/commercial-governance/pages/VendorLicensingPage').then(m => ({ default: m.VendorLicensingPage })));
-
 // ── Catalog (lazy) ──
 const ContractsPage = lazy(() => import('./features/catalog/pages/ContractsPage').then(m => ({ default: m.ContractsPage })));
 const ServiceCatalogPage = lazy(() => import('./features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
@@ -444,22 +440,6 @@ export default function App() {
                 }
               />
               {/* ── Admin ── */}
-              <Route
-                path="/licensing"
-                element={
-                  <ProtectedRoute permission="licensing:read" redirectTo="/unauthorized">
-                    <LicensingPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/vendor/licensing"
-                element={
-                  <ProtectedRoute permission="licensing:vendor:license:read" redirectTo="/unauthorized">
-                    <VendorLicensingPage />
-                  </ProtectedRoute>
-                }
-              />
               <Route
                 path="/users"
                 element={

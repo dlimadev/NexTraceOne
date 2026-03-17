@@ -2,7 +2,7 @@
  * Cliente API do Developer Portal — catálogo de APIs, subscriptions,
  * playground, geração de código e analytics.
  *
- * Segue o padrão dos demais módulos (promotion.ts, licensing.ts).
+ * Segue o padrão dos demais módulos (promotion.ts).
  * Todo acesso HTTP passa pelo client centralizado com interceptors de
  * autenticação e refresh token.
  */
