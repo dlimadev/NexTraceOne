@@ -68,7 +68,12 @@ export function Drawer({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[var(--z-modal)]">
+    <div
+      className="fixed inset-0 z-[var(--z-modal)]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'nto-drawer-title' : undefined}
+    >
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-overlay animate-fade-in"
@@ -91,7 +96,7 @@ export function Drawer({
         {(title || description) && (
           <div className="flex items-start justify-between gap-4 border-b border-divider px-6 py-4 shrink-0">
             <div>
-              {title && <h2 className="text-lg font-semibold text-heading">{title}</h2>}
+              {title && <h2 id="nto-drawer-title" className="text-lg font-semibold text-heading">{title}</h2>}
               {description && <p className="text-sm text-muted mt-1">{description}</p>}
             </div>
             <button

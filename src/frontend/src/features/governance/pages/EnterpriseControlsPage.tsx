@@ -7,6 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 import type {
   ControlDimensionDto, ControlsSummaryResponse, ControlDimensionType,
   MaturityLevelType, GovernanceTrendDirection,
@@ -110,7 +111,7 @@ export function EnterpriseControlsPage() {
   const overallColor = d.overallCoverage >= 80 ? 'text-success' : d.overallCoverage >= 60 ? 'text-amber-400' : 'text-critical';
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.controls.title')}</h1>
@@ -231,6 +232,6 @@ export function EnterpriseControlsPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

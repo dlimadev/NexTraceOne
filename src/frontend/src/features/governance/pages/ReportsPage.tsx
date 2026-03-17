@@ -10,6 +10,7 @@ import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { usePersona } from '../../../contexts/PersonaContext';
 import type { ReportsSummaryResponse } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Dados simulados de relatório executivo — alinhados com o backend GetReportsSummary.
@@ -78,7 +79,7 @@ export function ReportsPage() {
   const personaFocusKey = `governance.reports.${personaKey}.focus`;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="governance" />
 
@@ -270,6 +271,6 @@ export function ReportsPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

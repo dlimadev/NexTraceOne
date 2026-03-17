@@ -5,6 +5,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 type FreshnessStatus = 'Fresh' | 'Acceptable' | 'Stale' | 'Failed';
 type TrustLevel = 'Verified' | 'Trusted' | 'Provisional' | 'Untrusted';
@@ -102,7 +103,7 @@ export function IngestionFreshnessPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('integrations.freshnessTitle')}</h1>
@@ -207,6 +208,6 @@ export function IngestionFreshnessPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

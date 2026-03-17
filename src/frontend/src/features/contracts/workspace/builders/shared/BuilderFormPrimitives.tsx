@@ -28,21 +28,24 @@ export function Field({
   disabled?: boolean;
   mono?: boolean;
 }) {
+  const fieldId = `field-${label.toLowerCase().replace(/\s+/g, '-')}`;
   return (
     <div>
-      <label className="block text-[10px] font-medium text-muted mb-0.5">
+      <label htmlFor={fieldId} className="block text-[10px] font-medium text-muted mb-0.5">
         {label}
         {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       <input
+        id={fieldId}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
+        aria-invalid={error ? true : undefined}
         className={`${INPUT_CLASS} ${mono ? 'font-mono' : ''} ${error ? 'border-danger/50 focus:ring-danger' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
-      {error && <p className="text-[9px] text-danger mt-0.5">{error}</p>}
+      {error && <p className="text-[9px] text-danger mt-0.5" role="alert">{error}</p>}
     </div>
   );
 }
@@ -68,21 +71,24 @@ export function FieldArea({
   disabled?: boolean;
   mono?: boolean;
 }) {
+  const fieldId = `field-area-${label.toLowerCase().replace(/\s+/g, '-')}`;
   return (
     <div>
-      <label className="block text-[10px] font-medium text-muted mb-0.5">
+      <label htmlFor={fieldId} className="block text-[10px] font-medium text-muted mb-0.5">
         {label}
         {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       <textarea
+        id={fieldId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
         disabled={disabled}
+        aria-invalid={error ? true : undefined}
         className={`${INPUT_CLASS} resize-none ${mono ? 'font-mono' : ''} ${error ? 'border-danger/50 focus:ring-danger' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
-      {error && <p className="text-[9px] text-danger mt-0.5">{error}</p>}
+      {error && <p className="text-[9px] text-danger mt-0.5" role="alert">{error}</p>}
     </div>
   );
 }
@@ -102,15 +108,17 @@ export function FieldSelect<T extends string>({
   required?: boolean;
   disabled?: boolean;
 }) {
+  const fieldId = `field-select-${label.toLowerCase().replace(/\s+/g, '-')}`;
   const isObjectOptions = options.length > 0 && typeof options[0] === 'object';
 
   return (
     <div>
-      <label className="block text-[10px] font-medium text-muted mb-0.5">
+      <label htmlFor={fieldId} className="block text-[10px] font-medium text-muted mb-0.5">
         {label}
         {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       <select
+        id={fieldId}
         value={value}
         onChange={(e) => onChange(e.target.value as T)}
         disabled={disabled}
@@ -139,16 +147,18 @@ export function FieldCheckbox({
   onChange: (v: boolean) => void;
   disabled?: boolean;
 }) {
+  const fieldId = `field-checkbox-${label.toLowerCase().replace(/\s+/g, '-')}`;
   return (
     <div className="flex items-center gap-2">
       <input
+        id={fieldId}
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
         className="rounded border-edge accent-accent"
       />
-      <label className="text-xs text-muted">{label}</label>
+      <label htmlFor={fieldId} className="text-xs text-muted">{label}</label>
     </div>
   );
 }
@@ -178,20 +188,23 @@ export function FieldTagInput({
     onChange(tags.filter((t) => t !== tag));
   };
 
+  const fieldId = `field-tags-${label.toLowerCase().replace(/\s+/g, '-')}`;
+
   return (
     <div>
-      <label className="block text-[10px] font-medium text-muted mb-0.5">{label}</label>
+      <label htmlFor={fieldId} className="block text-[10px] font-medium text-muted mb-0.5">{label}</label>
       <div className="flex flex-wrap gap-1 mb-1">
         {tags.map((tag) => (
           <span key={tag} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] rounded bg-accent/10 text-accent border border-accent/20">
             {tag}
-            <button onClick={() => removeTag(tag)} className="hover:text-danger transition-colors">
+            <button onClick={() => removeTag(tag)} className="hover:text-danger transition-colors" aria-label={`Remove ${tag}`}>
               <X size={8} />
             </button>
           </span>
         ))}
       </div>
       <input
+        id={fieldId}
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}

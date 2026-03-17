@@ -6,6 +6,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer, PageSection } from '../../../components/shell';
 import type {
   ExecutiveOverviewResponse,
   RiskLevel,
@@ -108,198 +109,203 @@ export function ExecutiveOverviewPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.executive.overviewTitle')}</h1>
         <p className="text-muted mt-1">{t('governance.executive.overviewSubtitle')}</p>
       </div>
 
-      {/* Operational Trend */}
-      <Card className="mb-6">
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <TrendingUp size={16} className="text-accent" />
-            {t('governance.executive.operationalTrend')}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatCard
-              title={t('governance.executive.stabilityTrend')}
-              value={t(`governance.trend.${d.operationalTrend.stabilityTrend}`)}
-              icon={<Activity size={20} />}
-              color="text-accent"
-            />
-            <StatCard
-              title={t('governance.executive.incidentRateChange')}
-              value={`${d.operationalTrend.incidentRateChange}%`}
-              icon={<AlertTriangle size={20} />}
-              color={d.operationalTrend.incidentRateChange < 0 ? 'text-emerald-500' : 'text-critical'}
-            />
-            <StatCard
-              title={t('governance.executive.avgResolutionHours')}
-              value={`${d.operationalTrend.avgResolutionHours}h`}
-              icon={<Clock size={20} />}
-              color="text-accent"
-            />
-          </div>
-        </CardBody>
-      </Card>
+      {/* Stat Cards */}
+      <PageSection>
+          {/* Operational Trend */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <TrendingUp size={16} className="text-accent" />
+                {t('governance.executive.operationalTrend')}
+              </h2>
+            </CardHeader>
+            <CardBody>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StatCard
+                  title={t('governance.executive.stabilityTrend')}
+                  value={t(`governance.trend.${d.operationalTrend.stabilityTrend}`)}
+                  icon={<Activity size={20} />}
+                  color="text-accent"
+                />
+                <StatCard
+                  title={t('governance.executive.incidentRateChange')}
+                  value={`${d.operationalTrend.incidentRateChange}%`}
+                  icon={<AlertTriangle size={20} />}
+                  color={d.operationalTrend.incidentRateChange < 0 ? 'text-emerald-500' : 'text-critical'}
+                />
+                <StatCard
+                  title={t('governance.executive.avgResolutionHours')}
+                  value={`${d.operationalTrend.avgResolutionHours}h`}
+                  icon={<Clock size={20} />}
+                  color="text-accent"
+                />
+              </div>
+            </CardBody>
+          </Card>
 
-      {/* Risk Summary */}
-      <Card className="mb-6">
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <ShieldAlert size={16} className="text-accent" />
-            {t('governance.executive.riskSummary')}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
-              <p className="text-xs text-muted mb-1">{t('governance.executive.overallRisk')}</p>
-              <Badge variant={riskBadgeVariant(d.riskSummary.overallRisk)}>
-                {t(`governance.risk.level.${d.riskSummary.overallRisk}`)}
-              </Badge>
-            </div>
-            <StatCard
-              title={t('governance.executive.criticalDomains')}
-              value={d.riskSummary.criticalDomains}
-              icon={<AlertCircle size={20} />}
-              color="text-critical"
-            />
-            <StatCard
-              title={t('governance.executive.highRiskServices')}
-              value={d.riskSummary.highRiskServices}
-              icon={<AlertTriangle size={20} />}
-              color="text-orange-500"
-            />
-            <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
-              <p className="text-xs text-muted mb-1">{t('governance.executive.riskTrend')}</p>
-              <Badge variant={trendBadgeVariant(d.riskSummary.riskTrend)}>
-                {t(`governance.trend.${d.riskSummary.riskTrend}`)}
-              </Badge>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-
-      {/* Maturity Summary */}
-      <Card className="mb-6">
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <BarChart3 size={16} className="text-accent" />
-            {t('governance.executive.maturitySummary')}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {maturityItems.map(item => {
-              const barColor = item.value >= 80 ? 'bg-emerald-500' : item.value >= 60 ? 'bg-amber-500' : 'bg-critical';
-              return (
-                <div key={item.key}>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-xs text-muted">{t(`governance.executive.${item.key}`)}</p>
-                    <p className="text-xs font-medium text-heading">{item.value}%</p>
-                  </div>
-                  <div className="w-full bg-surface rounded-full h-2">
-                    <div
-                      className={`${barColor} rounded-full h-2 transition-all`}
-                      style={{ width: `${item.value}%` }}
-                    />
-                  </div>
+          {/* Risk Summary */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <ShieldAlert size={16} className="text-accent" />
+                {t('governance.executive.riskSummary')}
+              </h2>
+            </CardHeader>
+            <CardBody>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
+                  <p className="text-xs text-muted mb-1">{t('governance.executive.overallRisk')}</p>
+                  <Badge variant={riskBadgeVariant(d.riskSummary.overallRisk)}>
+                    {t(`governance.risk.level.${d.riskSummary.overallRisk}`)}
+                  </Badge>
                 </div>
-              );
-            })}
-          </div>
-        </CardBody>
-      </Card>
+                <StatCard
+                  title={t('governance.executive.criticalDomains')}
+                  value={d.riskSummary.criticalDomains}
+                  icon={<AlertCircle size={20} />}
+                  color="text-critical"
+                />
+                <StatCard
+                  title={t('governance.executive.highRiskServices')}
+                  value={d.riskSummary.highRiskServices}
+                  icon={<AlertTriangle size={20} />}
+                  color="text-orange-500"
+                />
+                <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
+                  <p className="text-xs text-muted mb-1">{t('governance.executive.riskTrend')}</p>
+                  <Badge variant={trendBadgeVariant(d.riskSummary.riskTrend)}>
+                    {t(`governance.trend.${d.riskSummary.riskTrend}`)}
+                  </Badge>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
 
-      {/* Change Safety */}
-      <Card className="mb-6">
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <RefreshCw size={16} className="text-accent" />
-            {t('governance.executive.changeSafety')}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard
-              title={t('governance.executive.safeChanges')}
-              value={d.changeSafetySummary.safeChanges}
-              icon={<CheckCircle size={20} />}
-              color="text-emerald-500"
-            />
-            <StatCard
-              title={t('governance.executive.riskyChanges')}
-              value={d.changeSafetySummary.riskyChanges}
-              icon={<AlertTriangle size={20} />}
-              color="text-orange-500"
-            />
-            <StatCard
-              title={t('governance.executive.rollbacks')}
-              value={d.changeSafetySummary.rollbacks}
-              icon={<RefreshCw size={20} />}
-              color="text-critical"
-            />
-            <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
-              <p className="text-xs text-muted mb-1">{t('governance.executive.confidenceTrend')}</p>
-              <Badge variant={trendBadgeVariant(d.changeSafetySummary.confidenceTrend)}>
-                {t(`governance.trend.${d.changeSafetySummary.confidenceTrend}`)}
-              </Badge>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
+          {/* Maturity Summary */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <BarChart3 size={16} className="text-accent" />
+                {t('governance.executive.maturitySummary')}
+              </h2>
+            </CardHeader>
+            <CardBody>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {maturityItems.map(item => {
+                  const barColor = item.value >= 80 ? 'bg-emerald-500' : item.value >= 60 ? 'bg-amber-500' : 'bg-critical';
+                  return (
+                    <div key={item.key}>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs text-muted">{t(`governance.executive.${item.key}`)}</p>
+                        <p className="text-xs font-medium text-heading">{item.value}%</p>
+                      </div>
+                      <div className="w-full bg-surface rounded-full h-2">
+                        <div
+                          className={`${barColor} rounded-full h-2 transition-all`}
+                          style={{ width: `${item.value}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardBody>
+          </Card>
 
-      {/* Incident Trend */}
-      <Card className="mb-6">
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <Activity size={16} className="text-accent" />
-            {t('governance.executive.incidentTrend')}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <StatCard
-              title={t('governance.executive.openIncidents')}
-              value={d.incidentTrendSummary.openIncidents}
-              icon={<AlertCircle size={20} />}
-              color="text-critical"
-            />
-            <StatCard
-              title={t('governance.executive.resolvedLast30Days')}
-              value={d.incidentTrendSummary.resolvedLast30Days}
-              icon={<CheckCircle size={20} />}
-              color="text-emerald-500"
-            />
-            <StatCard
-              title={t('governance.executive.avgResolutionHours')}
-              value={`${d.incidentTrendSummary.avgResolutionHours}h`}
-              icon={<Clock size={20} />}
-              color="text-accent"
-            />
-            <StatCard
-              title={t('governance.executive.recurrenceRate')}
-              value={`${d.incidentTrendSummary.recurrenceRate}%`}
-              icon={<RefreshCw size={20} />}
-              color="text-amber-500"
-            />
-            <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
-              <p className="text-xs text-muted mb-1">{t('governance.executive.incidentTrend')}</p>
-              <Badge variant={trendBadgeVariant(d.incidentTrendSummary.trend)}>
-                {t(`governance.trend.${d.incidentTrendSummary.trend}`)}
-              </Badge>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
+          {/* Change Safety */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <RefreshCw size={16} className="text-accent" />
+                {t('governance.executive.changeSafety')}
+              </h2>
+            </CardHeader>
+            <CardBody>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard
+                  title={t('governance.executive.safeChanges')}
+                  value={d.changeSafetySummary.safeChanges}
+                  icon={<CheckCircle size={20} />}
+                  color="text-emerald-500"
+                />
+                <StatCard
+                  title={t('governance.executive.riskyChanges')}
+                  value={d.changeSafetySummary.riskyChanges}
+                  icon={<AlertTriangle size={20} />}
+                  color="text-orange-500"
+                />
+                <StatCard
+                  title={t('governance.executive.rollbacks')}
+                  value={d.changeSafetySummary.rollbacks}
+                  icon={<RefreshCw size={20} />}
+                  color="text-critical"
+                />
+                <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
+                  <p className="text-xs text-muted mb-1">{t('governance.executive.confidenceTrend')}</p>
+                  <Badge variant={trendBadgeVariant(d.changeSafetySummary.confidenceTrend)}>
+                    {t(`governance.trend.${d.changeSafetySummary.confidenceTrend}`)}
+                  </Badge>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
 
-      {/* Critical Focus Areas */}
-      <Card className="mb-6">
+          {/* Incident Trend */}
+          <Card className="mb-6">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <Activity size={16} className="text-accent" />
+                {t('governance.executive.incidentTrend')}
+              </h2>
+            </CardHeader>
+            <CardBody>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <StatCard
+                  title={t('governance.executive.openIncidents')}
+                  value={d.incidentTrendSummary.openIncidents}
+                  icon={<AlertCircle size={20} />}
+                  color="text-critical"
+                />
+                <StatCard
+                  title={t('governance.executive.resolvedLast30Days')}
+                  value={d.incidentTrendSummary.resolvedLast30Days}
+                  icon={<CheckCircle size={20} />}
+                  color="text-emerald-500"
+                />
+                <StatCard
+                  title={t('governance.executive.avgResolutionHours')}
+                  value={`${d.incidentTrendSummary.avgResolutionHours}h`}
+                  icon={<Clock size={20} />}
+                  color="text-accent"
+                />
+                <StatCard
+                  title={t('governance.executive.recurrenceRate')}
+                  value={`${d.incidentTrendSummary.recurrenceRate}%`}
+                  icon={<RefreshCw size={20} />}
+                  color="text-amber-500"
+                />
+                <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
+                  <p className="text-xs text-muted mb-1">{t('governance.executive.incidentTrend')}</p>
+                  <Badge variant={trendBadgeVariant(d.incidentTrendSummary.trend)}>
+                    {t(`governance.trend.${d.incidentTrendSummary.trend}`)}
+                  </Badge>
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+      </PageSection>
+
+      {/* Critical Focus Areas & Domains */}
+      <PageSection>
+        {/* Critical Focus Areas */}
+        <Card className="mb-6">
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
             <Target size={16} className="text-accent" />
@@ -326,34 +332,35 @@ export function ExecutiveOverviewPage() {
             ))}
           </div>
         </CardBody>
-      </Card>
+        </Card>
 
-      {/* Top Domains Requiring Attention */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <ShieldAlert size={16} className="text-accent" />
-            {t('governance.executive.topDomainsAttention')}
-          </h2>
-        </CardHeader>
-        <CardBody className="p-0">
-          <div className="divide-y divide-edge">
-            {d.topDomainsRequiringAttention.map(domain => (
-              <div key={domain.domainId} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium text-heading">{domain.domainName}</span>
-                    <Badge variant={riskBadgeVariant(domain.riskLevel)}>
-                      {t(`governance.risk.level.${domain.riskLevel}`)}
-                    </Badge>
+        {/* Top Domains Requiring Attention */}
+        <Card>
+          <CardHeader>
+            <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+              <ShieldAlert size={16} className="text-accent" />
+              {t('governance.executive.topDomainsAttention')}
+            </h2>
+          </CardHeader>
+          <CardBody className="p-0">
+            <div className="divide-y divide-edge">
+              {d.topDomainsRequiringAttention.map(domain => (
+                <div key={domain.domainId} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium text-heading">{domain.domainName}</span>
+                      <Badge variant={riskBadgeVariant(domain.riskLevel)}>
+                        {t(`governance.risk.level.${domain.riskLevel}`)}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted">{domain.reason}</p>
                   </div>
-                  <p className="text-xs text-muted">{domain.reason}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
-    </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      </PageSection>
+    </PageContainer>
   );
 }

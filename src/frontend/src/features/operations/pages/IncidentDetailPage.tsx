@@ -12,6 +12,7 @@ import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ export function IncidentDetailPage() {
   // Loading state
   if (detailQuery.isLoading) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
           <ArrowLeft size={14} /> {t('incidents.detail.backToList')}
         </NavLink>
@@ -91,7 +92,7 @@ export function IncidentDetailPage() {
             </div>
           </CardBody>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -179,6 +180,7 @@ export function IncidentDetailPage() {
         </div>
       </div>
 
+      <PageSection>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column */}
         <div className="space-y-6">
@@ -427,6 +429,7 @@ export function IncidentDetailPage() {
           )}
         </div>
       </div>
+      </PageSection>
 
       {/* ── AI Assistant Panel ── */}
       <div className="mt-6">

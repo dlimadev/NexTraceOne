@@ -7,6 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Tipos locais para simulação de Governance Pack — alinhados com o backend SimulateGovernancePack.
@@ -78,7 +79,7 @@ export function PackSimulationPage() {
   const sim = mockSimulation;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Back navigation */}
       <Link
         to={`/governance/packs/${packId ?? sim.packId}`}
@@ -208,6 +209,6 @@ export function PackSimulationPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

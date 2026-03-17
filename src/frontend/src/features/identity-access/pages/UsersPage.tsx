@@ -7,6 +7,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 /**
  * Página de gestão de usuários do módulo Identity.
@@ -40,7 +41,7 @@ export function UsersPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('users.title')}</h1>
@@ -53,6 +54,7 @@ export function UsersPage() {
 
       {/* Formulário de criação de usuário */}
       {showForm && (
+        <PageSection>
         <Card className="mb-6">
           <CardHeader><h2 className="font-semibold text-heading">{t('users.createNewUser')}</h2></CardHeader>
           <CardBody>
@@ -103,9 +105,11 @@ export function UsersPage() {
             </form>
           </CardBody>
         </Card>
+        </PageSection>
       )}
 
       {/* Tabela de usuários do tenant */}
+      <PageSection>
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -159,6 +163,7 @@ export function UsersPage() {
           )}
         </div>
       </Card>
-    </div>
+      </PageSection>
+    </PageContainer>
   );
 }

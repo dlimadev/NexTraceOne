@@ -7,6 +7,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { workflowApi } from '../api';
 import type { WorkflowInstance } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 type InstanceStatus = WorkflowInstance['status'];
 
@@ -64,7 +65,7 @@ export function WorkflowPage() {
   const pending = instances?.items?.filter((i) => i.status === 'Pending' || i.status === 'InProgress') ?? [];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('workflow.title')}</h1>
         <p className="text-muted mt-1">{t('workflow.subtitle')}</p>
@@ -271,6 +272,6 @@ export function WorkflowPage() {
           </div>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

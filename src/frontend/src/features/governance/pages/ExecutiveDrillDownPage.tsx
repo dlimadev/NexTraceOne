@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { PageContainer } from '../../../components/shell';
 import type {
   ExecutiveDrillDownResponse,
   RiskLevel,
@@ -101,7 +102,7 @@ export function ExecutiveDrillDownPage() {
   const d = mockDrillDown;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">
@@ -231,6 +232,6 @@ export function ExecutiveDrillDownPage() {
           </ol>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

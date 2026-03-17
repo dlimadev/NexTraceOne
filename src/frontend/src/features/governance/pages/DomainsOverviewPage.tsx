@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 type Criticality = 'Critical' | 'High' | 'Medium' | 'Low';
@@ -62,36 +63,38 @@ export function DomainsOverviewPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <ModuleHeader
         titleKey="organization.domains.title"
         subtitleKey="organization.domains.subtitle"
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('organization.domains.totalDomains')} value={mockDomains.length} icon={<Globe size={20} />} color="text-accent" />
-        <StatCard title={t('organization.domains.totalTeams')} value={totalTeams} icon={<Users size={20} />} color="text-blue-500" />
-        <StatCard title={t('organization.domains.totalServices')} value={totalServices} icon={<Server size={20} />} color="text-success" />
-        <StatCard title={t('organization.domains.avgMaturity')} value={t('organization.domains.maturityLevel.Defined')} icon={<BarChart3 size={20} />} color="text-info" />
-      </div>
-
-      {/* Search */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={t('organization.domains.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-elevated border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-          />
+      <PageSection>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard title={t('organization.domains.totalDomains')} value={mockDomains.length} icon={<Globe size={20} />} color="text-accent" />
+          <StatCard title={t('organization.domains.totalTeams')} value={totalTeams} icon={<Users size={20} />} color="text-blue-500" />
+          <StatCard title={t('organization.domains.totalServices')} value={totalServices} icon={<Server size={20} />} color="text-success" />
+          <StatCard title={t('organization.domains.avgMaturity')} value={t('organization.domains.maturityLevel.Defined')} icon={<BarChart3 size={20} />} color="text-info" />
         </div>
-      </div>
+      </PageSection>
 
-      {/* Domain cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Search + Domain cards */}
+      <PageSection>
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="relative flex-1 max-w-xs">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={t('organization.domains.searchPlaceholder')}
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-elevated border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.length === 0 ? (
           <div className="col-span-full p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
         ) : (
@@ -147,7 +150,8 @@ export function DomainsOverviewPage() {
             </Card>
           ))
         )}
-      </div>
-    </div>
+        </div>
+      </PageSection>
+    </PageContainer>
   );
 }

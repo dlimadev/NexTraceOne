@@ -6,6 +6,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 type ExecutionResult = 'Success' | 'PartialSuccess' | 'Failed';
 
@@ -108,7 +109,7 @@ export function IngestionExecutionsPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('integrations.executionsTitle')}</h1>
@@ -218,6 +219,6 @@ export function IngestionExecutionsPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

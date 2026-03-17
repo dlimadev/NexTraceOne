@@ -16,6 +16,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
+import { PageContainer } from '../../../components/shell';
 
 /* ------------------------------------------------------------------ */
 /*  Tipos locais                                                       */
@@ -280,7 +281,7 @@ export function AiRoutingPage() {
   /* ---------------------------------------------------------------- */
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Page header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
@@ -353,6 +354,6 @@ export function AiRoutingPage() {
 
       {/* Tab content */}
       {activeTab === 'strategies' ? renderStrategies() : renderSourceWeights()}
-    </div>
+    </PageContainer>
   );
 }

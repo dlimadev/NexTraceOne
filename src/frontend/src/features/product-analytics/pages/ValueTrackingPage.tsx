@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de value tracking — marcos de valor.
@@ -68,7 +69,7 @@ export function ValueTrackingPage() {
   const avgCompletionRate = mockMilestones.reduce((sum, m) => sum + m.completionRate, 0) / mockMilestones.length;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">{t('analytics.value.title')}</h1>
@@ -148,6 +149,6 @@ export function ValueTrackingPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

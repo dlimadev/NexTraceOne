@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './contexts/AuthContext';
 import { PersonaProvider } from './contexts/PersonaContext';
-import { AppLayout } from './components/AppLayout';
+import { AppShell } from './components/shell/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Eager imports — critical for fast first paint
@@ -147,7 +147,7 @@ export default function App() {
             <Route path="/mfa" element={<MfaPage />} />
             <Route path="/invitation" element={<InvitationPage />} />
             <Route path="/select-tenant" element={<TenantSelectionPage />} />
-            <Route element={<AppLayout />}>
+            <Route element={<AppShell />}>
               {/* ── Home ── */}
               <Route path="/" element={<DashboardPage />} />
               {/* ── Global Search ── */}

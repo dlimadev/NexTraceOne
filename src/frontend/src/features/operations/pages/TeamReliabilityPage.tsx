@@ -8,6 +8,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 // Simulated data matching backend ListServiceReliability response
 const mockServices = [
@@ -61,7 +62,7 @@ export function TeamReliabilityPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('reliability.title')}</h1>
         <p className="text-muted mt-1">{t('reliability.subtitle')}</p>
@@ -152,6 +153,6 @@ export function TeamReliabilityPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

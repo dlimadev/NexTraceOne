@@ -36,31 +36,31 @@ describe('Button', () => {
   it('aplica a variante primary por padrão', () => {
     render(<Button>Primary</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('bg-accent');
+    expect(btn).toHaveClass('cta-gradient', 'text-on-accent');
   });
 
   it('aplica a variante secondary', () => {
     render(<Button variant="secondary">Secondary</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('bg-card', 'text-body');
+    expect(btn).toHaveClass('bg-elevated', 'text-body');
   });
 
   it('aplica a variante danger', () => {
     render(<Button variant="danger">Delete</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('bg-critical');
+    expect(btn).toHaveClass('text-critical');
   });
 
   it('aplica o tamanho sm', () => {
     render(<Button size="sm">Small</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('px-3', 'py-1.5');
+    expect(btn).toHaveClass('h-9', 'px-4');
   });
 
   it('aplica o tamanho lg', () => {
     render(<Button size="lg">Large</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('px-6', 'py-3');
+    expect(btn).toHaveClass('h-14', 'px-6');
   });
 
   it('mostra o spinner de loading', () => {

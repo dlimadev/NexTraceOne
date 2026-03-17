@@ -7,6 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import type { RiskSummaryResponse, RiskLevel } from '../../../types';
 
 /**
@@ -147,7 +148,7 @@ export function RiskCenterPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.riskTitle')}</h1>
@@ -155,82 +156,85 @@ export function RiskCenterPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <StatCard title={t('governance.risk.totalAssessed')} value={d.totalServicesAssessed} icon={<Shield size={20} />} color="text-accent" />
-        <StatCard title={t('governance.risk.critical')} value={d.criticalCount} icon={<ShieldAlert size={20} />} color="text-critical" />
-        <StatCard title={t('governance.risk.high')} value={d.highCount} icon={<AlertTriangle size={20} />} color="text-orange-500" />
-        <StatCard title={t('governance.risk.medium')} value={d.mediumCount} icon={<AlertCircle size={20} />} color="text-amber-500" />
-        <StatCard title={t('governance.risk.low')} value={d.lowCount} icon={<CheckCircle size={20} />} color="text-emerald-500" />
-      </div>
+      <PageSection>
+        <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
+          <StatCard title={t('governance.risk.totalAssessed')} value={d.totalServicesAssessed} icon={<Shield size={20} />} color="text-accent" />
+          <StatCard title={t('governance.risk.critical')} value={d.criticalCount} icon={<ShieldAlert size={20} />} color="text-critical" />
+          <StatCard title={t('governance.risk.high')} value={d.highCount} icon={<AlertTriangle size={20} />} color="text-orange-500" />
+          <StatCard title={t('governance.risk.medium')} value={d.mediumCount} icon={<AlertCircle size={20} />} color="text-amber-500" />
+          <StatCard title={t('governance.risk.low')} value={d.lowCount} icon={<CheckCircle size={20} />} color="text-emerald-500" />
+        </ContentGrid>
+      </PageSection>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={t('governance.risk.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-        </div>
-        {(['all', 'Critical', 'High', 'Medium', 'Low'] as RiskFilter[]).map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
-              filter === f
-                ? 'bg-accent/10 text-accent border-accent/30'
-                : 'bg-surface text-muted border-edge hover:text-body'
-            }`}
-          >
-            {f === 'all' ? t('governance.risk.filterAll') : t(`governance.risk.filter${f}`)}
-          </button>
-        ))}
-      </div>
-
-      {/* Risk list */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <ShieldAlert size={16} className="text-accent" />
-            {t('governance.risk.serviceRiskList')}
-          </h2>
-        </CardHeader>
-        <CardBody className="p-0">
-          <div className="divide-y divide-edge">
-            {filtered.length === 0 ? (
-              <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
-            ) : (
-              filtered.map(ind => (
-                <div key={ind.serviceId} className="px-4 py-3 hover:bg-hover transition-colors">
-                  <div className="flex items-center gap-3 mb-2">
-                    {riskIcon(ind.riskLevel)}
-                    <span className="text-sm font-medium text-heading">{ind.serviceName}</span>
-                    <Badge variant={riskBadgeVariant(ind.riskLevel)}>
-                      {t(`governance.risk.level.${ind.riskLevel}`)}
-                    </Badge>
-                    <span className="hidden md:inline text-xs text-muted">{ind.domain}</span>
-                    <span className="hidden md:inline text-xs text-muted">•</span>
-                    <span className="hidden md:inline text-xs text-muted">{ind.team}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2 ml-7">
-                    {ind.dimensions.map((dim, i) => (
-                      <div key={i} className="text-xs">
-                        <Badge variant={riskBadgeVariant(dim.level)} className="mr-1">
-                          {t(`governance.risk.dimension.${dim.dimension}`)}
-                        </Badge>
-                        <span className="text-muted">{dim.explanation}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
+      {/* Filters + Risk list */}
+      <PageSection>
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="relative flex-1 max-w-xs">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={t('governance.risk.searchPlaceholder')}
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+            />
           </div>
-        </CardBody>
-      </Card>
-    </div>
+          {(['all', 'Critical', 'High', 'Medium', 'Low'] as RiskFilter[]).map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
+                filter === f
+                  ? 'bg-accent/10 text-accent border-accent/30'
+                  : 'bg-surface text-muted border-edge hover:text-body'
+              }`}
+            >
+              {f === 'all' ? t('governance.risk.filterAll') : t(`governance.risk.filter${f}`)}
+            </button>
+          ))}
+        </div>
+
+        <Card>
+          <CardHeader>
+            <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+              <ShieldAlert size={16} className="text-accent" />
+              {t('governance.risk.serviceRiskList')}
+            </h2>
+          </CardHeader>
+          <CardBody className="p-0">
+            <div className="divide-y divide-edge">
+              {filtered.length === 0 ? (
+                <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+              ) : (
+                filtered.map(ind => (
+                  <div key={ind.serviceId} className="px-4 py-3 hover:bg-hover transition-colors">
+                    <div className="flex items-center gap-3 mb-2">
+                      {riskIcon(ind.riskLevel)}
+                      <span className="text-sm font-medium text-heading">{ind.serviceName}</span>
+                      <Badge variant={riskBadgeVariant(ind.riskLevel)}>
+                        {t(`governance.risk.level.${ind.riskLevel}`)}
+                      </Badge>
+                      <span className="hidden md:inline text-xs text-muted">{ind.domain}</span>
+                      <span className="hidden md:inline text-xs text-muted">•</span>
+                      <span className="hidden md:inline text-xs text-muted">{ind.team}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 ml-7">
+                      {ind.dimensions.map((dim, i) => (
+                        <div key={i} className="text-xs">
+                          <Badge variant={riskBadgeVariant(dim.level)} className="mr-1">
+                            {t(`governance.risk.dimension.${dim.dimension}`)}
+                          </Badge>
+                          <span className="text-muted">{dim.explanation}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      </PageSection>
+    </PageContainer>
   );
 }

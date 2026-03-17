@@ -28,6 +28,7 @@ import {
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
+import { PageContainer } from '../../../components/shell';
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -379,7 +380,7 @@ export function AiAssistantPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in h-[calc(100vh-4rem)]">
+    <PageContainer>
       <div className="flex h-full gap-4">
         {/* ── Sidebar — lista de conversas ────────────────────────────── */}
         <div className="w-[300px] shrink-0 bg-card rounded-lg border border-edge flex flex-col">
@@ -706,6 +707,6 @@ export function AiAssistantPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

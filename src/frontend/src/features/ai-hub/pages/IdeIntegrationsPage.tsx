@@ -7,6 +7,7 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 interface IdeClient {
   id: string;
@@ -87,7 +88,7 @@ export function IdeIntegrationsPage() {
     type === 'VsCode' ? <Code size={14} /> : <Monitor size={14} />;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('aiHub.ideTitle')}</h1>
         <p className="text-muted mt-1">{t('aiHub.ideSubtitle')}</p>
@@ -283,6 +284,6 @@ export function IdeIntegrationsPage() {
           <p className="text-xs text-muted">{t('aiHub.ideGovernanceNotice')}</p>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

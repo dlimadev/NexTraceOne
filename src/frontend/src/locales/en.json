@@ -3989,5 +3989,21 @@
       "minor": "Minor",
       "informational": "Informational"
     }
+  },
+  "shell": {
+    "sidebarNav": "Sidebar navigation",
+    "mainNavigation": "Main navigation",
+    "openMenu": "Open menu",
+    "mobileMenu": "Mobile navigation menu",
+    "userMenu": "User menu",
+    "myProfile": "My Profile",
+    "myAccess": "My Access",
+    "workspace": "Workspace",
+    "workspaceSwitcher": "Switch workspace",
+    "defaultWorkspace": "Default Workspace",
+    "environment": "Environment",
+    "moduleUnavailable": "Module Unavailable",
+    "moduleUnavailableDescription": "This module is temporarily unavailable. Please try again later.",
+    "moduleUnavailableDescriptionNamed": "The {{module}} module is temporarily unavailable. Please try again later."
   }
 }

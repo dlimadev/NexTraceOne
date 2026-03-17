@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
+import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -52,11 +53,11 @@ export function ContractSourceOfTruthPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <div className="flex items-center justify-center py-24">
           <p className="text-sm text-muted">{t('common.loading')}</p>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 

@@ -4,6 +4,7 @@ import { Award } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { MaturityScorecardsResponse, MaturityLevelType } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 type MaturityDimension = 'team' | 'domain';
 
@@ -125,7 +126,7 @@ export function MaturityScorecardsPage() {
   const dimensions: MaturityDimension[] = ['team', 'domain'];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.executive.scorecardsTitle')}</h1>
@@ -193,6 +194,6 @@ export function MaturityScorecardsPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

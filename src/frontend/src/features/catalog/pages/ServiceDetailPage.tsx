@@ -22,6 +22,7 @@ import { serviceCatalogApi } from '../api';
 import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
@@ -82,9 +83,9 @@ export function ServiceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in flex items-center justify-center min-h-[60vh]">
+      <PageContainer>
         <p className="text-sm text-muted">{t('common.loading')}</p>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -145,127 +146,132 @@ export function ServiceDetailPage() {
         {/* ── Coluna principal ── */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Visão geral */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <FileText size={16} className="text-accent" />
-                <h2 className="text-base font-semibold text-heading">
-                  {t('catalog.detail.overview')}
-                </h2>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <DetailField label={t('catalog.detail.description')} value={service.description} />
-                <DetailField label={t('catalog.detail.systemArea')} value={service.systemArea} />
-                <DetailField label={t('catalog.columns.domain')} value={service.domain} />
-                <DetailField
-                  label={t('catalog.columns.serviceType')}
-                  value={t(`catalog.badges.type.${service.serviceType}`)}
-                />
-              </dl>
-            </CardBody>
-          </Card>
-
-          {/* APIs associadas */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Globe size={16} className="text-accent" />
-                  <h2 className="text-base font-semibold text-heading">
-                    {t('catalog.detail.apis')}
-                  </h2>
-                </div>
-                <span className="text-xs text-muted">
-                  {t('catalog.detail.apiAndConsumerSummary', {
-                    apiCount: service.apiCount,
-                    consumerCount: service.totalConsumers,
-                  })}
-                </span>
-              </div>
-            </CardHeader>
-            <CardBody className="p-0">
-              {service.apis.length === 0 ? (
-                <div className="py-10 text-center">
-                  <p className="text-sm text-muted">{t('catalog.detail.noApis')}</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-edge text-left">
-                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                          {t('catalog.columns.name')}
-                        </th>
-                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                          {t('catalog.detail.routePattern')}
-                        </th>
-                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                          {t('catalog.detail.version')}
-                        </th>
-                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                          {t('catalog.detail.visibility')}
-                        </th>
-                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                          {t('catalog.detail.consumers')}
-                        </th>
-                        <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
-                          {t('catalog.detail.status')}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-edge">
-                      {service.apis.map((api: ServiceApiSummary) => (
-                        <tr key={api.apiId} className="hover:bg-elevated/50 transition-colors">
-                          <td className="px-4 py-3 font-medium text-heading">{api.name}</td>
-                          <td className="px-4 py-3 text-muted font-mono text-xs">{api.routePattern}</td>
-                          <td className="px-4 py-3 text-muted">{api.version}</td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex items-center gap-1 text-xs text-muted">
-                              <Eye size={12} />
-                              {api.visibility}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-muted">{api.consumerCount}</td>
-                          <td className="px-4 py-3">
-                            {api.isDecommissioned ? (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-red-900/40 text-red-300 border border-red-700/50">
-                                {t('catalog.detail.decommissioned')}
-                              </span>
-                            ) : (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-900/40 text-emerald-300 border border-emerald-700/50">
-                                {t('catalog.detail.active')}
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardBody>
-          </Card>
-
-          {/* Contratos associados */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
+          <PageSection>
+            <Card>
+              <CardHeader>
                 <div className="flex items-center gap-2">
                   <FileText size={16} className="text-accent" />
                   <h2 className="text-base font-semibold text-heading">
-                    {t('catalog.detail.contracts')}
+                    {t('catalog.detail.overview')}
                   </h2>
                 </div>
-                {serviceContracts && (
+              </CardHeader>
+              <CardBody>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <DetailField label={t('catalog.detail.description')} value={service.description} />
+                  <DetailField label={t('catalog.detail.systemArea')} value={service.systemArea} />
+                  <DetailField label={t('catalog.columns.domain')} value={service.domain} />
+                  <DetailField
+                    label={t('catalog.columns.serviceType')}
+                    value={t(`catalog.badges.type.${service.serviceType}`)}
+                  />
+                </dl>
+              </CardBody>
+            </Card>
+          </PageSection>
+
+          {/* APIs associadas */}
+          <PageSection>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Globe size={16} className="text-accent" />
+                    <h2 className="text-base font-semibold text-heading">
+                      {t('catalog.detail.apis')}
+                    </h2>
+                  </div>
                   <span className="text-xs text-muted">
-                    {serviceContracts.totalCount} {t('catalog.detail.contractsCount')}
+                    {t('catalog.detail.apiAndConsumerSummary', {
+                      apiCount: service.apiCount,
+                      consumerCount: service.totalConsumers,
+                    })}
                   </span>
+                </div>
+              </CardHeader>
+              <CardBody className="p-0">
+                {service.apis.length === 0 ? (
+                  <div className="py-10 text-center">
+                    <p className="text-sm text-muted">{t('catalog.detail.noApis')}</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-edge text-left">
+                          <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                            {t('catalog.columns.name')}
+                          </th>
+                          <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                            {t('catalog.detail.routePattern')}
+                          </th>
+                          <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                            {t('catalog.detail.version')}
+                          </th>
+                          <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                            {t('catalog.detail.visibility')}
+                          </th>
+                          <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                            {t('catalog.detail.consumers')}
+                          </th>
+                          <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
+                            {t('catalog.detail.status')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-edge">
+                        {service.apis.map((api: ServiceApiSummary) => (
+                          <tr key={api.apiId} className="hover:bg-elevated/50 transition-colors">
+                            <td className="px-4 py-3 font-medium text-heading">{api.name}</td>
+                            <td className="px-4 py-3 text-muted font-mono text-xs">{api.routePattern}</td>
+                            <td className="px-4 py-3 text-muted">{api.version}</td>
+                            <td className="px-4 py-3">
+                              <span className="inline-flex items-center gap-1 text-xs text-muted">
+                                <Eye size={12} />
+                                {api.visibility}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-muted">{api.consumerCount}</td>
+                            <td className="px-4 py-3">
+                              {api.isDecommissioned ? (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-red-900/40 text-red-300 border border-red-700/50">
+                                  {t('catalog.detail.decommissioned')}
+                                </span>
+                              ) : (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-900/40 text-emerald-300 border border-emerald-700/50">
+                                  {t('catalog.detail.active')}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
-              </div>
-            </CardHeader>
-            <CardBody className="p-0">
+              </CardBody>
+            </Card>
+          </PageSection>
+
+          {/* Contratos associados */}
+          <PageSection>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText size={16} className="text-accent" />
+                    <h2 className="text-base font-semibold text-heading">
+                      {t('catalog.detail.contracts')}
+                    </h2>
+                  </div>
+                  {serviceContracts && (
+                    <span className="text-xs text-muted">
+                      {serviceContracts.totalCount} {t('catalog.detail.contractsCount')}
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardBody className="p-0">
               {!serviceContracts || serviceContracts.contracts.length === 0 ? (
                 <div className="py-10 text-center">
                   <p className="text-sm text-muted">{t('catalog.detail.noContracts')}</p>
@@ -336,9 +342,8 @@ export function ServiceDetailPage() {
               )}
             </CardBody>
           </Card>
+          </PageSection>
         </div>
-
-        {/* ── Barra lateral ── */}
         <div className="flex flex-col gap-6">
           {/* Ownership */}
           <Card>

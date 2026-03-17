@@ -15,6 +15,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { globalSearchApi } from '../api/globalSearch';
 import type { SearchResultItem } from '../api/globalSearch';
+import { PageContainer } from '../../../components/shell';
 
 /** Intervalo de debounce para pesquisa (ms). */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -95,7 +96,7 @@ export function GlobalSearchPage() {
   const filteredResults = results;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* ── Cabeçalho ── */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">
@@ -196,7 +197,7 @@ export function GlobalSearchPage() {
           description={t('commandPalette.globalSearch.subtitle')}
         />
       )}
-    </div>
+    </PageContainer>
   );
 }
 

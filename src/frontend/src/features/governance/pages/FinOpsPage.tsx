@@ -10,6 +10,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import type { CostEfficiencyType } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -135,7 +136,7 @@ export function FinOpsPage() {
   );
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.finopsTitle')}</h1>
@@ -318,6 +319,6 @@ export function FinOpsPage() {
           </CardBody>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

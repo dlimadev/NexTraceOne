@@ -7,6 +7,7 @@ import {
   Search,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de adoção por módulo.
@@ -63,7 +64,7 @@ export function ModuleAdoptionPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">{t('analytics.adoption.title')}</h1>
@@ -142,6 +143,6 @@ export function ModuleAdoptionPage() {
       {filtered.length === 0 && (
         <div className="text-center py-12 text-zinc-500">{t('analytics.adoption.noResults')}</div>
       )}
-    </div>
+    </PageContainer>
   );
 }

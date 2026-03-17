@@ -15,6 +15,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
+import { PageContainer } from '../../../components/shell';
 
 /** Delay de debounce para a pesquisa (ms). */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -82,7 +83,7 @@ export function SourceOfTruthExplorerPage() {
   const showError = isError && debouncedQuery.trim().length > 0;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Onboarding hints — orientação contextual para Source of Truth */}
       <OnboardingHints module="knowledge" />
 
@@ -304,6 +305,6 @@ export function SourceOfTruthExplorerPage() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

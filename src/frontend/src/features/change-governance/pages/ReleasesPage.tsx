@@ -24,6 +24,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { changeIntelligenceApi } from '../api';
 import type { ChangeLevel, DeploymentState } from '../../../types';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 // ─── Constantes auxiliares ───────────────────────────────────────────────────
 
@@ -159,7 +160,7 @@ export function ReleasesPage() {
   const intel = intelligenceQuery.data;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -270,8 +271,10 @@ export function ReleasesPage() {
             </Card>
           )}
 
-          {/* Search */}
-          <Card className="mb-6">
+          {/* Filter + Table */}
+          <PageSection>
+            {/* Search */}
+            <Card className="mb-6">
             <CardBody>
               <div className="flex gap-3 items-center">
                 <Search size={16} className="text-muted shrink-0" />
@@ -357,10 +360,9 @@ export function ReleasesPage() {
               )}
             </div>
           </Card>
+          </PageSection>
         </>
       )}
-
-      {/* ═══════════════════ INTELLIGENCE TAB ═══════════════════ */}
       {activeTab === 'intelligence' && (
         <>
           {!selectedReleaseId ? (
@@ -921,6 +923,6 @@ export function ReleasesPage() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

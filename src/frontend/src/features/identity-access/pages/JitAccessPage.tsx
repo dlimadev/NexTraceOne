@@ -8,6 +8,7 @@ import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { JitAccessRequest } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de gestão de acessos temporários (JIT — Just-In-Time) do módulo Identity.
@@ -65,7 +66,7 @@ export function JitAccessPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('identity.jitAccess.title')}</h1>
@@ -208,6 +209,6 @@ export function JitAccessPage() {
           )}
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

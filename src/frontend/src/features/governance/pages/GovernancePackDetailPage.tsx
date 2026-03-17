@@ -8,6 +8,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Tipos locais para detalhe de Governance Pack — alinhados com o backend.
@@ -157,7 +158,7 @@ export function GovernancePackDetailPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Back navigation */}
       <Link to="/governance/packs" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
         <ArrowLeft size={14} />
@@ -430,6 +431,6 @@ export function GovernancePackDetailPage() {
           </CardBody>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

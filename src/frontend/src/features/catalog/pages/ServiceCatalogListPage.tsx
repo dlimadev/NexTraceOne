@@ -16,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { serviceCatalogApi } from '../api';
 import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../types';
 
@@ -139,7 +140,7 @@ export function ServiceCatalogListPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* ── Cabeçalho ── */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('catalog.title')}</h1>
@@ -148,7 +149,8 @@ export function ServiceCatalogListPage() {
 
       {/* ── Métricas de resumo ── */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <PageSection>
+          <ContentGrid className="!grid-cols-2 md:!grid-cols-3 xl:!grid-cols-6">
           <SummaryCard
             icon={<Server size={18} />}
             label={t('catalog.summary.total')}
@@ -185,11 +187,13 @@ export function ServiceCatalogListPage() {
             value={summary.retiredCount}
             accent="text-slate-400"
           />
-        </div>
+          </ContentGrid>
+        </PageSection>
       )}
 
-      {/* ── Pesquisa e filtros ── */}
-      <Card className="mb-6">
+      {/* ── Pesquisa e filtros + Tabela ── */}
+      <PageSection>
+        <Card className="mb-6">
         <CardBody>
           <div className="flex flex-col gap-4">
             {/* Barra de pesquisa */}
@@ -389,7 +393,8 @@ export function ServiceCatalogListPage() {
           )}
         </CardBody>
       </Card>
-    </div>
+      </PageSection>
+    </PageContainer>
   );
 }
 

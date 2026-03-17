@@ -7,6 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { RiskHeatmapResponse, RiskLevel } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 type HeatmapDimension = 'domain' | 'team' | 'criticality';
 
@@ -63,7 +64,7 @@ export function RiskHeatmapPage() {
   const dimensions: HeatmapDimension[] = ['domain', 'team', 'criticality'];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.executive.heatmapTitle')}</h1>
@@ -159,6 +160,6 @@ export function RiskHeatmapPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

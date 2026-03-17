@@ -7,6 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 import type {
   EvidencePackageDto, EvidencePackageListResponse, EvidencePackageStatusType,
   EvidenceItemDto, EvidenceTypeValue,
@@ -151,7 +152,7 @@ export function EvidencePackagesPage() {
     : null;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.evidence.title')}</h1>
@@ -290,6 +291,6 @@ export function EvidencePackagesPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

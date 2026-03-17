@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 /**
  * Página principal de Product Analytics.
@@ -58,7 +59,7 @@ export function ProductAnalyticsOverviewPage() {
   const d = mockSummary;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">{t('analytics.title')}</h1>
@@ -66,86 +67,92 @@ export function ProductAnalyticsOverviewPage() {
       </div>
 
       {/* Score cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          title={t('analytics.adoptionScore')}
-          value={`${d.adoptionScore}%`}
-          icon={<BarChart3 size={20} />}
-          color="text-accent"
-          trend={{ direction: 'up', label: t('analytics.trendImproving') }}
-        />
-        <StatCard
-          title={t('analytics.valueScore')}
-          value={`${d.valueScore}%`}
-          icon={<Award size={20} />}
-          color="text-emerald-400"
-          trend={{ direction: 'up', label: t('analytics.trendImproving') }}
-        />
-        <StatCard
-          title={t('analytics.frictionScore')}
-          value={`${d.frictionScore}%`}
-          icon={<AlertTriangle size={20} />}
-          color="text-amber-400"
-          trend={{ direction: 'down', label: t('analytics.trendDeclining') }}
-        />
-        <StatCard
-          title={t('analytics.uniqueUsers')}
-          value={d.uniqueUsers}
-          icon={<Users size={20} />}
-          color="text-blue-400"
-        />
-      </div>
+      <PageSection>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard
+            title={t('analytics.adoptionScore')}
+            value={`${d.adoptionScore}%`}
+            icon={<BarChart3 size={20} />}
+            color="text-accent"
+            trend={{ direction: 'up', label: t('analytics.trendImproving') }}
+          />
+          <StatCard
+            title={t('analytics.valueScore')}
+            value={`${d.valueScore}%`}
+            icon={<Award size={20} />}
+            color="text-emerald-400"
+            trend={{ direction: 'up', label: t('analytics.trendImproving') }}
+          />
+          <StatCard
+            title={t('analytics.frictionScore')}
+            value={`${d.frictionScore}%`}
+            icon={<AlertTriangle size={20} />}
+            color="text-amber-400"
+            trend={{ direction: 'down', label: t('analytics.trendDeclining') }}
+          />
+          <StatCard
+            title={t('analytics.uniqueUsers')}
+            value={d.uniqueUsers}
+            icon={<Users size={20} />}
+            color="text-blue-400"
+          />
+        </div>
+      </PageSection>
 
       {/* Time to value */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Target size={18} className="text-accent" />
-              <span className="font-semibold text-white">{t('analytics.timeToFirstValue')}</span>
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="text-3xl font-bold text-accent">{d.avgTimeToFirstValueMinutes} {t('analytics.minutes')}</div>
-            <p className="text-zinc-400 text-sm mt-1">{t('analytics.timeToFirstValueDesc')}</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Award size={18} className="text-emerald-400" />
-              <span className="font-semibold text-white">{t('analytics.timeToCoreValue')}</span>
-            </div>
-          </CardHeader>
-          <CardBody>
-            <div className="text-3xl font-bold text-emerald-400">{d.avgTimeToCoreValueMinutes} {t('analytics.minutes')}</div>
-            <p className="text-zinc-400 text-sm mt-1">{t('analytics.timeToCoreValueDesc')}</p>
-          </CardBody>
-        </Card>
-      </div>
+      <PageSection>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Target size={18} className="text-accent" />
+                <span className="font-semibold text-white">{t('analytics.timeToFirstValue')}</span>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <div className="text-3xl font-bold text-accent">{d.avgTimeToFirstValueMinutes} {t('analytics.minutes')}</div>
+              <p className="text-zinc-400 text-sm mt-1">{t('analytics.timeToFirstValueDesc')}</p>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Award size={18} className="text-emerald-400" />
+                <span className="font-semibold text-white">{t('analytics.timeToCoreValue')}</span>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <div className="text-3xl font-bold text-emerald-400">{d.avgTimeToCoreValueMinutes} {t('analytics.minutes')}</div>
+              <p className="text-zinc-400 text-sm mt-1">{t('analytics.timeToCoreValueDesc')}</p>
+            </CardBody>
+          </Card>
+        </div>
+      </PageSection>
 
       {/* Top Modules */}
-      <Card className="mb-8">
-        <CardHeader>
-          <span className="font-semibold text-white">{t('analytics.topModules')}</span>
-        </CardHeader>
-        <CardBody>
-          <div className="divide-y divide-zinc-800">
-            {d.topModules.map((mod) => (
-              <div key={mod.module} className="flex items-center justify-between py-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-white font-medium">{mod.moduleName}</span>
-                  {trendIcon(mod.trend)}
+      <PageSection>
+        <Card>
+          <CardHeader>
+            <span className="font-semibold text-white">{t('analytics.topModules')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="divide-y divide-zinc-800">
+              {d.topModules.map((mod) => (
+                <div key={mod.module} className="flex items-center justify-between py-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-white font-medium">{mod.moduleName}</span>
+                    {trendIcon(mod.trend)}
+                  </div>
+                  <div className="flex items-center gap-6 text-sm">
+                    <span className="text-zinc-400">{mod.eventCount.toLocaleString()} {t('analytics.actions')}</span>
+                    <span className="text-zinc-400">{mod.uniqueUsers} {t('analytics.users')}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-6 text-sm">
-                  <span className="text-zinc-400">{mod.eventCount.toLocaleString()} {t('analytics.actions')}</span>
-                  <span className="text-zinc-400">{mod.uniqueUsers} {t('analytics.users')}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      </PageSection>
 
       {/* Quick links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -166,6 +173,6 @@ export function ProductAnalyticsOverviewPage() {
           <span className="text-sm text-zinc-300">{t('analytics.viewValueTracking')}</span>
         </Link>
       </div>
-    </div>
+    </PageContainer>
   );
 }
