@@ -45,23 +45,23 @@ Cobrir:
 - configuração por ambiente
 
 #### Checklist
-- [ ] Bounded contexts coerentes
-- [ ] Separação Domain / Application / Infrastructure / API respeitada
-- [ ] i18n aplicado nas telas críticas
-- [ ] Logs em inglês e sem vazamento de dados sensíveis
-- [ ] Exceptions técnicas em inglês
-- [ ] Health/readiness existentes e úteis
+- [x] Bounded contexts coerentes
+- [x] Separação Domain / Application / Infrastructure / API respeitada
+- [x] i18n aplicado nas telas críticas
+- [x] Logs em inglês e sem vazamento de dados sensíveis
+- [x] Exceptions técnicas em inglês
+- [x] Health/readiness existentes e úteis
 - [ ] Configuração externa por ambiente revisada
 
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Arquitetura modular | A preencher |  |  |
-| Convenções de código | A preencher |  |  |
-| i18n base | A preencher |  |  |
-| Segurança base | A preencher |  |  |
-| Observabilidade base | A preencher |  |  |
-| Health/Readiness | A preencher |  |  |
+| Arquitetura modular | DONE | KEEP | 7 módulos isolados (catalog, changegovernance, operationalintelligence, aiknowledge, identityaccess, auditcompliance, governance) com DDD/CQRS, separação por .csproj, sem vazamentos de infraestrutura no Domain |
+| Convenções de código | DONE | KEEP | Strongly-typed IDs, CancellationToken em async, Result pattern, guard clauses — verificado em todos os handlers |
+| i18n base | DONE | KEEP | 4 locales (en, pt-PT, pt-BR, es), ~5,651 keys, 90+ componentes usando useTranslation |
+| Segurança base | DONE | KEEP | JWT Bearer + permissions, rate limiting (100/min IP), CORS restritivo, assembly integrity check |
+| Observabilidade base | DONE | KEEP | Serilog com console+file sinks, OpenTelemetry activity sources, métricas definidas |
+| Health/Readiness | DONE | KEEP | /health, /ready, /live endpoints configurados com HealthCheckResponseWriter |
 
 ---
 
@@ -77,27 +77,27 @@ Cobrir:
 - detalhe de serviço e contrato
 
 #### Checklist
-- [ ] Serviço pode ser cadastrado/importado
-- [ ] Contrato pode ser cadastrado/importado
-- [ ] Histórico de versões está acessível
-- [ ] Diff é utilizável
-- [ ] Compatibilidade é compreensível
-- [ ] Ownership por equipa/domínio está visível
-- [ ] Busca e filtros são úteis
-- [ ] Frontend suporta consulta real
+- [x] Serviço pode ser cadastrado/importado
+- [x] Contrato pode ser cadastrado/importado
+- [x] Histórico de versões está acessível
+- [x] Diff é utilizável
+- [x] Compatibilidade é compreensível
+- [x] Ownership por equipa/domínio está visível
+- [x] Busca e filtros são úteis
+- [x] Frontend suporta consulta real
 
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Catálogo de serviços | A preencher |  |  |
-| Detalhe de serviço | A preencher |  |  |
-| Catálogo de contratos | A preencher |  |  |
-| Detalhe de contrato | A preencher |  |  |
-| Versionamento | A preencher |  |  |
-| Diff semântico | A preencher |  |  |
-| Compatibilidade | A preencher |  |  |
-| Ownership | A preencher |  |  |
-| Busca | A preencher |  |  |
+| Catálogo de serviços | DONE | KEEP | ServiceAsset com EF persistence, CRUD completo, busca LIKE, filtros por team/domain/criticality |
+| Detalhe de serviço | DONE | KEEP | ServiceDetailPage com API real, ownership, dependências, AssistantPanel com contexto |
+| Catálogo de contratos | DONE | KEEP | ContractVersion com 7 lifecycle states, multi-protocol (OpenAPI/WSDL/AsyncAPI/Swagger) |
+| Detalhe de contrato | DONE | KEEP | ContractDetailPage com spec viewer, diff view, lock/sign operations |
+| Versionamento | DONE | KEEP | SemVer, import, create version, lock, deprecate, lifecycle transitions — tudo persisted |
+| Diff semântico | DONE | KEEP | ContractDiffCalculator domain service, ComputeSemanticDiff handler, UI side-by-side |
+| Compatibilidade | DONE | KEEP | ClassifyBreakingChange, GetCompatibilityAssessment, SuggestSemanticVersion — reais |
+| Ownership | DONE | KEEP | TeamName, TechnicalOwner, BusinessOwner em ServiceAsset, UpdateServiceOwnership handler |
+| Busca | DONE | KEEP | SearchServices, SearchContracts, SearchAssets, GlobalSearch — todos com LIKE patterns |
 
 ---
 
@@ -113,25 +113,25 @@ Cobrir:
 - trilha da decisão
 
 #### Checklist
-- [ ] Change pode ser criada
-- [ ] Change pode ser listada e consultada
-- [ ] Vínculo com serviço/contrato funciona
-- [ ] Evidence readiness é visível
-- [ ] Blast radius é útil
-- [ ] Advisory é clara
-- [ ] Aprovação é auditável
-- [ ] Frontend suporta decisão real
+- [x] Change pode ser criada
+- [x] Change pode ser listada e consultada
+- [x] Vínculo com serviço/contrato funciona
+- [x] Evidence readiness é visível
+- [x] Blast radius é útil
+- [x] Advisory é clara
+- [x] Aprovação é auditável
+- [x] Frontend suporta decisão real
 
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Create/List/Detail de change | A preencher |  |  |
-| Evidence pack | A preencher |  |  |
-| Blast radius | A preencher |  |  |
-| Advisory | A preencher |  |  |
-| Approval flow | A preencher |  |  |
-| Rollout readiness | A preencher |  |  |
-| Decision history | A preencher |  |  |
+| Create/List/Detail de change | DONE | KEEP | 21+ handlers reais, 4 DbContexts, EF migrations, paginação, filtros |
+| Evidence pack | DONE | KEEP | GetChangeAdvisory agrega score+blast+rollback+release com 4 factores ponderados |
+| Blast radius | DONE | KEEP | CalculateBlastRadius real: direct+transitive consumers, persistido em DB |
+| Advisory | DONE | KEEP | 4-factor weighted scoring (Evidence 25%, BlastRadius 25%, Score 25%, Rollback 25%), recomendação Approve/Reject/Conditional |
+| Approval flow | DONE | KEEP | RecordChangeDecision persiste ChangeEvent com decidedBy, rationale, conditions |
+| Rollout readiness | DONE | KEEP | ComputeChangeScore, AssessRollbackViability, PostReleaseReview — todos reais |
+| Decision history | DONE | KEEP | GetChangeDecisionHistory via IChangeEventRepository, timeline completa |
 
 ---
 
@@ -146,24 +146,24 @@ Cobrir:
 - histórico do outcome
 
 #### Checklist
-- [ ] Incident list/detail utilizáveis
-- [ ] Correlação com changes funciona
-- [ ] Correlação com serviços/dependências funciona
-- [ ] Runbooks estão acessíveis
-- [ ] Mitigação guiada funciona
-- [ ] Validação pós-ação existe
-- [ ] Outcome fica registrado
+- [x] Incident list/detail utilizáveis
+- [x] Correlação com changes funciona
+- [x] Correlação com serviços/dependências funciona
+- [x] Runbooks estão acessíveis
+- [x] Mitigação guiada funciona
+- [x] Validação pós-ação existe
+- [x] Outcome fica registrado
 
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Incident list/detail | A preencher |  |  |
-| Correlação com changes | A preencher |  |  |
-| Correlação com serviços | A preencher |  |  |
-| Runbooks | A preencher |  |  |
-| Mitigação guiada | A preencher |  |  |
-| Pós-validação | A preencher |  |  |
-| Histórico | A preencher |  |  |
+| Incident list/detail | DONE | KEEP | EfIncidentStore (678 linhas), IncidentDbContext com 5 DbSets, 6 seed incidents, CRUD real |
+| Correlação com changes | PARTIAL | COMPLETE | CorrelatedChangesJson em IncidentRecord — funcional mas baseado em seed data, não dinâmico |
+| Correlação com serviços | PARTIAL | COMPLETE | CorrelatedServicesJson + LinkedServicesJson — mesma limitação: seed data |
+| Runbooks | DONE | KEEP | RunbookRecord com steps/prerequisites/post-notes, 3 seed runbooks, ListRunbooks/GetRunbookDetail reais |
+| Mitigação guiada | DONE | KEEP | MitigationWorkflowRecord com Draft→Approved→InProgress→Completed, CreateMitigationWorkflow persiste em DB |
+| Pós-validação | DONE | KEEP | MitigationValidationLog com checks individuais (Passed/Failed/PartiallyPassed), persistido em DB |
+| Histórico | DONE | KEEP | GetMitigationHistory, UpdateMitigationWorkflowAction — audit trail completo |
 
 ---
 
@@ -186,11 +186,11 @@ Cobrir:
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Integration Hub | A preencher |  |  |
-| Connector health | A preencher |  |  |
-| Freshness | A preencher |  |  |
-| Scope por equipa/domínio | A preencher |  |  |
-| Governance packs | A preencher |  |  |
+| Integration Hub | PARTIAL | COMPLETE | Frontend com 4 páginas e i18n; Ingestion API é stub (aceita mas não persiste) |
+| Connector health | NOT STARTED | CREATE | Endpoints aceitam dados mas não processam nem armazenam |
+| Freshness | NOT STARTED | CREATE | Página existe no frontend mas sem backend real |
+| Scope por equipa/domínio | PARTIAL | COMPLETE | DelegatedAdmin domain model existe; backend não implementa enforcement |
+| Governance packs | PARTIAL | REFACTOR | 9 entidades de domínio definidas; 20+ handlers retornam dados hardcoded; Infrastructure vazia |
 
 ---
 
@@ -205,19 +205,19 @@ Cobrir:
 #### Checklist
 - [ ] Eventos analytics úteis
 - [ ] Métricas de adoção relevantes
-- [ ] Páginas críticas com performance aceitável
-- [ ] Jobs estáveis
-- [ ] Health/readiness válidos
-- [ ] Logs úteis para operação
+- [x] Páginas críticas com performance aceitável
+- [x] Jobs estáveis
+- [x] Health/readiness válidos
+- [x] Logs úteis para operação
 
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Product analytics | A preencher |  |  |
-| Performance crítica | A preencher |  |  |
-| Jobs | A preencher |  |  |
-| Deployment/readiness | A preencher |  |  |
-| Logs/diagnóstico | A preencher |  |  |
+| Product analytics | PARTIAL | COMPLETE | 5 páginas frontend com i18n e layout; todos dados mock (mockSummary hardcoded) |
+| Performance crítica | DONE | KEEP | Vite build com code-splitting; lazy-loaded routes; chunk warnings (>500kB) mas funcional |
+| Jobs | DONE | KEEP | OutboxProcessorJob + IdentityExpirationJob + 5 expiration handlers — reais |
+| Deployment/readiness | DONE | KEEP | /health, /ready, /live endpoints; HealthCheckResponseWriter configurado |
+| Logs/diagnóstico | DONE | KEEP | Serilog com console+file sinks, daily rolling; OpenTelemetry activity sources + meters |
 
 ## Riscos principais identificados
 | Risco | Impacto | Probabilidade | Mitigação |
