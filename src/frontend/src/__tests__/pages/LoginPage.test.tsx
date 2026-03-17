@@ -53,22 +53,24 @@ function renderLoginPage(authOverrides = {}) {
 describe('LoginPage', () => {
   it('renderiza o formulário de login', () => {
     renderLoginPage();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign in$/i })).toBeInTheDocument();
   });
 
   it('exibe o título e subtítulo da plataforma', () => {
     renderLoginPage();
-    expect(screen.getByText('NexTraceOne')).toBeInTheDocument();
-    expect(screen.getByText(/sovereign/i)).toBeInTheDocument();
+    // Split layout has NexTraceOne in both left panel and mobile header
+    expect(screen.getAllByText('NexTraceOne').length).toBeGreaterThanOrEqual(1);
+    // Tagline appears in both mobile header and desktop left panel
+    expect(screen.getAllByText(/sovereign/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('chama login com as credenciais corretas ao submeter', async () => {
     const { auth } = renderLoginPage();
 
-    await userEvent.type(screen.getByLabelText(/email/i), 'dev@acme.com');
-    await userEvent.type(screen.getByLabelText(/password/i), 'secret123');
+    await userEvent.type(screen.getByLabelText('Email'), 'dev@acme.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'secret123');
     await userEvent.click(screen.getByRole('button', { name: /sign in$/i }));
 
     await waitFor(() => {
@@ -80,8 +82,8 @@ describe('LoginPage', () => {
     const loginFn = vi.fn().mockRejectedValue(new Error('Unauthorized'));
     renderLoginPage({ login: loginFn });
 
-    await userEvent.type(screen.getByLabelText(/email/i), 'wrong@acme.com');
-    await userEvent.type(screen.getByLabelText(/password/i), 'wrong');
+    await userEvent.type(screen.getByLabelText('Email'), 'wrong@acme.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'wrong');
     await userEvent.click(screen.getByRole('button', { name: /sign in$/i }));
 
     await waitFor(() => {
@@ -96,8 +98,8 @@ describe('LoginPage', () => {
     );
     renderLoginPage({ login: loginFn });
 
-    await userEvent.type(screen.getByLabelText(/email/i), 'dev@acme.com');
-    await userEvent.type(screen.getByLabelText(/password/i), 'pass');
+    await userEvent.type(screen.getByLabelText('Email'), 'dev@acme.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'pass');
     await userEvent.click(screen.getByRole('button', { name: /sign in$/i }));
 
     // The submit button should be disabled while loading
@@ -113,8 +115,8 @@ describe('LoginPage', () => {
       .mockResolvedValueOnce('authenticated' as const);
     renderLoginPage({ login: loginFn });
 
-    await userEvent.type(screen.getByLabelText(/email/i), 'dev@acme.com');
-    await userEvent.type(screen.getByLabelText(/password/i), 'wrong');
+    await userEvent.type(screen.getByLabelText('Email'), 'dev@acme.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'wrong');
     await userEvent.click(screen.getByRole('button', { name: /sign in$/i }));
 
     await waitFor(() => {
@@ -131,5 +133,15 @@ describe('LoginPage', () => {
   it('exibe o rodapé indicando self-hosted', () => {
     renderLoginPage();
     expect(screen.getByText(/self-hosted/i)).toBeInTheDocument();
+  });
+
+  it('exibe botão de toggle de visibilidade de password', () => {
+    renderLoginPage();
+    expect(screen.getByLabelText(/show password/i)).toBeInTheDocument();
+  });
+
+  it('exibe SSO como opção primária de autenticação', () => {
+    renderLoginPage();
+    expect(screen.getByRole('button', { name: /sso/i })).toBeInTheDocument();
   });
 });

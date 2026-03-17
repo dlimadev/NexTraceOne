@@ -56,7 +56,20 @@
     "ssoDescription": "Recomendado para cuentas corporativas",
     "orDivider": "o inicie sesión con credenciales",
     "ssoRedirecting": "Redirigiendo al proveedor de identidad...",
-    "ssoError": "Falló la autenticación SSO. Intente de nuevo o use credenciales."
+    "ssoError": "Falló la autenticación SSO. Intente de nuevo o use credenciales.",
+    "signInSubtitle": "Accede a tu plataforma de gobernanza",
+    "loginHeadline": "Plataforma Soberana de Gobernanza de Ingeniería",
+    "loginSubheadline": "La fuente de verdad para servicios, contratos, cambios y conocimiento operacional en toda la organización.",
+    "capServiceGovernance": "Gobernanza de Servicios y Catálogo",
+    "capContractGovernance": "Gobernanza de Contratos y Ciclo de Vida",
+    "capChangeIntelligence": "Inteligencia de Cambios y Confianza",
+    "capComplianceAudit": "Cumplimiento, Auditoría y Riesgo",
+    "trustEncrypted": "Cifrado en tránsito",
+    "trustCompliant": "Conforme para empresas",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "needHelp": "¿Necesitas ayuda para iniciar sesión?",
+    "contactSupport": "Contactar soporte"
   },
   "tenants": {
     "selectTenant": "Seleccionar Organización",
@@ -78,7 +91,15 @@
     "recentServices": "Servicios Recientes",
     "registeredApisTitle": "APIs Registradas",
     "noServices": "Ningún servicio registrado aún",
-    "noApis": "Ninguna API registrada aún"
+    "noApis": "Ninguna API registrada aún",
+    "trendHealthy": "Saludable",
+    "inReviewShort": "en revisión",
+    "needAttention": "necesitan atención",
+    "activeNow": "activos ahora",
+    "alertOpenIncidents": "{{count}} incidente(s) abierto(s) requieren atención",
+    "alertPendingChanges": "{{count}} cambio(s) pendiente(s) de revisión",
+    "alertSuspectedRegressions": "{{count}} regresión(es) sospechosa(s) detectada(s)",
+    "alertDeprecatedContracts": "{{count}} contrato(s) deprecado(s) necesitan acción"
   },
   "sidebar": {
     "dashboard": "Panel",
