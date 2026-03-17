@@ -56,7 +56,20 @@
     "ssoDescription": "Recomendado para contas empresariais",
     "orDivider": "ou inicie sessão com credenciais",
     "ssoRedirecting": "A redirecionar para o fornecedor de identidade...",
-    "ssoError": "Falha na autenticação SSO. Tente novamente ou utilize credenciais."
+    "ssoError": "Falha na autenticação SSO. Tente novamente ou utilize credenciais.",
+    "signInSubtitle": "Aceder à plataforma de governança",
+    "loginHeadline": "Plataforma Soberana de Governança de Engenharia",
+    "loginSubheadline": "A fonte de verdade para serviços, contratos, mudanças e conhecimento operacional em toda a organização.",
+    "capServiceGovernance": "Governança de Serviços e Catálogo",
+    "capContractGovernance": "Governança de Contratos e Ciclo de Vida",
+    "capChangeIntelligence": "Inteligência de Mudanças e Confiança",
+    "capComplianceAudit": "Conformidade, Auditoria e Risco",
+    "trustEncrypted": "Encriptado em trânsito",
+    "trustCompliant": "Conforme para empresas",
+    "showPassword": "Mostrar password",
+    "hidePassword": "Ocultar password",
+    "needHelp": "Precisa de ajuda para iniciar sessão?",
+    "contactSupport": "Contactar suporte"
   },
   "tenants": {
     "selectTenant": "Selecionar Organização",
@@ -93,7 +106,15 @@
     "incidentResolved": "Resolvidos",
     "noChanges": "Nenhuma mudança registada ainda",
     "noIncidents": "Nenhum incidente registado",
-    "noContracts": "Nenhum contrato importado ainda"
+    "noContracts": "Nenhum contrato importado ainda",
+    "trendHealthy": "Saudável",
+    "inReviewShort": "em revisão",
+    "needAttention": "precisam de atenção",
+    "activeNow": "ativos agora",
+    "alertOpenIncidents": "{{count}} incidente(s) aberto(s) requerem atenção",
+    "alertPendingChanges": "{{count}} mudança(s) pendente(s) de revisão",
+    "alertSuspectedRegressions": "{{count}} regressão(ões) suspeita(s) detetada(s)",
+    "alertDeprecatedContracts": "{{count}} contrato(s) deprecado(s) precisam de ação"
   },
   "sidebar": {
     "dashboard": "Painel",

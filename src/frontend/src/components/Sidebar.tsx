@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -37,12 +38,15 @@ import {
   Route,
   Cable,
   Building2,
-  Boxes,
   ShieldPlus,
   TrendingUp,
   Target,
   Package,
   FileCheck,
+  PanelLeftClose,
+  PanelLeftOpen,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -152,25 +156,62 @@ const sectionLabels: Record<NavSection, string> = {
   admin: 'sidebar.sectionAdmin',
 };
 
+/** Icon per section (shown when sidebar is collapsed). */
+const sectionIcons: Record<NavSection, React.ReactNode> = {
+  home: <LayoutDashboard size={18} />,
+  services: <Server size={18} />,
+  knowledge: <Globe size={18} />,
+  contracts: <FileText size={18} />,
+  changes: <ShieldCheck size={18} />,
+  operations: <AlertTriangle size={18} />,
+  aiHub: <Bot size={18} />,
+  governance: <Gauge size={18} />,
+  organization: <Building2 size={18} />,
+  analytics: <TrendingUp size={18} />,
+  integrations: <Cable size={18} />,
+  admin: <ShieldPlus size={18} />,
+};
+
+interface SidebarProps {
+  /** Whether the sidebar is collapsed (icon-only mode). */
+  collapsed?: boolean;
+  /** Callback to toggle collapsed state. */
+  onToggleCollapse?: () => void;
+}
+
 /**
- * Sidebar com navegação persona-aware.
+ * Sidebar com navegação persona-aware e modo colapsado.
  *
  * A ordem das secções adapta-se à persona do utilizador (definida em persona.ts).
  * As secções destacadas recebem indicador visual (borda accent).
  * A filtragem por permissão continua a funcionar normalmente.
+ * Secções com múltiplos itens são expansíveis/recolhíveis.
  *
  * @see docs/PERSONA-UX-MAPPING.md
  */
-export function Sidebar() {
+export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { can, roleName } = usePermissions();
   const { persona, config } = usePersona();
+  const [expandedSections, setExpandedSections] = useState<Set<NavSection>>(new Set(['home']));
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const toggleSection = (section: NavSection) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(section)) {
+        next.delete(section);
+      } else {
+        next.add(section);
+      }
+      return next;
+    });
   };
 
   const visibleItems = navItems.filter(
@@ -186,84 +227,153 @@ export function Sidebar() {
     if (items.length === 0) return null;
     const labelKey = sectionLabels[sectionKey];
     const highlighted = isHighlighted(sectionKey);
-    return (
-      <div key={sectionKey} className={`mb-4 ${highlighted ? 'pl-0.5 border-l-2 border-accent/30' : ''}`}>
-        {labelKey && (
-          <p className={`px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wider ${highlighted ? 'text-accent' : 'text-faded'}`}>
-            {t(labelKey)}
-          </p>
-        )}
-        <ul className="space-y-0.5">
+    const isHome = sectionKey === 'home';
+    const isExpanded = expandedSections.has(sectionKey) || isHome;
+    const hasMultipleItems = items.length > 1;
+
+    // In collapsed mode, show only the first icon per section with tooltip
+    if (collapsed) {
+      return (
+        <div key={sectionKey} className="mb-1">
           {items.map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                    isActive
-                      ? 'bg-accent/10 text-accent border-l-2 border-accent -ml-px'
-                      : 'text-muted hover:bg-hover hover:text-body'
-                  }`
-                }
-              >
-                {item.icon}
-                <span>{t(item.labelKey)}</span>
-              </NavLink>
-            </li>
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/'}
+              title={t(item.labelKey)}
+              className={({ isActive }) =>
+                `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-colors mb-0.5 ${
+                  isActive
+                    ? 'bg-accent/10 text-accent'
+                    : 'text-muted hover:bg-hover hover:text-body'
+                }`
+              }
+            >
+              {item.icon}
+            </NavLink>
           ))}
-        </ul>
+        </div>
+      );
+    }
+
+    return (
+      <div key={sectionKey} className={`mb-1 ${highlighted ? 'pl-0.5 border-l-2 border-accent/30' : ''}`}>
+        {labelKey && (
+          <button
+            onClick={() => hasMultipleItems && toggleSection(sectionKey)}
+            className={`w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider ${
+              highlighted ? 'text-accent' : 'text-faded'
+            } ${hasMultipleItems ? 'hover:text-muted cursor-pointer' : 'cursor-default'}`}
+          >
+            <span>{t(labelKey)}</span>
+            {hasMultipleItems && (
+              <span className="text-faded">
+                {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              </span>
+            )}
+          </button>
+        )}
+        {(isExpanded || !hasMultipleItems) && (
+          <ul className="space-y-0.5">
+            {items.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      isActive
+                        ? 'bg-accent/10 text-accent font-medium'
+                        : 'text-muted hover:bg-hover hover:text-body'
+                    }`
+                  }
+                >
+                  {item.icon}
+                  <span className="truncate">{t(item.labelKey)}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     );
   };
 
+  const sidebarWidth = collapsed ? 'w-16' : 'w-64';
+
   return (
-    <aside className="w-64 bg-panel flex flex-col h-screen fixed left-0 top-0 border-r border-edge">
-      {/* Brand stripe — gradiente da marca no topo */}
-      <div className="h-1 brand-gradient shrink-0" />
+    <aside className={`${sidebarWidth} bg-panel flex flex-col h-screen fixed left-0 top-0 border-r border-edge transition-all duration-200 z-30`}>
+      {/* Brand stripe */}
+      <div className="h-0.5 brand-gradient shrink-0" />
 
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-edge">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center">
-            <span className="text-accent font-bold text-sm">N</span>
-          </div>
-          <div>
-            <span className="font-semibold text-base text-heading tracking-tight">NexTraceOne</span>
-            <p className="text-[11px] text-muted leading-tight">{t('sidebar.tagline')}</p>
-          </div>
+      <div className={`px-3 py-3 border-b border-edge flex items-center ${collapsed ? 'justify-center' : 'gap-2.5 px-4'}`}>
+        <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
+          <span className="text-accent font-bold text-sm">N</span>
         </div>
+        {!collapsed && (
+          <div className="flex-1 min-w-0">
+            <span className="font-semibold text-sm text-heading tracking-tight">NexTraceOne</span>
+            <p className="text-[10px] text-muted leading-tight truncate">{t('sidebar.tagline')}</p>
+          </div>
+        )}
       </div>
 
       {/* Navigation — secções ordenadas por persona */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+      <nav className={`flex-1 py-3 overflow-y-auto ${collapsed ? 'px-1' : 'px-2'}`}>
         {config.sectionOrder.map((sectionKey) => {
           const sectionItems = visibleItems.filter((i) => i.section === sectionKey);
           return renderSection(sectionKey, sectionItems);
         })}
       </nav>
 
+      {/* Collapse toggle */}
+      {onToggleCollapse && (
+        <div className={`px-2 py-2 border-t border-edge ${collapsed ? 'flex justify-center' : ''}`}>
+          <button
+            onClick={onToggleCollapse}
+            className="flex items-center gap-2 px-2 py-1.5 rounded-md text-faded hover:text-muted hover:bg-hover transition-colors w-full text-sm"
+            title={collapsed ? t('common.expand') : t('common.collapse')}
+            aria-label={collapsed ? t('common.expand') : t('common.collapse')}
+          >
+            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+            {!collapsed && <span>{t('common.collapse')}</span>}
+          </button>
+        </div>
+      )}
+
       {/* User info — inclui badge da persona */}
-      <div className="px-4 py-3 border-t border-edge">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-semibold shrink-0">
-            {user?.email?.[0]?.toUpperCase() ?? 'U'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-heading truncate">{user?.email ?? t('common.user')}</p>
-            <p className="text-xs text-muted truncate">
-              {t(`persona.${persona}.label`)} · {roleName || t('common.defaultRole')}
-            </p>
-          </div>
+      <div className={`py-3 border-t border-edge ${collapsed ? 'px-2 flex justify-center' : 'px-3'}`}>
+        {collapsed ? (
           <button
             onClick={handleLogout}
-            className="text-muted hover:text-critical transition-colors p-1 rounded hover:bg-critical/10"
+            className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-semibold hover:bg-critical/20 hover:text-critical transition-colors"
             title={t('auth.signOut')}
             aria-label={t('auth.signOut')}
           >
-            <LogOut size={16} />
+            {user?.email?.[0]?.toUpperCase() ?? 'U'}
           </button>
-        </div>
+        ) : (
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-semibold shrink-0">
+              {user?.email?.[0]?.toUpperCase() ?? 'U'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-heading truncate">{user?.email ?? t('common.user')}</p>
+              <p className="text-[11px] text-muted truncate">
+                {t(`persona.${persona}.label`)} · {roleName || t('common.defaultRole')}
+              </p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="text-muted hover:text-critical transition-colors p-1 rounded hover:bg-critical/10"
+              title={t('auth.signOut')}
+              aria-label={t('auth.signOut')}
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

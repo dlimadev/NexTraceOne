@@ -56,7 +56,20 @@
     "ssoDescription": "Recomendado para contas corporativas",
     "orDivider": "ou entre com credenciais",
     "ssoRedirecting": "Redirecionando para o provedor de identidade...",
-    "ssoError": "Falha na autenticação SSO. Tente novamente ou use credenciais."
+    "ssoError": "Falha na autenticação SSO. Tente novamente ou use credenciais.",
+    "signInSubtitle": "Acesse sua plataforma de governança",
+    "loginHeadline": "Plataforma Soberana de Governança de Engenharia",
+    "loginSubheadline": "A fonte de verdade para serviços, contratos, mudanças e conhecimento operacional em toda a organização.",
+    "capServiceGovernance": "Governança de Serviços e Catálogo",
+    "capContractGovernance": "Governança de Contratos e Ciclo de Vida",
+    "capChangeIntelligence": "Inteligência de Mudanças e Confiança",
+    "capComplianceAudit": "Conformidade, Auditoria e Risco",
+    "trustEncrypted": "Criptografado em trânsito",
+    "trustCompliant": "Compatível com empresas",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "needHelp": "Precisa de ajuda para entrar?",
+    "contactSupport": "Contatar suporte"
   },
   "tenants": {
     "selectTenant": "Selecionar Organização",
@@ -78,7 +91,15 @@
     "recentServices": "Serviços Recentes",
     "registeredApisTitle": "APIs Registradas",
     "noServices": "Nenhum serviço registrado ainda",
-    "noApis": "Nenhuma API registrada ainda"
+    "noApis": "Nenhuma API registrada ainda",
+    "trendHealthy": "Saudável",
+    "inReviewShort": "em revisão",
+    "needAttention": "precisam de atenção",
+    "activeNow": "ativos agora",
+    "alertOpenIncidents": "{{count}} incidente(s) aberto(s) requerem atenção",
+    "alertPendingChanges": "{{count}} mudança(s) pendente(s) de revisão",
+    "alertSuspectedRegressions": "{{count}} regressão(ões) suspeita(s) detectada(s)",
+    "alertDeprecatedContracts": "{{count}} contrato(s) deprecado(s) precisam de ação"
   },
   "sidebar": {
     "dashboard": "Painel",

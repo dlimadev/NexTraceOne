@@ -56,7 +56,20 @@
     "ssoDescription": "Recommended for corporate accounts",
     "orDivider": "or sign in with credentials",
     "ssoRedirecting": "Redirecting to identity provider...",
-    "ssoError": "SSO authentication failed. Please try again or use credentials."
+    "ssoError": "SSO authentication failed. Please try again or use credentials.",
+    "signInSubtitle": "Access your governance platform",
+    "loginHeadline": "Sovereign Engineering Governance Platform",
+    "loginSubheadline": "The source of truth for services, contracts, changes and operational knowledge across your organization.",
+    "capServiceGovernance": "Service Governance & Catalog",
+    "capContractGovernance": "Contract Governance & Lifecycle",
+    "capChangeIntelligence": "Change Intelligence & Confidence",
+    "capComplianceAudit": "Compliance, Audit & Risk",
+    "trustEncrypted": "Encrypted in transit",
+    "trustCompliant": "Enterprise compliant",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "needHelp": "Need help signing in?",
+    "contactSupport": "Contact support"
   },
   "tenants": {
     "selectTenant": "Select Organization",
@@ -93,7 +106,15 @@
     "incidentResolved": "Resolved",
     "noChanges": "No changes recorded yet",
     "noIncidents": "No incidents recorded",
-    "noContracts": "No contracts imported yet"
+    "noContracts": "No contracts imported yet",
+    "trendHealthy": "Healthy",
+    "inReviewShort": "in review",
+    "needAttention": "need attention",
+    "activeNow": "active now",
+    "alertOpenIncidents": "{{count}} open incident(s) require attention",
+    "alertPendingChanges": "{{count}} change(s) pending review",
+    "alertSuspectedRegressions": "{{count}} suspected regression(s) detected",
+    "alertDeprecatedContracts": "{{count}} deprecated contract(s) need action"
   },
   "sidebar": {
     "dashboard": "Dashboard",
