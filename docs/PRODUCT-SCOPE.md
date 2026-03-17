@@ -33,7 +33,7 @@ Fluxos centrais que definem o NexTraceOne como produto:
 - Service Catalog & Ownership (✅ produção)
 - Identity & Access (✅ produção)
 - Audit Compliance (✅ produção)
-- Licensing (✅ produção)
+- ~~Licensing~~ (removido — fora do núcleo do produto)
 
 ---
 

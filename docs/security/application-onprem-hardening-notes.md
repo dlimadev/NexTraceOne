@@ -119,7 +119,6 @@ dotnet publish src/platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj \
 |---------|----------------|
 | Connection string do banco | Variável de ambiente ou secrets manager |
 | JWT Secret | Variável de ambiente ou secrets manager |
-| License Key | Variável de ambiente ou secrets manager |
 | SMTP credentials | Variável de ambiente ou secrets manager |
 | OpenTelemetry endpoint | Variável de ambiente |
 
@@ -138,7 +137,6 @@ NEXTRACE_SKIP_INTEGRITY=true|false   # Pular verificação de integridade (dev o
 NEXTRACE_AUTO_MIGRATE=true|false     # Auto-migrate banco (default: false em prod)
 ConnectionStrings__NexTraceOne=...   # Connection string do PostgreSQL
 Jwt__Secret=...                      # Segredo JWT (mín. 256 bits)
-NexTraceOne__LicenseKey=...          # Chave de licença
 ```
 
 ---

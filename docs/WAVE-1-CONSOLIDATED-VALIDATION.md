@@ -1,5 +1,7 @@
 # NexTraceOne — Wave 1 Consolidated Validation (PR-1 to PR-16)
 
+> **Nota histórica (PR-17):** O módulo CommercialGovernance/Licensing foi implementado e validado na Wave 1, mas foi removido no PR-17 por não estar alinhado ao núcleo do produto NexTraceOne. As referências abaixo são mantidas como registo histórico.
+
 > **Date**: 2026-03-16  
 > **Scope**: All capabilities implemented from PR-1 through PR-16  
 > **Method**: Code-level inspection of backend handlers, domain entities, EF persistence, API endpoints, frontend pages, i18n, tests, and documentation  

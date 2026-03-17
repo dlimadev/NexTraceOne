@@ -27,7 +27,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | ChangeGovernance — Workflow | OK | Templates, stages, approvals, evidence packs, SLA policies |
 | ChangeGovernance — Promotion | OK | Promotion requests, gates, evaluation, freeze windows. RequirePermission enforced |
 | ChangeGovernance — RulesetGovernance | OK | Rulesets, lint execution, bindings, default installs. RequirePermission enforced |
-| CommercialGovernance | OK | Licensing, vendor ops, telemetry consent (124 testes) |
+| ~~CommercialGovernance~~ | REMOVED | Módulo removido no PR-17 — fora do núcleo do produto |
 | OperationalIntelligence — Runtime | OK | Snapshots, baselines, drift detection, observability profiles. RequirePermission enforced |
 | OperationalIntelligence — Cost | OK | Cost snapshots, attribution, trends, anomaly alerts. RequirePermission enforced |
 | OperationalIntelligence — Incidents | OK | Domain, queries, correlation, evidence, mitigation (164 testes). **⚠️ Handlers usam dados mock — sem persistência real.** Ver REBASELINE.md |
@@ -43,7 +43,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 | Frontend — i18n | OK | 4 locales (en, pt-BR, pt-PT, es); 1,650+ chaves; zero hardcoded strings visíveis nas áreas críticas |
 | Frontend — auth | OK | RBAC, ProtectedRoute, persona derivation, permissões visuais |
 | Frontend — Persona-aware UX | OK | 7 personas, PersonaContext, config por persona, home adaptativa |
-| Frontend — Dark Enterprise Theme | OK | Identidade visual única; VendorLicensing alinhado |
+| Frontend — Dark Enterprise Theme | OK | Identidade visual única |
 | Frontend — AI Hub | OK | AI Assistant, Model Registry, AI Policies, Token Budget, AI Audit pages |
 | Frontend — Operations | OK | Incidents, Runbooks, Reliability pages com domain connection |
 | Frontend — Governance | OK | Reports (persona-aware), Risk Center, Compliance, FinOps pages |
@@ -227,7 +227,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 ### Hardening & Refoundation Closure (Fase Final — concluída)
 28. ✅ i18n: Eliminar todas as hardcoded strings residuais (14 corrigidas)
 29. ✅ Segurança: RequirePermission em todos os 40 endpoints desprotegidos
-30. ✅ Visual: VendorLicensingPage alinhada ao dark enterprise theme
+30. ~~Visual: VendorLicensingPage~~ — removida junto com módulo CommercialGovernance
 31. ✅ Visual: Health status badges corrigidos para dark theme
 32. ✅ Documentação: SOLUTION-GAP-ANALYSIS.md atualizado
 
@@ -288,7 +288,7 @@ classificando cada área como **OK**, **Reposicionar**, **Refatorar** ou **Criar
 
 #### Testes
 - ✅ 1,447 testes backend a passar (atualizado pós-PR-16)
-- ✅ Cobertura em todos os módulos core (Catalog, ChangeGovernance, IdentityAccess, OperationalIntelligence, AIKnowledge, CommercialGovernance)
+- ✅ Cobertura em todos os módulos core (Catalog, ChangeGovernance, IdentityAccess, OperationalIntelligence, AIKnowledge)
 - ⚠️ Frontend tests limitados
 - ⚠️ E2E/Integration tests são placeholder
 

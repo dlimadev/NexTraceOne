@@ -17,7 +17,7 @@
 | **Change Governance** | 50+ | 100% | 0% | 4 | 4 | ALTA | ✅ Sim |
 | **Identity Access** | 35 | 100% | 0% | 1 | 1 | ALTA | ✅ Sim |
 | **Audit Compliance** | 7 | 100% | 0% | 1 | 1 | ALTA | ✅ Sim |
-| **Commercial Governance** | 21 | 100% | 0% | 1 | 2 | ALTA | ✅ Sim |
+| ~~Commercial Governance~~ | — | — | — | — | — | — | ❌ Removido (PR-17) |
 | **Operational Intelligence** | 42 | 26% | 74% | 2 | 0 | BAIXA | ❌ Parcial |
 | **AI Knowledge** | 36 | 78% | 22% | 3 | 0 | MÉDIA | ❌ Parcial |
 | **Governance** | 74 | 0% | 100% | 0 | 0 | BAIXA | ❌ Design |
@@ -61,12 +61,9 @@
 - Hash chain SHA-256 para imutabilidade
 - RecordAuditEvent, GetAuditTrail, VerifyChainIntegrity, SearchAuditLog — tudo real
 
-#### Commercial Governance — ALTA maturidade ✅
-
-- 1 DbContext real: LicensingDbContext
-- 6 repositórios implementados
-- 2 migrações aplicadas
-- Licenciamento, feature packs, hardware binding, trials — tudo real
+#### ~~Commercial Governance~~ — REMOVIDO (PR-17)
+- Módulo de licenciamento removido por não estar alinhado ao núcleo do produto.
+- Código, testes, migrações e frontend foram removidos de forma segura.
 
 #### Operational Intelligence — MATURIDADE MELHORADA ⚠️
 
@@ -110,7 +107,7 @@
 | **Identity Access** | 9 | ✅ Sim | — | Conectado ao backend |
 | **Product Analytics** | 5 | ✅ Sim | — | Conectado (dados mock no backend) |
 | **Audit Compliance** | 1 | ✅ Sim | — | Conectado ao backend |
-| **Commercial Governance** | 2 | ✅ Sim | — | Conectado ao backend |
+| ~~Commercial Governance~~ | — | — | — | Removido (PR-17) |
 | **Shared** | 1 | ✅ Sim | — | Dashboard |
 | **Total** | **82** | **73** | **9** | 89% conectado |
 
