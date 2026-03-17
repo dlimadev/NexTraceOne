@@ -1,6 +1,6 @@
-using NexTraceOne.CostIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
-namespace NexTraceOne.CostIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Tests.Cost.Domain.Entities;
 
 /// <summary>Testes unitários da entidade CostSnapshot — validação de invariantes e comportamento.</summary>
 public sealed class CostSnapshotTests

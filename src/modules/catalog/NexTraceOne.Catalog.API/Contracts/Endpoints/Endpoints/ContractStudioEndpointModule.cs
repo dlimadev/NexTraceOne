@@ -1,23 +1,26 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using NexTraceOne.Contracts.Domain.Enums;
-using AddDraftExampleFeature = NexTraceOne.Contracts.Application.Features.AddDraftExample.AddDraftExample;
-using ApproveDraftFeature = NexTraceOne.Contracts.Application.Features.ApproveDraft.ApproveDraft;
-using CreateDraftFeature = NexTraceOne.Contracts.Application.Features.CreateDraft.CreateDraft;
-using GenerateDraftFromAiFeature = NexTraceOne.Contracts.Application.Features.GenerateDraftFromAi.GenerateDraftFromAi;
-using GetDraftFeature = NexTraceOne.Contracts.Application.Features.GetDraft.GetDraft;
-using ListDraftReviewsFeature = NexTraceOne.Contracts.Application.Features.ListDraftReviews.ListDraftReviews;
-using ListDraftsFeature = NexTraceOne.Contracts.Application.Features.ListDrafts.ListDrafts;
-using PublishDraftFeature = NexTraceOne.Contracts.Application.Features.PublishDraft.PublishDraft;
-using RejectDraftFeature = NexTraceOne.Contracts.Application.Features.RejectDraft.RejectDraft;
-using SubmitDraftForReviewFeature = NexTraceOne.Contracts.Application.Features.SubmitDraftForReview.SubmitDraftForReview;
-using UpdateDraftContentFeature = NexTraceOne.Contracts.Application.Features.UpdateDraftContent.UpdateDraftContent;
-using UpdateDraftMetadataFeature = NexTraceOne.Contracts.Application.Features.UpdateDraftMetadata.UpdateDraftMetadata;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.API.Endpoints;
+using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample.AddDraftExample;
+using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft.ApproveDraft;
+using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
+using GenerateDraftFromAiFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi.GenerateDraftFromAi;
+using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
+using ListDraftReviewsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews.ListDraftReviews;
+using ListDraftsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts.ListDrafts;
+using PublishDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft.PublishDraft;
+using RejectDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft.RejectDraft;
+using SubmitDraftForReviewFeature = NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview.SubmitDraftForReview;
+using UpdateDraftContentFeature = NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent.UpdateDraftContent;
+using UpdateDraftMetadataFeature = NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata.UpdateDraftMetadata;
+
+namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do Contract Studio (drafts, revisões, publicação).

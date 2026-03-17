@@ -1,8 +1,9 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
 /// <summary>
 /// Entidade que representa o relatório de blast radius de uma release,

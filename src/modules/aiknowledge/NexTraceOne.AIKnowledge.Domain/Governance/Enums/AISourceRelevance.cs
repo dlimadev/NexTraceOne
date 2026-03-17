@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiGovernance.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 /// <summary>
 /// Relevância da fonte de conhecimento para um caso de uso específico.

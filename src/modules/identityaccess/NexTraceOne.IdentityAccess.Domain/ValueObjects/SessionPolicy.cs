@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Identity.Domain.ValueObjects;
+namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 /// <summary>
 /// Política de gestão de sessões aplicável a um tenant ou contexto.

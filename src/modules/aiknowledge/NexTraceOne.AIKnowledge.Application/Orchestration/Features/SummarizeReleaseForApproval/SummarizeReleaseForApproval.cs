@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.AiOrchestration.Application.Features.SummarizeReleaseForApproval;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration.Features.SummarizeReleaseForApproval;
 
 /// <summary>
 /// Feature: SummarizeReleaseForApproval — Módulo: AiOrchestration.

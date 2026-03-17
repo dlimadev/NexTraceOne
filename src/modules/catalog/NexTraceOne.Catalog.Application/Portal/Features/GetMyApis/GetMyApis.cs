@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetMyApis;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetMyApis;
 
 /// <summary>
 /// Feature: GetMyApis — lista APIs de que o utilizador é owner ou responsável.

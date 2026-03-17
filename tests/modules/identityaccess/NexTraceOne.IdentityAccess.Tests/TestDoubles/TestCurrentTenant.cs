@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
-namespace NexTraceOne.Identity.Tests.TestDoubles;
+namespace NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
 /// <summary>
 /// Implementação simples de tenant atual para cenários de teste.

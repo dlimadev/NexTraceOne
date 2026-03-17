@@ -1,10 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Features.ListBreakGlassRequests;
+namespace NexTraceOne.IdentityAccess.Application.Features.ListBreakGlassRequests;
 
 /// <summary>
 /// Feature: ListBreakGlassRequests — lista solicitações Break Glass do tenant atual.

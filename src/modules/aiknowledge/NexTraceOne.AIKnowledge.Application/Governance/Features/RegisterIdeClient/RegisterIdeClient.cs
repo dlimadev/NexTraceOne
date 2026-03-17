@@ -1,14 +1,16 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
-using NexTraceOne.AiGovernance.Domain.Errors;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.RegisterIdeClient;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterIdeClient;
 
 /// <summary>
 /// Feature: RegisterIdeClient — regista um novo cliente IDE para uso governado.

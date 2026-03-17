@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.GetDriftFindings;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 
 /// <summary>
 /// Feature: GetDriftFindings — lista drift findings de um serviço com paginação.

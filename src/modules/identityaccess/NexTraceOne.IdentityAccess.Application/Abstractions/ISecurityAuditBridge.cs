@@ -1,6 +1,6 @@
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Abstractions;
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Ponte entre o módulo Identity e o módulo Audit central da plataforma.

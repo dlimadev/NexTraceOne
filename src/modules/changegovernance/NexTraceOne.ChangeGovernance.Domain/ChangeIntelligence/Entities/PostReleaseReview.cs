@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
 /// <summary>
 /// Review automática pós-release baseada em janelas progressivas de observação.

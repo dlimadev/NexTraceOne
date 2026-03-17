@@ -1,7 +1,7 @@
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 
 /// <summary>Contrato de repositório para janelas de observação pós-release.</summary>
 public interface IObservationWindowRepository

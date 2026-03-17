@@ -1,7 +1,7 @@
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
-namespace NexTraceOne.Workflow.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
 
 /// <summary>Contrato de repositório para a entidade WorkflowInstance.</summary>
 public interface IWorkflowInstanceRepository

@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiOrchestration.Domain.Errors;
+namespace NexTraceOne.AIKnowledge.Domain.Orchestration.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo AiOrchestration com códigos i18n.

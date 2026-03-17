@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Entities;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.CreatePolicy;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.CreatePolicy;
 
 /// <summary>
 /// Feature: CreatePolicy — cria uma nova política de acesso de IA.

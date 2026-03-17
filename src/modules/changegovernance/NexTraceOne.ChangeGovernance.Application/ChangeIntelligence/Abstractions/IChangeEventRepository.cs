@@ -1,6 +1,6 @@
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 
 /// <summary>Contrato de repositório para eventos de mudança na timeline.</summary>
 public interface IChangeEventRepository

@@ -1,15 +1,18 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+
 using GetServiceSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceSourceOfTruth.GetServiceSourceOfTruth;
 using GetContractSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetContractSourceOfTruth.GetContractSourceOfTruth;
 using GetServiceCoverageFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceCoverage.GetServiceCoverage;
 using SearchSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.SearchSourceOfTruth.SearchSourceOfTruth;
 using GlobalSearchFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GlobalSearch.GlobalSearch;
 
-namespace NexTraceOne.Catalog.API.SourceOfTruth.Endpoints;
+namespace NexTraceOne.Catalog.API.SourceOfTruth.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra os endpoints Minimal API do módulo Source of Truth.

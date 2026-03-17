@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.AiOrchestration.Application.Features.GenerateRobotFrameworkDraft;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft;
 
 /// <summary>
 /// Feature: GenerateRobotFrameworkDraft — Módulo: AiOrchestration.

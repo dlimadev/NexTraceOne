@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.DeveloperPortal.Application;
-using NexTraceOne.DeveloperPortal.Infrastructure;
 
-namespace NexTraceOne.DeveloperPortal.API;
+using NexTraceOne.Catalog.Application.Portal;
+using NexTraceOne.Catalog.Infrastructure.Portal;
+
+namespace NexTraceOne.Catalog.API.Portal.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo DeveloperPortal.

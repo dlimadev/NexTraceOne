@@ -1,7 +1,8 @@
 using System.Text.Json;
-using NexTraceOne.AiGovernance.Application.Features.SendAssistantMessage;
 
-namespace NexTraceOne.AiGovernance.Tests.Governance.Application.Features;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessage;
+
+namespace NexTraceOne.AIKnowledge.Tests.Governance.Application.Features;
 
 /// <summary>
 /// Testes unitários para validação dos context bundles do AI Assistant.

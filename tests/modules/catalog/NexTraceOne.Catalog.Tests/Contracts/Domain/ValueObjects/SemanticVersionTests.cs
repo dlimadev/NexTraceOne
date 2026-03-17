@@ -1,6 +1,6 @@
-using NexTraceOne.Contracts.Domain.ValueObjects;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.ValueObjects;
 
 /// <summary>
 /// Testes de domínio para o value object SemanticVersion.

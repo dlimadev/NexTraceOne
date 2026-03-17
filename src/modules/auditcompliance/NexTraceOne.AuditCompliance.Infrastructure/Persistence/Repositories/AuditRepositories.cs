@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Audit.Application.Abstractions;
-using NexTraceOne.Audit.Domain.Entities;
 
-namespace NexTraceOne.Audit.Infrastructure.Persistence.Repositories;
+using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.AuditCompliance.Domain.Entities;
+
+namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
 
 internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEventRepository
 {

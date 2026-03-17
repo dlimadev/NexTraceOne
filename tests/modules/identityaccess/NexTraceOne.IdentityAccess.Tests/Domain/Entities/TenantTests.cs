@@ -1,7 +1,6 @@
-using FluentAssertions;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Tests.Domain.Entities;
+namespace NexTraceOne.IdentityAccess.Tests.Domain.Entities;
 
 /// <summary>
 /// Testes do aggregate Tenant — validam criação, atualização, ativação e desativação.

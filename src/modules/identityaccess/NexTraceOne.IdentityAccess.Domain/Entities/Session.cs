@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.Identity.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+
+namespace NexTraceOne.IdentityAccess.Domain.Entities;
 
 /// <summary>
 /// Aggregate Root que representa uma sessão autenticada com refresh token rotacionável.

@@ -1,4 +1,4 @@
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value object que modela a vinculação de um contrato a um Schema Registry (Kafka).

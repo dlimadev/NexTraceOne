@@ -1,18 +1,20 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.Promotion.Application.Features.ApprovePromotion;
-using NexTraceOne.Promotion.Application.Features.BlockPromotion;
-using NexTraceOne.Promotion.Application.Features.ConfigureEnvironment;
-using NexTraceOne.Promotion.Application.Features.CreatePromotionRequest;
-using NexTraceOne.Promotion.Application.Features.EvaluatePromotionGates;
-using NexTraceOne.Promotion.Application.Features.GetGateEvaluation;
-using NexTraceOne.Promotion.Application.Features.GetPromotionStatus;
-using NexTraceOne.Promotion.Application.Features.ListPromotionRequests;
-using NexTraceOne.Promotion.Application.Features.OverrideGateWithJustification;
 
-namespace NexTraceOne.Promotion.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.BlockPromotion;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.ConfigureEnvironment;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.CreatePromotionRequest;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluatePromotionGates;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetGateEvaluation;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification;
+
+namespace NexTraceOne.ChangeGovernance.Application.Promotion;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo Promotion.

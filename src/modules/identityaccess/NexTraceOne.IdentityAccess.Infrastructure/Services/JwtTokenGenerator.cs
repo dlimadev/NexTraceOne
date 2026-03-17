@@ -1,12 +1,14 @@
-using Microsoft.Extensions.Configuration;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace NexTraceOne.Identity.Infrastructure.Services;
+using Microsoft.Extensions.Configuration;
+
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Gerador de JWT (access token) e refresh token para o módulo Identity.

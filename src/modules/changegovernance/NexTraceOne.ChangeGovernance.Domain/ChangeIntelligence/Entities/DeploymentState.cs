@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
 /// <summary>Status do deployment de uma release.</summary>
 public enum DeploymentStatus

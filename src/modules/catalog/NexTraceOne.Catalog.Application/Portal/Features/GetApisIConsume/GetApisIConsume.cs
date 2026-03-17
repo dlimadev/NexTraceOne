@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetApisIConsume;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume;
 
 /// <summary>
 /// Feature: GetApisIConsume — painel do consumidor com APIs que o utilizador/serviço consome.

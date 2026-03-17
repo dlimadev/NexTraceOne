@@ -1,14 +1,16 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
-using NexTraceOne.ChangeIntelligence.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.RegisterExternalMarker;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker;
 
 /// <summary>
 /// Feature: RegisterExternalMarker — registra um marcador externo de ferramenta CI/CD na timeline da release.

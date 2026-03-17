@@ -1,8 +1,9 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Workflow.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
 
 /// <summary>
 /// Entidade que representa a política de SLA de um estágio de workflow.

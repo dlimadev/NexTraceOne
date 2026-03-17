@@ -1,14 +1,17 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
-using NexTraceOne.Identity.Domain.Errors;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Errors;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Application.Features.RefreshToken;
+using LocalLoginFeature = NexTraceOne.IdentityAccess.Application.Features.LocalLogin.LocalLogin;
+
+namespace NexTraceOne.IdentityAccess.Application.Features.RefreshToken;
 
 /// <summary>
 /// Feature: RefreshToken — rotaciona o refresh token e emite novo access token.
@@ -23,7 +26,7 @@ public static class RefreshToken
 {
     /// <summary>Comando de renovação de tokens.</summary>
     public sealed record Command(string RefreshToken, string? IpAddress = null, string? UserAgent = null)
-        : ICommand<LocalLoginFeature.LoginResponse>, IPublicRequest;
+        : ICommand<LocalLogin.LocalLogin.LoginResponse>, IPublicRequest;
 
     /// <summary>Valida a entrada da rotação de refresh token.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -47,7 +50,7 @@ public static class RefreshToken
         IRoleRepository roleRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
+        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLogin.LocalLogin.LoginResponse>
     {
         public async Task<Result<LocalLoginFeature.LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {

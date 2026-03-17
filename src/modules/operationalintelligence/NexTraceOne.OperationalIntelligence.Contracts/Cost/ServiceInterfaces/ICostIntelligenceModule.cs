@@ -1,4 +1,4 @@
-namespace NexTraceOne.CostIntelligence.Contracts.ServiceInterfaces;
+namespace NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo CostIntelligence.

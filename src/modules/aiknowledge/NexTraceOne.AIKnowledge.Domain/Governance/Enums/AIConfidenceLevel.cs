@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiGovernance.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 /// <summary>
 /// Nível de confiança da resposta da IA, baseado na qualidade do contexto disponível.

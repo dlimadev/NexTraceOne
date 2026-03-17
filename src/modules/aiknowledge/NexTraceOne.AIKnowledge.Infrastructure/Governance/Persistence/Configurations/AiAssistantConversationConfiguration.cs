@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
 
-namespace NexTraceOne.AiGovernance.Infrastructure.Persistence.Configurations;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+
+namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Configurations;
 
 internal sealed class AiAssistantConversationConfiguration : IEntityTypeConfiguration<AiAssistantConversation>
 {

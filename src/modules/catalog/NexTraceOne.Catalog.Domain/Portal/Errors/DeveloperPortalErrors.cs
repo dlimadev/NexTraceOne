@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.DeveloperPortal.Domain.Errors;
+namespace NexTraceOne.Catalog.Domain.Portal.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo DeveloperPortal com códigos i18n.

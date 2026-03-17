@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
 
-namespace NexTraceOne.Identity.Application.Features.ListPermissions;
+namespace NexTraceOne.IdentityAccess.Application.Features.ListPermissions;
 
 /// <summary>
 /// Feature: ListPermissions — lista todas as permissões registradas no sistema.

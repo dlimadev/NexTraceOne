@@ -1,7 +1,7 @@
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
-namespace NexTraceOne.AiGovernance.Application.Abstractions;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 
 /// <summary>
 /// Repositório de modelos de IA do Model Registry.

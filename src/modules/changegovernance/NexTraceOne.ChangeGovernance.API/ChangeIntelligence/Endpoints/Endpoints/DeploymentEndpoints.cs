@@ -1,12 +1,15 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using NotifyDeploymentFeature = NexTraceOne.ChangeIntelligence.Application.Features.NotifyDeployment.NotifyDeployment;
-using UpdateDeploymentStateFeature = NexTraceOne.ChangeIntelligence.Application.Features.UpdateDeploymentState.UpdateDeploymentState;
-using RegisterRollbackFeature = NexTraceOne.ChangeIntelligence.Application.Features.RegisterRollback.RegisterRollback;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
+using UpdateDeploymentStateFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState.UpdateDeploymentState;
+using RegisterRollbackFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback.RegisterRollback;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão do ciclo de vida de deployments.

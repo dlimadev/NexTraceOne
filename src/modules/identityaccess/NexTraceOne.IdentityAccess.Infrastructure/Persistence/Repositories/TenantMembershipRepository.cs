@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de vínculos de usuário com tenants persistidos via EF Core.

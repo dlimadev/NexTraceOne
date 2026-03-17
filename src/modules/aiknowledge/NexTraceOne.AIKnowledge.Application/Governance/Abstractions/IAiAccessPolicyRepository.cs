@@ -1,6 +1,6 @@
-using NexTraceOne.AiGovernance.Domain.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
-namespace NexTraceOne.AiGovernance.Application.Abstractions;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 
 /// <summary>
 /// Repositório de políticas de acesso de IA.

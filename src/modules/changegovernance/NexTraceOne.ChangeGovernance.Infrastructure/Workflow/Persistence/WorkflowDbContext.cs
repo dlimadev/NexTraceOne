@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Workflow.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
 
-namespace NexTraceOne.Workflow.Infrastructure.Persistence;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
 
 /// <summary>
 /// DbContext do módulo Workflow.

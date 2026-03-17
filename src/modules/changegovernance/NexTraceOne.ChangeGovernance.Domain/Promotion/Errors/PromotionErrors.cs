@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.Promotion.Domain.Errors;
+namespace NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo Promotion.

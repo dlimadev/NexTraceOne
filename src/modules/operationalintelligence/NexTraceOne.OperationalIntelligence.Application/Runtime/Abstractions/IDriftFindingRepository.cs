@@ -1,6 +1,6 @@
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Abstractions;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 
 /// <summary>
 /// Contrato de repositório para a entidade DriftFinding.

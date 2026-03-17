@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiGovernance.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 /// <summary>
 /// Razão para escalonamento de execução para IA externa.

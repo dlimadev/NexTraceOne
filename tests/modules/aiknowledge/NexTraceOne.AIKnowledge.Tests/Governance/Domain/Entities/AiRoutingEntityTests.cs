@@ -1,7 +1,7 @@
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
-namespace NexTraceOne.AiGovernance.Tests.Governance.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Tests.Governance.Domain.Entities;
 
 /// <summary>Testes unitários das entidades de AI Routing &amp; Enrichment.</summary>
 public sealed class AiRoutingEntityTests

@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
-using NexTraceOne.DeveloperPortal.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
+using NexTraceOne.Catalog.Domain.Portal.Errors;
 
-namespace NexTraceOne.DeveloperPortal.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Portal.Entities;
 
 /// <summary>
 /// Aggregate Root que representa a subscrição de um desenvolvedor a uma API do catálogo.

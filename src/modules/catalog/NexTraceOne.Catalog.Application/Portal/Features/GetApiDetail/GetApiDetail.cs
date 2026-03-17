@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Domain.Errors;
+using NexTraceOne.Catalog.Domain.Portal.Errors;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetApiDetail;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail;
 
 /// <summary>
 /// Feature: GetApiDetail — retorna detalhes completos de uma API incluindo sinais de confiança.

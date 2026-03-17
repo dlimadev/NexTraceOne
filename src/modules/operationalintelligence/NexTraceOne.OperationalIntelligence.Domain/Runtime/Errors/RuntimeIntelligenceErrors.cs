@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.RuntimeIntelligence.Domain.Errors;
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo RuntimeIntelligence com códigos i18n.

@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
+using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Audit.Application.Abstractions;
-using NexTraceOne.Audit.Domain.Entities;
 
-namespace NexTraceOne.Audit.Application.Features.RecordAuditEvent;
+namespace NexTraceOne.AuditCompliance.Application.Features.RecordAuditEvent;
 
 /// <summary>
 /// Feature: RecordAuditEvent — registra um evento de auditoria com hash chain SHA-256.

@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.SyncJiraWorkItems;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
 
 /// <summary>
 /// Feature: SyncJiraWorkItems — stub de sincronização com Jira (integração não configurada).

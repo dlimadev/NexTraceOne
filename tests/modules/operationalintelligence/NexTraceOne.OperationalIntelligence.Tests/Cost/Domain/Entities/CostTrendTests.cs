@@ -1,7 +1,7 @@
-using NexTraceOne.CostIntelligence.Domain.Entities;
-using NexTraceOne.CostIntelligence.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Enums;
 
-namespace NexTraceOne.CostIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Tests.Cost.Domain.Entities;
 
 /// <summary>Testes unitários da entidade CostTrend — classificação automática e invariantes.</summary>
 public sealed class CostTrendTests

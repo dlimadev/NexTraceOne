@@ -1,11 +1,14 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using ListMyTenantsFeature = NexTraceOne.Identity.Application.Features.ListMyTenants.ListMyTenants;
-using SelectTenantFeature = NexTraceOne.Identity.Application.Features.SelectTenant.SelectTenant;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+
+using ListMyTenantsFeature = NexTraceOne.IdentityAccess.Application.Features.ListMyTenants.ListMyTenants;
+using SelectTenantFeature = NexTraceOne.IdentityAccess.Application.Features.SelectTenant.SelectTenant;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão de tenants do utilizador autenticado.

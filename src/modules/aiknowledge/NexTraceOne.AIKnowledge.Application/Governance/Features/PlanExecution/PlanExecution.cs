@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.PlanExecution;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.PlanExecution;
 
 /// <summary>
 /// Feature: PlanExecution — planeia execução de IA com seleção inteligente de modelo,

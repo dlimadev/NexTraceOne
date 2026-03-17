@@ -1,16 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Contracts.ServiceInterfaces;
-using NexTraceOne.Workflow.Infrastructure.Persistence;
-using NexTraceOne.Workflow.Infrastructure.Persistence.Repositories;
-using NexTraceOne.Workflow.Infrastructure.Services;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.Workflow.ServiceInterfaces;
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Services;
 
-namespace NexTraceOne.Workflow.Infrastructure;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Workflow.

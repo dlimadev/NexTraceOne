@@ -1,11 +1,11 @@
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Tests.TestDoubles;
-using ListEnvironmentsFeature = NexTraceOne.Identity.Application.Features.ListEnvironments.ListEnvironments;
-using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+using ListEnvironmentsFeature = NexTraceOne.IdentityAccess.Application.Features.ListEnvironments.ListEnvironments;
+using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
+
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature ListEnvironments.

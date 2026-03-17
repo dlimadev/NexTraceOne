@@ -1,16 +1,19 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ExportAuditReportFeature = NexTraceOne.Audit.Application.Features.ExportAuditReport.ExportAuditReport;
-using GetAuditTrailFeature = NexTraceOne.Audit.Application.Features.GetAuditTrail.GetAuditTrail;
-using GetComplianceReportFeature = NexTraceOne.Audit.Application.Features.GetComplianceReport.GetComplianceReport;
-using RecordAuditEventFeature = NexTraceOne.Audit.Application.Features.RecordAuditEvent.RecordAuditEvent;
-using SearchAuditLogFeature = NexTraceOne.Audit.Application.Features.SearchAuditLog.SearchAuditLog;
-using VerifyChainIntegrityFeature = NexTraceOne.Audit.Application.Features.VerifyChainIntegrity.VerifyChainIntegrity;
 
-namespace NexTraceOne.Audit.API.Endpoints;
+using ExportAuditReportFeature = NexTraceOne.AuditCompliance.Application.Features.ExportAuditReport.ExportAuditReport;
+using GetAuditTrailFeature = NexTraceOne.AuditCompliance.Application.Features.GetAuditTrail.GetAuditTrail;
+using GetComplianceReportFeature = NexTraceOne.AuditCompliance.Application.Features.GetComplianceReport.GetComplianceReport;
+using RecordAuditEventFeature = NexTraceOne.AuditCompliance.Application.Features.RecordAuditEvent.RecordAuditEvent;
+using SearchAuditLogFeature = NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog.SearchAuditLog;
+using VerifyChainIntegrityFeature = NexTraceOne.AuditCompliance.Application.Features.VerifyChainIntegrity.VerifyChainIntegrity;
+
+namespace NexTraceOne.AuditCompliance.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo Audit.

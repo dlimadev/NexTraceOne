@@ -1,15 +1,18 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Errors;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Errors;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Application.Features.FederatedLogin;
+using LocalLoginFeature = NexTraceOne.IdentityAccess.Application.Features.LocalLogin.LocalLogin;
+
+namespace NexTraceOne.IdentityAccess.Application.Features.FederatedLogin;
 
 /// <summary>
 /// Feature: FederatedLogin — autentica um usuário federado com provider externo.
@@ -32,7 +35,7 @@ public static class FederatedLogin
         string Email,
         string Name,
         string? IpAddress = null,
-        string? UserAgent = null) : ICommand<LocalLoginFeature.LoginResponse>, IPublicRequest;
+        string? UserAgent = null) : ICommand<LocalLogin.LocalLogin.LoginResponse>, IPublicRequest;
 
     /// <summary>Valida a entrada do login federado.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -61,7 +64,7 @@ public static class FederatedLogin
         IDateTimeProvider dateTimeProvider,
         ICurrentTenant currentTenant,
         ILoginSessionCreator sessionCreator,
-        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLoginFeature.LoginResponse>
+        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLogin.LocalLogin.LoginResponse>
     {
         public async Task<Result<LocalLoginFeature.LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -1,76 +1,152 @@
 /* ═══════════════════════════════════════════════════════════════════════════════
-   NexTraceOne — Design Tokens & Global Styles
+   NexTraceOne — Design System Tokens & Global Styles
    Sovereign Engineering Governance Platform
 
-   Tema dark-first com tokens semânticos organizados em camadas:
-   marca, superfícies, tipografia, estados, bordas, sombras e raios.
-   Identidade visual azul elétrico + roxo sobre superfícies escuras sofisticadas.
+   Fonte da verdade: docs/DESIGN-SYSTEM.md
+   Identidade visual: navy profundo + cyan/mint como acentos sobre superfícies
+   escuras sofisticadas. Dark-first enterprise, sem purple, sem neon.
+
+   Camadas: canvas → deep → panel/card → elevated → hover
+   Acentos: cyan (foco/ativo) · mint (sucesso/saúde) · blue (CTA institucional)
+   Semântica: success · info · warning · danger · critical · neutral
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 @import "tailwindcss";
 
 @theme {
-  /* ─── Brand ────────────────────────────────────────────────────────────────── */
-  --color-brand: #4379EE;
-  --color-brand-blue: #15AFF6;
-  --color-brand-purple: #9039E8;
+  /* ─── Canvas & Surfaces ─────────────────────────────────────────────────────
+     Sistema de layering dark com profundidade navy.
+     canvas < deep < panel/card < elevated < hover < active < selected
+     ──────────────────────────────────────────────────────────────────────────── */
+  --color-canvas: #081120;
+  --color-deep: #0A1730;
+  --color-panel: #0F1E38;
+  --color-card: #0F1E38;
+  --color-elevated: #132543;
+  --color-subtle: #0D1B32;
+  --color-hover: #132543;
+  --color-active: #1A2E50;
+  --color-selected: #162A48;
+  --color-input: #091729;
+  --color-overlay: rgba(3, 10, 22, 0.72);
 
-  /* ─── Canvas & Surfaces (dark layering system) ─────────────────────────────── */
-  --color-canvas: #0A0C18;
-  --color-panel: #0E1220;
-  --color-card: #12182A;
-  --color-elevated: #1A2236;
-  --color-subtle: #151C2E;
-  --color-hover: #1E2840;
-  --color-active: #243050;
-  --color-selected: #1A2A4A;
-  --color-overlay: rgba(0, 0, 0, 0.6);
+  /* ─── Borders & Dividers ─────────────────────────────────────────────────── */
+  --color-edge: rgba(129, 170, 214, 0.14);
+  --color-edge-strong: rgba(129, 170, 214, 0.22);
+  --color-edge-focus: rgba(55, 190, 233, 0.42);
+  --color-divider: rgba(255, 255, 255, 0.06);
 
-  /* ─── Borders & Dividers ───────────────────────────────────────────────────── */
-  --color-edge: #2A3348;
-  --color-edge-strong: #3A4762;
-  --color-divider: #1E2840;
+  /* ─── Text Hierarchy ─────────────────────────────────────────────────────── */
+  --color-heading: #F2F7FF;
+  --color-body: #B5C4D8;
+  --color-muted: #8EA0B7;
+  --color-faded: #6D7E96;
+  --color-on-accent: #04111E;
 
-  /* ─── Text Hierarchy ───────────────────────────────────────────────────────── */
-  --color-heading: #FDFDFE;
-  --color-body: #D9DEE8;
-  --color-muted: #92939C;
-  --color-faded: #5C6478;
+  /* ─── Accent (Cyan / Mint / Blue CTA) ────────────────────────────────────── */
+  --color-accent: #2BB7E3;
+  --color-accent-hover: #6ED7F5;
+  --color-accent-muted: rgba(43, 183, 227, 0.12);
+  --color-focus-ring: rgba(43, 183, 227, 0.50);
+  --color-cyan: #18CFF2;
+  --color-cyan-hover: #47DBFF;
+  --color-mint: #1EF2C1;
+  --color-mint-hover: #79FCE0;
 
-  /* ─── Interactive / Accent ─────────────────────────────────────────────────── */
-  --color-accent: #4379EE;
-  --color-accent-hover: #5A8FFF;
-  --color-accent-muted: rgba(67, 121, 238, 0.12);
-  --color-focus-ring: rgba(67, 121, 238, 0.5);
+  /* ─── Semantic Status ────────────────────────────────────────────────────── */
+  --color-success: #1EF2C1;
+  --color-success-muted: rgba(30, 242, 193, 0.12);
+  --color-info: #18CFF2;
+  --color-info-muted: rgba(24, 207, 242, 0.12);
+  --color-warning: #F5C062;
+  --color-warning-muted: rgba(245, 192, 98, 0.12);
+  --color-critical: #FF7A86;
+  --color-critical-muted: rgba(255, 122, 134, 0.12);
+  --color-danger: #FF6A78;
+  --color-neutral: #8EA0B7;
 
-  /* ─── Semantic Status ──────────────────────────────────────────────────────── */
-  --color-success: #24B47E;
-  --color-success-muted: rgba(36, 180, 126, 0.12);
-  --color-warning: #E6A23C;
-  --color-warning-muted: rgba(230, 162, 60, 0.12);
-  --color-critical: #E15241;
-  --color-critical-muted: rgba(225, 82, 65, 0.12);
-  --color-info: #15AFF6;
-  --color-info-muted: rgba(21, 175, 246, 0.12);
+  /* ─── Data Visualization ─────────────────────────────────────────────────── */
+  --color-data-1: #18CFF2;
+  --color-data-2: #1EF2C1;
+  --color-data-3: #8EA0B7;
+  --color-data-4: #F5C062;
+  --color-data-5: #FF7A86;
+  --color-data-6: #5F8DFF;
 
-  /* ─── Typography ───────────────────────────────────────────────────────────── */
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* ─── Typography ─────────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
-  /* ─── Shadows (darker for dark surfaces) ───────────────────────────────────── */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.55);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.65);
-  --shadow-glow: 0 0 20px rgba(67, 121, 238, 0.15);
-  --shadow-glow-sm: 0 0 10px rgba(67, 121, 238, 0.1);
+  /* ─── Border Radius (suavemente arredondado, nunca quadrado duro) ─────── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
 
-  /* ─── Animations ───────────────────────────────────────────────────────────── */
-  --animate-fade-in: fade-in 0.2s ease-out;
-  --animate-slide-up: slide-up 0.25s ease-out;
-  --animate-slide-right: slide-right 0.25s ease-out;
+  /* ─── Shadows (escuras e difusas para dark UI) ───────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.30);
+  --shadow-surface: 0 10px 30px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.28);
+  --shadow-elevated: 0 18px 40px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.34);
+  --shadow-floating: 0 24px 60px rgba(0, 0, 0, 0.42);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.42);
+  --shadow-glow-cyan: 0 0 0 1px rgba(24, 207, 242, 0.22), 0 0 24px rgba(24, 207, 242, 0.16);
+  --shadow-glow-mint: 0 0 0 1px rgba(30, 242, 193, 0.20), 0 0 24px rgba(30, 242, 193, 0.14);
+  --shadow-glow-danger: 0 0 0 1px rgba(255, 122, 134, 0.24), 0 0 20px rgba(255, 122, 134, 0.14);
+  --shadow-glow: 0 0 24px rgba(24, 207, 242, 0.16);
+  --shadow-glow-sm: 0 0 12px rgba(24, 207, 242, 0.10);
+
+  /* ─── Spacing (base 8pt) ─────────────────────────────────────────────────── */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* ─── Animations ─────────────────────────────────────────────────────────── */
+  --animate-fade-in: fade-in 180ms var(--ease-standard);
+  --animate-slide-up: slide-up 240ms var(--ease-standard);
+  --animate-slide-right: slide-right 240ms var(--ease-standard);
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ─── CSS Custom Properties (não-Tailwind) ───────────────────────────────────
+   Motion tokens e easing curves usados em transições inline e componentes.
+   ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Motion durations */
+  --nto-motion-fast: 120ms;
+  --nto-motion-base: 180ms;
+  --nto-motion-medium: 240ms;
+  --nto-motion-slow: 320ms;
+
+  /* Easing curves */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasis: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Gradients */
+  --nto-gradient-page: linear-gradient(180deg, #0A1730 0%, #081120 100%);
+  --nto-gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
+  --nto-gradient-accent: linear-gradient(135deg, rgba(24,207,242,0.18) 0%, rgba(30,242,193,0.08) 100%);
+  --nto-gradient-cta: linear-gradient(135deg, #29C0E5 0%, #2BB7E3 100%);
+
+  /* Z-index layers */
+  --z-base: 0;
+  --z-sticky: 20;
+  --z-header: 40;
+  --z-dropdown: 60;
+  --z-modal: 80;
+  --z-toast: 100;
 }
 
 /* ─── Keyframes ──────────────────────────────────────────────────────────────── */
@@ -93,6 +169,11 @@
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ─── Global Base ────────────────────────────────────────────────────────────── */
@@ -121,12 +202,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-edge);
+  background: rgba(129, 170, 214, 0.18);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-edge-strong);
+  background: rgba(129, 170, 214, 0.28);
 }
 
 /* ─── Focus Ring (acessibilidade) ────────────────────────────────────────────── */
@@ -139,21 +220,33 @@ body {
 /* ─── Text Selection ─────────────────────────────────────────────────────────── */
 
 ::selection {
-  background-color: rgba(67, 121, 238, 0.3);
+  background-color: rgba(24, 207, 242, 0.25);
   color: var(--color-heading);
 }
 
 /* ─── Brand Gradient Utilities ───────────────────────────────────────────────── */
 
 .brand-gradient {
-  background: linear-gradient(90deg, #15AFF6 0%, #4379EE 45%, #9039E8 100%);
+  background: linear-gradient(90deg, #18CFF2 0%, #2BB7E3 50%, #1EF2C1 100%);
 }
 
 .brand-gradient-text {
-  background: linear-gradient(90deg, #15AFF6 0%, #4379EE 45%, #9039E8 100%);
+  background: linear-gradient(90deg, #18CFF2 0%, #2BB7E3 50%, #1EF2C1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ─── CTA Gradient ───────────────────────────────────────────────────────────── */
+
+.cta-gradient {
+  background: var(--nto-gradient-cta);
+}
+
+/* ─── Accent Gradient (subtle) ───────────────────────────────────────────────── */
+
+.accent-gradient {
+  background: var(--nto-gradient-accent);
 }
 
 /* ─── Skeleton Loader Utility ────────────────────────────────────────────────── */
@@ -166,13 +259,8 @@ body {
     var(--color-elevated) 75%
   );
   background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: 4px;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 10px;
 }
 
 /* ─── Reduced Motion ─────────────────────────────────────────────────────────── */

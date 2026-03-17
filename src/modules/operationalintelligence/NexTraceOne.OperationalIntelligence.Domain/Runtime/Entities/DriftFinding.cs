@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Domain.Enums;
-using NexTraceOne.RuntimeIntelligence.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Errors;
 
-namespace NexTraceOne.RuntimeIntelligence.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
 /// <summary>
 /// Entidade que representa um drift (desvio) detectado entre a baseline esperada

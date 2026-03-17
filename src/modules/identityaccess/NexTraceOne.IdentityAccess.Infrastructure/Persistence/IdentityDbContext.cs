@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Identity.Domain.Entities;
-using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence;
+using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 /// <summary>
 /// DbContext do módulo Identity.

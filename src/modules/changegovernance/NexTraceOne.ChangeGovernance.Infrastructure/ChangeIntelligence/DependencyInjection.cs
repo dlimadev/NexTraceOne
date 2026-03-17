@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
-using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 
-namespace NexTraceOne.ChangeIntelligence.Infrastructure;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo ChangeIntelligence.

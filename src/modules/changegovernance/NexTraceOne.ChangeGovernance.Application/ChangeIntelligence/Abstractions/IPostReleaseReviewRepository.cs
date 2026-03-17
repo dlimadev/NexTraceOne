@@ -1,6 +1,6 @@
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 
 /// <summary>Contrato de repositório para reviews pós-release.</summary>
 public interface IPostReleaseReviewRepository

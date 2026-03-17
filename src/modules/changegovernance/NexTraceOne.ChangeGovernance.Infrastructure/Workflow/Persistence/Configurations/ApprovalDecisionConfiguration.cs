@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Workflow.Domain.Entities;
 
-namespace NexTraceOne.Workflow.Infrastructure.Persistence.Configurations;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Configurations;
 
 internal sealed class ApprovalDecisionConfiguration : IEntityTypeConfiguration<ApprovalDecision>
 {

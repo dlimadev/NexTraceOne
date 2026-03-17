@@ -1,4 +1,4 @@
-namespace NexTraceOne.BuildingBlocks.Core;
+namespace NexTraceOne.BuildingBlocks.Core.Events;
 
 /// <summary>
 /// Marcador para Integration Events — eventos publicados entre módulos distintos.

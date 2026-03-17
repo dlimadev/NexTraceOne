@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiGovernance.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 /// <summary>
 /// Tipo funcional do modelo de IA registrado no Model Registry.

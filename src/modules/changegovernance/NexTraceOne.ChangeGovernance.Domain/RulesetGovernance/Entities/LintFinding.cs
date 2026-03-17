@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.RulesetGovernance.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
 /// <summary>
 /// Value Object que representa um finding individual de uma execução de linting.

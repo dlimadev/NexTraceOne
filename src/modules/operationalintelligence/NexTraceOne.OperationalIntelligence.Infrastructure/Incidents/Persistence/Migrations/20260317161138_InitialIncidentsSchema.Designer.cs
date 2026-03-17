@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Migrations
 {
     [DbContext(typeof(IncidentDbContext))]
-    [Migration("20260316000000_InitialIncidentsSchema")]
+    [Migration("20260317161138_InitialIncidentsSchema")]
     partial class InitialIncidentsSchema
     {
         /// <inheritdoc />
@@ -68,15 +68,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.IncidentRecord", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("CorrelationAnalysis")
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)");
-
-                    b.Property<int>("CorrelationConfidence")
-                        .HasColumnType("integer");
 
                     b.Property<string>("CorrelatedChangesJson")
                         .HasColumnType("jsonb");
@@ -87,15 +79,22 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.Property<string>("CorrelatedServicesJson")
                         .HasColumnType("jsonb");
 
+                    b.Property<string>("CorrelationAnalysis")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<int>("CorrelationConfidence")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
@@ -149,9 +148,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasColumnType("character varying(200)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset>("LastUpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -218,8 +215,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -240,7 +236,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.MitigationValidationLog", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("ChecksJson")
@@ -251,8 +246,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<string>("IncidentId")
                         .IsRequired()
@@ -260,9 +254,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasColumnType("character varying(200)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ObservedOutcome")
                         .HasMaxLength(4000)
@@ -276,15 +268,14 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ValidatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ValidatedBy")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
-
-                    b.Property<DateTimeOffset>("ValidatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("WorkflowId")
                         .HasColumnType("uuid");
@@ -301,7 +292,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.MitigationWorkflowActionLog", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Action")
@@ -314,8 +304,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<string>("IncidentId")
                         .IsRequired()
@@ -323,9 +312,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasColumnType("character varying(200)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<int>("NewStatus")
                         .HasColumnType("integer");
@@ -334,12 +321,12 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
+                    b.Property<DateTimeOffset>("PerformedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PerformedBy")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
-
-                    b.Property<DateTimeOffset>("PerformedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Reason")
                         .HasMaxLength(2000)
@@ -350,8 +337,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("WorkflowId")
                         .HasColumnType("uuid");
@@ -368,7 +354,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.MitigationWorkflowRecord", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<int>("ActionType")
@@ -400,8 +385,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<string>("CreatedByUser")
                         .IsRequired()
@@ -417,9 +401,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasColumnType("character varying(200)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("LinkedRunbookId")
                         .HasColumnType("uuid");
@@ -451,8 +433,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -466,7 +447,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.RunbookRecord", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -474,8 +454,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -483,9 +462,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasColumnType("character varying(4000)");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LastReviewedAt")
                         .HasColumnType("timestamp with time zone");
@@ -526,8 +503,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.Identity.Application;
-using NexTraceOne.Identity.Infrastructure;
 
-namespace NexTraceOne.Identity.API;
+using NexTraceOne.IdentityAccess.Application;
+using NexTraceOne.IdentityAccess.Infrastructure;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo Identity.

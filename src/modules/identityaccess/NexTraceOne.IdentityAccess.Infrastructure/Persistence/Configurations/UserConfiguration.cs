@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Configurations;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
 
 internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {

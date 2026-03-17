@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetApiConsumers;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers;
 
 /// <summary>
 /// Feature: GetApiConsumers — lista consumidores formais de uma API.

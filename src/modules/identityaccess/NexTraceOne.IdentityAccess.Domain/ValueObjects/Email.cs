@@ -1,8 +1,10 @@
-using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 using System.Net.Mail;
 
-namespace NexTraceOne.Identity.Domain.ValueObjects;
+using Ardalis.GuardClauses;
+
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+
+namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 /// <summary>
 /// Value Object que representa um email normalizado e validado.

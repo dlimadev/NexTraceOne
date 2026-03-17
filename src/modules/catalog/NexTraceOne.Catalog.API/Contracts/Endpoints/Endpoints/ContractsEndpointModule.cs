@@ -1,36 +1,39 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using NexTraceOne.Contracts.Domain.Enums;
-using ClassifyBreakingChangeFeature = NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange.ClassifyBreakingChange;
-using ComputeSemanticDiffFeature = NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff.ComputeSemanticDiff;
-using CreateContractVersionFeature = NexTraceOne.Contracts.Application.Features.CreateContractVersion.CreateContractVersion;
-using DeprecateContractVersionFeature = NexTraceOne.Contracts.Application.Features.DeprecateContractVersion.DeprecateContractVersion;
-using ExportContractFeature = NexTraceOne.Contracts.Application.Features.ExportContract.ExportContract;
-using GetContractHistoryFeature = NexTraceOne.Contracts.Application.Features.GetContractHistory.GetContractHistory;
-using GetContractVersionDetailFeature = NexTraceOne.Contracts.Application.Features.GetContractVersionDetail.GetContractVersionDetail;
-using GetContractsSummaryFeature = NexTraceOne.Contracts.Application.Features.GetContractsSummary.GetContractsSummary;
-using ImportContractFeature = NexTraceOne.Contracts.Application.Features.ImportContract.ImportContract;
-using ListContractsFeature = NexTraceOne.Contracts.Application.Features.ListContracts.ListContracts;
-using ListContractsByServiceFeature = NexTraceOne.Contracts.Application.Features.ListContractsByService.ListContractsByService;
-using LockContractVersionFeature = NexTraceOne.Contracts.Application.Features.LockContractVersion.LockContractVersion;
-using SignContractVersionFeature = NexTraceOne.Contracts.Application.Features.SignContractVersion.SignContractVersion;
-using SuggestSemanticVersionFeature = NexTraceOne.Contracts.Application.Features.SuggestSemanticVersion.SuggestSemanticVersion;
-using TransitionLifecycleStateFeature = NexTraceOne.Contracts.Application.Features.TransitionLifecycleState.TransitionLifecycleState;
-using ListRuleViolationsFeature = NexTraceOne.Contracts.Application.Features.ListRuleViolations.ListRuleViolations;
-using SearchContractsFeature = NexTraceOne.Contracts.Application.Features.SearchContracts.SearchContracts;
-using SyncContractsFeature = NexTraceOne.Contracts.Application.Features.SyncContracts.SyncContracts;
-using ValidateContractIntegrityFeature = NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity.ValidateContractIntegrity;
-using VerifySignatureFeature = NexTraceOne.Contracts.Application.Features.VerifySignature.VerifySignature;
-using GenerateScorecardFeature = NexTraceOne.Contracts.Application.Features.GenerateScorecard.GenerateScorecard;
-using GenerateEvidencePackFeature = NexTraceOne.Contracts.Application.Features.GenerateEvidencePack.GenerateEvidencePack;
-using EvaluateContractRulesFeature = NexTraceOne.Contracts.Application.Features.EvaluateContractRules.EvaluateContractRules;
-using GetCompatibilityAssessmentFeature = NexTraceOne.Contracts.Application.Features.GetCompatibilityAssessment.GetCompatibilityAssessment;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.API.Endpoints;
+using ClassifyBreakingChangeFeature = NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange.ClassifyBreakingChange;
+using ComputeSemanticDiffFeature = NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff.ComputeSemanticDiff;
+using CreateContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion.CreateContractVersion;
+using DeprecateContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.DeprecateContractVersion.DeprecateContractVersion;
+using ExportContractFeature = NexTraceOne.Catalog.Application.Contracts.Features.ExportContract.ExportContract;
+using GetContractHistoryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory.GetContractHistory;
+using GetContractVersionDetailFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractVersionDetail.GetContractVersionDetail;
+using GetContractsSummaryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractsSummary.GetContractsSummary;
+using ImportContractFeature = NexTraceOne.Catalog.Application.Contracts.Features.ImportContract.ImportContract;
+using ListContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListContracts.ListContracts;
+using ListContractsByServiceFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListContractsByService.ListContractsByService;
+using LockContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion.LockContractVersion;
+using SignContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.SignContractVersion.SignContractVersion;
+using SuggestSemanticVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.SuggestSemanticVersion.SuggestSemanticVersion;
+using TransitionLifecycleStateFeature = NexTraceOne.Catalog.Application.Contracts.Features.TransitionLifecycleState.TransitionLifecycleState;
+using ListRuleViolationsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListRuleViolations.ListRuleViolations;
+using SearchContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.SearchContracts.SearchContracts;
+using SyncContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.SyncContracts.SyncContracts;
+using ValidateContractIntegrityFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity.ValidateContractIntegrity;
+using VerifySignatureFeature = NexTraceOne.Catalog.Application.Contracts.Features.VerifySignature.VerifySignature;
+using GenerateScorecardFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard.GenerateScorecard;
+using GenerateEvidencePackFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateEvidencePack.GenerateEvidencePack;
+using EvaluateContractRulesFeature = NexTraceOne.Catalog.Application.Contracts.Features.EvaluateContractRules.EvaluateContractRules;
+using GetCompatibilityAssessmentFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment.GetCompatibilityAssessment;
+
+namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo Contracts.

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NexTraceOne.AiOrchestration.Application;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo AiOrchestration.

@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace NexTraceOne.BuildingBlocks.Core;
+namespace NexTraceOne.BuildingBlocks.Core.Events;
 
 /// <summary>
 /// Marcador para todos os Domain Events da plataforma.

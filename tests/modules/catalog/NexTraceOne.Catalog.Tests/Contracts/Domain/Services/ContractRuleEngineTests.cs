@@ -1,9 +1,9 @@
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.Services;
-using NexTraceOne.Contracts.Domain.ValueObjects;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Domain.Services;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Services;
 
 /// <summary>
 /// Testes unitários para <see cref="ContractRuleEngine"/>.

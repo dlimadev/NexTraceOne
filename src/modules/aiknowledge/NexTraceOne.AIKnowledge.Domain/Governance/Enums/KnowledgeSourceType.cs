@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiGovernance.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 /// <summary>
 /// Tipo de fonte de conhecimento utilizada para grounding/contexto das consultas de IA.

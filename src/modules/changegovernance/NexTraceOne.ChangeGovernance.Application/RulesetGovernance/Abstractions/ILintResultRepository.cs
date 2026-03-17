@@ -1,6 +1,6 @@
-using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
 
 /// <summary>Contrato de repositório para a entidade LintResult.</summary>
 public interface ILintResultRepository

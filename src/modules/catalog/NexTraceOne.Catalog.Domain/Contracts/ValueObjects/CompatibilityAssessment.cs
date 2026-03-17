@@ -1,7 +1,7 @@
 using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.Contracts.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value object que encapsula a avaliação completa de compatibilidade entre duas versões

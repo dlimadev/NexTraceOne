@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace NexTraceOne.Contracts.Domain.Services;
+namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 
 /// <summary>
 /// Serviço de domínio puro para canonicalização de conteúdo de contratos.

@@ -1,4 +1,5 @@
 import type { ReactNode, ButtonHTMLAttributes } from 'react';
+import { cn } from '../lib/cn';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -8,23 +9,28 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Mapa de variantes visuais alinhado ao tema dark enterprise.
- * - primary: fundo accent (azul marca), texto claro
- * - secondary: fundo card (superfície elevada), borda sutil
- * - danger: fundo crítico, para ações destrutivas
- * - ghost: sem fundo, apenas texto — hover revela superfície
+ * Mapa de variantes visuais — DESIGN-SYSTEM.md §4.3
+ *
+ * - primary: CTA institucional com gradient, texto escuro (on-accent)
+ * - secondary: superfície elevada, borda suave, hover com brilho discreto
+ * - danger: fundo crítico translúcido, para ações destrutivas
+ * - ghost: sem fundo, texto muted — hover revela superfície
  */
 const variantClasses: Record<string, string> = {
-  primary: 'bg-accent text-heading hover:bg-accent-hover disabled:opacity-40',
-  secondary: 'bg-card text-body border border-edge hover:bg-hover disabled:opacity-40',
-  danger: 'bg-critical text-heading hover:brightness-110 disabled:opacity-40',
-  ghost: 'text-muted hover:bg-hover hover:text-body',
+  primary:
+    'cta-gradient text-on-accent shadow-sm hover:brightness-110 hover:shadow-glow-sm disabled:opacity-40',
+  secondary:
+    'bg-elevated text-body border border-edge hover:border-edge-strong hover:bg-hover disabled:opacity-40',
+  danger:
+    'bg-critical/15 text-critical border border-critical/25 hover:bg-critical/20 disabled:opacity-40',
+  ghost:
+    'text-muted hover:bg-hover hover:text-body',
 };
 
 const sizeClasses: Record<string, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-sm',
-  lg: 'px-6 py-3 text-base',
+  sm: 'h-9 px-4 text-sm',
+  md: 'h-11 px-5 text-sm',
+  lg: 'h-14 px-6 text-base font-bold',
 };
 
 export function Button({
@@ -33,12 +39,20 @@ export function Button({
   loading,
   children,
   disabled,
-  className = '',
+  className,
   ...rest
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={cn(
+        'inline-flex items-center justify-center gap-2 rounded-lg font-semibold',
+        'transition-all duration-[var(--nto-motion-base)]',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+        'disabled:cursor-not-allowed',
+        variantClasses[variant],
+        sizeClasses[size],
+        className,
+      )}
       disabled={disabled || loading}
       {...rest}
     >

@@ -1,17 +1,19 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.CostIntelligence.Application.Features.AlertCostAnomaly;
-using NexTraceOne.CostIntelligence.Application.Features.AttributeCostToService;
-using NexTraceOne.CostIntelligence.Application.Features.ComputeCostTrend;
-using NexTraceOne.CostIntelligence.Application.Features.GetCostByRelease;
-using NexTraceOne.CostIntelligence.Application.Features.GetCostByRoute;
-using NexTraceOne.CostIntelligence.Application.Features.GetCostDelta;
-using NexTraceOne.CostIntelligence.Application.Features.GetCostReport;
-using NexTraceOne.CostIntelligence.Application.Features.IngestCostSnapshot;
 
-namespace NexTraceOne.CostIntelligence.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAnomaly;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.AttributeCostToService;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ComputeCostTrend;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRelease;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRoute;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostDelta;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostReport;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.IngestCostSnapshot;
+
+namespace NexTraceOne.OperationalIntelligence.Application.Cost;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo CostIntelligence.

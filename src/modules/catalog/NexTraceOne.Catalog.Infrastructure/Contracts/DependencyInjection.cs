@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Infrastructure.Persistence;
-using NexTraceOne.Contracts.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
-namespace NexTraceOne.Contracts.Infrastructure;
+namespace NexTraceOne.Catalog.Infrastructure.Contracts;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Contracts.

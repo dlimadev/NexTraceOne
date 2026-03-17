@@ -1,8 +1,9 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.AiGovernance.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 /// <summary>
 /// Representa uma mensagem individual dentro de uma conversa com o assistente de IA.

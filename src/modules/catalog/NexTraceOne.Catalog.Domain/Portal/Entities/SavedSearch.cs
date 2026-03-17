@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.DeveloperPortal.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Portal.Entities;
 
 /// <summary>
 /// Aggregate Root que representa uma pesquisa salva pelo utilizador no catálogo do portal.

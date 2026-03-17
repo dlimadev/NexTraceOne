@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
-using NexTraceOne.CostIntelligence.Domain.Entities;
 
-namespace NexTraceOne.CostIntelligence.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
+
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de perfis de custo de serviços com orçamento e alertas.

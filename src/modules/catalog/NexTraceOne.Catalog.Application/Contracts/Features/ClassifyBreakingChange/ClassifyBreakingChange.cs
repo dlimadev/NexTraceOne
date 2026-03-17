@@ -1,12 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
 
-namespace NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
 
 /// <summary>
 /// Feature: ClassifyBreakingChange — classifica o nível de mudança de uma versão de contrato com base no seu diff mais recente.
@@ -34,7 +37,7 @@ public static class ClassifyBreakingChange
             Guard.Against.Null(request);
 
             var version = await repository.GetByIdAsync(
-                Domain.Entities.ContractVersionId.From(request.ContractVersionId), cancellationToken);
+                ContractVersionId.From(request.ContractVersionId), cancellationToken);
 
             if (version is null)
                 return ContractsErrors.ContractVersionNotFound(request.ContractVersionId.ToString());

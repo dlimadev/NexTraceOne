@@ -1,10 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.CompareReleaseRuntime;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime;
 
 /// <summary>
 /// Feature: CompareReleaseRuntime — compara métricas de runtime entre dois períodos de release.
@@ -83,7 +86,7 @@ public static class CompareReleaseRuntime
         }
 
         /// <summary>Calcula médias das métricas de um conjunto de snapshots.</summary>
-        private static MetricsSummary ComputeAverages(IReadOnlyList<Domain.Entities.RuntimeSnapshot> snapshots)
+        private static MetricsSummary ComputeAverages(IReadOnlyList<RuntimeSnapshot> snapshots)
         {
             if (snapshots.Count == 0)
                 return new MetricsSummary(0, 0, 0, 0, 0, 0);

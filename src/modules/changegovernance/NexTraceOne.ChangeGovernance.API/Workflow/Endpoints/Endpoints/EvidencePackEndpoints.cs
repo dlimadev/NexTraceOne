@@ -1,12 +1,15 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using GenerateEvidencePackFeature = NexTraceOne.Workflow.Application.Features.GenerateEvidencePack.GenerateEvidencePack;
-using GetEvidencePackFeature = NexTraceOne.Workflow.Application.Features.GetEvidencePack.GetEvidencePack;
-using ExportEvidencePackPdfFeature = NexTraceOne.Workflow.Application.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
 
-namespace NexTraceOne.Workflow.API.Endpoints;
+using GenerateEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack.GenerateEvidencePack;
+using GetEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetEvidencePack.GetEvidencePack;
+using ExportEvidencePackPdfFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
+
+namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão de Evidence Packs no ciclo de vida do workflow.

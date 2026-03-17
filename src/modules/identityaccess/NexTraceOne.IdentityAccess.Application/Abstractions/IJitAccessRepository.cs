@@ -1,6 +1,6 @@
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Abstractions;
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Repositório de solicitações de acesso privilegiado temporário (JIT).

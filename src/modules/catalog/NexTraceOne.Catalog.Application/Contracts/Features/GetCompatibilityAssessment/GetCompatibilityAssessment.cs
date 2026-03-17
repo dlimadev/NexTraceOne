@@ -1,16 +1,18 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Errors;
-using NexTraceOne.Contracts.Domain.Services;
-using NexTraceOne.Contracts.Domain.ValueObjects;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Application.Features.GetCompatibilityAssessment;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
 
 /// <summary>
 /// Feature: GetCompatibilityAssessment — avalia a compatibilidade entre duas versões de contrato.

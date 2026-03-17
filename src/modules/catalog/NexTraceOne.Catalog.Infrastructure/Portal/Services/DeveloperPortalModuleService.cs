@@ -1,7 +1,7 @@
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Contracts.ServiceInterfaces;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Contracts.Portal.ServiceInterfaces;
 
-namespace NexTraceOne.DeveloperPortal.Infrastructure.Services;
+namespace NexTraceOne.Catalog.Infrastructure.Portal.Services;
 
 /// <summary>
 /// Implementação do contrato público do módulo DeveloperPortal.

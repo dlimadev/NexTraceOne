@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.AiGovernance.Application;
-using NexTraceOne.AiGovernance.Infrastructure;
 
-namespace NexTraceOne.AiGovernance.API;
+using NexTraceOne.AIKnowledge.Application.Governance;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance;
+
+namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo AiGovernance.

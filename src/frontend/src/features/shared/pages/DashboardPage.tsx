@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Zap, GitBranch, FileText, ShieldCheck, Activity, AlertTriangle,
-  ArrowRight, TrendingUp, TrendingDown, AlertCircle, Clock, Server,
+  ArrowRight, AlertCircle, Clock, Server,
 } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -77,7 +77,7 @@ export function DashboardPage() {
       title: t('dashboard.activeServices'),
       value: graphLoading ? '…' : totalServices,
       icon: <Activity size={22} />,
-      color: 'text-brand-blue',
+      color: 'text-cyan',
       trend: totalServices > 0 ? { direction: 'up' as const, label: t('dashboard.trendHealthy') } : undefined,
     },
     {
@@ -225,7 +225,7 @@ export function DashboardPage() {
           <CardHeader>
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
-                <Server size={16} className="text-brand-blue" />
+                <Server size={16} className="text-cyan" />
                 <h2 className="text-sm font-semibold text-heading">{t('dashboard.recentServices')}</h2>
               </div>
               <Link to="/services" className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 transition-colors">

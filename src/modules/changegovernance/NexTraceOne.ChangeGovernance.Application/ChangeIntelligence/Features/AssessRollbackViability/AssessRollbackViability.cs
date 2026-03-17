@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.AssessRollbackViability;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AssessRollbackViability;
 
 /// <summary>
 /// Feature: AssessRollbackViability — avalia viabilidade de rollback de uma release.

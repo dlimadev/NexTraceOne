@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.Identity.Contracts.IntegrationEvents;
+namespace NexTraceOne.IdentityAccess.Contracts.IntegrationEvents;
 
 /// <summary>
 /// Evento de integração publicado quando um usuário é criado.

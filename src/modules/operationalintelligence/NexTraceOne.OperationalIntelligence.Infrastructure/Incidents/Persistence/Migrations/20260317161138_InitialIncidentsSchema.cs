@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -18,7 +18,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ExternalRef = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Title = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    Description = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    Description = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Severity = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
@@ -53,14 +53,61 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     MitigationRecommendationsJson = table.Column<string>(type: "jsonb", nullable: true),
                     MitigationRecommendedRunbooksJson = table.Column<string>(type: "jsonb", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_oi_incidents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "oi_mitigation_validations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IncidentId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    WorkflowId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ObservedOutcome = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    ValidatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    ValidatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ChecksJson = table.Column<string>(type: "jsonb", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_oi_mitigation_validations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "oi_mitigation_workflow_actions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkflowId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IncidentId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Action = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    NewStatus = table.Column<int>(type: "integer", nullable: false),
+                    PerformedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Reason = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    Notes = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    PerformedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_oi_mitigation_workflow_actions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,61 +133,14 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     StepsJson = table.Column<string>(type: "jsonb", nullable: true),
                     DecisionsJson = table.Column<string>(type: "jsonb", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_oi_mitigation_workflows", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "oi_mitigation_workflow_actions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    WorkflowId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IncidentId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Action = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    NewStatus = table.Column<int>(type: "integer", nullable: false),
-                    PerformedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    Reason = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    Notes = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
-                    PerformedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_oi_mitigation_workflow_actions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "oi_mitigation_validations",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IncidentId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    WorkflowId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    ObservedOutcome = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
-                    ValidatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    ValidatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    ChecksJson = table.Column<string>(type: "jsonb", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_oi_mitigation_validations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -159,29 +159,38 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     PublishedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     LastReviewedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_oi_runbooks", x => x.Id);
                 });
 
-            migrationBuilder.Sql(@"
-                CREATE TABLE IF NOT EXISTS outbox_messages (
-                    ""Id"" uuid NOT NULL,
-                    ""EventType"" character varying(1000) NOT NULL,
-                    ""Payload"" text NOT NULL,
-                    ""CreatedAt"" timestamp with time zone NOT NULL,
-                    ""ProcessedAt"" timestamp with time zone,
-                    ""RetryCount"" integer NOT NULL,
-                    ""LastError"" character varying(4000),
-                    ""TenantId"" uuid NOT NULL,
-                    CONSTRAINT ""PK_outbox_messages"" PRIMARY KEY (""Id"")
-                );
-            ");
+            migrationBuilder.CreateTable(
+                name: "outbox_messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventType = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Payload = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    RetryCount = table.Column<int>(type: "integer", nullable: false),
+                    LastError = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_oi_incidents_DetectedAt",
+                table: "oi_incidents",
+                column: "DetectedAt");
 
             migrationBuilder.CreateIndex(
                 name: "IX_oi_incidents_ExternalRef",
@@ -195,39 +204,14 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_oi_incidents_Status",
-                table: "oi_incidents",
-                column: "Status");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_oi_incidents_Severity",
                 table: "oi_incidents",
                 column: "Severity");
 
             migrationBuilder.CreateIndex(
-                name: "IX_oi_incidents_DetectedAt",
+                name: "IX_oi_incidents_Status",
                 table: "oi_incidents",
-                column: "DetectedAt");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_oi_mitigation_workflows_IncidentId",
-                table: "oi_mitigation_workflows",
-                column: "IncidentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_oi_mitigation_workflows_Status",
-                table: "oi_mitigation_workflows",
                 column: "Status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_oi_mitigation_workflow_actions_WorkflowId",
-                table: "oi_mitigation_workflow_actions",
-                column: "WorkflowId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_oi_mitigation_workflow_actions_IncidentId",
-                table: "oi_mitigation_workflow_actions",
-                column: "IncidentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_oi_mitigation_validations_IncidentId",
@@ -240,12 +224,39 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                 column: "WorkflowId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_oi_mitigation_workflow_actions_IncidentId",
+                table: "oi_mitigation_workflow_actions",
+                column: "IncidentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_oi_mitigation_workflow_actions_WorkflowId",
+                table: "oi_mitigation_workflow_actions",
+                column: "WorkflowId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_oi_mitigation_workflows_IncidentId",
+                table: "oi_mitigation_workflows",
+                column: "IncidentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_oi_mitigation_workflows_Status",
+                table: "oi_mitigation_workflows",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_oi_runbooks_LinkedService",
                 table: "oi_runbooks",
                 column: "LinkedService");
 
-            migrationBuilder.Sql(@"CREATE INDEX IF NOT EXISTS ""IX_outbox_messages_CreatedAt"" ON outbox_messages (""CreatedAt"");");
-            migrationBuilder.Sql(@"CREATE INDEX IF NOT EXISTS ""IX_outbox_messages_ProcessedAt"" ON outbox_messages (""ProcessedAt"");");
+            migrationBuilder.CreateIndex(
+                name: "IX_outbox_messages_CreatedAt",
+                table: "outbox_messages",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_outbox_messages_ProcessedAt",
+                table: "outbox_messages",
+                column: "ProcessedAt");
         }
 
         /// <inheritdoc />
@@ -255,18 +266,19 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                 name: "oi_incidents");
 
             migrationBuilder.DropTable(
-                name: "oi_mitigation_workflows");
+                name: "oi_mitigation_validations");
 
             migrationBuilder.DropTable(
                 name: "oi_mitigation_workflow_actions");
 
             migrationBuilder.DropTable(
-                name: "oi_mitigation_validations");
+                name: "oi_mitigation_workflows");
 
             migrationBuilder.DropTable(
                 name: "oi_runbooks");
 
-            migrationBuilder.Sql(@"DROP TABLE IF EXISTS outbox_messages;");
+            migrationBuilder.DropTable(
+                name: "outbox_messages");
         }
     }
 }

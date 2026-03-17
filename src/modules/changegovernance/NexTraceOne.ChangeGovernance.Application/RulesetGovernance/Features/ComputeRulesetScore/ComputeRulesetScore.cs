@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Application.Features.ComputeRulesetScore;
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ComputeRulesetScore;
 
 /// <summary>
 /// Feature: ComputeRulesetScore -- computa o score de conformidade a partir de findings.

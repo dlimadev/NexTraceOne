@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Repositories;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de permissões granulares persistidas via EF Core.

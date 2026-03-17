@@ -1,9 +1,11 @@
-namespace NexTraceOne.RuntimeIntelligence.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
+
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
 
 /// <summary>
 /// Estado de saúde de um serviço em runtime, determinado pela análise
 /// combinada de taxa de erro, latência e métricas de capacidade.
-/// Utilizado pelo <see cref="NexTraceOne.RuntimeIntelligence.Domain.Entities.RuntimeSnapshot"/>
+/// Utilizado pelo <see cref="RuntimeSnapshot"/>
 /// para classificar automaticamente a condição operacional do serviço.
 /// </summary>
 public enum HealthStatus

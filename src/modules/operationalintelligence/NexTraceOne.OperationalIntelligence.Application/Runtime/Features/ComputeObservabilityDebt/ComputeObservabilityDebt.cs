@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.ComputeObservabilityDebt;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ComputeObservabilityDebt;
 
 /// <summary>
 /// Feature: ComputeObservabilityDebt — avalia e cria/atualiza o perfil de observabilidade de um serviço.

@@ -1,9 +1,10 @@
 using MediatR;
-using NexTraceOne.Audit.Application.Features.RecordAuditEvent;
-using NexTraceOne.Audit.Application.Features.VerifyChainIntegrity;
-using NexTraceOne.Audit.Contracts.ServiceInterfaces;
 
-namespace NexTraceOne.Audit.Infrastructure.Services;
+using NexTraceOne.AuditCompliance.Application.Features.RecordAuditEvent;
+using NexTraceOne.AuditCompliance.Application.Features.VerifyChainIntegrity;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+
+namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 
 internal sealed class AuditModuleService(ISender sender) : IAuditModule
 {

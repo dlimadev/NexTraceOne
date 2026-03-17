@@ -1,6 +1,6 @@
-using NexTraceOne.Identity.Contracts.DTOs;
+using NexTraceOne.IdentityAccess.Contracts.DTOs;
 
-namespace NexTraceOne.Identity.Contracts.ServiceInterfaces;
+namespace NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo Identity.

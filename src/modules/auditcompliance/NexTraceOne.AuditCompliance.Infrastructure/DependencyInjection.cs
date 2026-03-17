@@ -1,16 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
+using NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
+using NexTraceOne.AuditCompliance.Infrastructure.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.Audit.Application.Abstractions;
-using NexTraceOne.Audit.Contracts.ServiceInterfaces;
-using NexTraceOne.Audit.Infrastructure.Persistence;
-using NexTraceOne.Audit.Infrastructure.Persistence.Repositories;
-using NexTraceOne.Audit.Infrastructure.Services;
 
-namespace NexTraceOne.Audit.Infrastructure;
+namespace NexTraceOne.AuditCompliance.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Audit.

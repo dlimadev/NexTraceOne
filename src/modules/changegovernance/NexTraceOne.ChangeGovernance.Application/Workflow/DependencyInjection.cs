@@ -1,21 +1,23 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.Workflow.Application.Features.AddObservation;
-using NexTraceOne.Workflow.Application.Features.ApproveStage;
-using NexTraceOne.Workflow.Application.Features.CreateWorkflowTemplate;
-using NexTraceOne.Workflow.Application.Features.EscalateSlaViolation;
-using NexTraceOne.Workflow.Application.Features.ExportEvidencePackPdf;
-using NexTraceOne.Workflow.Application.Features.GenerateEvidencePack;
-using NexTraceOne.Workflow.Application.Features.GetEvidencePack;
-using NexTraceOne.Workflow.Application.Features.GetWorkflowStatus;
-using NexTraceOne.Workflow.Application.Features.InitiateWorkflow;
-using NexTraceOne.Workflow.Application.Features.ListPendingApprovals;
-using NexTraceOne.Workflow.Application.Features.RejectWorkflow;
-using NexTraceOne.Workflow.Application.Features.RequestChanges;
 
-namespace NexTraceOne.Workflow.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.AddObservation;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.ApproveStage;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.EscalateSlaViolation;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetEvidencePack;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetWorkflowStatus;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflow;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.RejectWorkflow;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.RequestChanges;
+
+namespace NexTraceOne.ChangeGovernance.Application.Workflow;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo Workflow.

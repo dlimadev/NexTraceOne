@@ -1,9 +1,12 @@
-namespace NexTraceOne.Contracts.Domain.Enums;
+using System.Text.Json.Serialization;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
 /// Tipo de contrato suportado pelo Contract Studio.
 /// Categoriza contratos conforme sua natureza funcional.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ContractType
 {
     /// <summary>Contrato de API REST (OpenAPI, Swagger).</summary>

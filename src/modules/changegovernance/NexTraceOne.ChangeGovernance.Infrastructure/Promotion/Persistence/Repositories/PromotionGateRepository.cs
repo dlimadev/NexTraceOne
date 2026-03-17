@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Domain.Entities;
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de gates de promoção, implementando consultas específicas de negócio.

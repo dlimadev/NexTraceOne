@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.AiGovernance.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.AiGovernance.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 /// <summary>
 /// Define o peso configurável de uma fonte de conhecimento para um caso de uso específico.

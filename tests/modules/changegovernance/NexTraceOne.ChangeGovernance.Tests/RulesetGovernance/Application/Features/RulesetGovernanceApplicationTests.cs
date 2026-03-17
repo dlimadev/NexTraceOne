@@ -1,17 +1,18 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
-using UploadRulesetFeature = NexTraceOne.RulesetGovernance.Application.Features.UploadRuleset.UploadRuleset;
-using ListRulesetsFeature = NexTraceOne.RulesetGovernance.Application.Features.ListRulesets.ListRulesets;
-using ArchiveRulesetFeature = NexTraceOne.RulesetGovernance.Application.Features.ArchiveRuleset.ArchiveRuleset;
-using BindRulesetToAssetTypeFeature = NexTraceOne.RulesetGovernance.Application.Features.BindRulesetToAssetType.BindRulesetToAssetType;
-using ExecuteLintForReleaseFeature = NexTraceOne.RulesetGovernance.Application.Features.ExecuteLintForRelease.ExecuteLintForRelease;
-using GetRulesetFindingsFeature = NexTraceOne.RulesetGovernance.Application.Features.GetRulesetFindings.GetRulesetFindings;
-using GetRulesetScoreFeature = NexTraceOne.RulesetGovernance.Application.Features.GetRulesetScore.GetRulesetScore;
-using InstallDefaultRulesetsFeature = NexTraceOne.RulesetGovernance.Application.Features.InstallDefaultRulesets.InstallDefaultRulesets;
-using ComputeRulesetScoreFeature = NexTraceOne.RulesetGovernance.Application.Features.ComputeRulesetScore.ComputeRulesetScore;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Tests.Application.Features;
+using UploadRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.UploadRuleset.UploadRuleset;
+using ListRulesetsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ListRulesets.ListRulesets;
+using ArchiveRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ArchiveRuleset.ArchiveRuleset;
+using BindRulesetToAssetTypeFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.BindRulesetToAssetType.BindRulesetToAssetType;
+using ExecuteLintForReleaseFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ExecuteLintForRelease.ExecuteLintForRelease;
+using GetRulesetFindingsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetFindings.GetRulesetFindings;
+using GetRulesetScoreFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetScore.GetRulesetScore;
+using InstallDefaultRulesetsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.InstallDefaultRulesets.InstallDefaultRulesets;
+using ComputeRulesetScoreFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ComputeRulesetScore.ComputeRulesetScore;
+
+namespace NexTraceOne.ChangeGovernance.Tests.RulesetGovernance.Application.Features;
 
 /// <summary>Testes de handlers da camada Application do módulo RulesetGovernance.</summary>
 public sealed class RulesetGovernanceApplicationTests

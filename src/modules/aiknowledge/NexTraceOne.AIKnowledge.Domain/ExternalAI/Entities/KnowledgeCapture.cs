@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Enums;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ExternalAi.Domain.Enums;
-using NexTraceOne.ExternalAi.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.ExternalAi.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 
 /// <summary>
 /// Representa conhecimento organizacional capturado a partir de interações com provedores

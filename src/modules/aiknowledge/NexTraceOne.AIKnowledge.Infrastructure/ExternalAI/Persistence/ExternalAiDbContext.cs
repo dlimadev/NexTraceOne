@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 
-namespace NexTraceOne.ExternalAi.Infrastructure.Persistence;
+namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 
 /// <summary>
 /// DbContext do módulo ExternalAi.

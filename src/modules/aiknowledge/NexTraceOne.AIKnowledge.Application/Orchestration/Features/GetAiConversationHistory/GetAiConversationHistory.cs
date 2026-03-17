@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.AiOrchestration.Application.Features.GetAiConversationHistory;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAiConversationHistory;
 
 /// <summary>
 /// Feature: GetAiConversationHistory — Módulo: AiOrchestration.

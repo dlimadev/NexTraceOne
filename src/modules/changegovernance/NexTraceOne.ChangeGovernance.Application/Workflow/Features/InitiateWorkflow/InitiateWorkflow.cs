@@ -1,14 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Enums;
-using NexTraceOne.Workflow.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Errors;
 
-namespace NexTraceOne.Workflow.Application.Features.InitiateWorkflow;
+namespace NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflow;
 
 /// <summary>
 /// Feature: InitiateWorkflow — inicia uma instância de workflow para uma release.

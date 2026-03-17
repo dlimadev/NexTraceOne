@@ -1,10 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.Catalog.Application.Graph;
 using NexTraceOne.Catalog.Application.SourceOfTruth;
 using NexTraceOne.Catalog.Infrastructure.Graph;
 
-namespace NexTraceOne.Catalog.API.Graph;
+namespace NexTraceOne.Catalog.API.Graph.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo Catalog Graph.

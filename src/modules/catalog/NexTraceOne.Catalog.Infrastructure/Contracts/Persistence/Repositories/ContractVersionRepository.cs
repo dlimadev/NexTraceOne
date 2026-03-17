@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
 
-namespace NexTraceOne.Contracts.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+
+namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de versões de contrato, implementando consultas específicas de negócio.

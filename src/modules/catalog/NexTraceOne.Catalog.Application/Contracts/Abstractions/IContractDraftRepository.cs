@@ -1,7 +1,7 @@
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Application.Abstractions;
+namespace NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
 /// <summary>
 /// Repositório para operações de persistência de drafts de contrato.

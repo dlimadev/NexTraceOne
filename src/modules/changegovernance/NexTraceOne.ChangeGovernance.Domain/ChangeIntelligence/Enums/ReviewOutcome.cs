@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Domain.Enums;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 /// <summary>
 /// Classificação do resultado da review pós-release.

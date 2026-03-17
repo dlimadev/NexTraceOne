@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
 
-namespace NexTraceOne.Contracts.Infrastructure.Persistence.Configurations;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+
+namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configurations;
 
 /// <summary>
 /// Configura o mapeamento EF Core da entidade ContractVersion (multi-protocolo).

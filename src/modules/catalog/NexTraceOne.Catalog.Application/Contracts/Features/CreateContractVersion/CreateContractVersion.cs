@@ -1,14 +1,16 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
 
-namespace NexTraceOne.Contracts.Application.Features.CreateContractVersion;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion;
 
 /// <summary>
 /// Feature: CreateContractVersion — cria uma nova versão de contrato a partir de uma versão anterior.

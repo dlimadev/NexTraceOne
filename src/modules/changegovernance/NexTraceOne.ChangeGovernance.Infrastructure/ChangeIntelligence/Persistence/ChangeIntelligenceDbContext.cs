@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 
 /// <summary>
 /// DbContext do módulo ChangeIntelligence.

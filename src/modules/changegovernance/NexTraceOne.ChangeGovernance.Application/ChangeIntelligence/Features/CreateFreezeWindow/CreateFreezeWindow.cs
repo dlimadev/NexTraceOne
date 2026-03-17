@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.CreateFreezeWindow;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CreateFreezeWindow;
 
 /// <summary>
 /// Feature: CreateFreezeWindow — cria uma janela de freeze para restringir ou elevar risco de mudanças.

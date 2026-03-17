@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.Audit.Application;
-using NexTraceOne.Audit.Infrastructure;
 
-namespace NexTraceOne.Audit.API;
+using NexTraceOne.AuditCompliance.Application;
+using NexTraceOne.AuditCompliance.Infrastructure;
+
+namespace NexTraceOne.AuditCompliance.API.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo Audit.

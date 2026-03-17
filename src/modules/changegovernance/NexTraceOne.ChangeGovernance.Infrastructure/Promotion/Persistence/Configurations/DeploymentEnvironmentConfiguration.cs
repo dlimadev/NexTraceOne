@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Promotion.Domain.Entities;
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence.Configurations;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Configurations;
 
 internal sealed class DeploymentEnvironmentConfiguration : IEntityTypeConfiguration<DeploymentEnvironment>
 {

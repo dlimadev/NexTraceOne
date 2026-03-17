@@ -1,13 +1,16 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using CreateDelegationFeature = NexTraceOne.Identity.Application.Features.CreateDelegation.CreateDelegation;
-using RevokeDelegationFeature = NexTraceOne.Identity.Application.Features.RevokeDelegation.RevokeDelegation;
-using ListDelegationsFeature = NexTraceOne.Identity.Application.Features.ListDelegations.ListDelegations;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using CreateDelegationFeature = NexTraceOne.IdentityAccess.Application.Features.CreateDelegation.CreateDelegation;
+using RevokeDelegationFeature = NexTraceOne.IdentityAccess.Application.Features.RevokeDelegation.RevokeDelegation;
+using ListDelegationsFeature = NexTraceOne.IdentityAccess.Application.Features.ListDelegations.ListDelegations;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de delegação formal de permissões — funcionalidade enterprise v1.1.

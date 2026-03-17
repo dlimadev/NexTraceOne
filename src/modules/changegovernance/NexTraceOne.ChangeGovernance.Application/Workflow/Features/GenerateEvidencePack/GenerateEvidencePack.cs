@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Errors;
 
-namespace NexTraceOne.Workflow.Application.Features.GenerateEvidencePack;
+namespace NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack;
 
 /// <summary>
 /// Feature: GenerateEvidencePack — cria ou atualiza o evidence pack de uma instância de workflow.

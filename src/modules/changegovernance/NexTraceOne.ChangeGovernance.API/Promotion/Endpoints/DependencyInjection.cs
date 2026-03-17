@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.Promotion.Application;
-using NexTraceOne.Promotion.Infrastructure;
 
-namespace NexTraceOne.Promotion.API;
+using NexTraceOne.ChangeGovernance.Application.Promotion;
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion;
+
+namespace NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo Promotion.

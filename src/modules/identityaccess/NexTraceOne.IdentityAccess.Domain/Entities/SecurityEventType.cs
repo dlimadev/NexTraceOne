@@ -1,4 +1,4 @@
-namespace NexTraceOne.Identity.Domain.Entities;
+namespace NexTraceOne.IdentityAccess.Domain.Entities;
 
 /// <summary>
 /// Catálogo de constantes que representam os tipos padronizados de eventos de segurança

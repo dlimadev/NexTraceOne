@@ -1,12 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RulesetGovernance.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
-using NexTraceOne.RulesetGovernance.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Errors;
 
-namespace NexTraceOne.RulesetGovernance.Application.Features.GetRulesetFindings;
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetFindings;
 
 /// <summary>
 /// Feature: GetRulesetFindings -- retorna os findings de linting de uma release.

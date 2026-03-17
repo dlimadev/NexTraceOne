@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.GetReleaseHistory;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory;
 
 /// <summary>
 /// Feature: GetReleaseHistory — lista o histórico de releases de um ativo de API.

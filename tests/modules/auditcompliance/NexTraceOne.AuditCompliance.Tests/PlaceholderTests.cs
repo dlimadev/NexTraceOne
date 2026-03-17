@@ -1,4 +1,4 @@
-namespace NexTraceOne.Audit.Tests;
+namespace NexTraceOne.AuditCompliance.Tests;
 
 /// <summary>Testes do módulo Audit.</summary>
 public sealed class PlaceholderTests

@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
-namespace NexTraceOne.Promotion.Application.Features.ListPromotionRequests;
+namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests;
 
 /// <summary>
 /// Feature: ListPromotionRequests — lista solicitações de promoção com filtro opcional por status.

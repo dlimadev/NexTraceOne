@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.RulesetGovernance.Domain.Errors;
+namespace NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo RulesetGovernance com códigos i18n.

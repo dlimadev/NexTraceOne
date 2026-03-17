@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Repositories;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de ambientes e acessos por ambiente.

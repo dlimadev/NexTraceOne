@@ -1,4 +1,4 @@
-namespace NexTraceOne.ExternalAi.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Enums;
 
 /// <summary>
 /// Estado do ciclo de vida de uma consulta a um provedor externo de IA.

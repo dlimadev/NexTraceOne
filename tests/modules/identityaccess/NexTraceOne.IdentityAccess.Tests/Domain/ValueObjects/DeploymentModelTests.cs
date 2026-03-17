@@ -1,7 +1,6 @@
-using FluentAssertions;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Tests.Domain.ValueObjects;
+namespace NexTraceOne.IdentityAccess.Tests.Domain.ValueObjects;
 
 /// <summary>
 /// Testes unitários para o value object <see cref="DeploymentModel"/>.

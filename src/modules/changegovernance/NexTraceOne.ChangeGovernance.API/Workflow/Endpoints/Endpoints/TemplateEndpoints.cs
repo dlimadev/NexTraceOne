@@ -1,10 +1,13 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using CreateWorkflowTemplateFeature = NexTraceOne.Workflow.Application.Features.CreateWorkflowTemplate.CreateWorkflowTemplate;
 
-namespace NexTraceOne.Workflow.API.Endpoints;
+using CreateWorkflowTemplateFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate.CreateWorkflowTemplate;
+
+namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão de templates de workflow.

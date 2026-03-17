@@ -1,19 +1,20 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using CreateDraftFeature = NexTraceOne.Contracts.Application.Features.CreateDraft.CreateDraft;
-using GetDraftFeature = NexTraceOne.Contracts.Application.Features.GetDraft.GetDraft;
-using UpdateDraftContentFeature = NexTraceOne.Contracts.Application.Features.UpdateDraftContent.UpdateDraftContent;
-using ListDraftsFeature = NexTraceOne.Contracts.Application.Features.ListDrafts.ListDrafts;
-using SubmitDraftForReviewFeature = NexTraceOne.Contracts.Application.Features.SubmitDraftForReview.SubmitDraftForReview;
-using ApproveDraftFeature = NexTraceOne.Contracts.Application.Features.ApproveDraft.ApproveDraft;
-using RejectDraftFeature = NexTraceOne.Contracts.Application.Features.RejectDraft.RejectDraft;
-using PublishDraftFeature = NexTraceOne.Contracts.Application.Features.PublishDraft.PublishDraft;
-using GenerateDraftFromAiFeature = NexTraceOne.Contracts.Application.Features.GenerateDraftFromAi.GenerateDraftFromAi;
-using AddDraftExampleFeature = NexTraceOne.Contracts.Application.Features.AddDraftExample.AddDraftExample;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Tests.Application.Features;
+using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
+using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
+using UpdateDraftContentFeature = NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent.UpdateDraftContent;
+using ListDraftsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts.ListDrafts;
+using SubmitDraftForReviewFeature = NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview.SubmitDraftForReview;
+using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft.ApproveDraft;
+using RejectDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft.RejectDraft;
+using PublishDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft.PublishDraft;
+using GenerateDraftFromAiFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi.GenerateDraftFromAi;
+using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample.AddDraftExample;
+
+namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
 /// <summary>
 /// Testes dos handlers da camada Application para o Contract Studio.

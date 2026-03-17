@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.ExternalAi.Domain.Errors;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo ExternalAi com códigos i18n.

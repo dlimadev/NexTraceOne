@@ -1,7 +1,7 @@
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Application.Abstractions;
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Repositório de sessões autenticadas do módulo Identity.

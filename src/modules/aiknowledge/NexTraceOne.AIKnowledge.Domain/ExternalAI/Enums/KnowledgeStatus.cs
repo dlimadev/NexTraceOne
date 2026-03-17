@@ -1,4 +1,4 @@
-namespace NexTraceOne.ExternalAi.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Enums;
 
 /// <summary>
 /// Estado de revisão de um conhecimento capturado a partir de interações com IA.

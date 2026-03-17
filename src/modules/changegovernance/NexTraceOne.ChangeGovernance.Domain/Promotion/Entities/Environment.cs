@@ -1,8 +1,9 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Promotion.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 
 /// <summary>
 /// Aggregate Root que representa um ambiente de deployment no pipeline de promoção.

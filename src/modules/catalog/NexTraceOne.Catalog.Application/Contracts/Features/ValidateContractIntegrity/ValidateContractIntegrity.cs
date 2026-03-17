@@ -1,15 +1,18 @@
 using System.Text.Json;
+
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.Errors;
-using NexTraceOne.Contracts.Domain.Services;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
 
-namespace NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity;
 
 /// <summary>
 /// Feature: ValidateContractIntegrity — valida se uma especificação de contrato pode ser parseada com sucesso.

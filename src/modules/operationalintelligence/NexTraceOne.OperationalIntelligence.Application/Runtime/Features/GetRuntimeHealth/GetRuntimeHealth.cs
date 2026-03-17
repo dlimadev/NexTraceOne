@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
-using NexTraceOne.RuntimeIntelligence.Domain.Errors;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Errors;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.GetRuntimeHealth;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetRuntimeHealth;
 
 /// <summary>
 /// Feature: GetRuntimeHealth — obtém o estado de saúde mais recente de um serviço em runtime.

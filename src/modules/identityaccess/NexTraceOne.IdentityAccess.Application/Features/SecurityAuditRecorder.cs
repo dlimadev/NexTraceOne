@@ -1,8 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Features;
+namespace NexTraceOne.IdentityAccess.Application.Features;
 
 /// <summary>
 /// Implementação injetável do registro centralizado de eventos de segurança (SecurityEvent)

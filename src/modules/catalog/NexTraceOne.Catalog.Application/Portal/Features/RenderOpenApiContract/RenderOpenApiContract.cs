@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Domain.Errors;
+using NexTraceOne.Catalog.Domain.Portal.Errors;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.RenderOpenApiContract;
+namespace NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract;
 
 /// <summary>
 /// Feature: RenderOpenApiContract — retorna contrato OpenAPI formatado para renderização.

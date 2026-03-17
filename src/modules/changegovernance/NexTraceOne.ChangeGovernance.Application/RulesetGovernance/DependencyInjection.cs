@@ -1,18 +1,20 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.RulesetGovernance.Application.Features.ArchiveRuleset;
-using NexTraceOne.RulesetGovernance.Application.Features.BindRulesetToAssetType;
-using NexTraceOne.RulesetGovernance.Application.Features.ComputeRulesetScore;
-using NexTraceOne.RulesetGovernance.Application.Features.ExecuteLintForRelease;
-using NexTraceOne.RulesetGovernance.Application.Features.GetRulesetFindings;
-using NexTraceOne.RulesetGovernance.Application.Features.GetRulesetScore;
-using NexTraceOne.RulesetGovernance.Application.Features.InstallDefaultRulesets;
-using NexTraceOne.RulesetGovernance.Application.Features.ListRulesets;
-using NexTraceOne.RulesetGovernance.Application.Features.UploadRuleset;
 
-namespace NexTraceOne.RulesetGovernance.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ArchiveRuleset;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.BindRulesetToAssetType;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ComputeRulesetScore;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ExecuteLintForRelease;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetFindings;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetScore;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.InstallDefaultRulesets;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ListRulesets;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.UploadRuleset;
+
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo RulesetGovernance.

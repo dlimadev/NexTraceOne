@@ -1,14 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using ComputeSemanticDiffFeature = NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff.ComputeSemanticDiff;
-using CreateContractVersionFeature = NexTraceOne.Contracts.Application.Features.CreateContractVersion.CreateContractVersion;
-using GetContractHistoryFeature = NexTraceOne.Contracts.Application.Features.GetContractHistory.GetContractHistory;
-using ImportContractFeature = NexTraceOne.Contracts.Application.Features.ImportContract.ImportContract;
-using LockContractVersionFeature = NexTraceOne.Contracts.Application.Features.LockContractVersion.LockContractVersion;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
-namespace NexTraceOne.Contracts.Tests.Application.Features;
+using ComputeSemanticDiffFeature = NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff.ComputeSemanticDiff;
+using CreateContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion.CreateContractVersion;
+using GetContractHistoryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory.GetContractHistory;
+using ImportContractFeature = NexTraceOne.Catalog.Application.Contracts.Features.ImportContract.ImportContract;
+using LockContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion.LockContractVersion;
+
+namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
 /// <summary>
 /// Testes de handlers da camada Application do módulo Contracts.

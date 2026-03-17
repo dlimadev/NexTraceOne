@@ -1,3 +1,5 @@
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
 namespace NexTraceOne.BuildingBlocks.Core.Primitives;
 
 /// <summary>

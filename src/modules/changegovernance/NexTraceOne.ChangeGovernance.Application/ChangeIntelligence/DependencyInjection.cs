@@ -1,25 +1,27 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.ChangeIntelligence.Application.Features.AttachWorkItemContext;
-using NexTraceOne.ChangeIntelligence.Application.Features.CalculateBlastRadius;
-using NexTraceOne.ChangeIntelligence.Application.Features.ClassifyChangeLevel;
-using NexTraceOne.ChangeIntelligence.Application.Features.ComputeChangeScore;
-using NexTraceOne.ChangeIntelligence.Application.Features.GetBlastRadiusReport;
-using NexTraceOne.ChangeIntelligence.Application.Features.GetChangeScore;
-using NexTraceOne.ChangeIntelligence.Application.Features.GetRelease;
-using NexTraceOne.ChangeIntelligence.Application.Features.GetReleaseHistory;
-using NexTraceOne.ChangeIntelligence.Application.Features.ListReleases;
-using NexTraceOne.ChangeIntelligence.Application.Features.NotifyDeployment;
-using NexTraceOne.ChangeIntelligence.Application.Features.RegisterRollback;
-using NexTraceOne.ChangeIntelligence.Application.Features.SyncJiraWorkItems;
-using NexTraceOne.ChangeIntelligence.Application.Features.UpdateDeploymentState;
-using NexTraceOne.ChangeIntelligence.Application.Features.GetChangeAdvisory;
-using NexTraceOne.ChangeIntelligence.Application.Features.RecordChangeDecision;
-using NexTraceOne.ChangeIntelligence.Application.Features.GetChangeDecisionHistory;
 
-namespace NexTraceOne.ChangeIntelligence.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AttachWorkItemContext;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeScore;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetBlastRadiusReport;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeScore;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState;
+
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo ChangeIntelligence.

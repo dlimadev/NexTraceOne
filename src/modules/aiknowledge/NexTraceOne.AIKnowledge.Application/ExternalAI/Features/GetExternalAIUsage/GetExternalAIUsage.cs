@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.ExternalAi.Application.Features.GetExternalAIUsage;
+namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.GetExternalAIUsage;
 
 /// <summary>
 /// Feature: GetExternalAIUsage — Módulo: ExternalAi.

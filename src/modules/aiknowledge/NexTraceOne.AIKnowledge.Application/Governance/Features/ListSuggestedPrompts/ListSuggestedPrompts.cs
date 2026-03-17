@@ -1,8 +1,9 @@
 using Ardalis.GuardClauses;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListSuggestedPrompts;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListSuggestedPrompts;
 
 /// <summary>
 /// Feature: ListSuggestedPrompts — lista prompts sugeridos por persona e categoria.

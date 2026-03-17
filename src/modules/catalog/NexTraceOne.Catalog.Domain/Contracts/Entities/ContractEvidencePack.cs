@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.Contracts.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 /// <summary>
 /// Entidade que representa o pacote de evidências técnicas gerado para uma mudança de contrato.

@@ -1,8 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value Object que encapsula a assinatura digital de um contrato.

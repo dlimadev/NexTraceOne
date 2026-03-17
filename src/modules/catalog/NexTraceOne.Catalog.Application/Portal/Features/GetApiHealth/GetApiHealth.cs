@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetApiHealth;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth;
 
 /// <summary>
 /// Feature: GetApiHealth — retorna indicadores de saúde e disponibilidade de uma API.

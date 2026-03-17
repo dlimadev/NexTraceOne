@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace NexTraceOne.Identity.Infrastructure.Services;
+namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Decodifica o payload de ID Tokens JWT sem validação de assinatura.

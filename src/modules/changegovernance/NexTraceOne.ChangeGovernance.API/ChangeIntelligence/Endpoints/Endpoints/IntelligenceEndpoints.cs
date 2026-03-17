@@ -1,15 +1,18 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using RegisterExternalMarkerFeature = NexTraceOne.ChangeIntelligence.Application.Features.RegisterExternalMarker.RegisterExternalMarker;
-using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
-using RecordReleaseBaselineFeature = NexTraceOne.ChangeIntelligence.Application.Features.RecordReleaseBaseline.RecordReleaseBaseline;
-using StartPostReleaseReviewFeature = NexTraceOne.ChangeIntelligence.Application.Features.StartPostReleaseReview.StartPostReleaseReview;
-using ProgressPostReleaseReviewFeature = NexTraceOne.ChangeIntelligence.Application.Features.ProgressPostReleaseReview.ProgressPostReleaseReview;
-using AssessRollbackViabilityFeature = NexTraceOne.ChangeIntelligence.Application.Features.AssessRollbackViability.AssessRollbackViability;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+using RegisterExternalMarkerFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker.RegisterExternalMarker;
+using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
+using RecordReleaseBaselineFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordReleaseBaseline.RecordReleaseBaseline;
+using StartPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.StartPostReleaseReview.StartPostReleaseReview;
+using ProgressPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ProgressPostReleaseReview.ProgressPostReleaseReview;
+using AssessRollbackViabilityFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AssessRollbackViability.AssessRollbackViability;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de inteligência avançada de mudança.

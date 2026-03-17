@@ -1,13 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Domain.Entities;
-using NexTraceOne.Promotion.Domain.Enums;
-using CreatePromotionRequestFeature = NexTraceOne.Promotion.Application.Features.CreatePromotionRequest.CreatePromotionRequest;
-using EvaluatePromotionGatesFeature = NexTraceOne.Promotion.Application.Features.EvaluatePromotionGates.EvaluatePromotionGates;
-using ApprovePromotionFeature = NexTraceOne.Promotion.Application.Features.ApprovePromotion.ApprovePromotion;
-using GetPromotionStatusFeature = NexTraceOne.Promotion.Application.Features.GetPromotionStatus.GetPromotionStatus;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
-namespace NexTraceOne.Promotion.Tests.Application.Features;
+using CreatePromotionRequestFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.CreatePromotionRequest.CreatePromotionRequest;
+using EvaluatePromotionGatesFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluatePromotionGates.EvaluatePromotionGates;
+using ApprovePromotionFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion.ApprovePromotion;
+using GetPromotionStatusFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus.GetPromotionStatus;
+
+namespace NexTraceOne.ChangeGovernance.Tests.Promotion.Application.Features;
 
 /// <summary>Testes de handlers da camada Application do módulo Promotion.</summary>
 public sealed class PromotionApplicationTests

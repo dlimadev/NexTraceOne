@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.Workflow.Application;
-using NexTraceOne.Workflow.Infrastructure;
 
-namespace NexTraceOne.Workflow.API;
+using NexTraceOne.ChangeGovernance.Application.Workflow;
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow;
+
+namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo Workflow.

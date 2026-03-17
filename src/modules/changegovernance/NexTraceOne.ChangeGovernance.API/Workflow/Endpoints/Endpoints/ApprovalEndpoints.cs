@@ -1,14 +1,17 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using InitiateWorkflowFeature = NexTraceOne.Workflow.Application.Features.InitiateWorkflow.InitiateWorkflow;
-using ApproveStageFeature = NexTraceOne.Workflow.Application.Features.ApproveStage.ApproveStage;
-using RejectWorkflowFeature = NexTraceOne.Workflow.Application.Features.RejectWorkflow.RejectWorkflow;
-using RequestChangesFeature = NexTraceOne.Workflow.Application.Features.RequestChanges.RequestChanges;
-using AddObservationFeature = NexTraceOne.Workflow.Application.Features.AddObservation.AddObservation;
 
-namespace NexTraceOne.Workflow.API.Endpoints;
+using InitiateWorkflowFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflow.InitiateWorkflow;
+using ApproveStageFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ApproveStage.ApproveStage;
+using RejectWorkflowFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.RejectWorkflow.RejectWorkflow;
+using RequestChangesFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.RequestChanges.RequestChanges;
+using AddObservationFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.AddObservation.AddObservation;
+
+namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de aprovação e decisão no ciclo de vida do workflow.

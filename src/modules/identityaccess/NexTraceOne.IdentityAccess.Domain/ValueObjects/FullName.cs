@@ -1,7 +1,8 @@
 using Ardalis.GuardClauses;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Identity.Domain.ValueObjects;
+namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 /// <summary>
 /// Value Object que representa o nome completo do usuário.

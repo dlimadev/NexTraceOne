@@ -7,10 +7,10 @@ import { Breadcrumbs } from './Breadcrumbs';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
- * Shell principal da aplicação autenticada.
+ * App Shell — DESIGN-SYSTEM.md §4.1 / GUIDELINE.md §5.1
  *
- * Estrutura: Sidebar (fixa, colapsável) à esquerda + coluna direita com AppHeader + conteúdo scrollável.
- * A CommandPalette é montada aqui e aberta via Cmd+K / Ctrl+K ou botão no header.
+ * Sidebar fixa (264-280px) + coluna direita com Topbar (64-72px) + conteúdo scrollável.
+ * Fundo canvas profundo, transição suave ao colapsar sidebar.
  */
 export function AppLayout() {
   const { isAuthenticated } = useAuth();
@@ -22,7 +22,6 @@ export function AppLayout() {
   const closePalette = useCallback(() => setPaletteOpen(false), []);
   const toggleSidebar = useCallback(() => setSidebarCollapsed((prev) => !prev), []);
 
-  /** Atalho global: Cmd+K (macOS) / Ctrl+K (Windows/Linux) abre a Command Palette. */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -38,12 +37,13 @@ export function AppLayout() {
     return <Navigate to="/login" replace />;
   }
 
-  const marginLeft = sidebarCollapsed ? 'ml-16' : 'ml-64';
-
   return (
     <div className="flex h-screen bg-canvas">
       <Sidebar collapsed={sidebarCollapsed} onToggleCollapse={toggleSidebar} />
-      <div className={`flex-1 ${marginLeft} flex flex-col min-h-0 transition-all duration-200`}>
+      <div
+        className="flex-1 flex flex-col min-h-0 transition-all duration-[var(--nto-motion-medium)]"
+        style={{ marginLeft: sidebarCollapsed ? 64 : 272 }}
+      >
         <AppHeader onOpenCommandPalette={openPalette} />
         {pathname !== '/' && <Breadcrumbs />}
         <main className="flex-1 overflow-y-auto">

@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
-namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 
 /// <summary>
 /// Fábrica de DbContext para uso em tempo de design (EF Core migrations).

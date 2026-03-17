@@ -1,21 +1,22 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Enums;
-using CreateWorkflowTemplateFeature = NexTraceOne.Workflow.Application.Features.CreateWorkflowTemplate.CreateWorkflowTemplate;
-using InitiateWorkflowFeature = NexTraceOne.Workflow.Application.Features.InitiateWorkflow.InitiateWorkflow;
-using ApproveStageFeature = NexTraceOne.Workflow.Application.Features.ApproveStage.ApproveStage;
-using RejectWorkflowFeature = NexTraceOne.Workflow.Application.Features.RejectWorkflow.RejectWorkflow;
-using RequestChangesFeature = NexTraceOne.Workflow.Application.Features.RequestChanges.RequestChanges;
-using AddObservationFeature = NexTraceOne.Workflow.Application.Features.AddObservation.AddObservation;
-using GetWorkflowStatusFeature = NexTraceOne.Workflow.Application.Features.GetWorkflowStatus.GetWorkflowStatus;
-using ListPendingApprovalsFeature = NexTraceOne.Workflow.Application.Features.ListPendingApprovals.ListPendingApprovals;
-using GenerateEvidencePackFeature = NexTraceOne.Workflow.Application.Features.GenerateEvidencePack.GenerateEvidencePack;
-using GetEvidencePackFeature = NexTraceOne.Workflow.Application.Features.GetEvidencePack.GetEvidencePack;
-using ExportEvidencePackPdfFeature = NexTraceOne.Workflow.Application.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
-using EscalateSlaViolationFeature = NexTraceOne.Workflow.Application.Features.EscalateSlaViolation.EscalateSlaViolation;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
-namespace NexTraceOne.Workflow.Tests.Application.Features;
+using CreateWorkflowTemplateFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate.CreateWorkflowTemplate;
+using InitiateWorkflowFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflow.InitiateWorkflow;
+using ApproveStageFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ApproveStage.ApproveStage;
+using RejectWorkflowFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.RejectWorkflow.RejectWorkflow;
+using RequestChangesFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.RequestChanges.RequestChanges;
+using AddObservationFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.AddObservation.AddObservation;
+using GetWorkflowStatusFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetWorkflowStatus.GetWorkflowStatus;
+using ListPendingApprovalsFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals.ListPendingApprovals;
+using GenerateEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack.GenerateEvidencePack;
+using GetEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetEvidencePack.GetEvidencePack;
+using ExportEvidencePackPdfFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
+using EscalateSlaViolationFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.EscalateSlaViolation.EscalateSlaViolation;
+
+namespace NexTraceOne.ChangeGovernance.Tests.Workflow.Application.Features;
 
 /// <summary>Testes de handlers da camada Application do módulo Workflow.</summary>
 public sealed class WorkflowApplicationTests

@@ -1,15 +1,18 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using GetIdeCapabilitiesFeature = NexTraceOne.AiGovernance.Application.Features.GetIdeCapabilities.GetIdeCapabilities;
-using ListIdeClientsFeature = NexTraceOne.AiGovernance.Application.Features.ListIdeClients.ListIdeClients;
-using RegisterIdeClientFeature = NexTraceOne.AiGovernance.Application.Features.RegisterIdeClient.RegisterIdeClient;
-using ListIdeCapabilityPoliciesFeature = NexTraceOne.AiGovernance.Application.Features.ListIdeCapabilityPolicies.ListIdeCapabilityPolicies;
-using GetIdeSummaryFeature = NexTraceOne.AiGovernance.Application.Features.GetIdeSummary.GetIdeSummary;
 
-namespace NexTraceOne.AiGovernance.API.Endpoints;
+using GetIdeCapabilitiesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetIdeCapabilities.GetIdeCapabilities;
+using ListIdeClientsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListIdeClients.ListIdeClients;
+using RegisterIdeClientFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterIdeClient.RegisterIdeClient;
+using ListIdeCapabilityPoliciesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListIdeCapabilityPolicies.ListIdeCapabilityPolicies;
+using GetIdeSummaryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetIdeSummary.GetIdeSummary;
+
+namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo IDE Integrations.

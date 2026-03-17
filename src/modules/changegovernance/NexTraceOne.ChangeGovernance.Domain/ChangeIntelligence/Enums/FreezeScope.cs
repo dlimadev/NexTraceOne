@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Domain.Enums;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 /// <summary>
 /// Escopo de aplicação de uma janela de freeze.

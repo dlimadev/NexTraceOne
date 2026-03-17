@@ -1,7 +1,7 @@
 using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.Contracts.Domain.ValueObjects;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Domain.Services;
+namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 
 /// <summary>
 /// Serviço de domínio responsável pelo cálculo de diff semântico entre especificações Swagger 2.0.

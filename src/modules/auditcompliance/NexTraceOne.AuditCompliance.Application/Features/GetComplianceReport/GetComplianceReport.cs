@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
+
+using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Audit.Application.Abstractions;
 
-namespace NexTraceOne.Audit.Application.Features.GetComplianceReport;
+namespace NexTraceOne.AuditCompliance.Application.Features.GetComplianceReport;
 
 /// <summary>
 /// Feature: GetComplianceReport — gera relatório de compliance com base nos dados de auditoria.

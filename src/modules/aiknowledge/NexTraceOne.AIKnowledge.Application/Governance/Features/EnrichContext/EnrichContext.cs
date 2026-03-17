@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.EnrichContext;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.EnrichContext;
 
 /// <summary>
 /// Feature: EnrichContext — executa pipeline de enriquecimento de contexto para IA.

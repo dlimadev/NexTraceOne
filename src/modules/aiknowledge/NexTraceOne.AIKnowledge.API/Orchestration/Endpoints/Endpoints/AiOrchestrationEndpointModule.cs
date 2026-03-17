@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
 
-namespace NexTraceOne.AiOrchestration.API.Endpoints;
+namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo AiOrchestration.

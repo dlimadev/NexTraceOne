@@ -1,20 +1,22 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.AiGovernance.Application.Features.CreateConversation;
-using NexTraceOne.AiGovernance.Application.Features.CreatePolicy;
-using NexTraceOne.AiGovernance.Application.Features.RegisterModel;
-using NexTraceOne.AiGovernance.Application.Features.SendAssistantMessage;
-using NexTraceOne.AiGovernance.Application.Features.UpdateBudget;
-using NexTraceOne.AiGovernance.Application.Features.UpdateConversation;
-using NexTraceOne.AiGovernance.Application.Features.UpdateModel;
-using NexTraceOne.AiGovernance.Application.Features.RegisterIdeClient;
-using NexTraceOne.AiGovernance.Application.Features.UpdatePolicy;
-using NexTraceOne.AiGovernance.Application.Features.PlanExecution;
-using NexTraceOne.AiGovernance.Application.Features.EnrichContext;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Features.CreateConversation;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.CreatePolicy;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.EnrichContext;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.PlanExecution;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterIdeClient;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterModel;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessage;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateBudget;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateConversation;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateModel;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy;
 using NexTraceOne.BuildingBlocks.Application;
 
-namespace NexTraceOne.AiGovernance.Application;
+namespace NexTraceOne.AIKnowledge.Application.Governance;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo AiGovernance.

@@ -1,4 +1,4 @@
-namespace NexTraceOne.Identity.Application.Abstractions;
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Serviço responsável por hash e verificação de senhas locais.

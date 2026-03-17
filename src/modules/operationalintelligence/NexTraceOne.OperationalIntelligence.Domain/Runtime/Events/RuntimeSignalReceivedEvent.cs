@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.RuntimeIntelligence.Domain.Events;
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Events;
 
 /// <summary>
 /// Evento emitido quando um sinal de runtime é recebido e processado.

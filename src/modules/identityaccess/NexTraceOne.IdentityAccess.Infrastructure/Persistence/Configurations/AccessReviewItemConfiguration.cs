@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Identity.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Configurations;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para AccessReviewItem.

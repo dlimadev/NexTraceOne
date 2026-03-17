@@ -1,4 +1,4 @@
-namespace NexTraceOne.Promotion.Domain.Enums;
+namespace NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
 /// <summary>
 /// Status do ciclo de vida de uma solicitação de promoção entre ambientes.

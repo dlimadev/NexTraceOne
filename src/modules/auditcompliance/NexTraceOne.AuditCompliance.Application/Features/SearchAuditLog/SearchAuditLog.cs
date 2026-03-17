@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
+using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Audit.Application.Abstractions;
 
-namespace NexTraceOne.Audit.Application.Features.SearchAuditLog;
+namespace NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog;
 
 /// <summary>
 /// Feature: SearchAuditLog — pesquisa eventos de auditoria com filtros.

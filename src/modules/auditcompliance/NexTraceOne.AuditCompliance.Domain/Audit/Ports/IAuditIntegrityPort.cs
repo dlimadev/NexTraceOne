@@ -1,4 +1,4 @@
-namespace NexTraceOne.Audit.Domain.Ports;
+namespace NexTraceOne.AuditCompliance.Domain.Audit.Ports;
 
 /// <summary>
 /// Porta de verificação de integridade da trilha de auditoria.

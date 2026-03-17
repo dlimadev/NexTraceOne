@@ -5,24 +5,19 @@ import {
   ShieldCheck, Eye, EyeOff, Lock, Mail, AlertCircle,
   CheckCircle2, Server, FileText, Activity, Shield,
 } from 'lucide-react';
+import { cn } from '../../../lib/cn';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Button } from '../../../components/Button';
 import { identityApi } from '../api';
 import { resolveApiError } from '../../../utils/apiErrors';
 
 /**
- * Página de login — enterprise split-layout, OIDC-first com fallback seguro.
+ * Página de login — Auth Shell enterprise (DESIGN-SYSTEM.md §4.2, DESIGN.md §9.1)
  *
- * Layout: painel esquerdo com branding e capacidades da plataforma,
- * painel direito com bloco de autenticação premium.
- *
- * Segurança:
- * - Password nunca pré-preenchida nem armazenada em estado além do necessário.
- * - Input password com toggle seguro (type password/text).
- * - autoComplete correto para cada campo.
- * - Nenhum dado sensível logado ou exposto.
- * - Mensagens de erro genéricas (sem detalhes técnicos).
- * - Password limpa do estado após submissão bem-sucedida.
+ * Split-layout: hero esquerdo (55%) + auth card direito (45%).
+ * Fundo navy profundo com halos radiais sutis.
+ * Hero: headline grande com palavra mint de ênfase, chips de capacidade, trust signals.
+ * Auth card: 420-460px, padding 40px, CTA gradient, SSO proeminente.
  */
 export function LoginPage() {
   const { t } = useTranslation();
@@ -38,13 +33,11 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  /** Limpa a password do estado — chamado após login bem-sucedido. */
   const clearSensitiveState = useCallback(() => {
     setPassword('');
     setShowPassword(false);
   }, []);
 
-  /** Inicia o fluxo OIDC/SSO redirecionando ao identity provider. */
   const handleSsoLogin = async () => {
     setError(null);
     setSsoLoading(true);
@@ -52,8 +45,7 @@ export function LoginPage() {
       const returnTo = searchParams.get('returnTo') ?? undefined;
       const { authorizationUrl } = await identityApi.startOidcLogin('default', returnTo);
       window.location.href = authorizationUrl;
-    } catch (_err) {
-      // Error details not exposed to UI for security; generic message shown
+    } catch {
       setError(t('auth.ssoError'));
       setSsoLoading(false);
     }
@@ -86,35 +78,37 @@ export function LoginPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-canvas flex">
-      {/* ── Left panel: Branding & Platform Context ──────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[45%] xl:w-[48%] flex-col justify-between p-10 xl:p-14 relative overflow-hidden">
-        {/* Gradient background overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/8 via-canvas to-brand-purple/6" />
-        <div className="absolute top-0 left-0 right-0 h-1 brand-gradient" />
+    <div className="min-h-screen bg-canvas flex relative overflow-hidden">
+      {/* ── Background halos — profundidade navy com brilho sutil ──────────── */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-cyan/[0.04] blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-mint/[0.03] blur-[120px]" />
+      </div>
 
+      {/* ── Left panel: Hero & Branding ──────────────────────────────────────── */}
+      <div className="hidden lg:flex lg:w-[55%] xl:w-[55%] flex-col justify-between p-12 xl:p-16 relative">
         <div className="relative z-10">
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-16">
-            <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center shadow-glow-sm">
-              <span className="text-accent font-bold text-lg">N</span>
+          <div className="flex items-center gap-3 mb-20">
+            <div className="w-11 h-11 rounded-lg bg-accent/12 flex items-center justify-center shadow-glow-sm">
+              <span className="text-cyan font-bold text-lg">N</span>
             </div>
             <span className="font-semibold text-lg text-heading tracking-tight">NexTraceOne</span>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-3xl xl:text-4xl font-bold text-heading leading-tight mb-4">
+          {/* Headline — display-01 scale, palavra de ênfase em mint */}
+          <h1 className="text-4xl xl:text-5xl font-bold text-heading leading-[1.1] mb-5 max-w-xl">
             {t('auth.loginHeadline')}
           </h1>
-          <p className="text-base text-muted leading-relaxed max-w-md mb-10">
+          <p className="text-lg text-body leading-relaxed max-w-md mb-12">
             {t('auth.loginSubheadline')}
           </p>
 
-          {/* Platform capabilities */}
-          <div className="space-y-4">
+          {/* Platform capabilities — chips com ícone */}
+          <div className="space-y-3.5">
             {platformCapabilities.map((cap) => (
-              <div key={cap.labelKey} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-md bg-elevated border border-edge flex items-center justify-center text-accent shrink-0">
+              <div key={cap.labelKey} className="flex items-center gap-3.5">
+                <div className="w-9 h-9 rounded-md bg-elevated border border-edge flex items-center justify-center text-cyan shrink-0">
                   {cap.icon}
                 </div>
                 <span className="text-sm text-body">{t(cap.labelKey)}</span>
@@ -136,21 +130,22 @@ export function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel: Authentication ──────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12">
-        <div className="w-full max-w-md animate-fade-in">
+      {/* ── Right panel: Auth Card ───────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 relative z-10">
+        <div className="w-full max-w-[440px] animate-fade-in">
           {/* Mobile-only logo */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/15 mb-3">
-              <span className="text-accent font-bold text-lg">N</span>
+          <div className="lg:hidden text-center mb-10">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-accent/12 mb-3 shadow-glow-sm">
+              <span className="text-cyan font-bold text-lg">N</span>
             </div>
             <h1 className="text-xl font-bold text-heading">NexTraceOne</h1>
             <p className="text-sm text-muted mt-1">{t('auth.tagline')}</p>
           </div>
 
-          {/* Auth card */}
-          <div className="bg-card rounded-xl shadow-lg border border-edge p-8">
-            <div className="h-0.5 brand-gradient rounded-full mb-8" />
+          {/* Auth card — DESIGN-SYSTEM.md: 420-460px, padding 40px, radius-lg */}
+          <div className="bg-card rounded-lg shadow-elevated border border-edge p-10">
+            {/* Accent stripe */}
+            <div className="h-0.5 brand-gradient rounded-pill mb-8" />
 
             <h2 className="text-xl font-semibold text-heading mb-1">{t('auth.signIn')}</h2>
             <p className="text-sm text-muted mb-8">{t('auth.signInSubtitle')}</p>
@@ -159,7 +154,7 @@ export function LoginPage() {
             {error && (
               <div
                 role="alert"
-                className="mb-6 rounded-lg bg-critical/10 border border-critical/25 px-4 py-3 flex items-start gap-3 animate-fade-in"
+                className="mb-6 rounded-md bg-critical/10 border border-critical/25 px-4 py-3 flex items-start gap-3 animate-fade-in"
               >
                 <AlertCircle size={16} className="text-critical shrink-0 mt-0.5" />
                 <p className="text-sm text-critical">{error}</p>
@@ -183,22 +178,22 @@ export function LoginPage() {
             </div>
 
             {/* Divider */}
-            <div className="relative flex items-center my-6">
-              <div className="flex-1 border-t border-edge" />
+            <div className="relative flex items-center my-7">
+              <div className="flex-1 border-t border-divider" />
               <span className="px-3 text-xs text-faded uppercase tracking-wider font-medium">
                 {t('auth.orDivider')}
               </span>
-              <div className="flex-1 border-t border-edge" />
+              <div className="flex-1 border-t border-divider" />
             </div>
 
-            {/* Credentials form (fallback) */}
+            {/* Credentials form — DESIGN-SYSTEM.md §4.4: input 56px, radius-lg, bg-input */}
             <form onSubmit={handleSubmit} className="space-y-5" noValidate>
               <div>
-                <label className="block text-sm font-medium text-body mb-1.5" htmlFor="email">
+                <label className="block text-sm font-medium text-body mb-2" htmlFor="email">
                   {t('auth.email')}
                 </label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded pointer-events-none" />
+                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-faded pointer-events-none" />
                   <input
                     id="email"
                     name="email"
@@ -211,17 +206,22 @@ export function LoginPage() {
                     autoComplete="username"
                     spellCheck={false}
                     aria-describedby={error ? 'login-error' : undefined}
-                    className="w-full rounded-lg bg-canvas border border-edge pl-10 pr-3 py-2.5 text-sm text-heading placeholder:text-faded focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
+                    className={cn(
+                      'w-full h-14 rounded-lg bg-input border border-edge',
+                      'pl-11 pr-4 text-sm text-heading placeholder:text-faded',
+                      'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+                      'transition-all duration-[var(--nto-motion-base)]',
+                    )}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-body mb-1.5" htmlFor="password">
+                <label className="block text-sm font-medium text-body mb-2" htmlFor="password">
                   {t('auth.password')}
                 </label>
                 <div className="relative">
-                  <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded pointer-events-none" />
+                  <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-faded pointer-events-none" />
                   <input
                     ref={passwordRef}
                     id="password"
@@ -235,12 +235,17 @@ export function LoginPage() {
                     autoComplete="current-password"
                     spellCheck={false}
                     aria-describedby={error ? 'login-error' : undefined}
-                    className="w-full rounded-lg bg-canvas border border-edge pl-10 pr-10 py-2.5 text-sm text-heading placeholder:text-faded focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
+                    className={cn(
+                      'w-full h-14 rounded-lg bg-input border border-edge',
+                      'pl-11 pr-11 text-sm text-heading placeholder:text-faded',
+                      'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
+                      'transition-all duration-[var(--nto-motion-base)]',
+                    )}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-faded hover:text-muted transition-colors p-0.5"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-faded hover:text-muted transition-colors p-0.5"
                     tabIndex={-1}
                     aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                   >
@@ -257,7 +262,7 @@ export function LoginPage() {
             {/* Help link */}
             <p className="text-center text-xs text-faded mt-6">
               {t('auth.needHelp')}{' '}
-              <span className="text-accent hover:text-accent-hover cursor-pointer">
+              <span className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors">
                 {t('auth.contactSupport')}
               </span>
             </p>

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Orquestrador de endpoints Minimal API do módulo Identity.

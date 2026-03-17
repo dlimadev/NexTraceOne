@@ -1,25 +1,27 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.DeveloperPortal.Application.Features.CreateSubscription;
-using NexTraceOne.DeveloperPortal.Application.Features.DeleteSubscription;
-using NexTraceOne.DeveloperPortal.Application.Features.ExecutePlayground;
-using NexTraceOne.DeveloperPortal.Application.Features.GenerateCode;
-using NexTraceOne.DeveloperPortal.Application.Features.GetApiConsumers;
-using NexTraceOne.DeveloperPortal.Application.Features.GetApiDetail;
-using NexTraceOne.DeveloperPortal.Application.Features.GetApiHealth;
-using NexTraceOne.DeveloperPortal.Application.Features.GetApisIConsume;
-using NexTraceOne.DeveloperPortal.Application.Features.GetAssetTimeline;
-using NexTraceOne.DeveloperPortal.Application.Features.GetMyApis;
-using NexTraceOne.DeveloperPortal.Application.Features.GetPlaygroundHistory;
-using NexTraceOne.DeveloperPortal.Application.Features.GetPortalAnalytics;
-using NexTraceOne.DeveloperPortal.Application.Features.GetSubscriptions;
-using NexTraceOne.DeveloperPortal.Application.Features.RecordAnalyticsEvent;
-using NexTraceOne.DeveloperPortal.Application.Features.RenderOpenApiContract;
-using NexTraceOne.DeveloperPortal.Application.Features.SearchCatalog;
 
-namespace NexTraceOne.DeveloperPortal.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription;
+using NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription;
+using NexTraceOne.Catalog.Application.Portal.Features.ExecutePlayground;
+using NexTraceOne.Catalog.Application.Portal.Features.GenerateCode;
+using NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers;
+using NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail;
+using NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth;
+using NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume;
+using NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline;
+using NexTraceOne.Catalog.Application.Portal.Features.GetMyApis;
+using NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory;
+using NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics;
+using NexTraceOne.Catalog.Application.Portal.Features.GetSubscriptions;
+using NexTraceOne.Catalog.Application.Portal.Features.RecordAnalyticsEvent;
+using NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract;
+using NexTraceOne.Catalog.Application.Portal.Features.SearchCatalog;
+
+namespace NexTraceOne.Catalog.Application.Portal;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo DeveloperPortal.

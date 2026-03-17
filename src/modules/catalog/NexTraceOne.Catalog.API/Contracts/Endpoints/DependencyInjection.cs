@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.Contracts.Application;
-using NexTraceOne.Contracts.Infrastructure;
 
-namespace NexTraceOne.Contracts.API;
+using NexTraceOne.Catalog.Application.Contracts;
+using NexTraceOne.Catalog.Infrastructure.Contracts;
+
+namespace NexTraceOne.Catalog.API.Contracts.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo Contracts.

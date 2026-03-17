@@ -1,13 +1,14 @@
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Behaviors;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Services;
+namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Implementação thread-safe e scoped do rastreador de eventos de segurança.
 ///
 /// Mantém em memória os <see cref="SecurityEvent"/>s criados durante uma requisição
-/// para que o <see cref="NexTraceOne.Identity.Application.Behaviors.SecurityEventAuditBehavior{TRequest,TResponse}"/>
+/// para que o <see cref="SecurityEventAuditBehavior{TRequest,TResponse}"/>
 /// possa propagá-los ao módulo Audit central após a execução do handler.
 ///
 /// Tempo de vida: Scoped (uma instância por requisição HTTP).

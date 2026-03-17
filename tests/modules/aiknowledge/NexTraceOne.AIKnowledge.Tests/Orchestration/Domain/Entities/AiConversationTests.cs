@@ -1,7 +1,7 @@
-using NexTraceOne.AiOrchestration.Domain.Entities;
-using NexTraceOne.AiOrchestration.Domain.Enums;
+using NexTraceOne.AIKnowledge.Domain.Orchestration.Entities;
+using NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
 
-namespace NexTraceOne.AiOrchestration.Tests.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Tests.Orchestration.Domain.Entities;
 
 /// <summary>Testes unitários da entidade AiConversation — ciclo de vida multi-turno.</summary>
 public sealed class AiConversationTests

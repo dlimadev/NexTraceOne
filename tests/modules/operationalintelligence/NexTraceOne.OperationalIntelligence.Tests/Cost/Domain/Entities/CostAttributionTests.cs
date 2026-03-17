@@ -1,6 +1,6 @@
-using NexTraceOne.CostIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
-namespace NexTraceOne.CostIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Tests.Cost.Domain.Entities;
 
 /// <summary>Testes unitários da entidade CostAttribution — validação de período, cálculo e atualização.</summary>
 public sealed class CostAttributionTests

@@ -1,15 +1,18 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using MediatR;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Errors;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Errors;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Application.Features.ChangePassword;
+namespace NexTraceOne.IdentityAccess.Application.Features.ChangePassword;
 
 /// <summary>
 /// Feature: ChangePassword — altera a senha do usuário autenticado (self-service).

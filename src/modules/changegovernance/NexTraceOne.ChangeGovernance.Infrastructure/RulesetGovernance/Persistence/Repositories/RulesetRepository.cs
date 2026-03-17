@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.RulesetGovernance.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Repositories;
 
 /// <summary>
 /// Repositorio de rulesets, implementando consultas específicas de negócio.

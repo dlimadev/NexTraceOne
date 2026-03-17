@@ -1,4 +1,4 @@
-namespace NexTraceOne.RulesetGovernance.Contracts.ServiceInterfaces;
+namespace NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo RulesetGovernance.

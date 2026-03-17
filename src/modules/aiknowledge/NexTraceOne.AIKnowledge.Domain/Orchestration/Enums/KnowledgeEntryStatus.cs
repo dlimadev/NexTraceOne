@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiOrchestration.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
 
 /// <summary>
 /// Estado de validação de uma entrada sugerida para a base de conhecimento

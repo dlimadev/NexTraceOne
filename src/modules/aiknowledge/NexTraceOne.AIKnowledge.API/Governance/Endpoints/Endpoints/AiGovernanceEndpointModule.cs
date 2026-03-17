@@ -1,34 +1,37 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ListModelsFeature = NexTraceOne.AiGovernance.Application.Features.ListModels.ListModels;
-using GetModelFeature = NexTraceOne.AiGovernance.Application.Features.GetModel.GetModel;
-using RegisterModelFeature = NexTraceOne.AiGovernance.Application.Features.RegisterModel.RegisterModel;
-using UpdateModelFeature = NexTraceOne.AiGovernance.Application.Features.UpdateModel.UpdateModel;
-using ListPoliciesFeature = NexTraceOne.AiGovernance.Application.Features.ListPolicies.ListPolicies;
-using CreatePolicyFeature = NexTraceOne.AiGovernance.Application.Features.CreatePolicy.CreatePolicy;
-using UpdatePolicyFeature = NexTraceOne.AiGovernance.Application.Features.UpdatePolicy.UpdatePolicy;
-using ListBudgetsFeature = NexTraceOne.AiGovernance.Application.Features.ListBudgets.ListBudgets;
-using UpdateBudgetFeature = NexTraceOne.AiGovernance.Application.Features.UpdateBudget.UpdateBudget;
-using ListAuditEntriesFeature = NexTraceOne.AiGovernance.Application.Features.ListAuditEntries.ListAuditEntries;
-using ListKnowledgeSourcesFeature = NexTraceOne.AiGovernance.Application.Features.ListKnowledgeSources.ListKnowledgeSources;
-using SendAssistantMessageFeature = NexTraceOne.AiGovernance.Application.Features.SendAssistantMessage.SendAssistantMessage;
-using ListConversationsFeature = NexTraceOne.AiGovernance.Application.Features.ListConversations.ListConversations;
-using CreateConversationFeature = NexTraceOne.AiGovernance.Application.Features.CreateConversation.CreateConversation;
-using GetConversationFeature = NexTraceOne.AiGovernance.Application.Features.GetConversation.GetConversation;
-using UpdateConversationFeature = NexTraceOne.AiGovernance.Application.Features.UpdateConversation.UpdateConversation;
-using ListMessagesFeature = NexTraceOne.AiGovernance.Application.Features.ListMessages.ListMessages;
-using ListSuggestedPromptsFeature = NexTraceOne.AiGovernance.Application.Features.ListSuggestedPrompts.ListSuggestedPrompts;
-using ListRoutingStrategiesFeature = NexTraceOne.AiGovernance.Application.Features.ListRoutingStrategies.ListRoutingStrategies;
-using GetRoutingDecisionFeature = NexTraceOne.AiGovernance.Application.Features.GetRoutingDecision.GetRoutingDecision;
-using PlanExecutionFeature = NexTraceOne.AiGovernance.Application.Features.PlanExecution.PlanExecution;
-using ListKnowledgeSourceWeightsFeature = NexTraceOne.AiGovernance.Application.Features.ListKnowledgeSourceWeights.ListKnowledgeSourceWeights;
-using EnrichContextFeature = NexTraceOne.AiGovernance.Application.Features.EnrichContext.EnrichContext;
-using NexTraceOne.AiGovernance.Domain.Enums;
 
-namespace NexTraceOne.AiGovernance.API.Endpoints;
+using ListModelsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListModels.ListModels;
+using GetModelFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetModel.GetModel;
+using RegisterModelFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterModel.RegisterModel;
+using UpdateModelFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateModel.UpdateModel;
+using ListPoliciesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListPolicies.ListPolicies;
+using CreatePolicyFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreatePolicy.CreatePolicy;
+using UpdatePolicyFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy.UpdatePolicy;
+using ListBudgetsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListBudgets.ListBudgets;
+using UpdateBudgetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateBudget.UpdateBudget;
+using ListAuditEntriesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAuditEntries.ListAuditEntries;
+using ListKnowledgeSourcesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListKnowledgeSources.ListKnowledgeSources;
+using SendAssistantMessageFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessage.SendAssistantMessage;
+using ListConversationsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListConversations.ListConversations;
+using CreateConversationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateConversation.CreateConversation;
+using GetConversationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetConversation.GetConversation;
+using UpdateConversationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateConversation.UpdateConversation;
+using ListMessagesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListMessages.ListMessages;
+using ListSuggestedPromptsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListSuggestedPrompts.ListSuggestedPrompts;
+using ListRoutingStrategiesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListRoutingStrategies.ListRoutingStrategies;
+using GetRoutingDecisionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetRoutingDecision.GetRoutingDecision;
+using PlanExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.PlanExecution.PlanExecution;
+using ListKnowledgeSourceWeightsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListKnowledgeSourceWeights.ListKnowledgeSourceWeights;
+using EnrichContextFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.EnrichContext.EnrichContext;
+
+namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo AI Governance.

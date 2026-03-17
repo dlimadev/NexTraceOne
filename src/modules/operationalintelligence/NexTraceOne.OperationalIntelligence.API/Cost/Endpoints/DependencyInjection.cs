@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.CostIntelligence.Application;
-using NexTraceOne.CostIntelligence.Infrastructure;
 
-namespace NexTraceOne.CostIntelligence.API;
+using NexTraceOne.OperationalIntelligence.Application.Cost;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Cost;
+
+namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo CostIntelligence.

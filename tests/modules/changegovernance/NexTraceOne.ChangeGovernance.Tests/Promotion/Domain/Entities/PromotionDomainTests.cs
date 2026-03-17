@@ -1,7 +1,7 @@
-using NexTraceOne.Promotion.Domain.Entities;
-using NexTraceOne.Promotion.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
-namespace NexTraceOne.Promotion.Tests.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Tests.Promotion.Domain.Entities;
 
 /// <summary>Testes unitários das entidades de domínio do módulo Promotion.</summary>
 public sealed class PromotionDomainTests

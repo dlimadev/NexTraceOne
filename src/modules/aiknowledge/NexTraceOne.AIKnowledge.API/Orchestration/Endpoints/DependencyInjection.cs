@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.AiOrchestration.Application;
-using NexTraceOne.AiOrchestration.Infrastructure;
 
-namespace NexTraceOne.AiOrchestration.API;
+using NexTraceOne.AIKnowledge.Application.Orchestration;
+using NexTraceOne.AIKnowledge.Infrastructure.Orchestration;
+
+namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo AiOrchestration.

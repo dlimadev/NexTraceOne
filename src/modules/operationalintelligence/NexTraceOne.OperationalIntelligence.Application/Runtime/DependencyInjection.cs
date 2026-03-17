@@ -1,20 +1,22 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.OperationalIntelligence.Application.Automation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents;
 using NexTraceOne.OperationalIntelligence.Application.Reliability;
-using NexTraceOne.RuntimeIntelligence.Application.Features.CompareReleaseRuntime;
-using NexTraceOne.RuntimeIntelligence.Application.Features.ComputeObservabilityDebt;
-using NexTraceOne.RuntimeIntelligence.Application.Features.DetectRuntimeDrift;
-using NexTraceOne.RuntimeIntelligence.Application.Features.GetDriftFindings;
-using NexTraceOne.RuntimeIntelligence.Application.Features.GetObservabilityScore;
-using NexTraceOne.RuntimeIntelligence.Application.Features.GetReleaseHealthTimeline;
-using NexTraceOne.RuntimeIntelligence.Application.Features.GetRuntimeHealth;
-using NexTraceOne.RuntimeIntelligence.Application.Features.IngestRuntimeSnapshot;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ComputeObservabilityDebt;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRuntimeDrift;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetRuntimeHealth;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.IngestRuntimeSnapshot;
 
-namespace NexTraceOne.RuntimeIntelligence.Application;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo RuntimeIntelligence.

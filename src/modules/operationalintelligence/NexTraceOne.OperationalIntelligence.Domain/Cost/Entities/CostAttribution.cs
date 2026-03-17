@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Errors;
 
-namespace NexTraceOne.CostIntelligence.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
 /// <summary>
 /// Entidade que atribui custo a uma API/serviço específico para um determinado período.

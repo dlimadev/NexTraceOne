@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Domain.Enums;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 /// <summary>
 /// Tipo de mudança no NexTraceOne.

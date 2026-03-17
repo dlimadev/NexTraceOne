@@ -1,11 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
-namespace NexTraceOne.Contracts.Application.Features.GetContractHistory;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
 
 /// <summary>
 /// Feature: GetContractHistory — lista o histórico de versões de contrato de um ativo de API.

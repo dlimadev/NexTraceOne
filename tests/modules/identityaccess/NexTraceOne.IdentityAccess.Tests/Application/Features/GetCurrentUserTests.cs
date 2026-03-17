@@ -1,11 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
-using NexTraceOne.Identity.Tests.TestDoubles;
-using GetCurrentUserFeature = NexTraceOne.Identity.Application.Features.GetCurrentUser.GetCurrentUser;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+using GetCurrentUserFeature = NexTraceOne.IdentityAccess.Application.Features.GetCurrentUser.GetCurrentUser;
+
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature GetCurrentUser (/me).

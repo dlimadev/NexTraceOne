@@ -1,8 +1,10 @@
 using MediatR;
-using Microsoft.Extensions.Logging;
-using NexTraceOne.Identity.Application.Abstractions;
 
-namespace NexTraceOne.Identity.Application.Behaviors;
+using Microsoft.Extensions.Logging;
+
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+
+namespace NexTraceOne.IdentityAccess.Application.Behaviors;
 
 /// <summary>
 /// Behavior do MediatR que propaga eventos de segurança para o módulo Audit central

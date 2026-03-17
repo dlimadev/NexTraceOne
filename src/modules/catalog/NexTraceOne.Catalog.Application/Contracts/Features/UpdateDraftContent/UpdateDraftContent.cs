@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
 
-namespace NexTraceOne.Contracts.Application.Features.UpdateDraftContent;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
 
 /// <summary>
 /// Feature: UpdateDraftContent — atualiza o conteúdo do artefato de um draft de contrato.

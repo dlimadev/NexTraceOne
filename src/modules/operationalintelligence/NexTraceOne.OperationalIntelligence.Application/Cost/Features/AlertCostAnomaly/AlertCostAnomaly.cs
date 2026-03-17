@@ -1,14 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
-using NexTraceOne.CostIntelligence.Domain.Entities;
-using NexTraceOne.CostIntelligence.Domain.Errors;
-using NexTraceOne.CostIntelligence.Domain.Events;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Errors;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Events;
 
-namespace NexTraceOne.CostIntelligence.Application.Features.AlertCostAnomaly;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAnomaly;
 
 /// <summary>
 /// Feature: AlertCostAnomaly — verifica se o custo de um serviço excedeu o limiar de alerta.

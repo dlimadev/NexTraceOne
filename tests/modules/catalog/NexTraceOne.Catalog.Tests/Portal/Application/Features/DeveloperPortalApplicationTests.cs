@@ -1,14 +1,13 @@
-using FluentAssertions;
-using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
-using CreateSubscriptionFeature = NexTraceOne.DeveloperPortal.Application.Features.CreateSubscription.CreateSubscription;
-using DeleteSubscriptionFeature = NexTraceOne.DeveloperPortal.Application.Features.DeleteSubscription.DeleteSubscription;
-using GenerateCodeFeature = NexTraceOne.DeveloperPortal.Application.Features.GenerateCode.GenerateCode;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
 
-namespace NexTraceOne.DeveloperPortal.Tests.Application.Features;
+using CreateSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription.CreateSubscription;
+using DeleteSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription.DeleteSubscription;
+using GenerateCodeFeature = NexTraceOne.Catalog.Application.Portal.Features.GenerateCode.GenerateCode;
+
+namespace NexTraceOne.Catalog.Tests.Portal.Application.Features;
 
 /// <summary>
 /// Testes de handlers da camada Application do módulo DeveloperPortal.

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '../lib/cn';
 
 interface BadgeProps {
   children: ReactNode;
@@ -7,8 +8,9 @@ interface BadgeProps {
 }
 
 /**
- * Variantes semânticas com fundo translúcido sobre superfícies escuras.
- * Cada cor de status usa opacidade de 15% para manter legibilidade sem poluir o layout.
+ * Badge semântico — DESIGN-SYSTEM.md §4.9
+ * Radius pill, fundo translúcido tonal por variante semântica.
+ * Altura: 24-28px, peso 500-600.
  */
 const variantClasses: Record<string, string> = {
   default: 'bg-elevated text-body',
@@ -18,10 +20,14 @@ const variantClasses: Record<string, string> = {
   info: 'bg-info/15 text-info',
 };
 
-export function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
+export function Badge({ children, variant = 'default', className }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${variantClasses[variant]} ${className}`}
+      className={cn(
+        'inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-semibold',
+        variantClasses[variant],
+        className,
+      )}
     >
       {children}
     </span>

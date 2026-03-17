@@ -1,11 +1,10 @@
 using Ardalis.GuardClauses;
-using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.AiGovernance.Domain.Enums;
 
-namespace NexTraceOne.AiGovernance.Domain.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 /// <summary>
 /// Captura o resultado de uma execução do pipeline de enriquecimento de contexto.

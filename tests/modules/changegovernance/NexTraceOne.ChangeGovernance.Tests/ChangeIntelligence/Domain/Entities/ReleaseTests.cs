@@ -1,7 +1,7 @@
 using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Domain.Entities;
 
 /// <summary>Testes unitários da entidade Release.</summary>
 public sealed class ReleaseTests

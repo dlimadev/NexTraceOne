@@ -1,11 +1,9 @@
-using FluentAssertions;
-using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features.ListMyTenants;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Features.ListMyTenants;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature ListMyTenants — valida resolução de tenants do usuário autenticado.

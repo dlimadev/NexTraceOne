@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
 
-namespace NexTraceOne.DeveloperPortal.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+
+namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de eventos de analytics do portal, implementando persistência via EF Core.

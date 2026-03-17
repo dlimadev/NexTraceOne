@@ -1,19 +1,22 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ApprovePromotionFeature = NexTraceOne.Promotion.Application.Features.ApprovePromotion.ApprovePromotion;
-using BlockPromotionFeature = NexTraceOne.Promotion.Application.Features.BlockPromotion.BlockPromotion;
-using ConfigureEnvironmentFeature = NexTraceOne.Promotion.Application.Features.ConfigureEnvironment.ConfigureEnvironment;
-using CreatePromotionRequestFeature = NexTraceOne.Promotion.Application.Features.CreatePromotionRequest.CreatePromotionRequest;
-using EvaluatePromotionGatesFeature = NexTraceOne.Promotion.Application.Features.EvaluatePromotionGates.EvaluatePromotionGates;
-using GetGateEvaluationFeature = NexTraceOne.Promotion.Application.Features.GetGateEvaluation.GetGateEvaluation;
-using GetPromotionStatusFeature = NexTraceOne.Promotion.Application.Features.GetPromotionStatus.GetPromotionStatus;
-using ListPromotionRequestsFeature = NexTraceOne.Promotion.Application.Features.ListPromotionRequests.ListPromotionRequests;
-using OverrideGateFeature = NexTraceOne.Promotion.Application.Features.OverrideGateWithJustification.OverrideGateWithJustification;
 
-namespace NexTraceOne.Promotion.API.Endpoints;
+using ApprovePromotionFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion.ApprovePromotion;
+using BlockPromotionFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.BlockPromotion.BlockPromotion;
+using ConfigureEnvironmentFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ConfigureEnvironment.ConfigureEnvironment;
+using CreatePromotionRequestFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.CreatePromotionRequest.CreatePromotionRequest;
+using EvaluatePromotionGatesFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluatePromotionGates.EvaluatePromotionGates;
+using GetGateEvaluationFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetGateEvaluation.GetGateEvaluation;
+using GetPromotionStatusFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus.GetPromotionStatus;
+using ListPromotionRequestsFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests.ListPromotionRequests;
+using OverrideGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification.OverrideGateWithJustification;
+
+namespace NexTraceOne.ChangeGovernance.API.Promotion.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo Promotion.

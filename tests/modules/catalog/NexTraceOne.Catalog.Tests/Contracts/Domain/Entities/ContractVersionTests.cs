@@ -1,6 +1,6 @@
-using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
-namespace NexTraceOne.Contracts.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Entities;
 
 /// <summary>
 /// Testes de domínio para o aggregate ContractVersion.

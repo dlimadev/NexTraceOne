@@ -1,14 +1,17 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using StartAccessReviewFeature = NexTraceOne.Identity.Application.Features.StartAccessReviewCampaign.StartAccessReviewCampaign;
-using ListAccessReviewFeature = NexTraceOne.Identity.Application.Features.ListAccessReviewCampaigns.ListAccessReviewCampaigns;
-using GetAccessReviewFeature = NexTraceOne.Identity.Application.Features.GetAccessReviewCampaign.GetAccessReviewCampaign;
-using DecideAccessReviewItemFeature = NexTraceOne.Identity.Application.Features.DecideAccessReviewItem.DecideAccessReviewItem;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using StartAccessReviewFeature = NexTraceOne.IdentityAccess.Application.Features.StartAccessReviewCampaign.StartAccessReviewCampaign;
+using ListAccessReviewFeature = NexTraceOne.IdentityAccess.Application.Features.ListAccessReviewCampaigns.ListAccessReviewCampaigns;
+using GetAccessReviewFeature = NexTraceOne.IdentityAccess.Application.Features.GetAccessReviewCampaign.GetAccessReviewCampaign;
+using DecideAccessReviewItemFeature = NexTraceOne.IdentityAccess.Application.Features.DecideAccessReviewItem.DecideAccessReviewItem;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de recertificação de acessos (Access Review) — compliance enterprise.

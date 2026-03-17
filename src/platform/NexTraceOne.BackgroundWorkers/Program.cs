@@ -4,6 +4,7 @@ using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.Identity.Infrastructure;
+using NexTraceOne.IdentityAccess.Infrastructure;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Background Workers

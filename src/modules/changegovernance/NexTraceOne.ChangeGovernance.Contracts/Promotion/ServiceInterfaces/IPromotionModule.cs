@@ -1,4 +1,4 @@
-namespace NexTraceOne.Promotion.Contracts.ServiceInterfaces;
+namespace NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo Promotion.

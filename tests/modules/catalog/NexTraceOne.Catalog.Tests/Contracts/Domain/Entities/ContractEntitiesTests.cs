@@ -1,9 +1,8 @@
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using FluentAssertions;
-using Xunit;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Entities;
 
 /// <summary>
 /// Testes de ContractRuleViolation e ContractArtifact.
@@ -130,7 +129,7 @@ public sealed class ContractEntitiesTests
         contract.TransitionTo(ContractLifecycleState.InReview, DateTimeOffset.UtcNow);
         contract.TransitionTo(ContractLifecycleState.Approved, DateTimeOffset.UtcNow);
 
-        var signature = NexTraceOne.Contracts.Domain.ValueObjects.ContractSignature.Create(
+        var signature = ContractSignature.Create(
             "canonical content", "admin", DateTimeOffset.UtcNow);
 
         var result = contract.Sign(signature);
@@ -146,7 +145,7 @@ public sealed class ContractEntitiesTests
             Guid.NewGuid(), "1.0.0",
             """{"openapi":"3.1.0"}""", "json", "upload").Value;
 
-        var signature = NexTraceOne.Contracts.Domain.ValueObjects.ContractSignature.Create(
+        var signature = ContractSignature.Create(
             "content", "admin", DateTimeOffset.UtcNow);
 
         var result = contract.Sign(signature);
@@ -161,7 +160,7 @@ public sealed class ContractEntitiesTests
             Guid.NewGuid(), "1.0.0",
             """{"openapi":"3.1.0"}""", "json", "upload").Value;
 
-        var provenance = NexTraceOne.Contracts.Domain.ValueObjects.ContractProvenance.ForImport(
+        var provenance = ContractProvenance.ForImport(
             "upload", "openapi-3.1-json", "OpenApiSpecParser", "3.1.0", "admin");
 
         contract.SetProvenance(provenance);

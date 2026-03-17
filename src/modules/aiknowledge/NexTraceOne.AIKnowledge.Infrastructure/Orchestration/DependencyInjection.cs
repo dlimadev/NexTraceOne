@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NexTraceOne.AiOrchestration.Infrastructure;
+namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo AiOrchestration.

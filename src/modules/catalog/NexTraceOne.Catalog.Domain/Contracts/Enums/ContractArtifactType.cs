@@ -1,10 +1,13 @@
-namespace NexTraceOne.Contracts.Domain.Enums;
+using System.Text.Json.Serialization;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
 /// Tipo de artefato gerado a partir de um contrato.
 /// Categoriza os artefatos produzidos pelo módulo, incluindo
 /// testes, scaffolds, documentação e evidências regulatórias.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ContractArtifactType
 {
     /// <summary>Artefato de teste de conformidade do provider.</summary>

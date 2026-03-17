@@ -1,9 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Application.Features;
+namespace NexTraceOne.IdentityAccess.Application.Features;
 
 /// <summary>
 /// Implementação injetável da criação centralizada de sessões de autenticação no módulo Identity.

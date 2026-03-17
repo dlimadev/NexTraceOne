@@ -1,4 +1,4 @@
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value object que representa um elemento de schema normalizado (campo, parâmetro, tipo).

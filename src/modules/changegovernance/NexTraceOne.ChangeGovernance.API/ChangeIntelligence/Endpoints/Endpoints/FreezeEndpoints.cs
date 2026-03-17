@@ -1,12 +1,15 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using CreateFreezeWindowFeature = NexTraceOne.ChangeIntelligence.Application.Features.CreateFreezeWindow.CreateFreezeWindow;
-using CheckFreezeConflictFeature = NexTraceOne.ChangeIntelligence.Application.Features.CheckFreezeConflict.CheckFreezeConflict;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+using CreateFreezeWindowFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CreateFreezeWindow.CreateFreezeWindow;
+using CheckFreezeConflictFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CheckFreezeConflict.CheckFreezeConflict;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão de janelas de freeze.

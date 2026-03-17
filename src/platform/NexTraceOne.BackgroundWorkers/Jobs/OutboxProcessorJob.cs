@@ -4,6 +4,8 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.Identity.Infrastructure.Persistence;
 using System.Text.Json;
 
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+
 namespace NexTraceOne.BackgroundWorkers.Jobs;
 
 /// <summary>

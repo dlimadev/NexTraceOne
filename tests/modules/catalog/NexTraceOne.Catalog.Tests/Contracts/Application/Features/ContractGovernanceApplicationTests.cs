@@ -1,13 +1,16 @@
 using FluentAssertions;
+
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+
 using NSubstitute;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
+
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
-using ListContractsFeature = NexTraceOne.Contracts.Application.Features.ListContracts.ListContracts;
-using GetContractsSummaryFeature = NexTraceOne.Contracts.Application.Features.GetContractsSummary.GetContractsSummary;
-using ListContractsByServiceFeature = NexTraceOne.Contracts.Application.Features.ListContractsByService.ListContractsByService;
+using ListContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListContracts.ListContracts;
+using GetContractsSummaryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractsSummary.GetContractsSummary;
+using ListContractsByServiceFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListContractsByService.ListContractsByService;
 
 namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 

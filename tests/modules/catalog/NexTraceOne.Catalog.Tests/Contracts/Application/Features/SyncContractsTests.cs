@@ -1,12 +1,12 @@
-using System.Linq;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using SyncContractsFeature = NexTraceOne.Contracts.Application.Features.SyncContracts.SyncContracts;
-using ValidateContractIntegrityFeature = NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity.ValidateContractIntegrity;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Tests.Application.Features;
+using SyncContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.SyncContracts.SyncContracts;
+using ValidateContractIntegrityFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity.ValidateContractIntegrity;
+
+namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
 /// <summary>
 /// Testes para os handlers SyncContracts (integração externa em lote) e ValidateContractIntegrity.

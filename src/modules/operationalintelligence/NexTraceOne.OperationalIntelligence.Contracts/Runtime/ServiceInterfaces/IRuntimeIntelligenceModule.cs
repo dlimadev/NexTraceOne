@@ -1,4 +1,4 @@
-namespace NexTraceOne.RuntimeIntelligence.Contracts.ServiceInterfaces;
+namespace NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo RuntimeIntelligence.

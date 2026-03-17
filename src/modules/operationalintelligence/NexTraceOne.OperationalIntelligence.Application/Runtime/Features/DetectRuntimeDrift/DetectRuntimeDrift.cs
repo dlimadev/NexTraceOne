@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
-using NexTraceOne.RuntimeIntelligence.Domain.Errors;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Errors;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.DetectRuntimeDrift;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRuntimeDrift;
 
 /// <summary>
 /// Feature: DetectRuntimeDrift — compara o snapshot mais recente de um serviço com sua baseline

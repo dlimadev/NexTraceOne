@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.AiOrchestration.Application.Features.SuggestSemanticVersionWithAI;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration.Features.SuggestSemanticVersionWithAI;
 
 /// <summary>
 /// Feature: SuggestSemanticVersionWithAI — Módulo: AiOrchestration.

@@ -1,14 +1,16 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
-using NexTraceOne.DeveloperPortal.Domain.Errors;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
+using NexTraceOne.Catalog.Domain.Portal.Errors;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.CreateSubscription;
+namespace NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription;
 
 /// <summary>
 /// Feature: CreateSubscription — regista subscrição formal de um consumidor a uma API.

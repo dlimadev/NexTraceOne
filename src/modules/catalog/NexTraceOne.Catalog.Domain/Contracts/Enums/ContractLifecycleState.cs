@@ -1,4 +1,6 @@
-namespace NexTraceOne.Contracts.Domain.Enums;
+using System.Text.Json.Serialization;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
 /// Estado do ciclo de vida de uma versão de contrato.
@@ -6,6 +8,7 @@ namespace NexTraceOne.Contracts.Domain.Enums;
 /// garantindo que apenas transições válidas sejam executadas
 /// e que cada mudança de estado seja auditada.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ContractLifecycleState
 {
     /// <summary>Rascunho — versão em edição, não visível para consumers.</summary>

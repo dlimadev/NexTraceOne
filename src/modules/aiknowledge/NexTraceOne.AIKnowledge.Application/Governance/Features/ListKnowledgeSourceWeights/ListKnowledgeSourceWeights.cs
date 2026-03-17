@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListKnowledgeSourceWeights;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListKnowledgeSourceWeights;
 
 /// <summary>
 /// Feature: ListKnowledgeSourceWeights — lista pesos configurados de fontes

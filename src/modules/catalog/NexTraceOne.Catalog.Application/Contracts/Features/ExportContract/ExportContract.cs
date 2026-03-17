@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
 
-namespace NexTraceOne.Contracts.Application.Features.ExportContract;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.ExportContract;
 
 /// <summary>
 /// Feature: ExportContract — exporta o conteúdo bruto da especificação de uma versão de contrato.

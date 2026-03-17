@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.Contracts.Domain.Enums;
 
-namespace NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 /// <summary>
 /// Registo de revisão de um draft de contrato.

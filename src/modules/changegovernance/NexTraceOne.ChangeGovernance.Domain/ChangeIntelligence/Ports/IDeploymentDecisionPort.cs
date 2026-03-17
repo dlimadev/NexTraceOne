@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Domain.Ports;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Ports;
 
 /// <summary>
 /// Porta de decisão sobre deployments.

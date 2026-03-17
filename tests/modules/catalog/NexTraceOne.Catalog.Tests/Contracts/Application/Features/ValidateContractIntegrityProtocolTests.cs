@@ -1,9 +1,10 @@
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using ValidateContractIntegrityFeature = NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity.ValidateContractIntegrity;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Tests.Application.Features;
+using ValidateContractIntegrityFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity.ValidateContractIntegrity;
+
+namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
 public sealed class ValidateContractIntegrityProtocolTests
 {

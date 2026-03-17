@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Infrastructure.Persistence;
-using NexTraceOne.Promotion.Infrastructure.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repositories;
 
-namespace NexTraceOne.Promotion.Infrastructure;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Promotion.

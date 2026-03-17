@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Entities;
 
-namespace NexTraceOne.Workflow.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de pacotes de evidência, implementando consultas específicas de negócio.

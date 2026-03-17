@@ -1,15 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
-using NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence;
-using NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 
-namespace NexTraceOne.RuntimeIntelligence.Infrastructure;
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo RuntimeIntelligence.

@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
 
-namespace NexTraceOne.DeveloperPortal.Infrastructure.Persistence;
+namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
 
 /// <summary>
 /// DbContext do módulo DeveloperPortal.

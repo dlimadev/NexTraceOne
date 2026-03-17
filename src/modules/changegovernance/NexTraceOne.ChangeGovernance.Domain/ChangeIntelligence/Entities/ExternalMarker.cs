@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
 /// <summary>
 /// Marcador externo recebido de ferramentas CI/CD (GitHub, GitLab, Jenkins, Azure DevOps).

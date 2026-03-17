@@ -1,14 +1,17 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using TransitionLifecycleStateFeature = NexTraceOne.Contracts.Application.Features.TransitionLifecycleState.TransitionLifecycleState;
-using SignContractVersionFeature = NexTraceOne.Contracts.Application.Features.SignContractVersion.SignContractVersion;
-using DeprecateContractVersionFeature = NexTraceOne.Contracts.Application.Features.DeprecateContractVersion.DeprecateContractVersion;
-using VerifySignatureFeature = NexTraceOne.Contracts.Application.Features.VerifySignature.VerifySignature;
-using GetContractVersionDetailFeature = NexTraceOne.Contracts.Application.Features.GetContractVersionDetail.GetContractVersionDetail;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Application.Features;
+using TransitionLifecycleStateFeature = NexTraceOne.Catalog.Application.Contracts.Features.TransitionLifecycleState.TransitionLifecycleState;
+using SignContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.SignContractVersion.SignContractVersion;
+using DeprecateContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.DeprecateContractVersion.DeprecateContractVersion;
+using VerifySignatureFeature = NexTraceOne.Catalog.Application.Contracts.Features.VerifySignature.VerifySignature;
+using GetContractVersionDetailFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractVersionDetail.GetContractVersionDetail;
+
+namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
 /// <summary>
 /// Testes dos handlers das novas features: lifecycle, assinatura, deprecação, verificação e detalhe.
@@ -181,9 +184,9 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Approved);
         // Sign the contract first
-        var canonical = NexTraceOne.Contracts.Domain.Services.ContractCanonicalizer.Canonicalize(
+        var canonical = ContractCanonicalizer.Canonicalize(
             contract.SpecContent, contract.Format);
-        var signature = NexTraceOne.Contracts.Domain.ValueObjects.ContractSignature.Create(
+        var signature = ContractSignature.Create(
             canonical, "admin", FixedNow);
         contract.Sign(signature);
 

@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RulesetGovernance.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Errors;
 
-namespace NexTraceOne.RulesetGovernance.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
 /// <summary>
 /// Aggregate Root que representa um ruleset de governança (conjunto de regras de linting).

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { cn } from '../lib/cn';
 import {
   LayoutDashboard,
   FileText,
@@ -38,7 +39,6 @@ import {
   Route,
   Cable,
   Building2,
-  ShieldPlus,
   TrendingUp,
   Target,
   Package,
@@ -47,6 +47,7 @@ import {
   PanelLeftOpen,
   ChevronDown,
   ChevronRight,
+  Plus,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePermissions } from '../hooks/usePermissions';
@@ -82,8 +83,12 @@ const navItems: NavItem[] = [
   // ── Knowledge ──
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
   // ── Contracts ──
-  { labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
+  { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
+  { labelKey: 'sidebar.createContract', to: '/contracts/new', icon: <Plus size={18} />, permission: 'contracts:write', section: 'contracts' },
   { labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={18} />, permission: 'contracts:read', section: 'contracts' },
+  { labelKey: 'sidebar.contractGovernance', to: '/contracts/governance', icon: <Shield size={18} />, permission: 'contracts:read', section: 'contracts' },
+  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ShieldCheck size={18} />, permission: 'contracts:write', section: 'contracts' },
+  { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Database size={18} />, permission: 'contracts:read', section: 'contracts' },
   // ── Changes ──
   { labelKey: 'sidebar.changeConfidence', to: '/changes', icon: <ShieldCheck size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.changeIntelligence', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:releases:read', section: 'changes' },
@@ -156,22 +161,6 @@ const sectionLabels: Record<NavSection, string> = {
   admin: 'sidebar.sectionAdmin',
 };
 
-/** Icon per section (shown when sidebar is collapsed). */
-const sectionIcons: Record<NavSection, React.ReactNode> = {
-  home: <LayoutDashboard size={18} />,
-  services: <Server size={18} />,
-  knowledge: <Globe size={18} />,
-  contracts: <FileText size={18} />,
-  changes: <ShieldCheck size={18} />,
-  operations: <AlertTriangle size={18} />,
-  aiHub: <Bot size={18} />,
-  governance: <Gauge size={18} />,
-  organization: <Building2 size={18} />,
-  analytics: <TrendingUp size={18} />,
-  integrations: <Cable size={18} />,
-  admin: <ShieldPlus size={18} />,
-};
-
 interface SidebarProps {
   /** Whether the sidebar is collapsed (icon-only mode). */
   collapsed?: boolean;
@@ -231,7 +220,6 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
     const isExpanded = expandedSections.has(sectionKey) || isHome;
     const hasMultipleItems = items.length > 1;
 
-    // In collapsed mode, show only the first icon per section with tooltip
     if (collapsed) {
       return (
         <div key={sectionKey} className="mb-1">
@@ -242,11 +230,13 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
               end={item.to === '/'}
               title={t(item.labelKey)}
               className={({ isActive }) =>
-                `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-colors mb-0.5 ${
+                cn(
+                  'flex items-center justify-center w-10 h-10 mx-auto rounded-md mb-0.5',
+                  'transition-all duration-[var(--nto-motion-base)]',
                   isActive
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-muted hover:bg-hover hover:text-body'
-                }`
+                    ? 'bg-accent/10 text-cyan shadow-glow-sm'
+                    : 'text-muted hover:bg-hover hover:text-body',
+                )
               }
             >
               {item.icon}
@@ -257,13 +247,15 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
     }
 
     return (
-      <div key={sectionKey} className={`mb-1 ${highlighted ? 'pl-0.5 border-l-2 border-accent/30' : ''}`}>
+      <div key={sectionKey} className={cn('mb-1.5', highlighted && 'pl-0.5 border-l-2 border-cyan/30')}>
         {labelKey && (
           <button
             onClick={() => { if (hasMultipleItems) toggleSection(sectionKey); }}
-            className={`w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider ${
-              highlighted ? 'text-accent' : 'text-faded'
-            } ${hasMultipleItems ? 'hover:text-muted cursor-pointer' : 'cursor-default'}`}
+            className={cn(
+              'w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider',
+              highlighted ? 'text-cyan' : 'text-faded',
+              hasMultipleItems ? 'hover:text-muted cursor-pointer' : 'cursor-default',
+            )}
           >
             <span>{t(labelKey)}</span>
             {hasMultipleItems && (
@@ -281,11 +273,13 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
                   to={item.to}
                   end={item.to === '/'}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                    cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-md text-sm',
+                      'transition-all duration-[var(--nto-motion-base)]',
                       isActive
-                        ? 'bg-accent/10 text-accent font-medium'
-                        : 'text-muted hover:bg-hover hover:text-body'
-                    }`
+                        ? 'bg-accent/10 text-cyan font-medium border-l-2 border-cyan -ml-0.5 pl-[10px]'
+                        : 'text-muted hover:bg-hover hover:text-body',
+                    )
                   }
                 >
                   {item.icon}
@@ -299,17 +293,24 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
     );
   };
 
-  const sidebarWidth = collapsed ? 'w-16' : 'w-64';
-
   return (
-    <aside className={`${sidebarWidth} bg-panel flex flex-col h-screen fixed left-0 top-0 border-r border-edge transition-all duration-200 z-30`}>
+    <aside
+      className={cn(
+        'bg-deep flex flex-col h-screen fixed left-0 top-0 border-r border-edge z-[var(--z-header)]',
+        'transition-all duration-[var(--nto-motion-medium)]',
+      )}
+      style={{ width: collapsed ? 64 : 272 }}
+    >
       {/* Brand stripe */}
       <div className="h-0.5 brand-gradient shrink-0" />
 
       {/* Logo */}
-      <div className={`px-3 py-3 border-b border-edge flex items-center ${collapsed ? 'justify-center' : 'gap-2.5 px-4'}`}>
-        <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
-          <span className="text-accent font-bold text-sm">N</span>
+      <div className={cn(
+        'py-4 border-b border-edge flex items-center',
+        collapsed ? 'justify-center px-3' : 'gap-3 px-5',
+      )}>
+        <div className="w-9 h-9 rounded-lg bg-accent/12 flex items-center justify-center shrink-0 shadow-glow-sm">
+          <span className="text-cyan font-bold text-base">N</span>
         </div>
         {!collapsed && (
           <div className="flex-1 min-w-0">
@@ -320,7 +321,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
       </div>
 
       {/* Navigation — secções ordenadas por persona */}
-      <nav className={`flex-1 py-3 overflow-y-auto ${collapsed ? 'px-1' : 'px-2'}`}>
+      <nav className={cn('flex-1 py-3 overflow-y-auto', collapsed ? 'px-1.5' : 'px-3')}>
         {config.sectionOrder.map((sectionKey) => {
           const sectionItems = visibleItems.filter((i) => i.section === sectionKey);
           return renderSection(sectionKey, sectionItems);
@@ -329,10 +330,10 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
 
       {/* Collapse toggle */}
       {onToggleCollapse && (
-        <div className={`px-2 py-2 border-t border-edge ${collapsed ? 'flex justify-center' : ''}`}>
+        <div className={cn('px-3 py-2 border-t border-edge', collapsed && 'flex justify-center')}>
           <button
             onClick={onToggleCollapse}
-            className="flex items-center gap-2 px-2 py-1.5 rounded-md text-faded hover:text-muted hover:bg-hover transition-colors w-full text-sm"
+            className="flex items-center gap-2 px-2 py-2 rounded-md text-faded hover:text-muted hover:bg-hover transition-all duration-[var(--nto-motion-base)] w-full text-sm"
             title={collapsed ? t('common.expand') : t('common.collapse')}
             aria-label={collapsed ? t('common.expand') : t('common.collapse')}
           >
@@ -342,12 +343,12 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
         </div>
       )}
 
-      {/* User info — inclui badge da persona */}
-      <div className={`py-3 border-t border-edge ${collapsed ? 'px-2 flex justify-center' : 'px-3'}`}>
+      {/* User info */}
+      <div className={cn('py-3 border-t border-edge', collapsed ? 'px-2 flex justify-center' : 'px-4')}>
         {collapsed ? (
           <button
             onClick={handleLogout}
-            className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-semibold hover:bg-critical/20 hover:text-critical transition-colors"
+            className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center text-cyan text-sm font-semibold hover:bg-critical/20 hover:text-critical transition-all duration-[var(--nto-motion-base)]"
             title={t('auth.signOut')}
             aria-label={t('auth.signOut')}
           >
@@ -355,7 +356,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
           </button>
         ) : (
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-sm font-semibold shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center text-cyan text-sm font-semibold shrink-0">
               {user?.email?.[0]?.toUpperCase() ?? 'U'}
             </div>
             <div className="flex-1 min-w-0">

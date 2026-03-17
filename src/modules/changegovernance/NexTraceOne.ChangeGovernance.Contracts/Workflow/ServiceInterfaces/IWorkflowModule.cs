@@ -1,4 +1,4 @@
-namespace NexTraceOne.Workflow.Contracts.ServiceInterfaces;
+namespace NexTraceOne.ChangeGovernance.Contracts.Workflow.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo Workflow.

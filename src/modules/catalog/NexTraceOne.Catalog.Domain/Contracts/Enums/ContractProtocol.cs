@@ -1,10 +1,13 @@
-namespace NexTraceOne.Contracts.Domain.Enums;
+using System.Text.Json.Serialization;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
 /// Protocolo de comunicação do contrato. Define o tipo de especificação
 /// suportado pelo módulo Contracts, permitindo governança multi-protocolo
 /// com parsing, diff semântico e rulesets específicos para cada formato.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ContractProtocol
 {
     /// <summary>OpenAPI 3.0.x / 3.1.x — linha principal REST/HTTP.</summary>

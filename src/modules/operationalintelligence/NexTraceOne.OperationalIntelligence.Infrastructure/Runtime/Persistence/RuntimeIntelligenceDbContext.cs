@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
-namespace NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence;
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 
 /// <summary>
 /// DbContext do módulo RuntimeIntelligence.

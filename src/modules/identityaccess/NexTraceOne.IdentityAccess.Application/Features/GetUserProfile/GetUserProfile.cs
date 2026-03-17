@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Errors;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Errors;
 
-namespace NexTraceOne.Identity.Application.Features.GetUserProfile;
+namespace NexTraceOne.IdentityAccess.Application.Features.GetUserProfile;
 
 /// <summary>
 /// Feature: GetUserProfile — obtém o perfil completo de um usuário.

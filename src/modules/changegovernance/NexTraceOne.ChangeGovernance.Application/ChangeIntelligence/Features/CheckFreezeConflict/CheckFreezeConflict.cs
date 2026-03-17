@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.CheckFreezeConflict;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CheckFreezeConflict;
 
 /// <summary>
 /// Feature: CheckFreezeConflict — verifica se há conflito com janela de freeze num determinado momento.

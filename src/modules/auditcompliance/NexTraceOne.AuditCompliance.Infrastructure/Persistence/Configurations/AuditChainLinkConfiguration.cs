@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Audit.Domain.Entities;
 
-namespace NexTraceOne.Audit.Infrastructure.Persistence.Configurations;
+using NexTraceOne.AuditCompliance.Domain.Entities;
+
+namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Configurations;
 
 internal sealed class AuditChainLinkConfiguration : IEntityTypeConfiguration<AuditChainLink>
 {

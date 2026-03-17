@@ -1,9 +1,9 @@
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Contracts.DTOs;
-using NexTraceOne.Identity.Contracts.ServiceInterfaces;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Contracts.DTOs;
+using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Services;
+namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Implementação do contrato público IIdentityModule.

@@ -9,11 +9,22 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 /// Interceptor EF Core que configura o parâmetro app.current_tenant_id no PostgreSQL
 /// antes de cada comando SQL, ativando o Row-Level Security para isolamento multi-tenant.
 ///
-/// Segurança: o tenant ID é sempre passado via parâmetro SQL ($1), nunca por interpolação
+/// O set_config é executado num comando separado na mesma conexão/transação para não
+/// poluir o result set da query principal com o retorno text do set_config, o que causava
+/// InvalidCastException ao ler colunas uuid/integer como text.
+///
+/// is_local = false (session-scoped) é usado porque o comando separado corre na sua
+/// própria transação implícita (autocommit); com is_local = true a configuração seria
+/// revertida antes da query principal executar.
+///
+/// Segurança: o tenant ID é sempre passado via parâmetro SQL, nunca por interpolação
 /// de string, prevenindo SQL injection mesmo em cenários de comprometimento do tenant resolver.
 /// </summary>
 public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbCommandInterceptor
 {
+    private const string SetConfigSql =
+        "SELECT set_config('app.current_tenant_id', @__tenantId, false)";
+
     public override InterceptionResult<DbDataReader> ReaderExecuting(
         DbCommand command,
         CommandEventData eventData,
@@ -21,6 +32,16 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
     {
         ApplyTenantContext(command);
         return base.ReaderExecuting(command, eventData, result);
+    }
+
+    public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<DbDataReader> result,
+        CancellationToken cancellationToken = default)
+    {
+        await ApplyTenantContextAsync(command, cancellationToken);
+        return await base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
     }
 
     public override InterceptionResult<int> NonQueryExecuting(
@@ -32,6 +53,16 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
         return base.NonQueryExecuting(command, eventData, result);
     }
 
+    public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
+    {
+        await ApplyTenantContextAsync(command, cancellationToken);
+        return await base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
+    }
+
     public override InterceptionResult<object> ScalarExecuting(
         DbCommand command,
         CommandEventData eventData,
@@ -41,9 +72,18 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
         return base.ScalarExecuting(command, eventData, result);
     }
 
+    public override async ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<object> result,
+        CancellationToken cancellationToken = default)
+    {
+        await ApplyTenantContextAsync(command, cancellationToken);
+        return await base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
+    }
+
     /// <summary>
-    /// Injeta o tenant ID como parâmetro SQL parametrizado para prevenir SQL injection.
-    /// O valor é passado via DbParameter, garantindo que nunca será interpretado como SQL.
+    /// Executa set_config num comando separado na mesma conexão (sync).
     /// </summary>
     private void ApplyTenantContext(DbCommand command)
     {
@@ -52,12 +92,41 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
             return;
         }
 
-        var tenantParam = command.CreateParameter();
+        using var configCmd = CreateTenantCommand(command);
+        configCmd.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// Executa set_config num comando separado na mesma conexão (async).
+    /// Usar a variante async evita bloqueio de thread em pipelines EF Core assíncronos
+    /// e respeita o CancellationToken da operação principal.
+    /// </summary>
+    private async Task ApplyTenantContextAsync(DbCommand command, CancellationToken cancellationToken)
+    {
+        if (currentTenant.Id == Guid.Empty)
+        {
+            return;
+        }
+
+        await using var configCmd = CreateTenantCommand(command);
+        await configCmd.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Cria o DbCommand para set_config reutilizando conexão e transação do comando principal.
+    /// </summary>
+    private DbCommand CreateTenantCommand(DbCommand command)
+    {
+        var configCmd = command.Connection!.CreateCommand();
+        configCmd.Transaction = command.Transaction;
+        configCmd.CommandText = SetConfigSql;
+
+        var tenantParam = configCmd.CreateParameter();
         tenantParam.ParameterName = "__tenantId";
         tenantParam.Value = currentTenant.Id.ToString();
         tenantParam.DbType = DbType.String;
-        command.Parameters.Add(tenantParam);
+        configCmd.Parameters.Add(tenantParam);
 
-        command.CommandText = $"select set_config('app.current_tenant_id', @__tenantId, true); {command.CommandText}";
+        return configCmd;
     }
 }

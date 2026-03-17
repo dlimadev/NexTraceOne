@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.Identity.Domain.Errors;
+namespace NexTraceOne.IdentityAccess.Domain.Errors;
 
 /// <summary>Catálogo centralizado de erros do módulo Identity com códigos i18n.</summary>
 public static class IdentityErrors

@@ -1,7 +1,7 @@
-using NexTraceOne.Promotion.Domain.Entities;
-using NexTraceOne.Promotion.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
-namespace NexTraceOne.Promotion.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 
 /// <summary>
 /// Contrato de repositório para solicitações de promoção.

@@ -1,14 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Errors;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using MediatR;
 
-namespace NexTraceOne.AiGovernance.Application.Features.UpdateConversation;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateConversation;
 
 /// <summary>
 /// Feature: UpdateConversation — atualiza metadados de uma conversa do assistente de IA.

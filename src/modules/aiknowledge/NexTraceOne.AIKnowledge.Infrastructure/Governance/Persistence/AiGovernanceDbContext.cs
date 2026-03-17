@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.AiGovernance.Domain.Entities;
+
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 
-namespace NexTraceOne.AiGovernance.Infrastructure.Persistence;
+namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 
 /// <summary>
 /// DbContext do módulo AiGovernance.

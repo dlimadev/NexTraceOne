@@ -1,6 +1,6 @@
-using NexTraceOne.Contracts.Domain.Services;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
 
-namespace NexTraceOne.Contracts.Tests.Domain.Services;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Services;
 
 /// <summary>
 /// Testes unitários para <see cref="SwaggerSpecParser"/>.

@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiOrchestration.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
 
 /// <summary>
 /// Estado de revisão de um artefato de teste gerado por IA.

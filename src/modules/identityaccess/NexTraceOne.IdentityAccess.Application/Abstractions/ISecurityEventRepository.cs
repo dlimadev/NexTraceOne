@@ -1,6 +1,6 @@
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Abstractions;
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Repositório de eventos de segurança e anomalias detectadas.

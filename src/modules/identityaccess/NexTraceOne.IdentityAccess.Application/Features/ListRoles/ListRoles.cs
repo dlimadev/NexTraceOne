@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Features.ListRoles;
+namespace NexTraceOne.IdentityAccess.Application.Features.ListRoles;
 
 /// <summary>
 /// Feature: ListRoles — lista todos os papéis de sistema disponíveis.

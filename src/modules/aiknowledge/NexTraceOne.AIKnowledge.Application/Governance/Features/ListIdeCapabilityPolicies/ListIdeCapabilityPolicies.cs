@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListIdeCapabilityPolicies;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListIdeCapabilityPolicies;
 
 /// <summary>
 /// Feature: ListIdeCapabilityPolicies — lista políticas de capacidade IDE.

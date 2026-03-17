@@ -1,7 +1,6 @@
-using FluentAssertions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
 
-namespace NexTraceOne.DeveloperPortal.Tests.Domain;
+namespace NexTraceOne.Catalog.Tests.Portal.Domain;
 
 /// <summary>
 /// Testes de domínio para o aggregate PlaygroundSession.

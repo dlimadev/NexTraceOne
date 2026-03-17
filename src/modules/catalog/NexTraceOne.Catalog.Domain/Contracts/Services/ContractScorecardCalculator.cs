@@ -1,8 +1,8 @@
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.ValueObjects;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Domain.Services;
+namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 
 /// <summary>
 /// Serviço de domínio responsável pelo cálculo do scorecard técnico de um contrato.

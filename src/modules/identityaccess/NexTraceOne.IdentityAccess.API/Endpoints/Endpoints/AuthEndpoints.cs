@@ -1,19 +1,22 @@
+using MediatR;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
-using FederatedLoginFeature = NexTraceOne.Identity.Application.Features.FederatedLogin.FederatedLogin;
-using RefreshTokenFeature = NexTraceOne.Identity.Application.Features.RefreshToken.RefreshToken;
-using LogoutFeature = NexTraceOne.Identity.Application.Features.Logout.Logout;
-using RevokeSessionFeature = NexTraceOne.Identity.Application.Features.RevokeSession.RevokeSession;
-using GetCurrentUserFeature = NexTraceOne.Identity.Application.Features.GetCurrentUser.GetCurrentUser;
-using ChangePasswordFeature = NexTraceOne.Identity.Application.Features.ChangePassword.ChangePassword;
-using StartOidcLoginFeature = NexTraceOne.Identity.Application.Features.StartOidcLogin.StartOidcLogin;
-using OidcCallbackFeature = NexTraceOne.Identity.Application.Features.OidcCallback.OidcCallback;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+
+using LocalLoginFeature = NexTraceOne.IdentityAccess.Application.Features.LocalLogin.LocalLogin;
+using FederatedLoginFeature = NexTraceOne.IdentityAccess.Application.Features.FederatedLogin.FederatedLogin;
+using RefreshTokenFeature = NexTraceOne.IdentityAccess.Application.Features.RefreshToken.RefreshToken;
+using LogoutFeature = NexTraceOne.IdentityAccess.Application.Features.Logout.Logout;
+using RevokeSessionFeature = NexTraceOne.IdentityAccess.Application.Features.RevokeSession.RevokeSession;
+using GetCurrentUserFeature = NexTraceOne.IdentityAccess.Application.Features.GetCurrentUser.GetCurrentUser;
+using ChangePasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ChangePassword.ChangePassword;
+using StartOidcLoginFeature = NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin.StartOidcLogin;
+using OidcCallbackFeature = NexTraceOne.IdentityAccess.Application.Features.OidcCallback.OidcCallback;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de autenticação do módulo Identity.

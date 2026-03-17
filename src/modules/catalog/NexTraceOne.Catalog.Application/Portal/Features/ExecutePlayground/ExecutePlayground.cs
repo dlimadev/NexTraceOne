@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.ExecutePlayground;
+namespace NexTraceOne.Catalog.Application.Portal.Features.ExecutePlayground;
 
 /// <summary>
 /// Feature: ExecutePlayground — executa request sandbox contra uma API no playground.

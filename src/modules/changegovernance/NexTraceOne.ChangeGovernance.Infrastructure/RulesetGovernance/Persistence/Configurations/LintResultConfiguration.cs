@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence.Configurations;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Configurations;
 
 internal sealed class LintResultConfiguration : IEntityTypeConfiguration<LintResult>
 {

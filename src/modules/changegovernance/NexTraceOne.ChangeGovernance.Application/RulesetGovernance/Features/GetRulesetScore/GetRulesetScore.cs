@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RulesetGovernance.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Errors;
 
-namespace NexTraceOne.RulesetGovernance.Application.Features.GetRulesetScore;
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetScore;
 
 /// <summary>
 /// Feature: GetRulesetScore -- retorna o score de conformidade de uma release.

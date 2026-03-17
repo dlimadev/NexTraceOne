@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetAssetTimeline;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline;
 
 /// <summary>
 /// Feature: GetAssetTimeline — retorna histórico cronológico de eventos de uma API.

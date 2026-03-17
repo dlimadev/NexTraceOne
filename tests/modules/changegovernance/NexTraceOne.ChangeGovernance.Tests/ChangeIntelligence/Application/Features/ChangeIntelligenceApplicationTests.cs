@@ -1,14 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using CalculateBlastRadiusFeature = NexTraceOne.ChangeIntelligence.Application.Features.CalculateBlastRadius.CalculateBlastRadius;
-using ClassifyChangeLevelFeature = NexTraceOne.ChangeIntelligence.Application.Features.ClassifyChangeLevel.ClassifyChangeLevel;
-using ComputeChangeScoreFeature = NexTraceOne.ChangeIntelligence.Application.Features.ComputeChangeScore.ComputeChangeScore;
-using GetReleaseFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetRelease.GetRelease;
-using NotifyDeploymentFeature = NexTraceOne.ChangeIntelligence.Application.Features.NotifyDeployment.NotifyDeployment;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Tests.Application.Features;
+using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius.CalculateBlastRadius;
+using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
+using ComputeChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeScore.ComputeChangeScore;
+using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
+using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
+
+namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Application.Features;
 
 /// <summary>Testes de handlers da camada Application do módulo ChangeIntelligence.</summary>
 public sealed class ChangeIntelligenceApplicationTests

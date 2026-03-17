@@ -1,7 +1,7 @@
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Events;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Domain.Events;
+namespace NexTraceOne.IdentityAccess.Domain.Events;
 
 /// <summary>
 /// Evento de domínio emitido quando um novo usuário é criado.

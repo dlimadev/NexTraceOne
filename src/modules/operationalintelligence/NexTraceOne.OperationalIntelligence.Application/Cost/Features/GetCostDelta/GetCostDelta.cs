@@ -1,11 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
-using NexTraceOne.CostIntelligence.Domain.Errors;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 
-namespace NexTraceOne.CostIntelligence.Application.Features.GetCostDelta;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostDelta;
 
 /// <summary>
 /// Feature: GetCostDelta — compara custos entre dois períodos para análise de variação.

@@ -1,13 +1,16 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using RequestJitAccessFeature = NexTraceOne.Identity.Application.Features.RequestJitAccess.RequestJitAccess;
-using DecideJitAccessFeature = NexTraceOne.Identity.Application.Features.DecideJitAccess.DecideJitAccess;
-using ListJitAccessFeature = NexTraceOne.Identity.Application.Features.ListJitAccessRequests.ListJitAccessRequests;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using RequestJitAccessFeature = NexTraceOne.IdentityAccess.Application.Features.RequestJitAccess.RequestJitAccess;
+using DecideJitAccessFeature = NexTraceOne.IdentityAccess.Application.Features.DecideJitAccess.DecideJitAccess;
+using ListJitAccessFeature = NexTraceOne.IdentityAccess.Application.Features.ListJitAccessRequests.ListJitAccessRequests;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de acesso privilegiado temporário (Just-In-Time) — funcionalidade enterprise v1.1.

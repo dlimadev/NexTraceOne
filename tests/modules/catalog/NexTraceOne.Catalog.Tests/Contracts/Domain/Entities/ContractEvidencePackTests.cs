@@ -1,8 +1,8 @@
 using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Entities;
 
 /// <summary>
 /// Testes unitários para <see cref="ContractEvidencePack"/>.

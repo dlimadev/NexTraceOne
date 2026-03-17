@@ -1,15 +1,18 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using ClassifyChangeLevelFeature = NexTraceOne.ChangeIntelligence.Application.Features.ClassifyChangeLevel.ClassifyChangeLevel;
-using CalculateBlastRadiusFeature = NexTraceOne.ChangeIntelligence.Application.Features.CalculateBlastRadius.CalculateBlastRadius;
-using GetBlastRadiusReportFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetBlastRadiusReport.GetBlastRadiusReport;
-using ComputeChangeScoreFeature = NexTraceOne.ChangeIntelligence.Application.Features.ComputeChangeScore.ComputeChangeScore;
-using GetChangeScoreFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeScore.GetChangeScore;
-using AttachWorkItemContextFeature = NexTraceOne.ChangeIntelligence.Application.Features.AttachWorkItemContext.AttachWorkItemContext;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
+using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius.CalculateBlastRadius;
+using GetBlastRadiusReportFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetBlastRadiusReport.GetBlastRadiusReport;
+using ComputeChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeScore.ComputeChangeScore;
+using GetChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeScore.GetChangeScore;
+using AttachWorkItemContextFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AttachWorkItemContext.AttachWorkItemContext;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de análise de inteligência de mudança.

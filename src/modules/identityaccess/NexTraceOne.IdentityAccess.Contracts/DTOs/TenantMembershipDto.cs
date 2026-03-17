@@ -1,4 +1,4 @@
-namespace NexTraceOne.Identity.Contracts.DTOs;
+namespace NexTraceOne.IdentityAccess.Contracts.DTOs;
 
 /// <summary>
 /// DTO público com dados de vínculo de tenant de um usuário.

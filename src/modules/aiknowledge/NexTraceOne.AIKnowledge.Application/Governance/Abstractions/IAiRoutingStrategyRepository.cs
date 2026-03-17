@@ -1,7 +1,6 @@
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
-namespace NexTraceOne.AiGovernance.Application.Abstractions;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 
 /// <summary>
 /// Repositório de estratégias de roteamento de IA.

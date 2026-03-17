@@ -1,10 +1,7 @@
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.ValueObjects;
-using FluentAssertions;
-using Xunit;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Entities;
 
 /// <summary>
 /// Testes do ciclo de vida (lifecycle) de ContractVersion.

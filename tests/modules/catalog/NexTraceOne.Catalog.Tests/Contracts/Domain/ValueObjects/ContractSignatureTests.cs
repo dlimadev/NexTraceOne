@@ -1,9 +1,7 @@
-using NexTraceOne.Contracts.Domain.ValueObjects;
-using NexTraceOne.Contracts.Domain.Services;
-using FluentAssertions;
-using Xunit;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.ValueObjects;
 
 /// <summary>
 /// Testes da assinatura digital e verificação de integridade de contratos.

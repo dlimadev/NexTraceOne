@@ -1,4 +1,4 @@
-namespace NexTraceOne.RuntimeIntelligence.Domain.Enums;
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
 
 /// <summary>
 /// Severidade de um drift (desvio) detectado entre a baseline esperada

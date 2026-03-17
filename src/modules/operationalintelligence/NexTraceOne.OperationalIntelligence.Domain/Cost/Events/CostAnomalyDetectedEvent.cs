@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.CostIntelligence.Domain.Events;
+namespace NexTraceOne.OperationalIntelligence.Domain.Cost.Events;
 
 /// <summary>
 /// Evento emitido quando uma anomalia de custo operacional é detectada.

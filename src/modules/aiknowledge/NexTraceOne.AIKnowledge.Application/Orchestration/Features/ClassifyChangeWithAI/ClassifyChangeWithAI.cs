@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.AiOrchestration.Application.Features.ClassifyChangeWithAI;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI;
 
 /// <summary>
 /// Feature: ClassifyChangeWithAI — Módulo: AiOrchestration.

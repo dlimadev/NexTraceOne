@@ -1,6 +1,6 @@
-using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
-namespace NexTraceOne.Contracts.Application.Abstractions;
+namespace NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
 /// <summary>
 /// Repositório para operações de persistência de revisões de contrato.

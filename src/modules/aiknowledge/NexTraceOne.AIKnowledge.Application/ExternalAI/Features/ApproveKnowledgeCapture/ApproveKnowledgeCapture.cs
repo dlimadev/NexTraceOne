@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.ExternalAi.Application.Features.ApproveKnowledgeCapture;
+namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.ApproveKnowledgeCapture;
 
 /// <summary>
 /// Feature: ApproveKnowledgeCapture — Módulo: ExternalAi.

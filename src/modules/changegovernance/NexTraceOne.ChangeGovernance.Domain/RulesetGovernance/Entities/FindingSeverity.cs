@@ -1,4 +1,4 @@
-namespace NexTraceOne.RulesetGovernance.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
 /// <summary>
 /// Severidade de um finding de linting, compatível com o padrão Spectral.

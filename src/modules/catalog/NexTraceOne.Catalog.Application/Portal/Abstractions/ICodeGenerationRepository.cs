@@ -1,6 +1,6 @@
-using NexTraceOne.DeveloperPortal.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
 
-namespace NexTraceOne.DeveloperPortal.Application.Abstractions;
+namespace NexTraceOne.Catalog.Application.Portal.Abstractions;
 
 /// <summary>
 /// Repositório de registros de geração de código do módulo DeveloperPortal.

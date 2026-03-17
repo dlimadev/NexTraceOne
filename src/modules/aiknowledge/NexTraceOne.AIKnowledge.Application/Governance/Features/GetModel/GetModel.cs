@@ -1,11 +1,12 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Errors;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.GetModel;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.GetModel;
 
 /// <summary>
 /// Feature: GetModel — obtém os detalhes completos de um modelo de IA.

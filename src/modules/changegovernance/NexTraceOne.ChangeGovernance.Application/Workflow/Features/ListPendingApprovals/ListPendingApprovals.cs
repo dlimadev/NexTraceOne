@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
-namespace NexTraceOne.Workflow.Application.Features.ListPendingApprovals;
+namespace NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals;
 
 /// <summary>
 /// Feature: ListPendingApprovals — lista instâncias de workflow em revisão com paginação.

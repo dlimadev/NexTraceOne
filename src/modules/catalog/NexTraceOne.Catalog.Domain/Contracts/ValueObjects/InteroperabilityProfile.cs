@@ -1,6 +1,6 @@
-using NexTraceOne.Contracts.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value object que define o perfil de interoperabilidade de um contrato.

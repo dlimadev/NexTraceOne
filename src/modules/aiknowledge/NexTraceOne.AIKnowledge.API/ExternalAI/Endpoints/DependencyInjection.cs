@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.ExternalAi.Application;
-using NexTraceOne.ExternalAi.Infrastructure;
 
-namespace NexTraceOne.ExternalAi.API;
+using NexTraceOne.AIKnowledge.Application.ExternalAI;
+using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI;
+
+namespace NexTraceOne.AIKnowledge.API.ExternalAI.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo ExternalAi.

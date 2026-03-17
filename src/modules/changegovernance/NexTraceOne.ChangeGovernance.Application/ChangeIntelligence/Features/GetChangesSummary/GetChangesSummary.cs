@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 
-namespace NexTraceOne.ChangeIntelligence.Application.Features.GetChangesSummary;
+namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangesSummary;
 
 /// <summary>
 /// Feature: GetChangesSummary — retorna contadores agregados de mudanças para dashboards de Change Confidence.

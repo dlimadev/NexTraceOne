@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListMessages;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListMessages;
 
 /// <summary>
 /// Feature: ListMessages — lista mensagens de uma conversa do assistente de IA.

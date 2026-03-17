@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RulesetGovernance.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Application.Features.UploadRuleset;
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.UploadRuleset;
 
 /// <summary>
 /// Feature: UploadRuleset — faz upload de um novo ruleset customizável.

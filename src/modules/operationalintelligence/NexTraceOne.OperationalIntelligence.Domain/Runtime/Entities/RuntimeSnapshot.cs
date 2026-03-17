@@ -1,10 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.RuntimeIntelligence.Domain.Enums;
-using NexTraceOne.RuntimeIntelligence.Domain.Errors;
 
-namespace NexTraceOne.RuntimeIntelligence.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
+
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
 /// <summary>
 /// Aggregate Root que representa um snapshot pontual de saúde e performance de um serviço em runtime.

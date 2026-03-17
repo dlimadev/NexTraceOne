@@ -1,7 +1,7 @@
-using NexTraceOne.Contracts.Domain.ValueObjects;
-using NexTraceOne.Contracts.Domain.Services;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.ValueObjects;
 
 public sealed class ContractSignatureSecurityTests
 {

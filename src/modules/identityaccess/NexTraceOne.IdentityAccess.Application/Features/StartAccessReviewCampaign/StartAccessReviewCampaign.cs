@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Errors;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Errors;
 
-namespace NexTraceOne.Identity.Application.Features.StartAccessReviewCampaign;
+namespace NexTraceOne.IdentityAccess.Application.Features.StartAccessReviewCampaign;
 
 /// <summary>
 /// Feature: StartAccessReviewCampaign — cria uma campanha de recertificação de acessos para um tenant.

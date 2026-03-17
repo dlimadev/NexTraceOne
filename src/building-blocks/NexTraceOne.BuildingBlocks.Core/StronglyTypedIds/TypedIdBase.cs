@@ -1,4 +1,4 @@
-namespace NexTraceOne.BuildingBlocks.Core;
+namespace NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
 /// <summary>
 /// Implementação base para identificadores fortemente tipados.

@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.RuntimeIntelligence.Application;
-using NexTraceOne.RuntimeIntelligence.Infrastructure;
 
-namespace NexTraceOne.RuntimeIntelligence.API;
+using NexTraceOne.OperationalIntelligence.Application.Runtime;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime;
+
+namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo RuntimeIntelligence.

@@ -1,12 +1,10 @@
-using FluentAssertions;
-using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features.SelectTenant;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Features.SelectTenant;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature SelectTenant — valida seleção de tenant após login multi-tenant.

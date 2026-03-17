@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListAuditEntries;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListAuditEntries;
 
 /// <summary>
 /// Feature: ListAuditEntries — lista entradas da trilha de auditoria de uso de IA.

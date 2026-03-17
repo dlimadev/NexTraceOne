@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
-using NexTraceOne.RuntimeIntelligence.Domain.Errors;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Errors;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.GetObservabilityScore;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
 
 /// <summary>
 /// Feature: GetObservabilityScore — obtém o perfil e score de maturidade de observabilidade de um serviço.

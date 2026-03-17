@@ -1,6 +1,4 @@
-using NexTraceOne.Identity.Domain.Entities;
-
-namespace NexTraceOne.Identity.Application.Abstractions;
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Abstração para integração com provedores de identidade OIDC externos.

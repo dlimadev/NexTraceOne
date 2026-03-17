@@ -1,8 +1,9 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
 using Ardalis.GuardClauses;
 
-namespace NexTraceOne.Contracts.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 /// <summary>
 /// Value object que representa metadados extraídos de uma especificação OpenAPI.

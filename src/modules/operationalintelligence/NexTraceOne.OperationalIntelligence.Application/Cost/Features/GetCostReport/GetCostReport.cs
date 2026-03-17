@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 
-namespace NexTraceOne.CostIntelligence.Application.Features.GetCostReport;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostReport;
 
 /// <summary>
 /// Feature: GetCostReport — obtém relatório de snapshots de custo para um serviço/ambiente.

@@ -1,9 +1,12 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
+
 using CreateGraphSnapshotFeature = NexTraceOne.Catalog.Application.Graph.Features.CreateGraphSnapshot.CreateGraphSnapshot;
 using CreateSavedViewFeature = NexTraceOne.Catalog.Application.Graph.Features.CreateSavedView.CreateSavedView;
 using GetAssetDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetAssetDetail.GetAssetDetail;
@@ -26,7 +29,7 @@ using SyncConsumersFeature = NexTraceOne.Catalog.Application.Graph.Features.Sync
 using UpdateServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceAsset.UpdateServiceAsset;
 using UpdateServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceOwnership.UpdateServiceOwnership;
 
-namespace NexTraceOne.Catalog.API.Graph.Endpoints;
+namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo Catalog Graph.

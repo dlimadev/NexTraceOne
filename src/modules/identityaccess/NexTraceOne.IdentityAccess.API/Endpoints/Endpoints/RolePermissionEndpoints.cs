@@ -1,12 +1,15 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ListRolesFeature = NexTraceOne.Identity.Application.Features.ListRoles.ListRoles;
-using ListPermissionsFeature = NexTraceOne.Identity.Application.Features.ListPermissions.ListPermissions;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using ListRolesFeature = NexTraceOne.IdentityAccess.Application.Features.ListRoles.ListRoles;
+using ListPermissionsFeature = NexTraceOne.IdentityAccess.Application.Features.ListPermissions.ListPermissions;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de consulta de papéis (roles) e permissões do sistema.

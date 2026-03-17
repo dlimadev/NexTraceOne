@@ -1,6 +1,6 @@
-using NexTraceOne.Promotion.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 
-namespace NexTraceOne.Promotion.Application.Abstractions;
+namespace NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 
 /// <summary>
 /// Contrato de repositório para gates de promoção.

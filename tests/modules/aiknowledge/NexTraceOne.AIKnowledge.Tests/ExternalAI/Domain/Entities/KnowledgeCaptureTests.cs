@@ -1,7 +1,7 @@
-using NexTraceOne.ExternalAi.Domain.Entities;
-using NexTraceOne.ExternalAi.Domain.Enums;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Enums;
 
-namespace NexTraceOne.ExternalAi.Tests.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Tests.ExternalAI.Domain.Entities;
 
 /// <summary>Testes unitários da entidade KnowledgeCapture — ciclo de revisão e reutilização.</summary>
 public sealed class KnowledgeCaptureTests

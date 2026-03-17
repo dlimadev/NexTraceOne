@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.Identity.Domain.Events;
-using NexTraceOne.Identity.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.IdentityAccess.Domain.Events;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+
+namespace NexTraceOne.IdentityAccess.Domain.Entities;
 
 /// <summary>
 /// Aggregate Root que representa um usuário autenticável da plataforma.

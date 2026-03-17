@@ -1,4 +1,7 @@
 using FluentAssertions;
+
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+
 using NSubstitute;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
@@ -6,12 +9,11 @@ using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceSourceOfT
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetContractSourceOfTruth;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceCoverage;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.SearchSourceOfTruth;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
 
 namespace NexTraceOne.Catalog.Tests.SourceOfTruth.Application.Features;
 

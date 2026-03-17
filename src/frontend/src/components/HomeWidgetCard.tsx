@@ -33,12 +33,12 @@ interface WidgetMetadata {
  * Fornece identidade visual e navegação contextual consistentes.
  */
 const widgetMeta: Record<HomeWidget['type'], WidgetMetadata> = {
-  services: { icon: <Server size={18} />, color: 'text-brand-blue', route: '/services', descKey: 'productPolish.guidanceServices' },
+  services: { icon: <Server size={18} />, color: 'text-cyan', route: '/services', descKey: 'productPolish.guidanceServices' },
   changes: { icon: <Zap size={18} />, color: 'text-warning', route: '/changes', descKey: 'productPolish.guidanceChanges' },
   incidents: { icon: <AlertTriangle size={18} />, color: 'text-critical', route: '/operations/incidents', descKey: 'productPolish.guidanceOperations' },
   contracts: { icon: <FileText size={18} />, color: 'text-success', route: '/contracts', descKey: 'productPolish.guidanceContracts' },
   reliability: { icon: <Activity size={18} />, color: 'text-accent', route: '/operations/reliability', descKey: 'productPolish.guidanceOperations' },
-  dependencies: { icon: <Share2 size={18} />, color: 'text-brand-blue', route: '/services/graph', descKey: 'productPolish.guidanceServices' },
+  dependencies: { icon: <Share2 size={18} />, color: 'text-cyan', route: '/services/graph', descKey: 'productPolish.guidanceServices' },
   risk: { icon: <Shield size={18} />, color: 'text-warning', route: '/governance/risk', descKey: 'productPolish.guidanceGovernance' },
   trend: { icon: <TrendingUp size={18} />, color: 'text-accent', route: '/governance/reports', descKey: 'productPolish.guidanceGovernance' },
   governance: { icon: <ShieldCheck size={18} />, color: 'text-success', route: '/governance/reports', descKey: 'productPolish.guidanceGovernance' },

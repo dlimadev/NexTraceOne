@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Orquestrador de endpoints Minimal API do módulo ChangeIntelligence.

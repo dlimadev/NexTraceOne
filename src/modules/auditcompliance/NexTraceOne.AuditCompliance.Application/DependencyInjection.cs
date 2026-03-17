@@ -1,14 +1,16 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.Audit.Application.Features.ConfigureRetention;
-using NexTraceOne.Audit.Application.Features.ExportAuditReport;
-using NexTraceOne.Audit.Application.Features.GetAuditTrail;
-using NexTraceOne.Audit.Application.Features.RecordAuditEvent;
-using NexTraceOne.Audit.Application.Features.SearchAuditLog;
 
-namespace NexTraceOne.Audit.Application;
+using NexTraceOne.AuditCompliance.Application.Features.ConfigureRetention;
+using NexTraceOne.AuditCompliance.Application.Features.ExportAuditReport;
+using NexTraceOne.AuditCompliance.Application.Features.GetAuditTrail;
+using NexTraceOne.AuditCompliance.Application.Features.RecordAuditEvent;
+using NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog;
+using NexTraceOne.BuildingBlocks.Application;
+
+namespace NexTraceOne.AuditCompliance.Application;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo Audit.

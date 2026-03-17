@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 
-namespace NexTraceOne.CostIntelligence.Application.Features.GetCostByRelease;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRelease;
 
 /// <summary>
 /// Feature: GetCostByRelease — obtém atribuições de custo relacionadas a um período de release.

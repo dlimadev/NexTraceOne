@@ -1,14 +1,16 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Errors;
-using NexTraceOne.Contracts.Domain.Services;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
 
-namespace NexTraceOne.Contracts.Application.Features.GenerateScorecard;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
 
 /// <summary>
 /// Feature: GenerateScorecard — gera o scorecard técnico de uma versão de contrato.

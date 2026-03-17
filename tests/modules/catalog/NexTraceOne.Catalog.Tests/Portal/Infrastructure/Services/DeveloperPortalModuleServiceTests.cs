@@ -1,11 +1,9 @@
-using FluentAssertions;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
-using NexTraceOne.DeveloperPortal.Infrastructure.Services;
-using NSubstitute;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
+using NexTraceOne.Catalog.Infrastructure.Portal.Services;
 
-namespace NexTraceOne.DeveloperPortal.Tests.Infrastructure.Services;
+namespace NexTraceOne.Catalog.Tests.Portal.Infrastructure.Services;
 
 /// <summary>
 /// Testes unitários para o serviço de contrato público cross-module DeveloperPortalModuleService.

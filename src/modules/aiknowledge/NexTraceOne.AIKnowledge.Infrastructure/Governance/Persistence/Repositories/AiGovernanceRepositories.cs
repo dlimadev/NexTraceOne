@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Entities;
-using NexTraceOne.AiGovernance.Domain.Enums;
 
-namespace NexTraceOne.AiGovernance.Infrastructure.Persistence.Repositories;
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+
+namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
 internal sealed class AiAccessPolicyRepository(AiGovernanceDbContext context) : IAiAccessPolicyRepository
 {

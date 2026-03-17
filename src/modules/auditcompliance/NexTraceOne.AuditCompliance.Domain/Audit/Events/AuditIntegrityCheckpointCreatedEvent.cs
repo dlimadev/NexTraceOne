@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.Audit.Domain.Events;
+namespace NexTraceOne.AuditCompliance.Domain.Audit.Events;
 
 /// <summary>
 /// Evento emitido quando um checkpoint de integridade da trilha de auditoria é criado.

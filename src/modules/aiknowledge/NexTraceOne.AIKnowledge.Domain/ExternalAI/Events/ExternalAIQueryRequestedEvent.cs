@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.ExternalAi.Domain.Events;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Events;
 
 /// <summary>
 /// Evento emitido quando uma consulta a IA externa é solicitada.

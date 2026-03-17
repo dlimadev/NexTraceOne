@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.Workflow.Domain.Errors;
+namespace NexTraceOne.ChangeGovernance.Domain.Workflow.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo Workflow.

@@ -1,9 +1,11 @@
-using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace NexTraceOne.Identity.Domain.ValueObjects;
+using Ardalis.GuardClauses;
+
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+
+namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 /// <summary>
 /// Value Object que encapsula o hash SHA-256 de um refresh token.

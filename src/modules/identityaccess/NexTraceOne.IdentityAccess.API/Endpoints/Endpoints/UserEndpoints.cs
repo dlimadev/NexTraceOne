@@ -1,17 +1,20 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ActivateUserFeature = NexTraceOne.Identity.Application.Features.ActivateUser.ActivateUser;
-using AssignRoleFeature = NexTraceOne.Identity.Application.Features.AssignRole.AssignRole;
-using CreateUserFeature = NexTraceOne.Identity.Application.Features.CreateUser.CreateUser;
-using DeactivateUserFeature = NexTraceOne.Identity.Application.Features.DeactivateUser.DeactivateUser;
-using GetUserProfileFeature = NexTraceOne.Identity.Application.Features.GetUserProfile.GetUserProfile;
-using ListActiveSessionsFeature = NexTraceOne.Identity.Application.Features.ListActiveSessions.ListActiveSessions;
-using ListTenantUsersFeature = NexTraceOne.Identity.Application.Features.ListTenantUsers.ListTenantUsers;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using ActivateUserFeature = NexTraceOne.IdentityAccess.Application.Features.ActivateUser.ActivateUser;
+using AssignRoleFeature = NexTraceOne.IdentityAccess.Application.Features.AssignRole.AssignRole;
+using CreateUserFeature = NexTraceOne.IdentityAccess.Application.Features.CreateUser.CreateUser;
+using DeactivateUserFeature = NexTraceOne.IdentityAccess.Application.Features.DeactivateUser.DeactivateUser;
+using GetUserProfileFeature = NexTraceOne.IdentityAccess.Application.Features.GetUserProfile.GetUserProfile;
+using ListActiveSessionsFeature = NexTraceOne.IdentityAccess.Application.Features.ListActiveSessions.ListActiveSessions;
+using ListTenantUsersFeature = NexTraceOne.IdentityAccess.Application.Features.ListTenantUsers.ListTenantUsers;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão de utilizadores do módulo Identity.

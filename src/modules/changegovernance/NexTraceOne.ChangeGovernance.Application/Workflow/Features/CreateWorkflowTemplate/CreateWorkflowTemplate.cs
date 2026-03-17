@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
 
-namespace NexTraceOne.Workflow.Application.Features.CreateWorkflowTemplate;
+namespace NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate;
 
 /// <summary>
 /// Feature: CreateWorkflowTemplate — cria um novo template reutilizável de workflow de aprovação.

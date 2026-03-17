@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Contracts.Domain.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
-namespace NexTraceOne.Contracts.Infrastructure.Persistence;
+namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 
 /// <summary>
 /// DbContext do módulo Contracts.

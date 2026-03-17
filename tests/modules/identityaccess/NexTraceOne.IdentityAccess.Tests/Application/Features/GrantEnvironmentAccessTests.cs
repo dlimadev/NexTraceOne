@@ -1,12 +1,13 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
-using NexTraceOne.Identity.Tests.TestDoubles;
-using GrantEnvironmentAccessFeature = NexTraceOne.Identity.Application.Features.GrantEnvironmentAccess.GrantEnvironmentAccess;
-using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+using GrantEnvironmentAccessFeature = NexTraceOne.IdentityAccess.Application.Features.GrantEnvironmentAccess.GrantEnvironmentAccess;
+using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
+
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature GrantEnvironmentAccess.

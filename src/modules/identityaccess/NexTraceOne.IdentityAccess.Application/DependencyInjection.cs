@@ -1,34 +1,36 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features.ActivateUser;
-using NexTraceOne.Identity.Application.Features.AssignRole;
-using NexTraceOne.Identity.Application.Features.ChangePassword;
-using NexTraceOne.Identity.Application.Features.CreateDelegation;
-using NexTraceOne.Identity.Application.Features.CreateUser;
-using NexTraceOne.Identity.Application.Features.DeactivateUser;
-using NexTraceOne.Identity.Application.Features.DecideJitAccess;
-using NexTraceOne.Identity.Application.Features.FederatedLogin;
-using NexTraceOne.Identity.Application.Features.GetUserProfile;
-using NexTraceOne.Identity.Application.Features.ListActiveSessions;
-using NexTraceOne.Identity.Application.Features.ListTenantUsers;
-using NexTraceOne.Identity.Application.Features.LocalLogin;
-using NexTraceOne.Identity.Application.Features.RefreshToken;
-using NexTraceOne.Identity.Application.Features.RequestBreakGlass;
-using NexTraceOne.Identity.Application.Features.RequestJitAccess;
-using NexTraceOne.Identity.Application.Features.RevokeBreakGlass;
-using NexTraceOne.Identity.Application.Features.RevokeDelegation;
-using NexTraceOne.Identity.Application.Features.RevokeSession;
-using NexTraceOne.Identity.Application.Features.SelectTenant;
-using NexTraceOne.Identity.Application.Features.StartOidcLogin;
-using NexTraceOne.Identity.Application.Features.OidcCallback;
-using NexTraceOne.Identity.Application.Features.StartAccessReviewCampaign;
-using NexTraceOne.Identity.Application.Features.GetAccessReviewCampaign;
-using NexTraceOne.Identity.Application.Features.DecideAccessReviewItem;
 
-namespace NexTraceOne.Identity.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Features.ActivateUser;
+using NexTraceOne.IdentityAccess.Application.Features.AssignRole;
+using NexTraceOne.IdentityAccess.Application.Features.ChangePassword;
+using NexTraceOne.IdentityAccess.Application.Features.CreateDelegation;
+using NexTraceOne.IdentityAccess.Application.Features.CreateUser;
+using NexTraceOne.IdentityAccess.Application.Features.DeactivateUser;
+using NexTraceOne.IdentityAccess.Application.Features.DecideAccessReviewItem;
+using NexTraceOne.IdentityAccess.Application.Features.DecideJitAccess;
+using NexTraceOne.IdentityAccess.Application.Features.FederatedLogin;
+using NexTraceOne.IdentityAccess.Application.Features.GetAccessReviewCampaign;
+using NexTraceOne.IdentityAccess.Application.Features.GetUserProfile;
+using NexTraceOne.IdentityAccess.Application.Features.ListActiveSessions;
+using NexTraceOne.IdentityAccess.Application.Features.ListTenantUsers;
+using NexTraceOne.IdentityAccess.Application.Features.LocalLogin;
+using NexTraceOne.IdentityAccess.Application.Features.OidcCallback;
+using NexTraceOne.IdentityAccess.Application.Features.RefreshToken;
+using NexTraceOne.IdentityAccess.Application.Features.RequestBreakGlass;
+using NexTraceOne.IdentityAccess.Application.Features.RequestJitAccess;
+using NexTraceOne.IdentityAccess.Application.Features.RevokeBreakGlass;
+using NexTraceOne.IdentityAccess.Application.Features.RevokeDelegation;
+using NexTraceOne.IdentityAccess.Application.Features.RevokeSession;
+using NexTraceOne.IdentityAccess.Application.Features.SelectTenant;
+using NexTraceOne.IdentityAccess.Application.Features.StartAccessReviewCampaign;
+using NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin;
+
+namespace NexTraceOne.IdentityAccess.Application;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo Identity.

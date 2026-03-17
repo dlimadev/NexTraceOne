@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
-using NexTraceOne.CostIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
-namespace NexTraceOne.CostIntelligence.Application.Features.IngestCostSnapshot;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Features.IngestCostSnapshot;
 
 /// <summary>
 /// Feature: IngestCostSnapshot — recebe dados de custo de infraestrutura e cria um snapshot.

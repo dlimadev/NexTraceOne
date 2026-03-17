@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NexTraceOne.ExternalAi.Application;
+namespace NexTraceOne.AIKnowledge.Application.ExternalAI;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo ExternalAi.

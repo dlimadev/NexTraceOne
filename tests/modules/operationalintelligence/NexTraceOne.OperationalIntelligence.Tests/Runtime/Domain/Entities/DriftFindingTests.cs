@@ -1,7 +1,7 @@
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
-using NexTraceOne.RuntimeIntelligence.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
 
-namespace NexTraceOne.RuntimeIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Tests.Runtime.Domain.Entities;
 
 /// <summary>Testes unitários da entidade DriftFinding — ciclo de vida, severidade e correlação.</summary>
 public sealed class DriftFindingTests

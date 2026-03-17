@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetPlaygroundHistory;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory;
 
 /// <summary>
 /// Feature: GetPlaygroundHistory — lista histórico de sessões de playground de um utilizador.

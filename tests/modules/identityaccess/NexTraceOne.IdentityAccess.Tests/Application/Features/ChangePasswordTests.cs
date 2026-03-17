@@ -1,11 +1,12 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
-using NexTraceOne.Identity.Tests.TestDoubles;
-using ChangePasswordFeature = NexTraceOne.Identity.Application.Features.ChangePassword.ChangePassword;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+using ChangePasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ChangePassword.ChangePassword;
+
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature ChangePassword.

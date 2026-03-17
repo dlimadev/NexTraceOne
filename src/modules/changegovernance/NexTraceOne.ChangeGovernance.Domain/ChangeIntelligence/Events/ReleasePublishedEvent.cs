@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.ChangeIntelligence.Domain.Events;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 
 /// <summary>
 /// Evento emitido quando uma release é publicada em um ambiente.

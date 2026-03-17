@@ -1,16 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Contracts.ServiceInterfaces;
-using NexTraceOne.Identity.Infrastructure.Persistence;
-using NexTraceOne.Identity.Infrastructure.Persistence.Repositories;
-using NexTraceOne.Identity.Infrastructure.Services;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
+using NexTraceOne.IdentityAccess.Infrastructure.Services;
 
-namespace NexTraceOne.Identity.Infrastructure;
+namespace NexTraceOne.IdentityAccess.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Identity.

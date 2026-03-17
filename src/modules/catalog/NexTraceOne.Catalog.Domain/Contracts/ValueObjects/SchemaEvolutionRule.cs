@@ -1,4 +1,4 @@
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value object que define uma regra de evolução de schema para contratos event-driven.

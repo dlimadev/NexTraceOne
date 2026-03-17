@@ -1,9 +1,9 @@
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Contracts.ServiceInterfaces;
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.Workflow.ServiceInterfaces;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
-namespace NexTraceOne.Workflow.Infrastructure.Services;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Services;
 
 /// <summary>
 /// Implementação concreta da interface pública do módulo Workflow.

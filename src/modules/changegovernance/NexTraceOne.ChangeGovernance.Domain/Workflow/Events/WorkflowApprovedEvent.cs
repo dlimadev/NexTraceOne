@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.Workflow.Domain.Events;
+namespace NexTraceOne.ChangeGovernance.Domain.Workflow.Events;
 
 /// <summary>
 /// Evento emitido quando um workflow de aprovação é concluído com sucesso.

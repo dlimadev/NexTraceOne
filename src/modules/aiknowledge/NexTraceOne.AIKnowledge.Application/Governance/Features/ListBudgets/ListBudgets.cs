@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListBudgets;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListBudgets;
 
 /// <summary>
 /// Feature: ListBudgets — lista budgets/quotas de tokens de IA com filtros opcionais.

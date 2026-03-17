@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Errors;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Errors;
 
-namespace NexTraceOne.Identity.Application.Features.RequestJitAccess;
+namespace NexTraceOne.IdentityAccess.Application.Features.RequestJitAccess;
 
 /// <summary>
 /// Feature: RequestJitAccess — solicita acesso privilegiado temporário (Just-in-Time).

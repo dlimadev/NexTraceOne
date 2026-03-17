@@ -1,11 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RulesetGovernance.Application.Abstractions;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
 
-namespace NexTraceOne.RulesetGovernance.Application.Features.ListRulesets;
+namespace NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ListRulesets;
 
 /// <summary>
 /// Feature: ListRulesets — lista rulesets com paginação.

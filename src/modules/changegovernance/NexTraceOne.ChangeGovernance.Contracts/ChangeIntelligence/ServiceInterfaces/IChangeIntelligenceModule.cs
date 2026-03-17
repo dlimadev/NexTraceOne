@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Contracts.ServiceInterfaces;
+namespace NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo ChangeIntelligence.

@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.AiGovernance.Domain.Enums;
-using NexTraceOne.AiGovernance.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.AiGovernance.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 /// <summary>
 /// Representa um budget/quota de tokens e requisições de IA para um escopo específico.

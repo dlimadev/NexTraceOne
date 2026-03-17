@@ -1,7 +1,8 @@
 using Ardalis.GuardClauses;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Identity.Domain.Entities;
+namespace NexTraceOne.IdentityAccess.Domain.Entities;
 
 /// <summary>
 /// Aggregate Root que representa um Tenant (organização/cliente/conta).

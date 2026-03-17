@@ -1,7 +1,9 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -17,7 +19,7 @@ using NexTraceOne.OperationalIntelligence.Application.Automation.Features.Record
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.UpdateAutomationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
-namespace NexTraceOne.OperationalIntelligence.API.Automation.Endpoints;
+namespace NexTraceOne.OperationalIntelligence.API.Automation.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de Operational Automation Workflows.

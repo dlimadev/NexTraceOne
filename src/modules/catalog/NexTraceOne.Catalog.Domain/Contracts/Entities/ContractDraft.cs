@@ -1,11 +1,12 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
 
-namespace NexTraceOne.Contracts.Domain.Entities;
+namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 /// <summary>
 /// Rascunho de contrato em edição no Contract Studio.

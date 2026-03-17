@@ -1,9 +1,10 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.AiGovernance.Domain.Enums;
 
-namespace NexTraceOne.AiGovernance.Domain.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 /// <summary>
 /// Representa uma entrada imutável na trilha de auditoria de uso de IA.

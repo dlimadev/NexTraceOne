@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Domain.Entities;
-using NexTraceOne.Promotion.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
 
-namespace NexTraceOne.Promotion.Application.Features.GetPromotionStatus;
+namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus;
 
 /// <summary>
 /// Feature: GetPromotionStatus — retorna o status atual e detalhes de uma solicitação de promoção.

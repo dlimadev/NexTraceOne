@@ -1,12 +1,11 @@
-using FluentAssertions;
-using NSubstitute;
-using NexTraceOne.Identity.Application.Abstractions;
-using RevokeSessionFeature = NexTraceOne.Identity.Application.Features.RevokeSession.RevokeSession;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
-using NexTraceOne.Identity.Tests.TestDoubles;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+using RevokeSessionFeature = NexTraceOne.IdentityAccess.Application.Features.RevokeSession.RevokeSession;
+
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes da feature RevokeSession.

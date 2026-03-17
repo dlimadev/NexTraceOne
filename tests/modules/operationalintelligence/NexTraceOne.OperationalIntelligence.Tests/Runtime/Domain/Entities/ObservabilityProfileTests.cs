@@ -1,6 +1,6 @@
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
-namespace NexTraceOne.RuntimeIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Tests.Runtime.Domain.Entities;
 
 /// <summary>Testes unitários da entidade ObservabilityProfile — score, capacidades e atualização.</summary>
 public sealed class ObservabilityProfileTests

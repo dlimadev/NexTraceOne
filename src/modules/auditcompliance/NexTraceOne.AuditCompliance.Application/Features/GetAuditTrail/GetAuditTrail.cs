@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
+using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Audit.Application.Abstractions;
 
-namespace NexTraceOne.Audit.Application.Features.GetAuditTrail;
+namespace NexTraceOne.AuditCompliance.Application.Features.GetAuditTrail;
 
 /// <summary>
 /// Feature: GetAuditTrail — obtém a trilha de auditoria de um recurso específico.

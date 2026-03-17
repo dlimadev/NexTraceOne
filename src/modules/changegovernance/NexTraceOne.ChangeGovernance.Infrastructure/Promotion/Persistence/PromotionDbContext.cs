@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Promotion.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 
 /// <summary>
 /// DbContext do módulo Promotion.

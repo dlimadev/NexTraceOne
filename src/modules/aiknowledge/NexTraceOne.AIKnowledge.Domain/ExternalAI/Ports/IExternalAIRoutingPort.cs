@@ -1,4 +1,4 @@
-namespace NexTraceOne.ExternalAi.Domain.Ports;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 
 /// <summary>
 /// Porta de roteamento para provedores de IA externa.

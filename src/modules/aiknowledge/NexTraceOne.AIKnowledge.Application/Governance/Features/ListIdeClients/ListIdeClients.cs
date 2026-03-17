@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListIdeClients;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListIdeClients;
 
 /// <summary>
 /// Feature: ListIdeClients — lista registos de clientes IDE autorizados.

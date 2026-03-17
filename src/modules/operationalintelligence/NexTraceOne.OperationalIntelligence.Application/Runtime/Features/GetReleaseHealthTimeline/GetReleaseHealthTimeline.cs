@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 
-namespace NexTraceOne.RuntimeIntelligence.Application.Features.GetReleaseHealthTimeline;
+namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline;
 
 /// <summary>
 /// Feature: GetReleaseHealthTimeline — obtém snapshots de saúde em torno de uma janela de release.

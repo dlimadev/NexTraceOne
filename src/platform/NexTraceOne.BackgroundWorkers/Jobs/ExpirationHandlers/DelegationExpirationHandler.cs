@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Identity.Domain.Entities;
+
 using NexTraceOne.Identity.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 

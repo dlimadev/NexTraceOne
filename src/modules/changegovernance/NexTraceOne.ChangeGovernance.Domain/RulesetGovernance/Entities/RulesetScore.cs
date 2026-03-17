@@ -1,4 +1,4 @@
-namespace NexTraceOne.RulesetGovernance.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
 /// <summary>
 /// Entidade removida — funcionalidade de score foi integrada ao LintResult.

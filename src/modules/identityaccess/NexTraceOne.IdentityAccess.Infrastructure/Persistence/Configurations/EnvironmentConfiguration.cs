@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Identity.Domain.Entities;
-using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade Environment.
@@ -13,7 +13,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Configurations;
 /// </summary>
 internal sealed class EnvironmentConfiguration : IEntityTypeConfiguration<Environment>
 {
-    public void Configure(EntityTypeBuilder<Environment> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.Environment> builder)
     {
         builder.ToTable("identity_environments");
         builder.HasKey(x => x.Id);

@@ -1,11 +1,12 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.ExternalAi.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.ExternalAi.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 
 /// <summary>
 /// Representa um provedor externo de IA registrado na plataforma (ex: OpenAI, Azure OpenAI, Claude).

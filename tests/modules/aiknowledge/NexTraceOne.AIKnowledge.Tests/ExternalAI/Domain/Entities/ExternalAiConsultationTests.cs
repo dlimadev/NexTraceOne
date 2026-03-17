@@ -1,7 +1,7 @@
-using NexTraceOne.ExternalAi.Domain.Entities;
-using NexTraceOne.ExternalAi.Domain.Enums;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Enums;
 
-namespace NexTraceOne.ExternalAi.Tests.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Tests.ExternalAI.Domain.Entities;
 
 /// <summary>Testes unitários da entidade ExternalAiConsultation — ciclo de vida e invariantes.</summary>
 public sealed class ExternalAiConsultationTests

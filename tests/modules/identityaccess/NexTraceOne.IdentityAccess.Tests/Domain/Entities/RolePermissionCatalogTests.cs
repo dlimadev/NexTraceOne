@@ -1,6 +1,6 @@
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Tests.Domain.Entities;
+namespace NexTraceOne.IdentityAccess.Tests.Domain.Entities;
 
 /// <summary>
 /// Testes unitários para <see cref="RolePermissionCatalog"/>.
@@ -20,7 +20,7 @@ public sealed class RolePermissionCatalogTests
         permissions.Should().Contain("identity:users:write");
         permissions.Should().Contain("platform:settings:write");
         permissions.Should().Contain("licensing:write");
-        permissions.Should().Contain("audit:export");
+        permissions.Should().Contain("audit:trail:read");
     }
 
     [Fact]
@@ -52,8 +52,8 @@ public sealed class RolePermissionCatalogTests
         var permissions = RolePermissionCatalog.GetPermissionsForRole(Role.Auditor);
 
         // Assert — Auditor deve ter acesso de leitura a auditoria e exportação
-        permissions.Should().Contain("audit:read");
-        permissions.Should().Contain("audit:export");
+        permissions.Should().Contain("audit:trail:read");
+        permissions.Should().Contain("audit:compliance:read");
         permissions.Should().NotContain("identity:users:write");
         permissions.Should().NotContain("platform:settings:write");
     }
@@ -67,8 +67,8 @@ public sealed class RolePermissionCatalogTests
 
         // Assert — ApprovalOnly é o papel mais restrito com permissões focadas em aprovação
         approvalPermissions.Count.Should().BeLessThan(developerPermissions.Count);
-        approvalPermissions.Should().Contain("workflow:approve");
-        approvalPermissions.Should().Contain("workflow:read");
+        approvalPermissions.Should().Contain("promotion:requests:write");
+        approvalPermissions.Should().Contain("change-intelligence:read");
     }
 
     // ── Testes de permissões do Developer Portal ──────────────────────────

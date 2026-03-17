@@ -1,10 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using MediatR;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.Audit.Application.Features.ConfigureRetention;
+namespace NexTraceOne.AuditCompliance.Application.Features.ConfigureRetention;
 
 /// <summary>
 /// Feature: ConfigureRetention — configura a política de retenção de eventos de auditoria.

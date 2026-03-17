@@ -1,4 +1,4 @@
-namespace NexTraceOne.RuntimeIntelligence.Domain.Ports;
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Ports;
 
 /// <summary>
 /// Porta de ingestão de sinais de runtime.

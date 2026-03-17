@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Enums;
 
-namespace NexTraceOne.Contracts.Contracts.ServiceInterfaces;
+namespace NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo Contracts.

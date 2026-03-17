@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Domain.Entities;
-using NexTraceOne.Promotion.Domain.Enums;
 
-namespace NexTraceOne.Promotion.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de solicitações de promoção, implementando consultas específicas de negócio.

@@ -1,12 +1,15 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using GetWorkflowStatusFeature = NexTraceOne.Workflow.Application.Features.GetWorkflowStatus.GetWorkflowStatus;
-using ListPendingApprovalsFeature = NexTraceOne.Workflow.Application.Features.ListPendingApprovals.ListPendingApprovals;
-using EscalateSlaViolationFeature = NexTraceOne.Workflow.Application.Features.EscalateSlaViolation.EscalateSlaViolation;
 
-namespace NexTraceOne.Workflow.API.Endpoints;
+using GetWorkflowStatusFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetWorkflowStatus.GetWorkflowStatus;
+using ListPendingApprovalsFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals.ListPendingApprovals;
+using EscalateSlaViolationFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.EscalateSlaViolation.EscalateSlaViolation;
+
+namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de consulta de status e monitoramento de workflows.

@@ -1,8 +1,7 @@
-using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Tests.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Domain.Entities;
 
 /// <summary>
 /// Testes de domínio para as extensões de Change Confidence na entidade Release.

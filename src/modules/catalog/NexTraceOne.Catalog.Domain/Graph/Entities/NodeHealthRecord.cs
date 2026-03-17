@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 namespace NexTraceOne.Catalog.Domain.Graph.Entities;

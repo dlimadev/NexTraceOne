@@ -1,11 +1,10 @@
 using Ardalis.GuardClauses;
-using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.AiGovernance.Domain.Enums;
 
-namespace NexTraceOne.AiGovernance.Domain.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 /// <summary>
 /// Representa o plano de execução construído para uma consulta de IA.

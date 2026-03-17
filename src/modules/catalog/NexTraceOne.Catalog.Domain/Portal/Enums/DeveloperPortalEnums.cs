@@ -1,4 +1,4 @@
-namespace NexTraceOne.DeveloperPortal.Domain.Enums;
+namespace NexTraceOne.Catalog.Domain.Portal.Enums;
 
 /// <summary>Nível de subscrição para notificações de alterações em API.</summary>
 public enum SubscriptionLevel

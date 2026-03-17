@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.ChangeIntelligence.Domain.Errors;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo ChangeIntelligence com códigos i18n.

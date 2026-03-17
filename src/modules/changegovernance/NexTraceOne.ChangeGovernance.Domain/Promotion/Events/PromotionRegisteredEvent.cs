@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.Promotion.Domain.Events;
+namespace NexTraceOne.ChangeGovernance.Domain.Promotion.Events;
 
 /// <summary>
 /// Evento emitido quando uma promoção de release entre ambientes é registrada.

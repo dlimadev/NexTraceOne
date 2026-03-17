@@ -1,6 +1,6 @@
-using NexTraceOne.ExternalAi.Domain.Entities;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 
-namespace NexTraceOne.ExternalAi.Tests.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Tests.ExternalAI.Domain.Entities;
 
 /// <summary>Testes unitários das entidades ExternalAiProvider e ExternalAiPolicy.</summary>
 public sealed class ExternalAiProviderAndPolicyTests

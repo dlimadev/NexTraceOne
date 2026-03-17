@@ -1,9 +1,12 @@
-namespace NexTraceOne.Contracts.Domain.Enums;
+using System.Text.Json.Serialization;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
 /// Estado do draft de contrato no fluxo de edição do Contract Studio.
 /// Controla a progressão desde a criação até a publicação ou descarte.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DraftStatus
 {
     /// <summary>Em edição — draft está sendo trabalhado pelo autor.</summary>

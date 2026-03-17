@@ -1,12 +1,15 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
-using GetReleaseFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetRelease.GetRelease;
-using ListReleasesFeature = NexTraceOne.ChangeIntelligence.Application.Features.ListReleases.ListReleases;
-using GetReleaseHistoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetReleaseHistory.GetReleaseHistory;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
+using ListReleasesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases.ListReleases;
+using GetReleaseHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory.GetReleaseHistory;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de consulta de releases e histórico.

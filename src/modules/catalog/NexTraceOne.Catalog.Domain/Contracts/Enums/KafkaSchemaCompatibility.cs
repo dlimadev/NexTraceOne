@@ -1,10 +1,13 @@
-namespace NexTraceOne.Contracts.Domain.Enums;
+using System.Text.Json.Serialization;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
 /// Modos de compatibilidade de schema suportados pelo Kafka Schema Registry.
 /// Define as regras de evolução permitidas para um subject, controlando quais
 /// mudanças em schemas são aceitas automaticamente e quais requerem governança.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum KafkaSchemaCompatibility
 {
     /// <summary>Sem verificação de compatibilidade — qualquer mudança é aceita.</summary>

@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Promotion.Application.Abstractions;
-using NexTraceOne.Promotion.Domain.Entities;
-using NexTraceOne.Promotion.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
 
-namespace NexTraceOne.Promotion.Application.Features.OverrideGateWithJustification;
+namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification;
 
 /// <summary>
 /// Feature: OverrideGateWithJustification — realiza override justificado de uma avaliação de gate reprovada.

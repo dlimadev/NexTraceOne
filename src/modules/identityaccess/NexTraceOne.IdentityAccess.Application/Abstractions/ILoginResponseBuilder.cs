@@ -1,7 +1,8 @@
-using NexTraceOne.Identity.Domain.Entities;
-using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Abstractions;
+using LocalLoginFeature = NexTraceOne.IdentityAccess.Application.Features.LocalLogin.LocalLogin;
+
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Contrato para construção de respostas padronizadas de login e resolução

@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiOrchestration.Domain.Enums;
+namespace NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
 
 /// <summary>
 /// Estado do ciclo de vida de uma conversa multi-turno com IA.

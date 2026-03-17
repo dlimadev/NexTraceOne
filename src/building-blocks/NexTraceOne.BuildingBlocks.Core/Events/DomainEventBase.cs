@@ -1,4 +1,4 @@
-namespace NexTraceOne.BuildingBlocks.Core;
+namespace NexTraceOne.BuildingBlocks.Core.Events;
 
 /// <summary>
 /// Implementação base para Domain Events.

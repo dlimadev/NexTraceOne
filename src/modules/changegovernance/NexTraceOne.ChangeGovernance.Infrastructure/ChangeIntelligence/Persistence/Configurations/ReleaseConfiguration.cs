@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Configurations;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Configurations;
 
 internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
 {

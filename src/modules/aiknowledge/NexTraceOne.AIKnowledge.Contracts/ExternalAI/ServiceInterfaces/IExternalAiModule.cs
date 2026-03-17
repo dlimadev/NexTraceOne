@@ -1,4 +1,4 @@
-namespace NexTraceOne.ExternalAi.Contracts.ServiceInterfaces;
+namespace NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo ExternalAi.

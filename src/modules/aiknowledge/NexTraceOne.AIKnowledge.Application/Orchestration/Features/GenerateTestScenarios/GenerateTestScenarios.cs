@@ -1,8 +1,4 @@
-using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
-
-namespace NexTraceOne.AiOrchestration.Application.Features.GenerateTestScenarios;
+namespace NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateTestScenarios;
 
 /// <summary>
 /// Feature: GenerateTestScenarios — Módulo: AiOrchestration.

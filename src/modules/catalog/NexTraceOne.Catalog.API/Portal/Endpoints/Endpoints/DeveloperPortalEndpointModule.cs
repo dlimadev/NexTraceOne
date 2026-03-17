@@ -1,28 +1,30 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
-using CreateSubscriptionFeature = NexTraceOne.DeveloperPortal.Application.Features.CreateSubscription.CreateSubscription;
-using DeleteSubscriptionFeature = NexTraceOne.DeveloperPortal.Application.Features.DeleteSubscription.DeleteSubscription;
-using ExecutePlaygroundFeature = NexTraceOne.DeveloperPortal.Application.Features.ExecutePlayground.ExecutePlayground;
-using GenerateCodeFeature = NexTraceOne.DeveloperPortal.Application.Features.GenerateCode.GenerateCode;
-using GetApiConsumersFeature = NexTraceOne.DeveloperPortal.Application.Features.GetApiConsumers.GetApiConsumers;
-using GetApiDetailFeature = NexTraceOne.DeveloperPortal.Application.Features.GetApiDetail.GetApiDetail;
-using GetApiHealthFeature = NexTraceOne.DeveloperPortal.Application.Features.GetApiHealth.GetApiHealth;
-using GetApisIConsumeFeature = NexTraceOne.DeveloperPortal.Application.Features.GetApisIConsume.GetApisIConsume;
-using GetAssetTimelineFeature = NexTraceOne.DeveloperPortal.Application.Features.GetAssetTimeline.GetAssetTimeline;
-using GetMyApisFeature = NexTraceOne.DeveloperPortal.Application.Features.GetMyApis.GetMyApis;
-using GetPlaygroundHistoryFeature = NexTraceOne.DeveloperPortal.Application.Features.GetPlaygroundHistory.GetPlaygroundHistory;
-using GetPortalAnalyticsFeature = NexTraceOne.DeveloperPortal.Application.Features.GetPortalAnalytics.GetPortalAnalytics;
-using GetSubscriptionsFeature = NexTraceOne.DeveloperPortal.Application.Features.GetSubscriptions.GetSubscriptions;
-using RecordAnalyticsEventFeature = NexTraceOne.DeveloperPortal.Application.Features.RecordAnalyticsEvent.RecordAnalyticsEvent;
-using RenderOpenApiContractFeature = NexTraceOne.DeveloperPortal.Application.Features.RenderOpenApiContract.RenderOpenApiContract;
-using SearchCatalogFeature = NexTraceOne.DeveloperPortal.Application.Features.SearchCatalog.SearchCatalog;
 
-namespace NexTraceOne.DeveloperPortal.API.Endpoints;
+using CreateSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription.CreateSubscription;
+using DeleteSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription.DeleteSubscription;
+using ExecutePlaygroundFeature = NexTraceOne.Catalog.Application.Portal.Features.ExecutePlayground.ExecutePlayground;
+using GenerateCodeFeature = NexTraceOne.Catalog.Application.Portal.Features.GenerateCode.GenerateCode;
+using GetApiConsumersFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers.GetApiConsumers;
+using GetApiDetailFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail.GetApiDetail;
+using GetApiHealthFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth.GetApiHealth;
+using GetApisIConsumeFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume.GetApisIConsume;
+using GetAssetTimelineFeature = NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline.GetAssetTimeline;
+using GetMyApisFeature = NexTraceOne.Catalog.Application.Portal.Features.GetMyApis.GetMyApis;
+using GetPlaygroundHistoryFeature = NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory.GetPlaygroundHistory;
+using GetPortalAnalyticsFeature = NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics.GetPortalAnalytics;
+using GetSubscriptionsFeature = NexTraceOne.Catalog.Application.Portal.Features.GetSubscriptions.GetSubscriptions;
+using RecordAnalyticsEventFeature = NexTraceOne.Catalog.Application.Portal.Features.RecordAnalyticsEvent.RecordAnalyticsEvent;
+using RenderOpenApiContractFeature = NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract.RenderOpenApiContract;
+using SearchCatalogFeature = NexTraceOne.Catalog.Application.Portal.Features.SearchCatalog.SearchCatalog;
+
+namespace NexTraceOne.Catalog.API.Portal.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo DeveloperPortal.

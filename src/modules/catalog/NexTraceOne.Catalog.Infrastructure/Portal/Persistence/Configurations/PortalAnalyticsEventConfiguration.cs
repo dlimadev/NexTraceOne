@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
 
-namespace NexTraceOne.DeveloperPortal.Infrastructure.Persistence.Configurations;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+
+namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade PortalAnalyticsEvent.

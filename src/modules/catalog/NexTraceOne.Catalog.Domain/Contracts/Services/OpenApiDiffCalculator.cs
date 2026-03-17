@@ -1,8 +1,9 @@
 using System.Text.Json;
-using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.Contracts.Domain.ValueObjects;
 
-namespace NexTraceOne.Contracts.Domain.Services;
+using NexTraceOne.BuildingBlocks.Core.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
+
+namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 
 /// <summary>
 /// Serviço de domínio responsável pelo cálculo de diff semântico entre especificações OpenAPI.

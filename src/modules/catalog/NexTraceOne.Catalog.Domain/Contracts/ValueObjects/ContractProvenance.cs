@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Contracts.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
 /// Value Object que captura a proveniência (lineage) de um contrato.

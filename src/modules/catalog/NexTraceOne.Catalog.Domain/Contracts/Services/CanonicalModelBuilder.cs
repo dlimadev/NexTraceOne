@@ -1,11 +1,12 @@
 using System.Text.Json;
 using System.Xml.Linq;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.ValueObjects;
+
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 #pragma warning disable CA1031 // Captura genérica necessária para resiliência ao processar specs malformadas
 
-namespace NexTraceOne.Contracts.Domain.Services;
+namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 
 /// <summary>
 /// Serviço de domínio responsável por construir o modelo canônico interno (ContractCanonicalModel)

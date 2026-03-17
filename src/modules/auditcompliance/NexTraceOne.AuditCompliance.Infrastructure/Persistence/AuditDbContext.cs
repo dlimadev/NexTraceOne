@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
+using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.Audit.Domain.Entities;
 
-namespace NexTraceOne.Audit.Infrastructure.Persistence;
+namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 
 /// <summary>
 /// DbContext do módulo Audit.

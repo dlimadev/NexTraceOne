@@ -1,10 +1,10 @@
 using Ardalis.GuardClauses;
+
+using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Audit.Application.Abstractions;
-using NexTraceOne.Audit.Domain.Errors;
 
-namespace NexTraceOne.Audit.Application.Features.VerifyChainIntegrity;
+namespace NexTraceOne.AuditCompliance.Application.Features.VerifyChainIntegrity;
 
 /// <summary>
 /// Feature: VerifyChainIntegrity — verifica a integridade da cadeia de hash SHA-256.

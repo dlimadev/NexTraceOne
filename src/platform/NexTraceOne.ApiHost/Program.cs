@@ -6,24 +6,27 @@ using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.ApiHost;
-using NexTraceOne.Identity.API;
 using NexTraceOne.Catalog.API.Graph;
-using NexTraceOne.Contracts.API;
-using NexTraceOne.ChangeIntelligence.API;
-using NexTraceOne.RulesetGovernance.API;
-using NexTraceOne.Workflow.API;
-using NexTraceOne.Promotion.API;
-using NexTraceOne.Audit.API;
-using NexTraceOne.DeveloperPortal.API;
 using NexTraceOne.Governance.API;
-using NexTraceOne.RuntimeIntelligence.API;
-using NexTraceOne.CostIntelligence.API;
-using NexTraceOne.AiGovernance.API;
-using NexTraceOne.ExternalAi.API;
-using NexTraceOne.AiOrchestration.API;
+
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
+
+using NexTraceOne.AIKnowledge.API.ExternalAI.Endpoints;
+using NexTraceOne.AIKnowledge.API.Governance.Endpoints;
+using NexTraceOne.AIKnowledge.API.Orchestration.Endpoints;
+using NexTraceOne.AuditCompliance.API.Endpoints;
+using NexTraceOne.Catalog.API.Contracts.Endpoints;
+using NexTraceOne.Catalog.API.Graph.Endpoints;
+using NexTraceOne.Catalog.API.Portal.Endpoints;
+using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
+using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
+using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
+using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
+using NexTraceOne.IdentityAccess.API.Endpoints;
+using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
+using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Sovereign Change Intelligence Platform
@@ -64,13 +67,19 @@ builder.Services.AddAiGovernanceModule(builder.Configuration);
 builder.Services.AddExternalAiModule(builder.Configuration);
 builder.Services.AddAiOrchestrationModule(builder.Configuration);
 
-// [5] OpenAPI
+// [5] JSON — serialização de enums como strings para Minimal API
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
+// [6] OpenAPI
 builder.Services.AddOpenApi();
 
-// [6] CORS — validação de origens e configuração restritiva
+// [7] CORS — validação de origens e configuração restritiva
 builder.AddCorsConfiguration();
 
-// [7] Rate Limiting — proteção contra abuso nas APIs públicas
+// [8] Rate Limiting — proteção contra abuso nas APIs públicas
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -95,11 +104,11 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-// [8] Tratamento de exceções não capturadas
+// [9] Tratamento de exceções não capturadas
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddProblemDetails();
 
-// [9] Compressão de respostas — melhoria de performance nas APIs
+// [10] Compressão de respostas — melhoria de performance nas APIs
 builder.Services.AddResponseCompression();
 
 var app = builder.Build();

@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Workflow.Domain.Enums;
-using NexTraceOne.Workflow.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Errors;
 
-namespace NexTraceOne.Workflow.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
 
 /// <summary>
 /// Aggregate Root que representa uma instância em execução de um workflow de aprovação.

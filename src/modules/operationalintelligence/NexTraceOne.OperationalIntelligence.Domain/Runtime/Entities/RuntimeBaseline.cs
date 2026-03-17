@@ -1,10 +1,9 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
-using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.RuntimeIntelligence.Domain.Errors;
 
-namespace NexTraceOne.RuntimeIntelligence.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
 /// <summary>
 /// Entidade que representa a baseline esperada de métricas de runtime de um serviço.

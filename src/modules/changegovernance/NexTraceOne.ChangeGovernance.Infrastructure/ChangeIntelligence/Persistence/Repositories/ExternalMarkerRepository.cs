@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de marcadores externos de ferramentas CI/CD.

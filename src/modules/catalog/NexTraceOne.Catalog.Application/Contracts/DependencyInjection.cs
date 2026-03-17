@@ -1,34 +1,36 @@
 using FluentValidation;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.Contracts.Application.Features.AddDraftExample;
-using NexTraceOne.Contracts.Application.Features.ApproveDraft;
-using NexTraceOne.Contracts.Application.Features.ClassifyBreakingChange;
-using NexTraceOne.Contracts.Application.Features.ComputeSemanticDiff;
-using NexTraceOne.Contracts.Application.Features.CreateContractVersion;
-using NexTraceOne.Contracts.Application.Features.CreateDraft;
-using NexTraceOne.Contracts.Application.Features.EvaluateContractRules;
-using NexTraceOne.Contracts.Application.Features.ExportContract;
-using NexTraceOne.Contracts.Application.Features.GenerateDraftFromAi;
-using NexTraceOne.Contracts.Application.Features.GenerateEvidencePack;
-using NexTraceOne.Contracts.Application.Features.GenerateScorecard;
-using NexTraceOne.Contracts.Application.Features.GetCompatibilityAssessment;
-using NexTraceOne.Contracts.Application.Features.GetContractHistory;
-using NexTraceOne.Contracts.Application.Features.GetDraft;
-using NexTraceOne.Contracts.Application.Features.ImportContract;
-using NexTraceOne.Contracts.Application.Features.ListDraftReviews;
-using NexTraceOne.Contracts.Application.Features.ListDrafts;
-using NexTraceOne.Contracts.Application.Features.LockContractVersion;
-using NexTraceOne.Contracts.Application.Features.PublishDraft;
-using NexTraceOne.Contracts.Application.Features.RejectDraft;
-using NexTraceOne.Contracts.Application.Features.SubmitDraftForReview;
-using NexTraceOne.Contracts.Application.Features.SuggestSemanticVersion;
-using NexTraceOne.Contracts.Application.Features.UpdateDraftContent;
-using NexTraceOne.Contracts.Application.Features.UpdateDraftMetadata;
-using NexTraceOne.Contracts.Application.Features.ValidateContractIntegrity;
 
-namespace NexTraceOne.Contracts.Application;
+using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample;
+using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
+using NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.EvaluateContractRules;
+using NexTraceOne.Catalog.Application.Contracts.Features.ExportContract;
+using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
+using NexTraceOne.Catalog.Application.Contracts.Features.GenerateEvidencePack;
+using NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.ImportContract;
+using NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews;
+using NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts;
+using NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion;
+using NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview;
+using NexTraceOne.Catalog.Application.Contracts.Features.SuggestSemanticVersion;
+using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
+using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata;
+using NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity;
+
+namespace NexTraceOne.Catalog.Application.Contracts;
 
 /// <summary>
 /// Registra serviços da camada Application do módulo Contracts.

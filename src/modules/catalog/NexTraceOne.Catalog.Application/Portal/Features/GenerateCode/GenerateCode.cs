@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GenerateCode;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GenerateCode;
 
 /// <summary>
 /// Feature: GenerateCode — gera artefactos de código a partir de contrato OpenAPI.

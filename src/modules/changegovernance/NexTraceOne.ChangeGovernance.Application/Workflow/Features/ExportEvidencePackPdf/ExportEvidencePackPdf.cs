@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Workflow.Application.Abstractions;
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Errors;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Errors;
 
-namespace NexTraceOne.Workflow.Application.Features.ExportEvidencePackPdf;
+namespace NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf;
 
 /// <summary>
 /// Feature: ExportEvidencePackPdf — exporta os dados estruturados do evidence pack para geração futura de PDF.

@@ -1,4 +1,4 @@
-namespace NexTraceOne.Audit.Contracts.ServiceInterfaces;
+namespace NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo Audit.

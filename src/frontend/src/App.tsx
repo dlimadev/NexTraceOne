@@ -19,13 +19,19 @@ const MySessionsPage = lazy(() => import('./features/identity-access/pages/MySes
 const UnauthorizedPage = lazy(() => import('./features/identity-access/pages/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
 
 // ── Catalog (lazy) ──
-const ContractsPage = lazy(() => import('./features/catalog/pages/ContractsPage').then(m => ({ default: m.ContractsPage })));
 const ServiceCatalogPage = lazy(() => import('./features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
 const ServiceCatalogListPage = lazy(() => import('./features/catalog/pages/ServiceCatalogListPage').then(m => ({ default: m.ServiceCatalogListPage })));
 const ServiceDetailPage = lazy(() => import('./features/catalog/pages/ServiceDetailPage').then(m => ({ default: m.ServiceDetailPage })));
 const DeveloperPortalPage = lazy(() => import('./features/catalog/pages/DeveloperPortalPage').then(m => ({ default: m.DeveloperPortalPage })));
-const ContractListPage = lazy(() => import('./features/catalog/pages/ContractListPage').then(m => ({ default: m.ContractListPage })));
-const ContractDetailPage = lazy(() => import('./features/catalog/pages/ContractDetailPage').then(m => ({ default: m.ContractDetailPage })));
+
+// ── Contracts (refactored — lazy) ──
+const ContractCatalogPage = lazy(() => import('./features/contracts/catalog/ContractCatalogPage').then(m => ({ default: m.ContractCatalogPage })));
+const CreateServicePage = lazy(() => import('./features/contracts/create/CreateServicePage').then(m => ({ default: m.CreateServicePage })));
+const ContractWorkspacePage = lazy(() => import('./features/contracts/workspace/ContractWorkspacePage').then(m => ({ default: m.ContractWorkspacePage })));
+const ContractPortalPage = lazy(() => import('./features/contracts/portal/ContractPortalPage').then(m => ({ default: m.ContractPortalPage })));
+const ContractGovernancePage = lazy(() => import('./features/contracts/governance/ContractGovernancePage').then(m => ({ default: m.ContractGovernancePage })));
+const SpectralRulesetManagerPage = lazy(() => import('./features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
+const CanonicalEntityCatalogPage = lazy(() => import('./features/contracts/canonical/CanonicalEntityCatalogPage').then(m => ({ default: m.CanonicalEntityCatalogPage })));
 const SourceOfTruthExplorerPage = lazy(() => import('./features/catalog/pages/SourceOfTruthExplorerPage').then(m => ({ default: m.SourceOfTruthExplorerPage })));
 const ServiceSourceOfTruthPage = lazy(() => import('./features/catalog/pages/ServiceSourceOfTruthPage').then(m => ({ default: m.ServiceSourceOfTruthPage })));
 const ContractSourceOfTruthPage = lazy(() => import('./features/catalog/pages/ContractSourceOfTruthPage').then(m => ({ default: m.ContractSourceOfTruthPage })));
@@ -190,15 +196,50 @@ export default function App() {
                 path="/contracts"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractListPage />
+                    <ContractCatalogPage />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/contracts/studio"
+                path="/contracts/new"
+                element={
+                  <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+                    <CreateServicePage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Legacy redirects — preservados para evitar bookmarks quebrados */}
+              <Route path="/contracts/studio" element={<Navigate to="/contracts" replace />} />
+              <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
+              <Route
+                path="/contracts/governance"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractsPage />
+                    <ContractGovernancePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/spectral"
+                element={
+                  <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+                    <SpectralRulesetManagerPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/canonical"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <CanonicalEntityCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/:contractVersionId/portal"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractPortalPage />
                   </ProtectedRoute>
                 }
               />
@@ -206,7 +247,7 @@ export default function App() {
                 path="/contracts/:contractVersionId"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractDetailPage />
+                    <ContractWorkspacePage />
                   </ProtectedRoute>
                 }
               />

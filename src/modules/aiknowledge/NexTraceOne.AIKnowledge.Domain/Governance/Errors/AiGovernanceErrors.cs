@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Domain.Errors;
+namespace NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo AiGovernance com códigos i18n.

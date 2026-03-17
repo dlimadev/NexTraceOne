@@ -1,16 +1,17 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
-using RegisterExternalMarkerFeature = NexTraceOne.ChangeIntelligence.Application.Features.RegisterExternalMarker.RegisterExternalMarker;
-using CreateFreezeWindowFeature = NexTraceOne.ChangeIntelligence.Application.Features.CreateFreezeWindow.CreateFreezeWindow;
-using CheckFreezeConflictFeature = NexTraceOne.ChangeIntelligence.Application.Features.CheckFreezeConflict.CheckFreezeConflict;
-using RecordReleaseBaselineFeature = NexTraceOne.ChangeIntelligence.Application.Features.RecordReleaseBaseline.RecordReleaseBaseline;
-using StartPostReleaseReviewFeature = NexTraceOne.ChangeIntelligence.Application.Features.StartPostReleaseReview.StartPostReleaseReview;
-using ProgressPostReleaseReviewFeature = NexTraceOne.ChangeIntelligence.Application.Features.ProgressPostReleaseReview.ProgressPostReleaseReview;
-using AssessRollbackViabilityFeature = NexTraceOne.ChangeIntelligence.Application.Features.AssessRollbackViability.AssessRollbackViability;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Tests.Application.Features;
+using RegisterExternalMarkerFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker.RegisterExternalMarker;
+using CreateFreezeWindowFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CreateFreezeWindow.CreateFreezeWindow;
+using CheckFreezeConflictFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CheckFreezeConflict.CheckFreezeConflict;
+using RecordReleaseBaselineFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordReleaseBaseline.RecordReleaseBaseline;
+using StartPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.StartPostReleaseReview.StartPostReleaseReview;
+using ProgressPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ProgressPostReleaseReview.ProgressPostReleaseReview;
+using AssessRollbackViabilityFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AssessRollbackViability.AssessRollbackViability;
+
+namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Application.Features;
 
 /// <summary>
 /// Testes de handlers da camada Application para os novos features de

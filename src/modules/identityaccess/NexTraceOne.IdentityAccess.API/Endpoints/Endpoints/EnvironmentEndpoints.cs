@@ -1,12 +1,15 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ListEnvironmentsFeature = NexTraceOne.Identity.Application.Features.ListEnvironments.ListEnvironments;
-using GrantEnvironmentAccessFeature = NexTraceOne.Identity.Application.Features.GrantEnvironmentAccess.GrantEnvironmentAccess;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using ListEnvironmentsFeature = NexTraceOne.IdentityAccess.Application.Features.ListEnvironments.ListEnvironments;
+using GrantEnvironmentAccessFeature = NexTraceOne.IdentityAccess.Application.Features.GrantEnvironmentAccess.GrantEnvironmentAccess;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de gestão de ambientes (Environment) do módulo Identity.

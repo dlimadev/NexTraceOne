@@ -1,14 +1,17 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using MediatR;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
-using NexTraceOne.DeveloperPortal.Domain.Errors;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Errors;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.DeleteSubscription;
+namespace NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription;
 
 /// <summary>
 /// Feature: DeleteSubscription — remove subscrição de notificações de uma API.

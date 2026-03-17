@@ -1,13 +1,16 @@
-using Microsoft.AspNetCore.Builder;
 using MediatR;
-using NexTraceOne.BuildingBlocks.Application.Localization;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
-using NexTraceOne.BuildingBlocks.Security.Extensions;
-using RequestBreakGlassFeature = NexTraceOne.Identity.Application.Features.RequestBreakGlass.RequestBreakGlass;
-using RevokeBreakGlassFeature = NexTraceOne.Identity.Application.Features.RevokeBreakGlass.RevokeBreakGlass;
-using ListBreakGlassFeature = NexTraceOne.Identity.Application.Features.ListBreakGlassRequests.ListBreakGlassRequests;
 
-namespace NexTraceOne.Identity.API.Endpoints;
+using Microsoft.AspNetCore.Builder;
+
+using NexTraceOne.BuildingBlocks.Application.Extensions;
+using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
+
+using RequestBreakGlassFeature = NexTraceOne.IdentityAccess.Application.Features.RequestBreakGlass.RequestBreakGlass;
+using RevokeBreakGlassFeature = NexTraceOne.IdentityAccess.Application.Features.RevokeBreakGlass.RevokeBreakGlass;
+using ListBreakGlassFeature = NexTraceOne.IdentityAccess.Application.Features.ListBreakGlassRequests.ListBreakGlassRequests;
+
+namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de acesso emergencial (Break Glass) — funcionalidade enterprise v1.1.

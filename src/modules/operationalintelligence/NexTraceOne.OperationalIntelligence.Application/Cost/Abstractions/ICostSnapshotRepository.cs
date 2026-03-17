@@ -1,6 +1,6 @@
-using NexTraceOne.CostIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
-namespace NexTraceOne.CostIntelligence.Application.Abstractions;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 
 /// <summary>
 /// Contrato de repositório para a entidade CostSnapshot.

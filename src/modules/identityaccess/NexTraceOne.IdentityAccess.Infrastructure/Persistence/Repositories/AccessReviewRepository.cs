@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Infrastructure.Persistence;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Repositories;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Implementação EF Core do repositório de campanhas de access review.

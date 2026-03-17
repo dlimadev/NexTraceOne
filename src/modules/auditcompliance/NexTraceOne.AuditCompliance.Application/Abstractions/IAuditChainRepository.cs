@@ -1,6 +1,6 @@
-using NexTraceOne.Audit.Domain.Entities;
+using NexTraceOne.AuditCompliance.Domain.Entities;
 
-namespace NexTraceOne.Audit.Application.Abstractions;
+namespace NexTraceOne.AuditCompliance.Application.Abstractions;
 
 /// <summary>
 /// Repositório da cadeia de hash de auditoria.

@@ -1,9 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.Identity.Domain.Entities;
 using System.Text.Json;
 
-namespace NexTraceOne.Identity.Infrastructure.Persistence.Configurations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para Delegation.

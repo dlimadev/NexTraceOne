@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.CostIntelligence.Domain.Errors;
+namespace NexTraceOne.OperationalIntelligence.Domain.Cost.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo CostIntelligence com códigos i18n.

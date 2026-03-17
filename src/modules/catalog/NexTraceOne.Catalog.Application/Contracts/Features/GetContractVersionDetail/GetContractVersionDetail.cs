@@ -1,13 +1,15 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Contracts.Application.Abstractions;
-using NexTraceOne.Contracts.Domain.Entities;
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.Errors;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
 
-namespace NexTraceOne.Contracts.Application.Features.GetContractVersionDetail;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.GetContractVersionDetail;
 
 /// <summary>
 /// Feature: GetContractVersionDetail — retorna detalhes completos de uma versão de contrato,
@@ -54,6 +56,7 @@ public static class GetContractVersionDetail
                 version.Id.Value,
                 version.ApiAssetId,
                 version.SemVer,
+                version.SpecContent,
                 version.Protocol,
                 version.LifecycleState,
                 version.Format,
@@ -70,6 +73,7 @@ public static class GetContractVersionDetail
                 version.DeprecationNotice,
                 version.DeprecationDate,
                 version.SunsetDate,
+                version.CreatedAt,
                 violations,
                 artifacts);
         }
@@ -97,6 +101,7 @@ public static class GetContractVersionDetail
         Guid Id,
         Guid ApiAssetId,
         string SemVer,
+        string SpecContent,
         ContractProtocol Protocol,
         ContractLifecycleState LifecycleState,
         string Format,
@@ -113,6 +118,7 @@ public static class GetContractVersionDetail
         string? DeprecationNotice,
         DateTimeOffset? DeprecationDate,
         DateTimeOffset? SunsetDate,
+        DateTimeOffset CreatedAt,
         IReadOnlyList<RuleViolationDto> RuleViolations,
         IReadOnlyList<ArtifactDto> Artifacts);
 }

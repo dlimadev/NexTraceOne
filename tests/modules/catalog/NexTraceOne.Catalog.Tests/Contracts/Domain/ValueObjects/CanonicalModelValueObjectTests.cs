@@ -1,7 +1,7 @@
-using NexTraceOne.Contracts.Domain.Enums;
-using NexTraceOne.Contracts.Domain.ValueObjects;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
-namespace NexTraceOne.Contracts.Tests.Domain.ValueObjects;
+namespace NexTraceOne.Catalog.Tests.Contracts.Domain.ValueObjects;
 
 /// <summary>
 /// Testes unitários para os value objects do modelo canônico:

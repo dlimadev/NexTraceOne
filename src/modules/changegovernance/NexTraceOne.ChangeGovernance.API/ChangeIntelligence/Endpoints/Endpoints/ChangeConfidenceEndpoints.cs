@@ -1,21 +1,24 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
-using ListChangesFeature = NexTraceOne.ChangeIntelligence.Application.Features.ListChanges.ListChanges;
-using GetChangesSummaryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangesSummary.GetChangesSummary;
-using ListChangesByServiceFeature = NexTraceOne.ChangeIntelligence.Application.Features.ListChangesByService.ListChangesByService;
-using GetReleaseFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetRelease.GetRelease;
-using GetBlastRadiusFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetBlastRadiusReport.GetBlastRadiusReport;
-using GetIntelligenceSummaryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
-using GetChangeAdvisoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeAdvisory.GetChangeAdvisory;
-using RecordChangeDecisionFeature = NexTraceOne.ChangeIntelligence.Application.Features.RecordChangeDecision.RecordChangeDecision;
-using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.API.Endpoints;
+using ListChangesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListChanges.ListChanges;
+using GetChangesSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangesSummary.GetChangesSummary;
+using ListChangesByServiceFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListChangesByService.ListChangesByService;
+using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
+using GetBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetBlastRadiusReport.GetBlastRadiusReport;
+using GetIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
+using GetChangeAdvisoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory.GetChangeAdvisory;
+using RecordChangeDecisionFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision.RecordChangeDecision;
+using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de Change Confidence do NexTraceOne.

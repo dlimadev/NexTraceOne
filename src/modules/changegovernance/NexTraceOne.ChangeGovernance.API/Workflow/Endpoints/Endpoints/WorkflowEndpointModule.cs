@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace NexTraceOne.Workflow.API.Endpoints;
+namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints.Endpoints;
 
 /// <summary>
 /// Orquestrador de endpoints Minimal API do módulo Workflow.

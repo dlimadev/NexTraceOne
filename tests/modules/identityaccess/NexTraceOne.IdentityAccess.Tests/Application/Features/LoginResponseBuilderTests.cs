@@ -1,13 +1,10 @@
-using FluentAssertions;
-using NSubstitute;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Application.Features;
-using LocalLoginFeature = NexTraceOne.Identity.Application.Features.LocalLogin.LocalLogin;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.ValueObjects;
-using NexTraceOne.Identity.Tests.TestDoubles;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.Features;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
-namespace NexTraceOne.Identity.Tests.Application.Features;
+namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes do serviço LoginResponseBuilder.

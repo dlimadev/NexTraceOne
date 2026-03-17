@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Domain.Enums;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.AiGovernance.Application.Features.ListModels;
+namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListModels;
 
 /// <summary>
 /// Feature: ListModels — lista modelos do Model Registry com filtros opcionais.

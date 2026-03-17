@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
+using NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
+using NexTraceOne.AIKnowledge.Domain.Orchestration.Errors;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.AiOrchestration.Domain.Enums;
-using NexTraceOne.AiOrchestration.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
-namespace NexTraceOne.AiOrchestration.Domain.Entities;
+namespace NexTraceOne.AIKnowledge.Domain.Orchestration.Entities;
 
 /// <summary>
 /// Representa uma conversa multi-turno com IA sobre uma mudança, release ou erro específico.

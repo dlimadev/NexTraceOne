@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.Audit.Domain.Errors;
+namespace NexTraceOne.AuditCompliance.Domain.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo Audit com códigos i18n.

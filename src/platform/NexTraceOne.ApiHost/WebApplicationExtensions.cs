@@ -1,13 +1,16 @@
-using NexTraceOne.Identity.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Contracts.Infrastructure.Persistence;
-using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
-using NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
-using NexTraceOne.Workflow.Infrastructure.Persistence;
-using NexTraceOne.Promotion.Infrastructure.Persistence;
 using NexTraceOne.Audit.Infrastructure.Persistence;
-using NexTraceOne.DeveloperPortal.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using Microsoft.EntityFrameworkCore;
+
+using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 namespace NexTraceOne.ApiHost;
 
@@ -54,6 +57,7 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<PromotionDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<IncidentDbContext>(migrationScope, pendingContexts);
 
             logger.LogInformation(
                 "Migrations applied successfully for: {Contexts}",

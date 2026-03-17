@@ -1,12 +1,13 @@
 using Ardalis.GuardClauses;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Errors;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Errors;
 
-namespace NexTraceOne.Identity.Application.Features.ListMyTenants;
+namespace NexTraceOne.IdentityAccess.Application.Features.ListMyTenants;
 
 /// <summary>
 /// Feature: ListMyTenants — lista os tenants disponíveis para o usuário autenticado.

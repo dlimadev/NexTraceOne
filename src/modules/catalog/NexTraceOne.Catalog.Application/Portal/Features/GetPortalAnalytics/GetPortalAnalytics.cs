@@ -1,11 +1,13 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
 
-namespace NexTraceOne.DeveloperPortal.Application.Features.GetPortalAnalytics;
+namespace NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics;
 
 /// <summary>
 /// Feature: GetPortalAnalytics — retorna métricas de adoção e uso do Developer Portal.

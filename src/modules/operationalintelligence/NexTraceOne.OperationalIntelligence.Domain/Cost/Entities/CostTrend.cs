@@ -1,12 +1,12 @@
 using Ardalis.GuardClauses;
-using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Domain.Enums;
-using NexTraceOne.CostIntelligence.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Errors;
 
-namespace NexTraceOne.CostIntelligence.Domain.Entities;
+namespace NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
 /// <summary>
 /// Entidade que representa a análise de tendência de custo de um serviço ao longo de um período.

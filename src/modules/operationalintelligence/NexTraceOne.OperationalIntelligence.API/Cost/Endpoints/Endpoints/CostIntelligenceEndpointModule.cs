@@ -1,18 +1,21 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using IngestCostSnapshotFeature = NexTraceOne.CostIntelligence.Application.Features.IngestCostSnapshot.IngestCostSnapshot;
-using GetCostReportFeature = NexTraceOne.CostIntelligence.Application.Features.GetCostReport.GetCostReport;
-using GetCostByReleaseFeature = NexTraceOne.CostIntelligence.Application.Features.GetCostByRelease.GetCostByRelease;
-using GetCostByRouteFeature = NexTraceOne.CostIntelligence.Application.Features.GetCostByRoute.GetCostByRoute;
-using GetCostDeltaFeature = NexTraceOne.CostIntelligence.Application.Features.GetCostDelta.GetCostDelta;
-using AttributeCostToServiceFeature = NexTraceOne.CostIntelligence.Application.Features.AttributeCostToService.AttributeCostToService;
-using ComputeCostTrendFeature = NexTraceOne.CostIntelligence.Application.Features.ComputeCostTrend.ComputeCostTrend;
-using AlertCostAnomalyFeature = NexTraceOne.CostIntelligence.Application.Features.AlertCostAnomaly.AlertCostAnomaly;
 
-namespace NexTraceOne.CostIntelligence.API.Endpoints;
+using IngestCostSnapshotFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.IngestCostSnapshot.IngestCostSnapshot;
+using GetCostReportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostReport.GetCostReport;
+using GetCostByReleaseFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRelease.GetCostByRelease;
+using GetCostByRouteFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRoute.GetCostByRoute;
+using GetCostDeltaFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostDelta.GetCostDelta;
+using AttributeCostToServiceFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.AttributeCostToService.AttributeCostToService;
+using ComputeCostTrendFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ComputeCostTrend.ComputeCostTrend;
+using AlertCostAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAnomaly.AlertCostAnomaly;
+
+namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo CostIntelligence.

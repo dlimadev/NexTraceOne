@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
-using NexTraceOne.BuildingBlocks.Application.Extensions;
 
-namespace NexTraceOne.ExternalAi.API.Endpoints;
+namespace NexTraceOne.AIKnowledge.API.ExternalAI.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo ExternalAi.

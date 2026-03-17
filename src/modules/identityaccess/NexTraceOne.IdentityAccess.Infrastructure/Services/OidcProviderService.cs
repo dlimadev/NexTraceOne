@@ -1,10 +1,12 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using NexTraceOne.Identity.Application.Abstractions;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace NexTraceOne.Identity.Infrastructure.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Implementação de referência do IOidcProvider para MVP1.

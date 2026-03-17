@@ -1,272 +1,455 @@
-# DESIGN.md
+# DESIGN.md — NexTraceOne
 
-## Objetivo
+## 1. Visão de design do produto
 
-Definir a identidade visual oficial do NexTraceOne para garantir
-consistência entre login, Home, módulos, fluxos administrativos,
-experiências por persona e interfaces assistidas por IA.
+O NexTraceOne deve ser percebido como uma **plataforma enterprise unificada para governança, observabilidade, inteligência de mudanças e operação orientada por contexto**.
 
-------------------------------------------------------------------------
+A visão de design não é apenas “fazer telas bonitas”.  
+É construir uma experiência onde o usuário sente que:
 
-## Princípios visuais
+- entende o estado da plataforma rapidamente
+- consegue localizar APIs, serviços, riscos e incidentes com clareza
+- navega por contextos complexos sem se perder
+- confia na ferramenta para tomar decisão operacional
+- percebe maturidade, segurança e alto nível de engenharia
 
-A interface do NexTraceOne deve ser:
+A tela de login já desenhada é a fundação visual e emocional dessa experiência.
 
--   enterprise
--   sóbria
--   premium
--   clara
--   consistente
--   confiável
--   orientada à decisão
--   preparada para alta densidade de informação sem poluição visual
+---
 
-A experiência visual não deve parecer:
+## 2. Papel da tela de login
 
--   gamer
--   cyberpunk
--   sci-fi exagerada
--   marketing landing page
--   dashboard genérico de observabilidade
+A tela de login do NexTraceOne não é só uma porta de entrada.  
+Ela estabelece as quatro promessas visuais do produto:
 
-------------------------------------------------------------------------
+### 2.1 Promessa 1 — Plataforma séria e enterprise
+O layout, o contraste, a organização e a mensagem textual posicionam a solução como produto corporativo de alto valor.
 
-## Direção estética
+### 2.2 Promessa 2 — Tecnologia com clareza
+Mesmo com visual sofisticado, a interface permanece legível, objetiva e centrada em leitura rápida.
 
-O NexTraceOne deve seguir uma identidade **dark enterprise** com:
+### 2.3 Promessa 3 — Segurança e controle
+O card de autenticação transmite confiança, estabilidade e sensação de ambiente gerenciado.
 
--   fundo escuro elegante
--   gradientes suaves
--   grid discreto
--   brilho sutil em pontos de destaque
--   cards limpos
--   bordas discretas
--   hierarquia tipográfica forte
--   espaçamento generoso
--   sensação de produto corporativo real
+### 2.4 Promessa 4 — Inteligência operacional
+O preview gráfico e os chips funcionais comunicam que o produto é operacional, analítico e vivo.
 
-------------------------------------------------------------------------
+Tudo no restante da plataforma precisa honrar essas promessas.
 
-## Fundo oficial da aplicação
+---
 
-O fundo visual deve manter consistência com a tela de login aprovada.
+## 3. North Star da experiência
 
-### Características obrigatórias
+A experiência ideal do NexTraceOne pode ser resumida assim:
 
--   base em azul marinho muito escuro / azul petróleo
--   gradientes suaves em azul, ciano e verde/teal
--   glow muito sutil
--   grid técnico discreto
--   profundidade visual leve
--   sem divisórias agressivas
--   sem texturas chamativas
+> “Entrar, entender o cenário, localizar o problema ou a oportunidade e agir com confiança.”
 
-### Regra obrigatória
+Essa é a régua para avaliar qualquer decisão de design.
 
-Login, Home e módulos devem compartilhar a mesma família visual de
-fundo.
+---
 
-------------------------------------------------------------------------
+## 4. Pilares da experiência
 
-## Paleta principal
+## 4.1 Contexto sempre visível
+O usuário precisa saber o tempo todo:
 
-### Base
+- em qual workspace/tenant está
+- qual ambiente está analisando
+- qual módulo está usando
+- qual janela temporal está aplicada
+- qual entidade está em foco
 
--   `#040D19`
--   `#061527`
--   `#0A1D33`
--   `#0D1F38`
+## 4.2 Hierarquia operacional
+A tela deve mostrar primeiro:
+- o que importa agora
+- o que mudou
+- o que está em risco
+- o que exige ação
 
-### Superfícies / cards
+## 4.3 Drill-down natural
+O usuário deve conseguir sair do macro para o detalhe sem ruptura visual:
 
--   `#0F1B2E`
--   `#132238`
--   `rgba(16, 29, 53, 0.76)`
--   `rgba(10, 21, 40, 0.82)`
+- overview → domínio → serviço → API → versão → evento/política/evidência
 
-### Texto
+## 4.4 Consistência entre módulos
+Mesmo quando a natureza do conteúdo muda, o comportamento visual deve se manter coerente.
 
--   Primário: `#E7EEF8`
--   Secundário: `#B2BFD0`
--   Terciário: `#8FA0B7`
+## 4.5 Densidade com legibilidade
+A plataforma pode ser rica em dados, mas deve sempre preservar leitura e priorização.
 
-### Acentos
+---
 
--   Cyan: `#22D3EE`
--   Teal: `#14B8A6`
--   Green: `#34D399`
--   Blue accent: `#60A5FA`
+## 5. Tradução da identidade em experiência
 
-### Estados
+## 5.1 O que o produto deve “parecer”
+- command center corporativo
+- plataforma de inteligência operacional
+- cockpit de governança e observabilidade
+- ambiente de alta confiabilidade
 
--   Success: `#34D399`
--   Warning: `#F59E0B`
--   Error: `#F87171`
--   Info: `#93C5FD`
+## 5.2 O que o produto não deve “parecer”
+- painel genérico de BI
+- admin panel comum
+- site de marketing escuro
+- dashboard colorido sem rigor semântico
 
-------------------------------------------------------------------------
+---
 
-## Tipografia
+## 6. Direção visual macro
 
-### Fontes recomendadas
+## 6.1 Background
+Fundo escuro profundo com nuances frias, reforçando seriedade e tecnologia.
 
--   Inter
--   Segoe UI
--   IBM Plex Sans
+## 6.2 Surface language
+Painéis escuros com borda delicada, brilho sutil e sensação de material premium.
+
+## 6.3 Accent logic
+Poucos acentos, usados para:
+- foco
+- saúde
+- status
+- risco
+- chamada à ação
+
+## 6.4 Information framing
+Informação sempre enquadrada em blocos claros:
+- cards
+- seções
+- tabelas
+- timelines
+- mapas
+- painéis laterais
+
+---
+
+## 7. Arquitetura de navegação do produto
+
+## 7.1 App shell
+O shell da aplicação é o principal mecanismo de orientação.
+
+### Sidebar
+Responsável por:
+- navegação primária por módulos
+- leitura da estrutura do produto
+- reforço do módulo atual
+
+### Topbar
+Responsável por:
+- contexto de tenant/workspace
+- busca global
+- notificações
+- atalhos
+- ações de perfil e ambiente
+
+## 7.2 Estrutura de página
+Cada página do NexTraceOne deve, em regra, conter:
+
+1. contexto da página
+2. sinais principais
+3. bloco analítico
+4. caminhos de ação
+5. profundidade opcional
+
+---
+
+## 8. Famílias de telas
+
+## 8.1 Auth
+Telas:
+- login
+- recuperação de senha
+- ativação
+- seleção de workspace
+- SSO/OIDC
+- MFA/2FA
+- convite
 
 ### Regras
+- composição limpa
+- hero institucional consistente
+- card de autenticação estável
+- foco absoluto em confiança e clareza
 
--   títulos com peso forte e legibilidade alta
--   corpo com leitura confortável
--   evitar tipografia futurista
--   evitar excesso de contraste visual
--   priorizar clareza e contexto
+## 8.2 Overview / Command center
+Telas que consolidam:
+- platform health
+- mudanças recentes
+- risco
+- incidentes ativos
+- topologia
+- insights
+- compliance
 
-------------------------------------------------------------------------
+### Regras
+- visão executiva primeiro
+- cards de KPI no topo
+- drill-down claro
+- pouco ruído visual
 
-## Componentes base
+## 8.3 Catálogo e inventário
+Telas:
+- catálogo de serviços
+- catálogo de APIs
+- assets técnicos
+- domínios, owners, consumers, producers, versões
 
-### Cards
+### Regras
+- busca e filtro fortes
+- tabelas enterprise
+- cards de resumo
+- detalhes em abas e seções
 
--   cantos arredondados
--   bordas discretas
--   fundo escuro translúcido/controlado
--   sombra suave
--   cabeçalho claro
--   rodapé opcional para ações
+## 8.4 Governança
+Telas:
+- policies
+- compliance center
+- scorecards
+- ownership
+- documentação
+- lifecycle
+- changelog
 
-### Tabelas
+### Regras
+- status semântico muito claro
+- visualização de aderência
+- gaps e violações fáceis de localizar
 
--   alta legibilidade
--   linhas discretas
--   densidade controlada
--   filtros claros
--   paginação simples
--   sem visual "planilha antiga"
+## 8.5 Observabilidade e operação
+Telas:
+- telemetria
+- traces
+- métricas
+- logs
+- runbooks
+- incidentes
+- timeline de mudanças
 
-### Formulários
+### Regras
+- leitura temporal forte
+- filtros poderosos
+- correlação visual entre eventos
 
--   campos altos e legíveis
--   ícones discretos
--   foco visível
--   estados de erro consistentes
--   labels sempre via i18n
+## 8.6 Configuração e administração
+Telas:
+- organization
+- identity & access
+- integrações
+- políticas
+- settings
 
-### Menu lateral
+### Regras
+- menos cenografia, mais clareza
+- formulários robustos
+- padrões de segurança visíveis
+- feedback explícito
 
--   flat e corporativo
--   item ativo com destaque lateral sutil
--   sem glow exagerado
--   grupos bem definidos
--   ordem adaptável por persona
+---
 
-### Top bar
+## 9. Blueprint da experiência por áreas
 
--   search contextual
--   ambiente
--   período
--   perfil
--   ações rápidas
--   design discreto
+## 9.1 Login
+### Objetivo
+Entrar no sistema com segurança e confiança.
 
-------------------------------------------------------------------------
+### Elementos chave
+- branding
+- headline clara
+- prova visual de valor
+- workspace
+- email
+- senha
+- manter sessão
+- recuperar senha
+- CTA principal
+- CTA SSO/OIDC
 
-## Design por persona
+### Sensação desejada
+“Estou entrando em uma plataforma corporativa séria, moderna e confiável.”
 
-A identidade visual é a mesma para todos, mas o conteúdo muda por
-persona.
+## 9.2 Dashboard / Overview
+### Objetivo
+Entender o estado atual da plataforma em poucos segundos.
 
-### Engineer / Tech Lead
+### Estrutura ideal
+- header com contexto
+- KPI cards
+- incidentes e risco
+- mudanças recentes
+- mapa/topologia
+- insights e compliance
+- links de aprofundamento
 
--   mais contexto operacional
--   mais densidade
--   ações rápidas visíveis
+### Sensação desejada
+“Consigo ver o que está saudável, o que mudou e o que exige atenção.”
 
-### Architect
+## 9.3 Catálogo de serviços e APIs
+### Objetivo
+Descobrir, filtrar e navegar por ativos com clareza.
 
--   mais visão estrutural
--   dependências e consistência em evidência
+### Estrutura ideal
+- busca poderosa
+- filtros persistentes
+- tabela principal
+- score/status por linha
+- detalhes em painel ou página dedicada
 
-### Product / Executive
+### Sensação desejada
+“Tudo está catalogado, rastreável e governado.”
 
--   linguagem menos técnica
--   foco em risco, impacto e evolução
--   simplificação de ruído técnico
+## 9.4 Detalhe de entidade
+### Pode ser
+- serviço
+- API
+- versão
+- domínio
+- incidente
+- política
+- evidência
 
-### Platform Admin / Auditor
+### Estrutura ideal
+- header rico
+- status
+- owner
+- criticidade
+- abas
+- timeline
+- relações/dependências
+- ações
 
--   layouts orientados a governança, políticas e evidência
+### Sensação desejada
+“Tenho contexto suficiente para decidir sem caçar informação em várias telas.”
 
-------------------------------------------------------------------------
+---
 
-## Padrões para IA na UI
+## 10. Regras de priorização visual
 
-### Chat / Assistant
+## 10.1 Em cada tela, definir explicitamente
+- o que é mais importante
+- o que é monitorado
+- o que é ação
+- o que é contexto auxiliar
 
-A experiência de IA deve lembrar interfaces modernas de copiloto, mas
-com identidade própria.
+## 10.2 Ordem recomendada de leitura
+1. título e escopo
+2. status e KPIs
+3. alertas e exceções
+4. conteúdo analítico
+5. ações secundárias
 
-#### Regras
+---
 
--   layout limpo
--   conversas com forte contexto
--   destaque claro para fontes/artefatos usados
--   separação entre prompt, resposta, evidência e ação
--   escolha de modelo apenas para perfis autorizados
--   mostrar quando a resposta usa IA interna ou externa, se aplicável
+## 11. Conteúdo e microcopy
 
-### Contract Studio
+## 11.1 Tom
+- profissional
+- direto
+- sem excesso de marketing
+- preciso
+- claro
 
-O editor de contratos pode se inspirar na clareza do Swagger Editor, mas
-deve manter a identidade do NexTraceOne.
+## 11.2 Exemplos corretos
+- “Abrir incidents”
+- “Ver topologia”
+- “Analisar impacto”
+- “Executar runbook”
+- “Aplicar política”
+- “Revisar evidências”
 
-#### Regras
+## 11.3 Exemplos ruins
+- “Magic insights”
+- “Awesome dashboard”
+- “Try now”
+- “Boost performance”
+- “All good”
 
--   modo assistido por IA
--   modo manual
--   boa leitura de schemas
--   diff claro
--   exemplos visíveis
--   versão e compatibilidade em destaque
+---
 
-------------------------------------------------------------------------
+## 12. Motion e resposta
 
-## Responsividade
+## 12.1 Função da motion
+A motion do NexTraceOne existe para:
+- orientar
+- confirmar
+- focar
+- conectar contexto
 
-### Desktop
+## 12.2 Motion recomendada
+- entrada suave de cards
+- hover discreto
+- drawers com transição firme
+- mudança de tabs rápida
+- skeletons elegantes
 
-Experiência principal.
+## 12.3 Motion proibida
+- elementos pulando
+- animação contínua sem propósito
+- exagero de escala
+- brilho pulsante em excesso
 
-### Tablet
+---
 
-Redução de densidade mantendo hierarquia.
+## 13. Segurança percebida como parte do design
 
-### Mobile
+Em um produto como o NexTraceOne, design não é só estética.  
+É também **percepção de segurança**.
 
-Visual consistente, porém com simplificação forte. Nem todos os módulos
-precisam ter a mesma profundidade funcional em mobile.
+### Isso significa:
+- campos de autenticação claros e confiáveis
+- labels explícitos
+- separação clara entre ações
+- mensagens de erro seguras
+- fluxo de senha e SSO bem desenhado
+- nenhuma decisão visual que sugira improviso
 
-------------------------------------------------------------------------
+Em especial, dados sensíveis como senha nunca podem parecer expostos, seja visualmente, seja pelo comportamento da aplicação.
 
-## Regras obrigatórias
+---
 
--   Toda UI deve usar i18n.
--   Nenhuma tela deve quebrar a identidade visual comum.
--   Não misturar estilos conflitantes entre módulos.
--   Toda nova tela deve parecer parte do mesmo produto.
--   Observabilidade visual nunca deve dominar a narrativa da plataforma.
--   O design deve reforçar governança, contratos, confiança em mudança e
-    consistência operacional.
+## 14. Estratégia para evolução do produto
 
-------------------------------------------------------------------------
+## 14.1 Ordem correta de expansão do design
+1. autenticação
+2. shell principal
+3. overview
+4. catálogo
+5. detalhe de entidade
+6. governança/compliance
+7. observabilidade e incidentes
+8. administração
 
-## Critério de aceite visual
+## 14.2 Como adicionar novas telas
+Toda nova tela deve responder:
+- qual é seu objetivo operacional?
+- qual sinal principal deve aparecer primeiro?
+- qual componente existente resolve isso?
+- qual padrão de navegação já deve ser reaproveitado?
 
-Uma tela do NexTraceOne está visualmente correta apenas se:
+Se a resposta for “vamos inventar um layout novo”, provavelmente a direção está errada.
 
--   parecer enterprise real
--   estiver alinhada ao login aprovado
--   mantiver coerência com Home e módulos
--   usar a paleta oficial
--   preservar clareza e foco
--   não parecer cópia direta de Dynatrace, Datadog ou Grafana
+---
+
+## 15. Critérios de qualidade
+
+Uma tela do NexTraceOne só está boa quando:
+
+- parece parte de um ecossistema unificado
+- é bonita sem sacrificar operação
+- tem hierarquia forte
+- usa cor com semântica
+- tem navegação previsível
+- transmite segurança
+- ajuda o usuário a agir
+
+---
+
+## 16. Resumo executivo
+
+**Design do NexTraceOne = comando, clareza, contexto e confiança.**
+
+A tela de login estabelece o tom.  
+O restante da plataforma deve expandir esse tom para uma experiência completa de:
+
+- governança
+- observabilidade
+- inteligência de mudança
+- operação enterprise

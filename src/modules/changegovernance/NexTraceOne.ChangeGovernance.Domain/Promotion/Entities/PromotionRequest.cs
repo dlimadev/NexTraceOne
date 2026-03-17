@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using MediatR;
-using NexTraceOne.BuildingBlocks.Core;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Promotion.Domain.Enums;
-using NexTraceOne.Promotion.Domain.Errors;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
+using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
 
-namespace NexTraceOne.Promotion.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 
 /// <summary>
 /// Aggregate Root que representa uma solicitação de promoção de release entre ambientes.

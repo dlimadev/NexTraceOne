@@ -1,18 +1,21 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using IngestRuntimeSnapshotFeature = NexTraceOne.RuntimeIntelligence.Application.Features.IngestRuntimeSnapshot.IngestRuntimeSnapshot;
-using GetRuntimeHealthFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetRuntimeHealth.GetRuntimeHealth;
-using GetObservabilityScoreFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetObservabilityScore.GetObservabilityScore;
-using ComputeObservabilityDebtFeature = NexTraceOne.RuntimeIntelligence.Application.Features.ComputeObservabilityDebt.ComputeObservabilityDebt;
-using DetectRuntimeDriftFeature = NexTraceOne.RuntimeIntelligence.Application.Features.DetectRuntimeDrift.DetectRuntimeDrift;
-using GetDriftFindingsFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetDriftFindings.GetDriftFindings;
-using GetReleaseHealthTimelineFeature = NexTraceOne.RuntimeIntelligence.Application.Features.GetReleaseHealthTimeline.GetReleaseHealthTimeline;
-using CompareReleaseRuntimeFeature = NexTraceOne.RuntimeIntelligence.Application.Features.CompareReleaseRuntime.CompareReleaseRuntime;
 
-namespace NexTraceOne.RuntimeIntelligence.API.Endpoints;
+using IngestRuntimeSnapshotFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.IngestRuntimeSnapshot.IngestRuntimeSnapshot;
+using GetRuntimeHealthFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetRuntimeHealth.GetRuntimeHealth;
+using GetObservabilityScoreFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore.GetObservabilityScore;
+using ComputeObservabilityDebtFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ComputeObservabilityDebt.ComputeObservabilityDebt;
+using DetectRuntimeDriftFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRuntimeDrift.DetectRuntimeDrift;
+using GetDriftFindingsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings.GetDriftFindings;
+using GetReleaseHealthTimelineFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline.GetReleaseHealthTimeline;
+using CompareReleaseRuntimeFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime.CompareReleaseRuntime;
+
+namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo RuntimeIntelligence.

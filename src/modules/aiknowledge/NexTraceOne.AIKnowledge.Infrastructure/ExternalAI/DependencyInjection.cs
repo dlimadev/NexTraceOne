@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NexTraceOne.ExternalAi.Infrastructure;
+namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo ExternalAi.

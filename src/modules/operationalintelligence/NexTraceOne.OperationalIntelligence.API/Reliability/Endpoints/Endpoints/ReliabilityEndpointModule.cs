@@ -1,9 +1,12 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
+
 using ListServiceReliabilityFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListServiceReliability.ListServiceReliability;
 using GetServiceReliabilityDetailFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityDetail.GetServiceReliabilityDetail;
 using GetTeamReliabilitySummaryFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilitySummary.GetTeamReliabilitySummary;
@@ -12,7 +15,7 @@ using GetServiceReliabilityTrendFeature = NexTraceOne.OperationalIntelligence.Ap
 using GetTeamReliabilityTrendFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilityTrend.GetTeamReliabilityTrend;
 using GetServiceReliabilityCoverageFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityCoverage.GetServiceReliabilityCoverage;
 
-namespace NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints;
+namespace NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints.Endpoints;
 
 /// <summary>
 /// Registra endpoints Minimal API do módulo Reliability.

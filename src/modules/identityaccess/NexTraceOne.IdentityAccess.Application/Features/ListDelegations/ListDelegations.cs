@@ -1,10 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Features.ListDelegations;
+namespace NexTraceOne.IdentityAccess.Application.Features.ListDelegations;
 
 /// <summary>
 /// Feature: ListDelegations — lista delegações ativas no tenant atual.

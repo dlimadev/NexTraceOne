@@ -1,4 +1,4 @@
-namespace NexTraceOne.AiOrchestration.Contracts.ServiceInterfaces;
+namespace NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo AiOrchestration.

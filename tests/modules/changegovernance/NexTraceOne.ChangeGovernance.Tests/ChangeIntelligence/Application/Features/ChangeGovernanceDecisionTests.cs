@@ -1,12 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NSubstitute.ReturnsExtensions;
-using GetChangeAdvisoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeAdvisory.GetChangeAdvisory;
-using RecordChangeDecisionFeature = NexTraceOne.ChangeIntelligence.Application.Features.RecordChangeDecision.RecordChangeDecision;
-using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Tests.Application.Features;
+using NSubstitute.ReturnsExtensions;
+
+using GetChangeAdvisoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory.GetChangeAdvisory;
+using RecordChangeDecisionFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision.RecordChangeDecision;
+using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
+
+namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Application.Features;
 
 /// <summary>Testes dos handlers de Change Governance Decision (Advisory, Decision, History).</summary>
 public sealed class ChangeGovernanceDecisionTests

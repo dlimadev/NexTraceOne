@@ -1,16 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.DeveloperPortal.Application.Abstractions;
-using NexTraceOne.DeveloperPortal.Contracts.ServiceInterfaces;
-using NexTraceOne.DeveloperPortal.Infrastructure.Persistence;
-using NexTraceOne.DeveloperPortal.Infrastructure.Persistence.Repositories;
-using NexTraceOne.DeveloperPortal.Infrastructure.Services;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
+using NexTraceOne.Catalog.Contracts.Portal.ServiceInterfaces;
+using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Repositories;
+using NexTraceOne.Catalog.Infrastructure.Portal.Services;
 
-namespace NexTraceOne.DeveloperPortal.Infrastructure;
+namespace NexTraceOne.Catalog.Infrastructure.Portal;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo DeveloperPortal.

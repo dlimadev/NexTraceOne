@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.AiGovernance.Application.Abstractions;
-using NexTraceOne.AiGovernance.Infrastructure.Persistence;
-using NexTraceOne.AiGovernance.Infrastructure.Persistence.Repositories;
+
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 
-namespace NexTraceOne.AiGovernance.Infrastructure;
+namespace NexTraceOne.AIKnowledge.Infrastructure.Governance;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo AiGovernance.

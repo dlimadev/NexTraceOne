@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.RulesetGovernance.Application;
-using NexTraceOne.RulesetGovernance.Infrastructure;
 
-namespace NexTraceOne.RulesetGovernance.API;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance;
+using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance;
+
+namespace NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo RulesetGovernance.

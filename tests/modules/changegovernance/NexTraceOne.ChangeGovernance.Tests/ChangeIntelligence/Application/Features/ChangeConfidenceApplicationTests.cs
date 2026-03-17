@@ -1,12 +1,12 @@
-using NexTraceOne.BuildingBlocks.Core.Enums;
-using NexTraceOne.ChangeIntelligence.Application.Abstractions;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
-using NexTraceOne.ChangeIntelligence.Domain.Enums;
-using ListChangesFeature = NexTraceOne.ChangeIntelligence.Application.Features.ListChanges.ListChanges;
-using GetChangesSummaryFeature = NexTraceOne.ChangeIntelligence.Application.Features.GetChangesSummary.GetChangesSummary;
-using ListChangesByServiceFeature = NexTraceOne.ChangeIntelligence.Application.Features.ListChangesByService.ListChangesByService;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
-namespace NexTraceOne.ChangeIntelligence.Tests.Application.Features;
+using ListChangesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListChanges.ListChanges;
+using GetChangesSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangesSummary.GetChangesSummary;
+using ListChangesByServiceFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListChangesByService.ListChangesByService;
+
+namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Application.Features;
 
 /// <summary>Testes dos handlers de Change Confidence da Fase 4.4.</summary>
 public sealed class ChangeConfidenceApplicationTests

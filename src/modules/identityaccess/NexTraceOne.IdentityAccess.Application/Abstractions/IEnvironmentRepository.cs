@@ -1,7 +1,8 @@
-using NexTraceOne.Identity.Domain.Entities;
-using Environment = NexTraceOne.Identity.Domain.Entities.Environment;
+using NexTraceOne.IdentityAccess.Domain.Entities;
 
-namespace NexTraceOne.Identity.Application.Abstractions;
+using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
+
+namespace NexTraceOne.IdentityAccess.Application.Abstractions;
 
 /// <summary>
 /// Repositório de ambientes e acessos por ambiente.

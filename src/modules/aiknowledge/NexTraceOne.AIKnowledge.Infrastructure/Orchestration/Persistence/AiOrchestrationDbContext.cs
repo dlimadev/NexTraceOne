@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 
-namespace NexTraceOne.AiOrchestration.Infrastructure.Persistence;
+namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 
 /// <summary>
 /// DbContext do módulo AiOrchestration.

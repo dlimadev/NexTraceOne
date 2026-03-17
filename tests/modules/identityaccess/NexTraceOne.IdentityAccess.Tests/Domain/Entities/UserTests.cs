@@ -1,9 +1,8 @@
-using FluentAssertions;
-using NexTraceOne.Identity.Domain.Entities;
-using NexTraceOne.Identity.Domain.Events;
-using NexTraceOne.Identity.Domain.ValueObjects;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Events;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
-namespace NexTraceOne.Identity.Tests.Domain.Entities;
+namespace NexTraceOne.IdentityAccess.Tests.Domain.Entities;
 
 /// <summary>
 /// Testes de domínio para o aggregate User.

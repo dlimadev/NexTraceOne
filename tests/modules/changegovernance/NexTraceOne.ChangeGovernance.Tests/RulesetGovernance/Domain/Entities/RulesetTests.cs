@@ -1,6 +1,6 @@
-using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Tests.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Tests.RulesetGovernance.Domain.Entities;
 
 /// <summary>Testes unitarios da entidade Ruleset.</summary>
 public sealed class RulesetTests

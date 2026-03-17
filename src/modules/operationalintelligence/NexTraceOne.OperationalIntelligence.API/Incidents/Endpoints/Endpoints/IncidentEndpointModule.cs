@@ -1,7 +1,9 @@
 using MediatR;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -15,7 +17,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
-namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints;
+namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
 
 /// <summary>
 /// Endpoints de Incident Correlation &amp; Mitigation.

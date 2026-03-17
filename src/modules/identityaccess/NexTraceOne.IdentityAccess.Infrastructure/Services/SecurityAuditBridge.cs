@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
-using NexTraceOne.Audit.Contracts.ServiceInterfaces;
-using NexTraceOne.Identity.Application.Abstractions;
-using NexTraceOne.Identity.Domain.Entities;
 
-namespace NexTraceOne.Identity.Infrastructure.Services;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+
+namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Implementação da ponte entre o módulo Identity e o módulo Audit central.

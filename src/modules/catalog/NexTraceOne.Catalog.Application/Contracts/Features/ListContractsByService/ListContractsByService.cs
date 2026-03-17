@@ -1,12 +1,14 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
-using NexTraceOne.Contracts.Application.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 
-namespace NexTraceOne.Contracts.Application.Features.ListContractsByService;
+namespace NexTraceOne.Catalog.Application.Contracts.Features.ListContractsByService;
 
 /// <summary>
 /// Feature: ListContractsByService — lista contratos associados a um serviço do catálogo.

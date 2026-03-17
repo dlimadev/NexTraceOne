@@ -1,6 +1,6 @@
 using NexTraceOne.BuildingBlocks.Core.Results;
 
-namespace NexTraceOne.Contracts.Domain.Errors;
+namespace NexTraceOne.Catalog.Domain.Contracts.Errors;
 
 /// <summary>
 /// Catálogo centralizado de erros do módulo Contracts com códigos i18n.

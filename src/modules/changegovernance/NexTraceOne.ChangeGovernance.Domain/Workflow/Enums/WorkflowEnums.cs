@@ -1,4 +1,4 @@
-namespace NexTraceOne.Workflow.Domain.Enums;
+namespace NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
 /// <summary>Status do ciclo de vida de uma instância de workflow.</summary>
 public enum WorkflowStatus

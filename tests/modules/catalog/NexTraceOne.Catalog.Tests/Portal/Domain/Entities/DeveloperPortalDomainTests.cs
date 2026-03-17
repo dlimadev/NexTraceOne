@@ -1,8 +1,7 @@
-using FluentAssertions;
-using NexTraceOne.DeveloperPortal.Domain.Entities;
-using NexTraceOne.DeveloperPortal.Domain.Enums;
+using NexTraceOne.Catalog.Domain.Portal.Entities;
+using NexTraceOne.Catalog.Domain.Portal.Enums;
 
-namespace NexTraceOne.DeveloperPortal.Tests.Domain.Entities;
+namespace NexTraceOne.Catalog.Tests.Portal.Domain.Entities;
 
 /// <summary>
 /// Testes de domínio complementares para as entidades do Developer Portal.

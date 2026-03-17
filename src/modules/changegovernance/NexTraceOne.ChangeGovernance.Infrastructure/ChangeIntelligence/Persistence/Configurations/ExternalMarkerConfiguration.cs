@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NexTraceOne.ChangeIntelligence.Domain.Entities;
 
-namespace NexTraceOne.ChangeIntelligence.Infrastructure.Persistence.Configurations;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+
+namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Configurations;
 
 /// <summary>Configuração EF Core para a entidade ExternalMarker.</summary>
 internal sealed class ExternalMarkerConfiguration : IEntityTypeConfiguration<ExternalMarker>

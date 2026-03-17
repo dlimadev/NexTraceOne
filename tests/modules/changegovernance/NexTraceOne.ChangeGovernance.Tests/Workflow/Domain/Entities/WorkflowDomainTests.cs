@@ -1,7 +1,7 @@
-using NexTraceOne.Workflow.Domain.Entities;
-using NexTraceOne.Workflow.Domain.Enums;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
-namespace NexTraceOne.Workflow.Tests.Domain.Entities;
+namespace NexTraceOne.ChangeGovernance.Tests.Workflow.Domain.Entities;
 
 /// <summary>Testes unitários das entidades de domínio do módulo Workflow.</summary>
 public sealed class WorkflowDomainTests

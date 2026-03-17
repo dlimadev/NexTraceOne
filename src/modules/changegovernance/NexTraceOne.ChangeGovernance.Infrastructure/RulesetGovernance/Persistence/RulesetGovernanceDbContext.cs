@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.RulesetGovernance.Domain.Entities;
+using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
-namespace NexTraceOne.RulesetGovernance.Infrastructure.Persistence;
+namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 
 /// <summary>
 /// DbContext do módulo RulesetGovernance.

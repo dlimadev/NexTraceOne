@@ -1,4 +1,4 @@
-namespace NexTraceOne.DeveloperPortal.Contracts.ServiceInterfaces;
+namespace NexTraceOne.Catalog.Contracts.Portal.ServiceInterfaces;
 
 /// <summary>
 /// Interface pública do módulo DeveloperPortal.

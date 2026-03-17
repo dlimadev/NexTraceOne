@@ -1,4 +1,4 @@
-namespace NexTraceOne.CostIntelligence.Domain.Enums;
+namespace NexTraceOne.OperationalIntelligence.Domain.Cost.Enums;
 
 /// <summary>
 /// Direção da tendência de custo de um serviço ao longo de um período.

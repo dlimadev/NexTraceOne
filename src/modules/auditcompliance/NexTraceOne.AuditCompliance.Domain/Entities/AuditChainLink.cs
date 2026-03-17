@@ -1,10 +1,12 @@
 using System.Security.Cryptography;
 using System.Text;
-using Ardalis.GuardClauses;
-using NexTraceOne.BuildingBlocks.Core;
-using NexTraceOne.BuildingBlocks.Core.Primitives;
 
-namespace NexTraceOne.Audit.Domain.Entities;
+using Ardalis.GuardClauses;
+
+using NexTraceOne.BuildingBlocks.Core.Primitives;
+using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+
+namespace NexTraceOne.AuditCompliance.Domain.Entities;
 
 /// <summary>
 /// Entidade que representa um elo da cadeia de hash de auditoria.

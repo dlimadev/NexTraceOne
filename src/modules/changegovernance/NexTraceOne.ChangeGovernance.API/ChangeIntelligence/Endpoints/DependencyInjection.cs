@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NexTraceOne.ChangeIntelligence.Application;
-using NexTraceOne.ChangeIntelligence.Infrastructure;
 
-namespace NexTraceOne.ChangeIntelligence.API;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
+
+namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
 
 /// <summary>
 /// Extensões de registo do módulo ChangeIntelligence no contentor DI.

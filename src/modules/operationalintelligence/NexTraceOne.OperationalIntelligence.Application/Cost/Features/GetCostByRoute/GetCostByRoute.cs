@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
+
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.CostIntelligence.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 
-namespace NexTraceOne.CostIntelligence.Application.Features.GetCostByRoute;
+namespace NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRoute;
 
 /// <summary>
 /// Feature: GetCostByRoute — obtém atribuições de custo filtradas por serviço e ambiente.

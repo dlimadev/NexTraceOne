@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.CostIntelligence.Domain.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
-namespace NexTraceOne.CostIntelligence.Infrastructure.Persistence;
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 
 /// <summary>
 /// DbContext do módulo CostIntelligence.

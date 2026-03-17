@@ -1,6 +1,6 @@
-using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Events;
 
-namespace NexTraceOne.AiOrchestration.Domain.Events;
+namespace NexTraceOne.AIKnowledge.Domain.Orchestration.Events;
 
 /// <summary>
 /// Evento emitido quando um candidato a conhecimento organizacional é identificado.

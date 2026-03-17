@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
-using NexTraceOne.RuntimeIntelligence.Application.Abstractions;
-using NexTraceOne.RuntimeIntelligence.Domain.Entities;
 
-namespace NexTraceOne.RuntimeIntelligence.Infrastructure.Persistence.Repositories;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
+
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 
 /// <summary>
 /// Repositório de perfis de maturidade de observabilidade por serviço.

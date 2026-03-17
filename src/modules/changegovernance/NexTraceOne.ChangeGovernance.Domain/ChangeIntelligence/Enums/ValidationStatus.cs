@@ -1,4 +1,4 @@
-namespace NexTraceOne.ChangeIntelligence.Domain.Enums;
+namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 /// <summary>
 /// Status de validação pós-mudança no NexTraceOne.
