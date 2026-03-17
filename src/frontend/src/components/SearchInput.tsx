@@ -42,6 +42,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <input
           ref={ref}
           type="search"
+          aria-label={rest['aria-label'] ?? 'Search'}
           className={cn(
             'w-full rounded-lg bg-input border border-edge pr-4 text-heading',
             'placeholder:text-muted',
