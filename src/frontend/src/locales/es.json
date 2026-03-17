@@ -3077,5 +3077,21 @@
     "meta": {
       "contextualRouting": "Consulta enrutada al modelo interno con fundamentación contextual del dominio relevante de la Fuente de Verdad."
     }
+  },
+  "shell": {
+    "sidebarNav": "Navegación lateral",
+    "mainNavigation": "Navegación principal",
+    "openMenu": "Abrir menú",
+    "mobileMenu": "Menú de navegación móvil",
+    "userMenu": "Menú del usuario",
+    "myProfile": "Mi Perfil",
+    "myAccess": "Mi Acceso",
+    "workspace": "Workspace",
+    "workspaceSwitcher": "Cambiar workspace",
+    "defaultWorkspace": "Workspace Predeterminado",
+    "environment": "Entorno",
+    "moduleUnavailable": "Módulo No Disponible",
+    "moduleUnavailableDescription": "Este módulo no está disponible temporalmente. Inténtelo de nuevo más tarde.",
+    "moduleUnavailableDescriptionNamed": "El módulo {{module}} no está disponible temporalmente. Inténtelo de nuevo más tarde."
   }
 }

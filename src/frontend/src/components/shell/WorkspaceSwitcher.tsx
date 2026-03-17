@@ -9,7 +9,7 @@ export function WorkspaceSwitcher() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const tenantName = user?.tenantName ?? t('shell.defaultWorkspace');
+  const tenantName = t('shell.defaultWorkspace');
   // TODO: source from environment context once multi-env switching is implemented
   const environment = 'Production';
 
