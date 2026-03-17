@@ -56,7 +56,7 @@ Cobrir:
 #### Estado atual
 | Item | Estado | Classificação | Observações |
 |---|---|---|---|
-| Arquitetura modular | DONE | KEEP | 7 módulos isolados com DDD/CQRS, separação por .csproj, sem vazamentos de infraestrutura no Domain |
+| Arquitetura modular | DONE | KEEP | 7 módulos isolados (catalog, changegovernance, operationalintelligence, aiknowledge, identityaccess, auditcompliance, governance) com DDD/CQRS, separação por .csproj, sem vazamentos de infraestrutura no Domain |
 | Convenções de código | DONE | KEEP | Strongly-typed IDs, CancellationToken em async, Result pattern, guard clauses — verificado em todos os handlers |
 | i18n base | DONE | KEEP | 4 locales (en, pt-PT, pt-BR, es), ~5,651 keys, 90+ componentes usando useTranslation |
 | Segurança base | DONE | KEEP | JWT Bearer + permissions, rate limiting (100/min IP), CORS restritivo, assembly integrity check |

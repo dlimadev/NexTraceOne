@@ -6,7 +6,8 @@
 > **Scope**: All capabilities implemented from PR-1 through PR-16  
 > **Method**: Code-level inspection of backend handlers, domain entities, EF persistence, API endpoints, frontend pages, i18n, tests, and documentation  
 > **Principle**: Only code evidence counts — documentation alone is not proof of completion  
-> **Re-validation**: Independent re-assessment on 2026-03-17 confirming builds, tests, and code inspection across all 6 blocks
+> **Re-validation**: Independent re-assessment on 2026-03-17 confirming builds, tests, and code inspection across all 6 blocks  
+> **Test count note**: Backend went from 1,472 to 1,243 after CommercialGovernance/Licensing removal in PR-17; Frontend went from 264 to 266 with 2 new tests added
 
 ---
 
@@ -14,7 +15,7 @@
 
 | Block | Status | Backend | Frontend | i18n | Tests | Main Evidence | Main Gaps | Action Taken | Risk | Recommendation |
 |-------|--------|---------|----------|------|-------|--------------|-----------|-------------|------|---------------|
-| **A — Foundation** | VALIDATED | ✅ 7 modules, clean layers, DDD/CQRS | ✅ Feature-based, lazy-loaded routes, design system | ✅ 4 locales, ~5,651 keys | ✅ 1,243 backend + 266 frontend pass (100%) | Modular monolith, JWT+permissions, rate limiting, health endpoints, Serilog+OpenTelemetry | None critical | Confirmed module isolation, DI registration, conventions | LOW | Foundation is solid and validated |
+| **A — Foundation** | VALIDATED | ✅ 7 modules (catalog, changegovernance, operationalintelligence, aiknowledge, identityaccess, auditcompliance, governance), clean layers, DDD/CQRS | ✅ Feature-based, lazy-loaded routes, design system | ✅ 4 locales, ~5,651 keys | ✅ 1,243 backend + 266 frontend pass (100%) | Modular monolith, JWT+permissions, rate limiting, health endpoints, Serilog+OpenTelemetry | None critical | Confirmed module isolation, DI registration, conventions | LOW | Foundation is solid and validated |
 | **B — Source of Truth** | VALIDATED | ✅ 30+ real handlers, EF persistence, migrations | ✅ Real API calls on all pages | ✅ Complete | ✅ 466 catalog tests | ServiceAsset, ContractVersion, ContractDraft, search, diff, versioning, ownership — all real persistence | No integration tests with real DB; Contract Studio UX polish | None needed — all real | LOW | Add integration tests; continue incremental improvement |
 | **C — Change Confidence** | VALIDATED | ✅ 21+ real handlers, 4 DbContexts, advisory, blast radius, decisions | ✅ ChangeCatalogPage + ChangeDetailPage fully wired | ✅ Complete | ✅ 195 tests | Release, BlastRadiusReport, ChangeIntelligenceScore, ChangeEvent — all persisted; 4-factor weighted advisory | None critical | Confirmed all handlers are real (not mock) | LOW | Ready for production use |
 | **D — Incidents** | VALIDATED WITH GAPS | ✅ EfIncidentStore (678 lines), 5 DbSets, real CRUD | ✅ Real API calls, no inline mock | ✅ Complete | ✅ 266 tests | IncidentRecord, MitigationWorkflow, RunbookRecord, MitigationValidation — all persisted; 17 endpoints | Correlation based on seed data not dynamic; no CreateIncident handler; no mitigation creation UI | Confirmed real persistence; documented correlation limitation | MEDIUM | Build dynamic correlation engine; add incident creation |
@@ -405,7 +406,7 @@ The honest assessment is that while Blocks A, B, and C are fully validated and B
 
 ## 8. PRIORITIZED REMAINING GAPS (RE-VALIDATED)
 
-### P0 — Blocks enclosure of PR-1 to PR-16 cycle
+### P0 — Blocks closure of PR-1 to PR-16 cycle
 *(None — no blocking issues found. Core flows B, C, D are functional.)*
 
 ### P1 — Must enter immediately after cycle closure

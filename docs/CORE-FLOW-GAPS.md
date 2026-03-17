@@ -83,7 +83,7 @@ Só entra neste documento o que impacta diretamente pelo menos um destes resulta
 ### Gaps de testes
 | Gap | Prioridade | Ação |
 |---|---|---|
-| 195 unit tests passam; falta integration tests com DB real | Média | Adicionar quando Testcontainers disponível |
+| 195 unit tests passam; falta integration tests com DB real | Alta | Adicionar quando Testcontainers disponível |
 
 ### Estado desejado
 - incident detail útil
