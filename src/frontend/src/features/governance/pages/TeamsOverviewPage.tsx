@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
+import { PageContainer } from '../../../components/shell';
 
 type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 
@@ -60,7 +61,7 @@ export function TeamsOverviewPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <ModuleHeader
         titleKey="organization.teams.title"
         subtitleKey="organization.teams.subtitle"
@@ -146,6 +147,6 @@ export function TeamsOverviewPage() {
           ))
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

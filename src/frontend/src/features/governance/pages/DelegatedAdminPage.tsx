@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
+import { PageContainer } from '../../../components/shell';
 
 type DelegationScope = 'TeamAdmin' | 'DomainAdmin' | 'ReadOnly' | 'FullAdmin';
 
@@ -106,7 +107,7 @@ export function DelegatedAdminPage() {
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <ModuleHeader
         titleKey="organization.delegatedAdmin.title"
         subtitleKey="organization.delegatedAdmin.subtitle"
@@ -200,6 +201,6 @@ export function DelegatedAdminPage() {
           ))
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

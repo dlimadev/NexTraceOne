@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import type { PolicyDto, PolicyListResponse, PolicyCategoryType, PolicyStatusType } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Dados simulados de políticas — alinhados com o backend ListPolicies.
@@ -171,7 +172,7 @@ export function PolicyCatalogPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.policies.title')}</h1>
@@ -271,6 +272,6 @@ export function PolicyCatalogPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

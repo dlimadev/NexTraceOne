@@ -8,6 +8,7 @@ import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { DelegationInfo } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de gestão de delegações de permissões do módulo Identity.
@@ -75,7 +76,7 @@ export function DelegationPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('identity.delegation.title')}</h1>
@@ -243,6 +244,6 @@ export function DelegationPage() {
           )}
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

@@ -15,6 +15,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { Button } from '../../../components/Button';
 import { OnboardingHints } from '../../../components/OnboardingHints';
+import { PageContainer } from '../../../components/shell';
 
 interface Model {
   id: string;
@@ -77,7 +78,7 @@ export function ModelRegistryPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="aiHub" />
 
@@ -170,6 +171,6 @@ export function ModelRegistryPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

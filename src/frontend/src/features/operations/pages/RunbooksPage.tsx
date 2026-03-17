@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de Runbooks — procedimentos operacionais e guias de mitigação.
@@ -13,7 +14,7 @@ export function RunbooksPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('runbooks.title')}</h1>
         <p className="text-muted mt-1">{t('runbooks.subtitle')}</p>
@@ -38,6 +39,6 @@ export function RunbooksPage() {
           />
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

@@ -17,6 +17,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { contractsApi } from '../api/contracts';
 import type { ContractListItem } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -106,7 +107,7 @@ export function ContractListPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* ── Cabeçalho ── */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('contractGov.title')}</h1>
@@ -329,7 +330,7 @@ export function ContractListPage() {
           )}
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }
 

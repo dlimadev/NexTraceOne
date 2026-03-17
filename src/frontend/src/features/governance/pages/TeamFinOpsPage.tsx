@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import type { CostEfficiencyType } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -74,7 +75,7 @@ export function TeamFinOpsPage() {
   const costChange = d.totalMonthlyCost - d.previousMonthCost;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Back + Header */}
       <div className="mb-6">
         <Link to="/governance/finops" className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover mb-3">
@@ -170,6 +171,6 @@ export function TeamFinOpsPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

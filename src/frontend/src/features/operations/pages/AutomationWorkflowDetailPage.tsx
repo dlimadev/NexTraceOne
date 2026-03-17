@@ -8,6 +8,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageContainer } from '../../../components/shell';
 
 /* ── Types ── */
 
@@ -145,13 +146,13 @@ export function AutomationWorkflowDetailPage() {
 
   if (!workflowId) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <EmptyState
           icon={<Zap size={24} />}
           title={t('automation.detail.notFound')}
           description={t('automation.detail.notFoundDesc')}
         />
-      </div>
+      </PageContainer>
     );
   }
 

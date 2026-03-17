@@ -6,6 +6,7 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageContainer } from '../../../components/shell';
 
 interface Budget {
   id: string;
@@ -54,7 +55,7 @@ export function TokenBudgetPage() {
   const totalTokensUsed = mockBudgets.reduce((s, b) => s + b.currentTokensUsed, 0);
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('aiHub.budgetTitle')}</h1>
         <p className="text-muted mt-1">{t('aiHub.budgetSubtitle')}</p>
@@ -130,6 +131,6 @@ export function TokenBudgetPage() {
           <Card><CardBody><p className="text-center text-muted py-8">{t('aiHub.noBudgetsFound')}</p></CardBody></Card>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

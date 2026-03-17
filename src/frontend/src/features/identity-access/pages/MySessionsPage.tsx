@@ -9,6 +9,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { ActiveSession } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de gestão de sessões ativas do usuário autenticado.
@@ -66,7 +67,7 @@ export function MySessionsPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('sessions.title')}</h1>
@@ -177,6 +178,6 @@ export function MySessionsPage() {
           )}
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

@@ -22,6 +22,7 @@ import { serviceCatalogApi } from '../api';
 import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
@@ -82,9 +83,9 @@ export function ServiceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in flex items-center justify-center min-h-[60vh]">
+      <PageContainer>
         <p className="text-sm text-muted">{t('common.loading')}</p>
-      </div>
+      </PageContainer>
     );
   }
 

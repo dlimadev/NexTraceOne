@@ -25,6 +25,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { AdvisoryFactorDto, ChangeAdvisoryResponse, DecisionHistoryItemDto } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /** Mapeia status de confiança para variante visual do Badge. */
 function confidenceVariant(status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' {
@@ -172,7 +173,7 @@ export function ChangeDetailPage() {
 
   if (changeQuery.isLoading) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <Link to="/changes" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
           <ArrowLeft size={14} /> {t('changeConfidence.detail.backToCatalog')}
         </Link>
@@ -184,7 +185,7 @@ export function ChangeDetailPage() {
             </div>
           </CardBody>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 

@@ -9,6 +9,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de uso por persona.
@@ -149,7 +150,7 @@ export function PersonaUsagePage() {
     : mockPersonas;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">{t('analytics.persona.title')}</h1>
@@ -246,6 +247,6 @@ export function PersonaUsagePage() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

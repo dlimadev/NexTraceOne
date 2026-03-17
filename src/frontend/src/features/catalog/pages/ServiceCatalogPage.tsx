@@ -26,6 +26,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
+import { PageContainer } from '../../../components/shell';
 import type {
   AssetGraph,
   ApiNode,
@@ -171,7 +172,7 @@ export function ServiceCatalogPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="services" />
 
@@ -525,7 +526,7 @@ export function ServiceCatalogPage() {
           )}
         </>
       )}
-    </div>
+    </PageContainer>
   );
 }
 

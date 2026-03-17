@@ -6,6 +6,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de jornadas e funis do produto.
@@ -112,7 +113,7 @@ export function JourneyFunnelPage() {
     : mockJourneys;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">{t('analytics.journey.title')}</h1>
@@ -199,6 +200,6 @@ export function JourneyFunnelPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

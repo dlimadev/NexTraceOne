@@ -7,6 +7,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { promotionApi } from '../api';
 import type { PromotionRequest } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 type PromotionStatus = PromotionRequest['status'];
 
@@ -72,7 +73,7 @@ export function PromotionPage() {
   const pending = requests.filter((r) => r.status === 'Pending' || r.status === 'Approved');
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('promotion.title')}</h1>
@@ -293,6 +294,6 @@ export function PromotionPage() {
           )}
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

@@ -8,6 +8,7 @@ import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { BreakGlassRequest } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de gestão de acessos emergenciais (Break Glass) do módulo Identity.
@@ -63,7 +64,7 @@ export function BreakGlassPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('identity.breakGlass.title')}</h1>
@@ -170,6 +171,6 @@ export function BreakGlassPage() {
           )}
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

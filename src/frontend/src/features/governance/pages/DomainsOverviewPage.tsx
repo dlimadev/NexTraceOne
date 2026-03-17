@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
+import { PageContainer } from '../../../components/shell';
 
 type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 type Criticality = 'Critical' | 'High' | 'Medium' | 'Low';
@@ -62,7 +63,7 @@ export function DomainsOverviewPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <ModuleHeader
         titleKey="organization.domains.title"
         subtitleKey="organization.domains.subtitle"
@@ -148,6 +149,6 @@ export function DomainsOverviewPage() {
           ))
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

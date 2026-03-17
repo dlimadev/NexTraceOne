@@ -11,6 +11,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { contractsApi, serviceCatalogApi } from '../api';
+import { PageContainer } from '../../../components/shell';
 import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
   ContractVersionDetail, SemanticDiff, ContractRuleViolation,
@@ -317,7 +318,7 @@ export function ContractsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="contracts" />
 
@@ -1071,6 +1072,6 @@ export function ContractsPage() {
           </CardBody>
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

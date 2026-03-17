@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { PageContainer } from '../../../components/shell';
 
 type ConnectorStatus = 'Active' | 'Degraded' | 'Failed' | 'Disabled';
 type ConnectorHealth = 'Healthy' | 'Degraded' | 'Failed' | 'Stale';
@@ -125,12 +126,12 @@ export function ConnectorDetailPage() {
     const fallback = Object.values(mockConnectors)[0];
     if (!fallback) {
       return (
-        <div className="p-6 lg:p-8 animate-fade-in">
+        <PageContainer>
           <Link to="/integrations" className="text-accent hover:underline text-sm flex items-center gap-1 mb-4">
             <ArrowLeft size={14} /> {t('integrations.backToHub')}
           </Link>
           <p className="text-muted">{t('integrations.connectorNotFound')}</p>
-        </div>
+        </PageContainer>
       );
     }
     return <ConnectorDetailContent connector={fallback} activeTab={activeTab} setActiveTab={setActiveTab} retryMessage={retryMessage} setRetryMessage={setRetryMessage} t={t} />;

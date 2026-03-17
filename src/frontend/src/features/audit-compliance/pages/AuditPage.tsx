@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { auditApi } from '../api';
+import { PageContainer } from '../../../components/shell';
 
 export function AuditPage() {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export function AuditPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('audit.title')}</h1>
@@ -170,6 +171,6 @@ export function AuditPage() {
           </div>
         )}
       </Card>
-    </div>
+    </PageContainer>
   );
 }

@@ -24,6 +24,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { changeIntelligenceApi } from '../api';
 import type { ChangeLevel, DeploymentState } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 // ─── Constantes auxiliares ───────────────────────────────────────────────────
 
@@ -159,7 +160,7 @@ export function ReleasesPage() {
   const intel = intelligenceQuery.data;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -921,6 +922,6 @@ export function ReleasesPage() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

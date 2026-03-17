@@ -8,6 +8,7 @@ import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { AccessReviewCampaign, AccessReviewCampaignDetail } from '../../../types';
+import { PageContainer } from '../../../components/shell';
 
 /**
  * Página de gestão de campanhas de revisão de acessos (Access Review) do módulo Identity.
@@ -93,7 +94,7 @@ export function AccessReviewPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-heading">{t('identity.accessReview.title')}</h1>
@@ -301,6 +302,6 @@ export function AccessReviewPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

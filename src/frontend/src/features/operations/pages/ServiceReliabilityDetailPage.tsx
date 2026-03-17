@@ -8,6 +8,7 @@ import {
 import { NavLink } from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { PageContainer } from '../../../components/shell';
 
 const mockDetails: Record<string, {
   identity: { serviceId: string; displayName: string; serviceType: string; domain: string; teamName: string; criticality: string };
@@ -100,12 +101,12 @@ export function ServiceReliabilityDetailPage() {
 
   if (!data) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <NavLink to="/operations/reliability" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
           <ArrowLeft size={14} /> {t('common.back')}
         </NavLink>
         <div className="text-center text-muted py-12">{t('reliability.detail.notFound')}</div>
-      </div>
+      </PageContainer>
     );
   }
 

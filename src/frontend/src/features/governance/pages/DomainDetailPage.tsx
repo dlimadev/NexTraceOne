@@ -10,6 +10,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
+import { PageContainer } from '../../../components/shell';
 
 type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 type TabId = 'overview' | 'teams' | 'services' | 'governance' | 'dependencies';
@@ -149,7 +150,7 @@ export function DomainDetailPage() {
   const formatPct = (v: number) => `${Math.round(v * 100)}%`;
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Back link */}
       <Link to="/governance/domains" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
         <ArrowLeft size={14} />
@@ -217,7 +218,7 @@ export function DomainDetailPage() {
       {activeTab === 'services' && <ServicesTab services={domain.services} t={t} />}
       {activeTab === 'governance' && <GovernanceTab gov={gov} t={t} formatPct={formatPct} />}
       {activeTab === 'dependencies' && <DependenciesTab deps={domain.crossDomainDependencies} t={t} />}
-    </div>
+    </PageContainer>
   );
 }
 

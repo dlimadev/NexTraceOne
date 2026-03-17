@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
+import { PageContainer } from '../../../components/shell';
 
 /* ── Types ── */
 
@@ -101,7 +102,7 @@ export function AutomationWorkflowsPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('automation.title')}</h1>
@@ -217,6 +218,6 @@ export function AutomationWorkflowsPage() {
           </div>
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }
