@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.AiGovernance.Domain.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 
@@ -14,10 +15,24 @@ public sealed class AiGovernanceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    public DbSet<AIAccessPolicy> AccessPolicies => Set<AIAccessPolicy>();
+    public DbSet<AIModel> Models => Set<AIModel>();
+    public DbSet<AIBudget> Budgets => Set<AIBudget>();
+    public DbSet<AiAssistantConversation> Conversations => Set<AiAssistantConversation>();
+    public DbSet<AiMessage> Messages => Set<AiMessage>();
+    public DbSet<AIUsageEntry> UsageEntries => Set<AIUsageEntry>();
+    public DbSet<AIKnowledgeSource> KnowledgeSources => Set<AIKnowledgeSource>();
+    public DbSet<AIIDEClientRegistration> IdeClientRegistrations => Set<AIIDEClientRegistration>();
+    public DbSet<AIIDECapabilityPolicy> IdeCapabilityPolicies => Set<AIIDECapabilityPolicy>();
+    public DbSet<AIRoutingDecision> RoutingDecisions => Set<AIRoutingDecision>();
+    public DbSet<AIRoutingStrategy> RoutingStrategies => Set<AIRoutingStrategy>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

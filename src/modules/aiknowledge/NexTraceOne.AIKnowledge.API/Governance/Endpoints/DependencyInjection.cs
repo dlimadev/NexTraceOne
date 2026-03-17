@@ -1,12 +1,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.AiGovernance.Application;
+using NexTraceOne.AiGovernance.Infrastructure;
 
 namespace NexTraceOne.AiGovernance.API;
 
 /// <summary>
 /// Registra serviços específicos da camada API do módulo AiGovernance.
-/// Compõe Application layer. Infrastructure será adicionada quando implementada.
+/// Compõe Application + Infrastructure layers.
 /// </summary>
 public static class DependencyInjection
 {
@@ -15,6 +16,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddAiGovernanceApplication(configuration);
+        services.AddAiGovernanceInfrastructure(configuration);
         return services;
     }
 }

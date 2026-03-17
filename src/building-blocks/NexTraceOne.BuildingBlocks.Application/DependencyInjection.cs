@@ -10,6 +10,7 @@ namespace NexTraceOne.BuildingBlocks.Application;
 /// <summary>
 /// Registra serviços do BuildingBlocks.Application no DI.
 /// Inclui: Pipeline Behaviors MediatR, DateTimeProvider, validators.
+/// Método idempotente — seguro para ser chamado por múltiplos módulos.
 /// </summary>
 public static class DependencyInjection
 {
@@ -17,6 +18,9 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        if (services.Any(d => d.ImplementationType == typeof(ValidationBehavior<,>)))
+            return services;
+
         services.AddLocalization(options => options.ResourcesPath = "Resources");
 
         services.AddScoped<IErrorLocalizer, ErrorLocalizer>();
