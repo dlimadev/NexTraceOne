@@ -4,6 +4,11 @@ import { ChevronDown, Building2, Check } from 'lucide-react';
 import { cn } from '../../lib/cn';
 import { useAuth } from '../../contexts/AuthContext';
 
+/** Default environment until multi-environment switching is implemented. */
+const DEFAULT_ENVIRONMENT = 'Production';
+
+const AVAILABLE_ENVIRONMENTS = ['Production', 'Staging', 'Development'] as const;
+
 export function WorkspaceSwitcher() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -11,7 +16,7 @@ export function WorkspaceSwitcher() {
 
   const tenantName = t('shell.defaultWorkspace');
   // TODO: source from environment context once multi-env switching is implemented
-  const environment = 'Production';
+  const environment = DEFAULT_ENVIRONMENT;
 
   return (
     <div className="relative hidden md:block">
@@ -62,7 +67,7 @@ export function WorkspaceSwitcher() {
             <div className="px-3 pt-2 mt-1 border-t border-edge">
               <p className="type-overline text-faded mb-1.5">{t('shell.environment')}</p>
               <div className="flex gap-1">
-                {['Production', 'Staging', 'Development'].map(env => (
+                {AVAILABLE_ENVIRONMENTS.map(env => (
                   <span
                     key={env}
                     className={cn(

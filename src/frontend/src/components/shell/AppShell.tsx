@@ -58,15 +58,22 @@ export function AppShell() {
         <AppSidebar collapsed={false} onToggleCollapse={closeMobile} mobile />
       </MobileDrawer>
 
-      {/* Main column */}
+      {/* Main column — marginLeft matches sidebar width on desktop only */}
       <div
         className={cn(
           'flex-1 flex flex-col min-h-0 min-w-0',
-          'transition-[margin] duration-[var(--nto-motion-medium)] ease-[var(--ease-standard)]',
+          'lg:transition-[margin] lg:duration-[var(--nto-motion-medium)] lg:ease-[var(--ease-standard)]',
         )}
-        style={{ marginLeft: sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED }}
+        style={{
+          ['--shell-sidebar-w' as string]: `${sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED}px`,
+        }}
         data-testid="app-shell-main"
       >
+        <style>{`
+          @media (min-width: 1024px) {
+            [data-testid="app-shell-main"] { margin-left: var(--shell-sidebar-w); }
+          }
+        `}</style>
         <AppTopbar
           onOpenCommandPalette={openPalette}
           onOpenMobileMenu={openMobile}
