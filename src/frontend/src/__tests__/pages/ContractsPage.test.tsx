@@ -24,6 +24,15 @@ vi.mock('../../features/catalog/api', () => ({
     getClassification: vi.fn(),
     suggestVersion: vi.fn(),
   },
+  serviceCatalogApi: {
+    getGraph: vi.fn().mockResolvedValue({
+      services: [],
+      apis: [
+        { apiAssetId: 'api-001', name: 'Order API', routePattern: '/api/v1/orders', version: '1.0', visibility: 'Internal', ownerServiceAssetId: 'svc-001', consumers: [] },
+        { apiAssetId: 'api-002', name: 'Payment API', routePattern: '/api/v1/payments', version: '1.0', visibility: 'Internal', ownerServiceAssetId: 'svc-002', consumers: [] },
+      ],
+    }),
+  },
 }));
 
 import { contractsApi } from '../../features/catalog/api';
@@ -83,9 +92,11 @@ describe('ContractsPage', () => {
     expect(screen.getByRole('button', { name: /import contract/i })).toBeInTheDocument();
   });
 
-  it('exibe a instrução para inserir API Asset ID', () => {
+  it('exibe a instrução para selecionar API Asset', async () => {
     renderContracts();
-    expect(screen.getByText(/enter an api asset id to view contract history/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/select an api asset above to view its contract history/i)).toBeInTheDocument();
+    });
   });
 
   it('exibe o formulário de importação ao clicar no botão', async () => {
@@ -94,11 +105,17 @@ describe('ContractsPage', () => {
     expect(screen.getByText('Import Contract', { selector: 'h2' })).toBeInTheDocument();
   });
 
-  it('carrega e exibe histórico de contratos ao inserir API Asset ID', async () => {
+  it('carrega e exibe histórico de contratos ao selecionar API Asset', async () => {
     vi.mocked(contractsApi.getHistory).mockResolvedValue(mockHistory);
     renderContracts();
-    const input = screen.getByPlaceholderText(/enter uuid to view contract history/i);
-    await userEvent.type(input, 'api-001');
+    // Wait for the API asset options to load
+    await waitFor(() => {
+      expect(screen.getByText(/order api/i)).toBeInTheDocument();
+    });
+    // Select from the history filter dropdown (the last select with the API Asset label)
+    const selects = screen.getAllByRole('combobox');
+    const historySelect = selects[selects.length - 1]; // history filter is the last select
+    await userEvent.selectOptions(historySelect, 'api-001');
     await waitFor(() => {
       expect(contractsApi.getHistory).toHaveBeenCalledWith('api-001');
     });
@@ -111,8 +128,12 @@ describe('ContractsPage', () => {
   it('exibe badge Draft para versões em rascunho', async () => {
     vi.mocked(contractsApi.getHistory).mockResolvedValue(mockHistory);
     renderContracts();
-    const input = screen.getByPlaceholderText(/enter uuid to view contract history/i);
-    await userEvent.type(input, 'api-001');
+    await waitFor(() => {
+      expect(screen.getByText(/order api/i)).toBeInTheDocument();
+    });
+    const selects = screen.getAllByRole('combobox');
+    const historySelect = selects[selects.length - 1];
+    await userEvent.selectOptions(historySelect, 'api-001');
     await waitFor(() => {
       expect(screen.getByText('Draft')).toBeInTheDocument();
     });
@@ -121,8 +142,12 @@ describe('ContractsPage', () => {
   it('exibe badge Locked para versões bloqueadas', async () => {
     vi.mocked(contractsApi.getHistory).mockResolvedValue(mockHistory);
     renderContracts();
-    const input = screen.getByPlaceholderText(/enter uuid to view contract history/i);
-    await userEvent.type(input, 'api-001');
+    await waitFor(() => {
+      expect(screen.getByText(/order api/i)).toBeInTheDocument();
+    });
+    const selects = screen.getAllByRole('combobox');
+    const historySelect = selects[selects.length - 1];
+    await userEvent.selectOptions(historySelect, 'api-001');
     await waitFor(() => {
       expect(screen.getByText('Locked')).toBeInTheDocument();
     });
@@ -131,8 +156,12 @@ describe('ContractsPage', () => {
   it('exibe botão Lock para versões não bloqueadas', async () => {
     vi.mocked(contractsApi.getHistory).mockResolvedValue(mockHistory);
     renderContracts();
-    const input = screen.getByPlaceholderText(/enter uuid to view contract history/i);
-    await userEvent.type(input, 'api-001');
+    await waitFor(() => {
+      expect(screen.getByText(/order api/i)).toBeInTheDocument();
+    });
+    const selects = screen.getAllByRole('combobox');
+    const historySelect = selects[selects.length - 1];
+    await userEvent.selectOptions(historySelect, 'api-001');
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /lock/i })).toBeInTheDocument();
     });
@@ -142,8 +171,12 @@ describe('ContractsPage', () => {
     vi.mocked(contractsApi.getHistory).mockResolvedValue(mockHistory);
     vi.mocked(contractsApi.lockVersion).mockResolvedValue({});
     renderContracts();
-    const input = screen.getByPlaceholderText(/enter uuid to view contract history/i);
-    await userEvent.type(input, 'api-001');
+    await waitFor(() => {
+      expect(screen.getByText(/order api/i)).toBeInTheDocument();
+    });
+    const selects = screen.getAllByRole('combobox');
+    const historySelect = selects[selects.length - 1];
+    await userEvent.selectOptions(historySelect, 'api-001');
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /lock/i })).toBeInTheDocument();
     });
@@ -154,15 +187,21 @@ describe('ContractsPage', () => {
   it('chama importContract ao submeter o formulário', async () => {
     vi.mocked(contractsApi.importContract).mockResolvedValue({ id: 'cv-new' });
     renderContracts();
+    // Wait for graph data to be loaded first (populates API selects)
+    await waitFor(() => {
+      expect(screen.getAllByText(/order api/i).length).toBeGreaterThan(0);
+    });
     await userEvent.click(screen.getByRole('button', { name: /import contract/i }));
-    await userEvent.type(screen.getByPlaceholderText(/550e8400/), 'api-abc');
+    // Select an API asset from the import form's select (first combobox in the import form)
+    const selects = screen.getAllByRole('combobox');
+    await userEvent.selectOptions(selects[0], 'api-001');
     await userEvent.type(screen.getByPlaceholderText(/e\.g\., 1\.0\.0/), '3.0.0');
     await userEvent.type(screen.getByPlaceholderText(/paste your specification here/i), 'openapi-spec-content');
     await userEvent.click(screen.getByRole('button', { name: /^import$/i }));
     await waitFor(() => {
       expect(contractsApi.importContract).toHaveBeenCalled();
       const [firstArg] = vi.mocked(contractsApi.importContract).mock.calls[0];
-      expect(firstArg).toMatchObject({ apiAssetId: 'api-abc', version: '3.0.0' });
+      expect(firstArg).toMatchObject({ apiAssetId: 'api-001', version: '3.0.0' });
     });
   });
 });

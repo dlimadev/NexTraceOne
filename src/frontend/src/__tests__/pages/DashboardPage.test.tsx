@@ -10,6 +10,47 @@ vi.mock('../../features/catalog/api/serviceCatalog', () => ({
   },
 }));
 
+vi.mock('../../features/catalog/api/contracts', () => ({
+  contractsApi: {
+    getContractsSummary: vi.fn().mockResolvedValue({
+      totalVersions: 12,
+      distinctContracts: 5,
+      draftCount: 3,
+      inReviewCount: 2,
+      approvedCount: 5,
+      lockedCount: 1,
+      deprecatedCount: 1,
+      byProtocol: [],
+    }),
+  },
+}));
+
+vi.mock('../../features/change-governance/api/changeConfidence', () => ({
+  changeConfidenceApi: {
+    getSummary: vi.fn().mockResolvedValue({
+      totalChanges: 24,
+      validatedChanges: 18,
+      changesNeedingAttention: 4,
+      suspectedRegressions: 2,
+      changesCorrelatedWithIncidents: 3,
+    }),
+  },
+}));
+
+vi.mock('../../features/operations/api/incidents', () => ({
+  incidentsApi: {
+    getIncidentSummary: vi.fn().mockResolvedValue({
+      totalOpen: 5,
+      criticalIncidents: 1,
+      withCorrelatedChanges: 2,
+      withMitigationAvailable: 3,
+      servicesImpacted: 4,
+      severityBreakdown: { critical: 1, major: 2, minor: 1, warning: 1 },
+      statusBreakdown: { open: 3, investigating: 1, mitigating: 1, monitoring: 0, resolved: 8, closed: 4 },
+    }),
+  },
+}));
+
 // Mock usePersona to avoid needing AuthProvider + PersonaProvider
 vi.mock('../../contexts/PersonaContext', () => ({
   usePersona: vi.fn(() => ({
@@ -20,6 +61,7 @@ vi.mock('../../contexts/PersonaContext', () => ({
       quickActions: [],
       navigationOrder: [],
       highlightedSections: [],
+      sectionOrder: [],
       aiContextScope: [],
       aiSuggestedPrompts: [],
     },
@@ -55,34 +97,31 @@ describe('DashboardPage', () => {
     expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument();
   });
 
-  it('exibe os stat cards com labels corretos', () => {
+  it('exibe os stat cards com labels de fluxos core', () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
     });
     renderDashboard();
     expect(screen.getByText('Active Services')).toBeInTheDocument();
-    expect(screen.getAllByText('Registered APIs').length).toBeGreaterThan(0);
-    expect(screen.getByText('Consumer Relations')).toBeInTheDocument();
     expect(screen.getByText('Total Contracts')).toBeInTheDocument();
-    expect(screen.getByText('Pending Approvals')).toBeInTheDocument();
+    expect(screen.getByText('Recent Changes')).toBeInTheDocument();
+    expect(screen.getByText('Open Incidents')).toBeInTheDocument();
+    expect(screen.getByText('Registered APIs')).toBeInTheDocument();
   });
 
-  it('exibe serviços e APIs carregados do grafo', async () => {
+  it('exibe serviços carregados do grafo com links de navegação', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [
         { serviceAssetId: 's1', name: 'payments-service', teamName: 'Payments', domain: 'Payments', serviceType: 'RestApi', criticality: 'High', lifecycleStatus: 'Active' },
         { serviceAssetId: 's2', name: 'auth-service', teamName: 'Identity', domain: 'Identity', serviceType: 'RestApi', criticality: 'Critical', lifecycleStatus: 'Active' },
       ],
-      apis: [
-        { apiAssetId: 'a1', name: 'Payments API', routePattern: '/api/payments', version: '1.0.0', visibility: 'Public', ownerServiceAssetId: 's1', consumers: [] },
-      ],
+      apis: [],
     });
     renderDashboard();
     await waitFor(() => {
       expect(screen.getByText('payments-service')).toBeInTheDocument();
       expect(screen.getByText('auth-service')).toBeInTheDocument();
-      expect(screen.getByText('Payments API')).toBeInTheDocument();
     });
   });
 
@@ -97,14 +136,14 @@ describe('DashboardPage', () => {
     });
   });
 
-  it('exibe mensagem quando não há APIs registadas', async () => {
+  it('exibe visão de saúde dos contratos com métricas reais', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({
       services: [],
       apis: [],
     });
     renderDashboard();
     await waitFor(() => {
-      expect(screen.getByText(/no apis registered yet/i)).toBeInTheDocument();
+      expect(screen.getByText('Contract Health')).toBeInTheDocument();
     });
   });
 });

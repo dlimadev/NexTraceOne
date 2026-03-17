@@ -121,6 +121,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
   { labelKey: 'sidebar.ingestionExecutions', to: '/integrations/executions', icon: <Activity size={18} />, permission: 'integrations:read', section: 'integrations' },
   { labelKey: 'sidebar.ingestionFreshness', to: '/integrations/freshness', icon: <Gauge size={18} />, permission: 'integrations:read', section: 'integrations' },
+  // ── Organization ──
+  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read' as Permission, section: 'organization' },
+  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Building2 size={18} />, permission: 'governance:domains:read' as Permission, section: 'organization' },
+  { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:delegated:read' as Permission, section: 'organization' },
   // ── Admin ──
   { labelKey: 'sidebar.licensing', to: '/licensing', icon: <Shield size={18} />, permission: 'licensing:read', section: 'admin' },
   { labelKey: 'sidebar.vendorLicensing', to: '/vendor/licensing', icon: <Shield size={18} />, permission: 'licensing:vendor:license:read', section: 'admin' },
@@ -144,6 +148,7 @@ const sectionLabels: Record<NavSection, string> = {
   operations: 'sidebar.sectionOperations',
   aiHub: 'sidebar.sectionAiHub',
   governance: 'sidebar.sectionGovernance',
+  organization: 'sidebar.sectionOrganization',
   analytics: 'sidebar.sectionAnalytics',
   integrations: 'sidebar.sectionIntegrations',
   admin: 'sidebar.sectionAdmin',

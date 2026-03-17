@@ -10,7 +10,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { OnboardingHints } from '../../../components/OnboardingHints';
-import { contractsApi } from '../api';
+import { contractsApi, serviceCatalogApi } from '../api';
 import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
   ContractVersionDetail, SemanticDiff, ContractRuleViolation,
@@ -154,6 +154,14 @@ export function ContractsPage() {
   }
 
   // ─── Queries ────────────────────────────────────────────────────────────────
+
+  /** Fetch available API assets for the entity picker (replaces raw GUID text inputs). */
+  const { data: graph } = useQuery({
+    queryKey: ['graph'],
+    queryFn: () => serviceCatalogApi.getGraph(),
+    staleTime: 60_000,
+  });
+  const availableApis = graph?.apis ?? [];
 
   const { data: history, isLoading } = useQuery({
     queryKey: ['contracts', 'history', apiAssetId],
@@ -355,14 +363,19 @@ export function ContractsPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
-                  <input
-                    type="text"
+                  <select
                     value={importForm.apiAssetId}
                     onChange={(e) => setImportForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                     required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder={t('contracts.uuidPlaceholder')}
-                  />
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  >
+                    <option value="">{t('contracts.selectApiAsset')}</option>
+                    {availableApis.map((api) => (
+                      <option key={api.apiAssetId} value={api.apiAssetId}>
+                        {api.name} — {api.routePattern}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-body mb-1">{t('contracts.version')}</label>
@@ -422,14 +435,19 @@ export function ContractsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-body mb-1">{t('contracts.apiAssetId')}</label>
-                  <input
-                    type="text"
+                  <select
                     value={createVersionForm.apiAssetId}
                     onChange={(e) => setCreateVersionForm((f) => ({ ...f, apiAssetId: e.target.value }))}
                     required
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                    placeholder={t('contracts.uuidPlaceholder')}
-                  />
+                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                  >
+                    <option value="">{t('contracts.selectApiAsset')}</option>
+                    {availableApis.map((api) => (
+                      <option key={api.apiAssetId} value={api.apiAssetId}>
+                        {api.name} — {api.routePattern}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-body mb-1">{t('contracts.version')}</label>
@@ -564,14 +582,19 @@ export function ContractsPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex gap-3 items-center">
-            <label className="text-sm font-medium text-body whitespace-nowrap">{t('contracts.apiAssetIdLabel')}</label>
-            <input
-              type="text"
+            <label className="text-sm font-medium text-body whitespace-nowrap">{t('contracts.selectApiAssetLabel')}</label>
+            <select
               value={apiAssetId}
               onChange={(e) => setApiAssetId(e.target.value)}
-              placeholder={t('contracts.filterPlaceholder')}
-              className="flex-1 text-sm bg-canvas border border-edge rounded-md px-3 py-1.5 text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-            />
+              className="flex-1 text-sm bg-canvas border border-edge rounded-md px-3 py-1.5 text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+            >
+              <option value="">{t('contracts.selectApiAsset')}</option>
+              {availableApis.map((api) => (
+                <option key={api.apiAssetId} value={api.apiAssetId}>
+                  {api.name} — {api.routePattern}
+                </option>
+              ))}
+            </select>
           </div>
         </CardBody>
       </Card>
@@ -585,7 +608,7 @@ export function ContractsPage() {
           {!apiAssetId ? (
             <div className="px-6 py-12 text-center">
               <FileCheck size={40} className="mx-auto mb-3 text-muted opacity-50" />
-              <p className="text-sm text-muted">{t('contracts.enterApiAssetId')}</p>
+              <p className="text-sm text-muted">{t('contracts.selectApiAssetPrompt')}</p>
             </div>
           ) : isLoading ? (
             <div className="flex items-center justify-center py-12">

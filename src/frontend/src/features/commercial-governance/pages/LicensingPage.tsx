@@ -531,7 +531,7 @@ export function LicensingPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  extendTrialMutation.mutate(extendForm);
+                  extendTrialMutation.mutate({ ...extendForm, licenseKey: extendForm.licenseKey || licenseKey });
                 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
               >
@@ -541,11 +541,9 @@ export function LicensingPage() {
                   </label>
                   <input
                     type="text"
-                    value={extendForm.licenseKey}
-                    onChange={(e) => setExtendForm((f) => ({ ...f, licenseKey: e.target.value }))}
-                    required
-                    placeholder={t('licensing.licenseKeyPlaceholder')}
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono"
+                    value={extendForm.licenseKey || licenseKey}
+                    readOnly
+                    className="w-full rounded-md bg-elevated border border-edge px-3 py-2 text-sm text-muted cursor-not-allowed font-mono"
                   />
                 </div>
                 <div>
@@ -582,7 +580,7 @@ export function LicensingPage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  convertTrialMutation.mutate(convertForm);
+                  convertTrialMutation.mutate({ ...convertForm, licenseKey: convertForm.licenseKey || licenseKey });
                 }}
                 className="space-y-4"
               >
@@ -593,13 +591,9 @@ export function LicensingPage() {
                     </label>
                     <input
                       type="text"
-                      value={convertForm.licenseKey}
-                      onChange={(e) =>
-                        setConvertForm((f) => ({ ...f, licenseKey: e.target.value }))
-                      }
-                      required
-                      placeholder={t('licensing.licenseKeyPlaceholder')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono"
+                      value={convertForm.licenseKey || licenseKey}
+                      readOnly
+                      className="w-full rounded-md bg-elevated border border-edge px-3 py-2 text-sm text-muted cursor-not-allowed font-mono"
                     />
                   </div>
                   <div>
