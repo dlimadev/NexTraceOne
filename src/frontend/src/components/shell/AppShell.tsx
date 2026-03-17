@@ -33,6 +33,7 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
     const mq = window.matchMedia('(min-width: 1024px)');
     const handler = () => { if (mq.matches) setMobileOpen(false); };
     mq.addEventListener('change', handler);
