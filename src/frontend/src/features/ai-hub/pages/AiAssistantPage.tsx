@@ -29,6 +29,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { PageContainer } from '../../../components/shell';
+import { aiGovernanceApi } from '../api/aiGovernance';
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -259,6 +260,8 @@ export function AiAssistantPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessagesMap['1'] || []);
   const [expandedMeta, setExpandedMeta] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [backendConnected, setBackendConnected] = useState<boolean | null>(null);
+  const [providerStatus, setProviderStatus] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -268,6 +271,19 @@ export function AiAssistantPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    aiGovernanceApi.checkProvidersHealth()
+      .then((data: { allHealthy: boolean; items: Array<{ providerId: string; isHealthy: boolean; message?: string }> }) => {
+        setBackendConnected(true);
+        const healthyCount = data.items?.filter((p: { isHealthy: boolean }) => p.isHealthy).length || 0;
+        setProviderStatus(`${healthyCount}/${data.items?.length || 0} providers healthy`);
+      })
+      .catch(() => {
+        setBackendConnected(false);
+        setProviderStatus('Backend unavailable');
+      });
+  }, []);
 
   const handleSelectConversation = (convId: string) => {
     setSelectedConversation(convId);
@@ -295,31 +311,61 @@ export function AiAssistantPage() {
     setExpandedMeta(null);
   };
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isTyping) return;
 
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
       role: 'user',
-      content: inputValue,
+      content: inputValue.trim(),
       timestamp: new Date().toISOString(),
     };
     setMessages(prev => [...prev, userMsg]);
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response with delay
-    setTimeout(() => {
+    try {
+      const response = await aiGovernanceApi.chat({
+        message: userMsg.content,
+        conversationId: selectedConversation || undefined,
+      });
+
       const assistantMsg: ChatMessage = {
         id: `a-${Date.now()}`,
         role: 'assistant',
-        content: `${t('aiHub.contextualResponsePrefix')}: "${inputValue.length > 80 ? inputValue.slice(0, 77) + '...' : inputValue}". ${t('aiHub.groundingDevelopment')}`,
-        modelName: 'NexTrace-Internal-v1',
-        provider: 'Internal',
+        content: response.content,
+        modelName: response.modelId,
+        provider: response.providerId,
+        isInternalModel: response.isInternalModel,
+        promptTokens: response.promptTokens,
+        completionTokens: response.completionTokens,
+        correlationId: response.correlationId,
+        useCaseType: 'General',
+        routingPath: response.isInternalModel ? 'InternalOnly' : 'ExternalEscalation',
+        confidenceLevel: 'High',
+        costClass: response.isInternalModel ? 'low' : 'medium',
+        routingRationale: `Routed to ${response.providerId}/${response.modelId}. Duration: ${response.durationMs?.toFixed(0)}ms`,
+        sourceWeightingSummary: '',
+        escalationReason: 'None',
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+
+      if (response.conversationId && !selectedConversation) {
+        setSelectedConversation(response.conversationId);
+      }
+    } catch {
+      // Fallback to mock response if backend unavailable
+      const assistantMsg: ChatMessage = {
+        id: `a-${Date.now()}`,
+        role: 'assistant',
+        content: `[Mock] ${t('aiHub.contextualResponsePrefix')}: "${userMsg.content.length > 80 ? userMsg.content.slice(0, 77) + '...' : userMsg.content}". ${t('aiHub.groundingDevelopment')}`,
+        modelName: 'Mock-Fallback',
+        provider: 'Mock',
         isInternalModel: true,
-        promptTokens: Math.floor(inputValue.length / 4),
+        promptTokens: Math.floor(userMsg.content.length / 4),
         completionTokens: 45,
-        appliedPolicyName: 'Default Internal Policy',
+        appliedPolicyName: 'Offline Fallback',
         groundingSources: activeContexts.map(ctx => {
           const srcMap: Record<string, string> = {
             services: 'Service Catalog',
@@ -331,19 +377,20 @@ export function AiAssistantPage() {
           return srcMap[ctx.toLowerCase()] || ctx;
         }),
         contextReferences: [],
-        correlationId: `resp-${Date.now()}`,
+        correlationId: `mock-${Date.now()}`,
         useCaseType: 'General',
-        routingPath: 'InternalOnly',
-        confidenceLevel: 'Medium',
-        costClass: 'low',
-        routingRationale: 'Default internal routing applied for general query.',
-        sourceWeightingSummary: activeContexts.map(c => `${c}:25%`).join(','),
-        escalationReason: 'None',
+        routingPath: 'MockFallback',
+        confidenceLevel: 'Low',
+        costClass: 'none',
+        routingRationale: 'Backend unavailable — mock response generated locally.',
+        sourceWeightingSummary: '',
+        escalationReason: 'BackendUnavailable',
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, assistantMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -450,6 +497,18 @@ export function AiAssistantPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {backendConnected === true && (
+                <Badge variant="success">
+                  <CheckCircle2 size={10} className="mr-0.5" />
+                  {providerStatus}
+                </Badge>
+              )}
+              {backendConnected === false && (
+                <Badge variant="warning">
+                  <AlertCircle size={10} className="mr-0.5" />
+                  {providerStatus}
+                </Badge>
+              )}
               <div className="flex items-center gap-1.5">
                 <User size={14} className="text-muted" />
                 <span className="text-xs text-muted">

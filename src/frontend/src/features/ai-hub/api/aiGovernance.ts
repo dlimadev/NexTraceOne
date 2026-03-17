@@ -93,4 +93,19 @@ export const aiGovernanceApi = {
     changeId?: string;
   }) =>
     client.post('/ai/context/enrich', data).then(r => r.data),
+
+  // ── AI Runtime ────────────────────────────────────────────────────
+  chat: (data: {
+    message: string;
+    conversationId?: string;
+    preferredModelId?: string;
+    systemPrompt?: string;
+    temperature?: number;
+    maxTokens?: number;
+  }) =>
+    client.post('/ai/chat', data).then(r => r.data),
+  listProviders: () =>
+    client.get('/ai/providers').then(r => r.data),
+  checkProvidersHealth: () =>
+    client.get('/ai/providers/health').then(r => r.data),
 };
