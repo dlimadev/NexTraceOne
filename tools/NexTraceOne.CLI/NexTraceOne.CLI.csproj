@@ -8,7 +8,6 @@
   </PropertyGroup>
   <ItemGroup Label="Bounded Contexts (Domain — contratos compartilhados absorvidos)">
     <ProjectReference Include="..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
-    <ProjectReference Include="..\..\src\modules\commercialgovernance\NexTraceOne.CommercialGovernance.Contracts\NexTraceOne.CommercialGovernance.Contracts.csproj" />
     <ProjectReference Include="..\..\src\modules\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\src\modules\changegovernance\NexTraceOne.ChangeGovernance.Contracts\NexTraceOne.ChangeGovernance.Contracts.csproj" />
     <ProjectReference Include="..\..\src\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
