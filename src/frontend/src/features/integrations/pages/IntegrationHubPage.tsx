@@ -8,7 +8,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 type ConnectorStatus = 'Active' | 'Degraded' | 'Failed' | 'Disabled';
 type ConnectorHealth = 'Healthy' | 'Degraded' | 'Failed' | 'Stale';
@@ -100,14 +100,17 @@ export function IntegrationHubPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('integrations.totalConnectors')} value={data.length} icon={<Cable size={20} />} color="text-accent" />
-        <StatCard title={t('integrations.healthyConnectors')} value={healthyCount} icon={<CheckCircle size={20} />} color="text-success" />
-        <StatCard title={t('integrations.degradedFailed')} value={degradedFailedCount} icon={<AlertTriangle size={20} />} color="text-critical" />
-        <StatCard title={t('integrations.staleFeeds')} value={staleCount} icon={<Clock size={20} />} color="text-warning" />
-      </div>
+      <PageSection>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <StatCard title={t('integrations.totalConnectors')} value={data.length} icon={<Cable size={20} />} color="text-accent" />
+          <StatCard title={t('integrations.healthyConnectors')} value={healthyCount} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('integrations.degradedFailed')} value={degradedFailedCount} icon={<AlertTriangle size={20} />} color="text-critical" />
+          <StatCard title={t('integrations.staleFeeds')} value={staleCount} icon={<Clock size={20} />} color="text-warning" />
+        </div>
+      </PageSection>
 
-      {/* Filters */}
+      {/* Connectors */}
+      <PageSection>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
@@ -191,6 +194,7 @@ export function IntegrationHubPage() {
           </div>
         </CardBody>
       </Card>
+      </PageSection>
     </PageContainer>
   );
 }

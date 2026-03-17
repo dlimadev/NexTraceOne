@@ -12,7 +12,7 @@ import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -180,6 +180,7 @@ export function IncidentDetailPage() {
         </div>
       </div>
 
+      <PageSection>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column */}
         <div className="space-y-6">
@@ -428,6 +429,7 @@ export function IncidentDetailPage() {
           )}
         </div>
       </div>
+      </PageSection>
 
       {/* ── AI Assistant Panel ── */}
       <div className="mt-6">
