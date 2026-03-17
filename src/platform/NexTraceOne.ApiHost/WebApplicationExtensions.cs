@@ -1,5 +1,4 @@
 using NexTraceOne.Identity.Infrastructure.Persistence;
-using NexTraceOne.Licensing.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.Contracts.Infrastructure.Persistence;
 using NexTraceOne.ChangeIntelligence.Infrastructure.Persistence;
@@ -47,7 +46,6 @@ public static class WebApplicationExtensions
             logger.LogInformation("Applying pending database migrations...");
 
             await MigrateContextAsync<IdentityDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<LicensingDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<CatalogGraphDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ContractsDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);

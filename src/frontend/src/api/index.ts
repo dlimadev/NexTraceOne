@@ -9,7 +9,6 @@ export { changeIntelligenceApi } from '../features/change-governance/api/changeI
 export { workflowApi } from '../features/change-governance/api/workflow';
 export { auditApi } from '../features/audit-compliance/api/audit';
 export { promotionApi } from '../features/change-governance/api/promotion';
-export { licensingApi } from '../features/commercial-governance/api/licensing';
 export { developerPortalApi } from '../features/catalog/api/developerPortal';
 export { globalSearchApi } from '../features/catalog/api/globalSearch';
 export { organizationGovernanceApi } from '../features/governance/api/organizationGovernance';

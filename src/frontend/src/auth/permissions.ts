@@ -102,23 +102,6 @@ export type Permission =
   // ── Audit ──
   | 'audit:read'
   | 'audit:export'
-  // ── Licensing ──
-  | 'licensing:read'
-  | 'licensing:write'
-  | 'licensing:vendor:license:read'
-  | 'licensing:vendor:license:create'
-  | 'licensing:vendor:license:revoke'
-  | 'licensing:vendor:license:rehost'
-  | 'licensing:vendor:license:manage'
-  | 'licensing:vendor:key:generate'
-  | 'licensing:vendor:trial:extend'
-  | 'licensing:vendor:activation:issue'
-  | 'licensing:vendor:tenant:manage'
-  | 'licensing:vendor:telemetry:view'
-  | 'licensing:vendor:plan:read'
-  | 'licensing:vendor:plan:create'
-  | 'licensing:vendor:featurepack:read'
-  | 'licensing:vendor:featurepack:create'
   // ── Integrations ──
   | 'integrations:read'
   | 'integrations:write'

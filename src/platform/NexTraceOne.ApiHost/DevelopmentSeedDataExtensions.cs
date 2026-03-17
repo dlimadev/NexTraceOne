@@ -21,7 +21,6 @@ public static class DevelopmentSeedDataExtensions
     private static readonly (string ConnectionStringName, string SqlFileName)[] SeedTargets =
     [
         ("IdentityDatabase", "seed-identity.sql"),
-        ("LicensingDatabase", "seed-licensing.sql"),
         ("CatalogDatabase", "seed-catalog.sql"),
         ("ChangeIntelligenceDatabase", "seed-changegovernance.sql"),
         ("AuditDatabase", "seed-audit.sql"),

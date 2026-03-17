@@ -76,23 +76,7 @@ Proteção contra uso de binários adulterados.
 
 ---
 
-## 5. License Binding — Hardware Fingerprint
-
-Licença vinculada ao hardware, não transferível.
-
-**Mecanismo:**
-```
-Fingerprint = SHA-256(CPU ID | Motherboard UUID | MAC Address)
-```
-
-- Na ativação: cliente envia fingerprint → servidor gera licença vinculada
-- No boot: `HardwareFingerprint.Generate()` recalcula e compara com licença
-- Em VMs: usa identificadores do hypervisor
-- Algoritmo determinístico — mesmo hardware = mesmo hash sempre
-
----
-
-## 6. Autenticação — Federation-First
+## 5. Autenticação — Federation-First
 
 **Estratégia:** OIDC Federation como método primário.
 
@@ -108,7 +92,7 @@ Fingerprint = SHA-256(CPU ID | Motherboard UUID | MAC Address)
 
 ---
 
-## 7. Autorização — Permission-Based
+## 6. Autorização — Permission-Based
 
 - Modelo RBAC com permissões granulares
 - Roles predefinidas: Admin, Manager, Developer, Viewer, Auditor
@@ -118,24 +102,22 @@ Fingerprint = SHA-256(CPU ID | Motherboard UUID | MAC Address)
 
 ---
 
-## 8. Resumo de Camadas de Segurança
+## 7. Resumo de Camadas de Segurança
 
 ```
 ┌─────────────────────────────────────────────┐
 │ Camada 1: Assembly Integrity (boot)         │
 ├─────────────────────────────────────────────┤
-│ Camada 2: License Verification (boot)       │
+│ Camada 2: OIDC/JWT Authentication (request) │
 ├─────────────────────────────────────────────┤
-│ Camada 3: OIDC/JWT Authentication (request) │
+│ Camada 3: Tenant Resolution (request)       │
 ├─────────────────────────────────────────────┤
-│ Camada 4: Tenant Resolution (request)       │
+│ Camada 4: Permission Check (handler)        │
 ├─────────────────────────────────────────────┤
-│ Camada 5: Permission Check (handler)        │
+│ Camada 5: RLS PostgreSQL (query)            │
 ├─────────────────────────────────────────────┤
-│ Camada 6: RLS PostgreSQL (query)            │
+│ Camada 6: Encryption at Rest (storage)      │
 ├─────────────────────────────────────────────┤
-│ Camada 7: Encryption at Rest (storage)      │
-├─────────────────────────────────────────────┤
-│ Camada 8: Audit Hash Chain (post-commit)    │
+│ Camada 7: Audit Hash Chain (post-commit)    │
 └─────────────────────────────────────────────┘
 ```

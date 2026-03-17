@@ -10,7 +10,6 @@
   </ItemGroup>
   <ItemGroup Label="Bounded Contexts (Infrastructure)">
     <ProjectReference Include="..\..\modules\identityaccess\NexTraceOne.IdentityAccess.API\NexTraceOne.IdentityAccess.API.csproj" />
-    <ProjectReference Include="..\..\modules\commercialgovernance\NexTraceOne.CommercialGovernance.API\NexTraceOne.CommercialGovernance.API.csproj" />
     <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
     <ProjectReference Include="..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.API\NexTraceOne.ChangeGovernance.API.csproj" />
     <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.API\NexTraceOne.OperationalIntelligence.API.csproj" />
