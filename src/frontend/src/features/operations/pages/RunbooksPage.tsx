@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 /**
  * Página de Runbooks — procedimentos operacionais e guias de mitigação.
@@ -20,8 +20,11 @@ export function RunbooksPage() {
         <p className="text-muted mt-1">{t('runbooks.subtitle')}</p>
       </div>
 
-      <OnboardingHints module="operations" />
+      <PageSection>
+        <OnboardingHints module="operations" />
+      </PageSection>
 
+      <PageSection>
       <Card>
         <CardBody>
           <EmptyState
@@ -39,6 +42,7 @@ export function RunbooksPage() {
           />
         </CardBody>
       </Card>
+      </PageSection>
     </PageContainer>
   );
 }

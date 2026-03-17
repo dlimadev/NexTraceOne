@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { auditApi } from '../api';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 export function AuditPage() {
   const { t } = useTranslation();
@@ -66,30 +66,31 @@ export function AuditPage() {
         </div>
       )}
 
-      {/* Filter */}
-      <Card className="mb-6">
-        <CardBody>
-          <div className="flex gap-3 items-center">
-            <Search size={16} className="text-muted shrink-0" />
-            <input
-              type="text"
-              value={eventTypeFilter}
-              onChange={(e) => {
-                setEventTypeFilter(e.target.value);
-                setPage(1);
-              }}
-              placeholder={t('audit.filterPlaceholder')}
-              className="flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
-            />
-            <Button variant="secondary" onClick={() => refetch()} loading={isFetching}>
-              <RefreshCw size={14} />
-              {t('common.refresh')}
-            </Button>
-          </div>
-        </CardBody>
-      </Card>
+      {/* Filter + Table */}
+      <PageSection>
+        <Card className="mb-6">
+          <CardBody>
+            <div className="flex gap-3 items-center">
+              <Search size={16} className="text-muted shrink-0" />
+              <input
+                type="text"
+                value={eventTypeFilter}
+                onChange={(e) => {
+                  setEventTypeFilter(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={t('audit.filterPlaceholder')}
+                className="flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
+              />
+              <Button variant="secondary" onClick={() => refetch()} loading={isFetching}>
+                <RefreshCw size={14} />
+                {t('common.refresh')}
+              </Button>
+            </div>
+          </CardBody>
+        </Card>
 
-      <Card>
+        <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -170,7 +171,8 @@ export function AuditPage() {
             </Button>
           </div>
         )}
-      </Card>
+        </Card>
+      </PageSection>
     </PageContainer>
   );
 }

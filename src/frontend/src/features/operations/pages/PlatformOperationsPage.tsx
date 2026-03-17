@@ -7,7 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, PageSection } from '../../../components/shell';
 
 // ── Types ──
 
@@ -166,12 +166,14 @@ export function PlatformOperationsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('platformOps.healthyCount')} value={`${healthyCount}/${mockSubsystems.length}`} icon={<CheckCircle size={20} />} color="text-success" />
-        <StatCard title={t('platformOps.activeJobs')} value={activeJobsCount} icon={<Activity size={20} />} color="text-info" />
-        <StatCard title={t('platformOps.totalPending')} value={totalPending} icon={<Inbox size={20} />} color="text-warning" />
-        <StatCard title={t('platformOps.unresolvedEvents')} value={unresolvedCount} icon={<Bell size={20} />} color="text-critical" />
-      </div>
+      <PageSection>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard title={t('platformOps.healthyCount')} value={`${healthyCount}/${mockSubsystems.length}`} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('platformOps.activeJobs')} value={activeJobsCount} icon={<Activity size={20} />} color="text-info" />
+          <StatCard title={t('platformOps.totalPending')} value={totalPending} icon={<Inbox size={20} />} color="text-warning" />
+          <StatCard title={t('platformOps.unresolvedEvents')} value={unresolvedCount} icon={<Bell size={20} />} color="text-critical" />
+        </div>
+      </PageSection>
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 border-b border-edge">
@@ -192,6 +194,7 @@ export function PlatformOperationsPage() {
 
       {/* ── Health Tab ── */}
       {activeTab === 'health' && (
+        <PageSection>
         <Card>
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
@@ -238,11 +241,12 @@ export function PlatformOperationsPage() {
             </div>
           </CardBody>
         </Card>
+        </PageSection>
       )}
 
       {/* ── Jobs Tab ── */}
       {activeTab === 'jobs' && (
-        <>
+        <PageSection>
           <div className="flex items-center gap-3 mb-4">
             <select
               value={jobFilter}
@@ -292,11 +296,12 @@ export function PlatformOperationsPage() {
               </div>
             </CardBody>
           </Card>
-        </>
+        </PageSection>
       )}
 
       {/* ── Queues Tab ── */}
       {activeTab === 'queues' && (
+        <PageSection>
         <Card>
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
@@ -327,11 +332,12 @@ export function PlatformOperationsPage() {
             </div>
           </CardBody>
         </Card>
+        </PageSection>
       )}
 
       {/* ── Events Tab ── */}
       {activeTab === 'events' && (
-        <>
+        <PageSection>
           <div className="flex items-center gap-3 mb-4">
             <select
               value={severityFilter}
@@ -381,7 +387,7 @@ export function PlatformOperationsPage() {
               </div>
             </CardBody>
           </Card>
-        </>
+        </PageSection>
       )}
     </PageContainer>
   );
