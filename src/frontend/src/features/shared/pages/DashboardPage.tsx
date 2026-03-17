@@ -12,6 +12,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { QuickActions } from '../../../components/QuickActions';
 import { PersonaQuickstart } from '../../../components/PersonaQuickstart';
 import { HomeWidgetCard } from '../../../components/HomeWidgetCard';
+import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 import { contractsApi } from '../../catalog/api/contracts';
@@ -157,7 +158,7 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer>
       {/* ── Context bar ──────────────────────────────────────────────────────── */}
       <div className="mb-6">
         <div className="flex items-center gap-3">
@@ -187,11 +188,13 @@ export function DashboardPage() {
       )}
 
       {/* ── KPI Stats ────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        {stats.map((s) => (
-          <StatCard key={s.title} {...s} />
-        ))}
-      </div>
+      <PageSection>
+        <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
+          {stats.map((s) => (
+            <StatCard key={s.title} {...s} />
+          ))}
+        </ContentGrid>
+      </PageSection>
 
       {/* ── Attention Alerts ─────────────────────────────────────────────────── */}
       {attentionAlerts.length > 0 && (
@@ -220,7 +223,8 @@ export function DashboardPage() {
       )}
 
       {/* ── Operational views: Services + Contract Health ────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+      <PageSection>
+        <ContentGrid columns={2}>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between w-full">
@@ -338,10 +342,12 @@ export function DashboardPage() {
             )}
           </CardBody>
         </Card>
-      </div>
+        </ContentGrid>
+      </PageSection>
 
       {/* ── Operational Intelligence: Changes + Incidents ────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <PageSection>
+        <ContentGrid columns={2}>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between w-full">
@@ -445,7 +451,8 @@ export function DashboardPage() {
             )}
           </CardBody>
         </Card>
-      </div>
-    </div>
+        </ContentGrid>
+      </PageSection>
+    </PageContainer>
   );
 }
