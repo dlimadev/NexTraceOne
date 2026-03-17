@@ -8,7 +8,11 @@
 
 ## 1. Resumo Executivo
 
-**Estágio geral:** A IA local no NexTraceOne encontra-se em estágio **inicial-parcial**. Existe um módulo `aiknowledge` com arquitetura DDD/Clean Architecture bem definida, dividido em 3 subdomínios (Governance, ExternalAI, Orchestration). O subdomínio de **Governance** é o único com implementação real funcional — possui 24 de 28 handlers com lógica real, 11 repositórios, 11 configurações EF Core, endpoints REST completos e testes unitários. Os subdomínios **ExternalAI** e **Orchestration** são 100% stubs/TODO. O frontend possui 7 páginas e 1 componente reutilizável, todos com UI funcional mas usando dados mock hardcoded.
+**Estágio geral:** A IA local no NexTraceOne encontra-se em estágio **inicial-parcial**. Existe um módulo `aiknowledge` com arquitetura DDD/Clean Architecture bem definida, dividido em 3 subdomínios (Governance, ExternalAI, Orchestration).
+
+O subdomínio de **Governance** é o único com implementação real funcional — possui 24 de 28 handlers com lógica real, 11 repositórios, 11 configurações EF Core, endpoints REST completos e testes unitários. Os subdomínios **ExternalAI** e **Orchestration** são 100% stubs/TODO.
+
+O frontend possui 7 páginas e 1 componente reutilizável, todos com UI funcional mas usando dados mock hardcoded.
 
 **Fato crítico:** Não existe nenhuma dependência de SDK de IA (Semantic Kernel, LangChain, OpenAI SDK) no projeto inteiro. Não há provider local configurado. Não há vector store. Não há embedding. Não há RAG. Não há inferência local. A IA descrita na arquitetura é uma **intenção documentada**, não uma capacidade funcional.
 
@@ -186,7 +190,7 @@ builder.Services.AddAiOrchestrationModule(builder.Configuration);
 - ✅ Registo de auditoria (usage entry)
 - ✅ Metadados completos (tokens, routing, confidence, caveats)
 
-**Limitação crítica:** A "resposta da IA" é gerada por lógica heurística interna (templates de texto), **não** por invocação de um LLM real.
+**Nota (criticidade ALTA):** A "resposta da IA" é gerada por lógica heurística interna (templates de texto), **não** por invocação de um LLM real.
 
 ### 3.3 Frontend — UI Funcional com Dados Mock
 
