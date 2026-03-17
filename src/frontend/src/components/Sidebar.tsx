@@ -260,7 +260,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
       <div key={sectionKey} className={`mb-1 ${highlighted ? 'pl-0.5 border-l-2 border-accent/30' : ''}`}>
         {labelKey && (
           <button
-            onClick={() => hasMultipleItems && toggleSection(sectionKey)}
+            onClick={() => { if (hasMultipleItems) toggleSection(sectionKey); }}
             className={`w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider ${
               highlighted ? 'text-accent' : 'text-faded'
             } ${hasMultipleItems ? 'hover:text-muted cursor-pointer' : 'cursor-default'}`}

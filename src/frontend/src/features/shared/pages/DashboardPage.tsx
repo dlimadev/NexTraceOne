@@ -75,14 +75,14 @@ export function DashboardPage() {
   const stats = [
     {
       title: t('dashboard.activeServices'),
-      value: graphLoading ? '…' : (totalServices || '—'),
+      value: graphLoading ? '…' : totalServices,
       icon: <Activity size={22} />,
       color: 'text-brand-blue',
       trend: totalServices > 0 ? { direction: 'up' as const, label: t('dashboard.trendHealthy') } : undefined,
     },
     {
       title: t('dashboard.totalContracts'),
-      value: contractsLoading ? '…' : (totalContracts || '—'),
+      value: contractsLoading ? '…' : totalContracts,
       icon: <FileText size={22} />,
       color: 'text-success',
       trend: (contractsSummary?.inReviewCount ?? 0) > 0
@@ -91,7 +91,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.recentChanges'),
-      value: changesLoading ? '…' : (totalChanges || '—'),
+      value: changesLoading ? '…' : totalChanges,
       icon: <ShieldCheck size={22} />,
       color: 'text-warning',
       trend: (changesSummary?.changesNeedingAttention ?? 0) > 0
@@ -100,7 +100,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.openIncidents'),
-      value: incidentsLoading ? '…' : (openIncidents || '—'),
+      value: incidentsLoading ? '…' : openIncidents,
       icon: <AlertTriangle size={22} />,
       color: 'text-critical',
       trend: openIncidents > 0
@@ -109,7 +109,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard.registeredApis'),
-      value: graphLoading ? '…' : (totalApis || '—'),
+      value: graphLoading ? '…' : totalApis,
       icon: <GitBranch size={22} />,
       color: 'text-accent',
     },
@@ -253,7 +253,7 @@ export function DashboardPage() {
                 description={t('productPolish.emptyServices')}
                 action={
                   <Link to="/services" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                    {t('common.getStarted')} →
+                    {t('common.getStarted')} <ArrowRight size={10} className="inline" />
                   </Link>
                 }
               />
@@ -312,7 +312,7 @@ export function DashboardPage() {
                 description={t('productPolish.emptyContracts')}
                 action={
                   <Link to="/contracts/studio" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                    {t('common.getStarted')} →
+                    {t('common.getStarted')} <ArrowRight size={10} className="inline" />
                   </Link>
                 }
               />
@@ -371,7 +371,7 @@ export function DashboardPage() {
                 description={t('productPolish.guidanceChanges')}
                 action={
                   <Link to="/changes" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                    {t('common.explore')} →
+                    {t('common.explore')} <ArrowRight size={10} className="inline" />
                   </Link>
                 }
               />
@@ -423,7 +423,7 @@ export function DashboardPage() {
                 description={t('productPolish.guidanceOperations')}
                 action={
                   <Link to="/operations/incidents" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                    {t('common.explore')} →
+                    {t('common.explore')} <ArrowRight size={10} className="inline" />
                   </Link>
                 }
               />

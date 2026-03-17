@@ -52,7 +52,8 @@ export function LoginPage() {
       const returnTo = searchParams.get('returnTo') ?? undefined;
       const { authorizationUrl } = await identityApi.startOidcLogin('default', returnTo);
       window.location.href = authorizationUrl;
-    } catch {
+    } catch (_err) {
+      // Error details not exposed to UI for security; generic message shown
       setError(t('auth.ssoError'));
       setSsoLoading(false);
     }
