@@ -156,7 +156,7 @@
       "invalidTokenMessage": "Contacte o administrador para um novo convite.",
       "errorGeneric": "Não foi possível aceitar o convite. Tente novamente.",
       "alreadyAccepted": "Este convite já foi aceite."
-    }
+    },
   "tenants": {
     "selectTenant": "Selecionar Organização",
     "selectTenantDescription": "Escolha a organização com a qual pretende trabalhar.",
