@@ -7,6 +7,7 @@ import { EmptyState } from '../../../../components/EmptyState';
 import { LifecycleBadge } from '../../shared/components';
 import { LoadingState, ErrorState } from '../../shared/components/StateIndicators';
 import { contractsApi } from '../../api/contracts';
+import type { ContractVersion, ContractDiffResult, ChangeEntry } from '../../../../types';
 
 interface VersioningSectionProps {
   apiAssetId: string;
@@ -60,7 +61,7 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
 
           {versions.length > 0 && (
             <div className="divide-y divide-edge">
-              {versions.map((v: any) => (
+              {versions.map((v: ContractVersion) => (
                 <div
                   key={v.id}
                   className={`flex items-center gap-3 px-4 py-3 text-xs transition-colors hover:bg-elevated/30
@@ -99,7 +100,7 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
               className="flex-1 text-xs bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
             >
               <option value="">{t('contracts.diff.selectBaseVersion', 'Select Base Version')}</option>
-              {versions.map((v: any) => (
+              {versions.map((v: ContractVersion) => (
                 <option key={v.id} value={v.id}>v{v.version} — {v.lifecycleState}</option>
               ))}
             </select>
@@ -112,7 +113,7 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
               className="flex-1 text-xs bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
             >
               <option value="">{t('contracts.diff.selectTargetVersion', 'Select Target Version')}</option>
-              {versions.map((v: any) => (
+              {versions.map((v: ContractVersion) => (
                 <option key={v.id} value={v.id}>v{v.version} — {v.lifecycleState}</option>
               ))}
             </select>
@@ -145,7 +146,7 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
 
 // ── Diff Results ──────────────────────────────────────────────────────────────
 
-function DiffResults({ data }: { data: any }) {
+function DiffResults({ data }: { data: ContractDiffResult }) {
   const { t } = useTranslation();
 
   const sections = [
@@ -184,7 +185,7 @@ function DiffResults({ data }: { data: any }) {
               {t(labelKey)} ({changes.length})
             </h4>
             <ul className="space-y-1">
-              {changes.map((change: any, idx: number) => (
+              {changes.map((change: ChangeEntry, idx: number) => (
                 <li key={idx} className="flex items-start gap-2 text-xs">
                   <span className="font-mono text-[10px] text-muted truncate max-w-[200px]">{change.path}</span>
                   <span className="text-body flex-1">{change.description}</span>
