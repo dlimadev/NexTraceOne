@@ -15,6 +15,7 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { OnboardingHints } from '../../../components/OnboardingHints';
+import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import type { ChangesFilterParams } from '../api/changeConfidence';
 import type { ChangeDto } from '../../../types';
@@ -143,7 +144,7 @@ export function ChangeCatalogPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in space-y-6">
+    <PageContainer>
       {/* ── Header ── */}
       <div>
         <h1 className="text-2xl font-bold text-heading">{t('changeConfidence.title')}</h1>
@@ -154,25 +155,28 @@ export function ChangeCatalogPage() {
       <OnboardingHints module="changes" />
 
       {/* ── Summary cards ── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {summaryCards.map(({ key, value, icon: Icon, color }) => (
-          <Card key={key}>
-            <CardBody className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg bg-elevated ${color}`}>
-                <Icon size={20} />
-              </div>
-              <div>
-                <p className="text-xs text-muted">{t(`changeConfidence.summary.${key}`)}</p>
-                <p className="text-lg font-semibold text-heading">
-                  {summaryQuery.isLoading ? '—' : (value ?? 0)}
-                </p>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
+      <PageSection>
+        <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
+          {summaryCards.map(({ key, value, icon: Icon, color }) => (
+            <Card key={key}>
+              <CardBody className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg bg-elevated ${color}`}>
+                  <Icon size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-muted">{t(`changeConfidence.summary.${key}`)}</p>
+                  <p className="text-lg font-semibold text-heading">
+                    {summaryQuery.isLoading ? '—' : (value ?? 0)}
+                  </p>
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </ContentGrid>
+      </PageSection>
 
-      {/* ── Filters ── */}
+      {/* ── Filters + Table ── */}
+      <PageSection>
       <Card>
         <CardBody>
           <div className="flex flex-wrap gap-3 items-center">
@@ -310,7 +314,8 @@ export function ChangeCatalogPage() {
           </div>
         )}
       </Card>
-    </div>
+      </PageSection>
+    </PageContainer>
   );
 }
 
