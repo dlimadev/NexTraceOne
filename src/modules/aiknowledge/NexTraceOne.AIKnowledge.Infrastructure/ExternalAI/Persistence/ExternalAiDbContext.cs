@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 
@@ -15,10 +16,27 @@ public sealed class ExternalAiDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock)
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    // TODO: Adicionar DbSet<T> para cada entidade do módulo
+    /// <summary>Provedores externos de IA registrados na plataforma.</summary>
+    public DbSet<ExternalAiProvider> Providers => Set<ExternalAiProvider>();
+
+    /// <summary>Políticas de governança para uso de IA externa.</summary>
+    public DbSet<ExternalAiPolicy> Policies => Set<ExternalAiPolicy>();
+
+    /// <summary>Consultas enviadas a provedores externos de IA.</summary>
+    public DbSet<ExternalAiConsultation> Consultations => Set<ExternalAiConsultation>();
+
+    /// <summary>Conhecimento organizacional capturado de interações com IA externa.</summary>
+    public DbSet<KnowledgeCapture> KnowledgeCaptures => Set<KnowledgeCapture>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ExternalAiDbContext).Assembly;
+
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Configurations";
+
+    /// <inheritdoc />
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default)
+        => SaveChangesAsync(cancellationToken);
 }

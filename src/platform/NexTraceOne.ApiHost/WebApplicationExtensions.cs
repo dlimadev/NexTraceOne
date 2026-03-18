@@ -5,6 +5,8 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
@@ -65,6 +67,8 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<RuntimeIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<ExternalAiDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<AiOrchestrationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
 
             logger.LogInformation(
