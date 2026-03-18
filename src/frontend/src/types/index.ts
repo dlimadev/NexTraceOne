@@ -625,10 +625,15 @@ export interface ContractSyncResponse {
 
 // ─── Contract Governance ─────────────────────────────────────────────────────
 
-/** Item de contrato na listagem de governança. */
+/**
+ * Item de contrato na listagem de governança.
+ * Inclui dados enriquecidos do ServiceAsset associado (domain, team, owner, criticality).
+ */
 export interface ContractListItem {
   versionId: string;
   apiAssetId: string;
+  serviceAssetId: string | null;
+  name: string;
   semVer: string;
   protocol: string;
   lifecycleState: string;
@@ -636,8 +641,15 @@ export interface ContractListItem {
   format: string;
   importedFrom: string;
   createdAt: string;
+  updatedAt: string;
   deprecationDate: string | null;
   isSigned: boolean;
+  domain: string;
+  team: string;
+  technicalOwner: string;
+  criticality: 'Low' | 'Medium' | 'High' | 'Critical';
+  exposure: 'Internal' | 'External' | 'Partner';
+  serviceType: 'RestApi' | 'Soap' | 'KafkaProducer' | 'KafkaConsumer' | 'BackgroundService' | 'GraphQl';
 }
 
 /** Resposta paginada da listagem de contratos. */
@@ -1156,6 +1168,52 @@ export interface DecisionHistoryItemDto {
 export interface DecisionHistoryResponse {
   releaseId: string;
   decisions: DecisionHistoryItemDto[];
+}
+
+// ─── Product Analytics ─────────────────────────────────────────────────────
+
+export type ProductAnalyticsTrendDirection = 'Improving' | 'Stable' | 'Declining';
+
+export interface AnalyticsModuleUsageDto {
+  module: string;
+  moduleName: string;
+  eventCount: number;
+  uniqueUsers: number;
+  trend: ProductAnalyticsTrendDirection;
+}
+
+export interface ProductAnalyticsSummaryResponse {
+  totalEvents: number;
+  uniqueUsers: number;
+  activePersonas: number;
+  topModules: AnalyticsModuleUsageDto[];
+  adoptionScore: number;
+  valueScore: number;
+  frictionScore: number;
+  avgTimeToFirstValueMinutes: number;
+  avgTimeToCoreValueMinutes: number;
+  trendDirection: ProductAnalyticsTrendDirection;
+  periodLabel: string;
+}
+
+export interface ModuleAdoptionDto {
+  module: string;
+  moduleName: string;
+  adoptionPercent: number;
+  totalActions: number;
+  uniqueUsers: number;
+  depthScore: number;
+  trend: ProductAnalyticsTrendDirection;
+  topFeatures: string[];
+}
+
+export interface ModuleAdoptionResponse {
+  modules: ModuleAdoptionDto[];
+  overallAdoptionScore: number;
+  mostAdopted: string;
+  leastAdopted: string;
+  biggestGrowth: string;
+  periodLabel: string;
 }
 
 // ─── Governance — Reports, Risk, Compliance, FinOps ─────────────────────────
@@ -2252,4 +2310,151 @@ export interface CreateDelegationRequest {
   domainId?: string;
   reason: string;
   expiresAt?: string;
+}
+
+// ─── Governance Packs & Waivers ─────────────────────────────────────────────
+
+/** Categoria de um Governance Pack. */
+export type GovernancePackCategory = 'Contracts' | 'SourceOfTruth' | 'Changes' | 'Incidents' | 'AIGovernance' | 'Reliability' | 'Operations';
+
+/** Estado de um Governance Pack. Alinhado com NexTraceOne.Governance.Domain.Enums.GovernancePackStatus. */
+export type GovernancePackStatus = 'Draft' | 'Published' | 'Deprecated' | 'Archived';
+
+/** Modo de enforcement de uma regra de governança. */
+export type EnforcementMode = 'Advisory' | 'SoftEnforce' | 'HardEnforce';
+
+/** Tipo de scope de aplicação de uma regra. */
+export type GovernanceScopeType = 'Global' | 'Domain' | 'Team' | 'Service';
+
+/** Resumo de um Governance Pack para listagem. */
+export interface GovernancePackSummary {
+  packId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: GovernancePackCategory;
+  status: GovernancePackStatus;
+  currentVersion: string;
+  scopeCount: number;
+  ruleCount: number;
+  createdAt: string;
+}
+
+/** Resposta da listagem de Governance Packs. */
+export interface GovernancePacksListResponse {
+  totalPacks: number;
+  publishedCount: number;
+  draftCount: number;
+  packs: GovernancePackSummary[];
+}
+
+/** Detalhes completos de um Governance Pack. */
+export interface GovernancePackDetail {
+  packId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: GovernancePackCategory;
+  status: GovernancePackStatus;
+  currentVersion: string;
+  scopeCount: number;
+  ruleCount: number;
+  createdAt: string;
+  updatedAt: string;
+  rules: GovernanceRuleBindingDto[];
+  scopes: GovernanceScopeDto[];
+  recentVersions: GovernancePackVersionDto[];
+}
+
+/** Regra vinculada a um Governance Pack. */
+export interface GovernanceRuleBindingDto {
+  ruleId: string;
+  ruleName: string;
+  description: string;
+  category: GovernancePackCategory;
+  defaultEnforcementMode: EnforcementMode;
+  isRequired: boolean;
+}
+
+/** Escopo de aplicação de um Governance Pack. */
+export interface GovernanceScopeDto {
+  scopeType: GovernanceScopeType;
+  scopeValue: string;
+  enforcementMode: EnforcementMode;
+}
+
+/** Versão de um Governance Pack. */
+export interface GovernancePackVersionDto {
+  versionId: string;
+  version: string;
+  createdAt: string;
+  createdBy: string;
+  ruleCount: number;
+}
+
+/** Comando para criar um Governance Pack. */
+export interface CreateGovernancePackRequest {
+  name: string;
+  displayName: string;
+  description: string;
+  category: GovernancePackCategory;
+}
+
+/** Comando para atualizar um Governance Pack. */
+export interface UpdateGovernancePackRequest {
+  displayName?: string;
+  description?: string;
+  status?: GovernancePackStatus;
+}
+
+/** Estado de um Waiver de governança. */
+export type WaiverStatus = 'Pending' | 'Approved' | 'Rejected' | 'Expired' | 'Revoked';
+
+/** Tipo de scope de um Waiver. */
+export type WaiverScopeType = 'Service' | 'Team' | 'Domain' | 'EntirePack';
+
+/** DTO de um Waiver de governança para listagem. */
+export interface GovernanceWaiverDto {
+  waiverId: string;
+  packId: string;
+  packName: string;
+  ruleId: string;
+  ruleName: string;
+  scope: string;
+  scopeType: WaiverScopeType;
+  justification: string;
+  status: WaiverStatus;
+  requestedBy: string;
+  requestedAt: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  expiresAt?: string;
+}
+
+/** Resposta da listagem de Waivers. */
+export interface GovernanceWaiversListResponse {
+  totalWaivers: number;
+  pendingCount: number;
+  approvedCount: number;
+  waivers: GovernanceWaiverDto[];
+}
+
+/** Comando para criar um Waiver. */
+export interface CreateGovernanceWaiverRequest {
+  packId: string;
+  ruleId?: string;
+  scope: string;
+  scopeType: WaiverScopeType;
+  justification: string;
+  expiresAt?: string;
+}
+
+/** Comando para aprovar um Waiver. */
+export interface ApproveWaiverRequest {
+  expiresAt?: string;
+}
+
+/** Comando para rejeitar um Waiver. */
+export interface RejectWaiverRequest {
+  reason: string;
 }

@@ -1,101 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  FileCheck, Search, Clock, CheckCircle, XCircle, Shield,
+  FileCheck, Search, Clock, CheckCircle, XCircle, Shield, Loader2, AlertTriangle,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
+import type { GovernanceWaiverDto, WaiverStatus as WaiverStatusType } from '../../../types';
 
-/**
- * Tipos locais para waivers de governança — alinhados com o backend ListGovernanceWaivers.
- */
-type WaiverStatus = 'Pending' | 'Approved' | 'Rejected' | 'Expired' | 'Revoked';
+type StatusFilter = 'all' | WaiverStatusType;
 
-interface GovernanceWaiver {
-  waiverId: string;
-  packName: string;
-  ruleName: string;
-  scope: string;
-  justification: string;
-  status: WaiverStatus;
-  requestedBy: string;
-  requestedAt: string;
-  expiresAt: string;
-}
-
-/**
- * Dados simulados de waivers — alinhados com o backend ListGovernanceWaivers.
- * Em produção, virão da API /api/v1/governance/waivers.
- */
-const mockWaivers: GovernanceWaiver[] = [
-  {
-    waiverId: 'w-001',
-    packName: 'Contracts Baseline',
-    ruleName: 'SEMVER-REQUIRED',
-    scope: 'Legacy Service A',
-    justification: 'Legacy service migration to new versioning in progress — expected Q2 completion',
-    status: 'Approved',
-    requestedBy: 'alice@company.com',
-    requestedAt: new Date(Date.now() - 15 * 86400000).toISOString(),
-    expiresAt: new Date(Date.now() + 45 * 86400000).toISOString(),
-  },
-  {
-    waiverId: 'w-002',
-    packName: 'Change Governance Pack',
-    ruleName: 'BLAST-RADIUS-CHECK',
-    scope: 'Internal Tools Service',
-    justification: 'Low-risk internal tool with no external consumers — blast radius not applicable',
-    status: 'Pending',
-    requestedBy: 'bob@company.com',
-    requestedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-    expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
-  },
-  {
-    waiverId: 'w-003',
-    packName: 'Source of Truth Standards',
-    ruleName: 'OWNER-ASSIGNMENT',
-    scope: 'Deprecated Reporting Service',
-    justification: 'Service scheduled for decommission — no owner reassignment needed',
-    status: 'Rejected',
-    requestedBy: 'carol@company.com',
-    requestedAt: new Date(Date.now() - 10 * 86400000).toISOString(),
-    expiresAt: new Date(Date.now() + 20 * 86400000).toISOString(),
-  },
-  {
-    waiverId: 'w-004',
-    packName: 'Contracts Baseline',
-    ruleName: 'BREAKING-CHANGE-REVIEW',
-    scope: 'Legacy Payment Gateway',
-    justification: 'Temporary waiver during payment provider migration — migration team tracking',
-    status: 'Expired',
-    requestedBy: 'dave@company.com',
-    requestedAt: new Date(Date.now() - 60 * 86400000).toISOString(),
-    expiresAt: new Date(Date.now() - 5 * 86400000).toISOString(),
-  },
-  {
-    waiverId: 'w-005',
-    packName: 'AI Usage Policy',
-    ruleName: 'MODEL-APPROVAL',
-    scope: 'Research Team',
-    justification: 'Experimentation phase with new model — formal approval pending security review',
-    status: 'Pending',
-    requestedBy: 'eve@company.com',
-    requestedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
-    expiresAt: new Date(Date.now() + 14 * 86400000).toISOString(),
-  },
-];
-
-type StatusFilter = 'all' | WaiverStatus;
-
-const waiverStatusBadge = (status: WaiverStatus): 'success' | 'warning' | 'danger' | 'default' | 'info' => {
+const waiverStatusBadge = (status: string): 'success' | 'warning' | 'danger' | 'default' | 'info' => {
   switch (status) {
     case 'Approved': return 'success';
     case 'Pending': return 'warning';
     case 'Rejected': return 'danger';
     case 'Expired': return 'default';
     case 'Revoked': return 'info';
+    default: return 'default';
   }
 };
 
@@ -107,13 +31,41 @@ export function WaiversPage() {
   const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  const [waivers, setWaivers] = useState<GovernanceWaiverDto[]>([]);
+  const [totalWaivers, setTotalWaivers] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [approvedCount, setApprovedCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const totalWaivers = mockWaivers.length;
-  const pendingCount = mockWaivers.filter(w => w.status === 'Pending').length;
-  const approvedCount = mockWaivers.filter(w => w.status === 'Approved').length;
-  const expiredCount = mockWaivers.filter(w => w.status === 'Expired').length;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-  const filtered = mockWaivers.filter(w => {
+    organizationGovernanceApi.listGovernanceWaivers()
+      .then((data) => {
+        if (!cancelled) {
+          setWaivers(data.waivers);
+          setTotalWaivers(data.totalWaivers);
+          setPendingCount(data.pendingCount);
+          setApprovedCount(data.approvedCount);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message || t('common.errorLoading'));
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [t]);
+
+  const expiredCount = waivers.filter(w => w.status === 'Expired').length;
+
+  const filtered = waivers.filter(w => {
     if (statusFilter !== 'all' && w.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -125,6 +77,35 @@ export function WaiversPage() {
     }
     return true;
   });
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
+          <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
+          <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error}</p>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -170,58 +151,64 @@ export function WaiversPage() {
       </div>
 
       {/* Waivers list */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <Shield size={16} className="text-accent" />
-            {t('governancePacks.waivers.listTitle')}
-          </h2>
-          <p className="text-xs text-muted mt-1">{t('governancePacks.waivers.listDescription')}</p>
-        </CardHeader>
-        <CardBody className="p-0">
-          <div className="divide-y divide-edge">
-            {filtered.length === 0 ? (
-              <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
-            ) : (
-              filtered.map(waiver => (
-                <div key={waiver.waiverId} className="px-4 py-4 hover:bg-hover transition-colors">
-                  <div className="flex items-start gap-4">
-                    <FileCheck size={14} className="text-muted mt-1 shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-sm font-medium text-heading">{waiver.ruleName}</span>
-                        <Badge variant={waiverStatusBadge(waiver.status)}>
-                          {t(`governancePacks.waivers.status.${waiver.status}`)}
-                        </Badge>
-                        <Badge variant="default">{waiver.packName}</Badge>
-                      </div>
-                      <p className="text-xs text-muted mb-2">{waiver.justification}</p>
-                      <div className="flex items-center gap-4 text-xs text-faded flex-wrap">
-                        <span>{t('governancePacks.waivers.scope')}: {waiver.scope}</span>
-                        <span>{t('governancePacks.waivers.requestedBy')}: {waiver.requestedBy}</span>
-                        <span>{t('governancePacks.waivers.expiresAt')}: {new Date(waiver.expiresAt).toLocaleDateString()}</span>
-                      </div>
-                      {/* Action buttons — visual only */}
-                      {waiver.status === 'Pending' && (
-                        <div className="flex items-center gap-2 mt-3">
-                          <button className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-success/15 text-success hover:bg-success/25 transition-colors">
-                            <CheckCircle size={12} />
-                            {t('governancePacks.waivers.approve')}
-                          </button>
-                          <button className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-critical/15 text-critical hover:bg-critical/25 transition-colors">
-                            <XCircle size={12} />
-                            {t('governancePacks.waivers.reject')}
-                          </button>
+      {waivers.length === 0 ? (
+        <div className="p-8 text-center text-muted text-sm">{t('governancePacks.waivers.noWaivers')}</div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+              <Shield size={16} className="text-accent" />
+              {t('governancePacks.waivers.listTitle')}
+            </h2>
+            <p className="text-xs text-muted mt-1">{t('governancePacks.waivers.listDescription')}</p>
+          </CardHeader>
+          <CardBody className="p-0">
+            <div className="divide-y divide-edge">
+              {filtered.length === 0 ? (
+                <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+              ) : (
+                filtered.map(waiver => (
+                  <div key={waiver.waiverId} className="px-4 py-4 hover:bg-hover transition-colors">
+                    <div className="flex items-start gap-4">
+                      <FileCheck size={14} className="text-muted mt-1 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-sm font-medium text-heading">{waiver.ruleName}</span>
+                          <Badge variant={waiverStatusBadge(waiver.status)}>
+                            {t(`governancePacks.waivers.status.${waiver.status}`)}
+                          </Badge>
+                          <Badge variant="default">{waiver.packName}</Badge>
                         </div>
-                      )}
+                        <p className="text-xs text-muted mb-2">{waiver.justification}</p>
+                        <div className="flex items-center gap-4 text-xs text-faded flex-wrap">
+                          <span>{t('governancePacks.waivers.scope')}: {waiver.scope}</span>
+                          <span>{t('governancePacks.waivers.requestedBy')}: {waiver.requestedBy}</span>
+                          {waiver.expiresAt && (
+                            <span>{t('governancePacks.waivers.expiresAt')}: {new Date(waiver.expiresAt).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                        {/* Action buttons — visual only */}
+                        {waiver.status === 'Pending' && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <button className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-success/15 text-success hover:bg-success/25 transition-colors">
+                              <CheckCircle size={12} />
+                              {t('governancePacks.waivers.approve')}
+                            </button>
+                            <button className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-critical/15 text-critical hover:bg-critical/25 transition-colors">
+                              <XCircle size={12} />
+                              {t('governancePacks.waivers.reject')}
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardBody>
-      </Card>
+                ))
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
     </PageContainer>
   );
 }

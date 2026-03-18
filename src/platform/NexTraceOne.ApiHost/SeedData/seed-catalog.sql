@@ -7,19 +7,19 @@
 
 -- ═══ ENGINEERING GRAPH — Services, APIs, Consumer Relationships ═══════════════
 
--- Services
-INSERT INTO eg_service_assets ("Id", "Name", "Domain", "TeamName")
+-- Services with full ownership and classification fields
+INSERT INTO eg_service_assets ("Id", "Name", "DisplayName", "Domain", "TeamName", "TechnicalOwner", "Criticality", "ExposureType", "ServiceType")
 VALUES
-  ('c0000000-0000-0000-0000-000000000001', 'Orders Service', 'Commerce', 'Team Alpha'),
-  ('c0000000-0000-0000-0000-000000000002', 'Payments Service', 'Finance', 'Team Beta'),
-  ('c0000000-0000-0000-0000-000000000003', 'Inventory Service', 'Logistics', 'Team Gamma'),
-  ('c0000000-0000-0000-0000-000000000004', 'Notifications Service', 'Platform', 'Team Delta'),
-  ('c0000000-0000-0000-0000-000000000005', 'Users Service', 'Identity', 'Team Alpha'),
-  ('c0000000-0000-0000-0000-000000000006', 'Shipping Service', 'Logistics', 'Team Gamma'),
-  ('c0000000-0000-0000-0000-000000000007', 'Analytics Service', 'Platform', 'Team Delta'),
-  ('c0000000-0000-0000-0000-000000000008', 'Gateway Service', 'Platform', 'Team Alpha'),
-  ('c0000000-0000-0000-0000-000000000009', 'Search Service', 'Platform', 'Team Beta'),
-  ('c0000000-0000-0000-0000-000000000010', 'Pricing Service', 'Commerce', 'Team Beta')
+  ('c0000000-0000-0000-0000-000000000001', 'Orders Service', 'Orders Service', 'Commerce', 'Team Alpha', 'john.silva@nextraceone.dev', 'Critical', 'External', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000002', 'Payments Service', 'Payments Service', 'Finance', 'Team Beta', 'maria.santos@nextraceone.dev', 'Critical', 'External', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000003', 'Inventory Service', 'Inventory Service', 'Logistics', 'Team Gamma', 'carlos.mendes@nextraceone.dev', 'High', 'Internal', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000004', 'Notifications Service', 'Notifications Service', 'Platform', 'Team Delta', 'ana.oliveira@nextraceone.dev', 'Medium', 'Internal', 'BackgroundService'),
+  ('c0000000-0000-0000-0000-000000000005', 'Users Service', 'Users Service', 'Identity', 'Team Alpha', 'john.silva@nextraceone.dev', 'Critical', 'External', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000006', 'Shipping Service', 'Shipping Service', 'Logistics', 'Team Gamma', 'carlos.mendes@nextraceone.dev', 'High', 'Partner', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000007', 'Analytics Service', 'Analytics Service', 'Platform', 'Team Delta', 'ana.oliveira@nextraceone.dev', 'Medium', 'Internal', 'BackgroundService'),
+  ('c0000000-0000-0000-0000-000000000008', 'Gateway Service', 'Gateway Service', 'Platform', 'Team Alpha', 'john.silva@nextraceone.dev', 'Critical', 'External', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000009', 'Search Service', 'Search Service', 'Platform', 'Team Beta', 'maria.santos@nextraceone.dev', 'High', 'Internal', 'RestApi'),
+  ('c0000000-0000-0000-0000-000000000010', 'Pricing Service', 'Pricing Service', 'Commerce', 'Team Beta', 'maria.santos@nextraceone.dev', 'High', 'Internal', 'RestApi')
 ON CONFLICT DO NOTHING;
 
 -- APIs

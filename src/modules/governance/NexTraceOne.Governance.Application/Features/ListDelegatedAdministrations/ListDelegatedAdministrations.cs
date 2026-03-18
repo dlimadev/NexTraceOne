@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.ListDelegatedAdministrations;
 
@@ -13,25 +15,53 @@ public static class ListDelegatedAdministrations
     public sealed record Query() : IQuery<Response>;
 
     /// <summary>Handler que retorna lista de delegações de administração com detalhes.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IDelegatedAdministrationRepository delegationRepository,
+        ITeamRepository teamRepository,
+        IGovernanceDomainRepository domainRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var delegations = new List<DelegatedAdminDto>
+            var delegations = await delegationRepository.ListAsync(scope: null, isActive: null, cancellationToken);
+
+            // Enriquecer com nomes de equipas e domínios
+            var dtos = new List<DelegatedAdminDto>();
+            foreach (var d in delegations)
             {
-                new("deleg-001", "user-042", "Ana Silva",
-                    "TeamAdmin", "team-commerce", "Commerce", null, null,
-                    "Delegação temporária durante licença do team lead",
-                    true, DateTimeOffset.UtcNow.AddDays(-15), DateTimeOffset.UtcNow.AddDays(15)),
-                new("deleg-002", "user-078", "Carlos Mendes",
-                    "DomainAdmin", null, null, "domain-platform", "Platform",
-                    "Administração delegada para supervisão de domínio durante reestruturação",
-                    true, DateTimeOffset.UtcNow.AddDays(-30), DateTimeOffset.UtcNow.AddDays(60))
-            };
+                string? teamName = null;
+                string? domainName = null;
 
-            var response = new Response(Delegations: delegations);
+                if (!string.IsNullOrEmpty(d.TeamId) && Guid.TryParse(d.TeamId, out var teamGuid))
+                {
+                    var team = await teamRepository.GetByIdAsync(new TeamId(teamGuid), cancellationToken);
+                    teamName = team?.DisplayName;
+                }
 
-            return Task.FromResult(Result<Response>.Success(response));
+                if (!string.IsNullOrEmpty(d.DomainId) && Guid.TryParse(d.DomainId, out var domainGuid))
+                {
+                    var domain = await domainRepository.GetByIdAsync(new GovernanceDomainId(domainGuid), cancellationToken);
+                    domainName = domain?.DisplayName;
+                }
+
+                dtos.Add(new DelegatedAdminDto(
+                    DelegationId: d.Id.Value.ToString(),
+                    GranteeUserId: d.GranteeUserId,
+                    GranteeDisplayName: d.GranteeDisplayName,
+                    Scope: d.Scope.ToString(),
+                    TeamId: d.TeamId,
+                    TeamName: teamName,
+                    DomainId: d.DomainId,
+                    DomainName: domainName,
+                    Reason: d.Reason,
+                    IsActive: d.IsActive && !d.IsExpired(),
+                    GrantedAt: d.GrantedAt,
+                    ExpiresAt: d.ExpiresAt
+                ));
+            }
+
+            var response = new Response(Delegations: dtos);
+
+            return Result<Response>.Success(response);
         }
     }
 

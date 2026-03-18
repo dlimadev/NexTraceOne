@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetDomainDetail;
 
@@ -13,50 +15,41 @@ public static class GetDomainDetail
     public sealed record Query(string DomainId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de um domínio com equipas, serviços e dependências.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IGovernanceDomainRepository domainRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var teams = new List<DomainTeamDto>
-            {
-                new("team-commerce", "commerce-squad", "Commerce", 5, "Primary"),
-                new("team-platform", "platform-squad", "Platform", 2, "Shared"),
-                new("team-data", "data-squad", "Data & Analytics", 1, "Delegated")
-            };
+            if (!Guid.TryParse(request.DomainId, out var domainGuid))
+                return Error.Validation("INVALID_DOMAIN_ID", "Domain ID '{0}' is not a valid GUID.", request.DomainId);
 
-            var services = new List<DomainServiceDto>
-            {
-                new("svc-payment-gateway", "Payment Gateway", "Commerce", "Critical", "Active"),
-                new("svc-order-api", "Order API", "Commerce", "High", "Active"),
-                new("svc-catalog-sync", "Catalog Sync", "Platform", "Medium", "Active"),
-                new("svc-pricing-engine", "Pricing Engine", "Commerce", "High", "Active")
-            };
+            var domain = await domainRepository.GetByIdAsync(new GovernanceDomainId(domainGuid), cancellationToken);
+            if (domain is null)
+                return Error.NotFound("DOMAIN_NOT_FOUND", "Domain '{0}' not found.", request.DomainId);
 
-            var crossDomainDeps = new List<CrossDomainDependencyDto>
-            {
-                new("dep-cd-001", "Payment Gateway", "Commerce", "Identity Service", "domain-identity", "Identity", "Synchronous"),
-                new("dep-cd-002", "Order API", "Commerce", "Notification Worker", "domain-platform", "Platform", "Asynchronous")
-            };
+            // TODO: enriquecer com dados reais de equipas, serviços e dependências cross-domain
+            var teams = new List<DomainTeamDto>();
+            var services = new List<DomainServiceDto>();
+            var crossDomainDeps = new List<CrossDomainDependencyDto>();
 
             var response = new Response(
-                DomainId: request.DomainId,
-                Name: "commerce",
-                DisplayName: "Commerce",
-                Description: "Domínio de comércio eletrónico, pagamentos e gestão de encomendas.",
-                Criticality: "Critical",
-                CapabilityClassification: "Revenue-Generating",
-                TeamCount: 3,
-                ServiceCount: 4,
-                ActiveIncidentCount: 2,
-                RecentChangeCount: 11,
-                MaturityLevel: "Defined",
-                ReliabilityScore: 92.3m,
+                DomainId: domain.Id.Value.ToString(),
+                Name: domain.Name,
+                DisplayName: domain.DisplayName,
+                Description: domain.Description,
+                Criticality: domain.Criticality.ToString(),
+                CapabilityClassification: domain.CapabilityClassification,
+                TeamCount: 0,
+                ServiceCount: 0,
+                ActiveIncidentCount: 0,
+                RecentChangeCount: 0,
+                MaturityLevel: "Developing",
+                ReliabilityScore: 0m,
                 Teams: teams,
                 Services: services,
                 CrossDomainDependencies: crossDomainDeps,
-                CreatedAt: DateTimeOffset.UtcNow.AddMonths(-12));
+                CreatedAt: domain.CreatedAt);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

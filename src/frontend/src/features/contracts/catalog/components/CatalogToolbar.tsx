@@ -3,6 +3,7 @@
  *
  * Utiliza componentes base NTO (SearchInput) e selects inline compactos
  * para manter a densidade de informação sem comprometer a usabilidade.
+ * Dados de filtro (domains, teams, owners) vêm do backend real.
  */
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,14 +11,13 @@ import { X, SlidersHorizontal } from 'lucide-react';
 import { SearchInput } from '../../../../components/SearchInput';
 import { cn } from '../../../../lib/cn';
 import { PROTOCOLS, LIFECYCLE_STATES, SERVICE_TYPES } from '../../shared/constants';
-import type { CatalogFilters } from '../types';
+import type { CatalogFilters, CatalogServiceType } from '../types';
 import { EMPTY_FILTERS, activeFilterCount } from '../types';
 
 const SEARCH_DEBOUNCE_MS = 350;
 
 const APPROVAL_STATES = ['Pending', 'InReview', 'Approved', 'Rejected', 'Escalated'] as const;
 const CRITICALITIES = ['Low', 'Medium', 'High', 'Critical'] as const;
-const EXPOSURES = ['Internal', 'External', 'Partner'] as const;
 
 interface CatalogToolbarProps {
   filters: CatalogFilters;
@@ -25,10 +25,10 @@ interface CatalogToolbarProps {
   resultCount: number;
   dynamicOptions?: {
     domains: string[];
-    products: string[];
-    owners: string[];
     teams: string[];
-    technologies: string[];
+    owners: string[];
+    serviceTypes: CatalogServiceType[];
+    exposures: string[];
   };
 }
 
@@ -177,7 +177,7 @@ export function CatalogToolbar({
               <InlineSelect
                 value={filters.exposure}
                 onChange={(v) => set('exposure', v)}
-                options={EXPOSURES.map((e) => ({ value: e, label: e }))}
+                options={dynamicOptions.exposures.map((e) => ({ value: e, label: e }))}
                 placeholder={t('contracts.catalog.filters.allExposure', 'All exposure')}
               />
 
@@ -189,13 +189,6 @@ export function CatalogToolbar({
                   label: t(`contracts.catalog.criticality.${c}`, c),
                 }))}
                 placeholder={t('contracts.catalog.filters.allRisks', 'All risks')}
-              />
-
-              <InlineSelect
-                value={filters.technology}
-                onChange={(v) => set('technology', v)}
-                options={dynamicOptions.technologies.map((t) => ({ value: t, label: t }))}
-                placeholder={t('contracts.catalog.filters.allTechnologies', 'All technologies')}
               />
             </>
           )}

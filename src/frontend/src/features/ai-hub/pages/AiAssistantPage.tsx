@@ -16,7 +16,6 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-  Archive,
   Tag,
   Sparkles,
   Database,
@@ -24,6 +23,8 @@ import {
   Link2,
   CheckCircle2,
   AlertCircle,
+  Loader2,
+  Inbox,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -43,6 +44,8 @@ interface Conversation {
   lastModelUsed: string | null;
   tags: string;
   defaultContextScope: string;
+  clientType?: string;
+  createdBy?: string;
 }
 
 interface ChatMessage {
@@ -68,178 +71,38 @@ interface ChatMessage {
   timestamp: string;
 }
 
-interface SuggestedPrompt {
-  prompt: string;
-  category: string;
-  personas: string[];
-  scopeHint: string | null;
-  relevance: string;
+// ── API Response Types ──────────────────────────────────────────────────
+
+interface ConversationApiItem {
+  id: string;
+  title: string;
+  persona: string;
+  clientType: string;
+  defaultContextScope: string;
+  lastModelUsed: string | null;
+  createdBy: string;
+  messageCount: number;
+  tags: string;
+  isActive: boolean;
+  lastMessageAt: string | null;
 }
 
-// ── Mock Data (simulates backend) ───────────────────────────────────────
-
-const mockConversations: Conversation[] = [
-  {
-    id: '1',
-    title: 'Payment API latency investigation',
-    persona: 'Engineer',
-    messageCount: 4,
-    isActive: true,
-    lastMessageAt: '2026-03-15T10:30:00Z',
-    lastModelUsed: 'NexTrace-Internal-v1',
-    tags: 'troubleshooting,payment',
-    defaultContextScope: 'services,incidents',
-  },
-  {
-    id: '2',
-    title: 'Contract compatibility check — order-service v3',
-    persona: 'Architect',
-    messageCount: 6,
-    isActive: true,
-    lastMessageAt: '2026-03-14T14:30:00Z',
-    lastModelUsed: 'NexTrace-Internal-v1',
-    tags: 'contracts',
-    defaultContextScope: 'contracts,services',
-  },
-  {
-    id: '3',
-    title: 'Incident correlation — notification failures',
-    persona: 'TechLead',
-    messageCount: 8,
-    isActive: false,
-    lastMessageAt: '2026-03-13T09:00:00Z',
-    lastModelUsed: 'NexTrace-Internal-v1',
-    tags: 'incident,correlation',
-    defaultContextScope: 'incidents,changes',
-  },
-];
-
-const mockMessagesMap: Record<string, ChatMessage[]> = {
-  '1': [
-    {
-      id: 'w1',
-      role: 'assistant',
-      content:
-        "Welcome! I'm the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights. What would you like to explore?",
-      modelName: 'NexTrace-Internal-v1',
-      provider: 'Internal',
-      isInternalModel: true,
-      promptTokens: 0,
-      completionTokens: 42,
-      groundingSources: ['Service Catalog', 'Contract Registry'],
-      contextReferences: [],
-      correlationId: 'init-001',
-      useCaseType: 'General',
-      routingPath: 'InternalOnly',
-      confidenceLevel: 'High',
-      costClass: 'low',
-      routingRationale: 'Default welcome message served by internal model with full catalog access.',
-      sourceWeightingSummary: 'ServiceCatalog:50%,ContractRegistry:50%',
-      escalationReason: 'None',
-      timestamp: '2026-03-15T10:00:00Z',
-    },
-    {
-      id: 'u1',
-      role: 'user',
-      content: 'What issues are affecting the payment API right now?',
-      timestamp: '2026-03-15T10:05:00Z',
-    },
-    {
-      id: 'a1',
-      role: 'assistant',
-      content:
-        'Based on the Service Catalog and Incident History, the payment-service is currently experiencing elevated latency (p99 > 2s) since 09:45 UTC. There is an active incident INC-2847 correlated with a deployment change CHG-1923 from 09:30 UTC. The blast radius includes order-service and notification-service as downstream consumers.',
-      modelName: 'NexTrace-Internal-v1',
-      provider: 'Internal',
-      isInternalModel: true,
-      promptTokens: 156,
-      completionTokens: 89,
-      appliedPolicyName: 'Default Internal Policy',
-      groundingSources: ['Service Catalog', 'Incident History', 'Change Intelligence'],
-      contextReferences: ['service:payment-service', 'incident:INC-2847', 'change:CHG-1923'],
-      correlationId: 'resp-002',
-      useCaseType: 'IncidentExplanation',
-      routingPath: 'InternalOnly',
-      confidenceLevel: 'High',
-      costClass: 'low',
-      routingRationale: 'Incident data fully available internally; no external escalation needed.',
-      sourceWeightingSummary: 'Incident:40%,Change:25%,Runbook:20%,TelemetrySummary:15%',
-      escalationReason: 'None',
-      timestamp: '2026-03-15T10:05:02Z',
-    },
-    {
-      id: 'u2',
-      role: 'user',
-      content: 'Is there a runbook for this type of issue?',
-      timestamp: '2026-03-15T10:10:00Z',
-    },
-    {
-      id: 'a2',
-      role: 'assistant',
-      content:
-        'Yes, there is a runbook RB-PAY-003 "Payment Service Latency Escalation" that covers this scenario. Key steps: (1) Verify deployment rollback eligibility for CHG-1923, (2) Check database connection pool saturation, (3) Enable circuit breaker on payment-gateway dependency. The runbook was last updated 2 weeks ago and has been used 3 times in the last quarter.',
-      modelName: 'NexTrace-Internal-v1',
-      provider: 'Internal',
-      isInternalModel: true,
-      promptTokens: 203,
-      completionTokens: 112,
-      appliedPolicyName: 'Default Internal Policy',
-      groundingSources: ['Runbook Library', 'Service Catalog', 'Change Intelligence'],
-      contextReferences: ['runbook:RB-PAY-003', 'change:CHG-1923'],
-      correlationId: 'resp-003',
-      useCaseType: 'MitigationGuidance',
-      routingPath: 'InternalOnly',
-      confidenceLevel: 'High',
-      costClass: 'low',
-      routingRationale: 'Runbook and change data available internally; mitigation steps grounded in verified sources.',
-      sourceWeightingSummary: 'Runbook:45%,Change:30%,ServiceCatalog:25%',
-      escalationReason: 'None',
-      timestamp: '2026-03-15T10:10:03Z',
-    },
-  ],
-  '2': [
-    {
-      id: 'w2',
-      role: 'assistant',
-      content: "Welcome! I'm ready to help you analyze contract compatibility. What would you like to check?",
-      modelName: 'NexTrace-Internal-v1',
-      provider: 'Internal',
-      isInternalModel: true,
-      groundingSources: ['Contract Registry'],
-      contextReferences: [],
-      correlationId: 'init-002',
-      useCaseType: 'ContractExplanation',
-      routingPath: 'InternalOnly',
-      confidenceLevel: 'High',
-      costClass: 'low',
-      routingRationale: 'Contract analysis scoped to internal registry; no external model required.',
-      sourceWeightingSummary: 'ContractRegistry:100%',
-      escalationReason: 'None',
-      timestamp: '2026-03-14T14:00:00Z',
-    },
-  ],
-  '3': [
-    {
-      id: 'w3',
-      role: 'assistant',
-      content: "Welcome! I'm ready to help you correlate incidents. What would you like to investigate?",
-      modelName: 'NexTrace-Internal-v1',
-      provider: 'Internal',
-      isInternalModel: true,
-      groundingSources: ['Incident History', 'Change Intelligence'],
-      contextReferences: [],
-      correlationId: 'init-003',
-      useCaseType: 'IncidentExplanation',
-      routingPath: 'InternalOnly',
-      confidenceLevel: 'Medium',
-      costClass: 'low',
-      routingRationale: 'Incident correlation initiated with partial context; awaiting user query for full grounding.',
-      sourceWeightingSummary: 'Incident:50%,Change:50%',
-      escalationReason: 'None',
-      timestamp: '2026-03-13T09:00:00Z',
-    },
-  ],
-};
+interface MessageApiItem {
+  messageId: string;
+  conversationId: string;
+  role: string;
+  content: string;
+  modelName: string | null;
+  provider: string | null;
+  isInternalModel: boolean;
+  promptTokens: number;
+  completionTokens: number;
+  appliedPolicyName: string | null;
+  groundingSources: string[];
+  contextReferences: string[];
+  correlationId: string;
+  timestamp: string;
+}
 
 const contextScopes = ['Services', 'Contracts', 'Incidents', 'Changes', 'Runbooks'] as const;
 
@@ -248,20 +111,28 @@ const contextScopes = ['Services', 'Contracts', 'Incidents', 'Changes', 'Runbook
  * A experiência adapta-se à persona do utilizador: contextos padrão,
  * prompts sugeridos, metadata de resposta e explicabilidade variam por perfil.
  *
+ * Esta versão usa exclusivamente APIs reais para listagem de conversas e mensagens.
+ *
  * @see docs/AI-ASSISTED-OPERATIONS.md
  * @see docs/PERSONA-UX-MAPPING.md — secção de IA por persona
  */
 export function AiAssistantPage() {
   const { t } = useTranslation();
   const { persona, config } = usePersona();
-  const [selectedConversation, setSelectedConversation] = useState<string>('1');
+
+  // ── State ─────────────────────────────────────────────────────────────
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [activeContexts, setActiveContexts] = useState<string[]>(config.aiContextScopes);
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState<ChatMessage[]>(mockMessagesMap['1'] || []);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [expandedMeta, setExpandedMeta] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [backendConnected, setBackendConnected] = useState<boolean | null>(null);
   const [providerStatus, setProviderStatus] = useState<string>('');
+  const [isLoadingConversations, setIsLoadingConversations] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [conversationsError, setConversationsError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -272,6 +143,90 @@ export function AiAssistantPage() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // ── Load conversations from backend ───────────────────────────────────
+  const loadConversations = useCallback(async () => {
+    setIsLoadingConversations(true);
+    setConversationsError(null);
+    try {
+      const data = await aiGovernanceApi.listConversations({ pageSize: 50 });
+      const items: Conversation[] = (data.items || []).map((item: ConversationApiItem) => ({
+        id: item.id,
+        title: item.title,
+        persona: item.persona,
+        messageCount: item.messageCount,
+        isActive: item.isActive,
+        lastMessageAt: item.lastMessageAt,
+        lastModelUsed: item.lastModelUsed,
+        tags: item.tags ?? '',
+        defaultContextScope: item.defaultContextScope ?? '',
+        clientType: item.clientType,
+        createdBy: item.createdBy,
+      }));
+      setConversations(items);
+      // Auto-select first conversation if available
+      if (items.length > 0 && selectedConversation === null) {
+        const firstItem = items[0];
+        if (firstItem) {
+          setSelectedConversation(firstItem.id);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load conversations:', err);
+      setConversationsError(t('aiHub.errorLoadingConversations'));
+    } finally {
+      setIsLoadingConversations(false);
+    }
+  }, [selectedConversation, t]);
+
+  // ── Load messages for selected conversation ───────────────────────────
+  const loadMessages = useCallback(async (conversationId: string) => {
+    setIsLoadingMessages(true);
+    try {
+      const data = await aiGovernanceApi.listMessages(conversationId, { pageSize: 100 });
+      const items: ChatMessage[] = (data.items || []).map((item: MessageApiItem) => ({
+        id: item.messageId,
+        role: item.role as 'user' | 'assistant',
+        content: item.content,
+        modelName: item.modelName,
+        provider: item.provider,
+        isInternalModel: item.isInternalModel,
+        promptTokens: item.promptTokens,
+        completionTokens: item.completionTokens,
+        appliedPolicyName: item.appliedPolicyName,
+        groundingSources: item.groundingSources ?? [],
+        contextReferences: item.contextReferences ?? [],
+        correlationId: item.correlationId,
+        timestamp: item.timestamp,
+        // Derived fields for UI display
+        useCaseType: 'General',
+        routingPath: item.isInternalModel ? 'InternalOnly' : 'ExternalEscalation',
+        confidenceLevel: item.isInternalModel ? 'High' : 'Medium',
+        costClass: item.isInternalModel ? 'low' : 'medium',
+      }));
+      setMessages(items);
+    } catch (err) {
+      console.error('Failed to load messages:', err);
+      setMessages([]);
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  }, []);
+
+  // ── Initial load ──────────────────────────────────────────────────────
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+  // ── Load messages when conversation changes ───────────────────────────
+  useEffect(() => {
+    if (selectedConversation) {
+      loadMessages(selectedConversation);
+    } else {
+      setMessages([]);
+    }
+  }, [selectedConversation, loadMessages]);
+
+  // ── Check provider health ─────────────────────────────────────────────
   useEffect(() => {
     aiGovernanceApi.checkProvidersHealth()
       .then((data: { allHealthy: boolean; items: Array<{ providerId: string; isHealthy: boolean; message?: string }> }) => {
@@ -287,28 +242,51 @@ export function AiAssistantPage() {
 
   const handleSelectConversation = (convId: string) => {
     setSelectedConversation(convId);
-    setMessages(mockMessagesMap[convId] || []);
     setExpandedMeta(null);
   };
 
-  const handleNewConversation = () => {
-    const newId = `new-${Date.now()}`;
-    setSelectedConversation(newId);
-    setMessages([
-      {
-        id: `w-${newId}`,
-        role: 'assistant',
-        content: t('aiHub.welcomeMessage'),
-        modelName: 'NexTrace-Internal-v1',
-        provider: 'Internal',
-        isInternalModel: true,
-        groundingSources: ['Service Catalog', 'Contract Registry'],
-        contextReferences: [],
-        correlationId: `init-${newId}`,
-        timestamp: new Date().toISOString(),
-      },
-    ]);
-    setExpandedMeta(null);
+  const handleNewConversation = async () => {
+    try {
+      const response = await aiGovernanceApi.createConversation({
+        title: t('aiHub.newConversationTitle'),
+        persona: persona,
+        clientType: 'Web',
+        defaultContextScope: activeContexts.join(',').toLowerCase(),
+      });
+      const newConv: Conversation = {
+        id: response.conversationId,
+        title: response.title,
+        persona: response.persona,
+        messageCount: 0,
+        isActive: response.isActive,
+        lastMessageAt: null,
+        lastModelUsed: null,
+        tags: '',
+        defaultContextScope: response.defaultContextScope,
+        clientType: response.clientType,
+      };
+      setConversations(prev => [newConv, ...prev]);
+      setSelectedConversation(response.conversationId);
+      setMessages([]);
+    } catch (err) {
+      console.error('Failed to create conversation:', err);
+      // Fallback: create temporary local conversation
+      const tempId = `temp-${Date.now()}`;
+      const tempConv: Conversation = {
+        id: tempId,
+        title: t('aiHub.newConversationTitle'),
+        persona: persona,
+        messageCount: 0,
+        isActive: true,
+        lastMessageAt: null,
+        lastModelUsed: null,
+        tags: '',
+        defaultContextScope: activeContexts.join(',').toLowerCase(),
+      };
+      setConversations(prev => [tempConv, ...prev]);
+      setSelectedConversation(tempId);
+      setMessages([]);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -408,7 +386,7 @@ export function AiAssistantPage() {
     setExpandedMeta(prev => (prev === msgId ? null : msgId));
   };
 
-  const selectedConv = mockConversations.find(c => c.id === selectedConversation);
+  const selectedConv = conversations.find(c => c.id === selectedConversation);
 
   const contextIcons: Record<string, React.ReactNode> = {
     Services: <Server size={14} />,
@@ -438,7 +416,39 @@ export function AiAssistantPage() {
             </Button>
           </div>
           <div className="flex-1 overflow-y-auto">
-            {mockConversations.map(conv => (
+            {/* ── Loading state ─────────────────────────────────────────── */}
+            {isLoadingConversations && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 size={20} className="animate-spin text-muted" />
+              </div>
+            )}
+
+            {/* ── Error state ───────────────────────────────────────────── */}
+            {conversationsError && !isLoadingConversations && (
+              <div className="px-4 py-6 text-center">
+                <AlertCircle size={24} className="text-warning mx-auto mb-2" />
+                <p className="text-sm text-muted">{conversationsError}</p>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={loadConversations}>
+                  {t('common.retry')}
+                </Button>
+              </div>
+            )}
+
+            {/* ── Empty state ───────────────────────────────────────────── */}
+            {!isLoadingConversations && !conversationsError && conversations.length === 0 && (
+              <div className="px-4 py-8 text-center">
+                <Inbox size={32} className="text-muted mx-auto mb-3" />
+                <p className="text-sm text-heading mb-1">{t('aiHub.noConversations')}</p>
+                <p className="text-xs text-muted mb-4">{t('aiHub.startNewConversation')}</p>
+                <Button variant="primary" size="sm" onClick={handleNewConversation}>
+                  <Plus size={14} className="mr-1" />
+                  {t('aiHub.newConversation')}
+                </Button>
+              </div>
+            )}
+
+            {/* ── Conversations list ────────────────────────────────────── */}
+            {!isLoadingConversations && !conversationsError && conversations.map(conv => (
               <button
                 key={conv.id}
                 onClick={() => handleSelectConversation(conv.id)}
@@ -526,7 +536,38 @@ export function AiAssistantPage() {
 
           {/* ── Mensagens ──────────────────────────────────────────────── */}
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            {messages.map(msg => (
+            {/* ── Loading messages state ──────────────────────────────── */}
+            {isLoadingMessages && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 size={20} className="animate-spin text-muted mr-2" />
+                <span className="text-sm text-muted">{t('aiHub.loadingMessages')}</span>
+              </div>
+            )}
+
+            {/* ── No conversation selected ────────────────────────────── */}
+            {!selectedConversation && !isLoadingMessages && (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <Bot size={48} className="text-muted mb-4" />
+                <p className="text-heading font-medium mb-2">{t('aiHub.selectConversation')}</p>
+                <p className="text-sm text-muted mb-4">{t('aiHub.selectConversationHint')}</p>
+                <Button variant="primary" size="sm" onClick={handleNewConversation}>
+                  <Plus size={14} className="mr-1" />
+                  {t('aiHub.newConversation')}
+                </Button>
+              </div>
+            )}
+
+            {/* ── Empty conversation ──────────────────────────────────── */}
+            {selectedConversation && !isLoadingMessages && messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <Sparkles size={32} className="text-accent mb-3" />
+                <p className="text-heading font-medium mb-1">{t('aiHub.emptyConversation')}</p>
+                <p className="text-sm text-muted">{t('aiHub.startTyping')}</p>
+              </div>
+            )}
+
+            {/* ── Messages list ───────────────────────────────────────── */}
+            {!isLoadingMessages && messages.map(msg => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[75%] rounded-lg px-4 py-3 ${

@@ -5,6 +5,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.ListContracts;
@@ -13,6 +14,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.ListContracts;
 /// Feature: ListContracts — lista contratos do catálogo com filtros opcionais.
 /// Retorna a versão mais recente de cada contrato (por ApiAssetId distinto),
 /// oferecendo a visão principal de governança de contratos do NexTraceOne.
+/// Inclui dados enriquecidos do ServiceAsset associado (domain, team, owner, criticality).
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class ListContracts
@@ -35,13 +37,16 @@ public static class ListContracts
         }
     }
 
-    /// <summary>Handler que lista contratos mais recentes por API asset.</summary>
-    public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
+    /// <summary>Handler que lista contratos mais recentes por API asset com dados enriquecidos do serviço.</summary>
+    public sealed class Handler(
+        IContractVersionRepository repository,
+        IApiAssetRepository apiAssetRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
+            // Busca as versões mais recentes de contrato
             var (items, totalCount) = await repository.ListLatestPerApiAssetAsync(
                 request.Protocol,
                 request.LifecycleState,
@@ -50,29 +55,52 @@ public static class ListContracts
                 request.PageSize,
                 cancellationToken);
 
-            var contracts = items
-                .Select(v => new ContractListItem(
-                    v.Id.Value,
-                    v.ApiAssetId,
-                    v.SemVer,
-                    v.Protocol.ToString(),
-                    v.LifecycleState.ToString(),
-                    v.IsLocked,
-                    v.Format,
-                    v.ImportedFrom,
-                    v.CreatedAt,
-                    v.DeprecationDate,
-                    v.Signature is not null))
-                .ToList();
+            // Batch lookup dos ApiAssets com ServiceAsset incluído
+            var apiAssetIds = items.Select(v => v.ApiAssetId).Distinct();
+            var apiAssetsDict = await apiAssetRepository.ListByApiAssetIdsAsync(apiAssetIds, cancellationToken);
+
+            // Enriquece cada contrato com dados do serviço
+            var contracts = items.Select(v =>
+            {
+                apiAssetsDict.TryGetValue(v.ApiAssetId, out var apiAsset);
+                var service = apiAsset?.OwnerService;
+
+                return new ContractListItem(
+                    VersionId: v.Id.Value,
+                    ApiAssetId: v.ApiAssetId,
+                    ServiceAssetId: service?.Id.Value,
+                    Name: apiAsset?.Name ?? "Unknown",
+                    SemVer: v.SemVer,
+                    Protocol: v.Protocol.ToString(),
+                    LifecycleState: v.LifecycleState.ToString(),
+                    IsLocked: v.IsLocked,
+                    Format: v.Format,
+                    ImportedFrom: v.ImportedFrom,
+                    CreatedAt: v.CreatedAt,
+                    UpdatedAt: v.UpdatedAt != default ? v.UpdatedAt : v.CreatedAt,
+                    DeprecationDate: v.DeprecationDate,
+                    IsSigned: v.Signature is not null,
+                    Domain: service?.Domain ?? string.Empty,
+                    Team: service?.TeamName ?? string.Empty,
+                    TechnicalOwner: service?.TechnicalOwner ?? string.Empty,
+                    Criticality: service?.Criticality.ToString() ?? "Medium",
+                    Exposure: service?.ExposureType.ToString() ?? "Internal",
+                    ServiceType: service?.ServiceType.ToString() ?? "RestApi");
+            }).ToList();
 
             return new Response(contracts, totalCount, request.Page, request.PageSize);
         }
     }
 
-    /// <summary>Item de contrato na listagem do catálogo de governança.</summary>
+    /// <summary>
+    /// Item de contrato na listagem do catálogo de governança.
+    /// Inclui dados enriquecidos do ServiceAsset associado via ApiAsset.
+    /// </summary>
     public sealed record ContractListItem(
         Guid VersionId,
         Guid ApiAssetId,
+        Guid? ServiceAssetId,
+        string Name,
         string SemVer,
         string Protocol,
         string LifecycleState,
@@ -80,8 +108,15 @@ public static class ListContracts
         string Format,
         string ImportedFrom,
         DateTimeOffset CreatedAt,
+        DateTimeOffset UpdatedAt,
         DateTimeOffset? DeprecationDate,
-        bool IsSigned);
+        bool IsSigned,
+        string Domain,
+        string Team,
+        string TechnicalOwner,
+        string Criticality,
+        string Exposure,
+        string ServiceType);
 
     /// <summary>Resposta paginada da listagem de contratos.</summary>
     public sealed record Response(

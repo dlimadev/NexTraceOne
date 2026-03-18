@@ -1,7 +1,8 @@
 /**
  * Tabela principal do catálogo de contratos.
  *
- * 11 colunas com sorting, badges semânticos e menu de acções por linha.
+ * Colunas com sorting, badges semânticos e menu de acções por linha.
+ * Dados enriquecidos (domain, team, owner, criticality) vêm do backend real.
  * Responsive via overflow-x horizontal em ecrãs menores.
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -26,7 +27,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../../../lib/cn';
 import { LifecycleBadge, ServiceTypeBadge } from '../../shared/components';
-import { ApprovalStateBadge, ComplianceBadge, CriticalityBadge } from './CatalogBadges';
+import { ApprovalStateBadge, CriticalityBadge } from './CatalogBadges';
 import type { CatalogItem } from '../types';
 import type { SortConfig, SortField } from '../types';
 
@@ -93,14 +94,11 @@ export function CatalogTable({ items, sort, onSort }: CatalogTableProps) {
               {t('contracts.catalog.columns.approval', 'Approval')}
             </th>
             <SortableHeader
-              label={t('contracts.catalog.columns.compliance', 'Compliance')}
-              field="complianceScore"
+              label={t('contracts.catalog.columns.criticality', 'Criticality')}
+              field="criticality"
               sort={sort}
               onToggle={toggleSort}
             />
-            <th className="px-3 py-3 text-left font-medium text-muted whitespace-nowrap">
-              {t('contracts.catalog.columns.criticality', 'Criticality')}
-            </th>
             <SortableHeader
               label={t('contracts.catalog.columns.updatedAt', 'Updated')}
               field="updatedAt"
@@ -173,19 +171,19 @@ function CatalogRow({ item }: { item: CatalogItem }) {
       style={{ transitionDuration: 'var(--nto-motion-fast)' }}
       onClick={() => navigate(`/contracts/${item.versionId}`)}
     >
-      {/* Name + product */}
+      {/* Name + domain */}
       <td className="px-3 py-3">
         <div className="min-w-0">
           <p className="font-medium text-heading truncate max-w-[220px] group-hover:text-cyan transition-colors">
             {item.name}
           </p>
-          <p className="text-[10px] text-muted truncate max-w-[220px]">{item.product}</p>
+          <p className="text-[10px] text-muted truncate max-w-[220px]">{item.domain}</p>
         </div>
       </td>
 
       {/* Service type */}
       <td className="px-3 py-3">
-        <ServiceTypeBadge type={item.serviceType} size="sm" />
+        <ServiceTypeBadge type={item.catalogServiceType} size="sm" />
       </td>
 
       {/* Domain */}
@@ -194,7 +192,7 @@ function CatalogRow({ item }: { item: CatalogItem }) {
       {/* Owner */}
       <td className="px-3 py-3">
         <div className="min-w-0">
-          <p className="text-body truncate max-w-[120px]">{item.owner}</p>
+          <p className="text-body truncate max-w-[120px]">{item.technicalOwner || '-'}</p>
           <p className="text-[10px] text-muted truncate max-w-[120px]">{item.team}</p>
         </div>
       </td>
@@ -212,11 +210,6 @@ function CatalogRow({ item }: { item: CatalogItem }) {
       {/* Approval */}
       <td className="px-3 py-3">
         <ApprovalStateBadge state={item.approvalState} size="sm" />
-      </td>
-
-      {/* Compliance */}
-      <td className="px-3 py-3">
-        <ComplianceBadge score={item.complianceScore} />
       </td>
 
       {/* Criticality */}

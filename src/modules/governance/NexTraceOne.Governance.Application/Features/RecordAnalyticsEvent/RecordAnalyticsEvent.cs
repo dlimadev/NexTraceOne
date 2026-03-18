@@ -1,5 +1,12 @@
+using Ardalis.GuardClauses;
+
+using FluentValidation;
+
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.RecordAnalyticsEvent;
@@ -15,6 +22,7 @@ public static class RecordAnalyticsEvent
     public sealed record Command(
         AnalyticsEventType EventType,
         ProductModule Module,
+        string Route,
         string? Feature,
         string? EntityType,
         string? Outcome,
@@ -22,26 +30,66 @@ public static class RecordAnalyticsEvent
         string? TeamId,
         string? DomainId,
         string? SessionCorrelationId,
-        string? ClientType) : ICommand<Response>;
+        string? ClientType,
+        string? MetadataJson) : ICommand<Response>;
+
+    /// <summary>Valida os parâmetros mínimos do evento de analytics.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Route).NotEmpty().MaximumLength(500);
+            RuleFor(x => x.Feature).MaximumLength(200);
+            RuleFor(x => x.EntityType).MaximumLength(100);
+            RuleFor(x => x.Outcome).MaximumLength(200);
+            RuleFor(x => x.PersonaHint).MaximumLength(50);
+            RuleFor(x => x.TeamId).MaximumLength(200);
+            RuleFor(x => x.DomainId).MaximumLength(200);
+            RuleFor(x => x.SessionCorrelationId).MaximumLength(200);
+            RuleFor(x => x.ClientType).MaximumLength(50);
+            RuleFor(x => x.MetadataJson).MaximumLength(8000);
+        }
+    }
 
     /// <summary>Handler que processa e armazena o evento de analytics.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        IAnalyticsEventRepository repository,
+        IUnitOfWork unitOfWork,
+        ICurrentTenant tenant,
+        ICurrentUser user,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // MVP: evento aceite e registado em memória.
-            // Em produção, persistir em store dedicado com retenção e agregação.
-            // NOTA: em produção, usar IClock/ISystemClock para obter o timestamp.
-            var eventId = Guid.NewGuid().ToString("N")[..12];
-            var timestamp = DateTimeOffset.UtcNow;
+            Guard.Against.Null(request);
+
+            var analyticsEvent = AnalyticsEvent.Create(
+                tenantId: tenant.Id,
+                userId: user.IsAuthenticated ? user.Id : null,
+                persona: request.PersonaHint,
+                module: request.Module,
+                eventType: request.EventType,
+                feature: request.Feature,
+                entityType: request.EntityType,
+                outcome: request.Outcome,
+                route: request.Route,
+                teamId: request.TeamId,
+                domainId: request.DomainId,
+                sessionId: request.SessionCorrelationId,
+                clientType: request.ClientType,
+                metadataJson: request.MetadataJson,
+                occurredAt: clock.UtcNow);
+
+            await repository.AddAsync(analyticsEvent, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
             var response = new Response(
-                EventId: eventId,
-                RecordedAt: timestamp,
+                EventId: analyticsEvent.Id.Value.ToString("N")[..12],
+                RecordedAt: analyticsEvent.OccurredAt,
                 EventType: request.EventType,
                 Module: request.Module);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return response;
         }
     }
 

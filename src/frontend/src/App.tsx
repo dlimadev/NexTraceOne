@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './contexts/AuthContext';
 import { PersonaProvider } from './contexts/PersonaContext';
+import { AnalyticsEventTracker } from './features/product-analytics/AnalyticsEventTracker';
 import { AppShell } from './components/shell/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PreviewGate } from './components/PreviewGate';
@@ -444,7 +445,7 @@ export default function App() {
                 path="/governance/packs"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <PreviewGate><GovernancePacksOverviewPage /></PreviewGate>
+                    <GovernancePacksOverviewPage />
                   </ProtectedRoute>
                 }
               />
@@ -452,7 +453,7 @@ export default function App() {
                 path="/governance/packs/:packId"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <PreviewGate><GovernancePackDetailPage /></PreviewGate>
+                    <GovernancePackDetailPage />
                   </ProtectedRoute>
                 }
               />
@@ -468,7 +469,7 @@ export default function App() {
                 path="/governance/waivers"
                 element={
                   <ProtectedRoute permission="governance:waivers:read" redirectTo="/unauthorized">
-                    <PreviewGate><WaiversPage /></PreviewGate>
+                    <WaiversPage />
                   </ProtectedRoute>
                 }
               />
@@ -477,7 +478,7 @@ export default function App() {
                 path="/governance/teams"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <PreviewGate><TeamsOverviewPage /></PreviewGate>
+                    <TeamsOverviewPage />
                   </ProtectedRoute>
                 }
               />
@@ -485,7 +486,7 @@ export default function App() {
                 path="/governance/teams/:teamId"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <PreviewGate><TeamDetailPage /></PreviewGate>
+                    <TeamDetailPage />
                   </ProtectedRoute>
                 }
               />
@@ -493,7 +494,7 @@ export default function App() {
                 path="/governance/domains"
                 element={
                   <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
-                    <PreviewGate><DomainsOverviewPage /></PreviewGate>
+                    <DomainsOverviewPage />
                   </ProtectedRoute>
                 }
               />
@@ -501,7 +502,7 @@ export default function App() {
                 path="/governance/domains/:domainId"
                 element={
                   <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
-                    <PreviewGate><DomainDetailPage /></PreviewGate>
+                    <DomainDetailPage />
                   </ProtectedRoute>
                 }
               />
@@ -509,7 +510,7 @@ export default function App() {
                 path="/governance/delegated-admin"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <PreviewGate><DelegatedAdminPage /></PreviewGate>
+                    <DelegatedAdminPage />
                   </ProtectedRoute>
                 }
               />
@@ -610,7 +611,7 @@ export default function App() {
                 path="/analytics"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <PreviewGate><ProductAnalyticsOverviewPage /></PreviewGate>
+                    <ProductAnalyticsOverviewPage />
                   </ProtectedRoute>
                 }
               />
@@ -618,7 +619,7 @@ export default function App() {
                 path="/analytics/adoption"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <PreviewGate><ModuleAdoptionPage /></PreviewGate>
+                    <ModuleAdoptionPage />
                   </ProtectedRoute>
                 }
               />

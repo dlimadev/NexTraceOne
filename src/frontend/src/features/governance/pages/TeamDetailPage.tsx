@@ -1,70 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import {
   Users, Server, FileText, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Building2, Calendar, ArrowLeft,
+  CheckCircle, Building2, Calendar, ArrowLeft, Loader2, BarChart3,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
+import type { TeamDetail, GovernanceSummary, TeamServiceDto, TeamContractDto, CrossTeamDependencyDto } from '../../../types';
 
 type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 type TabId = 'overview' | 'services' | 'contracts' | 'governance' | 'dependencies';
 
-const mockTeamDetail = {
-  teamId: 'team-platform',
-  name: 'platform',
-  displayName: 'Platform Engineering',
-  description: 'Core platform services and infrastructure',
-  status: 'Active',
-  parentOrganizationUnit: 'Engineering',
-  serviceCount: 8,
-  contractCount: 12,
-  activeIncidentCount: 2,
-  recentChangeCount: 15,
-  maturityLevel: 'Managed' as MaturityLevel,
-  reliabilityScore: 87.5,
-  services: [
-    { serviceId: 'svc-api-gw', name: 'API Gateway', domain: 'Platform', criticality: 'Critical', ownershipType: 'Primary' },
-    { serviceId: 'svc-auth', name: 'Auth Service', domain: 'Identity', criticality: 'Critical', ownershipType: 'Primary' },
-    { serviceId: 'svc-config', name: 'Config Service', domain: 'Platform', criticality: 'High', ownershipType: 'Primary' },
-  ],
-  contracts: [
-    { contractId: 'ctr-auth-api', name: 'Auth API v2', type: 'REST', version: '2.1.0', status: 'Published' },
-    { contractId: 'ctr-config-api', name: 'Config API v1', type: 'REST', version: '1.0.3', status: 'Published' },
-  ],
-  crossTeamDependencies: [
-    { dependencyId: 'dep-1', sourceServiceName: 'API Gateway', targetServiceName: 'Order Processor', targetTeamId: 'team-commerce', targetTeamName: 'Commerce', dependencyType: 'REST' },
-    { dependencyId: 'dep-2', sourceServiceName: 'Auth Service', targetServiceName: 'User Service', targetTeamId: 'team-identity', targetTeamName: 'Identity & Access', dependencyType: 'gRPC' },
-  ],
-  createdAt: '2024-01-15T10:00:00Z',
-};
-
-const mockGovernanceSummary = {
-  entityId: 'team-platform',
-  entityName: 'Platform Engineering',
-  overallMaturity: 'Managed' as MaturityLevel,
-  ownershipCoverage: 0.92,
-  contractCoverage: 0.85,
-  documentationCoverage: 0.78,
-  reliabilityScore: 87.5,
-  openRiskCount: 3,
-  policyViolationCount: 1,
-  dimensions: [
-    { dimension: 'Ownership', level: 'Managed' as MaturityLevel, score: 92, trend: 'Improving' as const },
-    { dimension: 'Contracts', level: 'Defined' as MaturityLevel, score: 85, trend: 'Stable' as const },
-    { dimension: 'Documentation', level: 'Developing' as MaturityLevel, score: 78, trend: 'Improving' as const },
-    { dimension: 'Change Governance', level: 'Managed' as MaturityLevel, score: 88, trend: 'Stable' as const },
-    { dimension: 'Incident Response', level: 'Defined' as MaturityLevel, score: 82, trend: 'Improving' as const },
-    { dimension: 'Reliability', level: 'Managed' as MaturityLevel, score: 87, trend: 'Stable' as const },
-  ],
-};
-
-const maturityBadgeVariant = (level: MaturityLevel): 'success' | 'info' | 'warning' | 'danger' => {
+const maturityBadgeVariant = (level: string): 'success' | 'info' | 'warning' | 'danger' => {
   switch (level) {
     case 'Optimizing':
     case 'Managed':
@@ -74,6 +27,7 @@ const maturityBadgeVariant = (level: MaturityLevel): 'success' | 'info' | 'warni
     case 'Developing':
       return 'warning';
     case 'Initial':
+    default:
       return 'danger';
   }
 };
@@ -119,10 +73,37 @@ export function TeamDetailPage() {
   const { t } = useTranslation();
   const { teamId } = useParams<{ teamId: string }>();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [team, setTeam] = useState<TeamDetail | null>(null);
+  const [gov, setGov] = useState<GovernanceSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // In a real app, fetch by teamId — for now use mock
-  const team = { ...mockTeamDetail, teamId: teamId ?? mockTeamDetail.teamId };
-  const gov = mockGovernanceSummary;
+  useEffect(() => {
+    if (!teamId) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      organizationGovernanceApi.getTeamDetail(teamId),
+      organizationGovernanceApi.getTeamGovernanceSummary(teamId).catch(() => null),
+    ])
+      .then(([teamData, govData]) => {
+        if (!cancelled) {
+          setTeam(teamData);
+          setGov(govData);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message || t('common.errorLoading'));
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [teamId, t]);
 
   const tabs: { id: TabId; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'organization.teamDetail.tabs.overview', icon: <Users size={16} /> },
@@ -135,10 +116,39 @@ export function TeamDetailPage() {
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
   const formatPct = (v: number) => `${Math.round(v * 100)}%`;
 
+  if (loading) {
+    return (
+      <PageContainer>
+        <Link to="/governance/teams" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
+          <ArrowLeft size={14} />
+          {t('organization.teams.title')}
+        </Link>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !team) {
+    return (
+      <PageContainer>
+        <Link to="/governance/teams" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
+          <ArrowLeft size={14} />
+          {t('organization.teams.title')}
+        </Link>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error || t('organization.teamDetail.notFound')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer>
       {/* Back link */}
-      <Link to="/organization/teams" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
+      <Link to="/governance/teams" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
         <ArrowLeft size={14} />
         {t('organization.teams.title')}
       </Link>
@@ -164,11 +174,11 @@ export function TeamDetailPage() {
           <div className="flex flex-wrap items-start gap-6">
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold text-heading">{team.displayName}</h2>
-              <p className="text-sm text-muted mt-1">{team.description}</p>
+              <p className="text-sm text-muted mt-1">{team.description || '—'}</p>
               <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted">
                 <span className="flex items-center gap-1">
                   <Building2 size={12} />
-                  {t('organization.teamDetail.orgUnit')}: {team.parentOrganizationUnit}
+                  {t('organization.teamDetail.orgUnit')}: {team.parentOrganizationUnit || '—'}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar size={12} />
@@ -210,7 +220,7 @@ export function TeamDetailPage() {
 
 /* ─── Overview Tab ─── */
 
-function OverviewTab({ team, t }: { team: typeof mockTeamDetail; t: (key: string) => string }) {
+function OverviewTab({ team, t }: { team: TeamDetail; t: (key: string) => string }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <StatCard title={t('organization.teamDetail.services')} value={team.serviceCount} icon={<Server size={20} />} color="text-accent" />
@@ -223,7 +233,7 @@ function OverviewTab({ team, t }: { team: typeof mockTeamDetail; t: (key: string
 
 /* ─── Services Tab ─── */
 
-function ServicesTab({ services, t }: { services: typeof mockTeamDetail.services; t: (key: string) => string }) {
+function ServicesTab({ services, t }: { services: TeamServiceDto[]; t: (key: string) => string }) {
   if (services.length === 0) {
     return <div className="p-8 text-center text-muted text-sm">{t('organization.teamDetail.noServices')}</div>;
   }
@@ -256,7 +266,7 @@ function ServicesTab({ services, t }: { services: typeof mockTeamDetail.services
 
 /* ─── Contracts Tab ─── */
 
-function ContractsTab({ contracts, t }: { contracts: typeof mockTeamDetail.contracts; t: (key: string) => string }) {
+function ContractsTab({ contracts, t }: { contracts: TeamContractDto[]; t: (key: string) => string }) {
   if (contracts.length === 0) {
     return <div className="p-8 text-center text-muted text-sm">{t('organization.teamDetail.noContracts')}</div>;
   }
@@ -288,7 +298,11 @@ function ContractsTab({ contracts, t }: { contracts: typeof mockTeamDetail.contr
 
 /* ─── Governance Tab ─── */
 
-function GovernanceTab({ gov, t, formatPct }: { gov: typeof mockGovernanceSummary; t: (key: string) => string; formatPct: (v: number) => string }) {
+function GovernanceTab({ gov, t, formatPct }: { gov: GovernanceSummary | null; t: (key: string) => string; formatPct: (v: number) => string }) {
+  if (!gov) {
+    return <div className="p-8 text-center text-muted text-sm">{t('organization.teamDetail.noGovernanceData')}</div>;
+  }
+
   return (
     <div className="space-y-6">
       {/* Summary */}
@@ -378,7 +392,7 @@ function GovernanceTab({ gov, t, formatPct }: { gov: typeof mockGovernanceSummar
 
 /* ─── Dependencies Tab ─── */
 
-function DependenciesTab({ deps, t }: { deps: typeof mockTeamDetail.crossTeamDependencies; t: (key: string) => string }) {
+function DependenciesTab({ deps, t }: { deps: CrossTeamDependencyDto[]; t: (key: string) => string }) {
   if (deps.length === 0) {
     return <div className="p-8 text-center text-muted text-sm">{t('organization.teamDetail.noDependencies')}</div>;
   }
@@ -428,4 +442,5 @@ function DependenciesTab({ deps, t }: { deps: typeof mockTeamDetail.crossTeamDep
       </Card>
     </div>
   );
+}
 }

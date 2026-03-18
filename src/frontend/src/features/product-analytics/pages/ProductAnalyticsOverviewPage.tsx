@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp,
   TrendingDown,
@@ -12,7 +13,10 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
  * Página principal de Product Analytics.
@@ -24,28 +28,6 @@ import { PageContainer, PageSection } from '../../../components/shell';
  * @see docs/PRODUCT-VISION.md — analytics como capacidade do produto
  */
 
-/* ── Dados de demonstração (MVP) ── */
-
-const mockSummary = {
-  totalEvents: 12_847,
-  uniqueUsers: 234,
-  activePersonas: 6,
-  adoptionScore: 74.5,
-  valueScore: 68.2,
-  frictionScore: 22.1,
-  avgTimeToFirstValueMinutes: 18.5,
-  avgTimeToCoreValueMinutes: 142.0,
-  trendDirection: 'Improving' as const,
-  topModules: [
-    { module: 'SourceOfTruth', moduleName: 'Source of Truth', eventCount: 3240, uniqueUsers: 89, trend: 'Improving' as const },
-    { module: 'ContractStudio', moduleName: 'Contract Studio', eventCount: 2810, uniqueUsers: 76, trend: 'Improving' as const },
-    { module: 'ChangeIntelligence', moduleName: 'Change Intelligence', eventCount: 2150, uniqueUsers: 68, trend: 'Stable' as const },
-    { module: 'AiAssistant', moduleName: 'AI Assistant', eventCount: 1980, uniqueUsers: 72, trend: 'Improving' as const },
-    { module: 'Incidents', moduleName: 'Incidents', eventCount: 1420, uniqueUsers: 54, trend: 'Stable' as const },
-    { module: 'Reliability', moduleName: 'Reliability', eventCount: 1247, uniqueUsers: 48, trend: 'Declining' as const },
-  ],
-};
-
 function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
     case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
@@ -56,7 +38,40 @@ function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
 
 export function ProductAnalyticsOverviewPage() {
   const { t } = useTranslation();
-  const d = mockSummary;
+
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['product-analytics-summary'],
+    queryFn: () => productAnalyticsApi.getSummary({ range: 'last_30d' }),
+    staleTime: 15_000,
+  });
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageLoadingState message={t('common.loading')} />
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <PageErrorState
+          action={
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="px-3 py-2 rounded-md bg-zinc-900 border border-zinc-700 text-white text-xs hover:border-accent/50"
+            >
+              {t('common.retry')}
+            </button>
+          }
+        />
+      </PageContainer>
+    );
+  }
+
+  const d = data;
 
   return (
     <PageContainer>
@@ -173,6 +188,12 @@ export function ProductAnalyticsOverviewPage() {
           <span className="text-sm text-zinc-300">{t('analytics.viewValueTracking')}</span>
         </Link>
       </div>
+
+      {d.totalEvents === 0 && (
+        <div className="text-center py-10 text-zinc-500 text-sm">
+          {t('common.noData')}
+        </div>
+      )}
     </PageContainer>
   );
 }

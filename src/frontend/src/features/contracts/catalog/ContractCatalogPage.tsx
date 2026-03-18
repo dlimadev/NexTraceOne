@@ -10,16 +10,15 @@ import { FilterChip } from '../../../components/FilterChip';
 import { ErrorState } from '../shared/components';
 import { useContractList, useContractsSummary } from '../hooks';
 import { CatalogToolbar, CatalogTable, CatalogSkeleton } from './components';
-import { enrichCatalogItems, extractFilterOptions } from './mockEnrichment';
 import type { CatalogFilters, SortConfig, SortField, CatalogItem } from './types';
-import { EMPTY_FILTERS } from './types';
+import { EMPTY_FILTERS, toCatalogItem, extractFilterOptions } from './types';
 
 /**
  * Catálogo governado de contratos — listagem enterprise com filtros avançados,
  * sorting, badges semânticos e menu de acções por linha.
  *
- * Suporta REST API, SOAP, Event API, Kafka Producer/Consumer e Workservice.
- * Preparado para integração real — mock enrichment para campos em falta.
+ * Suporta REST API, SOAP, Event API, Kafka Producer/Consumer e BackgroundService.
+ * Dados enriquecidos (domain, team, owner, criticality) vêm do backend real.
  */
 export function ContractCatalogPage() {
   const { t } = useTranslation();
@@ -39,20 +38,20 @@ export function ContractCatalogPage() {
   const summaryQuery = useContractsSummary();
   const summary = summaryQuery.data;
 
-  // ── Enrichment & client-side filtering ──────────────────────────────────────
-  const enrichedItems = useMemo(
-    () => enrichCatalogItems(listQuery.data?.items ?? []),
+  // ── Transform to catalog items & client-side filtering ────────────────────────
+  const catalogItems = useMemo(
+    () => (listQuery.data?.items ?? []).map(toCatalogItem),
     [listQuery.data],
   );
 
   const dynamicOptions = useMemo(
-    () => extractFilterOptions(enrichedItems),
-    [enrichedItems],
+    () => extractFilterOptions(catalogItems),
+    [catalogItems],
   );
 
   const filteredItems = useMemo(
-    () => applyClientFilters(enrichedItems, filters, lifecycleChip),
-    [enrichedItems, filters, lifecycleChip],
+    () => applyClientFilters(catalogItems, filters, lifecycleChip),
+    [catalogItems, filters, lifecycleChip],
   );
 
   const sortedItems = useMemo(
@@ -157,17 +156,17 @@ export function ContractCatalogPage() {
           {!listQuery.isLoading && !listQuery.isError && sortedItems.length === 0 && (
             <EmptyState
               title={
-                enrichedItems.length === 0
+                catalogItems.length === 0
                   ? t('contracts.catalog.states.empty', 'No contracts in the catalog')
                   : t('contracts.catalog.states.noResults', 'No contracts match your filters')
               }
               description={
-                enrichedItems.length === 0
+                catalogItems.length === 0
                   ? t('contracts.catalog.states.emptyDescription', 'Start by creating your first service contract or importing an existing specification.')
                   : t('contracts.catalog.states.noResultsDescription', 'Try adjusting your search criteria or clearing some filters.')
               }
               action={
-                enrichedItems.length === 0 ? (
+                catalogItems.length === 0 ? (
                   <Link to="/contracts/new">
                     <Button variant="secondary" size="sm">
                       <Plus size={12} />
@@ -193,7 +192,7 @@ export function ContractCatalogPage() {
   );
 }
 
-// ── Client-side filtering (for mock-enriched fields) ──────────────────────────
+// ── Client-side filtering (for real backend fields) ──────────────────────────
 
 function applyClientFilters(
   items: CatalogItem[],
@@ -201,22 +200,13 @@ function applyClientFilters(
   lifecycleChip: string,
 ): CatalogItem[] {
   return items.filter((item) => {
-    if (filters.serviceType && item.serviceType !== filters.serviceType) return false;
+    if (filters.serviceType && item.catalogServiceType !== filters.serviceType) return false;
     if (filters.domain && item.domain !== filters.domain) return false;
-    if (filters.product && item.product !== filters.product) return false;
-    if (filters.owner && item.owner !== filters.owner) return false;
+    if (filters.owner && item.technicalOwner !== filters.owner) return false;
     if (filters.team && item.team !== filters.team) return false;
     if (filters.approvalState && item.approvalState !== filters.approvalState) return false;
     if (filters.exposure && item.exposure !== filters.exposure) return false;
-    if (filters.technology && item.technology !== filters.technology) return false;
     if (filters.risk && item.criticality !== filters.risk) return false;
-
-    if (filters.compliance) {
-      const score = item.complianceScore;
-      if (filters.compliance === 'high' && score < 80) return false;
-      if (filters.compliance === 'medium' && (score < 50 || score >= 80)) return false;
-      if (filters.compliance === 'low' && score >= 50) return false;
-    }
 
     if (lifecycleChip && item.lifecycleState !== lifecycleChip) return false;
 
@@ -245,9 +235,9 @@ function applySorting(items: CatalogItem[], sort: SortConfig): CatalogItem[] {
 function getSortValue(item: CatalogItem, field: SortField): string | number {
   switch (field) {
     case 'name': return item.name.toLowerCase();
-    case 'serviceType': return item.serviceType;
+    case 'serviceType': return item.catalogServiceType;
     case 'semVer': return item.semVer;
-    case 'complianceScore': return item.complianceScore;
+    case 'criticality': return item.criticality;
     case 'lifecycleState': return item.lifecycleState;
     case 'updatedAt': return item.updatedAt;
     default: return '';

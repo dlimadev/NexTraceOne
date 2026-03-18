@@ -292,3 +292,275 @@ VALUES (
     NOW(), 'system', NOW(), 'system',
     false
 ) ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- AI ASSISTANT CONVERSATIONS & MESSAGES (Demo Data)
+-- ============================================================================
+
+-- ── Conversation 1: Payment API Investigation ──────────────────────────────
+
+INSERT INTO "AiAssistantConversations" (
+    "Id", "Title", "Persona", "ClientType", "DefaultContextScope",
+    "LastModelUsed", "CreatedBy", "MessageCount", "Tags", "IsActive",
+    "LastMessageAt", "ServiceId", "ContractId", "IncidentId", "TeamId",
+    "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'f0000000-0000-0000-0000-000000000001',
+    'Payment API latency investigation',
+    'Engineer',
+    'Web',
+    'services,incidents,changes',
+    'deepseek-r1:1.5b',
+    'system',
+    4,
+    'troubleshooting,payment,production',
+    true,
+    NOW() - interval '1 hour',
+    NULL, NULL, NULL, NULL,
+    NOW() - interval '2 hours', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Conversation 1 Messages
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e1000000-0000-0000-0000-000000000001',
+    'f0000000-0000-0000-0000-000000000001',
+    'assistant',
+    'Welcome! I''m the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights. What would you like to explore?',
+    'deepseek-r1:1.5b',
+    'ollama',
+    true,
+    0, 42, 'default-internal-access',
+    'Service Catalog,Contract Registry',
+    '',
+    'init-conv1',
+    NOW() - interval '2 hours',
+    NOW() - interval '2 hours', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e1000000-0000-0000-0000-000000000002',
+    'f0000000-0000-0000-0000-000000000001',
+    'user',
+    'What issues are affecting the payment API right now?',
+    NULL, NULL, false,
+    0, 0, NULL,
+    '', '',
+    'user-msg-001',
+    NOW() - interval '1 hour 55 minutes',
+    NOW() - interval '1 hour 55 minutes', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e1000000-0000-0000-0000-000000000003',
+    'f0000000-0000-0000-0000-000000000001',
+    'assistant',
+    'Based on the Service Catalog and Incident History, the payment-service is currently experiencing elevated latency (p99 > 2s) since 09:45 UTC. There is an active incident INC-2847 correlated with a deployment change CHG-1923 from 09:30 UTC. The blast radius includes order-service and notification-service as downstream consumers.',
+    'deepseek-r1:1.5b',
+    'ollama',
+    true,
+    156, 89, 'default-internal-access',
+    'Service Catalog,Incident History,Change Intelligence',
+    'service:payment-service,incident:INC-2847,change:CHG-1923',
+    'resp-002',
+    NOW() - interval '1 hour 54 minutes',
+    NOW() - interval '1 hour 54 minutes', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e1000000-0000-0000-0000-000000000004',
+    'f0000000-0000-0000-0000-000000000001',
+    'user',
+    'Is there a runbook for this type of issue?',
+    NULL, NULL, false,
+    0, 0, NULL,
+    '', '',
+    'user-msg-002',
+    NOW() - interval '1 hour 50 minutes',
+    NOW() - interval '1 hour 50 minutes', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- ── Conversation 2: Contract Compatibility Check ───────────────────────────
+
+INSERT INTO "AiAssistantConversations" (
+    "Id", "Title", "Persona", "ClientType", "DefaultContextScope",
+    "LastModelUsed", "CreatedBy", "MessageCount", "Tags", "IsActive",
+    "LastMessageAt", "ServiceId", "ContractId", "IncidentId", "TeamId",
+    "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'f0000000-0000-0000-0000-000000000002',
+    'Contract compatibility check — order-service v3',
+    'Architect',
+    'Web',
+    'contracts,services',
+    'deepseek-r1:1.5b',
+    'system',
+    2,
+    'contracts,compatibility',
+    true,
+    NOW() - interval '1 day',
+    NULL, NULL, NULL, NULL,
+    NOW() - interval '1 day', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e2000000-0000-0000-0000-000000000001',
+    'f0000000-0000-0000-0000-000000000002',
+    'assistant',
+    'Welcome! I''m ready to help you analyze contract compatibility. What would you like to check?',
+    'deepseek-r1:1.5b',
+    'ollama',
+    true,
+    0, 22, 'default-internal-access',
+    'Contract Registry',
+    '',
+    'init-conv2',
+    NOW() - interval '1 day',
+    NOW() - interval '1 day', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e2000000-0000-0000-0000-000000000002',
+    'f0000000-0000-0000-0000-000000000002',
+    'user',
+    'Check the compatibility of order-service v3 contract with existing consumers',
+    NULL, NULL, false,
+    0, 0, NULL,
+    '', '',
+    'user-msg-003',
+    NOW() - interval '23 hours',
+    NOW() - interval '23 hours', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- ── Conversation 3: Incident Correlation (Archived) ────────────────────────
+
+INSERT INTO "AiAssistantConversations" (
+    "Id", "Title", "Persona", "ClientType", "DefaultContextScope",
+    "LastModelUsed", "CreatedBy", "MessageCount", "Tags", "IsActive",
+    "LastMessageAt", "ServiceId", "ContractId", "IncidentId", "TeamId",
+    "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'f0000000-0000-0000-0000-000000000003',
+    'Incident correlation — notification failures',
+    'TechLead',
+    'Web',
+    'incidents,changes',
+    'deepseek-r1:1.5b',
+    'system',
+    3,
+    'incident,correlation,resolved',
+    false,
+    NOW() - interval '3 days',
+    NULL, NULL, NULL, NULL,
+    NOW() - interval '3 days', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e3000000-0000-0000-0000-000000000001',
+    'f0000000-0000-0000-0000-000000000003',
+    'assistant',
+    'Welcome! I''m ready to help you correlate incidents. What would you like to investigate?',
+    'deepseek-r1:1.5b',
+    'ollama',
+    true,
+    0, 20, 'default-internal-access',
+    'Incident History,Change Intelligence',
+    '',
+    'init-conv3',
+    NOW() - interval '3 days',
+    NOW() - interval '3 days', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e3000000-0000-0000-0000-000000000002',
+    'f0000000-0000-0000-0000-000000000003',
+    'user',
+    'We are seeing notification failures across multiple services. Can you help correlate these incidents?',
+    NULL, NULL, false,
+    0, 0, NULL,
+    '', '',
+    'user-msg-004',
+    NOW() - interval '2 days 23 hours',
+    NOW() - interval '2 days 23 hours', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO "AiMessages" (
+    "Id", "ConversationId", "Role", "Content",
+    "ModelName", "Provider", "IsInternalModel",
+    "PromptTokens", "CompletionTokens", "AppliedPolicyName",
+    "GroundingSources", "ContextReferences", "CorrelationId",
+    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'e3000000-0000-0000-0000-000000000003',
+    'f0000000-0000-0000-0000-000000000003',
+    'assistant',
+    'I''ve analyzed the incident timeline and identified a correlation. The notification failures started at 14:32 UTC, which coincides with deployment CHG-1845 to the messaging-gateway service. This change introduced a configuration update that affected the message queue connection pool. I recommend checking the messaging-gateway logs and considering a rollback of CHG-1845.',
+    'deepseek-r1:1.5b',
+    'ollama',
+    true,
+    178, 95, 'default-internal-access',
+    'Incident History,Change Intelligence,Service Catalog',
+    'incident:INC-2831,change:CHG-1845,service:messaging-gateway',
+    'resp-004',
+    NOW() - interval '2 days 22 hours',
+    NOW() - interval '2 days 22 hours', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;

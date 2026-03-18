@@ -1,12 +1,15 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.CreateGovernancePack;
 
 /// <summary>
 /// Feature: CreateGovernancePack — cria um novo governance pack na plataforma.
 /// Retorna o ID do pack criado para referência imediata.
-/// MVP stub para validação de fluxo.
 /// </summary>
 public static class CreateGovernancePack
 {
@@ -18,13 +21,33 @@ public static class CreateGovernancePack
         string Category) : ICommand<Response>;
 
     /// <summary>Handler que cria um novo governance pack e retorna o ID gerado.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        IGovernancePackRepository packRepository,
+        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var response = new Response(PackId: Guid.NewGuid().ToString());
+            // Verifica se já existe pack com o mesmo nome
+            var existing = await packRepository.GetByNameAsync(request.Name, cancellationToken);
+            if (existing is not null)
+                return Error.Conflict("PACK_NAME_EXISTS", "Governance pack with name '{0}' already exists.", request.Name);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            // Parse da categoria
+            if (!Enum.TryParse<GovernanceRuleCategory>(request.Category, ignoreCase: true, out var category))
+                return Error.Validation("INVALID_CATEGORY", "Category '{0}' is not valid.", request.Category);
+
+            var pack = GovernancePack.Create(
+                name: request.Name,
+                displayName: request.DisplayName,
+                description: request.Description,
+                category: category);
+
+            await packRepository.AddAsync(pack, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            var response = new Response(PackId: pack.Id.Value.ToString());
+
+            return Result<Response>.Success(response);
         }
     }
 

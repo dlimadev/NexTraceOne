@@ -3012,7 +3012,8 @@
     "status": {
       "Draft": "Rascunho",
       "Published": "Publicado",
-      "Deprecated": "Descontinuado"
+      "Deprecated": "Descontinuado",
+      "Archived": "Arquivado"
     },
     "category": {
       "Contracts": "Contratos",

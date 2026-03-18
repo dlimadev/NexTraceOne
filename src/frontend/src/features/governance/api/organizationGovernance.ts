@@ -12,6 +12,15 @@ import type {
   CreateTeamRequest,
   CreateDomainRequest,
   CreateDelegationRequest,
+  GovernancePackSummary,
+  GovernancePackDetail,
+  GovernanceWaiverDto,
+  GovernancePacksListResponse,
+  GovernanceWaiversListResponse,
+  CreateGovernancePackRequest,
+  CreateGovernanceWaiverRequest,
+  ApproveWaiverRequest,
+  RejectWaiverRequest,
 } from '../../../types';
 
 /** Cliente de API para governança multi-equipa e multi-domínio. */
@@ -53,4 +62,24 @@ export const organizationGovernanceApi = {
     client.get<{ delegations: DelegatedAdminDto[] }>('/admin/delegations').then((r) => r.data),
   createDelegation: (data: CreateDelegationRequest) =>
     client.post<{ delegationId: string }>('/admin/delegations', data).then((r) => r.data),
+
+  // Governance Packs
+  listGovernancePacks: (category?: string, status?: string) =>
+    client.get<GovernancePacksListResponse>('/governance/packs', { params: { category, status } }).then((r) => r.data),
+  getGovernancePack: (packId: string) =>
+    client.get<{ pack: GovernancePackDetail }>(`/governance/packs/${packId}`).then((r) => r.data),
+  createGovernancePack: (data: CreateGovernancePackRequest) =>
+    client.post<{ packId: string }>('/governance/packs', data).then((r) => r.data),
+  updateGovernancePack: (packId: string, data: Partial<CreateGovernancePackRequest>) =>
+    client.patch(`/governance/packs/${packId}`, data).then((r) => r.data),
+
+  // Governance Waivers
+  listGovernanceWaivers: (packId?: string, status?: string) =>
+    client.get<GovernanceWaiversListResponse>('/governance/waivers', { params: { packId, status } }).then((r) => r.data),
+  createGovernanceWaiver: (data: CreateGovernanceWaiverRequest) =>
+    client.post<{ waiverId: string }>('/governance/waivers', data).then((r) => r.data),
+  approveGovernanceWaiver: (waiverId: string, data: ApproveWaiverRequest) =>
+    client.post(`/governance/waivers/${waiverId}/approve`, data).then((r) => r.data),
+  rejectGovernanceWaiver: (waiverId: string, data: RejectWaiverRequest) =>
+    client.post(`/governance/waivers/${waiverId}/reject`, data).then((r) => r.data),
 };

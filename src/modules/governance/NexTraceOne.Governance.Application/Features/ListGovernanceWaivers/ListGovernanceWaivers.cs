@@ -1,12 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.ListGovernanceWaivers;
 
 /// <summary>
 /// Feature: ListGovernanceWaivers — catálogo de waivers de governança.
 /// Retorna pedidos de exceção com estado de aprovação, justificação e metadados.
-/// MVP com dados estáticos para validação de fluxo.
 /// </summary>
 public static class ListGovernanceWaivers
 {
@@ -16,57 +18,58 @@ public static class ListGovernanceWaivers
         string? Status = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna o catálogo de waivers de governança.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernanceWaiverRepository waiverRepository,
+        IGovernancePackRepository packRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var waivers = new List<WaiverDto>
+            // Parse de filtros opcionais
+            GovernancePackId? packIdFilter = null;
+            if (!string.IsNullOrEmpty(request.PackId) && Guid.TryParse(request.PackId, out var packGuid))
+                packIdFilter = new GovernancePackId(packGuid);
+
+            WaiverStatus? statusFilter = null;
+            if (!string.IsNullOrEmpty(request.Status) &&
+                Enum.TryParse<WaiverStatus>(request.Status, ignoreCase: true, out var st))
+                statusFilter = st;
+
+            var waivers = await waiverRepository.ListAsync(packIdFilter, statusFilter, cancellationToken);
+
+            // Obter nomes dos packs para enriquecer DTOs
+            var packIds = waivers.Select(w => w.PackId).Distinct().ToList();
+            var packs = new Dictionary<GovernancePackId, GovernancePack>();
+            foreach (var pid in packIds)
             {
-                new("waiver-001", "pack-001", "Contracts Baseline", "rule-003", "CONTRACT-EXAMPLES-PRESENT",
-                    "payment-api", "Service", "Legacy service migration in progress — examples to be added in Q2",
-                    "Approved", "engineer@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-30),
-                    "architect@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-28),
-                    DateTimeOffset.UtcNow.AddDays(60)),
-                new("waiver-002", "pack-003", "Change Governance", "rule-010", "BLAST-RADIUS-ASSESSMENT",
-                    "notification-hub", "Service", "Hotfix deployment — blast radius assessment deferred",
-                    "Approved", "techlead@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-15),
-                    "admin@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-14),
-                    DateTimeOffset.UtcNow.AddDays(7)),
-                new("waiver-003", "pack-001", "Contracts Baseline", "rule-002", "CONTRACT-VERSION-SEMVER",
-                    "billing-soap-v3", "Contract", "SOAP contract uses legacy versioning scheme — migration planned",
-                    "Pending", "engineer@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-5),
-                    null, null,
-                    DateTimeOffset.UtcNow.AddDays(90)),
-                new("waiver-004", "pack-004", "AI Usage Policy", "rule-020", "AI-MODEL-APPROVED",
-                    "data-engineering", "Team", "Testing unapproved model in sandbox for evaluation purposes",
-                    "Rejected", "datascientist@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-10),
-                    "admin@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-8),
-                    null),
-                new("waiver-005", "pack-005", "Operational Readiness", "rule-015", "RUNBOOK-PRESENT",
-                    "analytics-pipeline", "Service", "New service — runbook in progress, expected completion next sprint",
-                    "Pending", "engineer@nextraceone.io", DateTimeOffset.UtcNow.AddDays(-3),
-                    null, null,
-                    DateTimeOffset.UtcNow.AddDays(30))
-            };
+                var pack = await packRepository.GetByIdAsync(pid, cancellationToken);
+                if (pack is not null)
+                    packs[pid] = pack;
+            }
 
-            IEnumerable<WaiverDto> filtered = waivers;
-
-            if (!string.IsNullOrEmpty(request.PackId))
-                filtered = filtered.Where(w => w.PackId == request.PackId);
-
-            if (!string.IsNullOrEmpty(request.Status))
-                filtered = filtered.Where(w =>
-                    string.Equals(w.Status, request.Status, StringComparison.OrdinalIgnoreCase));
-
-            var list = filtered.ToList();
+            var dtos = waivers.Select(w => new WaiverDto(
+                WaiverId: w.Id.Value.ToString(),
+                PackId: w.PackId.Value.ToString(),
+                PackName: packs.TryGetValue(w.PackId, out var p) ? p.DisplayName : "Unknown",
+                RuleId: w.RuleId ?? string.Empty,
+                RuleName: w.RuleId ?? "(Entire Pack)", // TODO: resolver nome real da regra
+                Scope: w.Scope,
+                ScopeType: w.ScopeType.ToString(),
+                Justification: w.Justification,
+                Status: w.Status.ToString(),
+                RequestedBy: w.RequestedBy,
+                RequestedAt: w.RequestedAt,
+                ReviewedBy: w.ReviewedBy,
+                ReviewedAt: w.ReviewedAt,
+                ExpiresAt: w.ExpiresAt
+            )).ToList();
 
             var response = new Response(
-                TotalWaivers: waivers.Count,
-                PendingCount: waivers.Count(w => w.Status == "Pending"),
-                ApprovedCount: waivers.Count(w => w.Status == "Approved"),
-                Waivers: list);
+                TotalWaivers: dtos.Count,
+                PendingCount: dtos.Count(w => w.Status == WaiverStatus.Pending.ToString()),
+                ApprovedCount: dtos.Count(w => w.Status == WaiverStatus.Approved.ToString()),
+                Waivers: dtos);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

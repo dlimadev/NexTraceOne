@@ -27,10 +27,19 @@ vi.mock('../../contexts/PersonaContext', () => ({
 vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
   aiGovernanceApi: {
     sendMessage: vi.fn().mockRejectedValue(new Error('API not available')),
-    listConversations: vi.fn(),
-    createConversation: vi.fn(),
-    listMessages: vi.fn(),
-    listSuggestedPrompts: vi.fn(),
+    listConversations: vi.fn().mockResolvedValue({ items: [], totalCount: 0 }),
+    createConversation: vi.fn().mockResolvedValue({
+      conversationId: 'test-conv-1',
+      title: 'New Conversation',
+      persona: 'Engineer',
+      clientType: 'Web',
+      defaultContextScope: 'services,contracts',
+      isActive: true,
+    }),
+    listMessages: vi.fn().mockResolvedValue({ items: [], totalCount: 0 }),
+    listSuggestedPrompts: vi.fn().mockResolvedValue({ items: [] }),
+    checkProvidersHealth: vi.fn().mockResolvedValue({ allHealthy: true, items: [] }),
+    chat: vi.fn().mockRejectedValue(new Error('API not available')),
   },
 }));
 

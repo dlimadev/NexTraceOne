@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.ListDomains;
 
@@ -13,25 +14,28 @@ public static class ListDomains
     public sealed record Query() : IQuery<Response>;
 
     /// <summary>Handler que retorna lista de domínios com indicadores sumários.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IGovernanceDomainRepository domainRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var domains = new List<DomainSummaryDto>
-            {
-                new("domain-commerce", "commerce", "Commerce", "Domínio de comércio eletrónico, pagamentos e gestão de encomendas.",
-                    "Critical", 3, 5, 7, "Defined", "Revenue-Generating"),
-                new("domain-platform", "platform", "Platform", "Domínio de serviços transversais de infraestrutura e plataforma.",
-                    "High", 2, 8, 12, "Managed", "Enabling"),
-                new("domain-identity", "identity", "Identity", "Domínio de autenticação, autorização e gestão de identidades.",
-                    "High", 1, 3, 5, "Managed", "Supporting"),
-                new("domain-data", "data-analytics", "Data & Analytics", "Domínio de ingestão, transformação e análise de dados operacionais.",
-                    "Medium", 2, 4, 6, "Developing", "Enabling")
-            };
+            var domains = await domainRepository.ListAsync(criticality: null, cancellationToken);
 
-            var response = new Response(Domains: domains);
+            var dtos = domains.Select(d => new DomainSummaryDto(
+                DomainId: d.Id.Value.ToString(),
+                Name: d.Name,
+                DisplayName: d.DisplayName,
+                Description: d.Description,
+                Criticality: d.Criticality.ToString(),
+                TeamCount: 0,       // TODO: enriquecer com contagem real de equipas
+                ServiceCount: 0,    // TODO: enriquecer com contagem real de serviços
+                ContractCount: 0,   // TODO: enriquecer com contagem real de contratos
+                MaturityLevel: "Developing", // TODO: implementar cálculo de maturidade
+                CapabilityClassification: d.CapabilityClassification
+            )).ToList();
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var response = new Response(Domains: dtos);
+
+            return Result<Response>.Success(response);
         }
     }
 

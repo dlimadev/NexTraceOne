@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetGovernancePack;
@@ -7,7 +9,6 @@ namespace NexTraceOne.Governance.Application.Features.GetGovernancePack;
 /// <summary>
 /// Feature: GetGovernancePack — detalhe completo de um governance pack.
 /// Retorna regras vinculadas, escopos de aplicação e histórico de versões recentes.
-/// MVP com dados estáticos para validação de fluxo.
 /// </summary>
 public static class GetGovernancePack
 {
@@ -15,59 +16,55 @@ public static class GetGovernancePack
     public sealed record Query(string PackId) : IQuery<Response>;
 
     /// <summary>Handler que retorna os detalhes completos de um governance pack.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernancePackRepository packRepository,
+        IGovernancePackVersionRepository versionRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var packs = BuildMockPacks();
+            if (!Guid.TryParse(request.PackId, out var packGuid))
+                return Error.Validation("INVALID_PACK_ID", "Pack ID '{0}' is not a valid GUID.", request.PackId);
 
-            var pack = packs.FirstOrDefault(p => p.PackId == request.PackId);
+            var pack = await packRepository.GetByIdAsync(new GovernancePackId(packGuid), cancellationToken);
             if (pack is null)
-                return Task.FromResult<Result<Response>>(Error.NotFound("PACK_NOT_FOUND", "Governance pack '{0}' not found.", request.PackId));
+                return Error.NotFound("PACK_NOT_FOUND", "Governance pack '{0}' not found.", request.PackId);
 
-            var response = new Response(pack);
-            return Task.FromResult(Result<Response>.Success(response));
-        }
+            // Obtem versões do pack
+            var versions = await versionRepository.ListByPackIdAsync(pack.Id, cancellationToken);
+            var versionDtos = versions
+                .OrderByDescending(v => v.CreatedAt)
+                .Take(5)
+                .Select(v => new VersionSummaryDto(
+                    VersionId: v.Id.Value.ToString(),
+                    Version: v.Version,
+                    CreatedAt: v.CreatedAt,
+                    CreatedBy: v.CreatedBy,
+                    RuleCount: 0 // TODO: enriquecer com contagem real de rules
+                ))
+                .ToList();
 
-        private static List<GovernancePackDetailDto> BuildMockPacks()
-        {
-            var rules = new List<RuleBindingDto>
-            {
-                new("rule-001", "CONTRACT-SCHEMA-VALID", "Contract schema must pass validation against the published standard",
-                    GovernanceRuleCategory.Contracts, EnforcementMode.Blocking, true),
-                new("rule-002", "CONTRACT-VERSION-SEMVER", "Contracts must follow semantic versioning",
-                    GovernanceRuleCategory.Contracts, EnforcementMode.Required, true),
-                new("rule-003", "CONTRACT-EXAMPLES-PRESENT", "Contract must include request/response examples",
-                    GovernanceRuleCategory.Contracts, EnforcementMode.Advisory, false),
-                new("rule-004", "CONTRACT-OWNER-ASSIGNED", "Contract must have a designated owner",
-                    GovernanceRuleCategory.Contracts, EnforcementMode.Required, true),
-                new("rule-005", "CONTRACT-CHANGELOG-UPDATED", "Changelog must be updated on every version change",
-                    GovernanceRuleCategory.Contracts, EnforcementMode.Advisory, false)
-            };
+            // TODO: implementar RuleBindings quando tiver GovernanceRuleBinding no domínio
+            var rules = new List<RuleBindingDto>();
+            var scopes = new List<ScopeDto>();
 
-            var scopes = new List<ScopeDto>
-            {
-                new(GovernanceScopeType.Global, "*", EnforcementMode.Advisory),
-                new(GovernanceScopeType.Environment, "Production", EnforcementMode.Blocking),
-                new(GovernanceScopeType.Domain, "payments", EnforcementMode.Required),
-                new(GovernanceScopeType.Team, "platform-core", EnforcementMode.Required)
-            };
+            var detail = new GovernancePackDetailDto(
+                PackId: pack.Id.Value.ToString(),
+                Name: pack.Name,
+                DisplayName: pack.DisplayName,
+                Description: pack.Description ?? string.Empty,
+                Category: pack.Category,
+                Status: pack.Status,
+                CurrentVersion: pack.CurrentVersion ?? "0.0.0",
+                ScopeCount: 0,
+                RuleCount: 0,
+                CreatedAt: pack.CreatedAt,
+                UpdatedAt: pack.UpdatedAt,
+                Rules: rules,
+                Scopes: scopes,
+                RecentVersions: versionDtos);
 
-            var versions = new List<VersionSummaryDto>
-            {
-                new("ver-003", "2.1.0", DateTimeOffset.UtcNow.AddDays(-10), "architect@nextraceone.io", 18),
-                new("ver-002", "2.0.0", DateTimeOffset.UtcNow.AddDays(-45), "techlead@nextraceone.io", 15),
-                new("ver-001", "1.0.0", DateTimeOffset.UtcNow.AddDays(-120), "admin@nextraceone.io", 10)
-            };
-
-            return new List<GovernancePackDetailDto>
-            {
-                new("pack-001", "contracts-baseline", "Contracts Baseline",
-                    "Baseline governance rules for API and event contract quality, versioning and documentation",
-                    GovernanceRuleCategory.Contracts, GovernancePackStatus.Published,
-                    "2.1.0", 4, 18, DateTimeOffset.UtcNow.AddDays(-120), DateTimeOffset.UtcNow.AddDays(-10),
-                    rules, scopes, versions)
-            };
+            var response = new Response(detail);
+            return Result<Response>.Success(response);
         }
     }
 

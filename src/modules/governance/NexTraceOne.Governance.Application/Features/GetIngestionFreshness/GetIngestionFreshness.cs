@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetIngestionFreshness;
 
@@ -13,49 +15,62 @@ public static class GetIngestionFreshness
     public sealed record Query(string? DataDomain = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna o detalhe de frescura por fonte de ingestão.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IIngestionSourceRepository sourceRepository,
+        IIntegrationConnectorRepository connectorRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var now = DateTimeOffset.UtcNow;
 
-            var items = new List<FreshnessItem>
+            // Get all active sources
+            var sources = await sourceRepository.ListAsync(
+                connectorId: null,
+                status: null,
+                freshnessStatus: null,
+                ct: cancellationToken);
+
+            // Get connector names for display
+            var connectorIds = sources.Select(s => s.ConnectorId).Distinct().ToList();
+            var connectorNames = new Dictionary<IntegrationConnectorId, string>();
+
+            foreach (var connId in connectorIds)
             {
-                new("Changes", "GitHub CI/CD", "Webhook",
-                    "Fresh", now.AddMinutes(-12), 12, "Verified", "Active"),
-                new("Changes", "Azure DevOps Deployments", "Webhook",
-                    "Fresh", now.AddMinutes(-10), 10, "Trusted", "Active"),
-                new("Incidents", "PagerDuty Incidents", "Webhook",
-                    "Acceptable", now.AddHours(-2), 120, "Verified", "Active"),
-                new("Telemetry", "Datadog Telemetry", "Stream",
-                    "Fresh", now.AddMinutes(-3), 3, "Verified", "Active"),
-                new("Telemetry", "Datadog Telemetry", "API Polling",
-                    "Fresh", now.AddMinutes(-4), 4, "Verified", "Active"),
-                new("Contracts", "Kong Gateway", "API Polling",
-                    "Fresh", now.AddMinutes(-15), 15, "Trusted", "Active"),
-                new("Contracts", "Swagger/OpenAPI Import", "FileImport",
-                    "Unknown", now.AddDays(-14), 20_160, "Untrusted", "Paused"),
-                new("Knowledge", "Jira Work Items", "API Polling",
-                    "Fresh", now.AddMinutes(-5), 5, "Trusted", "Active"),
-                new("Knowledge", "Backstage Catalog", "API Polling",
-                    "Acceptable", now.AddMinutes(-30), 30, "Trusted", "Active"),
-                new("Runtime", "Kafka Events", "Stream",
-                    "Stale", now.AddHours(-6), 360, "Provisional", "Failed"),
-                new("Alerts", "Datadog Telemetry", "API Polling",
-                    "Fresh", now.AddMinutes(-4), 4, "Verified", "Active")
-            };
+                var connector = await connectorRepository.GetByIdAsync(connId, cancellationToken);
+                if (connector is not null)
+                {
+                    connectorNames[connId] = connector.Name;
+                }
+            }
 
-            IEnumerable<FreshnessItem> filtered = items;
+            var items = sources.Select(s =>
+            {
+                var lagMinutes = s.LastDataReceivedAt.HasValue
+                    ? (long)(now - s.LastDataReceivedAt.Value).TotalMinutes
+                    : 0;
 
+                return new FreshnessItem(
+                    Domain: s.SourceType, // Using SourceType as Domain for now
+                    ConnectorName: connectorNames.TryGetValue(s.ConnectorId, out var name) ? name : "Unknown",
+                    SourceType: s.SourceType,
+                    Freshness: s.FreshnessStatus.ToString(),
+                    LastReceivedAt: s.LastDataReceivedAt,
+                    LagMinutes: lagMinutes,
+                    TrustLevel: s.TrustLevel.ToString(),
+                    Status: s.Status.ToString());
+            }).ToList();
+
+            // Filter by domain if specified
             if (!string.IsNullOrEmpty(request.DataDomain))
-                filtered = filtered.Where(f =>
-                    f.Domain.Equals(request.DataDomain, StringComparison.OrdinalIgnoreCase));
+            {
+                items = items
+                    .Where(f => f.Domain.Equals(request.DataDomain, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
 
-            var list = filtered.ToList();
+            var response = new Response(Items: items);
 
-            var response = new Response(Items: list);
-
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetIntegrationConnector;
 
@@ -13,71 +15,79 @@ public static class GetIntegrationConnector
     public sealed record Query(string ConnectorId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de um conector de integração.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IIntegrationConnectorRepository connectorRepository,
+        IIngestionExecutionRepository executionRepository,
+        IIngestionSourceRepository sourceRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = new Response(
-                ConnectorId: Guid.Parse("a1b2c3d4-0001-4000-8000-000000000001"),
-                Name: "github-cicd",
-                DisplayName: "GitHub CI/CD",
-                ConnectorType: "CI/CD",
-                Provider: "GitHub",
-                Status: "Active",
-                Environment: "Production",
-                HealthStatus: "Healthy",
-                LastSuccessAt: DateTimeOffset.UtcNow.AddMinutes(-12),
-                LastFailureAt: null,
-                FreshnessLag: "12m",
-                ItemsSyncedTotal: 48_230,
-                Description: "Integração com GitHub Actions para ingestão de pipelines CI/CD, deployments e status de workflows. Recolhe dados de builds, releases e artefactos para correlação com mudanças em produção.",
-                Configuration: new ConfigurationSummary(
-                    Endpoint: "https://api.github.com/repos/org/*/actions",
-                    AuthenticationMode: "OAuth2 App Token",
-                    PollingMode: "Webhook + Polling (fallback 5m)",
-                    RetryPolicy: "Exponential backoff, max 3 retries",
-                    IsEnabled: true,
-                    AllowedDataDomains: new[] { "Changes", "Runtime", "Alerts" }),
-                RecentExecutions: new List<ExecutionSummaryItem>
-                {
-                    new(Guid.Parse("e1e2e3e4-0001-4000-8000-000000000001"),
-                        DateTimeOffset.UtcNow.AddMinutes(-12),
-                        DateTimeOffset.UtcNow.AddMinutes(-11),
-                        "Success", 142, 0, 0),
-                    new(Guid.Parse("e1e2e3e4-0002-4000-8000-000000000002"),
-                        DateTimeOffset.UtcNow.AddMinutes(-42),
-                        DateTimeOffset.UtcNow.AddMinutes(-41),
-                        "Success", 89, 0, 0),
-                    new(Guid.Parse("e1e2e3e4-0003-4000-8000-000000000003"),
-                        DateTimeOffset.UtcNow.AddHours(-1).AddMinutes(-12),
-                        DateTimeOffset.UtcNow.AddHours(-1).AddMinutes(-10),
-                        "PartialSuccess", 210, 3, 0),
-                    new(Guid.Parse("e1e2e3e4-0004-4000-8000-000000000004"),
-                        DateTimeOffset.UtcNow.AddHours(-2).AddMinutes(-12),
-                        DateTimeOffset.UtcNow.AddHours(-2).AddMinutes(-11),
-                        "Success", 175, 0, 0),
-                    new(Guid.Parse("e1e2e3e4-0005-4000-8000-000000000005"),
-                        DateTimeOffset.UtcNow.AddHours(-3).AddMinutes(-12),
-                        DateTimeOffset.UtcNow.AddHours(-3).AddMinutes(-10),
-                        "Failed", 0, 0, 2)
-                },
-                SourceScope: new List<string>
-                {
-                    "org/payment-service",
-                    "org/order-api",
-                    "org/catalog-sync",
-                    "org/notification-worker",
-                    "org/platform-infra"
-                },
-                AllowedTeams: new List<string>
-                {
-                    "payment-squad",
-                    "order-squad",
-                    "platform-squad",
-                    "integration-squad"
-                });
+            if (!Guid.TryParse(request.ConnectorId, out var connectorGuid))
+            {
+                return Error.Validation("INVALID_CONNECTOR_ID", "Invalid connector ID format");
+            }
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var connectorId = new IntegrationConnectorId(connectorGuid);
+            var connector = await connectorRepository.GetByIdAsync(connectorId, cancellationToken);
+
+            if (connector is null)
+            {
+                return Error.NotFound("CONNECTOR_NOT_FOUND", $"Connector {request.ConnectorId} not found");
+            }
+
+            // Get recent executions
+            var executions = await executionRepository.ListByConnectorIdAsync(connectorId, limit: 10, cancellationToken);
+
+            // Get sources for scope
+            var sources = await sourceRepository.ListByConnectorIdAsync(connectorId, cancellationToken);
+
+            var response = new Response(
+                ConnectorId: connector.Id.Value,
+                Name: connector.Name,
+                DisplayName: connector.Description ?? connector.Name,
+                ConnectorType: connector.ConnectorType,
+                Provider: connector.Provider,
+                Status: connector.Status.ToString(),
+                Environment: "Production", // TODO: add Environment field to entity
+                HealthStatus: connector.Health.ToString(),
+                LastSuccessAt: connector.LastSuccessAt,
+                LastFailureAt: connector.LastErrorAt,
+                FreshnessLag: FormatFreshnessLag(connector.FreshnessLagMinutes),
+                ItemsSyncedTotal: connector.TotalExecutions,
+                Description: connector.Description ?? "No description available",
+                Configuration: new ConfigurationSummary(
+                    Endpoint: connector.Endpoint ?? "Not configured",
+                    AuthenticationMode: "OAuth2 App Token", // TODO: add to entity
+                    PollingMode: "Webhook + Polling", // TODO: add to entity
+                    RetryPolicy: "Exponential backoff, max 3 retries",
+                    IsEnabled: connector.Status == Domain.Enums.ConnectorStatus.Active,
+                    AllowedDataDomains: new[] { "Changes", "Runtime", "Alerts" }),
+                RecentExecutions: executions.Select(e => new ExecutionSummaryItem(
+                    ExecutionId: e.Id.Value,
+                    StartedAt: e.StartedAt,
+                    FinishedAt: e.CompletedAt,
+                    Result: e.Result.ToString(),
+                    RecordsProcessed: e.ItemsProcessed,
+                    Warnings: e.ItemsFailed > 0 && e.ItemsSucceeded > 0 ? e.ItemsFailed : 0,
+                    Errors: e.Result == Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
+                    .ToList(),
+                SourceScope: sources.Select(s => s.Name).ToList(),
+                AllowedTeams: new List<string> { "platform-squad" }); // TODO: add ownership
+
+            return Result<Response>.Success(response);
+        }
+
+        private static string? FormatFreshnessLag(int? lagMinutes)
+        {
+            if (!lagMinutes.HasValue) return null;
+
+            var lag = lagMinutes.Value;
+            return lag switch
+            {
+                < 60 => $"{lag}m",
+                < 1440 => $"{lag / 60}h {lag % 60}m",
+                _ => $"{lag / 1440}d"
+            };
         }
     }
 

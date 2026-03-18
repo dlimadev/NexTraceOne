@@ -1,71 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import {
   Globe, Users, Server, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Tag, Calendar, ArrowLeft, BarChart3,
+  CheckCircle, Tag, Calendar, ArrowLeft, BarChart3, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
+import type { DomainDetail, GovernanceSummary, DomainTeamDto, DomainServiceDto, CrossDomainDependencyDto } from '../../../types';
 
-type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 type TabId = 'overview' | 'teams' | 'services' | 'governance' | 'dependencies';
 
-const mockDomainDetail = {
-  domainId: 'dom-commerce',
-  name: 'commerce',
-  displayName: 'Commerce',
-  description: 'E-commerce, orders, payments and inventory management',
-  criticality: 'Critical',
-  capabilityClassification: 'Revenue Generation',
-  teamCount: 2,
-  serviceCount: 10,
-  activeIncidentCount: 3,
-  recentChangeCount: 22,
-  maturityLevel: 'Defined' as MaturityLevel,
-  reliabilityScore: 79.3,
-  teams: [
-    { teamId: 'team-commerce', name: 'commerce', displayName: 'Commerce', serviceCount: 6, ownershipType: 'Primary' },
-    { teamId: 'team-platform', name: 'platform', displayName: 'Platform Engineering', serviceCount: 4, ownershipType: 'Shared' },
-  ],
-  services: [
-    { serviceId: 'svc-order-proc', name: 'Order Processor', teamName: 'Commerce', criticality: 'Critical', status: 'Active' },
-    { serviceId: 'svc-payment', name: 'Payment API', teamName: 'Commerce', criticality: 'Critical', status: 'Active' },
-    { serviceId: 'svc-inventory', name: 'Inventory Sync', teamName: 'Commerce', criticality: 'High', status: 'Active' },
-    { serviceId: 'svc-catalog', name: 'Product Catalog', teamName: 'Platform Engineering', criticality: 'High', status: 'Active' },
-  ],
-  crossDomainDependencies: [
-    { dependencyId: 'ddep-1', sourceServiceName: 'Order Processor', sourceDomainName: 'Commerce', targetServiceName: 'Auth Service', targetDomainId: 'dom-identity', targetDomainName: 'Identity & Access', dependencyType: 'REST' },
-    { dependencyId: 'ddep-2', sourceServiceName: 'Payment API', sourceDomainName: 'Commerce', targetServiceName: 'Notification Service', targetDomainId: 'dom-platform', targetDomainName: 'Platform', dependencyType: 'Kafka' },
-  ],
-  createdAt: '2024-01-10T08:00:00Z',
-};
-
-const mockGovernanceSummary = {
-  entityId: 'dom-commerce',
-  entityName: 'Commerce',
-  overallMaturity: 'Defined' as MaturityLevel,
-  ownershipCoverage: 0.88,
-  contractCoverage: 0.82,
-  documentationCoverage: 0.70,
-  reliabilityScore: 79.3,
-  openRiskCount: 5,
-  policyViolationCount: 2,
-  dimensions: [
-    { dimension: 'Ownership', level: 'Managed' as MaturityLevel, score: 88, trend: 'Stable' as const },
-    { dimension: 'Contracts', level: 'Defined' as MaturityLevel, score: 82, trend: 'Improving' as const },
-    { dimension: 'Documentation', level: 'Developing' as MaturityLevel, score: 70, trend: 'Improving' as const },
-    { dimension: 'Change Governance', level: 'Defined' as MaturityLevel, score: 76, trend: 'Stable' as const },
-    { dimension: 'Incident Response', level: 'Developing' as MaturityLevel, score: 68, trend: 'Improving' as const },
-    { dimension: 'Reliability', level: 'Defined' as MaturityLevel, score: 79, trend: 'Stable' as const },
-  ],
-};
-
-const maturityBadgeVariant = (level: MaturityLevel): 'success' | 'info' | 'warning' | 'danger' => {
+const maturityBadgeVariant = (level: string): 'success' | 'info' | 'warning' | 'danger' => {
   switch (level) {
     case 'Optimizing':
     case 'Managed':
@@ -75,6 +26,7 @@ const maturityBadgeVariant = (level: MaturityLevel): 'success' | 'info' | 'warni
     case 'Developing':
       return 'warning';
     case 'Initial':
+    default:
       return 'danger';
   }
 };
@@ -133,10 +85,37 @@ export function DomainDetailPage() {
   const { t } = useTranslation();
   const { domainId } = useParams<{ domainId: string }>();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [domain, setDomain] = useState<DomainDetail | null>(null);
+  const [gov, setGov] = useState<GovernanceSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // In a real app, fetch by domainId — for now use mock
-  const domain = { ...mockDomainDetail, domainId: domainId ?? mockDomainDetail.domainId };
-  const gov = mockGovernanceSummary;
+  useEffect(() => {
+    if (!domainId) return;
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      organizationGovernanceApi.getDomainDetail(domainId),
+      organizationGovernanceApi.getDomainGovernanceSummary(domainId).catch(() => null),
+    ])
+      .then(([domainData, govData]) => {
+        if (!cancelled) {
+          setDomain(domainData);
+          setGov(govData);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message || t('common.errorLoading'));
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [domainId, t]);
 
   const tabs: { id: TabId; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'organization.domainDetail.tabs.overview', icon: <Globe size={16} /> },
@@ -148,6 +127,35 @@ export function DomainDetailPage() {
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
   const formatPct = (v: number) => `${Math.round(v * 100)}%`;
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <Link to="/governance/domains" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
+          <ArrowLeft size={14} />
+          {t('organization.domains.title')}
+        </Link>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !domain) {
+    return (
+      <PageContainer>
+        <Link to="/governance/domains" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
+          <ArrowLeft size={14} />
+          {t('organization.domains.title')}
+        </Link>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error || t('organization.domainDetail.notFound')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -178,11 +186,11 @@ export function DomainDetailPage() {
           <div className="flex flex-wrap items-start gap-6">
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold text-heading">{domain.displayName}</h2>
-              <p className="text-sm text-muted mt-1">{domain.description}</p>
+              <p className="text-sm text-muted mt-1">{domain.description || '—'}</p>
               <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-muted">
                 <span className="flex items-center gap-1">
                   <Tag size={12} />
-                  {t('organization.domainDetail.capability')}: {domain.capabilityClassification}
+                  {t('organization.domainDetail.capability')}: {domain.capabilityClassification || '—'}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar size={12} />
@@ -224,7 +232,7 @@ export function DomainDetailPage() {
 
 /* ─── Overview Tab ─── */
 
-function OverviewTab({ domain, t }: { domain: typeof mockDomainDetail; t: (key: string) => string }) {
+function OverviewTab({ domain, t }: { domain: DomainDetail; t: (key: string) => string }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <StatCard title={t('organization.domainDetail.teams')} value={domain.teamCount} icon={<Users size={20} />} color="text-accent" />
@@ -237,7 +245,7 @@ function OverviewTab({ domain, t }: { domain: typeof mockDomainDetail; t: (key: 
 
 /* ─── Teams Tab ─── */
 
-function TeamsTab({ teams, t }: { teams: typeof mockDomainDetail.teams; t: (key: string) => string }) {
+function TeamsTab({ teams, t }: { teams: DomainTeamDto[]; t: (key: string) => string }) {
   if (teams.length === 0) {
     return <div className="p-8 text-center text-muted text-sm">{t('organization.domainDetail.noTeams')}</div>;
   }
@@ -271,7 +279,7 @@ function TeamsTab({ teams, t }: { teams: typeof mockDomainDetail.teams; t: (key:
 
 /* ─── Services Tab ─── */
 
-function ServicesTab({ services, t }: { services: typeof mockDomainDetail.services; t: (key: string) => string }) {
+function ServicesTab({ services, t }: { services: DomainServiceDto[]; t: (key: string) => string }) {
   if (services.length === 0) {
     return <div className="p-8 text-center text-muted text-sm">{t('organization.domainDetail.noServices')}</div>;
   }
@@ -304,7 +312,11 @@ function ServicesTab({ services, t }: { services: typeof mockDomainDetail.servic
 
 /* ─── Governance Tab ─── */
 
-function GovernanceTab({ gov, t, formatPct }: { gov: typeof mockGovernanceSummary; t: (key: string) => string; formatPct: (v: number) => string }) {
+function GovernanceTab({ gov, t, formatPct }: { gov: GovernanceSummary | null; t: (key: string) => string; formatPct: (v: number) => string }) {
+  if (!gov) {
+    return <div className="p-8 text-center text-muted text-sm">{t('organization.domainDetail.noGovernanceData')}</div>;
+  }
+
   return (
     <div className="space-y-6">
       {/* Summary */}
@@ -394,7 +406,7 @@ function GovernanceTab({ gov, t, formatPct }: { gov: typeof mockGovernanceSummar
 
 /* ─── Dependencies Tab ─── */
 
-function DependenciesTab({ deps, t }: { deps: typeof mockDomainDetail.crossDomainDependencies; t: (key: string) => string }) {
+function DependenciesTab({ deps, t }: { deps: CrossDomainDependencyDto[]; t: (key: string) => string }) {
   if (deps.length === 0) {
     return <div className="p-8 text-center text-muted text-sm">{t('organization.domainDetail.noDependencies')}</div>;
   }

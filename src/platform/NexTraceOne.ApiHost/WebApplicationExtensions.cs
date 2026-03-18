@@ -11,6 +11,7 @@ using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 namespace NexTraceOne.ApiHost;
@@ -60,6 +61,7 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IncidentDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
 
             logger.LogInformation(
                 "Migrations applied successfully for: {Contexts}",

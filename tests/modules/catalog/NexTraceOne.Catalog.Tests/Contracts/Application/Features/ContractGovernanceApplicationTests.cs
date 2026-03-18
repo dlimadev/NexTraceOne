@@ -25,14 +25,18 @@ public sealed class ContractGovernanceApplicationTests
     [Fact]
     public async Task ListContracts_Should_ReturnPaginatedResult()
     {
-        var repository = Substitute.For<IContractVersionRepository>();
-        var sut = new ListContractsFeature.Handler(repository);
+        var contractRepository = Substitute.For<IContractVersionRepository>();
+        var apiRepository = Substitute.For<IApiAssetRepository>();
+        var sut = new ListContractsFeature.Handler(contractRepository, apiRepository);
 
         var contract = ContractVersion.Import(
             Guid.NewGuid(), "1.0.0", "{}", "json", "upload", ContractProtocol.OpenApi).Value;
 
-        repository.ListLatestPerApiAssetAsync(null, null, null, 1, 20, Arg.Any<CancellationToken>())
+        contractRepository.ListLatestPerApiAssetAsync(null, null, null, 1, 20, Arg.Any<CancellationToken>())
             .Returns((new List<ContractVersion> { contract }, 1));
+
+        apiRepository.ListByApiAssetIdsAsync(Arg.Any<IEnumerable<Guid>>(), Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<Guid, ApiAsset>());
 
         var result = await sut.Handle(
             new ListContractsFeature.Query(null, null, null, 1, 20),
@@ -48,10 +52,11 @@ public sealed class ContractGovernanceApplicationTests
     [Fact]
     public async Task ListContracts_Should_PassFilters_To_Repository()
     {
-        var repository = Substitute.For<IContractVersionRepository>();
-        var sut = new ListContractsFeature.Handler(repository);
+        var contractRepository = Substitute.For<IContractVersionRepository>();
+        var apiRepository = Substitute.For<IApiAssetRepository>();
+        var sut = new ListContractsFeature.Handler(contractRepository, apiRepository);
 
-        repository.ListLatestPerApiAssetAsync(
+        contractRepository.ListLatestPerApiAssetAsync(
             ContractProtocol.AsyncApi, ContractLifecycleState.Approved, "test", 2, 10,
             Arg.Any<CancellationToken>())
             .Returns((new List<ContractVersion>(), 0));
@@ -62,7 +67,7 @@ public sealed class ContractGovernanceApplicationTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Items.Should().BeEmpty();
-        await repository.Received(1).ListLatestPerApiAssetAsync(
+        await contractRepository.Received(1).ListLatestPerApiAssetAsync(
             ContractProtocol.AsyncApi, ContractLifecycleState.Approved, "test", 2, 10,
             Arg.Any<CancellationToken>());
     }

@@ -1,75 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, Users, Globe, Calendar, Clock } from 'lucide-react';
+import { ShieldCheck, Users, Globe, Calendar, Clock, Loader2, AlertTriangle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
+import type { DelegatedAdminDto } from '../../../types';
 
 type DelegationScope = 'TeamAdmin' | 'DomainAdmin' | 'ReadOnly' | 'FullAdmin';
 
-interface Delegation {
-  delegationId: string;
-  granteeUserId: string;
-  granteeDisplayName: string;
-  scope: DelegationScope;
-  teamId: string | null;
-  teamName: string | null;
-  domainId: string | null;
-  domainName: string | null;
-  reason: string;
-  isActive: boolean;
-  grantedAt: string;
-  expiresAt: string | null;
-}
-
-const mockDelegations: Delegation[] = [
-  {
-    delegationId: 'del-1',
-    granteeUserId: 'usr-001',
-    granteeDisplayName: 'Maria Santos',
-    scope: 'TeamAdmin',
-    teamId: 'team-commerce',
-    teamName: 'Commerce',
-    domainId: null,
-    domainName: null,
-    reason: 'Team lead for Commerce during Q1 sprint',
-    isActive: true,
-    grantedAt: '2025-12-01T10:00:00Z',
-    expiresAt: '2026-06-01T00:00:00Z',
-  },
-  {
-    delegationId: 'del-2',
-    granteeUserId: 'usr-002',
-    granteeDisplayName: 'João Oliveira',
-    scope: 'DomainAdmin',
-    teamId: null,
-    teamName: null,
-    domainId: 'dom-platform',
-    domainName: 'Platform',
-    reason: 'Domain steward for Platform domain',
-    isActive: true,
-    grantedAt: '2025-11-15T08:00:00Z',
-    expiresAt: null,
-  },
-  {
-    delegationId: 'del-3',
-    granteeUserId: 'usr-003',
-    granteeDisplayName: 'Ana Costa',
-    scope: 'ReadOnly',
-    teamId: 'team-identity',
-    teamName: 'Identity & Access',
-    domainId: null,
-    domainName: null,
-    reason: 'Audit access for compliance review',
-    isActive: false,
-    grantedAt: '2025-10-01T10:00:00Z',
-    expiresAt: '2025-12-31T00:00:00Z',
-  },
-];
-
-const scopeBadgeVariant = (scope: DelegationScope): 'info' | 'warning' | 'default' | 'danger' => {
+const scopeBadgeVariant = (scope: string): 'info' | 'warning' | 'default' | 'danger' => {
   switch (scope) {
     case 'TeamAdmin':
       return 'info';
@@ -79,6 +21,8 @@ const scopeBadgeVariant = (scope: DelegationScope): 'info' | 'warning' | 'defaul
       return 'default';
     case 'FullAdmin':
       return 'danger';
+    default:
+      return 'default';
   }
 };
 
@@ -87,12 +31,37 @@ type ScopeFilter = 'All' | DelegationScope;
 export function DelegatedAdminPage() {
   const { t } = useTranslation();
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('All');
+  const [delegations, setDelegations] = useState<DelegatedAdminDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const activeDelegations = mockDelegations.filter(d => d.isActive).length;
-  const teamScoped = mockDelegations.filter(d => d.teamId !== null).length;
-  const domainScoped = mockDelegations.filter(d => d.domainId !== null).length;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-  const filtered = mockDelegations.filter(d => {
+    organizationGovernanceApi.listDelegations()
+      .then((data) => {
+        if (!cancelled) {
+          setDelegations(data.delegations);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message || t('common.errorLoading'));
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [t]);
+
+  const activeDelegations = delegations.filter(d => d.isActive).length;
+  const teamScoped = delegations.filter(d => d.teamId !== null && d.teamId !== undefined).length;
+  const domainScoped = delegations.filter(d => d.domainId !== null && d.domainId !== undefined).length;
+
+  const filtered = delegations.filter(d => {
     if (scopeFilter === 'All') return true;
     return d.scope === scopeFilter;
   });
@@ -105,6 +74,29 @@ export function DelegatedAdminPage() {
   ];
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <ModuleHeader titleKey="organization.delegatedAdmin.title" subtitleKey="organization.delegatedAdmin.subtitle" />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <ModuleHeader titleKey="organization.delegatedAdmin.title" subtitleKey="organization.delegatedAdmin.subtitle" />
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error}</p>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -138,69 +130,75 @@ export function DelegatedAdminPage() {
       </div>
 
       {/* Delegation cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.length === 0 ? (
-          <div className="col-span-full p-8 text-center text-muted text-sm">
-            {t('organization.delegatedAdmin.noDelegations')}
-          </div>
-        ) : (
-          filtered.map(delegation => (
-            <Card key={delegation.delegationId}>
-              <CardHeader>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <ShieldCheck size={18} className="text-accent shrink-0" />
-                    <h2 className="text-sm font-semibold text-heading truncate">
-                      {delegation.granteeDisplayName}
-                    </h2>
+      {delegations.length === 0 ? (
+        <div className="p-8 text-center text-muted text-sm">
+          {t('organization.delegatedAdmin.noDelegations')}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filtered.length === 0 ? (
+            <div className="col-span-full p-8 text-center text-muted text-sm">
+              {t('organization.delegatedAdmin.noDelegations')}
+            </div>
+          ) : (
+            filtered.map(delegation => (
+              <Card key={delegation.delegationId}>
+                <CardHeader>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <ShieldCheck size={18} className="text-accent shrink-0" />
+                      <h2 className="text-sm font-semibold text-heading truncate">
+                        {delegation.granteeDisplayName}
+                      </h2>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Badge variant={delegation.isActive ? 'success' : 'default'}>
+                        {t(`organization.delegatedAdmin.status.${delegation.isActive ? 'active' : 'inactive'}`)}
+                      </Badge>
+                      <Badge variant={scopeBadgeVariant(delegation.scope)}>
+                        {t(`organization.delegatedAdmin.scope.${delegation.scope}`)}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge variant={delegation.isActive ? 'success' : 'default'}>
-                      {t(`organization.delegatedAdmin.status.${delegation.isActive ? 'active' : 'inactive'}`)}
-                    </Badge>
-                    <Badge variant={scopeBadgeVariant(delegation.scope)}>
-                      {t(`organization.delegatedAdmin.scope.${delegation.scope}`)}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardBody>
-                {/* Context: team or domain */}
-                {delegation.teamName && (
-                  <div className="flex items-center gap-2 text-xs text-muted mb-2">
-                    <Users size={12} />
-                    <span>{t('organization.delegatedAdmin.team')}: {delegation.teamName}</span>
-                  </div>
-                )}
-                {delegation.domainName && (
-                  <div className="flex items-center gap-2 text-xs text-muted mb-2">
-                    <Globe size={12} />
-                    <span>{t('organization.delegatedAdmin.domain')}: {delegation.domainName}</span>
-                  </div>
-                )}
+                </CardHeader>
+                <CardBody>
+                  {/* Context: team or domain */}
+                  {delegation.teamName && (
+                    <div className="flex items-center gap-2 text-xs text-muted mb-2">
+                      <Users size={12} />
+                      <span>{t('organization.delegatedAdmin.team')}: {delegation.teamName}</span>
+                    </div>
+                  )}
+                  {delegation.domainName && (
+                    <div className="flex items-center gap-2 text-xs text-muted mb-2">
+                      <Globe size={12} />
+                      <span>{t('organization.delegatedAdmin.domain')}: {delegation.domainName}</span>
+                    </div>
+                  )}
 
-                {/* Reason */}
-                <p className="text-xs text-muted mb-3">{delegation.reason}</p>
+                  {/* Reason */}
+                  <p className="text-xs text-muted mb-3">{delegation.reason}</p>
 
-                {/* Dates */}
-                <div className="flex items-center gap-4 text-xs text-muted">
-                  <span className="flex items-center gap-1">
-                    <Calendar size={12} />
-                    {t('organization.delegatedAdmin.grantedAt')}: {formatDate(delegation.grantedAt)}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock size={12} />
-                    {t('organization.delegatedAdmin.expiresAt')}:{' '}
-                    {delegation.expiresAt
-                      ? formatDate(delegation.expiresAt)
-                      : t('organization.delegatedAdmin.noExpiry')}
-                  </span>
-                </div>
-              </CardBody>
-            </Card>
-          ))
-        )}
-      </div>
+                  {/* Dates */}
+                  <div className="flex items-center gap-4 text-xs text-muted">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={12} />
+                      {t('organization.delegatedAdmin.grantedAt')}: {formatDate(delegation.grantedAt)}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock size={12} />
+                      {t('organization.delegatedAdmin.expiresAt')}:{' '}
+                      {delegation.expiresAt
+                        ? formatDate(delegation.expiresAt)
+                        : t('organization.delegatedAdmin.noExpiry')}
+                    </span>
+                  </div>
+                </CardBody>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
     </PageContainer>
   );
 }

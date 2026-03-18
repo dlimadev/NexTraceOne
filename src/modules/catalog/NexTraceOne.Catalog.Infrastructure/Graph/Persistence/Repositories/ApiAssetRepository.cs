@@ -35,6 +35,22 @@ internal sealed class ApiAssetRepository(CatalogGraphDbContext context)
                 EF.Functions.ILike(asset.RoutePattern, $"%{searchTerm}%"))
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyDictionary<Guid, ApiAsset>> ListByApiAssetIdsAsync(
+        IEnumerable<Guid> apiAssetIds,
+        CancellationToken cancellationToken)
+    {
+        var ids = apiAssetIds.Distinct().ToList();
+        if (ids.Count == 0)
+            return new Dictionary<Guid, ApiAsset>();
+
+        var apiAssets = await _context.ApiAssets
+            .Include(a => a.OwnerService)
+            .Where(a => ids.Contains(a.Id.Value))
+            .ToListAsync(cancellationToken);
+
+        return apiAssets.ToDictionary(a => a.Id.Value);
+    }
+
     private static IQueryable<ApiAsset> IncludeGraph(IQueryable<ApiAsset> query)
         => query
             .Include(asset => asset.OwnerService)

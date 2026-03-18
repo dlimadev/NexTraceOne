@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetTeamDetail;
 
@@ -13,48 +15,41 @@ public static class GetTeamDetail
     public sealed record Query(string TeamId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de uma equipa com serviços, contratos e dependências.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(ITeamRepository teamRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var services = new List<TeamServiceDto>
-            {
-                new("svc-payment-gateway", "Payment Gateway", "Commerce", "Critical", "Primary"),
-                new("svc-order-api", "Order API", "Commerce", "High", "Primary"),
-                new("svc-catalog-sync", "Catalog Sync", "Platform", "Medium", "Shared")
-            };
+            if (!Guid.TryParse(request.TeamId, out var teamGuid))
+                return Error.Validation("INVALID_TEAM_ID", "Team ID '{0}' is not a valid GUID.", request.TeamId);
 
-            var contracts = new List<TeamContractDto>
-            {
-                new("ctr-payment-rest", "Payment API v2", "REST", "2.1.0", "Published"),
-                new("ctr-order-events", "Order Events", "Kafka", "1.3.0", "Published")
-            };
+            var team = await teamRepository.GetByIdAsync(new TeamId(teamGuid), cancellationToken);
+            if (team is null)
+                return Error.NotFound("TEAM_NOT_FOUND", "Team '{0}' not found.", request.TeamId);
 
-            var crossTeamDeps = new List<CrossTeamDependencyDto>
-            {
-                new("dep-001", "Payment Gateway", "Identity Service", "team-identity", "Identity", "Synchronous"),
-                new("dep-002", "Order API", "Notification Worker", "team-platform", "Platform", "Asynchronous")
-            };
+            // TODO: enriquecer com dados reais de serviços, contratos e dependências cross-team
+            var services = new List<TeamServiceDto>();
+            var contracts = new List<TeamContractDto>();
+            var crossTeamDeps = new List<CrossTeamDependencyDto>();
 
             var response = new Response(
-                TeamId: request.TeamId,
-                Name: "commerce-squad",
-                DisplayName: "Commerce",
-                Description: "Equipa responsável pelos serviços de comércio eletrónico e pagamentos.",
-                Status: "Active",
-                ParentOrganizationUnit: "Product",
-                ServiceCount: 3,
-                ContractCount: 2,
-                ActiveIncidentCount: 1,
-                RecentChangeCount: 7,
-                MaturityLevel: "Defined",
-                ReliabilityScore: 94.5m,
+                TeamId: team.Id.Value.ToString(),
+                Name: team.Name,
+                DisplayName: team.DisplayName,
+                Description: team.Description,
+                Status: team.Status.ToString(),
+                ParentOrganizationUnit: team.ParentOrganizationUnit,
+                ServiceCount: 0,
+                ContractCount: 0,
+                ActiveIncidentCount: 0,
+                RecentChangeCount: 0,
+                MaturityLevel: "Developing",
+                ReliabilityScore: 0m,
                 Services: services,
                 Contracts: contracts,
                 CrossTeamDependencies: crossTeamDeps,
-                CreatedAt: DateTimeOffset.UtcNow.AddMonths(-6));
+                CreatedAt: team.CreatedAt);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

@@ -22,6 +22,9 @@ public interface IApiAssetRepository
     /// <summary>Pesquisa ativos de API pelo nome ou rota.</summary>
     Task<IReadOnlyList<ApiAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken);
 
+    /// <summary>Lista ativos de API pelos identificadores (batch lookup com ServiceAsset incluído).</summary>
+    Task<IReadOnlyDictionary<Guid, ApiAsset>> ListByApiAssetIdsAsync(IEnumerable<Guid> apiAssetIds, CancellationToken cancellationToken);
+
     /// <summary>Adiciona um novo ativo de API para persistência.</summary>
     void Add(ApiAsset apiAsset);
 }

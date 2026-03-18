@@ -2164,6 +2164,16 @@
     "metaSourceWeights": "Source weights",
     "metaEscalation": "Escalation",
     "metaRoutingRationale": "Routing rationale",
+    "newConversationTitle": "New Conversation",
+    "newConversation": "New Conversation",
+    "noConversations": "No conversations yet",
+    "startNewConversation": "Start a new conversation to interact with the AI Assistant",
+    "errorLoadingConversations": "Failed to load conversations. Please try again.",
+    "loadingMessages": "Loading messages...",
+    "selectConversation": "Select a conversation",
+    "selectConversationHint": "Choose an existing conversation or start a new one",
+    "emptyConversation": "Ready to help",
+    "startTyping": "Type a message to start the conversation",
     "routingTitle": "AI Routing & Enrichment",
     "routingSubtitle": "Routing strategies, source weighting and enrichment governance",
     "routingStrategiesTab": "Routing Strategies",
@@ -3782,7 +3792,8 @@
     "status": {
       "Draft": "Draft",
       "Published": "Published",
-      "Deprecated": "Deprecated"
+      "Deprecated": "Deprecated",
+      "Archived": "Archived"
     },
     "category": {
       "Contracts": "Contracts",

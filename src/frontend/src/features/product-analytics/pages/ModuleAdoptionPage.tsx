@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp,
   TrendingDown,
@@ -7,7 +8,10 @@ import {
   Search,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageContainer } from '../../../components/shell';
+import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
  * Página de adoção por módulo.
@@ -18,25 +22,6 @@ import { PageContainer } from '../../../components/shell';
  *
  * @see docs/MODULES-AND-PAGES.md — módulos oficiais do produto
  */
-
-/* ── Dados de demonstração (MVP) ── */
-
-const mockModules = [
-  { module: 'Search', moduleName: 'Search', adoptionPercent: 94, totalActions: 4120, uniqueUsers: 210, depthScore: 96.1, trend: 'Stable' as const, topFeatures: ['global_search', 'command_palette', 'filter'] },
-  { module: 'SourceOfTruth', moduleName: 'Source of Truth', adoptionPercent: 89, totalActions: 3240, uniqueUsers: 156, depthScore: 92.3, trend: 'Improving' as const, topFeatures: ['query_contracts', 'view_services', 'search_schemas'] },
-  { module: 'ContractStudio', moduleName: 'Contract Studio', adoptionPercent: 76, totalActions: 2810, uniqueUsers: 134, depthScore: 78.4, trend: 'Improving' as const, topFeatures: ['create_draft', 'edit_contract', 'publish', 'validate'] },
-  { module: 'AiAssistant', moduleName: 'AI Assistant', adoptionPercent: 72, totalActions: 1980, uniqueUsers: 112, depthScore: 65.8, trend: 'Improving' as const, topFeatures: ['prompt_submit', 'response_used', 'context_query'] },
-  { module: 'ChangeIntelligence', moduleName: 'Change Intelligence', adoptionPercent: 68, totalActions: 2150, uniqueUsers: 98, depthScore: 71.2, trend: 'Stable' as const, topFeatures: ['view_changes', 'blast_radius', 'correlation'] },
-  { module: 'Incidents', moduleName: 'Incidents', adoptionPercent: 54, totalActions: 1420, uniqueUsers: 87, depthScore: 58.1, trend: 'Stable' as const, topFeatures: ['investigate', 'mitigation_start', 'mitigation_complete'] },
-  { module: 'Reliability', moduleName: 'Reliability', adoptionPercent: 48, totalActions: 1247, uniqueUsers: 62, depthScore: 45.6, trend: 'Declining' as const, topFeatures: ['view_dashboard', 'set_objectives', 'review_sla'] },
-  { module: 'Governance', moduleName: 'Governance', adoptionPercent: 41, totalActions: 980, uniqueUsers: 45, depthScore: 52.3, trend: 'Stable' as const, topFeatures: ['view_policies', 'compliance_check', 'evidence_export'] },
-  { module: 'Runbooks', moduleName: 'Runbooks', adoptionPercent: 38, totalActions: 540, uniqueUsers: 34, depthScore: 35.7, trend: 'Declining' as const, topFeatures: ['view_runbook', 'execute_step'] },
-  { module: 'ExecutiveViews', moduleName: 'Executive Views', adoptionPercent: 35, totalActions: 720, uniqueUsers: 28, depthScore: 88.2, trend: 'Improving' as const, topFeatures: ['overview', 'risk_heatmap', 'maturity', 'benchmarking'] },
-  { module: 'FinOps', moduleName: 'FinOps', adoptionPercent: 32, totalActions: 650, uniqueUsers: 24, depthScore: 42.1, trend: 'Stable' as const, topFeatures: ['cost_view', 'waste_analysis', 'efficiency'] },
-  { module: 'Automation', moduleName: 'Automation', adoptionPercent: 28, totalActions: 420, uniqueUsers: 22, depthScore: 31.5, trend: 'Improving' as const, topFeatures: ['create_workflow', 'execute', 'schedule'] },
-  { module: 'IntegrationHub', moduleName: 'Integration Hub', adoptionPercent: 22, totalActions: 380, uniqueUsers: 18, depthScore: 28.4, trend: 'Stable' as const, topFeatures: ['configure_connector', 'view_execution', 'freshness'] },
-  { module: 'DeveloperPortal', moduleName: 'Developer Portal', adoptionPercent: 18, totalActions: 280, uniqueUsers: 14, depthScore: 22.3, trend: 'Stable' as const, topFeatures: ['browse_apis', 'playground', 'subscribe'] },
-];
 
 function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
@@ -57,7 +42,41 @@ export function ModuleAdoptionPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
 
-  const filtered = mockModules.filter((m) => {
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['product-analytics-module-adoption'],
+    queryFn: () => productAnalyticsApi.getModuleAdoption({ range: 'last_30d' }),
+    staleTime: 15_000,
+  });
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageLoadingState message={t('common.loading')} />
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <PageErrorState
+          action={
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="px-3 py-2 rounded-md bg-zinc-900 border border-zinc-700 text-white text-xs hover:border-accent/50"
+            >
+              {t('common.retry')}
+            </button>
+          }
+        />
+      </PageContainer>
+    );
+  }
+
+  const modules = data.modules;
+
+  const filtered = modules.filter((m) => {
     if (!search) return true;
     const q = search.toLowerCase();
     return m.moduleName.toLowerCase().includes(q) || m.topFeatures.some((f) => f.includes(q));

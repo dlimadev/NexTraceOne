@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetIngestionHealth;
 
@@ -13,41 +15,88 @@ public static class GetIngestionHealth
     public sealed record Query(Guid? ConnectorId = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna o resumo de saúde do pipeline de ingestão.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IIntegrationConnectorRepository connectorRepository,
+        IIngestionSourceRepository sourceRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var now = DateTimeOffset.UtcNow;
 
-            var freshnessSummary = new List<DomainFreshness>
-            {
-                new("Changes", "Fresh", now.AddMinutes(-10), 10, 2),
-                new("Incidents", "Acceptable", now.AddHours(-2), 120, 1),
-                new("Telemetry", "Fresh", now.AddMinutes(-3), 3, 2),
-                new("Contracts", "Fresh", now.AddMinutes(-15), 15, 2),
-                new("Knowledge", "Acceptable", now.AddMinutes(-30), 30, 2),
-                new("Runtime", "Stale", now.AddHours(-6), 360, 1),
-                new("Alerts", "Fresh", now.AddMinutes(-4), 4, 1)
-            };
+            // Get connector health counts
+            var healthyCount = await connectorRepository.CountByHealthAsync(ConnectorHealth.Healthy, cancellationToken);
+            var degradedCount = await connectorRepository.CountByHealthAsync(ConnectorHealth.Degraded, cancellationToken);
+            var unhealthyCount = await connectorRepository.CountByHealthAsync(ConnectorHealth.Unhealthy, cancellationToken);
+            var criticalCount = await connectorRepository.CountByHealthAsync(ConnectorHealth.Critical, cancellationToken);
+            var failedCount = unhealthyCount + criticalCount;
 
-            var criticalIssues = new List<string>
+            // Get source freshness counts
+            var staleCount = await sourceRepository.CountByFreshnessStatusAsync(FreshnessStatus.Stale, cancellationToken);
+            var outdatedCount = await sourceRepository.CountByFreshnessStatusAsync(FreshnessStatus.Outdated, cancellationToken);
+            var expiredCount = await sourceRepository.CountByFreshnessStatusAsync(FreshnessStatus.Expired, cancellationToken);
+            var staleFeeds = staleCount + outdatedCount + expiredCount;
+
+            // Get all sources for freshness summary grouped by type
+            var sources = await sourceRepository.ListAsync(
+                connectorId: null,
+                status: SourceStatus.Active,
+                freshnessStatus: null,
+                ct: cancellationToken);
+
+            var freshnessSummary = sources
+                .GroupBy(s => s.SourceType)
+                .Select(g =>
+                {
+                    var latestSource = g.OrderByDescending(s => s.LastDataReceivedAt).FirstOrDefault();
+                    var lagMinutes = latestSource?.LastDataReceivedAt.HasValue == true
+                        ? (long)(now - latestSource.LastDataReceivedAt.Value).TotalMinutes
+                        : 0;
+
+                    var worstFreshness = g.Select(s => s.FreshnessStatus).Max();
+
+                    return new DomainFreshness(
+                        Domain: g.Key,
+                        Status: worstFreshness.ToString(),
+                        LastReceivedAt: latestSource?.LastDataReceivedAt,
+                        LagMinutes: lagMinutes,
+                        SourceCount: g.Count());
+                })
+                .ToList();
+
+            // Get connectors with issues for critical issues list
+            var connectors = await connectorRepository.ListAsync(
+                status: null,
+                health: null,
+                connectorType: null,
+                search: null,
+                ct: cancellationToken);
+
+            var criticalIssues = connectors
+                .Where(c => c.Health is ConnectorHealth.Critical or ConnectorHealth.Unhealthy or ConnectorHealth.Degraded)
+                .Select(c => $"{c.Name} connector {c.Health.ToString().ToLower()}" +
+                    (c.LastErrorMessage is not null ? $" — {c.LastErrorMessage}" : ""))
+                .ToList();
+
+            // Determine overall status
+            string overallStatus = (failedCount, degradedCount) switch
             {
-                "Kafka Events connector failed — broker unreachable since 6h ago",
-                "PagerDuty Incidents connector degraded — partial data loss in last 2 executions",
-                "Swagger/OpenAPI Import connector disabled for 14 days — stale contract data"
+                ( > 0, _) => "Critical",
+                (_, > 0) => "Degraded",
+                _ when staleFeeds > 0 => "Warning",
+                _ => "Healthy"
             };
 
             var response = new Response(
-                OverallStatus: "Degraded",
-                HealthyConnectors: 6,
-                DegradedConnectors: 1,
-                FailedConnectors: 1,
-                StaleFeeds: 2,
+                OverallStatus: overallStatus,
+                HealthyConnectors: healthyCount,
+                DegradedConnectors: degradedCount,
+                FailedConnectors: failedCount,
+                StaleFeeds: staleFeeds,
                 FreshnessSummary: freshnessSummary,
                 CriticalIssues: criticalIssues,
                 LastCheckedAt: now);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

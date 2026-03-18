@@ -1,113 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Package, Search, FileText, Shield, Zap, Bot, AlertTriangle,
-  Activity, Settings, CheckCircle, Archive,
+  Activity, Settings, CheckCircle, Archive, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
+import type { GovernancePackSummary, GovernancePackCategory, GovernancePackStatus } from '../../../types';
 
-/**
- * Tipos locais para Governance Packs — alinhados com o backend.
- */
-type PackCategory = 'Contracts' | 'SourceOfTruth' | 'Changes' | 'Incidents' | 'AIGovernance' | 'Reliability' | 'Operations';
-type PackStatus = 'Draft' | 'Published' | 'Deprecated';
+type CategoryFilter = 'all' | GovernancePackCategory;
+type StatusFilter = 'all' | GovernancePackStatus;
 
-interface GovernancePack {
-  packId: string;
-  name: string;
-  displayName: string;
-  description: string;
-  category: PackCategory;
-  status: PackStatus;
-  version: string;
-  scopeCount: number;
-  ruleCount: number;
-  createdAt: string;
-}
-
-/**
- * Dados simulados de governance packs — alinhados com o backend.
- * Em produção, virão da API /api/v1/governance/packs.
- */
-const mockPacks: GovernancePack[] = [
-  {
-    packId: 'contracts-baseline',
-    name: 'contracts-baseline',
-    displayName: 'Contracts Baseline',
-    description: 'Baseline governance rules for API and event contract management, versioning, and compatibility',
-    category: 'Contracts',
-    status: 'Published',
-    version: '2.1.0',
-    scopeCount: 12,
-    ruleCount: 8,
-    createdAt: new Date(Date.now() - 120 * 86400000).toISOString(),
-  },
-  {
-    packId: 'source-of-truth-standards',
-    name: 'source-of-truth-standards',
-    displayName: 'Source of Truth Standards',
-    description: 'Standards for service catalog completeness, ownership, and documentation as source of truth',
-    category: 'SourceOfTruth',
-    status: 'Published',
-    version: '1.3.0',
-    scopeCount: 8,
-    ruleCount: 6,
-    createdAt: new Date(Date.now() - 90 * 86400000).toISOString(),
-  },
-  {
-    packId: 'change-governance-pack',
-    name: 'change-governance-pack',
-    displayName: 'Change Governance Pack',
-    description: 'Production change confidence rules including blast radius assessment and validation gates',
-    category: 'Changes',
-    status: 'Published',
-    version: '3.0.0',
-    scopeCount: 15,
-    ruleCount: 10,
-    createdAt: new Date(Date.now() - 150 * 86400000).toISOString(),
-  },
-  {
-    packId: 'ai-usage-policy',
-    name: 'ai-usage-policy',
-    displayName: 'AI Usage Policy',
-    description: 'Governance rules for AI model usage, token budgets, prompt auditing, and external AI integrations',
-    category: 'AIGovernance',
-    status: 'Draft',
-    version: '0.9.0',
-    scopeCount: 5,
-    ruleCount: 7,
-    createdAt: new Date(Date.now() - 20 * 86400000).toISOString(),
-  },
-  {
-    packId: 'operational-readiness-pack',
-    name: 'operational-readiness-pack',
-    displayName: 'Operational Readiness Pack',
-    description: 'Operational readiness standards for runbooks, incident response, monitoring, and reliability',
-    category: 'Operations',
-    status: 'Deprecated',
-    version: '1.0.0',
-    scopeCount: 10,
-    ruleCount: 5,
-    createdAt: new Date(Date.now() - 200 * 86400000).toISOString(),
-  },
-];
-
-type CategoryFilter = 'all' | PackCategory;
-type StatusFilter = 'all' | PackStatus;
-
-const statusBadge = (st: PackStatus): 'success' | 'warning' | 'default' => {
+const statusBadge = (st: string): 'success' | 'warning' | 'default' => {
   switch (st) {
     case 'Published': return 'success';
     case 'Draft': return 'warning';
-    case 'Deprecated': return 'default';
+    case 'Deprecated':
+    default: return 'default';
   }
 };
 
-const categoryIcon = (cat: PackCategory) => {
+const categoryIcon = (cat: string) => {
   switch (cat) {
     case 'Contracts': return <FileText size={14} />;
     case 'SourceOfTruth': return <Shield size={14} />;
@@ -115,7 +32,8 @@ const categoryIcon = (cat: PackCategory) => {
     case 'Incidents': return <AlertTriangle size={14} />;
     case 'AIGovernance': return <Bot size={14} />;
     case 'Reliability': return <Activity size={14} />;
-    case 'Operations': return <Settings size={14} />;
+    case 'Operations':
+    default: return <Settings size={14} />;
   }
 };
 
@@ -128,13 +46,41 @@ export function GovernancePacksOverviewPage() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  const [packs, setPacks] = useState<GovernancePackSummary[]>([]);
+  const [totalPacks, setTotalPacks] = useState(0);
+  const [publishedCount, setPublishedCount] = useState(0);
+  const [draftCount, setDraftCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const totalPacks = mockPacks.length;
-  const publishedCount = mockPacks.filter(p => p.status === 'Published').length;
-  const draftCount = mockPacks.filter(p => p.status === 'Draft').length;
-  const deprecatedCount = mockPacks.filter(p => p.status === 'Deprecated').length;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-  const filtered = mockPacks.filter(p => {
+    organizationGovernanceApi.listGovernancePacks()
+      .then((data) => {
+        if (!cancelled) {
+          setPacks(data.packs);
+          setTotalPacks(data.totalPacks);
+          setPublishedCount(data.publishedCount);
+          setDraftCount(data.draftCount);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err.message || t('common.errorLoading'));
+          setLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [t]);
+
+  const deprecatedCount = packs.filter(p => p.status === 'Deprecated').length;
+
+  const filtered = packs.filter(p => {
     if (categoryFilter !== 'all' && p.category !== categoryFilter) return false;
     if (statusFilter !== 'all' && p.status !== statusFilter) return false;
     if (search) {
@@ -156,6 +102,35 @@ export function GovernancePacksOverviewPage() {
     { key: 'Reliability', labelKey: 'governancePacks.category.Reliability' },
     { key: 'Operations', labelKey: 'governancePacks.category.Operations' },
   ];
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.title')}</h1>
+          <p className="text-muted mt-1">{t('governancePacks.subtitle')}</p>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.title')}</h1>
+          <p className="text-muted mt-1">{t('governancePacks.subtitle')}</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error}</p>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -185,7 +160,7 @@ export function GovernancePacksOverviewPage() {
             className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </div>
-        {(['all', 'Draft', 'Published', 'Deprecated'] as StatusFilter[]).map(f => (
+        {(['all', 'Draft', 'Published', 'Deprecated', 'Archived'] as StatusFilter[]).map(f => (
           <button
             key={f}
             onClick={() => setStatusFilter(f)}
@@ -218,36 +193,40 @@ export function GovernancePacksOverviewPage() {
       </div>
 
       {/* Pack grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.length === 0 ? (
-          <div className="col-span-full p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
-        ) : (
-          filtered.map(pack => (
-            <Link key={pack.packId} to={`/governance/packs/${pack.packId}`} className="block">
-              <Card className="h-full hover:border-accent/30 transition-colors">
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-muted">{categoryIcon(pack.category)}</span>
-                    <span className="text-sm font-medium text-heading truncate">{pack.displayName}</span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant={statusBadge(pack.status)}>{t(`governancePacks.status.${pack.status}`)}</Badge>
-                    <Badge variant="info">{t(categories.find(c => c.key === pack.category)?.labelKey ?? '')}</Badge>
-                    <span className="text-xs text-faded font-mono">v{pack.version}</span>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <p className="text-xs text-muted mb-3">{pack.description}</p>
-                  <div className="flex items-center gap-4 text-xs text-faded">
-                    <span>{t('governancePacks.scopes')}: {pack.scopeCount}</span>
-                    <span>{t('governancePacks.rules')}: {pack.ruleCount}</span>
-                  </div>
-                </CardBody>
-              </Card>
-            </Link>
-          ))
-        )}
-      </div>
+      {packs.length === 0 ? (
+        <div className="p-8 text-center text-muted text-sm">{t('governancePacks.noPacks')}</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.length === 0 ? (
+            <div className="col-span-full p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+          ) : (
+            filtered.map(pack => (
+              <Link key={pack.packId} to={`/governance/packs/${pack.packId}`} className="block">
+                <Card className="h-full hover:border-accent/30 transition-colors">
+                  <CardHeader>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-muted">{categoryIcon(pack.category)}</span>
+                      <span className="text-sm font-medium text-heading truncate">{pack.displayName}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant={statusBadge(pack.status)}>{t(`governancePacks.status.${pack.status}`)}</Badge>
+                      <Badge variant="info">{t(categories.find(c => c.key === pack.category)?.labelKey ?? '')}</Badge>
+                      <span className="text-xs text-faded font-mono">v{pack.currentVersion}</span>
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <p className="text-xs text-muted mb-3">{pack.description}</p>
+                    <div className="flex items-center gap-4 text-xs text-faded">
+                      <span>{t('governancePacks.scopes')}: {pack.scopeCount}</span>
+                      <span>{t('governancePacks.rules')}: {pack.ruleCount}</span>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Link>
+            ))
+          )}
+        </div>
+      )}
     </PageContainer>
   );
 }

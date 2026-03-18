@@ -1,6 +1,10 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.RetryConnector;
 
@@ -23,17 +27,44 @@ public static class RetryConnector
     }
 
     /// <summary>Handler que enfileira o pedido de retry do conector.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        IIntegrationConnectorRepository connectorRepository,
+        IIngestionExecutionRepository executionRepository,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            if (!Guid.TryParse(request.ConnectorId, out var connectorGuid))
+            {
+                return Error.Validation("INVALID_CONNECTOR_ID", "Invalid connector ID format");
+            }
+
+            var connectorId = new IntegrationConnectorId(connectorGuid);
+            var connector = await connectorRepository.GetByIdAsync(connectorId, cancellationToken);
+
+            if (connector is null)
+            {
+                return Error.NotFound("CONNECTOR_NOT_FOUND", $"Connector {request.ConnectorId} not found");
+            }
+
+            // Create a new execution for the retry
+            var execution = IngestionExecution.Start(
+                connectorId: connectorId,
+                sourceId: null,
+                correlationId: $"retry-{Guid.NewGuid():N}",
+                utcNow: clock.UtcNow);
+
+            await executionRepository.AddAsync(execution, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
             var response = new Response(
-                RetryRequestId: Guid.NewGuid(),
+                RetryRequestId: execution.Id.Value,
                 ConnectorId: request.ConnectorId,
                 Status: "Queued",
-                RequestedAt: DateTimeOffset.UtcNow);
+                RequestedAt: clock.UtcNow);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

@@ -1416,6 +1416,16 @@
     "metaSourceWeights": "Pesos das fontes",
     "metaEscalation": "Escalonamento",
     "metaRoutingRationale": "Justificação de encaminhamento",
+    "newConversationTitle": "Nova Conversa",
+    "newConversation": "Nova Conversa",
+    "noConversations": "Sem conversas ainda",
+    "startNewConversation": "Inicie uma nova conversa para interagir com o Assistente de IA",
+    "errorLoadingConversations": "Falha ao carregar conversas. Por favor, tente novamente.",
+    "loadingMessages": "A carregar mensagens...",
+    "selectConversation": "Selecione uma conversa",
+    "selectConversationHint": "Escolha uma conversa existente ou inicie uma nova",
+    "emptyConversation": "Pronto para ajudar",
+    "startTyping": "Escreva uma mensagem para iniciar a conversa",
     "routingTitle": "Encaminhamento e Enriquecimento de IA",
     "routingSubtitle": "Estratégias de encaminhamento, ponderação de fontes e governança de enriquecimento",
     "routingStrategiesTab": "Estratégias de Encaminhamento",
@@ -3034,7 +3044,8 @@
     "status": {
       "Draft": "Rascunho",
       "Published": "Publicado",
-      "Deprecated": "Descontinuado"
+      "Deprecated": "Descontinuado",
+      "Archived": "Arquivado"
     },
     "category": {
       "Contracts": "Contratos",
