@@ -3195,7 +3195,19 @@
     },
     "meta": {
       "contextualRouting": "Consulta roteada para modelo interno com fundamentação contextual do domínio relevante da Fonte de Verdade."
-    }
+    },
+    "contextStrength": {
+      "strong": "Contexto forte",
+      "good": "Bom contexto",
+      "partial": "Contexto parcial",
+      "weak": "Contexto limitado",
+      "none": "Sem contexto"
+    },
+    "contextSummaryLabel": "Escopo consultado",
+    "suggestedSteps": "Próximos passos recomendados",
+    "caveatsLabel": "Limitações de contexto",
+    "fallbackCaveat": "Provedor de IA indisponível. Esta resposta é um fallback determinístico e pode não refletir dados reais.",
+    "noContextWarning": "Contexto limitado disponível. A resposta pode não refletir o estado atual desta entidade."
   },
   "shell": {
     "sidebarNav": "Navegação lateral",

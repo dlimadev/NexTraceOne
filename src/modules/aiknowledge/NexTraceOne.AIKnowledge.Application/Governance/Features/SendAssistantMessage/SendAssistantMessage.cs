@@ -422,19 +422,18 @@ public static class SendAssistantMessage
 
         /// <summary>
         /// Seleciona modelo baseado em caso de uso, persona e caminho de roteamento.
+        /// Retorna valores de fallback neutros — o provider real é resolvido pelo ModelRegistry ou AiRoutingOptions.
         /// </summary>
         private static (string Model, string Provider, bool IsInternal) SelectModel(
             AIUseCaseType useCaseType, string persona, AIRoutingPath routingPath)
         {
-            if (routingPath == AIRoutingPath.ExternalEscalation &&
-                useCaseType is AIUseCaseType.ContractGeneration or AIUseCaseType.ChangeAnalysis)
-                return ("NexTrace-Advanced-v1", "Internal-Advanced", true);
+            // For external escalation paths, prefer external providers by returning an empty provider
+            // so the routing adapter resolves from registry or options.
+            if (routingPath == AIRoutingPath.ExternalEscalation)
+                return (string.Empty, string.Empty, false);
 
-            if (persona.Equals("Executive", StringComparison.OrdinalIgnoreCase) ||
-                persona.Equals("Product", StringComparison.OrdinalIgnoreCase))
-                return ("NexTrace-Summary-v1", "Internal", true);
-
-            return ("NexTrace-Internal-v1", "Internal", true);
+            // All other paths: return empty values so the model catalog or routing options take precedence.
+            return (string.Empty, string.Empty, true);
         }
 
         /// <summary>

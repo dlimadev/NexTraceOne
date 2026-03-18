@@ -39,24 +39,58 @@ public sealed class ExternalAiRoutingPortAdapter : IExternalAIRoutingPort
         if (string.IsNullOrWhiteSpace(query))
             throw new InvalidOperationException("AI query must not be empty.");
 
+        // Try resolving model from registry; fall back to routing options when registry is empty.
         var resolvedModel = await _modelCatalogService.ResolveDefaultModelAsync("chat", cancellationToken);
-        if (resolvedModel is null)
-            throw new InvalidOperationException("No active chat model found in AI Model Registry.");
 
         var providerId = string.IsNullOrWhiteSpace(preferredProvider)
-            ? (_options.PreferredProvider ?? resolvedModel.ProviderId)
+            ? (_options.PreferredProvider ?? resolvedModel?.ProviderId)
             : preferredProvider;
 
+        // If no provider could be determined, there is nothing to route to.
+        if (string.IsNullOrWhiteSpace(providerId))
+        {
+            if (_options.EnableDeterministicFallback)
+                return BuildExplicitFallbackResponse("unknown", context, query);
+
+            throw new InvalidOperationException(
+                "No AI provider available: Model Registry is empty and no preferred provider is configured.");
+        }
+
         var chatProvider = _providerFactory.GetChatProvider(providerId);
-        if (chatProvider is null && !providerId.Equals(resolvedModel.ProviderId, StringComparison.OrdinalIgnoreCase))
+
+        // Secondary fallback: if the preferred/requested provider is not registered, try the resolved model's provider.
+        if (chatProvider is null && resolvedModel is not null &&
+            !providerId.Equals(resolvedModel.ProviderId, StringComparison.OrdinalIgnoreCase))
+        {
             chatProvider = _providerFactory.GetChatProvider(resolvedModel.ProviderId);
+            if (chatProvider is not null)
+                providerId = resolvedModel.ProviderId;
+        }
+
+        // Tertiary fallback: try any registered provider.
+        if (chatProvider is null)
+        {
+            var anyProvider = _providerFactory.GetAllProviders().OfType<IChatCompletionProvider>().FirstOrDefault();
+            if (anyProvider is not null)
+            {
+                chatProvider = _providerFactory.GetChatProvider(anyProvider.ProviderId);
+                if (chatProvider is not null)
+                    providerId = anyProvider.ProviderId;
+            }
+        }
 
         if (chatProvider is null)
-            throw new InvalidOperationException($"Chat provider '{providerId}' is not available.");
+        {
+            if (_options.EnableDeterministicFallback)
+                return BuildExplicitFallbackResponse(providerId, context, query);
 
-        var modelId = providerId.Equals(resolvedModel.ProviderId, StringComparison.OrdinalIgnoreCase)
-            ? resolvedModel.ModelName
-            : (_options.PreferredChatModel ?? resolvedModel.ModelName);
+            throw new InvalidOperationException($"Chat provider '{providerId}' is not available.");
+        }
+
+        // Resolve model name: prefer configured override, then registry, then options default.
+        var modelId = _options.PreferredChatModel
+            ?? resolvedModel?.ModelName
+            ?? providerId;
 
         var systemPrompt = BuildSystemPrompt(context);
         var messages = new List<ChatMessage>

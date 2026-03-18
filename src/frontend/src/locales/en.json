@@ -4005,6 +4005,7 @@
     "contextSummaryLabel": "Scope consulted",
     "suggestedSteps": "Recommended next steps",
     "caveatsLabel": "Context limitations",
+    "fallbackCaveat": "AI provider unavailable. This response is a deterministic fallback and may not reflect real data.",
     "noContextWarning": "Limited context available. Response may not reflect the current state of this entity.",
     "groundedIn": "Analysis grounded in real entity data from",
     "contextCaveats": {

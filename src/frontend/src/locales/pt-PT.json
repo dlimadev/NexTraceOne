@@ -3257,6 +3257,7 @@
     "contextSummaryLabel": "Âmbito consultado",
     "suggestedSteps": "Próximos passos recomendados",
     "caveatsLabel": "Limitações de contexto",
+    "fallbackCaveat": "Fornecedor de IA indisponível. Esta resposta é um fallback determinístico e pode não reflectir dados reais.",
     "noContextWarning": "Contexto limitado disponível. A resposta pode não refletir o estado atual desta entidade.",
     "groundedIn": "Análise fundamentada em dados reais da entidade de",
     "contextCaveats": {

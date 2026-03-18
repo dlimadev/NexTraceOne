@@ -428,7 +428,10 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
     setInputValue('');
     setIsTyping(true);
 
-    // Fire API call (non-blocking, falls back to contextual mock)
+    // stopTyping defers to the next macrotask so React can render the typing indicator first.
+    const stopTyping = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
+    // Fire API call (non-blocking, falls back to contextual local response)
     const contextPayload: Record<string, string> = {};
     if (contextType === 'service') contextPayload.serviceId = contextId;
     if (contextType === 'contract') contextPayload.contractId = contextId;
@@ -444,11 +447,20 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
         ...contextPayload,
         contextBundle: contextData ? JSON.stringify(contextData) : undefined,
       })
-      .then(response => {
+      .then(async response => {
+        const rawContent: string = response.assistantResponse || response.message || response.content || '';
+        const isFallback = rawContent.startsWith('[FALLBACK_PROVIDER_UNAVAILABLE]');
+        const displayContent = isFallback
+          ? rawContent.replace('[FALLBACK_PROVIDER_UNAVAILABLE]', '').trimStart()
+          : rawContent;
+
+        const baseCaveats: string[] = response.contextCaveats || [];
+        if (isFallback) baseCaveats.push(t('assistantPanel.fallbackCaveat'));
+
         const assistantMsg: ChatMessage = {
           id: response.correlationId || `a-${Date.now()}`,
           role: 'assistant',
-          content: response.assistantResponse || response.message || response.content || '',
+          content: displayContent,
           modelName: response.modelUsed || response.modelName,
           provider: response.provider,
           isInternalModel: response.isInternalModel ?? true,
@@ -459,49 +471,81 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
           contextReferences: response.contextReferences || [],
           correlationId: response.correlationId,
           useCaseType: response.useCaseType,
-          routingPath: response.routingPath,
-          confidenceLevel: response.confidenceLevel,
-          costClass: response.costClass,
+          routingPath: isFallback ? 'ProviderFallback' : response.routingPath,
+          confidenceLevel: isFallback ? 'Low' : response.confidenceLevel,
+          costClass: isFallback ? 'none' : response.costClass,
           routingRationale: response.routingRationale,
           sourceWeightingSummary: response.sourceWeightingSummary,
-          escalationReason: response.escalationReason,
+          escalationReason: isFallback ? 'ProviderUnavailableFallback' : response.escalationReason,
           suggestedActions: suggestedActions,
+          suggestedSteps: response.suggestedNextSteps || [],
+          caveats: baseCaveats,
+          contextSummaryText: response.contextSummary,
+          contextStrength: response.contextStrength,
           timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, assistantMsg]);
+        await stopTyping();
         setIsTyping(false);
       })
-      .catch((error: unknown) => {
-        const unavailableText = t('common.errorLoading');
-        const message = error instanceof Error
-          ? error.message
-          : unavailableText;
+      .catch(async () => {
+        // When contextData is available, generate a local grounded response.
+        // This ensures entity-specific data is shown even when the provider is unavailable,
+        // without silent mock — the fallback indicator is always explicit.
+        let content: string;
+        let caveats: string[];
+        let contextRefs: string[];
+        let contextStrength: string;
+        let catchSuggestedSteps: string[] = [];
+        let catchContextSummaryText = '';
+        let confidence = 'Unknown';
+
+        if (contextData) {
+          const localResponse = generateContextualResponse(contextType, contextSummary, text, t, contextData);
+          content = localResponse.content;
+          caveats = [t('assistantPanel.fallbackCaveat'), ...localResponse.caveats];
+          contextRefs = localResponse.refs;
+          contextStrength = localResponse.contextStrength;
+          catchSuggestedSteps = localResponse.suggestedSteps;
+          catchContextSummaryText = localResponse.contextSummaryText;
+          confidence = localResponse.confidence;
+        } else {
+          const unavailableText = t('common.errorLoading');
+          content = t('assistantPanel.fallbackCaveat');
+          caveats = [unavailableText];
+          contextRefs = [`${contextType}:${contextSummary.name}`];
+          contextStrength = 'weak';
+        }
 
         const assistantMsg: ChatMessage = {
           id: `a-${Date.now()}`,
           role: 'assistant',
-          content: `${unavailableText} ${message}`,
+          content,
           modelName: null,
           provider: null,
-          isInternalModel: false,
+          isInternalModel: true,
           promptTokens: 0,
           completionTokens: 0,
           appliedPolicyName: null,
           groundingSources: contextGroundingSources[contextType],
-          contextReferences: [`${contextType}:${contextSummary.name}`],
+          contextReferences: contextRefs,
           correlationId: `provider-unavailable-${Date.now()}`,
           useCaseType: contextType === 'service' ? 'ServiceLookup' : contextType === 'contract' ? 'ContractExplanation' : contextType === 'change' ? 'ChangeAnalysis' : 'IncidentExplanation',
-          routingPath: 'ProviderUnavailable',
-          confidenceLevel: 'Unknown',
+          routingPath: 'LocalFallback',
+          confidenceLevel: confidence,
           costClass: 'none',
-          routingRationale: 'Provider unavailable. No silent mock was used.',
+          routingRationale: 'Provider unavailable. Local grounded response used.',
           sourceWeightingSummary: '',
           escalationReason: 'ProviderUnavailable',
           suggestedActions: suggestedActions,
-          caveats: [unavailableText],
+          suggestedSteps: catchSuggestedSteps,
+          caveats,
+          contextSummaryText: catchContextSummaryText,
+          contextStrength,
           timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, assistantMsg]);
+        await stopTyping();
         setIsTyping(false);
       });
   };
