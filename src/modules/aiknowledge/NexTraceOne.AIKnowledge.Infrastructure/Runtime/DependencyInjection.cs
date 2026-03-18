@@ -5,13 +5,14 @@ using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo AI Runtime.
-/// Inclui: Ollama provider, factory, catalog, health services.
+/// Inclui: Ollama provider, OpenAI provider (quando configurado), factory, catalog, health services.
 /// </summary>
 public static class DependencyInjection
 {
@@ -24,6 +25,8 @@ public static class DependencyInjection
             configuration.GetSection(OllamaOptions.SectionName));
         services.Configure<AiRoutingOptions>(
             configuration.GetSection(AiRoutingOptions.SectionName));
+        services.Configure<OpenAiOptions>(
+            configuration.GetSection(OpenAiOptions.SectionName));
 
         // Ollama HTTP client (registered via IHttpClientFactory — typed client pattern)
         services.AddHttpClient<OllamaHttpClient>((sp, client) =>
@@ -38,6 +41,21 @@ public static class DependencyInjection
         services.AddScoped<OllamaProvider>();
         services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<OllamaProvider>());
         services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<OllamaProvider>());
+
+        // OpenAI provider — registered only when ApiKey is configured
+        var openAiOptions = configuration.GetSection(OpenAiOptions.SectionName).Get<OpenAiOptions>();
+        if (openAiOptions?.IsConfigured == true)
+        {
+            services.AddHttpClient<OpenAiHttpClient>((sp, client) =>
+            {
+                client.BaseAddress = new Uri(openAiOptions.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(openAiOptions.TimeoutSeconds);
+            });
+
+            services.AddScoped<OpenAiProvider>();
+            services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<OpenAiProvider>());
+            services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<OpenAiProvider>());
+        }
 
         // Factory — scoped to resolve scoped providers
         services.AddScoped<IAiProviderFactory, AiProviderFactory>();
