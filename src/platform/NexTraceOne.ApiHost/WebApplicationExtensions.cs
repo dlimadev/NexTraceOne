@@ -1,6 +1,8 @@
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.Audit.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
@@ -60,6 +62,8 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IncidentDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<RuntimeIntelligenceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
 

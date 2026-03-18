@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   ShieldCheck, Search, Shield, Lock, Unlock, Users,
 } from 'lucide-react';
@@ -7,6 +8,10 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { Loader } from '../../../components/Loader';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { Button } from '../../../components/Button';
+import { aiGovernanceApi } from '../api';
 
 interface Policy {
   id: string;
@@ -20,14 +25,6 @@ interface Policy {
   isActive: boolean;
 }
 
-const mockPolicies: Policy[] = [
-  { id: '1', name: 'Default Engineer Policy', description: 'Standard policy for engineers', scope: 'role', scopeValue: 'Engineer', allowExternalAI: false, internalOnly: true, maxTokensPerRequest: 4096, isActive: true },
-  { id: '2', name: 'Tech Lead Extended', description: 'Extended access for tech leads', scope: 'role', scopeValue: 'Tech Lead', allowExternalAI: true, internalOnly: false, maxTokensPerRequest: 8192, isActive: true },
-  { id: '3', name: 'Platform Admin Full', description: 'Full AI access for platform admins', scope: 'role', scopeValue: 'Platform Admin', allowExternalAI: true, internalOnly: false, maxTokensPerRequest: 16384, isActive: true },
-  { id: '4', name: 'Auditor Read-Only', description: 'Audit trail access only', scope: 'role', scopeValue: 'Auditor', allowExternalAI: false, internalOnly: true, maxTokensPerRequest: 2048, isActive: true },
-  { id: '5', name: 'Restricted Intern Policy', description: 'Limited access for interns', scope: 'group', scopeValue: 'Interns', allowExternalAI: false, internalOnly: true, maxTokensPerRequest: 1024, isActive: false },
-];
-
 type StatusFilter = 'all' | 'active' | 'inactive';
 
 /**
@@ -39,16 +36,53 @@ export function AiPoliciesPage() {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
 
-  const filtered = mockPolicies.filter((p) => {
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['ai-governance', 'policies'],
+    queryFn: () => aiGovernanceApi.listPolicies(),
+    staleTime: 30_000,
+  });
+
+  const policies: Policy[] = useMemo(() => {
+    const items = (data?.items ?? []) as Array<{
+      policyId: string;
+      name: string;
+      description: string;
+      scope: string;
+      scopeValue: string;
+      allowExternalAI: boolean;
+      internalOnly: boolean;
+      maxTokensPerRequest: number;
+      isActive: boolean;
+    }>;
+
+    return items.map((p) => ({
+      id: p.policyId,
+      name: p.name,
+      description: p.description,
+      scope: p.scope,
+      scopeValue: p.scopeValue,
+      allowExternalAI: p.allowExternalAI,
+      internalOnly: p.internalOnly,
+      maxTokensPerRequest: p.maxTokensPerRequest,
+      isActive: p.isActive,
+    }));
+  }, [data]);
+
+  const filtered = policies.filter((p) => {
     if (filter === 'active' && !p.isActive) return false;
     if (filter === 'inactive' && p.isActive) return false;
     if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.scopeValue.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
-  const totalActive = mockPolicies.filter((p) => p.isActive).length;
-  const internalOnly = mockPolicies.filter((p) => p.internalOnly && p.isActive).length;
-  const externalAllowed = mockPolicies.filter((p) => p.allowExternalAI && p.isActive).length;
+  const totalActive = policies.filter((p) => p.isActive).length;
+  const internalOnly = policies.filter((p) => p.internalOnly && p.isActive).length;
+  const externalAllowed = policies.filter((p) => p.allowExternalAI && p.isActive).length;
 
   const filters: { key: StatusFilter; label: string }[] = [
     { key: 'all', label: t('aiHub.filterAll') },
@@ -65,7 +99,7 @@ export function AiPoliciesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('aiHub.policiesTotalStat')} value={mockPolicies.length} icon={<ShieldCheck size={20} />} color="text-accent" />
+        <StatCard title={t('aiHub.policiesTotalStat')} value={policies.length} icon={<ShieldCheck size={20} />} color="text-accent" />
         <StatCard title={t('aiHub.policiesActiveStat')} value={totalActive} icon={<Shield size={20} />} color="text-success" />
         <StatCard title={t('aiHub.policiesInternalOnlyStat')} value={internalOnly} icon={<Lock size={20} />} color="text-info" />
         <StatCard title={t('aiHub.policiesExternalAllowedStat')} value={externalAllowed} icon={<Unlock size={20} />} color="text-warning" />
@@ -98,7 +132,25 @@ export function AiPoliciesPage() {
 
       {/* Policy list */}
       <div className="space-y-3">
-        {filtered.map((p) => (
+        {isLoading && (
+          <Card>
+            <CardBody className="flex justify-center py-16">
+              <Loader size="lg" />
+            </CardBody>
+          </Card>
+        )}
+
+        {isError && (
+          <PageErrorState
+            action={(
+              <Button variant="secondary" size="sm" onClick={() => refetch()}>
+                {t('common.retry', 'Retry')}
+              </Button>
+            )}
+          />
+        )}
+
+        {!isLoading && !isError && filtered.map((p) => (
           <Card key={p.id}>
             <CardBody>
               <div className="flex items-start justify-between gap-4">
@@ -119,7 +171,7 @@ export function AiPoliciesPage() {
             </CardBody>
           </Card>
         ))}
-        {filtered.length === 0 && (
+        {!isLoading && !isError && filtered.length === 0 && (
           <Card>
             <CardBody>
               <p className="text-center text-muted py-8">{t('aiHub.noPoliciesFound')}</p>

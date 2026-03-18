@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, AlertCircle, ShieldAlert, Eye,
   Search, CheckCircle, XCircle, Clock, Shield,
@@ -57,8 +57,22 @@ function timeAgo(dateStr: string): string {
  */
 export function IncidentsPage() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createForm, setCreateForm] = useState({
+    title: '',
+    description: '',
+    incidentType: 'ServiceDegradation',
+    severity: 'Major',
+    serviceId: '',
+    serviceDisplayName: '',
+    ownerTeam: '',
+    impactedDomain: '',
+    environment: 'Production',
+  });
 
   const incidentsQuery = useQuery({
     queryKey: ['incidents', filter, search],
@@ -76,6 +90,34 @@ export function IncidentsPage() {
   });
 
   const incidents: IncidentListItem[] = incidentsQuery.data?.items ?? [];
+
+  const createIncidentMutation = useMutation({
+    mutationFn: () => incidentsApi.createIncident({
+      ...createForm,
+      impactedDomain: createForm.impactedDomain || undefined,
+    }),
+    onSuccess: () => {
+      setCreateError(null);
+      setIsCreateOpen(false);
+      setCreateForm({
+        title: '',
+        description: '',
+        incidentType: 'ServiceDegradation',
+        severity: 'Major',
+        serviceId: '',
+        serviceDisplayName: '',
+        ownerTeam: '',
+        impactedDomain: '',
+        environment: 'Production',
+      });
+      queryClient.invalidateQueries({ queryKey: ['incidents'] });
+      queryClient.invalidateQueries({ queryKey: ['incidents-summary'] });
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : t('common.errorLoading');
+      setCreateError(message);
+    },
+  });
 
   const stats = summaryQuery.data ?? {
     totalOpen: 0,
@@ -108,6 +150,122 @@ export function IncidentsPage() {
 
       {/* Filters + Incident list */}
       <PageSection>
+        <div className="mb-4 flex items-center justify-end">
+          <button
+            type="button"
+            onClick={() => setIsCreateOpen(prev => !prev)}
+            className="px-3 py-2 text-sm rounded-md border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
+          >
+            {t('incidents.create.button', 'Create Incident')}
+          </button>
+        </div>
+
+        {isCreateOpen && (
+          <Card className="mb-4">
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading">{t('incidents.create.title', 'Create Incident')}</h2>
+            </CardHeader>
+            <CardBody>
+              <form
+                className="grid grid-cols-1 md:grid-cols-2 gap-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setCreateError(null);
+                  createIncidentMutation.mutate();
+                }}
+              >
+                <input
+                  value={createForm.title}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder={t('incidents.create.titlePlaceholder', 'Incident title')}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  required
+                />
+                <input
+                  value={createForm.serviceId}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, serviceId: e.target.value }))}
+                  placeholder={t('incidents.create.serviceIdPlaceholder', 'Service ID')}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  required
+                />
+                <input
+                  value={createForm.serviceDisplayName}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, serviceDisplayName: e.target.value }))}
+                  placeholder={t('incidents.create.serviceNamePlaceholder', 'Service display name')}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  required
+                />
+                <input
+                  value={createForm.ownerTeam}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, ownerTeam: e.target.value }))}
+                  placeholder={t('incidents.create.ownerTeamPlaceholder', 'Owner team')}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  required
+                />
+                <select
+                  value={createForm.incidentType}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, incidentType: e.target.value }))}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                >
+                  {['ServiceDegradation', 'AvailabilityIssue', 'DependencyFailure', 'ContractImpact', 'MessagingIssue', 'BackgroundProcessingIssue', 'OperationalRegression'].map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                <select
+                  value={createForm.severity}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, severity: e.target.value }))}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                >
+                  {['Warning', 'Minor', 'Major', 'Critical'].map(sev => (
+                    <option key={sev} value={sev}>{sev}</option>
+                  ))}
+                </select>
+                <input
+                  value={createForm.environment}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, environment: e.target.value }))}
+                  placeholder={t('incidents.create.environmentPlaceholder', 'Environment')}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                  required
+                />
+                <input
+                  value={createForm.impactedDomain}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, impactedDomain: e.target.value }))}
+                  placeholder={t('incidents.create.domainPlaceholder', 'Impacted domain (optional)')}
+                  className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
+                />
+                <textarea
+                  value={createForm.description}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder={t('incidents.create.descriptionPlaceholder', 'Describe what happened')}
+                  className="md:col-span-2 px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body min-h-[88px]"
+                  required
+                />
+
+                {createError && (
+                  <p className="md:col-span-2 text-sm text-critical">{createError}</p>
+                )}
+
+                <div className="md:col-span-2 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateOpen(false)}
+                    className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body"
+                  >
+                    {t('common.cancel', 'Cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={createIncidentMutation.isPending}
+                    className="px-3 py-2 text-sm rounded-md bg-accent text-accent-contrast disabled:opacity-60"
+                  >
+                    {createIncidentMutation.isPending ? t('common.loading', 'Loading...') : t('incidents.create.submit', 'Create')}
+                  </button>
+                </div>
+              </form>
+            </CardBody>
+          </Card>
+        )}
+
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="relative flex-1 max-w-xs">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />

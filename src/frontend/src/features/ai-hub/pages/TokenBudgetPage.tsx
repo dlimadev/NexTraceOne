@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Coins, Search, AlertCircle, TrendingUp, BarChart3,
 } from 'lucide-react';
@@ -7,6 +8,11 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { Loader } from '../../../components/Loader';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { Button } from '../../../components/Button';
+import { aiGovernanceApi } from '../api';
 
 interface Budget {
   id: string;
@@ -19,14 +25,8 @@ interface Budget {
   currentTokensUsed: number;
   currentRequestCount: number;
   isActive: boolean;
+  isQuotaExceeded: boolean;
 }
-
-const mockBudgets: Budget[] = [
-  { id: '1', name: 'Engineering Team Budget', scope: 'team', scopeValue: 'Engineering', period: 'Monthly', maxTokens: 500000, maxRequests: 5000, currentTokensUsed: 234500, currentRequestCount: 2345, isActive: true },
-  { id: '2', name: 'Product Team Budget', scope: 'team', scopeValue: 'Product', period: 'Monthly', maxTokens: 200000, maxRequests: 2000, currentTokensUsed: 195000, currentRequestCount: 1890, isActive: true },
-  { id: '3', name: 'Default User Budget', scope: 'role', scopeValue: 'Engineer', period: 'Daily', maxTokens: 10000, maxRequests: 100, currentTokensUsed: 11200, currentRequestCount: 112, isActive: true },
-  { id: '4', name: 'Executive Budget', scope: 'role', scopeValue: 'Executive', period: 'Weekly', maxTokens: 50000, maxRequests: 200, currentTokensUsed: 12000, currentRequestCount: 45, isActive: true },
-];
 
 function usagePct(used: number, max: number): number {
   return max > 0 ? Math.min(Math.round((used / max) * 100), 100) : 0;
@@ -46,13 +46,54 @@ export function TokenBudgetPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
 
-  const filtered = mockBudgets.filter((b) =>
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['ai-governance', 'budgets'],
+    queryFn: () => aiGovernanceApi.listBudgets(),
+    staleTime: 30_000,
+  });
+
+  const budgets: Budget[] = useMemo(() => {
+    const items = (data?.items ?? []) as Array<{
+      budgetId: string;
+      name: string;
+      scope: string;
+      scopeValue: string;
+      period: string;
+      maxTokens: number;
+      maxRequests: number;
+      currentTokensUsed: number;
+      currentRequestCount: number;
+      isActive: boolean;
+      isQuotaExceeded: boolean;
+    }>;
+
+    return items.map((b) => ({
+      id: b.budgetId,
+      name: b.name,
+      scope: b.scope,
+      scopeValue: b.scopeValue,
+      period: b.period,
+      maxTokens: b.maxTokens,
+      maxRequests: b.maxRequests,
+      currentTokensUsed: b.currentTokensUsed,
+      currentRequestCount: b.currentRequestCount,
+      isActive: b.isActive,
+      isQuotaExceeded: b.isQuotaExceeded,
+    }));
+  }, [data]);
+
+  const filtered = budgets.filter((b) =>
     !search || b.name.toLowerCase().includes(search.toLowerCase()) || b.scopeValue.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const totalActive = mockBudgets.filter((b) => b.isActive).length;
-  const quotaExceeded = mockBudgets.filter((b) => b.currentTokensUsed > b.maxTokens || b.currentRequestCount > b.maxRequests).length;
-  const totalTokensUsed = mockBudgets.reduce((s, b) => s + b.currentTokensUsed, 0);
+  const totalActive = budgets.filter((b) => b.isActive).length;
+  const quotaExceeded = budgets.filter((b) => b.isQuotaExceeded).length;
+  const totalTokensUsed = budgets.reduce((s, b) => s + b.currentTokensUsed, 0);
 
   return (
     <PageContainer>
@@ -63,7 +104,7 @@ export function TokenBudgetPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('aiHub.budgetTotalStat')} value={mockBudgets.length} icon={<Coins size={20} />} color="text-accent" />
+        <StatCard title={t('aiHub.budgetTotalStat')} value={budgets.length} icon={<Coins size={20} />} color="text-accent" />
         <StatCard title={t('aiHub.budgetActiveStat')} value={totalActive} icon={<BarChart3 size={20} />} color="text-success" />
         <StatCard title={t('aiHub.budgetExceededStat')} value={quotaExceeded} icon={<AlertCircle size={20} />} color="text-critical" />
         <StatCard title={t('aiHub.budgetTokensUsedStat')} value={totalTokensUsed.toLocaleString()} icon={<TrendingUp size={20} />} color="text-info" />
@@ -85,10 +126,28 @@ export function TokenBudgetPage() {
 
       {/* Budget list */}
       <div className="space-y-3">
-        {filtered.map((b) => {
+        {isLoading && (
+          <Card>
+            <CardBody className="flex justify-center py-16">
+              <Loader size="lg" />
+            </CardBody>
+          </Card>
+        )}
+
+        {isError && (
+          <PageErrorState
+            action={(
+              <Button variant="secondary" size="sm" onClick={() => refetch()}>
+                {t('common.retry', 'Retry')}
+              </Button>
+            )}
+          />
+        )}
+
+        {!isLoading && !isError && filtered.map((b) => {
           const tokenPct = usagePct(b.currentTokensUsed, b.maxTokens);
           const reqPct = usagePct(b.currentRequestCount, b.maxRequests);
-          const exceeded = b.currentTokensUsed > b.maxTokens || b.currentRequestCount > b.maxRequests;
+          const exceeded = b.isQuotaExceeded;
 
           return (
             <Card key={b.id}>
@@ -127,8 +186,8 @@ export function TokenBudgetPage() {
             </Card>
           );
         })}
-        {filtered.length === 0 && (
-          <Card><CardBody><p className="text-center text-muted py-8">{t('aiHub.noBudgetsFound')}</p></CardBody></Card>
+        {!isLoading && !isError && filtered.length === 0 && (
+          <EmptyState title={t('aiHub.noBudgetsFound')} size="compact" />
         )}
       </div>
     </PageContainer>

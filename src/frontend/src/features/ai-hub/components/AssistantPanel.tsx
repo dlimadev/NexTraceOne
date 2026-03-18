@@ -448,8 +448,8 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
         const assistantMsg: ChatMessage = {
           id: response.correlationId || `a-${Date.now()}`,
           role: 'assistant',
-          content: response.message || response.content || '',
-          modelName: response.modelName,
+          content: response.assistantResponse || response.message || response.content || '',
+          modelName: response.modelUsed || response.modelName,
           provider: response.provider,
           isInternalModel: response.isInternalModel ?? true,
           promptTokens: response.promptTokens,
@@ -471,46 +471,38 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
         setMessages(prev => [...prev, assistantMsg]);
         setIsTyping(false);
       })
-      .catch(() => {
-        // Fallback: contextual mock response
-        setTimeout(() => {
-          const { content, useCaseType, sources, refs, confidence, weightSummary, contextStrength, suggestedSteps, caveats, contextSummaryText } = generateContextualResponse(
-            contextType,
-            contextSummary,
-            text,
-            t,
-            contextData,
-          );
-          const assistantMsg: ChatMessage = {
-            id: `a-${Date.now()}`,
-            role: 'assistant',
-            content,
-            modelName: 'NexTrace-Internal-v1',
-            provider: 'Internal',
-            isInternalModel: true,
-            promptTokens: Math.floor(text.length / 4),
-            completionTokens: 65,
-            appliedPolicyName: 'Default Internal Policy',
-            groundingSources: sources,
-            contextReferences: refs,
-            correlationId: `ctx-${contextId}-${Date.now()}`,
-            useCaseType,
-            routingPath: 'InternalOnly',
-            confidenceLevel: confidence,
-            costClass: 'low',
-            routingRationale: t('assistantPanel.meta.contextualRouting'),
-            sourceWeightingSummary: weightSummary,
-            escalationReason: 'None',
-            suggestedActions: suggestedActions,
-            contextStrength,
-            suggestedSteps,
-            caveats,
-            contextSummaryText,
-            timestamp: new Date().toISOString(),
-          };
-          setMessages(prev => [...prev, assistantMsg]);
-          setIsTyping(false);
-        }, 800);
+      .catch((error: unknown) => {
+        const unavailableText = t('common.errorLoading');
+        const message = error instanceof Error
+          ? error.message
+          : unavailableText;
+
+        const assistantMsg: ChatMessage = {
+          id: `a-${Date.now()}`,
+          role: 'assistant',
+          content: `${unavailableText} ${message}`,
+          modelName: null,
+          provider: null,
+          isInternalModel: false,
+          promptTokens: 0,
+          completionTokens: 0,
+          appliedPolicyName: null,
+          groundingSources: contextGroundingSources[contextType],
+          contextReferences: [`${contextType}:${contextSummary.name}`],
+          correlationId: `provider-unavailable-${Date.now()}`,
+          useCaseType: contextType === 'service' ? 'ServiceLookup' : contextType === 'contract' ? 'ContractExplanation' : contextType === 'change' ? 'ChangeAnalysis' : 'IncidentExplanation',
+          routingPath: 'ProviderUnavailable',
+          confidenceLevel: 'Unknown',
+          costClass: 'none',
+          routingRationale: 'Provider unavailable. No silent mock was used.',
+          sourceWeightingSummary: '',
+          escalationReason: 'ProviderUnavailable',
+          suggestedActions: suggestedActions,
+          caveats: [unavailableText],
+          timestamp: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, assistantMsg]);
+        setIsTyping(false);
       });
   };
 

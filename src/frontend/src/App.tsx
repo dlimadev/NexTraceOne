@@ -69,6 +69,8 @@ const PlatformOperationsPage = lazy(() => import('./features/operations/pages/Pl
 const AiAssistantPage = lazy(() => import('./features/ai-hub/pages/AiAssistantPage').then(m => ({ default: m.AiAssistantPage })));
 const ModelRegistryPage = lazy(() => import('./features/ai-hub/pages/ModelRegistryPage').then(m => ({ default: m.ModelRegistryPage })));
 const AiPoliciesPage = lazy(() => import('./features/ai-hub/pages/AiPoliciesPage').then(m => ({ default: m.AiPoliciesPage })));
+const TokenBudgetPage = lazy(() => import('./features/ai-hub/pages/TokenBudgetPage').then(m => ({ default: m.TokenBudgetPage })));
+const AiAuditPage = lazy(() => import('./features/ai-hub/pages/AiAuditPage').then(m => ({ default: m.AiAuditPage })));
 const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegrationsPage').then(m => ({ default: m.IdeIntegrationsPage })));
 const AiRoutingPage = lazy(() => import('./features/ai-hub/pages/AiRoutingPage').then(m => ({ default: m.AiRoutingPage })));
 
@@ -398,10 +400,12 @@ export default function App() {
               />
               {/* ── AI Hub ── */}
               <Route path="/ai/assistant" element={<AiAssistantPage />} />
-              <Route path="/ai/models" element={<PreviewGate><ModelRegistryPage /></PreviewGate>} />
-              <Route path="/ai/policies" element={<PreviewGate><AiPoliciesPage /></PreviewGate>} />
-              <Route path="/ai/ide" element={<PreviewGate><IdeIntegrationsPage /></PreviewGate>} />
-              <Route path="/ai/routing" element={<PreviewGate><AiRoutingPage /></PreviewGate>} />
+               <Route path="/ai/models" element={<ModelRegistryPage />} />
+               <Route path="/ai/policies" element={<AiPoliciesPage />} />
+               <Route path="/ai/ide" element={<IdeIntegrationsPage />} />
+               <Route path="/ai/routing" element={<AiRoutingPage />} />
+               <Route path="/ai/budgets" element={<TokenBudgetPage />} />
+               <Route path="/ai/audit" element={<AiAuditPage />} />
               {/* ── Governance ── */}
               <Route path="/governance/reports" element={<PreviewGate><ReportsPage /></PreviewGate>} />
               <Route path="/governance/risk" element={<PreviewGate><RiskCenterPage /></PreviewGate>} />

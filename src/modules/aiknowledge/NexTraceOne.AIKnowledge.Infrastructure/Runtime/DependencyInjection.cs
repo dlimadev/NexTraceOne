@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
@@ -21,6 +22,8 @@ public static class DependencyInjection
         // Configuration
         services.Configure<OllamaOptions>(
             configuration.GetSection(OllamaOptions.SectionName));
+        services.Configure<AiRoutingOptions>(
+            configuration.GetSection(AiRoutingOptions.SectionName));
 
         // Ollama HTTP client (registered via IHttpClientFactory — typed client pattern)
         services.AddHttpClient<OllamaHttpClient>((sp, client) =>
@@ -38,6 +41,9 @@ public static class DependencyInjection
 
         // Factory — scoped to resolve scoped providers
         services.AddScoped<IAiProviderFactory, AiProviderFactory>();
+
+        // External AI routing port adapter
+        services.AddScoped<IExternalAIRoutingPort, ExternalAiRoutingPortAdapter>();
 
         // Catalog — scoped (depends on scoped repository)
         services.AddScoped<IAiModelCatalogService, AiModelCatalogService>();

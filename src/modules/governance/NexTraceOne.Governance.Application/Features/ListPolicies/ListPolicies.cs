@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.ListPolicies;
@@ -15,83 +17,136 @@ public static class ListPolicies
         string? Category = null,
         string? Status = null) : IQuery<Response>;
 
-    /// <summary>Handler que retorna o catálogo de políticas de governança.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>
+    /// Handler que retorna o catálogo de políticas de governança.
+    /// Nesta etapa, políticas enterprise são materializadas a partir de dados reais de Governance Packs,
+    /// rollouts e waivers persistidos no módulo Governance.
+    /// </summary>
+    public sealed class Handler(
+        IGovernancePackRepository packRepository,
+        IGovernanceWaiverRepository waiverRepository,
+        IGovernanceRolloutRecordRepository rolloutRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var policies = new List<PolicyDto>
-            {
-                new("pol-001", "SVC-OWNER-REQ", "Service Owner Required",
-                    "Every service must have a designated owner and team assignment",
-                    PolicyCategory.ServiceGovernance, "Services", PolicyStatus.Active,
-                    PolicySeverity.High, PolicyEnforcementMode.HardEnforce,
-                    new[] { "Production", "Staging" }, 38, 4, DateTimeOffset.UtcNow.AddDays(-90)),
-                new("pol-002", "CONTRACT-EXISTS", "Contract Definition Required",
-                    "All externally consumed services must have a published contract",
-                    PolicyCategory.ContractGovernance, "Contracts", PolicyStatus.Active,
-                    PolicySeverity.High, PolicyEnforcementMode.SoftEnforce,
-                    new[] { "Production" }, 42, 7, DateTimeOffset.UtcNow.AddDays(-85)),
-                new("pol-003", "RUNBOOK-PRESENT", "Runbook Availability",
-                    "Critical and high-criticality services must have an operational runbook",
-                    PolicyCategory.OperationalReadiness, "Operations", PolicyStatus.Active,
-                    PolicySeverity.Medium, PolicyEnforcementMode.SoftEnforce,
-                    new[] { "Production" }, 28, 12, DateTimeOffset.UtcNow.AddDays(-60)),
-                new("pol-004", "CHANGE-VALIDATION", "Change Validation Required",
-                    "All production changes must pass validation and blast radius assessment",
-                    PolicyCategory.ChangeGovernance, "Changes", PolicyStatus.Active,
-                    PolicySeverity.Critical, PolicyEnforcementMode.HardEnforce,
-                    new[] { "Production" }, 156, 3, DateTimeOffset.UtcNow.AddDays(-120)),
-                new("pol-005", "AI-MODEL-POLICY", "AI Model Usage Policy",
-                    "AI model usage must comply with approved model registry and access policies",
-                    PolicyCategory.AiGovernance, "AI", PolicyStatus.Active,
-                    PolicySeverity.High, PolicyEnforcementMode.HardEnforce,
-                    new[] { "Production", "Staging", "Development" }, 89, 2, DateTimeOffset.UtcNow.AddDays(-45)),
-                new("pol-006", "DOC-STANDARDS", "Documentation Standards",
-                    "Services must have up-to-date technical documentation and API references",
-                    PolicyCategory.DocumentationStandards, "Knowledge", PolicyStatus.Active,
-                    PolicySeverity.Medium, PolicyEnforcementMode.Advisory,
-                    new[] { "Production", "Staging" }, 42, 15, DateTimeOffset.UtcNow.AddDays(-70)),
-                new("pol-007", "DEP-MAPPING", "Dependency Mapping Required",
-                    "All services must have dependencies mapped in the service catalog",
-                    PolicyCategory.ServiceGovernance, "Services", PolicyStatus.Active,
-                    PolicySeverity.Medium, PolicyEnforcementMode.SoftEnforce,
-                    new[] { "Production" }, 42, 5, DateTimeOffset.UtcNow.AddDays(-55)),
-                new("pol-008", "INCIDENT-EVIDENCE", "Incident Mitigation Evidence",
-                    "Incident resolution must include mitigation evidence and post-mortem when applicable",
-                    PolicyCategory.OperationalReadiness, "Operations", PolicyStatus.Draft,
-                    PolicySeverity.High, PolicyEnforcementMode.Advisory,
-                    new[] { "Production" }, 0, 0, DateTimeOffset.UtcNow.AddDays(-10)),
-                new("pol-009", "VERSION-CONTROL", "Contract Versioning Required",
-                    "Contracts must follow semantic versioning with proper changelog",
-                    PolicyCategory.ContractGovernance, "Contracts", PolicyStatus.Active,
-                    PolicySeverity.Medium, PolicyEnforcementMode.SoftEnforce,
-                    new[] { "Production", "Staging" }, 35, 8, DateTimeOffset.UtcNow.AddDays(-80)),
-                new("pol-010", "SEC-REVIEW", "Security Review Required",
-                    "Services handling sensitive data must pass security review before production deployment",
-                    PolicyCategory.SecurityCompliance, "Security", PolicyStatus.Active,
-                    PolicySeverity.Critical, PolicyEnforcementMode.HardEnforce,
-                    new[] { "Production" }, 18, 1, DateTimeOffset.UtcNow.AddDays(-100))
-            };
+            PolicyCategory? categoryFilter = null;
+            if (!string.IsNullOrWhiteSpace(request.Category) &&
+                Enum.TryParse<PolicyCategory>(request.Category, ignoreCase: true, out var cat))
+                categoryFilter = cat;
 
-            // Apply filters
-            IEnumerable<PolicyDto> filtered = policies;
-            if (!string.IsNullOrEmpty(request.Category) &&
-                Enum.TryParse<PolicyCategory>(request.Category, out var cat))
-                filtered = filtered.Where(p => p.Category == cat);
-            if (!string.IsNullOrEmpty(request.Status) &&
-                Enum.TryParse<PolicyStatus>(request.Status, out var st))
-                filtered = filtered.Where(p => p.Status == st);
+            PolicyStatus? statusFilter = null;
+            if (!string.IsNullOrWhiteSpace(request.Status) &&
+                Enum.TryParse<PolicyStatus>(request.Status, ignoreCase: true, out var st))
+                statusFilter = st;
 
-            var list = filtered.ToList();
+            var packs = await packRepository.ListAsync(category: null, status: null, ct: cancellationToken);
+            var waivers = await waiverRepository.ListAsync(packId: null, status: null, ct: cancellationToken);
+            var rollouts = await rolloutRepository.ListAsync(
+                packId: null,
+                scopeType: null,
+                scopeValue: null,
+                status: null,
+                ct: cancellationToken);
+
+            var waiversByPack = waivers
+                .GroupBy(w => w.PackId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var rolloutsByPack = rollouts
+                .GroupBy(r => r.PackId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var policies = packs
+                .Select(p => ToPolicyDto(p, waiversByPack, rolloutsByPack))
+                .Where(p => categoryFilter is null || p.Category == categoryFilter)
+                .Where(p => statusFilter is null || p.Status == statusFilter)
+                .OrderBy(p => p.DisplayName)
+                .ToList();
+
+            // Totais devem refletir o universo (sem filtros)
+            var allPolicyDtos = packs
+                .Select(p => ToPolicyDto(p, waiversByPack, rolloutsByPack))
+                .ToList();
 
             var response = new Response(
-                TotalPolicies: policies.Count,
-                ActiveCount: policies.Count(p => p.Status == PolicyStatus.Active),
-                DraftCount: policies.Count(p => p.Status == PolicyStatus.Draft),
-                Policies: list);
+                TotalPolicies: allPolicyDtos.Count,
+                ActiveCount: allPolicyDtos.Count(p => p.Status == PolicyStatus.Active),
+                DraftCount: allPolicyDtos.Count(p => p.Status == PolicyStatus.Draft),
+                Policies: policies);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
+        }
+
+        private static PolicyDto ToPolicyDto(
+            GovernancePack pack,
+            IReadOnlyDictionary<GovernancePackId, List<GovernanceWaiver>> waiversByPack,
+            IReadOnlyDictionary<GovernancePackId, List<GovernanceRolloutRecord>> rolloutsByPack)
+        {
+            waiversByPack.TryGetValue(pack.Id, out var waivers);
+            rolloutsByPack.TryGetValue(pack.Id, out var rollouts);
+
+            var activeWaivers = (waivers ?? [])
+                .Count(w => w.Status is WaiverStatus.Pending or WaiverStatus.Approved);
+
+            var distinctScopes = (rollouts ?? [])
+                .Select(r => (r.ScopeType, r.Scope))
+                .Distinct()
+                .Count();
+
+            var scopeLabel = (rollouts ?? []).Count == 0
+                ? "Unassigned"
+                : string.Join(", ", (rollouts ?? [])
+                    .Select(r => r.ScopeType)
+                    .Distinct()
+                    .OrderBy(t => t)
+                    .Select(t => t.ToString()));
+
+            var policyStatus = pack.Status switch
+            {
+                GovernancePackStatus.Published => PolicyStatus.Active,
+                GovernancePackStatus.Draft => PolicyStatus.Draft,
+                GovernancePackStatus.Deprecated => PolicyStatus.Deprecated,
+                GovernancePackStatus.Archived => PolicyStatus.Inactive,
+                _ => PolicyStatus.Inactive
+            };
+
+            var policyCategory = pack.Category switch
+            {
+                GovernanceRuleCategory.Contracts => PolicyCategory.ContractGovernance,
+                GovernanceRuleCategory.SourceOfTruth => PolicyCategory.ServiceGovernance,
+                GovernanceRuleCategory.Changes => PolicyCategory.ChangeGovernance,
+                GovernanceRuleCategory.Incidents => PolicyCategory.OperationalReadiness,
+                GovernanceRuleCategory.AIGovernance => PolicyCategory.AiGovernance,
+                GovernanceRuleCategory.Reliability => PolicyCategory.OperationalReadiness,
+                GovernanceRuleCategory.Operations => PolicyCategory.OperationalReadiness,
+                _ => PolicyCategory.ServiceGovernance
+            };
+
+            // Enforcement/severity são derivados apenas quando houver dados reais persistidos.
+            var latestRollout = (rollouts ?? []).OrderByDescending(r => r.InitiatedAt).FirstOrDefault();
+            PolicyEnforcementMode? enforcementMode = latestRollout?.EnforcementMode switch
+            {
+                EnforcementMode.Advisory => PolicyEnforcementMode.Advisory,
+                EnforcementMode.Required => PolicyEnforcementMode.SoftEnforce,
+                EnforcementMode.Blocking => PolicyEnforcementMode.HardEnforce,
+                null => null,
+                _ => null
+            };
+
+            return new PolicyDto(
+                PolicyId: pack.Id.Value.ToString(),
+                Name: pack.Name,
+                DisplayName: pack.DisplayName,
+                Description: pack.Description ?? string.Empty,
+                Category: policyCategory,
+                Scope: scopeLabel,
+                Status: policyStatus,
+                Severity: null,
+                EnforcementMode: enforcementMode,
+                EffectiveEnvironments: [],
+                AffectedAssetsCount: distinctScopes,
+                ViolationCount: activeWaivers,
+                CreatedAt: pack.CreatedAt);
         }
     }
 
@@ -111,8 +166,8 @@ public static class ListPolicies
         PolicyCategory Category,
         string Scope,
         PolicyStatus Status,
-        PolicySeverity Severity,
-        PolicyEnforcementMode EnforcementMode,
+        PolicySeverity? Severity,
+        PolicyEnforcementMode? EnforcementMode,
         string[] EffectiveEnvironments,
         int AffectedAssetsCount,
         int ViolationCount,

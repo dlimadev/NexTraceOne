@@ -13,5 +13,10 @@ public enum RiskDimension
     Ownership = 4,
     Documentation = 5,
     IncidentRecurrence = 6,
-    AiGovernance = 7
+    AiGovernance = 7,
+
+    // Enterprise Governance (Stage 3C)
+    Waivers = 8,
+    Rollouts = 9,
+    Lifecycle = 10
 }

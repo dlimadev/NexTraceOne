@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
@@ -15,6 +16,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetInci
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
@@ -30,6 +32,20 @@ public sealed class IncidentEndpointModule
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v1/incidents");
+
+        // ── POST /api/v1/incidents — Criação real de incidente ──
+        group.MapPost("/", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CreateIncident.Command request,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(request, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:write")
+        .WithName("CreateIncident")
+        .WithSummary("Create operational incident and compute initial correlation");
 
         // ── GET /api/v1/incidents — Listagem filtrada de incidentes ──
         group.MapGet("/", async (
@@ -105,6 +121,21 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:read")
         .WithName("GetIncidentCorrelation")
         .WithSummary("Get incident correlation with changes and services");
+
+        // ── POST /api/v1/incidents/{incidentId}/correlation/refresh — Refresh manual ──
+        group.MapPost("/{incidentId}/correlation/refresh", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string incidentId,
+            CancellationToken cancellationToken = default) =>
+        {
+            var command = new RefreshIncidentCorrelation.Command(incidentId);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:write")
+        .WithName("RefreshIncidentCorrelation")
+        .WithSummary("Recompute incident correlation on demand");
 
         // ── GET /api/v1/incidents/{incidentId}/evidence — Evidências ──
         group.MapGet("/{incidentId}/evidence", async (

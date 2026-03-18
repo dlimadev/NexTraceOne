@@ -36,6 +36,10 @@ public sealed class RuntimeIntelligenceDbContext(
         => typeof(RuntimeIntelligenceDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Configurations";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

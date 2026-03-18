@@ -1222,7 +1222,19 @@ export interface ModuleAdoptionResponse {
 export type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
 
 /** Dimensão de risco operacional avaliada. */
-export type RiskDimensionType = 'Operational' | 'Change' | 'Contract' | 'Dependency' | 'Ownership' | 'Documentation' | 'IncidentRecurrence' | 'AiGovernance';
+export type RiskDimensionType =
+  | 'Operational'
+  | 'Change'
+  | 'Contract'
+  | 'Dependency'
+  | 'Ownership'
+  | 'Documentation'
+  | 'IncidentRecurrence'
+  | 'AiGovernance'
+  // Enterprise Governance (Stage 3C)
+  | 'Waivers'
+  | 'Rollouts'
+  | 'Lifecycle';
 
 /** Estado de compliance técnico-operacional. */
 export type ComplianceStatusType = 'Compliant' | 'PartiallyCompliant' | 'NonCompliant' | 'NotApplicable';
@@ -1243,20 +1255,19 @@ export interface RiskDimensionDto {
   explanation: string;
 }
 
-/** Indicador de risco por serviço. */
+/** Indicador de risco por Governance Pack. */
 export interface RiskIndicatorDto {
-  serviceId: string;
-  serviceName: string;
-  domain: string;
-  team: string;
+  packId: string;
+  packName: string;
+  category: GovernancePackCategory;
   riskLevel: RiskLevel;
   dimensions: RiskDimensionDto[];
 }
 
-/** Resumo de risco operacional. */
+/** Resumo de risco enterprise (baseado em packs/rollouts/waivers). */
 export interface RiskSummaryResponse {
   overallRiskLevel: RiskLevel;
-  totalServicesAssessed: number;
+  totalPacksAssessed: number;
   criticalCount: number;
   highCount: number;
   mediumCount: number;
@@ -1265,36 +1276,35 @@ export interface RiskSummaryResponse {
   generatedAt: string;
 }
 
-/** Indicadores de cobertura de compliance. */
-export interface CoverageIndicatorsDto {
-  ownerDefined: number;
-  contractDefined: number;
-  versioningPresent: number;
-  documentationAvailable: number;
-  runbookAvailable: number;
-  dependenciesMapped: number;
-  publicationUpToDate: number;
-}
-
-/** Gap de compliance identificado. */
-export interface ComplianceGapDto {
-  serviceId: string;
-  serviceName: string;
-  domain: string;
-  team: string;
+/** Linha de compliance por Governance Pack. */
+export interface CompliancePackRowDto {
+  packId: string;
+  packName: string;
+  category: GovernancePackCategory;
+  packStatus: GovernancePackStatus;
   status: ComplianceStatusType;
-  description: string;
+  pendingWaivers: number;
+  approvedWaivers: number;
+  rolloutCount: number;
+  completedRollouts: number;
+  failedRollouts: number;
 }
 
-/** Resumo de compliance. */
+/** Resumo de compliance enterprise (baseado em packs/rollouts/waivers). */
 export interface ComplianceSummaryResponse {
   overallScore: number;
-  totalServicesAssessed: number;
+  totalPacksAssessed: number;
   compliantCount: number;
   partiallyCompliantCount: number;
   nonCompliantCount: number;
-  coverage: CoverageIndicatorsDto;
-  gaps: ComplianceGapDto[];
+  totalRollouts: number;
+  pendingRollouts: number;
+  completedRollouts: number;
+  failedRollouts: number;
+  totalWaivers: number;
+  pendingWaivers: number;
+  approvedWaivers: number;
+  packs: CompliancePackRowDto[];
   generatedAt: string;
 }
 
@@ -1651,8 +1661,8 @@ export interface PolicyDto {
   category: PolicyCategoryType;
   scope: string;
   status: PolicyStatusType;
-  severity: PolicySeverityType;
-  enforcementMode: PolicyEnforcementModeType;
+  severity: PolicySeverityType | null;
+  enforcementMode: PolicyEnforcementModeType | null;
   effectiveEnvironments: string[];
   affectedAssetsCount: number;
   violationCount: number;
@@ -1665,6 +1675,67 @@ export interface PolicyListResponse {
   activeCount: number;
   draftCount: number;
   policies: PolicyDto[];
+}
+
+export interface PolicyRuleBindingDto {
+  ruleId: string;
+  ruleName: string;
+  description?: string | null;
+  category: GovernancePackCategory;
+  defaultEnforcementMode: EnforcementMode;
+  isRequired: boolean;
+}
+
+export interface PolicyRolloutDto {
+  rolloutId: string;
+  scopeType: GovernanceScopeType;
+  scopeValue: string;
+  enforcementMode: 'Advisory' | 'Required' | 'Blocking';
+  status: 'Pending' | 'InProgress' | 'Completed' | 'Failed' | 'RolledBack';
+  initiatedBy: string;
+  initiatedAt: string;
+  completedAt?: string | null;
+}
+
+export interface PolicyWaiverDto {
+  waiverId: string;
+  ruleId?: string | null;
+  scopeType: GovernanceScopeType;
+  scopeValue: string;
+  status: WaiverStatus;
+  requestedBy: string;
+  requestedAt: string;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  expiresAt?: string | null;
+  justification: string;
+}
+
+export interface PolicyDetailDto {
+  policyId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: PolicyCategoryType;
+  scope: string;
+  status: PolicyStatusType;
+  severity: PolicySeverityType | null;
+  enforcementMode: PolicyEnforcementModeType | null;
+  effectiveEnvironments: string[];
+  appliesTo: string[];
+  affectedAssetsCount: number;
+  waiverCount: number;
+  currentVersion?: string | null;
+  lastRolloutAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  rules: PolicyRuleBindingDto[];
+  rollouts: PolicyRolloutDto[];
+  waivers: PolicyWaiverDto[];
+}
+
+export interface PolicyDetailResponse {
+  policy: PolicyDetailDto;
 }
 
 /** DTO de resultado de check de compliance. */

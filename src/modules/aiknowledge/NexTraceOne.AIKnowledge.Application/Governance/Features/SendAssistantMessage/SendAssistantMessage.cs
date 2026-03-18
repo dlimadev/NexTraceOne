@@ -3,8 +3,11 @@ using System.Text.Json;
 using Ardalis.GuardClauses;
 
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -76,8 +79,11 @@ public static class SendAssistantMessage
         IAiMessageRepository messageRepository,
         IAiRoutingStrategyRepository routingStrategyRepository,
         IAiKnowledgeSourceRepository knowledgeSourceRepository,
+        IAiModelCatalogService modelCatalogService,
+        IExternalAIRoutingPort externalAiRoutingPort,
         ICurrentUser currentUser,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
@@ -137,6 +143,17 @@ public static class SendAssistantMessage
             var routingPath = applicableStrategy?.PreferredPath ?? AIRoutingPath.InternalOnly;
             var (selectedModel, selectedProvider, isInternal) = SelectModel(useCaseType, persona, routingPath);
 
+            var resolvedModel = request.PreferredModelId.HasValue
+                ? await modelCatalogService.ResolveModelByIdAsync(request.PreferredModelId.Value, cancellationToken)
+                : await modelCatalogService.ResolveDefaultModelAsync("chat", cancellationToken);
+
+            if (resolvedModel is not null)
+            {
+                selectedModel = resolvedModel.ModelName;
+                selectedProvider = resolvedModel.ProviderId;
+                isInternal = resolvedModel.IsInternal;
+            }
+
             // ── Resolver fontes e pesos de contexto ──────────────────────
             var sources = await knowledgeSourceRepository.ListAsync(
                 sourceType: null, isActive: true, cancellationToken);
@@ -174,15 +191,51 @@ public static class SendAssistantMessage
                 }
             }
 
-            // ── Gerar resposta grounded (com context bundle ou stub) ─────
-            const int stubPromptTokens = 0;
-            const int stubCompletionTokens = 0;
-
-            var (grounded, contextSummary, suggestedSteps, caveats, contextStrength) =
+            // ── Preparar grounding e executar inferência real ────────────
+            var (_, contextSummary, suggestedSteps, caveats, contextStrength) =
                 contextBundle is not null
                     ? GenerateGroundedResponse(request.Message, persona, useCaseType, groundingSources, contextBundle)
-                    : (GenerateStubResponse(request.Message, persona, useCaseType, groundingSources),
-                       (string?)null, (List<string>?)null, (List<string>?)null, "none");
+                    : (string.Empty, (string?)null, (List<string>?)null, (List<string>?)null, "none");
+
+            var groundingContext = BuildGroundingContext(
+                request,
+                persona,
+                useCaseType,
+                groundingSources,
+                contextSummary,
+                contextBundle);
+
+            string grounded;
+            try
+            {
+                grounded = await externalAiRoutingPort.RouteQueryAsync(
+                    groundingContext,
+                    request.Message,
+                    selectedProvider,
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex,
+                    "AI provider routing failed for conversation {ConversationId}.",
+                    conversationId);
+
+                return Error.Business(
+                    "AiGovernance.Assistant.ProviderUnavailable",
+                    "AI provider unavailable: {0}",
+                    ex.Message);
+            }
+
+            var promptTokens = Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
+            var completionTokens = Math.Max(1, grounded.Length / 4);
+            var usedDeterministicFallback = grounded.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
+
+            if (usedDeterministicFallback)
+            {
+                caveats ??= [];
+                caveats.Add("Provider unavailable at request time. Deterministic fallback was used explicitly.");
+                contextStrength = "partial";
+            }
 
             // Merge bundle caveats and context references
             if (contextBundle is not null)
@@ -212,8 +265,8 @@ public static class SendAssistantMessage
                 selectedModel,
                 selectedProvider,
                 isInternal: isInternal,
-                stubPromptTokens,
-                stubCompletionTokens,
+                promptTokens,
+                completionTokens,
                 appliedPolicyName: applicableStrategy?.Name,
                 string.Join(",", groundingSources),
                 string.Join(",", contextRefs),
@@ -233,8 +286,8 @@ public static class SendAssistantMessage
                 selectedProvider,
                 isInternal: isInternal,
                 now,
-                stubPromptTokens,
-                stubCompletionTokens,
+                promptTokens,
+                completionTokens,
                 policyId: null,
                 policyName: applicableStrategy?.Name,
                 UsageResult.Allowed,
@@ -252,23 +305,86 @@ public static class SendAssistantMessage
                 selectedModel,
                 selectedProvider,
                 IsInternalModel: isInternal,
-                PromptTokens: stubPromptTokens,
-                CompletionTokens: stubCompletionTokens,
+                PromptTokens: promptTokens,
+                CompletionTokens: completionTokens,
                 AppliedPolicy: applicableStrategy?.Name,
                 GroundingSources: groundingSources,
                 ContextReferences: contextRefs,
                 CorrelationId: correlationId,
                 UseCaseType: useCaseType.ToString(),
                 RoutingPath: routingPath.ToString(),
-                ConfidenceLevel: contextBundle is not null ? "High" : confidenceLevel,
-                CostClass: costClass,
-                RoutingRationale: routingRationale,
+                ConfidenceLevel: usedDeterministicFallback ? AIConfidenceLevel.Low.ToString() : (contextBundle is not null ? "High" : confidenceLevel),
+                CostClass: usedDeterministicFallback ? "none" : costClass,
+                RoutingRationale: usedDeterministicFallback
+                    ? $"Provider unavailable. Explicit deterministic fallback returned. Original rationale: {routingRationale}"
+                    : routingRationale,
                 SourceWeightingSummary: sourceWeightingSummary,
-                EscalationReason: escalationReason,
+                EscalationReason: usedDeterministicFallback ? "ProviderUnavailableFallback" : escalationReason,
                 ContextSummary: contextSummary,
                 SuggestedNextSteps: suggestedSteps,
                 ContextCaveats: caveats,
                 ContextStrength: contextStrength);
+        }
+
+        /// <summary>
+        /// Constrói contexto mínimo de grounding para envio ao provider.
+        /// Inclui escopo, entidades referenciadas e bundle real quando disponível.
+        /// </summary>
+        private static string BuildGroundingContext(
+            Command request,
+            string persona,
+            AIUseCaseType useCaseType,
+            IReadOnlyList<string> groundingSources,
+            string? contextSummary,
+            ContextBundleData? contextBundle)
+        {
+            var lines = new List<string>
+            {
+                $"Persona: {persona}",
+                $"UseCase: {useCaseType}",
+                $"ContextScope: {request.ContextScope ?? "general"}",
+                $"GroundingSources: {string.Join(", ", groundingSources)}"
+            };
+
+            if (!string.IsNullOrWhiteSpace(contextSummary))
+                lines.Add($"ContextSummary: {contextSummary}");
+
+            if (request.ServiceId.HasValue) lines.Add($"ServiceId: {request.ServiceId.Value}");
+            if (request.ContractId.HasValue) lines.Add($"ContractId: {request.ContractId.Value}");
+            if (request.IncidentId.HasValue) lines.Add($"IncidentId: {request.IncidentId.Value}");
+
+            // changeId ainda não faz parte do contrato deste comando; mantemos cobertura para os demais domínios.
+            if (request.TeamId.HasValue) lines.Add($"TeamId: {request.TeamId.Value}");
+            if (request.DomainId.HasValue) lines.Add($"DomainId: {request.DomainId.Value}");
+
+            if (contextBundle is not null)
+            {
+                lines.Add($"EntityType: {contextBundle.EntityType}");
+                lines.Add($"EntityName: {contextBundle.EntityName}");
+
+                if (!string.IsNullOrWhiteSpace(contextBundle.EntityStatus))
+                    lines.Add($"EntityStatus: {contextBundle.EntityStatus}");
+
+                if (!string.IsNullOrWhiteSpace(contextBundle.EntityDescription))
+                    lines.Add($"EntityDescription: {contextBundle.EntityDescription}");
+
+                if (contextBundle.Properties is { Count: > 0 })
+                {
+                    foreach (var prop in contextBundle.Properties)
+                        lines.Add($"Property.{prop.Key}: {prop.Value}");
+                }
+
+                if (contextBundle.Relations is { Count: > 0 })
+                {
+                    foreach (var rel in contextBundle.Relations.Take(8))
+                    {
+                        lines.Add($"Relation.{rel.RelationType}: {rel.EntityType}:{rel.Name}" +
+                                  (string.IsNullOrWhiteSpace(rel.Status) ? string.Empty : $" ({rel.Status})"));
+                    }
+                }
+            }
+
+            return string.Join("\n", lines);
         }
 
         /// <summary>

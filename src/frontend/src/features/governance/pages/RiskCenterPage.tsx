@@ -1,107 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldAlert, Search, AlertTriangle, AlertCircle,
-  Shield, CheckCircle,
+  Shield, CheckCircle, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import type { RiskSummaryResponse, RiskLevel } from '../../../types';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
 
-/**
- * Dados simulados de risco — alinhados com o backend GetRiskSummary.
- * Em produção, virão da API /api/v1/governance/risk/summary.
- */
-const mockRiskSummary: RiskSummaryResponse = {
-  overallRiskLevel: 'Medium',
-  totalServicesAssessed: 42,
-  criticalCount: 2,
-  highCount: 5,
-  mediumCount: 14,
-  lowCount: 21,
-  indicators: [
-    {
-      serviceId: 'svc-payment-gateway',
-      serviceName: 'Payment Gateway',
-      domain: 'Payments',
-      team: 'payment-squad',
-      riskLevel: 'Critical',
-      dimensions: [
-        { dimension: 'Operational', level: 'Critical', explanation: 'Multiple production incidents in last 30 days' },
-        { dimension: 'Change', level: 'High', explanation: 'Frequent deployments without validation' },
-        { dimension: 'IncidentRecurrence', level: 'Critical', explanation: 'Recurring error rate spikes' },
-      ],
-    },
-    {
-      serviceId: 'svc-order-api',
-      serviceName: 'Order API',
-      domain: 'Orders',
-      team: 'order-squad',
-      riskLevel: 'Critical',
-      dimensions: [
-        { dimension: 'Dependency', level: 'Critical', explanation: '12 direct consumers affected by recent changes' },
-        { dimension: 'Contract', level: 'High', explanation: 'Breaking contract change without versioning' },
-      ],
-    },
-    {
-      serviceId: 'svc-catalog-sync',
-      serviceName: 'Catalog Sync',
-      domain: 'Catalog',
-      team: 'platform-squad',
-      riskLevel: 'High',
-      dimensions: [
-        { dimension: 'Operational', level: 'High', explanation: 'Integration partner SLA breaches' },
-        { dimension: 'Documentation', level: 'Medium', explanation: 'Missing runbook and operational docs' },
-      ],
-    },
-    {
-      serviceId: 'svc-inventory-consumer',
-      serviceName: 'Inventory Consumer',
-      domain: 'Inventory',
-      team: 'order-squad',
-      riskLevel: 'High',
-      dimensions: [
-        { dimension: 'Change', level: 'High', explanation: 'Consumer lag after recent deployment' },
-        { dimension: 'Ownership', level: 'Medium', explanation: 'No defined technical owner' },
-      ],
-    },
-    {
-      serviceId: 'svc-auth-gateway',
-      serviceName: 'Auth Gateway',
-      domain: 'Identity',
-      team: 'identity-squad',
-      riskLevel: 'Medium',
-      dimensions: [
-        { dimension: 'Contract', level: 'Medium', explanation: 'Schema mismatch detected in staging' },
-        { dimension: 'AiGovernance', level: 'Low', explanation: 'AI-generated contract not reviewed' },
-      ],
-    },
-    {
-      serviceId: 'svc-notification-worker',
-      serviceName: 'Notification Worker',
-      domain: 'Platform',
-      team: 'platform-squad',
-      riskLevel: 'Medium',
-      dimensions: [
-        { dimension: 'Documentation', level: 'Medium', explanation: 'No runbook available' },
-        { dimension: 'Operational', level: 'Low', explanation: 'Minor background job failures' },
-      ],
-    },
-    {
-      serviceId: 'svc-reporting-engine',
-      serviceName: 'Reporting Engine',
-      domain: 'Analytics',
-      team: 'data-squad',
-      riskLevel: 'Low',
-      dimensions: [
-        { dimension: 'Operational', level: 'Low', explanation: 'Stable with no recent issues' },
-      ],
-    },
-  ],
-  generatedAt: new Date().toISOString(),
-};
+
 
 type RiskFilter = 'all' | RiskLevel;
 
@@ -133,8 +43,42 @@ export function RiskCenterPage() {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<RiskFilter>('all');
   const [search, setSearch] = useState('');
+  const [data, setData] = useState<RiskSummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const d = mockRiskSummary;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    organizationGovernanceApi.getRiskSummary()
+      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, [t]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  const d = data;
 
   const filtered = d.indicators.filter(ind => {
     if (filter !== 'all' && ind.riskLevel !== filter) return false;

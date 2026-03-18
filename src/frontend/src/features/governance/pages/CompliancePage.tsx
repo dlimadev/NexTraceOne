@@ -1,93 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Scale, Search, ShieldCheck, ShieldAlert, AlertCircle, CheckCircle,
+  Loader2, AlertTriangle,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import type { ComplianceSummaryResponse, ComplianceStatusType } from '../../../types';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
 
-/**
- * Dados simulados de compliance — alinhados com o backend GetComplianceSummary.
- * Em produção, virão da API /api/v1/governance/compliance/summary.
- */
-const mockCompliance: ComplianceSummaryResponse = {
-  overallScore: 74,
-  totalServicesAssessed: 42,
-  compliantCount: 24,
-  partiallyCompliantCount: 12,
-  nonCompliantCount: 6,
-  coverage: {
-    ownerDefined: 90,
-    contractDefined: 74,
-    versioningPresent: 68,
-    documentationAvailable: 64,
-    runbookAvailable: 45,
-    dependenciesMapped: 71,
-    publicationUpToDate: 60,
-  },
-  gaps: [
-    {
-      serviceId: 'svc-payment-gateway',
-      serviceName: 'Payment Gateway',
-      domain: 'Payments',
-      team: 'payment-squad',
-      status: 'NonCompliant',
-      description: 'Missing runbook, outdated contract version, no dependency map',
-    },
-    {
-      serviceId: 'svc-inventory-consumer',
-      serviceName: 'Inventory Consumer',
-      domain: 'Inventory',
-      team: 'order-squad',
-      status: 'NonCompliant',
-      description: 'No technical owner defined, missing documentation',
-    },
-    {
-      serviceId: 'svc-catalog-sync',
-      serviceName: 'Catalog Sync',
-      domain: 'Catalog',
-      team: 'platform-squad',
-      status: 'NonCompliant',
-      description: 'No runbook, missing contract, outdated publication',
-    },
-    {
-      serviceId: 'svc-auth-gateway',
-      serviceName: 'Auth Gateway',
-      domain: 'Identity',
-      team: 'identity-squad',
-      status: 'PartiallyCompliant',
-      description: 'Contract exists but versioning not enforced',
-    },
-    {
-      serviceId: 'svc-notification-worker',
-      serviceName: 'Notification Worker',
-      domain: 'Platform',
-      team: 'platform-squad',
-      status: 'PartiallyCompliant',
-      description: 'Missing runbook, documentation incomplete',
-    },
-    {
-      serviceId: 'svc-order-api',
-      serviceName: 'Order API',
-      domain: 'Orders',
-      team: 'order-squad',
-      status: 'PartiallyCompliant',
-      description: 'Dependency map outdated, publication behind',
-    },
-    {
-      serviceId: 'svc-reporting-engine',
-      serviceName: 'Reporting Engine',
-      domain: 'Analytics',
-      team: 'data-squad',
-      status: 'Compliant',
-      description: 'All governance indicators met',
-    },
-  ],
-  generatedAt: new Date().toISOString(),
-};
+
 
 type ComplianceFilter = 'all' | 'NonCompliant' | 'PartiallyCompliant';
 
@@ -108,8 +32,42 @@ export function CompliancePage() {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<ComplianceFilter>('all');
   const [search, setSearch] = useState('');
+  const [data, setData] = useState<ComplianceSummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const d = mockCompliance;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    organizationGovernanceApi.getComplianceSummary()
+      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, [t]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  const d = data;
 
   const filteredGaps = d.gaps.filter(gap => {
     if (filter === 'NonCompliant' && gap.status !== 'NonCompliant') return false;

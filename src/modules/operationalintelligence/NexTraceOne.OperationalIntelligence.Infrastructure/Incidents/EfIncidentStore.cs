@@ -40,6 +40,130 @@ internal sealed class EfIncidentStore(
 
     // ── Incidents ────────────────────────────────────────────────────────
 
+    public CreateIncidentResult CreateIncident(CreateIncidentInput input)
+    {
+        var now = clock.UtcNow;
+        var incidentId = IncidentRecordId.New();
+        var reference = GenerateNextReference(now);
+
+        var detectedAt = input.DetectedAtUtc ?? now;
+
+        var incident = IncidentRecord.Create(
+            incidentId,
+            reference,
+            input.Title,
+            input.Description,
+            input.IncidentType,
+            input.Severity,
+            IncidentStatus.Open,
+            input.ServiceId,
+            input.ServiceDisplayName,
+            input.OwnerTeam,
+            input.ImpactedDomain,
+            input.Environment,
+            detectedAt,
+            now,
+            hasCorrelation: false,
+            correlationConfidence: CorrelationConfidence.NotAssessed,
+            mitigationStatus: MitigationStatus.NotStarted);
+
+        incident.SetDetail(
+            Serialize(new[]
+            {
+                new TimelineEntryJson
+                {
+                    Timestamp = detectedAt,
+                    Description = "Incident created"
+                }
+            }),
+            Serialize(new[]
+            {
+                new LinkedServiceJson
+                {
+                    ServiceId = input.ServiceId,
+                    DisplayName = input.ServiceDisplayName,
+                    ServiceType = "Service",
+                    Criticality = input.Severity == IncidentSeverity.Critical ? "Critical" : "High"
+                }
+            }),
+            relatedContractsJson: null,
+            runbookLinksJson: null);
+
+        db.Incidents.Add(incident);
+        db.SaveChanges();
+
+        return new CreateIncidentResult(incident.Id.Value, reference, detectedAt);
+    }
+
+    public IncidentCorrelationContext? GetIncidentCorrelationContext(string incidentId)
+    {
+        if (!Guid.TryParse(incidentId, out var guid))
+            return null;
+
+        var incident = db.Incidents
+            .AsNoTracking()
+            .SingleOrDefault(i => i.Id == IncidentRecordId.From(guid));
+
+        if (incident is null)
+            return null;
+
+        return new IncidentCorrelationContext(
+            incident.Id.Value,
+            incident.ServiceId,
+            incident.ServiceName,
+            incident.Environment,
+            incident.DetectedAt);
+    }
+
+    public void SaveIncidentCorrelation(string incidentId, GetIncidentCorrelation.Response correlation)
+    {
+        if (!Guid.TryParse(incidentId, out var guid))
+            return;
+
+        var incident = db.Incidents
+            .SingleOrDefault(i => i.Id == IncidentRecordId.From(guid));
+
+        if (incident is null)
+            return;
+
+        incident.SetCorrelation(
+            correlation.Reason,
+            Serialize(correlation.RelatedChanges.Select(c => new CorrelatedChangeJson
+            {
+                ChangeId = c.ChangeId,
+                Description = c.Description,
+                ChangeType = c.ChangeType,
+                ConfidenceStatus = c.ConfidenceStatus,
+                DeployedAt = c.DeployedAt
+            }).ToArray()),
+            Serialize(correlation.RelatedServices.Select(s => new CorrelatedServiceJson
+            {
+                ServiceId = s.ServiceId,
+                DisplayName = s.DisplayName,
+                ImpactDescription = s.ImpactDescription
+            }).ToArray()),
+            Serialize(correlation.RelatedDependencies.Select(d => new CorrelatedDependencyJson
+            {
+                ServiceId = d.ServiceId,
+                DisplayName = d.DisplayName,
+                Relationship = d.Relationship
+            }).ToArray()),
+            Serialize(correlation.PossibleImpactedContracts.Select(c => new ImpactedContractJson
+            {
+                ContractVersionId = c.ContractVersionId,
+                Name = c.Name,
+                Version = c.Version,
+                Protocol = c.Protocol
+            }).ToArray()));
+
+        incident.UpdateCorrelationAssessment(
+            hasCorrelation: correlation.RelatedChanges.Count > 0,
+            confidence: correlation.Confidence,
+            updatedAtUtc: clock.UtcNow);
+
+        db.SaveChanges();
+    }
+
     public bool IncidentExists(string incidentId)
     {
         if (!Guid.TryParse(incidentId, out var guid))
@@ -201,6 +325,7 @@ internal sealed class EfIncidentStore(
         return new GetIncidentCorrelation.Response(
             incident.Id.Value,
             incident.CorrelationConfidence,
+            DeriveScore(incident.CorrelationConfidence),
             incident.CorrelationAnalysis ?? string.Empty,
             changes, services, dependencies, contracts);
     }
@@ -545,6 +670,36 @@ internal sealed class EfIncidentStore(
 
     private static string Serialize<T>(T value)
         => JsonSerializer.Serialize(value, JsonOptions);
+
+    private string GenerateNextReference(DateTimeOffset now)
+    {
+        var year = now.UtcDateTime.Year;
+        var prefix = $"INC-{year}-";
+
+        var existing = db.Incidents
+            .Where(i => i.ExternalRef.StartsWith(prefix))
+            .Select(i => i.ExternalRef)
+            .ToList();
+
+        var maxSeq = 0;
+        foreach (var value in existing)
+        {
+            var suffix = value[prefix.Length..];
+            if (int.TryParse(suffix, out var parsed) && parsed > maxSeq)
+                maxSeq = parsed;
+        }
+
+        return $"{prefix}{(maxSeq + 1):0000}";
+    }
+
+    private static decimal DeriveScore(CorrelationConfidence confidence) => confidence switch
+    {
+        CorrelationConfidence.Confirmed => 95m,
+        CorrelationConfidence.High => 80m,
+        CorrelationConfidence.Medium => 55m,
+        CorrelationConfidence.Low => 25m,
+        _ => 0m
+    };
 
     // ── Internal JSON DTOs ───────────────────────────────────────────────
 

@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, NavLink } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, ArrowLeft, ShieldAlert, AlertCircle, Eye,
   CheckCircle, XCircle, Clock, Search, Wrench,
@@ -72,11 +73,29 @@ function formatDate(dateStr: string): string {
 export function IncidentDetailPage() {
   const { t } = useTranslation();
   const { incidentId } = useParams<{ incidentId: string }>();
+  const queryClient = useQueryClient();
+  const [refreshFeedback, setRefreshFeedback] = useState<string | null>(null);
 
   const detailQuery = useQuery({
     queryKey: ['incident-detail', incidentId],
     queryFn: () => incidentsApi.getIncidentDetail(incidentId!),
     enabled: !!incidentId,
+  });
+
+  const refreshCorrelationMutation = useMutation({
+    mutationFn: async () => incidentsApi.refreshIncidentCorrelation(incidentId!),
+    onSuccess: (data) => {
+      setRefreshFeedback(
+        t('incidents.correlation.refreshedMessage', 'Correlation refreshed. Score: {{score}}', { score: data.score.toFixed(0) }),
+      );
+      queryClient.invalidateQueries({ queryKey: ['incident-detail', incidentId] });
+      queryClient.invalidateQueries({ queryKey: ['incidents'] });
+      queryClient.invalidateQueries({ queryKey: ['incidents-summary'] });
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : t('common.errorLoading');
+      setRefreshFeedback(message);
+    },
   });
 
   // Loading state
@@ -209,12 +228,30 @@ export function IncidentDetailPage() {
           {/* Correlation */}
           <Card>
             <CardHeader>
-              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <GitBranch size={16} className="text-accent" /> {t('incidents.correlation.title')}
-              </h2>
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                  <GitBranch size={16} className="text-accent" /> {t('incidents.correlation.title')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRefreshFeedback(null);
+                    refreshCorrelationMutation.mutate();
+                  }}
+                  disabled={refreshCorrelationMutation.isPending}
+                  className="px-2.5 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body disabled:opacity-60"
+                >
+                  {refreshCorrelationMutation.isPending
+                    ? t('common.loading', 'Loading...')
+                    : t('incidents.correlation.refreshAction', 'Refresh correlation')}
+                </button>
+              </div>
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
+                {refreshFeedback && (
+                  <p className="text-xs text-muted">{refreshFeedback}</p>
+                )}
                 <div>
                   <p className="text-xs text-muted mb-1">{t('incidents.correlation.confidence')}</p>
                   <Badge variant={confBadge.variant}>

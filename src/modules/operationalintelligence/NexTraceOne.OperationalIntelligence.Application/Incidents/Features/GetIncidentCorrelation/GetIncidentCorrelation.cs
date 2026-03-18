@@ -28,15 +28,19 @@ public static class GetIncidentCorrelation
     }
 
     /// <summary>Handler que compõe a correlação do incidente.</summary>
-    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IIncidentStore store,
+        IIncidentCorrelationService correlationService) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var correlation = store.GetIncidentCorrelation(request.IncidentId);
-            if (correlation is null)
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+            var correlation = await correlationService.RecomputeAsync(request.IncidentId, cancellationToken)
+                ?? store.GetIncidentCorrelation(request.IncidentId);
 
-            return Task.FromResult(Result<Response>.Success(correlation));
+            if (correlation is null)
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
+
+            return Result<Response>.Success(correlation);
         }
     }
 
@@ -44,6 +48,7 @@ public static class GetIncidentCorrelation
     public sealed record Response(
         Guid IncidentId,
         CorrelationConfidence Confidence,
+        decimal Score,
         string Reason,
         IReadOnlyList<CorrelatedChange> RelatedChanges,
         IReadOnlyList<CorrelatedService> RelatedServices,

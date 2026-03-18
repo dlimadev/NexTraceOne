@@ -36,6 +36,10 @@ public sealed class CostIntelligenceDbContext(
         => typeof(CostIntelligenceDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Configurations";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

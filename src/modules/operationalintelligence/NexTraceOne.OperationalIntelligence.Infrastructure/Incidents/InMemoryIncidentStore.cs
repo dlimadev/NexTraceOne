@@ -46,13 +46,92 @@ public sealed class InMemoryIncidentStore : IIncidentStore
     // Estado mutável (thread-safe via lock simples — suficiente para MVP in-memory)
     private readonly object _lock = new();
     private readonly List<CreatedWorkflow> _createdWorkflows = new();
+    private readonly List<CreatedIncident> _createdIncidents = new();
     private readonly List<RecordedValidation> _recordedValidations = new();
     private readonly List<WorkflowAction> _workflowActions = new();
 
     // ── Incidents ────────────────────────────────────────────────────────
 
+    public CreateIncidentResult CreateIncident(CreateIncidentInput input)
+    {
+        var incidentId = Guid.NewGuid();
+        var detectedAt = input.DetectedAtUtc ?? DateTimeOffset.UtcNow;
+
+        lock (_lock)
+        {
+            var reference = $"INC-{detectedAt.UtcDateTime.Year}-{(42 + _createdIncidents.Count + 1):0000}";
+
+            _createdIncidents.Add(new CreatedIncident(
+                incidentId,
+                reference,
+                input.Title,
+                input.Description,
+                input.IncidentType,
+                input.Severity,
+                input.ServiceId,
+                input.ServiceDisplayName,
+                input.OwnerTeam,
+                input.ImpactedDomain,
+                input.Environment,
+                detectedAt,
+                CorrelationConfidence.NotAssessed,
+                0m,
+                "No correlated changes computed yet."));
+
+            return new CreateIncidentResult(incidentId, reference, detectedAt);
+        }
+    }
+
+    public IncidentCorrelationContext? GetIncidentCorrelationContext(string incidentId)
+    {
+        lock (_lock)
+        {
+            var created = _createdIncidents.FirstOrDefault(i => i.IncidentId.ToString().Equals(incidentId, StringComparison.OrdinalIgnoreCase));
+            if (created is not null)
+            {
+                return new IncidentCorrelationContext(
+                    created.IncidentId,
+                    created.ServiceId,
+                    created.ServiceDisplayName,
+                    created.Environment,
+                    created.DetectedAtUtc);
+            }
+        }
+
+        var listItem = GetIncidentListItems()
+            .FirstOrDefault(i => i.IncidentId.ToString().Equals(incidentId, StringComparison.OrdinalIgnoreCase));
+
+        if (listItem is null)
+            return null;
+
+        return new IncidentCorrelationContext(
+            listItem.IncidentId,
+            listItem.ServiceId,
+            listItem.ServiceDisplayName,
+            listItem.Environment,
+            listItem.CreatedAt);
+    }
+
+    public void SaveIncidentCorrelation(string incidentId, GetIncidentCorrelation.Response correlation)
+    {
+        lock (_lock)
+        {
+            var index = _createdIncidents.FindIndex(i => i.IncidentId.ToString().Equals(incidentId, StringComparison.OrdinalIgnoreCase));
+            if (index >= 0)
+            {
+                _createdIncidents[index] = _createdIncidents[index] with
+                {
+                    CorrelationConfidence = correlation.Confidence,
+                    CorrelationScore = correlation.Score,
+                    CorrelationReason = correlation.Reason,
+                };
+            }
+        }
+    }
+
     public bool IncidentExists(string incidentId) =>
-        GetIncidentIds().Contains(incidentId, StringComparer.OrdinalIgnoreCase);
+        GetIncidentIds().Contains(incidentId, StringComparer.OrdinalIgnoreCase)
+        || _createdIncidents.Any(i => i.IncidentId.ToString().Equals(incidentId, StringComparison.OrdinalIgnoreCase));
 
     private static HashSet<string> GetIncidentIds() =>
         new(StringComparer.OrdinalIgnoreCase) { Inc1, Inc2, Inc3, Inc4, Inc5, Inc6 };
@@ -60,7 +139,7 @@ public sealed class InMemoryIncidentStore : IIncidentStore
     public IReadOnlyList<ListIncidents.IncidentListItem> GetIncidentListItems()
     {
         var now = _now;
-        return new List<ListIncidents.IncidentListItem>
+        var seed = new List<ListIncidents.IncidentListItem>
         {
             new(Guid.Parse(Inc1), "INC-2026-0042", "Payment Gateway — elevated error rate",
                 IncidentType.ServiceDegradation, IncidentSeverity.Critical, IncidentStatus.Mitigating,
@@ -87,6 +166,27 @@ public sealed class InMemoryIncidentStore : IIncidentStore
                 "svc-auth-gateway", "Auth Gateway", "identity-squad",
                 "Staging", now.AddDays(-5), true, CorrelationConfidence.High, MitigationStatus.Verified),
         };
+
+            lock (_lock)
+            {
+                seed.AddRange(_createdIncidents.Select(i => new ListIncidents.IncidentListItem(
+                i.IncidentId,
+                i.Reference,
+                i.Title,
+                i.IncidentType,
+                i.Severity,
+                IncidentStatus.Open,
+                i.ServiceId,
+                i.ServiceDisplayName,
+                i.OwnerTeam,
+                i.Environment,
+                i.DetectedAtUtc,
+                i.CorrelationConfidence != CorrelationConfidence.NotAssessed,
+                i.CorrelationConfidence,
+                MitigationStatus.NotStarted)));
+            }
+
+            return seed;
     }
 
     public GetIncidentDetail.Response? GetIncidentDetail(string incidentId)
@@ -202,6 +302,7 @@ public sealed class InMemoryIncidentStore : IIncidentStore
         {
             return new GetIncidentCorrelation.Response(
                 Guid.Parse(Inc1), CorrelationConfidence.High,
+                82m,
                 "Deployment of v2.14.0 strongly correlated with error rate increase. Temporal proximity and blast radius match.",
                 new[] { new GetIncidentCorrelation.CorrelatedChange(Guid.Parse("cc000001-0001-0000-0000-000000000001"), "Deploy v2.14.0 to Payment Gateway", "Deployment", "SuspectedRegression", now.AddHours(-4)) },
                 new[]
@@ -217,11 +318,29 @@ public sealed class InMemoryIncidentStore : IIncidentStore
         {
             return new GetIncidentCorrelation.Response(
                 Guid.Parse(Inc2), CorrelationConfidence.Low,
+                24m,
                 "No internal changes correlated. External dependency failure suspected.",
                 Array.Empty<GetIncidentCorrelation.CorrelatedChange>(),
                 new[] { new GetIncidentCorrelation.CorrelatedService("svc-catalog-sync", "Catalog Sync", "Primary — integration component affected") },
                 Array.Empty<GetIncidentCorrelation.CorrelatedDependency>(),
                 Array.Empty<GetIncidentCorrelation.ImpactedContract>());
+        }
+
+        lock (_lock)
+        {
+            var created = _createdIncidents.FirstOrDefault(i => i.IncidentId.ToString().Equals(incidentId, StringComparison.OrdinalIgnoreCase));
+            if (created is not null)
+            {
+                return new GetIncidentCorrelation.Response(
+                    created.IncidentId,
+                    created.CorrelationConfidence,
+                    created.CorrelationScore,
+                    created.CorrelationReason,
+                    [],
+                    [new GetIncidentCorrelation.CorrelatedService(created.ServiceId, created.ServiceDisplayName, "Primary impacted service")],
+                    [],
+                    []);
+            }
         }
 
         return null;
@@ -699,6 +818,23 @@ public sealed class InMemoryIncidentStore : IIncidentStore
         MitigationActionType ActionType, RiskLevel RiskLevel, bool RequiresApproval,
         Guid? LinkedRunbookId, IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? Steps,
         DateTimeOffset CreatedAt);
+
+    private sealed record CreatedIncident(
+        Guid IncidentId,
+        string Reference,
+        string Title,
+        string Description,
+        IncidentType IncidentType,
+        IncidentSeverity Severity,
+        string ServiceId,
+        string ServiceDisplayName,
+        string OwnerTeam,
+        string? ImpactedDomain,
+        string Environment,
+        DateTimeOffset DetectedAtUtc,
+        CorrelationConfidence CorrelationConfidence,
+        decimal CorrelationScore,
+        string CorrelationReason);
 
     private sealed record RecordedValidation(
         string IncidentId, string WorkflowId, ValidationStatus Status,

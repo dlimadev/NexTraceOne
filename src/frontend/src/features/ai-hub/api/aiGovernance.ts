@@ -21,6 +21,22 @@ export const aiGovernanceApi = {
     client.patch(`/ai/budgets/${budgetId}`, data).then(r => r.data),
   listAuditEntries: (params?: Record<string, unknown>) =>
     client.get('/ai/audit', { params }).then(r => r.data),
+
+  // ── IDE Integrations ──────────────────────────────────────────────
+  getIdeSummary: () =>
+    client.get('/ai/ide/summary').then(r => r.data),
+  listIdeClients: (params?: { userId?: string; clientType?: string; isActive?: boolean; pageSize?: number }) =>
+    client.get('/ai/ide/clients', { params }).then(r => r.data),
+  registerIdeClient: (data: unknown) =>
+    client.post('/ai/ide/clients/register', data).then(r => r.data),
+  listIdeCapabilityPolicies: (params?: { clientType?: string; isActive?: boolean; pageSize?: number }) =>
+    client.get('/ai/ide/policies', { params }).then(r => r.data),
+  getIdeCapabilities: (params: { clientType: string; persona?: string | null }) =>
+    client.get('/ai/ide/capabilities', { params }).then(r => r.data),
+
+  // ── Token usage (runtime) ─────────────────────────────────────────
+  getTokenUsage: (params: { userId?: string; tenantId?: string }) =>
+    client.get('/ai/token-usage', { params }).then(r => r.data),
   listKnowledgeSources: (params?: { sourceType?: string; isActive?: boolean }) =>
     client.get('/ai/knowledge-sources', { params }).then(r => r.data),
   sendMessage: (data: {

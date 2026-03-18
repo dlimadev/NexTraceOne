@@ -247,6 +247,32 @@ internal sealed class TeamDomainLinkRepository(GovernanceDbContext context) : IT
 /// </summary>
 internal sealed class GovernanceRolloutRecordRepository(GovernanceDbContext context) : IGovernanceRolloutRecordRepository
 {
+    public async Task<IReadOnlyList<GovernanceRolloutRecord>> ListAsync(
+        GovernancePackId? packId,
+        GovernanceScopeType? scopeType,
+        string? scopeValue,
+        RolloutStatus? status,
+        CancellationToken ct)
+    {
+        var query = context.RolloutRecords.AsQueryable();
+
+        if (packId is not null)
+            query = query.Where(r => r.PackId == packId);
+
+        if (scopeType.HasValue)
+            query = query.Where(r => r.ScopeType == scopeType.Value);
+
+        if (!string.IsNullOrWhiteSpace(scopeValue))
+            query = query.Where(r => r.Scope == scopeValue);
+
+        if (status.HasValue)
+            query = query.Where(r => r.Status == status.Value);
+
+        return await query
+            .OrderByDescending(r => r.InitiatedAt)
+            .ToListAsync(ct);
+    }
+
     public async Task<IReadOnlyList<GovernanceRolloutRecord>> ListByPackIdAsync(
         GovernancePackId packId,
         CancellationToken ct)

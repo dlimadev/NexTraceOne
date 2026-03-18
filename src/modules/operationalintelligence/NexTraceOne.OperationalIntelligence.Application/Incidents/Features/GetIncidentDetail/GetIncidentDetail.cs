@@ -31,15 +31,21 @@ public static class GetIncidentDetail
     /// Handler que compõe o detalhe consolidado de um incidente.
     /// Delega ao IIncidentStore para obter os dados.
     /// </summary>
-    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IIncidentStore store,
+        IIncidentCorrelationService correlationService) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // Recalcula correlação com dados de changes sempre que viável,
+            // evitando depender de correlação seedada estática.
+            await correlationService.RecomputeAsync(request.IncidentId, cancellationToken);
+
             var detail = store.GetIncidentDetail(request.IncidentId);
             if (detail is null)
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
 
-            return Task.FromResult(Result<Response>.Success(detail));
+            return Result<Response>.Success(detail);
         }
     }
 

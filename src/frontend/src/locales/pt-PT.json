@@ -3299,6 +3299,113 @@
     "moduleUnavailableDescription": "Este módulo está temporariamente indisponível. Tente novamente mais tarde.",
     "moduleUnavailableDescriptionNamed": "O módulo {{module}} está temporariamente indisponível. Tente novamente mais tarde."
   },
+  "governance": {
+    "policies": {
+      "title": "Catálogo de Políticas",
+      "subtitle": "Políticas enterprise derivadas de packs, rollouts e waivers persistidos em Governança.",
+      "totalPolicies": "Total de políticas",
+      "active": "Ativas",
+      "draft": "Rascunhos",
+      "totalViolations": "Waivers ativos",
+      "searchPlaceholder": "Pesquisar políticas…",
+      "filterAll": "Todas",
+      "catalogTitle": "Políticas",
+      "catalogDescription": "As políticas são geradas a partir de Governance Packs e refletem rollouts/waivers reais.",
+      "scope": "Âmbito",
+      "affectedAssets": "Âmbitos afetados",
+      "violations": "Waivers",
+      "status": {
+        "Active": "Ativa",
+        "Draft": "Rascunho",
+        "Inactive": "Inativa",
+        "Deprecated": "Depreciada"
+      },
+      "severity": {
+        "Low": "Baixa",
+        "Medium": "Média",
+        "High": "Alta",
+        "Critical": "Crítica",
+        "Unknown": "Desconhecida"
+      },
+      "enforcement": {
+        "Advisory": "Aviso",
+        "SoftEnforce": "Aplicação suave",
+        "HardEnforce": "Aplicação rígida",
+        "Unknown": "Desconhecido"
+      },
+      "category": {
+        "ServiceGovernance": "Governança de Serviços",
+        "ContractGovernance": "Governança de Contratos",
+        "ChangeGovernance": "Governança de Alterações",
+        "OperationalReadiness": "Prontidão Operacional",
+        "AiGovernance": "Governança de IA",
+        "SecurityCompliance": "Segurança e Conformidade",
+        "DocumentationStandards": "Normas de Documentação"
+      }
+    },
+    "complianceTitle": "Conformidade",
+    "complianceSubtitle": "Conformidade enterprise derivada de adoção de packs (rollouts) e exceções (waivers).",
+    "compliance": {
+      "overallScore": "Score geral",
+      "totalAssessed": "Packs avaliados",
+      "compliant": "Conforme",
+      "partiallyCompliant": "Parcialmente conforme",
+      "nonCompliant": "Não conforme",
+      "rollouts": "Rollouts",
+      "pendingRollouts": "Rollouts pendentes",
+      "failedRollouts": "Rollouts falhados",
+      "waivers": "Waivers",
+      "pendingWaivers": "Waivers pendentes",
+      "approvedWaivers": "Waivers aprovados",
+      "searchPlaceholder": "Pesquisar packs…",
+      "filterAll": "Todos",
+      "filterNonCompliant": "Não conforme",
+      "filterPartially": "Parcial",
+      "status": {
+        "Compliant": "Conforme",
+        "PartiallyCompliant": "Parcial",
+        "NonCompliant": "Não conforme",
+        "NotApplicable": "Não aplicável"
+      },
+      "gaps": "Packs que exigem atenção",
+      "gapsDescription": "Packs com waivers pendentes ou rollouts falhados."
+    },
+    "riskTitle": "Centro de Risco",
+    "riskSubtitle": "Indicadores de risco derivados do ciclo de vida de packs, rollouts e waivers.",
+    "risk": {
+      "totalAssessed": "Packs avaliados",
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo",
+      "searchPlaceholder": "Pesquisar packs…",
+      "filterAll": "Todos",
+      "filterCritical": "Crítico",
+      "filterHigh": "Alto",
+      "filterMedium": "Médio",
+      "filterLow": "Baixo",
+      "serviceRiskList": "Indicadores de risco por pack",
+      "level": {
+        "Critical": "Crítico",
+        "High": "Alto",
+        "Medium": "Médio",
+        "Low": "Baixo"
+      },
+      "dimension": {
+        "Waivers": "Waivers",
+        "Rollouts": "Rollouts",
+        "Lifecycle": "Ciclo de vida",
+        "Operational": "Operacional",
+        "Change": "Alteração",
+        "Contract": "Contrato",
+        "Dependency": "Dependência",
+        "Ownership": "Ownership",
+        "Documentation": "Documentação",
+        "IncidentRecurrence": "Recorrência de incidentes",
+        "AiGovernance": "Governança de IA"
+      }
+    }
+  },
   "preview": {
     "badge": "Preview",
     "bannerTitle": "Preview",

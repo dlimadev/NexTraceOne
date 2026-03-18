@@ -1,106 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Shield, Search, ShieldCheck, ShieldAlert, FileText, AlertTriangle,
-  Settings, BookOpen, Bot, Lock,
+  Settings, BookOpen, Bot, Lock, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import type { PolicyDto, PolicyListResponse, PolicyCategoryType, PolicyStatusType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
 
-/**
- * Dados simulados de políticas — alinhados com o backend ListPolicies.
- * Em produção, virão da API /api/v1/policies.
- */
-const mockPolicies: PolicyListResponse = {
-  totalPolicies: 10,
-  activeCount: 9,
-  draftCount: 1,
-  policies: [
-    {
-      policyId: 'pol-001', name: 'SVC-OWNER-REQ', displayName: 'Service Owner Required',
-      description: 'Every service must have a designated owner and team assignment',
-      category: 'ServiceGovernance', scope: 'Services', status: 'Active',
-      severity: 'High', enforcementMode: 'HardEnforce',
-      effectiveEnvironments: ['Production', 'Staging'], affectedAssetsCount: 38, violationCount: 4,
-      createdAt: new Date(Date.now() - 90 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-002', name: 'CONTRACT-EXISTS', displayName: 'Contract Definition Required',
-      description: 'All externally consumed services must have a published contract',
-      category: 'ContractGovernance', scope: 'Contracts', status: 'Active',
-      severity: 'High', enforcementMode: 'SoftEnforce',
-      effectiveEnvironments: ['Production'], affectedAssetsCount: 42, violationCount: 7,
-      createdAt: new Date(Date.now() - 85 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-003', name: 'RUNBOOK-PRESENT', displayName: 'Runbook Availability',
-      description: 'Critical and high-criticality services must have an operational runbook',
-      category: 'OperationalReadiness', scope: 'Operations', status: 'Active',
-      severity: 'Medium', enforcementMode: 'SoftEnforce',
-      effectiveEnvironments: ['Production'], affectedAssetsCount: 28, violationCount: 12,
-      createdAt: new Date(Date.now() - 60 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-004', name: 'CHANGE-VALIDATION', displayName: 'Change Validation Required',
-      description: 'All production changes must pass validation and blast radius assessment',
-      category: 'ChangeGovernance', scope: 'Changes', status: 'Active',
-      severity: 'Critical', enforcementMode: 'HardEnforce',
-      effectiveEnvironments: ['Production'], affectedAssetsCount: 156, violationCount: 3,
-      createdAt: new Date(Date.now() - 120 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-005', name: 'AI-MODEL-POLICY', displayName: 'AI Model Usage Policy',
-      description: 'AI model usage must comply with approved model registry and access policies',
-      category: 'AiGovernance', scope: 'AI', status: 'Active',
-      severity: 'High', enforcementMode: 'HardEnforce',
-      effectiveEnvironments: ['Production', 'Staging', 'Development'], affectedAssetsCount: 89, violationCount: 2,
-      createdAt: new Date(Date.now() - 45 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-006', name: 'DOC-STANDARDS', displayName: 'Documentation Standards',
-      description: 'Services must have up-to-date technical documentation and API references',
-      category: 'DocumentationStandards', scope: 'Knowledge', status: 'Active',
-      severity: 'Medium', enforcementMode: 'Advisory',
-      effectiveEnvironments: ['Production', 'Staging'], affectedAssetsCount: 42, violationCount: 15,
-      createdAt: new Date(Date.now() - 70 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-007', name: 'DEP-MAPPING', displayName: 'Dependency Mapping Required',
-      description: 'All services must have dependencies mapped in the service catalog',
-      category: 'ServiceGovernance', scope: 'Services', status: 'Active',
-      severity: 'Medium', enforcementMode: 'SoftEnforce',
-      effectiveEnvironments: ['Production'], affectedAssetsCount: 42, violationCount: 5,
-      createdAt: new Date(Date.now() - 55 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-008', name: 'INCIDENT-EVIDENCE', displayName: 'Incident Mitigation Evidence',
-      description: 'Incident resolution must include mitigation evidence and post-mortem when applicable',
-      category: 'OperationalReadiness', scope: 'Operations', status: 'Draft',
-      severity: 'High', enforcementMode: 'Advisory',
-      effectiveEnvironments: ['Production'], affectedAssetsCount: 0, violationCount: 0,
-      createdAt: new Date(Date.now() - 10 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-009', name: 'VERSION-CONTROL', displayName: 'Contract Versioning Required',
-      description: 'Contracts must follow semantic versioning with proper changelog',
-      category: 'ContractGovernance', scope: 'Contracts', status: 'Active',
-      severity: 'Medium', enforcementMode: 'SoftEnforce',
-      effectiveEnvironments: ['Production', 'Staging'], affectedAssetsCount: 35, violationCount: 8,
-      createdAt: new Date(Date.now() - 80 * 86400000).toISOString(),
-    },
-    {
-      policyId: 'pol-010', name: 'SEC-REVIEW', displayName: 'Security Review Required',
-      description: 'Services handling sensitive data must pass security review before production deployment',
-      category: 'SecurityCompliance', scope: 'Security', status: 'Active',
-      severity: 'Critical', enforcementMode: 'HardEnforce',
-      effectiveEnvironments: ['Production'], affectedAssetsCount: 18, violationCount: 1,
-      createdAt: new Date(Date.now() - 100 * 86400000).toISOString(),
-    },
-  ],
-};
+
 
 type CategoryFilter = 'all' | PolicyCategoryType;
 type StatusFilter = 'all' | PolicyStatusType;
@@ -144,8 +55,42 @@ export function PolicyCatalogPage() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  const [data, setData] = useState<PolicyListResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const d = mockPolicies;
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    organizationGovernanceApi.listPolicies()
+      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, [t]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  const d = data;
   const totalViolations = d.policies.reduce((sum, p) => sum + p.violationCount, 0);
 
   const filtered = d.policies.filter(p => {

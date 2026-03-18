@@ -25,6 +25,15 @@ public interface IIncidentStore
 {
     // ── Incidents ────────────────────────────────────────────────────────
 
+    /// <summary>Cria um novo incidente e retorna o identificador gerado.</summary>
+    CreateIncidentResult CreateIncident(CreateIncidentInput input);
+
+    /// <summary>Obtém os dados mínimos necessários para recomputar a correlação.</summary>
+    IncidentCorrelationContext? GetIncidentCorrelationContext(string incidentId);
+
+    /// <summary>Persiste o resultado computado de correlação no incidente.</summary>
+    void SaveIncidentCorrelation(string incidentId, GetIncidentCorrelation.Response correlation);
+
     /// <summary>Verifica se o incidente existe.</summary>
     bool IncidentExists(string incidentId);
 
@@ -94,3 +103,30 @@ public interface IIncidentStore
     /// <summary>Retorna o detalhe de um runbook.</summary>
     GetRunbookDetail.Response? GetRunbookDetail(string runbookId);
 }
+
+/// <summary>Dados de entrada mínimos para criação de incidente.</summary>
+public sealed record CreateIncidentInput(
+    string Title,
+    string Description,
+    IncidentType IncidentType,
+    IncidentSeverity Severity,
+    string ServiceId,
+    string ServiceDisplayName,
+    string OwnerTeam,
+    string? ImpactedDomain,
+    string Environment,
+    DateTimeOffset? DetectedAtUtc);
+
+/// <summary>Resultado da criação de incidente.</summary>
+public sealed record CreateIncidentResult(
+    Guid IncidentId,
+    string Reference,
+    DateTimeOffset CreatedAt);
+
+/// <summary>Contexto operacional necessário para recomputar correlação.</summary>
+public sealed record IncidentCorrelationContext(
+    Guid IncidentId,
+    string ServiceId,
+    string ServiceDisplayName,
+    string Environment,
+    DateTimeOffset DetectedAtUtc);

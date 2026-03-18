@@ -1,6 +1,8 @@
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
@@ -16,7 +18,9 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Services;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents;
@@ -34,10 +38,14 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddScoped<IIncidentCorrelationService, IncidentCorrelationService>();
+
         // Incident features
+        services.AddTransient<IValidator<CreateIncident.Command>, CreateIncident.Validator>();
         services.AddTransient<IValidator<ListIncidents.Query>, ListIncidents.Validator>();
         services.AddTransient<IValidator<GetIncidentDetail.Query>, GetIncidentDetail.Validator>();
         services.AddTransient<IValidator<GetIncidentCorrelation.Query>, GetIncidentCorrelation.Validator>();
+        services.AddTransient<IValidator<RefreshIncidentCorrelation.Command>, RefreshIncidentCorrelation.Validator>();
         services.AddTransient<IValidator<GetIncidentEvidence.Query>, GetIncidentEvidence.Validator>();
         services.AddTransient<IValidator<GetIncidentMitigation.Query>, GetIncidentMitigation.Validator>();
         services.AddTransient<IValidator<GetIncidentSummary.Query>, GetIncidentSummary.Validator>();

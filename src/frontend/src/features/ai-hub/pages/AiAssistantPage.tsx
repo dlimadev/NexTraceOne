@@ -270,22 +270,7 @@ export function AiAssistantPage() {
       setMessages([]);
     } catch (err) {
       console.error('Failed to create conversation:', err);
-      // Fallback: create temporary local conversation
-      const tempId = `temp-${Date.now()}`;
-      const tempConv: Conversation = {
-        id: tempId,
-        title: t('aiHub.newConversationTitle'),
-        persona: persona,
-        messageCount: 0,
-        isActive: true,
-        lastMessageAt: null,
-        lastModelUsed: null,
-        tags: '',
-        defaultContextScope: activeContexts.join(',').toLowerCase(),
-      };
-      setConversations(prev => [tempConv, ...prev]);
-      setSelectedConversation(tempId);
-      setMessages([]);
+      setConversationsError(t('common.errorLoading'));
     }
   };
 
@@ -303,28 +288,31 @@ export function AiAssistantPage() {
     setIsTyping(true);
 
     try {
-      const response = await aiGovernanceApi.chat({
+      const response = await aiGovernanceApi.sendMessage({
         message: userMsg.content,
         conversationId: selectedConversation || undefined,
+        contextScope: activeContexts.join(','),
+        persona,
+        clientType: 'Web',
       });
 
       const assistantMsg: ChatMessage = {
         id: `a-${Date.now()}`,
         role: 'assistant',
-        content: response.content,
-        modelName: response.modelId,
-        provider: response.providerId,
+        content: response.assistantResponse || response.message || response.content,
+        modelName: response.modelUsed || response.modelName || response.modelId,
+        provider: response.provider || response.providerId,
         isInternalModel: response.isInternalModel,
         promptTokens: response.promptTokens,
         completionTokens: response.completionTokens,
         correlationId: response.correlationId,
-        useCaseType: 'General',
-        routingPath: response.isInternalModel ? 'InternalOnly' : 'ExternalEscalation',
-        confidenceLevel: 'High',
-        costClass: response.isInternalModel ? 'low' : 'medium',
-        routingRationale: `Routed to ${response.providerId}/${response.modelId}. Duration: ${response.durationMs?.toFixed(0)}ms`,
-        sourceWeightingSummary: '',
-        escalationReason: 'None',
+        useCaseType: response.useCaseType || 'General',
+        routingPath: response.routingPath || (response.isInternalModel ? 'InternalOnly' : 'ExternalEscalation'),
+        confidenceLevel: response.confidenceLevel || 'Unknown',
+        costClass: response.costClass || (response.isInternalModel ? 'low' : 'medium'),
+        routingRationale: response.routingRationale || `Routed to ${response.provider || response.providerId}/${response.modelUsed || response.modelName || response.modelId}.`,
+        sourceWeightingSummary: response.sourceWeightingSummary || '',
+        escalationReason: response.escalationReason || 'None',
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, assistantMsg]);
@@ -332,37 +320,28 @@ export function AiAssistantPage() {
       if (response.conversationId && !selectedConversation) {
         setSelectedConversation(response.conversationId);
       }
-    } catch {
-      // Fallback to mock response if backend unavailable
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : t('common.errorLoading');
       const assistantMsg: ChatMessage = {
         id: `a-${Date.now()}`,
         role: 'assistant',
-        content: `[Mock] ${t('aiHub.contextualResponsePrefix')}: "${userMsg.content.length > 80 ? userMsg.content.slice(0, 77) + '...' : userMsg.content}". ${t('aiHub.groundingDevelopment')}`,
-        modelName: 'Mock-Fallback',
-        provider: 'Mock',
-        isInternalModel: true,
-        promptTokens: Math.floor(userMsg.content.length / 4),
-        completionTokens: 45,
-        appliedPolicyName: 'Offline Fallback',
-        groundingSources: activeContexts.map(ctx => {
-          const srcMap: Record<string, string> = {
-            services: 'Service Catalog',
-            contracts: 'Contract Registry',
-            incidents: 'Incident History',
-            changes: 'Change Intelligence',
-            runbooks: 'Runbook Library',
-          };
-          return srcMap[ctx.toLowerCase()] || ctx;
-        }),
+        content: `${t('common.errorLoading')} ${errorMessage}`,
+        modelName: null,
+        provider: null,
+        isInternalModel: false,
+        promptTokens: 0,
+        completionTokens: 0,
+        appliedPolicyName: null,
+        groundingSources: [],
         contextReferences: [],
-        correlationId: `mock-${Date.now()}`,
+        correlationId: `provider-unavailable-${Date.now()}`,
         useCaseType: 'General',
-        routingPath: 'MockFallback',
-        confidenceLevel: 'Low',
+        routingPath: 'ProviderUnavailable',
+        confidenceLevel: 'Unknown',
         costClass: 'none',
-        routingRationale: 'Backend unavailable — mock response generated locally.',
+        routingRationale: 'Provider unavailable. No silent mock was used.',
         sourceWeightingSummary: '',
-        escalationReason: 'BackendUnavailable',
+        escalationReason: 'ProviderUnavailable',
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, assistantMsg]);

@@ -3093,5 +3093,112 @@
     "moduleUnavailable": "Módulo No Disponible",
     "moduleUnavailableDescription": "Este módulo no está disponible temporalmente. Inténtelo de nuevo más tarde.",
     "moduleUnavailableDescriptionNamed": "El módulo {{module}} no está disponible temporalmente. Inténtelo de nuevo más tarde."
+  },
+  "governance": {
+    "policies": {
+      "title": "Catálogo de Políticas",
+      "subtitle": "Políticas empresariales derivadas de packs, rollouts y waivers persistidos en Gobernanza.",
+      "totalPolicies": "Total de políticas",
+      "active": "Activas",
+      "draft": "Borradores",
+      "totalViolations": "Waivers activos",
+      "searchPlaceholder": "Buscar políticas…",
+      "filterAll": "Todas",
+      "catalogTitle": "Políticas",
+      "catalogDescription": "Las políticas se generan a partir de Governance Packs y reflejan rollouts/waivers reales.",
+      "scope": "Ámbito",
+      "affectedAssets": "Ámbitos afectados",
+      "violations": "Waivers",
+      "status": {
+        "Active": "Activa",
+        "Draft": "Borrador",
+        "Inactive": "Inactiva",
+        "Deprecated": "Deprecada"
+      },
+      "severity": {
+        "Low": "Baja",
+        "Medium": "Media",
+        "High": "Alta",
+        "Critical": "Crítica",
+        "Unknown": "Desconocida"
+      },
+      "enforcement": {
+        "Advisory": "Aviso",
+        "SoftEnforce": "Aplicación suave",
+        "HardEnforce": "Aplicación estricta",
+        "Unknown": "Desconocido"
+      },
+      "category": {
+        "ServiceGovernance": "Gobernanza de Servicios",
+        "ContractGovernance": "Gobernanza de Contratos",
+        "ChangeGovernance": "Gobernanza de Cambios",
+        "OperationalReadiness": "Preparación Operacional",
+        "AiGovernance": "Gobernanza de IA",
+        "SecurityCompliance": "Seguridad y Cumplimiento",
+        "DocumentationStandards": "Estándares de Documentación"
+      }
+    },
+    "complianceTitle": "Cumplimiento",
+    "complianceSubtitle": "Cumplimiento empresarial derivado de la adopción de packs (rollouts) y excepciones (waivers).",
+    "compliance": {
+      "overallScore": "Puntuación general",
+      "totalAssessed": "Packs evaluados",
+      "compliant": "Conforme",
+      "partiallyCompliant": "Parcialmente conforme",
+      "nonCompliant": "No conforme",
+      "rollouts": "Rollouts",
+      "pendingRollouts": "Rollouts pendientes",
+      "failedRollouts": "Rollouts fallidos",
+      "waivers": "Waivers",
+      "pendingWaivers": "Waivers pendientes",
+      "approvedWaivers": "Waivers aprobados",
+      "searchPlaceholder": "Buscar packs…",
+      "filterAll": "Todos",
+      "filterNonCompliant": "No conforme",
+      "filterPartially": "Parcial",
+      "status": {
+        "Compliant": "Conforme",
+        "PartiallyCompliant": "Parcial",
+        "NonCompliant": "No conforme",
+        "NotApplicable": "No aplicable"
+      },
+      "gaps": "Packs que requieren atención",
+      "gapsDescription": "Packs con waivers pendientes o rollouts fallidos."
+    },
+    "riskTitle": "Centro de Riesgo",
+    "riskSubtitle": "Indicadores de riesgo derivados del ciclo de vida de packs, rollouts y waivers.",
+    "risk": {
+      "totalAssessed": "Packs evaluados",
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo",
+      "searchPlaceholder": "Buscar packs…",
+      "filterAll": "Todos",
+      "filterCritical": "Crítico",
+      "filterHigh": "Alto",
+      "filterMedium": "Medio",
+      "filterLow": "Bajo",
+      "serviceRiskList": "Indicadores de riesgo por pack",
+      "level": {
+        "Critical": "Crítico",
+        "High": "Alto",
+        "Medium": "Medio",
+        "Low": "Bajo"
+      },
+      "dimension": {
+        "Waivers": "Waivers",
+        "Rollouts": "Rollouts",
+        "Lifecycle": "Ciclo de vida",
+        "Operational": "Operacional",
+        "Change": "Cambio",
+        "Contract": "Contrato",
+        "Dependency": "Dependencia",
+        "Ownership": "Ownership",
+        "Documentation": "Documentación",
+        "IncidentRecurrence": "Recurrencia de incidentes",
+        "AiGovernance": "Gobernanza de IA"
+      }
+    }
   }
 }

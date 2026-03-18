@@ -199,11 +199,37 @@ export interface ImpactedContract {
 export interface IncidentCorrelationResponse {
   incidentId: string;
   confidence: string;
+  score: number;
   reason: string;
   relatedChanges: CorrelatedChange[];
   relatedServices: CorrelatedService[];
   relatedDependencies: CorrelatedDependency[];
   possibleImpactedContracts: ImpactedContract[];
+}
+
+export interface CreateIncidentRequest {
+  title: string;
+  description: string;
+  incidentType: string;
+  severity: string;
+  serviceId: string;
+  serviceDisplayName: string;
+  ownerTeam: string;
+  impactedDomain?: string;
+  environment: string;
+  detectedAtUtc?: string;
+}
+
+export interface CreateIncidentResponse {
+  incidentId: string;
+  reference: string;
+  createdAt: string;
+  status: string;
+  severity: string;
+  correlationConfidence: string;
+  hasCorrelatedChanges: boolean;
+  correlationScore: number;
+  correlationReason?: string;
 }
 
 // ── Evidence ─────────────────────────────────────────────────────────
@@ -393,6 +419,9 @@ export const incidentsApi = {
   listIncidents: (filters?: IncidentListFilters) =>
     client.get<IncidentListResponse>('/incidents', { params: filters }).then(r => r.data),
 
+  createIncident: (data: CreateIncidentRequest) =>
+    client.post<CreateIncidentResponse>('/incidents', data).then(r => r.data),
+
   getIncidentDetail: (incidentId: string) =>
     client.get<IncidentDetailResponse>(`/incidents/${incidentId}`).then(r => r.data),
 
@@ -401,6 +430,9 @@ export const incidentsApi = {
 
   getIncidentCorrelation: (incidentId: string) =>
     client.get<IncidentCorrelationResponse>(`/incidents/${incidentId}/correlation`).then(r => r.data),
+
+  refreshIncidentCorrelation: (incidentId: string) =>
+    client.post<IncidentCorrelationResponse>(`/incidents/${incidentId}/correlation/refresh`).then(r => r.data),
 
   getIncidentEvidence: (incidentId: string) =>
     client.get<IncidentEvidenceResponse>(`/incidents/${incidentId}/evidence`).then(r => r.data),

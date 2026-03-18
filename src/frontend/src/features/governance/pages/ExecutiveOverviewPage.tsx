@@ -1,7 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   TrendingUp, ShieldAlert, AlertTriangle, BarChart3, Activity,
-  CheckCircle, RefreshCw, Clock, Target, AlertCircle,
+  CheckCircle, RefreshCw, Clock, Target, AlertCircle, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -12,64 +13,9 @@ import type {
   RiskLevel,
   GovernanceTrendDirection,
 } from '../../../types';
+import { organizationGovernanceApi } from '../api/organizationGovernance';
 
-/**
- * Dados simulados do overview executivo — alinhados com o backend GetExecutiveOverview.
- * Em produção, virão da API /api/v1/governance/executive/overview.
- */
-const mockOverview: ExecutiveOverviewResponse = {
-  operationalTrend: {
-    stabilityTrend: 'Improving',
-    incidentRateChange: -12.5,
-    avgResolutionHours: 4.2,
-  },
-  riskSummary: {
-    overallRisk: 'Medium',
-    criticalDomains: 2,
-    highRiskServices: 5,
-    riskTrend: 'Stable',
-  },
-  maturitySummary: {
-    overallMaturity: 'Defined',
-    ownershipCoverage: 88,
-    contractCoverage: 72,
-    documentationCoverage: 64,
-    runbookCoverage: 45,
-  },
-  changeSafetySummary: {
-    safeChanges: 184,
-    riskyChanges: 23,
-    rollbacks: 7,
-    confidenceTrend: 'Improving',
-  },
-  incidentTrendSummary: {
-    openIncidents: 8,
-    resolvedLast30Days: 34,
-    avgResolutionHours: 4.2,
-    recurrenceRate: 14,
-    trend: 'Improving',
-  },
-  complianceCoverageSummary: {
-    overallScore: 74,
-    compliantPct: 68,
-    gapCount: 12,
-    trend: 'Stable',
-  },
-  criticalFocusAreas: [
-    { areaName: 'Payment Processing Stability', severity: 'Critical', description: 'Recurring incidents in payment gateway affecting SLA', affectedServices: 4 },
-    { areaName: 'Contract Coverage Gaps', severity: 'High', description: 'Multiple services without versioned contracts in Payments and Orders domains', affectedServices: 8 },
-    { areaName: 'Runbook Deficiency', severity: 'High', description: 'Critical services operating without runbooks', affectedServices: 12 },
-    { areaName: 'Dependency Mapping', severity: 'Medium', description: 'Incomplete dependency topology for platform services', affectedServices: 6 },
-  ],
-  topDomainsRequiringAttention: [
-    { domainId: 'dom-payments', domainName: 'Payments', riskLevel: 'Critical', reason: 'Recurring production incidents and SLA breaches' },
-    { domainId: 'dom-orders', domainName: 'Orders', riskLevel: 'High', reason: 'Breaking contract changes without validation' },
-    { domainId: 'dom-inventory', domainName: 'Inventory', riskLevel: 'High', reason: 'Consumer lag and missing ownership definitions' },
-    { domainId: 'dom-platform', domainName: 'Platform', riskLevel: 'Medium', reason: 'Documentation and runbook gaps across shared services' },
-    { domainId: 'dom-identity', domainName: 'Identity', riskLevel: 'Low', reason: 'Minor schema mismatch detected in staging' },
-  ],
-  generatedAt: new Date().toISOString(),
-};
+
 
 /** Mapeia RiskLevel para variante do Badge. */
 const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 'default' => {
@@ -99,7 +45,42 @@ const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'info' | 
  */
 export function ExecutiveOverviewPage() {
   const { t } = useTranslation();
-  const d = mockOverview;
+  const [data, setData] = useState<ExecutiveOverviewResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    organizationGovernanceApi.getExecutiveOverview()
+      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, [t]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <AlertTriangle size={48} className="text-critical" />
+          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  const d = data;
 
   const maturityItems = [
     { key: 'ownershipCoverage', value: d.maturitySummary.ownershipCoverage },

@@ -21,6 +21,11 @@ import type {
   CreateGovernanceWaiverRequest,
   ApproveWaiverRequest,
   RejectWaiverRequest,
+  ComplianceSummaryResponse,
+  RiskSummaryResponse,
+  PolicyListResponse,
+  PolicyDto,
+  ExecutiveOverviewResponse,
 } from '../../../types';
 
 /** Cliente de API para governança multi-equipa e multi-domínio. */
@@ -82,4 +87,22 @@ export const organizationGovernanceApi = {
     client.post(`/governance/waivers/${waiverId}/approve`, data).then((r) => r.data),
   rejectGovernanceWaiver: (waiverId: string, data: RejectWaiverRequest) =>
     client.post(`/governance/waivers/${waiverId}/reject`, data).then((r) => r.data),
+
+  // Compliance
+  getComplianceSummary: (teamId?: string, domainId?: string) =>
+    client.get<ComplianceSummaryResponse>('/compliance/summary', { params: { teamId, domainId } }).then((r) => r.data),
+
+  // Risk
+  getRiskSummary: (teamId?: string, domainId?: string) =>
+    client.get<RiskSummaryResponse>('/risk/summary', { params: { teamId, domainId } }).then((r) => r.data),
+
+  // Policies
+  listPolicies: (category?: string, status?: string) =>
+    client.get<PolicyListResponse>('/policies', { params: { category, status } }).then((r) => r.data),
+  getPolicy: (policyId: string) =>
+    client.get<PolicyDto>(`/policies/${policyId}`).then((r) => r.data),
+
+  // Executive
+  getExecutiveOverview: (domainId?: string, teamId?: string, range?: string) =>
+    client.get<ExecutiveOverviewResponse>('/executive/overview', { params: { domainId, teamId, range } }).then((r) => r.data),
 };

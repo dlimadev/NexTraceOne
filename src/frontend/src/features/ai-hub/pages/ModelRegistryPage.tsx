@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Database,
   Search,
@@ -16,6 +17,10 @@ import { StatCard } from '../../../components/StatCard';
 import { Button } from '../../../components/Button';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer } from '../../../components/shell';
+import { Loader } from '../../../components/Loader';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { aiGovernanceApi } from '../api';
 
 interface Model {
   id: string;
@@ -30,14 +35,6 @@ interface Model {
   sensitivityLevel: number;
 }
 
-const mockModels: Model[] = [
-  { id: '1', name: 'NexTrace-Internal-v1', displayName: 'NexTrace Internal Assistant', provider: 'Internal', modelType: 'Chat', isInternal: true, isExternal: false, status: 'Active', capabilities: 'chat,analysis,troubleshooting', sensitivityLevel: 1 },
-  { id: '2', name: 'gpt-4o', displayName: 'GPT-4o (Azure OpenAI)', provider: 'Azure OpenAI', modelType: 'Chat', isInternal: false, isExternal: true, status: 'Active', capabilities: 'chat,code-generation,analysis', sensitivityLevel: 3 },
-  { id: '3', name: 'claude-3-sonnet', displayName: 'Claude 3 Sonnet', provider: 'Anthropic', modelType: 'Chat', isInternal: false, isExternal: true, status: 'Inactive', capabilities: 'chat,analysis', sensitivityLevel: 3 },
-  { id: '4', name: 'text-embedding-3-large', displayName: 'Text Embedding 3 Large', provider: 'OpenAI', modelType: 'Embedding', isInternal: false, isExternal: true, status: 'Active', capabilities: 'embedding,search', sensitivityLevel: 2 },
-  { id: '5', name: 'NexTrace-CodeGen-v1', displayName: 'NexTrace Code Assistant', provider: 'Internal', modelType: 'CodeGeneration', isInternal: true, isExternal: false, status: 'Deprecated', capabilities: 'code-generation,completion', sensitivityLevel: 1 },
-];
-
 const statusFilters = ['All', 'Active', 'Inactive', 'Deprecated', 'Blocked'] as const;
 
 /**
@@ -49,7 +46,48 @@ export function ModelRegistryPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
 
-  const filtered = mockModels.filter(m => {
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['ai-governance', 'models', statusFilter],
+    queryFn: () => aiGovernanceApi.listModels({
+      status: statusFilter === 'All' ? undefined : statusFilter,
+    }),
+    staleTime: 30_000,
+  });
+
+  const models: Model[] = useMemo(() => {
+    const items = (data?.items ?? []) as Array<{
+      modelId: string;
+      name: string;
+      displayName: string;
+      provider: string;
+      modelType: string;
+      isInternal: boolean;
+      isExternal: boolean;
+      status: string;
+      capabilities: string;
+      sensitivityLevel: number;
+    }>;
+
+    return items.map((m) => ({
+      id: m.modelId,
+      name: m.name,
+      displayName: m.displayName,
+      provider: m.provider,
+      modelType: m.modelType,
+      isInternal: m.isInternal,
+      isExternal: m.isExternal,
+      status: m.status,
+      capabilities: m.capabilities,
+      sensitivityLevel: m.sensitivityLevel,
+    }));
+  }, [data]);
+
+  const filtered = models.filter(m => {
     const matchesSearch = !search || m.displayName.toLowerCase().includes(search.toLowerCase()) || m.provider.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'All' || m.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -87,7 +125,7 @@ export function ModelRegistryPage() {
           <h1 className="text-2xl font-bold text-heading">{t('aiHub.modelsTitle')}</h1>
           <p className="text-muted mt-1">{t('aiHub.modelsSubtitle')}</p>
         </div>
-        <Button variant="primary" size="md">
+        <Button variant="primary" size="md" disabled>
           <Plus size={16} />
           {t('aiHub.registerModel')}
         </Button>
@@ -95,10 +133,10 @@ export function ModelRegistryPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('aiHub.totalModels')} value={mockModels.length} icon={<Database size={20} />} color="text-accent" />
-        <StatCard title={t('aiHub.activeModels')} value={mockModels.filter(m => m.status === 'Active').length} icon={<Cpu size={20} />} color="text-success" />
-        <StatCard title={t('aiHub.internalModels')} value={mockModels.filter(m => m.isInternal).length} icon={<Lock size={20} />} color="text-info" />
-        <StatCard title={t('aiHub.externalModels')} value={mockModels.filter(m => m.isExternal).length} icon={<Globe size={20} />} color="text-warning" />
+        <StatCard title={t('aiHub.totalModels')} value={models.length} icon={<Database size={20} />} color="text-accent" />
+        <StatCard title={t('aiHub.activeModels')} value={models.filter(m => m.status === 'Active').length} icon={<Cpu size={20} />} color="text-success" />
+        <StatCard title={t('aiHub.internalModels')} value={models.filter(m => m.isInternal).length} icon={<Lock size={20} />} color="text-info" />
+        <StatCard title={t('aiHub.externalModels')} value={models.filter(m => m.isExternal).length} icon={<Globe size={20} />} color="text-warning" />
       </div>
 
       {/* Filter bar */}
@@ -131,46 +169,74 @@ export function ModelRegistryPage() {
       </div>
 
       {/* Model list */}
-      <div className="grid grid-cols-1 gap-4">
-        {filtered.map(model => (
-          <Card key={model.id}>
-            <CardBody>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${model.isInternal ? 'bg-info/15 text-info' : 'bg-warning/15 text-warning'}`}>
-                    {model.isInternal ? <Shield size={20} /> : <Globe size={20} />}
+      {isLoading && (
+        <Card>
+          <CardBody className="flex justify-center py-16">
+            <Loader size="lg" />
+          </CardBody>
+        </Card>
+      )}
+
+      {isError && (
+        <PageErrorState
+          action={(
+            <Button variant="secondary" size="sm" onClick={() => refetch()}>
+              {t('common.retry', 'Retry')}
+            </Button>
+          )}
+        />
+      )}
+
+      {!isLoading && !isError && filtered.length === 0 && (
+        <EmptyState
+          title={t('aiHub.noModelsFound', 'No models found')}
+          description={t('aiHub.noModelsFoundDescription', 'Try adjusting your filters or search.')}
+          size="compact"
+        />
+      )}
+
+      {!isLoading && !isError && filtered.length > 0 && (
+        <div className="grid grid-cols-1 gap-4">
+          {filtered.map(model => (
+            <Card key={model.id}>
+              <CardBody>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${model.isInternal ? 'bg-info/15 text-info' : 'bg-warning/15 text-warning'}`}>
+                      {model.isInternal ? <Shield size={20} /> : <Globe size={20} />}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-semibold text-heading truncate">{model.displayName}</h3>
+                        <Badge variant={statusBadgeVariant(model.status)}>{model.status}</Badge>
+                        <Badge variant={model.isInternal ? 'info' : 'warning'}>
+                          {model.isInternal ? t('aiHub.internal') : t('aiHub.external')}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted">
+                        <span>{model.provider}</span>
+                        <span>·</span>
+                        <span>{model.modelType}</span>
+                        <span>·</span>
+                        <span>{model.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        {model.capabilities.split(',').map(cap => (
+                          <Badge key={cap} variant="default">{cap.trim()}</Badge>
+                        ))}
+                        <Badge variant={sensitivityVariant(model.sensitivityLevel) as 'success' | 'warning' | 'danger'}>
+                          {sensitivityLabel(model.sensitivityLevel)}
+                        </Badge>
+                      </div>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-semibold text-heading truncate">{model.displayName}</h3>
-                      <Badge variant={statusBadgeVariant(model.status)}>{model.status}</Badge>
-                      <Badge variant={model.isInternal ? 'info' : 'warning'}>
-                        {model.isInternal ? t('aiHub.internal') : t('aiHub.external')}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-muted">
-                      <span>{model.provider}</span>
-                      <span>·</span>
-                      <span>{model.modelType}</span>
-                      <span>·</span>
-                      <span>{model.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      {model.capabilities.split(',').map(cap => (
-                        <Badge key={cap} variant="default">{cap.trim()}</Badge>
-                      ))}
-                      <Badge variant={sensitivityVariant(model.sensitivityLevel) as 'success' | 'warning' | 'danger'}>
-                        {sensitivityLabel(model.sensitivityLevel)}
-                      </Badge>
-                    </div>
-                  </div>
+                  <ChevronRight size={16} className="text-muted shrink-0" />
                 </div>
-                <ChevronRight size={16} className="text-muted shrink-0" />
-              </div>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      )}
     </PageContainer>
   );
 }

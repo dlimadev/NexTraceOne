@@ -193,6 +193,19 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
         ImpactedContractsJson = impactedContractsJson;
     }
 
+    /// <summary>
+    /// Atualiza estado agregado de correlação (flags + confiança + last update).
+    /// </summary>
+    public void UpdateCorrelationAssessment(
+        bool hasCorrelation,
+        CorrelationConfidence confidence,
+        DateTimeOffset updatedAtUtc)
+    {
+        HasCorrelation = hasCorrelation;
+        CorrelationConfidence = confidence;
+        LastUpdatedAt = updatedAtUtc;
+    }
+
     /// <summary>Define campos de evidência.</summary>
     public void SetEvidence(string? telemetrySummary, string? businessImpact,
         string? evidenceObservationsJson, string? analysis, string? temporalContext)

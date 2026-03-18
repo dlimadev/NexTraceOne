@@ -314,7 +314,7 @@ public sealed class IntegrationHubFeatureTests
         _connectorRepository.GetByIdAsync(Arg.Any<IntegrationConnectorId>(), Arg.Any<CancellationToken>())
             .Returns(connector);
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(1));
 
         var handler = new RetryConnector.Handler(_connectorRepository, _executionRepository, _unitOfWork, _clock);
         var command = new RetryConnector.Command(connectorId.ToString());
@@ -364,7 +364,7 @@ public sealed class IntegrationHubFeatureTests
         _executionRepository.GetByIdAsync(Arg.Any<IngestionExecutionId>(), Arg.Any<CancellationToken>())
             .Returns(originalExecution);
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
-            .Returns(Task.CompletedTask);
+            .Returns(Task.FromResult(1));
 
         var handler = new ReprocessExecution.Handler(_executionRepository, _unitOfWork, _clock);
         var command = new ReprocessExecution.Command(originalExecution.Id.Value.ToString());

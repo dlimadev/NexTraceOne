@@ -246,6 +246,16 @@ public interface ITeamDomainLinkRepository
 /// </summary>
 public interface IGovernanceRolloutRecordRepository
 {
+    /// <summary>
+    /// Lista rollouts com filtros opcionais.
+    /// </summary>
+    Task<IReadOnlyList<GovernanceRolloutRecord>> ListAsync(
+        GovernancePackId? packId,
+        GovernanceScopeType? scopeType,
+        string? scopeValue,
+        RolloutStatus? status,
+        CancellationToken ct);
+
     /// <summary>Lista todos os rollouts de um pack.</summary>
     Task<IReadOnlyList<GovernanceRolloutRecord>> ListByPackIdAsync(
         GovernancePackId packId,

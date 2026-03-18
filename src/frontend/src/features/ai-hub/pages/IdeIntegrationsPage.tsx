@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Monitor, Code, Search, Shield, ShieldCheck, Users, Plug, Terminal,
   CheckCircle, XCircle, Clock, FileText, AlertTriangle, Zap, Eye,
@@ -8,12 +9,17 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { Loader } from '../../../components/Loader';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { Button } from '../../../components/Button';
+import { aiGovernanceApi } from '../api';
 
 interface IdeClient {
   id: string;
   userId: string;
   userDisplayName: string;
-  clientType: 'VsCode' | 'VisualStudio';
+  clientType: string;
   clientVersion: string;
   deviceIdentifier: string;
   lastAccessAt: string;
@@ -22,7 +28,7 @@ interface IdeClient {
 
 interface IdeCapabilityPolicy {
   id: string;
-  clientType: 'VsCode' | 'VisualStudio';
+  clientType: string;
   persona: string | null;
   allowedCommands: string;
   allowedContextScopes: string;
@@ -33,22 +39,10 @@ interface IdeCapabilityPolicy {
   isActive: boolean;
 }
 
-const mockClients: IdeClient[] = [
-  { id: '1', userId: 'john.doe', userDisplayName: 'John Doe', clientType: 'VsCode', clientVersion: '1.2.0', deviceIdentifier: 'vsc-dev-01', lastAccessAt: '2026-03-15T14:30:00Z', isActive: true },
-  { id: '2', userId: 'jane.smith', userDisplayName: 'Jane Smith', clientType: 'VsCode', clientVersion: '1.2.0', deviceIdentifier: 'vsc-dev-02', lastAccessAt: '2026-03-15T11:15:00Z', isActive: true },
-  { id: '3', userId: 'bob.wilson', userDisplayName: 'Bob Wilson', clientType: 'VisualStudio', clientVersion: '1.0.0', deviceIdentifier: 'vs-dev-01', lastAccessAt: '2026-03-14T16:45:00Z', isActive: true },
-  { id: '4', userId: 'alice.chen', userDisplayName: 'Alice Chen', clientType: 'VsCode', clientVersion: '1.1.0', deviceIdentifier: 'vsc-dev-03', lastAccessAt: '2026-03-13T09:00:00Z', isActive: false },
-];
-
-const mockPolicies: IdeCapabilityPolicy[] = [
-  { id: '1', clientType: 'VsCode', persona: null, allowedCommands: 'Chat,ServiceLookup,ContractLookup,ContractGenerate,ContractValidate,IncidentLookup,ChangeLookup,RunbookLookup,ServiceSummary,SourceOfTruthQuery', allowedContextScopes: 'services,contracts,incidents,changes,runbooks', allowContractGeneration: true, allowIncidentTroubleshooting: true, allowExternalAI: false, maxTokensPerRequest: 4096, isActive: true },
-  { id: '2', clientType: 'VisualStudio', persona: null, allowedCommands: 'Chat,ServiceLookup,ContractLookup,ContractGenerate,ContractValidate,IncidentLookup,ChangeLookup,RunbookLookup,ServiceSummary,SourceOfTruthQuery', allowedContextScopes: 'services,contracts,incidents,changes,runbooks', allowContractGeneration: true, allowIncidentTroubleshooting: true, allowExternalAI: false, maxTokensPerRequest: 4096, isActive: true },
-  { id: '3', clientType: 'VsCode', persona: 'Engineer', allowedCommands: 'Chat,ServiceLookup,ContractLookup,ContractGenerate,IncidentLookup,RunbookLookup', allowedContextScopes: 'services,contracts,incidents,runbooks', allowContractGeneration: true, allowIncidentTroubleshooting: true, allowExternalAI: false, maxTokensPerRequest: 4096, isActive: true },
-];
-
 type ClientFilter = 'all' | 'VsCode' | 'VisualStudio';
 
 function timeAgo(dateStr: string): string {
+  if (!dateStr) return '—';
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 60) return `${mins}m`;
@@ -67,16 +61,113 @@ export function IdeIntegrationsPage() {
   const [clientFilter, setClientFilter] = useState<ClientFilter>('all');
   const [search, setSearch] = useState('');
 
-  const filteredClients = mockClients.filter((c) => {
+  const {
+    data: summary,
+    isLoading: isLoadingSummary,
+    isError: isSummaryError,
+    refetch: refetchSummary,
+  } = useQuery({
+    queryKey: ['ai-governance', 'ide', 'summary'],
+    queryFn: () => aiGovernanceApi.getIdeSummary(),
+    staleTime: 30_000,
+  });
+
+  const {
+    data: clientsData,
+    isLoading: isLoadingClients,
+    isError: isClientsError,
+    refetch: refetchClients,
+  } = useQuery({
+    queryKey: ['ai-governance', 'ide', 'clients'],
+    queryFn: () => aiGovernanceApi.listIdeClients({ pageSize: 200 }),
+    staleTime: 30_000,
+  });
+
+  const {
+    data: policiesData,
+    isLoading: isLoadingPolicies,
+    isError: isPoliciesError,
+    refetch: refetchPolicies,
+  } = useQuery({
+    queryKey: ['ai-governance', 'ide', 'policies'],
+    queryFn: () => aiGovernanceApi.listIdeCapabilityPolicies({ pageSize: 200 }),
+    staleTime: 30_000,
+  });
+
+  const { data: vsCodeCapabilities } = useQuery({
+    queryKey: ['ai-governance', 'ide', 'capabilities', 'VsCode'],
+    queryFn: () => aiGovernanceApi.getIdeCapabilities({ clientType: 'VsCode', persona: null }),
+    staleTime: 60_000,
+  });
+
+  const { data: vsCapabilities } = useQuery({
+    queryKey: ['ai-governance', 'ide', 'capabilities', 'VisualStudio'],
+    queryFn: () => aiGovernanceApi.getIdeCapabilities({ clientType: 'VisualStudio', persona: null }),
+    staleTime: 60_000,
+  });
+
+  const clients: IdeClient[] = useMemo(() => {
+    const items = (clientsData?.items ?? []) as Array<{
+      registrationId: string;
+      userId: string;
+      userDisplayName: string;
+      clientType: string;
+      clientVersion?: string | null;
+      deviceIdentifier?: string | null;
+      lastAccessAt?: string | null;
+      isActive: boolean;
+    }>;
+
+    return items.map((c) => ({
+      id: c.registrationId,
+      userId: c.userId,
+      userDisplayName: c.userDisplayName,
+      clientType: c.clientType,
+      clientVersion: c.clientVersion ?? '—',
+      deviceIdentifier: c.deviceIdentifier ?? '—',
+      lastAccessAt: c.lastAccessAt ?? '',
+      isActive: c.isActive,
+    }));
+  }, [clientsData]);
+
+  const capabilityPolicies: IdeCapabilityPolicy[] = useMemo(() => {
+    const items = (policiesData?.items ?? []) as Array<{
+      policyId: string;
+      clientType: string;
+      persona?: string | null;
+      allowedCommands: string;
+      allowedContextScopes: string;
+      allowContractGeneration: boolean;
+      allowIncidentTroubleshooting: boolean;
+      allowExternalAI: boolean;
+      maxTokensPerRequest: number;
+      isActive: boolean;
+    }>;
+
+    return items.map((p) => ({
+      id: p.policyId,
+      clientType: p.clientType,
+      persona: p.persona ?? null,
+      allowedCommands: p.allowedCommands,
+      allowedContextScopes: p.allowedContextScopes,
+      allowContractGeneration: p.allowContractGeneration,
+      allowIncidentTroubleshooting: p.allowIncidentTroubleshooting,
+      allowExternalAI: p.allowExternalAI,
+      maxTokensPerRequest: p.maxTokensPerRequest,
+      isActive: p.isActive,
+    }));
+  }, [policiesData]);
+
+  const filteredClients = clients.filter((c) => {
     if (clientFilter !== 'all' && c.clientType !== clientFilter) return false;
     if (search && !c.userDisplayName.toLowerCase().includes(search.toLowerCase()) && !c.userId.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
-  const totalActive = mockClients.filter((c) => c.isActive).length;
-  const vsCodeCount = mockClients.filter((c) => c.clientType === 'VsCode' && c.isActive).length;
-  const vsCount = mockClients.filter((c) => c.clientType === 'VisualStudio' && c.isActive).length;
-  const activePolicies = mockPolicies.filter((p) => p.isActive).length;
+  const totalActive = summary?.totalActiveClients ?? clients.filter((c) => c.isActive).length;
+  const vsCodeCount = clients.filter((c) => c.clientType === 'VsCode' && c.isActive).length;
+  const vsCount = clients.filter((c) => c.clientType === 'VisualStudio' && c.isActive).length;
+  const activePolicies = summary?.activePolicies ?? capabilityPolicies.filter((p) => p.isActive).length;
 
   const filters: { key: ClientFilter; label: string }[] = [
     { key: 'all', label: t('aiHub.ideFilterAll') },
@@ -86,6 +177,9 @@ export function IdeIntegrationsPage() {
 
   const clientIcon = (type: string) =>
     type === 'VsCode' ? <Code size={14} /> : <Monitor size={14} />;
+
+  const isLoading = isLoadingSummary || isLoadingClients || isLoadingPolicies;
+  const isError = isSummaryError || isClientsError || isPoliciesError;
 
   return (
     <PageContainer>
@@ -102,7 +196,34 @@ export function IdeIntegrationsPage() {
         <StatCard title={t('aiHub.ideActivePolicies')} value={activePolicies} icon={<ShieldCheck size={20} />} color="text-success" />
       </div>
 
+      {isLoading && (
+        <Card className="mb-8">
+          <CardBody className="flex justify-center py-16">
+            <Loader size="lg" />
+          </CardBody>
+        </Card>
+      )}
+
+      {isError && (
+        <PageErrorState
+          action={(
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                refetchSummary();
+                refetchClients();
+                refetchPolicies();
+              }}
+            >
+              {t('common.retry', 'Retry')}
+            </Button>
+          )}
+        />
+      )}
+
       {/* Client Types Overview */}
+      {!isLoading && !isError && (
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-heading mb-3">{t('aiHub.ideSupportedClients')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -121,15 +242,17 @@ export function IdeIntegrationsPage() {
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge variant="info">{t('aiHub.ideActiveClientsLabel')}: {vsCodeCount}</Badge>
-                <Badge variant={mockPolicies.some((p) => p.clientType === 'VsCode' && p.isActive) ? 'success' : 'default'}>
+                <Badge variant={summary?.clientTypes?.some((ct: any) => ct.clientType === 'VsCode' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
                   <Shield size={10} className="mr-1 inline" />{t('aiHub.idePolicyConfigured')}
                 </Badge>
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
-                {['Chat', 'ServiceLookup', 'ContractLookup', 'ContractGenerate', 'IncidentLookup'].map((cmd) => (
+                {(vsCodeCapabilities?.allowedCommands ?? ['Chat', 'ServiceLookup', 'ContractLookup', 'ContractGenerate', 'IncidentLookup']).slice(0, 5).map((cmd: string) => (
                   <span key={cmd} className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-muted">{cmd}</span>
                 ))}
-                <span className="text-[10px] text-faded">+5</span>
+                {(vsCodeCapabilities?.allowedCommands?.length ?? 0) > 5 && (
+                  <span className="text-[10px] text-faded">+{(vsCodeCapabilities.allowedCommands.length - 5)}</span>
+                )}
               </div>
             </CardBody>
           </Card>
@@ -149,22 +272,26 @@ export function IdeIntegrationsPage() {
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge variant="info">{t('aiHub.ideActiveClientsLabel')}: {vsCount}</Badge>
-                <Badge variant={mockPolicies.some((p) => p.clientType === 'VisualStudio' && p.isActive) ? 'success' : 'default'}>
+                <Badge variant={summary?.clientTypes?.some((ct: any) => ct.clientType === 'VisualStudio' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
                   <Shield size={10} className="mr-1 inline" />{t('aiHub.idePolicyConfigured')}
                 </Badge>
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
-                {['Chat', 'ServiceLookup', 'ContractLookup', 'ContractGenerate', 'IncidentLookup'].map((cmd) => (
+                {(vsCapabilities?.allowedCommands ?? ['Chat', 'ServiceLookup', 'ContractLookup', 'ContractGenerate', 'IncidentLookup']).slice(0, 5).map((cmd: string) => (
                   <span key={cmd} className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-muted">{cmd}</span>
                 ))}
-                <span className="text-[10px] text-faded">+5</span>
+                {(vsCapabilities?.allowedCommands?.length ?? 0) > 5 && (
+                  <span className="text-[10px] text-faded">+{(vsCapabilities.allowedCommands.length - 5)}</span>
+                )}
               </div>
             </CardBody>
           </Card>
         </div>
       </div>
+      )}
 
       {/* Registered Clients */}
+      {!isLoading && !isError && (
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-heading mb-3">{t('aiHub.ideRegisteredClients')}</h2>
         <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -223,20 +350,18 @@ export function IdeIntegrationsPage() {
             </Card>
           ))}
           {filteredClients.length === 0 && (
-            <Card>
-              <CardBody>
-                <p className="text-center text-muted py-8">{t('aiHub.ideNoClientsFound')}</p>
-              </CardBody>
-            </Card>
+            <EmptyState title={t('aiHub.ideNoClientsFound')} size="compact" />
           )}
         </div>
       </div>
+      )}
 
       {/* Capability Policies */}
+      {!isLoading && !isError && (
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-heading mb-3">{t('aiHub.ideCapabilityPolicies')}</h2>
         <div className="space-y-3">
-          {mockPolicies.map((p) => (
+          {capabilityPolicies.map((p) => (
             <Card key={p.id}>
               <CardBody>
                 <div className="flex items-start justify-between gap-4">
@@ -270,6 +395,7 @@ export function IdeIntegrationsPage() {
                       )}
                     </div>
                   </div>
+      )}
                 </div>
               </CardBody>
             </Card>

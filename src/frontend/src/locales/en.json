@@ -4047,6 +4047,113 @@
     "moduleUnavailableDescription": "This module is temporarily unavailable. Please try again later.",
     "moduleUnavailableDescriptionNamed": "The {{module}} module is temporarily unavailable. Please try again later."
   },
+  "governance": {
+    "policies": {
+      "title": "Policy Catalog",
+      "subtitle": "Enterprise governance policies derived from governance packs, rollouts and waivers.",
+      "totalPolicies": "Total policies",
+      "active": "Active",
+      "draft": "Draft",
+      "totalViolations": "Active waivers",
+      "searchPlaceholder": "Search policies…",
+      "filterAll": "All",
+      "catalogTitle": "Policies",
+      "catalogDescription": "Policies are sourced from Governance Packs and reflect current rollout/waiver state.",
+      "scope": "Scope",
+      "affectedAssets": "Affected scopes",
+      "violations": "Waivers",
+      "status": {
+        "Active": "Active",
+        "Draft": "Draft",
+        "Inactive": "Inactive",
+        "Deprecated": "Deprecated"
+      },
+      "severity": {
+        "Low": "Low",
+        "Medium": "Medium",
+        "High": "High",
+        "Critical": "Critical",
+        "Unknown": "Unknown"
+      },
+      "enforcement": {
+        "Advisory": "Advisory",
+        "SoftEnforce": "Soft enforce",
+        "HardEnforce": "Hard enforce",
+        "Unknown": "Unknown"
+      },
+      "category": {
+        "ServiceGovernance": "Service Governance",
+        "ContractGovernance": "Contract Governance",
+        "ChangeGovernance": "Change Governance",
+        "OperationalReadiness": "Operational Readiness",
+        "AiGovernance": "AI Governance",
+        "SecurityCompliance": "Security & Compliance",
+        "DocumentationStandards": "Documentation Standards"
+      }
+    },
+    "complianceTitle": "Compliance",
+    "complianceSubtitle": "Enterprise compliance derived from governance pack adoption (rollouts) and exceptions (waivers).",
+    "compliance": {
+      "overallScore": "Overall score",
+      "totalAssessed": "Packs assessed",
+      "compliant": "Compliant",
+      "partiallyCompliant": "Partially compliant",
+      "nonCompliant": "Non-compliant",
+      "rollouts": "Rollouts",
+      "pendingRollouts": "Pending rollouts",
+      "failedRollouts": "Failed rollouts",
+      "waivers": "Waivers",
+      "pendingWaivers": "Pending waivers",
+      "approvedWaivers": "Approved waivers",
+      "searchPlaceholder": "Search packs…",
+      "filterAll": "All",
+      "filterNonCompliant": "Non-compliant",
+      "filterPartially": "Partial",
+      "status": {
+        "Compliant": "Compliant",
+        "PartiallyCompliant": "Partially compliant",
+        "NonCompliant": "Non-compliant",
+        "NotApplicable": "Not applicable"
+      },
+      "gaps": "Packs requiring attention",
+      "gapsDescription": "Packs with pending waivers or failed rollouts." 
+    },
+    "riskTitle": "Risk Center",
+    "riskSubtitle": "Risk indicators derived from governance pack lifecycle, rollouts and waivers.",
+    "risk": {
+      "totalAssessed": "Packs assessed",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "searchPlaceholder": "Search packs…",
+      "filterAll": "All",
+      "filterCritical": "Critical",
+      "filterHigh": "High",
+      "filterMedium": "Medium",
+      "filterLow": "Low",
+      "serviceRiskList": "Pack risk indicators",
+      "level": {
+        "Critical": "Critical",
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low"
+      },
+      "dimension": {
+        "Waivers": "Waivers",
+        "Rollouts": "Rollouts",
+        "Lifecycle": "Lifecycle",
+        "Operational": "Operational",
+        "Change": "Change",
+        "Contract": "Contract",
+        "Dependency": "Dependency",
+        "Ownership": "Ownership",
+        "Documentation": "Documentation",
+        "IncidentRecurrence": "Incident recurrence",
+        "AiGovernance": "AI governance"
+      }
+    }
+  },
   "preview": {
     "badge": "Preview",
     "bannerTitle": "Preview",

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Route,
   Database,
@@ -17,6 +18,10 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { PageContainer } from '../../../components/shell';
+import { Loader } from '../../../components/Loader';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
+import { aiGovernanceApi } from '../api';
 
 /* ------------------------------------------------------------------ */
 /*  Tipos locais                                                       */
@@ -34,6 +39,7 @@ interface RoutingStrategy {
   allowExternalEscalation: boolean;
   isActive: boolean;
   priority: number;
+  createdAt?: string;
 }
 
 interface SourceWeight {
@@ -48,27 +54,6 @@ interface UseCaseWeights {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Dados mock                                                         */
-/* ------------------------------------------------------------------ */
-
-const mockStrategies: RoutingStrategy[] = [
-  { id: '1', name: 'Engineer Default', description: 'Internal-first routing for engineering personas', targetPersona: 'Engineer', targetUseCase: '*', targetClientType: '*', preferredPath: 'InternalOnly', maxSensitivityLevel: 3, allowExternalEscalation: false, isActive: true, priority: 1 },
-  { id: '2', name: 'Architect Advanced', description: 'Allows advanced model usage for architects when policy permits', targetPersona: 'Architect', targetUseCase: 'ContractGeneration', targetClientType: '*', preferredPath: 'InternalPreferred', maxSensitivityLevel: 4, allowExternalEscalation: true, isActive: true, priority: 2 },
-  { id: '3', name: 'Executive Summary', description: 'Cost-efficient routing for executive summaries', targetPersona: 'Executive', targetUseCase: 'ExecutiveSummary', targetClientType: 'Web', preferredPath: 'InternalOnly', maxSensitivityLevel: 2, allowExternalEscalation: false, isActive: true, priority: 1 },
-  { id: '4', name: 'Operations Incident', description: 'Enriched routing for incident investigation with full operational context', targetPersona: '*', targetUseCase: 'IncidentExplanation', targetClientType: '*', preferredPath: 'InternalPreferred', maxSensitivityLevel: 4, allowExternalEscalation: true, isActive: true, priority: 1 },
-  { id: '5', name: 'Auditor Visibility', description: 'Read-only routing with full audit trail for compliance personas', targetPersona: 'Auditor', targetUseCase: '*', targetClientType: '*', preferredPath: 'InternalOnly', maxSensitivityLevel: 2, allowExternalEscalation: false, isActive: true, priority: 3 },
-];
-
-const mockSourceWeights: UseCaseWeights[] = [
-  { useCaseType: 'ServiceLookup', sources: [{ sourceType: 'Service', weight: 60, relevance: 'Primary' }, { sourceType: 'Contract', weight: 25, relevance: 'Secondary' }, { sourceType: 'Documentation', weight: 15, relevance: 'Supplementary' }] },
-  { useCaseType: 'ContractExplanation', sources: [{ sourceType: 'Contract', weight: 55, relevance: 'Primary' }, { sourceType: 'Service', weight: 25, relevance: 'Secondary' }, { sourceType: 'SourceOfTruth', weight: 20, relevance: 'Secondary' }] },
-  { useCaseType: 'IncidentExplanation', sources: [{ sourceType: 'Incident', weight: 40, relevance: 'Primary' }, { sourceType: 'Change', weight: 25, relevance: 'Secondary' }, { sourceType: 'Runbook', weight: 20, relevance: 'Secondary' }, { sourceType: 'TelemetrySummary', weight: 15, relevance: 'Supplementary' }] },
-  { useCaseType: 'ChangeAnalysis', sources: [{ sourceType: 'Change', weight: 45, relevance: 'Primary' }, { sourceType: 'Service', weight: 25, relevance: 'Secondary' }, { sourceType: 'Incident', weight: 20, relevance: 'Secondary' }, { sourceType: 'TelemetrySummary', weight: 10, relevance: 'Supplementary' }] },
-  { useCaseType: 'ExecutiveSummary', sources: [{ sourceType: 'SourceOfTruth', weight: 40, relevance: 'Primary' }, { sourceType: 'Service', weight: 30, relevance: 'Secondary' }, { sourceType: 'TelemetrySummary', weight: 30, relevance: 'Secondary' }] },
-  { useCaseType: 'MitigationGuidance', sources: [{ sourceType: 'Runbook', weight: 40, relevance: 'Primary' }, { sourceType: 'Incident', weight: 30, relevance: 'Primary' }, { sourceType: 'Service', weight: 15, relevance: 'Secondary' }, { sourceType: 'TelemetrySummary', weight: 15, relevance: 'Supplementary' }] },
-];
-
-/* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -78,10 +63,10 @@ const pathBadgeVariant = (path: string): 'info' | 'warning' => {
   return path === 'InternalOnly' ? 'info' : 'warning';
 };
 
-const sensitivityLabel = (level: number): string => {
-  if (level <= 2) return 'Low';
-  if (level === 3) return 'Medium';
-  return 'High';
+const sensitivityLabel = (t: (key: string) => string, level: number): string => {
+  if (level <= 2) return t('aiHub.sensitivityLow');
+  if (level === 3) return t('aiHub.sensitivityMedium');
+  return t('aiHub.sensitivityHigh');
 };
 
 const sensitivityVariant = (level: number): 'success' | 'warning' | 'danger' => {
@@ -110,6 +95,85 @@ export function AiRoutingPage() {
   const [activeTab, setActiveTab] = useState<Tab>('strategies');
   const [expandedStrategy, setExpandedStrategy] = useState<string | null>(null);
 
+  const {
+    data: strategiesData,
+    isLoading: isLoadingStrategies,
+    isError: isStrategiesError,
+    refetch: refetchStrategies,
+  } = useQuery({
+    queryKey: ['ai-governance', 'routing', 'strategies'],
+    queryFn: () => aiGovernanceApi.listRoutingStrategies(),
+    staleTime: 30_000,
+  });
+
+  const {
+    data: weightsData,
+    isLoading: isLoadingWeights,
+    isError: isWeightsError,
+    refetch: refetchWeights,
+  } = useQuery({
+    queryKey: ['ai-governance', 'knowledge-sources', 'weights'],
+    queryFn: () => aiGovernanceApi.listKnowledgeSourceWeights(),
+    staleTime: 30_000,
+  });
+
+  const strategies: RoutingStrategy[] = useMemo(() => {
+    const items = (strategiesData?.items ?? []) as Array<{
+      strategyId: string;
+      name: string;
+      description: string;
+      targetPersona: string;
+      targetUseCase: string;
+      targetClientType: string;
+      preferredPath: string;
+      maxSensitivityLevel: number;
+      allowExternalEscalation: boolean;
+      isActive: boolean;
+      priority: number;
+      createdAt: string;
+    }>;
+
+    return items.map((s) => ({
+      id: s.strategyId,
+      name: s.name,
+      description: s.description,
+      targetPersona: s.targetPersona,
+      targetUseCase: s.targetUseCase,
+      targetClientType: s.targetClientType,
+      preferredPath: s.preferredPath,
+      maxSensitivityLevel: s.maxSensitivityLevel,
+      allowExternalEscalation: s.allowExternalEscalation,
+      isActive: s.isActive,
+      priority: s.priority,
+      createdAt: s.createdAt,
+    }));
+  }, [strategiesData]);
+
+  const sourceWeights: UseCaseWeights[] = useMemo(() => {
+    const items = (weightsData?.items ?? []) as Array<{
+      sourceType: string;
+      useCaseType: string;
+      relevance: 'Primary' | 'Secondary' | 'Supplementary';
+      weight: number;
+    }>;
+
+    const byUseCase = new Map<string, SourceWeight[]>();
+    for (const item of items) {
+      const list = byUseCase.get(item.useCaseType) ?? [];
+      list.push({
+        sourceType: item.sourceType,
+        relevance: item.relevance,
+        weight: item.weight,
+      });
+      byUseCase.set(item.useCaseType, list);
+    }
+
+    return Array.from(byUseCase.entries()).map(([useCaseType, sources]) => ({
+      useCaseType,
+      sources: sources.sort((a, b) => b.weight - a.weight),
+    }));
+  }, [weightsData]);
+
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'strategies', label: t('aiHub.routingStrategiesTab'), icon: <Route size={16} /> },
     { key: 'weights', label: t('aiHub.routingSourceWeightsTab'), icon: <Layers size={16} /> },
@@ -129,7 +193,7 @@ export function AiRoutingPage() {
 
   const renderStrategies = () => (
     <div className="grid grid-cols-1 gap-4">
-      {mockStrategies.map(strategy => {
+      {strategies.map(strategy => {
         const isExpanded = expandedStrategy === strategy.id;
         return (
           <Card key={strategy.id}>
@@ -150,7 +214,7 @@ export function AiRoutingPage() {
                         {strategy.preferredPath}
                       </Badge>
                       <Badge variant={sensitivityVariant(strategy.maxSensitivityLevel)}>
-                        {t('aiHub.routingSensitivity')}: {sensitivityLabel(strategy.maxSensitivityLevel)}
+                        {t('aiHub.routingSensitivity')}: {sensitivityLabel(t, strategy.maxSensitivityLevel)}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted">{strategy.description}</p>
@@ -189,7 +253,7 @@ export function AiRoutingPage() {
                   <div>
                     <span className="text-muted">{t('aiHub.routingSensitivity')}</span>
                     <p className="text-body font-medium mt-0.5">
-                      {strategy.maxSensitivityLevel} — {sensitivityLabel(strategy.maxSensitivityLevel)}
+                      {strategy.maxSensitivityLevel} — {sensitivityLabel(t, strategy.maxSensitivityLevel)}
                     </p>
                   </div>
                   <div>
@@ -221,7 +285,7 @@ export function AiRoutingPage() {
 
   const renderSourceWeights = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {mockSourceWeights.map(uc => (
+      {sourceWeights.map(uc => (
         <Card key={uc.useCaseType}>
           <CardBody>
             <div className="flex items-center gap-3 mb-4">
@@ -307,28 +371,28 @@ export function AiRoutingPage() {
         <div className="flex items-center gap-3 rounded-lg border border-edge bg-card px-4 py-3">
           <Route size={18} className="text-accent" />
           <div>
-            <p className="text-lg font-bold text-heading">{mockStrategies.length}</p>
+            <p className="text-lg font-bold text-heading">{strategies.length}</p>
             <p className="text-xs text-muted">{t('aiHub.routingStrategiesTab')}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-edge bg-card px-4 py-3">
           <CheckCircle2 size={18} className="text-success" />
           <div>
-            <p className="text-lg font-bold text-heading">{mockStrategies.filter(s => s.isActive).length}</p>
+            <p className="text-lg font-bold text-heading">{strategies.filter(s => s.isActive).length}</p>
             <p className="text-xs text-muted">{t('aiHub.routingActive')}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-edge bg-card px-4 py-3">
           <AlertTriangle size={18} className="text-warning" />
           <div>
-            <p className="text-lg font-bold text-heading">{mockStrategies.filter(s => s.allowExternalEscalation).length}</p>
+            <p className="text-lg font-bold text-heading">{strategies.filter(s => s.allowExternalEscalation).length}</p>
             <p className="text-xs text-muted">{t('aiHub.routingEscalationAllowed')}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 rounded-lg border border-edge bg-card px-4 py-3">
           <Cpu size={18} className="text-info" />
           <div>
-            <p className="text-lg font-bold text-heading">{mockSourceWeights.length}</p>
+            <p className="text-lg font-bold text-heading">{sourceWeights.length}</p>
             <p className="text-xs text-muted">{t('aiHub.routingSourceWeightsTitle')}</p>
           </div>
         </div>
@@ -353,7 +417,46 @@ export function AiRoutingPage() {
       </div>
 
       {/* Tab content */}
-      {activeTab === 'strategies' ? renderStrategies() : renderSourceWeights()}
+      {(isLoadingStrategies || isLoadingWeights) && (
+        <Card>
+          <CardBody className="flex justify-center py-16">
+            <Loader size="lg" />
+          </CardBody>
+        </Card>
+      )}
+
+      {(isStrategiesError || isWeightsError) && (
+        <PageErrorState
+          action={(
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                refetchStrategies();
+                refetchWeights();
+              }}
+            >
+              {t('common.retry', 'Retry')}
+            </Button>
+          )}
+        />
+      )}
+
+      {!isLoadingStrategies && !isLoadingWeights && !isStrategiesError && !isWeightsError && (
+        activeTab === 'strategies'
+          ? (strategies.length > 0 ? renderStrategies() : (
+            <EmptyState
+              title={t('aiHub.noRoutingStrategiesFound', 'No routing strategies found')}
+              size="compact"
+            />
+          ))
+          : (sourceWeights.length > 0 ? renderSourceWeights() : (
+            <EmptyState
+              title={t('aiHub.noRoutingWeightsFound', 'No source weights found')}
+              size="compact"
+            />
+          ))
+      )}
     </PageContainer>
   );
 }
