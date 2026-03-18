@@ -46,6 +46,11 @@ public static class DependencyInjection
         services.AddScoped<IAiIdeCapabilityPolicyRepository, AiIdeCapabilityPolicyRepository>();
         services.AddScoped<IAiRoutingDecisionRepository, AiRoutingDecisionRepository>();
         services.AddScoped<IAiRoutingStrategyRepository, AiRoutingStrategyRepository>();
+        services.AddScoped<IAiProviderRepository, AiProviderRepository>();
+        services.AddScoped<IAiSourceRepository, AiSourceRepository>();
+        services.AddScoped<IAiTokenQuotaPolicyRepository, AiTokenQuotaPolicyRepository>();
+        services.AddScoped<IAiTokenUsageLedgerRepository, AiTokenUsageLedgerRepository>();
+        services.AddScoped<IAiExternalInferenceRecordRepository, AiExternalInferenceRecordRepository>();
 
         return services;
     }

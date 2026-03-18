@@ -45,6 +45,17 @@ public static class DependencyInjection
         // Health — scoped (depends on scoped factory)
         services.AddScoped<IAiProviderHealthService, AiProviderHealthService>();
 
+        // Token quota — scoped (depends on scoped repositories)
+        services.AddScoped<IAiTokenQuotaService, AiTokenQuotaService>();
+
+        // Source registry — scoped (depends on scoped repository)
+        services.AddScoped<IAiSourceRegistryService, AiSourceRegistryService>();
+
+        // Retrieval services — scoped (foundation for RAG, database grounding and telemetry)
+        services.AddScoped<IDocumentRetrievalService, DocumentRetrievalService>();
+        services.AddScoped<IDatabaseRetrievalService, DatabaseRetrievalService>();
+        services.AddScoped<ITelemetryRetrievalService, TelemetryRetrievalService>();
+
         return services;
     }
 }

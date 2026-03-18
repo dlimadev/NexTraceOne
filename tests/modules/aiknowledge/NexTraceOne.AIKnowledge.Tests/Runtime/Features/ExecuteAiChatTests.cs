@@ -111,7 +111,7 @@ public sealed class ExecuteAiChatTests
         await handler.Handle(CreateCommand(), CancellationToken.None);
 
         await _usageRepo.Received(1).AddAsync(
-            Arg.Is<Domain.Governance.Entities.AIUsageEntry>(u =>
+            Arg.Is<AIUsageEntry>(u =>
                 u.ModelName == "llama3" && u.PromptTokens == 5 && u.CompletionTokens == 15),
             Arg.Any<CancellationToken>());
     }
