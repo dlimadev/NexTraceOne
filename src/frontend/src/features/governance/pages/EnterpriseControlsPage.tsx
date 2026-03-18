@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Layers, ShieldCheck, TrendingUp, TrendingDown, Minus, AlertTriangle,
-  FileText, Globe, Zap, Bot, BookOpen, Users,
+  FileText, Globe, Zap, Bot, BookOpen, Users, Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -12,55 +12,7 @@ import type {
   ControlDimensionDto, ControlsSummaryResponse, ControlDimensionType,
   MaturityLevelType, GovernanceTrendDirection,
 } from '../../../types';
-
-/**
- * Dados simulados de controles enterprise — alinhados com o backend GetControlsSummary.
- * Em produção, virão da API /api/v1/controls/summary.
- */
-const mockControls: ControlsSummaryResponse = {
-  overallCoverage: 78.5,
-  overallMaturity: 'Defined',
-  totalDimensions: 7,
-  criticalGapCount: 1,
-  dimensions: [
-    {
-      dimension: 'ContractGovernance', coveragePercent: 83.3, totalAssessed: 42, gapCount: 7,
-      maturity: 'Defined', trend: 'Improving',
-      summary: 'Contract governance coverage is strong but 7 services lack proper contract definitions',
-    },
-    {
-      dimension: 'SourceOfTruthCompleteness', coveragePercent: 72.5, totalAssessed: 42, gapCount: 12,
-      maturity: 'Developing', trend: 'Improving',
-      summary: 'Source of truth completeness improving; documentation and runbook gaps remain',
-    },
-    {
-      dimension: 'ChangeGovernance', coveragePercent: 91.2, totalAssessed: 156, gapCount: 3,
-      maturity: 'Managed', trend: 'Stable',
-      summary: 'Change governance is mature with high validation coverage',
-    },
-    {
-      dimension: 'IncidentMitigationEvidence', coveragePercent: 67.8, totalAssessed: 34, gapCount: 8,
-      maturity: 'Developing', trend: 'Improving',
-      summary: 'Mitigation evidence coverage growing but post-mortem discipline needs improvement',
-    },
-    {
-      dimension: 'AiGovernance', coveragePercent: 88.5, totalAssessed: 89, gapCount: 2,
-      maturity: 'Defined', trend: 'Stable',
-      summary: 'AI governance well-controlled through model registry and access policies',
-    },
-    {
-      dimension: 'DocumentationRunbookReadiness', coveragePercent: 55.4, totalAssessed: 42, gapCount: 19,
-      maturity: 'Developing', trend: 'Declining',
-      summary: 'Documentation and runbook coverage is below target; critical gap area',
-    },
-    {
-      dimension: 'OwnershipCoverage', coveragePercent: 90.5, totalAssessed: 42, gapCount: 4,
-      maturity: 'Managed', trend: 'Stable',
-      summary: 'Ownership coverage is high with only 4 unassigned services',
-    },
-  ],
-  generatedAt: new Date().toISOString(),
-};
+import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 const dimensionIcon = (dim: ControlDimensionType) => {
   switch (dim) {
@@ -102,13 +54,47 @@ const coverageColor = (pct: number): string => {
 
 /**
  * Página de Enterprise Controls — visão consolidada de controles enterprise por dimensão.
+ * Dados reais derivados de Governance Packs, Rollouts e Waivers por categoria.
  * Parte do módulo Governance do NexTraceOne.
  */
 export function EnterpriseControlsPage() {
   const { t } = useTranslation();
-  const d = mockControls;
+  const [data, setData] = useState<ControlsSummaryResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const overallColor = d.overallCoverage >= 80 ? 'text-success' : d.overallCoverage >= 60 ? 'text-amber-400' : 'text-critical';
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    organizationGovernanceApi.getControlsSummary()
+      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, [t]);
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-accent" />
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <AlertTriangle size={32} className="text-critical mb-2" />
+          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  const overallColor = data.overallCoverage >= 80 ? 'text-success' : data.overallCoverage >= 60 ? 'text-amber-400' : 'text-critical';
 
   return (
     <PageContainer>
@@ -122,16 +108,16 @@ export function EnterpriseControlsPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
           <p className="text-xs text-muted mb-1">{t('governance.controls.overallCoverage')}</p>
-          <p className={`text-4xl font-bold ${overallColor}`}>{d.overallCoverage}%</p>
+          <p className={`text-4xl font-bold ${overallColor}`}>{data.overallCoverage}%</p>
         </div>
-        <StatCard title={t('governance.controls.overallMaturity')} value={t(`governance.maturity.${d.overallMaturity}`)} icon={<ShieldCheck size={20} />} color="text-accent" />
-        <StatCard title={t('governance.controls.totalDimensions')} value={d.totalDimensions} icon={<Layers size={20} />} color="text-accent" />
-        <StatCard title={t('governance.controls.criticalGaps')} value={d.criticalGapCount} icon={<AlertTriangle size={20} />} color="text-critical" />
+        <StatCard title={t('governance.controls.overallMaturity')} value={t(`governance.maturity.${data.overallMaturity}`)} icon={<ShieldCheck size={20} />} color="text-accent" />
+        <StatCard title={t('governance.controls.totalDimensions')} value={data.totalDimensions} icon={<Layers size={20} />} color="text-accent" />
+        <StatCard title={t('governance.controls.criticalGaps')} value={data.criticalGapCount} icon={<AlertTriangle size={20} />} color="text-critical" />
       </div>
 
       {/* Dimension Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-        {d.dimensions.map(dim => (
+        {data.dimensions.map(dim => (
           <Card key={dim.dimension}>
             <CardBody>
               <div className="flex items-start gap-3">
@@ -196,7 +182,7 @@ export function EnterpriseControlsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
-                {d.dimensions.map(dim => (
+                {data.dimensions.map(dim => (
                   <tr key={dim.dimension} className="hover:bg-hover transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">

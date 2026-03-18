@@ -98,6 +98,10 @@ export function PackSimulationPage() {
         <p className="text-muted mt-1">
           {t('governancePacks.simulation.subtitle', { packName: sim.packName })}
         </p>
+        <div className="flex items-center gap-2 mt-2">
+          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
+          <span className="text-xs text-muted">{t('governance.preview.simulationReason')}</span>
+        </div>
       </div>
 
       {/* Summary stats */}

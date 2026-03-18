@@ -1,76 +1,117 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetRiskHeatmap;
 
 /// <summary>
-/// Feature: GetRiskHeatmap — heatmap de risco multidimensional por domínio, equipa ou criticidade.
-/// Permite visualização de concentração de risco com explicação contextual por célula.
+/// Feature: GetRiskHeatmap — heatmap de risco por categoria de Governance Pack.
+/// Cada célula representa uma categoria de pack com risk score derivado de rollouts e waivers reais.
+/// Dimensões cross-module (incidentes, regressões) retornam 0 — não disponíveis neste módulo.
 /// </summary>
 public static class GetRiskHeatmap
 {
-    /// <summary>Query de heatmap de risco. Dimensão: domain, team ou serviceCriticality.</summary>
+    /// <summary>Query de heatmap de risco. Dimensão: category (padrão) ou team/domain.</summary>
     public sealed record Query(
         string? Dimension = null) : IQuery<Response>;
 
-    /// <summary>Handler que computa as células do heatmap de risco.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>
+    /// Handler que computa células do heatmap de risco a partir de dados reais de Governance Packs,
+    /// Rollouts e Waivers. Cada categoria de pack gera uma célula com risk score real.
+    /// </summary>
+    public sealed class Handler(
+        IGovernancePackRepository packRepository,
+        IGovernanceWaiverRepository waiverRepository,
+        IGovernanceRolloutRecordRepository rolloutRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var dimension = request.Dimension ?? "domain";
+            var dimension = request.Dimension ?? "category";
 
-            var cells = new List<RiskHeatmapCellDto>
-            {
-                new("domain-commerce", "Commerce", RiskLevel.Critical, 92.0m,
-                    Incidents: 5, ChangeFailures: 3, ReliabilityDegradation: true,
-                    ContractGaps: 2, DocumentationGaps: 3, RunbookGaps: 4,
-                    DependencyFragility: 2, RegressionCount: 3,
-                    "Service degradation in Order Processor with frequent rollbacks and recurring incidents"),
-                new("domain-payments", "Payments", RiskLevel.High, 74.5m,
-                    Incidents: 3, ChangeFailures: 2, ReliabilityDegradation: false,
-                    ContractGaps: 1, DocumentationGaps: 2, RunbookGaps: 3,
-                    DependencyFragility: 1, RegressionCount: 2,
-                    "Recurring timeout incidents and failed deployments in Payment API"),
-                new("domain-integration", "Integration", RiskLevel.High, 71.0m,
-                    Incidents: 2, ChangeFailures: 1, ReliabilityDegradation: false,
-                    ContractGaps: 4, DocumentationGaps: 5, RunbookGaps: 4,
-                    DependencyFragility: 3, RegressionCount: 1,
-                    "Legacy adapters with no contracts, documentation or runbooks"),
-                new("domain-identity", "Identity", RiskLevel.Medium, 48.0m,
-                    Incidents: 1, ChangeFailures: 0, ReliabilityDegradation: false,
-                    ContractGaps: 1, DocumentationGaps: 1, RunbookGaps: 2,
-                    DependencyFragility: 0, RegressionCount: 0,
-                    "Missing runbook for User Service, contract version outdated"),
-                new("domain-analytics", "Analytics", RiskLevel.Medium, 45.5m,
-                    Incidents: 1, ChangeFailures: 1, ReliabilityDegradation: false,
-                    ContractGaps: 1, DocumentationGaps: 2, RunbookGaps: 2,
-                    DependencyFragility: 1, RegressionCount: 1,
-                    "Reporting engine with outdated contract and missing runbook"),
-                new("domain-messaging", "Messaging", RiskLevel.Low, 18.0m,
-                    Incidents: 0, ChangeFailures: 0, ReliabilityDegradation: false,
-                    ContractGaps: 0, DocumentationGaps: 0, RunbookGaps: 1,
-                    DependencyFragility: 0, RegressionCount: 0,
-                    "All dependencies healthy, only minor runbook gap in Notification Hub"),
-                new("domain-security", "Security", RiskLevel.Medium, 40.0m,
-                    Incidents: 0, ChangeFailures: 0, ReliabilityDegradation: false,
-                    ContractGaps: 0, DocumentationGaps: 2, RunbookGaps: 1,
-                    DependencyFragility: 1, RegressionCount: 0,
-                    "Auth Gateway with incomplete documentation and unmapped dependencies"),
-                new("domain-platform", "Platform", RiskLevel.Low, 22.0m,
-                    Incidents: 0, ChangeFailures: 0, ReliabilityDegradation: false,
-                    ContractGaps: 1, DocumentationGaps: 0, RunbookGaps: 0,
-                    DependencyFragility: 0, RegressionCount: 0,
-                    "Minor versioning gap in Cache Manager, overall healthy")
-            };
+            var packs = await packRepository.ListAsync(category: null, status: null, ct: cancellationToken);
+            var waivers = await waiverRepository.ListAsync(packId: null, status: null, ct: cancellationToken);
+            var rollouts = await rolloutRepository.ListAsync(
+                packId: null, scopeType: null, scopeValue: null, status: null, ct: cancellationToken);
+
+            var waiversByPack = waivers.GroupBy(w => w.PackId).ToDictionary(g => g.Key, g => g.ToList());
+            var rolloutsByPack = rollouts.GroupBy(r => r.PackId).ToDictionary(g => g.Key, g => g.ToList());
+
+            // Agrupa packs por categoria e computa risk por categoria
+            var cells = packs
+                .GroupBy(p => p.Category)
+                .Select(g => BuildCell(g.Key, g.ToList(), waiversByPack, rolloutsByPack))
+                .OrderByDescending(c => c.RiskScore)
+                .ToList();
 
             var response = new Response(
                 Dimension: dimension,
                 Cells: cells,
                 GeneratedAt: DateTimeOffset.UtcNow);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
+        }
+
+        private static RiskHeatmapCellDto BuildCell(
+            GovernanceRuleCategory category,
+            IReadOnlyList<GovernancePack> categoryPacks,
+            IReadOnlyDictionary<GovernancePackId, List<GovernanceWaiver>> waiversByPack,
+            IReadOnlyDictionary<GovernancePackId, List<GovernanceRolloutRecord>> rolloutsByPack)
+        {
+            var totalPacks = categoryPacks.Count;
+            var failedRollouts = 0;
+            var pendingWaivers = 0;
+            var approvedWaivers = 0;
+            var draftPacks = 0;
+            var hasReliabilityIssue = false;
+
+            foreach (var pack in categoryPacks)
+            {
+                rolloutsByPack.TryGetValue(pack.Id, out var pr);
+                waiversByPack.TryGetValue(pack.Id, out var pw);
+
+                failedRollouts += (pr ?? []).Count(r => r.Status == RolloutStatus.Failed);
+                pendingWaivers += (pw ?? []).Count(w => w.Status == WaiverStatus.Pending);
+                approvedWaivers += (pw ?? []).Count(w => w.Status == WaiverStatus.Approved);
+
+                if (pack.Status == GovernancePackStatus.Draft) draftPacks++;
+                if ((pr ?? []).Any(r => r.Status == RolloutStatus.Failed)) hasReliabilityIssue = true;
+            }
+
+            // Risk score: 0-100, baseado em falhas reais de rollout e waivers pendentes
+            var riskScore = Math.Min(100m, (failedRollouts * 30m) + (pendingWaivers * 15m) + (draftPacks * 5m));
+
+            var riskLevel = failedRollouts > 0
+                ? RiskLevel.Critical
+                : pendingWaivers > 1
+                    ? RiskLevel.High
+                    : pendingWaivers > 0 || draftPacks > 0
+                        ? RiskLevel.Medium
+                        : RiskLevel.Low;
+
+            var explanation = failedRollouts > 0
+                ? $"{failedRollouts} failed rollout(s) in {category} packs require immediate action"
+                : pendingWaivers > 0
+                    ? $"{pendingWaivers} pending waiver(s) for {category} packs awaiting approval"
+                    : draftPacks > 0
+                        ? $"{draftPacks} {category} pack(s) still in draft — not yet published"
+                        : $"All {totalPacks} {category} pack(s) are in healthy state";
+
+            return new RiskHeatmapCellDto(
+                GroupId: $"cat-{category.ToString().ToLowerInvariant()}",
+                GroupName: category.ToString(),
+                RiskLevel: riskLevel,
+                RiskScore: riskScore,
+                Incidents: 0,           // cross-module — não disponível neste módulo
+                ChangeFailures: failedRollouts,
+                ReliabilityDegradation: hasReliabilityIssue,
+                ContractGaps: category == GovernanceRuleCategory.Contracts ? pendingWaivers : 0,
+                DocumentationGaps: category == GovernanceRuleCategory.SourceOfTruth ? pendingWaivers : 0,
+                RunbookGaps: category == GovernanceRuleCategory.Operations ? pendingWaivers : 0,
+                DependencyFragility: 0, // cross-module — não disponível neste módulo
+                RegressionCount: 0,     // cross-module — não disponível neste módulo
+                Explanation: explanation);
         }
     }
 
