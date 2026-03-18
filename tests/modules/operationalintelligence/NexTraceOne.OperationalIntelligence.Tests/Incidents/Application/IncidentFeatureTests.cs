@@ -1,4 +1,5 @@
 using FluentAssertions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
@@ -20,6 +21,18 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 public sealed class IncidentFeatureTests
 {
     private readonly InMemoryIncidentStore _store = new();
+
+    /// <summary>
+    /// Stub de IIncidentCorrelationService que retorna null (sem correlação).
+    /// Permite que os handlers usem o fallback de leitura do store.
+    /// </summary>
+    private sealed class NullCorrelationService : IIncidentCorrelationService
+    {
+        public Task<GetIncidentCorrelation.Response?> RecomputeAsync(string incidentId, CancellationToken cancellationToken)
+            => Task.FromResult<GetIncidentCorrelation.Response?>(null);
+    }
+
+    private readonly NullCorrelationService _correlationService = new();
 
     // ── ListIncidents ────────────────────────────────────────────────
 
@@ -111,7 +124,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentDetail_KnownIncident_ShouldReturnDetail()
     {
-        var handler = new GetIncidentDetail.Handler(_store);
+        var handler = new GetIncidentDetail.Handler(_store, _correlationService);
         var query = new GetIncidentDetail.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -130,7 +143,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentDetail_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new GetIncidentDetail.Handler(_store);
+        var handler = new GetIncidentDetail.Handler(_store, _correlationService);
         var query = new GetIncidentDetail.Query("nonexistent-incident-id");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -155,7 +168,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentCorrelation_KnownIncident_ShouldReturnCorrelation()
     {
-        var handler = new GetIncidentCorrelation.Handler(_store);
+        var handler = new GetIncidentCorrelation.Handler(_store, _correlationService);
         var query = new GetIncidentCorrelation.Query("a1b2c3d4-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
