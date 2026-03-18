@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { useAuth } from '../../../contexts/AuthContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
@@ -179,10 +181,7 @@ export function ChangeDetailPage() {
         </Link>
         <Card>
           <CardBody>
-            <div className="flex items-center justify-center gap-2 py-12 text-muted">
-              <Loader2 size={20} className="animate-spin" />
-              {t('common.loading')}
-            </div>
+            <PageLoadingState />
           </CardBody>
         </Card>
       </PageContainer>
@@ -191,12 +190,15 @@ export function ChangeDetailPage() {
 
   if (changeQuery.isError || !change) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
-        <p className="text-critical">{t('common.error')}</p>
-        <Link to="/changes" className="text-accent hover:underline text-sm mt-2 inline-block">
-          {t('changeConfidence.detail.backToCatalog')}
-        </Link>
-      </div>
+      <PageContainer>
+        <PageErrorState
+          action={
+            <Link to="/changes" className="text-sm text-accent hover:underline">
+              {t('changeConfidence.detail.backToCatalog')}
+            </Link>
+          }
+        />
+      </PageContainer>
     );
   }
 

@@ -42,7 +42,7 @@ public sealed class WorkflowDbContext(
 
     /// <inheritdoc />
     protected override string? ConfigurationsNamespace
-        => "NexTraceOne.Workflow.Infrastructure";
+        => "NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Configurations";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

@@ -108,7 +108,7 @@ export const identityApi = {
       })
       .then((r) => r.data),
 
-  createUser: (data: { email: string; firstName: string; lastName: string; tenantId: string }) =>
+  createUser: (data: { email: string; firstName: string; lastName: string; tenantId: string; roleId: string }) =>
     client.post<{ id: string }>('/identity/users', data).then((r) => r.data),
 
   assignRole: (userId: string, tenantId: string, roleId: string) =>

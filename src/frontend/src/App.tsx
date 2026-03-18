@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { AppShell } from './components/shell/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PreviewGate } from './components/PreviewGate';
 
 // Eager imports — critical for fast first paint
 import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, ActivationPage, MfaPage, InvitationPage } from './features/identity-access';
@@ -29,6 +30,7 @@ const DeveloperPortalPage = lazy(() => import('./features/catalog/pages/Develope
 const ContractCatalogPage = lazy(() => import('./features/contracts/catalog/ContractCatalogPage').then(m => ({ default: m.ContractCatalogPage })));
 const CreateServicePage = lazy(() => import('./features/contracts/create/CreateServicePage').then(m => ({ default: m.CreateServicePage })));
 const ContractWorkspacePage = lazy(() => import('./features/contracts/workspace/ContractWorkspacePage').then(m => ({ default: m.ContractWorkspacePage })));
+const DraftStudioPage = lazy(() => import('./features/contracts/studio/DraftStudioPage').then(m => ({ default: m.DraftStudioPage })));
 const ContractPortalPage = lazy(() => import('./features/contracts/portal/ContractPortalPage').then(m => ({ default: m.ContractPortalPage })));
 const ContractGovernancePage = lazy(() => import('./features/contracts/governance/ContractGovernancePage').then(m => ({ default: m.ContractGovernancePage })));
 const SpectralRulesetManagerPage = lazy(() => import('./features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
@@ -185,15 +187,36 @@ export default function App() {
                 }
               />
               {/* ── Services ── */}
-              <Route path="/services" element={<ServiceCatalogListPage />} />
-              <Route path="/services/graph" element={<ServiceCatalogPage />} />
-              <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
+              <Route
+                path="/services"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ServiceCatalogListPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/services/graph"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ServiceCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/services/:serviceId"
+                element={
+                  <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+                    <ServiceDetailPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/graph" element={<Navigate to="/services/graph" replace />} />
               <Route
                 path="/portal"
                 element={
                   <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
-                    <DeveloperPortalPage />
+                    <PreviewGate><DeveloperPortalPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -214,6 +237,15 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Draft studio — edição de draft após criação */}
+              <Route
+                path="/contracts/studio/:draftId"
+                element={
+                  <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+                    <DraftStudioPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* Legacy redirects — preservados para evitar bookmarks quebrados */}
               <Route path="/contracts/studio" element={<Navigate to="/contracts" replace />} />
               <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
@@ -229,7 +261,7 @@ export default function App() {
                 path="/contracts/spectral"
                 element={
                   <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-                    <SpectralRulesetManagerPage />
+                    <PreviewGate><SpectralRulesetManagerPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -237,7 +269,7 @@ export default function App() {
                 path="/contracts/canonical"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <CanonicalEntityCatalogPage />
+                    <PreviewGate><CanonicalEntityCatalogPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -274,9 +306,30 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/releases" element={<ReleasesPage />} />
-              <Route path="/workflow" element={<WorkflowPage />} />
-              <Route path="/promotion" element={<PromotionPage />} />
+              <Route
+                path="/releases"
+                element={
+                  <ProtectedRoute permission="change-intelligence:releases:read" redirectTo="/unauthorized">
+                    <ReleasesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/workflow"
+                element={
+                  <ProtectedRoute permission="workflow:read" redirectTo="/unauthorized">
+                    <WorkflowPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/promotion"
+                element={
+                  <ProtectedRoute permission="promotion:read" redirectTo="/unauthorized">
+                    <PromotionPage />
+                  </ProtectedRoute>
+                }
+              />
               {/* ── Operations ── */}
               <Route
                 path="/operations/incidents"
@@ -294,12 +347,19 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/operations/runbooks" element={<RunbooksPage />} />
+              <Route
+                path="/operations/runbooks"
+                element={
+                  <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+                    <RunbooksPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/operations/reliability"
                 element={
                   <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
-                    <TeamReliabilityPage />
+                    <PreviewGate><TeamReliabilityPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -307,7 +367,7 @@ export default function App() {
                 path="/operations/reliability/:serviceId"
                 element={
                   <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
-                    <ServiceReliabilityDetailPage />
+                    <PreviewGate><ServiceReliabilityDetailPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -315,7 +375,7 @@ export default function App() {
                 path="/operations/automation"
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
-                    <AutomationWorkflowsPage />
+                    <PreviewGate><AutomationWorkflowsPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -323,7 +383,7 @@ export default function App() {
                 path="/operations/automation/admin"
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
-                    <AutomationAdminPage />
+                    <PreviewGate><AutomationAdminPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -331,35 +391,35 @@ export default function App() {
                 path="/operations/automation/:workflowId"
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
-                    <AutomationWorkflowDetailPage />
+                    <PreviewGate><AutomationWorkflowDetailPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
               {/* ── AI Hub ── */}
               <Route path="/ai/assistant" element={<AiAssistantPage />} />
-              <Route path="/ai/models" element={<ModelRegistryPage />} />
-              <Route path="/ai/policies" element={<AiPoliciesPage />} />
-              <Route path="/ai/ide" element={<IdeIntegrationsPage />} />
-              <Route path="/ai/routing" element={<AiRoutingPage />} />
+              <Route path="/ai/models" element={<PreviewGate><ModelRegistryPage /></PreviewGate>} />
+              <Route path="/ai/policies" element={<PreviewGate><AiPoliciesPage /></PreviewGate>} />
+              <Route path="/ai/ide" element={<PreviewGate><IdeIntegrationsPage /></PreviewGate>} />
+              <Route path="/ai/routing" element={<PreviewGate><AiRoutingPage /></PreviewGate>} />
               {/* ── Governance ── */}
-              <Route path="/governance/reports" element={<ReportsPage />} />
-              <Route path="/governance/risk" element={<RiskCenterPage />} />
-              <Route path="/governance/compliance" element={<CompliancePage />} />
-              <Route path="/governance/finops" element={<FinOpsPage />} />
-              <Route path="/governance/finops/services/:serviceId" element={<ServiceFinOpsPage />} />
-              <Route path="/governance/finops/teams/:teamId" element={<TeamFinOpsPage />} />
-              <Route path="/governance/finops/domains/:domainId" element={<DomainFinOpsPage />} />
-              <Route path="/governance/finops/executive" element={<ExecutiveFinOpsPage />} />
-              <Route path="/governance/executive" element={<ExecutiveOverviewPage />} />
-              <Route path="/governance/executive/heatmap" element={<RiskHeatmapPage />} />
-              <Route path="/governance/executive/maturity" element={<MaturityScorecardsPage />} />
-              <Route path="/governance/executive/benchmarking" element={<BenchmarkingPage />} />
-              <Route path="/governance/executive/drilldown/:entityType/:entityId" element={<ExecutiveDrillDownPage />} />
+              <Route path="/governance/reports" element={<PreviewGate><ReportsPage /></PreviewGate>} />
+              <Route path="/governance/risk" element={<PreviewGate><RiskCenterPage /></PreviewGate>} />
+              <Route path="/governance/compliance" element={<PreviewGate><CompliancePage /></PreviewGate>} />
+              <Route path="/governance/finops" element={<PreviewGate><FinOpsPage /></PreviewGate>} />
+              <Route path="/governance/finops/services/:serviceId" element={<PreviewGate><ServiceFinOpsPage /></PreviewGate>} />
+              <Route path="/governance/finops/teams/:teamId" element={<PreviewGate><TeamFinOpsPage /></PreviewGate>} />
+              <Route path="/governance/finops/domains/:domainId" element={<PreviewGate><DomainFinOpsPage /></PreviewGate>} />
+              <Route path="/governance/finops/executive" element={<PreviewGate><ExecutiveFinOpsPage /></PreviewGate>} />
+              <Route path="/governance/executive" element={<PreviewGate><ExecutiveOverviewPage /></PreviewGate>} />
+              <Route path="/governance/executive/heatmap" element={<PreviewGate><RiskHeatmapPage /></PreviewGate>} />
+              <Route path="/governance/executive/maturity" element={<PreviewGate><MaturityScorecardsPage /></PreviewGate>} />
+              <Route path="/governance/executive/benchmarking" element={<PreviewGate><BenchmarkingPage /></PreviewGate>} />
+              <Route path="/governance/executive/drilldown/:entityType/:entityId" element={<PreviewGate><ExecutiveDrillDownPage /></PreviewGate>} />
               <Route
                 path="/governance/policies"
                 element={
                   <ProtectedRoute permission="governance:policies:read" redirectTo="/unauthorized">
-                    <PolicyCatalogPage />
+                    <PreviewGate><PolicyCatalogPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -367,7 +427,7 @@ export default function App() {
                 path="/governance/evidence"
                 element={
                   <ProtectedRoute permission="governance:evidence:read" redirectTo="/unauthorized">
-                    <EvidencePackagesPage />
+                    <PreviewGate><EvidencePackagesPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -375,7 +435,7 @@ export default function App() {
                 path="/governance/controls"
                 element={
                   <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
-                    <EnterpriseControlsPage />
+                    <PreviewGate><EnterpriseControlsPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -384,7 +444,7 @@ export default function App() {
                 path="/governance/packs"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <GovernancePacksOverviewPage />
+                    <PreviewGate><GovernancePacksOverviewPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -392,7 +452,7 @@ export default function App() {
                 path="/governance/packs/:packId"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <GovernancePackDetailPage />
+                    <PreviewGate><GovernancePackDetailPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -400,7 +460,7 @@ export default function App() {
                 path="/governance/packs/:packId/simulate"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <PackSimulationPage />
+                    <PreviewGate><PackSimulationPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -408,7 +468,7 @@ export default function App() {
                 path="/governance/waivers"
                 element={
                   <ProtectedRoute permission="governance:waivers:read" redirectTo="/unauthorized">
-                    <WaiversPage />
+                    <PreviewGate><WaiversPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -417,7 +477,7 @@ export default function App() {
                 path="/governance/teams"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <TeamsOverviewPage />
+                    <PreviewGate><TeamsOverviewPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -425,7 +485,7 @@ export default function App() {
                 path="/governance/teams/:teamId"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <TeamDetailPage />
+                    <PreviewGate><TeamDetailPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -433,7 +493,7 @@ export default function App() {
                 path="/governance/domains"
                 element={
                   <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
-                    <DomainsOverviewPage />
+                    <PreviewGate><DomainsOverviewPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -441,7 +501,7 @@ export default function App() {
                 path="/governance/domains/:domainId"
                 element={
                   <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
-                    <DomainDetailPage />
+                    <PreviewGate><DomainDetailPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -449,7 +509,7 @@ export default function App() {
                 path="/governance/delegated-admin"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <DelegatedAdminPage />
+                    <PreviewGate><DelegatedAdminPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -458,7 +518,7 @@ export default function App() {
                 path="/integrations"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <IntegrationHubPage />
+                    <PreviewGate><IntegrationHubPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -466,7 +526,7 @@ export default function App() {
                 path="/integrations/connectors/:connectorId"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <ConnectorDetailPage />
+                    <PreviewGate><ConnectorDetailPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -474,7 +534,7 @@ export default function App() {
                 path="/integrations/executions"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <IngestionExecutionsPage />
+                    <PreviewGate><IngestionExecutionsPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -482,7 +542,7 @@ export default function App() {
                 path="/integrations/freshness"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <IngestionFreshnessPage />
+                    <PreviewGate><IngestionFreshnessPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -550,7 +610,7 @@ export default function App() {
                 path="/analytics"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <ProductAnalyticsOverviewPage />
+                    <PreviewGate><ProductAnalyticsOverviewPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -558,7 +618,7 @@ export default function App() {
                 path="/analytics/adoption"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <ModuleAdoptionPage />
+                    <PreviewGate><ModuleAdoptionPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -566,7 +626,7 @@ export default function App() {
                 path="/analytics/personas"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <PersonaUsagePage />
+                    <PreviewGate><PersonaUsagePage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -574,7 +634,7 @@ export default function App() {
                 path="/analytics/journeys"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <JourneyFunnelPage />
+                    <PreviewGate><JourneyFunnelPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />
@@ -582,7 +642,7 @@ export default function App() {
                 path="/analytics/value"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <ValueTrackingPage />
+                    <PreviewGate><ValueTrackingPage /></PreviewGate>
                   </ProtectedRoute>
                 }
               />

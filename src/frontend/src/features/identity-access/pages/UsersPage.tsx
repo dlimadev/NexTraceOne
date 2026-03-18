@@ -5,6 +5,7 @@ import { Plus, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import { PageContainer, PageSection } from '../../../components/shell';
@@ -23,7 +24,12 @@ export function UsersPage() {
   const { tenantId: authTenantId } = useAuth();
   const tenantId = authTenantId ?? '';
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ email: '', firstName: '', lastName: '', tenantId });
+  const [form, setForm] = useState({ email: '', firstName: '', lastName: '', tenantId, roleId: '' });
+
+  const { data: roles } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => identityApi.listRoles(),
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ['users', tenantId],
@@ -36,7 +42,7 @@ export function UsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setShowForm(false);
-      setForm({ email: '', firstName: '', lastName: '', tenantId });
+      setForm({ email: '', firstName: '', lastName: '', tenantId, roleId: '' });
     },
   });
 
@@ -98,6 +104,20 @@ export function UsersPage() {
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('users.role')}</label>
+                <select
+                  value={form.roleId}
+                  onChange={(e) => setForm((f) => ({ ...f, roleId: e.target.value }))}
+                  required
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                >
+                  <option value="">{t('users.selectRole')}</option>
+                  {roles?.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
               <div className="col-span-3 flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>{t('common.cancel')}</Button>
                 <Button type="submit" loading={createMutation.isPending}>{t('common.create')}</Button>
@@ -121,9 +141,7 @@ export function UsersPage() {
           {!tenantId ? (
             <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noTenantId')}</p>
           ) : isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-muted" />
-            </div>
+            <PageLoadingState />
           ) : !data?.items?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noUsersFound')}</p>
           ) : (

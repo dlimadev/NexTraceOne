@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { changeConfidenceApi } from '../api/changeConfidence';
@@ -259,15 +261,14 @@ export function ChangeCatalogPage() {
             <tbody>
               {changesQuery.isLoading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-muted">
-                    {t('common.loading')}
+                  <td colSpan={8}>
+                    <PageLoadingState size="sm" />
                   </td>
                 </tr>
               ) : changesQuery.isError ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center">
-                    <p className="text-critical font-medium">{t('common.error')}</p>
-                    <p className="text-xs text-muted mt-1">{t('common.errorDescription')}</p>
+                  <td colSpan={8}>
+                    <PageErrorState className="py-8" />
                   </td>
                 </tr>
               ) : changes.length === 0 ? (

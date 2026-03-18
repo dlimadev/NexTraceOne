@@ -363,7 +363,9 @@
     "active": "Ativo",
     "inactive": "Inativo",
     "deactivate": "Desativar",
-    "activate": "Ativar"
+    "activate": "Ativar",
+    "role": "Papel",
+    "selectRole": "Selecione um papel"
   },
   "authorization": {
     "accessDenied": "Acesso Negado",
@@ -802,7 +804,37 @@
     "violationRule": "Regra",
     "violationSeverity": "Severidade",
     "violations": "Violações",
-    "violationsTitle": "Violações de Regras"
+    "violationsTitle": "Violações de Regras",
+    "studio": {
+      "draftNotFound": "Rascunho não encontrado ou falha ao carregar.",
+      "backToCatalog": "Voltar para Contratos",
+      "tabSpec": "Especificação",
+      "tabMetadata": "Metadados",
+      "tabPreview": "Pré-visualização",
+      "submitForReview": "Submeter para Revisão",
+      "saveFailed": "Falha ao salvar alterações.",
+      "submitFailed": "Falha ao submeter para revisão.",
+      "submitSuccess": "Rascunho submetido para revisão com sucesso.",
+      "specContent": "Conteúdo da Especificação",
+      "specPlaceholder": "Cole ou escreva o conteúdo da especificação aqui...",
+      "draftTitle": "Título",
+      "draftDescription": "Descrição",
+      "proposedVersion": "Versão Proposta",
+      "contractType": "Tipo",
+      "protocol": "Protocolo",
+      "author": "Autor",
+      "createdAt": "Criado em",
+      "lastEdited": "Última edição",
+      "noContent": "Sem conteúdo de especificação ainda.",
+      "noContentHint": "Mude para a aba Especificação para adicionar conteúdo."
+    },
+    "draftStatus": {
+      "Editing": "Em Edição",
+      "InReview": "Em Revisão",
+      "Approved": "Aprovado",
+      "Rejected": "Rejeitado",
+      "Published": "Publicado"
+    }
   },
   "workflow": {
     "title": "Workflow e Aprovações",
@@ -3179,5 +3211,10 @@
     "moduleUnavailable": "Módulo Indisponível",
     "moduleUnavailableDescription": "Este módulo está temporariamente indisponível. Tente novamente mais tarde.",
     "moduleUnavailableDescriptionNamed": "O módulo {{module}} está temporariamente indisponível. Tente novamente mais tarde."
+  },
+  "preview": {
+    "badge": "Preview",
+    "bannerTitle": "Preview",
+    "bannerDescription": "Este módulo está em preview e ainda não faz parte do escopo certificado. Dados e funcionalidades podem estar incompletos."
   }
 }

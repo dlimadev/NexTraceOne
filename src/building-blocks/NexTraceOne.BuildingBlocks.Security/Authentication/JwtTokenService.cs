@@ -17,8 +17,12 @@ public sealed class JwtTokenService(
     IConfiguration configuration,
     IDateTimeProvider dateTimeProvider)
 {
-    private readonly string _issuer = configuration["Security:Jwt:Issuer"] ?? "NexTraceOne";
-    private readonly string _audience = configuration["Security:Jwt:Audience"] ?? "NexTraceOne.Clients";
+    private readonly string _issuer = configuration["Jwt:Issuer"]
+        ?? configuration["Security:Jwt:Issuer"]
+        ?? "NexTraceOne";
+    private readonly string _audience = configuration["Jwt:Audience"]
+        ?? configuration["Security:Jwt:Audience"]
+        ?? "NexTraceOne.Clients";
     // Segurança: a chave JWT DEVE ser configurada externamente em produção.
     // Em Development, permite fallback para chave conhecida — apenas para conveniência local.
     // A ausência da chave em ambientes não-Development impede a inicialização, evitando

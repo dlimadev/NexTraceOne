@@ -10,7 +10,7 @@ import { cn } from '../../lib/cn';
 import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
 
 export function AppShell() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoadingUser } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -42,6 +42,14 @@ export function AppShell() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (isLoadingUser) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-canvas">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+      </div>
+    );
   }
 
   return (

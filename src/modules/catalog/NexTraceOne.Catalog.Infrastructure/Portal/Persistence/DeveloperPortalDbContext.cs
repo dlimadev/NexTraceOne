@@ -39,7 +39,7 @@ public sealed class DeveloperPortalDbContext(
 
     /// <inheritdoc />
     protected override string? ConfigurationsNamespace
-        => "NexTraceOne.DeveloperPortal.Infrastructure";
+        => "NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Configurations";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

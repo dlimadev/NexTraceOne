@@ -134,9 +134,9 @@ app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseSecurityHeaders();
-app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseGlobalExceptionHandler();
 app.UseAuthentication();
+app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
 
 // ── Endpoints ──

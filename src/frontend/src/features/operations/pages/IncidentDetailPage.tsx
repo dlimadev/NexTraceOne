@@ -10,6 +10,8 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { PageContainer, PageSection } from '../../../components/shell';
@@ -86,10 +88,7 @@ export function IncidentDetailPage() {
         </NavLink>
         <Card>
           <CardBody>
-            <div className="flex items-center justify-center gap-2 py-12 text-muted">
-              <Loader2 size={20} className="animate-spin" />
-              {t('common.loading')}
-            </div>
+            <PageLoadingState />
           </CardBody>
         </Card>
       </PageContainer>
@@ -99,20 +98,19 @@ export function IncidentDetailPage() {
   // Error state
   if (detailQuery.isError) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
           <ArrowLeft size={14} /> {t('incidents.detail.backToList')}
         </NavLink>
         <Card>
           <CardBody>
-            <EmptyState
-              icon={<AlertTriangle size={24} />}
+            <PageErrorState
               title={t('incidents.detail.notFound')}
-              description={t('incidents.detail.notFoundDescription')}
+              message={t('incidents.detail.notFoundDescription')}
             />
           </CardBody>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -120,20 +118,19 @@ export function IncidentDetailPage() {
 
   if (!detail) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
+      <PageContainer>
         <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
           <ArrowLeft size={14} /> {t('incidents.detail.backToList')}
         </NavLink>
         <Card>
           <CardBody>
-            <EmptyState
-              icon={<AlertTriangle size={24} />}
+            <PageErrorState
               title={t('incidents.detail.notFound')}
-              description={t('incidents.detail.notFoundDescription')}
+              message={t('incidents.detail.notFoundDescription')}
             />
           </CardBody>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -438,13 +435,13 @@ export function IncidentDetailPage() {
           contextId={incidentId!}
           contextSummary={{
             name: `${identity.reference} — ${identity.title}`,
-            description: identity.description,
+            description: identity.summary,
             status: identity.status,
             additionalInfo: {
               severity: identity.severity,
               ...(ownerTeam ? { team: ownerTeam } : {}),
               ...(impactedDomain ? { domain: impactedDomain } : {}),
-              ...(correlation.primaryChangeId ? { correlatedChange: correlation.primaryChangeId } : {}),
+              ...(correlation.relatedChanges[0]?.changeId ? { correlatedChange: correlation.relatedChanges[0].changeId } : {}),
             },
           }}
           contextData={{

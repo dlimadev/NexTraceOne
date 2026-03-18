@@ -18,6 +18,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { serviceCatalogApi } from '../api';
 import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
@@ -84,25 +86,23 @@ export function ServiceDetailPage() {
   if (isLoading) {
     return (
       <PageContainer>
-        <p className="text-sm text-muted">{t('common.loading')}</p>
+        <PageLoadingState size="lg" />
       </PageContainer>
     );
   }
 
   if (isError || !service) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
-        <EmptyState
-          icon={<Server size={24} />}
-          title={t('common.error')}
-          description={t('common.noResults')}
+      <PageContainer>
+        <PageErrorState
+          message={t('common.noResults')}
           action={
             <Link to="/services" className="text-sm text-accent hover:underline">
               {t('common.back')}
             </Link>
           }
         />
-      </div>
+      </PageContainer>
     );
   }
 
@@ -456,6 +456,13 @@ export function ServiceDetailPage() {
                     {t('catalog.detail.repositoryUrl')}: {t('common.noData')}
                   </span>
                 )}
+                <Link
+                  to={`/source-of-truth/services/${serviceId}`}
+                  className="inline-flex items-center gap-2 text-accent hover:underline"
+                >
+                  <Eye size={14} />
+                  {t('catalog.detail.viewSourceOfTruth', 'Source of Truth')}
+                </Link>
               </div>
             </CardBody>
           </Card>

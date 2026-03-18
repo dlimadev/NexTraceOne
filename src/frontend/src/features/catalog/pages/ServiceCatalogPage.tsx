@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
 import { PageContainer } from '../../../components/shell';
@@ -317,10 +318,7 @@ export function ServiceCatalogPage() {
 
       {/* ── Conteúdo das abas ──────────────────────────────────────── */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <RefreshCw size={20} className="animate-spin text-muted" />
-          <span className="ml-2 text-muted">{t('common.loading')}</span>
-        </div>
+        <PageLoadingState />
       ) : (
         <>
           {/* ── Aba: Visão Operacional ──────────────────────────────── */}

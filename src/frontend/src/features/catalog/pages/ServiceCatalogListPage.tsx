@@ -16,6 +16,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { serviceCatalogApi } from '../api';
 import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../types';
@@ -276,17 +278,9 @@ export function ServiceCatalogListPage() {
           </div>
         </CardHeader>
         <CardBody className="p-0">
-          {isLoading && (
-            <div className="flex items-center justify-center py-16">
-              <p className="text-sm text-muted">{t('common.loading')}</p>
-            </div>
-          )}
+          {isLoading && <PageLoadingState />}
 
-          {isError && (
-            <div className="flex items-center justify-center py-16">
-              <p className="text-sm text-red-400">{t('common.error')}</p>
-            </div>
-          )}
+          {isError && <PageErrorState />}
 
           {!isLoading && !isError && services.length === 0 && (
             <EmptyState

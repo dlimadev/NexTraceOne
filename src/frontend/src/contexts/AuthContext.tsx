@@ -28,6 +28,7 @@ import {
  */
 interface AuthState {
   isAuthenticated: boolean;
+  isLoadingUser: boolean;
   accessToken: string | null;
   user: CurrentUserProfile | null;
   tenantId: string | null;
@@ -69,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const tenantId = getTenantId();
     return {
       isAuthenticated: !!token,
+      isLoadingUser: !!token,
       accessToken: token,
       user: null,
       tenantId,
@@ -87,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearAllTokens();
       setState({
         isAuthenticated: false,
+        isLoadingUser: false,
         accessToken: null,
         user: null,
         tenantId: null,
@@ -103,10 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hasActiveSession()) {
       identityApi.getCurrentUser().then((profile) => {
-        setState((s) => ({ ...s, user: profile }));
+        setState((s) => ({ ...s, user: profile, isLoadingUser: false }));
       }).catch(() => {
         // Se falhar ao carregar perfil, sessão pode estar inválida.
         // Não loga erro com detalhes para evitar vazamento de dados sensíveis.
+        setState((s) => ({ ...s, isLoadingUser: false }));
       });
     }
   }, []);
@@ -128,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (activeTenants.length > 1) {
       setState({
         isAuthenticated: true,
+        isLoadingUser: false,
         accessToken: data.accessToken,
         user: null,
         tenantId: null,
@@ -159,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setState({
       isAuthenticated: true,
+      isLoadingUser: false,
       accessToken: data.accessToken,
       user: profile,
       tenantId: data.user.tenantId,
@@ -195,6 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setState({
       isAuthenticated: true,
+      isLoadingUser: false,
       accessToken: response.accessToken,
       user: profile,
       tenantId: response.tenantId,
@@ -212,6 +219,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearAllTokens();
     setState({
       isAuthenticated: false,
+      isLoadingUser: false,
       accessToken: null,
       user: null,
       tenantId: null,

@@ -46,7 +46,7 @@ public sealed class ContractsDbContext(
 
     /// <inheritdoc />
     protected override string? ConfigurationsNamespace
-        => "NexTraceOne.Contracts.Infrastructure";
+        => "NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configurations";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

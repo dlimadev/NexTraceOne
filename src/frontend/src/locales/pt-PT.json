@@ -382,7 +382,9 @@
     "active": "Ativo",
     "inactive": "Inativo",
     "deactivate": "Desativar",
-    "activate": "Ativar"
+    "activate": "Ativar",
+    "role": "Função",
+    "selectRole": "Selecione uma função"
   },
   "authorization": {
     "accessDenied": "Acesso Negado",
@@ -824,7 +826,37 @@
     "violationsTitle": "Violações de Regras",
     "selectApiAsset": "Selecione um ativo de API…",
     "selectApiAssetLabel": "Ativo de API:",
-    "selectApiAssetPrompt": "Selecione um ativo de API acima para visualizar o histórico de contratos."
+    "selectApiAssetPrompt": "Selecione um ativo de API acima para visualizar o histórico de contratos.",
+    "studio": {
+      "draftNotFound": "Rascunho não encontrado ou falha ao carregar.",
+      "backToCatalog": "Voltar para Contratos",
+      "tabSpec": "Especificação",
+      "tabMetadata": "Metadados",
+      "tabPreview": "Pré-visualização",
+      "submitForReview": "Submeter para Revisão",
+      "saveFailed": "Falha ao guardar alterações.",
+      "submitFailed": "Falha ao submeter para revisão.",
+      "submitSuccess": "Rascunho submetido para revisão com sucesso.",
+      "specContent": "Conteúdo da Especificação",
+      "specPlaceholder": "Cole ou escreva o conteúdo da especificação aqui...",
+      "draftTitle": "Título",
+      "draftDescription": "Descrição",
+      "proposedVersion": "Versão Proposta",
+      "contractType": "Tipo",
+      "protocol": "Protocolo",
+      "author": "Autor",
+      "createdAt": "Criado em",
+      "lastEdited": "Última edição",
+      "noContent": "Sem conteúdo de especificação ainda.",
+      "noContentHint": "Mude para o separador Especificação para adicionar conteúdo."
+    },
+    "draftStatus": {
+      "Editing": "Em Edição",
+      "InReview": "Em Revisão",
+      "Approved": "Aprovado",
+      "Rejected": "Rejeitado",
+      "Published": "Publicado"
+    }
   },
   "workflow": {
     "title": "Workflow e Aprovações",
@@ -3255,5 +3287,10 @@
     "moduleUnavailable": "Módulo Indisponível",
     "moduleUnavailableDescription": "Este módulo está temporariamente indisponível. Tente novamente mais tarde.",
     "moduleUnavailableDescriptionNamed": "O módulo {{module}} está temporariamente indisponível. Tente novamente mais tarde."
+  },
+  "preview": {
+    "badge": "Preview",
+    "bannerTitle": "Preview",
+    "bannerDescription": "Este módulo está em preview e ainda não faz parte do âmbito certificado. Dados e funcionalidades podem estar incompletos."
   }
 }

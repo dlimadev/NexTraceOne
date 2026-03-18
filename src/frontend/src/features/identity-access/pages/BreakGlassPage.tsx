@@ -5,6 +5,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { BreakGlassRequest } from '../../../types';
@@ -94,8 +95,8 @@ export function BreakGlassPage() {
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
                   required
-                  minLength={10}
-                  maxLength={500}
+                  minLength={20}
+                  maxLength={2000}
                   rows={3}
                   placeholder={t('identity.breakGlass.justificationPlaceholder')}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
@@ -121,9 +122,7 @@ export function BreakGlassPage() {
         </CardHeader>
         <div className="overflow-x-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-muted" />
-            </div>
+            <PageLoadingState />
           ) : !requests?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">
               {t('identity.breakGlass.noRequests')}

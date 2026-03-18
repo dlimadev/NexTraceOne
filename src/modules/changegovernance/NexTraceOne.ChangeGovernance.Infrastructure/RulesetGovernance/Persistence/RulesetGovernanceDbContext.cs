@@ -33,7 +33,7 @@ public sealed class RulesetGovernanceDbContext(
 
     /// <inheritdoc />
     protected override string? ConfigurationsNamespace
-        => "NexTraceOne.RulesetGovernance.Infrastructure";
+        => "NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Configurations";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

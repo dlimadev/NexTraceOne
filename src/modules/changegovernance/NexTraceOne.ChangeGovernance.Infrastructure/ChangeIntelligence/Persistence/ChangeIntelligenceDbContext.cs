@@ -54,7 +54,7 @@ public sealed class ChangeIntelligenceDbContext(
 
     /// <inheritdoc />
     protected override string? ConfigurationsNamespace
-        => "NexTraceOne.ChangeIntelligence.Infrastructure";
+        => "NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Configurations";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

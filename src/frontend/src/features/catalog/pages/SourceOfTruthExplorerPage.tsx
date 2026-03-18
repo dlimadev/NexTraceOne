@@ -13,6 +13,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
@@ -138,11 +140,7 @@ export function SourceOfTruthExplorerPage() {
       </Card>
 
       {/* Loading */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-16">
-          <p className="text-sm text-muted">{t('common.loading')}</p>
-        </div>
-      )}
+      {isLoading && <PageLoadingState />}
 
       {/* Empty initial state */}
       {!debouncedQuery.trim() && !isLoading && (
@@ -163,13 +161,7 @@ export function SourceOfTruthExplorerPage() {
       )}
 
       {/* Error */}
-      {showError && (
-        <EmptyState
-          icon={<AlertTriangle size={24} />}
-          title={t('common.error')}
-          description={t('common.errorDescription')}
-        />
-      )}
+      {showError && <PageErrorState />}
 
       {/* Results */}
       {hasResults && data && (

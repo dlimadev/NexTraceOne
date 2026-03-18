@@ -387,7 +387,9 @@
     "active": "Active",
     "inactive": "Inactive",
     "deactivate": "Deactivate",
-    "activate": "Activate"
+    "activate": "Activate",
+    "role": "Role",
+    "selectRole": "Select a role"
   },
   "authorization": {
     "accessDenied": "Access Denied",
@@ -1165,7 +1167,35 @@
         "searchPlaceholder": "Search audit log...",
         "emptyTitle": "No audit entries",
         "emptyDescription": "Audit trail entries will appear here as actions are performed on this contract."
-      }
+      },
+      "draftNotFound": "Draft not found or failed to load.",
+      "backToCatalog": "Back to Contracts",
+      "tabSpec": "Specification",
+      "tabMetadata": "Metadata",
+      "tabPreview": "Preview",
+      "submitForReview": "Submit for Review",
+      "saveFailed": "Failed to save changes.",
+      "submitFailed": "Failed to submit for review.",
+      "submitSuccess": "Draft submitted for review successfully.",
+      "specContent": "Specification Content",
+      "specPlaceholder": "Paste or write your specification content here...",
+      "draftTitle": "Title",
+      "draftDescription": "Description",
+      "proposedVersion": "Proposed Version",
+      "contractType": "Type",
+      "protocol": "Protocol",
+      "author": "Author",
+      "createdAt": "Created",
+      "lastEdited": "Last edited",
+      "noContent": "No specification content yet.",
+      "noContentHint": "Switch to the Spec tab to add content."
+    },
+    "draftStatus": {
+      "Editing": "Editing",
+      "InReview": "In Review",
+      "Approved": "Approved",
+      "Rejected": "Rejected",
+      "Published": "Published"
     },
     "create": {
       "title": "Create Service Contract",
@@ -4005,5 +4035,10 @@
     "moduleUnavailable": "Module Unavailable",
     "moduleUnavailableDescription": "This module is temporarily unavailable. Please try again later.",
     "moduleUnavailableDescriptionNamed": "The {{module}} module is temporarily unavailable. Please try again later."
+  },
+  "preview": {
+    "badge": "Preview",
+    "bannerTitle": "Preview",
+    "bannerDescription": "This module is in preview and not yet part of the certified scope. Data and features may be incomplete."
   }
 }

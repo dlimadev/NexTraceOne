@@ -4,6 +4,8 @@ import { Shield, RefreshCw, Search, CheckCircle, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { auditApi } from '../api';
 import { PageContainer, PageSection } from '../../../components/shell';
 
@@ -104,13 +106,9 @@ export function AuditPage() {
         </CardHeader>
         <div className="overflow-x-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-muted" />
-            </div>
+            <PageLoadingState />
           ) : isError ? (
-            <p className="px-6 py-12 text-sm text-critical text-center">
-              {t('audit.loadFailed')}
-            </p>
+            <PageErrorState message={t('audit.loadFailed')} />
           ) : !data?.items?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">
               {t('audit.noEvents')}

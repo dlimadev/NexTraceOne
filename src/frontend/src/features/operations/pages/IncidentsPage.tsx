@@ -12,6 +12,8 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { incidentsApi, type IncidentListItem } from '../api/incidents';
 
@@ -141,18 +143,9 @@ export function IncidentsPage() {
           </CardHeader>
           <CardBody className="p-0">
             {incidentsQuery.isLoading ? (
-              <div className="p-8 flex items-center justify-center gap-2 text-muted text-sm">
-                <Loader2 size={16} className="animate-spin" />
-                {t('common.loading')}
-              </div>
+              <PageLoadingState size="sm" />
             ) : incidentsQuery.isError ? (
-              <div className="p-8">
-                <EmptyState
-                  icon={<AlertCircle size={24} />}
-                  title={t('common.error')}
-                  description={t('common.errorDescription')}
-                />
-              </div>
+              <PageErrorState className="py-8" />
             ) : (
               <div className="divide-y divide-edge">
                 {incidents.length === 0 ? (

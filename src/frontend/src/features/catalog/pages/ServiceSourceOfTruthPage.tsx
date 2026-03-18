@@ -15,6 +15,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import type { CoverageIndicators } from '../../../types';
 import { PageContainer } from '../../../components/shell';
@@ -82,20 +84,22 @@ export function ServiceSourceOfTruthPage() {
   if (isLoading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center py-24">
-          <p className="text-sm text-muted">{t('common.loading')}</p>
-        </div>
+        <PageLoadingState size="lg" />
       </PageContainer>
     );
   }
 
   if (isError || !sot) {
     return (
-      <div className="p-6 lg:p-8 animate-fade-in">
-        <div className="flex items-center justify-center py-24">
-          <p className="text-sm text-muted">{t('common.error')}</p>
-        </div>
-      </div>
+      <PageContainer>
+        <PageErrorState
+          action={
+            <Link to="/source-of-truth" className="text-sm text-accent hover:underline">
+              {t('common.back')}
+            </Link>
+          }
+        />
+      </PageContainer>
     );
   }
 
