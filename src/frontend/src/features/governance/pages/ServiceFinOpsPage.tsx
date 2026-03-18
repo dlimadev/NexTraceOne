@@ -89,6 +89,10 @@ export function ServiceFinOpsPage() {
           <Badge variant={efficiencyBadgeVariant(d.efficiency)}>{t(`governance.finops.efficiency.${d.efficiency}`)}</Badge>
         </div>
         <p className="text-muted mt-1">{d.domain} · {d.team} · {t('governance.finops.serviceFinOpsProfile')}</p>
+        <div className="flex items-center gap-2 mt-2">
+          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
+          <span className="text-xs text-muted">{t('governance.preview.finopsReason')}</span>
+        </div>
       </div>
 
       {/* Stats */}

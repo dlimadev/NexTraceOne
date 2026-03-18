@@ -1338,20 +1338,24 @@ export interface FinOpsSummaryResponse {
 }
 
 /** Resumo executivo de relatórios. */
+/** Resumo executivo de relatórios baseado em dados reais de Governance Packs, Rollouts e Waivers. */
 export interface ReportsSummaryResponse {
-  totalServices: number;
-  servicesWithOwner: number;
-  servicesWithContract: number;
-  servicesWithDocumentation: number;
-  servicesWithRunbook: number;
+  totalPacks: number;
+  publishedPacks: number;
+  packsWithRollout: number;
+  packsWithCompletedRollout: number;
+  totalWaivers: number;
+  pendingWaivers: number;
+  approvedWaivers: number;
+  totalRollouts: number;
+  completedRollouts: number;
+  failedRollouts: number;
+  pendingRollouts: number;
   overallRiskLevel: RiskLevel;
   overallMaturity: MaturityLevelType;
   changeConfidenceTrend: GovernanceTrendDirection;
   reliabilityTrend: GovernanceTrendDirection;
-  openIncidents: number;
-  recentChanges: number;
   complianceScore: number;
-  costEfficiency: CostEfficiencyType;
   generatedAt: string;
 }
 

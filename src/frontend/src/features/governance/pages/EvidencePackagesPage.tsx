@@ -157,6 +157,10 @@ export function EvidencePackagesPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-heading">{t('governance.evidence.title')}</h1>
         <p className="text-muted mt-1">{t('governance.evidence.subtitle')}</p>
+        <div className="flex items-center gap-2 mt-2">
+          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
+          <span className="text-xs text-muted">{t('governance.preview.evidenceReason')}</span>
+        </div>
       </div>
 
       {/* Stats */}

@@ -26,6 +26,10 @@ import type {
   PolicyListResponse,
   PolicyDto,
   ExecutiveOverviewResponse,
+  ReportsSummaryResponse,
+  ControlsSummaryResponse,
+  MaturityScorecardsResponse,
+  RiskHeatmapResponse,
 } from '../../../types';
 
 /** Cliente de API para governança multi-equipa e multi-domínio. */
@@ -105,4 +109,20 @@ export const organizationGovernanceApi = {
   // Executive
   getExecutiveOverview: (domainId?: string, teamId?: string, range?: string) =>
     client.get<ExecutiveOverviewResponse>('/executive/overview', { params: { domainId, teamId, range } }).then((r) => r.data),
+
+  // Reports
+  getReportsSummary: (teamId?: string, domainId?: string, persona?: string) =>
+    client.get<ReportsSummaryResponse>('/reports/summary', { params: { teamId, domainId, persona } }).then((r) => r.data),
+
+  // Enterprise Controls
+  getControlsSummary: (teamId?: string, domainId?: string, serviceId?: string) =>
+    client.get<ControlsSummaryResponse>('/controls/summary', { params: { teamId, domainId, serviceId } }).then((r) => r.data),
+
+  // Maturity Scorecards
+  getMaturityScorecards: (dimension?: string) =>
+    client.get<MaturityScorecardsResponse>('/executive/maturity/scorecards', { params: { dimension } }).then((r) => r.data),
+
+  // Risk Heatmap
+  getRiskHeatmap: (dimension?: string) =>
+    client.get<RiskHeatmapResponse>('/executive/risk/heatmap', { params: { dimension } }).then((r) => r.data),
 };
