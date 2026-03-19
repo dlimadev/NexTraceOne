@@ -504,7 +504,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         var lowConfidenceIncident = IncidentRecord.Create(
             id: IncidentRecordId.New(),
             externalRef: "INC-2026-LOW",
-            title: "Flaky health check",
+            title: "Intermittent health check",
             description: "Health endpoint intermittently returning 503",
             type: IncidentType.ServiceDegradation,
             severity: IncidentSeverity.Minor,
