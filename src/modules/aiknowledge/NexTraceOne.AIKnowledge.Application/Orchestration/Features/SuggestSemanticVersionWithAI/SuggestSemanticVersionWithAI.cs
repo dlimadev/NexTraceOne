@@ -41,7 +41,7 @@ public static class SuggestSemanticVersionWithAI
         IDateTimeProvider dateTimeProvider,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
-        private static readonly Regex VersionPattern = new(@"\d+\.\d+\.\d+", RegexOptions.Compiled);
+        private static readonly Regex VersionPattern = new(@"\d+\.\d+\.\d+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
