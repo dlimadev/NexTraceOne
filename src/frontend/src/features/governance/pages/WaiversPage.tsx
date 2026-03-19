@@ -7,6 +7,8 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { GovernanceWaiverDto, WaiverStatus as WaiverStatusType } from '../../../types';
 
@@ -85,9 +87,7 @@ export function WaiversPage() {
           <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
           <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
         </div>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+        <PageLoadingState />
       </PageContainer>
     );
   }
@@ -99,10 +99,7 @@ export function WaiversPage() {
           <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
           <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
         </div>
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <AlertTriangle size={48} className="text-critical" />
-          <p className="text-sm text-muted">{error}</p>
-        </div>
+        <PageErrorState message={error} />
       </PageContainer>
     );
   }
