@@ -23,7 +23,7 @@ internal sealed class ContractRuleViolationConfiguration : IEntityTypeConfigurat
             .HasConversion(id => id.Value, value => ContractVersionId.From(value))
             .IsRequired();
 
-        builder.Property(x => x.RulesetId).IsRequired();
+        builder.Property(x => x.RulesetId).IsRequired(false);
         builder.Property(x => x.RuleName).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Severity).HasMaxLength(50).IsRequired();
         builder.Property(x => x.Message).HasMaxLength(2000).IsRequired();
