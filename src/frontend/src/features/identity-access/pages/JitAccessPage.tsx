@@ -9,6 +9,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { JitAccessRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * Página de gestão de acessos temporários (JIT — Just-In-Time) do módulo Identity.
@@ -28,7 +29,7 @@ export function JitAccessPage() {
   const [form, setForm] = useState({ permissionCode: '', scope: '', justification: '' });
 
   /** Consulta as solicitações JIT pendentes. */
-  const { data: requests, isLoading } = useQuery({
+  const { data: requests, isLoading, isError: isRequestsError, refetch: refetchRequests } = useQuery({
     queryKey: ['jit-access', tenantId],
     queryFn: () => identityApi.listPendingJitRequests(),
     enabled: !!tenantId,
@@ -153,6 +154,8 @@ export function JitAccessPage() {
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
+          ) : isRequestsError ? (
+            <PageErrorState action={<button className="text-xs text-accent underline mt-2" onClick={() => refetchRequests()}>{t('common.retry')}</button>} />
           ) : !requests?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">
               {t('identity.jitAccess.noRequests')}

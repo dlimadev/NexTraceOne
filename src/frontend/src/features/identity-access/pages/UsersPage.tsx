@@ -6,6 +6,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import { PageContainer, PageSection } from '../../../components/shell';
@@ -31,7 +32,7 @@ export function UsersPage() {
     queryFn: () => identityApi.listRoles(),
   });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError: isUsersError, refetch: refetchUsers } = useQuery({
     queryKey: ['users', tenantId],
     queryFn: () => identityApi.listTenantUsers(tenantId, 1, 50),
     enabled: !!tenantId,
@@ -142,6 +143,8 @@ export function UsersPage() {
             <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noTenantId')}</p>
           ) : isLoading ? (
             <PageLoadingState />
+          ) : isUsersError ? (
+            <PageErrorState action={<button className="text-xs text-accent underline mt-2" onClick={() => refetchUsers()}>{t('common.retry')}</button>} />
           ) : !data?.items?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noUsersFound')}</p>
           ) : (
