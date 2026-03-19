@@ -1,19 +1,49 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
 using Respawn;
 using Respawn.Graph;
 using Testcontainers.PostgreSql;
 using Xunit;
+using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
+using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
+using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 
 namespace NexTraceOne.IntegrationTests.Infrastructure;
 
+/// <summary>
+/// Fixture de integração com PostgreSQL real via Testcontainers.
+/// Gerencia 11 bancos de dados isolados cobrindo todos os DbContexts da plataforma.
+/// Contextos que usam raw SQL "CREATE TABLE IF NOT EXISTS outbox_messages" podem compartilhar DB.
+/// Contextos com EF CreateTable padrão para outbox_messages requerem DB próprio para evitar conflitos.
+///
+/// nextrace_it_catalog           → CatalogGraphDbContext, ContractsDbContext, DeveloperPortalDbContext (IF NOT EXISTS)
+/// nextrace_it_change_governance → ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext, RulesetGovernanceDbContext (IF NOT EXISTS)
+/// nextrace_it_identity          → IdentityDbContext
+/// nextrace_it_incidents         → IncidentDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_runtime           → RuntimeIntelligenceDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_cost              → CostIntelligenceDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_aiknowledge       → AiGovernanceDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_externalai        → ExternalAiDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_aiorchestration   → AiOrchestrationDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_governance        → GovernanceDbContext ONLY (CreateTable padrão — isolado)
+/// nextrace_it_audit             → AuditDbContext (IF NOT EXISTS — DB próprio por clareza)
+/// </summary>
 public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
@@ -30,21 +60,46 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
     private readonly ICurrentUser _user = new TestCurrentUser();
     private readonly IDateTimeProvider _clock = new TestDateTimeProvider();
 
+    // ── Existing databases ────────────────────────────────────────────────────
+
     public string CatalogConnectionString => _connectionStrings["catalog"];
-    public string ContractsConnectionString => _connectionStrings["contracts"];
+    public string ContractsConnectionString => _connectionStrings["catalog"];
     public string ChangeGovernanceConnectionString => _connectionStrings["change-governance"];
     public string IdentityConnectionString => _connectionStrings["identity"];
     public string IncidentsConnectionString => _connectionStrings["incidents"];
+
+    // ── Isolated databases for conflicting contexts (Phase RH-6) ─────────────
+
+    public string AiKnowledgeConnectionString => _connectionStrings["aiknowledge"];
+    public string GovernanceConnectionString => _connectionStrings["governance"];
+    public string AuditConnectionString => _connectionStrings["audit"];
+    public string RuntimeIntelligenceConnectionString => _connectionStrings["runtime"];
+    public string CostIntelligenceConnectionString => _connectionStrings["cost"];
+    public string ExternalAiConnectionString => _connectionStrings["externalai"];
+    public string AiOrchestrationConnectionString => _connectionStrings["aiorchestration"];
+
+    // ── Shared connection string aliases ────────────────────────────────────
+
+    public string DeveloperPortalConnectionString => _connectionStrings["catalog"];
+    public string WorkflowConnectionString => _connectionStrings["change-governance"];
+    public string PromotionConnectionString => _connectionStrings["change-governance"];
+    public string RulesetGovernanceConnectionString => _connectionStrings["change-governance"];
 
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
 
         _connectionStrings["catalog"] = await CreateDatabaseAsync("nextrace_it_catalog");
-        _connectionStrings["contracts"] = await CreateDatabaseAsync("nextrace_it_contracts");
         _connectionStrings["change-governance"] = await CreateDatabaseAsync("nextrace_it_change_governance");
         _connectionStrings["identity"] = await CreateDatabaseAsync("nextrace_it_identity");
         _connectionStrings["incidents"] = await CreateDatabaseAsync("nextrace_it_incidents");
+        _connectionStrings["runtime"] = await CreateDatabaseAsync("nextrace_it_runtime");
+        _connectionStrings["cost"] = await CreateDatabaseAsync("nextrace_it_cost");
+        _connectionStrings["aiknowledge"] = await CreateDatabaseAsync("nextrace_it_aiknowledge");
+        _connectionStrings["externalai"] = await CreateDatabaseAsync("nextrace_it_externalai");
+        _connectionStrings["aiorchestration"] = await CreateDatabaseAsync("nextrace_it_aiorchestration");
+        _connectionStrings["governance"] = await CreateDatabaseAsync("nextrace_it_governance");
+        _connectionStrings["audit"] = await CreateDatabaseAsync("nextrace_it_audit");
 
         await ApplyMigrationsAsync();
         await InitializeRespawnersAsync();
@@ -55,50 +110,117 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         await _container.DisposeAsync();
     }
 
+    // ── DbContext factories — Core ────────────────────────────────────────────
+
     public CatalogGraphDbContext CreateCatalogGraphDbContext()
     {
-        var options = new DbContextOptionsBuilder<CatalogGraphDbContext>()
-            .UseNpgsql(CatalogConnectionString)
-            .Options;
-
-        return new CatalogGraphDbContext(options, _tenant, _user, _clock);
+        return new CatalogGraphDbContext(BuildOptions<CatalogGraphDbContext>(CatalogConnectionString), _tenant, _user, _clock);
     }
 
     public ContractsDbContext CreateContractsDbContext()
     {
-        var options = new DbContextOptionsBuilder<ContractsDbContext>()
-            .UseNpgsql(ContractsConnectionString)
-            .Options;
-
-        return new ContractsDbContext(options, _tenant, _user, _clock);
+        return new ContractsDbContext(BuildOptions<ContractsDbContext>(ContractsConnectionString), _tenant, _user, _clock);
     }
 
     public ChangeIntelligenceDbContext CreateChangeIntelligenceDbContext()
     {
-        var options = new DbContextOptionsBuilder<ChangeIntelligenceDbContext>()
-            .UseNpgsql(ChangeGovernanceConnectionString)
-            .Options;
-
-        return new ChangeIntelligenceDbContext(options, _tenant, _user, _clock);
+        return new ChangeIntelligenceDbContext(BuildOptions<ChangeIntelligenceDbContext>(ChangeGovernanceConnectionString), _tenant, _user, _clock);
     }
 
     public IdentityDbContext CreateIdentityDbContext()
     {
-        var options = new DbContextOptionsBuilder<IdentityDbContext>()
-            .UseNpgsql(IdentityConnectionString)
-            .Options;
-
-        return new IdentityDbContext(options, _tenant, _user, _clock);
+        return new IdentityDbContext(BuildOptions<IdentityDbContext>(IdentityConnectionString), _tenant, _user, _clock);
     }
 
     public IncidentDbContext CreateIncidentDbContext()
     {
-        var options = new DbContextOptionsBuilder<IncidentDbContext>()
-            .UseNpgsql(IncidentsConnectionString)
-            .Options;
-
-        return new IncidentDbContext(options, _tenant, _user, _clock);
+        return new IncidentDbContext(BuildOptions<IncidentDbContext>(IncidentsConnectionString), _tenant, _user, _clock);
     }
+
+    // ── DbContext factories — Change Governance extensions ───────────────────
+
+    public WorkflowDbContext CreateWorkflowDbContext()
+    {
+        return new WorkflowDbContext(BuildOptions<WorkflowDbContext>(WorkflowConnectionString), _tenant, _user, _clock);
+    }
+
+    public PromotionDbContext CreatePromotionDbContext()
+    {
+        return new PromotionDbContext(BuildOptions<PromotionDbContext>(PromotionConnectionString), _tenant, _user, _clock);
+    }
+
+    public RulesetGovernanceDbContext CreateRulesetGovernanceDbContext()
+    {
+        return new RulesetGovernanceDbContext(BuildOptions<RulesetGovernanceDbContext>(RulesetGovernanceConnectionString), _tenant, _user, _clock);
+    }
+
+    // ── DbContext factories — Catalog extensions ─────────────────────────────
+
+    public DeveloperPortalDbContext CreateDeveloperPortalDbContext()
+    {
+        return new DeveloperPortalDbContext(BuildOptions<DeveloperPortalDbContext>(DeveloperPortalConnectionString), _tenant, _user, _clock);
+    }
+
+    // ── DbContext factories — OperationalIntelligence extensions ─────────────
+
+    public RuntimeIntelligenceDbContext CreateRuntimeIntelligenceDbContext()
+    {
+        return new RuntimeIntelligenceDbContext(BuildOptions<RuntimeIntelligenceDbContext>(RuntimeIntelligenceConnectionString), _tenant, _user, _clock);
+    }
+
+    public CostIntelligenceDbContext CreateCostIntelligenceDbContext()
+    {
+        return new CostIntelligenceDbContext(BuildOptions<CostIntelligenceDbContext>(CostIntelligenceConnectionString), _tenant, _user, _clock);
+    }
+
+    // ── DbContext factories — AIKnowledge ─────────────────────────────────────
+
+    public AiGovernanceDbContext CreateAiGovernanceDbContext()
+    {
+        return new AiGovernanceDbContext(BuildOptions<AiGovernanceDbContext>(AiKnowledgeConnectionString), _tenant, _user, _clock);
+    }
+
+    public ExternalAiDbContext CreateExternalAiDbContext()
+    {
+        return new ExternalAiDbContext(BuildOptions<ExternalAiDbContext>(ExternalAiConnectionString), _tenant, _user, _clock);
+    }
+
+    public AiOrchestrationDbContext CreateAiOrchestrationDbContext()
+    {
+        return new AiOrchestrationDbContext(BuildOptions<AiOrchestrationDbContext>(AiOrchestrationConnectionString), _tenant, _user, _clock);
+    }
+
+    // ── DbContext factories — Governance ──────────────────────────────────────
+
+    public GovernanceDbContext CreateGovernanceDbContext()
+    {
+        return new GovernanceDbContext(BuildOptions<GovernanceDbContext>(GovernanceConnectionString), _tenant, _user, _clock);
+    }
+
+    // ── DbContext factories — Audit ───────────────────────────────────────────
+
+    public AuditDbContext CreateAuditDbContext()
+    {
+        return new AuditDbContext(BuildOptions<AuditDbContext>(AuditConnectionString), _tenant, _user, _clock);
+    }
+
+    // ── Options builder helper ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Constrói DbContextOptions suprimindo PendingModelChangesWarning.
+    /// No EF Core 10 este warning é elevado a erro, mas em testes de integração
+    /// queremos exercitar as migrations existentes independentemente de gaps de modelo.
+    /// </summary>
+    private static DbContextOptions<TContext> BuildOptions<TContext>(string connectionString)
+        where TContext : DbContext
+    {
+        return new DbContextOptionsBuilder<TContext>()
+            .UseNpgsql(connectionString)
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
+            .Options;
+    }
+
+    // ── Reset & Utilities ─────────────────────────────────────────────────────
 
     public async Task ResetDatabasesAsync(CancellationToken cancellationToken = default)
     {
@@ -147,6 +269,29 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         return result?.ToString();
     }
 
+    public async Task<bool> TableExistsAsync(
+        string connectionString,
+        string tableName,
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = """
+                              SELECT COUNT(1)
+                              FROM information_schema.tables
+                              WHERE table_schema = 'public'
+                                AND table_name = @tableName
+                              """;
+        command.Parameters.AddWithValue("tableName", tableName);
+
+        var result = await command.ExecuteScalarAsync(cancellationToken);
+        return Convert.ToInt64(result) > 0;
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
     private async Task<string> CreateDatabaseAsync(string databaseName)
     {
         var adminConnectionString = new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
@@ -178,20 +323,60 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
     private async Task ApplyMigrationsAsync()
     {
+        // ── Catalog database ─────────────────────────────────────────────────
         await using var catalogContext = CreateCatalogGraphDbContext();
         await catalogContext.Database.MigrateAsync();
 
         await using var contractsContext = CreateContractsDbContext();
         await contractsContext.Database.MigrateAsync();
 
+        await using var portalContext = CreateDeveloperPortalDbContext();
+        await portalContext.Database.MigrateAsync();
+
+        // ── Change Governance database ───────────────────────────────────────
         await using var changeIntelligenceContext = CreateChangeIntelligenceDbContext();
         await changeIntelligenceContext.Database.MigrateAsync();
 
+        await using var workflowContext = CreateWorkflowDbContext();
+        await workflowContext.Database.MigrateAsync();
+
+        await using var promotionContext = CreatePromotionDbContext();
+        await promotionContext.Database.MigrateAsync();
+
+        await using var rulesetContext = CreateRulesetGovernanceDbContext();
+        await rulesetContext.Database.MigrateAsync();
+
+        // ── Identity database ────────────────────────────────────────────────
         await using var identityContext = CreateIdentityDbContext();
         await identityContext.Database.MigrateAsync();
 
+        // ── Incidents / OI database ──────────────────────────────────────────
         await using var incidentsContext = CreateIncidentDbContext();
         await incidentsContext.Database.MigrateAsync();
+
+        await using var runtimeContext = CreateRuntimeIntelligenceDbContext();
+        await runtimeContext.Database.MigrateAsync();
+
+        await using var costContext = CreateCostIntelligenceDbContext();
+        await costContext.Database.MigrateAsync();
+
+        // ── AIKnowledge database ─────────────────────────────────────────────
+        await using var aiGovContext = CreateAiGovernanceDbContext();
+        await aiGovContext.Database.MigrateAsync();
+
+        await using var externalAiContext = CreateExternalAiDbContext();
+        await externalAiContext.Database.MigrateAsync();
+
+        await using var aiOrchContext = CreateAiOrchestrationDbContext();
+        await aiOrchContext.Database.MigrateAsync();
+
+        // ── Governance database ──────────────────────────────────────────────
+        await using var governanceContext = CreateGovernanceDbContext();
+        await governanceContext.Database.MigrateAsync();
+
+        // ── Audit database ───────────────────────────────────────────────────
+        await using var auditContext = CreateAuditDbContext();
+        await auditContext.Database.MigrateAsync();
     }
 
     private async Task InitializeRespawnersAsync()

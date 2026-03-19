@@ -23,16 +23,20 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
     public async Task Migrations_Should_Be_Applied_For_All_Module_Databases()
     {
         var catalogMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.CatalogConnectionString);
-        var contractsMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.ContractsConnectionString);
         var changeGovernanceMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.ChangeGovernanceConnectionString);
         var identityMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.IdentityConnectionString);
         var incidentsMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.IncidentsConnectionString);
+        var aiKnowledgeMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.AiKnowledgeConnectionString);
+        var governanceMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.GovernanceConnectionString);
+        var auditMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.AuditConnectionString);
 
-        catalogMigrations.Should().BeGreaterThan(0);
-        contractsMigrations.Should().BeGreaterThan(0);
-        changeGovernanceMigrations.Should().BeGreaterThan(0);
-        identityMigrations.Should().BeGreaterThan(0);
-        incidentsMigrations.Should().BeGreaterThan(0);
+        catalogMigrations.Should().BeGreaterThan(0, "catalog database has CatalogGraph + Contracts + Portal migrations");
+        changeGovernanceMigrations.Should().BeGreaterThan(0, "change-governance database has ChangeIntelligence + Workflow + Promotion + Ruleset migrations");
+        identityMigrations.Should().BeGreaterThan(0, "identity database has IdentityAccess migrations");
+        incidentsMigrations.Should().BeGreaterThan(0, "incidents database has OI Incidents + Runtime + Cost migrations");
+        aiKnowledgeMigrations.Should().BeGreaterThan(0, "aiknowledge database has AiGovernance + ExternalAi + AiOrchestration migrations");
+        governanceMigrations.Should().BeGreaterThan(0, "governance database has Governance module migrations");
+        auditMigrations.Should().BeGreaterThan(0, "audit database has AuditCompliance migrations");
     }
 
     [Fact]

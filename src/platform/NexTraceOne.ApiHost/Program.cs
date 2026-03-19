@@ -173,3 +173,7 @@ app.MapHealthChecks("/live", new HealthCheckOptions
 }).AllowAnonymous();
 
 app.Run();
+
+// Expose Program for WebApplicationFactory in E2E and integration tests
+public partial class Program { }
+
