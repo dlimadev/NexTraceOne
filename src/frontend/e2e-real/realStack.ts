@@ -37,6 +37,7 @@ export function buildBackendEnvironment(): NodeJS.ProcessEnv {
     ASPNETCORE_ENVIRONMENT: 'Development',
     ASPNETCORE_URLS: backendBaseUrl,
     NEXTRACE_SKIP_INTEGRITY: 'true',
+    NEXTRACE_IGNORE_PENDING_MODEL_CHANGES: 'true',
     ConnectionStrings__NexTraceOne: buildConnectionString(databaseMap.catalog),
     ConnectionStrings__CatalogDatabase: buildConnectionString(databaseMap.catalog),
     ConnectionStrings__ContractsDatabase: buildConnectionString(databaseMap.catalog),
