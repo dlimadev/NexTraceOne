@@ -95,8 +95,11 @@ export function ServiceCatalogOverviewTab({ graph, healthData, onSelectNode }: S
                   .map(api => (
                     <li
                       key={api.apiAssetId}
+                      role="button"
+                      tabIndex={0}
                       className="px-4 py-3 flex items-center justify-between hover:bg-hover transition-colors cursor-pointer"
                       onClick={() => onSelectNode(api.apiAssetId)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelectNode(api.apiAssetId); } }}
                     >
                       <div>
                         <p className="text-sm font-medium text-heading">{api.name}</p>

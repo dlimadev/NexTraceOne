@@ -26,8 +26,11 @@ export function ServiceCatalogServicesTab({ filteredServices, onSelectNode }: Se
             {filteredServices.map((svc) => (
               <li
                 key={svc.serviceAssetId}
+                role="button"
+                tabIndex={0}
                 className="px-6 py-4 flex items-center gap-4 hover:bg-hover transition-colors cursor-pointer"
                 onClick={() => onSelectNode(svc.serviceAssetId)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelectNode(svc.serviceAssetId); } }}
               >
                 <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center text-accent">
                   <Server size={18} />
