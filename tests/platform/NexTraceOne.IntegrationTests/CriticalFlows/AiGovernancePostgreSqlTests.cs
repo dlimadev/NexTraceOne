@@ -33,12 +33,12 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
     [Fact]
     public async Task AiKnowledge_Tables_Should_Exist_After_Migrations()
     {
-        var conversationsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "aig_conversations");
-        var modelsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "aig_models");
+        var conversationsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "ai_gov_conversations");
+        var modelsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "ai_gov_models");
         var providersExist = await Fixture.TableExistsAsync(Fixture.ExternalAiConnectionString, "ext_ai_providers");
 
-        conversationsExist.Should().BeTrue("aig_conversations deve ser criada pela migration AiGovernance");
-        modelsExist.Should().BeTrue("aig_models deve ser criada pela migration AiGovernance");
+        conversationsExist.Should().BeTrue("ai_gov_conversations deve ser criada pela migration AiGovernance");
+        modelsExist.Should().BeTrue("ai_gov_models deve ser criada pela migration AiGovernance");
         providersExist.Should().BeTrue("ext_ai_providers deve ser criada pela migration ExternalAi no banco externalai");
     }
 
@@ -237,10 +237,10 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
         serviceConversations[0].TurnCount.Should().Be(0);
     }
 
-    // ── Cross-context: same database ─────────────────────────────────────────
+    // ── Cross-context: isolated databases ────────────────────────────────────
 
     [Fact]
-    public async Task AiKnowledge_AllThreeContexts_Share_SameDatabase_And_Coexist()
+    public async Task AiKnowledge_AllThreeContexts_Have_Isolated_Databases_And_Coexist()
     {
         await ResetStateAsync();
 
@@ -273,8 +273,13 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
             await orchCtx.SaveChangesAsync();
         }
 
-        // Verify all persisted to the same database
+        // Each context has its own isolated database — verify each has migrations applied
         var aiGovMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.AiKnowledgeConnectionString);
-        aiGovMigrations.Should().BeGreaterThan(2, "porque 3 DbContexts aplicaram migrations na mesma base de dados");
+        var extAiMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.ExternalAiConnectionString);
+        var orchMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.AiOrchestrationConnectionString);
+
+        aiGovMigrations.Should().BeGreaterThan(0, "AiGovernanceDbContext deve ter migrations aplicadas na sua base isolada");
+        extAiMigrations.Should().BeGreaterThan(0, "ExternalAiDbContext deve ter migrations aplicadas na sua base isolada");
+        orchMigrations.Should().BeGreaterThan(0, "AiOrchestrationDbContext deve ter migrations aplicadas na sua base isolada");
     }
 }
