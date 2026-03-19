@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.IdentityAccess.Application;
 using NexTraceOne.IdentityAccess.Infrastructure;
 
@@ -18,6 +19,11 @@ public static class DependencyInjection
     {
         services.AddIdentityApplication(configuration);
         services.AddIdentityInfrastructure(configuration);
+
+        // Regista opções de sessão cookie (desabilitada por padrão — rollout controlado)
+        services.Configure<CookieSessionOptions>(
+            configuration.GetSection(CookieSessionOptions.SectionName));
+
         return services;
     }
 }

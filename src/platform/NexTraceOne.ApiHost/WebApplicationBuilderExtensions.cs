@@ -32,7 +32,10 @@ public static class WebApplicationBuilderExtensions
         {
             options.AddDefaultPolicy(policy =>
                 policy.WithOrigins(corsOrigins)
-                    .WithHeaders("Content-Type", "Authorization", "X-Tenant-Id", "X-Requested-With")
+                    .WithHeaders(
+                        "Content-Type", "Authorization",
+                        "X-Tenant-Id", "X-Requested-With",
+                        "X-Csrf-Token")   // necessário para o modelo de sessão cookie com CSRF
                     .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                     .AllowCredentials());
         });
