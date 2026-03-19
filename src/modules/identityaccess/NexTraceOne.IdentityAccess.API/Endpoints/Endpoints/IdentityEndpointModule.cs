@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+using NexTraceOne.BuildingBlocks.Security.CookieSession;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -7,6 +11,9 @@ namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
 /// Delega para ficheiros especializados por domínio funcional:
 /// Auth, Users, RolePermission, BreakGlass, JitAccess, Delegation, Tenant, AccessReview e Environment.
+///
+/// Endpoints de sessão cookie (CookieSessionEndpoints) são registados condicionalmente
+/// quando Auth:CookieSession:Enabled = true (rollout controlado — desabilitado por padrão).
 /// </summary>
 public sealed class IdentityEndpointModule
 {
@@ -26,5 +33,14 @@ public sealed class IdentityEndpointModule
         TenantEndpoints.Map(group);
         AccessReviewEndpoints.Map(group);
         EnvironmentEndpoints.Map(group);
+
+        // Endpoints de sessão cookie — apenas quando feature flag ativa
+        var cookieSessionOptions = app.ServiceProvider
+            .GetRequiredService<IOptions<CookieSessionOptions>>().Value;
+
+        if (cookieSessionOptions.Enabled)
+        {
+            CookieSessionEndpoints.Map(group);
+        }
     }
 }
