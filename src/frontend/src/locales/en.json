@@ -1619,6 +1619,11 @@
     "rejectPlaceholder": "Reason for rejection (required)",
     "confirmReject": "Confirm Reject",
     "workflowTemplates": "Workflow Templates",
+    "defaultTemplates": {
+      "standard": "Standard Release",
+      "breakingChange": "Breaking Change Release",
+      "hotfix": "Hotfix Release"
+    },
     "stageCount": "{{count}} stage",
     "stageCount_plural": "{{count}} stages",
     "allInstances": "All Workflow Instances",

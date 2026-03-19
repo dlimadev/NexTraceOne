@@ -731,6 +731,11 @@
     "rejectPlaceholder": "Motivo del rechazo (obligatorio)",
     "confirmReject": "Confirmar Rechazo",
     "workflowTemplates": "Plantillas de Workflow",
+    "defaultTemplates": {
+      "standard": "Release Estándar",
+      "breakingChange": "Release con Breaking Change",
+      "hotfix": "Hotfix Release"
+    },
     "stageCount": "{{count}} etapa",
     "stageCount_plural": "{{count}} etapas",
     "allInstances": "Todas las Instancias de Workflow",

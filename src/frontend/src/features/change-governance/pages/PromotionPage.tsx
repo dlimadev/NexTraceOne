@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowUpCircle, CheckCircle, XCircle, Plus, RefreshCw } from 'lucide-react';
+import { ArrowUpCircle, CheckCircle, XCircle, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { promotionApi } from '../api';
 import type { PromotionRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
@@ -20,9 +22,9 @@ function statusVariant(status: PromotionStatus): 'default' | 'success' | 'warnin
 
 const ENVIRONMENTS = ['development', 'staging', 'production'];
 const ENV_COLORS: Record<string, string> = {
-  development: 'bg-green-500',
-  staging: 'bg-yellow-500',
-  production: 'bg-red-500',
+  development: 'bg-success',
+  staging: 'bg-warning',
+  production: 'bg-critical',
 };
 
 interface CreateForm {
@@ -117,7 +119,7 @@ export function PromotionPage() {
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   {ENVIRONMENTS.map((env) => (
-                    <option key={env} value={env}>{env}</option>
+                    <option key={env} value={env}>{t(`releases.environments.${env}`)}</option>
                   ))}
                 </select>
               </div>
@@ -129,7 +131,7 @@ export function PromotionPage() {
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
                   {ENVIRONMENTS.map((env) => (
-                    <option key={env} value={env}>{env}</option>
+                    <option key={env} value={env}>{t(`releases.environments.${env}`)}</option>
                   ))}
                 </select>
               </div>
@@ -157,7 +159,7 @@ export function PromotionPage() {
               <div key={env} className="flex items-center gap-4">
                 <div className="flex flex-col items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${ENV_COLORS[env] ?? 'bg-muted'}`} />
-                  <span className="text-sm font-medium text-body capitalize">{env}</span>
+                  <span className="text-sm font-medium text-body">{t(`releases.environments.${env}`)}</span>
                 </div>
                 {i < ENVIRONMENTS.length - 1 && (
                   <ArrowUpCircle size={20} className="text-edge-strong rotate-90" />
@@ -237,19 +239,15 @@ export function PromotionPage() {
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-heading">{t('promotion.allRequests')}</h2>
             {data && (
-              <span className="text-sm text-muted">{data.totalCount} total</span>
+              <span className="text-sm text-muted">{data.totalCount} {t('common.total')}</span>
             )}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw size={20} className="animate-spin text-muted" />
-            </div>
+            <PageLoadingState />
           ) : isError ? (
-            <p className="px-6 py-12 text-sm text-critical text-center">
-              {t('promotion.loadFailed')}
-            </p>
+            <PageErrorState message={t('promotion.loadFailed')} />
           ) : !requests.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">
               {t('promotion.noRequests')}

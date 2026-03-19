@@ -6,6 +6,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { BreakGlassRequest } from '../../../types';
@@ -30,7 +31,7 @@ export function BreakGlassPage() {
   const [justification, setJustification] = useState('');
 
   /** Consulta as solicitações de Break Glass existentes. */
-  const { data: requests, isLoading } = useQuery({
+  const { data: requests, isLoading, isError } = useQuery({
     queryKey: ['break-glass', tenantId],
     queryFn: () => identityApi.listBreakGlassRequests(),
     enabled: !!tenantId,
@@ -123,6 +124,8 @@ export function BreakGlassPage() {
         <div className="overflow-x-auto">
           {isLoading ? (
             <PageLoadingState />
+          ) : isError ? (
+            <PageErrorState />
           ) : !requests?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">
               {t('identity.breakGlass.noRequests')}
