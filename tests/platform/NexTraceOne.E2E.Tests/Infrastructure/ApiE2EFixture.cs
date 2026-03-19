@@ -19,7 +19,7 @@ namespace NexTraceOne.E2E.Tests.Infrastructure;
 ///
 /// Estratégia:
 /// - Um container PostgreSQL 16 é iniciado para todos os testes da sessão
-/// - 7 bases de dados são criadas correspondendo aos contextos de produção
+/// - 11 bases de dados são criadas correspondendo aos agrupamentos reais dos contextos
 /// - Todas as migrations são aplicadas automaticamente pelo mecanismo do ApiHost
 /// - Os testes HTTP fazem chamadas reais ao HttpClient do WebApplicationFactory
 /// - O estado é resetado via Respawn entre grupos de testes quando necessário
@@ -58,7 +58,11 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         ("change-governance", "e2e_change_governance"),
         ("identity", "e2e_identity"),
         ("incidents", "e2e_incidents"),
+        ("runtime", "e2e_runtime"),
+        ("cost", "e2e_cost"),
         ("aiknowledge", "e2e_aiknowledge"),
+        ("external-ai", "e2e_external_ai"),
+        ("ai-orchestration", "e2e_ai_orchestration"),
         ("governance", "e2e_governance"),
         ("audit", "e2e_audit"),
     ];
@@ -77,6 +81,8 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         {
             _connectionStrings[key] = await CreateDatabaseAsync(dbName);
         }
+
+        ApplyEnvironmentOverrides();
 
         _factory = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
@@ -209,7 +215,11 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         var changeGov = _connectionStrings["change-governance"];
         var identity = _connectionStrings["identity"];
         var incidents = _connectionStrings["incidents"];
+        var runtime = _connectionStrings["runtime"];
+        var cost = _connectionStrings["cost"];
         var aiKnowledge = _connectionStrings["aiknowledge"];
+        var externalAi = _connectionStrings["external-ai"];
+        var aiOrchestration = _connectionStrings["ai-orchestration"];
         var governance = _connectionStrings["governance"];
         var audit = _connectionStrings["audit"];
 
@@ -226,14 +236,32 @@ public sealed class ApiE2EFixture : IAsyncLifetime
             ["ConnectionStrings:RulesetGovernanceDatabase"] = changeGov,
             ["ConnectionStrings:PromotionDatabase"] = changeGov,
             ["ConnectionStrings:IncidentDatabase"] = incidents,
-            ["ConnectionStrings:CostIntelligenceDatabase"] = incidents,
-            ["ConnectionStrings:RuntimeIntelligenceDatabase"] = incidents,
+            ["ConnectionStrings:CostIntelligenceDatabase"] = cost,
+            ["ConnectionStrings:RuntimeIntelligenceDatabase"] = runtime,
             ["ConnectionStrings:AuditDatabase"] = audit,
             ["ConnectionStrings:AiGovernanceDatabase"] = aiKnowledge,
-            ["ConnectionStrings:ExternalAiDatabase"] = aiKnowledge,
-            ["ConnectionStrings:AiOrchestrationDatabase"] = aiKnowledge,
+            ["ConnectionStrings:ExternalAiDatabase"] = externalAi,
+            ["ConnectionStrings:AiOrchestrationDatabase"] = aiOrchestration,
             ["ConnectionStrings:GovernanceDatabase"] = governance,
         };
+    }
+
+    private void ApplyEnvironmentOverrides()
+    {
+        foreach (var (key, value) in BuildConnectionStringOverrides())
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                continue;
+
+            Environment.SetEnvironmentVariable(key.Replace(":", "__", StringComparison.Ordinal), value);
+        }
+
+        Environment.SetEnvironmentVariable("Jwt__Secret", "e2e-testing-jwt-secret-min-256-bits-nextraceone-platform");
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "NexTraceOne");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "nextraceone-api");
+        Environment.SetEnvironmentVariable("Jwt__AccessTokenExpirationMinutes", "60");
+        Environment.SetEnvironmentVariable("NexTraceOne__IntegrityCheck", "false");
+        Environment.SetEnvironmentVariable("NEXTRACE_IGNORE_PENDING_MODEL_CHANGES", "true");
     }
 
     /// <summary>

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:e2e:real": "vite --host 127.0.0.1 --port 4173",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -12,6 +13,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:real": "playwright test -c playwright.real.config.ts",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:typecheck": "tsc --noEmit -p tsconfig.e2e.json",
     "typecheck": "tsc --noEmit",

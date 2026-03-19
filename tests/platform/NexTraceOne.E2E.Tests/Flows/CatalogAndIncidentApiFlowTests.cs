@@ -7,12 +7,14 @@ namespace NexTraceOne.E2E.Tests.Flows;
 /// Valida que os endpoints core respondem corretamente com autenticação real
 /// contra backend + PostgreSQL real.
 ///
-/// Classificação: ALTA CONFIANÇA para endpoints de listagem vazios
-///                MÉDIA CONFIANÇA para criação (requer seed de dados mais completo)
+/// Classificação: ALTA CONFIANÇA para endpoints reais contra base seedada
+///                MÉDIA CONFIANÇA para criação e mutações dependentes de permissões
 /// </summary>
 [Collection(ApiE2ECollection.Name)]
 public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
 {
+    private static readonly Guid OrdersApiAssetId = Guid.Parse("d0000000-0000-0000-0000-000000000001");
+
     // ── Catalog: Service Source of Truth ─────────────────────────────────────
 
     [Fact]
@@ -57,11 +59,9 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
 
         var response = await client.GetAsync("/api/v1/catalog/services");
 
-        // Database is fresh (no seed services) — should return 200 with empty list
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var content = await response.Content.ReadAsStringAsync();
-            // Should be a valid JSON response (array or paged result)
             content.Should().NotBeNullOrWhiteSpace();
             content.Should().Match(c => c.Contains("[") || c.Contains("items") || c.Contains("data"),
                 "a resposta de listagem deve conter array ou paginação");
@@ -126,7 +126,7 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
     }
 
     [Fact]
-    public async Task Incidents_List_Returns_Empty_List_In_Fresh_Database()
+    public async Task Incidents_List_Returns_Seeded_List_When_Authenticated()
     {
         var token = await fixture.GetAuthTokenAsync();
         if (token is null) return;
@@ -141,10 +141,8 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
         {
             var content = await response.Content.ReadAsStringAsync();
             content.Should().NotBeNullOrWhiteSpace();
-            // Fresh database should return empty list
-            content.Should().Match(c =>
-                c.Contains("[]") || c.Contains("\"items\":[]") || c.Contains("\"total\":0"),
-                "base de dados nova deve retornar lista vazia de incidentes");
+            content.Should().Contain("INC-2026-0042");
+            content.Should().Contain("Payment Gateway");
         }
     }
 
@@ -184,7 +182,7 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
     [Fact]
     public async Task ChangeGovernance_ListReleases_Without_Auth_Should_Return_401()
     {
-        var response = await fixture.Client.GetAsync("/api/v1/change-intelligence/releases");
+        var response = await fixture.Client.GetAsync($"/api/v1/releases?apiAssetId={OrdersApiAssetId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized,
             "listagem de releases exige autenticação");
@@ -200,7 +198,7 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
         client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-        var response = await client.GetAsync("/api/v1/change-intelligence/releases");
+        var response = await client.GetAsync($"/api/v1/releases?apiAssetId={OrdersApiAssetId}");
 
         ((int)response.StatusCode).Should().BeOneOf(new[] {200, 403}, "releases endpoint deve responder com 200 ou 403 para utilizador autenticado — nunca 500");
     }
@@ -236,7 +234,7 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
     [Fact]
     public async Task Contracts_List_Without_Auth_Should_Return_401()
     {
-        var response = await fixture.Client.GetAsync("/api/v1/contracts");
+        var response = await fixture.Client.GetAsync("/api/v1/contracts/summary");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized,
             "listagem de contratos exige autenticação");
@@ -252,7 +250,7 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
         client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-        var response = await client.GetAsync("/api/v1/contracts");
+        var response = await client.GetAsync("/api/v1/contracts/summary");
 
         ((int)response.StatusCode).Should().BeOneOf(new[] {200, 403}, "utilizador autenticado deve receber 200 ou 403 para listagem de contratos");
     }

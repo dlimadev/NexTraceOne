@@ -8,5 +8,5 @@
     "noEmit": true,
     "strict": true
   },
-  "include": ["e2e/**/*.ts"]
+  "include": ["e2e/**/*.ts", "e2e-real/**/*.ts"]
 }

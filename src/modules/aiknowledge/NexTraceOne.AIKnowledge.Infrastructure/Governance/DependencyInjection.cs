@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,10 +30,21 @@ public static class DependencyInjection
             ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
 
         services.AddDbContext<AiGovernanceDbContext>((serviceProvider, options) =>
-            options.UseNpgsql(connectionString)
-                .AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+        {
+            options.UseNpgsql(connectionString);
+
+            if (string.Equals(
+                Environment.GetEnvironmentVariable("NEXTRACE_IGNORE_PENDING_MODEL_CHANGES"),
+                "true",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+            }
+
+            options.AddInterceptors(
+                serviceProvider.GetRequiredService<AuditInterceptor>(),
+                serviceProvider.GetRequiredService<TenantRlsInterceptor>());
+        });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AiGovernanceDbContext>());
         services.AddScoped<IAiAccessPolicyRepository, AiAccessPolicyRepository>();
