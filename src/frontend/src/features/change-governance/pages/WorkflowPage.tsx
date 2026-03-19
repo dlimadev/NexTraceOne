@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CheckSquare, Clock, RefreshCw, XCircle } from 'lucide-react';
+import { CheckSquare, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { workflowApi } from '../api';
 import type { WorkflowInstance } from '../../../types';
 import { PageContainer } from '../../../components/shell';
@@ -18,7 +20,13 @@ function statusVariant(status: InstanceStatus): 'default' | 'success' | 'warning
   return 'default';
 }
 
-const TEMPLATE_LEVEL_LABELS = ['Operational', 'Non-Breaking', 'Additive', 'Breaking', 'Publication'];
+const TEMPLATE_LEVEL_KEYS = [
+  'releases.changeLevels.operational',
+  'releases.changeLevels.nonBreaking',
+  'releases.changeLevels.additive',
+  'releases.changeLevels.breaking',
+  'releases.changeLevels.publication',
+] as const;
 const TEMPLATE_LEVEL_VARIANTS = ['default', 'success', 'info', 'danger', 'warning'] as const;
 
 export function WorkflowPage() {
@@ -85,14 +93,9 @@ export function WorkflowPage() {
           </CardHeader>
           <CardBody className="p-0">
             {instancesLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <RefreshCw size={18} className="animate-spin text-muted" />
-              </div>
+              <PageLoadingState size="sm" />
             ) : instancesError ? (
-              <div className="flex items-center gap-2 px-6 py-8 text-sm text-critical justify-center">
-                <XCircle size={16} />
-                <span>{t('workflow.loadFailed')}</span>
-              </div>
+              <PageErrorState message={t('workflow.loadFailed')} />
             ) : pending.length === 0 ? (
               <p className="text-sm text-muted text-center py-8">{t('workflow.noPending')}</p>
             ) : (
@@ -201,32 +204,34 @@ export function WorkflowPage() {
           </CardHeader>
           <CardBody className="p-0">
             {templatesLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <RefreshCw size={18} className="animate-spin text-muted" />
-              </div>
+              <PageLoadingState size="sm" />
             ) : templates?.length ? (
               <ul className="divide-y divide-edge">
-                {templates.map((t) => (
-                  <li key={t.id} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
+                {templates.map((tmpl) => (
+                  <li key={tmpl.id} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
                     <div>
-                      <p className="text-sm font-medium text-body">{t.name}</p>
+                      <p className="text-sm font-medium text-body">{tmpl.name}</p>
                       <p className="text-xs text-muted">
-                        {t.stages.length} stage{t.stages.length !== 1 ? 's' : ''}
+                        {t('workflow.stageCount', { count: tmpl.stages.length })}
                       </p>
                     </div>
-                    <Badge variant={TEMPLATE_LEVEL_VARIANTS[t.changeLevel] ?? 'default'}>
-                      {TEMPLATE_LEVEL_LABELS[t.changeLevel] ?? `Level ${t.changeLevel}`}
+                    <Badge variant={TEMPLATE_LEVEL_VARIANTS[tmpl.changeLevel] ?? 'default'}>
+                      {t(TEMPLATE_LEVEL_KEYS[tmpl.changeLevel] ?? 'releases.changeLevels.unknown')}
                     </Badge>
                   </li>
                 ))}
               </ul>
             ) : (
               <ul className="divide-y divide-edge">
-                {['Standard Release', 'Breaking Change Release', 'Hotfix Release'].map((name, i) => (
-                  <li key={name} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
-                    <span className="text-sm text-body">{name}</span>
-                    <Badge variant={TEMPLATE_LEVEL_VARIANTS[i + 1] ?? 'default'}>
-                      {TEMPLATE_LEVEL_LABELS[i + 1]}
+                {[
+                  { key: 'workflow.defaultTemplates.standard', level: 1 },
+                  { key: 'workflow.defaultTemplates.breakingChange', level: 3 },
+                  { key: 'workflow.defaultTemplates.hotfix', level: 0 },
+                ].map(({ key, level }) => (
+                  <li key={key} className="px-6 py-3 flex items-center justify-between hover:bg-hover transition-colors">
+                    <span className="text-sm text-body">{t(key)}</span>
+                    <Badge variant={TEMPLATE_LEVEL_VARIANTS[level] ?? 'default'}>
+                      {t(TEMPLATE_LEVEL_KEYS[level] ?? 'releases.changeLevels.unknown')}
                     </Badge>
                   </li>
                 ))}
