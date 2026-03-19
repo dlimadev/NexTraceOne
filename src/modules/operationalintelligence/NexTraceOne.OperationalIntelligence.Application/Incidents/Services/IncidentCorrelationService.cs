@@ -54,8 +54,8 @@ internal sealed class IncidentCorrelationService(
             Page: 1,
             PageSize: 20), cancellationToken);
 
-        var candidates = byServiceId.Value.Changes
-            .Concat(byServiceName.Value.Changes)
+        var candidates = (byServiceId.IsSuccess && byServiceId.Value is not null ? byServiceId.Value.Changes : [])
+            .Concat(byServiceName.IsSuccess && byServiceName.Value is not null ? byServiceName.Value.Changes : [])
             .GroupBy(c => c.ChangeId)
             .Select(g => g.First())
             .OrderByDescending(c => c.CreatedAt)

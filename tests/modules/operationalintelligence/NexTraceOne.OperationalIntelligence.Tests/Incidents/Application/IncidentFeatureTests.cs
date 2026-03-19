@@ -182,7 +182,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentCorrelation_LowConfidenceIncident_ShouldReturnLowConfidence()
     {
-        var handler = new GetIncidentCorrelation.Handler(_store);
+        var handler = new GetIncidentCorrelation.Handler(_store, _correlationService);
         var query = new GetIncidentCorrelation.Query("a1b2c3d4-0002-0000-0000-000000000002");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -195,7 +195,7 @@ public sealed class IncidentFeatureTests
     [Fact]
     public async Task GetIncidentCorrelation_UnknownIncident_ShouldReturnNotFound()
     {
-        var handler = new GetIncidentCorrelation.Handler(_store);
+        var handler = new GetIncidentCorrelation.Handler(_store, _correlationService);
         var query = new GetIncidentCorrelation.Query("nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
