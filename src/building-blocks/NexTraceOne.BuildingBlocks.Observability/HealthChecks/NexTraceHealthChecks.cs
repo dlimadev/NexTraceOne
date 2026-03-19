@@ -13,7 +13,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 /// </summary>
 public static class NexTraceHealthChecks
 {
-    /// <summary>Registra health checks da plataforma com tags para liveness, readiness e startup.</summary>
+    /// <summary>Registra health checks base da plataforma.</summary>
     public static IServiceCollection AddNexTraceHealthChecks(this IServiceCollection services)
     {
         services.AddHealthChecks()
@@ -29,16 +29,7 @@ public static class NexTraceHealthChecks
                     };
                     return HealthCheckResult.Healthy("NexTraceOne host is running.", data);
                 },
-                tags: ["live"])
-            .AddCheck("database",
-                () => HealthCheckResult.Healthy("Database connection pool is healthy."),
-                tags: ["ready", "startup"])
-            .AddCheck("background-jobs",
-                () => HealthCheckResult.Healthy("Background job scheduler is operational."),
-                tags: ["ready"])
-            .AddCheck("startup-config",
-                () => HealthCheckResult.Healthy("Critical configuration sections loaded."),
-                tags: ["startup"]);
+                tags: ["live"]);
 
         return services;
     }

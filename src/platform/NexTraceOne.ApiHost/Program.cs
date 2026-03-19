@@ -50,6 +50,7 @@ builder.Host.ConfigureNexTraceSerilog(builder.Configuration);
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
 builder.Services.AddBuildingBlocksObservability(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
+builder.Services.AddApiHostOperationalHealthChecks();
 
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
@@ -132,9 +133,11 @@ await app.SeedDevelopmentDataAsync();
 // ── Middlewares na ordem correta ──
 app.UseResponseCompression();
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseRateLimiter();
 app.UseSecurityHeaders();
 app.UseGlobalExceptionHandler();
+app.UseCookieSessionCsrfProtection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
@@ -152,7 +155,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.MapHealthChecks("/health").AllowAnonymous();
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthCheckResponseWriter.WriteResponse
+}).AllowAnonymous();
 
 app.MapHealthChecks("/ready", new HealthCheckOptions
 {

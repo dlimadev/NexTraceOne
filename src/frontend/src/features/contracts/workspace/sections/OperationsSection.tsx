@@ -311,16 +311,22 @@ function parseYamlPathsHeuristic(content: string): OperationItem[] {
     // Detect path lines (e.g. "  /users:")
     const pathMatch = line.match(/^ {2}(\/[^\s:]+):\s*$/);
     if (pathMatch) {
-      currentPath = pathMatch[1];
+      const pathValue = pathMatch[1];
+      if (!pathValue) {
+        continue;
+      }
+
+      currentPath = pathValue;
       continue;
     }
     // Detect method lines (e.g. "    get:")
     if (currentPath) {
       const methodMatch = line.match(/^\s{4}(\w+):\s*$/);
-      if (methodMatch && methods.includes(methodMatch[1].toLowerCase())) {
+      const method = methodMatch?.[1]?.toLowerCase();
+      if (method && methods.includes(method)) {
         ops.push({
-          id: `${methodMatch[1]}-${currentPath}`,
-          method: methodMatch[1].toUpperCase(),
+          id: `${method}-${currentPath}`,
+          method: method.toUpperCase(),
           path: currentPath,
           operationId: '',
           summary: '',

@@ -1,9 +1,10 @@
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import {
-  Package, ArrowLeft, Info, List, Globe, History, BarChart3,
-  FileCheck, Play, Shield, ShieldCheck, ShieldAlert, Loader2, AlertTriangle,
+  Package, ArrowLeft, Info, List, Globe, History,
+  Play, Shield, ShieldCheck,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -48,8 +49,6 @@ export function GovernancePackDetailPage() {
   useEffect(() => {
     if (!packId) return;
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
     organizationGovernanceApi.getGovernancePack(packId)
       .then((response) => {
@@ -295,9 +294,18 @@ export function GovernancePackDetailPage() {
             <p className="text-xs text-muted mt-1">{t('governancePacks.detail.simulationDescription')}</p>
           </CardHeader>
           <CardBody>
+            <div className="mb-4 flex items-center gap-2 text-xs text-muted">
+              <Badge variant="warning">{t('governance.preview.badge')}</Badge>
+              <span>
+                {t(
+                  'governance.preview.simulationReason',
+                  'Simulation remains preview-only until the impact model is backed by production data.',
+                )}
+              </span>
+            </div>
             <Link
               to={`/governance/packs/${pack.packId}/simulate`}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent-hover transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-accent/30 bg-accent/10 text-accent hover:bg-accent/15 transition-colors"
             >
               <Play size={14} />
               {t('governancePacks.detail.runSimulation')}

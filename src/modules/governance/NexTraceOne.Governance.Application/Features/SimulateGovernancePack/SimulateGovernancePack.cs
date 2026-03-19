@@ -21,50 +21,10 @@ public static class SimulateGovernancePack
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var entities = new List<SimulationImpactDto>
-            {
-                new("Service", "svc-001", "payment-api", "NonCompliant", "Compliant", false),
-                new("Service", "svc-002", "order-service", "Compliant", "Compliant", false),
-                new("Service", "svc-003", "notification-hub", "NonCompliant", "NonCompliant", true),
-                new("Contract", "ctr-001", "payment-api-v2", "NonCompliant", "Compliant", false),
-                new("Contract", "ctr-002", "order-events-v1", "Compliant", "Compliant", false),
-                new("Contract", "ctr-003", "user-profile-api", "NonCompliant", "NonCompliant", true),
-                new("Service", "svc-004", "analytics-pipeline", "NonCompliant", "Compliant", false),
-                new("Contract", "ctr-004", "billing-soap-v3", "NonCompliant", "NonCompliant", true)
-            };
-
-            var byTeam = new Dictionary<string, int>
-            {
-                ["platform-core"] = 3,
-                ["payments"] = 2,
-                ["growth"] = 2,
-                ["data-engineering"] = 1
-            };
-
-            var byDomain = new Dictionary<string, int>
-            {
-                ["payments"] = 3,
-                ["operations"] = 2,
-                ["analytics"] = 2,
-                ["identity"] = 1
-            };
-
-            var summary = new SimulationSummaryDto(
-                TotalAffected: entities.Count,
-                CompliantCount: entities.Count(e => e.ProjectedStatus == "Compliant"),
-                NonCompliantCount: entities.Count(e => e.ProjectedStatus == "NonCompliant"),
-                BlockingCount: entities.Count(e => e.BlockingImpact),
-                ByTeam: byTeam,
-                ByDomain: byDomain);
-
-            var response = new Response(
-                SimulationId: Guid.NewGuid().ToString(),
-                PackId: request.PackId,
-                Summary: summary,
-                ImpactedEntities: entities,
-                SimulatedAt: DateTimeOffset.UtcNow);
-
-            return Task.FromResult(Result<Response>.Success(response));
+            return Task.FromResult<Result<Response>>(
+                Error.Business(
+                    "Governance.Packs.Simulation.PreviewOnly",
+                    "Governance pack simulation remains a preview-only workflow and is not backed by production data in this release."));
         }
     }
 

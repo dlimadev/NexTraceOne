@@ -13,6 +13,15 @@ export interface LoginResponse {
   user: LoginUser;
 }
 
+/** Resposta do login via cookie httpOnly + CSRF. */
+export interface CookieSessionLoginResponse {
+  csrfToken: string;
+  expiresIn: number;
+  user: LoginUser;
+}
+
+export type AuthLoginResponse = LoginResponse | CookieSessionLoginResponse;
+
 /** Resumo do usuário retornado no login (nested em LoginResponse). */
 export interface LoginUser {
   id: string;
@@ -54,6 +63,7 @@ export interface SelectTenantResponse {
   tenantName: string;
   roleName: string;
   permissions: string[];
+  csrfToken?: string;
 }
 
 /** Perfil detalhado retornado por /users/{id} — inclui memberships multi-tenant. */

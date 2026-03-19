@@ -5,13 +5,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle, AlertCircle, ShieldAlert, Eye,
   Search, CheckCircle, XCircle, Clock, Shield,
-  GitBranch, Wrench, Loader2,
+  GitBranch, Wrench,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
-import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';

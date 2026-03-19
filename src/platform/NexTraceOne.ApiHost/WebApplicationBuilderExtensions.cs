@@ -35,8 +35,8 @@ public static class WebApplicationBuilderExtensions
                     .WithHeaders(
                         "Content-Type", "Authorization",
                         "X-Tenant-Id", "X-Requested-With",
-                        "X-Csrf-Token")   // necessário para o modelo de sessão cookie com CSRF
-                    .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                        "X-Csrf-Token")
+                    .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                     .AllowCredentials());
         });
     }

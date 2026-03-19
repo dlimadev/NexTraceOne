@@ -1,5 +1,12 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { LoginResponse, CurrentUserProfile, TenantInfo, SelectTenantResponse } from '../types';
+import type {
+  AuthLoginResponse,
+  CurrentUserProfile,
+  TenantInfo,
+  SelectTenantResponse,
+  CookieSessionLoginResponse,
+} from '../types';
 import { identityApi } from '../api';
 import {
   storeTokens,
@@ -9,23 +16,11 @@ import {
   getUserId,
   storeTenantId,
   storeUserId,
+  storeCsrfToken,
   clearAllTokens,
   migrateFromLocalStorage,
-  hasActiveSession,
 } from '../utils/tokenStorage';
 
-/**
- * Estado de autenticação e contexto do tenant selecionado.
- *
- * `requiresTenantSelection` indica que o login foi bem-sucedido mas o usuário
- * possui múltiplos tenants — o frontend deve exibir a tela de seleção.
- * `availableTenants` contém a lista de tenants disponíveis para seleção.
- *
- * Tokens são armazenados de forma segura via módulo tokenStorage:
- * - Access token: sessionStorage (escopo de aba)
- * - Refresh token: memória apenas (não persiste no browser)
- * - Tenant/User ID: sessionStorage (necessário para re-hidratação)
- */
 interface AuthState {
   isAuthenticated: boolean;
   isLoadingUser: boolean;
@@ -37,53 +32,44 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  /** Autentica com email e senha. Se houver múltiplos tenants, redireciona para seleção. */
   login: (email: string, password: string) => Promise<'authenticated' | 'select-tenant'>;
-  /** Seleciona um tenant após login multi-tenant. */
   selectTenant: (tenantId: string) => Promise<void>;
-  /** Encerra a sessão e limpa dados locais. */
   logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-/**
- * Persiste dados de sessão no storage seguro após login bem-sucedido.
- * Access token vai para sessionStorage, refresh token fica em memória.
- */
-function persistSession(data: LoginResponse): void {
-  storeTokens(data.accessToken, data.refreshToken);
+function isCookieSessionLoginResponse(data: AuthLoginResponse): data is CookieSessionLoginResponse {
+  return 'csrfToken' in data;
+}
+
+function persistSession(data: AuthLoginResponse): void {
   storeTenantId(data.user.tenantId);
   storeUserId(data.user.id);
+
+  if (isCookieSessionLoginResponse(data)) {
+    storeCsrfToken(data.csrfToken);
+    return;
+  }
+
+  storeTokens(data.accessToken, data.refreshToken);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Migra dados de localStorage para o novo storage na primeira carga
   useEffect(() => {
     migrateFromLocalStorage();
   }, []);
 
-  const [state, setState] = useState<AuthState>(() => {
-    // Tenta migrar dados antigos do localStorage se existirem
-    migrateFromLocalStorage();
-    const token = getAccessToken();
-    const tenantId = getTenantId();
-    return {
-      isAuthenticated: !!token,
-      isLoadingUser: !!token,
-      accessToken: token,
-      user: null,
-      tenantId,
-      requiresTenantSelection: false,
-      availableTenants: [],
-    };
-  });
+  const [state, setState] = useState<AuthState>(() => ({
+    isAuthenticated: false,
+    isLoadingUser: true,
+    accessToken: getAccessToken(),
+    user: null,
+    tenantId: getTenantId(),
+    requiresTenantSelection: false,
+    availableTenants: [],
+  }));
 
-  /**
-   * Escuta evento de sessão expirada disparado pelo interceptor do API client.
-   * Limpa estado de autenticação e redireciona para login.
-   * Usar evento customizado evita import circular entre AuthContext e apiClient.
-   */
   useEffect(() => {
     const handleSessionExpired = () => {
       clearAllTokens();
@@ -102,24 +88,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('auth:session-expired', handleSessionExpired);
   }, []);
 
-  // Carrega o perfil do usuário autenticado ao iniciar quando há token armazenado
   useEffect(() => {
-    if (hasActiveSession()) {
-      identityApi.getCurrentUser().then((profile) => {
-        setState((s) => ({ ...s, user: profile, isLoadingUser: false }));
-      }).catch(() => {
-        // Se falhar ao carregar perfil, sessão pode estar inválida.
-        // Não loga erro com detalhes para evitar vazamento de dados sensíveis.
-        setState((s) => ({ ...s, isLoadingUser: false }));
-      });
-    }
+    let isMounted = true;
+
+    const bootstrapSession = async () => {
+      try {
+        const profile = await identityApi.getCurrentUser();
+
+        try {
+          const csrf = await identityApi.getCsrfToken();
+          if (csrf?.csrfToken) {
+            storeCsrfToken(csrf.csrfToken);
+          }
+        } catch {
+          // Fluxo bearer legado não expõe endpoint de CSRF ativo.
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        storeTenantId(profile.tenantId);
+        storeUserId(profile.id);
+
+        setState({
+          isAuthenticated: true,
+          isLoadingUser: false,
+          accessToken: getAccessToken(),
+          user: profile,
+          tenantId: profile.tenantId,
+          requiresTenantSelection: false,
+          availableTenants: [],
+        });
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        clearAllTokens();
+        setState({
+          isAuthenticated: false,
+          isLoadingUser: false,
+          accessToken: null,
+          user: null,
+          tenantId: null,
+          requiresTenantSelection: false,
+          availableTenants: [],
+        });
+      }
+    };
+
+    void bootstrapSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<'authenticated' | 'select-tenant'> => {
     const data = await identityApi.login({ email, password });
     persistSession(data);
 
-    // Verifica se o usuário tem múltiplos tenants disponíveis
     let tenants: TenantInfo[] = [];
     try {
       tenants = await identityApi.listMyTenants();
@@ -127,13 +156,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Se falhar ao listar tenants, assume o tenant do login
     }
 
-    // Se houver múltiplos tenants ativos, exige seleção explícita
     const activeTenants = tenants.filter((t) => t.isActive);
     if (activeTenants.length > 1) {
       setState({
         isAuthenticated: true,
         isLoadingUser: false,
-        accessToken: data.accessToken,
+        accessToken: getAccessToken(),
         user: null,
         tenantId: null,
         requiresTenantSelection: true,
@@ -142,12 +170,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return 'select-tenant';
     }
 
-    // Carrega perfil completo via /me após login para obter permissões atualizadas
     let profile: CurrentUserProfile | null = null;
     try {
       profile = await identityApi.getCurrentUser();
     } catch {
-      // Fallback: monta perfil básico a partir da resposta de login
       profile = {
         id: data.user.id,
         email: data.user.email,
@@ -165,9 +191,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({
       isAuthenticated: true,
       isLoadingUser: false,
-      accessToken: data.accessToken,
+      accessToken: getAccessToken(),
       user: profile,
-      tenantId: data.user.tenantId,
+      tenantId: profile.tenantId,
       requiresTenantSelection: false,
       availableTenants: [],
     });
@@ -177,10 +203,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const selectTenant = useCallback(async (tenantId: string) => {
     const response: SelectTenantResponse = await identityApi.selectTenant(tenantId);
 
-    updateAccessToken(response.accessToken);
+    if (response.csrfToken) {
+      storeCsrfToken(response.csrfToken);
+    } else {
+      updateAccessToken(response.accessToken);
+    }
+
     storeTenantId(response.tenantId);
 
-    // Carrega perfil completo com o novo contexto de tenant
     let profile: CurrentUserProfile | null = null;
     try {
       profile = await identityApi.getCurrentUser();
@@ -202,7 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({
       isAuthenticated: true,
       isLoadingUser: false,
-      accessToken: response.accessToken,
+      accessToken: getAccessToken(),
       user: profile,
       tenantId: response.tenantId,
       requiresTenantSelection: false,

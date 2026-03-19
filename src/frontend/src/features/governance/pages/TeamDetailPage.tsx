@@ -440,4 +440,3 @@ function DependenciesTab({ deps, t }: { deps: CrossTeamDependencyDto[]; t: (key:
     </div>
   );
 }
-}

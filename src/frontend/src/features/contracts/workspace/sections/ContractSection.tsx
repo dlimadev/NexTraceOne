@@ -172,10 +172,12 @@ function SourceEditor({ content, format, isReadOnly, onChange }: SourceEditorPro
     const entries: { line: number; text: string; depth: number }[] = [];
     const lines = content.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i] ?? '';
       const yamlMatch = line.match(/^(\s*)(\w[\w-]*)\s*:/);
       if (yamlMatch) {
-        entries.push({ line: i + 1, text: yamlMatch[2], depth: yamlMatch[1].length / 2 });
+        const indent = yamlMatch[1] ?? '';
+        const text = yamlMatch[2] ?? '';
+        entries.push({ line: i + 1, text, depth: indent.length / 2 });
       }
     }
     return entries.filter((e) => e.depth <= 2).slice(0, 40);

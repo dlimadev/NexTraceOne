@@ -184,7 +184,7 @@ export function GlobalSearchPage() {
       {!isLoading && !isError && filteredResults.length > 0 && (
         <div className="flex flex-col gap-3">
           {filteredResults.map((item) => (
-            <SearchResultCard key={item.entityId} item={item} t={t} />
+            <SearchResultCard key={item.entityId} item={item} />
           ))}
         </div>
       )}
@@ -205,11 +205,11 @@ export function GlobalSearchPage() {
 
 function SearchResultCard({
   item,
-  t,
 }: {
   item: SearchResultItem;
-  t: (key: string, fallback?: string) => string;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Link
       to={item.route}

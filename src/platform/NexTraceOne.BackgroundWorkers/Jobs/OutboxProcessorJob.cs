@@ -15,18 +15,31 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 public sealed class OutboxProcessorJob(
     IServiceScopeFactory serviceScopeFactory,
     IDateTimeProvider dateTimeProvider,
+    WorkerJobHealthRegistry jobHealthRegistry,
     ILogger<OutboxProcessorJob> logger) : BackgroundService
 {
     private const int BatchSize = 50;
     private const int MaxRetryCount = 5;
+    internal const string HealthCheckName = "outbox-processor";
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        jobHealthRegistry.MarkStarted(HealthCheckName);
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
 
         while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
-            await ProcessIdentityOutboxAsync(stoppingToken);
+            try
+            {
+                jobHealthRegistry.MarkStarted(HealthCheckName);
+                await ProcessIdentityOutboxAsync(stoppingToken);
+                jobHealthRegistry.MarkSucceeded(HealthCheckName);
+            }
+            catch (Exception ex)
+            {
+                jobHealthRegistry.MarkFailed(HealthCheckName, "Outbox cycle failed.");
+                logger.LogError(ex, "Unhandled error in outbox processor job.");
+            }
         }
     }
 

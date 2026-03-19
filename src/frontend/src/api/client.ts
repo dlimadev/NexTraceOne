@@ -14,14 +14,17 @@ import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import {
   getAccessToken,
+  getCsrfToken,
   getTenantId,
   getRefreshToken,
   storeTokens,
   clearAllTokens,
+  clearCsrfToken,
 } from '../utils/tokenStorage';
 
 const apiClient = axios.create({
   baseURL: '/api/v1',
+  withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -34,10 +37,18 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   const tenantId = getTenantId();
   if (tenantId) {
     config.headers['X-Tenant-Id'] = tenantId;
   }
+
+  const method = config.method?.toUpperCase();
+  const csrfToken = getCsrfToken();
+  if (csrfToken && method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    config.headers['X-Csrf-Token'] = csrfToken;
+  }
+
   return config;
 });
 
@@ -88,7 +99,7 @@ apiClient.interceptors.response.use(
         isRefreshing = true;
 
         try {
-          const { data } = await axios.post('/api/v1/identity/auth/refresh', { refreshToken });
+          const { data } = await axios.post('/api/v1/identity/auth/refresh', { refreshToken }, { withCredentials: true });
 
           // Segurança: validar estrutura da resposta antes de armazenar tokens.
           // Previne armazenamento de valores malformados ou vazios em caso de
@@ -108,6 +119,7 @@ apiClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return apiClient(originalRequest);
         } catch {
+          clearCsrfToken();
           clearAllTokens();
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
           return Promise.reject(error);
@@ -116,6 +128,7 @@ apiClient.interceptors.response.use(
         }
       }
 
+      clearCsrfToken();
       clearAllTokens();
       window.dispatchEvent(new CustomEvent('auth:session-expired'));
     }

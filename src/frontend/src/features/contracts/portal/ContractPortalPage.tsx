@@ -15,6 +15,7 @@ import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { contractsApi } from '../api/contracts';
 import { enrichToStudioContract } from '../workspace/studioMock';
 import { cn } from '../../../lib/cn';
+import type { ContractVersion } from '../../../types';
 
 type PortalTab =
   | 'overview'
@@ -562,7 +563,7 @@ function SecurityTab({ studio }: { studio: ReturnType<typeof enrichToStudioContr
 
 // ── Versions Tab ──────────────────────────────────────────────────────────────
 
-function VersionsTab({ versions, currentVersionId }: { versions: { id: string; semVer: string; lifecycleState: string; createdAt: string }[]; currentVersionId: string }) {
+function VersionsTab({ versions, currentVersionId }: { versions: ContractVersion[]; currentVersionId: string }) {
   const { t } = useTranslation();
 
   if (versions.length === 0) {
@@ -587,7 +588,7 @@ function VersionsTab({ versions, currentVersionId }: { versions: { id: string; s
                 v.id === currentVersionId && 'bg-accent/5 border-l-2 border-accent',
               )}
             >
-              <span className="text-xs font-mono font-bold text-heading">v{v.semVer}</span>
+              <span className="text-xs font-mono font-bold text-heading">v{v.version}</span>
               <LifecycleBadge state={v.lifecycleState} size="sm" />
               <span className="text-[10px] text-muted ml-auto">
                 {v.createdAt ? new Date(v.createdAt).toLocaleDateString() : ''}
@@ -669,14 +670,25 @@ function extractOperations(specContent: string, protocol: string): ExtractedOp[]
       let currentPath = '';
       for (const line of lines) {
         const pathMatch = line.match(/^\s{2}(\/\S+)\s*:/);
-        if (pathMatch) currentPath = pathMatch[1];
-        const methodMatch = line.match(/^\s{4}(\w+)\s*:/);
-        if (methodMatch && methods.includes(methodMatch[1])) {
-          ops.push({ method: methodMatch[1].toUpperCase(), path: currentPath });
+        if (pathMatch) {
+          const pathValue = pathMatch[1];
+          if (pathValue) {
+            currentPath = pathValue;
+          }
         }
-        if (line.includes('summary:') && ops.length > 0 && !ops[ops.length - 1].summary) {
+
+        const methodMatch = line.match(/^\s{4}(\w+)\s*:/);
+        const method = methodMatch?.[1];
+        if (method && methods.includes(method)) {
+          ops.push({ method: method.toUpperCase(), path: currentPath });
+        }
+
+        const lastOperation = ops[ops.length - 1];
+        if (line.includes('summary:') && lastOperation && !lastOperation.summary) {
           const val = line.split('summary:')[1]?.trim().replace(/^["']|["']$/g, '');
-          if (val) ops[ops.length - 1].summary = val;
+          if (val) {
+            lastOperation.summary = val;
+          }
         }
       }
     }
@@ -710,7 +722,13 @@ function extractSchemas(specContent: string): ExtractedSchema[] {
           if (currentSchema) {
             schemas.push({ name: currentSchema, type: 'object', propCount });
           }
-          currentSchema = schemaMatch[1];
+
+          const nextSchema = schemaMatch[1];
+          if (!nextSchema) {
+            continue;
+          }
+
+          currentSchema = nextSchema;
           propCount = 0;
           depth = 4;
           continue;

@@ -6,11 +6,10 @@ import {
   AlertTriangle, ArrowLeft, ShieldAlert, AlertCircle, Eye,
   CheckCircle, XCircle, Clock, Search, Wrench,
   GitBranch, FileText, BookOpen, Shield, Activity,
-  ExternalLink, Loader2,
+  ExternalLink,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';

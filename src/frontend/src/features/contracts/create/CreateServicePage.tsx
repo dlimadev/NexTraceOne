@@ -158,7 +158,8 @@ export function CreateServicePage() {
                   onClick={() => {
                     setSelectedType(st.value);
                     const protos = PROTOCOL_BY_TYPE[st.value];
-                    if (protos.length === 1) setSelectedProtocol(protos[0]);
+                    const singleProtocol = protos[0];
+                    if (protos.length === 1 && singleProtocol) setSelectedProtocol(singleProtocol);
                     else setSelectedProtocol('');
                   }}
                   className={`text-left rounded-lg border p-4 transition-all
@@ -305,9 +306,9 @@ export function CreateServicePage() {
                 </div>
               )}
 
-              {protocols.length === 1 && (
+              {protocols.length === 1 && protocols[0] && (
                 <div className="text-xs text-muted">
-                  {t('contracts.protocol', 'Protocol')}: <span className="text-heading font-medium">{t(`contracts.protocols.${protocols[0]}`, protocols[0])}</span>
+                  {t('contracts.protocol', 'Protocol')}: <span className="text-heading font-medium">{t(`contracts.protocols.${protocols[0]}`, { defaultValue: protocols[0] })}</span>
                 </div>
               )}
 

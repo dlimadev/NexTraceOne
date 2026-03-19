@@ -50,39 +50,14 @@ public static class ExecutePlayground
         IUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            // MVP1: execução mock — em produção, delegaria para sandbox isolado
-            var mockResponseBody = $"{{\"message\":\"Sandbox mock response for {request.HttpMethod} {request.RequestPath}\"}}";
-            const int mockStatusCode = 200;
-            const long mockDuration = 42L;
-
-            var session = PlaygroundSession.Create(
-                request.ApiAssetId,
-                request.ApiName,
-                request.UserId,
-                request.HttpMethod,
-                request.RequestPath,
-                request.RequestBody,
-                request.RequestHeaders,
-                mockStatusCode,
-                mockResponseBody,
-                mockDuration,
-                clock.UtcNow);
-
-            repository.Add(session);
-            await unitOfWork.CommitAsync(cancellationToken);
-
-            return new Response(
-                session.Id.Value,
-                session.HttpMethod,
-                session.RequestPath,
-                mockStatusCode,
-                mockResponseBody,
-                mockDuration,
-                session.ExecutedAt);
+            return Task.FromResult<Result<Response>>(
+                Error.Business(
+                    "Catalog.Playground.PreviewOnly",
+                    "Developer portal playground is still a preview-only capability and does not execute against a production-backed sandbox in this release."));
         }
     }
 

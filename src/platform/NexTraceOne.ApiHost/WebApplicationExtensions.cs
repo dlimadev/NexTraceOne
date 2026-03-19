@@ -4,10 +4,12 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
+using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
@@ -17,6 +19,7 @@ using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using System.Diagnostics;
 
 namespace NexTraceOne.ApiHost;
 
@@ -132,6 +135,38 @@ public static class WebApplicationExtensions
                     detail = "An unexpected error occurred while processing the request.",
                     status = StatusCodes.Status500InternalServerError
                 });
+            });
+        });
+    }
+
+    /// <summary>
+    /// Aplica validação CSRF global para requests mutáveis autenticados por cookie httpOnly.
+    /// Requests Bearer continuam isentos porque não transportam credenciais automáticas do browser.
+    /// </summary>
+    public static void UseCookieSessionCsrfProtection(this WebApplication app)
+    {
+        app.Use(async (context, next) =>
+        {
+            var options = context.RequestServices
+                .GetRequiredService<IOptions<CookieSessionOptions>>()
+                .Value;
+
+            if (!options.Enabled || CsrfTokenValidator.IsValid(context, options))
+            {
+                await next();
+                return;
+            }
+
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/problem+json";
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                title = "Forbidden",
+                detail = "CSRF token is missing or invalid.",
+                status = StatusCodes.Status403Forbidden,
+                code = "csrf_token_invalid",
+                traceId = Activity.Current?.Id ?? context.TraceIdentifier
             });
         });
     }

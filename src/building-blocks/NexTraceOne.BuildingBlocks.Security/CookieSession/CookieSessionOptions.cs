@@ -56,4 +56,10 @@ public sealed class CookieSessionOptions
     /// Padrão: 60 minutos.
     /// </summary>
     public int AccessTokenCookieExpirationMinutes { get; init; } = 60;
+
+    /// <summary>
+    /// Exige cookies marcados como Secure.
+    /// Deve permanecer true em produção; pode ser false apenas em development controlado.
+    /// </summary>
+    public bool RequireSecureCookies { get; init; } = true;
 }

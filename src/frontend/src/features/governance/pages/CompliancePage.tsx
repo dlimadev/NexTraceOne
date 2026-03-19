@@ -10,7 +10,7 @@ import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import type { ComplianceSummaryResponse, ComplianceStatusType } from '../../../types';
+import type { ComplianceSummaryResponse, ComplianceStatusType, CompliancePackRowDto } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 
@@ -58,28 +58,28 @@ export function CompliancePage() {
 
   const d = data;
 
-  const filteredGaps = d.gaps.filter(gap => {
+  const filteredGaps = d.packs.filter((gap: CompliancePackRowDto) => {
     if (filter === 'NonCompliant' && gap.status !== 'NonCompliant') return false;
     if (filter === 'PartiallyCompliant' && gap.status !== 'PartiallyCompliant') return false;
     if (search) {
       const q = search.toLowerCase();
-      return gap.serviceName.toLowerCase().includes(q)
-        || gap.domain.toLowerCase().includes(q)
-        || gap.team.toLowerCase().includes(q);
+      return gap.packName.toLowerCase().includes(q)
+        || gap.category.toLowerCase().includes(q)
+        || gap.packStatus.toLowerCase().includes(q);
     }
     return true;
   });
 
   const scoreColor = d.overallScore >= 80 ? 'text-success' : d.overallScore >= 60 ? 'text-amber-400' : 'text-critical';
+  const percent = (value: number, total: number) => (total > 0 ? Math.round((value / total) * 100) : 0);
 
   const coverageItems = [
-    { key: 'ownerDefined', value: d.coverage.ownerDefined },
-    { key: 'contractDefined', value: d.coverage.contractDefined },
-    { key: 'versioningPresent', value: d.coverage.versioningPresent },
-    { key: 'documentationAvailable', value: d.coverage.documentationAvailable },
-    { key: 'runbookAvailable', value: d.coverage.runbookAvailable },
-    { key: 'dependenciesMapped', value: d.coverage.dependenciesMapped },
-    { key: 'publicationUpToDate', value: d.coverage.publicationUpToDate },
+    { key: 'compliant', label: t('governance.compliance.compliant'), value: percent(d.compliantCount, d.totalPacksAssessed) },
+    { key: 'partiallyCompliant', label: t('governance.compliance.partiallyCompliant'), value: percent(d.partiallyCompliantCount, d.totalPacksAssessed) },
+    { key: 'nonCompliant', label: t('governance.compliance.nonCompliant'), value: percent(d.nonCompliantCount, d.totalPacksAssessed) },
+    { key: 'completedRollouts', label: t('governance.compliance.rolloutCompletion', 'Rollout completion'), value: percent(d.completedRollouts, d.totalRollouts) },
+    { key: 'failedRollouts', label: t('governance.compliance.rolloutFailure', 'Rollout failure'), value: percent(d.failedRollouts, d.totalRollouts) },
+    { key: 'approvedWaivers', label: t('governance.compliance.waiverApproval', 'Waiver approval'), value: percent(d.approvedWaivers, d.totalWaivers) },
   ];
 
   return (
@@ -97,7 +97,7 @@ export function CompliancePage() {
             <p className="text-xs text-muted mb-1">{t('governance.compliance.overallScore')}</p>
             <p className={`text-4xl font-bold ${scoreColor}`}>{d.overallScore}%</p>
           </div>
-          <StatCard title={t('governance.compliance.totalAssessed')} value={d.totalServicesAssessed} icon={<Scale size={20} />} color="text-accent" />
+          <StatCard title={t('governance.compliance.totalAssessed')} value={d.totalPacksAssessed} icon={<Scale size={20} />} color="text-accent" />
           <StatCard title={t('governance.compliance.compliant')} value={d.compliantCount} icon={<CheckCircle size={20} />} color="text-emerald-500" />
           <StatCard title={t('governance.compliance.partiallyCompliant')} value={d.partiallyCompliantCount} icon={<AlertCircle size={20} />} color="text-amber-500" />
           <StatCard title={t('governance.compliance.nonCompliant')} value={d.nonCompliantCount} icon={<ShieldAlert size={20} />} color="text-critical" />
@@ -182,20 +182,23 @@ export function CompliancePage() {
               {filteredGaps.length === 0 ? (
                 <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
               ) : (
-                filteredGaps.map(gap => (
-                  <div key={gap.serviceId} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">
+                filteredGaps.map((gap: CompliancePackRowDto) => (
+                  <div key={gap.packId} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium text-heading">{gap.serviceName}</span>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-sm font-medium text-heading">{gap.packName}</span>
                         <Badge variant={statusBadgeVariant(gap.status)}>
                           {t(`governance.compliance.status.${gap.status}`)}
                         </Badge>
+                        <Badge variant="default">{gap.packStatus}</Badge>
                       </div>
-                      <p className="text-xs text-muted">{gap.description}</p>
+                      <p className="text-xs text-muted">
+                        {gap.category} · {t('governance.compliance.rollouts', 'Rollouts')}: {gap.completedRollouts}/{gap.rolloutCount} · {t('governance.compliance.waivers', 'Waivers')}: {gap.approvedWaivers}/{gap.pendingWaivers + gap.approvedWaivers}
+                      </p>
                     </div>
                     <div className="hidden md:flex items-center gap-3 text-xs text-muted shrink-0">
-                      <span className="w-24 truncate">{gap.domain}</span>
-                      <span className="w-28 truncate">{gap.team}</span>
+                      <span className="w-28 truncate">{gap.category}</span>
+                      <span className="w-24 text-right">{gap.failedRollouts}</span>
                     </div>
                   </div>
                 ))

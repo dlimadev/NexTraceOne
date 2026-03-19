@@ -11,7 +11,6 @@ const AVAILABLE_ENVIRONMENTS = ['Production', 'Staging', 'Development'] as const
 
 export function WorkspaceSwitcher() {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   const tenantName = t('shell.defaultWorkspace');

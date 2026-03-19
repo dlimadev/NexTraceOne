@@ -155,43 +155,48 @@ export function AuditSection({ className = '' }: AuditSectionProps) {
         <Card>
           <CardBody className="p-0">
             <div className="divide-y divide-edge">
-              {filtered.map((entry) => (
-                <div key={entry.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-elevated/30 transition-colors">
-                  <div className={cn(
-                    'w-2 h-2 rounded-full mt-1.5 flex-shrink-0',
-                    ACTION_COLORS[entry.action] ? ACTION_COLORS[entry.action].replace('text-', 'bg-') : 'bg-muted',
-                  )} />
+              {filtered.map((entry) => {
+                const actionColor = ACTION_COLORS[entry.action] ?? 'text-body';
+                const dotColor = actionColor.replace('text-', 'bg-');
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className={cn(
-                        'text-xs font-medium',
-                        ACTION_COLORS[entry.action] ?? 'text-body',
-                      )}>
-                        {entry.action}
-                      </span>
-                    </div>
+                return (
+                  <div key={entry.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-elevated/30 transition-colors">
+                    <div className={cn(
+                      'w-2 h-2 rounded-full mt-1.5 flex-shrink-0',
+                      dotColor || 'bg-muted',
+                    )} />
 
-                    {entry.details && (
-                      <p className="text-xs text-body mb-1">{entry.details}</p>
-                    )}
-
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className="inline-flex items-center gap-1 text-[10px] text-muted">
-                        <User size={9} /> {entry.performedBy}
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-[10px] text-muted">
-                        <Clock size={9} /> {formatDateTime(entry.performedAt)}
-                      </span>
-                      {entry.correlationId && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-muted font-mono">
-                          <Hash size={9} /> {entry.correlationId}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={cn(
+                          'text-xs font-medium',
+                          actionColor,
+                        )}>
+                          {entry.action}
                         </span>
+                      </div>
+
+                      {entry.details && (
+                        <p className="text-xs text-body mb-1">{entry.details}</p>
                       )}
+
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted">
+                          <User size={9} /> {entry.performedBy}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted">
+                          <Clock size={9} /> {formatDateTime(entry.performedAt)}
+                        </span>
+                        {entry.correlationId && (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-muted font-mono">
+                            <Hash size={9} /> {entry.correlationId}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardBody>
         </Card>

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,6 @@ import {
   FileText,
   CheckSquare,
   ArrowUpCircle,
-  Shield,
   Users,
   ClipboardList,
   CornerDownLeft,
@@ -48,6 +48,7 @@ interface PaletteItem {
   icon: React.ReactNode;
   group: string;
   permission?: Permission;
+  preview?: boolean;
 }
 
 /**
@@ -60,7 +61,7 @@ const paletteItems: PaletteItem[] = [
   // ── Services ──
   { id: 'services', labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
   { id: 'dependency-graph', labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
-  { id: 'portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.services', permission: 'developer-portal:read' },
+  { id: 'portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.services', permission: 'developer-portal:read', preview: true },
   // ── Knowledge ──
   { id: 'source-of-truth', labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={16} />, group: 'commandPalette.knowledge', permission: 'catalog:assets:read' },
   // ── Contracts ──
@@ -74,20 +75,20 @@ const paletteItems: PaletteItem[] = [
   // ── Operations ──
   { id: 'incidents', labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },
   { id: 'runbooks', labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={16} />, group: 'commandPalette.operations', permission: 'operations:runbooks:read' },
-  { id: 'reliability', labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read' },
+  { id: 'reliability', labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read', preview: true },
   // ── AI Hub ──
   { id: 'ai-assistant', labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={16} />, group: 'commandPalette.aiHub', permission: 'ai:assistant:read' },
-  { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={16} />, group: 'commandPalette.aiHub', permission: 'ai:models:read' },
-  { id: 'ai-policies', labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.aiHub', permission: 'ai:policies:read' },
+  { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={16} />, group: 'commandPalette.aiHub', permission: 'ai:models:read', preview: true },
+  { id: 'ai-policies', labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.aiHub', permission: 'ai:policies:read', preview: true },
   // ── Governance ──
-  { id: 'executive-overview', labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Gauge size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
-  { id: 'risk-heatmap', labelKey: 'sidebar.riskHeatmap', to: '/governance/executive/heatmap', icon: <Grid3X3 size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read' },
-  { id: 'maturity-scorecards', labelKey: 'sidebar.maturityScorecards', to: '/governance/executive/maturity', icon: <Award size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
-  { id: 'benchmarking', labelKey: 'sidebar.benchmarking', to: '/governance/executive/benchmarking', icon: <GitCompare size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
-  { id: 'reports', labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read' },
-  { id: 'risk', labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read' },
-  { id: 'compliance', labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={16} />, group: 'commandPalette.governance', permission: 'governance:compliance:read' },
-  { id: 'finops', labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={16} />, group: 'commandPalette.governance', permission: 'governance:finops:read' },
+  { id: 'executive-overview', labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Gauge size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
+  { id: 'risk-heatmap', labelKey: 'sidebar.riskHeatmap', to: '/governance/executive/heatmap', icon: <Grid3X3 size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read', preview: true },
+  { id: 'maturity-scorecards', labelKey: 'sidebar.maturityScorecards', to: '/governance/executive/maturity', icon: <Award size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
+  { id: 'benchmarking', labelKey: 'sidebar.benchmarking', to: '/governance/executive/benchmarking', icon: <GitCompare size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
+  { id: 'reports', labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
+  { id: 'risk', labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read', preview: true },
+  { id: 'compliance', labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={16} />, group: 'commandPalette.governance', permission: 'governance:compliance:read', preview: true },
+  { id: 'finops', labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={16} />, group: 'commandPalette.governance', permission: 'governance:finops:read', preview: true },
   // ── Admin ──
   { id: 'users', labelKey: 'sidebar.users', to: '/users', icon: <Users size={16} />, group: 'commandPalette.admin', permission: 'identity:users:read' },
   { id: 'audit', labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={16} />, group: 'commandPalette.admin', permission: 'audit:read' },
@@ -119,7 +120,7 @@ const statusColors: Record<string, string> = {
   deprecated: 'bg-red-500/20 text-red-400',
 };
 
-/** Hook utilitário para debounce de valor. */
+ /** Hook utilitário para debounce de valor. */
 function useDebouncedValue<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -244,8 +245,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           if (item) handleSelectNavItem(item);
         } else {
           const entityIndex = activeIndex - navCount;
-          if (entityIndex < entityResults.length) {
-            handleSelectEntity(entityResults[entityIndex]);
+          const entityItem = entityResults[entityIndex];
+          if (entityItem) {
+            handleSelectEntity(entityItem);
           } else {
             handleSeeAll();
           }
@@ -331,6 +333,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                       >
                         <span className="shrink-0 opacity-70">{item.icon}</span>
                         <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
+                        {item.preview && (
+                          <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-amber-300">
+                            {t('preview.bannerTitle', 'Preview')}
+                          </span>
+                        )}
                         {index === activeIndex && (
                           <CornerDownLeft size={14} className="shrink-0 opacity-50" />
                         )}

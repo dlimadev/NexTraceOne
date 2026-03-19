@@ -7,7 +7,7 @@ import {
   Minus,
   Search,
 } from 'lucide-react';
-import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { Card, CardBody } from '../../../components/Card';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageContainer } from '../../../components/shell';

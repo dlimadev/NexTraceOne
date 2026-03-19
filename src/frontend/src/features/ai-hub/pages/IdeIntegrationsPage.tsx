@@ -358,58 +358,60 @@ export function IdeIntegrationsPage() {
 
       {/* Capability Policies */}
       {!isLoading && !isError && (
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-heading mb-3">{t('aiHub.ideCapabilityPolicies')}</h2>
-        <div className="space-y-3">
-          {capabilityPolicies.map((p) => (
-            <Card key={p.id}>
-              <CardBody>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-semibold text-heading">{p.clientType}</span>
-                      {p.persona && <Badge variant="info">{p.persona}</Badge>}
-                      {!p.persona && <Badge variant="default">{t('aiHub.ideAllPersonas')}</Badge>}
-                      <Badge variant={p.isActive ? 'success' : 'default'}>{p.isActive ? t('aiHub.statusActive') : t('aiHub.ideStatusInactive')}</Badge>
+        <>
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-heading mb-3">{t('aiHub.ideCapabilityPolicies')}</h2>
+            <div className="space-y-3">
+              {capabilityPolicies.map((p) => (
+                <Card key={p.id}>
+                  <CardBody>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold text-heading">{p.clientType}</span>
+                          {p.persona && <Badge variant="info">{p.persona}</Badge>}
+                          {!p.persona && <Badge variant="default">{t('aiHub.ideAllPersonas')}</Badge>}
+                          <Badge variant={p.isActive ? 'success' : 'default'}>{p.isActive ? t('aiHub.statusActive') : t('aiHub.ideStatusInactive')}</Badge>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {p.allowContractGeneration && (
+                            <Badge variant="info"><FileText size={10} className="mr-1 inline" />{t('aiHub.ideContractGen')}</Badge>
+                          )}
+                          {p.allowIncidentTroubleshooting && (
+                            <Badge variant="info"><AlertTriangle size={10} className="mr-1 inline" />{t('aiHub.ideTroubleshooting')}</Badge>
+                          )}
+                          {p.allowExternalAI ? (
+                            <Badge variant="warning"><Zap size={10} className="mr-1 inline" />{t('aiHub.ideExternalAiAllowed')}</Badge>
+                          ) : (
+                            <Badge variant="default"><Shield size={10} className="mr-1 inline" />{t('aiHub.ideInternalOnly')}</Badge>
+                          )}
+                          <span className="text-xs text-muted">{t('aiHub.ideMaxTokens')}: {p.maxTokensPerRequest.toLocaleString()}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {p.allowedCommands.split(',').slice(0, 5).map((cmd) => (
+                            <span key={cmd} className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-muted">{cmd}</span>
+                          ))}
+                          {p.allowedCommands.split(',').length > 5 && (
+                            <span className="text-[10px] text-faded">+{p.allowedCommands.split(',').length - 5}</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {p.allowContractGeneration && (
-                        <Badge variant="info"><FileText size={10} className="mr-1 inline" />{t('aiHub.ideContractGen')}</Badge>
-                      )}
-                      {p.allowIncidentTroubleshooting && (
-                        <Badge variant="info"><AlertTriangle size={10} className="mr-1 inline" />{t('aiHub.ideTroubleshooting')}</Badge>
-                      )}
-                      {p.allowExternalAI ? (
-                        <Badge variant="warning"><Zap size={10} className="mr-1 inline" />{t('aiHub.ideExternalAiAllowed')}</Badge>
-                      ) : (
-                        <Badge variant="default"><Shield size={10} className="mr-1 inline" />{t('aiHub.ideInternalOnly')}</Badge>
-                      )}
-                      <span className="text-xs text-muted">{t('aiHub.ideMaxTokens')}: {p.maxTokensPerRequest.toLocaleString()}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {p.allowedCommands.split(',').slice(0, 5).map((cmd) => (
-                        <span key={cmd} className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-muted">{cmd}</span>
-                      ))}
-                      {p.allowedCommands.split(',').length > 5 && (
-                        <span className="text-[10px] text-faded">+{p.allowedCommands.split(',').length - 5}</span>
-                      )}
-                    </div>
-                  </div>
-      )}
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          </div>
 
-      {/* Governance Notice */}
-      <div className="p-4 rounded-lg bg-elevated border border-edge">
-        <div className="flex items-start gap-3">
-          <ShieldCheck size={18} className="text-accent mt-0.5 shrink-0" />
-          <p className="text-xs text-muted">{t('aiHub.ideGovernanceNotice')}</p>
-        </div>
-      </div>
+          {/* Governance Notice */}
+          <div className="p-4 rounded-lg bg-elevated border border-edge">
+            <div className="flex items-start gap-3">
+              <ShieldCheck size={18} className="text-accent mt-0.5 shrink-0" />
+              <p className="text-xs text-muted">{t('aiHub.ideGovernanceNotice')}</p>
+            </div>
+          </div>
+        </>
+      )}
     </PageContainer>
   );
 }

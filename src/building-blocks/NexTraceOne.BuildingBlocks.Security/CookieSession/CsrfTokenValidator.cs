@@ -89,7 +89,7 @@ public static class CsrfTokenValidator
         response.Cookies.Append(options.AccessTokenCookieName, accessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = options.RequireSecureCookies,
             SameSite = SameSiteMode.Strict,
             Expires = expiry,
             Path = "/",
@@ -99,7 +99,7 @@ public static class CsrfTokenValidator
         response.Cookies.Append(options.CsrfCookieName, csrfToken, new CookieOptions
         {
             HttpOnly = false,
-            Secure = true,
+            Secure = options.RequireSecureCookies,
             SameSite = SameSiteMode.Strict,
             Expires = expiry,
             Path = "/",
@@ -116,7 +116,7 @@ public static class CsrfTokenValidator
         response.Cookies.Delete(options.AccessTokenCookieName, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = options.RequireSecureCookies,
             SameSite = SameSiteMode.Strict,
             Path = "/",
         });
@@ -124,7 +124,7 @@ public static class CsrfTokenValidator
         response.Cookies.Delete(options.CsrfCookieName, new CookieOptions
         {
             HttpOnly = false,
-            Secure = true,
+            Secure = options.RequireSecureCookies,
             SameSite = SameSiteMode.Strict,
             Path = "/",
         });

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -22,6 +23,7 @@ import {
   ClipboardCheck,
   Bot,
 } from 'lucide-react';
+import { Badge } from './Badge';
 import { usePersona } from '../contexts/PersonaContext';
 import type { QuickAction } from '../auth/persona';
 
@@ -85,8 +87,17 @@ export function QuickActions() {
             <span className="text-accent group-hover:text-accent/80 shrink-0">
               {iconMap[action.icon] ?? <Zap size={16} />}
             </span>
-            <span className="text-sm text-body group-hover:text-heading truncate">
-              {t(action.labelKey)}
+            <span className="min-w-0 flex-1">
+              <span className="text-sm text-body group-hover:text-heading truncate block">
+                {t(action.labelKey)}
+              </span>
+              {action.preview && (
+                <span className="mt-1 inline-flex">
+                  <Badge variant="warning" className="text-[10px]">
+                    {t('preview.bannerTitle', 'Preview')}
+                  </Badge>
+                </span>
+              )}
             </span>
           </button>
         ))}

@@ -81,13 +81,14 @@ const riskBadgeVariant = (risk: string): 'success' | 'warning' | 'danger' | 'def
  */
 export function AutomationAdminPage() {
   const { t } = useTranslation();
+  const todayUsage = usageOverview[0] ?? { period: 'automation.usage.today', total: 0, completed: 0, failed: 0, cancelled: 0 };
 
   const stats = {
     totalActions: actionAdminList.length,
     activePolicies: safetyPolicies.filter(p => p.enabled).length,
-    workflowsToday: usageOverview[0].total,
-    failureRate: usageOverview[0].total > 0
-      ? `${Math.round((usageOverview[0].failed / usageOverview[0].total) * 100)}%`
+    workflowsToday: todayUsage.total,
+    failureRate: todayUsage.total > 0
+      ? `${Math.round((todayUsage.failed / todayUsage.total) * 100)}%`
       : '0%',
   };
 

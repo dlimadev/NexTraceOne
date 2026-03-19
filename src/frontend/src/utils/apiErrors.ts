@@ -49,8 +49,11 @@ export function resolveApiError(error: unknown): string {
   const axiosError = error as AxiosError<ApiProblemDetails>;
   const data = axiosError?.response?.data;
 
-  if (data?.code && ERROR_CODE_MAP[data.code]) {
-    return i18n.t(ERROR_CODE_MAP[data.code]);
+  if (data?.code) {
+    const translationKey = ERROR_CODE_MAP[data.code];
+    if (translationKey) {
+      return i18n.t(translationKey);
+    }
   }
 
   const status = axiosError?.response?.status;

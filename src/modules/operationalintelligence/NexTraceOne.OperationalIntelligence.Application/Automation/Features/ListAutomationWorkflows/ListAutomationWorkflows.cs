@@ -39,85 +39,10 @@ public static class ListAutomationWorkflows
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var items = GenerateSimulatedItems(request);
-
-            var response = new Response(
-                Items: items,
-                TotalCount: items.Count);
-
-            return Task.FromResult(Result<Response>.Success(response));
-        }
-
-        private static IReadOnlyList<WorkflowSummary> GenerateSimulatedItems(Query request)
-        {
-            var allItems = new List<WorkflowSummary>
-            {
-                new(Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    "action-restart-controlled",
-                    "Controlled Service Restart",
-                    AutomationWorkflowStatus.Executing,
-                    RiskLevel.Medium,
-                    "ops-engineer@nextraceone.io",
-                    "svc-payment-gateway",
-                    DateTimeOffset.Parse("2024-06-15T10:15:00Z")),
-
-                new(Guid.Parse("b0a10002-0001-0000-0000-000000000001"),
-                    "action-observe-validate",
-                    "Observe and Validate",
-                    AutomationWorkflowStatus.AwaitingApproval,
-                    RiskLevel.Low,
-                    "platform-engineer@nextraceone.io",
-                    "svc-catalog-sync",
-                    DateTimeOffset.Parse("2024-06-16T08:00:00Z")),
-
-                new(Guid.Parse("b0a10003-0001-0000-0000-000000000001"),
-                    "action-verify-dependency",
-                    "Verify Dependency State",
-                    AutomationWorkflowStatus.Cancelled,
-                    RiskLevel.Low,
-                    "senior-engineer@nextraceone.io",
-                    "svc-order-api",
-                    DateTimeOffset.Parse("2024-06-16T09:00:00Z")),
-
-                new(Guid.Parse("b0a10004-0001-0000-0000-000000000001"),
-                    "action-rollback-readiness",
-                    "Rollback Readiness Review",
-                    AutomationWorkflowStatus.Completed,
-                    RiskLevel.High,
-                    "tech-lead@nextraceone.io",
-                    "svc-inventory-consumer",
-                    DateTimeOffset.Parse("2024-06-14T16:30:00Z")),
-
-                new(Guid.Parse("b0a10005-0001-0000-0000-000000000001"),
-                    "action-reprocess-controlled",
-                    "Controlled Event Reprocessing",
-                    AutomationWorkflowStatus.Draft,
-                    RiskLevel.Medium,
-                    "ops-engineer@nextraceone.io",
-                    "svc-notification-worker",
-                    DateTimeOffset.Parse("2024-06-17T07:00:00Z")),
-
-                new(Guid.Parse("b0a10006-0001-0000-0000-000000000001"),
-                    "action-execute-runbook-step",
-                    "Execute Runbook Step",
-                    AutomationWorkflowStatus.Completed,
-                    RiskLevel.Low,
-                    "platform-engineer@nextraceone.io",
-                    "svc-auth-gateway",
-                    DateTimeOffset.Parse("2024-06-13T11:00:00Z")),
-            };
-
-            var filtered = allItems.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(request.ServiceId))
-                filtered = filtered.Where(w => w.ServiceId != null &&
-                    w.ServiceId.Equals(request.ServiceId, StringComparison.OrdinalIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(request.Status) &&
-                Enum.TryParse<AutomationWorkflowStatus>(request.Status, true, out var statusFilter))
-                filtered = filtered.Where(w => w.Status == statusFilter);
-
-            return filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
+            return Task.FromResult<Result<Response>>(
+                Error.Business(
+                    "Operations.Automation.Workflows.PreviewOnly",
+                    "Operational automation workflows remain a preview-only capability and are not backed by production workflow data in this release."));
         }
     }
 

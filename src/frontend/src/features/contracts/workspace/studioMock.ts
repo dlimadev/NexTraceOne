@@ -29,7 +29,11 @@ function simpleHash(str: string): number {
 }
 
 function pick<T>(arr: readonly T[], hash: number): T {
-  return arr[hash % arr.length];
+  if (arr.length === 0) {
+    throw new Error('pick requires a non-empty array');
+  }
+
+  return arr[hash % arr.length] as T;
 }
 
 // ── Mock pools ────────────────────────────────────────────────────────────────

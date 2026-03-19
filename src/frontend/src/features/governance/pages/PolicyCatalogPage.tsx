@@ -18,7 +18,7 @@ import { organizationGovernanceApi } from '../api/organizationGovernance';
 type CategoryFilter = 'all' | PolicyCategoryType;
 type StatusFilter = 'all' | PolicyStatusType;
 
-const severityBadge = (sev: string): 'danger' | 'warning' | 'info' | 'default' => {
+const severityBadge = (sev: string | null): 'danger' | 'warning' | 'info' | 'default' => {
   switch (sev) {
     case 'Critical': return 'danger';
     case 'High': return 'warning';
@@ -187,7 +187,9 @@ export function PolicyCatalogPage() {
                       <span className="text-sm font-medium text-heading">{pol.displayName}</span>
                       <span className="text-xs text-faded font-mono">{pol.name}</span>
                       <Badge variant={statusBadge(pol.status)}>{t(`governance.policies.status.${pol.status}`)}</Badge>
-                      <Badge variant={severityBadge(pol.severity)}>{t(`governance.policies.severity.${pol.severity}`)}</Badge>
+                      <Badge variant={severityBadge(pol.severity)}>
+                        {pol.severity ? t(`governance.policies.severity.${pol.severity}`) : t('common.notAvailable')}
+                      </Badge>
                       <Badge variant="default">{t(`governance.policies.enforcement.${pol.enforcementMode}`)}</Badge>
                     </div>
                     <p className="text-xs text-muted mb-1">{pol.description}</p>

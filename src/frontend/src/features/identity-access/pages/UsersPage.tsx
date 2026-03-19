@@ -163,7 +163,7 @@ export function UsersPage() {
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center text-accent font-medium text-sm">
-                          {u.email[0].toUpperCase()}
+                          {(u.email.charAt(0) || 'U').toUpperCase()}
                         </div>
                         <span className="font-medium text-heading">{u.fullName}</span>
                       </div>

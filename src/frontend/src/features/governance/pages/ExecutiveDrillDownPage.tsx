@@ -118,7 +118,6 @@ export function ExecutiveDrillDownPage() {
           <Badge variant="warning">{t('governance.preview.badge')}</Badge>
           <span className="text-xs text-muted">{t('governance.preview.drilldownReason')}</span>
         </div>
-      </div>
         <div className="flex items-center gap-3 mt-3">
           <div className="flex items-center gap-2">
             <ShieldAlert size={14} className="text-muted" />

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,20 +9,26 @@ import {
   ChevronUp,
   Rocket,
 } from 'lucide-react';
+import { Badge } from './Badge';
 import { usePersona } from '../contexts/PersonaContext';
 import type { Persona } from '../auth/persona';
 
 const STORAGE_KEY = 'nex:quickstart:completed';
 
+interface QuickstartStepRoute {
+  to: string;
+  preview?: boolean;
+}
+
 /** Rotas recomendadas por persona para cada passo do quickstart. */
-const stepRoutes: Record<Persona, string[]> = {
-  Engineer: ['/services', '/changes', '/operations/incidents', '/contracts'],
-  TechLead: ['/services', '/changes', '/operations/reliability', '/operations/incidents'],
-  Architect: ['/services/graph', '/contracts', '/changes', '/governance/risk'],
-  Product: ['/changes', '/operations/reliability', '/governance/risk', '/operations/incidents'],
-  Executive: ['/governance/executive', '/governance/risk', '/services', '/governance/compliance'],
-  PlatformAdmin: ['/governance/policies', '/ai/models', '/users', '/governance/reports'],
-  Auditor: ['/audit', '/governance/evidence', '/governance/compliance', '/ai/policies'],
+const stepRoutes: Record<Persona, QuickstartStepRoute[]> = {
+  Engineer: [{ to: '/services' }, { to: '/changes' }, { to: '/operations/incidents' }, { to: '/contracts' }],
+  TechLead: [{ to: '/services' }, { to: '/changes' }, { to: '/operations/reliability', preview: true }, { to: '/operations/incidents' }],
+  Architect: [{ to: '/services/graph' }, { to: '/contracts' }, { to: '/changes' }, { to: '/governance/risk', preview: true }],
+  Product: [{ to: '/changes' }, { to: '/operations/reliability', preview: true }, { to: '/governance/risk', preview: true }, { to: '/operations/incidents' }],
+  Executive: [{ to: '/governance/executive', preview: true }, { to: '/governance/risk', preview: true }, { to: '/services' }, { to: '/governance/compliance', preview: true }],
+  PlatformAdmin: [{ to: '/governance/policies', preview: true }, { to: '/ai/models', preview: true }, { to: '/users' }, { to: '/governance/reports', preview: true }],
+  Auditor: [{ to: '/audit' }, { to: '/governance/evidence', preview: true }, { to: '/governance/compliance', preview: true }, { to: '/ai/policies', preview: true }],
 };
 
 function getCompleted(): Set<string> {
@@ -50,15 +57,12 @@ export function PersonaQuickstart() {
   const [completed, setCompleted] = useState<Set<string>>(() => getCompleted());
   const [collapsed, setCollapsed] = useState(false);
 
-  useEffect(() => {
-    setCompleted(getCompleted());
-  }, [persona]);
-
   const routes = stepRoutes[persona] ?? stepRoutes.Engineer;
   const steps = [1, 2, 3, 4].map((n) => ({
     id: `${persona}-step${n}`,
     labelKey: `productPolish.quickstart.${persona}.step${n}`,
-    route: routes[n - 1],
+    route: routes[n - 1]?.to ?? '/',
+    preview: routes[n - 1]?.preview ?? false,
   }));
 
   const allDone = steps.every((s) => completed.has(s.id));
@@ -135,6 +139,11 @@ export function PersonaQuickstart() {
                 >
                   {t(step.labelKey)}
                 </Link>
+                {step.preview && (
+                  <Badge variant="warning" className="text-[10px]">
+                    {t('preview.bannerTitle', 'Preview')}
+                  </Badge>
+                )}
               </div>
             );
           })}

@@ -161,7 +161,8 @@ export function JourneyFunnelPage() {
               {/* Funnel visualization */}
               <div className="space-y-3 mb-4">
                 {j.steps.map((step, idx) => {
-                  const prevPercent = idx > 0 ? j.steps[idx - 1].completionPercent : 100;
+                  const previousStep = idx > 0 ? j.steps[idx - 1] : undefined;
+                  const prevPercent = previousStep?.completionPercent ?? 100;
                   const dropOff = prevPercent - step.completionPercent;
 
                   return (

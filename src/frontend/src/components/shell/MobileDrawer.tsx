@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
-import { cn } from '../../lib/cn';
 
 interface MobileDrawerProps {
   open: boolean;

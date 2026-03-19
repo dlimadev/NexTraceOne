@@ -35,5 +35,6 @@ public sealed class HttpContextCurrentUser(IHttpContextAccessor httpContextAcces
 
     /// <inheritdoc />
     public bool HasPermission(string permission)
-        => User?.FindAll("permissions").Any(claim => string.Equals(claim.Value, permission, StringComparison.OrdinalIgnoreCase)) == true;
+        => User?.FindAll("permissions").Any(claim => string.Equals(claim.Value, permission, StringComparison.OrdinalIgnoreCase)) == true
+            || User?.FindAll("permission").Any(claim => string.Equals(claim.Value, permission, StringComparison.OrdinalIgnoreCase)) == true;
 }

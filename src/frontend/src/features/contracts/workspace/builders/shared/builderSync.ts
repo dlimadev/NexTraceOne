@@ -19,6 +19,45 @@ import type {
   SyncResult,
 } from './builderTypes';
 
+interface RestEndpointParameter {
+  name: string;
+  in: string;
+  required?: boolean;
+  type?: string;
+  description?: string;
+}
+
+interface RestEndpointRequestBody {
+  required?: boolean;
+  contentType?: string;
+  schema?: string;
+}
+
+interface RestEndpointResponse {
+  statusCode: string | number;
+  description?: string;
+  contentType?: string;
+  schema?: string;
+}
+
+interface RestEndpointShape {
+  path: string;
+  method: string;
+  operationId?: string;
+  summary?: string;
+  description?: string;
+  tags: string[];
+  deprecated?: boolean;
+  parameters: RestEndpointParameter[];
+  requestBody?: RestEndpointRequestBody;
+  responses: RestEndpointResponse[];
+  authScopes: string[];
+  rateLimit?: string;
+  idempotencyKey?: string;
+  observabilityNotes?: string;
+  deprecationNote?: string;
+}
+
 // ── REST → OpenAPI YAML ───────────────────────────────────────────────────────
 
 export function restBuilderToYaml(state: RestBuilderState): SyncResult {
@@ -45,7 +84,7 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
   if (state.endpoints.length === 0) {
     yaml += `  {} # No endpoints defined\n`;
   } else {
-    const grouped = groupByPath(state.endpoints);
+    const grouped = groupByPath(state.endpoints as RestEndpointShape[]);
     for (const [path, eps] of Object.entries(grouped)) {
       yaml += `  ${state.basePath}${path}:\n`;
       for (const ep of eps) {
@@ -104,7 +143,7 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
           if (ep.rateLimit) yaml += `        rateLimit: "${esc(ep.rateLimit)}"\n`;
           if (ep.idempotencyKey) yaml += `        idempotencyKey: "${esc(ep.idempotencyKey)}"\n`;
           if (ep.observabilityNotes) yaml += `        observability: "${esc(ep.observabilityNotes)}"\n`;
-          if (ep.deprecationNote) yaml += `        deprecationNote: "${esc(ep.deprecationNote)}"\n`;
+          if (ep.deprecationNote) yaml += `        deprecationNote: "${esc(String(ep.deprecationNote))}"\n`;
         }
       }
     }
@@ -308,11 +347,12 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function groupByPath(endpoints: { path: string; [k: string]: unknown }[]): Record<string, typeof endpoints> {
-  const map: Record<string, typeof endpoints> = {};
+function groupByPath(endpoints: RestEndpointShape[]): Record<string, RestEndpointShape[]> {
+  const map: Record<string, RestEndpointShape[]> = {};
   for (const ep of endpoints) {
-    if (!map[ep.path]) map[ep.path] = [];
-    map[ep.path].push(ep);
+    const bucket = map[ep.path] ?? [];
+    bucket.push(ep);
+    map[ep.path] = bucket;
   }
   return map;
 }

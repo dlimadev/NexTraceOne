@@ -24,26 +24,21 @@
  */
 
 const SESSION_KEYS = {
-  ACCESS_TOKEN: 'nxt_at',
   TENANT_ID: 'nxt_tid',
   USER_ID: 'nxt_uid',
 } as const;
+
+let inMemoryAccessToken: string | null = null;
+let inMemoryRefreshToken: string | null = null;
+let inMemoryCsrfToken: string | null = null;
 
 /**
  * Refresh token mantido em memória — nunca persistido no browser storage.
  * Em caso de refresh da página, o usuário precisa re-autenticar,
  * o que é o comportamento seguro esperado para tokens de longa duração.
  */
-let inMemoryRefreshToken: string | null = null;
-
-/**
- * Armazena os tokens após autenticação bem-sucedida.
- *
- * O access token vai para sessionStorage (escopo de aba).
- * O refresh token fica exclusivamente em memória.
- */
 export function storeTokens(accessToken: string, refreshToken: string): void {
-  sessionStorage.setItem(SESSION_KEYS.ACCESS_TOKEN, accessToken);
+  inMemoryAccessToken = accessToken;
   inMemoryRefreshToken = refreshToken;
 }
 
@@ -51,14 +46,14 @@ export function storeTokens(accessToken: string, refreshToken: string): void {
  * Atualiza apenas o access token (usado após refresh silencioso).
  */
 export function updateAccessToken(accessToken: string): void {
-  sessionStorage.setItem(SESSION_KEYS.ACCESS_TOKEN, accessToken);
+  inMemoryAccessToken = accessToken;
 }
 
 /**
  * Retorna o access token armazenado, ou null se não existir.
  */
 export function getAccessToken(): string | null {
-  return sessionStorage.getItem(SESSION_KEYS.ACCESS_TOKEN);
+  return inMemoryAccessToken;
 }
 
 /**
@@ -67,6 +62,27 @@ export function getAccessToken(): string | null {
  */
 export function getRefreshToken(): string | null {
   return inMemoryRefreshToken;
+}
+
+/**
+ * Armazena o token CSRF em memória.
+ */
+export function storeCsrfToken(csrfToken: string): void {
+  inMemoryCsrfToken = csrfToken;
+}
+
+/**
+ * Retorna o token CSRF armazenado, ou null se não existir.
+ */
+export function getCsrfToken(): string | null {
+  return inMemoryCsrfToken;
+}
+
+/**
+ * Remove o token CSRF da memória.
+ */
+export function clearCsrfToken(): void {
+  inMemoryCsrfToken = null;
 }
 
 /**
@@ -102,10 +118,11 @@ export function getUserId(): string | null {
  * Deve ser chamado no logout e em caso de sessão inválida.
  */
 export function clearAllTokens(): void {
-  sessionStorage.removeItem(SESSION_KEYS.ACCESS_TOKEN);
   sessionStorage.removeItem(SESSION_KEYS.TENANT_ID);
   sessionStorage.removeItem(SESSION_KEYS.USER_ID);
+  inMemoryAccessToken = null;
   inMemoryRefreshToken = null;
+  inMemoryCsrfToken = null;
 }
 
 /**
@@ -113,7 +130,7 @@ export function clearAllTokens(): void {
  * Não valida expiração — a validação real é feita pelo backend.
  */
 export function hasActiveSession(): boolean {
-  return !!getAccessToken();
+  return !!inMemoryAccessToken || !!getTenantId();
 }
 
 /**
@@ -123,20 +140,13 @@ export function hasActiveSession(): boolean {
  */
 export function migrateFromLocalStorage(): void {
   const legacyKeys = ['access_token', 'refresh_token', 'tenant_id', 'user_id'];
-  const oldAccessToken = localStorage.getItem('access_token');
-  const oldRefreshToken = localStorage.getItem('refresh_token');
   const oldTenantId = localStorage.getItem('tenant_id');
   const oldUserId = localStorage.getItem('user_id');
 
-  if (oldAccessToken) {
-    sessionStorage.setItem(SESSION_KEYS.ACCESS_TOKEN, oldAccessToken);
-  }
-  if (oldRefreshToken) {
-    inMemoryRefreshToken = oldRefreshToken;
-  }
   if (oldTenantId) {
     sessionStorage.setItem(SESSION_KEYS.TENANT_ID, oldTenantId);
   }
+
   if (oldUserId) {
     sessionStorage.setItem(SESSION_KEYS.USER_ID, oldUserId);
   }

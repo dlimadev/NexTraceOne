@@ -1,7 +1,10 @@
+import axios from 'axios';
 import client from '../../../api/client';
 import type {
   LoginRequest,
   LoginResponse,
+  CookieSessionLoginResponse,
+  AuthLoginResponse,
   CurrentUserProfile,
   UserProfile,
   TenantUser,
@@ -28,19 +31,52 @@ import type {
  */
 export const identityApi = {
   // ── Autenticação ─────────────────────────────────────────────
-  login: (data: LoginRequest) =>
-    client.post<LoginResponse>('/identity/auth/login', data).then((r) => r.data),
+  login: async (data: LoginRequest): Promise<AuthLoginResponse> => {
+    try {
+      const response = await client.post<CookieSessionLoginResponse>('/identity/auth/cookie-session', data);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return client.post<LoginResponse>('/identity/auth/login', data).then((r) => r.data);
+      }
+
+      throw error;
+    }
+  },
 
   refresh: (refreshToken: string) =>
     client
       .post<LoginResponse>('/identity/auth/refresh', { refreshToken })
       .then((r) => r.data),
 
-  logout: () =>
-    client.post('/identity/auth/logout'),
+  logout: async () => {
+    try {
+      return await client.delete('/identity/auth/cookie-session');
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return client.post('/identity/auth/logout');
+      }
+
+      throw error;
+    }
+  },
 
   getCurrentUser: () =>
     client.get<CurrentUserProfile>('/identity/auth/me').then((r) => r.data),
+
+  getCsrfToken: async () => {
+    try {
+      return await client
+        .get<{ csrfToken: string }>('/identity/auth/cookie-session/csrf-token')
+        .then((r) => r.data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return null;
+      }
+
+      throw error;
+    }
+  },
 
   changePassword: (currentPassword: string, newPassword: string) =>
     client.put('/identity/auth/password', { currentPassword, newPassword }),

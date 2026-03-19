@@ -66,6 +66,7 @@ public sealed class ApiKeyAuthenticationHandler(
 
         foreach (var permission in configuredKey.Permissions)
         {
+            claims.Add(new Claim("permissions", permission));
             claims.Add(new Claim("permission", permission));
         }
 
@@ -73,7 +74,7 @@ public sealed class ApiKeyAuthenticationHandler(
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-        Logger.LogInformation(
+        Logger.LogDebug(
             "API key authentication succeeded for client '{ClientId}' in tenant '{TenantId}'",
             configuredKey.ClientId,
             configuredKey.TenantId);

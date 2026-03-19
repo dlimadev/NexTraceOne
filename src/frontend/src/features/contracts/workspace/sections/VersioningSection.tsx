@@ -7,7 +7,7 @@ import { EmptyState } from '../../../../components/EmptyState';
 import { LifecycleBadge } from '../../shared/components';
 import { LoadingState, ErrorState } from '../../shared/components/StateIndicators';
 import { contractsApi } from '../../api/contracts';
-import type { ContractVersion, ContractDiffResult, ChangeEntry } from '../../../../types';
+import type { ContractVersion, SemanticDiff, ChangeEntry } from '../../../../types';
 
 interface VersioningSectionProps {
   apiAssetId: string;
@@ -146,13 +146,24 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
 
 // ── Diff Results ──────────────────────────────────────────────────────────────
 
-function DiffResults({ data }: { data: ContractDiffResult }) {
+function DiffResults({ data }: { data: SemanticDiff }) {
   const { t } = useTranslation();
 
-  const sections = [
-    { key: 'breakingChanges', labelKey: 'contracts.diff.breakingChanges', color: 'text-red-400', Icon: AlertTriangle },
-    { key: 'additiveChanges', labelKey: 'contracts.diff.additiveChanges', color: 'text-emerald-400', Icon: Plus },
-    { key: 'nonBreakingChanges', labelKey: 'contracts.diff.nonBreakingChanges', color: 'text-blue-400', Icon: Minus },
+  const breakingChanges = data.changes.filter((change) => change.isBreaking);
+  const additiveChanges = data.changes.filter((change) => !change.isBreaking && change.changeType === 'Added');
+  const nonBreakingChanges = data.changes.filter((change) => !change.isBreaking && change.changeType !== 'Added');
+  const changeLevel = data.isBreaking ? 'Breaking' : additiveChanges.length > 0 ? 'Additive' : 'NonBreaking';
+
+  const sections: Array<{
+    key: 'breakingChanges' | 'additiveChanges' | 'nonBreakingChanges';
+    labelKey: string;
+    color: string;
+    Icon: typeof AlertTriangle;
+    changes: ChangeEntry[];
+  }> = [
+    { key: 'breakingChanges', labelKey: 'contracts.diff.breakingChanges', color: 'text-red-400', Icon: AlertTriangle, changes: breakingChanges },
+    { key: 'additiveChanges', labelKey: 'contracts.diff.additiveChanges', color: 'text-emerald-400', Icon: Plus, changes: additiveChanges },
+    { key: 'nonBreakingChanges', labelKey: 'contracts.diff.nonBreakingChanges', color: 'text-blue-400', Icon: Minus, changes: nonBreakingChanges },
   ];
 
   return (
@@ -160,23 +171,22 @@ function DiffResults({ data }: { data: ContractDiffResult }) {
       {/* Summary badges */}
       <div className="flex items-center gap-3">
         <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-          data.changeLevel === 'Breaking' ? 'bg-red-900/30 text-red-400' :
-          data.changeLevel === 'Additive' ? 'bg-emerald-900/30 text-emerald-400' :
+          changeLevel === 'Breaking' ? 'bg-red-900/30 text-red-400' :
+          changeLevel === 'Additive' ? 'bg-emerald-900/30 text-emerald-400' :
           'bg-blue-900/30 text-blue-400'
         }`}>
-          {data.changeLevel}
+          {changeLevel}
         </span>
-        {data.suggestedSemVer && (
+        {data.suggestedVersion && (
           <span className="text-xs text-muted">
-            {t('contracts.diff.suggestedVersion', 'Suggested')}: <span className="font-mono text-heading">{data.suggestedSemVer}</span>
+            {t('contracts.diff.suggestedVersion', 'Suggested')}: <span className="font-mono text-heading">{data.suggestedVersion}</span>
           </span>
         )}
       </div>
 
       {/* Change lists */}
-      {sections.map(({ key, labelKey, color, Icon }) => {
-        const changes = data[key];
-        if (!changes || changes.length === 0) return null;
+      {sections.map(({ key, labelKey, color, Icon, changes }) => {
+        if (changes.length === 0) return null;
 
         return (
           <div key={key}>
@@ -196,7 +206,7 @@ function DiffResults({ data }: { data: ContractDiffResult }) {
         );
       })}
 
-      {!data.breakingChanges?.length && !data.additiveChanges?.length && !data.nonBreakingChanges?.length && (
+      {data.changes.length === 0 && (
         <p className="text-xs text-muted">{t('contracts.diff.noChanges', 'No changes detected')}</p>
       )}
     </div>

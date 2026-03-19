@@ -91,6 +91,8 @@ export interface QuickAction {
   icon: string;
   /** Rota de destino. */
   to: string;
+  /** Indica que a ação aponta para uma capability ainda em preview. */
+  preview?: boolean;
 }
 
 // ── Configurações por persona ──
@@ -180,9 +182,9 @@ const productConfig: PersonaConfig = {
   ],
   quickActions: [
     { id: 'review-release', labelKey: 'persona.Product.actions.reviewReleaseConfidence', icon: 'ShieldCheck', to: '/changes' },
-    { id: 'critical-status', labelKey: 'persona.Product.actions.viewCriticalServiceStatus', icon: 'Activity', to: '/operations/reliability' },
+    { id: 'critical-status', labelKey: 'persona.Product.actions.viewCriticalServiceStatus', icon: 'Activity', to: '/operations/reliability', preview: true },
     { id: 'product-incidents', labelKey: 'persona.Product.actions.inspectProductIncidents', icon: 'AlertTriangle', to: '/operations/incidents' },
-    { id: 'view-reports', labelKey: 'persona.Product.actions.viewReports', icon: 'BarChart3', to: '/governance/reports' },
+    { id: 'view-reports', labelKey: 'persona.Product.actions.viewReports', icon: 'BarChart3', to: '/governance/reports', preview: true },
   ],
   aiContextScopes: ['services', 'changes', 'incidents'],
   aiSuggestedPromptKeys: [
@@ -203,10 +205,10 @@ const executiveConfig: PersonaConfig = {
     { id: 'confidence-indicators', titleKey: 'persona.Executive.widgets.confidenceIndicators', type: 'releaseConfidence' },
   ],
   quickActions: [
-    { id: 'executive-overview', labelKey: 'persona.Executive.actions.openExecutiveOverview', icon: 'BarChart3', to: '/governance/reports' },
-    { id: 'operational-trend', labelKey: 'persona.Executive.actions.reviewOperationalTrend', icon: 'Activity', to: '/governance/risk' },
+    { id: 'executive-overview', labelKey: 'persona.Executive.actions.openExecutiveOverview', icon: 'BarChart3', to: '/governance/reports', preview: true },
+    { id: 'operational-trend', labelKey: 'persona.Executive.actions.reviewOperationalTrend', icon: 'Activity', to: '/governance/risk', preview: true },
     { id: 'inspect-domains', labelKey: 'persona.Executive.actions.inspectCriticalDomains', icon: 'Server', to: '/services' },
-    { id: 'view-compliance', labelKey: 'persona.Executive.actions.viewCompliance', icon: 'Scale', to: '/governance/compliance' },
+    { id: 'view-compliance', labelKey: 'persona.Executive.actions.viewCompliance', icon: 'Scale', to: '/governance/compliance', preview: true },
   ],
   aiContextScopes: ['risk', 'trends', 'services'],
   aiSuggestedPromptKeys: [
@@ -227,10 +229,10 @@ const platformAdminConfig: PersonaConfig = {
     { id: 'integrations', titleKey: 'persona.PlatformAdmin.widgets.integrations', type: 'governance' },
   ],
   quickActions: [
-    { id: 'manage-policies', labelKey: 'persona.PlatformAdmin.actions.managePolicies', icon: 'ShieldCheck', to: '/ai/policies' },
-    { id: 'manage-models', labelKey: 'persona.PlatformAdmin.actions.manageAiModels', icon: 'Database', to: '/ai/models' },
+    { id: 'manage-policies', labelKey: 'persona.PlatformAdmin.actions.managePolicies', icon: 'ShieldCheck', to: '/ai/policies', preview: true },
+    { id: 'manage-models', labelKey: 'persona.PlatformAdmin.actions.manageAiModels', icon: 'Database', to: '/ai/models', preview: true },
     { id: 'configure-integrations', labelKey: 'persona.PlatformAdmin.actions.configureIntegrations', icon: 'Settings', to: '/users' },
-    { id: 'review-coverage', labelKey: 'persona.PlatformAdmin.actions.reviewPlatformCoverage', icon: 'BarChart3', to: '/governance/reports' },
+    { id: 'review-coverage', labelKey: 'persona.PlatformAdmin.actions.reviewPlatformCoverage', icon: 'BarChart3', to: '/governance/reports', preview: true },
   ],
   aiContextScopes: ['governance', 'policies', 'models'],
   aiSuggestedPromptKeys: [
@@ -253,8 +255,8 @@ const auditorConfig: PersonaConfig = {
   quickActions: [
     { id: 'inspect-audit', labelKey: 'persona.Auditor.actions.inspectAuditTrail', icon: 'ClipboardList', to: '/audit' },
     { id: 'export-evidence', labelKey: 'persona.Auditor.actions.exportEvidence', icon: 'Download', to: '/audit' },
-    { id: 'review-approvals', labelKey: 'persona.Auditor.actions.reviewApprovalHistory', icon: 'ClipboardCheck', to: '/governance/compliance' },
-    { id: 'ai-audit', labelKey: 'persona.Auditor.actions.auditAiUsage', icon: 'Bot', to: '/ai/policies' },
+    { id: 'review-approvals', labelKey: 'persona.Auditor.actions.reviewApprovalHistory', icon: 'ClipboardCheck', to: '/governance/compliance', preview: true },
+    { id: 'ai-audit', labelKey: 'persona.Auditor.actions.auditAiUsage', icon: 'Bot', to: '/ai/policies', preview: true },
   ],
   aiContextScopes: ['audit', 'compliance', 'approvals'],
   aiSuggestedPromptKeys: [

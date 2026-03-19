@@ -73,9 +73,9 @@ export function RiskCenterPage() {
     if (filter !== 'all' && ind.riskLevel !== filter) return false;
     if (search) {
       const q = search.toLowerCase();
-      return ind.serviceName.toLowerCase().includes(q)
-        || ind.domain.toLowerCase().includes(q)
-        || ind.team.toLowerCase().includes(q);
+      return ind.packName.toLowerCase().includes(q)
+        || ind.category.toLowerCase().includes(q)
+        || ind.dimensions.some((dim) => dim.explanation.toLowerCase().includes(q));
     }
     return true;
   });
@@ -91,7 +91,7 @@ export function RiskCenterPage() {
       {/* Stats */}
       <PageSection>
         <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
-          <StatCard title={t('governance.risk.totalAssessed')} value={d.totalServicesAssessed} icon={<Shield size={20} />} color="text-accent" />
+          <StatCard title={t('governance.risk.totalAssessed')} value={d.totalPacksAssessed} icon={<Shield size={20} />} color="text-accent" />
           <StatCard title={t('governance.risk.critical')} value={d.criticalCount} icon={<ShieldAlert size={20} />} color="text-critical" />
           <StatCard title={t('governance.risk.high')} value={d.highCount} icon={<AlertTriangle size={20} />} color="text-orange-500" />
           <StatCard title={t('governance.risk.medium')} value={d.mediumCount} icon={<AlertCircle size={20} />} color="text-amber-500" />
@@ -140,16 +140,14 @@ export function RiskCenterPage() {
                 <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
               ) : (
                 filtered.map(ind => (
-                  <div key={ind.serviceId} className="px-4 py-3 hover:bg-hover transition-colors">
+                  <div key={ind.packId} className="px-4 py-3 hover:bg-hover transition-colors">
                     <div className="flex items-center gap-3 mb-2">
                       {riskIcon(ind.riskLevel)}
-                      <span className="text-sm font-medium text-heading">{ind.serviceName}</span>
+                      <span className="text-sm font-medium text-heading">{ind.packName}</span>
                       <Badge variant={riskBadgeVariant(ind.riskLevel)}>
                         {t(`governance.risk.level.${ind.riskLevel}`)}
                       </Badge>
-                      <span className="hidden md:inline text-xs text-muted">{ind.domain}</span>
-                      <span className="hidden md:inline text-xs text-muted">•</span>
-                      <span className="hidden md:inline text-xs text-muted">{ind.team}</span>
+                      <span className="hidden md:inline text-xs text-muted">{ind.category}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 ml-7">
                       {ind.dimensions.map((dim, i) => (

@@ -32,8 +32,10 @@ public static class HealthCheckResponseWriter
                 Description: entry.Value.Description,
                 DurationMs: entry.Value.Duration.TotalMilliseconds,
                 Tags: entry.Value.Tags.Any() ? entry.Value.Tags.ToArray() : null,
-                Exception: entry.Value.Exception?.Message
-            )).ToArray());
+                Data: entry.Value.Data.Count > 0
+                    ? entry.Value.Data.ToDictionary(pair => pair.Key, pair => pair.Value)
+                    : null,
+                HasException: entry.Value.Exception is not null)).ToArray());
 
         return context.Response.WriteAsJsonAsync(response, JsonOptions);
     }
@@ -49,5 +51,6 @@ public static class HealthCheckResponseWriter
         string? Description,
         double DurationMs,
         string[]? Tags,
-        string? Exception);
+        IReadOnlyDictionary<string, object?>? Data,
+        bool HasException);
 }

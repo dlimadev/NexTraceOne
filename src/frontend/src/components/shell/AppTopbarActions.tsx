@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Bell, Globe, Check } from 'lucide-react';
-import { cn } from '../../lib/cn';
 
 const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English' },

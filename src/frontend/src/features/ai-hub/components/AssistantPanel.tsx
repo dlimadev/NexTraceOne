@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Bot,
   Send,
-  Cpu,
   Shield,
   Database,
   Link2,

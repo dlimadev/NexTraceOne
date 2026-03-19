@@ -144,20 +144,18 @@ export function ContractDetailPage() {
                 <DetailRow label={t('contractGov.detail.protocol')} value={t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)} />
                 <DetailRow label={t('contractGov.detail.format')} value={detail.format} />
                 <DetailRow label={t('contractGov.detail.importedFrom')} value={detail.importedFrom ?? t('contractGov.detail.notAvailable')} />
-                {detail.serviceName && (
-                  <div>
-                    <dt className="text-xs text-muted mb-1">{t('contractGov.detail.ownerService')}</dt>
-                    <dd>
-                      <Link
-                        to="/services"
-                        className="text-sm text-accent hover:underline inline-flex items-center gap-1"
-                      >
-                        {detail.serviceName}
-                        <ExternalLink size={12} />
-                      </Link>
-                    </dd>
-                  </div>
-                )}
+                <div>
+                  <dt className="text-xs text-muted mb-1">{t('contractGov.detail.ownerService')}</dt>
+                  <dd>
+                    <Link
+                      to="/services"
+                      className="text-sm text-accent hover:underline inline-flex items-center gap-1"
+                    >
+                      {detail.apiAssetId}
+                      <ExternalLink size={12} />
+                    </Link>
+                  </dd>
+                </div>
                 <div>
                   <dt className="text-xs text-muted mb-1">{t('contractGov.detail.specPreview')}</dt>
                   <dd className="bg-elevated border border-edge rounded-md p-3 max-h-48 overflow-y-auto">
@@ -381,24 +379,24 @@ export function ContractDetailPage() {
           contextType="contract"
           contextId={contractVersionId!}
           contextSummary={{
-            name: detail.serviceName ? `${detail.serviceName} — ${detail.protocol}` : detail.contractVersionId,
-            description: detail.specPreview,
+            name: `${detail.apiAssetId} — ${detail.protocol}`,
+            description: detail.specContent ? detail.specContent.slice(0, 200) : undefined,
             status: detail.lifecycleState,
             additionalInfo: {
               ...(detail.protocol ? { protocol: detail.protocol } : {}),
-              ...(detail.version ? { version: detail.version } : {}),
-              ...(detail.serviceName ? { service: detail.serviceName } : {}),
+              ...(detail.semVer ? { version: detail.semVer } : {}),
+              ...(detail.apiAssetId ? { service: detail.apiAssetId } : {}),
             },
           }}
           contextData={{
             entityType: 'contract',
-            entityName: detail.serviceName ? `${detail.serviceName} — ${detail.protocol}` : detail.apiAssetId,
+            entityName: `${detail.apiAssetId} — ${detail.protocol}`,
             entityStatus: detail.lifecycleState,
-            entityDescription: detail.specContent ? detail.specContent.slice(0, 200) : undefined, // Spec content truncated to 200 chars to keep context bundle lightweight
+            entityDescription: detail.specContent ? detail.specContent.slice(0, 200) : undefined,
             properties: {
               ...(detail.protocol ? { protocol: detail.protocol } : {}),
               ...(detail.semVer ? { version: detail.semVer } : {}),
-              ...(detail.serviceName ? { service: detail.serviceName } : {}),
+              ...(detail.apiAssetId ? { service: detail.apiAssetId } : {}),
               ...(detail.format ? { format: detail.format } : {}),
               ...(detail.isLocked ? { locked: 'Yes' } : {}),
               ...(detail.fingerprint ? { fingerprint: detail.fingerprint } : {}),

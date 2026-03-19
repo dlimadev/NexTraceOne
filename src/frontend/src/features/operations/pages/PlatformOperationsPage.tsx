@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Server, Activity, CheckCircle, AlertTriangle, XCircle,
-  Clock, Inbox, Bell, Cpu, Database, Cog, BrainCircuit,
+  Server, Activity, CheckCircle, AlertTriangle,
+  Inbox, Bell, Cpu, Database, Cog, BrainCircuit,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

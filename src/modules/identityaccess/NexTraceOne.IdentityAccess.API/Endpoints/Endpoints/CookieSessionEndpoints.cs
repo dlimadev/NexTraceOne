@@ -44,7 +44,7 @@ internal static class CookieSessionEndpoints
     /// </summary>
     internal static void Map(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
     {
-        var sessionGroup = group.MapGroup("/cookie-session");
+        var sessionGroup = group.MapGroup("/auth/cookie-session");
 
         // POST /auth/cookie-session — autentica e define cookies httpOnly + CSRF
         sessionGroup.MapPost("/", async (
@@ -124,7 +124,7 @@ internal static class CookieSessionEndpoints
             httpContext.Response.Cookies.Append(opts.CsrfCookieName, csrfToken, new CookieOptions
             {
                 HttpOnly = false,
-                Secure = true,
+                Secure = opts.RequireSecureCookies,
                 SameSite = SameSiteMode.Strict,
                 Path = "/",
             });

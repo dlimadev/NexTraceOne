@@ -27,23 +27,29 @@ public sealed class IdentityExpirationJob(
     IServiceScopeFactory serviceScopeFactory,
     IDateTimeProvider dateTimeProvider,
     IEnumerable<IExpirationHandler> expirationHandlers,
+    WorkerJobHealthRegistry jobHealthRegistry,
     ILogger<IdentityExpirationJob> logger) : BackgroundService
 {
     private const int BatchSize = 100;
+    internal const string HealthCheckName = "identity-expiration";
 
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        jobHealthRegistry.MarkStarted(HealthCheckName);
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
 
         while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
             {
+                jobHealthRegistry.MarkStarted(HealthCheckName);
                 await ProcessExpirationsAsync(stoppingToken);
+                jobHealthRegistry.MarkSucceeded(HealthCheckName);
             }
             catch (Exception ex)
             {
+                jobHealthRegistry.MarkFailed(HealthCheckName, "Identity expiration cycle failed.");
                 logger.LogError(ex, "Unhandled error in Identity expiration job.");
             }
         }

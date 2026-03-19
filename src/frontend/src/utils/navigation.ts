@@ -70,7 +70,7 @@ export function isSafeRedirectPath(path: string): boolean {
   if (trimmed.includes('://')) return false;
 
   // Extrai apenas o pathname (remove query string e hash)
-  const pathname = trimmed.split('?')[0].split('#')[0];
+  const pathname = trimmed.split('?')[0]?.split('#')[0] ?? '/';
 
   // Verifica se o pathname corresponde a uma rota interna conhecida
   return ALLOWED_INTERNAL_PATHS.some(

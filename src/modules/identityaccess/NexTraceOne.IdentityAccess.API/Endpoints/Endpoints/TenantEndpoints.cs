@@ -1,9 +1,12 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.CookieSession;
 
 using ListMyTenantsFeature = NexTraceOne.IdentityAccess.Application.Features.ListMyTenants.ListMyTenants;
 using SelectTenantFeature = NexTraceOne.IdentityAccess.Application.Features.SelectTenant.SelectTenant;
@@ -35,10 +38,38 @@ internal static class TenantEndpoints
             SelectTenantRequest request,
             ISender sender,
             IErrorLocalizer localizer,
+            IOptions<CookieSessionOptions> sessionOptions,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new SelectTenantFeature.Command(request.TenantId), cancellationToken);
-            return result.ToHttpResult(localizer);
+
+            if (!result.IsSuccess)
+            {
+                return result.ToHttpResult(localizer);
+            }
+
+            var response = result.Value!;
+            var opts = sessionOptions.Value;
+            var authCookie = httpContext.Request.Cookies[opts.AccessTokenCookieName];
+
+            if (opts.Enabled && !string.IsNullOrWhiteSpace(authCookie))
+            {
+                var csrfToken = CsrfTokenValidator.ApplyCookies(httpContext.Response, response.AccessToken, opts);
+
+                return Results.Ok(new
+                {
+                    response.AccessToken,
+                    response.ExpiresIn,
+                    response.TenantId,
+                    response.TenantName,
+                    response.RoleName,
+                    response.Permissions,
+                    csrfToken
+                });
+            }
+
+            return Results.Ok(response);
         }).RequireAuthorization();
     }
 

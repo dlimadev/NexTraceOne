@@ -135,10 +135,17 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
           {violations.length > 0 && (
             <div className="divide-y divide-edge">
               {violations.map((v) => {
-                const config = SEVERITY_CONFIG[v.severity] ?? SEVERITY_CONFIG.Info;
+                const fallbackConfig = SEVERITY_CONFIG.Info;
+                const config = SEVERITY_CONFIG[v.severity] ?? fallbackConfig;
+                const Icon = config?.Icon;
+
+                if (!config || !Icon) {
+                  return null;
+                }
+
                 return (
                   <div key={v.id} className="flex items-start gap-3 px-4 py-3 text-xs">
-                    <config.Icon size={14} className={`flex-shrink-0 mt-0.5 ${config.color}`} />
+                    <Icon size={14} className={`flex-shrink-0 mt-0.5 ${config.color}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="font-medium text-heading">{v.ruleName}</span>

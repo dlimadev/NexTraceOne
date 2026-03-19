@@ -148,9 +148,7 @@ export function MySessionsPage() {
                         {parseBrowser(session.userAgent)}
                       </td>
                       <td className="px-6 py-3 text-body">
-                        {(session as Record<string, unknown>).createdAt
-                          ? new Date(String((session as Record<string, unknown>).createdAt)).toLocaleString()
-                          : '—'}
+                        —
                       </td>
                       <td className="px-6 py-3 text-body">
                         {new Date(session.expiresAt).toLocaleString()}

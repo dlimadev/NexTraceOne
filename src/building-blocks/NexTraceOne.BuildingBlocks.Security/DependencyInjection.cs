@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.Authorization;
+using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using System.Text;
 
@@ -66,6 +67,8 @@ public static class DependencyInjection
             signingKey = "development-signing-key-development-signing-key-1234567890";
         }
 
+        services.Configure<CookieSessionOptions>(configuration.GetSection(CookieSessionOptions.SectionName));
+
         services.AddHttpContextAccessor();
         services.AddScoped<JwtTokenService>();
         services.AddScoped<CurrentTenantAccessor>();
@@ -102,6 +105,34 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(1)
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(context.Token))
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        var cookieSessionOptions = configuration
+                            .GetSection(CookieSessionOptions.SectionName)
+                            .Get<CookieSessionOptions>() ?? new CookieSessionOptions();
+
+                        if (!cookieSessionOptions.Enabled)
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        var tokenFromCookie = context.Request.Cookies[cookieSessionOptions.AccessTokenCookieName];
+                        if (!string.IsNullOrWhiteSpace(tokenFromCookie))
+                        {
+                            context.Token = tokenFromCookie;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             })
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
