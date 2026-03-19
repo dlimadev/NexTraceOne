@@ -1,5 +1,10 @@
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AskCatalogQuestion;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.SuggestSemanticVersionWithAI;
+using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AIKnowledge.Application.Orchestration;
 
@@ -13,7 +18,11 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // TODO: Registrar MediatR handlers e validators deste módulo
+        services.AddBuildingBlocksApplication(configuration);
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+        services.AddTransient<IValidator<AskCatalogQuestion.Command>, AskCatalogQuestion.Validator>();
+        services.AddTransient<IValidator<ClassifyChangeWithAI.Command>, ClassifyChangeWithAI.Validator>();
+        services.AddTransient<IValidator<SuggestSemanticVersionWithAI.Command>, SuggestSemanticVersionWithAI.Validator>();
         return services;
     }
 }
