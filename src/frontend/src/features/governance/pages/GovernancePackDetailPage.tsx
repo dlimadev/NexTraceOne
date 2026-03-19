@@ -9,6 +9,8 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { GovernancePackDetail, EnforcementMode, GovernancePackStatus } from '../../../types';
 
@@ -81,9 +83,7 @@ export function GovernancePackDetailPage() {
           <ArrowLeft size={14} />
           {t('governancePacks.detail.backToPacks')}
         </Link>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+        <PageLoadingState />
       </PageContainer>
     );
   }
@@ -95,10 +95,7 @@ export function GovernancePackDetailPage() {
           <ArrowLeft size={14} />
           {t('governancePacks.detail.backToPacks')}
         </Link>
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <AlertTriangle size={48} className="text-critical" />
-          <p className="text-sm text-muted">{error || t('governancePacks.detail.notFound')}</p>
-        </div>
+        <PageErrorState message={error || t('governancePacks.detail.notFound')} />
       </PageContainer>
     );
   }

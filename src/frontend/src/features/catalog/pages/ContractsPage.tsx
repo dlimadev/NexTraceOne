@@ -10,6 +10,7 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { OnboardingHints } from '../../../components/OnboardingHints';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { contractsApi, serviceCatalogApi } from '../api';
 import { PageContainer } from '../../../components/shell';
 import type {
@@ -164,7 +165,7 @@ export function ContractsPage() {
   });
   const availableApis = graph?.apis ?? [];
 
-  const { data: history, isLoading } = useQuery({
+  const { data: history, isLoading, isError: isHistoryError } = useQuery({
     queryKey: ['contracts', 'history', apiAssetId],
     queryFn: () => contractsApi.getHistory(apiAssetId),
     enabled: !!apiAssetId,
@@ -615,6 +616,8 @@ export function ContractsPage() {
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
+          ) : isHistoryError ? (
+            <PageErrorState size="sm" />
           ) : !history?.length ? (
             <div className="px-6 py-12 text-center">
               <AlertTriangle size={40} className="mx-auto mb-3 text-muted opacity-50" />

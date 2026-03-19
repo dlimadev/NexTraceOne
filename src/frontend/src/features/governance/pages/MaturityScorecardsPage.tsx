@@ -5,6 +5,8 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { MaturityScorecardsResponse, MaturityLevelType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 type MaturityDimension = 'team' | 'domain';
@@ -79,17 +81,10 @@ export function MaturityScorecardsPage() {
         ))}
       </div>
 
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
-      )}
+      {loading && <PageLoadingState />}
 
       {!loading && (error || !data) && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <AlertTriangle size={32} className="text-critical mb-2" />
-          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
-        </div>
+        <PageErrorState message={error ?? undefined} />
       )}
 
       {/* Scorecards */}

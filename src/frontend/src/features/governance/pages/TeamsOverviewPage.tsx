@@ -9,6 +9,8 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { TeamSummary } from '../../../types';
 
@@ -85,9 +87,7 @@ export function TeamsOverviewPage() {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.teams.title" subtitleKey="organization.teams.subtitle" />
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+        <PageLoadingState />
       </PageContainer>
     );
   }
@@ -96,10 +96,7 @@ export function TeamsOverviewPage() {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.teams.title" subtitleKey="organization.teams.subtitle" />
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <AlertTriangle size={48} className="text-critical" />
-          <p className="text-sm text-muted">{error}</p>
-        </div>
+        <PageErrorState message={error} />
       </PageContainer>
     );
   }

@@ -9,6 +9,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { AccessReviewCampaign, AccessReviewCampaignDetail } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * Página de gestão de campanhas de revisão de acessos (Access Review) do módulo Identity.

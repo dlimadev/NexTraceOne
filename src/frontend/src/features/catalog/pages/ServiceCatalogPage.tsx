@@ -25,8 +25,11 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
+import { ServiceCatalogOverviewTab } from '../components/ServiceCatalogOverviewTab';
+import { ServiceCatalogServicesTab } from '../components/ServiceCatalogServicesTab';
 import { PageContainer } from '../../../components/shell';
 import type {
   AssetGraph,
@@ -71,7 +74,7 @@ export function ServiceCatalogPage() {
   const [apiForm, setApiForm] = useState({ name: '', baseUrl: '', ownerServiceId: '', description: '' });
 
   // ── Queries principais ──────────────────────────────────────────────
-  const { data: graph, isLoading } = useQuery({
+  const { data: graph, isLoading, isError: isGraphError } = useQuery({
     queryKey: ['graph'],
     queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 30_000,
@@ -317,107 +320,19 @@ export function ServiceCatalogPage() {
       </div>
 
       {/* ── Conteúdo das abas ──────────────────────────────────────── */}
-      {isLoading ? (
+      {isGraphError ? (
+        <PageErrorState />
+      ) : isLoading ? (
         <PageLoadingState />
       ) : (
         <>
           {/* ── Aba: Visão Operacional ──────────────────────────────── */}
           {tab === 'overview' && (
-            <div className="space-y-6">
-              {/* KPI cards — métricas operacionais resumidas */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: t('serviceCatalog.overview.requestsPerMin'), value: '—', icon: <Activity size={18} />, color: 'text-blue-500' },
-                  { label: t('serviceCatalog.overview.throughput'), value: '—', icon: <TrendingUp size={18} />, color: 'text-emerald-500' },
-                  { label: t('serviceCatalog.overview.avgLatency'), value: '—', icon: <Timer size={18} />, color: 'text-amber-500' },
-                  { label: t('serviceCatalog.overview.errorRate'), value: '—', icon: <AlertTriangle size={18} />, color: 'text-red-500' },
-                ].map((kpi) => (
-                  <Card key={kpi.label}>
-                    <CardBody className="flex items-center gap-3">
-                      <div className={kpi.color}>{kpi.icon}</div>
-                      <div>
-                        <p className="text-2xl font-bold text-heading">{kpi.value}</p>
-                        <p className="text-xs text-muted">{kpi.label}</p>
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Resumo de saúde dos nós */}
-              <Card>
-                <CardHeader>
-                  <h2 className="font-semibold text-heading">{t('serviceCatalog.overview.serviceHealth')}</h2>
-                </CardHeader>
-                <CardBody>
-                  {healthData?.items && healthData.items.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {(['healthy', 'degraded', 'unhealthy', 'unknown'] as const).map((status) => {
-                        const count = healthData.items.filter((h) => h.status.toLowerCase() === status).length;
-                        const colors = {
-                          healthy: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50',
-                          degraded: 'bg-amber-900/40 text-amber-300 border-amber-700/50',
-                          unhealthy: 'bg-red-900/40 text-red-300 border-red-700/50',
-                          unknown: 'bg-slate-800/40 text-slate-300 border-slate-700/50',
-                        };
-                        return (
-                          <div key={status} className={`rounded-lg border p-4 text-center ${colors[status]}`}>
-                            <p className="text-3xl font-bold">{count}</p>
-                            <p className="text-xs font-medium mt-1">{t(`serviceCatalog.overview.${status}`)}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="py-8 text-center">
-                      <Activity size={32} className="mx-auto text-muted mb-3" />
-                      <p className="text-sm text-muted">{t('serviceCatalog.overview.noMetrics')}</p>
-                      <p className="text-xs text-muted mt-1">{t('serviceCatalog.overview.noMetricsHint')}</p>
-                    </div>
-                  )}
-                </CardBody>
-              </Card>
-
-              {/* Principais consumidores e anomalias */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.overview.topConsumers')}</h3>
-                  </CardHeader>
-                  <CardBody className="p-0">
-                    {graph?.apis && graph.apis.some(a => (a.consumers?.length ?? 0) > 0) ? (
-                      <ul className="divide-y divide-edge">
-                        {graph.apis
-                          .filter(a => (a.consumers?.length ?? 0) > 0)
-                          .sort((a, b) => (b.consumers?.length ?? 0) - (a.consumers?.length ?? 0))
-                          .slice(0, 5)
-                          .map(api => (
-                            <li key={api.apiAssetId} className="px-4 py-3 flex items-center justify-between hover:bg-hover transition-colors">
-                              <div>
-                                <p className="text-sm font-medium text-heading">{api.name}</p>
-                                <p className="text-xs text-muted font-mono">{api.routePattern}</p>
-                              </div>
-                              <Badge variant="info">{api.consumers?.length ?? 0} {t('serviceCatalog.consumers')}</Badge>
-                            </li>
-                          ))}
-                      </ul>
-                    ) : (
-                      <p className="px-4 py-6 text-sm text-muted text-center">{t('serviceCatalog.noDependencies')}</p>
-                    )}
-                  </CardBody>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.overview.anomalies')}</h3>
-                  </CardHeader>
-                  <CardBody className="py-8 text-center">
-                    <Shield size={32} className="mx-auto text-muted mb-3" />
-                    <p className="text-sm text-muted">{t('serviceCatalog.overview.noAnomalies')}</p>
-                  </CardBody>
-                </Card>
-              </div>
-            </div>
+            <ServiceCatalogOverviewTab
+              graph={graph}
+              healthData={healthData}
+              onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }}
+            />
           )}
 
           {/* ── Aba: Grafo Visual ──────────────────────────────────── */}
@@ -437,29 +352,10 @@ export function ServiceCatalogPage() {
 
           {/* ── Aba: Serviços ──────────────────────────────────────── */}
           {tab === 'services' && (
-            <Card>
-              <CardBody className="p-0">
-                {!filteredServices.length ? (
-                  <p className="px-6 py-12 text-sm text-muted text-center">{t('serviceCatalog.noServices')}</p>
-                ) : (
-                  <ul className="divide-y divide-edge">
-                    {filteredServices.map((svc) => (
-                      <li key={svc.serviceAssetId} className="px-6 py-4 flex items-center gap-4 hover:bg-hover transition-colors cursor-pointer" onClick={() => selectNodeForImpact(svc.serviceAssetId)}>
-                        <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center text-accent">
-                          <Server size={18} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-heading">{svc.name}</p>
-                          <p className="text-xs text-muted">{svc.teamName} · {svc.domain}</p>
-                        </div>
-                        <Badge variant="info">{svc.domain}</Badge>
-                        <ChevronRight size={16} className="text-muted" />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </CardBody>
-            </Card>
+            <ServiceCatalogServicesTab
+              filteredServices={filteredServices}
+              onSelectNode={selectNodeForImpact}
+            />
           )}
 
           {/* ── Aba: APIs ──────────────────────────────────────────── */}
