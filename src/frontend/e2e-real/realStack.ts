@@ -1,14 +1,16 @@
 import { execFile, spawn } from 'node:child_process';
 import { open, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
 export const repoRoot = path.resolve(import.meta.dirname, '..');
-export const backendProjectPath = path.resolve(repoRoot, '../platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj');
-export const stateFilePath = '/tmp/nextraceone-playwright-real-state.json';
-export const backendLogPath = '/tmp/nextraceone-playwright-real-backend.log';
+export const backendProjectPath = process.env.NEXTRACE_E2E_BACKEND_PROJECT_PATH
+  ?? path.resolve(repoRoot, '../platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj');
+export const stateFilePath = path.join(tmpdir(), 'nextraceone-playwright-real-state.json');
+export const backendLogPath = path.join(tmpdir(), 'nextraceone-playwright-real-backend.log');
 export const postgresContainerName = 'nextraceone-rh6-playwright-postgres';
 export const backendBaseUrl = 'http://127.0.0.1:5187';
 export const postgresPort = 15432;
@@ -140,7 +142,12 @@ export async function stopBackendProcess(pid: number | undefined): Promise<void>
   if (!pid) return;
 
   try {
-    process.kill(-pid, 'SIGTERM');
+    if (process.platform !== 'win32') {
+      process.kill(-pid, 'SIGTERM');
+      return;
+    }
+
+    process.kill(pid, 'SIGTERM');
   } catch {
     try {
       process.kill(pid, 'SIGTERM');

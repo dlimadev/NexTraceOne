@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import { loginAsAdmin, logout } from './helpers/auth';
 
@@ -45,7 +46,7 @@ test.describe('RH-6 real web flows', () => {
     await page.getByRole('button', { name: /visual/i }).click();
     await page.getByRole('button', { name: /^next$/i }).click();
 
-    const draftTitle = `RH6 Draft ${Date.now()}`;
+    const draftTitle = `RH6 Draft ${randomUUID().slice(0, 8)}`;
     await page.getByLabel(/name/i).fill(draftTitle);
     await page.getByLabel(/description/i).fill('Created by real Playwright RH-6 flow');
 
