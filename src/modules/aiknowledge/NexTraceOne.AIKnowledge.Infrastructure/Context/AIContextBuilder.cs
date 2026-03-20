@@ -92,8 +92,9 @@ internal sealed class AIContextBuilder(
 
     private static string DeterminePersona(ICurrentUser user)
     {
-        // Inferência de persona baseada em permissões existentes.
-        // Em fases futuras, a persona virá explicitamente do token JWT.
+        // Inferência de persona baseada em permissões existentes usando prioridade decrescente.
+        // Um usuário com múltiplas permissões recebe a persona mais elevada (most-privileged wins).
+        // Em fases futuras, a persona virá explicitamente do token JWT como claim dedicado.
         if (user.HasPermission("platform:admin"))
             return "PlatformAdmin";
         if (user.HasPermission("governance:manage"))

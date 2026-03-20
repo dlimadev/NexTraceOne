@@ -43,11 +43,32 @@ public sealed class OperationalExecutionContext(
             TenantId,
             EnvironmentId,
             EnvironmentProfile,
-            EnvironmentProfile is EnvironmentProfile.Production or EnvironmentProfile.DisasterRecovery
-                ? EnvironmentCriticality.Critical
-                : EnvironmentCriticality.Low,
+            InferCriticality(EnvironmentProfile, IsProductionLikeEnvironment),
             IsProductionLikeEnvironment,
             isActive: true);
+
+    /// <summary>
+    /// Infere a criticidade a partir do perfil e do flag IsProductionLike.
+    /// Usado quando o TenantEnvironmentContext é construído a partir do contexto de execução,
+    /// sem acesso direto à entidade de domínio (que contém a criticidade real).
+    /// Em fases futuras, o accessor de ambiente deverá expor a criticidade diretamente.
+    /// </summary>
+    private static EnvironmentCriticality InferCriticality(EnvironmentProfile profile, bool isProductionLike)
+    {
+        if (isProductionLike)
+            return EnvironmentCriticality.Critical;
+
+        return profile switch
+        {
+            EnvironmentProfile.Production => EnvironmentCriticality.Critical,
+            EnvironmentProfile.DisasterRecovery => EnvironmentCriticality.Critical,
+            EnvironmentProfile.Staging => EnvironmentCriticality.High,
+            EnvironmentProfile.UserAcceptanceTesting => EnvironmentCriticality.High,
+            EnvironmentProfile.Validation => EnvironmentCriticality.Medium,
+            EnvironmentProfile.PerformanceTesting => EnvironmentCriticality.Medium,
+            _ => EnvironmentCriticality.Low
+        };
+    }
 
     /// <inheritdoc />
     public bool IsFullyResolved
