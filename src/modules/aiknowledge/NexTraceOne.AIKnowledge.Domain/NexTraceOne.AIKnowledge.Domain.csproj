@@ -10,5 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
     <ProjectReference Include="..\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\modules\identityaccess\NexTraceOne.IdentityAccess.Domain\NexTraceOne.IdentityAccess.Domain.csproj" />
   </ItemGroup>
 </Project>

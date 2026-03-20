@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.IdentityAccess.Domain.Enums;
 
 namespace NexTraceOne.IdentityAccess.Domain.Entities;
 
@@ -36,6 +37,49 @@ public sealed class Environment : Entity<EnvironmentId>
 
     /// <summary>Indica se o ambiente está ativo e disponível para uso.</summary>
     public bool IsActive { get; private set; }
+
+    /// <summary>
+    /// Perfil operacional do ambiente.
+    /// Define a natureza base do ambiente (Development, Validation, Staging, Production, etc.)
+    /// independente do nome livre dado pelo tenant.
+    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
+    /// </summary>
+    public EnvironmentProfile Profile { get; private set; } = EnvironmentProfile.Development;
+
+    /// <summary>
+    /// Código curto definido pelo tenant para identificação rápida (ex.: "DEV", "QA-EU", "PROD-BR").
+    /// Diferente do Slug (que é URL-friendly), o Code é livre e de uso interno.
+    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
+    /// </summary>
+    public string? Code { get; private set; }
+
+    /// <summary>
+    /// Descrição livre do ambiente, usada para fins informativos e de documentação interna.
+    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
+    /// </summary>
+    public string? Description { get; private set; }
+
+    /// <summary>
+    /// Criticidade operacional do ambiente.
+    /// Determina nível de proteção, auditoria e rigor em mudanças.
+    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
+    /// </summary>
+    public EnvironmentCriticality Criticality { get; private set; } = EnvironmentCriticality.Low;
+
+    /// <summary>
+    /// Região ou localização do ambiente (ex.: "br-east", "eu-west-1", "on-prem-sp").
+    /// Informação opcional para contexto geográfico e roteamento.
+    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
+    /// </summary>
+    public string? Region { get; private set; }
+
+    /// <summary>
+    /// Indica se este ambiente tem comportamento e políticas similares ao de produção.
+    /// Verdadeiro para Production, DisasterRecovery e ambientes de alta criticidade.
+    /// Influencia decisões de IA, políticas de promoção e auditoria.
+    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
+    /// </summary>
+    public bool IsProductionLike { get; private set; }
 
     /// <summary>Data/hora UTC de criação do ambiente.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
@@ -77,6 +121,64 @@ public sealed class Environment : Entity<EnvironmentId>
 
     /// <summary>Ativa o ambiente, tornando-o disponível para atribuição de acessos.</summary>
     public void Activate() => IsActive = true;
+
+    /// <summary>
+    /// Factory method completo para criação de ambiente com perfil operacional explícito.
+    /// Permite configurar o perfil operacional, criticidade e demais atributos da Fase 1.
+    /// </summary>
+    public static Environment Create(
+        TenantId tenantId,
+        string name,
+        string slug,
+        int sortOrder,
+        DateTimeOffset now,
+        EnvironmentProfile profile,
+        EnvironmentCriticality criticality = EnvironmentCriticality.Low,
+        string? code = null,
+        string? description = null,
+        string? region = null,
+        bool? isProductionLike = null)
+    {
+        Guard.Against.Null(tenantId);
+        Guard.Against.NullOrWhiteSpace(name, message: "Environment name is required.");
+        Guard.Against.NullOrWhiteSpace(slug, message: "Environment slug is required.");
+        Guard.Against.Negative(sortOrder, message: "Environment sort order must be zero or positive.");
+
+        var productionLike = isProductionLike ?? profile is EnvironmentProfile.Production or EnvironmentProfile.DisasterRecovery;
+
+        return new Environment
+        {
+            Id = EnvironmentId.New(),
+            TenantId = tenantId,
+            Name = name,
+            Slug = slug.ToLowerInvariant(),
+            SortOrder = sortOrder,
+            IsActive = true,
+            CreatedAt = now,
+            Profile = profile,
+            Criticality = criticality,
+            Code = code,
+            Description = description,
+            Region = region,
+            IsProductionLike = productionLike
+        };
+    }
+
+    /// <summary>Atualiza o perfil operacional do ambiente.</summary>
+    public void UpdateProfile(EnvironmentProfile profile, EnvironmentCriticality criticality, bool? isProductionLike = null)
+    {
+        Profile = profile;
+        Criticality = criticality;
+        IsProductionLike = isProductionLike ?? profile is EnvironmentProfile.Production or EnvironmentProfile.DisasterRecovery;
+    }
+
+    /// <summary>Atualiza o código curto e a região do ambiente.</summary>
+    public void UpdateLocationInfo(string? code, string? region, string? description)
+    {
+        Code = code;
+        Region = region;
+        Description = description;
+    }
 
     /// <summary>Desativa o ambiente, impedindo novos acessos e operações.</summary>
     public void Deactivate() => IsActive = false;
