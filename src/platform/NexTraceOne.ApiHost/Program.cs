@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Observability.Logging;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
+using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Catalog.API.Graph;
 using NexTraceOne.Governance.API;
@@ -140,6 +141,7 @@ app.UseGlobalExceptionHandler();
 app.UseCookieSessionCsrfProtection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
+app.UseMiddleware<EnvironmentResolutionMiddleware>();
 app.UseAuthorization();
 
 // ── Endpoints ──

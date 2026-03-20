@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.AIKnowledge.Application.Abstractions;
+using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
@@ -45,6 +47,10 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AiOrchestrationDbContext>());
+
+        // Fase 2 — AI Context Builders
+        services.AddScoped<IAIContextBuilder, AIContextBuilder>();
+        services.AddScoped<IPromotionRiskContextBuilder, PromotionRiskContextBuilder>();
 
         return services;
     }
