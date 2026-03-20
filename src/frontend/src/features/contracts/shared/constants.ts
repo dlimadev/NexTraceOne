@@ -3,8 +3,7 @@
  * Centraliza valores de protocolo, tipo, lifecycle, tokens visuais NTO
  * e navegação do workspace.
  */
-import type { ContractProtocol, ContractLifecycleState } from '../types';
-import type { WorkspaceSectionDef, WorkspaceSectionId } from '../types/workspace';
+import type { ContractProtocol, ContractLifecycleState } from '../types/index';
 
 // ── Service Types ─────────────────────────────────────────────────────────
 
@@ -116,40 +115,29 @@ export const SEVERITY_COLORS: Record<string, string> = {
 
 // ── Workspace Navigation — 16 Sections ────────────────────────────────────
 
-export const WORKSPACE_SECTIONS: readonly WorkspaceSectionDef[] = [
-  // Overview group
+export const WORKSPACE_SECTIONS = [
   { id: 'summary', labelKey: 'contracts.workspace.summary', icon: 'LayoutDashboard', group: 'overview' },
   { id: 'definition', labelKey: 'contracts.workspace.definition', icon: 'FileText', group: 'overview' },
 
-  // Contract group
   { id: 'contract', labelKey: 'contracts.workspace.contract', icon: 'Code', group: 'contract' },
   { id: 'operations', labelKey: 'contracts.workspace.operations', icon: 'GitBranch', group: 'contract' },
   { id: 'schemas', labelKey: 'contracts.workspace.schemas', icon: 'Database', group: 'contract' },
   { id: 'security', labelKey: 'contracts.workspace.security', icon: 'Shield', group: 'contract' },
 
-  // Knowledge group
-  { id: 'glossary', labelKey: 'contracts.workspace.glossary', icon: 'BookOpen', group: 'knowledge' },
-  { id: 'useCases', labelKey: 'contracts.workspace.useCases', icon: 'Target', group: 'knowledge' },
-  { id: 'interactions', labelKey: 'contracts.workspace.interactions', icon: 'MessageSquare', group: 'knowledge' },
-
-  // Governance group
   { id: 'validation', labelKey: 'contracts.workspace.validation', icon: 'ScanSearch', group: 'governance' },
   { id: 'versioning', labelKey: 'contracts.workspace.versioning', icon: 'GitCompare', group: 'governance' },
   { id: 'changelog', labelKey: 'contracts.workspace.changelog', icon: 'History', group: 'governance' },
   { id: 'approvals', labelKey: 'contracts.workspace.approvals', icon: 'CheckCircle', group: 'governance' },
   { id: 'compliance', labelKey: 'contracts.workspace.compliance', icon: 'ShieldCheck', group: 'governance' },
 
-  // Relationships group
   { id: 'consumers', labelKey: 'contracts.workspace.consumers', icon: 'Users', group: 'relationships' },
   { id: 'dependencies', labelKey: 'contracts.workspace.dependencies', icon: 'Network', group: 'relationships' },
-  { id: 'audit', labelKey: 'contracts.workspace.audit', icon: 'ClipboardList', group: 'relationships' },
 ] as const;
 
 /** Agrupa secções por grupo funcional para rendering do sidebar. */
 export const WORKSPACE_SECTION_GROUPS = [
   { key: 'overview', labelKey: 'contracts.workspace.groups.overview' },
   { key: 'contract', labelKey: 'contracts.workspace.groups.contract' },
-  { key: 'knowledge', labelKey: 'contracts.workspace.groups.knowledge' },
   { key: 'governance', labelKey: 'contracts.workspace.groups.governance' },
   { key: 'relationships', labelKey: 'contracts.workspace.groups.relationships' },
 ] as const;

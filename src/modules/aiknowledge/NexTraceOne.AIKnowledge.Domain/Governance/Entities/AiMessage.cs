@@ -133,6 +133,11 @@ public sealed class AiMessage : AuditableEntity<AiMessageId>
         };
     }
 
+    public string GetDisplayContent()
+        => IsDegradedResponse()
+            ? Content.Replace(DeterministicFallbackPrefix, string.Empty, StringComparison.OrdinalIgnoreCase).TrimStart()
+            : Content;
+
     public bool IsDegradedResponse()
         => string.Equals(Role, "assistant", StringComparison.OrdinalIgnoreCase)
            && Content.StartsWith(DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase);
@@ -155,6 +160,10 @@ public sealed class AiMessage : AuditableEntity<AiMessageId>
         string modelName,
         string provider,
         int promptTokens,
+        int completionTokens,
+        string? appliedPolicyName,
+        string groundingSources,
+        string contextReferences,
         string correlationId,
         DateTimeOffset timestamp)
     {
@@ -178,10 +187,10 @@ public sealed class AiMessage : AuditableEntity<AiMessageId>
             Provider = provider,
             IsInternalModel = true,
             PromptTokens = promptTokens,
-            CompletionTokens = 0,
-            AppliedPolicyName = null,
-            GroundingSources = string.Empty,
-            ContextReferences = string.Empty,
+            CompletionTokens = completionTokens,
+            AppliedPolicyName = appliedPolicyName,
+            GroundingSources = groundingSources ?? string.Empty,
+            ContextReferences = contextReferences ?? string.Empty,
             CorrelationId = correlationId,
             Timestamp = timestamp
         };

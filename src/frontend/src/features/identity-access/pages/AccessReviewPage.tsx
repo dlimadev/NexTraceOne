@@ -9,6 +9,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { AccessReviewCampaign, AccessReviewCampaignDetail } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
@@ -96,15 +97,15 @@ export function AccessReviewPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('identity.accessReview.title')}</h1>
-          <p className="text-muted mt-1">{t('identity.accessReview.subtitle')}</p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <ClipboardCheck size={16} /> {t('identity.accessReview.startCampaign')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('identity.accessReview.title')}
+        subtitle={t('identity.accessReview.subtitle')}
+        actions={
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <ClipboardCheck size={16} /> {t('identity.accessReview.startCampaign')}
+          </Button>
+        }
+      />
 
       {/* Formulário de criação de campanha */}
       {showForm && (

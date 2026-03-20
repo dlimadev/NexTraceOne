@@ -9,7 +9,8 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, StatsGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -108,24 +109,21 @@ export function GovernancePackDetailPage() {
       </Link>
 
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Package size={24} className="text-accent" />
-          <h1 className="text-2xl font-bold text-heading">{pack.displayName}</h1>
+      <PageHeader
+        title={pack.displayName}
+        subtitle={pack.description}
+        badge={
           <Badge variant={statusBadge(pack.status)}>{t(`governancePacks.status.${pack.status}`)}</Badge>
-        </div>
-        <p className="text-muted mt-1">{pack.description}</p>
-      </div>
+        }
+      />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <StatsGrid columns={4}>
         <StatCard title={t('governancePacks.detail.version')} value={`v${pack.currentVersion}`} icon={<History size={20} />} color="text-accent" />
         <StatCard title={t('governancePacks.rules')} value={pack.ruleCount} icon={<Shield size={20} />} color="text-info" />
         <StatCard title={t('governancePacks.scopes')} value={pack.scopeCount} icon={<Globe size={20} />} color="text-success" />
         <StatCard title={t('governancePacks.detail.versions')} value={pack.recentVersions.length} icon={<History size={20} />} color="text-warning" />
-      </div>
-
-      {/* Tabs */}
+      </StatsGrid>
       <div className="flex flex-wrap items-center gap-1 mb-6 border-b border-edge">
         {tabs.map(tab => (
           <button
@@ -239,8 +237,8 @@ export function GovernancePackDetailPage() {
                       <span className="text-sm font-medium text-heading">{scope.scopeValue}</span>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="info">{t(`governancePacks.detail.scopeType.${scope.scopeType}`)}</Badge>
-                        <Badge variant={enforcementBadge(scope.enforcementMode)}>
-                          {t(`governancePacks.detail.enforcement.${scope.enforcementMode}`)}
+                        <Badge variant={enforcementBadge((scope.enforcementMode ?? 'Advisory') as EnforcementMode)}>
+                          {t(`governancePacks.detail.enforcement.${scope.enforcementMode ?? 'Advisory'}`)}
                         </Badge>
                       </div>
                     </div>

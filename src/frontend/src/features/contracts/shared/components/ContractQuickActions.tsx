@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import {
   Send,
   Check,
@@ -13,7 +12,6 @@ import {
   GitCompare,
   Copy,
   Plus,
-  Eye,
 } from 'lucide-react';
 import { LIFECYCLE_TRANSITIONS } from '../constants';
 import type { ContractLifecycleState } from '../../types';
@@ -22,7 +20,6 @@ interface ContractQuickActionsProps {
   lifecycleState: ContractLifecycleState;
   isLocked?: boolean;
   isSigned?: boolean;
-  portalUrl?: string;
   onTransition?: (targetState: ContractLifecycleState) => void;
   onSign?: () => void;
   onExport?: () => void;
@@ -47,9 +44,7 @@ const TRANSITION_ICONS: Record<string, React.ComponentType<{ size?: number; clas
  */
 export function ContractQuickActions({
   lifecycleState,
-  isLocked,
   isSigned,
-  portalUrl,
   onTransition,
   onSign,
   onExport,
@@ -77,17 +72,6 @@ export function ContractQuickActions({
           </button>
         );
       })}
-
-      {/* Portal link */}
-      {portalUrl && (
-        <Link
-          to={portalUrl}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-elevated text-muted hover:text-heading transition-colors"
-        >
-          <Eye size={12} />
-          {t('contracts.catalog.actions.viewPortal', 'View Portal')}
-        </Link>
-      )}
 
       {/* Sign */}
       {!isSigned && lifecycleState === 'Locked' && onSign && (

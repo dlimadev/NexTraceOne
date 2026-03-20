@@ -18,29 +18,20 @@ import {
   AlertTriangle,
   FileCode,
   Bot,
-  Database,
   ShieldCheck,
-  ShieldAlert,
-  BarChart3,
-  Scale,
-  DollarSign,
   Share2,
   Layers,
   Globe,
   Activity,
-  Gauge,
-  Grid3X3,
-  Award,
-  GitCompare,
   Loader2,
   ArrowRight,
+  BarChart3,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
 import { globalSearchApi } from '../features/catalog/api/globalSearch';
 import type { SearchResultItem } from '../features/catalog/api/globalSearch';
 import { usePersona } from '../contexts/PersonaContext';
-import { isRouteAvailableInFinalProductionScope } from '../releaseScope';
 
 interface PaletteItem {
   id: string;
@@ -62,9 +53,9 @@ const paletteItems: PaletteItem[] = [
   // ── Services ──
   { id: 'services', labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <GitBranch size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
   { id: 'dependency-graph', labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={16} />, group: 'commandPalette.services', permission: 'catalog:assets:read' },
-  { id: 'portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.services', permission: 'developer-portal:read', preview: true },
   // ── Knowledge ──
   { id: 'source-of-truth', labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={16} />, group: 'commandPalette.knowledge', permission: 'catalog:assets:read' },
+  { id: 'developer-portal', labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={16} />, group: 'commandPalette.knowledge', permission: 'developer-portal:read' },
   // ── Contracts ──
   { id: 'contracts', labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
   { id: 'contract-studio', labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
@@ -76,23 +67,30 @@ const paletteItems: PaletteItem[] = [
   // ── Operations ──
   { id: 'incidents', labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },
   { id: 'runbooks', labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={16} />, group: 'commandPalette.operations', permission: 'operations:runbooks:read' },
-  { id: 'reliability', labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read', preview: true },
+  { id: 'reliability', labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read' },
+  { id: 'automation', labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={16} />, group: 'commandPalette.operations', permission: 'operations:automation:read' },
   // ── AI Hub ──
   { id: 'ai-assistant', labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={16} />, group: 'commandPalette.aiHub', permission: 'ai:assistant:read' },
-  { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={16} />, group: 'commandPalette.aiHub', permission: 'ai:models:read', preview: true },
-  { id: 'ai-policies', labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.aiHub', permission: 'ai:policies:read', preview: true },
+  { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Search size={16} />, group: 'commandPalette.aiHub', permission: 'ai:governance:read' },
+  { id: 'ai-policies', labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.aiHub', permission: 'ai:governance:read' },
+  { id: 'ai-budgets', labelKey: 'sidebar.aiBudgets', to: '/ai/budgets', icon: <BarChart3 size={16} />, group: 'commandPalette.aiHub', permission: 'ai:governance:read' },
   // ── Governance ──
-  { id: 'executive-overview', labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Gauge size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
-  { id: 'risk-heatmap', labelKey: 'sidebar.riskHeatmap', to: '/governance/executive/heatmap', icon: <Grid3X3 size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read', preview: true },
-  { id: 'maturity-scorecards', labelKey: 'sidebar.maturityScorecards', to: '/governance/executive/maturity', icon: <Award size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
-  { id: 'benchmarking', labelKey: 'sidebar.benchmarking', to: '/governance/executive/benchmarking', icon: <GitCompare size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
-  { id: 'reports', labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={16} />, group: 'commandPalette.governance', permission: 'governance:reports:read', preview: true },
-  { id: 'risk', labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={16} />, group: 'commandPalette.governance', permission: 'governance:risk:read', preview: true },
-  { id: 'compliance', labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={16} />, group: 'commandPalette.governance', permission: 'governance:compliance:read', preview: true },
-  { id: 'finops', labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={16} />, group: 'commandPalette.governance', permission: 'governance:finops:read', preview: true },
+  { id: 'governance-executive', labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <BarChart3 size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-reports', labelKey: 'sidebar.reports', to: '/governance/reports', icon: <FileText size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-risk', labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-compliance', labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardList size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-policies', labelKey: 'sidebar.policies', to: '/governance/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-finops', labelKey: 'sidebar.finops', to: '/governance/finops', icon: <BarChart3 size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-teams', labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  { id: 'governance-domains', labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={16} />, group: 'commandPalette.governance', permission: 'governance:read' },
+  // ── Integrations ──
+  { id: 'integrations', labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <GitBranch size={16} />, group: 'commandPalette.integrations', permission: 'integrations:read' },
+  // ── Analytics ──
+  { id: 'analytics', labelKey: 'sidebar.productAnalytics', to: '/analytics', icon: <BarChart3 size={16} />, group: 'commandPalette.analytics', permission: 'analytics:read' },
   // ── Admin ──
   { id: 'users', labelKey: 'sidebar.users', to: '/users', icon: <Users size={16} />, group: 'commandPalette.admin', permission: 'identity:users:read' },
   { id: 'audit', labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={16} />, group: 'commandPalette.admin', permission: 'audit:read' },
+  { id: 'platform-ops', labelKey: 'sidebar.platformOperations', to: '/platform/operations', icon: <Search size={16} />, group: 'commandPalette.admin', permission: 'platform:admin:read' },
 ];
 
 /** Ícone por tipo de entidade retornada pela pesquisa global. */
@@ -167,12 +165,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   });
 
   const visibleItems = useMemo(
-    () => paletteItems.filter((item) => isRouteAvailableInFinalProductionScope(item.to) && (!item.permission || can(item.permission))),
+    () => paletteItems.filter((item) => !item.permission || can(item.permission)),
     [can],
   );
 
   const entityResults = useMemo(
-    () => (searchData?.items ?? []).filter((item) => isRouteAvailableInFinalProductionScope(item.route)),
+    () => searchData?.items ?? [],
     [searchData?.items],
   );
 

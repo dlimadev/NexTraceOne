@@ -19,9 +19,6 @@ interface ComplianceSectionProps {
   className?: string;
 }
 
-/**
- * Secção de compliance — violações de regras, policy checks e score.
- */
 export function ComplianceSection({ contractVersionId, className = '' }: ComplianceSectionProps) {
   const { t } = useTranslation();
 
@@ -39,6 +36,8 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
 
   const violations: ContractRuleViolation[] = violationsQuery.data ?? [];
   const integrity = integrityQuery.data;
+  const integrityErrors = integrity?.errors ?? [];
+  const integrityWarnings = integrity?.warnings ?? [];
 
   const criticalCount = violations.filter((v) => v.severity === 'Critical' || v.severity === 'Error').length;
   const warningCount = violations.filter((v) => v.severity === 'Warning').length;
@@ -59,8 +58,8 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
         />
         <SummaryCard
           label={t('contracts.compliance.warnings', 'Warnings')}
-          value={warningCount}
-          variant={warningCount > 0 ? 'warning' : 'success'}
+          value={warningCount + integrityWarnings.length}
+          variant={warningCount + integrityWarnings.length > 0 ? 'warning' : 'success'}
         />
         <SummaryCard
           label={t('contracts.validateIntegrity.title', 'Integrity')}
@@ -80,26 +79,31 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
               </h3>
             </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="space-y-4">
             <div className="grid grid-cols-3 gap-4 text-xs">
               <div>
-                <p className="text-muted mb-0.5">{t('contracts.validateIntegrity.paths', 'Paths')}</p>
-                <p className="text-heading font-medium">{integrity.pathCount}</p>
+                <p className="text-muted mb-0.5">{t('contracts.validateIntegrity.errors', 'Errors')}</p>
+                <p className="text-heading font-medium">{integrityErrors.length}</p>
               </div>
               <div>
-                <p className="text-muted mb-0.5">{t('contracts.validateIntegrity.endpoints', 'Endpoints')}</p>
-                <p className="text-heading font-medium">{integrity.endpointCount}</p>
+                <p className="text-muted mb-0.5">{t('contracts.validateIntegrity.warnings', 'Warnings')}</p>
+                <p className="text-heading font-medium">{integrityWarnings.length}</p>
               </div>
-              {integrity.schemaVersion && (
-                <div>
-                  <p className="text-muted mb-0.5">{t('contracts.validateIntegrity.schemaVersion', 'Schema')}</p>
-                  <p className="text-heading font-medium">{integrity.schemaVersion}</p>
-                </div>
-              )}
+              <div>
+                <p className="text-muted mb-0.5">{t('contracts.validateIntegrity.status', 'Status')}</p>
+                <p className="text-heading font-medium">
+                  {integrity.isValid ? t('contracts.validateIntegrity.valid', 'Valid') : t('contracts.validateIntegrity.invalid', 'Invalid')}
+                </p>
+              </div>
             </div>
-            {integrity.validationError && (
-              <div className="mt-3 text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded p-2">
-                {integrity.validationError}
+
+            {integrityErrors.length > 0 && (
+              <div className="space-y-2">
+                {integrityErrors.map((error, index) => (
+                  <div key={`integrity-error-${index}`} className="text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded p-2">
+                    {error}
+                  </div>
+                ))}
               </div>
             )}
           </CardBody>
@@ -134,7 +138,7 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
 
           {violations.length > 0 && (
             <div className="divide-y divide-edge">
-              {violations.map((v) => {
+              {violations.map((v, index) => {
                 const fallbackConfig = SEVERITY_CONFIG.Info;
                 const config = SEVERITY_CONFIG[v.severity] ?? fallbackConfig;
                 const Icon = config?.Icon;
@@ -144,7 +148,7 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
                 }
 
                 return (
-                  <div key={v.id} className="flex items-start gap-3 px-4 py-3 text-xs">
+                  <div key={`${v.ruleName}-${v.path}-${index}`} className="flex items-start gap-3 px-4 py-3 text-xs">
                     <Icon size={14} className={`flex-shrink-0 mt-0.5 ${config.color}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">

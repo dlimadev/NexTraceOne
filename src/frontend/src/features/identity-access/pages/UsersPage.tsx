@@ -10,6 +10,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de gestão de usuários do módulo Identity.
@@ -49,15 +50,15 @@ export function UsersPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('users.title')}</h1>
-          <p className="text-muted mt-1">{t('users.subtitle')}</p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <Plus size={16} /> {t('users.createUser')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('users.title')}
+        subtitle={t('users.subtitle')}
+        actions={
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <Plus size={16} /> {t('users.createUser')}
+          </Button>
+        }
+      />
 
       {/* Formulário de criação de usuário */}
       {showForm && (

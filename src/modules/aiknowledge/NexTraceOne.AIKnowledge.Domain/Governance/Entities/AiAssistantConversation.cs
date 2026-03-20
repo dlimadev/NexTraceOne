@@ -66,6 +66,9 @@ public sealed class AiAssistantConversation : AuditableEntity<AiAssistantConvers
     /// <summary>Identificador opcional do incidente associado à conversa.</summary>
     public Guid? IncidentId { get; private set; }
 
+    /// <summary>Identificador opcional da alteração associada à conversa.</summary>
+    public Guid? ChangeId { get; private set; }
+
     /// <summary>Identificador opcional da equipa associada à conversa.</summary>
     public Guid? TeamId { get; private set; }
 
@@ -81,7 +84,8 @@ public sealed class AiAssistantConversation : AuditableEntity<AiAssistantConvers
         Guid? serviceId = null,
         Guid? contractId = null,
         Guid? incidentId = null,
-        Guid? teamId = null)
+        Guid? teamId = null,
+        Guid? changeId = null)
     {
         Guard.Against.NullOrWhiteSpace(title);
         Guard.Against.NullOrWhiteSpace(persona);
@@ -101,6 +105,7 @@ public sealed class AiAssistantConversation : AuditableEntity<AiAssistantConvers
             ServiceId = serviceId,
             ContractId = contractId,
             IncidentId = incidentId,
+            ChangeId = changeId,
             TeamId = teamId
         };
     }

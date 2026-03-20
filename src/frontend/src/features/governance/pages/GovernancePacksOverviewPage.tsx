@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -108,10 +109,10 @@ export function GovernancePacksOverviewPage() {
   if (loading) {
     return (
       <PageContainer>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.title')}</h1>
-          <p className="text-muted mt-1">{t('governancePacks.subtitle')}</p>
-        </div>
+        <PageHeader
+          title={t('governancePacks.title')}
+          subtitle={t('governancePacks.subtitle')}
+        />
         <PageLoadingState />
       </PageContainer>
     );
@@ -120,10 +121,10 @@ export function GovernancePacksOverviewPage() {
   if (error) {
     return (
       <PageContainer>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.title')}</h1>
-          <p className="text-muted mt-1">{t('governancePacks.subtitle')}</p>
-        </div>
+        <PageHeader
+          title={t('governancePacks.title')}
+          subtitle={t('governancePacks.subtitle')}
+        />
         <PageErrorState message={error} />
       </PageContainer>
     );
@@ -132,10 +133,10 @@ export function GovernancePacksOverviewPage() {
   return (
     <PageContainer>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governancePacks.title')}</h1>
-        <p className="text-muted mt-1">{t('governancePacks.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governancePacks.title')}
+        subtitle={t('governancePacks.subtitle')}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

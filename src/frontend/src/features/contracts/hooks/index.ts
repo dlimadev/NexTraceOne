@@ -13,7 +13,7 @@ export { useContractExport } from './useContractExport';
 export { useContractDiff } from './useContractDiff';
 
 // ── Draft workflow hooks ──────────────────────────────────────────────────────
-export { useCreateDraft, useGenerateFromAi, useSubmitForReview, usePublishDraft } from './useDraftWorkflow';
+export { useCreateDraft, useSubmitForReview, usePublishDraft } from './useDraftWorkflow';
 
 // ── Validation hooks ──────────────────────────────────────────────────────────
 export { useValidationSummary, useExecuteValidation, useValidateSpec } from './useValidation';

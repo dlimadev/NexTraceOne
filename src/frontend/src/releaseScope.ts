@@ -11,10 +11,13 @@ export const finalProductionIncludedRoutePrefixes = [
   '/source-of-truth',
   '/services',
   '/graph',
+  '/contracts',
   '/changes',
   '/releases',
   '/workflow',
   '/promotion',
+  '/operations',
+  '/ai',
   '/users',
   '/audit',
   '/break-glass',
@@ -23,18 +26,14 @@ export const finalProductionIncludedRoutePrefixes = [
   '/access-reviews',
   '/my-sessions',
   '/unauthorized',
-] as const;
-
-export const finalProductionExcludedRoutePrefixes = [
   '/portal',
-  '/contracts',
-  '/operations',
-  '/ai',
   '/governance',
   '/integrations',
   '/analytics',
-  '/platform/operations',
+  '/platform',
 ] as const;
+
+export const finalProductionExcludedRoutePrefixes = [] as const;
 
 function normalizeRoute(route: string): string {
   if (!route) {

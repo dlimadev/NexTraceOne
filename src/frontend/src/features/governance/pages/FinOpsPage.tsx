@@ -11,6 +11,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import type { CostEfficiencyType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -137,15 +138,15 @@ export function FinOpsPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.finopsTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.finopsSubtitle')}</p>
+      <PageHeader
+        title={t('governance.finopsTitle')}
+        subtitle={t('governance.finopsSubtitle')}
+      >
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="warning">{t('governance.preview.badge')}</Badge>
           <span className="text-xs text-muted">{t('governance.preview.finopsReason')}</span>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

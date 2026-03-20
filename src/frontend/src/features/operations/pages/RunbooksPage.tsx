@@ -5,6 +5,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de Runbooks — procedimentos operacionais e guias de mitigação.
@@ -15,10 +16,10 @@ export function RunbooksPage() {
 
   return (
     <PageContainer>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('runbooks.title')}</h1>
-        <p className="text-muted mt-1">{t('runbooks.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('runbooks.title')}
+        subtitle={t('runbooks.subtitle')}
+      />
 
       <PageSection>
         <OnboardingHints module="operations" />

@@ -2,7 +2,6 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft,
-  Server,
   Shield,
   Users,
   Globe,
@@ -17,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
-import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { serviceCatalogApi } from '../api';
@@ -83,6 +81,8 @@ export function ServiceDetailPage() {
     queryFn: () => contractsApi.listContractsByService(serviceId!),
     enabled: !!serviceId,
   });
+
+  const contracts = serviceContracts?.contracts ?? serviceContracts?.items ?? [];
 
   if (isLoading) {
     return (
@@ -273,7 +273,7 @@ export function ServiceDetailPage() {
                 </div>
               </CardHeader>
               <CardBody className="p-0">
-              {!serviceContracts || serviceContracts.contracts.length === 0 ? (
+              {contracts.length === 0 ? (
                 <div className="py-10 text-center">
                   <p className="text-sm text-muted">{t('catalog.detail.noContracts')}</p>
                 </div>
@@ -303,13 +303,13 @@ export function ServiceDetailPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-edge">
-                      {serviceContracts.contracts.map((contract: ServiceContractItem) => (
-                        <tr key={contract.versionId} className="hover:bg-elevated/50 transition-colors">
+                      {contracts.map((contract: ServiceContractItem) => (
+                        <tr key={contract.versionId ?? contract.contractVersionId} className="hover:bg-elevated/50 transition-colors">
                           <td className="px-4 py-3">
-                            <span className="font-medium text-heading">{contract.apiName}</span>
-                            <span className="block text-xs text-muted font-mono">{contract.apiRoutePattern}</span>
+                            <span className="font-medium text-heading">{contract.apiName ?? '—'}</span>
+                            <span className="block text-xs text-muted font-mono">{contract.apiRoutePattern ?? '—'}</span>
                           </td>
-                          <td className="px-4 py-3 text-muted font-mono text-xs">v{contract.semVer}</td>
+                          <td className="px-4 py-3 text-muted font-mono text-xs">v{contract.semVer ?? contract.version}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[contract.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
                               {t(`contractGov.badges.protocols.${contract.protocol}`, contract.protocol)}
@@ -329,7 +329,7 @@ export function ServiceDetailPage() {
                           </td>
                           <td className="px-4 py-3">
                             <Link
-                              to={`/source-of-truth/contracts/${contract.versionId}`}
+                              to={`/source-of-truth/contracts/${contract.versionId ?? contract.contractVersionId}`}
                               className="text-xs text-accent hover:underline"
                             >
                               {t('catalog.detail.viewContract')}
@@ -545,19 +545,19 @@ export function ServiceDetailPage() {
               ...(service.totalConsumers != null ? { consumers: String(service.totalConsumers) } : {}),
             },
             relations: [
-              ...(serviceContracts?.contracts?.map(c => ({
+              ...(contracts.map((c: ServiceContractItem) => ({
                 relationType: 'Contracts',
                 entityType: 'contract',
-                name: c.apiName || c.versionId,
+                name: c.apiName || c.versionId || c.contractVersionId,
                 status: c.lifecycleState,
                 properties: {
                   ...(c.protocol ? { protocol: c.protocol } : {}),
-                  ...(c.semVer ? { version: c.semVer } : {}),
+                  ...(c.semVer || c.version ? { version: c.semVer ?? c.version } : {}),
                 },
               })) || []),
             ],
             caveats: [
-              ...(!serviceContracts?.contracts?.length ? [t('assistantPanel.contextCaveats.noContractsLoaded')] : []),
+              ...(!contracts.length ? [t('assistantPanel.contextCaveats.noContractsLoaded')] : []),
             ].filter(Boolean),
           }}
         />

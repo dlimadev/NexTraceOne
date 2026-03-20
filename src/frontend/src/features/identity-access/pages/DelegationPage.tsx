@@ -9,6 +9,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { DelegationInfo } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de gestão de delegações de permissões do módulo Identity.
@@ -77,15 +78,15 @@ export function DelegationPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('identity.delegation.title')}</h1>
-          <p className="text-muted mt-1">{t('identity.delegation.subtitle')}</p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <UserCheck size={16} /> {t('identity.delegation.create')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('identity.delegation.title')}
+        subtitle={t('identity.delegation.subtitle')}
+        actions={
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <UserCheck size={16} /> {t('identity.delegation.create')}
+          </Button>
+        }
+      />
 
       {/* Formulário de criação de delegação */}
       {showForm && (

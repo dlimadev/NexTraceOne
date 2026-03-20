@@ -31,27 +31,6 @@ export function useCreateDraft() {
 }
 
 /**
- * Hook para gerar um draft por IA.
- */
-export function useGenerateFromAi() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: {
-      title: string;
-      author: string;
-      contractType: ContractType;
-      protocol: ContractProtocol;
-      prompt: string;
-      serviceId?: string;
-    }) => contractStudioApi.generateFromAi(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: draftKeys.lists() });
-    },
-  });
-}
-
-/**
  * Hook para submeter um draft para revisão.
  */
 export function useSubmitForReview() {

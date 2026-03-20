@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   Globe,
   Server,
@@ -10,18 +10,16 @@ import {
   Database,
   Columns,
   Upload,
-  LayoutTemplate,
-  Copy,
-  Code,
   ArrowLeft,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
+import { PageContainer } from '../../../components/shell';
 import { SERVICE_TYPES, PROTOCOL_BY_TYPE, type ServiceTypeValue } from '../shared/constants';
 import { contractStudioApi } from '../api/contractStudio';
-import type { ContractType, ContractProtocol } from '../types';
+import type { ContractType, ContractProtocol, ServiceListItem } from '../types';
 import { useAuth } from '../../../contexts/AuthContext';
+import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 
 const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   RestApi: Globe,
@@ -31,7 +29,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?
   SharedSchema: Database,
 };
 
-type CreationMode = 'visual' | 'import' | 'template' | 'clone' | 'source' | 'ai';
+type CreationMode = 'visual' | 'import';
 
 interface CreationModeOption {
   id: CreationMode;
@@ -43,10 +41,6 @@ interface CreationModeOption {
 const CREATION_MODES: CreationModeOption[] = [
   { id: 'visual', labelKey: 'contracts.create.modeVisual', descriptionKey: 'contracts.create.modeVisualDesc', Icon: Columns },
   { id: 'import', labelKey: 'contracts.create.modeImport', descriptionKey: 'contracts.create.modeImportDesc', Icon: Upload },
-  { id: 'ai', labelKey: 'contracts.create.modeAi', descriptionKey: 'contracts.create.modeAiDesc', Icon: Sparkles },
-  { id: 'template', labelKey: 'contracts.create.modeTemplate', descriptionKey: 'contracts.create.modeTemplateDesc', Icon: LayoutTemplate },
-  { id: 'clone', labelKey: 'contracts.create.modeClone', descriptionKey: 'contracts.create.modeCloneDesc', Icon: Copy },
-  { id: 'source', labelKey: 'contracts.create.modeSource', descriptionKey: 'contracts.create.modeSourceDesc', Icon: Code },
 ];
 
 type Step = 'type' | 'mode' | 'details';
@@ -65,32 +59,27 @@ export function CreateServicePage() {
   const [selectedType, setSelectedType] = useState<ServiceTypeValue | null>(null);
   const [selectedMode, setSelectedMode] = useState<CreationMode | null>(null);
   const [selectedProtocol, setSelectedProtocol] = useState<ContractProtocol | ''>('');
+  const [linkedServiceId, setLinkedServiceId] = useState('');
 
-  // Form fields for details step
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [aiPrompt, setAiPrompt] = useState('');
   const [importContent, setImportContent] = useState('');
+
+  const servicesQuery = useQuery({
+    queryKey: ['catalog-services-for-contracts'],
+    queryFn: () => serviceCatalogApi.listServices(),
+  });
 
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!selectedType || !selectedProtocol) throw new Error('Missing required fields');
-
-      if (selectedMode === 'ai') {
-        return contractStudioApi.generateFromAi({
-          title,
-          author: currentActor,
-          contractType: selectedType as ContractType,
-          protocol: selectedProtocol as ContractProtocol,
-          prompt: aiPrompt,
-        });
-      }
 
       const createdDraft = await contractStudioApi.createDraft({
         title,
         author: currentActor,
         contractType: selectedType as ContractType,
         protocol: selectedProtocol as ContractProtocol,
+        serviceId: linkedServiceId || undefined,
         description,
       });
 
@@ -110,13 +99,14 @@ export function CreateServicePage() {
   });
 
   const protocols = selectedType ? PROTOCOL_BY_TYPE[selectedType] : [];
+  const availableServices = servicesQuery.data?.items ?? [];
 
   const canProceedToMode = !!selectedType;
   const canProceedToDetails = !!selectedMode;
-  const canCreate = !!title && !!selectedProtocol && (selectedMode !== 'ai' || !!aiPrompt) && (selectedMode !== 'import' || !!importContent.trim() || !!title);
+  const canCreate = !!title && !!selectedProtocol && (selectedMode !== 'import' || !!importContent.trim() || !!title);
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-6">
+    <PageContainer className="max-w-4xl">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button
@@ -126,7 +116,7 @@ export function CreateServicePage() {
           <ArrowLeft size={18} />
         </button>
         <div>
-          <h1 className="text-lg font-semibold text-heading">
+          <h1 className="text-xl sm:text-2xl font-bold text-heading">
             {t('contracts.create.title', 'Create Service Contract')}
           </h1>
           <p className="text-xs text-muted">
@@ -215,7 +205,7 @@ export function CreateServicePage() {
           <h2 className="text-sm font-semibold text-heading mb-4">
             {t('contracts.create.selectMode', 'How do you want to create it?')}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {CREATION_MODES.map((mode) => {
               const isSelected = selectedMode === mode.id;
 
@@ -300,6 +290,28 @@ export function CreateServicePage() {
                 />
               </div>
 
+              {/* Linked Service */}
+              <div>
+                <label className="block text-xs font-medium text-heading mb-1">
+                  {t('contracts.create.linkedService', 'Linked Service')}
+                </label>
+                <select
+                  value={linkedServiceId}
+                  onChange={(e) => setLinkedServiceId(e.target.value)}
+                  className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                >
+                  <option value="">{t('contracts.create.linkedServiceOptional', 'No linked service yet')}</option>
+                  {availableServices.map((service: ServiceListItem) => (
+                    <option key={service.serviceId} value={service.serviceId}>
+                      {service.displayName} · {service.domain} · {service.teamName}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[10px] text-muted">
+                  {t('contracts.create.linkedServiceHint', 'Linking a real catalog service enables publish and workspace enrichment without artificial fallback.')}
+                </p>
+              </div>
+
               {/* Protocol selection */}
               {protocols.length > 1 && (
                 <div>
@@ -322,22 +334,6 @@ export function CreateServicePage() {
               {protocols.length === 1 && protocols[0] && (
                 <div className="text-xs text-muted">
                   {t('contracts.protocol', 'Protocol')}: <span className="text-heading font-medium">{t(`contracts.protocols.${protocols[0]}`, { defaultValue: protocols[0] })}</span>
-                </div>
-              )}
-
-              {/* AI prompt (when mode is 'ai') */}
-              {selectedMode === 'ai' && (
-                <div>
-                  <label className="block text-xs font-medium text-heading mb-1">
-                    {t('contracts.create.aiPrompt', 'AI Prompt')} *
-                  </label>
-                  <textarea
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    rows={4}
-                    placeholder={t('contracts.create.aiPromptPlaceholder', 'Describe the API you want to generate. Include endpoints, operations, data models...')}
-                    className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none"
-                  />
                 </div>
               )}
 
@@ -378,12 +374,12 @@ export function CreateServicePage() {
               className="inline-flex items-center gap-1.5 px-5 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {createMutation.isPending
-                ? t('common.loading', 'Creating...')
-                : t('common.create', 'Create')}
+                ? t('contracts.create.creatingDraft', 'Creating draft...')
+                : t('contracts.create.createDraft', 'Create Draft')}
             </button>
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

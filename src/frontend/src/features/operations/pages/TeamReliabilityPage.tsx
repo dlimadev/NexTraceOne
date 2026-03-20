@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 // Simulated data matching backend ListServiceReliability response
 const mockServices = [
@@ -63,10 +64,10 @@ export function TeamReliabilityPage() {
 
   return (
     <PageContainer>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('reliability.title')}</h1>
-        <p className="text-muted mt-1">{t('reliability.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('reliability.title')}
+        subtitle={t('reliability.subtitle')}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

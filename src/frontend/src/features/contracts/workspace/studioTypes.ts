@@ -4,13 +4,10 @@
  * O backend ContractVersionDetail não fornece todos os campos necessários
  * para a experiência completa do studio (domain, owner, compliance, etc.).
  * Esta camada define o view-model completo que o studio consome.
- *
- * Pronto para substituição real: basta popular StudioContract directamente
- * a partir do backend e remover a camada de mock enrichment.
  */
 import type { ApprovalState, ApprovalChecklistItem, PolicyCheckResult } from '../types/domain';
 
-/** View-model real do workspace/portal alimentado por dados do backend e derivações honestas. */
+/** View-model do workspace alimentado por dados reais do backend e por derivações explícitas e honestas. */
 export interface StudioContract {
   // ── Identity ──
   id: string;

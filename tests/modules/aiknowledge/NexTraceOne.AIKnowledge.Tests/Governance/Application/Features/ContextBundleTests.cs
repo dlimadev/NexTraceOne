@@ -265,6 +265,7 @@ public sealed class ContextBundleTests
             ServiceId: Guid.NewGuid(),
             ContractId: null,
             IncidentId: null,
+            ChangeId: null,
             TeamId: null,
             DomainId: null,
             ContextBundle: null);
@@ -293,6 +294,7 @@ public sealed class ContextBundleTests
             ServiceId: Guid.NewGuid(),
             ContractId: null,
             IncidentId: null,
+            ChangeId: null,
             TeamId: null,
             DomainId: null,
             ContextBundle: json);

@@ -20,6 +20,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
+import type { SourceOfTruthReferenceItem } from '../../../types';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -211,14 +212,14 @@ export function ContractSourceOfTruthPage() {
                 <EmptyState icon={<BookOpen size={20} />} title={t('sourceOfTruth.contract.noReferences')} />
               ) : (
                 <ul className="space-y-3">
-                  {sot.references.map((ref) => (
+                  {sot.references.map((ref: SourceOfTruthReferenceItem) => (
                     <li key={ref.referenceId} className="flex items-start gap-3 p-3 rounded-lg bg-elevated border border-edge">
                       <FileText size={16} className="text-muted shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-heading truncate">{ref.title}</p>
                         <p className="text-xs text-muted line-clamp-2">{ref.description}</p>
                         <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType)}
+                          {String(t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType))}
                         </span>
                       </div>
                       {ref.url && (

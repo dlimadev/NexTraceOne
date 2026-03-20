@@ -288,13 +288,13 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         await connection.OpenAsync();
 
         var sql = """
-                  INSERT INTO identity_tenants (\"Id\", \"Name\", \"Slug\", \"IsActive\", \"CreatedAt\")
+                  INSERT INTO identity_tenants ("Id", "Name", "Slug", "IsActive", "CreatedAt")
                   VALUES ('a0000000-0000-0000-0000-000000000099', 'E2E Test Org', 'e2e-test-org', true, NOW())
                   ON CONFLICT DO NOTHING;
 
                   INSERT INTO identity_users (
-                      \"Id\", \"Email\", \"first_name\", \"last_name\", \"PasswordHash\",
-                      \"IsActive\", \"LastLoginAt\", \"FailedLoginAttempts\")
+                      "Id", "Email", "first_name", "last_name", "PasswordHash",
+                      "IsActive", "LastLoginAt", "FailedLoginAttempts")
                   VALUES (
                       'b0000000-0000-0000-0000-000000000099',
                       'e2e.admin@nextraceone.test',
@@ -310,7 +310,7 @@ public sealed class ApiE2EFixture : IAsyncLifetime
                   ON CONFLICT DO NOTHING;
 
                   INSERT INTO identity_tenant_memberships (
-                      \"Id\", \"UserId\", \"TenantId\", \"RoleId\", \"JoinedAt\", \"IsActive\")
+                      "Id", "UserId", "TenantId", "RoleId", "JoinedAt", "IsActive")
                   VALUES (
                       'e0000000-0000-0000-0000-000000000099',
                       'b0000000-0000-0000-0000-000000000099',

@@ -8,7 +8,8 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, StatsGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /* ── Types ── */
 
@@ -94,24 +95,21 @@ export function AutomationAdminPage() {
 
   return (
     <PageContainer>
-      {/* Page header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading flex items-center gap-2">
-          <ShieldAlert size={22} className="text-accent" />
-          {t('automation.admin.title')}
-        </h1>
-        <p className="text-muted mt-1">{t('automation.admin.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('automation.admin.title')}
+        subtitle={t('automation.admin.subtitle')}
+        badge={<ShieldAlert size={22} className="text-accent" />}
+      />
 
       <OnboardingHints module="operations" />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <StatsGrid columns={4}>
         <StatCard title={t('automation.admin.stats.totalActions')} value={stats.totalActions} icon={<Zap size={20} />} color="text-accent" />
         <StatCard title={t('automation.admin.stats.activePolicies')} value={stats.activePolicies} icon={<ShieldAlert size={20} />} color="text-warning" />
         <StatCard title={t('automation.admin.stats.workflowsToday')} value={stats.workflowsToday} icon={<Activity size={20} />} color="text-info" />
         <StatCard title={t('automation.admin.stats.failureRate')} value={stats.failureRate} icon={<AlertTriangle size={20} />} color="text-critical" />
-      </div>
+      </StatsGrid>
 
       {/* Action Catalog Table */}
       <Card className="mb-6">

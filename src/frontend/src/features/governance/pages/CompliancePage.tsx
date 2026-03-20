@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import type { ComplianceSummaryResponse, ComplianceStatusType, CompliancePackRowDto } from '../../../types';
@@ -84,11 +85,10 @@ export function CompliancePage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.complianceTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.complianceSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.complianceTitle')}
+        subtitle={t('governance.complianceSubtitle')}
+      />
 
       {/* Score + Stats */}
       <PageSection>

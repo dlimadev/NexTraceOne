@@ -15,13 +15,9 @@ import {
   SchemasSection,
   SecuritySection,
   ChangelogSection,
-  GlossarySection,
-  UseCasesSection,
-  InteractionsSection,
   ApprovalsSection,
   ConsumersSection,
   DependenciesSection,
-  AuditSection,
 } from './sections';
 import { StudioRail } from './components/StudioRail';
 import {
@@ -132,15 +128,6 @@ export function ContractWorkspacePage() {
           />
         );
 
-      case 'glossary':
-        return <GlossarySection contractId={contractVersionId} />;
-
-      case 'useCases':
-        return <UseCasesSection contractId={contractVersionId} />;
-
-      case 'interactions':
-        return <InteractionsSection contractId={contractVersionId} protocol={detail.protocol} />;
-
       case 'versioning':
         return (
           <VersioningSection
@@ -181,9 +168,6 @@ export function ContractWorkspacePage() {
       case 'dependencies':
         return <DependenciesSection contract={studioContract} />;
 
-      case 'audit':
-        return <AuditSection contractVersionId={contractVersionId} />;
-
       default:
         return null;
     }
@@ -208,7 +192,6 @@ export function ContractWorkspacePage() {
               lifecycleState={detail.lifecycleState as ContractLifecycleState}
               isLocked={detail.isLocked}
               isSigned={!!detail.signedBy}
-              portalUrl={`/contracts/${contractVersionId}/portal`}
               onTransition={handleTransition}
               onExport={handleExport}
             />

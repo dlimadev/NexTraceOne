@@ -143,10 +143,10 @@ public sealed class ProtocolAutoDetectionTests
 
     // ── Helpers ──────────────────────────────────────────────────
 
-    private static (IContractVersionRepository repository, IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider) CreateMocks()
+    private static (IContractVersionRepository repository, IContractsUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider) CreateMocks()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         repository.GetByApiAssetAndSemVerAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())

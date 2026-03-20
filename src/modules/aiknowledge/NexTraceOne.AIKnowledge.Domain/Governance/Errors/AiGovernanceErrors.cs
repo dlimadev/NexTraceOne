@@ -79,6 +79,13 @@ public static class AiGovernanceErrors
             "AI assistant conversation '{0}' was not found.",
             conversationId);
 
+    /// <summary>O utilizador atual não tem acesso à conversa do assistente de IA solicitada.</summary>
+    public static Error ConversationAccessDenied(string conversationId)
+        => Error.Forbidden(
+            "AiGovernance.Conversation.AccessDenied",
+            "AI assistant conversation '{0}' is not accessible for the current user.",
+            conversationId);
+
     /// <summary>Conversa do assistente de IA não está ativa.</summary>
     public static Error ConversationNotActive(string conversationId)
         => Error.Business(

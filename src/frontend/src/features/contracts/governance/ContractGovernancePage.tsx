@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageContainer } from '../../../components/shell';
 import { ProtocolBadge, LifecycleBadge } from '../shared/components';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { contractsApi } from '../api/contracts';
@@ -49,8 +51,8 @@ export function ContractGovernancePage() {
   const insights = useMemo(() => computeGovernanceInsights(contracts), [contracts]);
   const policyResults = useMemo(() => computePolicyChecks(contracts), [contracts]);
 
-  if (summaryQuery.isLoading || listQuery.isLoading) return <LoadingState />;
-  if (summaryQuery.isError) return <ErrorState onRetry={() => summaryQuery.refetch()} />;
+  if (summaryQuery.isLoading || listQuery.isLoading) return <PageContainer><LoadingState /></PageContainer>;
+  if (summaryQuery.isError) return <PageContainer><ErrorState onRetry={() => summaryQuery.refetch()} /></PageContainer>;
 
   const views: { id: GovernanceView; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'contracts.governance.views.overview', icon: <BarChart3 size={13} /> },
@@ -61,28 +63,23 @@ export function ContractGovernancePage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-base font-bold text-heading">
-            {t('contracts.governance.title', 'Contract Governance')}
-          </h1>
-          <p className="text-xs text-muted mt-0.5">
-            {t('contracts.governance.subtitle', 'Compliance overview, risk areas, and governance actions for all contracts.')}
-          </p>
-        </div>
-        <button
-          onClick={() => { summaryQuery.refetch(); listQuery.refetch(); }}
-          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs text-muted hover:text-accent transition-colors"
-        >
-          <RefreshCw size={12} />
-          {t('common.refresh', 'Refresh')}
-        </button>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('contracts.governance.title', 'Contract Governance')}
+        subtitle={t('contracts.governance.subtitle', 'Compliance overview, risk areas, and governance actions for all contracts.')}
+        actions={
+          <button
+            onClick={() => { summaryQuery.refetch(); listQuery.refetch(); }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted hover:text-accent transition-colors"
+          >
+            <RefreshCw size={14} />
+            {t('common.refresh', 'Refresh')}
+          </button>
+        }
+      />
 
       {/* View tabs */}
-      <div className="flex items-center gap-1 border-b border-edge overflow-x-auto">
+      <div className="flex items-center gap-1 border-b border-edge overflow-x-auto mb-6">
         {views.map((v) => (
           <button
             key={v.id}
@@ -124,7 +121,7 @@ export function ContractGovernancePage() {
       {view === 'audit' && (
         <AuditView contracts={contracts} />
       )}
-    </div>
+    </PageContainer>
   );
 }
 

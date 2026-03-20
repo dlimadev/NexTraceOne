@@ -2,11 +2,10 @@
 export { ContractCatalogPage } from './catalog/ContractCatalogPage';
 export { CreateServicePage } from './create/CreateServicePage';
 export { ContractWorkspacePage } from './workspace/ContractWorkspacePage';
-export { ContractPortalPage } from './portal/ContractPortalPage';
-export { ContractGovernancePage } from './governance/ContractGovernancePage';
 
 // ── API ───────────────────────────────────────────────────────────────────────
-export { contractsApi, contractStudioApi } from './api';
+export { contractsApi } from './api/contracts';
+export { contractStudioApi } from './api/contractStudio';
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 export {
@@ -19,11 +18,10 @@ export {
   useContractHistory,
   useContractDiff,
   useCreateDraft,
-  useGenerateFromAi,
   useSubmitForReview,
   usePublishDraft,
   contractQueryKeys,
-} from './hooks';
+} from './hooks/index';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-export type { WorkspaceSectionId, ServiceKind, AuthoringMode, SpecFormat } from './types';
+export type { WorkspaceSectionId, ServiceKind, AuthoringMode, SpecFormat } from './types/index';

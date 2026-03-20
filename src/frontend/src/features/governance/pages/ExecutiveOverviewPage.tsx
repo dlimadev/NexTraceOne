@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import type {
   ExecutiveOverviewResponse,
   RiskLevel,
@@ -91,11 +92,10 @@ export function ExecutiveOverviewPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.executive.overviewTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.executive.overviewSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.executive.overviewTitle')}
+        subtitle={t('governance.executive.overviewSubtitle')}
+      />
 
       {/* Stat Cards */}
       <PageSection>

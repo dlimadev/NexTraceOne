@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageContainer } from '../../../components/shell';
 import { ProtocolBadge, LifecycleBadge } from '../shared/components';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { contractsApi } from '../api/contracts';
@@ -62,8 +63,8 @@ export function ContractPortalPage() {
     return toStudioContract(detailQuery.data);
   }, [detailQuery.data]);
 
-  if (detailQuery.isLoading) return <LoadingState />;
-  if (detailQuery.isError || !detailQuery.data || !studio) return <ErrorState onRetry={() => detailQuery.refetch()} />;
+  if (detailQuery.isLoading) return <PageContainer><LoadingState /></PageContainer>;
+  if (detailQuery.isError || !detailQuery.data || !studio) return <PageContainer><ErrorState onRetry={() => detailQuery.refetch()} /></PageContainer>;
 
   const detail = detailQuery.data;
   const violations = violationsQuery.data ?? [];
@@ -85,7 +86,7 @@ export function ContractPortalPage() {
     <Globe size={18} className="text-mint" />;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <PageContainer>
       {/* Back link */}
       <Link
         to={`/contracts/${contractVersionId}`}
@@ -528,11 +529,11 @@ function SecurityTab({
           )}
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }
 
-// ── Versions Tab ──────────────────────────────────────────────────────────────
+// ── Versions Tab
 
 function VersionsTab({ versions, currentVersionId }: { versions: ContractVersion[]; currentVersionId: string }) {
   const { t } = useTranslation();

@@ -9,6 +9,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import type { PolicyDto, PolicyListResponse, PolicyCategoryType, PolicyStatusType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -107,11 +108,10 @@ export function PolicyCatalogPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.policies.title')}</h1>
-        <p className="text-muted mt-1">{t('governance.policies.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.policies.title')}
+        subtitle={t('governance.policies.subtitle')}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

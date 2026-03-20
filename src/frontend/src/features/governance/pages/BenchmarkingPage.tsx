@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   BarChart3, TrendingUp, Shield, Activity, RefreshCw,
   Award, DollarSign,
@@ -8,103 +9,15 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { executiveApi } from '../api/executive';
 import type {
-  BenchmarkingResponse,
   CostEfficiencyType,
 } from '../../../types';
 
 type BenchmarkDimension = 'teams' | 'domains';
-
-/**
- * Dados simulados de benchmarking — alinhados com o backend GetBenchmarking.
- * Em produção, virão da API /api/v1/governance/executive/benchmarking.
- */
-const mockBenchmarking: BenchmarkingResponse = {
-  dimension: 'teams',
-  comparisons: [
-    {
-      groupId: 'team-payment-squad',
-      groupName: 'Payment Squad',
-      serviceCount: 8,
-      criticality: 'Critical',
-      reliabilityScore: 72,
-      reliabilityTrend: 'Declining',
-      changeSafetyScore: 68,
-      incidentRecurrenceRate: 22,
-      maturityScore: 74,
-      riskScore: 82,
-      finopsEfficiency: 'Acceptable',
-      strengths: ['Ownership maturity', 'Contract versioning', 'Change validation pipeline'],
-      gaps: ['Runbook coverage', 'Incident recurrence', 'AI governance'],
-      context: 'Handles highest-criticality payment flows with strong ownership but operational stability challenges due to incident recurrence',
-    },
-    {
-      groupId: 'team-order-squad',
-      groupName: 'Order Squad',
-      serviceCount: 6,
-      criticality: 'High',
-      reliabilityScore: 65,
-      reliabilityTrend: 'Stable',
-      changeSafetyScore: 58,
-      incidentRecurrenceRate: 18,
-      maturityScore: 55,
-      riskScore: 71,
-      finopsEfficiency: 'Inefficient',
-      strengths: ['Ownership definition', 'Dependency awareness'],
-      gaps: ['Contract versioning', 'Runbook coverage', 'Change validation', 'FinOps optimization'],
-      context: 'Core order processing team with good ownership but contract governance and change safety need improvement',
-    },
-    {
-      groupId: 'team-platform-squad',
-      groupName: 'Platform Squad',
-      serviceCount: 12,
-      criticality: 'High',
-      reliabilityScore: 78,
-      reliabilityTrend: 'Improving',
-      changeSafetyScore: 82,
-      incidentRecurrenceRate: 8,
-      maturityScore: 62,
-      riskScore: 48,
-      finopsEfficiency: 'Efficient',
-      strengths: ['Change validation', 'Low incident recurrence', 'FinOps efficiency', 'Reliability trend'],
-      gaps: ['Documentation', 'Runbook coverage', 'Shared ownership clarity'],
-      context: 'Infrastructure team with strong operational practices but shared service ownership and documentation need attention',
-    },
-    {
-      groupId: 'team-identity-squad',
-      groupName: 'Identity Squad',
-      serviceCount: 4,
-      criticality: 'Critical',
-      reliabilityScore: 94,
-      reliabilityTrend: 'Improving',
-      changeSafetyScore: 92,
-      incidentRecurrenceRate: 3,
-      maturityScore: 88,
-      riskScore: 18,
-      finopsEfficiency: 'Efficient',
-      strengths: ['Overall maturity', 'Reliability', 'Change safety', 'Contract governance', 'Low risk'],
-      gaps: ['AI governance adoption'],
-      context: 'Exemplary team with highest maturity and reliability scores, serving as benchmark reference for other teams',
-    },
-    {
-      groupId: 'team-data-squad',
-      groupName: 'Data Squad',
-      serviceCount: 5,
-      criticality: 'Medium',
-      reliabilityScore: 80,
-      reliabilityTrend: 'Stable',
-      changeSafetyScore: 55,
-      incidentRecurrenceRate: 12,
-      maturityScore: 65,
-      riskScore: 40,
-      finopsEfficiency: 'Acceptable',
-      strengths: ['Documentation quality', 'AI governance integration', 'Pipeline monitoring'],
-      gaps: ['Event contract coverage', 'Change validation', 'Schema migration safety'],
-      context: 'Data-focused team with good documentation practices but event contracts and change validation require strengthening',
-    },
-  ],
-  generatedAt: new Date().toISOString(),
-};
 
 /** Mapeia CostEfficiencyType para variante do Badge. */
 const finopsBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'danger' | 'default' => {
@@ -136,20 +49,23 @@ export function BenchmarkingPage() {
   const { t } = useTranslation();
   const [dimension, setDimension] = useState<BenchmarkDimension>('teams');
 
-  const d = mockBenchmarking;
+  const { data: d, isLoading, isError, refetch } = useQuery({
+    queryKey: ['executive-benchmarking', dimension],
+    queryFn: () => executiveApi.getBenchmarking(dimension),
+    staleTime: 30_000,
+  });
+
   const dimensionOptions: BenchmarkDimension[] = ['teams', 'domains'];
+
+  if (isLoading) return <PageLoadingState />;
+  if (isError || !d) return <PageErrorState onRetry={refetch} />;
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.executive.benchmarkingTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.executive.benchmarkingSubtitle')}</p>
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
-          <span className="text-xs text-muted">{t('governance.preview.benchmarkingReason')}</span>
-        </div>
-      </div>
+      <PageHeader
+        title={t('governance.executive.benchmarkingTitle')}
+        subtitle={t('governance.executive.benchmarkingSubtitle')}
+      />
 
       {/* Dimension Selector */}
       <div className="flex flex-wrap items-center gap-3 mb-6">

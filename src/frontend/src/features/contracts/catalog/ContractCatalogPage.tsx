@@ -8,6 +8,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { FilterChip } from '../../../components/FilterChip';
 import { ErrorState } from '../shared/components';
+import { PageContainer } from '../../../components/shell';
 import { useContractList, useContractsSummary } from '../hooks';
 import { CatalogToolbar, CatalogTable, CatalogSkeleton } from './components';
 import type { CatalogFilters, SortConfig, SortField, CatalogItem } from './types';
@@ -65,7 +66,7 @@ export function ContractCatalogPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="p-6 space-y-5">
+    <PageContainer>
       {/* Header */}
       <PageHeader
         title={t('contracts.catalog.title', 'Contract Catalog')}
@@ -188,7 +189,7 @@ export function ContractCatalogPage() {
           )}
         </CardBody>
       </Card>
-    </div>
+    </PageContainer>
   );
 }
 

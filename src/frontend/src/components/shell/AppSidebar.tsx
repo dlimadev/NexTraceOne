@@ -12,15 +12,14 @@ import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
-import { isRouteAvailableInFinalProductionScope } from '../../releaseScope';
 import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
-  Shield, ClipboardList, BookOpen, AlertTriangle, Clock, UserCheck,
-  ClipboardCheck, Monitor, Bot, Database, ShieldCheck, ShieldAlert,
-  BarChart3, Scale, DollarSign, FileCode, Share2, Server, Layers,
-  Globe, Activity, Plug, Gauge, Grid3X3, Award, GitCompare, Route,
-  Cable, Building2, TrendingUp, Target, Package, FileCheck, Plus,
+  Shield, ClipboardList, AlertTriangle, Clock, UserCheck,
+  ClipboardCheck, Monitor, Bot, Database, ShieldCheck,
+  FileCode, Share2, Server, Layers,
+  Globe, Activity, Plus,
   PanelLeftClose, PanelLeftOpen,
+  BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
 } from 'lucide-react';
 
 interface NavItem {
@@ -37,8 +36,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.dashboard', to: '/', icon: <LayoutDashboard size={18} />, section: 'home' },
   { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'services' },
-  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'services', preview: true },
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
+  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'knowledge' },
   { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
   { labelKey: 'sidebar.createContract', to: '/contracts/new', icon: <Plus size={18} />, permission: 'contracts:write', section: 'contracts' },
   { labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={18} />, permission: 'contracts:read', section: 'contracts' },
@@ -51,39 +50,26 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:read', section: 'changes' },
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
-  { labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={18} />, permission: 'operations:reliability:read', section: 'operations', preview: true },
-  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={18} />, permission: 'operations:automation:read', section: 'operations', preview: true },
+  { labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={18} />, permission: 'operations:reliability:read', section: 'operations' },
+  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={18} />, permission: 'operations:automation:read', section: 'operations' },
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
-  { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:models:read', section: 'aiHub', preview: true },
-  { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={18} />, permission: 'ai:policies:read', section: 'aiHub', preview: true },
-  { labelKey: 'sidebar.aiRouting', to: '/ai/routing', icon: <Route size={18} />, permission: 'ai:governance:read', section: 'aiHub', preview: true },
-  { labelKey: 'sidebar.ideIntegrations', to: '/ai/ide', icon: <Plug size={18} />, permission: 'ai:ide:read', section: 'aiHub', preview: true },
-  { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Gauge size={18} />, permission: 'governance:reports:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.riskHeatmap', to: '/governance/executive/heatmap', icon: <Grid3X3 size={18} />, permission: 'governance:risk:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.maturityScorecards', to: '/governance/executive/maturity', icon: <Award size={18} />, permission: 'governance:reports:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.benchmarking', to: '/governance/executive/benchmarking', icon: <GitCompare size={18} />, permission: 'governance:reports:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <ShieldAlert size={18} />, permission: 'governance:risk:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <Scale size={18} />, permission: 'governance:compliance:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.policyCatalog', to: '/governance/policies', icon: <Shield size={18} />, permission: 'governance:policies:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.evidencePackages', to: '/governance/evidence', icon: <ClipboardList size={18} />, permission: 'governance:evidence:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.enterpriseControls', to: '/governance/controls', icon: <ShieldCheck size={18} />, permission: 'governance:controls:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.executiveFinOps', to: '/governance/finops/executive', icon: <DollarSign size={18} />, permission: 'governance:finops:read', section: 'governance', preview: true },
-  { labelKey: 'sidebar.governancePacks', to: '/governance/packs', icon: <Package size={18} />, permission: 'governance:packs:read', section: 'governance' },
-  { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <FileCheck size={18} />, permission: 'governance:waivers:read', section: 'governance' },
-  { labelKey: 'sidebar.analyticsOverview', to: '/analytics', icon: <TrendingUp size={18} />, permission: 'governance:analytics:read', section: 'analytics', preview: true },
-  { labelKey: 'sidebar.moduleAdoption', to: '/analytics/adoption', icon: <BarChart3 size={18} />, permission: 'governance:analytics:read', section: 'analytics', preview: true },
-  { labelKey: 'sidebar.personaUsage', to: '/analytics/personas', icon: <Users size={18} />, permission: 'governance:analytics:read', section: 'analytics', preview: true },
-  { labelKey: 'sidebar.journeyFunnels', to: '/analytics/journeys', icon: <Target size={18} />, permission: 'governance:analytics:read', section: 'analytics', preview: true },
-  { labelKey: 'sidebar.valueTracking', to: '/analytics/value', icon: <Award size={18} />, permission: 'governance:analytics:read', section: 'analytics', preview: true },
-  { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations', preview: true },
-  { labelKey: 'sidebar.ingestionExecutions', to: '/integrations/executions', icon: <Activity size={18} />, permission: 'integrations:read', section: 'integrations', preview: true },
-  { labelKey: 'sidebar.ingestionFreshness', to: '/integrations/freshness', icon: <Gauge size={18} />, permission: 'integrations:read', section: 'integrations', preview: true },
-  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read', section: 'organization' },
-  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Building2 size={18} />, permission: 'governance:domains:read', section: 'organization' },
-  // TODO: Add 'governance:delegated:read' to Permission type when delegated admin permissions are formalized
-  { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:delegated:read' as Permission, section: 'organization' },
+  { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <Shield size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiRouting', to: '/ai/routing', icon: <Share2 size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiIde', to: '/ai/ide', icon: <Monitor size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiBudgets', to: '/ai/budgets', icon: <BarChart3 size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiAudit', to: '/ai/audit', icon: <ClipboardList size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.policies', to: '/governance/policies', icon: <Shield size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.packs', to: '/governance/packs', icon: <Layers size={18} />, permission: 'governance:read', section: 'governance' },
+  { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:read', section: 'organization' },
+  { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={18} />, permission: 'governance:read', section: 'organization' },
+  { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
+  { labelKey: 'sidebar.productAnalytics', to: '/analytics', icon: <BarChart3 size={18} />, permission: 'analytics:read', section: 'analytics' },
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },
   { labelKey: 'sidebar.breakGlass', to: '/break-glass', icon: <AlertTriangle size={18} />, permission: 'identity:sessions:read', section: 'admin' },
   { labelKey: 'sidebar.jitAccess', to: '/jit-access', icon: <Clock size={18} />, permission: 'identity:users:read', section: 'admin' },
@@ -138,7 +124,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
     });
   };
 
-  const visibleItems = navItems.filter(item => isRouteAvailableInFinalProductionScope(item.to) && (!item.permission || can(item.permission)));
+  const visibleItems = navItems.filter(item => !item.permission || can(item.permission));
   const isHighlighted = (section: NavSection): boolean => config.highlightedSections.includes(section);
 
   return (

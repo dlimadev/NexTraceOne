@@ -8,6 +8,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { auditApi } from '../api';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 export function AuditPage() {
   const { t } = useTranslation();
@@ -33,20 +34,20 @@ export function AuditPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('audit.title')}</h1>
-          <p className="text-muted mt-1">{t('audit.subtitle')}</p>
-        </div>
-        <Button
-          variant="secondary"
-          onClick={() => verifyIntegrity()}
-          loading={verifying}
-        >
-          <Shield size={16} />
-          {t('audit.verifyIntegrity')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('audit.title')}
+        subtitle={t('audit.subtitle')}
+        actions={
+          <Button
+            variant="secondary"
+            onClick={() => verifyIntegrity()}
+            loading={verifying}
+          >
+            <Shield size={16} />
+            {t('audit.verifyIntegrity')}
+          </Button>
+        }
+      />
 
       {/* Integrity result */}
       {integrity && (
@@ -121,27 +122,29 @@ export function AuditPage() {
                   <th className="px-6 py-3 font-medium text-muted">{t('audit.actor')}</th>
                   <th className="px-6 py-3 font-medium text-muted">{t('audit.aggregate')}</th>
                   <th className="px-6 py-3 font-medium text-muted">{t('audit.timestamp')}</th>
-                  <th className="px-6 py-3 font-medium text-muted">{t('audit.hash')}</th>
+                  <th className="px-6 py-3 font-medium text-muted">
+                    {t('audit.sourceModule', { defaultValue: 'Source module' })}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
-                {data.items.map((e) => (
-                  <tr key={e.id} className="hover:bg-hover transition-colors">
-                    <td className="px-6 py-3 font-medium text-heading">{e.eventType}</td>
-                    <td className="px-6 py-3 text-body">{e.actorEmail}</td>
-                    <td className="px-6 py-3 text-body">{e.aggregateType}</td>
-                    <td className="px-6 py-3 text-xs text-muted">
-                      {new Date(e.occurredAt).toLocaleString()}
-                    </td>
-                    <td
-                      className="px-6 py-3 font-mono text-xs text-faded truncate max-w-[120px]"
-                      title={e.hash}
-                      aria-label={t('audit.hashLabel', { hash: e.hash })}
-                    >
-                      {e.hash.slice(0, 12)}…
-                    </td>
-                  </tr>
-                ))}
+                {data.items.map((e) => {
+                  const sourceModule = (e as { payload?: { sourceModule?: string } }).payload?.sourceModule;
+
+                  return (
+                    <tr key={e.id} className="hover:bg-hover transition-colors">
+                      <td className="px-6 py-3 font-medium text-heading">{e.eventType}</td>
+                      <td className="px-6 py-3 text-body">{e.actorEmail}</td>
+                      <td className="px-6 py-3 text-body">{e.aggregateType}</td>
+                      <td className="px-6 py-3 text-xs text-muted">
+                        {new Date(e.occurredAt).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-3 text-xs text-faded">
+                        {typeof sourceModule === 'string' ? sourceModule : '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}

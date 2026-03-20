@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import type {
   EvidencePackageDto, EvidencePackageListResponse, EvidencePackageStatusType,
   EvidenceItemDto, EvidenceTypeValue,
@@ -110,7 +111,7 @@ const statusBadge = (st: EvidencePackageStatusType): 'success' | 'warning' | 'in
   }
 };
 
-const evidenceIcon = (type: EvidenceTypeValue) => {
+const evidenceIcon = (type: string) => {
   switch (type) {
     case 'Approval': return <FileCheck size={14} />;
     case 'ChangeHistory': return <Clock size={14} />;
@@ -153,15 +154,15 @@ export function EvidencePackagesPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.evidence.title')}</h1>
-        <p className="text-muted mt-1">{t('governance.evidence.subtitle')}</p>
+      <PageHeader
+        title={t('governance.evidence.title')}
+        subtitle={t('governance.evidence.subtitle')}
+      >
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="warning">{t('governance.preview.badge')}</Badge>
           <span className="text-xs text-muted">{t('governance.preview.evidenceReason')}</span>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -109,6 +110,21 @@ interface MessageApiItem {
   responseState?: string;
   isDegraded?: boolean;
   degradedReason?: string | null;
+}
+
+interface ConversationDetailApiResponse {
+  conversationId: string;
+  title: string;
+  persona: string;
+  clientType: string;
+  defaultContextScope: string;
+  lastModelUsed: string | null;
+  createdBy: string;
+  messageCount: number;
+  tags: string;
+  isActive: boolean;
+  lastMessageAt: string | null;
+  messages: MessageApiItem[];
 }
 
 const contextScopes = ['Services', 'Contracts', 'Incidents', 'Changes', 'Runbooks'] as const;
@@ -286,13 +302,30 @@ export function AiAssistantPage() {
     setMessagesError(null);
 
     try {
-      const data = await aiGovernanceApi.listMessages(conversationId, { pageSize: 100 });
-      if (requestId !== messageLoadRequestRef.current) {
+      const data: ConversationDetailApiResponse = await aiGovernanceApi.getConversation(conversationId, { messagePageSize: 100 });
+       if (requestId !== messageLoadRequestRef.current) {
         return;
       }
 
-      const items: ChatMessage[] = (data.items || []).map((item: MessageApiItem) => mapMessage(item));
+      const items: ChatMessage[] = (data.messages || []).map((item: MessageApiItem) => mapMessage(item));
       setMessages(items);
+      setConversations(prev => prev.map(conv => (
+        conv.id === conversationId
+          ? {
+              ...conv,
+              title: data.title,
+              persona: data.persona,
+              messageCount: data.messageCount,
+              isActive: data.isActive,
+              lastMessageAt: data.lastMessageAt,
+              lastModelUsed: data.lastModelUsed,
+              tags: data.tags ?? '',
+              defaultContextScope: data.defaultContextScope ?? '',
+              clientType: data.clientType,
+              createdBy: data.createdBy,
+            }
+          : conv
+      )));
     } catch (err) {
       console.error('Failed to load messages:', err);
       setMessages([]);
@@ -391,7 +424,7 @@ export function AiAssistantPage() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -408,7 +441,7 @@ export function AiAssistantPage() {
 
   const selectedConv = conversations.find(c => c.id === selectedConversation);
 
-  const contextIcons: Record<string, React.ReactNode> = {
+  const contextIcons: Record<string, ReactNode> = {
     Services: <Server size={14} />,
     Contracts: <FileText size={14} />,
     Incidents: <AlertTriangle size={14} />,

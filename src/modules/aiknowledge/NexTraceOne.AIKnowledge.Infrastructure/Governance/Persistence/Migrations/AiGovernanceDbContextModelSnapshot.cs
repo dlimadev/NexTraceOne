@@ -1020,6 +1020,9 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ChangeId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ClientType")
                         .IsRequired()
                         .HasMaxLength(100)

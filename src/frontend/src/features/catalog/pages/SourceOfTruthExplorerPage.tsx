@@ -8,7 +8,6 @@ import {
   BookOpen,
   ExternalLink,
   Globe,
-  AlertTriangle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
@@ -168,7 +167,7 @@ export function SourceOfTruthExplorerPage() {
         <div className="space-y-8">
           {/* Total */}
           <p className="text-sm text-muted">
-            {data.totalResults} {t('sourceOfTruth.results.totalResults')}
+            {(data.totalResults ?? (data.services.length + data.contracts.length + data.references.length))} {t('sourceOfTruth.results.totalResults')}
           </p>
 
           {/* Services */}
@@ -225,8 +224,8 @@ export function SourceOfTruthExplorerPage() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {data.contracts.map((c) => (
                   <Link
-                    key={c.versionId}
-                    to={`/source-of-truth/contracts/${c.versionId}`}
+                    key={c.versionId ?? c.id}
+                    to={`/source-of-truth/contracts/${c.versionId ?? c.id}`}
                     className="block group"
                   >
                     <Card className="hover:border-accent/40 transition-colors h-full">
@@ -283,10 +282,10 @@ export function SourceOfTruthExplorerPage() {
                       <p className="text-xs text-muted mb-3 line-clamp-2">{ref.description}</p>
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {t(`sourceOfTruth.assetTypes.${ref.assetType}`, ref.assetType)}
+                          {String(t(`sourceOfTruth.assetTypes.${ref.assetType}`, ref.assetType))}
                         </span>
                         <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType)}
+                          {String(t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType))}
                         </span>
                       </div>
                     </CardBody>

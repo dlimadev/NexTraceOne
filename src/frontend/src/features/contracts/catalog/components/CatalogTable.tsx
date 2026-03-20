@@ -214,7 +214,9 @@ function CatalogRow({ item }: { item: CatalogItem }) {
 
       {/* Criticality */}
       <td className="px-3 py-3">
-        <CriticalityBadge level={item.criticality} />
+        <CriticalityBadge
+          level={toCriticalityLevel(item.criticality)}
+        />
       </td>
 
       {/* Updated */}
@@ -365,6 +367,10 @@ function RowActionMenu({ item }: { item: CatalogItem }) {
       )}
     </div>
   );
+}
+
+function toCriticalityLevel(level: string): 'Low' | 'Medium' | 'High' | 'Critical' {
+  return level === 'Low' || level === 'High' || level === 'Critical' ? level : 'Medium';
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

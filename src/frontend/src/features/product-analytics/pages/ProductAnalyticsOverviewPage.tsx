@@ -15,7 +15,8 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
-import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageContainer, PageSection, StatsGrid } from '../../../components/shell';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
@@ -32,7 +33,7 @@ function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
     case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
     case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
-    default: return <Minus size={14} className="text-zinc-400" />;
+    default: return <Minus size={14} className="text-muted" />;
   }
 }
 
@@ -61,7 +62,7 @@ export function ProductAnalyticsOverviewPage() {
             <button
               type="button"
               onClick={() => refetch()}
-              className="px-3 py-2 rounded-md bg-zinc-900 border border-zinc-700 text-white text-xs hover:border-accent/50"
+              className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50"
             >
               {t('common.retry')}
             </button>
@@ -75,15 +76,14 @@ export function ProductAnalyticsOverviewPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('analytics.title')}</h1>
-        <p className="text-zinc-400 mt-1">{t('analytics.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('analytics.title')}
+        subtitle={t('analytics.subtitle')}
+      />
 
       {/* Score cards */}
       <PageSection>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatsGrid columns={4}>
           <StatCard
             title={t('analytics.adoptionScore')}
             value={`${d.adoptionScore}%`}
@@ -111,7 +111,7 @@ export function ProductAnalyticsOverviewPage() {
             icon={<Users size={20} />}
             color="text-blue-400"
           />
-        </div>
+        </StatsGrid>
       </PageSection>
 
       {/* Time to value */}
@@ -121,24 +121,24 @@ export function ProductAnalyticsOverviewPage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Target size={18} className="text-accent" />
-                <span className="font-semibold text-white">{t('analytics.timeToFirstValue')}</span>
+                <span className="font-semibold text-heading">{t('analytics.timeToFirstValue')}</span>
               </div>
             </CardHeader>
             <CardBody>
               <div className="text-3xl font-bold text-accent">{d.avgTimeToFirstValueMinutes} {t('analytics.minutes')}</div>
-              <p className="text-zinc-400 text-sm mt-1">{t('analytics.timeToFirstValueDesc')}</p>
+              <p className="text-muted text-sm mt-1">{t('analytics.timeToFirstValueDesc')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Award size={18} className="text-emerald-400" />
-                <span className="font-semibold text-white">{t('analytics.timeToCoreValue')}</span>
+                <span className="font-semibold text-heading">{t('analytics.timeToCoreValue')}</span>
               </div>
             </CardHeader>
             <CardBody>
               <div className="text-3xl font-bold text-emerald-400">{d.avgTimeToCoreValueMinutes} {t('analytics.minutes')}</div>
-              <p className="text-zinc-400 text-sm mt-1">{t('analytics.timeToCoreValueDesc')}</p>
+              <p className="text-muted text-sm mt-1">{t('analytics.timeToCoreValueDesc')}</p>
             </CardBody>
           </Card>
         </div>
@@ -148,19 +148,19 @@ export function ProductAnalyticsOverviewPage() {
       <PageSection>
         <Card>
           <CardHeader>
-            <span className="font-semibold text-white">{t('analytics.topModules')}</span>
+            <span className="font-semibold text-heading">{t('analytics.topModules')}</span>
           </CardHeader>
           <CardBody>
-            <div className="divide-y divide-zinc-800">
+            <div className="divide-y divide-edge">
               {d.topModules.map((mod) => (
                 <div key={mod.module} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3">
-                    <span className="text-white font-medium">{mod.moduleName}</span>
+                    <span className="text-heading font-medium">{mod.moduleName}</span>
                     {trendIcon(mod.trend)}
                   </div>
                   <div className="flex items-center gap-6 text-sm">
-                    <span className="text-zinc-400">{mod.eventCount.toLocaleString()} {t('analytics.actions')}</span>
-                    <span className="text-zinc-400">{mod.uniqueUsers} {t('analytics.users')}</span>
+                    <span className="text-muted">{mod.eventCount.toLocaleString()} {t('analytics.actions')}</span>
+                    <span className="text-muted">{mod.uniqueUsers} {t('analytics.users')}</span>
                   </div>
                 </div>
               ))}
@@ -170,27 +170,27 @@ export function ProductAnalyticsOverviewPage() {
       </PageSection>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Link to="/analytics/adoption" className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-accent/40 transition text-center">
+      <StatsGrid columns={4}>
+        <Link to="/analytics/adoption" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
           <BarChart3 size={24} className="mx-auto mb-2 text-accent" />
-          <span className="text-sm text-zinc-300">{t('analytics.viewModuleAdoption')}</span>
+          <span className="text-sm text-body">{t('analytics.viewModuleAdoption')}</span>
         </Link>
-        <Link to="/analytics/personas" className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-accent/40 transition text-center">
+        <Link to="/analytics/personas" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Users size={24} className="mx-auto mb-2 text-blue-400" />
-          <span className="text-sm text-zinc-300">{t('analytics.viewPersonaUsage')}</span>
+          <span className="text-sm text-body">{t('analytics.viewPersonaUsage')}</span>
         </Link>
-        <Link to="/analytics/journeys" className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-accent/40 transition text-center">
+        <Link to="/analytics/journeys" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Target size={24} className="mx-auto mb-2 text-emerald-400" />
-          <span className="text-sm text-zinc-300">{t('analytics.viewJourneys')}</span>
+          <span className="text-sm text-body">{t('analytics.viewJourneys')}</span>
         </Link>
-        <Link to="/analytics/value" className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-accent/40 transition text-center">
+        <Link to="/analytics/value" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Award size={24} className="mx-auto mb-2 text-amber-400" />
-          <span className="text-sm text-zinc-300">{t('analytics.viewValueTracking')}</span>
+          <span className="text-sm text-body">{t('analytics.viewValueTracking')}</span>
         </Link>
-      </div>
+      </StatsGrid>
 
       {d.totalEvents === 0 && (
-        <div className="text-center py-10 text-zinc-500 text-sm">
+        <div className="text-center py-10 text-faded text-sm">
           {t('common.noData')}
         </div>
       )}

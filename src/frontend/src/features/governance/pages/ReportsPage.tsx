@@ -13,6 +13,7 @@ import { OnboardingHints } from '../../../components/OnboardingHints';
 import { usePersona } from '../../../contexts/PersonaContext';
 import type { ReportsSummaryResponse } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -88,14 +89,14 @@ export function ReportsPage() {
       {/* Onboarding hints */}
       <OnboardingHints module="governance" />
 
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.reportsTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.reportsSubtitle')}</p>
+      <PageHeader
+        title={t('governance.reportsTitle')}
+        subtitle={t('governance.reportsSubtitle')}
+      >
         <Badge variant="info" className="mt-2">
           {t('governance.reports.personaView', { persona })}
         </Badge>
-      </div>
+      </PageHeader>
 
       {/* Governance Pack Stats — dados reais */}
       <div className="mb-6">

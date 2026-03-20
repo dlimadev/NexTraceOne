@@ -3,9 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NexTraceOne.Identity.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
-
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -19,7 +17,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -64,7 +62,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.AccessReviewCampaign", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -101,7 +99,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_access_review_campaigns", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.AccessReviewItem", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -146,7 +144,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_access_review_items", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.BreakGlassRequest", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.BreakGlassRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -210,7 +208,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_break_glass_requests", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.Delegation", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Delegation", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -264,7 +262,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_delegations", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.Environment", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Environment", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -302,7 +300,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_environments", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.EnvironmentAccess", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.EnvironmentAccess", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -349,7 +347,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_environment_accesses", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.ExternalIdentity", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.ExternalIdentity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -390,7 +388,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_external_identities", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.JitAccessRequest", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.JitAccessRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -460,7 +458,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_jit_access_requests", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.Permission", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Permission", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -595,6 +593,20 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                         },
                         new
                         {
+                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c034"),
+                            Code = "operations:incidents:read",
+                            Module = "Operations",
+                            Name = "View operational incidents"
+                        },
+                        new
+                        {
+                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c035"),
+                            Code = "operations:incidents:write",
+                            Module = "Operations",
+                            Name = "Create and manage operational incidents"
+                        },
+                        new
+                        {
                             Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c040"),
                             Code = "workflow:read",
                             Module = "Workflow",
@@ -693,7 +705,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.Role", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -770,7 +782,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.SecurityEvent", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.SecurityEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -835,7 +847,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_security_events", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.Session", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Session", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -874,7 +886,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_sessions", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.SsoGroupMapping", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.SsoGroupMapping", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -916,7 +928,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_sso_group_mappings", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.Tenant", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Tenant", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -949,7 +961,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_tenants", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.TenantMembership", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.TenantMembership", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -979,7 +991,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_tenant_memberships", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.User", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -1021,18 +1033,18 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                     b.ToTable("identity_users", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.AccessReviewItem", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewItem", b =>
                 {
-                    b.HasOne("NexTraceOne.Identity.Domain.Entities.AccessReviewCampaign", null)
+                    b.HasOne("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", null)
                         .WithMany("Items")
                         .HasForeignKey("CampaignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.User", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.User", b =>
                 {
-                    b.OwnsOne("NexTraceOne.Identity.Domain.ValueObjects.FullName", "FullName", b1 =>
+                    b.OwnsOne("NexTraceOne.IdentityAccess.Domain.ValueObjects.FullName", "FullName", b1 =>
                         {
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uuid");
@@ -1061,7 +1073,7 @@ namespace NexTraceOne.Identity.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NexTraceOne.Identity.Domain.Entities.AccessReviewCampaign", b =>
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", b =>
                 {
                     b.Navigation("Items");
                 });

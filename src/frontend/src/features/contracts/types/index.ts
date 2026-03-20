@@ -80,4 +80,5 @@ export type {
   ChangeEntry,
   ContractDiffResult,
   SignatureVerificationResult,
+  ServiceListItem,
 } from '../../../types';

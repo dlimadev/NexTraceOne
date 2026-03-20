@@ -30,7 +30,9 @@ import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
 import { ServiceCatalogOverviewTab } from '../components/ServiceCatalogOverviewTab';
 import { ServiceCatalogServicesTab } from '../components/ServiceCatalogServicesTab';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, StatsGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageHeader } from '../../../components/PageHeader';
 import type {
   AssetGraph,
   ApiNode,
@@ -180,24 +182,23 @@ export function ServiceCatalogPage() {
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="services" />
 
-      {/* ── Cabeçalho ──────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('serviceCatalog.title')}</h1>
-          <p className="text-muted mt-1">{t('serviceCatalog.subtitle')}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => setShowServiceForm((v) => !v)}>
-            <Plus size={16} /> {t('serviceCatalog.registerService')}
-          </Button>
-          <Button onClick={() => setShowApiForm((v) => !v)}>
-            <Plus size={16} /> {t('serviceCatalog.registerApi')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('serviceCatalog.title')}
+        subtitle={t('serviceCatalog.subtitle')}
+        actions={
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => setShowServiceForm((v) => !v)}>
+              <Plus size={16} /> {t('serviceCatalog.registerService')}
+            </Button>
+            <Button onClick={() => setShowApiForm((v) => !v)}>
+              <Plus size={16} /> {t('serviceCatalog.registerApi')}
+            </Button>
+          </div>
+        }
+      />
 
       {/* ── Estatísticas resumidas ──────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <StatsGrid columns={4}>
         {[
           { label: t('serviceCatalog.stats.services'), value: graphStats.services, icon: <Server size={18} />, color: 'text-blue-500' },
           { label: t('serviceCatalog.stats.apis'), value: graphStats.apis, icon: <Globe size={18} />, color: 'text-emerald-500' },
@@ -214,7 +215,7 @@ export function ServiceCatalogPage() {
             </CardBody>
           </Card>
         ))}
-      </div>
+      </StatsGrid>
 
       {/* ── Formulário de registro de serviço ───────────────────────── */}
       {showServiceForm && (

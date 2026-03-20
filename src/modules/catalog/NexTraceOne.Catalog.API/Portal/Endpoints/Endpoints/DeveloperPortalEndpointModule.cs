@@ -9,7 +9,6 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using CreateSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription.CreateSubscription;
 using DeleteSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription.DeleteSubscription;
-using ExecutePlaygroundFeature = NexTraceOne.Catalog.Application.Portal.Features.ExecutePlayground.ExecutePlayground;
 using GenerateCodeFeature = NexTraceOne.Catalog.Application.Portal.Features.GenerateCode.GenerateCode;
 using GetApiConsumersFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers.GetApiConsumers;
 using GetApiDetailFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail.GetApiDetail;
@@ -29,11 +28,11 @@ namespace NexTraceOne.Catalog.API.Portal.Endpoints.Endpoints;
 /// <summary>
 /// Registra todos os endpoints Minimal API do módulo DeveloperPortal.
 /// Descoberto automaticamente pelo ApiHost via assembly scanning.
-/// Endpoints organizados por funcionalidade: catálogo, subscrições, playground, geração de código e analytics.
+/// Endpoints organizados por funcionalidade: catálogo, subscrições, histórico de consumo, geração de código e analytics.
 ///
 /// Política de autorização:
 /// - Endpoints de leitura do catálogo exigem "developer-portal:read".
-/// - Endpoints de escrita (subscrições, playground, codegen, analytics) exigem "developer-portal:write".
+/// - Endpoints de escrita (subscrições, codegen, analytics) exigem "developer-portal:write".
 /// </summary>
 public sealed class DeveloperPortalEndpointModule
 {
@@ -204,18 +203,7 @@ public sealed class DeveloperPortalEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("developer-portal:write");
 
-        // ── Playground ──
-
-        // POST /api/v1/developerportal/playground/execute — Executar chamada no playground
-        group.MapPost("/playground/execute", async (
-            ExecutePlaygroundFeature.Command command,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(command, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("developer-portal:write");
+        // ── Histórico de playground ──
 
         // GET /api/v1/developerportal/playground/history — Histórico de sessões do playground
         group.MapGet("/playground/history", async (

@@ -38,6 +38,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CatalogGraphDbContext>());
+        services.AddScoped<ICatalogGraphUnitOfWork>(sp => sp.GetRequiredService<CatalogGraphDbContext>());
 
         // ── Repositórios de ativos (existentes) ──────────────────────────
         services.AddScoped<IApiAssetRepository, ApiAssetRepository>();

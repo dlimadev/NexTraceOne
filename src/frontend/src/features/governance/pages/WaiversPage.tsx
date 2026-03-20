@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -83,10 +84,10 @@ export function WaiversPage() {
   if (loading) {
     return (
       <PageContainer>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
-          <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
-        </div>
+        <PageHeader
+          title={t('governancePacks.waivers.title')}
+          subtitle={t('governancePacks.waivers.subtitle')}
+        />
         <PageLoadingState />
       </PageContainer>
     );
@@ -95,10 +96,10 @@ export function WaiversPage() {
   if (error) {
     return (
       <PageContainer>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
-          <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
-        </div>
+        <PageHeader
+          title={t('governancePacks.waivers.title')}
+          subtitle={t('governancePacks.waivers.subtitle')}
+        />
         <PageErrorState message={error} />
       </PageContainer>
     );
@@ -106,11 +107,10 @@ export function WaiversPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governancePacks.waivers.title')}</h1>
-        <p className="text-muted mt-1">{t('governancePacks.waivers.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governancePacks.waivers.title')}
+        subtitle={t('governancePacks.waivers.subtitle')}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

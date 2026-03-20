@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import * as React from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -14,7 +15,10 @@ import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { incidentsApi, type IncidentListItem } from '../api/incidents';
+import { usePermissions } from '../../../hooks/usePermissions';
+import { resolveApiError } from '../../../utils/apiErrors';
 
 type StatusFilter = 'all' | 'Open' | 'Investigating' | 'Mitigating' | 'Monitoring' | 'Resolved' | 'Closed';
 
@@ -49,6 +53,18 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
+const defaultCreateForm = {
+  title: '',
+  description: '',
+  incidentType: 'ServiceDegradation',
+  severity: 'Major',
+  serviceId: '',
+  serviceDisplayName: '',
+  ownerTeam: '',
+  impactedDomain: '',
+  environment: 'Production',
+};
+
 /**
  * Página de Incidentes — visão consolidada de incidentes com correlação contextualizada.
  * Correlaciona incidentes com serviços, mudanças, contratos, ownership e mitigação.
@@ -57,29 +73,24 @@ function timeAgo(dateStr: string): string {
 export function IncidentsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { can } = usePermissions();
+  const canCreateIncident = can('operations:incidents:write');
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
-  const [createForm, setCreateForm] = useState({
-    title: '',
-    description: '',
-    incidentType: 'ServiceDegradation',
-    severity: 'Major',
-    serviceId: '',
-    serviceDisplayName: '',
-    ownerTeam: '',
-    impactedDomain: '',
-    environment: 'Production',
-  });
+  const [createSuccess, setCreateSuccess] = useState<{ incidentId: string; reference: string } | null>(null);
+  const [createForm, setCreateForm] = useState(defaultCreateForm);
 
   const incidentsQuery = useQuery({
-    queryKey: ['incidents', filter, search],
+    queryKey: ['incidents', filter, search, page, pageSize],
     queryFn: () => incidentsApi.listIncidents({
       status: filter !== 'all' ? filter : undefined,
       search: search || undefined,
-      page: 1,
-      pageSize: 50,
+      page,
+      pageSize,
     }),
   });
 
@@ -89,32 +100,45 @@ export function IncidentsPage() {
   });
 
   const incidents: IncidentListItem[] = incidentsQuery.data?.items ?? [];
+  const totalCount = incidentsQuery.data?.totalCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const canGoToPreviousPage = page > 1;
+  const canGoToNextPage = page < totalPages;
+  const currentRangeStart = totalCount === 0 ? 0 : (page - 1) * pageSize + 1;
+  const currentRangeEnd = totalCount === 0 ? 0 : Math.min(page * pageSize, totalCount);
+  const isCreateFormValid = useMemo(() => (
+    createForm.title.trim().length > 0
+    && createForm.description.trim().length > 0
+    && createForm.serviceId.trim().length > 0
+    && createForm.serviceDisplayName.trim().length > 0
+    && createForm.ownerTeam.trim().length > 0
+    && createForm.environment.trim().length > 0
+  ), [createForm]);
 
   const createIncidentMutation = useMutation({
     mutationFn: () => incidentsApi.createIncident({
       ...createForm,
       impactedDomain: createForm.impactedDomain || undefined,
     }),
-    onSuccess: () => {
+    onSuccess: async (response) => {
       setCreateError(null);
-      setIsCreateOpen(false);
-      setCreateForm({
-        title: '',
-        description: '',
-        incidentType: 'ServiceDegradation',
-        severity: 'Major',
-        serviceId: '',
-        serviceDisplayName: '',
-        ownerTeam: '',
-        impactedDomain: '',
-        environment: 'Production',
+      setCreateSuccess({
+        incidentId: response.incidentId,
+        reference: response.reference,
       });
-      queryClient.invalidateQueries({ queryKey: ['incidents'] });
-      queryClient.invalidateQueries({ queryKey: ['incidents-summary'] });
+      setIsCreateOpen(false);
+      setFilter('all');
+      setSearch('');
+      setPage(1);
+      setCreateForm(defaultCreateForm);
+      await queryClient.invalidateQueries({ queryKey: ['incidents'] });
+      await queryClient.invalidateQueries({ queryKey: ['incidents-summary'] });
+      await queryClient.refetchQueries({ queryKey: ['incidents'] });
+      await queryClient.refetchQueries({ queryKey: ['incidents-summary'] });
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : t('common.errorLoading');
-      setCreateError(message);
+      setCreateSuccess(null);
+      setCreateError(resolveApiError(error));
     },
   });
 
@@ -128,10 +152,10 @@ export function IncidentsPage() {
 
   return (
     <PageContainer>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('incidents.title')}</h1>
-        <p className="text-muted mt-1">{t('incidents.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('incidents.title')}
+        subtitle={t('incidents.subtitle')}
+      />
 
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="operations" />
@@ -149,17 +173,52 @@ export function IncidentsPage() {
 
       {/* Filters + Incident list */}
       <PageSection>
-        <div className="mb-4 flex items-center justify-end">
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(prev => !prev)}
-            className="px-3 py-2 text-sm rounded-md border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
-          >
-            {t('incidents.create.button', 'Create Incident')}
-          </button>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-muted">
+            {t('incidents.list.countSummary', 'Showing {{start}}-{{end}} of {{total}} incidents', {
+              start: currentRangeStart,
+              end: currentRangeEnd,
+              total: totalCount,
+            })}
+          </div>
+          {canCreateIncident ? (
+            <button
+              type="button"
+              onClick={() => {
+                setCreateSuccess(null);
+                setCreateError(null);
+                setIsCreateOpen(prev => !prev);
+              }}
+              className="px-3 py-2 text-sm rounded-md border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
+            >
+              {t('incidents.create.button', 'Create Incident')}
+            </button>
+          ) : (
+            <p className="text-xs text-muted">
+              {t('incidents.create.readOnlyHint', 'Your current role can review incidents but cannot create new ones.')}
+            </p>
+          )}
         </div>
 
-        {isCreateOpen && (
+        {createSuccess && (
+          <Card className="mb-4 border border-emerald-500/30">
+            <CardBody className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-body">
+                {t('incidents.create.successMessage', 'Incident {{reference}} was created and persisted successfully.', {
+                  reference: createSuccess.reference,
+                })}
+              </p>
+              <NavLink
+                to={`/operations/incidents/${createSuccess.incidentId}`}
+                className="text-sm text-accent hover:underline"
+              >
+                {t('incidents.create.openDetail', 'Open incident detail')}
+              </NavLink>
+            </CardBody>
+          </Card>
+        )}
+
+        {isCreateOpen && canCreateIncident && (
           <Card className="mb-4">
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading">{t('incidents.create.title', 'Create Incident')}</h2>
@@ -170,6 +229,7 @@ export function IncidentsPage() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   setCreateError(null);
+                  setCreateSuccess(null);
                   createIncidentMutation.mutate();
                 }}
               >
@@ -247,14 +307,17 @@ export function IncidentsPage() {
                 <div className="md:col-span-2 flex justify-end gap-2">
                   <button
                     type="button"
-                    onClick={() => setIsCreateOpen(false)}
+                    onClick={() => {
+                      setCreateError(null);
+                      setIsCreateOpen(false);
+                    }}
                     className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body"
                   >
                     {t('common.cancel', 'Cancel')}
                   </button>
                   <button
                     type="submit"
-                    disabled={createIncidentMutation.isPending}
+                    disabled={!isCreateFormValid || createIncidentMutation.isPending}
                     className="px-3 py-2 text-sm rounded-md bg-accent text-accent-contrast disabled:opacity-60"
                   >
                     {createIncidentMutation.isPending ? t('common.loading', 'Loading...') : t('incidents.create.submit', 'Create')}
@@ -271,15 +334,21 @@ export function IncidentsPage() {
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t('incidents.searchPlaceholder')}
+              onChange={e => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              placeholder={t('incidents.searchPlaceholder', 'Search incidents...')}
               className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-surface border border-edge text-body placeholder:text-muted focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           {(['all', 'Open', 'Investigating', 'Mitigating', 'Monitoring', 'Resolved', 'Closed'] as StatusFilter[]).map(f => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
+              onClick={() => {
+                setFilter(f);
+                setPage(1);
+              }}
               className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
                 filter === f
                   ? 'bg-accent/10 text-accent border-accent/30'
@@ -293,10 +362,15 @@ export function IncidentsPage() {
 
         <Card>
           <CardHeader>
-            <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-              <AlertTriangle size={16} className="text-accent" />
-              {t('incidents.list.title')}
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <AlertTriangle size={16} className="text-accent" />
+                {t('incidents.list.title')}
+              </h2>
+              <span className="text-xs text-muted">
+                {t('incidents.list.pageSummary', 'Page {{page}} of {{totalPages}}', { page, totalPages })}
+              </span>
+            </div>
           </CardHeader>
           <CardBody className="p-0">
             {incidentsQuery.isLoading ? (
@@ -314,7 +388,9 @@ export function IncidentsPage() {
                       <NavLink
                         key={inc.incidentId}
                         to={`/operations/incidents/${inc.incidentId}`}
-                        className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors"
+                        className={`flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors ${
+                          createSuccess?.incidentId === inc.incidentId ? 'bg-accent/5' : ''
+                        }`}
                       >
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           <Badge variant={badge.variant} className="flex items-center gap-1 shrink-0">
@@ -357,6 +433,32 @@ export function IncidentsPage() {
             )}
           </CardBody>
         </Card>
+
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setPage(prev => Math.max(1, prev - 1))}
+            disabled={!canGoToPreviousPage || incidentsQuery.isFetching}
+            className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body disabled:opacity-50"
+          >
+            {t('common.back', 'Back')}
+          </button>
+          <span className="text-xs text-muted">
+            {t('incidents.list.countSummary', 'Showing {{start}}-{{end}} of {{total}} incidents', {
+              start: currentRangeStart,
+              end: currentRangeEnd,
+              total: totalCount,
+            })}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={!canGoToNextPage || incidentsQuery.isFetching}
+            className="px-3 py-2 text-sm rounded-md border border-edge text-muted hover:text-body disabled:opacity-50"
+          >
+            {t('common.next', 'Next')}
+          </button>
+        </div>
       </PageSection>
     </PageContainer>
   );

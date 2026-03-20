@@ -27,6 +27,8 @@ import {
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageContainer } from '../../../components/shell';
 import { developerPortalApi } from '../api';
 import type {
   CatalogItem,
@@ -218,15 +220,11 @@ export function DeveloperPortalPage() {
     'w-full px-3 py-2 bg-surface border border-edge rounded-md text-sm text-body focus:outline-none focus:ring-2 focus:ring-accent/40';
 
   return (
-    <div className="space-y-6">
-      {/* Cabeçalho */}
-      <div>
-        <h1 className="text-2xl font-bold text-heading flex items-center gap-2">
-          <BookOpen size={24} />
-          {t('developerPortal.title')}
-        </h1>
-        <p className="text-muted text-sm mt-1">{t('developerPortal.description')}</p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('developerPortal.title')}
+        subtitle={t('developerPortal.description')}
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-edge">
@@ -581,9 +579,9 @@ export function DeveloperPortalPage() {
                     {t('developerPortal.playground.result.responseBody')}
                   </h3>
                   <Badge
-                    variant={playResult.responseStatusCode < 400 ? 'success' : 'danger'}
+                    variant={(playResult.responseStatusCode ?? playResult.statusCode) < 400 ? 'success' : 'danger'}
                   >
-                    {t('developerPortal.playground.result.statusCode')}: {playResult.responseStatusCode}
+                    {t('developerPortal.playground.result.statusCode')}: {playResult.responseStatusCode ?? playResult.statusCode}
                   </Badge>
                 </div>
               </CardHeader>
@@ -597,7 +595,7 @@ export function DeveloperPortalPage() {
                   </span>
                   <span>
                     {t('developerPortal.playground.result.executedAt')}:{' '}
-                    {new Date(playResult.executedAt).toLocaleString()}
+                    {playResult.executedAt ? new Date(playResult.executedAt).toLocaleString() : '-'}
                   </span>
                 </div>
               </CardBody>
@@ -651,8 +649,8 @@ export function DeveloperPortalPage() {
                             {h.requestPath}
                           </td>
                           <td className="py-2 px-3">
-                            <Badge variant={h.responseStatusCode < 400 ? 'success' : 'danger'}>
-                              {h.responseStatusCode}
+                            <Badge variant={(h.responseStatusCode ?? h.statusCode) < 400 ? 'success' : 'danger'}>
+                              {h.responseStatusCode ?? h.statusCode}
                             </Badge>
                           </td>
                           <td className="py-2 px-3 text-muted">{h.durationMs}ms</td>
@@ -722,7 +720,7 @@ export function DeveloperPortalPage() {
                 ))}
               </div>
 
-              {analyticsQuery.data.topSearches.length > 0 && (
+              {(analyticsQuery.data.topSearches ?? []).length > 0 && (
                 <Card>
                   <CardHeader>
                     <h3 className="font-semibold text-heading">
@@ -738,9 +736,9 @@ export function DeveloperPortalPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {analyticsQuery.data.topSearches.map((s) => (
-                          <tr key={s.query} className="border-b border-edge/50">
-                            <td className="py-2 px-3 text-body">{s.query}</td>
+                        {(analyticsQuery.data.topSearches ?? []).map((s) => (
+                          <tr key={s.term} className="border-b border-edge/50">
+                            <td className="py-2 px-3 text-body">{s.term}</td>
                             <td className="py-2 px-3 text-muted">{s.count}</td>
                           </tr>
                         ))}
@@ -750,7 +748,7 @@ export function DeveloperPortalPage() {
                 </Card>
               )}
 
-              {analyticsQuery.data.topSearches.length === 0 && (
+              {(analyticsQuery.data.topSearches ?? []).length === 0 && (
                 <p className="text-muted text-sm">{t('developerPortal.analytics.noData')}</p>
               )}
             </>
@@ -989,6 +987,6 @@ export function DeveloperPortalPage() {
           </Card>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -9,6 +9,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 
 /**
@@ -130,7 +131,7 @@ const mockPersonas = [
 
 function trendIcon(depth: number) {
   if (depth >= 80) return <TrendingUp size={14} className="text-emerald-400" />;
-  if (depth >= 60) return <Minus size={14} className="text-zinc-400" />;
+  if (depth >= 60) return <Minus size={14} className="text-muted" />;
   return <TrendingDown size={14} className="text-amber-400" />;
 }
 
@@ -151,17 +152,16 @@ export function PersonaUsagePage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('analytics.persona.title')}</h1>
-        <p className="text-zinc-400 mt-1">{t('analytics.persona.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('analytics.persona.title')}
+        subtitle={t('analytics.persona.subtitle')}
+      />
 
       {/* Persona filter */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setSelectedPersona(null)}
-          className={`px-3 py-1.5 rounded-lg text-sm transition ${!selectedPersona ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm transition ${!selectedPersona ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-elevated text-muted border border-edge hover:border-edge-strong'}`}
         >
           {t('analytics.persona.all')}
         </button>
@@ -169,7 +169,7 @@ export function PersonaUsagePage() {
           <button
             key={p.persona}
             onClick={() => setSelectedPersona(p.persona)}
-            className={`px-3 py-1.5 rounded-lg text-sm transition ${selectedPersona === p.persona ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'}`}
+            className={`px-3 py-1.5 rounded-lg text-sm transition ${selectedPersona === p.persona ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-elevated text-muted border border-edge hover:border-edge-strong'}`}
           >
             {t(`analytics.persona.role.${p.persona}`)}
           </button>
@@ -184,12 +184,12 @@ export function PersonaUsagePage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Users size={18} className="text-accent" />
-                  <span className="font-semibold text-white">{t(`analytics.persona.role.${p.persona}`)}</span>
+                  <span className="font-semibold text-heading">{t(`analytics.persona.role.${p.persona}`)}</span>
                   {trendIcon(p.adoptionDepth)}
                 </div>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="text-zinc-400">{p.activeUsers} {t('analytics.users')}</span>
-                  <span className="text-zinc-400">{p.totalActions.toLocaleString()} {t('analytics.actions')}</span>
+                  <span className="text-muted">{p.activeUsers} {t('analytics.users')}</span>
+                  <span className="text-muted">{p.totalActions.toLocaleString()} {t('analytics.actions')}</span>
                   <span className={`font-medium ${depthColor(p.adoptionDepth)}`}>{p.adoptionDepth}% {t('analytics.persona.depth')}</span>
                 </div>
               </div>
@@ -198,19 +198,19 @@ export function PersonaUsagePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Top modules */}
                 <div>
-                  <h4 className="text-xs text-zinc-500 uppercase tracking-wide mb-2">{t('analytics.persona.topModules')}</h4>
+                  <h4 className="text-xs text-faded uppercase tracking-wide mb-2">{t('analytics.persona.topModules')}</h4>
                   <div className="space-y-2">
                     {p.topModules.map((mod) => (
                       <div key={mod.module} className="flex items-center justify-between">
-                        <span className="text-sm text-zinc-300">{mod.module}</span>
+                        <span className="text-sm text-body">{mod.module}</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-16 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                          <div className="w-16 h-1.5 rounded-full bg-elevated overflow-hidden">
                             <div
                               className="h-full rounded-full bg-accent transition-all"
                               style={{ width: `${mod.adoptionPercent}%` }}
                             />
                           </div>
-                          <span className="text-xs text-zinc-500">{mod.adoptionPercent}%</span>
+                          <span className="text-xs text-faded">{mod.adoptionPercent}%</span>
                         </div>
                       </div>
                     ))}
@@ -219,12 +219,12 @@ export function PersonaUsagePage() {
 
                 {/* Milestones reached */}
                 <div>
-                  <h4 className="text-xs text-zinc-500 uppercase tracking-wide mb-2">{t('analytics.persona.milestonesReached')}</h4>
+                  <h4 className="text-xs text-faded uppercase tracking-wide mb-2">{t('analytics.persona.milestonesReached')}</h4>
                   <div className="space-y-1">
                     {p.milestones.map((m) => (
                       <div key={m} className="flex items-center gap-2">
                         <CheckCircle size={14} className="text-emerald-400" />
-                        <span className="text-sm text-zinc-300">{t(`analytics.milestone.${m}`)}</span>
+                        <span className="text-sm text-body">{t(`analytics.milestone.${m}`)}</span>
                       </div>
                     ))}
                   </div>
@@ -232,12 +232,12 @@ export function PersonaUsagePage() {
 
                 {/* Friction points */}
                 <div>
-                  <h4 className="text-xs text-zinc-500 uppercase tracking-wide mb-2">{t('analytics.persona.frictionPoints')}</h4>
+                  <h4 className="text-xs text-faded uppercase tracking-wide mb-2">{t('analytics.persona.frictionPoints')}</h4>
                   <div className="space-y-1">
                     {p.frictionPoints.map((f) => (
                       <div key={f} className="flex items-center gap-2">
                         <AlertCircle size={14} className="text-amber-400" />
-                        <span className="text-sm text-zinc-300">{f.replace(/_/g, ' ')}</span>
+                        <span className="text-sm text-body">{f.replace(/_/g, ' ')}</span>
                       </div>
                     ))}
                   </div>

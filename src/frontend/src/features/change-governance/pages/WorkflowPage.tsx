@@ -174,13 +174,17 @@ export function WorkflowPage() {
                             variant="danger"
                             disabled={!rejectReason.trim()}
                             loading={rejectMutation.isPending}
-                            onClick={() =>
+                            onClick={() => {
+                              if (!rejectTarget) {
+                                return;
+                              }
+
                               rejectMutation.mutate({
                                 instanceId: rejectTarget.instanceId,
                                 stageId: rejectTarget.stageId,
                                 reason: rejectReason,
-                              })
-                            }
+                              });
+                            }}
                           >
                             {t('workflow.confirmReject')}
                           </Button>
@@ -262,7 +266,7 @@ export function WorkflowPage() {
                 {instances.items.map((inst) => (
                   <tr key={inst.id} className="hover:bg-hover transition-colors">
                     <td className="px-6 py-3 font-mono text-xs text-body">{inst.id.slice(0, 8)}…</td>
-                    <td className="px-6 py-3 font-mono text-xs text-body">{inst.releaseId.slice(0, 8)}…</td>
+                    <td className="px-6 py-3 font-mono text-xs text-body">{(inst.releaseId ?? '—').slice(0, 8)}{inst.releaseId ? '…' : ''}</td>
                     <td className="px-6 py-3">
                       <Badge variant={statusVariant(inst.status)}>{inst.status}</Badge>
                     </td>

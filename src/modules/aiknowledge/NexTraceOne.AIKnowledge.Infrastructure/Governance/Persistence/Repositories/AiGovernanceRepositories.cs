@@ -108,16 +108,14 @@ internal sealed class AiAssistantConversationRepository(AiGovernanceDbContext co
             query = query.Where(c => c.IsActive == isActive.Value);
 
         return await query
-            .OrderByDescending(c => c.LastMessageAt)
+            .OrderByDescending(c => c.LastMessageAt ?? c.CreatedAt)
+            .ThenByDescending(c => c.CreatedAt)
             .Take(pageSize)
             .ToListAsync(ct);
     }
 
     public async Task<AiAssistantConversation?> GetByIdAsync(AiAssistantConversationId id, CancellationToken ct)
-    {
-        var conversations = await context.Conversations.ToListAsync(ct);
-        return conversations.SingleOrDefault(c => c.Id.Value == id.Value);
-    }
+        => await context.Conversations.SingleOrDefaultAsync(c => c.Id == id, ct);
 
     public async Task AddAsync(AiAssistantConversation conversation, CancellationToken ct)
     {
@@ -153,11 +151,13 @@ internal sealed class AiMessageRepository(AiGovernanceDbContext context) : IAiMe
         var messages = await context.Messages
             .Where(m => m.ConversationId == conversationId)
             .OrderByDescending(m => m.Timestamp)
+            .ThenByDescending(m => m.CreatedAt)
             .Take(pageSize)
             .ToListAsync(ct);
 
         return messages
             .OrderBy(m => m.Timestamp)
+            .ThenBy(m => m.CreatedAt)
             .ToList();
     }
 

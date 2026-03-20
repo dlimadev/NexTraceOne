@@ -49,6 +49,7 @@ public static class SendAssistantMessage
         Guid? ServiceId,
         Guid? ContractId,
         Guid? IncidentId,
+        Guid? ChangeId,
         Guid? TeamId,
         Guid? DomainId,
         string? ContextBundle = null) : ICommand<Response>;
@@ -116,6 +117,12 @@ public static class SendAssistantMessage
             {
                 var convId = AiAssistantConversationId.From(request.ConversationId.Value);
                 conversation = await conversationRepository.GetByIdAsync(convId, cancellationToken);
+
+                if (conversation is null)
+                    return AiGovernanceErrors.ConversationNotFound(request.ConversationId.Value.ToString());
+
+                if (!IsConversationOwner(conversation, currentUser))
+                    return AiGovernanceErrors.ConversationAccessDenied(request.ConversationId.Value.ToString());
             }
 
             if (conversation is null)
@@ -128,10 +135,11 @@ public static class SendAssistantMessage
                     clientType,
                     request.ContextScope ?? string.Empty,
                     ResolveConversationOwner(currentUser),
-                    request.ServiceId,
-                    request.ContractId,
-                    request.IncidentId,
-                    request.TeamId);
+                    serviceId: request.ServiceId,
+                    contractId: request.ContractId,
+                    incidentId: request.IncidentId,
+                    teamId: request.TeamId,
+                    changeId: request.ChangeId);
                 await conversationRepository.AddAsync(conversation, cancellationToken);
             }
 
@@ -142,8 +150,8 @@ public static class SendAssistantMessage
 
             // ── Persistir mensagem do utilizador ──────────────────────────
             var userMessage = AiMessage.UserMessage(conversationId, request.Message, now);
-            await messageRepository.AddAsync(userMessage, cancellationToken);
             conversation.RecordMessage(null, now);
+            await messageRepository.AddAsync(userMessage, cancellationToken);
 
             // ── Classificar caso de uso ──────────────────────────────────
             var useCaseType = ClassifyUseCase(request.Message, request.ContextScope);
@@ -279,6 +287,7 @@ public static class SendAssistantMessage
             }
 
             // ── Persistir mensagem do assistente ──────────────────────────
+            conversation.RecordMessage(selectedModel, now);
             var assistantMsg = usedDeterministicFallback
                 ? AiMessage.DegradedAssistantMessage(
                     conversationId,
@@ -286,6 +295,10 @@ public static class SendAssistantMessage
                     string.IsNullOrWhiteSpace(selectedModel) ? DegradedModelName : selectedModel,
                     string.IsNullOrWhiteSpace(selectedProvider) ? DegradedProviderId : selectedProvider,
                     promptTokens,
+                    completionTokens,
+                    applicableStrategy?.Name,
+                    string.Join(",", groundingSources),
+                    string.Join(",", contextRefs),
                     correlationId,
                     now)
                 : AiMessage.AssistantMessage(
@@ -302,8 +315,6 @@ public static class SendAssistantMessage
                     correlationId,
                     now);
             await messageRepository.AddAsync(assistantMsg, cancellationToken);
-            conversation.RecordMessage(selectedModel, now);
-
             await conversationRepository.UpdateAsync(conversation, cancellationToken);
 
             // ── Registar auditoria de uso ─────────────────────────────────
@@ -330,7 +341,7 @@ public static class SendAssistantMessage
             return new Response(
                 conversationId,
                 assistantMsg.Id.Value,
-                grounded,
+                assistantMsg.GetDisplayContent(),
                 selectedModel,
                 selectedProvider,
                 IsInternalModel: isInternal,
@@ -341,7 +352,7 @@ public static class SendAssistantMessage
                 ContextReferences: contextRefs,
                 CorrelationId: correlationId,
                 UseCaseType: useCaseType.ToString(),
-                RoutingPath: routingPath.ToString(),
+                RoutingPath: usedDeterministicFallback ? "ProviderUnavailableFallback" : routingPath.ToString(),
                 ConfidenceLevel: usedDeterministicFallback ? AIConfidenceLevel.Low.ToString() : (contextBundle is not null ? "High" : confidenceLevel),
                 CostClass: costClass,
                 RoutingRationale: usedDeterministicFallback
@@ -405,8 +416,7 @@ public static class SendAssistantMessage
             if (request.ServiceId.HasValue) lines.Add($"ServiceId: {request.ServiceId.Value}");
             if (request.ContractId.HasValue) lines.Add($"ContractId: {request.ContractId.Value}");
             if (request.IncidentId.HasValue) lines.Add($"IncidentId: {request.IncidentId.Value}");
-
-            // changeId ainda não faz parte do contrato deste comando; mantemos cobertura para os demais domínios.
+            if (request.ChangeId.HasValue) lines.Add($"ChangeId: {request.ChangeId.Value}");
             if (request.TeamId.HasValue) lines.Add($"TeamId: {request.TeamId.Value}");
             if (request.DomainId.HasValue) lines.Add($"DomainId: {request.DomainId.Value}");
 
@@ -567,8 +577,21 @@ public static class SendAssistantMessage
             if (request.ServiceId.HasValue) refs.Add($"service:{request.ServiceId.Value}");
             if (request.ContractId.HasValue) refs.Add($"contract:{request.ContractId.Value}");
             if (request.IncidentId.HasValue) refs.Add($"incident:{request.IncidentId.Value}");
+            if (request.ChangeId.HasValue) refs.Add($"change:{request.ChangeId.Value}");
             if (request.TeamId.HasValue) refs.Add($"team:{request.TeamId.Value}");
             if (request.DomainId.HasValue) refs.Add($"domain:{request.DomainId.Value}");
+
+            if (!string.IsNullOrWhiteSpace(request.ContextScope))
+            {
+                var scopes = request.ContextScope.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var scope in scopes)
+                {
+                    var scopeRef = $"scope:{scope.ToLowerInvariant()}";
+                    if (!refs.Contains(scopeRef))
+                        refs.Add(scopeRef);
+                }
+            }
+
             return refs;
         }
 

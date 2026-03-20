@@ -7,22 +7,97 @@
  * autenticação e refresh token.
  */
 import client from '../../../api/client';
-import type {
-  PagedList,
-  CatalogItem,
-  ApiDetail,
-  ApiHealthInfo,
-  TimelineEntry,
-  ApiConsumer,
-  Subscription,
-  PlaygroundResult,
-  PlaygroundHistoryItem,
-  CodeGenerationResult,
-  PortalAnalytics,
-  SubscriptionLevel,
-  NotificationChannel,
-  GenerationType,
-} from '../../../types';
+import type { PagedList } from '../../../types';
+
+interface CatalogItem {
+  apiAssetId: string;
+  name: string;
+  apiName?: string;
+  displayName?: string;
+  description?: string;
+  version?: string;
+  healthStatus?: string;
+  ownerServiceName?: string;
+}
+
+interface ApiDetail {
+  apiAssetId: string;
+  name: string;
+  description?: string;
+  version?: string;
+}
+
+interface ApiHealthInfo {
+  status: string;
+  score?: number;
+  lastCheckedAt?: string;
+}
+
+interface TimelineEntry {
+  id: string;
+  title: string;
+  description?: string;
+  occurredAt: string;
+}
+
+interface ApiConsumer {
+  consumerId: string;
+  consumerName: string;
+  consumerType?: string;
+}
+
+type SubscriptionLevel = 'BreakingChangesOnly' | 'AllChanges' | 'DeprecationNotices' | 'SecurityAdvisories';
+type NotificationChannel = 'Email' | 'Webhook' | 'Teams' | 'Slack';
+type GenerationType = 'ClientSdk' | 'ServerStub' | 'Example';
+
+interface Subscription {
+  id: string;
+  apiAssetId: string;
+  apiName: string;
+  subscriberEmail: string;
+  consumerServiceName: string;
+  level: SubscriptionLevel;
+  channel: NotificationChannel;
+  isActive?: boolean;
+}
+
+interface PlaygroundResult {
+  statusCode: number;
+  responseStatusCode?: number;
+  responseBody: string;
+  durationMs: number;
+  executedAt?: string;
+}
+
+interface PlaygroundHistoryItem {
+  id: string;
+  sessionId?: string;
+  apiAssetId: string;
+  apiName?: string;
+  httpMethod?: string;
+  requestPath: string;
+  executedAt: string;
+  statusCode: number;
+  responseStatusCode?: number;
+  durationMs?: number;
+}
+
+interface CodeGenerationResult {
+  content: string;
+  fileName: string;
+  language: string;
+}
+
+interface PortalAnalytics {
+  totalExecutions: number;
+  totalSubscriptions: number;
+  totalSearches?: number;
+  totalApiViews?: number;
+  totalPlaygroundExecutions?: number;
+  totalCodeGenerations?: number;
+  popularApis: Array<{ apiAssetId: string; count: number }>;
+  topSearches?: Array<{ term: string; count: number }>;
+}
 
 export const developerPortalApi = {
   // ── Catálogo ────────────────────────────────────────────────────────────────

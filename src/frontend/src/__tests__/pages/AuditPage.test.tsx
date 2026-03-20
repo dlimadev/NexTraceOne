@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { AuditPage } from '../../features/audit-compliance/pages/AuditPage';
-import type { AuditEvent, PagedList } from '../../types';
 
 vi.mock('../../features/audit-compliance/api', () => ({
   auditApi: {
@@ -15,17 +14,16 @@ vi.mock('../../features/audit-compliance/api', () => ({
 
 import { auditApi } from '../../features/audit-compliance/api';
 
-const mockEvents: PagedList<AuditEvent> = {
+const mockEvents = {
   items: [
     {
       id: 'evt-1',
       eventType: 'ReleaseCreated',
       aggregateId: 'rel-001',
       aggregateType: 'Release',
-      actorId: 'usr-001',
       actorEmail: 'admin@acme.com',
-      payload: {},
-      hash: 'abc123def456789012345678901234567890123456789012',
+      payload: { sourceModule: 'ChangeGovernance' },
+      hash: 'evt-1',
       occurredAt: '2024-01-15T10:00:00Z',
     },
     {
@@ -33,11 +31,9 @@ const mockEvents: PagedList<AuditEvent> = {
       eventType: 'UserLoggedIn',
       aggregateId: 'ses-001',
       aggregateType: 'Session',
-      actorId: 'usr-002',
       actorEmail: 'dev@acme.com',
-      payload: {},
-      hash: 'def456ghi789012345678901234567890123456789012345',
-      previousHash: 'abc123def456789012345678901234567890123456789012',
+      payload: { sourceModule: 'IdentityAccess' },
+      hash: 'evt-2',
       occurredAt: '2024-01-15T09:00:00Z',
     },
   ],
@@ -80,6 +76,7 @@ describe('AuditPage', () => {
       expect(screen.getByText('ReleaseCreated')).toBeInTheDocument();
       expect(screen.getByText('UserLoggedIn')).toBeInTheDocument();
       expect(screen.getByText('admin@acme.com')).toBeInTheDocument();
+      expect(screen.getAllByText(/changegovernance/i).length).toBeGreaterThan(0);
     });
   });
 
@@ -130,7 +127,7 @@ describe('AuditPage', () => {
     });
     vi.mocked(auditApi.verifyIntegrity).mockResolvedValue({
       valid: false,
-      message: 'Integrity violation detected at event evt-5.',
+      message: 'Integrity violation detected. 1 issue(s) found.',
     });
     renderAudit();
     await userEvent.click(screen.getByRole('button', { name: /verify integrity/i }));

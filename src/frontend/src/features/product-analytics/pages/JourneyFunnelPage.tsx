@@ -6,6 +6,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 
 /**
@@ -114,17 +115,16 @@ export function JourneyFunnelPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('analytics.journey.title')}</h1>
-        <p className="text-zinc-400 mt-1">{t('analytics.journey.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('analytics.journey.title')}
+        subtitle={t('analytics.journey.subtitle')}
+      />
 
       {/* Journey filter */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setSelectedJourney(null)}
-          className={`px-3 py-1.5 rounded-lg text-sm transition ${!selectedJourney ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'}`}
+          className={`px-3 py-1.5 rounded-lg text-sm transition ${!selectedJourney ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-elevated text-muted border border-edge hover:border-edge-strong'}`}
         >
           {t('analytics.journey.all')}
         </button>
@@ -132,7 +132,7 @@ export function JourneyFunnelPage() {
           <button
             key={j.journeyId}
             onClick={() => setSelectedJourney(j.journeyId)}
-            className={`px-3 py-1.5 rounded-lg text-sm transition ${selectedJourney === j.journeyId ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'}`}
+            className={`px-3 py-1.5 rounded-lg text-sm transition ${selectedJourney === j.journeyId ? 'bg-accent/20 text-accent border border-accent/40' : 'bg-elevated text-muted border border-edge hover:border-edge-strong'}`}
           >
             {j.journeyName}
           </button>
@@ -145,12 +145,12 @@ export function JourneyFunnelPage() {
           <Card key={j.journeyId}>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-white">{j.journeyName}</span>
+                <span className="font-semibold text-heading">{j.journeyName}</span>
                 <div className="flex items-center gap-4 text-sm">
                   <span className={`font-medium ${completionColor(j.completionRate)}`}>
                     {j.completionRate}% {t('analytics.journey.completion')}
                   </span>
-                  <span className="text-zinc-400 flex items-center gap-1">
+                  <span className="text-muted flex items-center gap-1">
                     <Clock size={14} />
                     {j.avgDurationMinutes} {t('analytics.minutes')}
                   </span>
@@ -169,17 +169,17 @@ export function JourneyFunnelPage() {
                     <div key={step.stepId}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          {idx > 0 && <ArrowRight size={12} className="text-zinc-600" />}
-                          <span className="text-sm text-zinc-300">{step.stepName}</span>
+                          {idx > 0 && <ArrowRight size={12} className="text-faded" />}
+                          <span className="text-sm text-body">{step.stepName}</span>
                         </div>
                         <div className="flex items-center gap-3 text-sm">
-                          <span className="text-white font-medium">{step.completionPercent}%</span>
+                          <span className="text-heading font-medium">{step.completionPercent}%</span>
                           {dropOff > 5 && (
                             <span className="text-red-400 text-xs">-{dropOff.toFixed(1)}%</span>
                           )}
                         </div>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-elevated overflow-hidden">
                         <div
                           className={`h-full rounded-full ${barColor(step.completionPercent)} transition-all`}
                           style={{ width: `${step.completionPercent}%` }}

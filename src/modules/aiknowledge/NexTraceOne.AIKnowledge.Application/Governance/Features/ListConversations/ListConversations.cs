@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -19,6 +20,10 @@ public static class ListConversations
             ? currentUser.Email
             : currentUser.Id;
 
+    private static bool IsCurrentUserScope(string requestedUserId, ICurrentUser currentUser)
+        => string.Equals(requestedUserId, currentUser.Id, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(requestedUserId, currentUser.Email, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Query de listagem de conversas do assistente de IA.</summary>
     public sealed record Query(
         string? UserId,
@@ -33,9 +38,10 @@ public static class ListConversations
         {
             Guard.Against.Null(request);
 
-            var effectiveUserId = string.IsNullOrWhiteSpace(request.UserId)
-                ? ResolveConversationOwner(currentUser)
-                : request.UserId;
+            if (!string.IsNullOrWhiteSpace(request.UserId) && !IsCurrentUserScope(request.UserId, currentUser))
+                return AiGovernanceErrors.ConversationAccessDenied(request.UserId);
+
+            var effectiveUserId = ResolveConversationOwner(currentUser);
 
             var conversations = await conversationRepository.ListAsync(
                 effectiveUserId,

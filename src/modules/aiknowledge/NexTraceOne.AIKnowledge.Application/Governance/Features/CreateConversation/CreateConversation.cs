@@ -33,6 +33,7 @@ public static class CreateConversation
         Guid? ServiceId,
         Guid? ContractId,
         Guid? IncidentId,
+        Guid? ChangeId,
         Guid? TeamId) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de criação de conversa.</summary>
@@ -63,10 +64,11 @@ public static class CreateConversation
                 clientType,
                 request.DefaultContextScope ?? string.Empty,
                 ResolveConversationOwner(currentUser),
-                request.ServiceId,
-                request.ContractId,
-                request.IncidentId,
-                request.TeamId);
+                serviceId: request.ServiceId,
+                contractId: request.ContractId,
+                incidentId: request.IncidentId,
+                teamId: request.TeamId,
+                changeId: request.ChangeId);
 
             if (!string.IsNullOrWhiteSpace(request.Tags))
                 conversation.UpdateMetadata(request.Title, request.Tags);
@@ -79,7 +81,8 @@ public static class CreateConversation
                 conversation.Persona,
                 conversation.ClientType.ToString(),
                 conversation.DefaultContextScope,
-                conversation.IsActive);
+                conversation.IsActive,
+                conversation.ChangeId);
         }
     }
 
@@ -90,5 +93,6 @@ public static class CreateConversation
         string Persona,
         string ClientType,
         string DefaultContextScope,
-        bool IsActive);
+        bool IsActive,
+        Guid? ChangeId);
 }

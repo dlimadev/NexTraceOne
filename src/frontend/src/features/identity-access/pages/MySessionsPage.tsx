@@ -10,6 +10,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { ActiveSession } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de gestão de sessões ativas do usuário autenticado.
@@ -68,12 +69,10 @@ export function MySessionsPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('sessions.title')}</h1>
-          <p className="text-muted mt-1">{t('sessions.subtitle')}</p>
-        </div>
-      </div>
+      <PageHeader
+        title={t('sessions.title')}
+        subtitle={t('sessions.subtitle')}
+      />
 
       {/* Diálogo de confirmação inline para revogação */}
       {revokeConfirmId && (

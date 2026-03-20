@@ -10,8 +10,6 @@ namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.Lis
 /// Feature: ListIncidents — lista incidentes com filtros contextualizados.
 /// Retorna resumo de incidentes com correlação, severidade, status, serviço e mitigação.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
-///
-/// Nota: nesta fase os dados são simulados até integração completa entre módulos.
 /// </summary>
 public static class ListIncidents
 {

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 
@@ -17,7 +18,7 @@ public sealed class CatalogGraphDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, ICatalogGraphUnitOfWork
 {
     /// <summary>Ativos de API persistidos do módulo Catalog Graph.</summary>
     public DbSet<ApiAsset> ApiAssets => Set<ApiAsset>();

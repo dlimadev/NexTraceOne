@@ -20,6 +20,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api';
 import type { ChangeLevel, DeploymentState } from '../../../types';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { ReleasesIntelligenceTab } from '../components/ReleasesIntelligenceTab';
 
 // ─── Constantes auxiliares ───────────────────────────────────────────────────
@@ -145,17 +146,16 @@ export function ReleasesPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('releases.title')}</h1>
-          <p className="text-muted mt-1">{t('releases.subtitle')}</p>
-        </div>
-        <Button onClick={() => { setActiveTab('overview'); setShowForm((v) => !v); }}>
-          <Plus size={16} />
-          {t('releases.notifyDeployment')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('releases.title')}
+        subtitle={t('releases.subtitle')}
+        actions={
+          <Button onClick={() => { setActiveTab('overview'); setShowForm((v) => !v); }}>
+            <Plus size={16} />
+            {t('releases.notifyDeployment')}
+          </Button>
+        }
+      />
 
       {/* Tab Navigation */}
       <div className="flex gap-1 mb-6 border-b border-edge">
@@ -318,8 +318,8 @@ export function ReleasesPage() {
                           </Badge>
                         </td>
                         <td className="px-6 py-3">
-                          <Badge variant={stateVariant(r.deploymentState)}>
-                            {r.deploymentState}
+                          <Badge variant={stateVariant(r.deploymentState ?? r.status)}>
+                            {r.deploymentState ?? r.status}
                           </Badge>
                         </td>
                         <td className="px-6 py-3 text-body">

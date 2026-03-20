@@ -1,5 +1,5 @@
 import type { ContractVersionDetail, ContractLifecycleState } from '../types';
-import type { ApprovalState, ApprovalChecklistItem, PolicyCheckResult } from '../types/domain';
+import type { ApprovalState, PolicyCheckResult } from '../types/domain';
 import type { StudioActivityItem, StudioContract, StudioRelationship } from './studioTypes';
 
 function mapLifecycleToApprovalState(lifecycleState: ContractLifecycleState): ApprovalState | undefined {
@@ -15,30 +15,6 @@ function mapLifecycleToApprovalState(lifecycleState: ContractLifecycleState): Ap
     default:
       return undefined;
   }
-}
-
-function buildApprovalChecklist(detail: ContractVersionDetail): ApprovalChecklistItem[] {
-  if (detail.lifecycleState === 'InReview') {
-    return [
-      {
-        role: 'TechLead',
-        state: 'InReview',
-      },
-    ];
-  }
-
-  if (detail.lifecycleState === 'Approved' || detail.lifecycleState === 'Locked') {
-    return [
-      {
-        role: 'TechLead',
-        state: 'Approved',
-        reviewedBy: detail.signedBy,
-        reviewedAt: detail.signedAt,
-      },
-    ];
-  }
-
-  return [];
 }
 
 function buildPolicyChecks(detail: ContractVersionDetail): PolicyCheckResult[] {
@@ -102,7 +78,6 @@ function buildConsumers(detail: ContractVersionDetail): StudioRelationship[] {
 }
 
 export function toStudioContract(detail: ContractVersionDetail): StudioContract {
-  const approvalChecklist = buildApprovalChecklist(detail);
   const policyChecks = buildPolicyChecks(detail);
 
   return {
@@ -139,10 +114,10 @@ export function toStudioContract(detail: ContractVersionDetail): StudioContract 
     externalLinks: [detail.documentationUrl, detail.repositoryUrl].filter((value): value is string => !!value),
     approvalState: mapLifecycleToApprovalState(detail.lifecycleState),
     complianceScore: null,
-    approvalChecklist,
+    approvalChecklist: [],
     policyChecks,
     importedFrom: detail.importedFrom,
-    provenance: detail.provenance?.origin,
+    provenance: undefined,
     deprecationNotice: detail.deprecationNotice,
     sunsetDate: detail.sunsetDate,
     createdAt: detail.createdAt,

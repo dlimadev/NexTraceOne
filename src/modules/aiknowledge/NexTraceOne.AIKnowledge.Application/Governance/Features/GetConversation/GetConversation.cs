@@ -41,6 +41,9 @@ public static class GetConversation
             if (conversation is null)
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
+            if (!IsConversationOwner(conversation, currentUser))
+                return AiGovernanceErrors.ConversationAccessDenied(request.ConversationId.ToString());
+
             var messages = await messageRepository.ListByConversationAsync(
                 request.ConversationId,
                 request.MessagePageSize,
@@ -49,7 +52,7 @@ public static class GetConversation
             var messageItems = messages.Select(m => new MessageItem(
                 m.Id.Value,
                 m.Role,
-                m.Content,
+                m.GetDisplayContent(),
                 m.ModelName,
                 m.Provider,
                 m.IsInternalModel,
@@ -79,6 +82,7 @@ public static class GetConversation
                 conversation.ServiceId,
                 conversation.ContractId,
                 conversation.IncidentId,
+                conversation.ChangeId,
                 conversation.TeamId,
                 messageItems,
                 messageItems.Count);
@@ -101,6 +105,7 @@ public static class GetConversation
         Guid? ServiceId,
         Guid? ContractId,
         Guid? IncidentId,
+        Guid? ChangeId,
         Guid? TeamId,
         IReadOnlyList<MessageItem> Messages,
         int ReturnedMessageCount);

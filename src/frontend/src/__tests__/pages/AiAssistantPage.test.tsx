@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -10,11 +10,19 @@ beforeAll(() => {
   Element.prototype.scrollIntoView = vi.fn();
 });
 
-const listConversationsMock = vi.fn();
-const createConversationMock = vi.fn();
-const listMessagesMock = vi.fn();
-const sendMessageMock = vi.fn();
-const checkProvidersHealthMock = vi.fn();
+const {
+  listConversationsMock,
+  createConversationMock,
+  getConversationMock,
+  sendMessageMock,
+  checkProvidersHealthMock,
+} = vi.hoisted(() => ({
+  listConversationsMock: vi.fn(),
+  createConversationMock: vi.fn(),
+  getConversationMock: vi.fn(),
+  sendMessageMock: vi.fn(),
+  checkProvidersHealthMock: vi.fn(),
+}));
 
 vi.mock('../../contexts/PersonaContext', () => ({
   usePersona: vi.fn().mockReturnValue({
@@ -36,7 +44,8 @@ vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
     sendMessage: sendMessageMock,
     listConversations: listConversationsMock,
     createConversation: createConversationMock,
-    listMessages: listMessagesMock,
+    getConversation: getConversationMock,
+    listMessages: vi.fn(),
     listSuggestedPrompts: vi.fn().mockResolvedValue({ items: [] }),
     checkProvidersHealth: checkProvidersHealthMock,
     chat: vi.fn().mockRejectedValue(new Error('API not available')),
@@ -74,7 +83,20 @@ describe('AiAssistantPage', () => {
       defaultContextScope: 'services,contracts',
       isActive: true,
     });
-    listMessagesMock.mockResolvedValue({ items: [], totalCount: 0 });
+    getConversationMock.mockResolvedValue({
+      conversationId: 'test-conv-1',
+      title: 'New Conversation',
+      persona: 'Engineer',
+      clientType: 'Web',
+      defaultContextScope: 'services,contracts',
+      lastModelUsed: null,
+      createdBy: 'user-1',
+      messageCount: 0,
+      tags: '',
+      isActive: true,
+      lastMessageAt: null,
+      messages: [],
+    });
     sendMessageMock.mockRejectedValue(new Error('API not available'));
     checkProvidersHealthMock.mockResolvedValue({ allHealthy: true, items: [] });
   });
@@ -128,8 +150,19 @@ describe('AiAssistantPage', () => {
       }],
       totalCount: 1,
     });
-    listMessagesMock.mockResolvedValue({
-      items: [{
+    getConversationMock.mockResolvedValue({
+      conversationId: 'conv-persisted',
+      title: 'Persisted conversation',
+      persona: 'Engineer',
+      clientType: 'Web',
+      defaultContextScope: 'services',
+      lastModelUsed: 'deepseek-r1:1.5b',
+      createdBy: 'user-1',
+      messageCount: 2,
+      tags: '',
+      isActive: true,
+      lastMessageAt: '2026-03-20T10:00:00Z',
+      messages: [{
         messageId: 'msg-1',
         conversationId: 'conv-persisted',
         role: 'assistant',
@@ -148,12 +181,100 @@ describe('AiAssistantPage', () => {
         isDegraded: false,
         degradedReason: null,
       }],
-      totalCount: 1,
     });
 
     renderPage('/ai/assistant?conversation=conv-persisted');
 
-    await waitFor(() => expect(listMessagesMock).toHaveBeenCalledWith('conv-persisted', { pageSize: 100 }));
+    await waitFor(() => expect(getConversationMock).toHaveBeenCalledWith('conv-persisted', { messagePageSize: 100 }));
+    expect(await screen.findByText('Persisted assistant answer')).toBeVisible();
+  });
+
+  it('reopens the persisted conversation after send by reloading the backend conversation detail', async () => {
+    const user = userEvent.setup();
+
+    listConversationsMock.mockResolvedValue({
+      items: [{
+        id: 'test-conv-1',
+        title: 'Persisted conversation',
+        persona: 'Engineer',
+        clientType: 'Web',
+        defaultContextScope: 'services',
+        lastModelUsed: 'deepseek-r1:1.5b',
+        createdBy: 'user-1',
+        messageCount: 0,
+        tags: '',
+        isActive: true,
+        lastMessageAt: null,
+      }],
+      totalCount: 1,
+    });
+    getConversationMock.mockResolvedValue({
+      conversationId: 'test-conv-1',
+      title: 'Persisted conversation',
+      persona: 'Engineer',
+      clientType: 'Web',
+      defaultContextScope: 'services',
+      lastModelUsed: 'deepseek-r1:1.5b',
+      createdBy: 'user-1',
+      messageCount: 2,
+      tags: '',
+      isActive: true,
+      lastMessageAt: '2026-03-20T10:00:00Z',
+      messages: [
+        {
+          messageId: 'msg-user',
+          conversationId: 'test-conv-1',
+          role: 'user',
+          content: 'Investigate payment latency',
+          modelName: null,
+          provider: null,
+          isInternalModel: false,
+          promptTokens: 0,
+          completionTokens: 0,
+          appliedPolicyName: null,
+          groundingSources: [],
+          contextReferences: [],
+          correlationId: 'corr-user',
+          timestamp: '2026-03-20T10:00:00Z',
+          responseState: 'Completed',
+          isDegraded: false,
+          degradedReason: null,
+        },
+        {
+          messageId: 'msg-assistant',
+          conversationId: 'test-conv-1',
+          role: 'assistant',
+          content: 'Persisted assistant answer',
+          modelName: 'deepseek-r1:1.5b',
+          provider: 'ollama',
+          isInternalModel: true,
+          promptTokens: 12,
+          completionTokens: 16,
+          appliedPolicyName: null,
+          groundingSources: ['Service Catalog'],
+          contextReferences: ['service:payments'],
+          correlationId: 'corr-assistant',
+          timestamp: '2026-03-20T10:00:01Z',
+          responseState: 'Completed',
+          isDegraded: false,
+          degradedReason: null,
+        },
+      ],
+    });
+    sendMessageMock.mockResolvedValue({
+      conversationId: 'test-conv-1',
+      messageId: 'msg-assistant',
+      userMessageId: 'msg-user',
+    });
+
+    renderPage('/ai/assistant?conversation=test-conv-1');
+
+    const input = await screen.findByRole('textbox');
+    await user.type(input, 'Investigate payment latency');
+    await user.click(screen.getByRole('button', { name: /send/i }));
+
+    await waitFor(() => expect(sendMessageMock).toHaveBeenCalled());
+    await waitFor(() => expect(getConversationMock).toHaveBeenLastCalledWith('test-conv-1', { messagePageSize: 100 }));
     expect(await screen.findByText('Persisted assistant answer')).toBeVisible();
   });
 
@@ -166,6 +287,36 @@ describe('AiAssistantPage', () => {
       clientType: 'Web',
       defaultContextScope: 'services,contracts',
       isActive: true,
+    });
+    listConversationsMock.mockResolvedValue({
+      items: [{
+        id: 'test-conv-1',
+        title: 'New Conversation',
+        persona: 'Engineer',
+        clientType: 'Web',
+        defaultContextScope: 'services,contracts',
+        lastModelUsed: null,
+        createdBy: 'user-1',
+        messageCount: 0,
+        tags: '',
+        isActive: true,
+        lastMessageAt: null,
+      }],
+      totalCount: 1,
+    });
+    getConversationMock.mockResolvedValue({
+      conversationId: 'test-conv-1',
+      title: 'New Conversation',
+      persona: 'Engineer',
+      clientType: 'Web',
+      defaultContextScope: 'services,contracts',
+      lastModelUsed: null,
+      createdBy: 'user-1',
+      messageCount: 0,
+      tags: '',
+      isActive: true,
+      lastMessageAt: null,
+      messages: [],
     });
 
     renderPage();

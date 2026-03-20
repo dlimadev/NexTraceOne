@@ -9,14 +9,16 @@ import {
   FileText,
   Code,
   Settings,
-  Sparkles,
   Loader2,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { contractStudioApi } from '../api/contractStudio';
 import { PROTOCOL_COLORS, LIFECYCLE_COLORS } from '../shared/constants';
 import { cn } from '../../../lib/cn';
+import { PageContainer } from '../../../components/shell';
 import { useAuth } from '../../../contexts/AuthContext';
+import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
+import type { ServiceListItem } from '../types';
 
 const draftKeys = {
   detail: (id: string) => ['contract-drafts', 'detail', id] as const,
@@ -43,11 +45,17 @@ export function DraftStudioPage() {
   const [draftTitle, setDraftTitle] = useState<string | null>(null);
   const [draftDescription, setDraftDescription] = useState<string | null>(null);
   const [draftProposedVersion, setDraftProposedVersion] = useState<string | null>(null);
+  const [draftServiceId, setDraftServiceId] = useState<string | null>(null);
 
   const draftQuery = useQuery({
     queryKey: draftKeys.detail(draftId ?? ''),
     queryFn: () => contractStudioApi.getDraft(draftId!),
     enabled: !!draftId,
+  });
+
+  const servicesQuery = useQuery({
+    queryKey: ['catalog-services-for-contract-drafts'],
+    queryFn: () => serviceCatalogApi.listServices(),
   });
 
   const draft = draftQuery.data;
@@ -56,6 +64,8 @@ export function DraftStudioPage() {
   const title = draftTitle ?? draft?.title ?? '';
   const description = draftDescription ?? draft?.description ?? '';
   const proposedVersion = draftProposedVersion ?? draft?.proposedVersion ?? '1.0.0';
+  const serviceId = draftServiceId ?? draft?.serviceId ?? '';
+  const services = servicesQuery.data?.items ?? [];
 
   const resetOverrides = () => {
     setDraftSpecContent(null);
@@ -63,6 +73,7 @@ export function DraftStudioPage() {
     setDraftTitle(null);
     setDraftDescription(null);
     setDraftProposedVersion(null);
+    setDraftServiceId(null);
   };
 
   const saveContentMutation = useMutation({
@@ -84,6 +95,7 @@ export function DraftStudioPage() {
         title,
         description,
         proposedVersion,
+        serviceId: serviceId || undefined,
         editedBy: currentActor,
       }),
     onSuccess: async () => {
@@ -101,26 +113,30 @@ export function DraftStudioPage() {
 
   if (draftQuery.isLoading) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[50vh]">
-        <div className="flex items-center gap-2 text-muted">
-          <Loader2 size={20} className="animate-spin" />
-          <span className="text-sm">{t('common.loading', 'Loading...')}</span>
+      <PageContainer>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="flex items-center gap-2 text-muted">
+            <Loader2 size={20} className="animate-spin" />
+            <span className="text-sm">{t('common.loading', 'Loading...')}</span>
+          </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (draftQuery.isError || !draft) {
     return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-4">
-        <p className="text-sm text-danger">{t('contracts.studio.draftNotFound', 'Draft not found or failed to load.')}</p>
-        <button
-          onClick={() => navigate('/contracts')}
-          className="text-sm text-accent hover:underline"
-        >
-          {t('contracts.studio.backToCatalog', 'Back to Contracts')}
-        </button>
-      </div>
+      <PageContainer>
+        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+          <p className="text-sm text-danger">{t('contracts.studio.draftNotFound', 'Draft not found or failed to load.')}</p>
+          <button
+            onClick={() => navigate('/contracts')}
+            className="text-sm text-accent hover:underline"
+          >
+            {t('contracts.studio.backToCatalog', 'Back to Contracts')}
+          </button>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -136,7 +152,7 @@ export function DraftStudioPage() {
   return (
     <div className="flex flex-col h-full">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-edge bg-panel">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-edge bg-panel">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/contracts')}
@@ -147,11 +163,6 @@ export function DraftStudioPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base font-semibold text-heading">{draft.title}</h1>
-              {draft.isAiGenerated && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded bg-accent/15 text-accent border border-accent/25">
-                  <Sparkles size={10} /> AI
-                </span>
-              )}
             </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className={cn('inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded', PROTOCOL_COLORS[draft.protocol] ?? 'bg-muted/15 text-muted')}>
@@ -190,7 +201,7 @@ export function DraftStudioPage() {
       </div>
 
       {/* ── Tab Bar ── */}
-      <div className="flex items-center gap-1 px-6 pt-3 border-b border-edge bg-panel">
+      <div className="flex items-center gap-1 px-4 sm:px-6 pt-3 border-b border-edge bg-panel">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -303,6 +314,27 @@ export function DraftStudioPage() {
                   className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
+              <div>
+                <label className="block text-xs font-medium text-heading mb-1">
+                  {t('contracts.studio.linkedService', 'Linked Service')}
+                </label>
+                <select
+                  value={serviceId}
+                  onChange={(e) => setDraftServiceId(e.target.value)}
+                  disabled={!isEditable}
+                  className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                >
+                  <option value="">{t('contracts.studio.linkedServiceOptional', 'No linked service yet')}</option>
+                  {services.map((service: ServiceListItem) => (
+                    <option key={service.serviceId} value={service.serviceId}>
+                      {service.displayName} · {service.domain} · {service.teamName}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[10px] text-muted">
+                  {t('contracts.studio.linkedServiceHint', 'Publishing requires a real catalog link. Select a service to let Contracts create or reuse the correct API asset.')}
+                </p>
+              </div>
               <div className="pt-2 space-y-2 text-xs text-muted">
                 <p>{t('contracts.studio.contractType', 'Type')}: <span className="text-heading font-medium">{draft.contractType}</span></p>
                 <p>{t('contracts.studio.protocol', 'Protocol')}: <span className="text-heading font-medium">{draft.protocol}</span></p>
@@ -321,18 +353,16 @@ export function DraftStudioPage() {
         {/* Tab: Preview */}
         {activeTab === 'preview' && (
           <Card>
-            <CardBody>
-              {specContent ? (
-                <pre className="text-xs font-mono text-body whitespace-pre-wrap break-words leading-relaxed max-h-[70vh] overflow-y-auto">
-                  {specContent}
-                </pre>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-muted">
-                  <FileText size={32} className="mb-2 opacity-40" />
-                  <p className="text-sm">{t('contracts.studio.noContent', 'No specification content yet.')}</p>
-                  <p className="text-xs mt-1">{t('contracts.studio.noContentHint', 'Switch to the Spec tab to add content.')}</p>
-                </div>
-              )}
+            <CardBody className="space-y-4">
+              <div>
+                <h3 className="text-xs font-medium text-heading mb-1">{t('contracts.studio.preview.title', 'Preview')}</h3>
+                <p className="text-xs text-muted">
+                  {t('contracts.studio.preview.description', 'This preview reflects the persisted draft content and metadata without artificial enrichment.')}
+                </p>
+              </div>
+              <pre className="text-[11px] font-mono bg-elevated border border-edge rounded-md px-4 py-3 text-body overflow-x-auto whitespace-pre-wrap">
+                {specContent || t('contracts.studio.preview.empty', 'No specification content has been saved yet.')}
+              </pre>
             </CardBody>
           </Card>
         )}

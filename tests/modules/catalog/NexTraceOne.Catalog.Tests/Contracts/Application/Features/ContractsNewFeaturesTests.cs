@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.Services;
@@ -229,10 +230,13 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Approved);
         var repository = Substitute.For<IContractVersionRepository>();
+        var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         repository.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>())
             .Returns(contract);
+        apiAssetRepository.GetByIdAsync(Arg.Any<Catalog.Domain.Graph.Entities.ApiAssetId>(), Arg.Any<CancellationToken>())
+            .Returns((Catalog.Domain.Graph.Entities.ApiAsset?)null);
 
-        var handler = new GetContractVersionDetailFeature.Handler(repository);
+        var handler = new GetContractVersionDetailFeature.Handler(repository, apiAssetRepository);
         var result = await handler.Handle(
             new GetContractVersionDetailFeature.Query(contract.Id.Value),
             CancellationToken.None);
@@ -248,10 +252,11 @@ public sealed class ContractsNewFeaturesTests
     public async Task GetDetail_Should_ReturnNotFound_WhenMissing()
     {
         var repository = Substitute.For<IContractVersionRepository>();
+        var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         repository.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>())
             .Returns((ContractVersion?)null);
 
-        var handler = new GetContractVersionDetailFeature.Handler(repository);
+        var handler = new GetContractVersionDetailFeature.Handler(repository, apiAssetRepository);
         var result = await handler.Handle(
             new GetContractVersionDetailFeature.Query(Guid.NewGuid()),
             CancellationToken.None);

@@ -9,14 +9,10 @@ import {
   Shield,
   GitCompare,
   History,
-  BookOpen,
-  Target,
-  MessageSquare,
   CheckCircle,
   ShieldCheck,
   Users,
   Network,
-  ClipboardList,
   ScanSearch,
 } from 'lucide-react';
 import { cn } from '../../../lib/cn';
@@ -30,9 +26,6 @@ const SECTION_ICONS: Record<WorkspaceSectionId, React.ComponentType<{ size?: num
   operations: GitBranch,
   schemas: Database,
   security: Shield,
-  glossary: BookOpen,
-  useCases: Target,
-  interactions: MessageSquare,
   validation: ScanSearch,
   versioning: GitCompare,
   changelog: History,
@@ -40,7 +33,6 @@ const SECTION_ICONS: Record<WorkspaceSectionId, React.ComponentType<{ size?: num
   compliance: ShieldCheck,
   consumers: Users,
   dependencies: Network,
-  audit: ClipboardList,
 };
 
 interface WorkspaceLayoutProps {

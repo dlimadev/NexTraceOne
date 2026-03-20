@@ -5,6 +5,7 @@ import { ShieldAlert, Zap } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de Automation Workflows.
@@ -16,9 +17,10 @@ export function AutomationWorkflowsPage() {
 
   return (
     <PageContainer>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('automation.title')}</h1>
-        <p className="text-muted mt-1">{t('automation.subtitle')}</p>
+      <PageHeader
+        title={t('automation.title')}
+        subtitle={t('automation.subtitle')}
+      >
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="warning">{t('governance.preview.badge')}</Badge>
           <span className="text-xs text-muted">
@@ -28,7 +30,7 @@ export function AutomationWorkflowsPage() {
             )}
           </span>
         </div>
-      </div>
+      </PageHeader>
 
       <div className="mb-6 rounded-md border border-warning/30 bg-warning/5 p-3 text-xs text-muted flex items-center gap-2">
         <ShieldAlert size={14} className="text-warning shrink-0" />

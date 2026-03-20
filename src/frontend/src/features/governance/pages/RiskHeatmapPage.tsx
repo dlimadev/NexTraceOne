@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { RiskHeatmapResponse, RiskLevel } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 type HeatmapDimension = 'category' | 'domain' | 'team';
@@ -60,11 +61,10 @@ export function RiskHeatmapPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.executive.heatmapTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.executive.heatmapSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.executive.heatmapTitle')}
+        subtitle={t('governance.executive.heatmapSubtitle')}
+      />
 
       {/* Dimension Selector */}
       <div className="flex flex-wrap items-center gap-3 mb-6">

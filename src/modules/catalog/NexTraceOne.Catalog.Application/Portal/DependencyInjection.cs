@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription;
 using NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription;
-using NexTraceOne.Catalog.Application.Portal.Features.ExecutePlayground;
 using NexTraceOne.Catalog.Application.Portal.Features.GenerateCode;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail;
@@ -43,7 +42,6 @@ public static class DependencyInjection
 
         services.AddTransient<IValidator<CreateSubscription.Command>, CreateSubscription.Validator>();
         services.AddTransient<IValidator<DeleteSubscription.Command>, DeleteSubscription.Validator>();
-        services.AddTransient<IValidator<ExecutePlayground.Command>, ExecutePlayground.Validator>();
         services.AddTransient<IValidator<GenerateCode.Command>, GenerateCode.Validator>();
         services.AddTransient<IValidator<GetApiConsumers.Query>, GetApiConsumers.Validator>();
         services.AddTransient<IValidator<GetApiDetail.Query>, GetApiDetail.Validator>();

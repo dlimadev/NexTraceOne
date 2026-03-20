@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import type {
   ControlDimensionDto, ControlsSummaryResponse, ControlDimensionType,
   MaturityLevelType, GovernanceTrendDirection,
@@ -98,11 +99,10 @@ export function EnterpriseControlsPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.controls.title')}</h1>
-        <p className="text-muted mt-1">{t('governance.controls.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.controls.title')}
+        subtitle={t('governance.controls.subtitle')}
+      />
 
       {/* Overall Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

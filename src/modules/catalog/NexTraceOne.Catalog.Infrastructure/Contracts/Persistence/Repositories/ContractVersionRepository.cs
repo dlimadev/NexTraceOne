@@ -140,16 +140,15 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
         if (ids.Count == 0)
             return [];
 
-        var latestIds = await context.ContractVersions
+        var versions = await context.ContractVersions
             .Where(v => ids.Contains(v.ApiAssetId))
-            .GroupBy(v => v.ApiAssetId)
-            .Select(g => g.OrderByDescending(v => v.CreatedAt).First().Id.Value)
             .ToListAsync(cancellationToken);
 
-        return await context.ContractVersions
-            .Where(v => latestIds.Contains(v.Id.Value))
+        return versions
+            .GroupBy(v => v.ApiAssetId)
+            .Select(g => g.OrderByDescending(v => v.CreatedAt).First())
             .OrderByDescending(v => v.CreatedAt)
-            .ToListAsync(cancellationToken);
+            .ToList();
     }
 
     /// <summary>

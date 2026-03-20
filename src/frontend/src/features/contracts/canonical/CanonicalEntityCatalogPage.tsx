@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageContainer, StatsGrid } from '../../../components/shell';
 import { useCanonicalEntities, useCanonicalEntityUsages } from '../hooks';
 import type { CanonicalEntity, CanonicalEntityState } from '../types';
 
@@ -46,23 +48,17 @@ export function CanonicalEntityCatalogPage() {
   const domains = [...new Set(entities.map((e) => e.domain).filter(Boolean))];
 
   return (
-    <div className="space-y-6 p-6 max-w-6xl mx-auto">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-heading flex items-center gap-2">
-            <Database size={20} className="text-accent" />
-            {t('contracts.canonical.catalog.title', 'Canonical Entities')}
-          </h1>
-          <p className="text-sm text-muted mt-1">
-            {t('contracts.canonical.catalog.subtitle', 'Standardized, reusable schemas and models for contract governance.')}
-          </p>
-        </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
-          <Plus size={14} />
-          {t('contracts.canonical.catalog.create', 'Add Entity')}
-        </button>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('contracts.canonical.catalog.title', 'Canonical Entities')}
+        subtitle={t('contracts.canonical.catalog.subtitle', 'Standardized, reusable schemas and models for contract governance.')}
+        actions={
+          <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
+            <Plus size={14} />
+            {t('contracts.canonical.catalog.create', 'Add Entity')}
+          </button>
+        }
+      />
 
       {/* Search & filters */}
       <div className="flex items-center gap-3 flex-wrap">
@@ -107,14 +103,14 @@ export function CanonicalEntityCatalogPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <StatsGrid columns={4}>
         {(['Draft', 'Published', 'Deprecated', 'Retired'] as const).map((state) => (
           <div key={state} className={`rounded-lg border p-4 ${STATE_COLORS[state]}`}>
             <p className="text-xs opacity-70">{state}</p>
             <p className="text-2xl font-bold mt-1">{entities.filter((e) => e.state === state).length}</p>
           </div>
         ))}
-      </div>
+      </StatsGrid>
 
       {/* Entity list */}
       {entities.length === 0 && !entitiesQuery.isLoading && (
@@ -135,7 +131,7 @@ export function CanonicalEntityCatalogPage() {
           />
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

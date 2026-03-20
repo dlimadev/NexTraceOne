@@ -10,7 +10,6 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample.AddDraftExample;
 using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft.ApproveDraft;
 using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
-using GenerateDraftFromAiFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi.GenerateDraftFromAi;
 using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
 using ListDraftReviewsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews.ListDraftReviews;
 using ListDraftsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts.ListDrafts;
@@ -173,18 +172,6 @@ public sealed class ContractStudioEndpointModule
             var updatedCommand = command with { DraftId = draftId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("contracts:write");
-
-        // ── AI-Assisted Generation ──────────────────────────────
-
-        group.MapPost("/generate", async (
-            GenerateDraftFromAiFeature.Command command,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult(response => $"/api/v1/contracts/drafts/{response.DraftId}", localizer);
         }).RequirePermission("contracts:write");
 
         // ── Examples ────────────────────────────────────────────

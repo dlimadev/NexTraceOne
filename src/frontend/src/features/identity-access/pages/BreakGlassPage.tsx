@@ -11,6 +11,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { BreakGlassRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Página de gestão de acessos emergenciais (Break Glass) do módulo Identity.
@@ -67,15 +68,15 @@ export function BreakGlassPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('identity.breakGlass.title')}</h1>
-          <p className="text-muted mt-1">{t('identity.breakGlass.subtitle')}</p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <AlertTriangle size={16} /> {t('identity.breakGlass.request')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('identity.breakGlass.title')}
+        subtitle={t('identity.breakGlass.subtitle')}
+        actions={
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <AlertTriangle size={16} /> {t('identity.breakGlass.request')}
+          </Button>
+        }
+      />
 
       {/* Formulário de solicitação de acesso emergencial */}
       {showForm && (

@@ -10,6 +10,7 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
@@ -27,7 +28,7 @@ function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
     case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
     case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
-    default: return <Minus size={14} className="text-zinc-400" />;
+    default: return <Minus size={14} className="text-muted" />;
   }
 }
 
@@ -64,7 +65,7 @@ export function ModuleAdoptionPage() {
             <button
               type="button"
               onClick={() => refetch()}
-              className="px-3 py-2 rounded-md bg-zinc-900 border border-zinc-700 text-white text-xs hover:border-accent/50"
+              className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50"
             >
               {t('common.retry')}
             </button>
@@ -84,22 +85,21 @@ export function ModuleAdoptionPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('analytics.adoption.title')}</h1>
-        <p className="text-zinc-400 mt-1">{t('analytics.adoption.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('analytics.adoption.title')}
+        subtitle={t('analytics.adoption.subtitle')}
+      />
 
       {/* Search */}
       <div className="flex items-center gap-2 mb-6">
         <div className="relative flex-1 max-w-sm">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-faded" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('analytics.adoption.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-500 focus:border-accent/50 focus:outline-none text-sm"
+            className="w-full pl-9 pr-3 py-2 rounded-lg bg-input border border-edge text-heading placeholder-faded focus:border-accent/50 focus:outline-none text-sm"
           />
         </div>
       </div>
@@ -113,35 +113,35 @@ export function ModuleAdoptionPage() {
                 {/* Module info */}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-white font-semibold">{mod.moduleName}</span>
+                    <span className="text-heading font-semibold">{mod.moduleName}</span>
                     {trendIcon(mod.trend)}
-                    <span className="text-xs text-zinc-500">{t(`analytics.trend.${mod.trend}`)}</span>
+                    <span className="text-xs text-faded">{t(`analytics.trend.${mod.trend}`)}</span>
                   </div>
                   {/* Adoption bar */}
                   <div className="flex items-center gap-3">
-                    <div className="w-48 h-2 rounded-full bg-zinc-800 overflow-hidden">
+                    <div className="w-48 h-2 rounded-full bg-elevated overflow-hidden">
                       <div
                         className={`h-full rounded-full ${adoptionColor(mod.adoptionPercent)} transition-all`}
                         style={{ width: `${mod.adoptionPercent}%` }}
                       />
                     </div>
-                    <span className="text-sm text-white font-medium">{mod.adoptionPercent}%</span>
+                    <span className="text-sm text-heading font-medium">{mod.adoptionPercent}%</span>
                   </div>
                 </div>
 
                 {/* Stats */}
                 <div className="flex items-center gap-6 text-sm">
                   <div className="text-center">
-                    <div className="text-white font-medium">{mod.totalActions.toLocaleString()}</div>
-                    <div className="text-zinc-500 text-xs">{t('analytics.actions')}</div>
+                    <div className="text-heading font-medium">{mod.totalActions.toLocaleString()}</div>
+                    <div className="text-faded text-xs">{t('analytics.actions')}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-white font-medium">{mod.uniqueUsers}</div>
-                    <div className="text-zinc-500 text-xs">{t('analytics.users')}</div>
+                    <div className="text-heading font-medium">{mod.uniqueUsers}</div>
+                    <div className="text-faded text-xs">{t('analytics.users')}</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-white font-medium">{mod.depthScore.toFixed(1)}</div>
-                    <div className="text-zinc-500 text-xs">{t('analytics.adoption.depthScore')}</div>
+                    <div className="text-heading font-medium">{mod.depthScore.toFixed(1)}</div>
+                    <div className="text-faded text-xs">{t('analytics.adoption.depthScore')}</div>
                   </div>
                 </div>
               </div>
@@ -149,7 +149,7 @@ export function ModuleAdoptionPage() {
               {/* Top features */}
               <div className="mt-3 flex flex-wrap gap-2">
                 {mod.topFeatures.map((f) => (
-                  <span key={f} className="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-400 text-xs">
+                  <span key={f} className="px-2 py-0.5 rounded-md bg-elevated text-muted text-xs">
                     {f}
                   </span>
                 ))}
@@ -160,7 +160,7 @@ export function ModuleAdoptionPage() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-12 text-zinc-500">{t('analytics.adoption.noResults')}</div>
+        <div className="text-center py-12 text-faded">{t('analytics.adoption.noResults')}</div>
       )}
     </PageContainer>
   );

@@ -15,6 +15,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { ContractVersionDetailPanel } from '../components/ContractVersionDetailPanel';
 import { contractsApi, serviceCatalogApi } from '../api';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
   ContractVersionDetail, SemanticDiff,
@@ -240,23 +241,23 @@ export function ContractsPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('contracts.title')}</h1>
-          <p className="text-muted mt-1">{t('contracts.subtitle')}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => { setShowDiffPanel((v) => !v); setDiffResult(null); }}>
-            <GitCompare size={16} /> {t('contracts.diffCompare.title')}
-          </Button>
-          <Button onClick={() => setShowImportForm((v) => !v)}>
-            <Plus size={16} /> {t('contracts.importContract')}
-          </Button>
-          <Button variant="secondary" onClick={() => setShowCreateVersionForm((v) => !v)}>
-            <FilePlus size={16} /> {t('contracts.createVersion')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('contracts.title')}
+        subtitle={t('contracts.subtitle')}
+        actions={
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => { setShowDiffPanel((v) => !v); setDiffResult(null); }}>
+              <GitCompare size={16} /> {t('contracts.diffCompare.title')}
+            </Button>
+            <Button onClick={() => setShowImportForm((v) => !v)}>
+              <Plus size={16} /> {t('contracts.importContract')}
+            </Button>
+            <Button variant="secondary" onClick={() => setShowCreateVersionForm((v) => !v)}>
+              <FilePlus size={16} /> {t('contracts.createVersion')}
+            </Button>
+          </div>
+        }
+      />
 
       {/* Import Form */}
       {showImportForm && (

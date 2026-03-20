@@ -18,3 +18,6 @@ export { ContextStrip } from './ContextStrip';
 export { ShellLoader } from './ShellLoader';
 export { ModuleUnavailable } from './ModuleUnavailable';
 export { MobileDrawer } from './MobileDrawer';
+export { FilterBar } from './FilterBar';
+export { TableWrapper } from './TableWrapper';
+export { StatsGrid } from './StatsGrid';

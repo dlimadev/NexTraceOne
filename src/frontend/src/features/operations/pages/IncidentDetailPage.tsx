@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, NavLink } from 'react-router-dom';
@@ -159,7 +160,7 @@ export function IncidentDetailPage() {
   const mitBadge = mitigationBadge(mitigation.status);
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <PageContainer className="animate-fade-in">
       {/* Back link */}
       <NavLink to="/operations/incidents" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
         <ArrowLeft size={14} /> {t('incidents.detail.backToList')}
@@ -261,33 +262,37 @@ export function IncidentDetailPage() {
                   <p className="text-xs text-muted mb-1">{t('incidents.correlation.reason')}</p>
                   <p className="text-sm text-body">{correlation.reason}</p>
                 </div>
-                {correlation.relatedChanges.length > 0 && (
-                  <div>
-                    <p className="text-xs text-muted mb-2">{t('incidents.correlation.relatedChanges')}</p>
-                    {correlation.relatedChanges.map((change, idx) => (
+                <div>
+                  <p className="text-xs text-muted mb-2">{t('incidents.correlation.relatedChanges')}</p>
+                  {correlation.relatedChanges.length > 0 ? (
+                    correlation.relatedChanges.map((change, idx) => (
                       <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated text-sm">
                         <GitBranch size={14} className="text-amber-400 shrink-0" />
                         <span className="text-body">{change.description}</span>
                         <Badge variant="warning" className="text-[10px] ml-auto shrink-0">{change.confidenceStatus}</Badge>
                       </div>
-                    ))}
-                  </div>
-                )}
-                {correlation.relatedServices.length > 0 && (
-                  <div>
-                    <p className="text-xs text-muted mb-2">{t('incidents.correlation.relatedServices')}</p>
-                    {correlation.relatedServices.map((svc, idx) => (
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted">{t('incidents.correlation.noRelatedChanges', 'No correlated changes were confirmed for this incident yet.')}</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs text-muted mb-2">{t('incidents.correlation.relatedServices')}</p>
+                  {correlation.relatedServices.length > 0 ? (
+                    correlation.relatedServices.map((svc, idx) => (
                       <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated text-sm">
                         <Activity size={14} className="text-accent shrink-0" />
                         <NavLink to={`/services/${svc.serviceId}`} className="text-accent hover:underline">{svc.displayName}</NavLink>
                         <span className="text-muted text-xs ml-auto">{svc.impactDescription}</span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </CardBody>
-          </Card>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted">{t('incidents.correlation.noRelatedServices', 'No impacted services beyond the primary context are currently linked.')}</p>
+                  )}
+                </div>
+               </div>
+             </CardBody>
+           </Card>
 
           {/* Evidence */}
           <Card>
@@ -335,7 +340,7 @@ export function IncidentDetailPage() {
             </CardHeader>
             <CardBody>
               <div className="space-y-2">
-                {linkedServices.map(svc => (
+                {linkedServices.length > 0 ? linkedServices.map(svc => (
                   <NavLink
                     key={svc.serviceId}
                     to={`/services/${svc.serviceId}`}
@@ -349,10 +354,12 @@ export function IncidentDetailPage() {
                       {svc.criticality}
                     </Badge>
                   </NavLink>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
+                )) : (
+                  <p className="text-sm text-muted">{t('incidents.detail.noLinkedServices', 'No linked services are currently persisted for this incident.')}</p>
+                )}
+               </div>
+             </CardBody>
+           </Card>
 
           {/* Mitigation */}
           <Card>
@@ -537,6 +544,6 @@ export function IncidentDetailPage() {
           }}
         />
       </div>
-    </div>
+    </PageContainer>
   );
-}
+ }

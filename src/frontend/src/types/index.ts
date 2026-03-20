@@ -251,7 +251,7 @@ export interface AssetGraph {
   apis: ApiNode[];
 }
 
-/** Nó de serviço no grafo de engenharia. */
+/** Nó de serviço no grafo de Engenharia. */
 export interface ServiceNode {
   serviceAssetId: string;
   name: string;
@@ -599,4 +599,1562 @@ export interface ContractVersionDetailRuleViolation {
   message: string;
   path: string;
   suggestedFix?: string;
+}
+
+// ─── Shared Pagination ────────────────────────────────────────────────────────
+
+export interface PagedList<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+// ─── Contract Support Types ───────────────────────────────────────────────────
+
+export interface ContractProvenance {
+  sourceType?: string;
+  sourceSystem?: string;
+  sourceReference?: string;
+  importedAt?: string;
+  importedBy?: string;
+}
+
+// ─── Governance ───────────────────────────────────────────────────────────────
+
+export type GovernancePackCategory =
+  | 'Contracts'
+  | 'SourceOfTruth'
+  | 'Changes'
+  | 'Incidents'
+  | 'AIGovernance'
+  | 'Reliability'
+  | 'Operations';
+
+export type GovernancePackStatus = 'Draft' | 'Published' | 'Deprecated' | 'Archived';
+export type EnforcementMode = 'Advisory' | 'SoftEnforce' | 'HardEnforce';
+export type WaiverStatus = 'Pending' | 'Approved' | 'Rejected' | 'Expired' | 'Revoked';
+export type ComplianceStatusType = 'Compliant' | 'PartiallyCompliant' | 'NonCompliant';
+export type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
+export type GovernanceTrendDirection = 'Improving' | 'Stable' | 'Declining';
+export type MaturityLevelType = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
+export type CostEfficiencyType = 'Efficient' | 'Acceptable' | 'Inefficient' | 'Wasteful';
+export type PolicyCategoryType =
+  | 'ServiceGovernance'
+  | 'ContractGovernance'
+  | 'ChangeGovernance'
+  | 'OperationalReadiness'
+  | 'AiGovernance'
+  | 'SecurityCompliance'
+  | 'DocumentationStandards';
+export type PolicyStatusType = 'Draft' | 'Active' | 'Deprecated' | 'Archived';
+export type ControlDimensionType =
+  | 'ContractGovernance'
+  | 'SourceOfTruthCompleteness'
+  | 'ChangeGovernance'
+  | 'IncidentMitigationEvidence'
+  | 'AiGovernance'
+  | 'DocumentationRunbookReadiness'
+  | 'OwnershipCoverage';
+
+export interface GovernancePackSummary {
+  packId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: GovernancePackCategory;
+  status: GovernancePackStatus;
+  currentVersion: string;
+  scopeCount: number;
+  ruleCount: number;
+}
+
+export interface GovernancePackRuleDto {
+  ruleId: string;
+  ruleName: string;
+  description: string;
+  defaultEnforcementMode: EnforcementMode;
+  isRequired: boolean;
+}
+
+export interface GovernancePackScopeDto {
+  scopeId: string;
+  scopeType: string;
+  scopeName: string;
+  scopeValue: string;
+  enforcementMode?: string;
+  environment?: string;
+}
+
+export interface GovernancePackVersionDto {
+  versionId: string;
+  version: string;
+  status: GovernancePackStatus;
+  publishedAt?: string;
+  publishedBy?: string;
+  createdAt: string;
+  createdBy: string;
+  ruleCount: number;
+}
+
+export interface GovernancePackDetail {
+  packId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: GovernancePackCategory;
+  status: GovernancePackStatus;
+  currentVersion: string;
+  ruleCount: number;
+  scopeCount: number;
+  createdAt: string;
+  updatedAt: string;
+  rules: GovernancePackRuleDto[];
+  scopes: GovernancePackScopeDto[];
+  recentVersions: GovernancePackVersionDto[];
+}
+
+export interface GovernanceWaiverDto {
+  waiverId: string;
+  packId?: string;
+  packName: string;
+  ruleName: string;
+  scope: string;
+  justification: string;
+  requestedBy: string;
+  status: WaiverStatus;
+  requestedAt?: string;
+  expiresAt?: string | null;
+}
+
+export interface GovernancePacksListResponse {
+  packs: GovernancePackSummary[];
+  totalPacks: number;
+  publishedCount: number;
+  draftCount: number;
+}
+
+export interface GovernanceWaiversListResponse {
+  waivers: GovernanceWaiverDto[];
+  totalWaivers: number;
+  pendingCount: number;
+  approvedCount: number;
+}
+
+export interface CreateGovernancePackRequest {
+  name: string;
+  displayName: string;
+  description: string;
+  category: GovernancePackCategory;
+}
+
+export interface CreateGovernanceWaiverRequest {
+  packId: string;
+  ruleId?: string;
+  scope: string;
+  justification: string;
+  expiresAt?: string;
+}
+
+export interface ApproveWaiverRequest {
+  comment?: string;
+}
+
+export interface RejectWaiverRequest {
+  reason: string;
+}
+
+export interface CompliancePackRowDto {
+  packId: string;
+  packName: string;
+  category: string;
+  packStatus: string;
+  status: ComplianceStatusType;
+  score: number;
+  rolloutCount: number;
+  completedRollouts: number;
+  failedRollouts: number;
+  approvedWaivers: number;
+  pendingWaivers: number;
+}
+
+export interface ComplianceSummaryResponse {
+  overallScore: number;
+  totalPacksAssessed: number;
+  compliantCount: number;
+  partiallyCompliantCount: number;
+  nonCompliantCount: number;
+  totalRollouts: number;
+  completedRollouts: number;
+  failedRollouts: number;
+  totalWaivers: number;
+  approvedWaivers: number;
+  packs: CompliancePackRowDto[];
+}
+
+export interface RiskIndicatorDimensionDto {
+  dimension: string;
+  level: RiskLevel;
+  explanation: string;
+}
+
+export interface RiskIndicatorDto {
+  packId: string;
+  packName: string;
+  category: string;
+  riskLevel: RiskLevel;
+  dimensions: RiskIndicatorDimensionDto[];
+}
+
+export interface RiskSummaryResponse {
+  totalPacksAssessed: number;
+  criticalCount: number;
+  highCount: number;
+  mediumCount: number;
+  lowCount: number;
+  indicators: RiskIndicatorDto[];
+}
+
+export interface PolicyDto {
+  policyId: string;
+  name: string;
+  displayName: string;
+  description: string;
+  category: PolicyCategoryType;
+  status: PolicyStatusType;
+  severity: 'Low' | 'Medium' | 'High' | 'Critical' | null;
+  enforcementMode: EnforcementMode;
+  scope: string;
+  effectiveEnvironments: string[];
+  affectedAssetsCount: number;
+  violationCount: number;
+}
+
+export interface PolicyListResponse {
+  policies: PolicyDto[];
+  totalPolicies: number;
+  activeCount: number;
+  draftCount: number;
+}
+
+export interface ExecutiveOperationalTrendDto {
+  stabilityTrend: GovernanceTrendDirection;
+  incidentRateChange: number;
+  avgResolutionHours: number;
+}
+
+export interface ExecutiveRiskSummaryDto {
+  overallRisk: RiskLevel;
+  criticalDomains: number;
+  highRiskServices: number;
+  riskTrend: GovernanceTrendDirection;
+}
+
+export interface ExecutiveMaturitySummaryDto {
+  ownershipCoverage: number;
+  contractCoverage: number;
+  documentationCoverage: number;
+  runbookCoverage: number;
+}
+
+export interface IncidentTrendSummaryDto {
+  openIncidents: number;
+  resolvedLast30Days: number;
+  avgResolutionHours: number;
+  recurrenceRate: number;
+  trend: GovernanceTrendDirection;
+}
+
+export interface CriticalFocusAreaDto {
+  areaName: string;
+  severity: RiskLevel;
+  description: string;
+  affectedServices: number;
+}
+
+export interface DomainAttentionDto {
+  domainId: string;
+  domainName: string;
+  riskLevel: RiskLevel;
+  reason: string;
+}
+
+export interface ChangeSafetySummaryDto {
+  safeChanges: number;
+  riskyChanges: number;
+  rollbacks: number;
+  confidenceTrend: GovernanceTrendDirection;
+}
+
+export interface ExecutiveOverviewResponse {
+  operationalTrend: ExecutiveOperationalTrendDto;
+  riskSummary: ExecutiveRiskSummaryDto;
+  maturitySummary: ExecutiveMaturitySummaryDto;
+  changeSafetySummary: ChangeSafetySummaryDto;
+  incidentTrendSummary: IncidentTrendSummaryDto;
+  criticalFocusAreas: CriticalFocusAreaDto[];
+  topDomainsRequiringAttention: DomainAttentionDto[];
+}
+
+export interface ReportsSummaryResponse {
+  totalPacks: number;
+  publishedPacks: number;
+  totalRollouts: number;
+  completedRollouts: number;
+  pendingRollouts: number;
+  failedRollouts: number;
+  complianceScore: number;
+  changeConfidenceTrend: GovernanceTrendDirection;
+  overallRiskLevel: RiskLevel;
+  overallMaturity: MaturityLevelType;
+  pendingWaivers: number;
+  totalWaivers: number;
+  packsWithRollout: number;
+  packsWithCompletedRollout: number;
+}
+
+export interface ControlDimensionDto {
+  dimension: ControlDimensionType;
+  coveragePercent: number;
+  maturity: MaturityLevelType;
+  trend: GovernanceTrendDirection;
+  totalAssessed: number;
+  gapCount: number;
+  summary: string;
+}
+
+export interface ControlsSummaryResponse {
+  overallCoverage: number;
+  overallMaturity: MaturityLevelType;
+  totalDimensions: number;
+  criticalGapCount: number;
+  dimensions: ControlDimensionDto[];
+}
+
+export interface MaturityScorecardDimensionDto {
+  dimension: string;
+  level: MaturityLevelType;
+  score: number;
+  maxScore: number;
+  explanation: string;
+}
+
+export interface MaturityScorecardDto {
+  groupId: string;
+  groupName: string;
+  overallMaturity: MaturityLevelType;
+  dimensions: MaturityScorecardDimensionDto[];
+}
+
+export interface MaturityScorecardsResponse {
+  scorecards: MaturityScorecardDto[];
+}
+
+export interface RiskHeatmapCell {
+  groupId: string;
+  groupName: string;
+  riskLevel: RiskLevel;
+  riskScore: number;
+  changeFailures: number;
+  contractGaps: number;
+  documentationGaps: number;
+  runbookGaps: number;
+  reliabilityDegradation: boolean;
+  explanation: string;
+}
+
+export interface RiskHeatmapResponse {
+  cells: RiskHeatmapCell[];
+}
+
+// ─── Organization / Governance Structure ──────────────────────────────────────
+
+export interface TeamSummary {
+  teamId: string;
+  displayName: string;
+  description?: string;
+  parentOrganizationUnit?: string;
+  status: 'Active' | 'Inactive' | 'Archived';
+  maturityLevel: MaturityLevelType;
+  serviceCount: number;
+  contractCount: number;
+  memberCount: number;
+}
+
+export interface TeamServiceDto {
+  serviceId: string;
+  name: string;
+  domain: string;
+  criticality: Criticality;
+  ownershipType: string;
+}
+
+export interface TeamContractDto {
+  contractId: string;
+  name: string;
+  type: string;
+  version: string;
+  status: string;
+}
+
+export interface GovernanceDimensionDto {
+  dimension: string;
+  level: MaturityLevelType;
+  score: number;
+  trend: GovernanceTrendDirection;
+}
+
+export interface GovernanceDimensionDto {
+  dimension: string;
+  level: MaturityLevelType;
+  score: number;
+  trend: GovernanceTrendDirection;
+}
+
+export interface GovernanceSummary {
+  overallMaturity: MaturityLevelType;
+  openRiskCount: number;
+  policyViolationCount: number;
+  ownershipCoverage: number;
+  contractCoverage: number;
+  documentationCoverage: number;
+  runbookCoverage: number;
+  dimensions: GovernanceDimensionDto[];
+}
+
+export interface CrossTeamDependencyDto {
+  dependencyId: string;
+  sourceServiceName: string;
+  targetServiceName: string;
+  targetTeamId: string;
+  targetTeamName: string;
+  dependencyType: string;
+}
+
+export interface CrossTeamDependencies {
+  dependencies: CrossTeamDependencyDto[];
+}
+
+export interface TeamDetail extends TeamSummary {
+  createdAt: string;
+  activeIncidentCount: number;
+  reliabilityScore: number;
+  services: TeamServiceDto[];
+  contracts: TeamContractDto[];
+  crossTeamDependencies: CrossTeamDependencyDto[];
+}
+
+export interface DomainSummary {
+  domainId: string;
+  displayName: string;
+  description?: string;
+  capabilityClassification?: string;
+  criticality: Criticality;
+  maturityLevel: MaturityLevelType;
+  teamCount: number;
+  serviceCount: number;
+  contractCount: number;
+}
+
+export interface DomainTeamDto {
+  teamId: string;
+  displayName: string;
+  serviceCount: number;
+  contractCount: number;
+  memberCount: number;
+  maturityLevel: MaturityLevelType;
+  ownershipType?: string;
+}
+
+export interface DomainServiceDto {
+  serviceId: string;
+  name: string;
+  criticality: Criticality;
+  ownershipType: string;
+  teamName: string;
+  status?: string;
+}
+
+export interface CrossDomainDependencyDto {
+  dependencyId: string;
+  sourceServiceName: string;
+  targetServiceName: string;
+  targetDomainId: string;
+  targetDomainName: string;
+  dependencyType: string;
+}
+
+export interface CrossDomainDependencies {
+  dependencies: CrossDomainDependencyDto[];
+}
+
+export interface DomainDetail extends DomainSummary {
+  createdAt: string;
+  activeIncidentCount: number;
+  reliabilityScore: number;
+  teams: DomainTeamDto[];
+  services: DomainServiceDto[];
+  crossDomainDependencies: CrossDomainDependencyDto[];
+}
+
+export interface ScopedContext {
+  teamIds: string[];
+  domainIds: string[];
+  organizationUnitIds: string[];
+}
+
+export interface DelegatedAdminDto {
+  delegationId: string;
+  granteeDisplayName: string;
+  scope: 'TeamAdmin' | 'DomainAdmin' | 'ReadOnly' | 'FullAdmin';
+  isActive: boolean;
+  teamId?: string | null;
+  teamName?: string | null;
+  domainId?: string | null;
+  domainName?: string | null;
+  reason: string;
+  grantedAt: string;
+  expiresAt?: string | null;
+}
+
+export interface CreateTeamRequest {
+  displayName: string;
+  description?: string;
+  parentOrganizationUnit?: string;
+}
+
+export interface CreateDomainRequest {
+  displayName: string;
+  description?: string;
+  capabilityClassification?: string;
+  criticality?: Criticality;
+}
+
+export interface CreateDelegationRequest {
+  granteeId: string;
+  scope: 'TeamAdmin' | 'DomainAdmin' | 'ReadOnly' | 'FullAdmin';
+  teamId?: string;
+  domainId?: string;
+  reason: string;
+  expiresAt?: string;
+}
+
+// ─── Contract API / Studio Types ──────────────────────────────────────────────
+
+export type ContractType =
+  | 'RestApi'
+  | 'SoapService'
+  | 'EventContract'
+  | 'BackgroundService'
+  | 'SharedSchema';
+
+export type ContractClassification = 'Breaking' | 'Additive' | 'NonBreaking' | 'Unknown';
+export type DraftStatus = 'Editing' | 'InReview' | 'Approved' | 'Rejected' | 'Published';
+export type ReviewDecision = 'Approved' | 'Rejected' | 'NeedsChanges';
+
+export interface ContractRuleViolation {
+  id?: string;
+  ruleName: string;
+  severity: string;
+  message: string;
+  path: string;
+  suggestedFix?: string;
+}
+
+export interface ContractArtifact {
+  artifactId: string;
+  artifactType: string;
+  name: string;
+  contentFormat: string;
+  isAiGenerated: boolean;
+  generatedAt?: string;
+}
+
+export interface ContractIntegrityResult {
+  isValid: boolean;
+  errors?: string[];
+  warnings?: string[];
+  pathCount?: number;
+  endpointCount?: number;
+  schemaVersion?: string;
+  validationError?: string;
+}
+
+export interface ContractSearchResult {
+  contractVersionId: string;
+  apiAssetId: string;
+  version: string;
+  protocol: ContractProtocol;
+  lifecycleState: ContractLifecycleState;
+}
+
+export interface ContractSyncItem {
+  contractVersionId: string;
+  externalReference: string;
+  status: string;
+  synchronizedAt?: string;
+}
+
+export interface ContractSyncResponse {
+  items: ContractSyncItem[];
+  totalCount: number;
+}
+
+export interface ContractListItem {
+  id?: string;
+  versionId?: string;
+  contractVersionId?: string;
+  apiAssetId: string;
+  serviceAssetId?: string;
+  name?: string;
+  apiName?: string;
+  semVer?: string;
+  version?: string;
+  protocol: ContractProtocol;
+  lifecycleState: ContractLifecycleState;
+  isLocked?: boolean;
+  format?: string;
+  importedFrom?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  deprecationDate?: string;
+  isSigned?: boolean;
+  domain?: string;
+  team?: string;
+  teamName?: string;
+  technicalOwner?: string;
+  criticality?: string;
+  exposure?: string;
+  exposureType?: string;
+  serviceType?: string;
+  ruleViolationCount?: number;
+}
+
+export interface ContractListResponse {
+  items: ContractListItem[];
+  totalCount: number;
+}
+
+export interface ContractProtocolCount {
+  protocol: ContractProtocol;
+  count: number;
+}
+
+export interface ContractsSummary {
+  totalCount: number;
+  totalVersions?: number;
+  distinctContracts?: number;
+  byProtocol: ContractProtocolCount[];
+  approvedCount: number;
+  lockedCount: number;
+  draftCount?: number;
+  inReviewCount?: number;
+  deprecatedCount?: number;
+}
+
+export interface ServiceContractItem {
+  contractVersionId: string;
+  versionId?: string;
+  version: string;
+  semVer?: string;
+  apiName?: string;
+  apiRoutePattern?: string;
+  protocol: ContractProtocol;
+  lifecycleState: ContractLifecycleState;
+  isLocked?: boolean;
+}
+
+export interface ServiceContractsResponse {
+  items: ServiceContractItem[];
+  contracts?: ServiceContractItem[];
+  totalCount: number;
+}
+
+export interface ContractDraftExample {
+  id: string;
+  name: string;
+  description?: string;
+  content: string;
+  contentFormat: string;
+  exampleType: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface ContractDraft {
+  id: string;
+  title: string;
+  description?: string;
+  serviceId?: string;
+  contractType: ContractType;
+  protocol: ContractProtocol;
+  specContent: string;
+  format: string;
+  proposedVersion: string;
+  status: DraftStatus;
+  author: string;
+  baseContractVersionId?: string;
+  isAiGenerated: boolean;
+  aiGenerationPrompt?: string;
+  lastEditedAt?: string;
+  lastEditedBy?: string;
+  createdAt: string;
+  examples: ContractDraftExample[];
+}
+
+export interface ContractReviewEntry {
+  id: string;
+  draftId: string;
+  reviewedBy: string;
+  decision: ReviewDecision;
+  comment?: string;
+  reviewedAt: string;
+}
+
+export interface DraftListResponse {
+  items: ContractDraft[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface SignatureVerificationResult {
+  contractVersionId: string;
+  hasSignature: boolean;
+  isValid: boolean;
+  fingerprint?: string | null;
+  algorithm?: string | null;
+  verificationMessage: string;
+}
+
+// ─── Change Governance / Workflow ─────────────────────────────────────────────
+
+export type ChangeLevel = 0 | 1 | 2 | 3 | 4;
+export type DeploymentState = 'Planned' | 'Pending' | 'Running' | 'Succeeded' | 'Failed' | 'RolledBack';
+
+export interface Release {
+  id: string;
+  apiAssetId: string;
+  version: string;
+  environment: string;
+  status: DeploymentState;
+  deploymentState?: DeploymentState;
+  changeLevel: ChangeLevel;
+  riskScore?: number;
+  description?: string;
+  changeType?: string;
+  commitSha?: string;
+  pipelineSource?: string | null;
+  workItemReference?: string | null;
+  createdAt: string;
+}
+
+export interface ChangeDto {
+  id: string;
+  changeId?: string;
+  serviceName: string;
+  teamName?: string;
+  version: string;
+  environment: string;
+  changeType?: string;
+  description?: string;
+  commitSha?: string;
+  pipelineSource?: string | null;
+  workItemReference?: string | null;
+  changeScore: number;
+  changeLevel?: number;
+  confidenceStatus: string;
+  deploymentStatus?: string;
+  validationStatus?: string;
+  createdAt: string;
+}
+
+export interface DecisionHistoryItemDto {
+  decisionId: string;
+  eventId: string;
+  decision: string;
+  rationale?: string;
+  conditions?: string;
+  decidedBy: string;
+  decidedAt: string;
+  description: string;
+  eventType: string;
+  source: string;
+  occurredAt: string;
+}
+
+export interface PromotionGateResult {
+  gateName: string;
+  passed: boolean;
+  message?: string;
+}
+
+export interface PromotionRequest {
+  id: string;
+  releaseId: string;
+  sourceEnvironment: string;
+  targetEnvironment: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Promoted';
+  gateResults: PromotionGateResult[];
+  createdAt: string;
+}
+
+export interface BlastRadiusReport {
+  releaseId: string;
+  totalAffectedConsumers: number;
+  directConsumers: string[];
+  transitiveConsumers: string[];
+  calculatedAt: string;
+}
+
+export interface ChangeScore {
+  releaseId: string;
+  score: number;
+  breakingChangeWeight: number;
+  blastRadiusWeight: number;
+  environmentWeight: number;
+  computedAt: string;
+}
+
+export interface WorkflowTemplateStage {
+  id: string;
+  name: string;
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  changeLevel: ChangeLevel;
+  stages: WorkflowTemplateStage[];
+}
+
+export interface WorkflowInstance {
+  id: string;
+  releaseId?: string;
+  status: 'Pending' | 'InProgress' | 'Approved' | 'Rejected' | 'Cancelled';
+  currentStage?: string | null;
+  createdAt: string;
+}
+
+export interface AdvisoryFactorDto {
+  factorName: string;
+  status: 'Pass' | 'Warning' | 'Fail' | 'Unknown';
+  explanation: string;
+  description?: string;
+  weight?: number;
+}
+
+export interface ChangeAdvisoryResponse {
+  recommendation: 'Approve' | 'ApproveConditionally' | 'Reject' | 'NeedsMoreEvidence' | string;
+  confidenceScore: number;
+  overallConfidence: number;
+  rationale?: string;
+  factors: AdvisoryFactorDto[];
+}
+
+export interface ChangesListResponse {
+  items: ChangeDto[];
+  changes?: ChangeDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ChangesSummaryResponse {
+  totalChanges: number;
+  changesNeedingAttention: number;
+  suspectedRegressions: number;
+  validatedChanges?: number;
+  changesCorrelatedWithIncidents?: number;
+}
+
+export interface RecordDecisionRequest {
+  decision: 'Approved' | 'Rejected' | 'ApprovedConditionally';
+  rationale?: string;
+  conditions?: string;
+  decidedBy: string;
+}
+
+export interface RecordDecisionResponse {
+  decisionId: string;
+  recordedAt: string;
+}
+
+export interface DecisionHistoryResponse {
+  items: DecisionHistoryItemDto[];
+  decisions?: DecisionHistoryItemDto[];
+}
+
+export interface SourceOfTruthReferenceItem {
+  referenceId: string;
+  title: string;
+  description: string;
+  assetType: string;
+  referenceType: string;
+  url?: string;
+}
+
+export interface SourceOfTruthSearchResponse {
+  services: ServiceDetail[];
+  contracts: Array<ContractVersionDetail & { versionId?: string }>;
+  references: SourceOfTruthReferenceItem[];
+  totalResults?: number;
+}
+
+export interface CoverageIndicators {
+  hasOwner: boolean;
+  hasContracts: boolean;
+  hasDocumentation: boolean;
+  hasRunbook: boolean;
+  hasRecentChangeHistory: boolean;
+  hasDependenciesMapped: boolean;
+  hasEventTopics: boolean;
+}
+
+export interface ServiceCoverageResponse {
+  metIndicators: number;
+  totalIndicators: number;
+  coverageScore?: number;
+}
+
+export interface ServiceSourceOfTruth {
+  serviceId: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  domain: string;
+  systemArea?: string;
+  serviceType?: string;
+  teamName: string;
+  criticality?: string;
+  lifecycleStatus?: string;
+  exposureType?: string;
+  technicalOwner?: string;
+  businessOwner?: string;
+  documentationUrl?: string;
+  repositoryUrl?: string;
+  totalApis: number;
+  totalContracts: number;
+  totalReferences: number;
+  apis: ServiceApiSummary[];
+  contracts: Array<ContractVersionDetail & { versionId?: string }>;
+  references: SourceOfTruthReferenceItem[];
+  coverage: CoverageIndicators;
+}
+
+export type GenerationType = 'ClientSdk' | 'ServerStub' | 'Example';
+
+export interface ContractSourceOfTruth {
+  apiAssetId: string;
+  semVer: string;
+  protocol: ContractProtocol;
+  format?: string;
+  importedFrom?: string;
+  artifactCount: number;
+  diffCount: number;
+  violationCount: number;
+  governance: {
+    lifecycleState: ContractLifecycleState;
+    isLocked?: boolean;
+    isSigned?: boolean;
+    deprecationNotice?: string;
+    deprecationDate?: string;
+    sunsetDate?: string;
+  };
+  references: SourceOfTruthReferenceItem[];
+}
+
+export interface AuditEvent {
+  eventId: string;
+  id?: string;
+  occurredAt: string;
+  actor: string;
+  actorEmail?: string;
+  action: string;
+  eventType?: string;
+  entityType?: string;
+  aggregateType?: string;
+  entityId?: string;
+  correlationId?: string;
+  hash?: string;
+}
+
+// ── Product Analytics ──────────────────────────────────────────────────────────
+
+export interface ModuleAdoptionDto {
+  module: string;
+  moduleName: string;
+  adoptionPercent: number;
+  totalActions: number;
+  uniqueUsers: number;
+  depthScore: number;
+  trend: GovernanceTrendDirection;
+  topFeatures: string[];
+}
+
+export interface ModuleAdoptionResponse {
+  modules: ModuleAdoptionDto[];
+  overallAdoptionScore: number;
+  mostAdopted: string;
+  leastAdopted: string;
+  biggestGrowth: string;
+  periodLabel: string;
+}
+
+export interface ProductAnalyticsModuleUsageDto {
+  module: string;
+  moduleName: string;
+  eventCount: number;
+  uniqueUsers: number;
+  trend: GovernanceTrendDirection;
+}
+
+export interface ProductAnalyticsSummaryResponse {
+  totalEvents: number;
+  uniqueUsers: number;
+  activePersonas: number;
+  topModules: ProductAnalyticsModuleUsageDto[];
+  adoptionScore: number;
+  valueScore: number;
+  frictionScore: number;
+  avgTimeToFirstValueMinutes: number;
+  avgTimeToCoreValueMinutes: number;
+  trendDirection: GovernanceTrendDirection;
+  periodLabel: string;
+}
+
+// ── Benchmarking ───────────────────────────────────────────────────────────────
+
+export interface BenchmarkComparisonDto {
+  groupId: string;
+  groupName: string;
+  serviceCount: number;
+  criticality: Criticality;
+  reliabilityScore: number;
+  reliabilityTrend: GovernanceTrendDirection;
+  changeSafetyScore: number;
+  incidentRecurrenceRate: number;
+  maturityScore: number;
+  riskScore: number;
+  finopsEfficiency: CostEfficiencyType;
+  strengths: string[];
+  gaps: string[];
+  context: string;
+}
+
+export interface BenchmarkingResponse {
+  dimension: string;
+  comparisons: BenchmarkComparisonDto[];
+  generatedAt?: string;
+}
+
+// ── Evidence Packages ──────────────────────────────────────────────────────────
+
+export type EvidencePackageStatusType = 'Draft' | 'Sealed' | 'Exported';
+
+export type EvidenceTypeValue =
+  | 'Approval'
+  | 'ChangeHistory'
+  | 'ContractPublication'
+  | 'ComplianceResult'
+  | 'AiUsageRecord'
+  | 'MitigationRecord'
+  | 'SecurityReview'
+  | 'ChangeValidation'
+  | 'PolicyDecision'
+  | 'ModelRegistrySnapshot'
+  | 'TokenUsage'
+  | 'AuditReference';
+
+export interface EvidencePackageDto {
+  packageId: string;
+  name: string;
+  description: string;
+  scope: string;
+  status: EvidencePackageStatusType;
+  itemCount: number;
+  includedTypes: string[];
+  createdBy: string;
+  createdAt: string;
+  sealedAt: string | null;
+}
+
+export interface EvidenceItemDto {
+  itemId: string;
+  type: string;
+  title: string;
+  description: string;
+  sourceModule: string;
+  referenceId: string;
+  recordedBy: string;
+  recordedAt: string;
+}
+
+export interface EvidencePackageListResponse {
+  totalPackages: number;
+  sealedCount: number;
+  exportedCount: number;
+  draftCount: number;
+  packages: EvidencePackageDto[];
+}
+
+// ── Executive Drill-Down ───────────────────────────────────────────────────────
+
+export interface ExecutiveDrillDownIndicatorDto {
+  name: string;
+  value: string;
+  trend: GovernanceTrendDirection;
+  explanation: string;
+}
+
+export interface ExecutiveDrillDownCriticalServiceDto {
+  serviceId: string;
+  serviceName: string;
+  riskLevel: RiskLevel;
+  mainIssue: string;
+}
+
+export interface ExecutiveDrillDownGapDto {
+  area: string;
+  severity: RiskLevel;
+  description: string;
+  recommendation: string;
+}
+
+export interface ExecutiveDrillDownResponse {
+  entityType: string;
+  entityId: string;
+  entityName: string;
+  riskLevel: RiskLevel;
+  maturityLevel: MaturityLevelType;
+  keyIndicators: ExecutiveDrillDownIndicatorDto[];
+  criticalServices: ExecutiveDrillDownCriticalServiceDto[];
+  topGaps: ExecutiveDrillDownGapDto[];
+  recommendedFocus: string[];
+  generatedAt: string;
+}
+
+// ── Developer Portal ───────────────────────────────────────────────────────────
+
+export type SubscriptionLevel = 'BreakingChangesOnly' | 'AllChanges' | 'DeprecationNotices' | 'SecurityAdvisories';
+export type NotificationChannel = 'Email' | 'Webhook' | 'Teams' | 'Slack';
+
+export interface CatalogItem {
+  apiAssetId: string;
+  name: string;
+  apiName?: string;
+  displayName?: string;
+  description?: string;
+  version?: string;
+  healthStatus?: string;
+  ownerServiceName?: string;
+}
+
+export interface Subscription {
+  id: string;
+  apiAssetId: string;
+  apiName: string;
+  subscriberEmail: string;
+  consumerServiceName: string;
+  level: SubscriptionLevel;
+  channel: NotificationChannel;
+  isActive?: boolean;
+}
+
+export interface PlaygroundResult {
+  statusCode: number;
+  responseStatusCode?: number;
+  responseBody: string;
+  durationMs: number;
+  executedAt?: string;
+}
+
+export interface PlaygroundHistoryItem {
+  id: string;
+  sessionId?: string;
+  apiAssetId: string;
+  apiName?: string;
+  httpMethod?: string;
+  requestPath: string;
+  executedAt: string;
+  statusCode: number;
+  responseStatusCode?: number;
+  durationMs?: number;
+}
+
+export interface PortalAnalytics {
+  totalExecutions: number;
+  totalSubscriptions: number;
+  totalSearches?: number;
+  totalApiViews?: number;
+  totalPlaygroundExecutions?: number;
+  totalCodeGenerations?: number;
+  popularApis: Array<{ apiAssetId: string; count: number }>;
+  topSearches?: Array<{ term: string; count: number }>;
+}
+
+// ── FinOps ──────────────────────────────────────────────────────
+
+export interface FinOpsWasteSignalDto {
+  description: string;
+  pattern: string;
+  type: string;
+  estimatedWaste: number;
+}
+
+export interface FinOpsReliabilityCorrelationDto {
+  reliabilityScore: number;
+  recentIncidents: number;
+  reliabilityTrend: GovernanceTrendDirection;
+}
+
+export interface FinOpsServiceCostDto {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  efficiency: CostEfficiencyType;
+  monthlyCost: number;
+  trend: GovernanceTrendDirection;
+  wasteSignals: FinOpsWasteSignalDto[];
+  reliabilityCorrelation: FinOpsReliabilityCorrelationDto | null;
+}
+
+export interface FinOpsCostDriverDto {
+  serviceId: string;
+  serviceName: string;
+  monthlyCost: number;
+  efficiency: CostEfficiencyType;
+}
+
+export interface FinOpsOptimizationDto {
+  serviceId: string;
+  serviceName: string;
+  potentialSavings: number;
+  priority: string;
+  recommendation: string;
+}
+
+export interface FinOpsSummaryResponse {
+  totalMonthlyCost: number;
+  totalWaste: number;
+  overallEfficiency: CostEfficiencyType;
+  costTrend: GovernanceTrendDirection;
+  services: FinOpsServiceCostDto[];
+  topCostDrivers: FinOpsCostDriverDto[];
+  topWasteSignals: FinOpsWasteSignalDto[];
+  optimizationOpportunities: FinOpsOptimizationDto[];
+  generatedAt: string;
+}
+
+export interface ServiceFinOpsResponse {
+  serviceId: string;
+  serviceName: string;
+  domain: string;
+  team: string;
+  efficiency: CostEfficiencyType;
+  monthlyCost: number;
+  trend: GovernanceTrendDirection;
+  wasteSignals: FinOpsWasteSignalDto[];
+  reliabilityCorrelation: FinOpsReliabilityCorrelationDto | null;
+  optimizationOpportunities: FinOpsOptimizationDto[];
+  generatedAt: string;
+}
+
+export interface TeamFinOpsResponse {
+  teamId: string;
+  teamName: string;
+  totalCost: number;
+  efficiency: CostEfficiencyType;
+  trend: GovernanceTrendDirection;
+  services: FinOpsServiceCostDto[];
+  topWasteSignals: FinOpsWasteSignalDto[];
+  optimizationOpportunities: FinOpsOptimizationDto[];
+  generatedAt: string;
+}
+
+export interface DomainFinOpsResponse {
+  domainId: string;
+  domainName: string;
+  totalCost: number;
+  efficiency: CostEfficiencyType;
+  trend: GovernanceTrendDirection;
+  services: FinOpsServiceCostDto[];
+  topWasteSignals: FinOpsWasteSignalDto[];
+  optimizationOpportunities: FinOpsOptimizationDto[];
+  generatedAt: string;
+}
+
+export interface FinOpsTrendPointDto {
+  period: string;
+  totalCost: number;
+  waste: number;
+  efficiency: CostEfficiencyType;
+}
+
+export interface FinOpsTrendsResponse {
+  dimension: string;
+  filterId: string | null;
+  points: FinOpsTrendPointDto[];
+  generatedAt: string;
+}
+
+// ── Integration Hub ─────────────────────────────────────────────
+
+export interface IntegrationConnectorDto {
+  connectorId: string;
+  name: string;
+  connectorType: string;
+  provider: string;
+  status: string;
+  environment: string;
+  lastSyncAt: string | null;
+  syncFrequency: string;
+  healthScore: number;
+  dataDomainsCount: number;
+  sourcesCount: number;
+  createdAt: string;
+}
+
+export interface IntegrationConnectorsListResponse {
+  connectors: IntegrationConnectorDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface IntegrationConnectorDetailDto {
+  connectorId: string;
+  name: string;
+  connectorType: string;
+  provider: string;
+  status: string;
+  environment: string;
+  description: string;
+  lastSyncAt: string | null;
+  syncFrequency: string;
+  healthScore: number;
+  configuration: Record<string, string>;
+  dataDomains: string[];
+  sources: IngestionSourceDto[];
+  recentExecutions: IngestionExecutionDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IngestionSourceDto {
+  sourceId: string;
+  name: string;
+  dataDomain: string;
+  trustLevel: string;
+  status: string;
+  lastIngestionAt: string | null;
+  recordCount: number;
+}
+
+export interface IngestionSourcesListResponse {
+  sources: IngestionSourceDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface IngestionExecutionDto {
+  executionId: string;
+  connectorId: string;
+  connectorName: string;
+  sourceId: string | null;
+  sourceName: string | null;
+  result: string;
+  recordsProcessed: number;
+  recordsFailed: number;
+  startedAt: string;
+  completedAt: string | null;
+  durationMs: number;
+  errorMessage: string | null;
+}
+
+export interface IngestionExecutionsListResponse {
+  executions: IngestionExecutionDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface IngestionHealthDto {
+  connectorId: string | null;
+  overallHealth: string;
+  activeConnectors: number;
+  totalConnectors: number;
+  failedExecutions24h: number;
+  successRate: number;
+  avgProcessingTimeMs: number;
+}
+
+export interface FreshnessIndicatorDto {
+  dataDomain: string;
+  latestIngestionAt: string;
+  freshnessStatus: string;
+  staleSources: number;
+  totalSources: number;
+}
+
+export interface IngestionFreshnessResponse {
+  indicators: FreshnessIndicatorDto[];
+  generatedAt: string;
+}
+
+// ── Reliability ─────────────────────────────────────────────────
+
+export interface ServiceReliabilityDto {
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  domain: string;
+  environment: string;
+  serviceType: string;
+  criticality: string;
+  reliabilityScore: number;
+  status: string;
+  openIncidents: number;
+  sloCompliance: number;
+  mttr: string;
+  runbookCoverage: number;
+  lastIncidentAt: string | null;
+}
+
+export interface ServiceReliabilityListResponse {
+  services: ServiceReliabilityDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ServiceReliabilityDetailResponse {
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  domain: string;
+  environment: string;
+  serviceType: string;
+  criticality: string;
+  reliabilityScore: number;
+  status: string;
+  sloCompliance: number;
+  mttr: string;
+  runbookCoverage: number;
+  openIncidents: number;
+  recentIncidents: Array<{ incidentId: string; title: string; severity: string; createdAt: string }>;
+  coverageIndicators: { hasRunbook: boolean; hasSlo: boolean; hasOwnership: boolean; hasDependencyMap: boolean; hasAlerts: boolean };
+  generatedAt: string;
+}
+
+export interface TeamReliabilitySummaryResponse {
+  teamId: string;
+  teamName: string;
+  overallScore: number;
+  serviceCount: number;
+  criticalServices: number;
+  openIncidents: number;
+  avgSloCompliance: number;
+  avgRunbookCoverage: number;
+  services: ServiceReliabilityDto[];
+  generatedAt: string;
+}
+
+// ── Platform Operations ─────────────────────────────────────────
+
+export interface PlatformHealthMetric {
+  name: string;
+  value: string;
+  status: string;
+  trend: GovernanceTrendDirection;
+}
+
+export interface PlatformOperationsResponse {
+  health: PlatformHealthMetric[];
+  activeAlerts: number;
+  resolvedAlerts24h: number;
+  systemUptime: string;
+  generatedAt: string;
+}
+
+// ── Product Analytics: Persona Usage ────────────────────────────
+
+export interface PersonaModuleUsageDto {
+  module: string;
+  adoptionPercent: number;
+  actionCount: number;
+}
+
+export interface PersonaUsageDto {
+  persona: string;
+  activeUsers: number;
+  totalActions: number;
+  adoptionDepth: number;
+  topModules: PersonaModuleUsageDto[];
+  topActions: string[];
+  frictionPoints: string[];
+  milestones: string[];
+}
+
+export interface PersonaUsageResponse {
+  personas: PersonaUsageDto[];
+  generatedAt: string;
+}
+
+// ── Product Analytics: Journeys ─────────────────────────────────
+
+export interface JourneyStepDto {
+  step: string;
+  count: number;
+  dropoff: number;
+}
+
+export interface JourneyDto {
+  journeyId: string;
+  name: string;
+  persona: string;
+  steps: JourneyStepDto[];
+  completionRate: number;
+  avgDuration: string;
+}
+
+export interface JourneysResponse {
+  journeys: JourneyDto[];
+  generatedAt: string;
+}
+
+// ── Product Analytics: Value Milestones ─────────────────────────
+
+export interface ValueMilestoneDto {
+  milestoneId: string;
+  name: string;
+  description: string;
+  persona: string;
+  reachedByPercent: number;
+  totalReached: number;
+  trend: GovernanceTrendDirection;
+}
+
+export interface ValueMilestonesResponse {
+  milestones: ValueMilestoneDto[];
+  generatedAt: string;
+}
+
+// ── Product Analytics: Friction Indicators ──────────────────────
+
+export interface FrictionIndicatorDto {
+  indicator: string;
+  module: string;
+  persona: string;
+  occurrences: number;
+  impact: string;
+  trend: GovernanceTrendDirection;
+}
+
+export interface FrictionIndicatorsResponse {
+  indicators: FrictionIndicatorDto[];
+  generatedAt: string;
 }

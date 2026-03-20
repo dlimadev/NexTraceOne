@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { MaturityScorecardsResponse, MaturityLevelType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -58,11 +59,10 @@ export function MaturityScorecardsPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.executive.scorecardsTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.executive.scorecardsSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.executive.scorecardsTitle')}
+        subtitle={t('governance.executive.scorecardsSubtitle')}
+      />
 
       {/* Dimension Selector */}
       <div className="flex flex-wrap items-center gap-3 mb-6">

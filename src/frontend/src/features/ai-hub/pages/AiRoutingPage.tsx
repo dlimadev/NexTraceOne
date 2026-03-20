@@ -18,6 +18,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { Loader } from '../../../components/Loader';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
@@ -346,19 +347,18 @@ export function AiRoutingPage() {
 
   return (
     <PageContainer>
-      {/* Page header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('aiHub.routingTitle')}</h1>
-          <p className="text-muted mt-1">{t('aiHub.routingSubtitle')}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="info">
-            <Eye size={12} className="mr-1 inline" />
-            {persona}
-          </Badge>
-        </div>
-      </div>
+      <PageHeader
+        title={t('aiHub.routingTitle')}
+        subtitle={t('aiHub.routingSubtitle')}
+        actions={
+          <div className="flex items-center gap-2">
+            <Badge variant="info">
+              <Eye size={12} className="mr-1 inline" />
+              {persona}
+            </Badge>
+          </div>
+        }
+      />
 
       {/* Governance notice */}
       <div className="mb-6 flex items-center gap-3 rounded-lg border border-edge bg-elevated px-4 py-3">

@@ -28,9 +28,15 @@ export type CatalogServiceType =
  * Campos derivados (approvalState) são calculados no frontend a partir do lifecycle.
  */
 export interface CatalogItem extends ContractListItem {
-  /** Tipo de serviço mapeado a partir do protocol/serviceType do backend. */
+  name: string;
+  semVer: string;
+  domain: string;
+  team: string;
+  technicalOwner: string;
+  criticality: string;
+  exposure: string;
+  updatedAt: string;
   catalogServiceType: CatalogServiceType;
-  /** Estado de aprovação derivado do lifecycleState. */
   approvalState: ApprovalState;
 }
 
@@ -38,9 +44,24 @@ export interface CatalogItem extends ContractListItem {
  * Converte ContractListItem em CatalogItem, derivando campos da UI.
  */
 export function toCatalogItem(item: ContractListItem): CatalogItem {
+  const name = item.name ?? item.apiName ?? item.apiAssetId;
+  const semVer = item.semVer ?? item.version ?? '0.0.0';
+  const team = item.team ?? item.teamName ?? '';
+  const exposure = item.exposure ?? item.exposureType ?? '';
+  const updatedAt = item.updatedAt ?? item.createdAt ?? new Date(0).toISOString();
+  const serviceType = item.serviceType ?? item.protocol;
+
   return {
     ...item,
-    catalogServiceType: mapServiceType(item.serviceType, item.protocol),
+    name,
+    semVer,
+    domain: item.domain ?? '',
+    team,
+    technicalOwner: item.technicalOwner ?? '',
+    criticality: item.criticality ?? '',
+    exposure,
+    updatedAt,
+    catalogServiceType: mapServiceType(serviceType, item.protocol),
     approvalState: deriveApprovalState(item.lifecycleState),
   };
 }

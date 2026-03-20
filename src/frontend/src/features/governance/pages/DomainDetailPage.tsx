@@ -262,8 +262,8 @@ function TeamsTab({ teams, t }: { teams: DomainTeamDto[]; t: (key: string) => st
               <Users size={14} className="text-muted shrink-0" />
               <span className="text-sm font-medium text-heading flex-1 truncate">{team.displayName}</span>
               <span className="text-xs text-muted hidden md:inline">{team.serviceCount} {t('organization.domainDetail.services')}</span>
-              <Badge variant={ownershipBadgeVariant(team.ownershipType)}>
-                {t(`organization.domainDetail.ownershipType.${team.ownershipType}`)}
+              <Badge variant={ownershipBadgeVariant(team.ownershipType ?? 'Unknown')}>
+                {t(`organization.domainDetail.ownershipType.${team.ownershipType ?? 'Unknown'}`)}
               </Badge>
               <ArrowRight size={14} className="text-muted" />
             </Link>
@@ -297,7 +297,7 @@ function ServicesTab({ services, t }: { services: DomainServiceDto[]; t: (key: s
               <span className="text-sm font-medium text-heading flex-1 truncate">{svc.name}</span>
               <span className="text-xs text-muted hidden md:inline">{svc.teamName}</span>
               <Badge variant={criticalityVariant(svc.criticality)}>{svc.criticality}</Badge>
-              <Badge variant={statusBadgeVariant(svc.status)}>{svc.status}</Badge>
+              <Badge variant={statusBadgeVariant(svc.status ?? 'Unknown')}>{svc.status ?? 'Unknown'}</Badge>
               <ArrowRight size={14} className="text-muted" />
             </Link>
           ))}

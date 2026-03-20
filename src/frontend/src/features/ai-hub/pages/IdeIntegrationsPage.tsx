@@ -9,6 +9,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { Loader } from '../../../components/Loader';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
@@ -183,10 +184,10 @@ export function IdeIntegrationsPage() {
 
   return (
     <PageContainer>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('aiHub.ideTitle')}</h1>
-        <p className="text-muted mt-1">{t('aiHub.ideSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('aiHub.ideTitle')}
+        subtitle={t('aiHub.ideSubtitle')}
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

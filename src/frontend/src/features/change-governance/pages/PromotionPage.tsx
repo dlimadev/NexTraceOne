@@ -10,6 +10,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { promotionApi } from '../api';
 import type { PromotionRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 type PromotionStatus = PromotionRequest['status'];
 
@@ -76,15 +77,15 @@ export function PromotionPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('promotion.title')}</h1>
-          <p className="text-muted mt-1">{t('promotion.subtitle')}</p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <Plus size={16} /> {t('promotion.newRequest')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('promotion.title')}
+        subtitle={t('promotion.subtitle')}
+        actions={
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <Plus size={16} /> {t('promotion.newRequest')}
+          </Button>
+        }
+      />
 
       {/* Create Form */}
       {showForm && (

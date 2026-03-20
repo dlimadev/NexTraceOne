@@ -7,6 +7,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import type {
   ExecutiveDrillDownResponse,
   RiskLevel,
@@ -104,21 +105,18 @@ export function ExecutiveDrillDownPage() {
   return (
     <PageContainer>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">
-          {t('governance.executive.drillDownTitle')}
-        </h1>
-        <p className="text-muted mt-1">
-          {t('governance.executive.drillDownSubtitle', {
-            entityType: entityType ?? d.entityType,
-            entityName: d.entityName,
-          })}
-        </p>
+      <PageHeader
+        title={t('governance.executive.drillDownTitle')}
+        subtitle={t('governance.executive.drillDownSubtitle', {
+          entityType: entityType ?? d.entityType,
+          entityName: d.entityName,
+        })}
+      >
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="warning">{t('governance.preview.badge')}</Badge>
           <span className="text-xs text-muted">{t('governance.preview.drilldownReason')}</span>
         </div>
-        <div className="flex items-center gap-3 mt-3">
+        <div className="flex flex-wrap items-center gap-3 mt-3">
           <div className="flex items-center gap-2">
             <ShieldAlert size={14} className="text-muted" />
             <span className="text-xs text-muted">{t('governance.executive.drillDownRiskLevel')}</span>
@@ -134,7 +132,7 @@ export function ExecutiveDrillDownPage() {
             </Badge>
           </div>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Key Indicators */}
       <Card className="mb-6">

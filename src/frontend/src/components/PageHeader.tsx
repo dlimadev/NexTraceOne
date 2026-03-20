@@ -19,6 +19,7 @@ interface PageHeaderProps {
  * Cabeçalho de página padronizado para todo o produto.
  *
  * Garante hierarquia visual consistente: título + descrição + ações.
+ * Responsivo: ações reflui para baixo do título em viewports pequenos.
  * Segue a estrutura definida no DESIGN.md §4.3.
  *
  * @see docs/DESIGN.md — Anatomia padrão de página
@@ -33,10 +34,10 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <div className={cn('mb-6', className)}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-heading truncate">{title}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-heading truncate">{title}</h1>
             {badge}
           </div>
           {subtitle && (

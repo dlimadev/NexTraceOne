@@ -9,6 +9,7 @@ import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { JitAccessRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
@@ -68,15 +69,15 @@ export function JitAccessPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('identity.jitAccess.title')}</h1>
-          <p className="text-muted mt-1">{t('identity.jitAccess.subtitle')}</p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <Clock size={16} /> {t('identity.jitAccess.request')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('identity.jitAccess.title')}
+        subtitle={t('identity.jitAccess.subtitle')}
+        actions={
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <Clock size={16} /> {t('identity.jitAccess.request')}
+          </Button>
+        }
+      />
 
       {/* Formulário de solicitação de acesso JIT */}
       {showForm && (

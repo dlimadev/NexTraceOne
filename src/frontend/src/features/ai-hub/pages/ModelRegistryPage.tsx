@@ -16,7 +16,8 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { Button } from '../../../components/Button';
 import { OnboardingHints } from '../../../components/OnboardingHints';
-import { PageContainer } from '../../../components/shell';
+import { PageContainer, StatsGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { Loader } from '../../../components/Loader';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
@@ -120,24 +121,24 @@ export function ModelRegistryPage() {
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="aiHub" />
 
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{t('aiHub.modelsTitle')}</h1>
-          <p className="text-muted mt-1">{t('aiHub.modelsSubtitle')}</p>
-        </div>
-        <Button variant="primary" size="md" disabled>
-          <Plus size={16} />
-          {t('aiHub.registerModel')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('aiHub.modelsTitle')}
+        subtitle={t('aiHub.modelsSubtitle')}
+        actions={
+          <Button variant="primary" size="md" disabled>
+            <Plus size={16} />
+            {t('aiHub.registerModel')}
+          </Button>
+        }
+      />
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <StatsGrid columns={4}>
         <StatCard title={t('aiHub.totalModels')} value={models.length} icon={<Database size={20} />} color="text-accent" />
         <StatCard title={t('aiHub.activeModels')} value={models.filter(m => m.status === 'Active').length} icon={<Cpu size={20} />} color="text-success" />
         <StatCard title={t('aiHub.internalModels')} value={models.filter(m => m.isInternal).length} icon={<Lock size={20} />} color="text-info" />
         <StatCard title={t('aiHub.externalModels')} value={models.filter(m => m.isExternal).length} icon={<Globe size={20} />} color="text-warning" />
-      </div>
+      </StatsGrid>
 
       {/* Filter bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">

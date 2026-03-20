@@ -1,7 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
 using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
@@ -16,10 +18,6 @@ using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Feature
 
 namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
-/// <summary>
-/// Testes dos handlers da camada Application para o Contract Studio.
-/// Cobre criação, consulta, edição, revisão, publicação e geração por IA de drafts.
-/// </summary>
 public sealed class ContractStudioApplicationTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 06, 15, 10, 0, 0, TimeSpan.Zero);
@@ -327,22 +325,35 @@ public sealed class ContractStudioApplicationTests
     [Fact]
     public async Task PublishDraft_Should_CreateContractVersion_When_DraftIsApproved()
     {
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, service.Id.Value).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
         draft.SubmitForReview(FixedNow);
         draft.Approve("reviewer@test.com", FixedNow);
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var versionRepo = Substitute.For<IContractVersionRepository>();
+        var apiAssetRepo = Substitute.For<IApiAssetRepository>();
+        var serviceAssetRepo = Substitute.For<IServiceAssetRepository>();
         var unitOfWork = CreateUnitOfWork();
+        var graphUnitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
             .Returns(draft);
+        serviceAssetRepo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(service);
 
-        var sut = new PublishDraftFeature.Handler(draftRepo, versionRepo, unitOfWork, dateTimeProvider);
+        var sut = new PublishDraftFeature.Handler(
+            draftRepo,
+            versionRepo,
+            apiAssetRepo,
+            serviceAssetRepo,
+            unitOfWork,
+            graphUnitOfWork,
+            dateTimeProvider);
 
         var result = await sut.Handle(
             new PublishDraftFeature.Command(draft.Id.Value, "publisher@test.com"),
@@ -351,8 +362,10 @@ public sealed class ContractStudioApplicationTests
         result.IsSuccess.Should().BeTrue();
         result.Value.ContractVersionId.Should().NotBeEmpty();
         result.Value.DraftId.Should().Be(draft.Id.Value);
+        apiAssetRepo.Received(1).Add(Arg.Any<ApiAsset>());
         versionRepo.Received(1).Add(Arg.Any<ContractVersion>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+        await graphUnitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -360,13 +373,23 @@ public sealed class ContractStudioApplicationTests
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var versionRepo = Substitute.For<IContractVersionRepository>();
+        var apiAssetRepo = Substitute.For<IApiAssetRepository>();
+        var serviceAssetRepo = Substitute.For<IServiceAssetRepository>();
         var unitOfWork = CreateUnitOfWork();
+        var graphUnitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
             .Returns((ContractDraft?)null);
 
-        var sut = new PublishDraftFeature.Handler(draftRepo, versionRepo, unitOfWork, dateTimeProvider);
+        var sut = new PublishDraftFeature.Handler(
+            draftRepo,
+            versionRepo,
+            apiAssetRepo,
+            serviceAssetRepo,
+            unitOfWork,
+            graphUnitOfWork,
+            dateTimeProvider);
 
         var result = await sut.Handle(
             new PublishDraftFeature.Command(Guid.NewGuid(), "publisher@test.com"),

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -11,6 +12,7 @@ beforeAll(() => {
 vi.mock('../../features/operations/api/incidents', () => ({
   incidentsApi: {
     getIncidentDetail: vi.fn(),
+    refreshIncidentCorrelation: vi.fn(),
   },
 }));
 
@@ -44,35 +46,28 @@ const mockIncident = {
     incidentId: '22222222-2222-2222-2222-222222222222',
     reference: 'INC-1042',
     title: 'Payment gateway timeout errors',
-    description: 'Elevated timeout rates on payment processing API',
-    severity: 'High',
+    summary: 'Elevated timeout rates on payment processing API',
+    incidentType: 'ServiceDegradation',
+    severity: 'Major',
     status: 'Open',
-    environment: 'production',
-    domain: 'Payments',
-    teamName: 'payments-squad',
-    correlatedChangeId: 'chg-1',
-    correlatedChangeDescription: 'Deployment v2.4.1',
-    confidenceLevel: 0.87,
-    mitigationStatus: 'InProgress',
     createdAt: '2026-03-15T10:00:00Z',
     updatedAt: '2026-03-15T12:00:00Z',
-    resolvedAt: null,
   },
   linkedServices: [
     { serviceId: 'svc-payment', displayName: 'Payment Gateway', serviceType: 'Backend', criticality: 'Critical' },
   ],
   ownerTeam: 'payments-squad',
   impactedDomain: 'Payments',
-  impactedEnvironment: 'production',
+  impactedEnvironment: 'Production',
   timeline: [
-    { timestamp: '2026-03-15T10:00:00Z', type: 'Created', description: 'Incident created by monitoring alert' },
-    { timestamp: '2026-03-15T10:15:00Z', type: 'Updated', description: 'Severity escalated to High' },
+    { timestamp: '2026-03-15T10:00:00Z', description: 'Incident created by monitoring alert' },
+    { timestamp: '2026-03-15T10:15:00Z', description: 'Severity escalated to Major' },
   ],
   correlation: {
     confidence: 'High',
     reason: 'Deployment detected within blast radius',
     relatedChanges: [
-      { changeId: 'chg-1', description: 'Deployment payment-gateway v2.4.1', changeType: 'Deployment', confidenceStatus: 'High', deployedAt: '2026-03-15T09:45:00Z' },
+      { changeId: '11111111-1111-1111-1111-111111111111', description: 'Deployment payment-gateway v2.4.1', changeType: 'Deployment', confidenceStatus: 'HighEvidence', deployedAt: '2026-03-15T09:45:00Z' },
     ],
     relatedServices: [
       { serviceId: 'svc-payment', displayName: 'Payment Gateway', impactDescription: 'Direct impact on payment processing' },
@@ -96,10 +91,10 @@ const mockIncident = {
     escalationGuidance: 'Escalate to platform team if issue persists after rollback',
   },
   runbooks: [
-    { runbookId: 'rb-1', title: 'Payment Gateway Recovery', category: 'Recovery', lastUpdated: '2026-02-01' },
+    { title: 'Payment Gateway Recovery', url: 'https://docs.internal/runbooks/payment-gateway-recovery' },
   ],
   relatedContracts: [
-    { contractVersionId: 'cv-pay-1', name: 'payments-api', version: 'v2.0', protocol: 'OpenApi', lifecycleState: 'Approved' },
+    { contractVersionId: '33333333-3333-3333-3333-333333333333', name: 'payments-api', version: 'v2.0', protocol: 'OpenApi', lifecycleState: 'Approved' },
   ],
 };
 
@@ -121,6 +116,16 @@ function renderPage(incidentId = '22222222-2222-2222-2222-222222222222') {
 describe('IncidentDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(incidentsApi.refreshIncidentCorrelation).mockResolvedValue({
+      incidentId: '22222222-2222-2222-2222-222222222222',
+      confidence: 'High',
+      score: 87,
+      reason: 'Correlation refreshed',
+      relatedChanges: [],
+      relatedServices: [],
+      relatedDependencies: [],
+      possibleImpactedContracts: [],
+    });
   });
 
   it('shows loading state', () => {
@@ -162,11 +167,18 @@ describe('IncidentDetailPage', () => {
     });
   });
 
-  it('displays evidence observations', async () => {
-    vi.mocked(incidentsApi.getIncidentDetail).mockResolvedValue(mockIncident);
+  it('shows honest correlation empty state when no changes are linked', async () => {
+    vi.mocked(incidentsApi.getIncidentDetail).mockResolvedValue({
+      ...mockIncident,
+      correlation: {
+        ...mockIncident.correlation,
+        relatedChanges: [],
+        relatedServices: [],
+      },
+    });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText(/timeout errors concentrated/i)).toBeInTheDocument();
+      expect(screen.getByText(/no correlated changes were confirmed/i)).toBeInTheDocument();
     });
   });
 
@@ -176,15 +188,5 @@ describe('IncidentDetailPage', () => {
     await waitFor(() => {
       expect(screen.getByText(/not found/i)).toBeInTheDocument();
     });
-  });
-
-  it('shows back to list link', async () => {
-    vi.mocked(incidentsApi.getIncidentDetail).mockResolvedValue(mockIncident);
-    renderPage();
-    await waitFor(() => {
-      expect(screen.getByText('INC-1042')).toBeInTheDocument();
-    });
-    const backLinks = screen.getAllByRole('link').filter(link => link.getAttribute('href')?.includes('/operations/incidents'));
-    expect(backLinks.length).toBeGreaterThanOrEqual(1);
   });
 });

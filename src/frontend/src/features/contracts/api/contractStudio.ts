@@ -70,7 +70,6 @@ function mapDraftCreationResult(raw: unknown) {
     title: readValue<string>(source, 'title') ?? '',
     status: readValue<string>(source, 'status') ?? 'Editing',
     createdAt: readValue<string>(source, 'createdAt') ?? '',
-    generatedContentPreview: readValue<string>(source, 'generatedContentPreview') ?? '',
   };
 }
 
@@ -132,16 +131,6 @@ export const contractStudioApi = {
 
   publish: (draftId: string, data: { publishedBy: string }) =>
     client.post<{ contractVersionId: string }>(`/contracts/drafts/${draftId}/publish`, data).then(r => r.data),
-
-  generateFromAi: (data: {
-    title: string;
-    author: string;
-    contractType: ContractType;
-    protocol: ContractProtocol;
-    prompt: string;
-    serviceId?: string;
-  }) =>
-    client.post('/contracts/drafts/generate', data).then((r) => mapDraftCreationResult(r.data)),
 
   addExample: (draftId: string, data: {
     name: string;

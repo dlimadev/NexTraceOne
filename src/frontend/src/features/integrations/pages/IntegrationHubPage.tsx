@@ -8,7 +8,8 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { PageContainer, PageSection } from '../../../components/shell';
+import { PageContainer, PageSection, StatsGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 
 type ConnectorStatus = 'Active' | 'Degraded' | 'Failed' | 'Disabled';
 type ConnectorHealth = 'Healthy' | 'Degraded' | 'Failed' | 'Stale';
@@ -93,20 +94,19 @@ export function IntegrationHubPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('integrations.hubTitle')}</h1>
-        <p className="text-muted mt-1">{t('integrations.hubSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('integrations.hubTitle')}
+        subtitle={t('integrations.hubSubtitle')}
+      />
 
       {/* Stats */}
       <PageSection>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatsGrid columns={4}>
           <StatCard title={t('integrations.totalConnectors')} value={data.length} icon={<Cable size={20} />} color="text-accent" />
           <StatCard title={t('integrations.healthyConnectors')} value={healthyCount} icon={<CheckCircle size={20} />} color="text-success" />
           <StatCard title={t('integrations.degradedFailed')} value={degradedFailedCount} icon={<AlertTriangle size={20} />} color="text-critical" />
           <StatCard title={t('integrations.staleFeeds')} value={staleCount} icon={<Clock size={20} />} color="text-warning" />
-        </div>
+        </StatsGrid>
       </PageSection>
 
       {/* Connectors */}

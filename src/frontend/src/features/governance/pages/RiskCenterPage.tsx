@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import type { RiskSummaryResponse, RiskLevel } from '../../../types';
@@ -82,11 +83,10 @@ export function RiskCenterPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-heading">{t('governance.riskTitle')}</h1>
-        <p className="text-muted mt-1">{t('governance.riskSubtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('governance.riskTitle')}
+        subtitle={t('governance.riskSubtitle')}
+      />
 
       {/* Stats */}
       <PageSection>

@@ -103,6 +103,20 @@ public static class ContractsErrors
     public static Error InvalidDraftTransition(string fromStatus, string toStatus)
         => Error.Business("Contracts.Draft.InvalidTransition", "Cannot transition draft from '{0}' to '{1}'.", fromStatus, toStatus);
 
+    /// <summary>Draft precisa estar ligado a um serviço ou API asset real antes da publicação.</summary>
+    public static Error DraftMissingCatalogLink(string draftId)
+        => Error.Validation(
+            "Contracts.Draft.MissingCatalogLink",
+            "Contract draft '{0}' must be linked to a real service or API asset before publication.",
+            draftId);
+
+    /// <summary>Referência de catálogo associada ao draft não foi encontrada.</summary>
+    public static Error CatalogLinkNotFound(string linkedId)
+        => Error.NotFound(
+            "Contracts.Catalog.LinkNotFound",
+            "No service or API asset was found for linked identifier '{0}'.",
+            linkedId);
+
     // ── ContractExample ─────────────────────────────────────────────
 
     /// <summary>Exemplo de contrato não encontrado.</summary>

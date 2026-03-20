@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
-import { PageContainer } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageContainer, StatsGrid } from '../../../components/shell';
 
 /**
  * Página de value tracking — marcos de valor.
@@ -45,7 +46,7 @@ function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
     case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
     case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
-    default: return <Minus size={14} className="text-zinc-400" />;
+    default: return <Minus size={14} className="text-muted" />;
   }
 }
 
@@ -70,14 +71,13 @@ export function ValueTrackingPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">{t('analytics.value.title')}</h1>
-        <p className="text-zinc-400 mt-1">{t('analytics.value.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('analytics.value.title')}
+        subtitle={t('analytics.value.subtitle')}
+      />
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <StatsGrid columns={4}>
         <StatCard
           title={t('analytics.timeToFirstValue')}
           value="18.5 min"
@@ -104,12 +104,10 @@ export function ValueTrackingPage() {
           icon={<Users size={20} />}
           color="text-amber-400"
         />
-      </div>
-
-      {/* Milestones list */}
+      </StatsGrid>
       <Card>
         <CardHeader>
-          <span className="font-semibold text-white">{t('analytics.value.milestoneProgress')}</span>
+          <span className="font-semibold text-heading">{t('analytics.value.milestoneProgress')}</span>
         </CardHeader>
         <CardBody>
           <div className="space-y-4">
@@ -118,28 +116,28 @@ export function ValueTrackingPage() {
                 {/* Milestone name & trend */}
                 <div className="md:w-72 flex items-center gap-2">
                   <CheckCircle size={16} className={m.completionRate >= 50 ? 'text-emerald-400' : 'text-zinc-600'} />
-                  <span className="text-sm text-white">{t(`analytics.milestone.${m.type}`)}</span>
+                  <span className="text-sm text-heading">{t(`analytics.milestone.${m.type}`)}</span>
                   {trendIcon(m.trend)}
                 </div>
 
                 {/* Progress bar */}
                 <div className="flex-1 flex items-center gap-3">
-                  <div className="flex-1 h-2 rounded-full bg-zinc-800 overflow-hidden">
+                  <div className="flex-1 h-2 rounded-full bg-elevated overflow-hidden">
                     <div
                       className={`h-full rounded-full ${completionColor(m.completionRate)} transition-all`}
                       style={{ width: `${m.completionRate}%` }}
                     />
                   </div>
-                  <span className="text-sm text-white font-medium w-14 text-right">{m.completionRate}%</span>
+                  <span className="text-sm text-heading font-medium w-14 text-right">{m.completionRate}%</span>
                 </div>
 
                 {/* Stats */}
                 <div className="flex items-center gap-4 text-sm md:w-48">
-                  <span className="text-zinc-400 flex items-center gap-1">
+                  <span className="text-muted flex items-center gap-1">
                     <Clock size={12} />
                     {formatTime(m.avgTimeMinutes)}
                   </span>
-                  <span className="text-zinc-400 flex items-center gap-1">
+                  <span className="text-muted flex items-center gap-1">
                     <Users size={12} />
                     {m.usersReached}
                   </span>

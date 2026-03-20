@@ -79,6 +79,7 @@ export type Permission =
   | 'ai:ide:write'
   | 'ai:governance:read'
   // ── Governance ──
+  | 'governance:read'
   | 'governance:reports:read'
   | 'governance:risk:read'
   | 'governance:compliance:read'
@@ -87,6 +88,7 @@ export type Permission =
   | 'governance:evidence:read'
   | 'governance:controls:read'
   // ── Product Analytics ──
+  | 'analytics:read'
   | 'governance:analytics:read'
   | 'governance:analytics:write'
   // ── Organization Governance ──

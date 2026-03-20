@@ -18,7 +18,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
-import type { CoverageIndicators } from '../../../types';
+import type { CoverageIndicators, ContractVersionDetail, SourceOfTruthReferenceItem, ServiceApiSummary } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de criticidade. */
@@ -104,6 +104,7 @@ export function ServiceSourceOfTruthPage() {
   }
 
   const coveragePercent = coverage?.coverageScore ?? 0;
+  const lifecycleStatus = sot.lifecycleStatus ?? 'Unknown';
   const dashOffset = RING_CIRCUMFERENCE - (coveragePercent / 100) * RING_CIRCUMFERENCE;
 
   return (
@@ -134,8 +135,8 @@ export function ServiceSourceOfTruthPage() {
                 {t(`catalog.badges.criticality.${sot.criticality}`, sot.criticality)}
               </span>
             )}
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.lifecycleStatus] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-              {t(`catalog.badges.lifecycle.${sot.lifecycleStatus}`, sot.lifecycleStatus)}
+            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[lifecycleStatus] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+              {String(t(`catalog.badges.lifecycle.${lifecycleStatus}`, lifecycleStatus))}
             </span>
           </div>
         </div>
@@ -157,7 +158,7 @@ export function ServiceSourceOfTruthPage() {
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.serviceType')}</dt>
-                  <dd className="text-body">{sot.serviceType ? t(`catalog.badges.type.${sot.serviceType}`, sot.serviceType) : t('common.noData')}</dd>
+                  <dd className="text-body">{sot.serviceType ? String(t(`catalog.badges.type.${sot.serviceType}`, sot.serviceType)) : t('common.noData')}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.service.systemArea')}</dt>
@@ -224,14 +225,14 @@ export function ServiceSourceOfTruthPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-edge">
-                      {sot.apis.map((api) => (
-                        <tr key={api.apiAssetId} className="hover:bg-hover transition-colors">
+                      {sot.apis.map((api: ServiceApiSummary) => (
+                        <tr key={api.apiId} className="hover:bg-hover transition-colors">
                           <td className="px-6 py-3 text-body font-medium">{api.name}</td>
                           <td className="px-6 py-3 text-muted font-mono text-xs">{api.routePattern}</td>
                           <td className="px-6 py-3 text-muted">{api.version}</td>
                           <td className="px-6 py-3">
                             <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                              {t(`catalog.badges.exposure.${api.visibility}`, api.visibility)}
+                              {String(t(`catalog.badges.exposure.${api.visibility}`, api.visibility))}
                             </span>
                           </td>
                           <td className="px-6 py-3 text-right text-muted">{api.consumerCount}</td>
@@ -270,22 +271,22 @@ export function ServiceSourceOfTruthPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-edge">
-                      {sot.contracts.map((c) => (
-                        <tr key={c.versionId} className="hover:bg-hover transition-colors">
+                      {sot.contracts.map((c: ContractVersionDetail & { versionId?: string }) => (
+                        <tr key={c.versionId ?? c.id} className="hover:bg-hover transition-colors">
                           <td className="px-6 py-3">
-                            <Link to={`/source-of-truth/contracts/${c.versionId}`} className="text-accent hover:text-accent/80 font-medium">
+                            <Link to={`/source-of-truth/contracts/${c.versionId ?? c.id}`} className="text-accent hover:text-accent/80 font-medium">
                               {c.apiAssetId}
                             </Link>
                           </td>
                           <td className="px-6 py-3 text-muted">v{c.semVer}</td>
                           <td className="px-6 py-3">
                             <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
-                              {t(`contractGov.badges.protocols.${c.protocol}`, c.protocol)}
+                              {String(t(`contractGov.badges.protocols.${c.protocol}`, c.protocol))}
                             </span>
                           </td>
                           <td className="px-6 py-3">
                             <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                              {t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState)}
+                              {String(t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState))}
                             </span>
                           </td>
                         </tr>
@@ -311,14 +312,14 @@ export function ServiceSourceOfTruthPage() {
                 <EmptyState icon={<BookOpen size={20} />} title={t('sourceOfTruth.service.noReferences')} />
               ) : (
                 <ul className="space-y-3">
-                  {sot.references.map((ref) => (
+                  {sot.references.map((ref: SourceOfTruthReferenceItem) => (
                     <li key={ref.referenceId} className="flex items-start gap-3 p-3 rounded-lg bg-elevated border border-edge">
                       <FileText size={16} className="text-muted shrink-0 mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-heading truncate">{ref.title}</p>
                         <p className="text-xs text-muted line-clamp-2">{ref.description}</p>
                         <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
-                          {t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType)}
+                          {String(t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType))}
                         </span>
                       </div>
                       {ref.url && (
@@ -376,14 +377,14 @@ export function ServiceSourceOfTruthPage() {
                 {COVERAGE_KEYS.map((key) => {
                   const met = sot.coverage[key];
                   return (
-                    <li key={key} className="flex items-center gap-2 text-sm">
+                    <li key={String(key)} className="flex items-center gap-2 text-sm">
                       {met ? (
                         <CheckCircle size={14} className="text-emerald-400 shrink-0" />
                       ) : (
                         <XCircle size={14} className="text-red-400 shrink-0" />
                       )}
                       <span className={met ? 'text-body' : 'text-muted'}>
-                        {t(`sourceOfTruth.service.indicators.${key}`)}
+                        {String(t(`sourceOfTruth.service.indicators.${String(key)}`))}
                       </span>
                     </li>
                   );

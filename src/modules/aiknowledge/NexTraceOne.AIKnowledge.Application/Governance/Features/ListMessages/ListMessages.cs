@@ -42,6 +42,9 @@ public static class ListMessages
             if (conversation is null)
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
+            if (!IsConversationOwner(conversation, currentUser))
+                return AiGovernanceErrors.ConversationAccessDenied(request.ConversationId.ToString());
+
             var messages = await messageRepository.ListByConversationAsync(
                 request.ConversationId,
                 request.PageSize,
@@ -55,7 +58,7 @@ public static class ListMessages
                 m.Id.Value,
                 m.ConversationId,
                 m.Role,
-                m.Content,
+                m.GetDisplayContent(),
                 m.ModelName,
                 m.Provider,
                 m.IsInternalModel,

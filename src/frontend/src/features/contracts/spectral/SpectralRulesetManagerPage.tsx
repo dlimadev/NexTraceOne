@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
+import { PageHeader } from '../../../components/PageHeader';
+import { PageContainer, StatsGrid } from '../../../components/shell';
 import { useSpectralRulesets, useToggleSpectralRuleset, useDeleteSpectralRuleset } from '../hooks';
 import { SEVERITY_COLORS } from '../shared/constants';
 import type { SpectralRuleset, SpectralRulesetOrigin } from '../types';
@@ -55,23 +57,17 @@ export function SpectralRulesetManagerPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 max-w-6xl mx-auto">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-heading flex items-center gap-2">
-            <ScanSearch size={20} className="text-accent" />
-            {t('contracts.spectral.manager.title', 'Spectral Rulesets')}
-          </h1>
-          <p className="text-sm text-muted mt-1">
-            {t('contracts.spectral.manager.subtitle', 'Manage linting rulesets for contract validation and governance.')}
-          </p>
-        </div>
-        <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
-          <Plus size={14} />
-          {t('contracts.spectral.manager.create', 'Add Ruleset')}
-        </button>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('contracts.spectral.manager.title', 'Spectral Rulesets')}
+        subtitle={t('contracts.spectral.manager.subtitle', 'Manage linting rulesets for contract validation and governance.')}
+        actions={
+          <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
+            <Plus size={14} />
+            {t('contracts.spectral.manager.create', 'Add Ruleset')}
+          </button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex items-center gap-3">
@@ -92,14 +88,12 @@ export function SpectralRulesetManagerPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <StatsGrid columns={4}>
         <StatCard label={t('contracts.spectral.manager.total', 'Total')} value={rulesets.length} />
         <StatCard label={t('contracts.spectral.manager.active', 'Active')} value={rulesets.filter((r) => r.isActive).length} variant="success" />
         <StatCard label={t('contracts.spectral.manager.inactive', 'Inactive')} value={rulesets.filter((r) => !r.isActive).length} variant="warning" />
         <StatCard label={t('contracts.spectral.manager.defaults', 'Default')} value={rulesets.filter((r) => r.isDefault).length} variant="accent" />
-      </div>
-
-      {/* Ruleset list */}
+      </StatsGrid>
       {rulesets.length === 0 && !rulesetsQuery.isLoading && (
         <EmptyState
           icon="ScanSearch"
@@ -237,7 +231,7 @@ export function SpectralRulesetManagerPage() {
           );
         })}
       </div>
-    </div>
+    </PageContainer>
   );
 }
 

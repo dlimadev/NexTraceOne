@@ -23,6 +23,8 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
     private static readonly Guid SeedIncidentId = Guid.Parse("a1b2c3d4-0001-0000-0000-000000000001");
     private static readonly Guid SeedAdminUserId = Guid.Parse("b0000000-0000-0000-0000-000000000001");
     private static readonly Guid SeedConversationId = Guid.Parse("f0000000-0000-0000-0000-000000000001");
+    private const string SeedAuditorEmail = "auditor@nextraceone.dev";
+    private const string SeedAuditorPassword = "Admin@123";
 
     [Fact]
     public async Task IdentityAccess_Should_Login_ListTenants_And_SelectTenant_And_Use_Real_CookieSession()
@@ -78,6 +80,26 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
     }
 
     [Fact]
+    public async Task IdentityAccess_Should_Get_Current_User_And_List_Tenant_Users_With_Real_Backend()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedAdminEmail,
+            ApiHostPostgreSqlFixture.SeedAdminPassword);
+
+        var meResponse = await client.GetAsync("/api/v1/identity/auth/me");
+        meResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var mePayload = await meResponse.Content.ReadAsStringAsync();
+        mePayload.Should().Contain(ApiHostPostgreSqlFixture.SeedAdminEmail);
+        mePayload.Should().Contain(ApiHostPostgreSqlFixture.NexTraceCorpTenantId.ToString());
+
+        var usersResponse = await client.GetAsync($"/api/v1/identity/tenants/{ApiHostPostgreSqlFixture.NexTraceCorpTenantId}/users?page=1&pageSize=20");
+        usersResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var usersPayload = await usersResponse.Content.ReadAsStringAsync();
+        usersPayload.Should().Contain(ApiHostPostgreSqlFixture.SeedAdminEmail);
+        usersPayload.Should().Contain(ApiHostPostgreSqlFixture.SeedDeveloperEmail);
+    }
+
+    [Fact]
     public async Task IdentityAccess_Should_Enforce_Minimal_Permissions_With_Real_Authorization()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -91,7 +113,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
     }
 
     [Fact]
-    public async Task Catalog_And_SourceOfTruth_Should_List_Services_Get_Detail_And_Expose_Real_Contract_Catalog_Summary()
+    public async Task Catalog_And_SourceOfTruth_Should_List_Services_Get_Detail_Search_And_Expose_Real_Contract_Catalog_Summary()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
             ApiHostPostgreSqlFixture.SeedAdminEmail,
@@ -109,6 +131,17 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         detailPayload.Should().Contain("Payments Service");
         detailPayload.Should().Contain("Finance");
 
+        var sourceOfTruthSearchResponse = await client.GetAsync("/api/v1/source-of-truth/search?q=Payments&scope=services&maxResults=10");
+        sourceOfTruthSearchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var sourceOfTruthSearchPayload = await sourceOfTruthSearchResponse.Content.ReadAsStringAsync();
+        sourceOfTruthSearchPayload.Should().Contain("Payments Service");
+
+        var serviceSourceOfTruthResponse = await client.GetAsync($"/api/v1/source-of-truth/services/{PaymentsServiceId}");
+        serviceSourceOfTruthResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var serviceSourceOfTruthPayload = await serviceSourceOfTruthResponse.Content.ReadAsStringAsync();
+        serviceSourceOfTruthPayload.Should().Contain("Payments Service");
+        serviceSourceOfTruthPayload.Should().Contain("Finance");
+
         var contractsListResponse = await client.GetAsync("/api/v1/contracts/list?page=1&pageSize=20");
         contractsListResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var contractsListPayload = await contractsListResponse.Content.ReadAsStringAsync();
@@ -122,6 +155,16 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         contractDetailPayload.Should().Contain("routePattern");
         contractDetailPayload.Should().Contain("technicalOwner");
 
+        var contractSourceOfTruthResponse = await client.GetAsync($"/api/v1/source-of-truth/contracts/{contractVersionId}");
+        contractSourceOfTruthResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var contractSourceOfTruthPayload = await contractSourceOfTruthResponse.Content.ReadAsStringAsync();
+        contractSourceOfTruthPayload.Should().Contain("OpenApi");
+        contractSourceOfTruthPayload.Should().Contain("Approved");
+
+        var globalSearchResponse = await client.GetAsync("/api/v1/source-of-truth/global-search?q=Orders&persona=Engineer&maxResults=10");
+        globalSearchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await globalSearchResponse.Content.ReadAsStringAsync()).Should().Contain("Orders");
+
         var contractsResponse = await client.GetAsync("/api/v1/contracts/summary");
         contractsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var contractsPayload = await contractsResponse.Content.ReadAsStringAsync();
@@ -130,7 +173,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
     }
 
     [Fact]
-    public async Task Contracts_Should_Create_Update_And_Submit_Draft_With_Real_Backend()
+    public async Task Contracts_Should_Create_Update_Submit_Approve_Publish_And_Reopen_With_Real_Backend()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
             ApiHostPostgreSqlFixture.SeedAdminEmail,
@@ -192,7 +235,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
             title = $"{draftTitle} Updated",
             description = "Updated in RH-6 integration suite",
             proposedVersion = "1.0.1",
-            serviceId = OrdersApiAssetId,
+            serviceId = PaymentsServiceId,
             editedBy = ApiHostPostgreSqlFixture.SeedAdminEmail,
         });
         updateMetadataResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -204,16 +247,59 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         reloadDraftPayload.Should().Contain($"{draftTitle} Updated");
         reloadDraftPayload.Should().Contain("1.0.1");
         reloadDraftPayload.Should().Contain("lastEditedAt");
+        reloadDraftPayload.Should().Contain(PaymentsServiceId.ToString());
 
         var submitResponse = await client.PostAsync($"/api/v1/contracts/drafts/{draftId}/submit-review", null);
-        submitResponse.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.Conflict);
+        submitResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var approveResponse = await client.PostAsJsonAsync($"/api/v1/contracts/drafts/{draftId}/approve", new
+        {
+            approvedBy = ApiHostPostgreSqlFixture.SeedAdminEmail,
+            comment = "Approved by RH-6 integration suite",
+        });
+        approveResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var publishResponse = await client.PostAsJsonAsync($"/api/v1/contracts/drafts/{draftId}/publish", new
+        {
+            publishedBy = ApiHostPostgreSqlFixture.SeedAdminEmail,
+        });
+        publishResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var contractVersionId = await ExtractGuidAsync(publishResponse, "contractVersionId");
 
         var submittedDraftResponse = await client.GetAsync($"/api/v1/contracts/drafts/{draftId}");
         submittedDraftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        (await submittedDraftResponse.Content.ReadAsStringAsync()).Should().Contain("InReview");
+        (await submittedDraftResponse.Content.ReadAsStringAsync()).Should().Contain("Published");
+
+        var detailResponse = await client.GetAsync($"/api/v1/contracts/{contractVersionId}/detail");
+        detailResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var detailPayload = await detailResponse.Content.ReadAsStringAsync();
+        detailPayload.Should().Contain($"{draftTitle} Updated");
+        detailPayload.Should().Contain("Payments Service");
+        detailPayload.Should().Contain("Finance");
+        detailPayload.Should().Contain("Team Beta");
+        detailPayload.Should().Contain("1.0.1");
+
+        var contractsByServiceResponse = await client.GetAsync($"/api/v1/contracts/by-service/{PaymentsServiceId}");
+        contractsByServiceResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await contractsByServiceResponse.Content.ReadAsStringAsync()).Should().Contain("1.0.1");
 
         var reviewsResponse = await client.GetAsync($"/api/v1/contracts/drafts/{draftId}/reviews");
         reviewsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await reviewsResponse.Content.ReadAsStringAsync()).Should().Contain("Approved");
+    }
+
+    [Fact]
+    public async Task PreviewOnly_Governance_And_DeveloperPortal_Endpoints_Should_Be_Removed_From_Final_Product_Surface()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedAdminEmail,
+            ApiHostPostgreSqlFixture.SeedAdminPassword);
+
+        var simulateResponse = await client.PostAsync($"/api/v1/governance/packs/{Guid.NewGuid():D}/simulate", null);
+        simulateResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        var playgroundResponse = await client.PostAsync("/api/v1/developerportal/playground/execute", null);
+        playgroundResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -263,7 +349,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
             environment = "Production",
             detectedAtUtc = DateTimeOffset.UtcNow,
         });
-        createIncidentResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        createIncidentResponse.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Fact]
@@ -307,6 +393,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         sendPayload.GetProperty("conversationMessageCount").GetInt32().Should().Be(2);
         sendPayload.GetProperty("responseState").GetString().Should().BeOneOf("Completed", "Degraded");
         sendPayload.GetProperty("assistantResponse").GetString().Should().NotBeNullOrWhiteSpace();
+        sendPayload.GetProperty("assistantResponse").GetString().Should().NotContain("[FALLBACK_PROVIDER_UNAVAILABLE]");
 
         var listConversationsResponse = await client.GetAsync("/api/v1/ai/assistant/conversations?pageSize=20");
         listConversationsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -324,14 +411,201 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         items[0].GetProperty("role").GetString().Should().Be("user");
         items[1].GetProperty("role").GetString().Should().Be("assistant");
         items[0].GetProperty("content").GetString().Should().Contain("Payments Service");
+        items[1].GetProperty("content").GetString().Should().NotContain("[FALLBACK_PROVIDER_UNAVAILABLE]");
         items[1].GetProperty("responseState").GetString().Should().BeOneOf("Completed", "Degraded");
+        items[1].GetProperty("groundingSources").GetArrayLength().Should().BeGreaterThan(0);
+        items[1].GetProperty("contextReferences").GetArrayLength().Should().BeGreaterThan(0);
+        items[1].GetProperty("content").GetString().Should().Be(sendPayload.GetProperty("assistantResponse").GetString());
 
         var reopenedConversationResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{createdConversationId}?messagePageSize=20");
         reopenedConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var reopenedPayload = await reopenedConversationResponse.Content.ReadAsStringAsync();
-        reopenedPayload.Should().Contain(conversationTitle);
-        reopenedPayload.Should().Contain("Payments Service");
-        reopenedPayload.Should().Contain("responseState");
+        using var reopenedDocument = JsonDocument.Parse(await reopenedConversationResponse.Content.ReadAsStringAsync());
+        var reopenedRoot = reopenedDocument.RootElement;
+        reopenedRoot.GetProperty("messageCount").GetInt32().Should().Be(2);
+        reopenedRoot.GetProperty("messages")[1].GetProperty("content").GetString().Should().Be(sendPayload.GetProperty("assistantResponse").GetString());
+        reopenedRoot.GetProperty("messages")[1].GetProperty("groundingSources").GetArrayLength().Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public async Task AI_Should_Not_Silently_Create_A_New_Conversation_When_Send_Targets_Unknown_Id()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedAdminEmail,
+            ApiHostPostgreSqlFixture.SeedAdminPassword);
+
+        var missingConversationId = Guid.NewGuid();
+
+        var sendMessageResponse = await client.PostAsJsonAsync("/api/v1/ai/assistant/chat", new
+        {
+            conversationId = missingConversationId,
+            message = "This should fail instead of creating another conversation.",
+            contextScope = "services",
+            persona = "Engineer",
+            clientType = "Web",
+        });
+
+        sendMessageResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task AI_Should_Enforce_User_Scoped_Conversation_Access_For_List_Open_Messages_And_Send()
+    {
+        using var adminClient = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedAdminEmail,
+            ApiHostPostgreSqlFixture.SeedAdminPassword);
+        using var developerClient = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedDeveloperEmail,
+            ApiHostPostgreSqlFixture.SeedDeveloperPassword);
+
+        var conversationTitle = $"Scoped AI {Guid.NewGuid():N}"[..20];
+
+        var createConversationResponse = await adminClient.PostAsJsonAsync("/api/v1/ai/assistant/conversations", new
+        {
+            title = conversationTitle,
+            persona = "Engineer",
+            clientType = "Web",
+            defaultContextScope = "services,incidents",
+        });
+        createConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var conversationId = await ExtractGuidAsync(createConversationResponse, "conversationId");
+
+        var developerListResponse = await developerClient.GetAsync("/api/v1/ai/assistant/conversations?pageSize=20");
+        developerListResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await developerListResponse.Content.ReadAsStringAsync()).Should().NotContain(conversationTitle);
+
+        var developerOpenResponse = await developerClient.GetAsync($"/api/v1/ai/assistant/conversations/{conversationId}?messagePageSize=20");
+        developerOpenResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var developerMessagesResponse = await developerClient.GetAsync($"/api/v1/ai/assistant/conversations/{conversationId}/messages?pageSize=20");
+        developerMessagesResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+
+        var developerSendResponse = await developerClient.PostAsJsonAsync("/api/v1/ai/assistant/chat", new
+        {
+            conversationId,
+            message = "Attempt to continue another user's conversation.",
+            contextScope = "services",
+            persona = "Engineer",
+            clientType = "Web",
+        });
+        developerSendResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Incidents_Should_Create_Persist_List_Detail_And_Report_Real_TotalCount()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedAdminEmail,
+            ApiHostPostgreSqlFixture.SeedAdminPassword);
+
+        var title = $"ZR4 Incident {Guid.NewGuid():N}"[..20];
+
+        var createResponse = await client.PostAsJsonAsync("/api/v1/incidents", new
+        {
+            title,
+            description = "Created by ZR-4 integration suite",
+            incidentType = "ServiceDegradation",
+            severity = "Major",
+            serviceId = "svc-zr4-incidents",
+            serviceDisplayName = "ZR4 Incidents Service",
+            ownerTeam = "platform-core",
+            impactedDomain = "Platform",
+            environment = "Production",
+            detectedAtUtc = DateTimeOffset.UtcNow,
+        });
+
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var createdIncidentId = await ExtractGuidAsync(createResponse, "incidentId");
+
+        var listResponse = await client.GetAsync($"/api/v1/incidents?search={Uri.EscapeDataString(title)}&page=1&pageSize=1");
+        listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var listDocument = JsonDocument.Parse(await listResponse.Content.ReadAsStringAsync());
+        var listRoot = listDocument.RootElement.TryGetProperty("data", out var nestedList)
+            ? nestedList
+            : listDocument.RootElement;
+        listRoot.GetProperty("totalCount").GetInt32().Should().Be(1);
+        listRoot.GetProperty("page").GetInt32().Should().Be(1);
+        listRoot.GetProperty("pageSize").GetInt32().Should().Be(1);
+        var items = listRoot.GetProperty("items");
+        items.GetArrayLength().Should().Be(1);
+        items[0].GetProperty("incidentId").GetGuid().Should().Be(createdIncidentId);
+        items[0].GetProperty("title").GetString().Should().Be(title);
+        items[0].GetProperty("serviceDisplayName").GetString().Should().Be("ZR4 Incidents Service");
+
+        var detailResponse = await client.GetAsync($"/api/v1/incidents/{createdIncidentId}");
+        detailResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var detailDocument = JsonDocument.Parse(await detailResponse.Content.ReadAsStringAsync());
+        var detailRoot = detailDocument.RootElement.TryGetProperty("data", out var nestedDetail)
+            ? nestedDetail
+            : detailDocument.RootElement;
+        detailRoot.GetProperty("identity").GetProperty("incidentId").GetGuid().Should().Be(createdIncidentId);
+        detailRoot.GetProperty("identity").GetProperty("title").GetString().Should().Be(title);
+        detailRoot.GetProperty("ownerTeam").GetString().Should().Be("platform-core");
+        detailRoot.GetProperty("impactedEnvironment").GetString().Should().Be("Production");
+        detailRoot.GetProperty("linkedServices")[0].GetProperty("serviceId").GetString().Should().Be("svc-zr4-incidents");
+
+        var reopenedResponse = await client.GetAsync($"/api/v1/incidents/{createdIncidentId}");
+        reopenedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await reopenedResponse.Content.ReadAsStringAsync()).Should().Contain(title);
+    }
+
+    [Fact]
+    public async Task Incidents_Should_Return_Forbidden_For_ReadOnly_Profile_When_Creating()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(
+            SeedAuditorEmail,
+            SeedAuditorPassword);
+
+        var response = await client.PostAsJsonAsync("/api/v1/incidents", new
+        {
+            title = $"ZR4 Forbidden {Guid.NewGuid():N}"[..20],
+            description = "Read-only profiles must not create incidents.",
+            incidentType = "ServiceDegradation",
+            severity = "Minor",
+            serviceId = "svc-zr4-readonly",
+            serviceDisplayName = "ZR4 Read Only Service",
+            ownerTeam = "audit-team",
+            impactedDomain = "Audit",
+            environment = "Production",
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Audit_Should_Record_Search_And_Verify_Real_Audit_Chain()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(
+            ApiHostPostgreSqlFixture.SeedAdminEmail,
+            ApiHostPostgreSqlFixture.SeedAdminPassword);
+
+        var initialSearchResponse = await client.GetAsync("/api/v1/audit/search?page=1&pageSize=20");
+        initialSearchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        using var initialSearchDocument = JsonDocument.Parse(await initialSearchResponse.Content.ReadAsStringAsync());
+        var initialSearchRoot = initialSearchDocument.RootElement.TryGetProperty("data", out var nestedSearch)
+            ? nestedSearch
+            : initialSearchDocument.RootElement;
+        var initialItems = initialSearchRoot.GetProperty("items");
+        initialItems.GetArrayLength().Should().BeGreaterThan(0);
+
+        var firstAuditItem = initialItems[0];
+        var sourceModule = firstAuditItem.GetProperty("sourceModule").GetString();
+        var actionType = firstAuditItem.GetProperty("actionType").GetString();
+
+        sourceModule.Should().NotBeNullOrWhiteSpace();
+        actionType.Should().NotBeNullOrWhiteSpace();
+
+        var filteredSearchResponse = await client.GetAsync($"/api/v1/audit/search?sourceModule={Uri.EscapeDataString(sourceModule!)}&actionType={Uri.EscapeDataString(actionType!)}&page=1&pageSize=20");
+        filteredSearchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var filteredSearchPayload = await filteredSearchResponse.Content.ReadAsStringAsync();
+        filteredSearchPayload.Should().Contain(sourceModule);
+        filteredSearchPayload.Should().Contain(actionType);
+
+        var verifyResponse = await client.GetAsync("/api/v1/audit/verify-chain");
+        verifyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var verifyPayload = await verifyResponse.Content.ReadAsStringAsync();
+        verifyPayload.Should().MatchRegex("\"(isIntact|IsIntact)\"");
+        verifyPayload.Should().MatchRegex("\"(totalLinks|TotalLinks)\"");
     }
 
     private static async Task<Guid> ExtractFirstGuidFromItemsAsync(HttpResponseMessage response, string propertyName)

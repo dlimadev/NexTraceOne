@@ -15,4 +15,7 @@
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Portal\Features\ExecutePlayground\" />
+  </ItemGroup>
 </Project>

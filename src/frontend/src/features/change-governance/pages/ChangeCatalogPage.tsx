@@ -18,6 +18,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
+import { PageHeader } from '../../../components/PageHeader';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import type { ChangesFilterParams } from '../api/changeConfidence';
 import type { ChangeDto } from '../../../types';
@@ -147,11 +148,10 @@ export function ChangeCatalogPage() {
 
   return (
     <PageContainer>
-      {/* ── Header ── */}
-      <div>
-        <h1 className="text-2xl font-bold text-heading">{t('changeConfidence.title')}</h1>
-        <p className="text-sm text-muted mt-1">{t('changeConfidence.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('changeConfidence.title')}
+        subtitle={t('changeConfidence.subtitle')}
+      />
 
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="changes" />
