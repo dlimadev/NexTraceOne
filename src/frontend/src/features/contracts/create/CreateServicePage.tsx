@@ -21,6 +21,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { SERVICE_TYPES, PROTOCOL_BY_TYPE, type ServiceTypeValue } from '../shared/constants';
 import { contractStudioApi } from '../api/contractStudio';
 import type { ContractType, ContractProtocol } from '../types';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   RestApi: Globe,
@@ -57,6 +58,8 @@ type Step = 'type' | 'mode' | 'details';
 export function CreateServicePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const currentActor = user?.email || user?.fullName || user?.id || 'system';
 
   const [step, setStep] = useState<Step>('type');
   const [selectedType, setSelectedType] = useState<ServiceTypeValue | null>(null);
@@ -76,20 +79,30 @@ export function CreateServicePage() {
       if (selectedMode === 'ai') {
         return contractStudioApi.generateFromAi({
           title,
-          author: 'current-user',
+          author: currentActor,
           contractType: selectedType as ContractType,
           protocol: selectedProtocol as ContractProtocol,
           prompt: aiPrompt,
         });
       }
 
-      return contractStudioApi.createDraft({
+      const createdDraft = await contractStudioApi.createDraft({
         title,
-        author: 'current-user',
+        author: currentActor,
         contractType: selectedType as ContractType,
         protocol: selectedProtocol as ContractProtocol,
         description,
       });
+
+      if (selectedMode === 'import' && importContent.trim()) {
+        await contractStudioApi.updateContent(createdDraft.draftId, {
+          specContent: importContent,
+          format: selectedProtocol === 'Wsdl' ? 'xml' : 'yaml',
+          editedBy: currentActor,
+        });
+      }
+
+      return createdDraft;
     },
     onSuccess: (data) => {
       navigate(`/contracts/studio/${data.draftId}`);
@@ -100,7 +113,7 @@ export function CreateServicePage() {
 
   const canProceedToMode = !!selectedType;
   const canProceedToDetails = !!selectedMode;
-  const canCreate = !!title && !!selectedProtocol && (selectedMode !== 'ai' || !!aiPrompt);
+  const canCreate = !!title && !!selectedProtocol && (selectedMode !== 'ai' || !!aiPrompt) && (selectedMode !== 'import' || !!importContent.trim() || !!title);
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-6">

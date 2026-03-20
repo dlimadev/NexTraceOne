@@ -10,7 +10,7 @@
  */
 import type { ApprovalState, ApprovalChecklistItem, PolicyCheckResult } from '../types/domain';
 
-/** View-model enriquecido de um contrato para o studio. */
+/** View-model real do workspace/portal alimentado por dados do backend e derivações honestas. */
 export interface StudioContract {
   // ── Identity ──
   id: string;
@@ -54,8 +54,8 @@ export interface StudioContract {
   externalLinks: string[];
 
   // ── Governance ──
-  approvalState: ApprovalState;
-  complianceScore: number;
+  approvalState?: ApprovalState;
+  complianceScore?: number | null;
   approvalChecklist: ApprovalChecklistItem[];
   policyChecks: PolicyCheckResult[];
 

@@ -114,15 +114,21 @@ internal sealed class AiAssistantConversationRepository(AiGovernanceDbContext co
     }
 
     public async Task<AiAssistantConversation?> GetByIdAsync(AiAssistantConversationId id, CancellationToken ct)
-        => await context.Conversations.SingleOrDefaultAsync(c => c.Id == id, ct);
+    {
+        var conversations = await context.Conversations.ToListAsync(ct);
+        return conversations.SingleOrDefault(c => c.Id.Value == id.Value);
+    }
 
     public async Task AddAsync(AiAssistantConversation conversation, CancellationToken ct)
-        => await context.Conversations.AddAsync(conversation, ct);
+    {
+        await context.Conversations.AddAsync(conversation, ct);
+        await context.SaveChangesAsync(ct);
+    }
 
-    public Task UpdateAsync(AiAssistantConversation conversation, CancellationToken ct)
+    public async Task UpdateAsync(AiAssistantConversation conversation, CancellationToken ct)
     {
         context.Conversations.Update(conversation);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(ct);
     }
 
     public async Task<int> CountAsync(string? userId, bool? isActive, CancellationToken ct)
@@ -143,14 +149,23 @@ internal sealed class AiMessageRepository(AiGovernanceDbContext context) : IAiMe
 {
     public async Task<IReadOnlyList<AiMessage>> ListByConversationAsync(
         Guid conversationId, int pageSize, CancellationToken ct)
-        => await context.Messages
+    {
+        var messages = await context.Messages
             .Where(m => m.ConversationId == conversationId)
-            .OrderBy(m => m.Timestamp)
+            .OrderByDescending(m => m.Timestamp)
             .Take(pageSize)
             .ToListAsync(ct);
 
+        return messages
+            .OrderBy(m => m.Timestamp)
+            .ToList();
+    }
+
     public async Task AddAsync(AiMessage message, CancellationToken ct)
-        => await context.Messages.AddAsync(message, ct);
+    {
+        await context.Messages.AddAsync(message, ct);
+        await context.SaveChangesAsync(ct);
+    }
 
     public async Task<int> CountByConversationAsync(Guid conversationId, CancellationToken ct)
         => await context.Messages.CountAsync(m => m.ConversationId == conversationId, ct);
@@ -189,7 +204,10 @@ internal sealed class AiUsageEntryRepository(AiGovernanceDbContext context) : IA
     }
 
     public async Task AddAsync(AIUsageEntry entry, CancellationToken ct)
-        => await context.UsageEntries.AddAsync(entry, ct);
+    {
+        await context.UsageEntries.AddAsync(entry, ct);
+        await context.SaveChangesAsync(ct);
+    }
 }
 
 internal sealed class AiKnowledgeSourceRepository(AiGovernanceDbContext context) : IAiKnowledgeSourceRepository

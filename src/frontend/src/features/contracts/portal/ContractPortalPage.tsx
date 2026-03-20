@@ -10,12 +10,12 @@ import {
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
-import { ProtocolBadge, LifecycleBadge, ComplianceScoreCard } from '../shared/components';
+import { ProtocolBadge, LifecycleBadge } from '../shared/components';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { contractsApi } from '../api/contracts';
-import { enrichToStudioContract } from '../workspace/studioMock';
+import { toStudioContract } from '../workspace/toStudioContract';
 import { cn } from '../../../lib/cn';
-import type { ContractVersion } from '../../../types';
+import type { ContractVersion, ContractVersionDetail } from '../../../types';
 
 type PortalTab =
   | 'overview'
@@ -59,7 +59,7 @@ export function ContractPortalPage() {
 
   const studio = useMemo(() => {
     if (!detailQuery.data) return null;
-    return enrichToStudioContract(detailQuery.data);
+    return toStudioContract(detailQuery.data);
   }, [detailQuery.data]);
 
   if (detailQuery.isLoading) return <LoadingState />;
@@ -68,7 +68,7 @@ export function ContractPortalPage() {
   const detail = detailQuery.data;
   const violations = violationsQuery.data ?? [];
   const versions = historyQuery.data ?? [];
-  const score = violations.length === 0 ? 100 : Math.max(0, 100 - violations.length * 15);
+  const baseUrl = detail.routePattern || '';
 
   const tabs: { id: PortalTab; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'contracts.portal.tabs.overview', icon: <FileText size={13} /> },
@@ -103,8 +103,8 @@ export function ContractPortalPage() {
               {serviceIcon}
             </div>
             <div className="space-y-1.5">
-              <h1 className="text-lg font-bold text-heading">{studio.friendlyName || detail.apiAssetId}</h1>
-              <p className="text-xs text-muted">{studio.functionalDescription || detail.apiAssetId}</p>
+              <h1 className="text-lg font-bold text-heading">{studio.friendlyName || detail.apiName || detail.apiAssetId}</h1>
+              <p className="text-xs text-muted">{studio.functionalDescription || detail.routePattern || t('contracts.portal.noDescription', 'No description available.')}</p>
               <div className="flex items-center gap-2 flex-wrap">
                 <ProtocolBadge protocol={detail.protocol} size="md" />
                 <LifecycleBadge state={detail.lifecycleState} size="md" />
@@ -115,7 +115,10 @@ export function ContractPortalPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <ComplianceScoreCard score={score} />
+            <div className="rounded-lg border border-edge bg-elevated/40 px-3 py-2 text-right">
+              <p className="text-[10px] text-muted uppercase tracking-wider">{t('contracts.portal.violations', 'Violations')}</p>
+              <p className="text-sm font-semibold text-heading">{violations.length}</p>
+            </div>
             <button
               onClick={async () => {
                 try {
@@ -124,7 +127,7 @@ export function ContractPortalPage() {
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement('a');
                   a.href = url;
-                  a.download = `${detail.apiAssetId}-${detail.semVer}.${result.format}`;
+                  a.download = `${studio.technicalName || detail.apiAssetId}-${detail.semVer}.${result.format}`;
                   a.click();
                   URL.revokeObjectURL(url);
                 } catch { /* toast */ }
@@ -140,10 +143,10 @@ export function ContractPortalPage() {
 
       {/* ── Quick info cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <InfoCard icon={<Users size={16} />} label={t('contracts.portal.owner', 'Owner')} value={`@${studio.owner}`} />
-        <InfoCard icon={<Target size={16} />} label={t('contracts.portal.domain', 'Domain')} value={studio.domain} />
-        <InfoCard icon={<Shield size={16} />} label={t('contracts.portal.criticality', 'Criticality')} value={studio.criticality} />
-        <InfoCard icon={<Clock size={16} />} label={t('contracts.portal.created', 'Created')} value={detail.createdAt ? new Date(detail.createdAt).toLocaleDateString() : '-'} />
+        <InfoCard icon={<Users size={16} />} label={t('contracts.portal.owner', 'Owner')} value={studio.owner || t('common.notAvailable', 'Not available')} />
+        <InfoCard icon={<Target size={16} />} label={t('contracts.portal.domain', 'Domain')} value={studio.domain || t('common.notAvailable', 'Not available')} />
+        <InfoCard icon={<Shield size={16} />} label={t('contracts.portal.criticality', 'Criticality')} value={studio.criticality || t('common.notAvailable', 'Not available')} />
+        <InfoCard icon={<Clock size={16} />} label={t('contracts.portal.created', 'Created')} value={detail.createdAt ? new Date(detail.createdAt).toLocaleDateString() : t('common.notAvailable', 'Not available')} />
       </div>
 
       {/* ── Deprecation notice ── */}
@@ -186,7 +189,7 @@ export function ContractPortalPage() {
       {/* ── Tab content ── */}
       <div className="min-h-[400px]">
         {activeTab === 'overview' && (
-          <OverviewTab detail={detail} studio={studio} score={score} violations={violations} />
+          <OverviewTab detail={detail} studio={studio} violations={violations} baseUrl={baseUrl} />
         )}
         {activeTab === 'endpoints' && (
           <EndpointsTab specContent={detail.specContent} protocol={detail.protocol} />
@@ -195,13 +198,13 @@ export function ContractPortalPage() {
           <SchemasTab specContent={detail.specContent} />
         )}
         {activeTab === 'security' && (
-          <SecurityTab studio={studio} />
+          <SecurityTab detail={detail} studio={studio} violations={violations} />
         )}
         {activeTab === 'versions' && (
           <VersionsTab versions={versions} currentVersionId={contractVersionId!} />
         )}
         {activeTab === 'examples' && (
-          <ExamplesTab studio={studio} specContent={detail.specContent} />
+          <ExamplesTab />
         )}
         {activeTab === 'glossary' && (
           <GlossaryTab />
@@ -230,12 +233,12 @@ function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string
 // ── Overview Tab ──────────────────────────────────────────────────────────────
 
 function OverviewTab({
-  detail, studio, score, violations,
+  detail, studio, violations, baseUrl,
 }: {
-  detail: { specContent: string; format: string; protocol: string; apiAssetId: string; semVer: string };
-  studio: ReturnType<typeof enrichToStudioContract>;
-  score: number;
+  detail: ContractVersionDetail;
+  studio: ReturnType<typeof toStudioContract>;
   violations: { ruleId?: string; message: string; severity: string }[];
+  baseUrl: string;
 }) {
   const { t } = useTranslation();
 
@@ -258,17 +261,21 @@ function OverviewTab({
               <p className="text-[10px] text-muted uppercase tracking-wider mb-1.5">
                 {t('contracts.portal.baseUrl', 'Base URL')}
               </p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-xs font-mono text-body bg-panel px-2 py-1 rounded border border-edge">
-                  /api/{detail.apiAssetId.toLowerCase()}/v{detail.semVer.split('.')[0]}
-                </code>
-                <button
-                  onClick={() => navigator.clipboard?.writeText(`/api/${detail.apiAssetId.toLowerCase()}/v${detail.semVer.split('.')[0]}`)}
-                  className="p-1.5 rounded hover:bg-elevated transition-colors text-muted hover:text-accent"
-                >
-                  <Copy size={12} />
-                </button>
-              </div>
+              {baseUrl ? (
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs font-mono text-body bg-panel px-2 py-1 rounded border border-edge">
+                    {baseUrl}
+                  </code>
+                  <button
+                    onClick={() => navigator.clipboard?.writeText(baseUrl)}
+                    className="p-1.5 rounded hover:bg-elevated transition-colors text-muted hover:text-accent"
+                  >
+                    <Copy size={12} />
+                  </button>
+                </div>
+              ) : (
+                <p className="text-xs text-muted">{t('common.notAvailable', 'Not available')}</p>
+              )}
             </div>
             <p className="text-xs text-body leading-relaxed">
               {studio.functionalDescription || t('contracts.portal.noDescription', 'No description available.')}
@@ -347,12 +354,12 @@ function OverviewTab({
             </h3>
           </CardHeader>
           <CardBody className="space-y-2">
-            <PortalRow label={t('contracts.portal.ownerLabel', 'Owner')} value={`@${studio.owner}`} />
+            <PortalRow label={t('contracts.portal.ownerLabel', 'Owner')} value={studio.owner} />
             <PortalRow label={t('contracts.portal.team', 'Team')} value={studio.team} />
             <PortalRow label={t('contracts.portal.domain', 'Domain')} value={studio.domain} />
             <PortalRow label={t('contracts.portal.product', 'Product')} value={studio.product} />
-            {studio.sla && <PortalRow label="SLA" value={studio.sla} />}
-            {studio.slo && <PortalRow label="SLO" value={studio.slo} />}
+            <PortalRow label="SLA" value={studio.sla} />
+            <PortalRow label="SLO" value={studio.slo} />
           </CardBody>
         </Card>
 
@@ -365,32 +372,14 @@ function OverviewTab({
             </h3>
           </CardHeader>
           <CardBody className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted">{t('contracts.portal.score', 'Score')}</span>
-              <span className={cn(
-                'text-sm font-bold',
-                score >= 80 ? 'text-mint' : score >= 50 ? 'text-warning' : 'text-danger',
-              )}>{score}%</span>
-            </div>
-            <div className="h-1.5 bg-elevated rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  'h-full rounded-full transition-all',
-                  score >= 80 ? 'bg-mint' : score >= 50 ? 'bg-warning' : 'bg-danger',
-                )}
-                style={{ width: `${score}%` }}
-              />
-            </div>
+            <PortalRow label={t('contracts.portal.violations', 'Violations')} value={String(violations.length)} />
             <p className="text-[10px] text-muted">
-              {violations.length === 0
-                ? t('contracts.portal.noViolations', 'No violations detected.')
-                : t('contracts.portal.violationCount', '{{count}} violation(s) detected.', { count: violations.length })}
+              {t('contracts.portal.validationOnlyHint', 'Validation results are real. A consolidated compliance score is not yet available for this contract.')}
             </p>
           </CardBody>
         </Card>
 
-        {/* Consumers & Producers */}
-        {(studio.consumers.length > 0 || studio.producers.length > 0) && (
+        {studio.consumers.length > 0 && (
           <Card>
             <CardHeader>
               <h3 className="text-xs font-semibold text-heading">
@@ -405,33 +394,6 @@ function OverviewTab({
                   <span className="text-[9px] text-muted">{c.type}</span>
                 </div>
               ))}
-              {studio.producers.slice(0, 5).map((p) => (
-                <div key={p.id} className="flex items-center gap-2">
-                  <ChevronRight size={10} className="text-cyan" />
-                  <span className="text-xs text-body">{p.name}</span>
-                  <span className="text-[9px] text-muted">producer</span>
-                </div>
-              ))}
-            </CardBody>
-          </Card>
-        )}
-
-        {/* Tags */}
-        {studio.tags.length > 0 && (
-          <Card>
-            <CardHeader>
-              <h3 className="text-xs font-semibold text-heading">
-                {t('contracts.portal.tagsLabel', 'Tags')}
-              </h3>
-            </CardHeader>
-            <CardBody>
-              <div className="flex flex-wrap gap-1">
-                {studio.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-0.5 text-[10px] rounded bg-elevated border border-edge text-muted">
-                    {tag}
-                  </span>
-                ))}
-              </div>
             </CardBody>
           </Card>
         )}
@@ -522,8 +484,17 @@ function SchemasTab({ specContent }: { specContent: string }) {
 
 // ── Security Tab ──────────────────────────────────────────────────────────────
 
-function SecurityTab({ studio }: { studio: ReturnType<typeof enrichToStudioContract> }) {
+function SecurityTab({
+  detail,
+  studio,
+  violations,
+}: {
+  detail: ContractVersionDetail;
+  studio: ReturnType<typeof toStudioContract>;
+  violations: { message: string; severity: string }[];
+}) {
   const { t } = useTranslation();
+  const securityViolations = violations.filter((v) => v.message.toLowerCase().includes('security'));
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -535,6 +506,7 @@ function SecurityTab({ studio }: { studio: ReturnType<typeof enrichToStudioContr
           <PortalRow label={t('contracts.portal.visibility', 'Visibility')} value={studio.visibility} />
           <PortalRow label={t('contracts.portal.dataClassification', 'Data Classification')} value={studio.dataClassification} />
           <PortalRow label={t('contracts.portal.criticality', 'Criticality')} value={studio.criticality} />
+          <PortalRow label={t('contracts.portal.owner', 'Owner')} value={studio.owner} />
         </CardBody>
       </Card>
       <Card>
@@ -542,19 +514,18 @@ function SecurityTab({ studio }: { studio: ReturnType<typeof enrichToStudioContr
           <h3 className="text-xs font-semibold text-heading">{t('contracts.portal.securityRequirements', 'Requirements')}</h3>
         </CardHeader>
         <CardBody className="space-y-2">
-          <p className="text-xs text-muted">
-            {t('contracts.portal.securityHint', 'Security requirements are derived from the specification and organizational policies.')}
-          </p>
-          {studio.policyChecks
-            .filter((p) => p.policyName.toLowerCase().includes('secur'))
-            .map((p) => (
-              <div key={p.policyId} className="flex items-center gap-2">
-                {p.passed
-                  ? <Shield size={11} className="text-mint" />
-                  : <AlertTriangle size={11} className="text-warning" />}
-                <span className="text-xs text-body">{p.policyName}</span>
+          {securityViolations.length === 0 ? (
+            <p className="text-xs text-muted">
+              {t('contracts.portal.securityHint', 'No explicit security validation findings were returned for this contract version.')}
+            </p>
+          ) : (
+            securityViolations.map((violation, index) => (
+              <div key={`${detail.id}-security-${index}`} className="flex items-center gap-2">
+                <AlertTriangle size={11} className="text-warning" />
+                <span className="text-xs text-body">{violation.message}</span>
               </div>
-            ))}
+            ))
+          )}
         </CardBody>
       </Card>
     </div>
@@ -608,7 +579,7 @@ function VersionsTab({ versions, currentVersionId }: { versions: ContractVersion
 
 // ── Examples Tab ──────────────────────────────────────────────────────────────
 
-function ExamplesTab({ studio, specContent }: { studio: ReturnType<typeof enrichToStudioContract>; specContent: string }) {
+function ExamplesTab() {
   const { t } = useTranslation();
 
   return (
@@ -638,11 +609,11 @@ function GlossaryTab() {
 
 // ── Shared helpers ────────────────────────────────────────────────────────────
 
-function PortalRow({ label, value }: { label: string; value: string }) {
+function PortalRow({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="text-[10px] text-muted">{label}</span>
-      <span className="text-xs text-body font-medium truncate max-w-[200px]">{value}</span>
+      <span className="text-xs text-body font-medium truncate max-w-[200px]">{value || '—'}</span>
     </div>
   );
 }
@@ -709,7 +680,6 @@ function extractSchemas(specContent: string): ExtractedSchema[] {
     const lines = specContent.split('\n');
     let inSchemas = false;
     let currentSchema = '';
-    let depth = 0;
     let propCount = 0;
     for (const line of lines) {
       if (line.match(/^\s{2}schemas:\s*$/i) || line.match(/components:/i)) {
@@ -730,7 +700,6 @@ function extractSchemas(specContent: string): ExtractedSchema[] {
 
           currentSchema = nextSchema;
           propCount = 0;
-          depth = 4;
           continue;
         }
         if (currentSchema && line.match(/^\s{8}\w+\s*:/)) {

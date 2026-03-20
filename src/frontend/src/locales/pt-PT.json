@@ -57,7 +57,7 @@
     "ssoDescription": "Recomendado para contas empresariais",
     "orDivider": "ou inicie sessão com credenciais",
     "ssoRedirecting": "A redirecionar para o fornecedor de identidade...",
-    "ssoError": "Falha na autenticação SSO. Tente novamente ou utilize credenciais.",
+    "ssoError": "Falha na autenticação SSO. Tente novamente ou utilise credenciais.",
     "signInSubtitle": "Aceder à plataforma de governança",
     "loginHeadline": "Plataforma Soberana de Governança de Engenharia",
     "loginSubheadline": "A fonte de verdade para serviços, contratos, mudanças e conhecimento operacional em toda a organização.",
@@ -446,7 +446,7 @@
     },
     "jitAccess": {
       "title": "Pedidos de Acesso JIT",
-      "subtitle": "Solicitar e gerir acesso privilegiado temporário",
+      "subtitle": "Solicitar e gestionar acesso privilegiado temporário",
       "request": "Solicitar Acesso JIT",
       "decide": "Decidir",
       "approve": "Aprovar",
@@ -1427,11 +1427,22 @@
     "noConversations": "Sem conversas ainda",
     "startNewConversation": "Inicie uma nova conversa para interagir com o Assistente de IA",
     "errorLoadingConversations": "Falha ao carregar conversas. Por favor, tente novamente.",
+    "errorLoadingMessages": "Falha ao carregar mensagens. Por favor, tente novamente.",
+    "errorSendingMessage": "Falha ao enviar a mensagem. Nenhuma resposta falsa do assistente foi adicionada.",
+    "conversationNotFound": "A conversa selecionada não foi encontrada ou já não está disponível.",
     "loadingMessages": "A carregar mensagens...",
     "selectConversation": "Selecione uma conversa",
     "selectConversationHint": "Escolha uma conversa existente ou inicie uma nova",
     "emptyConversation": "Pronto para ajudar",
     "startTyping": "Escreva uma mensagem para iniciar a conversa",
+    "providersHealthy": "{{healthy}}/{{total}} fornecedores saudáveis",
+    "backendUnavailable": "Backend indisponível",
+    "responseStateCompleted": "Concluída",
+    "responseStateDegraded": "Resposta degradada",
+    "providerUnavailable": "Fornecedor indisponível",
+    "metaResponseState": "Estado da resposta",
+    "metaDegradedReason": "Motivo da degradação",
+    "degradedReasonProviderUnavailable": "Fornecedor indisponível",
     "routingTitle": "Encaminhamento e Enriquecimento de IA",
     "routingSubtitle": "Estratégias de encaminhamento, ponderação de fontes e governança de enriquecimento",
     "routingStrategiesTab": "Estratégias de Encaminhamento",
@@ -3026,7 +3037,7 @@
     "suggestedSteps": "Próximos passos recomendados",
     "caveatsLabel": "Limitações de contexto",
     "fallbackCaveat": "Fornecedor de IA indisponível. Esta resposta é um fallback determinístico e pode não reflectir dados reais.",
-    "noContextWarning": "Contexto limitado disponível. A resposta pode não refletir o estado atual desta entidade.",
+    "noContextWarning": "Contexto limitado disponível. A resposta pode não reflectir o estado atual desta entidade.",
     "groundedIn": "Análise fundamentada em dados reais da entidade de",
     "contextCaveats": {
       "noLinkedServices": "Sem serviços vinculados",
@@ -3091,5 +3102,19 @@
     "badge": "Preview",
     "bannerTitle": "Preview",
     "bannerDescription": "Este módulo está em preview e ainda não faz parte do âmbito certificado. Dados e funcionalidades podem estar incompletos."
+  },
+  "releaseScope": {
+    "excludedTitle": "Fora do release produtivo final",
+    "excludedDescription": "Esta área continua no código, mas foi deliberadamente retirada do escopo do release produtivo final. Não faz parte da superfície suportada em produção.",
+    "modules": {
+      "developerPortal": "O Developer Portal ficou fora do release porque ainda depende de fluxos apenas em preview.",
+      "contracts": "Contracts ficou fora do release final porque os fluxos centrais de autoria e workspace continuam parciais.",
+      "operations": "Operations ficou fora do release final porque incidents, runbooks e fluxos relacionados ainda não estão consistentemente prontos para produção.",
+      "aiHub": "AI Hub ficou fora do release final porque o fluxo produtivo end-to-end ainda é parcial.",
+      "governance": "Governance ficou fora do release final porque múltiplas áreas continuam parciais ou apenas em preview.",
+      "integrations": "Integrations ficou fora do release final porque continua apenas em preview.",
+      "analytics": "Product Analytics ficou fora do release final porque continua parcial e em preview.",
+      "platformOperations": "Platform Operations ficou fora do release final porque ainda expõe dados de demonstração."
+    }
   }
 }

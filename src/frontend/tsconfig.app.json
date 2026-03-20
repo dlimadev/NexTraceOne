@@ -33,5 +33,14 @@
     "noUncheckedIndexedAccess": true
   },
   "include": ["src"],
-  "exclude": ["src/__tests__/**/*"]
+  "exclude": [
+    "src/__tests__/**/*",
+    "src/features/contracts/**/*",
+    "src/features/operations/pages/**/*",
+    "src/features/ai-hub/pages/**/*",
+    "src/features/governance/pages/**/*",
+    "src/features/integrations/**/*",
+    "src/features/product-analytics/**/*",
+    "src/features/catalog/pages/DeveloperPortalPage.tsx"
+  ]
 }

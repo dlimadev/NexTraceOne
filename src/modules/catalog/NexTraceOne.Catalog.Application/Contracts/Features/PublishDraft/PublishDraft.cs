@@ -45,7 +45,7 @@ public static class PublishDraft
     public sealed class Handler(
         IContractDraftRepository draftRepository,
         IContractVersionRepository versionRepository,
-        IUnitOfWork unitOfWork,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

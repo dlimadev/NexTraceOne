@@ -299,7 +299,7 @@ VALUES (
 
 -- ── Conversation 1: Payment API Investigation ──────────────────────────────
 
-INSERT INTO "AiAssistantConversations" (
+INSERT INTO ai_gov_conversations (
     "Id", "Title", "Persona", "ClientType", "DefaultContextScope",
     "LastModelUsed", "CreatedBy", "MessageCount", "Tags", "IsActive",
     "LastMessageAt", "ServiceId", "ContractId", "IncidentId", "TeamId",
@@ -322,12 +322,12 @@ VALUES (
 ) ON CONFLICT DO NOTHING;
 
 -- Conversation 1 Messages
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e1000000-0000-0000-0000-000000000001',
@@ -342,15 +342,15 @@ VALUES (
     '',
     'init-conv1',
     NOW() - interval '2 hours',
-    NOW() - interval '2 hours', NOW(), 'system', false
+    NOW() - interval '2 hours', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e1000000-0000-0000-0000-000000000002',
@@ -362,15 +362,15 @@ VALUES (
     '', '',
     'user-msg-001',
     NOW() - interval '1 hour 55 minutes',
-    NOW() - interval '1 hour 55 minutes', NOW(), 'system', false
+    NOW() - interval '1 hour 55 minutes', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e1000000-0000-0000-0000-000000000003',
@@ -385,15 +385,15 @@ VALUES (
     'service:payment-service,incident:INC-2847,change:CHG-1923',
     'resp-002',
     NOW() - interval '1 hour 54 minutes',
-    NOW() - interval '1 hour 54 minutes', NOW(), 'system', false
+    NOW() - interval '1 hour 54 minutes', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e1000000-0000-0000-0000-000000000004',
@@ -405,12 +405,12 @@ VALUES (
     '', '',
     'user-msg-002',
     NOW() - interval '1 hour 50 minutes',
-    NOW() - interval '1 hour 50 minutes', NOW(), 'system', false
+    NOW() - interval '1 hour 50 minutes', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
 -- ── Conversation 2: Contract Compatibility Check ───────────────────────────
 
-INSERT INTO "AiAssistantConversations" (
+INSERT INTO ai_gov_conversations (
     "Id", "Title", "Persona", "ClientType", "DefaultContextScope",
     "LastModelUsed", "CreatedBy", "MessageCount", "Tags", "IsActive",
     "LastMessageAt", "ServiceId", "ContractId", "IncidentId", "TeamId",
@@ -432,12 +432,12 @@ VALUES (
     NOW() - interval '1 day', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e2000000-0000-0000-0000-000000000001',
@@ -452,15 +452,15 @@ VALUES (
     '',
     'init-conv2',
     NOW() - interval '1 day',
-    NOW() - interval '1 day', NOW(), 'system', false
+    NOW() - interval '1 day', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e2000000-0000-0000-0000-000000000002',
@@ -472,12 +472,12 @@ VALUES (
     '', '',
     'user-msg-003',
     NOW() - interval '23 hours',
-    NOW() - interval '23 hours', NOW(), 'system', false
+    NOW() - interval '23 hours', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
 -- ── Conversation 3: Incident Correlation (Archived) ────────────────────────
 
-INSERT INTO "AiAssistantConversations" (
+INSERT INTO ai_gov_conversations (
     "Id", "Title", "Persona", "ClientType", "DefaultContextScope",
     "LastModelUsed", "CreatedBy", "MessageCount", "Tags", "IsActive",
     "LastMessageAt", "ServiceId", "ContractId", "IncidentId", "TeamId",
@@ -499,12 +499,12 @@ VALUES (
     NOW() - interval '3 days', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e3000000-0000-0000-0000-000000000001',
@@ -519,15 +519,15 @@ VALUES (
     '',
     'init-conv3',
     NOW() - interval '3 days',
-    NOW() - interval '3 days', NOW(), 'system', false
+    NOW() - interval '3 days', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e3000000-0000-0000-0000-000000000002',
@@ -539,15 +539,15 @@ VALUES (
     '', '',
     'user-msg-004',
     NOW() - interval '2 days 23 hours',
-    NOW() - interval '2 days 23 hours', NOW(), 'system', false
+    NOW() - interval '2 days 23 hours', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
 
-INSERT INTO "AiMessages" (
+INSERT INTO ai_gov_messages (
     "Id", "ConversationId", "Role", "Content",
     "ModelName", "Provider", "IsInternalModel",
     "PromptTokens", "CompletionTokens", "AppliedPolicyName",
     "GroundingSources", "ContextReferences", "CorrelationId",
-    "Timestamp", "CreatedAt", "UpdatedAt", "UpdatedBy", "IsDeleted"
+    "Timestamp", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 )
 VALUES (
     'e3000000-0000-0000-0000-000000000003',
@@ -562,5 +562,5 @@ VALUES (
     'incident:INC-2831,change:CHG-1845,service:messaging-gateway',
     'resp-004',
     NOW() - interval '2 days 22 hours',
-    NOW() - interval '2 days 22 hours', NOW(), 'system', false
+    NOW() - interval '2 days 22 hours', 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;

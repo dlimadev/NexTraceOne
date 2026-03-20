@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { AppShell } from './components/shell/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { PreviewGate } from './components/PreviewGate';
+import { ReleaseScopeGate } from './components/ReleaseScopeGate';
 
 // Eager imports — critical for fast first paint
 import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, ActivationPage, MfaPage, InvitationPage } from './features/identity-access';
@@ -24,17 +24,6 @@ const UnauthorizedPage = lazy(() => import('./features/identity-access/pages/Una
 const ServiceCatalogPage = lazy(() => import('./features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
 const ServiceCatalogListPage = lazy(() => import('./features/catalog/pages/ServiceCatalogListPage').then(m => ({ default: m.ServiceCatalogListPage })));
 const ServiceDetailPage = lazy(() => import('./features/catalog/pages/ServiceDetailPage').then(m => ({ default: m.ServiceDetailPage })));
-const DeveloperPortalPage = lazy(() => import('./features/catalog/pages/DeveloperPortalPage').then(m => ({ default: m.DeveloperPortalPage })));
-
-// ── Contracts (refactored — lazy) ──
-const ContractCatalogPage = lazy(() => import('./features/contracts/catalog/ContractCatalogPage').then(m => ({ default: m.ContractCatalogPage })));
-const CreateServicePage = lazy(() => import('./features/contracts/create/CreateServicePage').then(m => ({ default: m.CreateServicePage })));
-const ContractWorkspacePage = lazy(() => import('./features/contracts/workspace/ContractWorkspacePage').then(m => ({ default: m.ContractWorkspacePage })));
-const DraftStudioPage = lazy(() => import('./features/contracts/studio/DraftStudioPage').then(m => ({ default: m.DraftStudioPage })));
-const ContractPortalPage = lazy(() => import('./features/contracts/portal/ContractPortalPage').then(m => ({ default: m.ContractPortalPage })));
-const ContractGovernancePage = lazy(() => import('./features/contracts/governance/ContractGovernancePage').then(m => ({ default: m.ContractGovernancePage })));
-const SpectralRulesetManagerPage = lazy(() => import('./features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
-const CanonicalEntityCatalogPage = lazy(() => import('./features/contracts/canonical/CanonicalEntityCatalogPage').then(m => ({ default: m.CanonicalEntityCatalogPage })));
 const SourceOfTruthExplorerPage = lazy(() => import('./features/catalog/pages/SourceOfTruthExplorerPage').then(m => ({ default: m.SourceOfTruthExplorerPage })));
 const ServiceSourceOfTruthPage = lazy(() => import('./features/catalog/pages/ServiceSourceOfTruthPage').then(m => ({ default: m.ServiceSourceOfTruthPage })));
 const ContractSourceOfTruthPage = lazy(() => import('./features/catalog/pages/ContractSourceOfTruthPage').then(m => ({ default: m.ContractSourceOfTruthPage })));
@@ -53,69 +42,6 @@ const AuditPage = lazy(() => import('./features/audit-compliance/pages/AuditPage
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 
-// ── Operations (lazy) ──
-const IncidentsPage = lazy(() => import('./features/operations/pages/IncidentsPage').then(m => ({ default: m.IncidentsPage })));
-const IncidentDetailPage = lazy(() => import('./features/operations/pages/IncidentDetailPage').then(m => ({ default: m.IncidentDetailPage })));
-const RunbooksPage = lazy(() => import('./features/operations/pages/RunbooksPage').then(m => ({ default: m.RunbooksPage })));
-const TeamReliabilityPage = lazy(() => import('./features/operations/pages/TeamReliabilityPage').then(m => ({ default: m.TeamReliabilityPage })));
-const ServiceReliabilityDetailPage = lazy(() => import('./features/operations/pages/ServiceReliabilityDetailPage').then(m => ({ default: m.ServiceReliabilityDetailPage })));
-const AutomationWorkflowsPage = lazy(() => import('./features/operations/pages/AutomationWorkflowsPage').then(m => ({ default: m.AutomationWorkflowsPage })));
-const AutomationWorkflowDetailPage = lazy(() => import('./features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
-const AutomationAdminPage = lazy(() => import('./features/operations/pages/AutomationAdminPage').then(m => ({ default: m.AutomationAdminPage })));
-const PlatformOperationsPage = lazy(() => import('./features/operations/pages/PlatformOperationsPage').then(m => ({ default: m.PlatformOperationsPage })));
-
-// ── AI Hub (lazy) ──
-const AiAssistantPage = lazy(() => import('./features/ai-hub/pages/AiAssistantPage').then(m => ({ default: m.AiAssistantPage })));
-const ModelRegistryPage = lazy(() => import('./features/ai-hub/pages/ModelRegistryPage').then(m => ({ default: m.ModelRegistryPage })));
-const AiPoliciesPage = lazy(() => import('./features/ai-hub/pages/AiPoliciesPage').then(m => ({ default: m.AiPoliciesPage })));
-const TokenBudgetPage = lazy(() => import('./features/ai-hub/pages/TokenBudgetPage').then(m => ({ default: m.TokenBudgetPage })));
-const AiAuditPage = lazy(() => import('./features/ai-hub/pages/AiAuditPage').then(m => ({ default: m.AiAuditPage })));
-const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegrationsPage').then(m => ({ default: m.IdeIntegrationsPage })));
-const AiRoutingPage = lazy(() => import('./features/ai-hub/pages/AiRoutingPage').then(m => ({ default: m.AiRoutingPage })));
-
-// ── Governance (lazy) ──
-const ReportsPage = lazy(() => import('./features/governance/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
-const RiskCenterPage = lazy(() => import('./features/governance/pages/RiskCenterPage').then(m => ({ default: m.RiskCenterPage })));
-const CompliancePage = lazy(() => import('./features/governance/pages/CompliancePage').then(m => ({ default: m.CompliancePage })));
-const FinOpsPage = lazy(() => import('./features/governance/pages/FinOpsPage').then(m => ({ default: m.FinOpsPage })));
-const ServiceFinOpsPage = lazy(() => import('./features/governance/pages/ServiceFinOpsPage').then(m => ({ default: m.ServiceFinOpsPage })));
-const TeamFinOpsPage = lazy(() => import('./features/governance/pages/TeamFinOpsPage').then(m => ({ default: m.TeamFinOpsPage })));
-const DomainFinOpsPage = lazy(() => import('./features/governance/pages/DomainFinOpsPage').then(m => ({ default: m.DomainFinOpsPage })));
-const ExecutiveFinOpsPage = lazy(() => import('./features/governance/pages/ExecutiveFinOpsPage').then(m => ({ default: m.ExecutiveFinOpsPage })));
-const ExecutiveOverviewPage = lazy(() => import('./features/governance/pages/ExecutiveOverviewPage').then(m => ({ default: m.ExecutiveOverviewPage })));
-const RiskHeatmapPage = lazy(() => import('./features/governance/pages/RiskHeatmapPage').then(m => ({ default: m.RiskHeatmapPage })));
-const MaturityScorecardsPage = lazy(() => import('./features/governance/pages/MaturityScorecardsPage').then(m => ({ default: m.MaturityScorecardsPage })));
-const BenchmarkingPage = lazy(() => import('./features/governance/pages/BenchmarkingPage').then(m => ({ default: m.BenchmarkingPage })));
-const ExecutiveDrillDownPage = lazy(() => import('./features/governance/pages/ExecutiveDrillDownPage').then(m => ({ default: m.ExecutiveDrillDownPage })));
-const PolicyCatalogPage = lazy(() => import('./features/governance/pages/PolicyCatalogPage').then(m => ({ default: m.PolicyCatalogPage })));
-const EvidencePackagesPage = lazy(() => import('./features/governance/pages/EvidencePackagesPage').then(m => ({ default: m.EvidencePackagesPage })));
-const EnterpriseControlsPage = lazy(() => import('./features/governance/pages/EnterpriseControlsPage').then(m => ({ default: m.EnterpriseControlsPage })));
-
-// ── Governance Packs (lazy) ──
-const GovernancePacksOverviewPage = lazy(() => import('./features/governance/pages/GovernancePacksOverviewPage').then(m => ({ default: m.GovernancePacksOverviewPage })));
-const GovernancePackDetailPage = lazy(() => import('./features/governance/pages/GovernancePackDetailPage').then(m => ({ default: m.GovernancePackDetailPage })));
-const PackSimulationPage = lazy(() => import('./features/governance/pages/PackSimulationPage').then(m => ({ default: m.PackSimulationPage })));
-const WaiversPage = lazy(() => import('./features/governance/pages/WaiversPage').then(m => ({ default: m.WaiversPage })));
-
-// ── Organization Governance (lazy) ──
-const TeamsOverviewPage = lazy(() => import('./features/governance/pages/TeamsOverviewPage').then(m => ({ default: m.TeamsOverviewPage })));
-const TeamDetailPage = lazy(() => import('./features/governance/pages/TeamDetailPage').then(m => ({ default: m.TeamDetailPage })));
-const DomainsOverviewPage = lazy(() => import('./features/governance/pages/DomainsOverviewPage').then(m => ({ default: m.DomainsOverviewPage })));
-const DomainDetailPage = lazy(() => import('./features/governance/pages/DomainDetailPage').then(m => ({ default: m.DomainDetailPage })));
-const DelegatedAdminPage = lazy(() => import('./features/governance/pages/DelegatedAdminPage').then(m => ({ default: m.DelegatedAdminPage })));
-
-// ── Integrations (lazy) ──
-const IntegrationHubPage = lazy(() => import('./features/integrations/pages/IntegrationHubPage').then(m => ({ default: m.IntegrationHubPage })));
-const ConnectorDetailPage = lazy(() => import('./features/integrations/pages/ConnectorDetailPage').then(m => ({ default: m.ConnectorDetailPage })));
-const IngestionExecutionsPage = lazy(() => import('./features/integrations/pages/IngestionExecutionsPage').then(m => ({ default: m.IngestionExecutionsPage })));
-const IngestionFreshnessPage = lazy(() => import('./features/integrations/pages/IngestionFreshnessPage').then(m => ({ default: m.IngestionFreshnessPage })));
-
-// ── Product Analytics (lazy) ──
-const ProductAnalyticsOverviewPage = lazy(() => import('./features/product-analytics/pages/ProductAnalyticsOverviewPage').then(m => ({ default: m.ProductAnalyticsOverviewPage })));
-const ModuleAdoptionPage = lazy(() => import('./features/product-analytics/pages/ModuleAdoptionPage').then(m => ({ default: m.ModuleAdoptionPage })));
-const PersonaUsagePage = lazy(() => import('./features/product-analytics/pages/PersonaUsagePage').then(m => ({ default: m.PersonaUsagePage })));
-const JourneyFunnelPage = lazy(() => import('./features/product-analytics/pages/JourneyFunnelPage').then(m => ({ default: m.JourneyFunnelPage })));
-const ValueTrackingPage = lazy(() => import('./features/product-analytics/pages/ValueTrackingPage').then(m => ({ default: m.ValueTrackingPage })));
 
 function PageLoader() {
   return (
@@ -218,16 +144,15 @@ export default function App() {
                 path="/portal"
                 element={
                   <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
-                    <PreviewGate><DeveloperPortalPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="developerPortal" />
                   </ProtectedRoute>
                 }
               />
-              {/* ── Contracts ── */}
               <Route
                 path="/contracts"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractCatalogPage />
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
@@ -235,27 +160,25 @@ export default function App() {
                 path="/contracts/new"
                 element={
                   <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-                    <CreateServicePage />
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
-              {/* Draft studio — edição de draft após criação */}
               <Route
                 path="/contracts/studio/:draftId"
                 element={
                   <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-                    <DraftStudioPage />
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
-              {/* Legacy redirects — preservados para evitar bookmarks quebrados */}
               <Route path="/contracts/studio" element={<Navigate to="/contracts" replace />} />
               <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
               <Route
                 path="/contracts/governance"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractGovernancePage />
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
@@ -263,7 +186,7 @@ export default function App() {
                 path="/contracts/spectral"
                 element={
                   <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-                    <PreviewGate><SpectralRulesetManagerPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
@@ -271,7 +194,7 @@ export default function App() {
                 path="/contracts/canonical"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <PreviewGate><CanonicalEntityCatalogPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
@@ -279,7 +202,7 @@ export default function App() {
                 path="/contracts/:contractVersionId/portal"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractPortalPage />
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
@@ -287,7 +210,7 @@ export default function App() {
                 path="/contracts/:contractVersionId"
                 element={
                   <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
-                    <ContractWorkspacePage />
+                    <ReleaseScopeGate moduleKey="contracts" />
                   </ProtectedRoute>
                 }
               />
@@ -337,7 +260,7 @@ export default function App() {
                 path="/operations/incidents"
                 element={
                   <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
-                    <IncidentsPage />
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -345,7 +268,7 @@ export default function App() {
                 path="/operations/incidents/:incidentId"
                 element={
                   <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
-                    <IncidentDetailPage />
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -353,7 +276,7 @@ export default function App() {
                 path="/operations/runbooks"
                 element={
                   <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
-                    <RunbooksPage />
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -361,7 +284,7 @@ export default function App() {
                 path="/operations/reliability"
                 element={
                   <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
-                    <PreviewGate><TeamReliabilityPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -369,7 +292,7 @@ export default function App() {
                 path="/operations/reliability/:serviceId"
                 element={
                   <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
-                    <PreviewGate><ServiceReliabilityDetailPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -377,7 +300,7 @@ export default function App() {
                 path="/operations/automation"
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
-                    <PreviewGate><AutomationWorkflowsPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -385,7 +308,7 @@ export default function App() {
                 path="/operations/automation/admin"
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
-                    <PreviewGate><AutomationAdminPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
@@ -393,37 +316,35 @@ export default function App() {
                 path="/operations/automation/:workflowId"
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
-                    <PreviewGate><AutomationWorkflowDetailPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="operations" />
                   </ProtectedRoute>
                 }
               />
-              {/* ── AI Hub ── */}
-              <Route path="/ai/assistant" element={<AiAssistantPage />} />
-               <Route path="/ai/models" element={<ModelRegistryPage />} />
-               <Route path="/ai/policies" element={<AiPoliciesPage />} />
-               <Route path="/ai/ide" element={<IdeIntegrationsPage />} />
-               <Route path="/ai/routing" element={<AiRoutingPage />} />
-               <Route path="/ai/budgets" element={<TokenBudgetPage />} />
-               <Route path="/ai/audit" element={<AiAuditPage />} />
-              {/* ── Governance ── */}
-              <Route path="/governance/reports" element={<PreviewGate><ReportsPage /></PreviewGate>} />
-              <Route path="/governance/risk" element={<PreviewGate><RiskCenterPage /></PreviewGate>} />
-              <Route path="/governance/compliance" element={<PreviewGate><CompliancePage /></PreviewGate>} />
-              <Route path="/governance/finops" element={<PreviewGate><FinOpsPage /></PreviewGate>} />
-              <Route path="/governance/finops/services/:serviceId" element={<PreviewGate><ServiceFinOpsPage /></PreviewGate>} />
-              <Route path="/governance/finops/teams/:teamId" element={<PreviewGate><TeamFinOpsPage /></PreviewGate>} />
-              <Route path="/governance/finops/domains/:domainId" element={<PreviewGate><DomainFinOpsPage /></PreviewGate>} />
-              <Route path="/governance/finops/executive" element={<PreviewGate><ExecutiveFinOpsPage /></PreviewGate>} />
-              <Route path="/governance/executive" element={<PreviewGate><ExecutiveOverviewPage /></PreviewGate>} />
-              <Route path="/governance/executive/heatmap" element={<PreviewGate><RiskHeatmapPage /></PreviewGate>} />
-              <Route path="/governance/executive/maturity" element={<PreviewGate><MaturityScorecardsPage /></PreviewGate>} />
-              <Route path="/governance/executive/benchmarking" element={<PreviewGate><BenchmarkingPage /></PreviewGate>} />
-              <Route path="/governance/executive/drilldown/:entityType/:entityId" element={<PreviewGate><ExecutiveDrillDownPage /></PreviewGate>} />
+              <Route path="/ai/assistant" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/ai/models" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/ai/policies" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/ai/ide" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/ai/routing" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/ai/budgets" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/ai/audit" element={<ReleaseScopeGate moduleKey="aiHub" />} />
+              <Route path="/governance/reports" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/risk" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/compliance" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/finops" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/finops/services/:serviceId" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/finops/teams/:teamId" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/finops/domains/:domainId" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/finops/executive" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/executive" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/executive/heatmap" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/executive/maturity" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/executive/benchmarking" element={<ReleaseScopeGate moduleKey="governance" />} />
+              <Route path="/governance/executive/drilldown/:entityType/:entityId" element={<ReleaseScopeGate moduleKey="governance" />} />
               <Route
                 path="/governance/policies"
                 element={
                   <ProtectedRoute permission="governance:policies:read" redirectTo="/unauthorized">
-                    <PreviewGate><PolicyCatalogPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -431,7 +352,7 @@ export default function App() {
                 path="/governance/evidence"
                 element={
                   <ProtectedRoute permission="governance:evidence:read" redirectTo="/unauthorized">
-                    <PreviewGate><EvidencePackagesPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -439,16 +360,15 @@ export default function App() {
                 path="/governance/controls"
                 element={
                   <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
-                    <PreviewGate><EnterpriseControlsPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
-              {/* ── Governance Packs ── */}
               <Route
                 path="/governance/packs"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <GovernancePacksOverviewPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -456,7 +376,7 @@ export default function App() {
                 path="/governance/packs/:packId"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <GovernancePackDetailPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -464,7 +384,7 @@ export default function App() {
                 path="/governance/packs/:packId/simulate"
                 element={
                   <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
-                    <PreviewGate><PackSimulationPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -472,16 +392,15 @@ export default function App() {
                 path="/governance/waivers"
                 element={
                   <ProtectedRoute permission="governance:waivers:read" redirectTo="/unauthorized">
-                    <WaiversPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
-              {/* ── Organization Governance ── */}
               <Route
                 path="/governance/teams"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <TeamsOverviewPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -489,7 +408,7 @@ export default function App() {
                 path="/governance/teams/:teamId"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <TeamDetailPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -497,7 +416,7 @@ export default function App() {
                 path="/governance/domains"
                 element={
                   <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
-                    <DomainsOverviewPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -505,7 +424,7 @@ export default function App() {
                 path="/governance/domains/:domainId"
                 element={
                   <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
-                    <DomainDetailPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
@@ -513,16 +432,15 @@ export default function App() {
                 path="/governance/delegated-admin"
                 element={
                   <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
-                    <DelegatedAdminPage />
+                    <ReleaseScopeGate moduleKey="governance" />
                   </ProtectedRoute>
                 }
               />
-              {/* ── Integrations ── */}
               <Route
                 path="/integrations"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <PreviewGate><IntegrationHubPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="integrations" />
                   </ProtectedRoute>
                 }
               />
@@ -530,7 +448,7 @@ export default function App() {
                 path="/integrations/connectors/:connectorId"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <PreviewGate><ConnectorDetailPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="integrations" />
                   </ProtectedRoute>
                 }
               />
@@ -538,7 +456,7 @@ export default function App() {
                 path="/integrations/executions"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <PreviewGate><IngestionExecutionsPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="integrations" />
                   </ProtectedRoute>
                 }
               />
@@ -546,7 +464,7 @@ export default function App() {
                 path="/integrations/freshness"
                 element={
                   <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
-                    <PreviewGate><IngestionFreshnessPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="integrations" />
                   </ProtectedRoute>
                 }
               />
@@ -614,7 +532,7 @@ export default function App() {
                 path="/analytics"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <ProductAnalyticsOverviewPage />
+                    <ReleaseScopeGate moduleKey="analytics" />
                   </ProtectedRoute>
                 }
               />
@@ -622,7 +540,7 @@ export default function App() {
                 path="/analytics/adoption"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <ModuleAdoptionPage />
+                    <ReleaseScopeGate moduleKey="analytics" />
                   </ProtectedRoute>
                 }
               />
@@ -630,7 +548,7 @@ export default function App() {
                 path="/analytics/personas"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <PreviewGate><PersonaUsagePage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="analytics" />
                   </ProtectedRoute>
                 }
               />
@@ -638,7 +556,7 @@ export default function App() {
                 path="/analytics/journeys"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <PreviewGate><JourneyFunnelPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="analytics" />
                   </ProtectedRoute>
                 }
               />
@@ -646,7 +564,7 @@ export default function App() {
                 path="/analytics/value"
                 element={
                   <ProtectedRoute permission="governance:analytics:read" redirectTo="/unauthorized">
-                    <PreviewGate><ValueTrackingPage /></PreviewGate>
+                    <ReleaseScopeGate moduleKey="analytics" />
                   </ProtectedRoute>
                 }
               />
@@ -654,7 +572,7 @@ export default function App() {
                 path="/platform/operations"
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
-                    <PlatformOperationsPage />
+                    <ReleaseScopeGate moduleKey="platformOperations" />
                   </ProtectedRoute>
                 }
               />

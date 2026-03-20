@@ -40,6 +40,7 @@ import type { Permission } from '../auth/permissions';
 import { globalSearchApi } from '../features/catalog/api/globalSearch';
 import type { SearchResultItem } from '../features/catalog/api/globalSearch';
 import { usePersona } from '../contexts/PersonaContext';
+import { isRouteAvailableInFinalProductionScope } from '../releaseScope';
 
 interface PaletteItem {
   id: string;
@@ -165,11 +166,14 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     staleTime: 30_000,
   });
 
-  const entityResults = searchData?.items ?? [];
-
   const visibleItems = useMemo(
-    () => paletteItems.filter((item) => !item.permission || can(item.permission)),
+    () => paletteItems.filter((item) => isRouteAvailableInFinalProductionScope(item.to) && (!item.permission || can(item.permission))),
     [can],
+  );
+
+  const entityResults = useMemo(
+    () => (searchData?.items ?? []).filter((item) => isRouteAvailableInFinalProductionScope(item.route)),
+    [searchData?.items],
   );
 
   const filtered = useMemo(() => {

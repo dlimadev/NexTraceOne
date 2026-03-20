@@ -2175,11 +2175,22 @@
     "noConversations": "No conversations yet",
     "startNewConversation": "Start a new conversation to interact with the AI Assistant",
     "errorLoadingConversations": "Failed to load conversations. Please try again.",
+    "errorLoadingMessages": "Failed to load messages. Please try again.",
+    "errorSendingMessage": "Failed to send the message. No fake assistant response was added.",
+    "conversationNotFound": "The selected conversation was not found or is no longer available.",
     "loadingMessages": "Loading messages...",
     "selectConversation": "Select a conversation",
     "selectConversationHint": "Choose an existing conversation or start a new one",
     "emptyConversation": "Ready to help",
     "startTyping": "Type a message to start the conversation",
+    "providersHealthy": "{{healthy}}/{{total}} providers healthy",
+    "backendUnavailable": "Backend unavailable",
+    "responseStateCompleted": "Completed",
+    "responseStateDegraded": "Degraded response",
+    "providerUnavailable": "Provider unavailable",
+    "metaResponseState": "Response state",
+    "metaDegradedReason": "Degraded reason",
+    "degradedReasonProviderUnavailable": "Provider unavailable",
     "routingTitle": "AI Routing & Enrichment",
     "routingSubtitle": "Routing strategies, source weighting and enrichment governance",
     "routingStrategiesTab": "Routing Strategies",
@@ -3839,5 +3850,19 @@
     "badge": "Preview",
     "bannerTitle": "Preview",
     "bannerDescription": "This module is in preview and not yet part of the certified scope. Data and features may be incomplete."
+  },
+  "releaseScope": {
+    "excludedTitle": "Outside the final production release",
+    "excludedDescription": "This area remains in the codebase but is intentionally outside the final production release scope. It is not part of the supported production surface.",
+    "modules": {
+      "developerPortal": "Developer Portal is excluded because it still depends on preview-only flows.",
+      "contracts": "Contracts is excluded from the final release because core authoring and workspace flows remain partial.",
+      "operations": "Operations is excluded from the final release because incidents, runbooks and related flows are not yet consistently production-ready.",
+      "aiHub": "AI Hub is excluded from the final release because the end-to-end production flow is still partial.",
+      "governance": "Governance is excluded from the final release because multiple areas remain partial or preview-only.",
+      "integrations": "Integrations is excluded from the final release because it is still preview-only.",
+      "analytics": "Product Analytics is excluded from the final release because it is still partial and preview-only.",
+      "platformOperations": "Platform Operations is excluded from the final release because it still exposes demonstration data."
+    }
   }
 }

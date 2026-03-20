@@ -18,6 +18,11 @@ namespace NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 /// </summary>
 public sealed class AiMessage : AuditableEntity<AiMessageId>
 {
+    public const string DeterministicFallbackPrefix = "[FALLBACK_PROVIDER_UNAVAILABLE]";
+    public const string CompletedResponseState = "Completed";
+    public const string DegradedResponseState = "Degraded";
+    public const string ProviderUnavailableReason = "ProviderUnavailable";
+
     private AiMessage() { }
 
     /// <summary>Identificador da conversa à qual esta mensagem pertence.</summary>
@@ -123,6 +128,60 @@ public sealed class AiMessage : AuditableEntity<AiMessageId>
             AppliedPolicyName = appliedPolicyName,
             GroundingSources = groundingSources ?? string.Empty,
             ContextReferences = contextReferences ?? string.Empty,
+            CorrelationId = correlationId,
+            Timestamp = timestamp
+        };
+    }
+
+    public bool IsDegradedResponse()
+        => string.Equals(Role, "assistant", StringComparison.OrdinalIgnoreCase)
+           && Content.StartsWith(DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase);
+
+    public string GetResponseState()
+        => string.Equals(Role, "assistant", StringComparison.OrdinalIgnoreCase)
+            ? (IsDegradedResponse() ? DegradedResponseState : CompletedResponseState)
+            : CompletedResponseState;
+
+    public string? GetDegradedReason()
+        => IsDegradedResponse() ? ProviderUnavailableReason : null;
+
+    /// <summary>
+    /// Cria uma mensagem degradada explícita quando o provider real não consegue responder.
+    /// A mensagem continua persistida para manter histórico íntegro e recarregável.
+    /// </summary>
+    public static AiMessage DegradedAssistantMessage(
+        Guid conversationId,
+        string content,
+        string modelName,
+        string provider,
+        int promptTokens,
+        string correlationId,
+        DateTimeOffset timestamp)
+    {
+        Guard.Against.Default(conversationId);
+        Guard.Against.NullOrWhiteSpace(content);
+        Guard.Against.NullOrWhiteSpace(modelName);
+        Guard.Against.NullOrWhiteSpace(provider);
+        Guard.Against.NullOrWhiteSpace(correlationId);
+
+        var persistedContent = content.StartsWith(DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase)
+            ? content
+            : $"{DeterministicFallbackPrefix} {content}";
+
+        return new AiMessage
+        {
+            Id = AiMessageId.New(),
+            ConversationId = conversationId,
+            Role = "assistant",
+            Content = persistedContent,
+            ModelName = modelName,
+            Provider = provider,
+            IsInternalModel = true,
+            PromptTokens = promptTokens,
+            CompletionTokens = 0,
+            AppliedPolicyName = null,
+            GroundingSources = string.Empty,
+            ContextReferences = string.Empty,
             CorrelationId = correlationId,
             Timestamp = timestamp
         };

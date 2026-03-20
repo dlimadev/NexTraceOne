@@ -54,6 +54,20 @@ public static class ResultExtensions
         return Results.Created(location, result.Value);
     }
 
+    /// <summary>Converte Result para Created (201) usando uma função para calcular a localização do recurso criado.</summary>
+    public static IResult ToCreatedResult<T>(this Result<T> result, Func<T, string> locationFactory, IErrorLocalizer? localizer = null)
+    {
+        if (result.IsFailure)
+        {
+            return result.ToHttpResult(localizer);
+        }
+
+        ArgumentNullException.ThrowIfNull(locationFactory);
+        var value = result.Value!;
+        var location = locationFactory(value);
+        return Results.Created(location, value);
+    }
+
     private static int GetStatusCode(ErrorType type)
         => type switch
         {

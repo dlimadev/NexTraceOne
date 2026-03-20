@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -164,23 +164,19 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     table.PrimaryKey("PK_gov_waivers", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "outbox_messages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    EventType = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    Payload = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    ProcessedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    RetryCount = table.Column<int>(type: "integer", nullable: false),
-                    LastError = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
-                });
+            migrationBuilder.Sql(@"
+                CREATE TABLE IF NOT EXISTS outbox_messages (
+                    ""Id"" uuid NOT NULL,
+                    ""EventType"" character varying(1000) NOT NULL,
+                    ""Payload"" text NOT NULL,
+                    ""CreatedAt"" timestamp with time zone NOT NULL,
+                    ""ProcessedAt"" timestamp with time zone,
+                    ""RetryCount"" integer NOT NULL,
+                    ""LastError"" character varying(4000),
+                    ""TenantId"" uuid NOT NULL,
+                    CONSTRAINT ""PK_outbox_messages"" PRIMARY KEY (""Id"")
+                );
+            ");
 
             migrationBuilder.CreateIndex(
                 name: "IX_gov_delegated_administrations_DomainId",
@@ -352,15 +348,9 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 table: "gov_waivers",
                 column: "Status");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
-                column: "CreatedAt");
+            migrationBuilder.Sql(@"CREATE INDEX IF NOT EXISTS ""IX_outbox_messages_CreatedAt"" ON outbox_messages (""CreatedAt"");");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
-                column: "ProcessedAt");
+            migrationBuilder.Sql(@"CREATE INDEX IF NOT EXISTS ""IX_outbox_messages_ProcessedAt"" ON outbox_messages (""ProcessedAt"");");
         }
 
         /// <inheritdoc />
@@ -390,8 +380,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
             migrationBuilder.DropTable(
                 name: "gov_waivers");
 
-            migrationBuilder.DropTable(
-                name: "outbox_messages");
+            migrationBuilder.Sql(@"DROP TABLE IF EXISTS outbox_messages;");
         }
     }
 }

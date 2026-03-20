@@ -10,6 +10,7 @@ using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -25,6 +26,18 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantM
 /// </summary>
 public static class SendAssistantMessage
 {
+    private const string DegradedProviderId = "system-fallback";
+    private const string DegradedModelName = "deterministic-fallback";
+
+    private static string ResolveConversationOwner(ICurrentUser currentUser)
+        => !string.IsNullOrWhiteSpace(currentUser.Email)
+            ? currentUser.Email
+            : currentUser.Id;
+
+    private static bool IsConversationOwner(AiAssistantConversation conversation, ICurrentUser currentUser)
+        => string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(conversation.CreatedBy, currentUser.Email, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Comando de envio de mensagem ao assistente de IA com contexto completo.</summary>
     public sealed record Command(
         Guid? ConversationId,
@@ -98,7 +111,6 @@ public static class SendAssistantMessage
                 : AIClientType.Web;
             var persona = request.Persona ?? "Engineer";
 
-            // ── Resolver ou criar conversa ────────────────────────────────
             AiAssistantConversation? conversation = null;
             if (request.ConversationId.HasValue)
             {
@@ -115,13 +127,16 @@ public static class SendAssistantMessage
                     persona,
                     clientType,
                     request.ContextScope ?? string.Empty,
-                    currentUser.Id,
+                    ResolveConversationOwner(currentUser),
                     request.ServiceId,
                     request.ContractId,
                     request.IncidentId,
                     request.TeamId);
                 await conversationRepository.AddAsync(conversation, cancellationToken);
             }
+
+            if (!conversation.IsActive)
+                return AiGovernanceErrors.ConversationNotActive(conversation.Id.Value.ToString());
 
             var conversationId = conversation.Id.Value;
 
@@ -206,6 +221,7 @@ public static class SendAssistantMessage
                 contextBundle);
 
             string grounded;
+            string? degradedReason = null;
             try
             {
                 grounded = await externalAiRoutingPort.RouteQueryAsync(
@@ -214,27 +230,31 @@ public static class SendAssistantMessage
                     selectedProvider,
                     cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 logger.LogWarning(ex,
-                    "AI provider routing failed for conversation {ConversationId}.",
+                    "AI provider routing failed for conversation {ConversationId}. Persisting explicit degraded response.",
                     conversationId);
 
-                return Error.Business(
-                    "AiGovernance.Assistant.ProviderUnavailable",
-                    "AI provider unavailable: {0}",
-                    ex.Message);
+                degradedReason = AiMessage.ProviderUnavailableReason;
+                grounded = BuildExplicitProviderUnavailableResponse(request.Message, groundingContext, ex.Message);
+                selectedModel = DegradedModelName;
+                selectedProvider = DegradedProviderId;
+                isInternal = true;
             }
 
             var promptTokens = Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
             var completionTokens = Math.Max(1, grounded.Length / 4);
-            var usedDeterministicFallback = grounded.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
+            var usedDeterministicFallback = grounded.StartsWith(AiMessage.DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase);
 
             if (usedDeterministicFallback)
             {
+                degradedReason ??= AiMessage.ProviderUnavailableReason;
                 caveats ??= [];
-                caveats.Add("Provider unavailable at request time. Deterministic fallback was used explicitly.");
+                caveats.Add("Provider unavailable at request time. Explicit degraded response was persistida.");
                 contextStrength = "partial";
+                costClass = "none";
+                escalationReason = "ProviderUnavailableFallback";
             }
 
             // Merge bundle caveats and context references
@@ -259,19 +279,28 @@ public static class SendAssistantMessage
             }
 
             // ── Persistir mensagem do assistente ──────────────────────────
-            var assistantMsg = AiMessage.AssistantMessage(
-                conversationId,
-                grounded,
-                selectedModel,
-                selectedProvider,
-                isInternal: isInternal,
-                promptTokens,
-                completionTokens,
-                appliedPolicyName: applicableStrategy?.Name,
-                string.Join(",", groundingSources),
-                string.Join(",", contextRefs),
-                correlationId,
-                now);
+            var assistantMsg = usedDeterministicFallback
+                ? AiMessage.DegradedAssistantMessage(
+                    conversationId,
+                    grounded,
+                    string.IsNullOrWhiteSpace(selectedModel) ? DegradedModelName : selectedModel,
+                    string.IsNullOrWhiteSpace(selectedProvider) ? DegradedProviderId : selectedProvider,
+                    promptTokens,
+                    correlationId,
+                    now)
+                : AiMessage.AssistantMessage(
+                    conversationId,
+                    grounded,
+                    selectedModel,
+                    selectedProvider,
+                    isInternal: isInternal,
+                    promptTokens,
+                    completionTokens,
+                    appliedPolicyName: applicableStrategy?.Name,
+                    string.Join(",", groundingSources),
+                    string.Join(",", contextRefs),
+                    correlationId,
+                    now);
             await messageRepository.AddAsync(assistantMsg, cancellationToken);
             conversation.RecordMessage(selectedModel, now);
 
@@ -314,16 +343,40 @@ public static class SendAssistantMessage
                 UseCaseType: useCaseType.ToString(),
                 RoutingPath: routingPath.ToString(),
                 ConfidenceLevel: usedDeterministicFallback ? AIConfidenceLevel.Low.ToString() : (contextBundle is not null ? "High" : confidenceLevel),
-                CostClass: usedDeterministicFallback ? "none" : costClass,
+                CostClass: costClass,
                 RoutingRationale: usedDeterministicFallback
-                    ? $"Provider unavailable. Explicit deterministic fallback returned. Original rationale: {routingRationale}"
+                    ? $"Provider unavailable. Explicit degraded response persisted. Original rationale: {routingRationale}"
                     : routingRationale,
                 SourceWeightingSummary: sourceWeightingSummary,
-                EscalationReason: usedDeterministicFallback ? "ProviderUnavailableFallback" : escalationReason,
+                EscalationReason: escalationReason,
                 ContextSummary: contextSummary,
                 SuggestedNextSteps: suggestedSteps,
                 ContextCaveats: caveats,
-                ContextStrength: contextStrength);
+                ContextStrength: contextStrength,
+                UserMessageId: userMessage.Id.Value,
+                UserMessageTimestamp: userMessage.Timestamp,
+                AssistantMessageTimestamp: assistantMsg.Timestamp,
+                ResponseState: assistantMsg.GetResponseState(),
+                IsDegraded: assistantMsg.IsDegradedResponse(),
+                DegradedReason: degradedReason ?? assistantMsg.GetDegradedReason(),
+                ConversationTitle: conversation.Title,
+                ConversationMessageCount: conversation.MessageCount,
+                ConversationLastMessageAt: conversation.LastMessageAt);
+        }
+
+        private static string BuildExplicitProviderUnavailableResponse(string query, string groundingContext, string errorMessage)
+        {
+            var contextSnippet = string.IsNullOrWhiteSpace(groundingContext)
+                ? "No grounding context available."
+                : groundingContext.Length > 900
+                    ? string.Concat(groundingContext.AsSpan(0, 900), "...")
+                    : groundingContext;
+
+            var querySnippet = query.Length > 240
+                ? string.Concat(query.AsSpan(0, 240), "...")
+                : query;
+
+            return $"{AiMessage.DeterministicFallbackPrefix} Provider unavailable. This response is degraded and should be treated as limited guidance. Operational detail: {errorMessage}.\n\nQuestion: {querySnippet}\nGrounding snapshot: {contextSnippet}";
         }
 
         /// <summary>
@@ -755,5 +808,14 @@ public static class SendAssistantMessage
         string? ContextSummary = null,
         List<string>? SuggestedNextSteps = null,
         List<string>? ContextCaveats = null,
-        string? ContextStrength = null);
+        string? ContextStrength = null,
+        Guid? UserMessageId = null,
+        DateTimeOffset? UserMessageTimestamp = null,
+        DateTimeOffset? AssistantMessageTimestamp = null,
+        string? ResponseState = null,
+        bool IsDegraded = false,
+        string? DegradedReason = null,
+        string? ConversationTitle = null,
+        int? ConversationMessageCount = null,
+        DateTimeOffset? ConversationLastMessageAt = null);
 }

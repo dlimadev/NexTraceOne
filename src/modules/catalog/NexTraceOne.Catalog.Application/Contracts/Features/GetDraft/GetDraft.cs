@@ -73,6 +73,7 @@ public static class GetDraft
                 draft.AiGenerationPrompt,
                 draft.LastEditedAt,
                 draft.LastEditedBy,
+                draft.CreatedAt,
                 examples);
         }
     }
@@ -106,5 +107,6 @@ public static class GetDraft
         string? AiGenerationPrompt,
         DateTimeOffset? LastEditedAt,
         string? LastEditedBy,
+        DateTimeOffset CreatedAt,
         IReadOnlyList<ExampleDto> Examples);
 }

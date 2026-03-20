@@ -47,7 +47,7 @@ public static class GenerateDraftFromAi
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IContractsUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -72,7 +72,18 @@ public static class GenerateDraftFromAi
             repository.Add(draft);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            return new Response(draft.Id.Value, content);
+            var persistedDraft = (await repository.ListAsync(
+                    DraftStatus.Editing,
+                    request.ServiceId,
+                    request.Author,
+                    1,
+                    20,
+                    cancellationToken))
+                .OrderByDescending(item => item.CreatedAt)
+                .FirstOrDefault(item => item.Title == request.Title && item.Protocol == request.Protocol)
+                ?? draft;
+
+            return new Response(persistedDraft.Id.Value, content);
         }
 
         /// <summary>

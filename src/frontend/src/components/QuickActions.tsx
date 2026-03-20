@@ -23,9 +23,9 @@ import {
   ClipboardCheck,
   Bot,
 } from 'lucide-react';
-import { Badge } from './Badge';
 import { usePersona } from '../contexts/PersonaContext';
 import type { QuickAction } from '../auth/persona';
+import { isRouteAvailableInFinalProductionScope } from '../releaseScope';
 
 /**
  * Mapeamento de nomes de ícone para componentes lucide-react.
@@ -71,13 +71,15 @@ export function QuickActions() {
     navigate(action.to);
   };
 
+  const visibleActions = config.quickActions.filter((action) => isRouteAvailableInFinalProductionScope(action.to));
+
   return (
     <div className="mb-6">
       <h2 className="text-sm font-semibold text-muted uppercase tracking-wider mb-3">
         {t('persona.quickActions')}
       </h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {config.quickActions.map((action) => (
+        {visibleActions.map((action) => (
           <button
             key={action.id}
             onClick={() => handleAction(action)}
@@ -91,13 +93,6 @@ export function QuickActions() {
               <span className="text-sm text-body group-hover:text-heading truncate block">
                 {t(action.labelKey)}
               </span>
-              {action.preview && (
-                <span className="mt-1 inline-flex">
-                  <Badge variant="warning" className="text-[10px]">
-                    {t('preview.bannerTitle', 'Preview')}
-                  </Badge>
-                </span>
-              )}
             </span>
           </button>
         ))}

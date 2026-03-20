@@ -41,25 +41,38 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
     [Fact]
     public async Task Contracts_Should_Create_Edit_And_Submit_Draft_With_Real_Backend()
     {
-        using var client = await fixture.CreateAuthenticatedClientAsync();
+        using var client = await fixture.CreateAuthenticatedClientAsync(SeedAdminEmail, SeedAdminPassword);
 
         var suffix = Guid.NewGuid().ToString("N")[..8];
+        var draftTitle = $"RH6 Draft {suffix}";
 
         var createResponse = await client.PostAsJsonAsync("/api/v1/contracts/drafts", new
         {
-            title = $"RH6 Draft {suffix}",
-            author = ApiE2EFixture.E2EAdminEmail,
+            title = draftTitle,
+            author = SeedAdminEmail,
             contractType = "RestApi",
             protocol = "OpenApi",
             description = "Real RH-6 contract draft"
         });
 
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        var createdDraftId = ExtractGuidFromLocation(createResponse) ?? await ExtractGuidAsync(createResponse, "draftId");
+        var createdDraftId = await ExtractGuidAsync(createResponse, "draftId");
 
-        var updateContentResponse = await client.PatchAsJsonAsync($"/api/v1/contracts/drafts/{createdDraftId}/content", new
+        var listDraftsResponse = await client.GetAsync($"/api/v1/contracts/drafts?status=Editing&author={Uri.EscapeDataString(SeedAdminEmail)}&page=1&pageSize=20");
+        listDraftsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var listDraftsPayload = await listDraftsResponse.Content.ReadAsStringAsync();
+        listDraftsPayload.Should().Contain(draftTitle);
+        var persistedDraftId = await ExtractFirstGuidFromItemsAsync(listDraftsResponse, "draftId");
+
+        createdDraftId.Should().Be(persistedDraftId);
+
+        var getDraftResponse = await client.GetAsync($"/api/v1/contracts/drafts/{persistedDraftId}");
+        getDraftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await getDraftResponse.Content.ReadAsStringAsync()).Should().Contain(draftTitle);
+
+        var updateContentResponse = await client.PatchAsJsonAsync($"/api/v1/contracts/drafts/{persistedDraftId}/content", new
         {
-            draftId = createdDraftId,
+            draftId = persistedDraftId,
             specContent =
                 """
                 openapi: 3.0.0
@@ -75,25 +88,36 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
                           description: OK
                 """,
             format = "yaml",
-            editedBy = ApiE2EFixture.E2EAdminEmail
+            editedBy = SeedAdminEmail
         });
 
         updateContentResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var updateMetadataResponse = await client.PatchAsJsonAsync($"/api/v1/contracts/drafts/{createdDraftId}/metadata", new
+        var updateMetadataResponse = await client.PatchAsJsonAsync($"/api/v1/contracts/drafts/{persistedDraftId}/metadata", new
         {
-            draftId = createdDraftId,
+            draftId = persistedDraftId,
             title = $"RH6 Draft {suffix} Updated",
             description = "Updated via real API E2E flow",
             proposedVersion = "1.0.1",
             serviceId = OrdersApiAssetId,
-            editedBy = ApiE2EFixture.E2EAdminEmail
+            editedBy = SeedAdminEmail
         });
 
         updateMetadataResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var submitResponse = await client.PostAsync($"/api/v1/contracts/drafts/{createdDraftId}/submit-review", content: null);
+        var reloadDraftResponse = await client.GetAsync($"/api/v1/contracts/drafts/{persistedDraftId}");
+        reloadDraftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var reloadDraftPayload = await reloadDraftResponse.Content.ReadAsStringAsync();
+        reloadDraftPayload.Should().Contain("RH6 Contracts API");
+        reloadDraftPayload.Should().Contain($"RH6 Draft {suffix} Updated");
+        reloadDraftPayload.Should().Contain("1.0.1");
+
+        var submitResponse = await client.PostAsync($"/api/v1/contracts/drafts/{persistedDraftId}/submit-review", content: null);
         submitResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var submittedDraftResponse = await client.GetAsync($"/api/v1/contracts/drafts/{persistedDraftId}");
+        submittedDraftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await submittedDraftResponse.Content.ReadAsStringAsync()).Should().Contain("InReview");
     }
 
     [Fact]
@@ -164,7 +188,7 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
     [Fact]
     public async Task AI_Should_Create_Conversation_Send_Message_And_List_Persisted_Messages()
     {
-        using var client = await fixture.CreateAuthenticatedClientAsync();
+        using var client = await fixture.CreateAuthenticatedClientAsync(SeedAdminEmail, SeedAdminPassword);
 
         var createConversationResponse = await client.PostAsJsonAsync("/api/v1/ai/assistant/conversations", new
         {
@@ -175,11 +199,10 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
         });
 
         createConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        var conversationId = await ExtractGuidAsync(createConversationResponse, "conversationId");
+        var createdConversationId = await ExtractGuidAsync(createConversationResponse, "conversationId");
 
         var sendMessageResponse = await client.PostAsJsonAsync("/api/v1/ai/assistant/chat", new
         {
-            conversationId,
             message = "Summarize the likely operational risk for Payments Service in production.",
             contextScope = "services,changes,incidents",
             persona = "Engineer",
@@ -188,14 +211,16 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
 
         sendMessageResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         var sendMessagePayload = await sendMessageResponse.Content.ReadAsStringAsync();
-        sendMessagePayload.Should().Contain(conversationId.ToString());
         sendMessagePayload.Should().Match(payload =>
             payload.Contains("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.Ordinal)
             || payload.Contains("assistantResponse", StringComparison.OrdinalIgnoreCase)
             || payload.Contains("content", StringComparison.OrdinalIgnoreCase)
             || payload.Contains("message", StringComparison.OrdinalIgnoreCase));
 
-        var listMessagesResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{conversationId}/messages?pageSize=50");
+        var responseConversationId = await ExtractGuidAsync(sendMessageResponse, "conversationId");
+        responseConversationId.Should().NotBe(Guid.Empty);
+
+        var listMessagesResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{responseConversationId}/messages?pageSize=50");
         listMessagesResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var listMessagesPayload = await listMessagesResponse.Content.ReadAsStringAsync();
@@ -203,17 +228,82 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
         listMessagesPayload.Should().Match(payload =>
             payload.Contains("assistant", StringComparison.OrdinalIgnoreCase)
             || payload.Contains("user", StringComparison.OrdinalIgnoreCase));
+
+        var createdConversationResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{createdConversationId}?messagePageSize=20");
+        createdConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task AI_Should_Create_Open_Send_Persist_Relist_And_Reopen_Conversation()
+    {
+        using var client = await fixture.CreateAuthenticatedClientAsync(SeedAdminEmail, SeedAdminPassword);
+
+        var conversationTitle = $"RH6 AI Conversation {Guid.NewGuid():N}"[..24];
+
+        var createConversationResponse = await client.PostAsJsonAsync("/api/v1/ai/assistant/conversations", new
+        {
+            title = conversationTitle,
+            persona = "Engineer",
+            clientType = "Web",
+            defaultContextScope = "services,incidents,changes"
+        });
+
+        createConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var createdConversationId = await ExtractGuidAsync(createConversationResponse, "conversationId");
+
+        var openConversationResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{createdConversationId}?messagePageSize=20");
+        openConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await openConversationResponse.Content.ReadAsStringAsync()).Should().Contain(conversationTitle);
+
+        var sendMessageResponse = await client.PostAsJsonAsync("/api/v1/ai/assistant/chat", new
+        {
+            conversationId = createdConversationId,
+            message = "Summarize the likely operational risk for Payments Service in production.",
+            contextScope = "services,changes,incidents",
+            persona = "Engineer",
+            clientType = "Web"
+        });
+
+        sendMessageResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var sendDocument = JsonDocument.Parse(await sendMessageResponse.Content.ReadAsStringAsync());
+        var sendPayload = sendDocument.RootElement;
+        sendPayload.GetProperty("conversationId").GetGuid().Should().Be(createdConversationId);
+        sendPayload.GetProperty("userMessageId").GetGuid().Should().NotBe(Guid.Empty);
+        sendPayload.GetProperty("messageId").GetGuid().Should().NotBe(Guid.Empty);
+        sendPayload.GetProperty("responseState").GetString().Should().BeOneOf("Completed", "Degraded");
+        sendPayload.GetProperty("assistantResponse").GetString().Should().NotBeNullOrWhiteSpace();
+
+        var listConversationsResponse = await client.GetAsync("/api/v1/ai/assistant/conversations?pageSize=20");
+        listConversationsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        (await listConversationsResponse.Content.ReadAsStringAsync()).Should().Contain(conversationTitle);
+
+        var listMessagesResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{createdConversationId}/messages?pageSize=20");
+        listMessagesResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var listMessagesDocument = JsonDocument.Parse(await listMessagesResponse.Content.ReadAsStringAsync());
+        var items = listMessagesDocument.RootElement.GetProperty("items");
+        items.GetArrayLength().Should().Be(2);
+        items[0].GetProperty("role").GetString().Should().Be("user");
+        items[1].GetProperty("role").GetString().Should().Be("assistant");
+        items[0].GetProperty("content").GetString().Should().Contain("Payments Service");
+        items[1].GetProperty("responseState").GetString().Should().BeOneOf("Completed", "Degraded");
+
+        var reopenedConversationResponse = await client.GetAsync($"/api/v1/ai/assistant/conversations/{createdConversationId}?messagePageSize=20");
+        reopenedConversationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var reopenedPayload = await reopenedConversationResponse.Content.ReadAsStringAsync();
+        reopenedPayload.Should().Contain(conversationTitle);
+        reopenedPayload.Should().Contain("Payments Service");
+        reopenedPayload.Should().Contain("responseState");
     }
 
     private static async Task<Guid> ExtractGuidAsync(HttpResponseMessage response, string propertyName)
     {
         using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
-        if (TryReadGuid(document.RootElement, propertyName, out var value))
+        if (TryReadGuid(document.RootElement, propertyName, out var value) || TryReadGuid(document.RootElement, "id", out value))
             return value;
 
         if (document.RootElement.TryGetProperty("data", out var dataElement)
-            && TryReadGuid(dataElement, propertyName, out value))
+            && (TryReadGuid(dataElement, propertyName, out value) || TryReadGuid(dataElement, "id", out value)))
         {
             return value;
         }
@@ -235,15 +325,47 @@ public sealed class RealBusinessApiFlowTests(ApiE2EFixture fixture)
     {
         value = Guid.Empty;
 
-        if (!element.TryGetProperty(propertyName, out var property))
-            return false;
-
-        if (property.ValueKind == JsonValueKind.String
-            && Guid.TryParse(property.GetString(), out value))
+        foreach (var candidate in GetCandidatePropertyNames(propertyName))
         {
-            return true;
+            if (!element.TryGetProperty(candidate, out var property))
+                continue;
+
+            if (property.ValueKind == JsonValueKind.String
+                && Guid.TryParse(property.GetString(), out value))
+            {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    private static IEnumerable<string> GetCandidatePropertyNames(string propertyName)
+    {
+        yield return propertyName;
+        if (!string.IsNullOrWhiteSpace(propertyName))
+        {
+            yield return char.ToUpperInvariant(propertyName[0]) + propertyName[1..];
+        }
+    }
+
+    private static async Task<Guid> ExtractFirstGuidFromItemsAsync(HttpResponseMessage response, string propertyName)
+    {
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        if (!document.RootElement.TryGetProperty("items", out var items)
+            || items.ValueKind != JsonValueKind.Array)
+        {
+            throw new InvalidOperationException("Could not extract items array from response.");
+        }
+
+        foreach (var item in items.EnumerateArray())
+        {
+            if (TryReadGuid(item, propertyName, out var value) || TryReadGuid(item, "id", out value))
+            {
+                return value;
+            }
+        }
+
+        throw new InvalidOperationException($"Could not extract GUID property '{propertyName}' from response items.");
     }
 }

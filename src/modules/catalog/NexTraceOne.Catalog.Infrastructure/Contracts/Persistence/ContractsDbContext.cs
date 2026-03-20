@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
@@ -17,7 +18,7 @@ public sealed class ContractsDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IContractsUnitOfWork
 {
     /// <summary>Versões de contrato multi-protocolo persistidas no módulo Contracts.</summary>
     public DbSet<ContractVersion> ContractVersions => Set<ContractVersion>();

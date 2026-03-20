@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -13,6 +14,11 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListConversati
 /// </summary>
 public static class ListConversations
 {
+    private static string ResolveConversationOwner(ICurrentUser currentUser)
+        => !string.IsNullOrWhiteSpace(currentUser.Email)
+            ? currentUser.Email
+            : currentUser.Id;
+
     /// <summary>Query de listagem de conversas do assistente de IA.</summary>
     public sealed record Query(
         string? UserId,
@@ -20,20 +26,25 @@ public static class ListConversations
 
     /// <summary>Handler que lista resumos de conversas maduras do assistente.</summary>
     public sealed class Handler(
-        IAiAssistantConversationRepository conversationRepository) : IQueryHandler<Query, Response>
+        IAiAssistantConversationRepository conversationRepository,
+        ICurrentUser currentUser) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
+            var effectiveUserId = string.IsNullOrWhiteSpace(request.UserId)
+                ? ResolveConversationOwner(currentUser)
+                : request.UserId;
+
             var conversations = await conversationRepository.ListAsync(
-                request.UserId,
+                effectiveUserId,
                 isActive: null,
                 request.PageSize,
                 cancellationToken);
 
             var totalCount = await conversationRepository.CountAsync(
-                request.UserId,
+                effectiveUserId,
                 isActive: null,
                 cancellationToken);
 

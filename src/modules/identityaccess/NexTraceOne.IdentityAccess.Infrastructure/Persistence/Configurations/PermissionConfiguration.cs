@@ -47,6 +47,10 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C031")), "change-intelligence:releases:write", "Create and manage releases", "ChangeIntelligence"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C032")), "change-intelligence:blast-radius:read", "View blast radius reports", "ChangeIntelligence"),
 
+            // Operations
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C034")), "operations:incidents:read", "View operational incidents", "Operations"),
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C035")), "operations:incidents:write", "Create and manage operational incidents", "Operations"),
+
             // Workflow
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C040")), "workflow:read", "View workflow instances and templates", "Workflow"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C041")), "workflow:write", "Create and configure workflows", "Workflow"),

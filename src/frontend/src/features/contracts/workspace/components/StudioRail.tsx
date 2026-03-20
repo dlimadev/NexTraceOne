@@ -44,25 +44,28 @@ export function StudioRail({ contract, onTransition, className }: StudioRailProp
           <RailRow label={t('contracts.studio.rail.lifecycle', 'Lifecycle')}>
             <LifecycleBadge state={contract.lifecycleState} />
           </RailRow>
-          <RailRow label={t('contracts.studio.rail.approval', 'Approval')}>
-            <span className={cn(
-              'text-[10px] font-medium px-2 py-0.5 rounded-md',
-              contract.approvalState === 'Approved' ? 'bg-mint/10 text-mint' :
-              contract.approvalState === 'InReview' ? 'bg-cyan/10 text-cyan' :
-              contract.approvalState === 'Rejected' ? 'bg-danger/10 text-danger' :
-              'bg-elevated text-muted',
-            )}>
-              {t(`contracts.catalog.approvalStates.${contract.approvalState}`, contract.approvalState)}
-            </span>
-          </RailRow>
+          {contract.approvalState && (
+            <RailRow label={t('contracts.studio.rail.approval', 'Approval')}>
+              <span className={cn(
+                'text-[10px] font-medium px-2 py-0.5 rounded-md',
+                contract.approvalState === 'Approved' ? 'bg-mint/10 text-mint' :
+                contract.approvalState === 'InReview' ? 'bg-cyan/10 text-cyan' :
+                contract.approvalState === 'Rejected' ? 'bg-danger/10 text-danger' :
+                'bg-elevated text-muted',
+              )}>
+                {t(`contracts.catalog.approvalStates.${contract.approvalState}`, contract.approvalState)}
+              </span>
+            </RailRow>
+          )}
           <RailRow label={t('contracts.studio.rail.compliance', 'Compliance')}>
             <span className={cn(
               'text-[10px] font-bold',
+              contract.complianceScore == null ? 'text-muted' :
               contract.complianceScore >= 80 ? 'text-mint' :
               contract.complianceScore >= 60 ? 'text-warning' :
               'text-danger',
             )}>
-              {contract.complianceScore}%
+              {contract.complianceScore == null ? t('common.notAvailable', 'Not available') : `${contract.complianceScore}%`}
             </span>
           </RailRow>
           <RailRow label={t('contracts.studio.rail.version', 'Version')}>
@@ -75,13 +78,13 @@ export function StudioRail({ contract, onTransition, className }: StudioRailProp
       <RailSection title={t('contracts.studio.rail.owners', 'Owners')} icon={<Users size={12} />}>
         <div className="space-y-1.5">
           <RailRow label={t('contracts.studio.rail.owner', 'Owner')}>
-            <span className="text-[10px] text-body">@{contract.owner}</span>
+            <span className="text-[10px] text-body">{contract.owner ? `@${contract.owner}` : t('common.notAvailable', 'Not available')}</span>
           </RailRow>
           <RailRow label={t('contracts.studio.rail.team', 'Team')}>
-            <span className="text-[10px] text-body">{contract.team}</span>
+            <span className="text-[10px] text-body">{contract.team || t('common.notAvailable', 'Not available')}</span>
           </RailRow>
           <RailRow label={t('contracts.studio.rail.domain', 'Domain')}>
-            <span className="text-[10px] text-body">{contract.domain}</span>
+            <span className="text-[10px] text-body">{contract.domain || t('common.notAvailable', 'Not available')}</span>
           </RailRow>
         </div>
       </RailSection>
@@ -89,63 +92,75 @@ export function StudioRail({ contract, onTransition, className }: StudioRailProp
       {/* ── Approval Checklist ── */}
       <RailSection
         title={t('contracts.approvals.checklist', 'Approval Checklist')}
-        badge={`${approvedCount}/${totalApprovals}`}
+        badge={totalApprovals > 0 ? `${approvedCount}/${totalApprovals}` : undefined}
       >
-        <div className="space-y-1">
-          {contract.approvalChecklist.map((item) => (
-            <div key={item.role} className="flex items-center gap-2 py-1">
-              {item.state === 'Approved' ? (
-                <CheckCircle size={12} className="text-mint flex-shrink-0" />
-              ) : (
-                <Circle size={12} className="text-muted/40 flex-shrink-0" />
-              )}
-              <span className={cn(
-                'text-[10px] flex-1',
-                item.state === 'Approved' ? 'text-body' : 'text-muted',
-              )}>
-                {t(`contracts.approvals.${item.role.charAt(0).toLowerCase() + item.role.slice(1)}`, item.role)}
-              </span>
-              {item.reviewedBy && (
-                <span className="text-[9px] text-muted/60">@{item.reviewedBy.split('.')[0]}</span>
-              )}
+        {totalApprovals === 0 ? (
+          <p className="text-[10px] text-muted">
+            {t('contracts.studio.rail.approvalUnavailable', 'No approval checklist is available for this contract version yet.')}
+          </p>
+        ) : (
+          <>
+            <div className="space-y-1">
+              {contract.approvalChecklist.map((item) => (
+                <div key={item.role} className="flex items-center gap-2 py-1">
+                  {item.state === 'Approved' ? (
+                    <CheckCircle size={12} className="text-mint flex-shrink-0" />
+                  ) : (
+                    <Circle size={12} className="text-muted/40 flex-shrink-0" />
+                  )}
+                  <span className={cn(
+                    'text-[10px] flex-1',
+                    item.state === 'Approved' ? 'text-body' : 'text-muted',
+                  )}>
+                    {t(`contracts.approvals.${item.role.charAt(0).toLowerCase() + item.role.slice(1)}`, item.role)}
+                  </span>
+                  {item.reviewedBy && (
+                    <span className="text-[9px] text-muted/60">@{item.reviewedBy.split('.')[0]}</span>
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        {/* Progress bar */}
-        <div className="mt-2">
-          <div className="h-1 bg-elevated rounded-full overflow-hidden">
-            <div
-              className="h-full bg-mint rounded-full transition-all"
-              style={{ width: `${totalApprovals > 0 ? (approvedCount / totalApprovals) * 100 : 0}%` }}
-            />
-          </div>
-        </div>
+            <div className="mt-2">
+              <div className="h-1 bg-elevated rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-mint rounded-full transition-all"
+                  style={{ width: `${totalApprovals > 0 ? (approvedCount / totalApprovals) * 100 : 0}%` }}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </RailSection>
 
       {/* ── Policy Checks ── */}
       <RailSection
         title={t('contracts.studio.rail.policyChecks', 'Policy Checks')}
         icon={<Shield size={12} />}
-        badge={`${passedPolicies}/${totalPolicies}`}
+        badge={totalPolicies > 0 ? `${passedPolicies}/${totalPolicies}` : undefined}
       >
-        <div className="space-y-1">
-          {contract.policyChecks.map((check) => (
-            <div key={check.policyId} className="flex items-center gap-2 py-1">
-              {check.passed ? (
-                <CheckCircle size={11} className="text-mint flex-shrink-0" />
-              ) : (
-                <AlertTriangle size={11} className="text-warning flex-shrink-0" />
-              )}
-              <span className={cn(
-                'text-[10px] flex-1',
-                check.passed ? 'text-muted' : 'text-body',
-              )}>
-                {check.policyName}
-              </span>
-            </div>
-          ))}
-        </div>
+        {totalPolicies === 0 ? (
+          <p className="text-[10px] text-muted">
+            {t('contracts.studio.rail.policyUnavailable', 'No policy check records are available for this contract version yet.')}
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {contract.policyChecks.map((check) => (
+              <div key={check.policyId} className="flex items-center gap-2 py-1">
+                {check.passed ? (
+                  <CheckCircle size={11} className="text-mint flex-shrink-0" />
+                ) : (
+                  <AlertTriangle size={11} className="text-warning flex-shrink-0" />
+                )}
+                <span className={cn(
+                  'text-[10px] flex-1',
+                  check.passed ? 'text-muted' : 'text-body',
+                )}>
+                  {check.policyName}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </RailSection>
 
       {/* ── Risks ── */}
@@ -180,16 +195,22 @@ export function StudioRail({ contract, onTransition, className }: StudioRailProp
         title={t('contracts.studio.rail.recentActivity', 'Recent Activity')}
         icon={<Activity size={12} />}
       >
-        <div className="space-y-1.5">
-          {contract.recentActivity.slice(0, 5).map((item) => (
-            <div key={item.id} className="py-1">
-              <p className="text-[10px] text-body leading-snug">{item.action}</p>
-              <p className="text-[9px] text-muted/60">
-                @{item.actor.split('.')[0]} · {formatRelativeTime(item.timestamp)}
-              </p>
-            </div>
-          ))}
-        </div>
+        {contract.recentActivity.length === 0 ? (
+          <p className="text-[10px] text-muted">
+            {t('contracts.studio.rail.noRecentActivity', 'No recorded activity is available for this contract version yet.')}
+          </p>
+        ) : (
+          <div className="space-y-1.5">
+            {contract.recentActivity.slice(0, 5).map((item) => (
+              <div key={item.id} className="py-1">
+                <p className="text-[10px] text-body leading-snug">{item.action}</p>
+                <p className="text-[9px] text-muted/60">
+                  @{item.actor.split('.')[0]} · {formatRelativeTime(item.timestamp)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </RailSection>
 
       {/* ── Available Transitions ── */}

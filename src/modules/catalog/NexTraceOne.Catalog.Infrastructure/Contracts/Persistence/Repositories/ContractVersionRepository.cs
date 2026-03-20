@@ -18,6 +18,8 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
     public override async Task<ContractVersion?> GetByIdAsync(ContractVersionId id, CancellationToken ct = default)
         => await context.ContractVersions
             .Include(v => v.Diffs)
+            .Include(v => v.RuleViolations)
+            .Include(v => v.Artifacts)
             .SingleOrDefaultAsync(v => v.Id == id, ct);
 
     /// <summary>Busca uma versão de contrato pelo ativo de API e versão semântica.</summary>
@@ -93,35 +95,35 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        // Sub-query: obter o ID da versão mais recente por ApiAssetId
-        var latestIdsQuery = context.ContractVersions
+        var latestVersions = (await context.ContractVersions
+                .ToListAsync(cancellationToken))
             .GroupBy(v => v.ApiAssetId)
-            .Select(g => g.OrderByDescending(v => v.CreatedAt).First().Id);
-
-        var query = context.ContractVersions
-            .Where(v => latestIdsQuery.Contains(v.Id));
+            .Select(g => g.OrderByDescending(v => v.CreatedAt).First())
+            .AsEnumerable();
 
         if (protocol.HasValue)
-            query = query.Where(v => v.Protocol == protocol.Value);
+            latestVersions = latestVersions.Where(v => v.Protocol == protocol.Value);
 
         if (lifecycleState.HasValue)
-            query = query.Where(v => v.LifecycleState == lifecycleState.Value);
+            latestVersions = latestVersions.Where(v => v.LifecycleState == lifecycleState.Value);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var pattern = $"%{searchTerm}%";
-            query = query.Where(v =>
-                EF.Functions.Like(v.SemVer, pattern) ||
-                EF.Functions.Like(v.ImportedFrom, pattern));
+            latestVersions = latestVersions.Where(v =>
+                v.SemVer.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || v.ImportedFrom.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
         }
 
-        var totalCount = await query.CountAsync(cancellationToken);
-
-        var items = await query
+        var orderedVersions = latestVersions
             .OrderByDescending(v => v.CreatedAt)
+            .ToList();
+
+        var totalCount = orderedVersions.Count;
+
+        var items = orderedVersions
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return (items, totalCount);
     }
@@ -138,15 +140,14 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
         if (ids.Count == 0)
             return [];
 
-        // Obter a versão mais recente por cada ApiAssetId no conjunto
         var latestIds = await context.ContractVersions
             .Where(v => ids.Contains(v.ApiAssetId))
             .GroupBy(v => v.ApiAssetId)
-            .Select(g => g.OrderByDescending(v => v.CreatedAt).First().Id)
+            .Select(g => g.OrderByDescending(v => v.CreatedAt).First().Id.Value)
             .ToListAsync(cancellationToken);
 
         return await context.ContractVersions
-            .Where(v => latestIds.Contains(v.Id))
+            .Where(v => latestIds.Contains(v.Id.Value))
             .OrderByDescending(v => v.CreatedAt)
             .ToListAsync(cancellationToken);
     }

@@ -18,6 +18,10 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateConversa
 /// </summary>
 public static class UpdateConversation
 {
+    private static bool IsConversationOwner(AiAssistantConversation conversation, ICurrentUser currentUser)
+        => string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(conversation.CreatedBy, currentUser.Email, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Comando de atualização de conversa do assistente de IA.</summary>
     public sealed record Command(
         Guid ConversationId,
@@ -50,8 +54,7 @@ public static class UpdateConversation
             if (conversation is null)
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
-            // Validar que o utilizador autenticado é o proprietário da conversa
-            if (!string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase))
+            if (!IsConversationOwner(conversation, currentUser))
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
             if (!string.IsNullOrWhiteSpace(request.Title))

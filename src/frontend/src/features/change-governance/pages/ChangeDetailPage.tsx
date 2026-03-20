@@ -28,6 +28,7 @@ import { changeConfidenceApi } from '../api/changeConfidence';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { AdvisoryFactorDto, ChangeAdvisoryResponse, DecisionHistoryItemDto } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 
 /** Mapeia status de confiança para variante visual do Badge. */
 function confidenceVariant(status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' {
@@ -790,6 +791,7 @@ export function ChangeDetailPage() {
               <ExternalLink size={14} />
               {t('changeConfidence.detail.viewInReleases')}
             </Link>
+            {isRouteAvailableInFinalProductionScope('/operations/incidents') && (
             <Link
               to="/operations/incidents"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-elevated border border-edge text-sm text-body hover:text-heading hover:border-accent transition-colors"
@@ -797,6 +799,7 @@ export function ChangeDetailPage() {
               <ExternalLink size={14} />
               {t('changeConfidence.detail.viewIncidents')}
             </Link>
+            )}
           </div>
         </CardBody>
       </Card>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import {
   Bot,
   Send,
@@ -68,6 +69,9 @@ interface ChatMessage {
   routingRationale?: string;
   sourceWeightingSummary?: string;
   escalationReason?: string;
+  responseState?: string;
+  isDegraded?: boolean;
+  degradedReason?: string | null;
   timestamp: string;
 }
 
@@ -102,9 +106,54 @@ interface MessageApiItem {
   contextReferences: string[];
   correlationId: string;
   timestamp: string;
+  responseState?: string;
+  isDegraded?: boolean;
+  degradedReason?: string | null;
 }
 
 const contextScopes = ['Services', 'Contracts', 'Incidents', 'Changes', 'Runbooks'] as const;
+const conversationSearchParam = 'conversation';
+
+function normalizeContextScope(scope: string) {
+  return contextScopes.find(candidate => candidate.toLowerCase() === scope.toLowerCase()) ?? scope;
+}
+
+function mapMessage(item: MessageApiItem): ChatMessage {
+  const isAssistant = item.role === 'assistant';
+  const isDegraded = item.isDegraded ?? false;
+
+  return {
+    id: item.messageId,
+    role: item.role as 'user' | 'assistant',
+    content: item.content,
+    modelName: item.modelName,
+    provider: item.provider,
+    isInternalModel: item.isInternalModel,
+    promptTokens: item.promptTokens,
+    completionTokens: item.completionTokens,
+    appliedPolicyName: item.appliedPolicyName,
+    groundingSources: item.groundingSources ?? [],
+    contextReferences: item.contextReferences ?? [],
+    correlationId: item.correlationId,
+    timestamp: item.timestamp,
+    responseState: item.responseState ?? (isAssistant ? (isDegraded ? 'Degraded' : 'Completed') : 'Completed'),
+    isDegraded,
+    degradedReason: item.degradedReason ?? null,
+    useCaseType: 'General',
+    routingPath: isDegraded ? 'ProviderUnavailable' : item.isInternalModel ? 'InternalOnly' : 'ExternalEscalation',
+    confidenceLevel: isDegraded ? 'Low' : item.isInternalModel ? 'High' : 'Medium',
+    costClass: isDegraded ? 'none' : item.isInternalModel ? 'low' : 'medium',
+  };
+}
+
+function getProblemStatus(error: unknown): number | null {
+  if (typeof error !== 'object' || error === null || !('response' in error)) {
+    return null;
+  }
+
+  const response = (error as { response?: { status?: number } }).response;
+  return typeof response?.status === 'number' ? response.status : null;
+}
 
 /**
  * Página madura do AI Assistant — assistente IA contextualizado, governado e explicável.
@@ -119,11 +168,14 @@ const contextScopes = ['Services', 'Contracts', 'Incidents', 'Changes', 'Runbook
 export function AiAssistantPage() {
   const { t } = useTranslation();
   const { persona, config } = usePersona();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // ── State ─────────────────────────────────────────────────────────────
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [activeContexts, setActiveContexts] = useState<string[]>(config.aiContextScopes);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(() => searchParams.get(conversationSearchParam));
+  const [activeContexts, setActiveContexts] = useState<string[]>(() =>
+    Array.from(new Set(config.aiContextScopes.map(normalizeContextScope))),
+  );
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [expandedMeta, setExpandedMeta] = useState<string | null>(null);
@@ -133,22 +185,50 @@ export function AiAssistantPage() {
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [conversationsError, setConversationsError] = useState<string | null>(null);
+  const [messagesError, setMessagesError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const conversationLoadRequestRef = useRef(0);
+  const messageLoadRequestRef = useRef(0);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  const setSelectedConversationState = useCallback((conversationId: string | null) => {
+    setSelectedConversation(conversationId);
+    setExpandedMeta(null);
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    if (conversationId) {
+      nextSearchParams.set(conversationSearchParam, conversationId);
+    } else {
+      nextSearchParams.delete(conversationSearchParam);
+    }
+
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  useEffect(() => {
+    const conversationFromUrl = searchParams.get(conversationSearchParam);
+    setSelectedConversation(current => current === conversationFromUrl ? current : conversationFromUrl);
+  }, [searchParams]);
+
   // ── Load conversations from backend ───────────────────────────────────
-  const loadConversations = useCallback(async () => {
+  const loadConversations = useCallback(async (preferredConversationId?: string | null) => {
+    const requestId = ++conversationLoadRequestRef.current;
     setIsLoadingConversations(true);
     setConversationsError(null);
+
     try {
       const data = await aiGovernanceApi.listConversations({ pageSize: 50 });
+      if (requestId !== conversationLoadRequestRef.current) {
+        return;
+      }
+
       const items: Conversation[] = (data.items || []).map((item: ConversationApiItem) => ({
         id: item.id,
         title: item.title,
@@ -162,67 +242,80 @@ export function AiAssistantPage() {
         clientType: item.clientType,
         createdBy: item.createdBy,
       }));
+
       setConversations(items);
-      // Auto-select first conversation if available
-      if (items.length > 0 && selectedConversation === null) {
-        const firstItem = items[0];
-        if (firstItem) {
-          setSelectedConversation(firstItem.id);
+
+      const requestedConversationId = preferredConversationId
+        ?? searchParams.get(conversationSearchParam)
+        ?? selectedConversation;
+
+      if (requestedConversationId && items.some(item => item.id === requestedConversationId)) {
+        if (selectedConversation !== requestedConversationId) {
+          setSelectedConversationState(requestedConversationId);
         }
+        return;
+      }
+
+      if (requestedConversationId && !items.some(item => item.id === requestedConversationId)) {
+        setMessages([]);
+        setMessagesError(t('aiHub.conversationNotFound'));
+      }
+
+      if (items.length > 0) {
+        const firstConversation = items[0];
+        if (firstConversation) {
+          setSelectedConversationState(firstConversation.id);
+        }
+      } else {
+        setSelectedConversationState(null);
       }
     } catch (err) {
       console.error('Failed to load conversations:', err);
       setConversationsError(t('aiHub.errorLoadingConversations'));
     } finally {
-      setIsLoadingConversations(false);
+      if (requestId === conversationLoadRequestRef.current) {
+        setIsLoadingConversations(false);
+      }
     }
-  }, [selectedConversation, t]);
+  }, [searchParams, selectedConversation, setSelectedConversationState, t]);
 
   // ── Load messages for selected conversation ───────────────────────────
   const loadMessages = useCallback(async (conversationId: string) => {
+    const requestId = ++messageLoadRequestRef.current;
     setIsLoadingMessages(true);
+    setMessagesError(null);
+
     try {
       const data = await aiGovernanceApi.listMessages(conversationId, { pageSize: 100 });
-      const items: ChatMessage[] = (data.items || []).map((item: MessageApiItem) => ({
-        id: item.messageId,
-        role: item.role as 'user' | 'assistant',
-        content: item.content,
-        modelName: item.modelName,
-        provider: item.provider,
-        isInternalModel: item.isInternalModel,
-        promptTokens: item.promptTokens,
-        completionTokens: item.completionTokens,
-        appliedPolicyName: item.appliedPolicyName,
-        groundingSources: item.groundingSources ?? [],
-        contextReferences: item.contextReferences ?? [],
-        correlationId: item.correlationId,
-        timestamp: item.timestamp,
-        // Derived fields for UI display
-        useCaseType: 'General',
-        routingPath: item.isInternalModel ? 'InternalOnly' : 'ExternalEscalation',
-        confidenceLevel: item.isInternalModel ? 'High' : 'Medium',
-        costClass: item.isInternalModel ? 'low' : 'medium',
-      }));
+      if (requestId !== messageLoadRequestRef.current) {
+        return;
+      }
+
+      const items: ChatMessage[] = (data.items || []).map((item: MessageApiItem) => mapMessage(item));
       setMessages(items);
     } catch (err) {
       console.error('Failed to load messages:', err);
       setMessages([]);
+      setMessagesError(getProblemStatus(err) === 404 ? t('aiHub.conversationNotFound') : t('aiHub.errorLoadingMessages'));
     } finally {
-      setIsLoadingMessages(false);
+      if (requestId === messageLoadRequestRef.current) {
+        setIsLoadingMessages(false);
+      }
     }
-  }, []);
+  }, [t]);
 
   // ── Initial load ──────────────────────────────────────────────────────
   useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
+    void loadConversations();
+  }, []);
 
   // ── Load messages when conversation changes ───────────────────────────
   useEffect(() => {
     if (selectedConversation) {
-      loadMessages(selectedConversation);
+      void loadMessages(selectedConversation);
     } else {
       setMessages([]);
+      setMessagesError(null);
     }
   }, [selectedConversation, loadMessages]);
 
@@ -232,42 +325,33 @@ export function AiAssistantPage() {
       .then((data: { allHealthy: boolean; items: Array<{ providerId: string; isHealthy: boolean; message?: string }> }) => {
         setBackendConnected(true);
         const healthyCount = data.items?.filter((p: { isHealthy: boolean }) => p.isHealthy).length || 0;
-        setProviderStatus(`${healthyCount}/${data.items?.length || 0} providers healthy`);
+        setProviderStatus(t('aiHub.providersHealthy', { healthy: healthyCount, total: data.items?.length || 0 }));
       })
       .catch(() => {
         setBackendConnected(false);
-        setProviderStatus('Backend unavailable');
+        setProviderStatus(t('aiHub.backendUnavailable'));
       });
-  }, []);
+  }, [t]);
 
   const handleSelectConversation = (convId: string) => {
-    setSelectedConversation(convId);
-    setExpandedMeta(null);
+    setMessagesError(null);
+    setSelectedConversationState(convId);
   };
 
   const handleNewConversation = async () => {
     try {
+      setConversationsError(null);
+      setMessagesError(null);
       const response = await aiGovernanceApi.createConversation({
         title: t('aiHub.newConversationTitle'),
         persona: persona,
         clientType: 'Web',
         defaultContextScope: activeContexts.join(',').toLowerCase(),
       });
-      const newConv: Conversation = {
-        id: response.conversationId,
-        title: response.title,
-        persona: response.persona,
-        messageCount: 0,
-        isActive: response.isActive,
-        lastMessageAt: null,
-        lastModelUsed: null,
-        tags: '',
-        defaultContextScope: response.defaultContextScope,
-        clientType: response.clientType,
-      };
-      setConversations(prev => [newConv, ...prev]);
-      setSelectedConversation(response.conversationId);
+
       setMessages([]);
+      setSelectedConversationState(response.conversationId);
+      await loadConversations(response.conversationId);
     } catch (err) {
       console.error('Failed to create conversation:', err);
       setConversationsError(t('common.errorLoading'));
@@ -275,76 +359,33 @@ export function AiAssistantPage() {
   };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || isTyping) return;
+    const messageToSend = inputValue.trim();
+    if (!messageToSend || isTyping) return;
 
-    const userMsg: ChatMessage = {
-      id: `u-${Date.now()}`,
-      role: 'user',
-      content: inputValue.trim(),
-      timestamp: new Date().toISOString(),
-    };
-    setMessages(prev => [...prev, userMsg]);
     setInputValue('');
     setIsTyping(true);
+    setMessagesError(null);
 
     try {
       const response = await aiGovernanceApi.sendMessage({
-        message: userMsg.content,
+        message: messageToSend,
         conversationId: selectedConversation || undefined,
         contextScope: activeContexts.join(','),
         persona,
         clientType: 'Web',
       });
 
-      const assistantMsg: ChatMessage = {
-        id: `a-${Date.now()}`,
-        role: 'assistant',
-        content: response.assistantResponse || response.message || response.content,
-        modelName: response.modelUsed || response.modelName || response.modelId,
-        provider: response.provider || response.providerId,
-        isInternalModel: response.isInternalModel,
-        promptTokens: response.promptTokens,
-        completionTokens: response.completionTokens,
-        correlationId: response.correlationId,
-        useCaseType: response.useCaseType || 'General',
-        routingPath: response.routingPath || (response.isInternalModel ? 'InternalOnly' : 'ExternalEscalation'),
-        confidenceLevel: response.confidenceLevel || 'Unknown',
-        costClass: response.costClass || (response.isInternalModel ? 'low' : 'medium'),
-        routingRationale: response.routingRationale || `Routed to ${response.provider || response.providerId}/${response.modelUsed || response.modelName || response.modelId}.`,
-        sourceWeightingSummary: response.sourceWeightingSummary || '',
-        escalationReason: response.escalationReason || 'None',
-        timestamp: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, assistantMsg]);
-
-      if (response.conversationId && !selectedConversation) {
-        setSelectedConversation(response.conversationId);
+      const targetConversationId = response.conversationId || selectedConversation;
+      if (targetConversationId) {
+        setSelectedConversationState(targetConversationId);
+        await loadMessages(targetConversationId);
+        await loadConversations(targetConversationId);
+      } else {
+        await loadConversations();
       }
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : t('common.errorLoading');
-      const assistantMsg: ChatMessage = {
-        id: `a-${Date.now()}`,
-        role: 'assistant',
-        content: `${t('common.errorLoading')} ${errorMessage}`,
-        modelName: null,
-        provider: null,
-        isInternalModel: false,
-        promptTokens: 0,
-        completionTokens: 0,
-        appliedPolicyName: null,
-        groundingSources: [],
-        contextReferences: [],
-        correlationId: `provider-unavailable-${Date.now()}`,
-        useCaseType: 'General',
-        routingPath: 'ProviderUnavailable',
-        confidenceLevel: 'Unknown',
-        costClass: 'none',
-        routingRationale: 'Provider unavailable. No silent mock was used.',
-        sourceWeightingSummary: '',
-        escalationReason: 'ProviderUnavailable',
-        timestamp: new Date().toISOString(),
-      };
-      setMessages(prev => [...prev, assistantMsg]);
+      setInputValue(messageToSend);
+      setMessagesError(getProblemStatus(error) === 404 ? t('aiHub.conversationNotFound') : t('aiHub.errorSendingMessage'));
     } finally {
       setIsTyping(false);
     }
@@ -407,7 +448,7 @@ export function AiAssistantPage() {
               <div className="px-4 py-6 text-center">
                 <AlertCircle size={24} className="text-warning mx-auto mb-2" />
                 <p className="text-sm text-muted">{conversationsError}</p>
-                <Button variant="ghost" size="sm" className="mt-2" onClick={loadConversations}>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => void loadConversations()}>
                   {t('common.retry')}
                 </Button>
               </div>
@@ -536,8 +577,24 @@ export function AiAssistantPage() {
               </div>
             )}
 
+            {/* ── Message error state ─────────────────────────────────── */}
+            {selectedConversation && !isLoadingMessages && messagesError && (
+              <div className="px-4 py-6 text-center rounded-lg border border-edge bg-elevated/60">
+                <AlertCircle size={24} className="text-warning mx-auto mb-2" />
+                <p className="text-sm text-muted">{messagesError}</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => selectedConversation && loadMessages(selectedConversation)}
+                >
+                  {t('common.retry')}
+                </Button>
+              </div>
+            )}
+
             {/* ── Empty conversation ──────────────────────────────────── */}
-            {selectedConversation && !isLoadingMessages && messages.length === 0 && (
+            {selectedConversation && !isLoadingMessages && !messagesError && messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <Sparkles size={32} className="text-accent mb-3" />
                 <p className="text-heading font-medium mb-1">{t('aiHub.emptyConversation')}</p>
@@ -546,7 +603,7 @@ export function AiAssistantPage() {
             )}
 
             {/* ── Messages list ───────────────────────────────────────── */}
-            {!isLoadingMessages && messages.map(msg => (
+            {!isLoadingMessages && !messagesError && messages.map(msg => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[75%] rounded-lg px-4 py-3 ${
@@ -558,8 +615,19 @@ export function AiAssistantPage() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <Bot size={14} className="text-accent" />
                       <span className="text-xs font-medium text-accent">{t('aiHub.assistant')}</span>
+                      {msg.responseState === 'Degraded' && (
+                        <Badge variant="warning">
+                          <div className="flex items-center gap-1">
+                            <AlertCircle size={10} aria-hidden="true" />
+                            {t('aiHub.responseStateDegraded')}
+                          </div>
+                        </Badge>
+                      )}
+                      {msg.degradedReason === 'ProviderUnavailable' && (
+                        <Badge variant="warning">{t('aiHub.providerUnavailable')}</Badge>
+                      )}
                       {msg.modelName && (
-                        <Badge variant={msg.isInternalModel ? 'info' : 'warning'}>
+                        <Badge variant={msg.isDegraded ? 'warning' : msg.isInternalModel ? 'info' : 'warning'}>
                           <div className="flex items-center gap-1">
                             <Cpu size={10} />
                             {msg.modelName}
@@ -586,7 +654,7 @@ export function AiAssistantPage() {
                           </div>
                         </Badge>
                       )}
-                      {msg.isInternalModel && (
+                      {msg.isInternalModel && !msg.isDegraded && (
                         <Badge variant="info">
                           <div className="flex items-center gap-1">
                             <Shield size={10} />
@@ -594,7 +662,7 @@ export function AiAssistantPage() {
                           </div>
                         </Badge>
                       )}
-                      {msg.escalationReason && msg.escalationReason !== 'None' && (
+                      {msg.escalationReason && msg.escalationReason !== 'None' && !msg.isDegraded && (
                         <Badge variant="warning">
                           <div className="flex items-center gap-1">
                             <AlertCircle size={10} aria-hidden="true" />
@@ -656,6 +724,10 @@ export function AiAssistantPage() {
                       {expandedMeta === msg.id && (
                         <div className="mt-2 p-3 rounded-md bg-canvas border border-edge text-xs space-y-1.5">
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                            <span className="text-muted">{t('aiHub.metaResponseState')}:</span>
+                            <span className="text-body">{msg.responseState ?? t('aiHub.responseStateCompleted')}</span>
+                            <span className="text-muted">{t('aiHub.metaDegradedReason')}:</span>
+                            <span className="text-body">{msg.degradedReason ? t(`aiHub.degradedReason${msg.degradedReason}`) : '—'}</span>
                             <span className="text-muted">{t('aiHub.metaModel')}:</span>
                             <span className="text-body">{msg.modelName ?? '—'}</span>
                             <span className="text-muted">{t('aiHub.metaProvider')}:</span>
@@ -703,7 +775,6 @@ export function AiAssistantPage() {
               </div>
             ))}
 
-            {/* ── Typing indicator ─────────────────────────────────────── */}
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-elevated rounded-lg px-4 py-3 flex items-center gap-2">
@@ -719,7 +790,7 @@ export function AiAssistantPage() {
             )}
 
             {/* ── Suggested Prompts (shown only when conversation has few messages) ── */}
-            {messages.length <= 2 && (
+            {messages.length <= 2 && !messagesError && (
               <div className="pt-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles size={14} className="text-accent" />
@@ -770,7 +841,7 @@ export function AiAssistantPage() {
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={t('productPolish.aiAssistantHint')}
+                placeholder={t('aiHub.inputPlaceholder')}
                 className="flex-1 bg-elevated border border-edge rounded-lg px-4 py-2.5 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
                 disabled={isTyping}
               />

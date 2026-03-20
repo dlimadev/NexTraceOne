@@ -75,64 +75,74 @@ VALUES (
 -- ── GOVERNANCE DOMAINS ──────────────────────────────────────────────────────
 
 -- Core Services Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000001',
     'core-services',
     'Core Services',
     'Serviços core da plataforma: autenticação, autorização, gestão de utilizadores e configurações.',
     'Critical',
-    'Platform'
+    'Platform',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Payments Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000002',
     'payments',
     'Payments',
     'Serviços de processamento de pagamentos, gateways e reconciliação financeira.',
     'Critical',
-    'Business'
+    'Business',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Orders Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000003',
     'orders',
     'Orders',
     'Gestão de encomendas, carrinho de compras e fulfillment.',
     'High',
-    'Business'
+    'Business',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Notifications Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000004',
     'notifications',
     'Notifications',
     'Serviços de notificações: email, SMS, push e webhooks.',
     'Medium',
-    'Support'
+    'Support',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Analytics Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000005',
     'analytics',
     'Analytics',
     'Ingestão, processamento e visualização de dados analíticos e operacionais.',
     'Medium',
-    'Data'
+    'Data',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- ── GOVERNANCE PACKS ────────────────────────────────────────────────────────
 
 -- API Contract Standards Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000001',
     'api-contract-standards',
@@ -140,11 +150,13 @@ VALUES (
     'Padrões obrigatórios para contratos de API REST: versionamento, exemplos, schemas, headers.',
     'ContractQuality',
     'Active',
-    '1.0.0'
+    '1.0.0',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Security Baseline Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000002',
     'security-baseline',
@@ -152,11 +164,13 @@ VALUES (
     'Requisitos mínimos de segurança: autenticação, autorização, rate limiting, input validation.',
     'Security',
     'Active',
-    '1.0.0'
+    '1.0.0',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Observability Standards Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000003',
     'observability-standards',
@@ -164,11 +178,13 @@ VALUES (
     'Padrões de observabilidade: métricas, logs estruturados, traces, health checks.',
     'Observability',
     'Active',
-    '1.0.0'
+    '1.0.0',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Change Management Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000004',
     'change-management',
@@ -176,59 +192,70 @@ VALUES (
     'Regras de gestão de mudanças: aprovações, blast radius, rollback plans.',
     'ChangeManagement',
     'Draft',
-    NULL
+    NULL,
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- ── GOVERNANCE PACK VERSIONS ────────────────────────────────────────────────
 
 -- API Contract Standards v1.0.0
-INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "PublishedAt")
+INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "CreatedAt", "PublishedAt")
 VALUES (
     '40000000-0000-0000-0000-000000000001',
     '30000000-0000-0000-0000-000000000001',
     '1.0.0',
-    '[
-        {"ruleId": "api-must-have-version", "ruleName": "API Must Have Version", "description": "Toda API deve ter versionamento explícito no path ou header.", "category": "ContractQuality", "defaultEnforcementMode": "Blocking", "isRequired": true},
-        {"ruleId": "api-must-have-examples", "ruleName": "API Must Have Examples", "description": "Toda operação deve ter pelo menos um exemplo de request e response.", "category": "ContractQuality", "defaultEnforcementMode": "Warning", "isRequired": false},
-        {"ruleId": "api-must-have-description", "ruleName": "API Must Have Description", "description": "Toda operação e parâmetro deve ter descrição legível.", "category": "ContractQuality", "defaultEnforcementMode": "Warning", "isRequired": false}
-    ]',
+    '{
+        "rules": [
+            {"ruleId": "api-must-have-version", "ruleName": "API Must Have Version", "description": "Toda API deve ter versionamento explícito no path ou header.", "category": "ContractQuality", "defaultEnforcementMode": "Blocking", "isRequired": true},
+            {"ruleId": "api-must-have-examples", "ruleName": "API Must Have Examples", "description": "Toda operação deve ter pelo menos um exemplo de request e response.", "category": "ContractQuality", "defaultEnforcementMode": "Warning", "isRequired": false},
+            {"ruleId": "api-must-have-description", "ruleName": "API Must Have Description", "description": "Toda operação e parâmetro deve ter descrição legível.", "category": "ContractQuality", "defaultEnforcementMode": "Warning", "isRequired": false}
+        ]
+    }',
     'Blocking',
     'Versão inicial do pack de padrões de contratos API.',
     'system',
+    NOW(),
     NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Security Baseline v1.0.0
-INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "PublishedAt")
+INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "CreatedAt", "PublishedAt")
 VALUES (
     '40000000-0000-0000-0000-000000000002',
     '30000000-0000-0000-0000-000000000002',
     '1.0.0',
-    '[
-        {"ruleId": "must-require-auth", "ruleName": "Must Require Authentication", "description": "Toda API pública deve requerer autenticação.", "category": "Security", "defaultEnforcementMode": "Blocking", "isRequired": true},
-        {"ruleId": "must-have-rate-limit", "ruleName": "Must Have Rate Limiting", "description": "Toda API deve ter rate limiting configurado.", "category": "Security", "defaultEnforcementMode": "Warning", "isRequired": false},
-        {"ruleId": "no-sensitive-in-query", "ruleName": "No Sensitive Data in Query", "description": "Dados sensíveis não podem ser passados em query strings.", "category": "Security", "defaultEnforcementMode": "Blocking", "isRequired": true}
-    ]',
+    '{
+        "rules": [
+            {"ruleId": "must-require-auth", "ruleName": "Must Require Authentication", "description": "Toda API pública deve requerer autenticação.", "category": "Security", "defaultEnforcementMode": "Blocking", "isRequired": true},
+            {"ruleId": "must-have-rate-limit", "ruleName": "Must Have Rate Limiting", "description": "Toda API deve ter rate limiting configurado.", "category": "Security", "defaultEnforcementMode": "Warning", "isRequired": false},
+            {"ruleId": "no-sensitive-in-query", "ruleName": "No Sensitive Data in Query", "description": "Dados sensíveis não podem ser passados em query strings.", "category": "Security", "defaultEnforcementMode": "Blocking", "isRequired": true}
+        ]
+    }',
     'Blocking',
     'Versão inicial do pack de segurança baseline.',
     'system',
+    NOW(),
     NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Observability Standards v1.0.0
-INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "PublishedAt")
+INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "CreatedAt", "PublishedAt")
 VALUES (
     '40000000-0000-0000-0000-000000000003',
     '30000000-0000-0000-0000-000000000003',
     '1.0.0',
-    '[
-        {"ruleId": "must-have-health-check", "ruleName": "Must Have Health Check", "description": "Todo serviço deve expor endpoint /health.", "category": "Observability", "defaultEnforcementMode": "Blocking", "isRequired": true},
-        {"ruleId": "must-log-structured", "ruleName": "Must Use Structured Logging", "description": "Logs devem ser estruturados em JSON com campos padrão.", "category": "Observability", "defaultEnforcementMode": "Warning", "isRequired": false},
-        {"ruleId": "must-propagate-trace", "ruleName": "Must Propagate Trace Context", "description": "Serviços devem propagar W3C Trace Context.", "category": "Observability", "defaultEnforcementMode": "Warning", "isRequired": false}
-    ]',
+    '{
+        "rules": [
+            {"ruleId": "must-have-health-check", "ruleName": "Must Have Health Check", "description": "Todo serviço deve expor endpoint /health.", "category": "Observability", "defaultEnforcementMode": "Blocking", "isRequired": true},
+            {"ruleId": "must-log-structured", "ruleName": "Must Use Structured Logging", "description": "Logs devem ser estruturados em JSON com campos padrão.", "category": "Observability", "defaultEnforcementMode": "Warning", "isRequired": false},
+            {"ruleId": "must-propagate-trace", "ruleName": "Must Propagate Trace Context", "description": "Serviços devem propagar W3C Trace Context.", "category": "Observability", "defaultEnforcementMode": "Warning", "isRequired": false}
+        ]
+    }',
     'Warning',
     'Versão inicial do pack de padrões de observabilidade.',
     'system',
+    NOW(),
     NOW()
 ) ON CONFLICT DO NOTHING;
 

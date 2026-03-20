@@ -16,6 +16,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { contractStudioApi } from '../api/contractStudio';
 import { PROTOCOL_COLORS, LIFECYCLE_COLORS } from '../shared/constants';
 import { cn } from '../../../lib/cn';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const draftKeys = {
   detail: (id: string) => ['contract-drafts', 'detail', id] as const,
@@ -33,14 +34,15 @@ export function DraftStudioPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const currentActor = user?.email || user?.fullName || user?.id || 'system';
 
   const [activeTab, setActiveTab] = useState<DraftTab>('spec');
-  const [specContent, setSpecContent] = useState('');
-  const [format, setFormat] = useState('yaml');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [proposedVersion, setProposedVersion] = useState('');
-  const [initialized, setInitialized] = useState(false);
+  const [draftSpecContent, setDraftSpecContent] = useState<string | null>(null);
+  const [draftFormat, setDraftFormat] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState<string | null>(null);
+  const [draftDescription, setDraftDescription] = useState<string | null>(null);
+  const [draftProposedVersion, setDraftProposedVersion] = useState<string | null>(null);
 
   const draftQuery = useQuery({
     queryKey: draftKeys.detail(draftId ?? ''),
@@ -48,26 +50,31 @@ export function DraftStudioPage() {
     enabled: !!draftId,
   });
 
-  // Initialize local state from fetched draft (once)
-  if (draftQuery.data && !initialized) {
-    const d = draftQuery.data;
-    setSpecContent(d.specContent || '');
-    setFormat(d.format || 'yaml');
-    setTitle(d.title || '');
-    setDescription(d.description || '');
-    setProposedVersion(d.proposedVersion || '1.0.0');
-    setInitialized(true);
-  }
+  const draft = draftQuery.data;
+  const specContent = draftSpecContent ?? draft?.specContent ?? '';
+  const format = draftFormat ?? draft?.format ?? 'yaml';
+  const title = draftTitle ?? draft?.title ?? '';
+  const description = draftDescription ?? draft?.description ?? '';
+  const proposedVersion = draftProposedVersion ?? draft?.proposedVersion ?? '1.0.0';
+
+  const resetOverrides = () => {
+    setDraftSpecContent(null);
+    setDraftFormat(null);
+    setDraftTitle(null);
+    setDraftDescription(null);
+    setDraftProposedVersion(null);
+  };
 
   const saveContentMutation = useMutation({
     mutationFn: () =>
       contractStudioApi.updateContent(draftId!, {
         specContent,
         format,
-        editedBy: 'current-user',
+        editedBy: currentActor,
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
+    onSuccess: async () => {
+      resetOverrides();
+      await queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
     },
   });
 
@@ -77,17 +84,18 @@ export function DraftStudioPage() {
         title,
         description,
         proposedVersion,
-        editedBy: 'current-user',
+        editedBy: currentActor,
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
+    onSuccess: async () => {
+      resetOverrides();
+      await queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
     },
   });
 
   const submitMutation = useMutation({
     mutationFn: () => contractStudioApi.submitForReview(draftId!),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
     },
   });
 
@@ -102,7 +110,7 @@ export function DraftStudioPage() {
     );
   }
 
-  if (draftQuery.isError || !draftQuery.data) {
+  if (draftQuery.isError || !draft) {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-4">
         <p className="text-sm text-danger">{t('contracts.studio.draftNotFound', 'Draft not found or failed to load.')}</p>
@@ -116,7 +124,6 @@ export function DraftStudioPage() {
     );
   }
 
-  const draft = draftQuery.data;
   const isEditable = draft.status === 'Editing';
   const isSaving = saveContentMutation.isPending || saveMetadataMutation.isPending;
 
@@ -171,7 +178,7 @@ export function DraftStudioPage() {
               </button>
               <button
                 onClick={() => submitMutation.mutate()}
-                disabled={submitMutation.isPending || !draft.specContent}
+                disabled={submitMutation.isPending || !specContent.trim()}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-40 transition-colors"
               >
                 {submitMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
@@ -209,6 +216,11 @@ export function DraftStudioPage() {
             {t('contracts.studio.saveFailed', 'Failed to save changes.')}
           </div>
         )}
+        {(saveContentMutation.isSuccess || saveMetadataMutation.isSuccess) && !isSaving && (
+          <div className="mb-4 text-xs text-emerald-400 bg-emerald-900/10 border border-emerald-700/20 rounded-md px-3 py-2">
+            {t('contracts.studio.saveSuccess', 'Changes saved successfully.')}
+          </div>
+        )}
         {submitMutation.isError && (
           <div className="mb-4 text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded-md px-3 py-2">
             {t('contracts.studio.submitFailed', 'Failed to submit for review.')}
@@ -230,7 +242,7 @@ export function DraftStudioPage() {
                 </label>
                 <select
                   value={format}
-                  onChange={(e) => setFormat(e.target.value)}
+                  onChange={(e) => setDraftFormat(e.target.value)}
                   disabled={!isEditable}
                   className="text-xs bg-elevated border border-edge rounded px-2 py-1 text-body"
                 >
@@ -241,7 +253,7 @@ export function DraftStudioPage() {
               </div>
               <textarea
                 value={specContent}
-                onChange={(e) => setSpecContent(e.target.value)}
+                onChange={(e) => setDraftSpecContent(e.target.value)}
                 readOnly={!isEditable}
                 rows={24}
                 placeholder={t('contracts.studio.specPlaceholder', 'Paste or write your specification content here...')}
@@ -262,7 +274,7 @@ export function DraftStudioPage() {
                 <input
                   type="text"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => setDraftTitle(e.target.value)}
                   readOnly={!isEditable}
                   className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
                 />
@@ -273,7 +285,7 @@ export function DraftStudioPage() {
                 </label>
                 <textarea
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => setDraftDescription(e.target.value)}
                   readOnly={!isEditable}
                   rows={3}
                   className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent resize-none"
@@ -286,7 +298,7 @@ export function DraftStudioPage() {
                 <input
                   type="text"
                   value={proposedVersion}
-                  onChange={(e) => setProposedVersion(e.target.value)}
+                  onChange={(e) => setDraftProposedVersion(e.target.value)}
                   readOnly={!isEditable}
                   className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
                 />
@@ -295,9 +307,11 @@ export function DraftStudioPage() {
                 <p>{t('contracts.studio.contractType', 'Type')}: <span className="text-heading font-medium">{draft.contractType}</span></p>
                 <p>{t('contracts.studio.protocol', 'Protocol')}: <span className="text-heading font-medium">{draft.protocol}</span></p>
                 <p>{t('contracts.studio.author', 'Author')}: <span className="text-heading font-medium">{draft.author}</span></p>
-                <p>{t('contracts.studio.createdAt', 'Created')}: <span className="text-heading font-medium">{new Date(draft.createdAt).toLocaleString()}</span></p>
+                {draft.createdAt && (
+                  <p>{t('contracts.studio.createdAt', 'Created')}: <span className="text-heading font-medium">{new Date(draft.createdAt).toLocaleString()}</span></p>
+                )}
                 {draft.lastEditedAt && (
-                  <p>{t('contracts.studio.lastEdited', 'Last edited')}: <span className="text-heading font-medium">{new Date(draft.lastEditedAt).toLocaleString()} {draft.lastEditedBy && `by ${draft.lastEditedBy}`}</span></p>
+                  <p>{t('contracts.studio.lastEdited', 'Last edited')}: <span className="text-heading font-medium">{new Date(draft.lastEditedAt).toLocaleString()}{draft.lastEditedBy ? ` · ${draft.lastEditedBy}` : ''}</span></p>
                 )}
               </div>
             </CardBody>

@@ -39,7 +39,9 @@ export function SummarySection({
             <div className="min-w-0">
               <h2 className="text-base font-bold text-heading mb-1">{contract.friendlyName}</h2>
               <p className="text-xs font-mono text-muted/70 mb-2">{contract.technicalName}</p>
-              <p className="text-xs text-body leading-relaxed">{contract.functionalDescription}</p>
+              <p className="text-xs text-body leading-relaxed">
+                {contract.functionalDescription || t('contracts.workspace.noDefinitionSummary', 'No functional summary is available for this contract version yet.')}
+              </p>
             </div>
             <div className="flex items-center gap-1.5 flex-shrink-0">
               <ServiceTypeBadge type={contract.serviceType} />
@@ -70,8 +72,8 @@ export function SummarySection({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard
           label={t('contracts.studio.summary.compliance', 'Compliance')}
-          value={`${contract.complianceScore}%`}
-          variant={contract.complianceScore >= 80 ? 'success' : contract.complianceScore >= 60 ? 'warning' : 'danger'}
+          value={contract.complianceScore == null ? t('common.notAvailable', 'Not available') : `${contract.complianceScore}%`}
+          variant={contract.complianceScore == null ? 'neutral' : contract.complianceScore >= 80 ? 'success' : contract.complianceScore >= 60 ? 'warning' : 'danger'}
           icon={<Shield size={14} />}
           onClick={() => onNavigate?.('compliance')}
         />
@@ -110,12 +112,12 @@ export function SummarySection({
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <InfoField label={t('contracts.studio.summary.domain', 'Domain')} value={contract.domain} />
-            <InfoField label={t('contracts.studio.summary.product', 'Product')} value={contract.product} />
-            <InfoField label={t('contracts.studio.summary.capability', 'Capability')} value={contract.capability} />
-            <InfoField label={t('contracts.studio.summary.owner', 'Owner')} value={`@${contract.owner}`} />
-            <InfoField label={t('contracts.studio.summary.team', 'Team')} value={contract.team} />
-            <InfoField label={t('contracts.studio.summary.criticality', 'Criticality')} value={contract.criticality} />
+            <InfoField label={t('contracts.studio.summary.domain', 'Domain')} value={contract.domain || t('common.notAvailable', 'Not available')} />
+            <InfoField label={t('contracts.studio.summary.product', 'Product')} value={contract.product || t('common.notAvailable', 'Not available')} />
+            <InfoField label={t('contracts.studio.summary.capability', 'Capability')} value={contract.capability || t('common.notAvailable', 'Not available')} />
+            <InfoField label={t('contracts.studio.summary.owner', 'Owner')} value={contract.owner ? `@${contract.owner}` : t('common.notAvailable', 'Not available')} />
+            <InfoField label={t('contracts.studio.summary.team', 'Team')} value={contract.team || t('common.notAvailable', 'Not available')} />
+            <InfoField label={t('contracts.studio.summary.criticality', 'Criticality')} value={contract.criticality || t('common.notAvailable', 'Not available')} />
           </div>
         </CardBody>
       </Card>

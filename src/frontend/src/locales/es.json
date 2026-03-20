@@ -2892,5 +2892,19 @@
     "moduleUnavailable": "Módulo No Disponible",
     "moduleUnavailableDescription": "Este módulo no está disponible temporalmente. Inténtelo de nuevo más tarde.",
     "moduleUnavailableDescriptionNamed": "El módulo {{module}} no está disponible temporalmente. Inténtelo de nuevo más tarde."
+  },
+  "releaseScope": {
+    "excludedTitle": "Fuera del release productivo final",
+    "excludedDescription": "Esta área sigue en el código, pero fue retirada deliberadamente del alcance del release productivo final. No forma parte de la superficie soportada en producción.",
+    "modules": {
+      "developerPortal": "Developer Portal quedó fuera del release porque aún depende de flujos solo en preview.",
+      "contracts": "Contracts quedó fuera del release final porque los flujos centrales de autoría y workspace siguen siendo parciales.",
+      "operations": "Operations quedó fuera del release final porque incidents, runbooks y flujos relacionados todavía no están consistentemente listos para producción.",
+      "aiHub": "AI Hub quedó fuera del release final porque el flujo productivo end-to-end todavía es parcial.",
+      "governance": "Governance quedó fuera del release final porque varias áreas siguen siendo parciales o solo preview.",
+      "integrations": "Integrations quedó fuera del release final porque sigue siendo solo preview.",
+      "analytics": "Product Analytics quedó fuera del release final porque sigue siendo parcial y preview.",
+      "platformOperations": "Platform Operations quedó fuera del release final porque todavía expone datos de demostración."
+    }
   }
 }

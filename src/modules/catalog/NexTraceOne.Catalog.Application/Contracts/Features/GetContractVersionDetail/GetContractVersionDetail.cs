@@ -1,13 +1,13 @@
 using Ardalis.GuardClauses;
-
 using FluentValidation;
-
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.GetContractVersionDetail;
 
@@ -32,7 +32,8 @@ public static class GetContractVersionDetail
 
     /// <summary>Handler que carrega e retorna detalhes completos da versão de contrato.</summary>
     public sealed class Handler(
-        IContractVersionRepository repository) : IQueryHandler<Query, Response>
+        IContractVersionRepository repository,
+        IApiAssetRepository apiAssetRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -44,6 +45,9 @@ public static class GetContractVersionDetail
             if (version is null)
                 return ContractsErrors.ContractVersionNotFound(request.ContractVersionId.ToString());
 
+            var apiAsset = await apiAssetRepository.GetByIdAsync(ApiAssetId.From(version.ApiAssetId), cancellationToken);
+            var service = apiAsset?.OwnerService;
+
             var violations = version.RuleViolations
                 .Select(v => new RuleViolationDto(v.RuleName, v.Severity, v.Message, v.Path, v.SuggestedFix))
                 .ToList();
@@ -51,6 +55,37 @@ public static class GetContractVersionDetail
             var artifacts = version.Artifacts
                 .Select(a => new ArtifactDto(a.Id.Value, a.ArtifactType, a.Name, a.ContentFormat, a.IsAiGenerated, a.GeneratedAt))
                 .ToList();
+
+            var consumers = apiAsset?.ConsumerRelationships
+                .Select(c => new ConsumerDto(
+                    c.Id.Value,
+                    c.ConsumerName,
+                    c.SourceType,
+                    string.Empty,
+                    string.Empty,
+                    c.ConfidenceScore,
+                    c.LastObservedAt))
+                .ToList() ?? [];
+
+            var discoverySources = apiAsset?.DiscoverySources
+                .Select(source => new DiscoverySourceDto(
+                    source.Id.Value,
+                    source.SourceType,
+                    source.ExternalReference,
+                    source.DiscoveredAt,
+                    source.ConfidenceScore))
+                .ToList() ?? [];
+
+            var provenance = version.Provenance is null
+                ? null
+                : new ProvenanceDto(
+                    version.Provenance.Origin,
+                    version.Provenance.OriginalFormat,
+                    version.Provenance.ParserUsed,
+                    version.Provenance.StandardVersion,
+                    version.Provenance.ImportedBy,
+                    version.Provenance.IsAiGenerated,
+                    version.Provenance.AiModelVersion);
 
             return new Response(
                 version.Id.Value,
@@ -68,12 +103,31 @@ public static class GetContractVersionDetail
                 version.Signature?.Algorithm,
                 version.Signature?.SignedBy,
                 version.Signature?.SignedAt,
-                version.Provenance?.Origin,
-                version.Provenance?.IsAiGenerated ?? false,
+                provenance,
                 version.DeprecationNotice,
                 version.DeprecationDate,
                 version.SunsetDate,
                 version.CreatedAt,
+                apiAsset?.Name,
+                apiAsset?.RoutePattern,
+                apiAsset?.Version,
+                apiAsset?.Visibility,
+                service?.Id.Value,
+                service?.Name,
+                service?.DisplayName,
+                service?.Description,
+                service?.ServiceType.ToString(),
+                service?.Domain,
+                service?.SystemArea,
+                service?.TeamName,
+                service?.TechnicalOwner,
+                service?.BusinessOwner,
+                service?.Criticality.ToString(),
+                service?.ExposureType.ToString(),
+                service?.DocumentationUrl,
+                service?.RepositoryUrl,
+                consumers,
+                discoverySources,
                 violations,
                 artifacts);
         }
@@ -96,6 +150,34 @@ public static class GetContractVersionDetail
         bool IsAiGenerated,
         DateTimeOffset GeneratedAt);
 
+    /// <summary>DTO de proveniência.</summary>
+    public sealed record ProvenanceDto(
+        string Origin,
+        string OriginalFormat,
+        string ParserUsed,
+        string StandardVersion,
+        string ImportedBy,
+        bool IsAiGenerated,
+        string? AiModelVersion);
+
+    /// <summary>DTO de consumidor.</summary>
+    public sealed record ConsumerDto(
+        Guid Id,
+        string Name,
+        string Kind,
+        string Environment,
+        string ExternalReference,
+        decimal ConfidenceScore,
+        DateTimeOffset LastObservedAt);
+
+    /// <summary>DTO de fonte de descoberta.</summary>
+    public sealed record DiscoverySourceDto(
+        Guid Id,
+        string SourceType,
+        string ExternalReference,
+        DateTimeOffset DiscoveredAt,
+        decimal ConfidenceScore);
+
     /// <summary>Resposta com detalhes completos de uma versão de contrato.</summary>
     public sealed record Response(
         Guid Id,
@@ -110,15 +192,34 @@ public static class GetContractVersionDetail
         DateTimeOffset? LockedAt,
         string? LockedBy,
         string? Fingerprint,
-        string? SignatureAlgorithm,
+        string? Algorithm,
         string? SignedBy,
         DateTimeOffset? SignedAt,
-        string? ProvenanceOrigin,
-        bool IsAiGenerated,
+        ProvenanceDto? Provenance,
         string? DeprecationNotice,
         DateTimeOffset? DeprecationDate,
         DateTimeOffset? SunsetDate,
         DateTimeOffset CreatedAt,
+        string? ApiName,
+        string? RoutePattern,
+        string? ApiVersion,
+        string? Visibility,
+        Guid? ServiceAssetId,
+        string? ServiceName,
+        string? ServiceDisplayName,
+        string? ServiceDescription,
+        string? ServiceType,
+        string? Domain,
+        string? SystemArea,
+        string? TeamName,
+        string? TechnicalOwner,
+        string? BusinessOwner,
+        string? Criticality,
+        string? ExposureType,
+        string? DocumentationUrl,
+        string? RepositoryUrl,
+        IReadOnlyList<ConsumerDto> Consumers,
+        IReadOnlyList<DiscoverySourceDto> DiscoverySources,
         IReadOnlyList<RuleViolationDto> RuleViolations,
         IReadOnlyList<ArtifactDto> Artifacts);
 }

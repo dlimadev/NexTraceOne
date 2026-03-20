@@ -1,7 +1,8 @@
-import { defineConfig, loadEnv } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
+import { loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import path from 'node:path'
+import { resolve } from 'node:path'
 
 /**
  * Configuração Vite para o frontend NexTraceOne.
@@ -26,7 +27,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src'),
+        '@': resolve(__dirname, 'src'),
       },
     },
     server: {

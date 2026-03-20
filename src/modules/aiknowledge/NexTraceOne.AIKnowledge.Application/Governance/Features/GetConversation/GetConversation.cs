@@ -16,6 +16,10 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.GetConversatio
 /// </summary>
 public static class GetConversation
 {
+    private static bool IsConversationOwner(AiAssistantConversation conversation, ICurrentUser currentUser)
+        => string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(conversation.CreatedBy, currentUser.Email, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Query de obtenção de conversa com mensagens.</summary>
     public sealed record Query(
         Guid ConversationId,
@@ -37,10 +41,6 @@ public static class GetConversation
             if (conversation is null)
                 return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
-            // Validar que o utilizador autenticado é o proprietário da conversa
-            if (!string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase))
-                return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
-
             var messages = await messageRepository.ListByConversationAsync(
                 request.ConversationId,
                 request.MessagePageSize,
@@ -59,7 +59,10 @@ public static class GetConversation
                 m.GroundingSources.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(),
                 m.ContextReferences.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(),
                 m.CorrelationId,
-                m.Timestamp)).ToList();
+                m.Timestamp,
+                m.GetResponseState(),
+                m.IsDegradedResponse(),
+                m.GetDegradedReason())).ToList();
 
             return new Response(
                 conversation.Id.Value,
@@ -116,5 +119,8 @@ public static class GetConversation
         List<string> GroundingSources,
         List<string> ContextReferences,
         string CorrelationId,
-        DateTimeOffset Timestamp);
+        DateTimeOffset Timestamp,
+        string ResponseState,
+        bool IsDegraded,
+        string? DegradedReason);
 }

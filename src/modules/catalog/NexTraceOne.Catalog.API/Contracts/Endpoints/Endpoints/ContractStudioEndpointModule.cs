@@ -1,6 +1,6 @@
 using MediatR;
-
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
@@ -41,14 +41,14 @@ public sealed class ContractStudioEndpointModule
 
         // ── Drafts CRUD ─────────────────────────────────────────
 
-        group.MapPost("/", async (
+        group.MapPost(string.Empty, async (
             CreateDraftFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/drafts/{0}", localizer);
+            return result.ToCreatedResult(response => $"/api/v1/contracts/drafts/{response.DraftId}", localizer);
         }).RequirePermission("contracts:write");
 
         group.MapGet("/{draftId:guid}", async (
@@ -61,8 +61,8 @@ public sealed class ContractStudioEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
 
-        group.MapGet("/", async (
-            DraftStatus? status,
+        group.MapGet(string.Empty, async (
+            string? status,
             Guid? serviceId,
             string? author,
             int? page,
@@ -71,8 +71,23 @@ public sealed class ContractStudioEndpointModule
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            DraftStatus? parsedStatus = null;
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (!Enum.TryParse<DraftStatus>(status, ignoreCase: true, out var statusValue))
+                {
+                    return Results.BadRequest(new
+                    {
+                        code = "Contracts.Draft.InvalidStatus",
+                        detail = $"Invalid draft status '{status}'."
+                    });
+                }
+
+                parsedStatus = statusValue;
+            }
+
             var result = await sender.Send(new ListDraftsFeature.Query(
-                status, serviceId, author, page ?? 1, pageSize ?? 20), cancellationToken);
+                parsedStatus, serviceId, author, page ?? 1, pageSize ?? 20), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
 
@@ -169,7 +184,7 @@ public sealed class ContractStudioEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/drafts/{0}", localizer);
+            return result.ToCreatedResult(response => $"/api/v1/contracts/drafts/{response.DraftId}", localizer);
         }).RequirePermission("contracts:write");
 
         // ── Examples ────────────────────────────────────────────

@@ -9,9 +9,9 @@ import {
   ChevronUp,
   Rocket,
 } from 'lucide-react';
-import { Badge } from './Badge';
 import { usePersona } from '../contexts/PersonaContext';
 import type { Persona } from '../auth/persona';
+import { isRouteAvailableInFinalProductionScope } from '../releaseScope';
 
 const STORAGE_KEY = 'nex:quickstart:completed';
 
@@ -57,15 +57,16 @@ export function PersonaQuickstart() {
   const [completed, setCompleted] = useState<Set<string>>(() => getCompleted());
   const [collapsed, setCollapsed] = useState(false);
 
-  const routes = stepRoutes[persona] ?? stepRoutes.Engineer;
-  const steps = [1, 2, 3, 4].map((n) => ({
-    id: `${persona}-step${n}`,
-    labelKey: `productPolish.quickstart.${persona}.step${n}`,
-    route: routes[n - 1]?.to ?? '/',
-    preview: routes[n - 1]?.preview ?? false,
-  }));
+  const steps = (stepRoutes[persona] ?? stepRoutes.Engineer)
+    .map((route, index) => ({
+      id: `${persona}-step${index + 1}`,
+      labelKey: `productPolish.quickstart.${persona}.step${index + 1}`,
+      route: route.to,
+      preview: false,
+    }))
+    .filter((step) => isRouteAvailableInFinalProductionScope(step.route));
 
-  const allDone = steps.every((s) => completed.has(s.id));
+  const allDone = steps.length > 0 && steps.every((s) => completed.has(s.id));
 
   const handleToggle = (id: string) => {
     const next = new Set(completed);
@@ -78,7 +79,7 @@ export function PersonaQuickstart() {
     persistCompleted(next);
   };
 
-  if (allDone) return null;
+  if (steps.length === 0 || allDone) return null;
 
   const doneCount = steps.filter((s) => completed.has(s.id)).length;
 
@@ -139,11 +140,6 @@ export function PersonaQuickstart() {
                 >
                   {t(step.labelKey)}
                 </Link>
-                {step.preview && (
-                  <Badge variant="warning" className="text-[10px]">
-                    {t('preview.bannerTitle', 'Preview')}
-                  </Badge>
-                )}
               </div>
             );
           })}

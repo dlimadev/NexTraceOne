@@ -17,9 +17,14 @@ internal sealed class ContractDraftRepository(ContractsDbContext context)
 {
     /// <summary>Busca um draft pelo Id, incluindo a coleção de exemplos associados.</summary>
     public override async Task<ContractDraft?> GetByIdAsync(ContractDraftId id, CancellationToken ct = default)
-        => await context.Drafts
+    {
+        var drafts = await context.Drafts
+            .IgnoreQueryFilters()
             .Include(d => d.Examples)
-            .SingleOrDefaultAsync(d => d.Id == id, ct);
+            .ToListAsync(ct);
+
+        return drafts.SingleOrDefault(d => !d.IsDeleted && d.Id.Value == id.Value);
+    }
 
     /// <summary>
     /// Lista drafts de contrato com filtros opcionais e paginação.

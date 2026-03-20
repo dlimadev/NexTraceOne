@@ -55,6 +55,7 @@ public static class RolePermissionCatalog
 
                 // Operations
                 "operations:incidents:read",
+                "operations:incidents:write",
                 "operations:mitigation:read",
                 "operations:mitigation:write",
                 "operations:runbooks:read",
@@ -152,6 +153,7 @@ public static class RolePermissionCatalog
                 "change-intelligence:read",
                 "change-intelligence:write",
                 "operations:incidents:read",
+                "operations:incidents:write",
                 "operations:mitigation:read",
                 "operations:reliability:read",
                 "operations:runbooks:read",
@@ -183,6 +185,7 @@ public static class RolePermissionCatalog
                 "developer-portal:write",
                 "change-intelligence:read",
                 "operations:incidents:read",
+                "operations:incidents:write",
                 "operations:reliability:read",
                 "operations:runbooks:read",
                 "operations:runtime:read",

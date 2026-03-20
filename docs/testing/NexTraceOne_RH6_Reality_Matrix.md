@@ -9,8 +9,8 @@
 |---|---|---|---|
 | Backend unit | `tests/building-blocks/**`, `tests/modules/**` | `PARCIAL` | Protege regras e handlers, mas não substitui prova contra PostgreSQL real. |
 | Frontend unit | `src/frontend/src/__tests__/**` | `PARCIAL` | Boa proteção de componentes/páginas, mas sem backend real. |
-| Integration tests | `tests/platform/NexTraceOne.IntegrationTests/**` | `REAL` | Usa PostgreSQL real via Testcontainers, migrations reais, queries EF reais e reset controlado. |
-| .NET E2E API | `tests/platform/NexTraceOne.E2E.Tests/**` | `REAL` | Usa `WebApplicationFactory` + PostgreSQL real + autenticação real; RH-6 removeu o placeholder remanescente. |
+| Integration tests | `tests/platform/NexTraceOne.IntegrationTests/**` | `REAL` | RH-6 cobre agora duas camadas reais: persistência/queries EF contra PostgreSQL real e fluxos de host/API com `WebApplicationFactory` + PostgreSQL real. |
+| .NET E2E API | `tests/platform/NexTraceOne.E2E.Tests/**` | `REAL` | Usa `WebApplicationFactory` + PostgreSQL real + autenticação real; continua como prova HTTP do backend completo. |
 | Playwright legado | `src/frontend/e2e/**` | `MOCKADO DEMAIS` | Continua útil para UX rápida, mas depende de interceptação massiva e não serve como prova principal de produção. |
 | Playwright real RH-6 | `src/frontend/e2e-real/**` | `REAL` | Sobe frontend + backend + PostgreSQL real e valida fluxos web com autenticação e dados seedados. |
 
@@ -19,19 +19,41 @@
 ### Integration tests reais
 
 - IdentityAccess:
-  - persistência real de utilizador, papel e membership
-  - joins reais por tenant
+  - login/autenticação real
+  - refresh token real
+  - listagem de tenants do utilizador
+  - seleção real de tenant ativo
+  - autorização mínima por permissão (403 real para perfil sem acesso)
 - Catalog / Source of Truth:
-  - listagem/projeção real de serviços/APIs
-  - ownership, topology e consumer relationships
+  - listagem real de serviços
+  - detalhe real de serviço
+  - catálogo real de contratos
+  - cobertura adicional de ownership, topology e consumer relationships via EF/PostgreSQL real
 - Contracts:
-  - versões, artefactos, violações, diffs e drafts via PostgreSQL real
+  - `create draft`
+  - `get draft`
+  - `update draft content`
+  - `update draft metadata`
+  - `submit-review`
+  - cobertura adicional de versões, artefactos, violações e queries reais via EF/PostgreSQL real
 - ChangeGovernance:
-  - releases, blast radius, rulesets, workflow e promotion
+  - `list releases`
+  - `get intelligence`
+  - `review/start`
+  - cobertura adicional de blast radius, workflow, promotion e rulesets via EF/PostgreSQL real
 - OperationalIntelligence:
-  - incidentes, mitigation workflows, runtime snapshots, cost snapshots
+  - `list incidents`
+  - `get incident detail`
+  - `refresh correlation`
+  - `create incident`
+  - cobertura adicional de mitigation workflows, runtime snapshots e cost snapshots via EF/PostgreSQL real
 - AI:
-  - `AiGovernanceDbContext`, `ExternalAiDbContext`, `AiOrchestrationDbContext`
+  - `list conversations`
+  - `create conversation`
+  - `send assistant message`
+  - `list messages`
+  - fallback explícito quando o provider não está operacional
+  - cobertura adicional de `AiGovernanceDbContext`, `ExternalAiDbContext` e `AiOrchestrationDbContext`
 - Governance / Audit / Developer Portal:
   - persistência e queries reais para contextos antes frágeis
 

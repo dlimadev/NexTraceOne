@@ -254,4 +254,92 @@ public sealed class CatalogAndIncidentApiFlowTests(ApiE2EFixture fixture)
 
         ((int)response.StatusCode).Should().BeOneOf(new[] {200, 403}, "utilizador autenticado deve receber 200 ou 403 para listagem de contratos");
     }
+
+    [Fact]
+    public async Task Incidents_List_Pagination_Should_Report_Unpaged_TotalCount()
+    {
+        var client = await fixture.CreateAuthenticatedClientAsync();
+
+        var response = await client.GetAsync("/api/v1/incidents?page=1&pageSize=2");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var content = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(content);
+
+        doc.RootElement.GetProperty("items").GetArrayLength().Should().Be(2);
+        doc.RootElement.GetProperty("totalCount").GetInt32().Should().BeGreaterThan(2);
+    }
+
+    [Fact]
+    public async Task Incidents_Create_Persist_Detail_And_Reopen_Should_Work_EndToEnd()
+    {
+        var client = await fixture.CreateAuthenticatedClientAsync();
+        var uniqueSuffix = Guid.NewGuid().ToString("N")[..8];
+        var title = $"E2E incident {uniqueSuffix}";
+
+        var createPayload = new
+        {
+            Title = title,
+            Description = "Incident created by real E2E flow to validate persistence.",
+            IncidentType = "ServiceDegradation",
+            Severity = "Major",
+            ServiceId = "svc-e2e-core",
+            ServiceDisplayName = "E2E Core Service",
+            OwnerTeam = "core-squad",
+            ImpactedDomain = "Core",
+            Environment = "Production"
+        };
+
+        var createResponse = await client.PostAsJsonAsync("/api/v1/incidents", createPayload);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var createJson = await createResponse.Content.ReadAsStringAsync();
+        using var createdDoc = JsonDocument.Parse(createJson);
+        var incidentId = createdDoc.RootElement.GetProperty("incidentId").GetGuid();
+        var reference = createdDoc.RootElement.GetProperty("reference").GetString();
+        reference.Should().NotBeNullOrWhiteSpace();
+
+        var listResponse = await client.GetAsync($"/api/v1/incidents?search={Uri.EscapeDataString(title)}&page=1&pageSize=10");
+        listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var listDoc = JsonDocument.Parse(await listResponse.Content.ReadAsStringAsync());
+        listDoc.RootElement.GetProperty("totalCount").GetInt32().Should().Be(1);
+        var listItems = listDoc.RootElement.GetProperty("items");
+        listItems.GetArrayLength().Should().Be(1);
+        listItems[0].GetProperty("incidentId").GetGuid().Should().Be(incidentId);
+        listItems[0].GetProperty("title").GetString().Should().Be(title);
+
+        var detailResponse = await client.GetAsync($"/api/v1/incidents/{incidentId}");
+        detailResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var detailDoc = JsonDocument.Parse(await detailResponse.Content.ReadAsStringAsync());
+        detailDoc.RootElement.GetProperty("identity").GetProperty("incidentId").GetGuid().Should().Be(incidentId);
+        detailDoc.RootElement.GetProperty("identity").GetProperty("title").GetString().Should().Be(title);
+        detailDoc.RootElement.GetProperty("ownerTeam").GetString().Should().Be("core-squad");
+        detailDoc.RootElement.GetProperty("linkedServices")[0].GetProperty("serviceId").GetString().Should().Be("svc-e2e-core");
+
+        var reopenedDetailResponse = await client.GetAsync($"/api/v1/incidents/{incidentId}");
+        reopenedDetailResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var reopenedDoc = JsonDocument.Parse(await reopenedDetailResponse.Content.ReadAsStringAsync());
+        reopenedDoc.RootElement.GetProperty("identity").GetProperty("reference").GetString().Should().Be(reference);
+        reopenedDoc.RootElement.GetProperty("identity").GetProperty("title").GetString().Should().Be(title);
+    }
+
+    [Fact]
+    public async Task Incidents_Create_With_ReadOnly_Profile_Should_Return_403()
+    {
+        var client = await fixture.CreateAuthenticatedClientAsync(ApiE2EFixture.E2EViewerEmail, ApiE2EFixture.E2EViewerPassword);
+
+        var response = await client.PostAsJsonAsync("/api/v1/incidents", new
+        {
+            Title = "Forbidden create incident",
+            Description = "Read-only users must not create incidents.",
+            IncidentType = "ServiceDegradation",
+            Severity = "Minor",
+            ServiceId = "svc-read-only",
+            ServiceDisplayName = "Read Only Service",
+            OwnerTeam = "viewer-squad",
+            Environment = "Production"
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
 }

@@ -22,13 +22,15 @@ public sealed class ContractsApplicationTests
     private const string AdditiveSpec = """{"openapi":"3.0.0","info":{"title":"Test","version":"1.1.0"},"paths":{"/users":{"get":{"responses":{"200":{"description":"OK"}}}},"/orders":{"get":{"responses":{"200":{"description":"OK"}}}}}}""";
     private const string BreakingSpec = """{"openapi":"3.0.0","info":{"title":"Test","version":"2.0.0"},"paths":{}}""";
 
+    private static IContractsUnitOfWork CreateUnitOfWork() => Substitute.For<IContractsUnitOfWork>();
+
     // ── ImportContract ────────────────────────────────────────────────────
 
     [Fact]
     public async Task ImportContract_Should_ReturnResponse_When_ApiAssetDoesNotHaveThisSemVer()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ImportContractFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -52,7 +54,7 @@ public sealed class ContractsApplicationTests
     {
         var existing = ContractVersion.Import(Guid.NewGuid(), "1.0.0", BaseSpec, "json", "upload").Value;
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ImportContractFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -74,7 +76,7 @@ public sealed class ContractsApplicationTests
     public async Task CreateContractVersion_Should_ReturnError_When_NoPreviousVersionExists()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -96,7 +98,7 @@ public sealed class ContractsApplicationTests
         var apiAssetId = Guid.NewGuid();
         var previous = ContractVersion.Import(apiAssetId, "1.0.0", BaseSpec, "json", "upload").Value;
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -145,7 +147,7 @@ public sealed class ContractsApplicationTests
     {
         var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", BaseSpec, "json", "upload").Value;
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new LockContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -165,7 +167,7 @@ public sealed class ContractsApplicationTests
     public async Task LockContractVersion_Should_ReturnNotFound_When_VersionDoesNotExist()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new LockContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -190,7 +192,7 @@ public sealed class ContractsApplicationTests
         var baseVersion = ContractVersion.Import(apiAssetId, "1.0.0", BaseSpec, "json", "upload").Value;
         var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", AdditiveSpec, "json", "upload").Value;
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ComputeSemanticDiffFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -217,7 +219,7 @@ public sealed class ContractsApplicationTests
         var baseVersion = ContractVersion.Import(apiAssetId, "1.0.0", BaseSpec, "json", "upload").Value;
         var targetVersion = ContractVersion.Import(apiAssetId, "2.0.0", BreakingSpec, "json", "upload").Value;
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ComputeSemanticDiffFeature.Handler(repository, unitOfWork, dateTimeProvider);
 

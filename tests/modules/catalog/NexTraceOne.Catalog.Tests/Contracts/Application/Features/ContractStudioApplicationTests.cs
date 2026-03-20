@@ -26,13 +26,15 @@ public sealed class ContractStudioApplicationTests
 
     private const string ValidSpec = """{"openapi":"3.1.0","info":{"title":"Test","version":"1.0.0"},"paths":{"/users":{"get":{"responses":{"200":{"description":"OK"}}}}}}""";
 
+    private static IContractsUnitOfWork CreateUnitOfWork() => Substitute.For<IContractsUnitOfWork>();
+
     // ── CreateDraft ─────────────────────────────────────────────────────
 
     [Fact]
     public async Task CreateDraft_Should_ReturnResponse_When_InputIsValid()
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -52,7 +54,7 @@ public sealed class ContractStudioApplicationTests
     public async Task CreateDraft_Should_ReturnDraftId_And_Title_When_Created()
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -121,7 +123,7 @@ public sealed class ContractStudioApplicationTests
             "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -143,7 +145,7 @@ public sealed class ContractStudioApplicationTests
     public async Task UpdateDraftContent_Should_ReturnNotFound_When_DraftDoesNotExist()
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -199,7 +201,7 @@ public sealed class ContractStudioApplicationTests
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -221,7 +223,7 @@ public sealed class ContractStudioApplicationTests
     public async Task SubmitDraftForReview_Should_ReturnNotFound_When_DraftDoesNotExist()
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -249,7 +251,7 @@ public sealed class ContractStudioApplicationTests
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var reviewRepo = Substitute.For<IContractReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -273,7 +275,7 @@ public sealed class ContractStudioApplicationTests
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var reviewRepo = Substitute.For<IContractReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -301,7 +303,7 @@ public sealed class ContractStudioApplicationTests
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var reviewRepo = Substitute.For<IContractReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -333,7 +335,7 @@ public sealed class ContractStudioApplicationTests
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var versionRepo = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -358,7 +360,7 @@ public sealed class ContractStudioApplicationTests
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var versionRepo = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -380,7 +382,7 @@ public sealed class ContractStudioApplicationTests
     public async Task GenerateDraftFromAi_Should_ReturnDraft_When_InputIsValid()
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
 
         var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork);
 
@@ -409,7 +411,7 @@ public sealed class ContractStudioApplicationTests
             "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 

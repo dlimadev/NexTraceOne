@@ -55,7 +55,7 @@ public sealed class OllamaHttpClient
 
                 var sw = Stopwatch.StartNew();
                 var response = await _httpClient.PostAsJsonAsync(
-                    "/api/chat", request, JsonOptions, cancellationToken);
+                    "api/chat", request, JsonOptions, cancellationToken);
 
                 response.EnsureSuccessStatusCode();
 
@@ -92,7 +92,7 @@ public sealed class OllamaHttpClient
         try
         {
             var response = await _httpClient.GetFromJsonAsync<OllamaTagsResponse>(
-                "/api/tags", JsonOptions, cancellationToken);
+                "api/tags", JsonOptions, cancellationToken);
             return response;
         }
         catch (Exception ex)
@@ -108,7 +108,7 @@ public sealed class OllamaHttpClient
         {
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(5));
-            var response = await _httpClient.GetAsync("/", cts.Token);
+            var response = await _httpClient.GetAsync(string.Empty, cts.Token);
             return response.IsSuccessStatusCode;
         }
         catch

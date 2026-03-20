@@ -1,4 +1,7 @@
 using Ardalis.GuardClauses;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -13,6 +16,10 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListMessages;
 /// </summary>
 public static class ListMessages
 {
+    private static bool IsConversationOwner(AiAssistantConversation conversation, ICurrentUser currentUser)
+        => string.Equals(conversation.CreatedBy, currentUser.Id, StringComparison.OrdinalIgnoreCase)
+           || string.Equals(conversation.CreatedBy, currentUser.Email, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Query de listagem de mensagens de uma conversa.</summary>
     public sealed record Query(
         Guid ConversationId,
@@ -20,11 +27,20 @@ public static class ListMessages
 
     /// <summary>Handler que lista mensagens com metadados completos.</summary>
     public sealed class Handler(
-        IAiMessageRepository messageRepository) : IQueryHandler<Query, Response>
+        IAiAssistantConversationRepository conversationRepository,
+        IAiMessageRepository messageRepository,
+        ICurrentUser currentUser) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            var conversation = await conversationRepository.GetByIdAsync(
+                AiAssistantConversationId.From(request.ConversationId),
+                cancellationToken);
+
+            if (conversation is null)
+                return AiGovernanceErrors.ConversationNotFound(request.ConversationId.ToString());
 
             var messages = await messageRepository.ListByConversationAsync(
                 request.ConversationId,
@@ -49,7 +65,10 @@ public static class ListMessages
                 m.GroundingSources.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(),
                 m.ContextReferences.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList(),
                 m.CorrelationId,
-                m.Timestamp)).ToList();
+                m.Timestamp,
+                m.GetResponseState(),
+                m.IsDegradedResponse(),
+                m.GetDegradedReason())).ToList();
 
             return new Response(items, totalCount);
         }
@@ -75,5 +94,8 @@ public static class ListMessages
         List<string> GroundingSources,
         List<string> ContextReferences,
         string CorrelationId,
-        DateTimeOffset Timestamp);
+        DateTimeOffset Timestamp,
+        string ResponseState,
+        bool IsDegraded,
+        string? DegradedReason);
 }

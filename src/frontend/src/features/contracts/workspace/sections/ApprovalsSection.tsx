@@ -37,17 +37,17 @@ export function ApprovalsSection({ contract, onTransition, className = '' }: App
         />
         <StatusCard
           label={t('contracts.studio.approvals.approval', 'Approval')}
-          value={contract.approvalState}
+          value={contract.approvalState ?? t('common.notAvailable', 'Not available')}
           variant={contract.approvalState === 'Approved' ? 'success' : contract.approvalState === 'Rejected' ? 'danger' : 'default'}
         />
         <StatusCard
           label={t('contracts.studio.approvals.progress', 'Progress')}
-          value={`${approvedCount}/${totalApprovals}`}
+          value={totalApprovals > 0 ? `${approvedCount}/${totalApprovals}` : t('common.notAvailable', 'Not available')}
         />
         <StatusCard
           label={t('contracts.studio.approvals.score', 'Approval Score')}
-          value={`${progressPercent}%`}
-          variant={progressPercent === 100 ? 'success' : progressPercent >= 50 ? 'warning' : 'danger'}
+          value={totalApprovals > 0 ? `${progressPercent}%` : t('common.notAvailable', 'Not available')}
+          variant={totalApprovals === 0 ? 'default' : progressPercent === 100 ? 'success' : progressPercent >= 50 ? 'warning' : 'danger'}
         />
       </div>
 
@@ -58,75 +58,85 @@ export function ApprovalsSection({ contract, onTransition, className = '' }: App
             <h3 className="text-xs font-semibold text-heading">
               {t('contracts.approvals.checklist', 'Approval Checklist')}
             </h3>
-            <span className="text-[10px] text-muted">{approvedCount} / {totalApprovals} {t('contracts.approvals.approved', 'approved')}</span>
+            {totalApprovals > 0 && (
+              <span className="text-[10px] text-muted">{approvedCount} / {totalApprovals} {t('contracts.approvals.approved', 'approved')}</span>
+            )}
           </div>
         </CardHeader>
         <CardBody>
-          {/* Progress bar */}
-          <div className="mb-4">
-            <div className="h-2 bg-elevated rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  'h-full rounded-full transition-all duration-500',
-                  progressPercent === 100 ? 'bg-mint' :
-                  progressPercent >= 50 ? 'bg-cyan' :
-                  'bg-warning',
-                )}
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Checklist */}
-          <div className="space-y-2">
-            {contract.approvalChecklist.map((item) => {
-              const roleKey = item.role.charAt(0).toLowerCase() + item.role.slice(1);
-              return (
-                <div
-                  key={item.role}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-md border transition-colors',
-                    item.state === 'Approved'
-                      ? 'bg-mint/5 border-mint/20'
-                      : 'bg-card border-edge',
-                  )}
-                >
-                  {item.state === 'Approved' ? (
-                    <CheckCircle size={16} className="text-mint flex-shrink-0" />
-                  ) : (
-                    <Circle size={16} className="text-muted/40 flex-shrink-0" />
-                  )}
-
-                  <div className="flex-1 min-w-0">
-                    <p className={cn(
-                      'text-xs font-medium',
-                      item.state === 'Approved' ? 'text-heading' : 'text-muted',
-                    )}>
-                      {t(`contracts.approvals.${roleKey}`, item.role)}
-                    </p>
-                    {item.reviewedBy && (
-                      <p className="text-[10px] text-muted">
-                        {t('contracts.studio.approvals.reviewedBy', 'Reviewed by')} @{item.reviewedBy} · {item.reviewedAt ? formatDate(item.reviewedAt) : ''}
-                      </p>
+          {totalApprovals === 0 ? (
+            <p className="text-xs text-muted">
+              {t('contracts.studio.approvals.noChecklist', 'No persisted approval checklist is available for this contract version yet.')}
+            </p>
+          ) : (
+            <>
+              {/* Progress bar */}
+              <div className="mb-4">
+                <div className="h-2 bg-elevated rounded-full overflow-hidden">
+                  <div
+                    className={cn(
+                      'h-full rounded-full transition-all duration-500',
+                      progressPercent === 100 ? 'bg-mint' :
+                      progressPercent >= 50 ? 'bg-cyan' :
+                      'bg-warning',
                     )}
-                    {item.comment && (
-                      <p className="text-[10px] text-body mt-0.5 italic">"{item.comment}"</p>
-                    )}
-                  </div>
-
-                  <span className={cn(
-                    'text-[10px] font-medium px-2 py-0.5 rounded-md',
-                    item.state === 'Approved' ? 'bg-mint/10 text-mint' :
-                    item.state === 'InReview' ? 'bg-cyan/10 text-cyan' :
-                    item.state === 'Rejected' ? 'bg-danger/10 text-danger' :
-                    'bg-elevated text-muted',
-                  )}>
-                    {item.state}
-                  </span>
+                    style={{ width: `${progressPercent}%` }}
+                  />
                 </div>
-              );
-            })}
-          </div>
+              </div>
+
+              {/* Checklist */}
+              <div className="space-y-2">
+                {contract.approvalChecklist.map((item) => {
+                  const roleKey = item.role.charAt(0).toLowerCase() + item.role.slice(1);
+                  return (
+                    <div
+                      key={item.role}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-md border transition-colors',
+                        item.state === 'Approved'
+                          ? 'bg-mint/5 border-mint/20'
+                          : 'bg-card border-edge',
+                      )}
+                    >
+                      {item.state === 'Approved' ? (
+                        <CheckCircle size={16} className="text-mint flex-shrink-0" />
+                      ) : (
+                        <Circle size={16} className="text-muted/40 flex-shrink-0" />
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          'text-xs font-medium',
+                          item.state === 'Approved' ? 'text-heading' : 'text-muted',
+                        )}>
+                          {t(`contracts.approvals.${roleKey}`, item.role)}
+                        </p>
+                        {item.reviewedBy && (
+                          <p className="text-[10px] text-muted">
+                            {t('contracts.studio.approvals.reviewedBy', 'Reviewed by')} @{item.reviewedBy} · {item.reviewedAt ? formatDate(item.reviewedAt) : ''}
+                          </p>
+                        )}
+                        {item.comment && (
+                          <p className="text-[10px] text-body mt-0.5 italic">"{item.comment}"</p>
+                        )}
+                      </div>
+
+                      <span className={cn(
+                        'text-[10px] font-medium px-2 py-0.5 rounded-md',
+                        item.state === 'Approved' ? 'bg-mint/10 text-mint' :
+                        item.state === 'InReview' ? 'bg-cyan/10 text-cyan' :
+                        item.state === 'Rejected' ? 'bg-danger/10 text-danger' :
+                        'bg-elevated text-muted',
+                      )}>
+                        {item.state}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </CardBody>
       </Card>
 

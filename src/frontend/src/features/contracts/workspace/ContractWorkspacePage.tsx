@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { AlertTriangle } from 'lucide-react';
 import { WorkspaceLayout } from './WorkspaceLayout';
 import { ContractHeader, ContractQuickActions } from '../shared/components';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
@@ -32,7 +30,7 @@ import {
   useContractTransition,
   useContractExport,
 } from '../hooks';
-import { enrichToStudioContract } from './studioMock';
+import { toStudioContract } from './toStudioContract';
 import type { WorkspaceSectionId } from '../types';
 import type { ContractLifecycleState } from '../types';
 
@@ -43,7 +41,6 @@ import type { ContractLifecycleState } from '../types';
  */
 export function ContractWorkspacePage() {
   const { contractVersionId } = useParams<{ contractVersionId: string }>();
-  const { t } = useTranslation();
 
   const detailQuery = useContractDetail(contractVersionId);
   const violationsQuery = useContractViolations(contractVersionId);
@@ -52,7 +49,7 @@ export function ContractWorkspacePage() {
 
   const studioContract = useMemo(() => {
     if (!detailQuery.data) return null;
-    return enrichToStudioContract(detailQuery.data);
+    return toStudioContract(detailQuery.data);
   }, [detailQuery.data]);
 
   if (detailQuery.isLoading) {
@@ -73,7 +70,7 @@ export function ContractWorkspacePage() {
   const handleExport = async () => {
     if (!contractVersionId) return;
     try {
-      await exportVersion(contractVersionId, `contract-${detail.semVer}.${detail.format}`);
+      await exportVersion(contractVersionId, `${studioContract.technicalName || 'contract'}-${detail.semVer}.${detail.format}`);
     } catch {
       // Error handled by toast
     }
@@ -195,44 +192,28 @@ export function ContractWorkspacePage() {
   return (
     <WorkspaceLayout
       header={
-        <>
-          <div className="mb-4 flex items-start gap-3 rounded-lg border border-amber-500/25 bg-amber-500/5 px-4 py-3 text-xs text-amber-200">
-            <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-400" />
-            <div>
-              <p className="font-medium text-amber-300">
-                {t('contracts.workspace.previewMetadataTitle', 'Partially real contract workspace')}
-              </p>
-              <p className="mt-1 text-amber-200/80">
-                {t(
-                  'contracts.workspace.previewMetadataDescription',
-                  'Core contract content comes from the backend, but some studio metadata is still enriched locally for preview purposes. Treat owner, domain, compliance and relationship context as non-authoritative until backend support is completed.',
-                )}
-              </p>
-            </div>
-          </div>
-          <ContractHeader
-            title={detail.apiAssetId}
-            friendlyName={studioContract.friendlyName}
-            version={detail.semVer}
-            protocol={detail.protocol}
-            lifecycleState={detail.lifecycleState}
-            serviceType={studioContract.serviceType}
-            domain={studioContract.domain}
-            owner={studioContract.owner}
-            isLocked={detail.isLocked}
-            isSigned={!!detail.signedBy}
-            actions={
-              <ContractQuickActions
-                lifecycleState={detail.lifecycleState as ContractLifecycleState}
-                isLocked={detail.isLocked}
-                isSigned={!!detail.signedBy}
-                portalUrl={`/contracts/${contractVersionId}/portal`}
-                onTransition={handleTransition}
-                onExport={handleExport}
-              />
-            }
-          />
-        </>
+        <ContractHeader
+          title={studioContract.technicalName}
+          friendlyName={studioContract.friendlyName}
+          version={detail.semVer}
+          protocol={detail.protocol}
+          lifecycleState={detail.lifecycleState}
+          serviceType={studioContract.serviceType}
+          domain={studioContract.domain || undefined}
+          owner={studioContract.owner || undefined}
+          isLocked={detail.isLocked}
+          isSigned={!!detail.signedBy}
+          actions={
+            <ContractQuickActions
+              lifecycleState={detail.lifecycleState as ContractLifecycleState}
+              isLocked={detail.isLocked}
+              isSigned={!!detail.signedBy}
+              portalUrl={`/contracts/${contractVersionId}/portal`}
+              onTransition={handleTransition}
+              onExport={handleExport}
+            />
+          }
+        />
       }
       rail={
         <StudioRail

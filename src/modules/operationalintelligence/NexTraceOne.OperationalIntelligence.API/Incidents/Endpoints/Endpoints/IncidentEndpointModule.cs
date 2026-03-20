@@ -41,7 +41,7 @@ public sealed class IncidentEndpointModule
             CancellationToken cancellationToken = default) =>
         {
             var result = await sender.Send(request, cancellationToken);
-            return result.ToHttpResult(localizer);
+            return result.ToCreatedResult(response => $"/api/v1/incidents/{response.IncidentId}", localizer);
         })
         .RequirePermission("operations:incidents:write")
         .WithName("CreateIncident")

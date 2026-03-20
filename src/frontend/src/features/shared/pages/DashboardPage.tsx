@@ -18,6 +18,7 @@ import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 import { contractsApi } from '../../catalog/api/contracts';
 import { changeConfidenceApi } from '../../change-governance/api/changeConfidence';
 import { incidentsApi } from '../../operations/api/incidents';
+import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 
 /**
  * Página principal do dashboard — experiência persona-aware com narrativa operacional.
@@ -42,6 +43,7 @@ import { incidentsApi } from '../../operations/api/incidents';
 export function DashboardPage() {
   const { t } = useTranslation();
   const { persona, config } = usePersona();
+  const showContractsSurface = isRouteAvailableInFinalProductionScope('/contracts');
 
   const { data: graph, isLoading: graphLoading, isError: graphError } = useQuery({
     queryKey: ['graph'],
@@ -118,7 +120,7 @@ export function DashboardPage() {
 
   // Build attention alerts from operational data
   const attentionAlerts: Array<{ icon: React.ReactNode; text: string; severity: 'critical' | 'warning' | 'info'; to: string }> = [];
-  if (openIncidents > 0) {
+  if (openIncidents > 0 && isRouteAvailableInFinalProductionScope('/operations/incidents')) {
     attentionAlerts.push({
       icon: <AlertTriangle size={14} />,
       text: t('dashboard.alertOpenIncidents', { count: openIncidents }),
@@ -142,7 +144,7 @@ export function DashboardPage() {
       to: '/changes',
     });
   }
-  if ((contractsSummary?.deprecatedCount ?? 0) > 0) {
+  if ((contractsSummary?.deprecatedCount ?? 0) > 0 && isRouteAvailableInFinalProductionScope('/contracts')) {
     attentionAlerts.push({
       icon: <FileText size={14} />,
       text: t('dashboard.alertDeprecatedContracts', { count: contractsSummary?.deprecatedCount }),
@@ -150,6 +152,27 @@ export function DashboardPage() {
       to: '/contracts',
     });
   }
+
+  const visibleHomeWidgets = config.homeWidgets.filter((widget) => {
+    const routeByWidgetType: Record<string, string> = {
+      services: '/services',
+      changes: '/changes',
+      incidents: '/operations/incidents',
+      contracts: '/contracts',
+      reliability: '/operations/reliability',
+      dependencies: '/services/graph',
+      risk: '/governance/risk',
+      trend: '/governance/reports',
+      governance: '/governance/reports',
+      audit: '/audit',
+      ownership: '/services',
+      releaseConfidence: '/changes',
+      aiInsights: '/ai/assistant',
+    };
+
+    const route = routeByWidgetType[widget.type] ?? '/';
+    return isRouteAvailableInFinalProductionScope(route);
+  });
 
   const severityColors = {
     critical: 'bg-critical/10 border-critical/25 text-critical',
@@ -214,9 +237,9 @@ export function DashboardPage() {
       )}
 
       {/* Persona-specific widgets */}
-      {config.homeWidgets.length > 0 && (
+      {visibleHomeWidgets.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-          {config.homeWidgets.map((widget) => (
+          {visibleHomeWidgets.map((widget) => (
             <HomeWidgetCard key={widget.id} widget={widget} />
           ))}
         </div>
@@ -224,7 +247,7 @@ export function DashboardPage() {
 
       {/* ── Operational views: Services + Contract Health ────────────────────── */}
       <PageSection>
-        <ContentGrid columns={2}>
+        <ContentGrid columns={showContractsSurface ? 2 : 1}>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between w-full">
@@ -287,6 +310,7 @@ export function DashboardPage() {
           </CardBody>
         </Card>
 
+        {showContractsSurface && (
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between w-full">
@@ -342,6 +366,7 @@ export function DashboardPage() {
             )}
           </CardBody>
         </Card>
+        )}
         </ContentGrid>
       </PageSection>
 

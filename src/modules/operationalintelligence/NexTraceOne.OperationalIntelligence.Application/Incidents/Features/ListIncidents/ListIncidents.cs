@@ -83,11 +83,15 @@ public static class ListIncidents
             if (request.To.HasValue)
                 filtered = filtered.Where(i => i.CreatedAt <= request.To.Value);
 
-            var items = filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
+            var totalCount = filtered.Count();
+            var items = filtered
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
 
             var response = new Response(
                 Items: items,
-                TotalCount: items.Count,
+                TotalCount: totalCount,
                 Page: request.Page,
                 PageSize: request.PageSize);
 

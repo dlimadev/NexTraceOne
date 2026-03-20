@@ -1,8 +1,10 @@
 using System.Diagnostics;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 
@@ -17,11 +19,16 @@ public sealed class OllamaProvider : IAiProvider, IChatCompletionProvider
     private static readonly string[] DefaultCapabilities = ["chat", "completion"];
 
     private readonly OllamaHttpClient _client;
+    private readonly OllamaOptions _options;
     private readonly ILogger<OllamaProvider> _logger;
 
-    public OllamaProvider(OllamaHttpClient client, ILogger<OllamaProvider> logger)
+    public OllamaProvider(
+        OllamaHttpClient client,
+        IOptions<OllamaOptions> options,
+        ILogger<OllamaProvider> logger)
     {
         _client = client;
+        _options = options.Value;
         _logger = logger;
     }
 
@@ -79,9 +86,11 @@ public sealed class OllamaProvider : IAiProvider, IChatCompletionProvider
         var sw = Stopwatch.StartNew();
         try
         {
+            var selectedModel = await ResolveModelAsync(request.ModelId, cancellationToken);
+
             var ollamaRequest = new OllamaChatRequest
             {
-                Model = request.ModelId,
+                Model = selectedModel,
                 Stream = false,
                 Messages = request.Messages.Select(m => new OllamaChatMessage
                 {
@@ -122,5 +131,54 @@ public sealed class OllamaProvider : IAiProvider, IChatCompletionProvider
                 false, null, request.ModelId, ProviderId,
                 0, 0, sw.Elapsed, ex.Message);
         }
+    }
+
+    private async Task<string> ResolveModelAsync(string requestedModel, CancellationToken cancellationToken)
+    {
+        var candidate = string.IsNullOrWhiteSpace(requestedModel)
+            ? _options.DefaultChatModel
+            : requestedModel;
+
+        var tags = await _client.ListModelsAsync(cancellationToken);
+        var availableModels = tags?.Models?.Select(m => m.Name).Where(n => !string.IsNullOrWhiteSpace(n)).ToList() ?? [];
+
+        if (availableModels.Count == 0)
+            return candidate;
+
+        if (availableModels.Any(m => string.Equals(m, candidate, StringComparison.OrdinalIgnoreCase)))
+            return candidate;
+
+        if (availableModels.Any(m => string.Equals(m, _options.DefaultChatModel, StringComparison.OrdinalIgnoreCase)))
+        {
+            _logger.LogWarning(
+                "Requested Ollama model {RequestedModel} not available. Falling back to configured default model {DefaultModel}.",
+                candidate,
+                _options.DefaultChatModel);
+            return _options.DefaultChatModel;
+        }
+
+        var requestedFamily = candidate.Split(':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(requestedFamily))
+        {
+            var familyMatch = availableModels.FirstOrDefault(
+                m => m.StartsWith($"{requestedFamily}:", StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(familyMatch))
+            {
+                _logger.LogWarning(
+                    "Requested Ollama model {RequestedModel} not available. Falling back to same-family model {FallbackModel}.",
+                    candidate,
+                    familyMatch);
+                return familyMatch;
+            }
+        }
+
+        var firstAvailable = availableModels[0];
+        _logger.LogWarning(
+            "Requested Ollama model {RequestedModel} not available. Falling back to first available model {FallbackModel}.",
+            candidate,
+            firstAvailable);
+
+        return firstAvailable;
     }
 }

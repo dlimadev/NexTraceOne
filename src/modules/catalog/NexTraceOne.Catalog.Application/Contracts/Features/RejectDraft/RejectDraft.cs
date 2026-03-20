@@ -44,7 +44,7 @@ public static class RejectDraft
     public sealed class Handler(
         IContractDraftRepository draftRepository,
         IContractReviewRepository reviewRepository,
-        IUnitOfWork unitOfWork,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

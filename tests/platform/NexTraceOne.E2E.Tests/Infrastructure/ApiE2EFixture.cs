@@ -31,16 +31,19 @@ namespace NexTraceOne.E2E.Tests.Infrastructure;
 /// </summary>
 public sealed class ApiE2EFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
-        .WithDatabase("postgres")
-        .WithUsername("postgres")
-        .WithPassword("postgres")
-        .Build();
-
+    private PostgreSqlContainer? _container;
+    private string? _adminConnectionString;
     private WebApplicationFactory<Program>? _factory;
     private readonly Dictionary<string, string> _connectionStrings = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Respawner> _respawners = new(StringComparer.OrdinalIgnoreCase);
+
+    private static readonly string[] LocalAdminConnectionCandidates =
+    [
+        Environment.GetEnvironmentVariable("NEXTRACE_TEST_ADMIN_CONNECTION_STRING") ?? string.Empty,
+        "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres;Include Error Detail=true",
+        "Host=localhost;Port=5432;Database=postgres;Username=nextraceone;Password=ouro18;Include Error Detail=true",
+        "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=ouro18;Include Error Detail=true",
+    ];
 
     // ── Test user credentials ─────────────────────────────────────────────────
 
@@ -49,6 +52,12 @@ public sealed class ApiE2EFixture : IAsyncLifetime
 
     /// <summary>Senha do utilizador de teste admin.</summary>
     public const string E2EAdminPassword = "Admin@123";
+
+    /// <summary>Email do utilizador de teste viewer para fluxos E2E.</summary>
+    public const string E2EViewerEmail = "e2e.viewer@nextraceone.test";
+
+    /// <summary>Senha do utilizador de teste viewer.</summary>
+    public const string E2EViewerPassword = "Viewer@123";
 
     // ── Database grouping matching production configuration ───────────────────
 
@@ -75,7 +84,7 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
         Environment.SetEnvironmentVariable("NEXTRACE_SKIP_INTEGRITY", "true");
 
-        await _container.StartAsync();
+        _adminConnectionString = await StartPostgreSqlAsync();
 
         foreach (var (key, dbName) in DatabaseTargets)
         {
@@ -127,7 +136,8 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         Client?.Dispose();
         if (_factory is not null)
             await _factory.DisposeAsync();
-        await _container.DisposeAsync();
+        if (_container is not null)
+            await _container.DisposeAsync();
     }
 
     /// <summary>Resets all test databases to their post-migration clean state.</summary>
@@ -278,28 +288,40 @@ public sealed class ApiE2EFixture : IAsyncLifetime
         await connection.OpenAsync();
 
         var sql = """
-                  INSERT INTO identity_tenants ("Id", "Name", "Slug", "IsActive", "CreatedAt")
+                  INSERT INTO identity_tenants (\"Id\", \"Name\", \"Slug\", \"IsActive\", \"CreatedAt\")
                   VALUES ('a0000000-0000-0000-0000-000000000099', 'E2E Test Org', 'e2e-test-org', true, NOW())
                   ON CONFLICT DO NOTHING;
 
                   INSERT INTO identity_users (
-                      "Id", "Email", "first_name", "last_name", "PasswordHash",
-                      "IsActive", "LastLoginAt", "FailedLoginAttempts")
+                      \"Id\", \"Email\", \"first_name\", \"last_name\", \"PasswordHash\",
+                      \"IsActive\", \"LastLoginAt\", \"FailedLoginAttempts\")
                   VALUES (
                       'b0000000-0000-0000-0000-000000000099',
                       'e2e.admin@nextraceone.test',
                       'E2E', 'Admin',
                       'v1.JmfnVELOwwfJunLeGbMN/g==.nkH8yRKF34TIfYNWcx84oAGJ+f2Q725ByMUk1JC7TNw=',
+                      true, NOW(), 0),
+                  (
+                      'b0000000-0000-0000-0000-000000000098',
+                      'e2e.viewer@nextraceone.test',
+                      'E2E', 'Viewer',
+                      'v1.JmfnVELOwwfJunLeGbMN/g==.nkH8yRKF34TIfYNWcx84oAGJ+f2Q725ByMUk1JC7TNw=',
                       true, NOW(), 0)
                   ON CONFLICT DO NOTHING;
 
                   INSERT INTO identity_tenant_memberships (
-                      "Id", "UserId", "TenantId", "RoleId", "JoinedAt", "IsActive")
+                      \"Id\", \"UserId\", \"TenantId\", \"RoleId\", \"JoinedAt\", \"IsActive\")
                   VALUES (
                       'e0000000-0000-0000-0000-000000000099',
                       'b0000000-0000-0000-0000-000000000099',
                       'a0000000-0000-0000-0000-000000000099',
                       '1e91a557-fade-46df-b248-0f5f5899c001',
+                      NOW(), true),
+                  (
+                      'e0000000-0000-0000-0000-000000000098',
+                      'b0000000-0000-0000-0000-000000000098',
+                      'a0000000-0000-0000-0000-000000000099',
+                      '1e91a557-fade-46df-b248-0f5f5899c004',
                       NOW(), true)
                   ON CONFLICT DO NOTHING;
                   """;
@@ -311,10 +333,8 @@ public sealed class ApiE2EFixture : IAsyncLifetime
 
     private async Task<string> CreateDatabaseAsync(string databaseName)
     {
-        var adminConnectionString = new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
-        {
-            Database = "postgres"
-        }.ToString();
+        var adminConnectionString = _adminConnectionString
+            ?? throw new InvalidOperationException("PostgreSQL admin connection string was not initialized.");
 
         await using var connection = new NpgsqlConnection(adminConnectionString);
         await connection.OpenAsync();
@@ -331,10 +351,52 @@ public sealed class ApiE2EFixture : IAsyncLifetime
             await createCommand.ExecuteNonQueryAsync();
         }
 
-        return new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
+        return new NpgsqlConnectionStringBuilder(adminConnectionString)
         {
             Database = databaseName
         }.ToString();
+    }
+
+    private async Task<string> StartPostgreSqlAsync()
+    {
+        try
+        {
+            _container = new PostgreSqlBuilder()
+                .WithImage("postgres:16-alpine")
+                .WithDatabase("postgres")
+                .WithUsername("postgres")
+                .WithPassword("postgres")
+                .Build();
+
+            await _container.StartAsync();
+
+            return new NpgsqlConnectionStringBuilder(_container.GetConnectionString())
+            {
+                Database = "postgres"
+            }.ToString();
+        }
+        catch
+        {
+            foreach (var candidate in LocalAdminConnectionCandidates.Where(value => !string.IsNullOrWhiteSpace(value)))
+            {
+                try
+                {
+                    await using var connection = new NpgsqlConnection(candidate);
+                    await connection.OpenAsync();
+                    await using var command = connection.CreateCommand();
+                    command.CommandText = "SELECT 1";
+                    await command.ExecuteScalarAsync();
+                    return candidate;
+                }
+                catch
+                {
+                    // Try next local candidate.
+                }
+            }
+
+            throw new InvalidOperationException(
+                "Neither Docker/Testcontainers nor a local PostgreSQL admin connection is available for RH-6 E2E tests.");
+        }
     }
 
     private async Task WaitForApplicationReadyAsync()

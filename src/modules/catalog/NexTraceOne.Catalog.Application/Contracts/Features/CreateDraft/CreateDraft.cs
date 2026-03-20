@@ -45,7 +45,7 @@ public static class CreateDraft
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository repository,
-        IUnitOfWork unitOfWork,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -67,11 +67,22 @@ public static class CreateDraft
             repository.Add(draft);
             await unitOfWork.CommitAsync(cancellationToken);
 
+            var persistedDraft = (await repository.ListAsync(
+                    DraftStatus.Editing,
+                    request.ServiceId,
+                    request.Author,
+                    1,
+                    20,
+                    cancellationToken))
+                .OrderByDescending(item => item.CreatedAt)
+                .FirstOrDefault(item => item.Title == request.Title && item.Protocol == request.Protocol)
+                ?? draft;
+
             return new Response(
-                draft.Id.Value,
-                draft.Title,
-                draft.Status.ToString(),
-                dateTimeProvider.UtcNow);
+                persistedDraft.Id.Value,
+                persistedDraft.Title,
+                persistedDraft.Status.ToString(),
+                persistedDraft.CreatedAt == default ? dateTimeProvider.UtcNow : persistedDraft.CreatedAt);
         }
     }
 

@@ -18,6 +18,11 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.CreateConversa
 /// </summary>
 public static class CreateConversation
 {
+    private static string ResolveConversationOwner(ICurrentUser currentUser)
+        => !string.IsNullOrWhiteSpace(currentUser.Email)
+            ? currentUser.Email
+            : currentUser.Id;
+
     /// <summary>Comando de criação de conversa do assistente de IA.</summary>
     public sealed record Command(
         string Title,
@@ -57,7 +62,7 @@ public static class CreateConversation
                 request.Persona ?? "Engineer",
                 clientType,
                 request.DefaultContextScope ?? string.Empty,
-                currentUser.Id,
+                ResolveConversationOwner(currentUser),
                 request.ServiceId,
                 request.ContractId,
                 request.IncidentId,

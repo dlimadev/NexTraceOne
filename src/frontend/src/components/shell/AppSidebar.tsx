@@ -12,6 +12,7 @@ import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
+import { isRouteAvailableInFinalProductionScope } from '../../releaseScope';
 import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
   Shield, ClipboardList, BookOpen, AlertTriangle, Clock, UserCheck,
@@ -137,7 +138,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
     });
   };
 
-  const visibleItems = navItems.filter(item => !item.permission || can(item.permission));
+  const visibleItems = navItems.filter(item => isRouteAvailableInFinalProductionScope(item.to) && (!item.permission || can(item.permission)));
   const isHighlighted = (section: NavSection): boolean => config.highlightedSections.includes(section);
 
   return (

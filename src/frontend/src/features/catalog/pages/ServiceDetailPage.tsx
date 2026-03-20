@@ -25,6 +25,7 @@ import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
@@ -69,7 +70,7 @@ const contractLifecycleColors: Record<string, string> = {
 /** Página de detalhe de um serviço do catálogo. */
 export function ServiceDetailPage() {
   const { t } = useTranslation();
-  const { serviceId } = useParams<{ serviceId: string }>();
+  const { serviceId } = useParams<{ serviceId: string}>();
 
   const { data: service, isLoading, isError } = useQuery({
     queryKey: ['catalog-service-detail', serviceId],
@@ -328,7 +329,7 @@ export function ServiceDetailPage() {
                           </td>
                           <td className="px-4 py-3">
                             <Link
-                              to={`/contracts/${contract.versionId}`}
+                              to={`/source-of-truth/contracts/${contract.versionId}`}
                               className="text-xs text-accent hover:underline"
                             >
                               {t('catalog.detail.viewContract')}
@@ -467,7 +468,7 @@ export function ServiceDetailPage() {
             </CardBody>
           </Card>
 
-          {/* Related Changes */}
+          {/* Recent Changes */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -489,7 +490,7 @@ export function ServiceDetailPage() {
             </CardBody>
           </Card>
 
-          {/* Related Incidents */}
+          {isRouteAvailableInFinalProductionScope('/operations/incidents') && (
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -510,6 +511,7 @@ export function ServiceDetailPage() {
               </Link>
             </CardBody>
           </Card>
+          )}
         </div>
       </div>
 

@@ -8,10 +8,72 @@ import type {
   DraftStatus,
 } from '../types';
 
-/**
- * API client para o Contract Studio Enterprise.
- * Endpoints de draft CRUD, review, publicação e geração assistida por IA.
- */
+function readValue<T>(source: Record<string, unknown>, camel: string, pascal?: string): T | undefined {
+  const pascalKey = pascal ?? `${camel.charAt(0).toUpperCase()}${camel.slice(1)}`;
+  return (source[camel] as T | undefined) ?? (source[pascalKey] as T | undefined);
+}
+
+function mapDraft(raw: unknown): ContractDraft {
+  const source = (raw ?? {}) as Record<string, unknown>;
+  const exampleItems = (readValue<unknown[]>(source, 'examples') ?? []);
+
+  return {
+    id: readValue<string>(source, 'id') ?? readValue<string>(source, 'draftId') ?? '',
+    title: readValue<string>(source, 'title') ?? '',
+    description: readValue<string>(source, 'description') ?? '',
+    serviceId: readValue<string>(source, 'serviceId'),
+    contractType: readValue<ContractType>(source, 'contractType') ?? 'RestApi',
+    protocol: readValue<ContractProtocol>(source, 'protocol') ?? 'OpenApi',
+    specContent: readValue<string>(source, 'specContent') ?? '',
+    format: readValue<string>(source, 'format') ?? 'yaml',
+    proposedVersion: readValue<string>(source, 'proposedVersion') ?? '1.0.0',
+    status: readValue<DraftStatus>(source, 'status') ?? 'Editing',
+    author: readValue<string>(source, 'author') ?? '',
+    baseContractVersionId: readValue<string>(source, 'baseContractVersionId'),
+    isAiGenerated: readValue<boolean>(source, 'isAiGenerated') ?? false,
+    aiGenerationPrompt: readValue<string>(source, 'aiGenerationPrompt'),
+    lastEditedAt: readValue<string>(source, 'lastEditedAt'),
+    lastEditedBy: readValue<string>(source, 'lastEditedBy'),
+    createdAt: readValue<string>(source, 'createdAt') ?? '',
+    examples: exampleItems.map((example: unknown) => {
+      const item = example as Record<string, unknown>;
+      return {
+        id: readValue<string>(item, 'id') ?? '',
+        name: readValue<string>(item, 'name') ?? '',
+        description: readValue<string>(item, 'description') ?? '',
+        content: readValue<string>(item, 'content') ?? '',
+        contentFormat: readValue<string>(item, 'contentFormat') ?? '',
+        exampleType: readValue<string>(item, 'exampleType') ?? '',
+        createdBy: readValue<string>(item, 'createdBy') ?? '',
+        createdAt: readValue<string>(item, 'createdAt') ?? '',
+      };
+    }),
+  };
+}
+
+function mapReview(raw: unknown): ContractReviewEntry {
+  const source = (raw ?? {}) as Record<string, unknown>;
+  return {
+    id: readValue<string>(source, 'id') ?? '',
+    draftId: readValue<string>(source, 'draftId') ?? '',
+    reviewedBy: readValue<string>(source, 'reviewedBy') ?? '',
+    decision: readValue<ContractReviewEntry['decision']>(source, 'decision') ?? 'Approved',
+    comment: readValue<string>(source, 'comment') ?? '',
+    reviewedAt: readValue<string>(source, 'reviewedAt') ?? '',
+  };
+}
+
+function mapDraftCreationResult(raw: unknown) {
+  const source = (raw ?? {}) as Record<string, unknown>;
+  return {
+    draftId: readValue<string>(source, 'draftId') ?? '',
+    title: readValue<string>(source, 'title') ?? '',
+    status: readValue<string>(source, 'status') ?? 'Editing',
+    createdAt: readValue<string>(source, 'createdAt') ?? '',
+    generatedContentPreview: readValue<string>(source, 'generatedContentPreview') ?? '',
+  };
+}
+
 export const contractStudioApi = {
   createDraft: (data: {
     title: string;
@@ -21,10 +83,10 @@ export const contractStudioApi = {
     serviceId?: string;
     description?: string;
   }) =>
-    client.post<{ draftId: string; title: string; status: string; createdAt: string }>('/contracts/drafts', data).then(r => r.data),
+    client.post('/contracts/drafts', data).then((r) => mapDraftCreationResult(r.data)),
 
   getDraft: (draftId: string) =>
-    client.get<ContractDraft>(`/contracts/drafts/${draftId}`).then(r => r.data),
+    client.get(`/contracts/drafts/${draftId}`).then((r) => mapDraft(r.data)),
 
   listDrafts: (params?: {
     status?: DraftStatus;
@@ -33,7 +95,15 @@ export const contractStudioApi = {
     page?: number;
     pageSize?: number;
   }) =>
-    client.get<DraftListResponse>('/contracts/drafts', { params }).then(r => r.data),
+    client.get('/contracts/drafts', { params }).then((r) => {
+      const payload = (r.data ?? {}) as Record<string, unknown>;
+      return {
+        items: ((payload.items as unknown[]) ?? []).map(mapDraft),
+        totalCount: (payload.totalCount as number) ?? 0,
+        page: (payload.page as number) ?? 1,
+        pageSize: (payload.pageSize as number) ?? 20,
+      } as DraftListResponse;
+    }),
 
   updateContent: (draftId: string, data: {
     specContent: string;
@@ -71,7 +141,7 @@ export const contractStudioApi = {
     prompt: string;
     serviceId?: string;
   }) =>
-    client.post<{ draftId: string; title: string; generatedContentPreview: string; createdAt: string }>('/contracts/drafts/generate', data).then(r => r.data),
+    client.post('/contracts/drafts/generate', data).then((r) => mapDraftCreationResult(r.data)),
 
   addExample: (draftId: string, data: {
     name: string;
@@ -84,5 +154,5 @@ export const contractStudioApi = {
     client.post<{ exampleId: string }>(`/contracts/drafts/${draftId}/examples`, data).then(r => r.data),
 
   listReviews: (draftId: string) =>
-    client.get<ContractReviewEntry[]>(`/contracts/drafts/${draftId}/reviews`).then(r => r.data),
+    client.get(`/contracts/drafts/${draftId}/reviews`).then((r) => ((r.data as unknown[]) ?? []).map(mapReview)),
 };

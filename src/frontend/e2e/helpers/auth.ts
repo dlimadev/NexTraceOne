@@ -71,6 +71,7 @@ const ENGINEER_PERMISSIONS = [
   'change-intelligence:read',
   'change-intelligence:releases:read',
   'operations:incidents:read',
+  'operations:incidents:write',
   'operations:runbooks:read',
 ];
 

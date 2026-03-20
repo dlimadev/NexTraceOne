@@ -19,6 +19,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
+import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -83,10 +84,12 @@ export function ContractSourceOfTruthPage() {
           <ArrowLeft size={16} />
           <span>{t('sourceOfTruth.contract.backToExplorer')}</span>
         </Link>
+        {isRouteAvailableInFinalProductionScope(`/contracts/${contractVersionId}`) && (
         <Link to={`/contracts/${contractVersionId}`} className="flex items-center gap-1.5 text-sm text-accent hover:text-accent/80 transition-colors">
           <ExternalLink size={14} />
           <span>{t('sourceOfTruth.contract.viewContractDetail')}</span>
         </Link>
+        )}
       </div>
 
       {/* Header */}

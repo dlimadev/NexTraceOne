@@ -16,6 +16,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { globalSearchApi } from '../api/globalSearch';
 import type { SearchResultItem } from '../api/globalSearch';
 import { PageContainer } from '../../../components/shell';
+import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 
 /** Intervalo de debounce para pesquisa (ms). */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -93,7 +94,7 @@ export function GlobalSearchPage() {
   const totalResults = data?.totalResults ?? 0;
 
   /** Resultados da API — já filtrados por scope no backend. */
-  const filteredResults = results;
+  const filteredResults = results.filter((item) => isRouteAvailableInFinalProductionScope(item.route));
 
   return (
     <PageContainer>

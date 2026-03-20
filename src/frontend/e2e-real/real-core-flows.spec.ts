@@ -109,20 +109,29 @@ test.describe('RH-6 real web flows', () => {
     await expect(page.getByText(/correlation refreshed|score:/i)).toBeVisible({ timeout: 30_000 });
   });
 
-  test('ai assistant real: create conversation and receive real backend response or fallback', async ({ page }) => {
+  test('ai assistant real: create conversation, persist messages, reload and reopen the same conversation', async ({ page }) => {
     await loginAsAdmin(page);
 
     await page.goto('/ai/assistant');
     await expect(page.getByRole('heading', { name: /ai assistant/i })).toBeVisible({ timeout: 30_000 });
 
     await page.getByRole('button', { name: /new conversation/i }).first().click();
-    const input = page.getByPlaceholder(/ask questions about your services, contracts, incidents, or changes/i);
-    await input.fill('Summarize the operational risk for Payments Service in production.');
+    const userPrompt = `Summarize the operational risk for Payments Service in production ${randomUUID().slice(0, 8)}`;
+    const input = page.getByPlaceholder(/ask about services, contracts, incidents, changes/i);
+    await input.fill(userPrompt);
     await page.getByRole('button', { name: /send/i }).click();
 
-    await expect(page.getByText(/operational risk for payments service/i)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(userPrompt)).toBeVisible({ timeout: 30_000 });
     await expect(
-      page.getByText(/\[FALLBACK_PROVIDER_UNAVAILABLE\]|Payments Service|Grounding Sources/i).first(),
+      page.getByText(/degraded response|provider unavailable|grounded|partial context|limited context/i).first(),
+    ).toBeVisible({ timeout: 30_000 });
+
+    await page.reload();
+
+    await expect(page).toHaveURL(/conversation=/, { timeout: 30_000 });
+    await expect(page.getByText(userPrompt)).toBeVisible({ timeout: 30_000 });
+    await expect(
+      page.getByText(/degraded response|provider unavailable|grounded|partial context|limited context/i).first(),
     ).toBeVisible({ timeout: 30_000 });
   });
 });

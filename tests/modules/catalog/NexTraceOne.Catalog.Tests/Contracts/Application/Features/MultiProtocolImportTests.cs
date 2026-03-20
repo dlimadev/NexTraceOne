@@ -26,6 +26,8 @@ public sealed class MultiProtocolImportTests
 
     private const string AsyncApiSpec = """{"asyncapi":"2.0.0","info":{"title":"User Events","version":"1.0.0"},"channels":{"user/created":{"publish":{"message":{"payload":{"type":"object","properties":{"userId":{"type":"string"}}}}}}}}""";
 
+    private static IContractsUnitOfWork CreateUnitOfWork() => Substitute.For<IContractsUnitOfWork>();
+
     private const string WsdlSpec =
         """
         <?xml version="1.0" encoding="UTF-8"?>
@@ -51,7 +53,7 @@ public sealed class MultiProtocolImportTests
         ContractProtocol protocol, string format)
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ImportContractFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -79,7 +81,7 @@ public sealed class MultiProtocolImportTests
     public async Task ImportContract_Should_StoreWsdlProtocol_When_XmlFormatSpecified()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ImportContractFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -100,7 +102,7 @@ public sealed class MultiProtocolImportTests
     public async Task ImportContract_Should_DefaultToOpenApi_When_ProtocolNotSpecified()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ImportContractFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -125,7 +127,7 @@ public sealed class MultiProtocolImportTests
         var previous = ContractVersion.Import(apiAssetId, "1.0.0", WsdlSpec, "xml", "upload", ContractProtocol.Wsdl).Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -149,7 +151,7 @@ public sealed class MultiProtocolImportTests
         var previous = ContractVersion.Import(apiAssetId, "1.0.0", OpenApiSpec, "json", "upload", ContractProtocol.OpenApi).Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 

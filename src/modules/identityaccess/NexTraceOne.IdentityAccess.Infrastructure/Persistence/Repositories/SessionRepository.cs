@@ -16,7 +16,7 @@ internal sealed class SessionRepository(IdentityDbContext context)
 {
     /// <inheritdoc />
     public async Task<Session?> GetByRefreshTokenHashAsync(RefreshTokenHash refreshTokenHash, CancellationToken cancellationToken)
-        => await context.Sessions.SingleOrDefaultAsync(x => x.RefreshToken.Value == refreshTokenHash.Value, cancellationToken);
+        => await context.Sessions.SingleOrDefaultAsync(x => x.RefreshToken == refreshTokenHash, cancellationToken);
 
     /// <inheritdoc />
     public async Task<Session?> GetActiveByUserIdAsync(UserId userId, CancellationToken cancellationToken)

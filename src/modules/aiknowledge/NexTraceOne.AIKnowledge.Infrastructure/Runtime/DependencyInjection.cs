@@ -33,7 +33,11 @@ public static class DependencyInjection
         {
             var options = configuration.GetSection(OllamaOptions.SectionName).Get<OllamaOptions>()
                 ?? new OllamaOptions();
-            client.BaseAddress = new Uri(options.BaseUrl);
+            var normalizedBaseUrl = options.BaseUrl.EndsWith("/", StringComparison.Ordinal)
+                ? options.BaseUrl
+                : $"{options.BaseUrl}/";
+
+            client.BaseAddress = new Uri(normalizedBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
         });
 
