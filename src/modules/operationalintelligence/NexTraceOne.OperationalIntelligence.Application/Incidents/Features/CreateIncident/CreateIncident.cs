@@ -1,5 +1,6 @@
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
@@ -42,10 +43,15 @@ public static class CreateIncident
     /// <summary>Handler de criação de incidente com correlação automática inicial.</summary>
     public sealed class Handler(
         IIncidentStore store,
-        IIncidentCorrelationService correlationService) : ICommandHandler<Command, Response>
+        IIncidentCorrelationService correlationService,
+        ICurrentTenant currentTenant,
+        ICurrentEnvironment currentEnvironment) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var tenantId = currentTenant.IsActive ? currentTenant.Id : (Guid?)null;
+            var environmentId = currentEnvironment.IsResolved ? currentEnvironment.EnvironmentId : (Guid?)null;
+
             var created = store.CreateIncident(new CreateIncidentInput(
                 request.Title,
                 request.Description,
@@ -56,7 +62,9 @@ public static class CreateIncident
                 request.OwnerTeam,
                 request.ImpactedDomain,
                 request.Environment,
-                request.DetectedAtUtc));
+                request.DetectedAtUtc,
+                tenantId,
+                environmentId));
 
             var correlation = await correlationService.RecomputeAsync(created.IncidentId.ToString(), cancellationToken);
 

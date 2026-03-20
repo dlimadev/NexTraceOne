@@ -26,6 +26,8 @@ internal sealed class IncidentRecordConfiguration : IEntityTypeConfiguration<Inc
         builder.Property(x => x.OwnerTeam).HasMaxLength(200).IsRequired();
         builder.Property(x => x.ImpactedDomain).HasMaxLength(200);
         builder.Property(x => x.Environment).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.TenantId).HasColumnName("tenant_id");
+        builder.Property(x => x.EnvironmentId).HasColumnName("environment_id");
         builder.Property(x => x.DetectedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.LastUpdatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.HasCorrelation).IsRequired();
@@ -59,5 +61,7 @@ internal sealed class IncidentRecordConfiguration : IEntityTypeConfiguration<Inc
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Severity);
         builder.HasIndex(x => x.DetectedAt);
+        builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_oi_incidents_tenant_id");
+        builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_oi_incidents_tenant_environment");
     }
 }

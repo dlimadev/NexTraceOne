@@ -115,7 +115,9 @@ public sealed record CreateIncidentInput(
     string OwnerTeam,
     string? ImpactedDomain,
     string Environment,
-    DateTimeOffset? DetectedAtUtc);
+    DateTimeOffset? DetectedAtUtc,
+    Guid? TenantId = null,
+    Guid? EnvironmentId = null);
 
 /// <summary>Resultado da criação de incidente.</summary>
 public sealed record CreateIncidentResult(

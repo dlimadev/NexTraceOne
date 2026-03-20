@@ -30,6 +30,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IIncidentStore, EfIncidentStore>();
+        services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
 
         return services;
     }

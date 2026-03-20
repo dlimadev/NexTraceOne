@@ -73,6 +73,21 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// <summary>Descrição ou sumário da mudança.</summary>
     public string? Description { get; private set; }
 
+    // ── Fase 4: Contexto de Tenant/Ambiente ────────────────────────────────
+
+    /// <summary>
+    /// Identificador do tenant ao qual a release pertence.
+    /// Nullable por retrocompatibilidade — releases criadas antes da Fase 4
+    /// não possuem este campo preenchido.
+    /// </summary>
+    public Guid? TenantId { get; private set; }
+
+    /// <summary>
+    /// Identificador do ambiente (infra) de destino da release.
+    /// Nullable por retrocompatibilidade — complementa o campo Environment (string).
+    /// </summary>
+    public Guid? EnvironmentId { get; private set; }
+
     /// <summary>
     /// Cria uma nova release a partir de um evento de deployment recebido do CI/CD.
     /// Validações de negócio mais profundas são feitas no command handler.
@@ -187,6 +202,17 @@ public sealed class Release : AggregateRoot<ReleaseId>
         TeamName = teamName;
         Domain = domain;
         Description = description;
+    }
+
+    /// <summary>
+    /// Define o contexto de tenant e ambiente da release.
+    /// Operação idempotente — apenas atribui se o valor atual for null (??= semantics).
+    /// Garante que o primeiro contexto definido não seja sobrescrito.
+    /// </summary>
+    public void SetTenantContext(Guid? tenantId, Guid? environmentId)
+    {
+        TenantId ??= tenantId;
+        EnvironmentId ??= environmentId;
     }
 
     /// <summary>

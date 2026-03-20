@@ -103,6 +103,14 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid?>("EnvironmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("environment_id");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
                     b.Property<string>("EscalationPath")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
@@ -226,6 +234,12 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.HasIndex("Severity");
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_oi_incidents_tenant_id");
+
+                    b.HasIndex("TenantId", "EnvironmentId")
+                        .HasDatabaseName("ix_oi_incidents_tenant_environment");
 
                     b.ToTable("oi_incidents", (string)null);
                 });

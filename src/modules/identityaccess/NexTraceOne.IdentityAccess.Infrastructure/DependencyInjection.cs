@@ -86,6 +86,7 @@ public static class DependencyInjection
         services.AddScoped<IEnvironmentProfileResolver, EnvironmentProfileResolver>();
         services.AddScoped<IEnvironmentAccessValidator, EnvironmentAccessValidator>();
         services.AddScoped<IOperationalExecutionContext, OperationalExecutionContext>();
+        services.AddScoped<ICurrentEnvironment, CurrentEnvironmentAdapter>();
 
         // Fase 2 — Authorization handlers
         services.AddScoped<IAuthorizationHandler, EnvironmentAccessAuthorizationHandler>();

@@ -502,6 +502,14 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid?>("EnvironmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("environment_id");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
                     b.Property<string>("PipelineSource")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -538,6 +546,12 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasKey("Id");
 
                     b.HasIndex("ApiAssetId");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_ci_releases_tenant_id");
+
+                    b.HasIndex("TenantId", "EnvironmentId")
+                        .HasDatabaseName("ix_ci_releases_tenant_environment");
 
                     b.ToTable("ci_releases", (string)null);
                 });

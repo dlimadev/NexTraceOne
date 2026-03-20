@@ -46,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IObservationWindowRepository, ObservationWindowRepository>();
         services.AddScoped<IPostReleaseReviewRepository, PostReleaseReviewRepository>();
         services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
+        services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
 
         return services;
     }
