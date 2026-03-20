@@ -34,7 +34,8 @@ public static class WebApplicationBuilderExtensions
                 policy.WithOrigins(corsOrigins)
                     .WithHeaders(
                         "Content-Type", "Authorization",
-                        "X-Tenant-Id", "X-Requested-With",
+                        "X-Tenant-Id", "X-Environment-Id", "X-Correlation-Id",
+                        "X-Requested-With",
                         "X-Csrf-Token")
                     .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                     .AllowCredentials());

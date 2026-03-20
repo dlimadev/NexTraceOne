@@ -53,7 +53,8 @@ public static class DependencyInjection
                         NexTraceActivitySources.Queries.Name,
                         NexTraceActivitySources.Events.Name,
                         NexTraceActivitySources.ExternalHttp.Name,
-                        NexTraceActivitySources.TelemetryPipeline.Name)
+                        NexTraceActivitySources.TelemetryPipeline.Name,
+                        NexTraceActivitySources.Integrations.Name)
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation();
 

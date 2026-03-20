@@ -29,4 +29,6 @@ public static class NexTraceActivitySources
     /// Permite rastrear a própria execução dos jobs de consolidação e cleanup.
     /// </summary>
     public static readonly ActivitySource TelemetryPipeline = new("NexTraceOne.TelemetryPipeline");
+    /// <summary>Source para operações de integração com sistemas externos (adapters, webhooks, Kafka).</summary>
+    public static readonly ActivitySource Integrations = new("NexTraceOne.Integrations");
 }
