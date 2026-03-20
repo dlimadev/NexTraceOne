@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './contexts/AuthContext';
+import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { AppShell } from './components/shell/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -131,6 +132,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <EnvironmentProvider>
         <PersonaProvider>
           <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
@@ -749,6 +751,7 @@ export default function App() {
           </Suspense>
           </BrowserRouter>
         </PersonaProvider>
+        </EnvironmentProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider>

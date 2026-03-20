@@ -23,6 +23,17 @@ vi.mock('../../contexts/PersonaContext', () => ({
   }),
 }));
 
+vi.mock('../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn().mockReturnValue({
+    activeEnvironmentId: 'tenant-1-prod',
+    activeEnvironment: { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  }),
+}));
+
 vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
   aiGovernanceApi: { sendMessage: vi.fn().mockRejectedValue(new Error('API not available')) },
 }));

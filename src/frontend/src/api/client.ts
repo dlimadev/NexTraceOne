@@ -16,6 +16,7 @@ import {
   getAccessToken,
   getCsrfToken,
   getTenantId,
+  getEnvironmentId,
   getRefreshToken,
   storeTokens,
   clearAllTokens,
@@ -41,6 +42,11 @@ apiClient.interceptors.request.use((config) => {
   const tenantId = getTenantId();
   if (tenantId) {
     config.headers['X-Tenant-Id'] = tenantId;
+  }
+
+  const environmentId = getEnvironmentId();
+  if (environmentId) {
+    config.headers['X-Environment-Id'] = environmentId;
   }
 
   const method = config.method?.toUpperCase();

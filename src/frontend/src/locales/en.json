@@ -3795,7 +3795,8 @@
       "noDecisionHistory": "No decision history",
       "noContractsLoaded": "No contracts loaded",
       "noVersionHistory": "No version history available"
-    }
+    },
+    "analyzingNonProd": "Analyzing {{environment}} (non-production)"
   },
   "domainBadges": {
     "confidence": {
@@ -3863,6 +3864,20 @@
       "integrations": "Integrations is excluded from the final release because it is still preview-only.",
       "analytics": "Product Analytics is excluded from the final release because it is still partial and preview-only.",
       "platformOperations": "Platform Operations is excluded from the final release because it still exposes demonstration data."
+    }
+  },
+  "environment": {
+    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) — this is a non-production environment.",
+    "select": "Select Environment",
+    "active": "Active Environment",
+    "profile": {
+      "production": "Production",
+      "staging": "Staging",
+      "uat": "UAT",
+      "qa": "QA",
+      "development": "Development",
+      "sandbox": "Sandbox",
+      "unknown": "Unknown"
     }
   }
 }

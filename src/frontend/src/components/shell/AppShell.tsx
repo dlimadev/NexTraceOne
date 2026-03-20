@@ -6,6 +6,7 @@ import { AppSidebar } from './AppSidebar';
 import { AppTopbar } from './AppTopbar';
 import { AppContentFrame } from './AppContentFrame';
 import { MobileDrawer } from './MobileDrawer';
+import { EnvironmentBanner } from './EnvironmentBanner';
 import { cn } from '../../lib/cn';
 import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
 
@@ -87,6 +88,7 @@ export function AppShell() {
           onOpenMobileMenu={openMobile}
           sidebarCollapsed={sidebarCollapsed}
         />
+        <EnvironmentBanner />
         <AppContentFrame>
           <Outlet />
         </AppContentFrame>

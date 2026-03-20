@@ -2875,7 +2875,8 @@
     "suggestedSteps": "Próximos pasos recomendados",
     "caveatsLabel": "Limitaciones de contexto",
     "fallbackCaveat": "Proveedor de IA no disponible. Esta respuesta es un fallback determinista y puede no reflejar datos reales.",
-    "noContextWarning": "Contexto limitado disponible. La respuesta puede no reflejar el estado actual de esta entidad."
+    "noContextWarning": "Contexto limitado disponible. La respuesta puede no reflejar el estado actual de esta entidad.",
+    "analyzingNonProd": "Analizando {{environment}} (no productivo)"
   },
   "shell": {
     "sidebarNav": "Navegación lateral",
@@ -2905,6 +2906,20 @@
       "integrations": "Integrations quedó fuera del release final porque sigue siendo solo preview.",
       "analytics": "Product Analytics quedó fuera del release final porque sigue siendo parcial y preview.",
       "platformOperations": "Platform Operations quedó fuera del release final porque todavía expone datos de demostración."
+    }
+  },
+  "environment": {
+    "nonProductionBanner": "Está operando en {{name}} ({{profile}}) — este es un entorno no productivo.",
+    "select": "Seleccionar Entorno",
+    "active": "Entorno Activo",
+    "profile": {
+      "production": "Producción",
+      "staging": "Staging",
+      "uat": "UAT",
+      "qa": "QA",
+      "development": "Desarrollo",
+      "sandbox": "Sandbox",
+      "unknown": "Desconocido"
     }
   }
 }

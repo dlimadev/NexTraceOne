@@ -16,6 +16,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -74,6 +75,7 @@ export function IncidentDetailPage() {
   const { t } = useTranslation();
   const { incidentId } = useParams<{ incidentId: string }>();
   const queryClient = useQueryClient();
+  const { activeEnvironment } = useEnvironment();
   const [refreshFeedback, setRefreshFeedback] = useState<string | null>(null);
 
   const detailQuery = useQuery({
@@ -542,6 +544,9 @@ export function IncidentDetailPage() {
               ...(!correlation.relatedChanges?.length ? [t('assistantPanel.contextCaveats.noCorrelatedChanges')] : []),
             ].filter(Boolean),
           }}
+          activeEnvironmentId={activeEnvironment?.id}
+          activeEnvironmentName={activeEnvironment?.name}
+          isNonProductionEnvironment={activeEnvironment ? !activeEnvironment.isProductionLike : false}
         />
       </div>
     </PageContainer>

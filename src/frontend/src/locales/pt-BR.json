@@ -2188,5 +2188,22 @@
       "analytics": "Product Analytics ficou fora do release final porque continua parcial e em preview.",
       "platformOperations": "Platform Operations ficou fora do release final porque ainda expõe dados de demonstração."
     }
+  },
+  "environment": {
+    "nonProductionBanner": "Você está operando em {{name}} ({{profile}}) — este é um ambiente não produtivo.",
+    "select": "Selecionar Ambiente",
+    "active": "Ambiente Ativo",
+    "profile": {
+      "production": "Produção",
+      "staging": "Homologação",
+      "uat": "UAT",
+      "qa": "QA",
+      "development": "Desenvolvimento",
+      "sandbox": "Sandbox",
+      "unknown": "Desconhecido"
+    }
+  },
+  "assistantPanel": {
+    "analyzingNonProd": "Analisando {{environment}} (não produtivo)"
   }
 }

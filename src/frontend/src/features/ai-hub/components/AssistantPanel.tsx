@@ -64,6 +64,12 @@ export interface AssistantPanelProps {
   contextId: string;
   contextSummary: ContextSummary;
   contextData?: ContextData;
+  /** Contexto de ambiente ativo — passado opcionalmente pelo host para grounding da IA */
+  activeEnvironmentId?: string;
+  /** Nome do ambiente ativo para exibição */
+  activeEnvironmentName?: string;
+  /** Indica se o ambiente é não produtivo — exibe aviso no painel */
+  isNonProductionEnvironment?: boolean;
 }
 
 interface ChatMessage {
@@ -353,7 +359,7 @@ function generateContextualResponse(
  *
  * @see docs/AI-ASSISTED-OPERATIONS.md
  */
-export function AssistantPanel({ contextType, contextId, contextSummary, contextData }: AssistantPanelProps) {
+export function AssistantPanel({ contextType, contextId, contextSummary, contextData, activeEnvironmentId: _activeEnvironmentId, activeEnvironmentName, isNonProductionEnvironment }: AssistantPanelProps) {
   const { t } = useTranslation();
   const { persona } = usePersona();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -657,6 +663,12 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
             <p className="text-[10px] text-muted">
               {t(`assistantPanel.contextLabel.${contextType}`)}: {contextSummary.name}
             </p>
+            {isNonProductionEnvironment && activeEnvironmentName && (
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 mt-2">
+                <AlertTriangle size={11} />
+                <span>{t('assistantPanel.analyzingNonProd', { environment: activeEnvironmentName })}</span>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2">

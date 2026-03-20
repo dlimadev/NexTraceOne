@@ -24,6 +24,7 @@ import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
@@ -69,6 +70,7 @@ const contractLifecycleColors: Record<string, string> = {
 export function ServiceDetailPage() {
   const { t } = useTranslation();
   const { serviceId } = useParams<{ serviceId: string}>();
+  const { activeEnvironment } = useEnvironment();
 
   const { data: service, isLoading, isError } = useQuery({
     queryKey: ['catalog-service-detail', serviceId],
@@ -560,6 +562,9 @@ export function ServiceDetailPage() {
               ...(!contracts.length ? [t('assistantPanel.contextCaveats.noContractsLoaded')] : []),
             ].filter(Boolean),
           }}
+          activeEnvironmentId={activeEnvironment?.id}
+          activeEnvironmentName={activeEnvironment?.name}
+          isNonProductionEnvironment={activeEnvironment ? !activeEnvironment.isProductionLike : false}
         />
       </div>
     </div>

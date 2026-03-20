@@ -3047,7 +3047,8 @@
       "noDecisionHistory": "Sem histórico de decisões",
       "noContractsLoaded": "Sem contratos carregados",
       "noVersionHistory": "Sem histórico de versões disponível"
-    }
+    },
+    "analyzingNonProd": "A analisar {{environment}} (não produtivo)"
   },
   "domainBadges": {
     "confidence": {
@@ -3115,6 +3116,20 @@
       "integrations": "Integrations ficou fora do release final porque continua apenas em preview.",
       "analytics": "Product Analytics ficou fora do release final porque continua parcial e em preview.",
       "platformOperations": "Platform Operations ficou fora do release final porque ainda expõe dados de demonstração."
+    }
+  },
+  "environment": {
+    "nonProductionBanner": "Está a operar em {{name}} ({{profile}}) — este é um ambiente não produtivo.",
+    "select": "Selecionar Ambiente",
+    "active": "Ambiente Ativo",
+    "profile": {
+      "production": "Produção",
+      "staging": "Homologação",
+      "uat": "UAT",
+      "qa": "QA",
+      "development": "Desenvolvimento",
+      "sandbox": "Sandbox",
+      "unknown": "Desconhecido"
     }
   }
 }
