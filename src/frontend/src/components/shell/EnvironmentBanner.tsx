@@ -27,6 +27,7 @@ export function EnvironmentBanner() {
     <div
       role="status"
       aria-live="polite"
+      aria-atomic="true"
       className={cn(
         'flex items-center gap-2 px-4 py-2 text-xs',
         'bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-300',

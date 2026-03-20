@@ -61,39 +61,39 @@ export const EnvironmentContext = createContext<EnvironmentContextValue | null>(
 // TODO Phase 7: Replace with real API call to GET /api/v1/identity/environments?tenantId=X
 // The backend already has EnvironmentResolutionMiddleware and X-Environment-Id header support
 // from Phase 2. This mock respects the contract: N environments per tenant, no hardcoded enum.
-function loadEnvironmentsForTenant(_tenantId: string | null): EnvironmentOption[] {
-  if (!_tenantId) return [];
+function loadEnvironmentsForTenant(tenantId: string | null): EnvironmentOption[] {
+  if (!tenantId) return [];
   // Returns a realistic multi-environment set — not 3 hardcoded envs.
   // Real data will come from the backend in Phase 7.
   return [
     {
-      id: `${_tenantId}-prod`,
+      id: `${tenantId}-prod`,
       name: 'Production',
       profile: 'production',
       isProductionLike: true,
       isDefault: false,
     },
     {
-      id: `${_tenantId}-staging`,
+      id: `${tenantId}-staging`,
       name: 'Staging',
       profile: 'staging',
       isProductionLike: true,
     },
     {
-      id: `${_tenantId}-uat`,
+      id: `${tenantId}-uat`,
       name: 'UAT',
       profile: 'uat',
       isProductionLike: false,
     },
     {
-      id: `${_tenantId}-qa`,
+      id: `${tenantId}-qa`,
       name: 'QA',
       profile: 'qa',
       isProductionLike: false,
       isDefault: true,
     },
     {
-      id: `${_tenantId}-dev`,
+      id: `${tenantId}-dev`,
       name: 'Development',
       profile: 'development',
       isProductionLike: false,
