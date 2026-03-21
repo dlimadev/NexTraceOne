@@ -9,6 +9,7 @@ using NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
 using NexTraceOne.AuditCompliance.Infrastructure.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure;
@@ -24,11 +25,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("AuditDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'AuditDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("AuditDatabase", "NexTraceOne");
 
         services.AddDbContext<AuditDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

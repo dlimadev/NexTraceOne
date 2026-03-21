@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.Workflow.ServiceInterfaces;
@@ -26,11 +27,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("WorkflowDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'WorkflowDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("WorkflowDatabase", "NexTraceOne");
 
         services.AddDbContext<WorkflowDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

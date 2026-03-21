@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
 using UpdateDeploymentStateFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState.UpdateDeploymentState;
@@ -34,7 +35,7 @@ internal static class DeploymentEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/releases/{0}", localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapPut("/{releaseId:guid}/status", async (
             Guid releaseId,
@@ -46,7 +47,7 @@ internal static class DeploymentEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapPost("/{releaseId:guid}/rollback", async (
             Guid releaseId,
@@ -58,6 +59,6 @@ internal static class DeploymentEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
     }
 }

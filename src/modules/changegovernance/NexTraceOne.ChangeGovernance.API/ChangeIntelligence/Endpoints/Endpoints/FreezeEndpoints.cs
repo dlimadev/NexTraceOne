@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using CreateFreezeWindowFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CreateFreezeWindow.CreateFreezeWindow;
 using CheckFreezeConflictFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CheckFreezeConflict.CheckFreezeConflict;
@@ -33,7 +34,7 @@ internal static class FreezeEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapGet("/check", async (
             [AsParameters] CheckFreezeConflictRequest request,
@@ -44,7 +45,7 @@ internal static class FreezeEndpoints
             var query = new CheckFreezeConflictFeature.Query(request.At, request.Environment);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
     }
 }
 

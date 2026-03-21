@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using RegisterExternalMarkerFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker.RegisterExternalMarker;
 using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
@@ -39,7 +40,7 @@ internal static class IntelligenceEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapGet("/{releaseId:guid}/intelligence", async (
             Guid releaseId,
@@ -49,7 +50,7 @@ internal static class IntelligenceEndpoints
         {
             var result = await sender.Send(new GetChangeIntelligenceSummaryFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
 
         group.MapPost("/{releaseId:guid}/baseline", async (
             Guid releaseId,
@@ -61,7 +62,7 @@ internal static class IntelligenceEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapPost("/{releaseId:guid}/review/start", async (
             Guid releaseId,
@@ -71,7 +72,7 @@ internal static class IntelligenceEndpoints
         {
             var result = await sender.Send(new StartPostReleaseReviewFeature.Command(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapPost("/{releaseId:guid}/review/progress", async (
             Guid releaseId,
@@ -83,7 +84,7 @@ internal static class IntelligenceEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapPost("/{releaseId:guid}/rollback-assessment", async (
             Guid releaseId,
@@ -95,6 +96,6 @@ internal static class IntelligenceEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
     }
 }

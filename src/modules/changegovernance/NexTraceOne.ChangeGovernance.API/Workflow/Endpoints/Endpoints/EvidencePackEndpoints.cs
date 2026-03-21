@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GenerateEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack.GenerateEvidencePack;
 using GetEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetEvidencePack.GetEvidencePack;
@@ -36,7 +37,7 @@ internal static class EvidencePackEndpoints
             var updatedCommand = command with { WorkflowInstanceId = instanceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToCreatedResult("/api/v1/workflow/{0}/evidence-pack", localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
 
         group.MapGet("/{instanceId:guid}/evidence-pack", async (
             Guid instanceId,
@@ -46,7 +47,7 @@ internal static class EvidencePackEndpoints
         {
             var result = await sender.Send(new GetEvidencePackFeature.Query(instanceId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:read");
 
         group.MapGet("/{instanceId:guid}/evidence-pack/export", async (
             Guid instanceId,
@@ -56,6 +57,6 @@ internal static class EvidencePackEndpoints
         {
             var result = await sender.Send(new ExportEvidencePackPdfFeature.Query(instanceId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:read");
     }
 }

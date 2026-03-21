@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using CreateWorkflowTemplateFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate.CreateWorkflowTemplate;
 
@@ -31,6 +32,6 @@ internal static class TemplateEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/workflow/templates/{0}", localizer);
-        });
+        }).RequirePermission("workflow:templates:write");
     }
 }

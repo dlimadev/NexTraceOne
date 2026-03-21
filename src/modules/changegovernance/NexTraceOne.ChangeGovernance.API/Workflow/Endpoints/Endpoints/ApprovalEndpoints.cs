@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using InitiateWorkflowFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflow.InitiateWorkflow;
 using ApproveStageFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ApproveStage.ApproveStage;
@@ -36,7 +37,7 @@ internal static class ApprovalEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/workflow/{0}", localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
 
         group.MapPost("/stages/{stageId:guid}/approve", async (
             Guid stageId,
@@ -48,7 +49,7 @@ internal static class ApprovalEndpoints
             var updatedCommand = command with { StageId = stageId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
 
         group.MapPost("/{instanceId:guid}/reject", async (
             Guid instanceId,
@@ -60,7 +61,7 @@ internal static class ApprovalEndpoints
             var updatedCommand = command with { InstanceId = instanceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
 
         group.MapPost("/{instanceId:guid}/stages/{stageId:guid}/request-changes", async (
             Guid instanceId,
@@ -73,7 +74,7 @@ internal static class ApprovalEndpoints
             var updatedCommand = command with { InstanceId = instanceId, StageId = stageId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
 
         group.MapPost("/{instanceId:guid}/stages/{stageId:guid}/observation", async (
             Guid instanceId,
@@ -86,6 +87,6 @@ internal static class ApprovalEndpoints
             var updatedCommand = command with { InstanceId = instanceId, StageId = stageId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
     }
 }
