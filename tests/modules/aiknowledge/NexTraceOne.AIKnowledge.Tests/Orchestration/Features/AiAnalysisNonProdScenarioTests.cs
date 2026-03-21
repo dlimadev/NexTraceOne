@@ -131,8 +131,10 @@ public sealed class AiAnalysisNonProdScenarioTests
             TenantId: "tenant-acme-001",
             SourceEnvironmentId: "env-staging-001",
             SourceEnvironmentName: "Staging",
+            SourceIsProductionLike: false,
             TargetEnvironmentId: "env-prod-001",
             TargetEnvironmentName: "Production",
+            TargetIsProductionLike: true,
             ServiceName: "payment-service",
             Version: "2.1.0",
             ReleaseId: "rel-789",
@@ -166,7 +168,7 @@ public sealed class AiAnalysisNonProdScenarioTests
 
         var handler = new AssessPromotionReadiness.Handler(_routingPort, _dateTimeProvider, _readinessLogger);
         var command = new AssessPromotionReadiness.Command(
-            "tenant-acme-001", "env-staging-001", "Staging", "env-prod-001", "Production",
+            "tenant-acme-001", "env-staging-001", "Staging", false, "env-prod-001", "Production", true,
             "api-gateway", "1.5.0", null, 7, null);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -242,7 +244,7 @@ public sealed class AiAnalysisNonProdScenarioTests
 
         var handler = new AssessPromotionReadiness.Handler(_routingPort, _dateTimeProvider, _readinessLogger);
         var command = new AssessPromotionReadiness.Command(
-            "tenant-acme-001", "env-qa-001", "QA", "env-prod-001", "Production",
+            "tenant-acme-001", "env-qa-001", "QA", false, "env-prod-001", "Production", true,
             "inventory-service", "4.0.0", "rel-release-final-001", 14, null);
 
         var result = await handler.Handle(command, CancellationToken.None);

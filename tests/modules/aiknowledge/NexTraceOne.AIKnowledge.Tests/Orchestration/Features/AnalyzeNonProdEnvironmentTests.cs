@@ -144,4 +144,54 @@ public sealed class AnalyzeNonProdEnvironmentTests
         validationResult.IsValid.Should().BeFalse();
         validationResult.Errors.Should().Contain(e => e.PropertyName == nameof(AnalyzeNonProdEnvironment.Command.TenantId));
     }
+
+    [Theory]
+    [InlineData("production")]
+    [InlineData("PRODUCTION")]
+    [InlineData("disasterrecovery")]
+    [InlineData("DisasterRecovery")]
+    [InlineData("DR")]
+    public void Validate_ShouldFail_WhenEnvironmentProfileIsProductionLike(string profile)
+    {
+        var validator = new AnalyzeNonProdEnvironment.Validator();
+        var command = new AnalyzeNonProdEnvironment.Command(
+            TenantId: SampleTenantId,
+            EnvironmentId: SampleEnvId,
+            EnvironmentName: "Production",
+            EnvironmentProfile: profile,
+            ServiceFilter: null,
+            ObservationWindowDays: 7,
+            PreferredProvider: null);
+
+        var result = validator.Validate(command);
+
+        result.IsValid.Should().BeFalse(
+            $"EnvironmentProfile '{profile}' is production-like and must be rejected by non-prod analysis.");
+        result.Errors.Should().Contain(e =>
+            e.PropertyName == nameof(AnalyzeNonProdEnvironment.Command.EnvironmentProfile));
+    }
+
+    [Theory]
+    [InlineData("qa")]
+    [InlineData("staging")]
+    [InlineData("development")]
+    [InlineData("uat")]
+    [InlineData("sandbox")]
+    public void Validate_ShouldPass_WhenEnvironmentProfileIsNonProduction(string profile)
+    {
+        var validator = new AnalyzeNonProdEnvironment.Validator();
+        var command = new AnalyzeNonProdEnvironment.Command(
+            TenantId: SampleTenantId,
+            EnvironmentId: SampleEnvId,
+            EnvironmentName: "QA",
+            EnvironmentProfile: profile,
+            ServiceFilter: null,
+            ObservationWindowDays: 7,
+            PreferredProvider: null);
+
+        var result = validator.Validate(command);
+
+        result.IsValid.Should().BeTrue(
+            $"EnvironmentProfile '{profile}' is non-production and should be accepted.");
+    }
 }
