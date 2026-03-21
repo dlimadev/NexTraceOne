@@ -33,9 +33,9 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
     [Fact]
     public async Task DeveloperPortal_Should_Have_Tables_After_Migrations()
     {
-        var subscriptionsExist = await Fixture.TableExistsAsync(Fixture.DeveloperPortalConnectionString, "portal_subscriptions");
+        var subscriptionsExist = await Fixture.TableExistsAsync(Fixture.DeveloperPortalConnectionString, "dp_subscriptions");
 
-        subscriptionsExist.Should().BeTrue("portal_subscriptions deve ser criada pela migration DeveloperPortal");
+        subscriptionsExist.Should().BeTrue("dp_subscriptions deve ser criada pela migration DeveloperPortal");
     }
 
     [Fact]
@@ -374,18 +374,16 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         allEvents.Should().Be(3);
     }
 
-    // ── Cross-database: OI contexts share same database ───────────────────────
+    // ── Cross-database: OI contexts have isolated databases ───────────────────
 
     [Fact]
-    public async Task OperationalIntelligence_ThreeContexts_Share_SameDatabase_And_Coexist()
+    public async Task OperationalIntelligence_ThreeContexts_Have_Migrations_And_Coexist()
     {
         await ResetStateAsync();
 
-        var incidentCtx = Fixture.CreateIncidentDbContext();
         var runtimeCtx = Fixture.CreateRuntimeIntelligenceDbContext();
         var costCtx = Fixture.CreateCostIntelligenceDbContext();
 
-        await using (incidentCtx)
         await using (runtimeCtx)
         await using (costCtx)
         {
@@ -406,10 +404,16 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
             await costCtx.SaveChangesAsync();
         }
 
-        // All 3 contexts share incidents database — verify migration count > 1
-        var migrationsCount = await Fixture.GetAppliedMigrationsCountAsync(Fixture.IncidentsConnectionString);
-        migrationsCount.Should().BeGreaterThan(1,
-            "porque IncidentDbContext, RuntimeIntelligenceDbContext e CostIntelligenceDbContext " +
-            "todos aplicaram migrations na mesma base de dados operacional");
+        // Each context has its own isolated database — verify each has migrations applied
+        var incidentMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.IncidentsConnectionString);
+        var runtimeMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.RuntimeIntelligenceConnectionString);
+        var costMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.CostIntelligenceConnectionString);
+
+        incidentMigrations.Should().BeGreaterThan(0,
+            "IncidentDbContext deve ter migrations aplicadas na sua base isolada");
+        runtimeMigrations.Should().BeGreaterThan(0,
+            "RuntimeIntelligenceDbContext deve ter migrations aplicadas na sua base isolada");
+        costMigrations.Should().BeGreaterThan(0,
+            "CostIntelligenceDbContext deve ter migrations aplicadas na sua base isolada");
     }
 }
