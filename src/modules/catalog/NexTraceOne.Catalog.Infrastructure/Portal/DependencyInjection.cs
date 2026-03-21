@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Contracts.Portal.ServiceInterfaces;
@@ -30,11 +31,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("DeveloperPortalDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'DeveloperPortalDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("DeveloperPortalDatabase", "NexTraceOne");
 
         services.AddDbContext<DeveloperPortalDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

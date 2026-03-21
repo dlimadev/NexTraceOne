@@ -8,6 +8,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration;
@@ -24,11 +25,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("AiOrchestrationDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'AiOrchestrationDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("AiOrchestrationDatabase", "NexTraceOne");
 
         services.AddDbContext<AiOrchestrationDbContext>((serviceProvider, options) =>
         {

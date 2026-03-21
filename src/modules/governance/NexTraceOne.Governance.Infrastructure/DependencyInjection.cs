@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
@@ -24,11 +25,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("GovernanceDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'GovernanceDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("GovernanceDatabase", "NexTraceOne");
 
         services.AddDbContext<GovernanceDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

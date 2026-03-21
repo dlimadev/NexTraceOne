@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
 using ListReleasesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases.ListReleases;
@@ -33,7 +34,7 @@ internal static class ReleaseQueryEndpoints
         {
             var result = await sender.Send(new GetReleaseFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
 
         group.MapGet("/", async (
             Guid apiAssetId,
@@ -45,7 +46,7 @@ internal static class ReleaseQueryEndpoints
         {
             var result = await sender.Send(new ListReleasesFeature.Query(apiAssetId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
 
         group.MapGet("/{apiAssetId:guid}/history", async (
             Guid apiAssetId,
@@ -57,6 +58,6 @@ internal static class ReleaseQueryEndpoints
         {
             var result = await sender.Send(new GetReleaseHistoryFeature.Query(apiAssetId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
     }
 }

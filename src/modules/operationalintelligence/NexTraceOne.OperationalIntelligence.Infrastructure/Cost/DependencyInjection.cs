@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
@@ -25,11 +26,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("CostIntelligenceDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'CostIntelligenceDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("CostIntelligenceDatabase", "NexTraceOne");
 
         services.AddDbContext<CostIntelligenceDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

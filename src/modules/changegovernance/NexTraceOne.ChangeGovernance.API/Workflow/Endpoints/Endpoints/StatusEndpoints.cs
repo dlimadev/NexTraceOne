@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GetWorkflowStatusFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetWorkflowStatus.GetWorkflowStatus;
 using ListPendingApprovalsFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals.ListPendingApprovals;
@@ -34,7 +35,7 @@ internal static class StatusEndpoints
         {
             var result = await sender.Send(new GetWorkflowStatusFeature.Query(instanceId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:read");
 
         group.MapGet("/pending-approvals", async (
             string approverUserId,
@@ -46,7 +47,7 @@ internal static class StatusEndpoints
         {
             var result = await sender.Send(new ListPendingApprovalsFeature.Query(approverUserId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:read");
 
         group.MapPost("/{instanceId:guid}/escalate-sla", async (
             Guid instanceId,
@@ -58,6 +59,6 @@ internal static class StatusEndpoints
             var updatedCommand = command with { WorkflowInstanceId = instanceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("workflow:instances:write");
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI;
@@ -22,11 +23,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksInfrastructure(configuration);
 
-        var connectionString = configuration.GetConnectionString("ExternalAiDatabase")
-            ?? configuration.GetConnectionString("NexTraceOne")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'ExternalAiDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
+        var connectionString = configuration.GetRequiredConnectionString("ExternalAiDatabase", "NexTraceOne");
 
         services.AddDbContext<ExternalAiDbContext>((serviceProvider, options) =>
         {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
 using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius.CalculateBlastRadius;
@@ -39,7 +40,7 @@ internal static class AnalysisEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapPost("/{releaseId:guid}/blast-radius", async (
             Guid releaseId,
@@ -51,7 +52,7 @@ internal static class AnalysisEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapGet("/{releaseId:guid}/blast-radius", async (
             Guid releaseId,
@@ -61,7 +62,7 @@ internal static class AnalysisEndpoints
         {
             var result = await sender.Send(new GetBlastRadiusReportFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
 
         group.MapPost("/{releaseId:guid}/score", async (
             Guid releaseId,
@@ -73,7 +74,7 @@ internal static class AnalysisEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
 
         group.MapGet("/{releaseId:guid}/score", async (
             Guid releaseId,
@@ -83,7 +84,7 @@ internal static class AnalysisEndpoints
         {
             var result = await sender.Send(new GetChangeScoreFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:read");
 
         group.MapPut("/{releaseId:guid}/workitem", async (
             Guid releaseId,
@@ -95,6 +96,6 @@ internal static class AnalysisEndpoints
             var updatedCommand = command with { ReleaseId = releaseId };
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        });
+        }).RequirePermission("change-intelligence:write");
     }
 }

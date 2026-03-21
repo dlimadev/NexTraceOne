@@ -9,12 +9,20 @@ namespace NexTraceOne.ApiHost;
 /// Validação de configuração crítica durante o arranque da aplicação.
 /// Garante que secções obrigatórias existem antes do host aceitar tráfego.
 /// Em ambientes não-Development, valida também que Jwt:Secret está preenchido
+/// e tem comprimento mínimo para operação segura com HS256 (32 caracteres = 32 bytes de material de chave),
 /// e que connection strings não estão vazias.
 /// </summary>
 public static class StartupValidation
 {
     private static readonly string[] CriticalSections = ["ConnectionStrings", "Jwt"];
     private static readonly string[] OptionalSections = ["NexTraceOne", "Serilog", "OpenTelemetry"];
+
+    /// <summary>
+    /// Comprimento mínimo do Jwt:Secret para garantir material de chave adequado para HS256.
+    /// 32 caracteres ASCII = 32 bytes de material de chave, o mínimo para HMAC-SHA256.
+    /// Para alta entropia real, gerar com: openssl rand -base64 48
+    /// </summary>
+    private const int MinimumJwtSecretLength = 32;
 
     /// <summary>
     /// Valida que as secções de configuração críticas existem.
@@ -58,17 +66,7 @@ public static class StartupValidation
         }
 
         // Validação de Jwt:Secret em ambientes não-Development
-        if (!app.Environment.IsDevelopment())
-        {
-            var jwtSecret = configuration["Jwt:Secret"];
-            if (string.IsNullOrWhiteSpace(jwtSecret))
-            {
-                logger.LogCritical("Jwt:Secret is empty in non-Development environment. Authentication will fail. Aborting startup.");
-                throw new InvalidOperationException(
-                    "NexTraceOne startup aborted: Jwt:Secret must be configured in non-Development environments. " +
-                    "Set the Jwt:Secret configuration value via environment variables or a secrets manager.");
-            }
-        }
+        ValidateJwtSecret(app, configuration, logger);
 
         // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
@@ -104,5 +102,67 @@ public static class StartupValidation
             validationResult);
 
         return app;
+    }
+
+    /// <summary>
+    /// Valida a configuração do Jwt:Secret com critérios de segurança por ambiente.
+    /// Em Development: avisa se ausente, mas permite continuar com placeholder.
+    /// Em Staging/Production: falha se ausente, nulo, whitespace ou curto demais.
+    /// </summary>
+    private static void ValidateJwtSecret(WebApplication app, IConfiguration configuration, ILogger logger)
+    {
+        var jwtSecret = configuration["Jwt:Secret"];
+
+        if (app.Environment.IsDevelopment())
+        {
+            if (string.IsNullOrWhiteSpace(jwtSecret))
+            {
+                logger.LogWarning(
+                    "Jwt:Secret is not configured in Development environment. " +
+                    "Set 'Jwt:Secret' in appsettings.Development.json or via dotnet user-secrets for local use. " +
+                    "This would block startup in non-Development environments.");
+            }
+            else if (jwtSecret.Length < MinimumJwtSecretLength)
+            {
+                logger.LogWarning(
+                    "Jwt:Secret is {Length} characters in Development — below the recommended minimum of {Min}. " +
+                    "Use a secret with at least {Min} characters for adequate key material in HS256.",
+                    jwtSecret.Length,
+                    MinimumJwtSecretLength);
+            }
+
+            return;
+        }
+
+        // Staging / Production: secret must be present, non-whitespace and meet minimum length
+        if (string.IsNullOrWhiteSpace(jwtSecret))
+        {
+            logger.LogCritical(
+                "Jwt:Secret is absent or empty in {Environment} environment. Authentication will fail. Aborting startup.",
+                app.Environment.EnvironmentName);
+            throw new InvalidOperationException(
+                $"NexTraceOne startup aborted: Jwt:Secret must be configured in {app.Environment.EnvironmentName} environments. " +
+                "Set the 'Jwt__Secret' environment variable or provision it via a secrets manager " +
+                $"(minimum {MinimumJwtSecretLength} characters required for HS256 key material).");
+        }
+
+        if (jwtSecret.Length < MinimumJwtSecretLength)
+        {
+            logger.LogCritical(
+                "Jwt:Secret is {Length} characters — below the required minimum of {Min} in {Environment} environment. Aborting startup.",
+                jwtSecret.Length,
+                MinimumJwtSecretLength,
+                app.Environment.EnvironmentName);
+            throw new InvalidOperationException(
+                $"NexTraceOne startup aborted: Jwt:Secret in {app.Environment.EnvironmentName} must be at least " +
+                $"{MinimumJwtSecretLength} characters long to provide adequate key material for HS256. " +
+                "Provide a cryptographically strong secret via the 'Jwt__Secret' environment variable " +
+                "(generate with: openssl rand -base64 48).");
+        }
+
+        logger.LogInformation(
+            "Jwt:Secret validated — length {Length} characters, adequate for HS256, environment {Environment}.",
+            jwtSecret.Length,
+            app.Environment.EnvironmentName);
     }
 }
