@@ -24,6 +24,49 @@ import type {
   AccessReviewCampaignDetail,
 } from '../../../types';
 
+/** Ambiente retornado pela API de gestão de ambientes. */
+export interface EnvironmentItem {
+  id: string;
+  name: string;
+  slug: string;
+  sortOrder: number;
+  isActive: boolean;
+  profile: string;
+  criticality?: string;
+  isProductionLike: boolean;
+  isPrimaryProduction: boolean;
+  code?: string;
+  region?: string;
+  description?: string;
+}
+
+/** Payload para criação de ambiente. */
+export interface CreateEnvironmentRequest {
+  name: string;
+  slug: string;
+  sortOrder: number;
+  profile: string;
+  criticality: string;
+  code?: string;
+  description?: string;
+  region?: string;
+  isProductionLike?: boolean;
+  isPrimaryProduction: boolean;
+}
+
+/** Payload para atualização de ambiente. */
+export interface UpdateEnvironmentRequest {
+  environmentId?: string;
+  name: string;
+  sortOrder: number;
+  profile: string;
+  criticality: string;
+  code?: string;
+  description?: string;
+  region?: string;
+  isProductionLike?: boolean;
+}
+
 /**
  * Cliente de API do módulo Identity.
  * Cobre autenticação, gestão de usuários, papéis, permissões, sessões,
@@ -215,4 +258,21 @@ export const identityApi = {
 
   decideAccessReviewItem: (campaignId: string, itemId: string, approve: boolean, comment?: string) =>
     client.post(`/identity/access-reviews/${encodeURIComponent(campaignId)}/items/${encodeURIComponent(itemId)}/decide`, { approve, comment }),
+
+  // ── Environments ─────────────────────────────────────────────
+  listEnvironments: () =>
+    client.get<EnvironmentItem[]>('/identity/environments').then((r) => r.data),
+
+  getPrimaryProductionEnvironment: () =>
+    client.get<EnvironmentItem | null>('/identity/environments/primary-production').then((r) => r.data),
+
+  createEnvironment: (data: CreateEnvironmentRequest) =>
+    client.post<{ environmentId: string; name: string; slug: string }>('/identity/environments', data).then((r) => r.data),
+
+  updateEnvironment: (environmentId: string, data: UpdateEnvironmentRequest) =>
+    client.put<{ environmentId: string; name: string; slug: string; profile: string; isProductionLike: boolean }>(
+      `/identity/environments/${encodeURIComponent(environmentId)}`, data).then((r) => r.data),
+
+  setPrimaryProductionEnvironment: (environmentId: string) =>
+    client.patch(`/identity/environments/${encodeURIComponent(environmentId)}/primary-production`).then((r) => r.data),
 };

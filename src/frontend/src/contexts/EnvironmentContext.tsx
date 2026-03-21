@@ -33,6 +33,7 @@ export interface EnvironmentOption {
   name: string;
   profile: EnvironmentProfile;
   isProductionLike: boolean;
+  isPrimaryProduction?: boolean;
   isDefault?: boolean;
 }
 
@@ -47,6 +48,8 @@ interface ApiEnvironmentResponse {
   profile?: string;
   /** Presente quando a migração AddEnvironmentProfileFields estiver aplicada. */
   isProductionLike?: boolean;
+  /** Indica se este é o ambiente produtivo principal do tenant. */
+  isPrimaryProduction?: boolean;
   isDefault?: boolean;
 }
 
@@ -110,6 +113,7 @@ function mapApiEnvironment(env: ApiEnvironmentResponse): EnvironmentOption {
     name: env.name,
     profile,
     isProductionLike,
+    isPrimaryProduction: env.isPrimaryProduction === true,
     isDefault: env.isDefault === true,
   };
 }

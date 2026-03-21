@@ -62,6 +62,10 @@ internal sealed class EnvironmentConfiguration : IEntityTypeConfiguration<Enviro
             .HasDefaultValue(false)
             .IsRequired();
 
+        builder.Property(x => x.IsPrimaryProduction)
+            .HasDefaultValue(false)
+            .IsRequired();
+
         builder.Property(x => x.Code)
             .HasMaxLength(50)
             .IsRequired(false);
@@ -76,5 +80,13 @@ internal sealed class EnvironmentConfiguration : IEntityTypeConfiguration<Enviro
         builder.HasIndex(x => new { x.TenantId, x.Slug })
             .IsUnique()
             .HasDatabaseName("IX_identity_environments_tenant_slug");
+
+        // Garante que somente um ambiente ativo com IsPrimaryProduction=true pode existir por tenant.
+        // Índice parcial: só indexa linhas onde IsPrimaryProduction=true E IsActive=true.
+        // Isso permite múltiplos ambientes não-primários e ambientes inativos sem conflito.
+        builder.HasIndex(x => new { x.TenantId, x.IsPrimaryProduction })
+            .IsUnique()
+            .HasFilter("\"IsPrimaryProduction\" = true AND \"IsActive\" = true")
+            .HasDatabaseName("IX_identity_environments_tenant_primary_production_unique");
     }
 }

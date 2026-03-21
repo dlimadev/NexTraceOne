@@ -300,6 +300,11 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<bool>("IsPrimaryProduction")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -330,6 +335,11 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "Slug")
                         .IsUnique()
                         .HasDatabaseName("IX_identity_environments_tenant_slug");
+
+                    b.HasIndex("TenantId", "IsPrimaryProduction")
+                        .IsUnique()
+                        .HasFilter("\"IsPrimaryProduction\" = true AND \"IsActive\" = true")
+                        .HasDatabaseName("IX_identity_environments_tenant_primary_production_unique");
 
                     b.ToTable("identity_environments", (string)null);
                 });

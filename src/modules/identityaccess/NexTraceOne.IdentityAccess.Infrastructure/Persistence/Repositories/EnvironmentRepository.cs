@@ -19,11 +19,21 @@ internal sealed class EnvironmentRepository(IdentityDbContext dbContext) : IEnvi
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
     /// <inheritdoc />
+    public async Task<Environment?> GetByIdForTenantAsync(EnvironmentId id, TenantId tenantId, CancellationToken cancellationToken)
+        => await dbContext.Environments
+            .FirstOrDefaultAsync(e => e.Id == id && e.TenantId == tenantId, cancellationToken);
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<Environment>> ListByTenantAsync(TenantId tenantId, CancellationToken cancellationToken)
         => await dbContext.Environments
             .Where(e => e.TenantId == tenantId && e.IsActive)
             .OrderBy(e => e.SortOrder)
             .ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<Environment?> GetPrimaryProductionAsync(TenantId tenantId, CancellationToken cancellationToken)
+        => await dbContext.Environments
+            .FirstOrDefaultAsync(e => e.TenantId == tenantId && e.IsPrimaryProduction && e.IsActive, cancellationToken);
 
     /// <inheritdoc />
     public async Task<bool> SlugExistsAsync(TenantId tenantId, string slug, CancellationToken cancellationToken)

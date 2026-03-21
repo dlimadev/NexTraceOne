@@ -13,6 +13,7 @@ import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, 
 
 // ── Identity-access (lazy) ──
 const UsersPage = lazy(() => import('./features/identity-access/pages/UsersPage').then(m => ({ default: m.UsersPage })));
+const EnvironmentsPage = lazy(() => import('./features/identity-access/pages/EnvironmentsPage').then(m => ({ default: m.EnvironmentsPage })));
 const BreakGlassPage = lazy(() => import('./features/identity-access/pages/BreakGlassPage').then(m => ({ default: m.BreakGlassPage })));
 const JitAccessPage = lazy(() => import('./features/identity-access/pages/JitAccessPage').then(m => ({ default: m.JitAccessPage })));
 const DelegationPage = lazy(() => import('./features/identity-access/pages/DelegationPage').then(m => ({ default: m.DelegationPage })));
@@ -712,6 +713,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
                     <UsersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/environments"
+                element={
+                  <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
+                    <EnvironmentsPage />
                   </ProtectedRoute>
                 }
               />

@@ -38,6 +38,8 @@ public static class ListEnvironments
         string Profile,
         /// <summary>Indica se o ambiente tem políticas similares à produção.</summary>
         bool IsProductionLike,
+        /// <summary>Indica se este é o ambiente produtivo principal do tenant.</summary>
+        bool IsPrimaryProduction,
         /// <summary>Código curto opcional definido pelo tenant.</summary>
         string? Code);
 
@@ -72,6 +74,7 @@ public static class ListEnvironments
                     e.IsActive,
                     ProfileNames.GetValueOrDefault(e.Profile, "unknown"),
                     e.IsProductionLike,
+                    e.IsPrimaryProduction,
                     e.Code))
                 .ToList();
 

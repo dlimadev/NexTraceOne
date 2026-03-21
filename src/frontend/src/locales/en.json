@@ -4082,5 +4082,54 @@
       "blocker": "BLOCKER",
       "warning": "WARNING"
     }
+  },
+  "environments": {
+    "title": "Environments",
+    "subtitle": "Manage operational environments for your tenant",
+    "createEnvironment": "Create Environment",
+    "createNewEnvironment": "Create New Environment",
+    "editEnvironment": "Edit Environment",
+    "name": "Name",
+    "slug": "Slug",
+    "code": "Code",
+    "description": "Description",
+    "region": "Region",
+    "sortOrder": "Sort Order",
+    "profile": "Operational Profile",
+    "criticality": "Criticality",
+    "isProductionLike": "Production-like",
+    "isPrimaryProduction": "Primary Production",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "setAsPrimary": "Set as Primary Production",
+    "primaryProductionBadge": "Primary Production",
+    "productionLikeBadge": "Production-like",
+    "noEnvironmentsFound": "No environments configured for this tenant.",
+    "slugHelp": "Unique identifier (lowercase, hyphens allowed)",
+    "codeHelp": "Short internal code (e.g. PROD, QA-EU)",
+    "isPrimaryProductionHelp": "Designates this environment as the primary production environment for this tenant. Only one environment can hold this designation.",
+    "confirmSetPrimary": "Set {{name}} as the primary production environment? The current primary production will be revoked.",
+    "primaryProductionUpdated": "Primary production environment updated.",
+    "environmentCreated": "Environment created successfully.",
+    "environmentUpdated": "Environment updated successfully.",
+    "profiles": {
+      "Development": "Development",
+      "Validation": "Validation / QA",
+      "Staging": "Staging / Homologation",
+      "Production": "Production",
+      "Sandbox": "Sandbox",
+      "DisasterRecovery": "Disaster Recovery",
+      "Training": "Training",
+      "UserAcceptanceTesting": "User Acceptance Testing (UAT)",
+      "PerformanceTesting": "Performance Testing"
+    },
+    "criticalities": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    }
   }
 }
