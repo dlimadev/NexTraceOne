@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, Search, TrendingUp, TrendingDown, Minus,
   AlertTriangle, CheckCircle, AlertCircle, XCircle,
@@ -9,80 +10,17 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import type { CostEfficiencyType } from '../../../types';
+import { finOpsApi } from '../api/finOps';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 }
-
-const mockFinOps = {
-  totalMonthlyCost: 61300,
-  totalWaste: 20200,
-  overallEfficiency: 'Acceptable' as CostEfficiencyType,
-  costTrend: 'Stable' as const,
-  services: [
-    {
-      serviceId: 'svc-order-processor', serviceName: 'Order Processor', domain: 'Commerce', team: 'Team Commerce',
-      efficiency: 'Wasteful' as CostEfficiencyType, monthlyCost: 18700, trend: 'Declining' as const,
-      wasteSignals: [
-        { description: 'Frequent rollbacks causing reprocessing', pattern: 'rollback-waste', type: 'RepeatedReprocessing', estimatedWaste: 5400 },
-        { description: 'Idle compute during off-peak', pattern: 'idle-compute', type: 'IdleCostlyResource', estimatedWaste: 2100 },
-      ],
-      reliabilityCorrelation: { reliabilityScore: 58.3, recentIncidents: 5, reliabilityTrend: 'Declining' as const },
-    },
-    {
-      serviceId: 'svc-catalog-sync', serviceName: 'Catalog Sync', domain: 'Catalog', team: 'Team Platform',
-      efficiency: 'Wasteful' as CostEfficiencyType, monthlyCost: 15200, trend: 'Declining' as const,
-      wasteSignals: [
-        { description: 'Duplicate data processing pipelines', pattern: 'duplicate-etl', type: 'RepeatedReprocessing', estimatedWaste: 4200 },
-        { description: 'Idle staging environment', pattern: 'idle-staging', type: 'IdleCostlyResource', estimatedWaste: 2500 },
-      ],
-      reliabilityCorrelation: { reliabilityScore: 65.4, recentIncidents: 4, reliabilityTrend: 'Declining' as const },
-    },
-    {
-      serviceId: 'svc-payment-api', serviceName: 'Payment API', domain: 'Payments', team: 'Team Payments',
-      efficiency: 'Inefficient' as CostEfficiencyType, monthlyCost: 12500, trend: 'Declining' as const,
-      wasteSignals: [
-        { description: 'Excessive retries on timeout', pattern: 'retry-pattern', type: 'ExcessiveRetries', estimatedWaste: 3200 },
-      ],
-      reliabilityCorrelation: { reliabilityScore: 72.5, recentIncidents: 3, reliabilityTrend: 'Declining' as const },
-    },
-    {
-      serviceId: 'svc-inventory-sync', serviceName: 'Inventory Sync', domain: 'Commerce', team: 'Team Commerce',
-      efficiency: 'Inefficient' as CostEfficiencyType, monthlyCost: 8900, trend: 'Declining' as const,
-      wasteSignals: [
-        { description: 'Redundant sync cycles', pattern: 'redundant-sync', type: 'RepeatedReprocessing', estimatedWaste: 2800 },
-      ],
-      reliabilityCorrelation: { reliabilityScore: 81.0, recentIncidents: 2, reliabilityTrend: 'Declining' as const },
-    },
-    {
-      serviceId: 'svc-user-service', serviceName: 'User Service', domain: 'Identity', team: 'Team Identity',
-      efficiency: 'Acceptable' as CostEfficiencyType, monthlyCost: 4200, trend: 'Stable' as const,
-      wasteSignals: [],
-      reliabilityCorrelation: { reliabilityScore: 95.1, recentIncidents: 0, reliabilityTrend: 'Stable' as const },
-    },
-    {
-      serviceId: 'svc-notification-hub', serviceName: 'Notification Hub', domain: 'Messaging', team: 'Team Messaging',
-      efficiency: 'Efficient' as CostEfficiencyType, monthlyCost: 1800, trend: 'Improving' as const,
-      wasteSignals: [],
-      reliabilityCorrelation: { reliabilityScore: 99.2, recentIncidents: 0, reliabilityTrend: 'Improving' as const },
-    },
-  ],
-  topCostDrivers: [
-    { serviceId: 'svc-order-processor', serviceName: 'Order Processor', monthlyCost: 18700, efficiency: 'Wasteful' as CostEfficiencyType },
-    { serviceId: 'svc-catalog-sync', serviceName: 'Catalog Sync', monthlyCost: 15200, efficiency: 'Wasteful' as CostEfficiencyType },
-    { serviceId: 'svc-payment-api', serviceName: 'Payment API', monthlyCost: 12500, efficiency: 'Inefficient' as CostEfficiencyType },
-  ],
-  optimizationOpportunities: [
-    { serviceId: 'svc-order-processor', serviceName: 'Order Processor', potentialSavings: 7500, priority: 'High', recommendation: 'Address rollback waste and idle compute' },
-    { serviceId: 'svc-catalog-sync', serviceName: 'Catalog Sync', potentialSavings: 6700, priority: 'High', recommendation: 'Consolidate duplicate ETL pipelines' },
-    { serviceId: 'svc-payment-api', serviceName: 'Payment API', potentialSavings: 3200, priority: 'Medium', recommendation: 'Reduce retry storms with circuit breaker' },
-  ],
-  generatedAt: new Date().toISOString(),
-};
-
 type EfficiencyFilter = 'all' | CostEfficiencyType;
 
 const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'danger' | 'default' => {
@@ -119,7 +57,14 @@ export function FinOpsPage() {
   const [search, setSearch] = useState('');
   const fmt = (v: number) => formatCurrency(v, i18n.language);
 
-  const d = mockFinOps;
+  const { data: d, isLoading, isError, refetch } = useQuery({
+    queryKey: queryKeys.governance.finops.summary(),
+    queryFn: () => finOpsApi.getSummary(),
+    staleTime: 30_000,
+  });
+
+  if (isLoading) return (<PageContainer><PageLoadingState /></PageContainer>);
+  if (isError || !d) return (<PageContainer><PageErrorState action={<button onClick={() => refetch()} className="px-3 py-1.5 text-xs rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">{t('common.retry')}</button>} /></PageContainer>);
 
   const filtered = d.services.filter(svc => {
     if (filter !== 'all' && svc.efficiency !== filter) return false;

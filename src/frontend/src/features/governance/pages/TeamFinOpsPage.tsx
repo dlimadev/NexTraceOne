@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, TrendingUp, TrendingDown, Minus, AlertTriangle,
   CheckCircle, AlertCircle, XCircle, Activity, ArrowLeft,
@@ -8,7 +9,11 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import type { CostEfficiencyType } from '../../../types';
+import { finOpsApi } from '../api/finOps';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
@@ -42,37 +47,22 @@ const trendIcon = (dir: string) => {
     default: return <Minus size={14} className="text-muted" />;
   }
 };
-
-const mockTeamFinOps = {
-  teamId: 'team-commerce',
-  teamName: 'Team Commerce',
-  domain: 'Commerce',
-  totalMonthlyCost: 42800,
-  previousMonthCost: 40500,
-  costTrend: 'Declining' as const,
-  overallEfficiency: 'Inefficient' as CostEfficiencyType,
-  totalWaste: 17000,
-  serviceCount: 3,
-  avgReliabilityScore: 68.2,
-  totalRecentIncidents: 11,
-  topOptimizationFocus: 'Reduce reprocessing waste in Order Processor and Catalog Sync',
-  services: [
-    { serviceId: 'svc-order-processor', serviceName: 'Order Processor', efficiency: 'Wasteful' as CostEfficiencyType, monthlyCost: 18700, trend: 'Declining' as const, wasteAmount: 7500, reliabilityScore: 58.3 },
-    { serviceId: 'svc-catalog-sync', serviceName: 'Catalog Sync', efficiency: 'Wasteful' as CostEfficiencyType, monthlyCost: 15200, trend: 'Declining' as const, wasteAmount: 6700, reliabilityScore: 65.4 },
-    { serviceId: 'svc-inventory-sync', serviceName: 'Inventory Sync', efficiency: 'Inefficient' as CostEfficiencyType, monthlyCost: 8900, trend: 'Declining' as const, wasteAmount: 2800, reliabilityScore: 81.0 },
-  ],
-  trendSeries: [
-    { period: '2025-10', cost: 38200 }, { period: '2025-11', cost: 39800 }, { period: '2025-12', cost: 40500 },
-    { period: '2026-01', cost: 41200 }, { period: '2026-02', cost: 42100 }, { period: '2026-03', cost: 42800 },
-  ],
-};
-
 export function TeamFinOpsPage() {
   const { t, i18n } = useTranslation();
-  const { teamId: _teamId } = useParams<{ teamId: string }>();
+  const { teamId } = useParams<{ teamId: string }>();
   const fmt = (v: number) => formatCurrency(v, i18n.language);
-  const d = mockTeamFinOps;
-  const costChange = d.totalMonthlyCost - d.previousMonthCost;
+
+  const { data: d, isLoading, isError, refetch } = useQuery({
+    queryKey: queryKeys.governance.finops.team(teamId!),
+    queryFn: () => finOpsApi.getTeamFinOps(teamId!),
+    staleTime: 30_000,
+    enabled: !!teamId,
+  });
+
+  if (isLoading) return (<PageContainer><PageLoadingState /></PageContainer>);
+  if (isError || !d) return (<PageContainer><PageErrorState action={<button onClick={() => refetch()} className="px-3 py-1.5 text-xs rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">{t('common.retry')}</button>} /></PageContainer>);
+
+  const totalWaste = d.topWasteSignals.reduce((sum, ws) => sum + ws.estimatedWaste, 0);
 
   return (
     <PageContainer>
@@ -85,9 +75,9 @@ export function TeamFinOpsPage() {
         <div className="flex items-center gap-3">
           <Users size={24} className="text-accent" />
           <h1 className="text-2xl font-bold text-heading">{d.teamName}</h1>
-          <Badge variant={efficiencyBadgeVariant(d.overallEfficiency)}>{t(`governance.finops.efficiency.${d.overallEfficiency}`)}</Badge>
+          <Badge variant={efficiencyBadgeVariant(d.efficiency)}>{t(`governance.finops.efficiency.${d.efficiency}`)}</Badge>
         </div>
-        <p className="text-muted mt-1">{d.domain} · {d.serviceCount} {t('governance.finops.services')} · {t('governance.finops.teamFinOpsProfile')}</p>
+        <p className="text-muted mt-1">{d.services.length} {t('governance.finops.services')} · {t('governance.finops.teamFinOpsProfile')}</p>
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="warning">{t('governance.preview.badge')}</Badge>
           <span className="text-xs text-muted">{t('governance.preview.finopsReason')}</span>
@@ -96,51 +86,11 @@ export function TeamFinOpsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title={t('governance.finops.totalMonthlyCost')} value={fmt(d.totalMonthlyCost)} icon={<DollarSign size={20} />} color="text-accent" />
-        <StatCard title={t('governance.finops.totalWaste')} value={fmt(d.totalWaste)} icon={<AlertTriangle size={20} />} color="text-critical" />
-        <StatCard title={t('governance.finops.avgReliability')} value={`${d.avgReliabilityScore}%`} icon={<Activity size={20} />} color={d.avgReliabilityScore >= 90 ? 'text-success' : d.avgReliabilityScore >= 70 ? 'text-warning' : 'text-critical'} />
-        <StatCard title={t('governance.finops.incidents')} value={String(d.totalRecentIncidents)} icon={<AlertTriangle size={20} />} color="text-warning" />
+        <StatCard title={t('governance.finops.totalMonthlyCost')} value={fmt(d.totalCost)} icon={<DollarSign size={20} />} color="text-accent" />
+        <StatCard title={t('governance.finops.totalWaste')} value={fmt(totalWaste)} icon={<AlertTriangle size={20} />} color="text-critical" />
+        <StatCard title={t('governance.finops.overallEfficiency')} value={t(`governance.finops.efficiency.${d.efficiency}`)} icon={<Activity size={20} />} color="text-amber-500" />
+        <StatCard title={t('governance.finops.services')} value={String(d.services.length)} icon={<Users size={20} />} color="text-info" />
       </div>
-
-      {/* Cost trend */}
-      <Card className="mb-6">
-        <CardHeader>
-          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            {trendIcon(d.costTrend)}
-            {t('governance.finops.costTrend')}
-          </h2>
-        </CardHeader>
-        <CardBody>
-          <div className="flex items-end gap-1 h-24">
-            {d.trendSeries.map((point, i) => {
-              const max = Math.max(...d.trendSeries.map(p => p.cost));
-              const height = max > 0 ? (point.cost / max) * 100 : 0;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full bg-accent/20 rounded-t relative" style={{ height: `${height}%` }}>
-                    <div className="absolute inset-0 bg-accent/40 rounded-t" />
-                  </div>
-                  <span className="text-[9px] text-muted">{point.period.slice(5)}</span>
-                </div>
-              );
-            })}
-          </div>
-          <p className="text-xs text-muted mt-2">{t('governance.finops.costChange')}: {costChange >= 0 ? '+' : ''}{fmt(costChange)} {t('governance.finops.vsLastMonth')}</p>
-        </CardBody>
-      </Card>
-
-      {/* Optimization focus */}
-      <Card className="mb-6">
-        <CardBody>
-          <div className="flex items-center gap-3">
-            <Target size={16} className="text-success shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-heading">{t('governance.finops.topOptimizationFocus')}</p>
-              <p className="text-sm text-muted mt-0.5">{d.topOptimizationFocus}</p>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
 
       {/* Services */}
       <Card>
@@ -157,16 +107,18 @@ export function TeamFinOpsPage() {
                 {efficiencyIcon(svc.efficiency)}
                 <span className="text-sm font-medium text-heading flex-1 truncate">{svc.serviceName}</span>
                 <Badge variant={efficiencyBadgeVariant(svc.efficiency)}>{t(`governance.finops.efficiency.${svc.efficiency}`)}</Badge>
-                <div className="hidden md:flex items-center gap-1 text-xs text-muted">
-                  <Activity size={12} className={svc.reliabilityScore >= 90 ? 'text-success' : svc.reliabilityScore >= 70 ? 'text-warning' : 'text-critical'} />
-                  {svc.reliabilityScore}%
-                </div>
+                {svc.reliabilityCorrelation && (
+                  <div className="hidden md:flex items-center gap-1 text-xs text-muted">
+                    <Activity size={12} className={svc.reliabilityCorrelation.reliabilityScore >= 90 ? 'text-success' : svc.reliabilityCorrelation.reliabilityScore >= 70 ? 'text-warning' : 'text-critical'} />
+                    {svc.reliabilityCorrelation.reliabilityScore}%
+                  </div>
+                )}
                 <div className="hidden md:flex items-center gap-1 text-xs text-muted">
                   {trendIcon(svc.trend)}
                   {t(`governance.finops.trend.${svc.trend}`)}
                 </div>
-                {svc.wasteAmount > 0 && (
-                  <Badge variant="danger" className="text-[10px]">{t('governance.finops.wasteAmount')}: {fmt(svc.wasteAmount)}</Badge>
+                {svc.wasteSignals.reduce((s, ws) => s + ws.estimatedWaste, 0) > 0 && (
+                  <Badge variant="danger" className="text-[10px]">{t('governance.finops.wasteAmount')}: {fmt(svc.wasteSignals.reduce((s, ws) => s + ws.estimatedWaste, 0))}</Badge>
                 )}
                 <span className="text-sm font-mono font-medium text-heading w-24 text-right">{fmt(svc.monthlyCost)}</span>
                 <ArrowRight size={14} className="text-muted" />
@@ -175,6 +127,34 @@ export function TeamFinOpsPage() {
           </div>
         </CardBody>
       </Card>
+
+      {/* Waste Signals */}
+      {d.topWasteSignals.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+              <AlertTriangle size={16} className="text-critical" />
+              {t('governance.finops.wasteSignals')}
+            </h2>
+          </CardHeader>
+          <CardBody className="p-0">
+            <div className="divide-y divide-edge">
+              {d.topWasteSignals.map((ws, i) => (
+                <div key={i} className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <XCircle size={14} className="text-critical shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-heading">{ws.description}</p>
+                      <p className="text-xs text-muted mt-0.5">{ws.pattern}</p>
+                    </div>
+                    <span className="text-sm font-mono font-medium text-critical shrink-0">{fmt(ws.estimatedWaste)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
     </PageContainer>
   );
 }
