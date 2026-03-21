@@ -32,7 +32,6 @@ import { ServiceCatalogOverviewTab } from '../components/ServiceCatalogOverviewT
 import { ServiceCatalogServicesTab } from '../components/ServiceCatalogServicesTab';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { PageHeader } from '../../../components/PageHeader';
 import type {
   AssetGraph,
   ApiNode,

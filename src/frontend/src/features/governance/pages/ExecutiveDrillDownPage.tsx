@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Crosshair, ShieldAlert, Award, BarChart3, AlertTriangle,
   AlertCircle,
@@ -8,55 +9,15 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import type {
-  ExecutiveDrillDownResponse,
   RiskLevel,
   GovernanceTrendDirection,
   MaturityLevelType,
 } from '../../../types';
-
-/**
- * Dados simulados do drill-down executivo — alinhados com o backend GetExecutiveDrillDown.
- * Em produção, virão da API /api/v1/governance/executive/drilldown/:entityType/:entityId.
- */
-const mockDrillDown: ExecutiveDrillDownResponse = {
-  entityType: 'domain',
-  entityId: 'dom-payments',
-  entityName: 'Payments',
-  riskLevel: 'Critical',
-  maturityLevel: 'Managed',
-  keyIndicators: [
-    { name: 'Service Count', value: '8', trend: 'Stable', explanation: 'Number of active services in this domain' },
-    { name: 'Open Incidents', value: '5', trend: 'Declining', explanation: 'Active incidents impacting production availability' },
-    { name: 'Change Confidence', value: '68%', trend: 'Improving', explanation: 'Percentage of changes deployed safely in last 30 days' },
-    { name: 'Contract Coverage', value: '72%', trend: 'Improving', explanation: 'Services with versioned and validated contracts' },
-    { name: 'Runbook Coverage', value: '38%', trend: 'Stable', explanation: 'Services with operational runbooks available' },
-    { name: 'Avg Resolution Time', value: '4.5h', trend: 'Improving', explanation: 'Average time to resolve production incidents' },
-  ],
-  criticalServices: [
-    { serviceId: 'svc-payment-gateway', serviceName: 'Payment Gateway', riskLevel: 'Critical', mainIssue: 'Recurring production incidents with SLA breach risk' },
-    { serviceId: 'svc-payment-processor', serviceName: 'Payment Processor', riskLevel: 'Critical', mainIssue: 'High dependency fragility and cascading failure potential' },
-    { serviceId: 'svc-refund-engine', serviceName: 'Refund Engine', riskLevel: 'High', mainIssue: 'Missing runbook and incomplete dependency mapping' },
-    { serviceId: 'svc-payment-reconciliation', serviceName: 'Payment Reconciliation', riskLevel: 'High', mainIssue: 'Contract versioning not enforced, schema drift detected' },
-    { serviceId: 'svc-fraud-detection', serviceName: 'Fraud Detection', riskLevel: 'Medium', mainIssue: 'Documentation gaps and limited change validation' },
-  ],
-  topGaps: [
-    { area: 'Runbook Coverage', severity: 'Critical', description: 'Only 3 of 8 services have operational runbooks', recommendation: 'Prioritize runbook creation for Payment Gateway and Payment Processor' },
-    { area: 'Incident Recurrence', severity: 'Critical', description: '22% incident recurrence rate in the last 30 days', recommendation: 'Conduct root cause analysis for top recurring incidents and create prevention measures' },
-    { area: 'Contract Validation', severity: 'High', description: 'Schema drift detected between Payment Reconciliation and downstream consumers', recommendation: 'Enforce contract validation in CI/CD pipeline for all payment services' },
-    { area: 'Dependency Mapping', severity: 'High', description: 'Incomplete topology mapping for cascading failure analysis', recommendation: 'Complete dependency registration for all services in the domain' },
-    { area: 'AI Governance', severity: 'Medium', description: 'No AI governance policies defined for the domain', recommendation: 'Define AI usage policies aligned with platform AI governance framework' },
-  ],
-  recommendedFocus: [
-    'Stabilize Payment Gateway with dedicated incident response',
-    'Create operational runbooks for all critical-path services',
-    'Enforce contract versioning and validation in deployment pipeline',
-    'Complete dependency topology for blast radius analysis',
-    'Reduce incident recurrence through systematic root cause analysis',
-  ],
-  generatedAt: new Date().toISOString(),
-};
-
+import { executiveApi } from '../api/executive';
+import { queryKeys } from '../../../shared/api/queryKeys';
 /** Mapeia RiskLevel para variante do Badge. */
 const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 'default' => {
   switch (level) {
@@ -97,10 +58,17 @@ const maturityBadgeVariant = (level: MaturityLevelType): 'success' | 'warning' |
  */
 export function ExecutiveDrillDownPage() {
   const { t } = useTranslation();
-  const { entityType } = useParams<{ entityType: string; entityId: string }>();
+  const { entityType, entityId } = useParams<{ entityType: string; entityId: string }>();
 
-  // Usa dados simulados independente dos parâmetros da rota
-  const d = mockDrillDown;
+  const { data: d, isLoading, isError, refetch } = useQuery({
+    queryKey: queryKeys.governance.executive.drillDown(entityType ?? '', entityId ?? ''),
+    queryFn: () => executiveApi.getDrillDown(entityType!, entityId!),
+    staleTime: 30_000,
+    enabled: !!entityType && !!entityId,
+  });
+
+  if (isLoading) return (<PageContainer><PageLoadingState /></PageContainer>);
+  if (isError || !d) return (<PageContainer><PageErrorState action={<button onClick={() => refetch()} className="px-3 py-1.5 text-xs rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">{t('common.retry')}</button>} /></PageContainer>);
 
   return (
     <PageContainer>

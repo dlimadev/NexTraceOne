@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Gauge, CheckCircle, AlertTriangle, XCircle, Clock, Activity, Shield,
 } from 'lucide-react';
@@ -6,10 +8,12 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { integrationsApi } from '../api/integrations';
 
 type FreshnessStatus = 'Fresh' | 'Acceptable' | 'Stale' | 'Failed';
 type TrustLevel = 'Verified' | 'Trusted' | 'Provisional' | 'Untrusted';
-type OverallHealth = 'Healthy' | 'Degraded' | 'Critical';
 
 interface DomainFreshness {
   domain: string;
@@ -28,35 +32,28 @@ interface CriticalIssue {
   since: string;
 }
 
-const mockOverallHealth: OverallHealth = 'Degraded';
-
-const mockDomains: DomainFreshness[] = [
-  { domain: 'Changes', freshnessStatus: 'Fresh', lastReceived: '2024-01-15T10:28:00Z', lagMinutes: 4, trustLevel: 'Verified', sourceCount: 3 },
-  { domain: 'Incidents', freshnessStatus: 'Fresh', lastReceived: '2024-01-15T10:25:00Z', lagMinutes: 7, trustLevel: 'Verified', sourceCount: 2 },
-  { domain: 'Telemetry', freshnessStatus: 'Acceptable', lastReceived: '2024-01-15T09:45:00Z', lagMinutes: 47, trustLevel: 'Trusted', sourceCount: 4 },
-  { domain: 'Contracts', freshnessStatus: 'Fresh', lastReceived: '2024-01-15T10:20:00Z', lagMinutes: 12, trustLevel: 'Verified', sourceCount: 1 },
-  { domain: 'Knowledge', freshnessStatus: 'Failed', lastReceived: '2024-01-14T18:00:00Z', lagMinutes: 992, trustLevel: 'Untrusted', sourceCount: 1 },
-  { domain: 'Runtime', freshnessStatus: 'Fresh', lastReceived: '2024-01-15T10:29:00Z', lagMinutes: 3, trustLevel: 'Verified', sourceCount: 2 },
-  { domain: 'Alerts', freshnessStatus: 'Stale', lastReceived: '2024-01-15T06:00:00Z', lagMinutes: 272, trustLevel: 'Provisional', sourceCount: 1 },
-];
-
-const mockCriticalIssues: CriticalIssue[] = [
-  { id: 'ci-001', domain: 'Knowledge', message: 'Confluence Wiki connector has been failing for 16+ hours. Knowledge domain data is stale.', severity: 'Critical', since: '2024-01-15T04:00:00Z' },
-  { id: 'ci-002', domain: 'Alerts', message: 'OpsGenie Alerts connector last successful sync was 4+ hours ago. Alert data freshness degraded.', severity: 'Warning', since: '2024-01-15T06:00:00Z' },
-  { id: 'ci-003', domain: 'Telemetry', message: 'AWS CloudWatch ingestion experiencing partial failures. Some metric gaps detected.', severity: 'Warning', since: '2024-01-15T09:45:00Z' },
-];
-
-const freshnessStatusBadge = (s: FreshnessStatus): 'success' | 'warning' | 'danger' | 'info' => {
+const freshnessStatusBadge = (s: string): 'success' | 'warning' | 'danger' | 'info' => {
   switch (s) {
     case 'Fresh': return 'success';
     case 'Acceptable': return 'info';
     case 'Stale': return 'warning';
     case 'Failed': return 'danger';
+    default: return 'info';
   }
 };
 
-const trustBadge = (t: TrustLevel): 'success' | 'info' | 'warning' | 'danger' => {
-  switch (t) {
+const deriveTrustLevel = (status: string): TrustLevel => {
+  switch (status) {
+    case 'Fresh': return 'Verified';
+    case 'Acceptable': return 'Trusted';
+    case 'Stale': return 'Provisional';
+    case 'Failed': return 'Untrusted';
+    default: return 'Provisional';
+  }
+};
+
+const trustBadge = (tl: TrustLevel): 'success' | 'info' | 'warning' | 'danger' => {
+  switch (tl) {
     case 'Verified': return 'success';
     case 'Trusted': return 'info';
     case 'Provisional': return 'warning';
@@ -64,19 +61,21 @@ const trustBadge = (t: TrustLevel): 'success' | 'info' | 'warning' | 'danger' =>
   }
 };
 
-const overallHealthColor = (h: OverallHealth) => {
+const overallHealthColor = (h: string) => {
   switch (h) {
     case 'Healthy': return 'text-success';
     case 'Degraded': return 'text-warning';
     case 'Critical': return 'text-critical';
+    default: return 'text-muted';
   }
 };
 
-const overallHealthIcon = (h: OverallHealth) => {
+const overallHealthIcon = (h: string) => {
   switch (h) {
     case 'Healthy': return <CheckCircle size={20} className="text-success" />;
     case 'Degraded': return <AlertTriangle size={20} className="text-warning" />;
     case 'Critical': return <XCircle size={20} className="text-critical" />;
+    default: return <Activity size={20} className="text-muted" />;
   }
 };
 
@@ -90,17 +89,61 @@ function formatLag(minutes: number): string {
   return remainHours > 0 ? `${days}d ${remainHours}h` : `${days}d`;
 }
 
+function computeLagMinutes(latestIngestionAt: string): number {
+  return Math.max(0, Math.floor((Date.now() - new Date(latestIngestionAt).getTime()) / 60_000));
+}
+
 export function IngestionFreshnessPage() {
   const { t } = useTranslation();
 
-  const freshCount = mockDomains.filter(d => d.freshnessStatus === 'Fresh').length;
-  const staleCount = mockDomains.filter(d => d.freshnessStatus === 'Stale' || d.freshnessStatus === 'Failed').length;
-  const totalSources = mockDomains.reduce((sum, d) => sum + d.sourceCount, 0);
+  const { data: freshnessResponse, isLoading: loadingFreshness, isError: errorFreshness, refetch: refetchFreshness } = useQuery({
+    queryKey: ['integrations', 'freshness'],
+    queryFn: () => integrationsApi.getFreshness(),
+    staleTime: 30_000,
+  });
+
+  const { data: health } = useQuery({
+    queryKey: ['integrations', 'health'],
+    queryFn: () => integrationsApi.getHealth(),
+    staleTime: 30_000,
+  });
+
+  const indicators = freshnessResponse?.indicators ?? [];
+  const overallHealth = health?.overallHealth ?? 'Degraded';
+
+  const domains: DomainFreshness[] = useMemo(() => indicators.map(ind => ({
+    domain: ind.dataDomain,
+    freshnessStatus: ind.freshnessStatus as FreshnessStatus,
+    lastReceived: ind.latestIngestionAt,
+    lagMinutes: computeLagMinutes(ind.latestIngestionAt),
+    trustLevel: deriveTrustLevel(ind.freshnessStatus),
+    sourceCount: ind.totalSources,
+  })), [indicators]);
+
+  const criticalIssues: CriticalIssue[] = useMemo(() =>
+    indicators
+      .filter(ind => ind.freshnessStatus === 'Stale' || ind.freshnessStatus === 'Failed')
+      .map((ind, idx) => ({
+        id: `ci-${idx}`,
+        domain: ind.dataDomain,
+        message: `${ind.dataDomain}: ${ind.staleSources}/${ind.totalSources} source(s) ${ind.freshnessStatus.toLowerCase()}.`,
+        severity: (ind.freshnessStatus === 'Failed' ? 'Critical' : 'Warning') as 'Critical' | 'Warning',
+        since: ind.latestIngestionAt,
+      })),
+    [indicators],
+  );
+
+  const freshCount = domains.filter(d => d.freshnessStatus === 'Fresh').length;
+  const staleCount = domains.filter(d => d.freshnessStatus === 'Stale' || d.freshnessStatus === 'Failed').length;
+  const totalSources = domains.reduce((sum, d) => sum + d.sourceCount, 0);
 
   const formatDate = (iso: string) => {
     try { return new Date(iso).toLocaleString(); }
     catch { return iso; }
   };
+
+  if (loadingFreshness) return <PageLoadingState />;
+  if (errorFreshness) return <PageErrorState action={<button onClick={() => refetchFreshness()} className="btn btn-sm btn-primary">{t('common.retry')}</button>} />;
 
   return (
     <PageContainer>
@@ -114,9 +157,9 @@ export function IngestionFreshnessPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard
           title={t('integrations.overallHealth')}
-          value={t(`integrations.${mockOverallHealth.toLowerCase()}`)}
-          icon={overallHealthIcon(mockOverallHealth)}
-          color={overallHealthColor(mockOverallHealth)}
+          value={t(`integrations.${overallHealth.toLowerCase()}`)}
+          icon={overallHealthIcon(overallHealth)}
+          color={overallHealthColor(overallHealth)}
         />
         <StatCard title={t('integrations.fresh')} value={freshCount} icon={<CheckCircle size={20} />} color="text-success" />
         <StatCard title={t('integrations.staleFeeds')} value={staleCount} icon={<AlertTriangle size={20} />} color="text-critical" />
@@ -124,7 +167,7 @@ export function IngestionFreshnessPage() {
       </div>
 
       {/* Critical issues */}
-      {mockCriticalIssues.length > 0 && (
+      {criticalIssues.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
@@ -134,7 +177,7 @@ export function IngestionFreshnessPage() {
           </CardHeader>
           <CardBody className="p-0">
             <div className="divide-y divide-edge">
-              {mockCriticalIssues.map(issue => (
+              {criticalIssues.map(issue => (
                 <div key={issue.id} className="px-4 py-3 flex items-start gap-3 hover:bg-hover transition-colors">
                   {issue.severity === 'Critical'
                     ? <XCircle size={16} className="text-critical shrink-0 mt-0.5" />
@@ -174,7 +217,7 @@ export function IngestionFreshnessPage() {
             <span className="text-right">{t('integrations.sourceCount')}</span>
           </div>
           <div className="divide-y divide-edge">
-            {mockDomains.map(dm => (
+            {domains.map(dm => (
               <div
                 key={dm.domain}
                 className={`grid grid-cols-1 md:grid-cols-6 gap-2 px-4 py-3 items-center hover:bg-hover transition-colors ${

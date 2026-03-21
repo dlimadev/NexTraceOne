@@ -69,9 +69,9 @@ function riskColor(level: string): string {
   }
 }
 
-function severityBadgeVariant(severity: string): 'error' | 'warning' | 'info' {
+function severityBadgeVariant(severity: string): 'danger' | 'warning' | 'info' {
   switch (severity?.toUpperCase()) {
-    case 'HIGH': return 'error';
+    case 'HIGH': return 'danger';
     case 'MEDIUM': return 'warning';
     default: return 'info';
   }
@@ -449,7 +449,7 @@ function ReadinessTab({
               {result.readinessLevel}
             </span>
             {result.shouldBlock && (
-              <Badge variant="error">{t('aiAnalysis.readiness.blocked')}</Badge>
+              <Badge variant="danger">{t('aiAnalysis.readiness.blocked')}</Badge>
             )}
             <FallbackBadge show={result.isFallback} label={t('aiAnalysis.fallback')} />
           </div>
@@ -467,7 +467,7 @@ function ReadinessTab({
               <ul className="space-y-2">
                 {result.blockers.map((b, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
-                    <Badge variant="error">{t('aiAnalysis.readiness.blocker')}</Badge>
+                    <Badge variant="danger">{t('aiAnalysis.readiness.blocker')}</Badge>
                     <span className="text-slate-400 text-xs">[{b.category}]</span>
                     <span className="text-slate-300">{b.description}</span>
                   </li>

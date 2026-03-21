@@ -59,7 +59,45 @@ export const queryKeys = {
     reports: () => [...queryKeys.governance.all, 'reports'] as const,
     risk: () => [...queryKeys.governance.all, 'risk'] as const,
     compliance: () => [...queryKeys.governance.all, 'compliance'] as const,
-    finops: () => [...queryKeys.governance.all, 'finops'] as const,
+    finops: {
+      all: () => [...queryKeys.governance.all, 'finops'] as const,
+      summary: (params?: Record<string, unknown>) => [...queryKeys.governance.finops.all(), 'summary', params] as const,
+      service: (id: string) => [...queryKeys.governance.finops.all(), 'service', id] as const,
+      team: (id: string) => [...queryKeys.governance.finops.all(), 'team', id] as const,
+      domain: (id: string) => [...queryKeys.governance.finops.all(), 'domain', id] as const,
+      trends: (params?: Record<string, unknown>) => [...queryKeys.governance.finops.all(), 'trends', params] as const,
+    },
+    evidence: {
+      all: () => [...queryKeys.governance.all, 'evidence'] as const,
+      list: (params?: Record<string, unknown>) => [...queryKeys.governance.evidence.all(), 'list', params] as const,
+      detail: (id: string) => [...queryKeys.governance.evidence.all(), 'detail', id] as const,
+    },
+    executive: {
+      all: () => [...queryKeys.governance.all, 'executive'] as const,
+      drillDown: (entityType: string, entityId: string) => [...queryKeys.governance.executive.all(), 'drillDown', entityType, entityId] as const,
+    },
+  },
+
+  // ── Reliability ──
+  reliability: {
+    all: ['reliability'] as const,
+    list: (params?: Record<string, unknown>) => [...queryKeys.reliability.all, 'list', params] as const,
+    detail: (id: string) => [...queryKeys.reliability.all, 'detail', id] as const,
+    teamSummary: (teamId: string) => [...queryKeys.reliability.all, 'teamSummary', teamId] as const,
+  },
+
+  // ── Platform Operations ──
+  platformOps: {
+    all: ['platformOps'] as const,
+    health: () => [...queryKeys.platformOps.all, 'health'] as const,
+  },
+
+  // ── Product Analytics ──
+  analytics: {
+    all: ['analytics'] as const,
+    journeys: (params?: Record<string, unknown>) => [...queryKeys.analytics.all, 'journeys', params] as const,
+    milestones: (params?: Record<string, unknown>) => [...queryKeys.analytics.all, 'milestones', params] as const,
+    personas: (params?: Record<string, unknown>) => [...queryKeys.analytics.all, 'personas', params] as const,
   },
 
   // ── AI Hub ──

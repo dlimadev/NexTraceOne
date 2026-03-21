@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Package, Search, Lock, Download, FileCheck, FileText,
@@ -9,97 +10,14 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { evidenceApi } from '../api/evidence';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import type {
-  EvidencePackageDto, EvidencePackageListResponse, EvidencePackageStatusType,
-  EvidenceItemDto, EvidenceTypeValue,
+  EvidencePackageStatusType,
+  EvidenceTypeValue,
 } from '../../../types';
-
-/**
- * Dados simulados de pacotes de evidência — alinhados com o backend ListEvidencePackages.
- * Em produção, virão da API /api/v1/evidence/packages.
- */
-const mockPackages: EvidencePackageListResponse = {
-  totalPackages: 5,
-  sealedCount: 3,
-  exportedCount: 1,
-  draftCount: 1,
-  packages: [
-    {
-      packageId: 'evp-001', name: 'Q1 2026 Compliance Evidence',
-      description: 'Quarterly compliance evidence package for production services',
-      scope: 'quarterly-review', status: 'Sealed', itemCount: 24,
-      includedTypes: ['Approvals', 'Change History', 'Contract Publications', 'Compliance Results'],
-      createdBy: 'auditor@nextraceone.com',
-      createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
-      sealedAt: new Date(Date.now() - 14 * 86400000).toISOString(),
-    },
-    {
-      packageId: 'evp-002', name: 'Payment Gateway Security Review',
-      description: 'Security compliance evidence for PCI-DSS audit',
-      scope: 'security-audit', status: 'Exported', itemCount: 18,
-      includedTypes: ['Security Reviews', 'Change Validations', 'AI Usage Records', 'Mitigation Records'],
-      createdBy: 'security@nextraceone.com',
-      createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
-      sealedAt: new Date(Date.now() - 28 * 86400000).toISOString(),
-    },
-    {
-      packageId: 'evp-003', name: 'AI Governance Audit Pack',
-      description: 'Evidence package for AI model usage and policy compliance',
-      scope: 'ai-governance', status: 'Sealed', itemCount: 35,
-      includedTypes: ['AI Usage Records', 'Policy Decisions', 'Model Registry Snapshots', 'Token Usage'],
-      createdBy: 'ai-governance@nextraceone.com',
-      createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
-      sealedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
-    },
-    {
-      packageId: 'evp-004', name: 'Change Governance March 2026',
-      description: 'Change validation and blast radius evidence for March releases',
-      scope: 'change-governance', status: 'Draft', itemCount: 12,
-      includedTypes: ['Change History', 'Blast Radius', 'Approval History', 'Rollback Records'],
-      createdBy: 'release-mgr@nextraceone.com',
-      createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-      sealedAt: null,
-    },
-    {
-      packageId: 'evp-005', name: 'Incident Mitigation Evidence',
-      description: 'Post-incident mitigation and resolution evidence pack',
-      scope: 'incident-review', status: 'Sealed', itemCount: 8,
-      includedTypes: ['Mitigation Records', 'Approval History', 'Post-mortem References', 'Audit Trails'],
-      createdBy: 'ops-lead@nextraceone.com',
-      createdAt: new Date(Date.now() - 20 * 86400000).toISOString(),
-      sealedAt: new Date(Date.now() - 19 * 86400000).toISOString(),
-    },
-  ],
-};
-
-/** Itens simulados para visualização de detalhe. */
-const mockItems: EvidenceItemDto[] = [
-  { itemId: 'evi-001', type: 'Approval', title: 'Change Approval #CH-2026-0142',
-    description: 'Production deployment approved by Tech Lead', sourceModule: 'change-governance',
-    referenceId: 'CH-2026-0142', recordedBy: 'techlead@nextraceone.com',
-    recordedAt: new Date(Date.now() - 16 * 86400000).toISOString() },
-  { itemId: 'evi-002', type: 'ChangeHistory', title: 'Release v3.2.0 Deployment',
-    description: 'Successful production deployment with blast radius assessment', sourceModule: 'change-governance',
-    referenceId: 'REL-2026-0089', recordedBy: 'ci-system',
-    recordedAt: new Date(Date.now() - 16 * 86400000).toISOString() },
-  { itemId: 'evi-003', type: 'ContractPublication', title: 'Order API Contract v2.1.0',
-    description: 'Contract published with breaking change notification', sourceModule: 'catalog',
-    referenceId: 'CTR-ORDER-API-2.1.0', recordedBy: 'architect@nextraceone.com',
-    recordedAt: new Date(Date.now() - 18 * 86400000).toISOString() },
-  { itemId: 'evi-004', type: 'ComplianceResult', title: 'Q1 Compliance Check Run',
-    description: 'Quarterly compliance evaluation: 78% coverage', sourceModule: 'governance',
-    referenceId: 'CHK-RUN-2026-Q1', recordedBy: 'system',
-    recordedAt: new Date(Date.now() - 15 * 86400000).toISOString() },
-  { itemId: 'evi-005', type: 'AiUsageRecord', title: 'AI Assistant Usage Summary',
-    description: 'AI assistant usage within approved policy limits', sourceModule: 'ai-governance',
-    referenceId: 'AI-USAGE-2026-03', recordedBy: 'system',
-    recordedAt: new Date(Date.now() - 15 * 86400000).toISOString() },
-  { itemId: 'evi-006', type: 'MitigationRecord', title: 'Incident INC-2026-0034 Mitigation',
-    description: 'Incident resolved with documented mitigation steps', sourceModule: 'operations',
-    referenceId: 'INC-2026-0034', recordedBy: 'oncall@nextraceone.com',
-    recordedAt: new Date(Date.now() - 20 * 86400000).toISOString() },
-];
-
 type StatusFilter = 'all' | EvidencePackageStatusType;
 
 const statusBadge = (st: EvidencePackageStatusType): 'success' | 'warning' | 'info' | 'default' => {
@@ -135,7 +53,21 @@ export function EvidencePackagesPage() {
   const [search, setSearch] = useState('');
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
 
-  const d = mockPackages;
+  const { data: d, isLoading, isError, refetch } = useQuery({
+    queryKey: queryKeys.governance.evidence.list(),
+    queryFn: () => evidenceApi.listPackages(),
+    staleTime: 30_000,
+  });
+
+  useQuery({
+    queryKey: queryKeys.governance.evidence.detail(selectedPackageId!),
+    queryFn: () => evidenceApi.getPackage(selectedPackageId!),
+    staleTime: 30_000,
+    enabled: !!selectedPackageId,
+  });
+
+  if (isLoading) return (<PageContainer><PageLoadingState /></PageContainer>);
+  if (isError || !d) return (<PageContainer><PageErrorState action={<button onClick={() => refetch()} className="px-3 py-1.5 text-xs rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">{t('common.retry')}</button>} /></PageContainer>);
 
   const filtered = d.packages.filter(p => {
     if (statusFilter !== 'all' && p.status !== statusFilter) return false;
@@ -273,18 +205,7 @@ export function EvidencePackagesPage() {
                   </div>
                   <div className="border-t border-edge pt-3">
                     <p className="text-xs font-semibold text-heading mb-2">{t('governance.evidence.evidenceItems')}</p>
-                    <div className="space-y-2">
-                      {mockItems.map(item => (
-                        <div key={item.itemId} className="flex items-start gap-2 p-2 rounded bg-surface/50">
-                          <div className="mt-0.5 text-muted">{evidenceIcon(item.type)}</div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-medium text-body">{item.title}</p>
-                            <p className="text-[10px] text-muted">{item.description}</p>
-                            <p className="text-[10px] text-faded">{item.referenceId} · {item.recordedBy}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-xs text-muted text-center py-4">{t('governance.evidence.itemsNotAvailable', 'Evidence items are not yet available from the API.')}</p>
                   </div>
                   <button className="w-full mt-2 px-3 py-2 text-xs font-medium rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors flex items-center justify-center gap-2">
                     <Download size={14} />
