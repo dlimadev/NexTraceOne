@@ -191,7 +191,7 @@ export function VisualRestBuilder({
           </h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field
               label={t('contracts.builder.rest.title', 'Title')}
               value={state.title}
@@ -227,7 +227,7 @@ export function VisualRestBuilder({
             placeholder={t('contracts.builder.rest.descPlaceholder', 'Describe what this API does...')}
             disabled={isReadOnly}
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field
               label={t('contracts.builder.rest.contact', 'Contact')}
               value={state.contact}
@@ -260,7 +260,7 @@ export function VisualRestBuilder({
               {t('contracts.builder.rest.endpoints', 'Endpoints')} ({state.endpoints.length})
             </h3>
             {!isReadOnly && (
-              <button
+              <button type="button"
                 onClick={addEndpoint}
                 className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
               >
@@ -283,7 +283,7 @@ export function VisualRestBuilder({
               return (
                 <div key={ep.id} className="group">
                   {/* Collapsed row */}
-                  <button
+                  <button type="button"
                     onClick={() => setExpandedId(isExpanded ? null : ep.id)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors"
                   >
@@ -303,14 +303,14 @@ export function VisualRestBuilder({
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       {!isReadOnly && (
                         <>
-                          <button
+                          <button type="button"
                             onClick={(e) => { e.stopPropagation(); duplicateEndpoint(ep); }}
                             className="text-muted hover:text-accent transition-colors"
                             title={t('contracts.builder.rest.duplicate', 'Duplicate')}
                           >
                             <Copy size={12} />
                           </button>
-                          <button
+                          <button type="button"
                             onClick={(e) => { e.stopPropagation(); removeEndpoint(ep.id); }}
                             className="text-muted hover:text-danger transition-colors"
                           >
@@ -325,7 +325,7 @@ export function VisualRestBuilder({
                   {isExpanded && (
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-4">
                       {/* Basic info */}
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <FieldSelect
                           label={t('contracts.builder.rest.method', 'Method')}
                           value={ep.method}
@@ -383,7 +383,7 @@ export function VisualRestBuilder({
                         onToggle={() => toggleSubSection(ep.id, 'params')}
                       >
                         {ep.parameters.map((param, pi) => (
-                          <div key={param.id} className="grid grid-cols-5 gap-2 items-end">
+                          <div key={param.id} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 items-end">
                             <Field label={pi === 0 ? t('contracts.builder.rest.paramName', 'Name') : ''} value={param.name} onChange={(v) => {
                               const next = [...ep.parameters]; next[pi] = { ...param, name: v };
                               updateEndpoint(ep.id, { parameters: next });
@@ -401,13 +401,13 @@ export function VisualRestBuilder({
                               updateEndpoint(ep.id, { parameters: next });
                             }} disabled={isReadOnly} />
                             {!isReadOnly && (
-                              <button onClick={() => updateEndpoint(ep.id, { parameters: ep.parameters.filter((_, j) => j !== pi) })}
+                              <button type="button" onClick={() => updateEndpoint(ep.id, { parameters: ep.parameters.filter((_, j) => j !== pi) })}
                                 className="text-muted hover:text-danger transition-colors pb-1"><Trash2 size={11} /></button>
                             )}
                           </div>
                         ))}
                         {!isReadOnly && (
-                          <button onClick={() => updateEndpoint(ep.id, { parameters: [...ep.parameters, createParameter()] })}
+                          <button type="button" onClick={() => updateEndpoint(ep.id, { parameters: [...ep.parameters, createParameter()] })}
                             className="text-[10px] text-accent hover:text-accent/80 transition-colors">
                             + {t('contracts.builder.rest.addParam', 'Add Parameter')}
                           </button>
@@ -424,7 +424,7 @@ export function VisualRestBuilder({
                         >
                           {ep.requestBody ? (
                             <div className="space-y-2">
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <Field label={t('contracts.builder.rest.contentType', 'Content Type')} value={ep.requestBody.contentType}
                                   onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, contentType: v } })}
                                   placeholder="application/json" mono disabled={isReadOnly} />
@@ -438,14 +438,14 @@ export function VisualRestBuilder({
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: v } })}
                                 rows={3} mono disabled={isReadOnly} />
                               {!isReadOnly && (
-                                <button onClick={() => updateEndpoint(ep.id, { requestBody: null })}
+                                <button type="button" onClick={() => updateEndpoint(ep.id, { requestBody: null })}
                                   className="text-[10px] text-danger hover:text-danger/80 transition-colors">
                                   {t('contracts.builder.rest.removeBody', 'Remove Request Body')}
                                 </button>
                               )}
                             </div>
                           ) : (!isReadOnly && (
-                            <button onClick={() => updateEndpoint(ep.id, { requestBody: { contentType: 'application/json', schema: '', required: true, example: '' } })}
+                            <button type="button" onClick={() => updateEndpoint(ep.id, { requestBody: { contentType: 'application/json', schema: '', required: true, example: '' } })}
                               className="text-[10px] text-accent hover:text-accent/80 transition-colors">
                               + {t('contracts.builder.rest.addBody', 'Add Request Body')}
                             </button>
@@ -462,7 +462,7 @@ export function VisualRestBuilder({
                       >
                         {ep.responses.map((res, ri) => (
                           <div key={res.id} className="space-y-2 pb-2 mb-2 border-b border-edge last:border-0">
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                               <FieldSelect label={t('contracts.builder.rest.statusCode', 'Status Code')} value={res.statusCode as typeof STATUS_CODES[number]}
                                 onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, statusCode: v }; updateEndpoint(ep.id, { responses: next }); }}
                                 options={STATUS_CODES} disabled={isReadOnly} />
@@ -480,7 +480,7 @@ export function VisualRestBuilder({
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, example: v }; updateEndpoint(ep.id, { responses: next }); }}
                               rows={2} mono disabled={isReadOnly} />
                             {!isReadOnly && (
-                              <button onClick={() => updateEndpoint(ep.id, { responses: ep.responses.filter((_, j) => j !== ri) })}
+                              <button type="button" onClick={() => updateEndpoint(ep.id, { responses: ep.responses.filter((_, j) => j !== ri) })}
                                 className="text-[10px] text-danger hover:text-danger/80 transition-colors">
                                 {t('contracts.builder.rest.removeResponse', 'Remove')}
                               </button>
@@ -488,7 +488,7 @@ export function VisualRestBuilder({
                           </div>
                         ))}
                         {!isReadOnly && (
-                          <button onClick={() => updateEndpoint(ep.id, { responses: [...ep.responses, createResponse()] })}
+                          <button type="button" onClick={() => updateEndpoint(ep.id, { responses: [...ep.responses, createResponse()] })}
                             className="text-[10px] text-accent hover:text-accent/80 transition-colors">
                             + {t('contracts.builder.rest.addResponse', 'Add Response')}
                           </button>
@@ -513,7 +513,7 @@ export function VisualRestBuilder({
                         isOpen={isSubExpanded(ep.id, 'behavior')}
                         onToggle={() => toggleSubSection(ep.id, 'behavior')}
                       >
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <Field label={t('contracts.builder.rest.rateLimit', 'Rate Limit')} value={ep.rateLimit}
                             onChange={(v) => updateEndpoint(ep.id, { rateLimit: v })} placeholder="100/min" disabled={isReadOnly} />
                           <Field label={t('contracts.builder.rest.idempotencyKey', 'Idempotency Key')} value={ep.idempotencyKey}
@@ -558,11 +558,11 @@ export function VisualRestBuilder({
       {/* ── Action bar ── */}
       {!isReadOnly && (
         <div className="flex items-center justify-end gap-2">
-          <button onClick={handleValidate}
+          <button type="button" onClick={handleValidate}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-elevated border border-edge text-body hover:bg-elevated/80 transition-colors">
             {t('contracts.builder.rest.validate', 'Validate')}
           </button>
-          <button onClick={handleGenerateSource}
+          <button type="button" onClick={handleGenerateSource}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">
             {t('contracts.builder.rest.generateSource', 'Generate Source')}
           </button>
@@ -581,7 +581,7 @@ function CollapsibleSubSection({
 }) {
   return (
     <div className="border border-edge rounded-md">
-      <button onClick={onToggle} className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-elevated/20 transition-colors">
+      <button type="button" onClick={onToggle} className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-elevated/20 transition-colors">
         {isOpen ? <ChevronDown size={10} className="text-muted" /> : <ChevronRight size={10} className="text-muted" />}
         <span className="text-[10px] font-semibold uppercase tracking-wider text-muted/70 flex-1">{title}</span>
         {count > 0 && <span className="text-[9px] text-accent bg-accent/10 px-1.5 py-0.5 rounded">{count}</span>}

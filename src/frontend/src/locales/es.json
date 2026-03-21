@@ -37,7 +37,13 @@
     "errorDescription": "Algo salió mal. Inténtelo de nuevo más tarde.",
     "collapse": "Contraer",
     "expand": "Expandir",
-    "errorLoading": "Error al cargar datos"
+    "errorLoading": "Error al cargar datos",
+    "timeAgo": {
+      "lessThanHour": "< 1h atrás",
+      "hours": "{{count}}h atrás",
+      "days": "{{count}}d atrás"
+    },
+    "somethingWentWrong": "Algo salió mal"
   },
   "auth": {
     "signIn": "Iniciar sesión en su cuenta",

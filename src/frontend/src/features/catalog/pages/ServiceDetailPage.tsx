@@ -200,7 +200,7 @@ export function ServiceDetailPage() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                      <thead>
+                      <thead className="sticky top-0 z-10 bg-panel">
                         <tr className="border-b border-edge text-left">
                           <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
                             {t('catalog.columns.name')}
@@ -282,7 +282,7 @@ export function ServiceDetailPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead>
+                    <thead className="sticky top-0 z-10 bg-panel">
                       <tr className="border-b border-edge text-left">
                         <th className="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wider">
                           {t('catalog.columns.name')}

@@ -37,7 +37,13 @@
     "errorDescription": "Algo deu errado. Tente novamente mais tarde.",
     "collapse": "Recolher",
     "expand": "Expandir",
-    "errorLoading": "Erro ao carregar dados"
+    "errorLoading": "Erro ao carregar dados",
+    "timeAgo": {
+      "lessThanHour": "< 1h atrás",
+      "hours": "{{count}}h atrás",
+      "days": "{{count}}d atrás"
+    },
+    "somethingWentWrong": "Algo deu errado"
   },
   "auth": {
     "signIn": "Entrar na sua conta",

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/cn';
 
@@ -22,12 +23,14 @@ interface ErrorStateProps {
  * sem depender apenas da cor (ícone + texto).
  */
 export function ErrorState({
-  title = 'Something went wrong',
+  title,
   message,
   action,
   icon,
   className,
 }: ErrorStateProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t('common.error');
   return (
     <div
       className={cn(
@@ -39,7 +42,7 @@ export function ErrorState({
       <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-critical/15 border border-critical/25 text-critical mb-4">
         {icon ?? <AlertTriangle size={24} />}
       </div>
-      <h3 className="text-sm font-semibold text-heading mb-1">{title}</h3>
+      <h3 className="text-sm font-semibold text-heading mb-1">{resolvedTitle}</h3>
       {message && <p className="text-xs text-muted max-w-xs mb-4">{message}</p>}
       {action}
     </div>
