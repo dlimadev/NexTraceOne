@@ -129,7 +129,7 @@ export function VisualEventBuilder({
           </h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.event.title', 'Title')} value={state.title}
               onChange={(v) => update({ title: v })} placeholder="Order Events" required disabled={isReadOnly} />
             <Field label={t('contracts.builder.event.version', 'Version')} value={state.version}
@@ -150,7 +150,7 @@ export function VisualEventBuilder({
               {t('contracts.builder.event.channels', 'Channels / Topics')} ({state.channels.length})
             </h3>
             {!isReadOnly && (
-              <button onClick={addChannel} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+              <button type="button" onClick={addChannel} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
                 <Plus size={10} /> {t('contracts.builder.event.addChannel', 'Add Channel')}
               </button>
             )}
@@ -167,13 +167,13 @@ export function VisualEventBuilder({
               const isExpanded = expandedId === ch.id;
               return (
                 <div key={ch.id} className="group">
-                  <button onClick={() => setExpandedId(isExpanded ? null : ch.id)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors">
+                  <button type="button" onClick={() => setExpandedId(isExpanded ? null : ch.id)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors">
                     {isExpanded ? <ChevronDown size={12} className="text-muted" /> : <ChevronRight size={12} className="text-muted" />}
                     <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-cyan/15 text-cyan border border-cyan/25">EVT</span>
                     <span className="text-xs font-mono text-heading flex-1 truncate">{ch.topicName || t('contracts.builder.event.unnamed', 'Unnamed Topic')}</span>
                     {ch.eventName && <span className="text-[10px] text-muted truncate max-w-[180px]">{ch.eventName}</span>}
                     {!isReadOnly && (
-                      <button onClick={(e) => { e.stopPropagation(); removeChannel(ch.id); }} className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); removeChannel(ch.id); }} className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all">
                         <Trash2 size={12} />
                       </button>
                     )}
@@ -181,13 +181,13 @@ export function VisualEventBuilder({
                   {isExpanded && (
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-3">
                       {/* Identity */}
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.event.topicName', 'Topic Name')} value={ch.topicName}
                           onChange={(v) => updateChannel(ch.id, { topicName: v })} placeholder="orders.created" required mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.eventName', 'Event Name')} value={ch.eventName}
                           onChange={(v) => updateChannel(ch.id, { eventName: v })} placeholder="OrderCreated" disabled={isReadOnly} />
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <Field label={t('contracts.builder.event.eventVersion', 'Event Version')} value={ch.version}
                           onChange={(v) => updateChannel(ch.id, { version: v })} placeholder="1.0.0" mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.producer', 'Producer')} value={ch.producer}
@@ -205,7 +205,7 @@ export function VisualEventBuilder({
                         onChange={(v) => updateChannel(ch.id, { headers: v })} placeholder='correlationId: string, traceId: string' rows={2} mono disabled={isReadOnly} />
 
                       {/* Config */}
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <FieldSelect label={t('contracts.builder.event.compatibility', 'Compatibility')} value={ch.compatibility}
                           onChange={(v) => updateChannel(ch.id, { compatibility: v as CompatibilityMode })}
                           options={COMPAT_OPTIONS} disabled={isReadOnly} />
@@ -214,7 +214,7 @@ export function VisualEventBuilder({
                         <Field label={t('contracts.builder.event.partitions', 'Partitions')} value={ch.partitions}
                           onChange={(v) => updateChannel(ch.id, { partitions: v })} placeholder="3" disabled={isReadOnly} />
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <Field label={t('contracts.builder.event.ordering', 'Ordering')} value={ch.ordering}
                           onChange={(v) => updateChannel(ch.id, { ordering: v })} placeholder="by-key" disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.retries', 'Retries')} value={ch.retries}
@@ -226,7 +226,7 @@ export function VisualEventBuilder({
                         onChange={(v) => updateChannel(ch.id, { idempotent: v })} disabled={isReadOnly} />
 
                       {/* Ownership & Observability */}
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.event.owner', 'Owner')} value={ch.owner}
                           onChange={(v) => updateChannel(ch.id, { owner: v })} placeholder="team-orders" disabled={isReadOnly} />
                         <FieldArea label={t('contracts.builder.event.observabilityNotes', 'Observability')} value={ch.observabilityNotes}
@@ -248,11 +248,11 @@ export function VisualEventBuilder({
       {/* ── Action bar ── */}
       {!isReadOnly && (
         <div className="flex items-center justify-end gap-2">
-          <button onClick={handleValidate}
+          <button type="button" onClick={handleValidate}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-elevated border border-edge text-body hover:bg-elevated/80 transition-colors">
             {t('contracts.builder.event.validate', 'Validate')}
           </button>
-          <button onClick={handleGenerateSource}
+          <button type="button" onClick={handleGenerateSource}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">
             {t('contracts.builder.event.generateSource', 'Generate AsyncAPI')}
           </button>

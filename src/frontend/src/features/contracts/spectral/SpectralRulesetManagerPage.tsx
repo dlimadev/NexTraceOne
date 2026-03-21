@@ -62,7 +62,7 @@ export function SpectralRulesetManagerPage() {
         title={t('contracts.spectral.manager.title', 'Spectral Rulesets')}
         subtitle={t('contracts.spectral.manager.subtitle', 'Manage linting rulesets for contract validation and governance.')}
         actions={
-          <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
+          <button type="button" className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
             <Plus size={14} />
             {t('contracts.spectral.manager.create', 'Add Ruleset')}
           </button>
@@ -73,7 +73,7 @@ export function SpectralRulesetManagerPage() {
       <div className="flex items-center gap-3">
         <label className="text-xs text-muted">{t('contracts.spectral.manager.filterOrigin', 'Origin:')}</label>
         {(['', 'Platform', 'Organization', 'Team', 'Imported', 'ExternalRepository'] as const).map((origin) => (
-          <button
+          <button type="button"
             key={origin || 'all'}
             onClick={() => setOriginFilter(origin)}
             className={`px-3 py-1 text-xs rounded-full border transition-colors ${
@@ -113,7 +113,7 @@ export function SpectralRulesetManagerPage() {
               <CardBody>
                 <div className="flex items-center gap-3">
                   {/* Expand toggle */}
-                  <button
+                  <button type="button"
                     onClick={() => setExpandedId(isExpanded ? null : ruleset.id)}
                     className="text-muted hover:text-heading transition-colors"
                   >
@@ -148,7 +148,7 @@ export function SpectralRulesetManagerPage() {
                   </span>
 
                   {/* Active toggle */}
-                  <button
+                  <button type="button"
                     onClick={() => handleToggle(ruleset)}
                     disabled={toggleMutation.isPending}
                     className="text-muted hover:text-heading transition-colors"
@@ -164,7 +164,7 @@ export function SpectralRulesetManagerPage() {
                   </button>
 
                   {/* Delete */}
-                  <button
+                  <button type="button"
                     onClick={() => handleDelete(ruleset.id)}
                     disabled={deleteMutation.isPending}
                     className="text-muted hover:text-danger transition-colors"
@@ -176,7 +176,7 @@ export function SpectralRulesetManagerPage() {
 
                 {/* Expanded detail */}
                 {isExpanded && (
-                  <div className="mt-4 pt-4 border-t border-edge/10 grid grid-cols-3 gap-4 text-xs">
+                  <div className="mt-4 pt-4 border-t border-edge/10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-xs">
                     <div>
                       <p className="text-muted mb-1">{t('contracts.spectral.manager.origin', 'Origin')}</p>
                       <p className="text-heading">{ruleset.origin}</p>

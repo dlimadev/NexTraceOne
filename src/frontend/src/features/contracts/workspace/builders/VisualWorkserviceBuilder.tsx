@@ -130,7 +130,7 @@ export function VisualWorkserviceBuilder({
           </h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.workservice.name', 'Service Name')} value={state.name}
               onChange={(v) => update({ name: v })} placeholder="order-processor" required
               error={fieldError('name') ? t(fieldError('name')!.messageKey, fieldError('name')!.fallback) : undefined}
@@ -153,7 +153,7 @@ export function VisualWorkserviceBuilder({
           </h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FieldSelect
               label={t('contracts.builder.workservice.triggerType', 'Trigger Type')}
               value={state.trigger}
@@ -197,7 +197,7 @@ export function VisualWorkserviceBuilder({
             onChange={(v) => update({ outputs: v })}
             placeholder={t('contracts.builder.workservice.outputsPlaceholder', 'Describe expected outputs or side effects...')}
             rows={2} disabled={isReadOnly} />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.workservice.retries', 'Max Retries')} value={state.retries}
               onChange={(v) => update({ retries: v })} placeholder="3" disabled={isReadOnly} />
             <Field label={t('contracts.builder.workservice.timeout', 'Timeout (seconds)')} value={state.timeout}
@@ -222,7 +222,7 @@ export function VisualWorkserviceBuilder({
               {t('contracts.builder.workservice.dependencies', 'Dependencies')} ({state.dependencies.length})
             </h3>
             {!isReadOnly && (
-              <button onClick={addDependency} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+              <button type="button" onClick={addDependency} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
                 <Plus size={10} /> {t('contracts.builder.workservice.addDep', 'Add Dependency')}
               </button>
             )}
@@ -235,7 +235,7 @@ export function VisualWorkserviceBuilder({
             </div>
           )}
           {state.dependencies.map((dep) => (
-            <div key={dep.id} className="grid grid-cols-4 gap-2 items-end">
+            <div key={dep.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end">
               <Field label={t('contracts.builder.workservice.depName', 'Name')} value={dep.name}
                 onChange={(v) => updateDep(dep.id, { name: v })} placeholder="orders-db" disabled={isReadOnly} />
               <FieldSelect label={t('contracts.builder.workservice.depType', 'Type')} value={dep.type}
@@ -244,7 +244,7 @@ export function VisualWorkserviceBuilder({
               <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={dep.required}
                 onChange={(v) => updateDep(dep.id, { required: v })} disabled={isReadOnly} />
               {!isReadOnly && (
-                <button onClick={() => removeDep(dep.id)} className="text-muted hover:text-danger transition-colors pb-1">
+                <button type="button" onClick={() => removeDep(dep.id)} className="text-muted hover:text-danger transition-colors pb-1">
                   <Trash2 size={11} />
                 </button>
               )}
@@ -273,11 +273,11 @@ export function VisualWorkserviceBuilder({
       {/* ── Action bar ── */}
       {!isReadOnly && (
         <div className="flex items-center justify-end gap-2">
-          <button onClick={handleValidate}
+          <button type="button" onClick={handleValidate}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-elevated border border-edge text-body hover:bg-elevated/80 transition-colors">
             {t('contracts.builder.workservice.validate', 'Validate')}
           </button>
-          <button onClick={handleGenerateSource}
+          <button type="button" onClick={handleGenerateSource}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">
             {t('contracts.builder.workservice.generateSource', 'Generate Definition')}
           </button>

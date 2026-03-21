@@ -125,7 +125,7 @@ export function VisualSoapBuilder({
           </h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field
               label={t('contracts.builder.soap.serviceName', 'Service Name')}
               value={state.serviceName}
@@ -192,7 +192,7 @@ export function VisualSoapBuilder({
               {t('contracts.builder.soap.operations', 'Operations')} ({state.operations.length})
             </h3>
             {!isReadOnly && (
-              <button onClick={addOperation} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+              <button type="button" onClick={addOperation} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
                 <Plus size={10} /> {t('contracts.builder.soap.addOperation', 'Add Operation')}
               </button>
             )}
@@ -209,20 +209,20 @@ export function VisualSoapBuilder({
               const isExpanded = expandedId === op.id;
               return (
                 <div key={op.id} className="group">
-                  <button onClick={() => setExpandedId(isExpanded ? null : op.id)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors">
+                  <button type="button" onClick={() => setExpandedId(isExpanded ? null : op.id)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors">
                     {isExpanded ? <ChevronDown size={12} className="text-muted" /> : <ChevronRight size={12} className="text-muted" />}
                     <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-accent/15 text-accent border border-accent/25">OP</span>
                     <span className="text-xs font-mono text-heading flex-1 truncate">{op.name || t('contracts.builder.soap.unnamed', 'Unnamed Operation')}</span>
                     {op.soapAction && <span className="text-[10px] text-muted truncate max-w-[160px]">{op.soapAction}</span>}
                     {!isReadOnly && (
-                      <button onClick={(e) => { e.stopPropagation(); removeOp(op.id); }} className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); removeOp(op.id); }} className="opacity-0 group-hover:opacity-100 text-muted hover:text-danger transition-all">
                         <Trash2 size={12} />
                       </button>
                     )}
                   </button>
                   {isExpanded && (
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.soap.operationName', 'Operation Name')} value={op.name}
                           onChange={(v) => updateOp(op.id, { name: v })} placeholder="GetUser" required disabled={isReadOnly} />
                         <Field label={t('contracts.builder.soap.soapAction', 'SOAP Action')} value={op.soapAction}
@@ -248,11 +248,11 @@ export function VisualSoapBuilder({
       {/* ── Action bar ── */}
       {!isReadOnly && (
         <div className="flex items-center justify-end gap-2">
-          <button onClick={handleValidate}
+          <button type="button" onClick={handleValidate}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-elevated border border-edge text-body hover:bg-elevated/80 transition-colors">
             {t('contracts.builder.soap.validate', 'Validate')}
           </button>
-          <button onClick={handleGenerateSource}
+          <button type="button" onClick={handleGenerateSource}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium rounded-md bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors">
             {t('contracts.builder.soap.generateSource', 'Generate WSDL')}
           </button>
