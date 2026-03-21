@@ -44,13 +44,13 @@ const statusIcon = (status: string) => {
   }
 };
 
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: (key: string, options?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 1) return '< 1h ago';
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 1) return t('common.timeAgo.lessThanHour');
+  if (hours < 24) return t('common.timeAgo.hours', { count: hours });
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return t('common.timeAgo.days', { count: days });
 }
 
 const defaultCreateForm = {
@@ -267,7 +267,7 @@ export function IncidentsPage() {
                   className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
                 >
                   {['ServiceDegradation', 'AvailabilityIssue', 'DependencyFailure', 'ContractImpact', 'MessagingIssue', 'BackgroundProcessingIssue', 'OperationalRegression'].map(type => (
-                    <option key={type} value={type}>{type}</option>
+                    <option key={type} value={type}>{t(`incidents.type.${type}`)}</option>
                   ))}
                 </select>
                 <select
@@ -276,7 +276,7 @@ export function IncidentsPage() {
                   className="px-3 py-2 text-sm rounded-md bg-surface border border-edge text-body"
                 >
                   {['Warning', 'Minor', 'Major', 'Critical'].map(sev => (
-                    <option key={sev} value={sev}>{sev}</option>
+                    <option key={sev} value={sev}>{t(`incidents.severity.${sev}`)}</option>
                   ))}
                 </select>
                 <input
@@ -411,7 +411,7 @@ export function IncidentsPage() {
                         <div className="hidden md:flex items-center gap-3 text-xs text-muted shrink-0">
                           <span className="w-28 truncate">{inc.serviceDisplayName}</span>
                           <span className="w-24 truncate">{inc.ownerTeam}</span>
-                          <span className="w-16 text-right">{timeAgo(inc.createdAt)}</span>
+                          <span className="w-16 text-right">{timeAgo(inc.createdAt, t)}</span>
                           {inc.hasCorrelatedChanges && (
                             <Badge variant="warning" className="text-[10px] flex items-center gap-1">
                               <GitBranch size={10} />

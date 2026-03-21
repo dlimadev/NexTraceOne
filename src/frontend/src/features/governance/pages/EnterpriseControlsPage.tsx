@@ -171,7 +171,7 @@ export function EnterpriseControlsPage() {
         <CardBody className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
+              <thead className="sticky top-0 z-10 bg-panel">
                 <tr className="border-b border-edge">
                   <th className="px-4 py-3 text-left text-xs font-medium text-muted">{t('governance.controls.dimensionColumn')}</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-muted">{t('governance.controls.coverageColumn')}</th>

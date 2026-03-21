@@ -139,9 +139,9 @@ export function LoginPage() {
         {/* Help link */}
         <p className="text-center text-xs text-faded mt-6">
           {t('auth.needHelp')}{' '}
-          <span className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors">
+          <button type="button" className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors bg-transparent border-none p-0 text-xs">
             {t('auth.contactSupport')}
-          </span>
+          </button>
         </p>
       </AuthCard>
 

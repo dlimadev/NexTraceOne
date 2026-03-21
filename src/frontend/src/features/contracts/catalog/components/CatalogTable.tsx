@@ -55,7 +55,7 @@ export function CatalogTable({ items, sort, onSort }: CatalogTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs min-w-[1100px]">
-        <thead>
+        <thead className="sticky top-0 z-10 bg-panel">
           <tr className="border-b border-edge">
             <SortableHeader
               label={t('contracts.catalog.columns.name', 'Name')}

@@ -428,7 +428,7 @@ export function DeveloperPortalPage() {
           {subscriptionsQuery.data && subscriptionsQuery.data.length > 0 && (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
+                <thead className="sticky top-0 z-10 bg-panel">
                   <tr className="border-b border-edge text-left text-muted">
                     <th className="py-2 px-3">{t('developerPortal.subscriptions.apiName')}</th>
                     <th className="py-2 px-3">{t('developerPortal.subscriptions.level')}</th>
@@ -621,7 +621,7 @@ export function DeveloperPortalPage() {
               {historyQuery.data && historyQuery.data.items.length > 0 && (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead>
+                    <thead className="sticky top-0 z-10 bg-panel">
                       <tr className="border-b border-edge text-left text-muted">
                         <th className="py-2 px-3">{t('sourceOfTruth.table.api')}</th>
                         <th className="py-2 px-3">
@@ -729,7 +729,7 @@ export function DeveloperPortalPage() {
                   </CardHeader>
                   <CardBody>
                     <table className="w-full text-sm">
-                      <thead>
+                      <thead className="sticky top-0 z-10 bg-panel">
                         <tr className="border-b border-edge text-left text-muted">
                           <th className="py-2 px-3">{t('developerPortal.analytics.query')}</th>
                           <th className="py-2 px-3">{t('developerPortal.analytics.count')}</th>

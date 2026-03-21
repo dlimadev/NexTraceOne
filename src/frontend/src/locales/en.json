@@ -37,7 +37,13 @@
     "errorDescription": "Something went wrong. Please try again later.",
     "collapse": "Collapse",
     "expand": "Expand",
-    "errorLoading": "Error loading data"
+    "errorLoading": "Error loading data",
+    "timeAgo": {
+      "lessThanHour": "< 1h ago",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    },
+    "somethingWentWrong": "Something went wrong"
   },
   "auth": {
     "signIn": "Sign in to your account",

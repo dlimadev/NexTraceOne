@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, Users } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { identityApi } from '../api';
@@ -68,11 +69,12 @@ export function UsersPage() {
           <CardBody>
             <form
               onSubmit={(e) => { e.preventDefault(); createMutation.mutate(form); }}
-              className="grid grid-cols-3 gap-4"
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
             >
               <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('users.firstName')}</label>
+                <label htmlFor="user-firstName" className="block text-sm font-medium text-body mb-1">{t('users.firstName')}</label>
                 <input
+                  id="user-firstName"
                   type="text"
                   value={form.firstName}
                   onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
@@ -83,8 +85,9 @@ export function UsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('users.lastName')}</label>
+                <label htmlFor="user-lastName" className="block text-sm font-medium text-body mb-1">{t('users.lastName')}</label>
                 <input
+                  id="user-lastName"
                   type="text"
                   value={form.lastName}
                   onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
@@ -95,8 +98,9 @@ export function UsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('users.email')}</label>
+                <label htmlFor="user-email" className="block text-sm font-medium text-body mb-1">{t('users.email')}</label>
                 <input
+                  id="user-email"
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -107,8 +111,9 @@ export function UsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('users.role')}</label>
+                <label htmlFor="user-role" className="block text-sm font-medium text-body mb-1">{t('users.role')}</label>
                 <select
+                  id="user-role"
                   value={form.roleId}
                   onChange={(e) => setForm((f) => ({ ...f, roleId: e.target.value }))}
                   required
@@ -120,7 +125,7 @@ export function UsersPage() {
                   ))}
                 </select>
               </div>
-              <div className="col-span-3 flex gap-2 justify-end">
+              <div className="md:col-span-2 xl:col-span-3 flex gap-2 justify-end">
                 <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>{t('common.cancel')}</Button>
                 <Button type="submit" loading={createMutation.isPending}>{t('common.create')}</Button>
               </div>
@@ -145,13 +150,16 @@ export function UsersPage() {
           ) : isLoading ? (
             <PageLoadingState />
           ) : isUsersError ? (
-            <PageErrorState action={<button className="text-xs text-accent underline mt-2" onClick={() => refetchUsers()}>{t('common.retry')}</button>} />
+            <PageErrorState action={<Button variant="secondary" size="sm" onClick={() => refetchUsers()}><RefreshCw size={14} /> {t('common.retry')}</Button>} />
           ) : !data?.items?.length ? (
-            <p className="px-6 py-12 text-sm text-muted text-center">{t('users.noUsersFound')}</p>
+            <EmptyState
+              icon={<Users size={24} />}
+              title={t('users.noUsersFound')}
+            />
           ) : (
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-edge bg-panel text-left">
+                <tr className="border-b border-edge bg-panel text-left sticky top-0 z-10">
                   <th className="px-6 py-3 font-medium text-muted">{t('users.name')}</th>
                   <th className="px-6 py-3 font-medium text-muted">{t('users.email')}</th>
                   <th className="px-6 py-3 font-medium text-muted">{t('users.roles')}</th>
