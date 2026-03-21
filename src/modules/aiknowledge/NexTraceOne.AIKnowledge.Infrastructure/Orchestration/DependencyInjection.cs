@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Repositories;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -49,6 +51,11 @@ public static class DependencyInjection
         // Fase 2 — AI Context Builders
         services.AddScoped<IAIContextBuilder, AIContextBuilder>();
         services.AddScoped<IPromotionRiskContextBuilder, PromotionRiskContextBuilder>();
+
+        // Fase 2 — Repositórios de Orquestração
+        services.AddScoped<IAiOrchestrationConversationRepository, AiOrchestrationConversationRepository>();
+        services.AddScoped<IKnowledgeCaptureEntryRepository, KnowledgeCaptureEntryRepository>();
+        services.AddScoped<IGeneratedTestArtifactRepository, GeneratedTestArtifactRepository>();
 
         return services;
     }

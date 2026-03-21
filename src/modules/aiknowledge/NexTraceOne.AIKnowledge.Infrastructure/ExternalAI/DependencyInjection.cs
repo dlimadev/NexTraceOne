@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Repositories;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -43,6 +45,10 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ExternalAiDbContext>());
+        services.AddScoped<IKnowledgeCaptureRepository, KnowledgeCaptureRepository>();
+        services.AddScoped<IExternalAiConsultationRepository, ExternalAiConsultationRepository>();
+        services.AddScoped<IExternalAiPolicyRepository, ExternalAiPolicyRepository>();
+        services.AddScoped<IExternalAiProviderRepository, ExternalAiProviderRepository>();
 
         return services;
     }
