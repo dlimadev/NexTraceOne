@@ -60,7 +60,8 @@ public static class ListServiceReliability
                 Items: items,
                 TotalCount: items.Count,
                 Page: request.Page,
-                PageSize: request.PageSize);
+                PageSize: request.PageSize,
+                IsSimulated: true);
 
             return Task.FromResult(Result<Response>.Success(response));
         }
@@ -141,5 +142,6 @@ public static class ListServiceReliability
         IReadOnlyList<ServiceReliabilityItem> Items,
         int TotalCount,
         int Page,
-        int PageSize);
+        int PageSize,
+        bool IsSimulated);
 }

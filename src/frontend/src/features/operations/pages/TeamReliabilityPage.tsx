@@ -69,6 +69,12 @@ export function TeamReliabilityPage() {
         subtitle={t('reliability.subtitle')}
       />
 
+      {/* Demo data banner */}
+      <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200">
+        <span className="font-medium">{t('reliability.demoBanner.title')}</span>{' '}
+        {t('reliability.demoBanner.description')}
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('reliability.totalServices')} value={stats.total} icon={<Activity size={20} />} />
