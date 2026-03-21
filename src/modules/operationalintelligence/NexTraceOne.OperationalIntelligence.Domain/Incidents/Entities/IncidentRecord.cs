@@ -131,6 +131,21 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     /// <summary>Runbooks recomendados para mitigação (JSON).</summary>
     public string? MitigationRecommendedRunbooksJson { get; private set; }
 
+    // ── Fase 4: Contexto de Tenant/Ambiente ────────────────────────────────
+
+    /// <summary>
+    /// Identificador do tenant ao qual o incidente pertence.
+    /// Nullable por retrocompatibilidade — incidentes criados antes da Fase 4
+    /// não possuem este campo preenchido.
+    /// </summary>
+    public Guid? TenantId { get; private set; }
+
+    /// <summary>
+    /// Identificador do ambiente (infra) onde o incidente ocorreu.
+    /// Nullable por retrocompatibilidade — complementa o campo Environment (string).
+    /// </summary>
+    public Guid? EnvironmentId { get; private set; }
+
     /// <summary>
     /// Factory method para criação de um IncidentRecord com validações de guarda.
     /// </summary>
@@ -242,6 +257,17 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
         LinkedServicesJson = linkedServicesJson;
         RelatedContractsJson = relatedContractsJson;
         RunbookLinksJson = runbookLinksJson;
+    }
+
+    /// <summary>
+    /// Define o contexto de tenant e ambiente do incidente.
+    /// Operação idempotente — apenas atribui se o valor atual for null (??= semantics).
+    /// Garante que o primeiro contexto definido não seja sobrescrito.
+    /// </summary>
+    public void SetTenantContext(Guid? tenantId, Guid? environmentId)
+    {
+        TenantId ??= tenantId;
+        EnvironmentId ??= environmentId;
     }
 }
 

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from './contexts/AuthContext';
+import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { AppShell } from './components/shell/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -61,6 +62,7 @@ const AiRoutingPage = lazy(() => import('./features/ai-hub/pages/AiRoutingPage')
 const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegrationsPage').then(m => ({ default: m.IdeIntegrationsPage })));
 const TokenBudgetPage = lazy(() => import('./features/ai-hub/pages/TokenBudgetPage').then(m => ({ default: m.TokenBudgetPage })));
 const AiAuditPage = lazy(() => import('./features/ai-hub/pages/AiAuditPage').then(m => ({ default: m.AiAuditPage })));
+const AiAnalysisPage = lazy(() => import('./features/ai-hub/pages/AiAnalysisPage').then(m => ({ default: m.AiAnalysisPage })));
 
 // ── Governance (lazy) ──
 const ExecutiveOverviewPage = lazy(() => import('./features/governance/pages/ExecutiveOverviewPage').then(m => ({ default: m.ExecutiveOverviewPage })));
@@ -131,6 +133,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <EnvironmentProvider>
         <PersonaProvider>
           <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
@@ -407,6 +410,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="ai:governance:read" redirectTo="/unauthorized">
                     <AiAuditPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai/analysis"
+                element={
+                  <ProtectedRoute permission="ai:runtime:write" redirectTo="/unauthorized">
+                    <AiAnalysisPage />
                   </ProtectedRoute>
                 }
               />
@@ -749,6 +760,7 @@ export default function App() {
           </Suspense>
           </BrowserRouter>
         </PersonaProvider>
+        </EnvironmentProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
     </QueryClientProvider>

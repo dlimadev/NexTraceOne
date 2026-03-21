@@ -89,6 +89,9 @@ internal sealed class EfIncidentStore(
             relatedContractsJson: null,
             runbookLinksJson: null);
 
+        // Fase 4: enriquecer com contexto operacional de tenant/ambiente
+        incident.SetTenantContext(input.TenantId, input.EnvironmentId);
+
         db.Incidents.Add(incident);
         db.SaveChanges();
 

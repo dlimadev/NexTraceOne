@@ -46,5 +46,14 @@ internal sealed class EnvironmentConfiguration : IEntityTypeConfiguration<Enviro
         builder.HasIndex(x => new { x.TenantId, x.Slug })
             .IsUnique()
             .HasDatabaseName("IX_identity_environments_tenant_slug");
+
+        // Phase 1 fields — deferred to migration AddEnvironmentProfileFields (Phase 2).
+        // Explicitly ignored to prevent EF Core from attempting convention-based mapping.
+        builder.Ignore(x => x.Profile);
+        builder.Ignore(x => x.Code);
+        builder.Ignore(x => x.Description);
+        builder.Ignore(x => x.Criticality);
+        builder.Ignore(x => x.Region);
+        builder.Ignore(x => x.IsProductionLike);
     }
 }

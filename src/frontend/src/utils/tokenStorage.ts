@@ -28,6 +28,26 @@ const SESSION_KEYS = {
   USER_ID: 'nxt_uid',
 } as const;
 
+const ENVIRONMENT_SESSION_KEY = 'nxt_eid';
+
+/**
+ * Persiste o ID do ambiente ativo em sessionStorage.
+ * sessionStorage é o storage adequado: escopo de aba, limpo ao fechar o browser.
+ */
+export function storeEnvironmentId(environmentId: string): void {
+  sessionStorage.setItem(ENVIRONMENT_SESSION_KEY, environmentId);
+}
+
+/** Recupera o ID do ambiente ativo da sessionStorage. Retorna null se não definido. */
+export function getEnvironmentId(): string | null {
+  return sessionStorage.getItem(ENVIRONMENT_SESSION_KEY);
+}
+
+/** Remove o ambiente ativo (chamado no logout ou troca de tenant). */
+export function clearEnvironmentId(): void {
+  sessionStorage.removeItem(ENVIRONMENT_SESSION_KEY);
+}
+
 let inMemoryAccessToken: string | null = null;
 let inMemoryRefreshToken: string | null = null;
 let inMemoryCsrfToken: string | null = null;
@@ -120,6 +140,7 @@ export function getUserId(): string | null {
 export function clearAllTokens(): void {
   sessionStorage.removeItem(SESSION_KEYS.TENANT_ID);
   sessionStorage.removeItem(SESSION_KEYS.USER_ID);
+  sessionStorage.removeItem(ENVIRONMENT_SESSION_KEY);
   inMemoryAccessToken = null;
   inMemoryRefreshToken = null;
   inMemoryCsrfToken = null;

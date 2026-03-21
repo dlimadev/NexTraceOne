@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { AppShell } from '../../../components/shell/AppShell';
 
 // Mock auth context
@@ -25,6 +26,19 @@ vi.mock('../../../contexts/AuthContext', () => ({
     requiresTenantSelection: false,
     availableTenants: [],
   })),
+}));
+
+// Mock environment context
+vi.mock('../../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn(() => ({
+    activeEnvironmentId: 'tenant-1-prod',
+    activeEnvironment: { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  })),
+  EnvironmentProvider: ({ children }: { children: ReactNode }) => children,
 }));
 
 // Mock persona context

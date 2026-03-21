@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Behaviors;
+using NexTraceOne.BuildingBlocks.Application.Correlation;
+using NexTraceOne.BuildingBlocks.Application.Integrations;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 
 namespace NexTraceOne.BuildingBlocks.Application;
@@ -27,10 +29,16 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ContextualLoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TenantIsolationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+
+        // Fase 5: Contexto distribuído — integração e correlação
+        services.AddScoped<IIntegrationContextResolver, NullIntegrationContextResolver>();
+        services.AddScoped<IDistributedSignalCorrelationService, NullDistributedSignalCorrelationService>();
+        services.AddScoped<IPromotionRiskSignalProvider, NullPromotionRiskSignalProvider>();
 
         return services;
     }

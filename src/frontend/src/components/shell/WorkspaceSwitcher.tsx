@@ -1,21 +1,27 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Building2, Check } from 'lucide-react';
+import { ChevronDown, Building2, Check, AlertTriangle } from 'lucide-react';
 import { cn } from '../../lib/cn';
-import { useAuth } from '../../contexts/AuthContext';
+import { useEnvironment, type EnvironmentProfile } from '../../contexts/EnvironmentContext';
 
-/** Default environment until multi-environment switching is implemented. */
-const DEFAULT_ENVIRONMENT = 'Production';
-
-const AVAILABLE_ENVIRONMENTS = ['Production', 'Staging', 'Development'] as const;
+function getProfileBadgeClass(profile: EnvironmentProfile): string {
+  switch (profile) {
+    case 'production': return 'text-red-400 border-red-400/30 bg-red-400/10';
+    case 'staging': return 'text-orange-400 border-orange-400/30 bg-orange-400/10';
+    case 'uat': return 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10';
+    case 'qa': return 'text-blue-400 border-blue-400/30 bg-blue-400/10';
+    case 'development': return 'text-green-400 border-green-400/30 bg-green-400/10';
+    case 'sandbox': return 'text-purple-400 border-purple-400/30 bg-purple-400/10';
+    default: return 'text-faded border-edge';
+  }
+}
 
 export function WorkspaceSwitcher() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const { activeEnvironment, availableEnvironments, selectEnvironment } = useEnvironment();
 
   const tenantName = t('shell.defaultWorkspace');
-  // TODO: source from environment context once multi-env switching is implemented
-  const environment = DEFAULT_ENVIRONMENT;
 
   return (
     <div className="relative hidden md:block">
@@ -33,9 +39,19 @@ export function WorkspaceSwitcher() {
       >
         <Building2 size={14} className="text-muted shrink-0" />
         <span className="truncate max-w-[120px]">{tenantName}</span>
-        <span className="text-[10px] text-faded border border-edge rounded px-1 py-0.5 hidden lg:inline">
-          {environment}
-        </span>
+        {activeEnvironment && (
+          <span
+            className={cn(
+              'text-[10px] px-1.5 py-0.5 rounded border hidden lg:inline',
+              getProfileBadgeClass(activeEnvironment.profile),
+            )}
+          >
+            {activeEnvironment.name}
+          </span>
+        )}
+        {activeEnvironment && !activeEnvironment.isProductionLike && (
+          <AlertTriangle size={12} className="text-yellow-400 shrink-0" aria-hidden="true" />
+        )}
         <ChevronDown size={12} className="text-faded shrink-0" />
       </button>
 
@@ -64,22 +80,40 @@ export function WorkspaceSwitcher() {
             </button>
 
             <div className="px-3 pt-2 mt-1 border-t border-edge">
-              <p className="type-overline text-faded mb-1.5">{t('shell.environment')}</p>
-              <div className="flex gap-1">
-                {AVAILABLE_ENVIRONMENTS.map(env => (
-                  <span
-                    key={env}
-                    className={cn(
-                      'text-[10px] px-2 py-1 rounded border',
-                      env === environment
-                        ? 'bg-accent/10 text-cyan border-cyan/30'
-                        : 'text-faded border-edge hover:text-muted hover:border-edge-strong cursor-pointer',
-                      'transition-all duration-[var(--nto-motion-base)]',
-                    )}
-                  >
-                    {env}
-                  </span>
-                ))}
+              <p className="type-overline text-faded mb-1.5">{t('environment.select')}</p>
+              <div className="flex flex-col gap-1">
+                {availableEnvironments.map(env => {
+                  const isActive = activeEnvironment?.id === env.id;
+                  return (
+                    <button
+                      key={env.id}
+                      role="option"
+                      aria-selected={isActive}
+                      onClick={() => {
+                        selectEnvironment(env.id);
+                        setOpen(false);
+                      }}
+                      className={cn(
+                        'flex items-center justify-between w-full text-left text-[11px] px-2 py-1.5 rounded border',
+                        isActive
+                          ? cn('bg-accent/10 text-cyan border-cyan/30')
+                          : cn(
+                              getProfileBadgeClass(env.profile),
+                              'hover:border-edge-strong cursor-pointer',
+                            ),
+                        'transition-all duration-[var(--nto-motion-base)]',
+                      )}
+                    >
+                      <span>{env.name}</span>
+                      <div className="flex items-center gap-1">
+                        {!env.isProductionLike && (
+                          <AlertTriangle size={10} className="text-yellow-400" aria-hidden="true" />
+                        )}
+                        {isActive && <Check size={11} className="text-cyan" />}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

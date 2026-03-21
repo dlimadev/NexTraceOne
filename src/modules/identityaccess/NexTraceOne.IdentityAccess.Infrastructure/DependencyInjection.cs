@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,8 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Infrastructure.Authorization;
+using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 using NexTraceOne.IdentityAccess.Infrastructure.Services;
@@ -75,6 +78,19 @@ public static class DependencyInjection
 
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
+
+        // Fase 2 — Contexto operacional e resolução de ambiente
+        services.AddScoped<EnvironmentContextAccessor>();
+        services.AddScoped<IEnvironmentContextAccessor>(sp => sp.GetRequiredService<EnvironmentContextAccessor>());
+        services.AddScoped<ITenantEnvironmentContextResolver, TenantEnvironmentContextResolver>();
+        services.AddScoped<IEnvironmentProfileResolver, EnvironmentProfileResolver>();
+        services.AddScoped<IEnvironmentAccessValidator, EnvironmentAccessValidator>();
+        services.AddScoped<IOperationalExecutionContext, OperationalExecutionContext>();
+        services.AddScoped<ICurrentEnvironment, CurrentEnvironmentAdapter>();
+
+        // Fase 2 — Authorization handlers
+        services.AddScoped<IAuthorizationHandler, EnvironmentAccessAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, OperationalContextAuthorizationHandler>();
 
         return services;
     }
