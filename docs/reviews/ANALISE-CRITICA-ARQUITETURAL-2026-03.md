@@ -331,36 +331,36 @@ O que precisa de correção é a **divergência entre complexidade estrutural e 
 
 #### 🔴 Crítico — Corrigir agora
 
-| # | Acção | Esforço |
-|---|-------|---------|
-| 1 | Mover credenciais de appsettings.json para appsettings.Development.json | 1 hora |
-| 2 | Tornar validação de JWT secret um bloqueio de startup em produção | 30 min |
-| 3 | Remover null stubs aspiracionais do BuildingBlocks | 30 min |
-| 4 | Documentar limitação de connection pool com 16 databases | 30 min |
+| # | Acção | Esforço | Estado |
+|---|-------|---------|--------|
+| 1 | Mover credenciais de appsettings.json para appsettings.Development.json | 1 hora | ✅ Feito |
+| 2 | Tornar validação de JWT secret um bloqueio de startup em produção | 30 min | ✅ Feito |
+| 3 | Remover null stubs aspiracionais do BuildingBlocks | 30 min | ✅ Feito |
+| 4 | Documentar limitação de connection pool com 16 databases | 30 min | ✅ Feito (MaxPoolSize=10 + ADR-001) |
 
 #### 🟡 Importante — Revisar em breve
 
-| # | Acção | Esforço |
-|---|-------|---------|
-| 5 | Planear consolidação de databases (16 → 4) | 2-3 dias |
-| 6 | Implementar counts reais no Governance (substituir zeros hardcoded) | 1-2 dias |
-| 7 | Marcar dados simulados do OperationalIntelligence como demo na UI | 1 dia |
-| 8 | Corrigir 21 testes de frontend falhados | 2-3 dias |
-| 9 | Adicionar estado de implementação nos docs de Phase 5-7 | 1 dia |
+| # | Acção | Esforço | Estado |
+|---|-------|---------|--------|
+| 5 | Planear consolidação de databases (16 → 4) | 2-3 dias | ✅ ADR-001 criado |
+| 6 | Implementar counts reais no Governance (substituir zeros hardcoded) | 1-2 dias | ✅ TeamCount real via TeamDomainLink |
+| 7 | Marcar dados simulados do OperationalIntelligence como demo na UI | 1 dia | ✅ IsSimulated flag + demo banner |
+| 8 | Corrigir 21 testes de frontend falhados | 2-3 dias | ✅ 394/394 passam |
+| 9 | Adicionar estado de implementação nos docs de Phase 5-7 | 1 dia | ✅ Feito |
 
 #### ✅ Aceitável — Manter por enquanto
 
-| # | Item | Razão |
-|---|------|-------|
-| 10 | In-process event bus | Suficiente para monólito |
-| 11 | Repository interfaces com 1 implementação | Valor de testabilidade |
-| 12 | Contracts projects vazios | Não bloqueia funcionalidade actual |
-| 13 | Ingestion API como stub | Pode evoluir quando houver integrações reais |
+| # | Item | Razão | Mitigação aplicada |
+|---|------|-------|-------------------|
+| 10 | In-process event bus | Suficiente para monólito | ADR-002 documenta limitações + IdempotencyKey adicionado ao OutboxMessage |
+| 11 | Repository interfaces com 1 implementação | Valor de testabilidade | — |
+| 12 | Contracts projects vazios | Não bloqueia funcionalidade actual | — |
+| 13 | Ingestion API como stub | Pode evoluir quando houver integrações reais | — |
 
 ### Se eu estivesse a assumir tecnicamente este projecto hoje:
 
-1. **Primeira semana:** Corrigir items 1-4 (segurança e limpeza)
-2. **Segundo sprint:** Consolidar databases (item 5) + counts reais (item 6)
+1. **Primeira semana:** ~~Corrigir items 1-4 (segurança e limpeza)~~ ✅ Feito
+2. **Segundo sprint:** ~~Consolidar databases (item 5) + counts reais (item 6)~~ ✅ ADR criado + counts reais implementados
 3. **Terceiro sprint:** Foco em funcionalidade real — ChangeIntelligence end-to-end com dados reais
 4. **Regra de ouro:** Zero features novas até as existentes funcionarem com dados reais
 
@@ -377,3 +377,18 @@ Análise realizada por revisão automatizada completa do repositório, incluindo
 - Inspecção de 16 DbContexts e 49+ migrações
 - Análise de 132 componentes React e 91 páginas
 - Verificação de todas as dependências e configurações
+
+### Remediação (2026-03-21)
+
+Todas as acções críticas e importantes foram implementadas:
+- ✅ Credenciais removidas do appsettings.json base → movidas para appsettings.Development.json
+- ✅ JWT secret bloqueia startup em non-Development
+- ✅ Null stubs removidos do BuildingBlocks
+- ✅ MaxPoolSize=10 em todas as connection strings
+- ✅ Warning log para auto-migrations em ambientes non-Development
+- ✅ IdempotencyKey adicionado ao OutboxMessage
+- ✅ TeamCount real no Governance via TeamDomainLink
+- ✅ IsSimulated flag + demo banner na UI de Reliability
+- ✅ 21 testes de frontend corrigidos (394/394 passam)
+- ✅ ADR-001 (consolidação de databases) e ADR-002 (event bus) criados
+- ✅ Status de implementação adicionado aos docs Phase 5-7
