@@ -81,7 +81,8 @@ public static class GetExecutiveTrends
                 Category: category,
                 Series: series,
                 Insights: insights,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true);
 
             return Task.FromResult(Result<Response>.Success(response));
         }
@@ -92,7 +93,8 @@ public static class GetExecutiveTrends
         string Category,
         IReadOnlyList<TrendSeriesDto> Series,
         IReadOnlyList<TrendInsightDto> Insights,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated);
 
     /// <summary>Série temporal com direção de tendência e pontos de dados.</summary>
     public sealed record TrendSeriesDto(

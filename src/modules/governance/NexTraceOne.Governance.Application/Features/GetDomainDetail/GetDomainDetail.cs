@@ -15,7 +15,10 @@ public static class GetDomainDetail
     public sealed record Query(string DomainId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de um domínio com equipas, serviços e dependências.</summary>
-    public sealed class Handler(IGovernanceDomainRepository domainRepository) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernanceDomainRepository domainRepository,
+        ITeamDomainLinkRepository teamDomainLinkRepository,
+        ITeamRepository teamRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -26,8 +29,23 @@ public static class GetDomainDetail
             if (domain is null)
                 return Error.NotFound("DOMAIN_NOT_FOUND", "Domain '{0}' not found.", request.DomainId);
 
-            // TODO: enriquecer com dados reais de equipas, serviços e dependências cross-domain
+            var links = await teamDomainLinkRepository.ListByDomainIdAsync(domain.Id, cancellationToken);
+
             var teams = new List<DomainTeamDto>();
+            foreach (var link in links)
+            {
+                var team = await teamRepository.GetByIdAsync(link.TeamId, cancellationToken);
+                if (team is not null)
+                {
+                    teams.Add(new DomainTeamDto(
+                        TeamId: team.Id.Value.ToString(),
+                        Name: team.Name,
+                        DisplayName: team.DisplayName,
+                        ServiceCount: 0,
+                        OwnershipType: link.OwnershipType.ToString()));
+                }
+            }
+
             var services = new List<DomainServiceDto>();
             var crossDomainDeps = new List<CrossDomainDependencyDto>();
 
@@ -38,7 +56,7 @@ public static class GetDomainDetail
                 Description: domain.Description,
                 Criticality: domain.Criticality.ToString(),
                 CapabilityClassification: domain.CapabilityClassification,
-                TeamCount: 0,
+                TeamCount: teams.Count,
                 ServiceCount: 0,
                 ActiveIncidentCount: 0,
                 RecentChangeCount: 0,

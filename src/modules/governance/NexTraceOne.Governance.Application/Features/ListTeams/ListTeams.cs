@@ -14,27 +14,33 @@ public static class ListTeams
     public sealed record Query() : IQuery<Response>;
 
     /// <summary>Handler que retorna lista de equipas com indicadores sumários.</summary>
-    public sealed class Handler(ITeamRepository teamRepository) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        ITeamRepository teamRepository,
+        ITeamDomainLinkRepository teamDomainLinkRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var teams = await teamRepository.ListAsync(status: null, cancellationToken);
 
-            var dtos = teams.Select(t => new TeamSummaryDto(
-                TeamId: t.Id.Value.ToString(),
-                Name: t.Name,
-                DisplayName: t.DisplayName,
-                Description: t.Description,
-                Status: t.Status.ToString(),
-                ServiceCount: 0,    // TODO: enriquecer com contagem real de serviços
-                ContractCount: 0,   // TODO: enriquecer com contagem real de contratos
-                MemberCount: 0,     // TODO: enriquecer com contagem real de membros
-                MaturityLevel: "Developing", // TODO: implementar cálculo de maturidade
-                ParentOrganizationUnit: t.ParentOrganizationUnit
-            )).ToList();
+            var dtos = new List<TeamSummaryDto>();
+            foreach (var t in teams)
+            {
+                var links = await teamDomainLinkRepository.ListByTeamIdAsync(t.Id, cancellationToken);
+                dtos.Add(new TeamSummaryDto(
+                    TeamId: t.Id.Value.ToString(),
+                    Name: t.Name,
+                    DisplayName: t.DisplayName,
+                    Description: t.Description,
+                    Status: t.Status.ToString(),
+                    ServiceCount: 0,    // Cross-module: requires Catalog integration
+                    ContractCount: 0,   // Cross-module: requires Catalog integration
+                    MemberCount: 0,     // Cross-module: requires IdentityAccess integration
+                    MaturityLevel: "Developing",
+                    ParentOrganizationUnit: t.ParentOrganizationUnit
+                ));
+            }
 
             var response = new Response(Teams: dtos);
-
             return Result<Response>.Success(response);
         }
     }
