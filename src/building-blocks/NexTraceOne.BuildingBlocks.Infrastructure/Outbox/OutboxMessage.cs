@@ -18,6 +18,13 @@ public sealed class OutboxMessage
     public string? LastError { get; set; }
     public Guid TenantId { get; init; }
 
+    /// <summary>
+    /// Chave de idempotência para garantir processamento único.
+    /// Formato: {EventType}:{AggregateId}:{Timestamp}.
+    /// Handlers devem verificar esta chave antes de executar side-effects.
+    /// </summary>
+    public string IdempotencyKey { get; init; } = string.Empty;
+
     /// <summary>Cria uma mensagem de outbox a partir de um evento de domínio serializado.</summary>
     public static OutboxMessage Create(object domainEvent, Guid tenantId, DateTimeOffset createdAt)
         => new()
@@ -25,6 +32,7 @@ public sealed class OutboxMessage
             EventType = domainEvent.GetType().AssemblyQualifiedName ?? domainEvent.GetType().FullName ?? domainEvent.GetType().Name,
             Payload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType()),
             TenantId = tenantId,
-            CreatedAt = createdAt
+            CreatedAt = createdAt,
+            IdempotencyKey = $"{domainEvent.GetType().AssemblyQualifiedName}:{Guid.NewGuid():N}:{createdAt:O}"
         };
 }
