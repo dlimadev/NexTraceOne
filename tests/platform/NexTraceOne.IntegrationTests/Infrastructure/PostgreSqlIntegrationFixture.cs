@@ -28,21 +28,16 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 
 /// <summary>
 /// Fixture de integração com PostgreSQL real via Testcontainers.
-/// Gerencia 11 bancos de dados isolados cobrindo todos os DbContexts da plataforma.
-/// Contextos que usam raw SQL "CREATE TABLE IF NOT EXISTS outbox_messages" podem compartilhar DB.
-/// Contextos com EF CreateTable padrão para outbox_messages requerem DB próprio para evitar conflitos.
+/// Gerencia 4 bancos de dados consolidados cobrindo todos os 16 DbContexts da plataforma (ADR-001).
+/// Todas as tabelas usam prefixos de módulo únicos e outbox_messages usa CREATE TABLE IF NOT EXISTS,
+/// permitindo múltiplos DbContexts por database sem conflitos.
 ///
-/// nextrace_it_catalog           → CatalogGraphDbContext, ContractsDbContext, DeveloperPortalDbContext (IF NOT EXISTS)
-/// nextrace_it_change_governance → ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext, RulesetGovernanceDbContext (IF NOT EXISTS)
-/// nextrace_it_identity          → IdentityDbContext
-/// nextrace_it_incidents         → IncidentDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_runtime           → RuntimeIntelligenceDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_cost              → CostIntelligenceDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_aiknowledge       → AiGovernanceDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_externalai        → ExternalAiDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_aiorchestration   → AiOrchestrationDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_governance        → GovernanceDbContext ONLY (CreateTable padrão — isolado)
-/// nextrace_it_audit             → AuditDbContext (IF NOT EXISTS — DB próprio por clareza)
+/// nextrace_it_identity   → IdentityDbContext, AuditDbContext
+/// nextrace_it_catalog    → CatalogGraphDbContext, ContractsDbContext, DeveloperPortalDbContext
+/// nextrace_it_operations → ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext,
+///                          RulesetGovernanceDbContext, IncidentDbContext, RuntimeIntelligenceDbContext,
+///                          CostIntelligenceDbContext, GovernanceDbContext
+/// nextrace_it_ai         → AiGovernanceDbContext, ExternalAiDbContext, AiOrchestrationDbContext
 /// </summary>
 public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 {
@@ -60,46 +55,36 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
     private readonly ICurrentUser _user = new TestCurrentUser();
     private readonly IDateTimeProvider _clock = new TestDateTimeProvider();
 
-    // ── Existing databases ────────────────────────────────────────────────────
+    // ── 4 consolidated databases (ADR-001) ────────────────────────────────────
+
+    public string IdentityConnectionString => _connectionStrings["identity"];
+    public string AuditConnectionString => _connectionStrings["identity"];
 
     public string CatalogConnectionString => _connectionStrings["catalog"];
     public string ContractsConnectionString => _connectionStrings["catalog"];
-    public string ChangeGovernanceConnectionString => _connectionStrings["change-governance"];
-    public string IdentityConnectionString => _connectionStrings["identity"];
-    public string IncidentsConnectionString => _connectionStrings["incidents"];
-
-    // ── Isolated databases for conflicting contexts (Phase RH-6) ─────────────
-
-    public string AiKnowledgeConnectionString => _connectionStrings["aiknowledge"];
-    public string GovernanceConnectionString => _connectionStrings["governance"];
-    public string AuditConnectionString => _connectionStrings["audit"];
-    public string RuntimeIntelligenceConnectionString => _connectionStrings["runtime"];
-    public string CostIntelligenceConnectionString => _connectionStrings["cost"];
-    public string ExternalAiConnectionString => _connectionStrings["externalai"];
-    public string AiOrchestrationConnectionString => _connectionStrings["aiorchestration"];
-
-    // ── Shared connection string aliases ────────────────────────────────────
-
     public string DeveloperPortalConnectionString => _connectionStrings["catalog"];
-    public string WorkflowConnectionString => _connectionStrings["change-governance"];
-    public string PromotionConnectionString => _connectionStrings["change-governance"];
-    public string RulesetGovernanceConnectionString => _connectionStrings["change-governance"];
+
+    public string ChangeGovernanceConnectionString => _connectionStrings["operations"];
+    public string WorkflowConnectionString => _connectionStrings["operations"];
+    public string PromotionConnectionString => _connectionStrings["operations"];
+    public string RulesetGovernanceConnectionString => _connectionStrings["operations"];
+    public string IncidentsConnectionString => _connectionStrings["operations"];
+    public string RuntimeIntelligenceConnectionString => _connectionStrings["operations"];
+    public string CostIntelligenceConnectionString => _connectionStrings["operations"];
+    public string GovernanceConnectionString => _connectionStrings["operations"];
+
+    public string AiKnowledgeConnectionString => _connectionStrings["ai"];
+    public string ExternalAiConnectionString => _connectionStrings["ai"];
+    public string AiOrchestrationConnectionString => _connectionStrings["ai"];
 
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
 
-        _connectionStrings["catalog"] = await CreateDatabaseAsync("nextrace_it_catalog");
-        _connectionStrings["change-governance"] = await CreateDatabaseAsync("nextrace_it_change_governance");
         _connectionStrings["identity"] = await CreateDatabaseAsync("nextrace_it_identity");
-        _connectionStrings["incidents"] = await CreateDatabaseAsync("nextrace_it_incidents");
-        _connectionStrings["runtime"] = await CreateDatabaseAsync("nextrace_it_runtime");
-        _connectionStrings["cost"] = await CreateDatabaseAsync("nextrace_it_cost");
-        _connectionStrings["aiknowledge"] = await CreateDatabaseAsync("nextrace_it_aiknowledge");
-        _connectionStrings["externalai"] = await CreateDatabaseAsync("nextrace_it_externalai");
-        _connectionStrings["aiorchestration"] = await CreateDatabaseAsync("nextrace_it_aiorchestration");
-        _connectionStrings["governance"] = await CreateDatabaseAsync("nextrace_it_governance");
-        _connectionStrings["audit"] = await CreateDatabaseAsync("nextrace_it_audit");
+        _connectionStrings["catalog"] = await CreateDatabaseAsync("nextrace_it_catalog");
+        _connectionStrings["operations"] = await CreateDatabaseAsync("nextrace_it_operations");
+        _connectionStrings["ai"] = await CreateDatabaseAsync("nextrace_it_ai");
 
         await ApplyMigrationsAsync();
         await InitializeRespawnersAsync();
@@ -350,7 +335,7 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         await using var identityContext = CreateIdentityDbContext();
         await identityContext.Database.MigrateAsync();
 
-        // ── Incidents / OI database ──────────────────────────────────────────
+        // ── Operations database (ChangeGov + OI + Governance) ────────────────
         await using var incidentsContext = CreateIncidentDbContext();
         await incidentsContext.Database.MigrateAsync();
 
@@ -360,7 +345,14 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         await using var costContext = CreateCostIntelligenceDbContext();
         await costContext.Database.MigrateAsync();
 
-        // ── AIKnowledge database ─────────────────────────────────────────────
+        await using var governanceContext = CreateGovernanceDbContext();
+        await governanceContext.Database.MigrateAsync();
+
+        // ── Identity database (Identity + Audit) ─────────────────────────────
+        await using var auditContext = CreateAuditDbContext();
+        await auditContext.Database.MigrateAsync();
+
+        // ── AI database ──────────────────────────────────────────────────────
         await using var aiGovContext = CreateAiGovernanceDbContext();
         await aiGovContext.Database.MigrateAsync();
 
@@ -369,14 +361,6 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
         await using var aiOrchContext = CreateAiOrchestrationDbContext();
         await aiOrchContext.Database.MigrateAsync();
-
-        // ── Governance database ──────────────────────────────────────────────
-        await using var governanceContext = CreateGovernanceDbContext();
-        await governanceContext.Database.MigrateAsync();
-
-        // ── Audit database ───────────────────────────────────────────────────
-        await using var auditContext = CreateAuditDbContext();
-        await auditContext.Database.MigrateAsync();
     }
 
     private async Task InitializeRespawnersAsync()

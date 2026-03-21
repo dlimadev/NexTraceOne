@@ -1,7 +1,8 @@
 # ADR-001: Database Consolidation Plan (16 → 4)
 
-**Status:** Proposed  
+**Status:** Implemented  
 **Date:** 2026-03-21  
+**Implemented:** 2026-03-22  
 **Context:** Architectural Analysis (ANALISE-CRITICA-ARQUITETURAL-2026-03.md)
 
 ## Context
@@ -29,7 +30,7 @@ Consolidate 16 databases into 4, using PostgreSQL schemas for module isolation w
 
 1. **Phase 1 — Pool Size (Done):** Add `Maximum Pool Size=10` to all connection strings (160 max total)
 2. **Phase 2 — Schema prefixes:** Add PostgreSQL schema configuration to each DbContext's `OnModelCreating`
-3. **Phase 3 — Connection string consolidation:** Point related contexts to the same database
+3. **Phase 3 — Connection string consolidation (Done):** Point related contexts to the same database. All 17 connection string keys now map to 4 physical databases. All tables use unique module prefixes (`identity_`, `ci_`, `oi_`, `gov_`, `aud_`, `eg_`, `ct_`, `dp_`, `wf_`, `rg_`, `prm_`, `ai_gov_`, `ext_ai_`, `ai_orch_`) so no conflicts exist. The `outbox_messages` table uses `CREATE TABLE IF NOT EXISTS` in all migrations.
 4. **Phase 4 — Migration consolidation:** Merge migration histories into 4 pipelines
 
 ## Consequences

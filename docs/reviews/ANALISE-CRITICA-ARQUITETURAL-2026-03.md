@@ -342,7 +342,7 @@ O que precisa de correção é a **divergência entre complexidade estrutural e 
 
 | # | Acção | Esforço | Estado |
 |---|-------|---------|--------|
-| 5 | Planear consolidação de databases (16 → 4) | 2-3 dias | ✅ ADR-001 criado |
+| 5 | Planear consolidação de databases (16 → 4) | 2-3 dias | ✅ Implementado — consolidado de 7 para 4 databases |
 | 6 | Implementar counts reais no Governance (substituir zeros hardcoded) | 1-2 dias | ✅ TeamCount real via TeamDomainLink |
 | 7 | Marcar dados simulados do OperationalIntelligence como demo na UI | 1 dia | ✅ IsSimulated flag + demo banner |
 | 8 | Corrigir 21 testes de frontend falhados | 2-3 dias | ✅ 394/394 passam |
