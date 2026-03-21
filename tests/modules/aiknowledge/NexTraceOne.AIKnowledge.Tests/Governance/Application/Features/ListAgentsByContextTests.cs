@@ -54,8 +54,8 @@ public sealed class ListAgentsByContextTests
     [Fact]
     public async Task Handle_RestApiContext_ShouldReturnAgentsForApiDesignAndTestGeneration()
     {
-        var apiAgent = CreateAgent("api-contract-author", AgentCategory.ApiDesign, isOfficial: true);
-        var testAgent = CreateAgent("api-test-scenario", AgentCategory.TestGeneration, isOfficial: true);
+        var apiAgent = CreateAgent("api-contract-author", AgentCategory.ApiDesign, isOfficial: true, displayName: "API Contract Author");
+        var testAgent = CreateAgent("api-test-scenario", AgentCategory.TestGeneration, isOfficial: true, displayName: "API Test Scenario Generator");
 
         _repository.ListByCategoriesAsync(
             Arg.Any<IReadOnlyList<AgentCategory>>(),
@@ -97,7 +97,7 @@ public sealed class ListAgentsByContextTests
     [Fact]
     public async Task Handle_SoapContext_ShouldReturnSoapDesignAgents()
     {
-        var soapAgent = CreateAgent("soap-contract-author", AgentCategory.SoapDesign, isOfficial: true);
+        var soapAgent = CreateAgent("soap-contract-author", AgentCategory.SoapDesign, isOfficial: true, displayName: "SOAP Contract Author");
 
         _repository.ListByCategoriesAsync(
             Arg.Any<IReadOnlyList<AgentCategory>>(),
@@ -140,7 +140,7 @@ public sealed class ListAgentsByContextTests
     [Fact]
     public async Task Handle_KafkaContext_ShouldReturnEventDesignAgents()
     {
-        var kafkaAgent = CreateAgent("kafka-schema-contract", AgentCategory.EventDesign, isOfficial: true);
+        var kafkaAgent = CreateAgent("kafka-schema-contract", AgentCategory.EventDesign, isOfficial: true, displayName: "Kafka Schema Contract Designer");
 
         _repository.ListByCategoriesAsync(
             Arg.Any<IReadOnlyList<AgentCategory>>(),
@@ -262,11 +262,13 @@ public sealed class ListAgentsByContextTests
         string name,
         AgentCategory category,
         bool isOfficial = false,
-        string icon = "🤖")
+        string icon = "🤖",
+        string? displayName = null)
     {
+        var resolvedDisplayName = displayName ?? name.Replace("-", " ");
         return AiAgent.Register(
             name,
-            name.Replace("-", " ").Replace("api", "API").Replace("soap", "SOAP"),
+            resolvedDisplayName,
             $"Test agent for {name}",
             category,
             isOfficial,

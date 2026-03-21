@@ -62,6 +62,11 @@ interface AiAgentsSectionProps {
   className?: string;
 }
 
+// ── Constants ────────────────────────────────────────────────────────────────
+
+/** Maximum number of capability tags displayed per agent card. */
+const MAX_DISPLAYED_CAPABILITIES = 3;
+
 /**
  * Derivação do contexto de módulo a partir do protocolo e tipo de serviço do contrato.
  */
@@ -122,7 +127,9 @@ export function AiAgentsSection({ contract, className }: AiAgentsSectionProps) {
     setExecutionError(null);
     setExecutionResult(null);
 
-    // Build contextual input enriched with contract info
+    // Build contextual input enriched with contract info.
+    // Note: these field labels are intentionally in English — they are part
+    // of the AI model prompt, not user-visible UI strings.
     const contextualInput = `Contract: ${contract.friendlyName} (${contract.technicalName})
 Protocol: ${contract.protocol}
 Service Type: ${contract.serviceType}
@@ -371,14 +378,24 @@ function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
                   {agent.targetPersona}
                 </span>
               )}
-              {agent.capabilities && agent.capabilities.split(',').slice(0, 3).map(cap => (
-                <span
-                  key={cap}
-                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-elevated text-muted"
-                >
-                  {cap.trim()}
-                </span>
-              ))}
+              {agent.capabilities && (() => {
+                const caps = agent.capabilities.split(',').map(c => c.trim()).filter(Boolean);
+                return (
+                  <>
+                    {caps.slice(0, MAX_DISPLAYED_CAPABILITIES).map(cap => (
+                      <span
+                        key={cap}
+                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-elevated text-muted"
+                      >
+                        {cap}
+                      </span>
+                    ))}
+                    {caps.length > MAX_DISPLAYED_CAPABILITIES && (
+                      <span className="text-[9px] text-muted">+{caps.length - MAX_DISPLAYED_CAPABILITIES}</span>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>
