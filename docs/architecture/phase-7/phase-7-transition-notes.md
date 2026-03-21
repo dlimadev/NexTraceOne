@@ -98,3 +98,19 @@ A Phase 7 não altera estes testes.
 - `ai:runtime:write` requerido para todos os endpoints
 - Grounding não inclui dados sensíveis (apenas metadados)
 - CorrelationId disponível para rastreabilidade em logs
+
+---
+
+## Implementation Status (as of March 2026)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| AnalyzeNonProdEnvironment | ✅ Implemented | Validates non-prod profiles, returns analysis context |
+| CompareEnvironments | ✅ Implemented | Compares two environments with signal data |
+| AssessPromotionReadiness | ✅ Implemented | Validates source/target profiles for promotion |
+| AI Analysis endpoints (3) | ✅ Implemented | POST /api/v1/aiorchestration/analysis/* |
+| AiAnalysisPage frontend | ✅ Implemented | 3-tab UI for analysis features |
+| Real LLM integration | ❌ Not implemented | Handlers use structured analysis without actual LLM calls |
+| Cross-module signal data | ❌ Not implemented | Correlation interfaces exist but have no concrete implementations |
+
+**Summary:** The AI analysis features are implemented at the handler level with proper validation, environment profile checking, and structured responses. However, they do not call a real LLM — they return structured analysis based on input parameters and validation rules. Real AI capabilities require: (1) concrete implementations of IDistributedSignalCorrelationService and IPromotionRiskSignalProvider, and (2) LLM integration through the existing AI runtime infrastructure.

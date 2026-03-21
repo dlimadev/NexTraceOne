@@ -14,27 +14,33 @@ public static class ListDomains
     public sealed record Query() : IQuery<Response>;
 
     /// <summary>Handler que retorna lista de domínios com indicadores sumários.</summary>
-    public sealed class Handler(IGovernanceDomainRepository domainRepository) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernanceDomainRepository domainRepository,
+        ITeamDomainLinkRepository teamDomainLinkRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var domains = await domainRepository.ListAsync(criticality: null, cancellationToken);
 
-            var dtos = domains.Select(d => new DomainSummaryDto(
-                DomainId: d.Id.Value.ToString(),
-                Name: d.Name,
-                DisplayName: d.DisplayName,
-                Description: d.Description,
-                Criticality: d.Criticality.ToString(),
-                TeamCount: 0,       // TODO: enriquecer com contagem real de equipas
-                ServiceCount: 0,    // TODO: enriquecer com contagem real de serviços
-                ContractCount: 0,   // TODO: enriquecer com contagem real de contratos
-                MaturityLevel: "Developing", // TODO: implementar cálculo de maturidade
-                CapabilityClassification: d.CapabilityClassification
-            )).ToList();
+            var dtos = new List<DomainSummaryDto>();
+            foreach (var d in domains)
+            {
+                var links = await teamDomainLinkRepository.ListByDomainIdAsync(d.Id, cancellationToken);
+                dtos.Add(new DomainSummaryDto(
+                    DomainId: d.Id.Value.ToString(),
+                    Name: d.Name,
+                    DisplayName: d.DisplayName,
+                    Description: d.Description,
+                    Criticality: d.Criticality.ToString(),
+                    TeamCount: links.Count,
+                    ServiceCount: 0,    // Cross-module: requires Catalog integration
+                    ContractCount: 0,   // Cross-module: requires Catalog integration
+                    MaturityLevel: "Developing",
+                    CapabilityClassification: d.CapabilityClassification
+                ));
+            }
 
             var response = new Response(Domains: dtos);
-
             return Result<Response>.Success(response);
         }
     }

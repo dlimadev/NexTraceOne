@@ -2003,6 +2003,10 @@
   "reliability": {
     "title": "Service Reliability",
     "subtitle": "Team-owned service reliability overview — health, trends and operational context",
+    "demoBanner": {
+      "title": "Demo Data:",
+      "description": "The data shown on this page is simulated for demonstration purposes. Real data will be available when cross-module integration is complete."
+    },
     "totalServices": "Total Services",
     "healthyServices": "Healthy",
     "degradedServices": "Degraded",

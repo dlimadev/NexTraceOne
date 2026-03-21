@@ -118,3 +118,20 @@ O novo `ContextualLoggingBehavior` é adicionado automaticamente ao pipeline Med
 | `Integrations/IntegrationBindingDescriptorTests.cs` | 4 testes — criação, NullResolver |
 
 **Total de testes da suite BuildingBlocks.Application após Fase 5:** 38 (passando)
+
+---
+
+## Implementation Status (as of March 2026)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| ContextPropagationHeaders | ✅ Implemented | Headers defined and propagated |
+| DistributedExecutionContext | ✅ Implemented | Context model defined |
+| ContextualLoggingBehavior | ✅ Implemented | MediatR pipeline enriches logs with tenant/environment |
+| IIntegrationContextResolver | ⚠️ Interface only | No concrete implementation. Null stub removed. |
+| IDistributedSignalCorrelationService | ⚠️ Interface only | No concrete implementation. Null stub removed. |
+| IPromotionRiskSignalProvider | ⚠️ Interface only | No concrete implementation. Null stub removed. |
+| TelemetryContextEnricher | ✅ Implemented | OpenTelemetry activities enriched with nexttrace.* tags |
+| IntegrationEventBase tenant fields | ✅ Implemented | TenantId? and EnvironmentId? added |
+
+**Summary:** Core context propagation infrastructure is implemented and working. The three cross-module correlation interfaces are defined but have no implementations — they were designed as future extension points. Null stub implementations were removed to reduce cognitive overhead.

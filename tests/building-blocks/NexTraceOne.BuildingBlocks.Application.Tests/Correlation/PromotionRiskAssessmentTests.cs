@@ -62,15 +62,4 @@ public sealed class PromotionRiskAssessmentTests
         assessment.ShouldBlock.Should().BeFalse();
     }
 
-    [Fact]
-    public void NullProvider_ShouldReturnNoneRisk()
-    {
-        var provider = new NullPromotionRiskSignalProvider();
-        var result = provider.AssessPromotionRiskAsync(
-            TenantId, SourceEnvId, TargetEnvId, "api", DateTimeOffset.UtcNow).Result;
-
-        result.RiskLevel.Should().Be(PromotionRiskLevel.None);
-        result.ShouldBlock.Should().BeFalse();
-        result.Signals.Should().BeEmpty();
-    }
 }

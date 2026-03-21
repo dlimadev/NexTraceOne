@@ -75,7 +75,8 @@ public static class GetServiceReliabilityDetail
                         new RunbookSummaryItem("Order API — Incident Response", "https://docs.internal/runbooks/order-api"),
                     ],
                     AnomalySummary: "No anomalies detected in the last 24 hours.",
-                    Coverage: new ReliabilityCoverageIndicators(true, true, true, true, true, true)),
+                    Coverage: new ReliabilityCoverageIndicators(true, true, true, true, true, true),
+                    IsSimulated: true),
 
                 "svc-payment-gateway" => new Response(
                     Identity: new ServiceIdentity("svc-payment-gateway", "Payment Gateway", "RestApi", "Payments", "payment-squad", "Critical"),
@@ -98,7 +99,8 @@ public static class GetServiceReliabilityDetail
                         new RunbookSummaryItem("Payment Gateway — Degradation Playbook", "https://docs.internal/runbooks/payment-gw"),
                     ],
                     AnomalySummary: "Error rate anomaly detected: 5.2% vs expected 1.0%. Correlated with recent change v3.1.0.",
-                    Coverage: new ReliabilityCoverageIndicators(true, true, true, true, true, true)),
+                    Coverage: new ReliabilityCoverageIndicators(true, true, true, true, true, true),
+                    IsSimulated: true),
 
                 "svc-catalog-sync" => new Response(
                     Identity: new ServiceIdentity("svc-catalog-sync", "Catalog Sync", "IntegrationComponent", "Catalog", "platform-squad", "Medium"),
@@ -115,7 +117,8 @@ public static class GetServiceReliabilityDetail
                     LinkedContracts: [],
                     Runbooks: [],
                     AnomalySummary: "Complete service failure — dependency unavailable.",
-                    Coverage: new ReliabilityCoverageIndicators(true, false, false, false, false, true)),
+                    Coverage: new ReliabilityCoverageIndicators(true, false, false, false, false, true),
+                    IsSimulated: true),
 
                 _ => null
             };
@@ -178,5 +181,6 @@ public static class GetServiceReliabilityDetail
         IReadOnlyList<ContractSummaryItem> LinkedContracts,
         IReadOnlyList<RunbookSummaryItem> Runbooks,
         string AnomalySummary,
-        ReliabilityCoverageIndicators Coverage);
+        ReliabilityCoverageIndicators Coverage,
+        bool IsSimulated);
 }

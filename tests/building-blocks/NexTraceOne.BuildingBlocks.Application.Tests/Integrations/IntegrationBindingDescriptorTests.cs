@@ -26,27 +26,4 @@ public sealed class IntegrationBindingDescriptorTests
         binding.EnvironmentId.Should().BeNull(); // global binding
     }
 
-    [Fact]
-    public void NullResolver_ShouldReturnNullForResolve()
-    {
-        var resolver = new NullIntegrationContextResolver();
-        var result = resolver.ResolveAsync("kafka", Guid.NewGuid(), null).Result;
-        result.Should().BeNull();
-    }
-
-    [Fact]
-    public void NullResolver_ShouldReturnEmptyForListActive()
-    {
-        var resolver = new NullIntegrationContextResolver();
-        var result = resolver.ListActiveBindingsAsync(Guid.NewGuid(), null).Result;
-        result.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void NullResolver_HasActiveBinding_ShouldBeFalse()
-    {
-        var resolver = new NullIntegrationContextResolver();
-        var result = resolver.HasActiveBindingAsync("kafka", Guid.NewGuid(), null).Result;
-        result.Should().BeFalse();
-    }
 }

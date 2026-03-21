@@ -63,8 +63,10 @@ public static class StartupValidation
             var jwtSecret = configuration["Jwt:Secret"];
             if (string.IsNullOrWhiteSpace(jwtSecret))
             {
-                validationWarnings.Add("Jwt:Secret");
-                logger.LogWarning("Jwt:Secret is empty in non-Development environment. Authentication may fail.");
+                logger.LogCritical("Jwt:Secret is empty in non-Development environment. Authentication will fail. Aborting startup.");
+                throw new InvalidOperationException(
+                    "NexTraceOne startup aborted: Jwt:Secret must be configured in non-Development environments. " +
+                    "Set the Jwt:Secret configuration value via environment variables or a secrets manager.");
             }
         }
 

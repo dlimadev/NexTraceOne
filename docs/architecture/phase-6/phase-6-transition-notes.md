@@ -83,3 +83,19 @@
 - O `WorkspaceSwitcher` agora depende de `EnvironmentProvider` — qualquer uso fora do
   `AuthProvider > EnvironmentProvider` precisará de mock ou wrapper
 - Todos os testes afetados foram atualizados com mocks adequados
+
+---
+
+## Implementation Status (as of March 2026)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| EnvironmentContext.tsx | ✅ Implemented | React context with real API call to fetch environments |
+| useEnvironment / useEnvironmentProfile | ✅ Implemented | Custom hooks for environment-aware components |
+| X-Environment-Id header in API client | ✅ Implemented | Sent on every API request |
+| WorkspaceSwitcher | ✅ Implemented | Dynamic environment selector in shell |
+| EnvironmentBanner | ✅ Implemented | Visual warning for non-production environments |
+| AssistantPanel env context | ✅ Implemented | AI assistant receives environment context |
+| tokenStorage env persistence | ✅ Implemented | sessionStorage-based with `nxt_eid` key |
+
+**Summary:** Frontend environment context is fully implemented and integrated across all components. The environment selector, banner, and context propagation work end-to-end.

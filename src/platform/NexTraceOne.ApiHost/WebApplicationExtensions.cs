@@ -47,6 +47,16 @@ public static class WebApplicationExtensions
         if (!shouldMigrate)
             return;
 
+        if (!app.Environment.IsDevelopment())
+        {
+            var migrationLogger = app.Services.GetRequiredService<ILogger<Program>>();
+            migrationLogger.LogWarning(
+                "Auto-migrations are running in non-Development environment '{Environment}'. " +
+                "This is unsafe for production deployments with multiple instances. " +
+                "Consider using a CI/CD migration pipeline instead.",
+                app.Environment.EnvironmentName);
+        }
+
         using var migrationScope = app.Services.CreateScope();
         var logger = migrationScope.ServiceProvider
             .GetRequiredService<ILogger<Program>>();
