@@ -23,12 +23,12 @@ interface QuickstartStepRoute {
 /** Rotas recomendadas por persona para cada passo do quickstart. */
 const stepRoutes: Record<Persona, QuickstartStepRoute[]> = {
   Engineer: [{ to: '/services' }, { to: '/changes' }, { to: '/operations/incidents' }, { to: '/contracts' }],
-  TechLead: [{ to: '/services' }, { to: '/changes' }, { to: '/operations/reliability', preview: true }, { to: '/operations/incidents' }],
-  Architect: [{ to: '/services/graph' }, { to: '/contracts' }, { to: '/changes' }, { to: '/governance/risk', preview: true }],
-  Product: [{ to: '/changes' }, { to: '/operations/reliability', preview: true }, { to: '/governance/risk', preview: true }, { to: '/operations/incidents' }],
-  Executive: [{ to: '/governance/executive', preview: true }, { to: '/governance/risk', preview: true }, { to: '/services' }, { to: '/governance/compliance', preview: true }],
-  PlatformAdmin: [{ to: '/governance/policies', preview: true }, { to: '/ai/models', preview: true }, { to: '/users' }, { to: '/governance/reports', preview: true }],
-  Auditor: [{ to: '/audit' }, { to: '/governance/evidence', preview: true }, { to: '/governance/compliance', preview: true }, { to: '/ai/policies', preview: true }],
+  TechLead: [{ to: '/services' }, { to: '/changes' }, { to: '/operations/reliability' }, { to: '/operations/incidents' }],
+  Architect: [{ to: '/services/graph' }, { to: '/contracts' }, { to: '/changes' }, { to: '/governance/risk' }],
+  Product: [{ to: '/changes' }, { to: '/operations/reliability' }, { to: '/governance/risk' }, { to: '/operations/incidents' }],
+  Executive: [{ to: '/governance/executive' }, { to: '/governance/risk' }, { to: '/services' }, { to: '/governance/compliance' }],
+  PlatformAdmin: [{ to: '/governance/policies' }, { to: '/ai/models' }, { to: '/users' }, { to: '/governance/reports' }],
+  Auditor: [{ to: '/audit' }, { to: '/governance/evidence' }, { to: '/governance/compliance' }, { to: '/ai/policies' }],
 };
 
 function getCompleted(): Set<string> {

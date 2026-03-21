@@ -77,6 +77,8 @@ export type Permission =
   | 'ai:policies:write'
   | 'ai:ide:read'
   | 'ai:ide:write'
+  | 'ai:runtime:read'
+  | 'ai:runtime:write'
   | 'ai:governance:read'
   // ── Governance ──
   | 'governance:read'
