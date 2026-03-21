@@ -77,16 +77,17 @@ export const EnvironmentContext = createContext<EnvironmentContextValue | null>(
 /**
  * Infere o perfil do ambiente a partir do slug ou nome quando o backend
  * ainda não retorna o campo `profile` (antes da migração AddEnvironmentProfileFields).
- * Critério: correspondência parcial case-insensitive no slug ou nome.
+ * Usa correspondência por palavra-limite para evitar falsos positivos como "product-catalog".
  */
 function inferProfile(slug: string, name: string): EnvironmentProfile {
   const text = `${slug} ${name}`.toLowerCase();
-  if (text.includes('prod')) return 'production';
-  if (text.includes('staging') || text.includes('stage')) return 'staging';
-  if (text.includes('uat')) return 'uat';
-  if (text.includes('qa') || text.includes('test')) return 'qa';
-  if (text.includes('dev')) return 'development';
-  if (text.includes('sandbox') || text.includes('demo')) return 'sandbox';
+  // Word-boundary matching using \b to avoid matching 'prod' in 'product-catalog'
+  if (/\bprod(?:uction)?\b/.test(text)) return 'production';
+  if (/\bstag(?:ing|e)?\b/.test(text)) return 'staging';
+  if (/\buat\b/.test(text)) return 'uat';
+  if (/\bqa\b|\btest\b/.test(text)) return 'qa';
+  if (/\bdev(?:elopment)?\b/.test(text)) return 'development';
+  if (/\bsandbox\b|\bdemo\b/.test(text)) return 'sandbox';
   return 'unknown';
 }
 

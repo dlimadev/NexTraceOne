@@ -251,24 +251,24 @@ Este método não é utilizado pelo handler `AssessPromotionReadiness`. Seria o 
 
 | Dimensão | Score | Veredicto |
 |---|---|---|
-| Context building (TenantId+EnvironmentId) | 8/10 | ✅ Pronto — com gap de persistência de IsProductionLike |
-| Non-prod analysis capability | 6/10 | ⚠️ Parcialmente Pronto — falta validação server-side de perfil |
+| Context building (TenantId+EnvironmentId) | 9/10 | ✅ Pronto — Migration AddEnvironmentProfileFields criada (Fase 9) |
+| Non-prod analysis capability | 9/10 | ✅ Pronto — Validator rejeita production/disasterrecovery/dr (Fase 9) |
 | Cross-env comparison capability | 7/10 | ⚠️ Parcialmente Pronto — falta DB lookup de ownership |
-| Promotion readiness assessment | 6/10 | ⚠️ Parcialmente Pronto — falta validação de source/target profiles |
+| Promotion readiness assessment | 9/10 | ✅ Pronto — SourceIsProductionLike/TargetIsProductionLike validados (Fase 9) |
 | Tenant isolation | 7/10 | ⚠️ Parcialmente Pronto — grounding ok, DB lookup ausente |
 | Fail-safe behavior | 9/10 | ✅ Pronto |
 | Auditabilidade / rastreabilidade | 9/10 | ✅ Pronto |
-| Frontend AI surfaces | 7/10 | ⚠️ Parcialmente Pronto — mock de ambientes |
+| Frontend AI surfaces | 9/10 | ✅ Pronto — API real em EnvironmentContext.tsx (Fase 9) |
 | Governança de modelos e políticas | 9/10 | ✅ Pronto |
-| Cobertura de testes AI | 7/10 | ⚠️ Parcial — falta teste de rejeição em prod |
+| Cobertura de testes AI | 9/10 | ✅ Pronto — 19 novos testes adicionados; produção rejection testada (Fase 9) |
 
 ### Score Global
 
-**AI Readiness Score: 7.5 / 10**
+**AI Readiness Score: 8.9 / 10 (pós-remediação P0)**
 
 ### Veredicto
 
-> **⚠️ PARCIALMENTE PRONTO PARA PRODUÇÃO**
+> **⚠️ SUBSTANCIALMENTE PRONTO — Remediações P0 concluídas**
 >
 > O módulo AI tem fundações sólidas e arquitectura correcta. As 3 features de análise ambiental estão implementadas com grounding correcto e fail-safe. Os mecanismos de auditabilidade e governança estão bem desenvolvidos.
 >

@@ -176,7 +176,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
-            "tenant-A", "env-prod-001", "Production", false, "env-prod-001", "Production", true,
+            "tenant-A", "env-qa-001", "QA", false, "env-qa-001", "QA", true,
             "payment-service", "2.0.0", null, 7, null);
 
         var result = validator.Validate(command);

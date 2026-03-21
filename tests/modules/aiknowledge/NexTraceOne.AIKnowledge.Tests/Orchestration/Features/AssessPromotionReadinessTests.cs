@@ -95,11 +95,11 @@ public sealed class AssessPromotionReadinessTests
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
             TenantId: "tenant-acme-001",
-            SourceEnvironmentId: "env-prod-001",
-            SourceEnvironmentName: "Production",
+            SourceEnvironmentId: "env-qa-001",
+            SourceEnvironmentName: "QA",
             SourceIsProductionLike: false,
-            TargetEnvironmentId: "env-prod-001", // same
-            TargetEnvironmentName: "Production",
+            TargetEnvironmentId: "env-qa-001", // same as source — the issue
+            TargetEnvironmentName: "QA",
             TargetIsProductionLike: true,
             ServiceName: "payment-service",
             Version: "2.1.0",
