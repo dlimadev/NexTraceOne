@@ -81,6 +81,18 @@ public sealed class Environment : Entity<EnvironmentId>
     /// </summary>
     public bool IsProductionLike { get; private set; }
 
+    /// <summary>
+    /// Indica se este é o ambiente produtivo principal do tenant.
+    /// Cada tenant deve ter no máximo um ambiente marcado como produção principal ativa.
+    /// A regra de unicidade é garantida por índice parcial no banco de dados:
+    /// apenas um ambiente ativo com IsPrimaryProduction=true por TenantId.
+    ///
+    /// Este campo é a fonte de verdade para o conceito de "ambiente de produção" no tenant —
+    /// usado pela IA para comparação de ambientes não produtivos, análise de risco de release
+    /// e avaliação de readiness para promoção.
+    /// </summary>
+    public bool IsPrimaryProduction { get; private set; }
+
     /// <summary>Data/hora UTC de criação do ambiente.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -137,7 +149,8 @@ public sealed class Environment : Entity<EnvironmentId>
         string? code = null,
         string? description = null,
         string? region = null,
-        bool? isProductionLike = null)
+        bool? isProductionLike = null,
+        bool isPrimaryProduction = false)
     {
         Guard.Against.Null(tenantId);
         Guard.Against.NullOrWhiteSpace(name, message: "Environment name is required.");
@@ -160,7 +173,8 @@ public sealed class Environment : Entity<EnvironmentId>
             Code = code,
             Description = description,
             Region = region,
-            IsProductionLike = productionLike
+            IsProductionLike = productionLike,
+            IsPrimaryProduction = isPrimaryProduction
         };
     }
 
@@ -180,8 +194,37 @@ public sealed class Environment : Entity<EnvironmentId>
         Description = description;
     }
 
+    /// <summary>Atualiza o nome e a ordem do ambiente.</summary>
+    public void UpdateBasicInfo(string name, int sortOrder)
+    {
+        Guard.Against.NullOrWhiteSpace(name, message: "Environment name is required.");
+        Guard.Against.Negative(sortOrder, message: "Environment sort order must be zero or positive.");
+        Name = name;
+        SortOrder = sortOrder;
+    }
+
+    /// <summary>
+    /// Designa este ambiente como o ambiente de produção principal do tenant.
+    /// O ambiente deve estar ativo para poder ser designado como produção principal.
+    /// O isolamento de unicidade é garantido a nível de banco de dados.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Se o ambiente não estiver ativo.</exception>
+    public void DesignateAsPrimaryProduction()
+    {
+        if (!IsActive)
+            throw new InvalidOperationException("An inactive environment cannot be designated as the primary production environment.");
+        IsPrimaryProduction = true;
+    }
+
+    /// <summary>Remove a designação de produção principal deste ambiente.</summary>
+    public void RevokePrimaryProductionDesignation() => IsPrimaryProduction = false;
+
     /// <summary>Desativa o ambiente, impedindo novos acessos e operações.</summary>
-    public void Deactivate() => IsActive = false;
+    public void Deactivate()
+    {
+        IsActive = false;
+        IsPrimaryProduction = false; // Um ambiente inativo não pode ser produção principal
+    }
 
     /// <summary>Atualiza a ordem de exibição do ambiente.</summary>
     /// <param name="sortOrder">Novo valor de ordenação (deve ser zero ou positivo).</param>

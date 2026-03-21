@@ -2294,5 +2294,54 @@
       "blocker": "BLOQUEIO",
       "warning": "AVISO"
     }
+  },
+  "environments": {
+    "title": "Ambientes",
+    "subtitle": "Gerencie os ambientes operacionais do seu tenant",
+    "createEnvironment": "Criar Ambiente",
+    "createNewEnvironment": "Criar Novo Ambiente",
+    "editEnvironment": "Editar Ambiente",
+    "name": "Nome",
+    "slug": "Slug",
+    "code": "Código",
+    "description": "Descrição",
+    "region": "Região",
+    "sortOrder": "Ordem",
+    "profile": "Perfil Operacional",
+    "criticality": "Criticidade",
+    "isProductionLike": "Similar à Produção",
+    "isPrimaryProduction": "Produção Principal",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "activate": "Ativar",
+    "deactivate": "Desativar",
+    "setAsPrimary": "Definir como Produção Principal",
+    "primaryProductionBadge": "Produção Principal",
+    "productionLikeBadge": "Similar à Produção",
+    "noEnvironmentsFound": "Nenhum ambiente configurado para este tenant.",
+    "slugHelp": "Identificador único (minúsculas, hifens permitidos)",
+    "codeHelp": "Código interno curto (ex.: PROD, QA-EU)",
+    "isPrimaryProductionHelp": "Designa este ambiente como o ambiente de produção principal do tenant. Apenas um ambiente pode ter esta designação.",
+    "confirmSetPrimary": "Definir {{name}} como ambiente de produção principal? A produção principal atual será revogada.",
+    "primaryProductionUpdated": "Ambiente de produção principal atualizado.",
+    "environmentCreated": "Ambiente criado com sucesso.",
+    "environmentUpdated": "Ambiente atualizado com sucesso.",
+    "profiles": {
+      "Development": "Desenvolvimento",
+      "Validation": "Validação / QA",
+      "Staging": "Homologação / Staging",
+      "Production": "Produção",
+      "Sandbox": "Sandbox",
+      "DisasterRecovery": "Recuperação de Desastre",
+      "Training": "Treinamento",
+      "UserAcceptanceTesting": "Teste de Aceite (UAT)",
+      "PerformanceTesting": "Teste de Performance"
+    },
+    "criticalities": {
+      "Low": "Baixa",
+      "Medium": "Média",
+      "High": "Alta",
+      "Critical": "Crítica"
+    }
   }
 }

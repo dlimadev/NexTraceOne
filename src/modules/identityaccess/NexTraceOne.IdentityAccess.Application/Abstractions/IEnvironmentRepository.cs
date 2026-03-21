@@ -14,8 +14,20 @@ public interface IEnvironmentRepository
     /// <summary>Obtém um ambiente pelo identificador.</summary>
     Task<Environment?> GetByIdAsync(EnvironmentId id, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Obtém um ambiente pelo identificador, garantindo que pertence ao tenant informado.
+    /// Retorna null se não encontrado ou se pertencer a outro tenant.
+    /// </summary>
+    Task<Environment?> GetByIdForTenantAsync(EnvironmentId id, TenantId tenantId, CancellationToken cancellationToken);
+
     /// <summary>Lista ambientes ativos de um tenant, ordenados por SortOrder.</summary>
     Task<IReadOnlyList<Environment>> ListByTenantAsync(TenantId tenantId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Obtém o ambiente designado como produção principal ativo do tenant.
+    /// Retorna null se nenhum ambiente estiver designado como produção principal.
+    /// </summary>
+    Task<Environment?> GetPrimaryProductionAsync(TenantId tenantId, CancellationToken cancellationToken);
 
     /// <summary>Verifica se o slug já existe no tenant.</summary>
     Task<bool> SlugExistsAsync(TenantId tenantId, string slug, CancellationToken cancellationToken);

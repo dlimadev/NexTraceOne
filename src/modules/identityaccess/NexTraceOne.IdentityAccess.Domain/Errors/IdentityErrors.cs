@@ -195,4 +195,16 @@ public static class IdentityErrors
     /// <summary>Nível de acesso ao ambiente inválido.</summary>
     public static Error InvalidEnvironmentAccessLevel(string accessLevel)
         => Error.Validation("Identity.Environment.InvalidAccessLevel", "Access level '{0}' is not valid. Valid levels: read, write, admin, none.", accessLevel);
+
+    /// <summary>Já existe um ambiente produtivo principal ativo neste tenant.</summary>
+    public static Error PrimaryProductionAlreadyExists(Guid tenantId)
+        => Error.Conflict("Identity.Environment.PrimaryProductionAlreadyExists", "Tenant '{0}' already has an active primary production environment. Revoke the current designation before setting a new one.", tenantId);
+
+    /// <summary>Ambiente não pertence ao tenant especificado.</summary>
+    public static Error EnvironmentNotBelongsToTenant(Guid environmentId, Guid tenantId)
+        => Error.Forbidden("Identity.Environment.NotBelongsToTenant", "Environment '{0}' does not belong to tenant '{1}'.", environmentId, tenantId);
+
+    /// <summary>Ambiente inativo não pode ser designado como produção principal.</summary>
+    public static Error CannotDesignateInactiveAsPrimaryProduction(Guid environmentId)
+        => Error.Validation("Identity.Environment.CannotDesignateInactiveAsPrimaryProduction", "Environment '{0}' is not active and cannot be designated as the primary production environment.", environmentId);
 }

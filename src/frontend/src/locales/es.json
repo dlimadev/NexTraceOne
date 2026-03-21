@@ -3010,5 +3010,54 @@
       "blocker": "BLOQUEO",
       "warning": "ADVERTENCIA"
     }
+  },
+  "environments": {
+    "title": "Entornos",
+    "subtitle": "Gestiona los entornos operativos de tu tenant",
+    "createEnvironment": "Crear Entorno",
+    "createNewEnvironment": "Crear Nuevo Entorno",
+    "editEnvironment": "Editar Entorno",
+    "name": "Nombre",
+    "slug": "Slug",
+    "code": "Código",
+    "description": "Descripción",
+    "region": "Región",
+    "sortOrder": "Orden",
+    "profile": "Perfil Operativo",
+    "criticality": "Criticidad",
+    "isProductionLike": "Similar a Producción",
+    "isPrimaryProduction": "Producción Principal",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "setAsPrimary": "Establecer como Producción Principal",
+    "primaryProductionBadge": "Producción Principal",
+    "productionLikeBadge": "Similar a Producción",
+    "noEnvironmentsFound": "No hay entornos configurados para este tenant.",
+    "slugHelp": "Identificador único (minúsculas, guiones permitidos)",
+    "codeHelp": "Código interno corto (ej.: PROD, QA-EU)",
+    "isPrimaryProductionHelp": "Designa este entorno como el entorno de producción principal del tenant.",
+    "confirmSetPrimary": "¿Establecer {{name}} como entorno de producción principal?",
+    "primaryProductionUpdated": "Entorno de producción principal actualizado.",
+    "environmentCreated": "Entorno creado exitosamente.",
+    "environmentUpdated": "Entorno actualizado exitosamente.",
+    "profiles": {
+      "Development": "Desarrollo",
+      "Validation": "Validación / QA",
+      "Staging": "Staging / Homologación",
+      "Production": "Producción",
+      "Sandbox": "Sandbox",
+      "DisasterRecovery": "Recuperación ante Desastres",
+      "Training": "Entrenamiento",
+      "UserAcceptanceTesting": "Prueba de Aceptación (UAT)",
+      "PerformanceTesting": "Prueba de Rendimiento"
+    },
+    "criticalities": {
+      "Low": "Baja",
+      "Medium": "Media",
+      "High": "Alta",
+      "Critical": "Crítica"
+    }
   }
 }
