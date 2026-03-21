@@ -132,6 +132,7 @@ export const WORKSPACE_SECTIONS = [
 
   { id: 'consumers', labelKey: 'contracts.workspace.consumers', icon: 'Users', group: 'relationships' },
   { id: 'dependencies', labelKey: 'contracts.workspace.dependencies', icon: 'Network', group: 'relationships' },
+  { id: 'ai-agents', labelKey: 'contracts.workspace.aiAgents', icon: 'Bot', group: 'ai' },
 ] as const;
 
 /** Agrupa secções por grupo funcional para rendering do sidebar. */
@@ -140,6 +141,7 @@ export const WORKSPACE_SECTION_GROUPS = [
   { key: 'contract', labelKey: 'contracts.workspace.groups.contract' },
   { key: 'governance', labelKey: 'contracts.workspace.groups.governance' },
   { key: 'relationships', labelKey: 'contracts.workspace.groups.relationships' },
+  { key: 'ai', labelKey: 'contracts.workspace.groups.ai' },
 ] as const;
 
 // Re-export tipo para conveniência

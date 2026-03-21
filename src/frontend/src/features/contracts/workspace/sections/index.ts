@@ -11,3 +11,4 @@ export { ChangelogSection } from './ChangelogSection';
 export { ApprovalsSection } from './ApprovalsSection';
 export { ConsumersSection } from './ConsumersSection';
 export { DependenciesSection } from './DependenciesSection';
+export { AiAgentsSection } from './AiAgentsSection';

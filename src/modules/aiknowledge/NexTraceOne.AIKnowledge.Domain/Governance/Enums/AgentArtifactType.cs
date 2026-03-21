@@ -8,6 +8,7 @@ namespace NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 /// Documentation: documentação gerada.
 /// Analysis: resultado de análise.
 /// Generic: artefacto genérico.
+/// SoapContractDraft: rascunho de contrato SOAP/WSDL.
 /// </summary>
 public enum AgentArtifactType
 {
@@ -19,4 +20,5 @@ public enum AgentArtifactType
     Analysis = 5,
     CodeReview = 6,
     Checklist = 7,
+    SoapContractDraft = 8,
 }

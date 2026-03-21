@@ -21,4 +21,5 @@ public enum AgentCategory
     TestGeneration = 12,
     EventDesign = 13,
     DocumentationAssistance = 14,
+    SoapDesign = 15,
 }

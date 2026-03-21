@@ -33,6 +33,7 @@ using EnrichContextFeature = NexTraceOne.AIKnowledge.Application.Governance.Feat
 using ListAvailableModelsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAvailableModels.ListAvailableModels;
 using ListAgentsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAgents.ListAgents;
 using GetAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgent.GetAgent;
+using ListAgentsByContextFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAgentsByContext.ListAgentsByContext;
 using CreateAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateAgent.CreateAgent;
 using UpdateAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateAgent.UpdateAgent;
 using ExecuteAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteAgent.ExecuteAgent;
@@ -172,6 +173,17 @@ public sealed class AiGovernanceEndpointModule
         {
             var result = await sender.Send(
                 new ListAgentsFeature.Query(isOfficial), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+
+        group.MapGet("/by-context", async (
+            string context,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListAgentsByContextFeature.Query(context), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:read");
 

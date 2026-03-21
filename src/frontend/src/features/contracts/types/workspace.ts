@@ -17,7 +17,8 @@ export type WorkspaceSectionId =
   | 'compliance'
   | 'validation'
   | 'consumers'
-  | 'dependencies';
+  | 'dependencies'
+  | 'ai-agents';
 
 /** Grupo funcional de secções no workspace. */
 export type WorkspaceSectionGroup =
