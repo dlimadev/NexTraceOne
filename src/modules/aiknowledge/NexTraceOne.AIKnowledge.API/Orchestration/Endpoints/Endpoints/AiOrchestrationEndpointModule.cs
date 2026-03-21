@@ -7,6 +7,9 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using AskCatalogQuestionFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AskCatalogQuestion.AskCatalogQuestion;
 using ClassifyChangeWithAIFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI.ClassifyChangeWithAI;
 using SuggestSemanticVersionWithAIFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.SuggestSemanticVersionWithAI.SuggestSemanticVersionWithAI;
+using AnalyzeNonProdEnvironmentFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeNonProdEnvironment.AnalyzeNonProdEnvironment;
+using CompareEnvironmentsFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments.CompareEnvironments;
+using AssessPromotionReadinessFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotionReadiness.AssessPromotionReadiness;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -25,6 +28,7 @@ public sealed class AiOrchestrationEndpointModule
         MapCatalogEndpoints(app);
         MapChangeEndpoints(app);
         MapContractEndpoints(app);
+        MapEnvironmentAnalysisEndpoints(app);
     }
 
     private static void MapCatalogEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
@@ -63,6 +67,41 @@ public sealed class AiOrchestrationEndpointModule
 
         group.MapPost("/suggest-version", async (
             SuggestSemanticVersionWithAIFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+    }
+
+    private static void MapEnvironmentAnalysisEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration/analysis");
+
+        group.MapPost("/non-prod", async (
+            AnalyzeNonProdEnvironmentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/compare-environments", async (
+            CompareEnvironmentsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/promotion-readiness", async (
+            AssessPromotionReadinessFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

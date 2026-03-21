@@ -268,7 +268,8 @@
     "sectionOrganization": "Organização",
     "teams": "Equipas",
     "domains": "Domínios",
-    "delegatedAdmin": "Admin Delegado"
+    "delegatedAdmin": "Admin Delegado",
+    "aiAnalysis": "Análise de IA"
   },
   "platformOps": {
     "title": "Operações da Plataforma",
@@ -3130,6 +3131,57 @@
       "development": "Desenvolvimento",
       "sandbox": "Sandbox",
       "unknown": "Desconhecido"
+    }
+  },
+  "aiAnalysis": {
+    "title": "Análise de IA",
+    "subtitle": "Análise de ambientes e avaliação de prontidão para promoção assistida por IA",
+    "analyzingContext": "A analisar: {{environment}}",
+    "nonProductionMode": "Ambiente não produtivo",
+    "noContextAvailable": "Nenhum tenant ou ambiente activo. Seleccione um workspace para continuar.",
+    "fallback": "Fallback",
+    "correlationId": "ID de correlação",
+    "tabs": {
+      "non-prod": "Risco Não-Prod",
+      "compare": "Comparar",
+      "readiness": "Prontidão"
+    },
+    "errors": {
+      "analysisFailedTryAgain": "Análise falhou. Por favor, tente novamente.",
+      "comparisonFailed": "Comparação de ambientes falhou. Por favor, tente novamente.",
+      "readinessFailed": "Avaliação de prontidão falhou. Por favor, tente novamente."
+    },
+    "nonProd": {
+      "title": "Análise de Risco Não Produtivo",
+      "description": "Analisar {{environment}} em busca de sinais que possam representar risco para produção.",
+      "runAnalysis": "Executar Análise",
+      "productionNotApplicable": "Análise de não-produtivo não se aplica a ambientes similares à produção.",
+      "overallRisk": "Risco Global",
+      "findings": "Descobertas"
+    },
+    "compare": {
+      "title": "Comparação de Ambientes",
+      "description": "Comparar o ambiente activo com outro ambiente do mesmo tenant.",
+      "subjectLabel": "Sujeito (activo)",
+      "referenceLabel": "Ambiente de referência",
+      "selectReference": "Seleccionar ambiente de referência...",
+      "runComparison": "Comparar",
+      "divergences": "Divergências"
+    },
+    "readiness": {
+      "title": "Prontidão para Promoção",
+      "description": "Avaliar a prontidão para promover um serviço do ambiente activo para o destino.",
+      "serviceName": "Nome do serviço",
+      "version": "Versão",
+      "targetEnvironment": "Ambiente de destino",
+      "selectTarget": "Seleccionar ambiente de destino...",
+      "assess": "Avaliar Prontidão",
+      "score": "Pontuação",
+      "blockers": "Bloqueadores",
+      "warnings": "Avisos",
+      "blocked": "BLOQUEADO",
+      "blocker": "BLOQUEIO",
+      "warning": "AVISO"
     }
   }
 }

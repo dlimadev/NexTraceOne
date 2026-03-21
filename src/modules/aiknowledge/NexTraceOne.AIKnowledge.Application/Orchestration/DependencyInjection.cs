@@ -1,8 +1,11 @@
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeNonProdEnvironment;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotionReadiness;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AskCatalogQuestion;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.SuggestSemanticVersionWithAI;
 using NexTraceOne.BuildingBlocks.Application;
 
@@ -23,6 +26,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<AskCatalogQuestion.Command>, AskCatalogQuestion.Validator>();
         services.AddTransient<IValidator<ClassifyChangeWithAI.Command>, ClassifyChangeWithAI.Validator>();
         services.AddTransient<IValidator<SuggestSemanticVersionWithAI.Command>, SuggestSemanticVersionWithAI.Validator>();
+        services.AddTransient<IValidator<AnalyzeNonProdEnvironment.Command>, AnalyzeNonProdEnvironment.Validator>();
+        services.AddTransient<IValidator<CompareEnvironments.Command>, CompareEnvironments.Validator>();
+        services.AddTransient<IValidator<AssessPromotionReadiness.Command>, AssessPromotionReadiness.Validator>();
         return services;
     }
 }

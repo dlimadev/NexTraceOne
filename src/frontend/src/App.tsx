@@ -62,6 +62,7 @@ const AiRoutingPage = lazy(() => import('./features/ai-hub/pages/AiRoutingPage')
 const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegrationsPage').then(m => ({ default: m.IdeIntegrationsPage })));
 const TokenBudgetPage = lazy(() => import('./features/ai-hub/pages/TokenBudgetPage').then(m => ({ default: m.TokenBudgetPage })));
 const AiAuditPage = lazy(() => import('./features/ai-hub/pages/AiAuditPage').then(m => ({ default: m.AiAuditPage })));
+const AiAnalysisPage = lazy(() => import('./features/ai-hub/pages/AiAnalysisPage').then(m => ({ default: m.AiAnalysisPage })));
 
 // ── Governance (lazy) ──
 const ExecutiveOverviewPage = lazy(() => import('./features/governance/pages/ExecutiveOverviewPage').then(m => ({ default: m.ExecutiveOverviewPage })));
@@ -409,6 +410,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="ai:governance:read" redirectTo="/unauthorized">
                     <AiAuditPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai/analysis"
+                element={
+                  <ProtectedRoute permission="ai:runtime:write" redirectTo="/unauthorized">
+                    <AiAnalysisPage />
                   </ProtectedRoute>
                 }
               />

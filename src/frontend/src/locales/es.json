@@ -163,7 +163,8 @@
     "valueTracking": "Seguimiento de Valor",
     "platformOperations": "Operaciones de la Plataforma",
     "governancePacks": "Packs de Gobernanza",
-    "waivers": "Excepciones y Exenciones"
+    "waivers": "Excepciones y Exenciones",
+    "aiAnalysis": "Análisis de IA"
   },
   "platformOps": {
     "title": "Operaciones de la Plataforma",
@@ -2920,6 +2921,57 @@
       "development": "Desarrollo",
       "sandbox": "Sandbox",
       "unknown": "Desconocido"
+    }
+  },
+  "aiAnalysis": {
+    "title": "Análisis de IA",
+    "subtitle": "Análisis de entornos y evaluación de preparación para promoción asistida por IA",
+    "analyzingContext": "Analizando: {{environment}}",
+    "nonProductionMode": "Entorno no productivo",
+    "noContextAvailable": "No hay tenant ni entorno activo. Seleccione un workspace para continuar.",
+    "fallback": "Fallback",
+    "correlationId": "ID de correlación",
+    "tabs": {
+      "non-prod": "Riesgo No-Prod",
+      "compare": "Comparar",
+      "readiness": "Preparación"
+    },
+    "errors": {
+      "analysisFailedTryAgain": "El análisis falló. Por favor, inténtelo de nuevo.",
+      "comparisonFailed": "La comparación de entornos falló. Por favor, inténtelo de nuevo.",
+      "readinessFailed": "La evaluación de preparación falló. Por favor, inténtelo de nuevo."
+    },
+    "nonProd": {
+      "title": "Análisis de Riesgo No Productivo",
+      "description": "Analizar {{environment}} en busca de señales que puedan representar riesgo para producción.",
+      "runAnalysis": "Ejecutar Análisis",
+      "productionNotApplicable": "El análisis de no-producción no aplica a entornos similares a producción.",
+      "overallRisk": "Riesgo General",
+      "findings": "Hallazgos"
+    },
+    "compare": {
+      "title": "Comparación de Entornos",
+      "description": "Comparar el entorno activo con otro entorno del mismo tenant.",
+      "subjectLabel": "Sujeto (activo)",
+      "referenceLabel": "Entorno de referencia",
+      "selectReference": "Seleccionar entorno de referencia...",
+      "runComparison": "Comparar",
+      "divergences": "Divergencias"
+    },
+    "readiness": {
+      "title": "Preparación para Promoción",
+      "description": "Evaluar la preparación para promover un servicio del entorno activo al destino.",
+      "serviceName": "Nombre del servicio",
+      "version": "Versión",
+      "targetEnvironment": "Entorno de destino",
+      "selectTarget": "Seleccionar entorno de destino...",
+      "assess": "Evaluar Preparación",
+      "score": "Puntuación",
+      "blockers": "Bloqueadores",
+      "warnings": "Advertencias",
+      "blocked": "BLOQUEADO",
+      "blocker": "BLOQUEO",
+      "warning": "ADVERTENCIA"
     }
   }
 }

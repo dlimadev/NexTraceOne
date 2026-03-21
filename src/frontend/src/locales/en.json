@@ -273,7 +273,8 @@
     "sectionOrganization": "Organization",
     "teams": "Teams",
     "domains": "Domains",
-    "delegatedAdmin": "Delegated Admin"
+    "delegatedAdmin": "Delegated Admin",
+    "aiAnalysis": "AI Analysis"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -3878,6 +3879,57 @@
       "development": "Development",
       "sandbox": "Sandbox",
       "unknown": "Unknown"
+    }
+  },
+  "aiAnalysis": {
+    "title": "AI Analysis",
+    "subtitle": "AI-powered environment analysis and promotion readiness assessment",
+    "analyzingContext": "Analyzing: {{environment}}",
+    "nonProductionMode": "Non-production environment",
+    "noContextAvailable": "No active tenant or environment context. Please select a workspace to proceed.",
+    "fallback": "Fallback",
+    "correlationId": "Correlation ID",
+    "tabs": {
+      "non-prod": "Non-Prod Risk",
+      "compare": "Compare",
+      "readiness": "Readiness"
+    },
+    "errors": {
+      "analysisFailedTryAgain": "Analysis failed. Please try again.",
+      "comparisonFailed": "Environment comparison failed. Please try again.",
+      "readinessFailed": "Promotion readiness assessment failed. Please try again."
+    },
+    "nonProd": {
+      "title": "Non-Production Risk Analysis",
+      "description": "Analyze {{environment}} for signals that may represent risk to production.",
+      "runAnalysis": "Run Analysis",
+      "productionNotApplicable": "Non-prod analysis is not applicable for production-like environments.",
+      "overallRisk": "Overall Risk",
+      "findings": "Findings"
+    },
+    "compare": {
+      "title": "Environment Comparison",
+      "description": "Compare the active environment with another environment in the same tenant.",
+      "subjectLabel": "Subject (active)",
+      "referenceLabel": "Reference environment",
+      "selectReference": "Select reference environment...",
+      "runComparison": "Compare",
+      "divergences": "Divergences"
+    },
+    "readiness": {
+      "title": "Promotion Readiness",
+      "description": "Assess readiness for promoting a service from the active environment to target.",
+      "serviceName": "Service name",
+      "version": "Version",
+      "targetEnvironment": "Target environment",
+      "selectTarget": "Select target environment...",
+      "assess": "Assess Readiness",
+      "score": "Score",
+      "blockers": "Blockers",
+      "warnings": "Warnings",
+      "blocked": "BLOCKED",
+      "blocker": "BLOCKER",
+      "warning": "WARNING"
     }
   }
 }

@@ -124,4 +124,44 @@ export const aiGovernanceApi = {
     client.get('/ai/providers').then(r => r.data),
   checkProvidersHealth: () =>
     client.get('/ai/providers/health').then(r => r.data),
+
+  // ── AI Environment Analysis (Phase 7) ────────────────────────────────
+  analyzeNonProdEnvironment: (data: {
+    tenantId: string;
+    environmentId: string;
+    environmentName: string;
+    environmentProfile: string;
+    serviceFilter?: string[] | null;
+    observationWindowDays: number;
+    preferredProvider?: string | null;
+  }) =>
+    client.post('/aiorchestration/analysis/non-prod', data).then(r => r.data),
+
+  compareEnvironments: (data: {
+    tenantId: string;
+    subjectEnvironmentId: string;
+    subjectEnvironmentName: string;
+    subjectEnvironmentProfile: string;
+    referenceEnvironmentId: string;
+    referenceEnvironmentName: string;
+    referenceEnvironmentProfile: string;
+    serviceFilter?: string[] | null;
+    comparisonDimensions?: string[] | null;
+    preferredProvider?: string | null;
+  }) =>
+    client.post('/aiorchestration/analysis/compare-environments', data).then(r => r.data),
+
+  assessPromotionReadiness: (data: {
+    tenantId: string;
+    sourceEnvironmentId: string;
+    sourceEnvironmentName: string;
+    targetEnvironmentId: string;
+    targetEnvironmentName: string;
+    serviceName: string;
+    version: string;
+    releaseId?: string | null;
+    observationWindowDays: number;
+    preferredProvider?: string | null;
+  }) =>
+    client.post('/aiorchestration/analysis/promotion-readiness', data).then(r => r.data),
 };
