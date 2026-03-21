@@ -34,9 +34,9 @@ describe('tokenStorage — segurança de sessão', () => {
     clearAllTokens();
   });
 
-  it('armazena access token em sessionStorage', () => {
+  it('armazena access token em memória', () => {
     storeTokens('my-access-token', 'my-refresh-token');
-    expect(sessionStorage.getItem('nxt_at')).toBe('my-access-token');
+    expect(getAccessToken()).toBe('my-access-token');
   });
 
   it('NÃO armazena refresh token em sessionStorage ou localStorage', () => {
@@ -96,7 +96,7 @@ describe('tokenStorage — segurança de sessão', () => {
   });
 
   describe('migrateFromLocalStorage', () => {
-    it('migra tokens de localStorage para sessionStorage/memória', () => {
+    it('migra tenant e user de localStorage para sessionStorage', () => {
       localStorage.setItem('access_token', 'legacy-access');
       localStorage.setItem('refresh_token', 'legacy-refresh');
       localStorage.setItem('tenant_id', 'legacy-tenant');
@@ -104,8 +104,9 @@ describe('tokenStorage — segurança de sessão', () => {
 
       migrateFromLocalStorage();
 
-      expect(getAccessToken()).toBe('legacy-access');
-      expect(getRefreshToken()).toBe('legacy-refresh');
+      // Apenas tenant_id e user_id são migrados para sessionStorage.
+      // access_token e refresh_token são removidos do localStorage sem migração
+      // (o utilizador precisa re-autenticar após migração).
       expect(getTenantId()).toBe('legacy-tenant');
       expect(getUserId()).toBe('legacy-user');
     });

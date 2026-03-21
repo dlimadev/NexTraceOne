@@ -33,7 +33,21 @@ export const finalProductionIncludedRoutePrefixes = [
   '/platform',
 ] as const;
 
-export const finalProductionExcludedRoutePrefixes = [] as const;
+export const finalProductionExcludedRoutePrefixes = [
+  '/portal',
+  '/governance',
+  '/integrations',
+  '/analytics',
+  '/operations/runbooks',
+  '/operations/reliability',
+  '/operations/automation',
+  '/ai/models',
+  '/ai/policies',
+  '/ai/routing',
+  '/ai/ide',
+  '/ai/budgets',
+  '/ai/audit',
+] as const;
 
 function normalizeRoute(route: string): string {
   if (!route) {

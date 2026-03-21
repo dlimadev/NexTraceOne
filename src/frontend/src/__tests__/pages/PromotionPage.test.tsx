@@ -79,9 +79,9 @@ describe('PromotionPage', () => {
       items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0,
     });
     renderPromotion();
-    expect(screen.getByText('development')).toBeInTheDocument();
-    expect(screen.getByText('staging')).toBeInTheDocument();
-    expect(screen.getByText('production')).toBeInTheDocument();
+    expect(screen.getByText('Development')).toBeInTheDocument();
+    expect(screen.getByText('Staging')).toBeInTheDocument();
+    expect(screen.getByText('Production')).toBeInTheDocument();
   });
 
   it('exibe o botão para criar nova requisição', () => {
