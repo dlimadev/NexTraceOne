@@ -367,7 +367,7 @@ export function ServiceCatalogPage() {
                 ) : (
                   <ul className="divide-y divide-edge">
                     {filteredApis.map((api) => (
-                      <li key={api.apiAssetId} className="px-6 py-4 flex items-center gap-4 hover:bg-hover transition-colors cursor-pointer" onClick={() => selectNodeForImpact(api.apiAssetId)}>
+                      <li key={api.apiAssetId} className="px-6 py-4 flex items-center gap-4 hover:bg-hover transition-colors cursor-pointer" role="button" tabIndex={0} onClick={() => selectNodeForImpact(api.apiAssetId)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectNodeForImpact(api.apiAssetId); } }}>
                         <div className="w-10 h-10 rounded-lg bg-info/15 flex items-center justify-center text-info">
                           <Globe size={18} />
                         </div>
@@ -490,7 +490,7 @@ function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSele
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {Array.from(serviceApiMap.values()).map(({ service, apis }) => (
           <Card key={service.serviceAssetId} className="overflow-hidden">
-            <CardHeader className={`${nodeColors.service.bg} cursor-pointer`} onClick={() => onSelectNode(service.serviceAssetId)}>
+            <CardHeader className={`${nodeColors.service.bg} cursor-pointer`} role="button" tabIndex={0} onClick={() => onSelectNode(service.serviceAssetId)} onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelectNode(service.serviceAssetId); } }}>
               <div className="flex items-center gap-2">
                 <Server size={16} className={nodeColors.service.text} />
                 <div>
