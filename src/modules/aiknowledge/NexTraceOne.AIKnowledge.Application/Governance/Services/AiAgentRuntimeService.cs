@@ -243,6 +243,7 @@ public sealed class AiAgentRuntimeService(
     {
         AgentCategory.ContractGovernance => AgentArtifactType.OpenApiDraft,
         AgentCategory.ApiDesign => AgentArtifactType.OpenApiDraft,
+        AgentCategory.SoapDesign => AgentArtifactType.SoapContractDraft,
         AgentCategory.TestGeneration => AgentArtifactType.TestScenarios,
         AgentCategory.EventDesign => AgentArtifactType.KafkaSchema,
         AgentCategory.DocumentationAssistance => AgentArtifactType.Documentation,
@@ -254,6 +255,7 @@ public sealed class AiAgentRuntimeService(
     private static string DeriveArtifactFormat(AgentArtifactType type) => type switch
     {
         AgentArtifactType.OpenApiDraft => "yaml",
+        AgentArtifactType.SoapContractDraft => "xml",
         AgentArtifactType.TestScenarios => "json",
         AgentArtifactType.KafkaSchema => "json",
         AgentArtifactType.Documentation => "markdown",

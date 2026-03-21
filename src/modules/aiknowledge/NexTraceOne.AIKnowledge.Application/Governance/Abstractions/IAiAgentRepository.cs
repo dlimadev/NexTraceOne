@@ -1,4 +1,5 @@
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 
@@ -12,6 +13,12 @@ public interface IAiAgentRepository
     Task<IReadOnlyList<AiAgent>> ListAsync(
         bool? isActive,
         bool? isOfficial,
+        CancellationToken ct);
+
+    /// <summary>Lista agents filtrando por categorias específicas.</summary>
+    Task<IReadOnlyList<AiAgent>> ListByCategoriesAsync(
+        IReadOnlyList<AgentCategory> categories,
+        bool? isActive,
         CancellationToken ct);
 
     /// <summary>Obtém um agent pelo identificador fortemente tipado.</summary>

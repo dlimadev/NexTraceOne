@@ -868,6 +868,29 @@
       "Approved": "Aprovado",
       "Rejected": "Rejeitado",
       "Published": "Publicado"
+    },
+    "workspace": {
+      "aiAgents": "Agentes de IA",
+      "aiAgentsTitle": "Agentes de IA",
+      "aiAgentsSubtitle": "Agentes recomendados para contratos {{context}}. Selecione um agente e forneça o contexto para gerar artefactos governados.",
+      "aiAgentsLoading": "Carregando agentes de IA...",
+      "aiAgentsLoadError": "Falha ao carregar agentes de IA para este tipo de contrato.",
+      "aiAgentsEmpty": "Nenhum agente de IA disponível para este tipo de contrato.",
+      "aiAgentsInputLabel": "Descreva o que precisa",
+      "aiAgentsInputPlaceholder": "Ex: Gerar uma especificação OpenAPI completa para esta API com endpoints de autenticação...",
+      "aiAgentsContextNote": "O contexto do contrato é incluído automaticamente no input do agente.",
+      "aiAgentsRun": "Executar Agente",
+      "aiAgentsRunning": "Executando...",
+      "aiAgentsExecuteError": "Falha na execução do agente. Tente novamente.",
+      "aiAgentsExecutionComplete": "Agente concluído com sucesso",
+      "aiAgentsArtifacts": "Artefactos Gerados",
+      "aiAgentsArtifactPending": "Aguardando revisão",
+      "aiAgentsOutput": "Saída",
+      "aiAgentsTokens": "{{prompt}} tokens de prompt + {{completion}} de conclusão",
+      "aiAgentsOpenAssistant": "Abrir Assistente de IA",
+      "groups": {
+        "ai": "IA"
+      }
     }
   },
   "workflow": {

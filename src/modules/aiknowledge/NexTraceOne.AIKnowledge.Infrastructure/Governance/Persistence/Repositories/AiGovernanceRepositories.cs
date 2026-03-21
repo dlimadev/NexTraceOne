@@ -346,6 +346,19 @@ internal sealed class AiAgentRepository(AiGovernanceDbContext context) : IAiAgen
         return await query.OrderBy(a => a.SortOrder).ThenBy(a => a.DisplayName).ToListAsync(ct);
     }
 
+    public async Task<IReadOnlyList<AiAgent>> ListByCategoriesAsync(
+        IReadOnlyList<AgentCategory> categories,
+        bool? isActive,
+        CancellationToken ct)
+    {
+        var query = context.Agents.Where(a => categories.Contains(a.Category));
+
+        if (isActive.HasValue)
+            query = query.Where(a => a.IsActive == isActive.Value);
+
+        return await query.OrderBy(a => a.SortOrder).ThenBy(a => a.DisplayName).ToListAsync(ct);
+    }
+
     public async Task<AiAgent?> GetByIdAsync(AiAgentId id, CancellationToken ct)
         => await context.Agents.SingleOrDefaultAsync(a => a.Id == id, ct);
 

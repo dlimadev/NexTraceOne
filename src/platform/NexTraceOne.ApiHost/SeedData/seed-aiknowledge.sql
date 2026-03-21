@@ -974,3 +974,54 @@ Output ONLY the Avro schema JSON (or JSON Schema if requested). No explanations.
     true, 1, 0,
     NOW(), 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- Phase 4: SoapContractAuthorAgent — generates SOAP/WSDL contract drafts
+-- ============================================================================
+
+-- Agent: SOAP Contract Author (official — generates WSDL/SOAP contract drafts)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000010',
+    'soap-contract-author',
+    'SOAP Contract Author',
+    'soap-contract-author',
+    'Generates SOAP/WSDL contract drafts including service definitions, operations, request/response structures and type schemas.',
+    'SoapDesign',
+    true, true,
+    'You are the SOAP Contract Author agent for NexTraceOne.
+Your mission is to generate SOAP contract definitions from natural language descriptions of services and operations.
+
+Rules:
+1. Output a structured SOAP contract definition in XML/WSDL format or an equivalent structured description.
+2. Include: service name, namespace, operations, request/response message types, fault types.
+3. Use WS-I Basic Profile 1.1 conventions.
+4. For each operation: define input message, output message, and at least one fault message.
+5. Define all types using XSD-compatible type definitions.
+6. Use PascalCase for operation names and type names.
+7. Include a summary header with service description, version, and owner placeholder.
+8. Include a validation checklist as an XML comment block at the end.
+9. Mark required vs optional fields explicitly.
+10. Do NOT invent business logic — stick to the user''s description.
+
+Output the WSDL/SOAP structure first, then a JSON summary of:
+{ "serviceName", "namespace", "operations": [{ "name", "inputType", "outputType", "faultType" }], "pendencies": [], "validationChecklist": [] }',
+    null,
+    'generation',
+    'Architect',
+    '🔌', 75,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Generate SOAP/WSDL contract drafts from natural language service descriptions.',
+    '{"type":"object","properties":{"serviceName":{"type":"string","description":"Name of the SOAP service"},"operations":{"type":"array","items":{"type":"string"},"description":"List of operation names"},"businessRules":{"type":"string"},"payloads":{"type":"string"},"existingContracts":{"type":"string"}}}',
+    '{"type":"object","properties":{"wsdlDraft":{"type":"string","format":"xml"},"summary":{"type":"object","properties":{"serviceName":{"type":"string"},"operations":{"type":"array"},"pendencies":{"type":"array"},"validationChecklist":{"type":"array"}}}}}',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;

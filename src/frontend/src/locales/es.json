@@ -728,7 +728,30 @@
     "violationRule": "Regla",
     "violationSeverity": "Severidad",
     "violations": "Violaciones",
-    "violationsTitle": "Violaciones de Reglas"
+    "violationsTitle": "Violaciones de Reglas",
+    "workspace": {
+      "aiAgents": "Agentes IA",
+      "aiAgentsTitle": "Agentes IA",
+      "aiAgentsSubtitle": "Agentes recomendados para contratos {{context}}. Selecciona un agente y proporciona contexto para generar artefactos gobernados.",
+      "aiAgentsLoading": "Cargando agentes IA...",
+      "aiAgentsLoadError": "Error al cargar agentes IA para este tipo de contrato.",
+      "aiAgentsEmpty": "No hay agentes IA disponibles para este tipo de contrato.",
+      "aiAgentsInputLabel": "Describe lo que necesitas",
+      "aiAgentsInputPlaceholder": "Ej: Generar una especificación OpenAPI completa para esta API con endpoints de autenticación...",
+      "aiAgentsContextNote": "El contexto del contrato se incluye automáticamente en el input del agente.",
+      "aiAgentsRun": "Ejecutar Agente",
+      "aiAgentsRunning": "Ejecutando...",
+      "aiAgentsExecuteError": "Error al ejecutar el agente. Inténtalo de nuevo.",
+      "aiAgentsExecutionComplete": "Agente completado con éxito",
+      "aiAgentsArtifacts": "Artefactos Generados",
+      "aiAgentsArtifactPending": "Pendiente de revisión",
+      "aiAgentsOutput": "Salida",
+      "aiAgentsTokens": "{{prompt}} tokens de prompt + {{completion}} de completado",
+      "aiAgentsOpenAssistant": "Abrir Asistente IA",
+      "groups": {
+        "ai": "IA"
+      }
+    }
   },
   "workflow": {
     "title": "Workflow y Aprobaciones",

@@ -896,7 +896,28 @@
         "invalid": "Invalid format",
         "unclosedTag": "Unclosed XML tag detected"
       },
-      "validation": "Validation"
+      "validation": "Validation",
+      "aiAgents": "AI Agents",
+      "aiAgentsTitle": "AI Agents",
+      "aiAgentsSubtitle": "Recommended agents for {{context}} contracts. Select an agent and provide context to generate governed artifacts.",
+      "aiAgentsLoading": "Loading AI agents...",
+      "aiAgentsLoadError": "Failed to load AI agents for this contract type.",
+      "aiAgentsEmpty": "No AI agents available for this contract type.",
+      "aiAgentsInputLabel": "Describe what you need",
+      "aiAgentsInputPlaceholder": "e.g. Generate a complete OpenAPI spec for this API with authentication endpoints...",
+      "aiAgentsContextNote": "Contract context is automatically included in the agent input.",
+      "aiAgentsRun": "Run Agent",
+      "aiAgentsRunning": "Running...",
+      "aiAgentsExecuteError": "Agent execution failed. Please try again.",
+      "aiAgentsExecutionComplete": "Agent completed successfully",
+      "aiAgentsArtifacts": "Generated Artifacts",
+      "aiAgentsArtifactPending": "Pending review",
+      "aiAgentsOutput": "Output",
+      "aiAgentsTokens": "{{prompt}} prompt + {{completion}} completion tokens",
+      "aiAgentsOpenAssistant": "Open AI Assistant",
+      "groups": {
+        "ai": "AI"
+      }
     },
     "builder": {
       "validation": {

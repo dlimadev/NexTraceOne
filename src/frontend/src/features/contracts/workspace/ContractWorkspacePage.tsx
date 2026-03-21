@@ -18,6 +18,7 @@ import {
   ApprovalsSection,
   ConsumersSection,
   DependenciesSection,
+  AiAgentsSection,
 } from './sections';
 import { StudioRail } from './components/StudioRail';
 import {
@@ -167,6 +168,9 @@ export function ContractWorkspacePage() {
 
       case 'dependencies':
         return <DependenciesSection contract={studioContract} />;
+
+      case 'ai-agents':
+        return <AiAgentsSection contract={studioContract} />;
 
       default:
         return null;

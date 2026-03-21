@@ -132,6 +132,8 @@ export const aiGovernanceApi = {
   // ── AI Agents ─────────────────────────────────────────────────────
   listAgents: (params?: { isOfficial?: boolean }) =>
     client.get('/ai/agents', { params }).then(r => r.data),
+  listAgentsByContext: (context: string) =>
+    client.get('/ai/agents/by-context', { params: { context } }).then(r => r.data),
   getAgent: (agentId: string) =>
     client.get(`/ai/agents/${agentId}`).then(r => r.data),
   createAgent: (data: {
