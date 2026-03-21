@@ -21,8 +21,18 @@ public static class AssessPromotionReadiness
         string TenantId,
         string SourceEnvironmentId,
         string SourceEnvironmentName,
+        /// <summary>
+        /// Indica se o ambiente de origem é equivalente a produção.
+        /// Deve ser false — a promoção parte de um ambiente não produtivo.
+        /// </summary>
+        bool SourceIsProductionLike,
         string TargetEnvironmentId,
         string TargetEnvironmentName,
+        /// <summary>
+        /// Indica se o ambiente de destino é equivalente a produção.
+        /// Deve ser true — a promoção avança para produção ou equivalente.
+        /// </summary>
+        bool TargetIsProductionLike,
         string ServiceName,
         string Version,
         string? ReleaseId,
@@ -41,6 +51,16 @@ public static class AssessPromotionReadiness
             RuleFor(x => x.ObservationWindowDays).InclusiveBetween(1, 90);
             RuleFor(x => x).Must(x => x.SourceEnvironmentId != x.TargetEnvironmentId)
                 .WithMessage("Source and target environments must be different for promotion readiness.");
+            RuleFor(x => x.SourceIsProductionLike)
+                .Equal(false)
+                .WithMessage(
+                    "Promotion readiness assessment requires a non-production source environment. " +
+                    "The source environment must not be production-like (SourceIsProductionLike must be false).");
+            RuleFor(x => x.TargetIsProductionLike)
+                .Equal(true)
+                .WithMessage(
+                    "Promotion readiness assessment requires a production-like target environment. " +
+                    "The target environment must be production-like (TargetIsProductionLike must be true).");
         }
     }
 
@@ -119,7 +139,7 @@ public static class AssessPromotionReadiness
         {
             var sb = new System.Text.StringBuilder();
             sb.AppendLine($"Service: {request.ServiceName} v{request.Version}");
-            sb.AppendLine($"Promoting FROM: {request.SourceEnvironmentName} TO: {request.TargetEnvironmentName}");
+            sb.AppendLine($"Promoting FROM: {request.SourceEnvironmentName} (production-like: {request.SourceIsProductionLike}) TO: {request.TargetEnvironmentName} (production-like: {request.TargetIsProductionLike})");
             sb.AppendLine($"Tenant: {request.TenantId}");
             sb.AppendLine($"Observation window: last {request.ObservationWindowDays} days");
             if (!string.IsNullOrWhiteSpace(request.ReleaseId))

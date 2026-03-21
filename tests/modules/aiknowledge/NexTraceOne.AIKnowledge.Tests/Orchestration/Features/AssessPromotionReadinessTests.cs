@@ -21,8 +21,10 @@ public sealed class AssessPromotionReadinessTests
             TenantId: "tenant-acme-001",
             SourceEnvironmentId: "env-qa-001",
             SourceEnvironmentName: "QA",
+            SourceIsProductionLike: false,
             TargetEnvironmentId: "env-prod-001",
             TargetEnvironmentName: "Production",
+            TargetIsProductionLike: true,
             ServiceName: "payment-service",
             Version: "2.1.0",
             ReleaseId: "rel-123",
@@ -93,10 +95,12 @@ public sealed class AssessPromotionReadinessTests
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
             TenantId: "tenant-acme-001",
-            SourceEnvironmentId: "env-prod-001",
-            SourceEnvironmentName: "Production",
-            TargetEnvironmentId: "env-prod-001", // same
-            TargetEnvironmentName: "Production",
+            SourceEnvironmentId: "env-qa-001",
+            SourceEnvironmentName: "QA",
+            SourceIsProductionLike: false,
+            TargetEnvironmentId: "env-qa-001", // same as source — the issue
+            TargetEnvironmentName: "QA",
+            TargetIsProductionLike: true,
             ServiceName: "payment-service",
             Version: "2.1.0",
             ReleaseId: null,
@@ -104,5 +108,49 @@ public sealed class AssessPromotionReadinessTests
             PreferredProvider: null);
         var result = validator.Validate(command);
         result.IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Validate_ShouldFail_WhenSourceIsProductionLike()
+    {
+        var validator = new AssessPromotionReadiness.Validator();
+        var command = new AssessPromotionReadiness.Command(
+            TenantId: "tenant-acme-001",
+            SourceEnvironmentId: "env-prod-001",
+            SourceEnvironmentName: "Production",
+            SourceIsProductionLike: true, // wrong — source must be non-prod
+            TargetEnvironmentId: "env-qa-001",
+            TargetEnvironmentName: "QA",
+            TargetIsProductionLike: true,
+            ServiceName: "payment-service",
+            Version: "2.1.0",
+            ReleaseId: null,
+            ObservationWindowDays: 7,
+            PreferredProvider: null);
+        var result = validator.Validate(command);
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(command.SourceIsProductionLike));
+    }
+
+    [Fact]
+    public void Validate_ShouldFail_WhenTargetIsNotProductionLike()
+    {
+        var validator = new AssessPromotionReadiness.Validator();
+        var command = new AssessPromotionReadiness.Command(
+            TenantId: "tenant-acme-001",
+            SourceEnvironmentId: "env-qa-001",
+            SourceEnvironmentName: "QA",
+            SourceIsProductionLike: false,
+            TargetEnvironmentId: "env-staging-001",
+            TargetEnvironmentName: "Staging",
+            TargetIsProductionLike: false, // wrong — target must be prod-like
+            ServiceName: "payment-service",
+            Version: "2.1.0",
+            ReleaseId: null,
+            ObservationWindowDays: 7,
+            PreferredProvider: null);
+        var result = validator.Validate(command);
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(command.TargetIsProductionLike));
     }
 }

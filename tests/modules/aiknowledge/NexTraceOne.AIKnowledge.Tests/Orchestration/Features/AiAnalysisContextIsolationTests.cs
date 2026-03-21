@@ -176,7 +176,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
-            "tenant-A", "env-prod-001", "Production", "env-prod-001", "Production",
+            "tenant-A", "env-qa-001", "QA", false, "env-qa-001", "QA", true,
             "payment-service", "2.0.0", null, 7, null);
 
         var result = validator.Validate(command);
@@ -189,7 +189,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
-            "tenant-A", "env-qa-001", "QA", "env-prod-001", "Production",
+            "tenant-A", "env-qa-001", "QA", false, "env-prod-001", "Production", true,
             "", "2.0.0", null, 7, null); // empty service name
 
         var result = validator.Validate(command);
@@ -203,7 +203,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
-            "tenant-A", "env-qa-001", "QA", "env-prod-001", "Production",
+            "tenant-A", "env-qa-001", "QA", false, "env-prod-001", "Production", true,
             "payment-service", "", null, 7, null); // empty version
 
         var result = validator.Validate(command);
@@ -220,7 +220,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         var validator = new AssessPromotionReadiness.Validator();
         var command = new AssessPromotionReadiness.Command(
-            "tenant-A", "env-qa-001", "QA", "env-prod-001", "Production",
+            "tenant-A", "env-qa-001", "QA", false, "env-prod-001", "Production", true,
             "payment-service", "2.0.0", null, days, null);
 
         var result = validator.Validate(command);
@@ -238,7 +238,7 @@ public sealed class AiAnalysisContextIsolationTests
         var handler = new AssessPromotionReadiness.Handler(_routingPort, _dateTimeProvider, _readinessLogger);
         var command = new AssessPromotionReadiness.Command(
             "tenant-enterprise-007",
-            "env-staging-001", "Staging", "env-prod-001", "Production",
+            "env-staging-001", "Staging", false, "env-prod-001", "Production", true,
             "order-service", "3.1.0", "rel-456", 7, null);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -353,7 +353,7 @@ public sealed class AiAnalysisContextIsolationTests
 
         // AssessPromotionReadiness
         var readinessHandler = new AssessPromotionReadiness.Handler(_routingPort, _dateTimeProvider, _readinessLogger);
-        var readinessResult = await readinessHandler.Handle(new AssessPromotionReadiness.Command("t", "e1", "E1", "e2", "E2", "svc", "1.0", null, 7, null), CancellationToken.None);
+        var readinessResult = await readinessHandler.Handle(new AssessPromotionReadiness.Command("t", "e1", "E1", false, "e2", "E2", true, "svc", "1.0", null, 7, null), CancellationToken.None);
         readinessResult.IsSuccess.Should().BeFalse();
     }
 }

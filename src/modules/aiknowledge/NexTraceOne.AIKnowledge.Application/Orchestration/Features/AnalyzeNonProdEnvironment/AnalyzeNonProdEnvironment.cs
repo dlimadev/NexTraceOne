@@ -41,12 +41,29 @@ public static class AnalyzeNonProdEnvironment
 
     public sealed class Validator : AbstractValidator<Command>
     {
+        /// <summary>
+        /// Perfis de ambiente que representam produção ou equivalente de produção.
+        /// Análise não-produtiva é proibida nestes perfis por política de segurança.
+        /// </summary>
+        private static readonly HashSet<string> ProductionLikeProfiles =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "production",
+                "disasterrecovery",
+                "dr",
+            };
+
         public Validator()
         {
             RuleFor(x => x.TenantId).NotEmpty().WithMessage("TenantId is required for environment analysis.");
             RuleFor(x => x.EnvironmentId).NotEmpty().WithMessage("EnvironmentId is required for non-prod analysis.");
             RuleFor(x => x.EnvironmentName).NotEmpty();
-            RuleFor(x => x.EnvironmentProfile).NotEmpty();
+            RuleFor(x => x.EnvironmentProfile)
+                .NotEmpty()
+                .Must(profile => !ProductionLikeProfiles.Contains(profile))
+                .WithMessage(
+                    "Non-prod analysis cannot be executed against a production or disaster-recovery environment. " +
+                    "Provide a non-production environment profile (e.g. qa, staging, uat, development, sandbox).");
             RuleFor(x => x.ObservationWindowDays).InclusiveBetween(1, 90);
         }
     }

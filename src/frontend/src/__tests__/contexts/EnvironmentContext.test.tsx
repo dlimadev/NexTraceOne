@@ -23,6 +23,25 @@ vi.mock('../../utils/tokenStorage', () => ({
   storeCsrfToken: vi.fn(),
 }));
 
+// vi.mock factory is hoisted — use vi.hoisted() to define mocks used inside it
+const { mockGet } = vi.hoisted(() => ({ mockGet: vi.fn() }));
+
+// Mock the API client — EnvironmentProvider now calls the real API
+vi.mock('../../api/client', () => ({
+  default: {
+    get: mockGet,
+    post: vi.fn(),
+    patch: vi.fn(),
+  },
+}));
+
+const mockEnvironments = [
+  { id: 'env-prod-001', name: 'Production', slug: 'prod', sortOrder: 0, isActive: true, profile: 'production', isProductionLike: true },
+  { id: 'env-staging-001', name: 'Staging', slug: 'staging', sortOrder: 1, isActive: true, profile: 'staging', isProductionLike: true },
+  { id: 'env-qa-001', name: 'QA', slug: 'qa', sortOrder: 2, isActive: true, profile: 'qa', isProductionLike: false, isDefault: true },
+  { id: 'env-dev-001', name: 'Development', slug: 'dev', sortOrder: 3, isActive: true, profile: 'development', isProductionLike: false },
+];
+
 // Helper: mock AuthContext value
 function createAuthContextValue(tenantId: string | null, isAuthenticated: boolean) {
   return {
@@ -72,9 +91,11 @@ function Wrapper({ tenantId, isAuthenticated, children }: { tenantId: string | n
 describe('EnvironmentContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock: return environments successfully
+    mockGet.mockResolvedValue({ data: mockEnvironments });
   });
 
-  it('should load environments when tenant is authenticated', async () => {
+  it('should load environments from API when tenant is authenticated', async () => {
     render(
       <Wrapper tenantId="tenant-123" isAuthenticated={true}>
         <TestConsumer />
@@ -85,6 +106,8 @@ describe('EnvironmentContext', () => {
       const count = parseInt(screen.getByTestId('env-count').textContent ?? '0');
       expect(count).toBeGreaterThan(0);
     });
+
+    expect(mockGet).toHaveBeenCalledWith('/identity/environments');
   });
 
   it('should have no environments when not authenticated', async () => {
@@ -98,9 +121,12 @@ describe('EnvironmentContext', () => {
       expect(screen.getByTestId('env-count').textContent).toBe('0');
       expect(screen.getByTestId('active-env').textContent).toBe('none');
     });
+
+    // Should not call API when not authenticated
+    expect(mockGet).not.toHaveBeenCalled();
   });
 
-  it('should auto-select default environment', async () => {
+  it('should auto-select default environment (isDefault=true)', async () => {
     render(
       <Wrapper tenantId="tenant-123" isAuthenticated={true}>
         <TestConsumer />
@@ -108,8 +134,9 @@ describe('EnvironmentContext', () => {
     );
 
     await waitFor(() => {
+      // The QA environment has isDefault: true and sortOrder: 2
       const activeEnv = screen.getByTestId('active-env').textContent;
-      expect(activeEnv).not.toBe('none');
+      expect(activeEnv).toBe('QA');
     });
   });
 
@@ -133,7 +160,7 @@ describe('EnvironmentContext', () => {
     });
   });
 
-  it('should clear environments on logout (tenantId null)', async () => {
+  it('should clear environments on logout (isAuthenticated false)', async () => {
     const { rerender } = render(
       <Wrapper tenantId="tenant-123" isAuthenticated={true}>
         <TestConsumer />
@@ -144,7 +171,7 @@ describe('EnvironmentContext', () => {
       expect(parseInt(screen.getByTestId('env-count').textContent ?? '0')).toBeGreaterThan(0);
     });
 
-    // Simulate logout: tenantId = null, isAuthenticated = false
+    // Simulate logout: isAuthenticated = false
     rerender(
       <Wrapper tenantId={null} isAuthenticated={false}>
         <TestConsumer />
@@ -153,6 +180,41 @@ describe('EnvironmentContext', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('env-count').textContent).toBe('0');
+    });
+  });
+
+  it('should gracefully handle API errors and leave environments empty', async () => {
+    mockGet.mockRejectedValueOnce(new Error('Network error'));
+
+    render(
+      <Wrapper tenantId="tenant-123" isAuthenticated={true}>
+        <TestConsumer />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('env-count').textContent).toBe('0');
+      expect(screen.getByTestId('active-env').textContent).toBe('none');
+    });
+  });
+
+  it('should infer production profile when backend does not return profile field', async () => {
+    // Simulate backend without profile fields (pre-migration state)
+    mockGet.mockResolvedValueOnce({
+      data: [
+        { id: 'env-1', name: 'Production', slug: 'prod', sortOrder: 0, isActive: true },
+        { id: 'env-2', name: 'QA', slug: 'qa', sortOrder: 1, isActive: true },
+      ],
+    });
+
+    render(
+      <Wrapper tenantId="tenant-123" isAuthenticated={true}>
+        <TestConsumer />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      expect(parseInt(screen.getByTestId('env-count').textContent ?? '0')).toBe(2);
     });
   });
 });

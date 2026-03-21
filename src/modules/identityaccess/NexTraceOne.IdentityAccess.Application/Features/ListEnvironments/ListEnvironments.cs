@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.Enums;
 using NexTraceOne.IdentityAccess.Domain.Errors;
 
 namespace NexTraceOne.IdentityAccess.Application.Features.ListEnvironments;
@@ -32,13 +33,24 @@ public static class ListEnvironments
         string Name,
         string Slug,
         int SortOrder,
-        bool IsActive);
+        bool IsActive,
+        /// <summary>Perfil operacional do ambiente (ex.: development, qa, staging, production).</summary>
+        string Profile,
+        /// <summary>Indica se o ambiente tem políticas similares à produção.</summary>
+        bool IsProductionLike,
+        /// <summary>Código curto opcional definido pelo tenant.</summary>
+        string? Code);
 
     /// <summary>Handler que retorna os ambientes ativos do tenant atual.</summary>
     public sealed class Handler(
         ICurrentTenant currentTenant,
         IEnvironmentRepository environmentRepository) : IQueryHandler<Query, IReadOnlyList<EnvironmentResponse>>
     {
+        /// <summary>Cache de conversão de EnvironmentProfile para string lowercase.</summary>
+        private static readonly Dictionary<EnvironmentProfile, string> ProfileNames =
+            System.Enum.GetValues<EnvironmentProfile>()
+                .ToDictionary(p => p, p => p.ToString().ToLowerInvariant());
+
         public async Task<Result<IReadOnlyList<EnvironmentResponse>>> Handle(
             Query request,
             CancellationToken cancellationToken)
@@ -57,7 +69,10 @@ public static class ListEnvironments
                     e.Name,
                     e.Slug,
                     e.SortOrder,
-                    e.IsActive))
+                    e.IsActive,
+                    ProfileNames.GetValueOrDefault(e.Profile, "unknown"),
+                    e.IsProductionLike,
+                    e.Code))
                 .ToList();
 
             return Result<IReadOnlyList<EnvironmentResponse>>.Success(result);
