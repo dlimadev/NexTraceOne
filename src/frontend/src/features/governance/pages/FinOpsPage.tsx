@@ -17,6 +17,7 @@ import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { DemoBanner } from '../../../components/DemoBanner';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -92,6 +93,8 @@ export function FinOpsPage() {
           <span className="text-xs text-muted">{t('governance.preview.finopsReason')}</span>
         </div>
       </PageHeader>
+
+      <DemoBanner className="mb-4" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

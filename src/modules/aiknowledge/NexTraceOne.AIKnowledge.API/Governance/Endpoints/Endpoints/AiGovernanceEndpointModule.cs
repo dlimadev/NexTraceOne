@@ -30,6 +30,14 @@ using GetRoutingDecisionFeature = NexTraceOne.AIKnowledge.Application.Governance
 using PlanExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.PlanExecution.PlanExecution;
 using ListKnowledgeSourceWeightsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListKnowledgeSourceWeights.ListKnowledgeSourceWeights;
 using EnrichContextFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.EnrichContext.EnrichContext;
+using ListAvailableModelsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAvailableModels.ListAvailableModels;
+using ListAgentsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAgents.ListAgents;
+using GetAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgent.GetAgent;
+using CreateAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateAgent.CreateAgent;
+using UpdateAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateAgent.UpdateAgent;
+using ExecuteAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteAgent.ExecuteAgent;
+using GetAgentExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentExecution.GetAgentExecution;
+using ReviewArtifactFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ReviewArtifact.ReviewArtifact;
 
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
@@ -51,6 +59,7 @@ public sealed class AiGovernanceEndpointModule
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
         MapModelRegistryEndpoints(app);
+        MapAvailableModelsEndpoints(app);
         MapAccessPolicyEndpoints(app);
         MapBudgetEndpoints(app);
         MapAuditEndpoints(app);
@@ -58,6 +67,9 @@ public sealed class AiGovernanceEndpointModule
         MapAssistantEndpoints(app);
         MapRoutingEndpoints(app);
         MapEnrichmentEndpoints(app);
+        MapAgentEndpoints(app);
+        MapAgentExecutionEndpoints(app);
+        MapAgentArtifactEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -124,6 +136,146 @@ public sealed class AiGovernanceEndpointModule
                 body.DefaultUseCases,
                 body.SensitivityLevel,
                 body.NewStatus);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Available Models (per-user authorization) ────────────────────────
+
+    private static void MapAvailableModelsEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/models");
+
+        group.MapGet("/available", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListAvailableModelsFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+    }
+
+    // ── AI Agents ───────────────────────────────────────────────────────
+
+    private static void MapAgentEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/agents");
+
+        group.MapGet("/", async (
+            bool? isOfficial,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListAgentsFeature.Query(isOfficial), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+
+        group.MapGet("/{agentId:guid}", async (
+            Guid agentId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAgentFeature.Query(agentId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+
+        group.MapPost("/", async (
+            CreateAgentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPut("/{agentId:guid}", async (
+            Guid agentId,
+            UpdateAgentRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateAgentFeature.Command(
+                agentId,
+                body.DisplayName,
+                body.Description,
+                body.SystemPrompt,
+                body.Objective,
+                body.Capabilities,
+                body.TargetPersona,
+                body.Icon,
+                body.PreferredModelId,
+                body.AllowedModelIds,
+                body.AllowedTools,
+                body.InputSchema,
+                body.OutputSchema,
+                body.Visibility,
+                body.AllowModelOverride,
+                body.SortOrder);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/{agentId:guid}/execute", async (
+            Guid agentId,
+            ExecuteAgentRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ExecuteAgentFeature.Command(
+                agentId,
+                body.Input,
+                body.ModelIdOverride,
+                body.ContextJson);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:write");
+    }
+
+    // ── Agent Executions ────────────────────────────────────────────────
+
+    private static void MapAgentExecutionEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/agent-executions");
+
+        group.MapGet("/{executionId:guid}", async (
+            Guid executionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAgentExecutionFeature.Query(executionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:assistant:read");
+    }
+
+    // ── Agent Artifacts ─────────────────────────────────────────────────
+
+    private static void MapAgentArtifactEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/artifacts");
+
+        group.MapPost("/{artifactId:guid}/review", async (
+            Guid artifactId,
+            ReviewArtifactRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ReviewArtifactFeature.Command(
+                artifactId,
+                body.Decision,
+                body.Notes);
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
@@ -470,3 +622,32 @@ public sealed record UpdateConversationRequest(
     string? Title,
     string? Tags,
     bool? Archive);
+
+/// <summary>Corpo de pedido para atualização de um agent customizado.</summary>
+public sealed record UpdateAgentRequest(
+    string DisplayName,
+    string Description,
+    string? SystemPrompt,
+    string? Objective,
+    string? Capabilities,
+    string? TargetPersona,
+    string? Icon,
+    Guid? PreferredModelId,
+    string? AllowedModelIds,
+    string? AllowedTools,
+    string? InputSchema,
+    string? OutputSchema,
+    string? Visibility,
+    bool? AllowModelOverride,
+    int? SortOrder);
+
+/// <summary>Corpo de pedido para execução de um agent.</summary>
+public sealed record ExecuteAgentRequest(
+    string Input,
+    Guid? ModelIdOverride,
+    string? ContextJson);
+
+/// <summary>Corpo de pedido para review de um artefacto.</summary>
+public sealed record ReviewArtifactRequest(
+    string Decision,
+    string? Notes);

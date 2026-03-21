@@ -27,7 +27,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("RulesetGovernanceDatabase")
             ?? configuration.GetConnectionString("NexTraceOne")
             ?? configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+            ?? throw new InvalidOperationException(
+                "Connection string 'RulesetGovernanceDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
 
         services.AddDbContext<RulesetGovernanceDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

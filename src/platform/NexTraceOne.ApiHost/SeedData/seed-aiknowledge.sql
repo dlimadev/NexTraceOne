@@ -8,9 +8,10 @@
 -- ── AI PROVIDERS ────────────────────────────────────────────────────────────
 
 -- Provider: Ollama (local, default)
-INSERT INTO "AiProviders" ("Id", "Name", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "SupportedCapabilities", "Priority", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO "AiProviders" ("Id", "Name", "Slug", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "AuthenticationMode", "SupportedCapabilities", "SupportsChat", "SupportsEmbeddings", "SupportsTools", "SupportsVision", "SupportsStructuredOutput", "HealthStatus", "Priority", "TimeoutSeconds", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'c0000000-0000-0000-0000-000000000001',
+    'ollama',
     'ollama',
     'Ollama (Local)',
     'ollama',
@@ -18,8 +19,16 @@ VALUES (
     true,
     false,
     true,
+    'None',
     'chat,reasoning,embeddings,streaming',
+    true,
+    true,
+    false,
+    false,
+    false,
+    'Unknown',
     1,
+    30,
     'Local AI provider using Ollama. Hosts models like DeepSeek, Llama, Mistral.',
     NOW(),
     NOW(), 'system', NOW(), 'system',
@@ -27,9 +36,10 @@ VALUES (
 ) ON CONFLICT DO NOTHING;
 
 -- Provider: OpenAI (external, future)
-INSERT INTO "AiProviders" ("Id", "Name", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "SupportedCapabilities", "Priority", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO "AiProviders" ("Id", "Name", "Slug", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "AuthenticationMode", "SupportedCapabilities", "SupportsChat", "SupportsEmbeddings", "SupportsTools", "SupportsVision", "SupportsStructuredOutput", "HealthStatus", "Priority", "TimeoutSeconds", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'c0000000-0000-0000-0000-000000000002',
+    'openai',
     'openai',
     'OpenAI',
     'openai',
@@ -37,8 +47,16 @@ VALUES (
     false,
     true,
     false,
+    'ApiKey',
     'chat,reasoning,embeddings,vision,tool-calling,streaming,structured-output',
+    true,
+    true,
+    true,
+    true,
+    true,
+    'Unknown',
     10,
+    60,
     'OpenAI external provider (GPT-4, GPT-4o). Requires API key and token quota.',
     NOW(),
     NOW(), 'system', NOW(), 'system',
@@ -46,9 +64,10 @@ VALUES (
 ) ON CONFLICT DO NOTHING;
 
 -- Provider: Azure OpenAI (external, future)
-INSERT INTO "AiProviders" ("Id", "Name", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "SupportedCapabilities", "Priority", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO "AiProviders" ("Id", "Name", "Slug", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "AuthenticationMode", "SupportedCapabilities", "SupportsChat", "SupportsEmbeddings", "SupportsTools", "SupportsVision", "SupportsStructuredOutput", "HealthStatus", "Priority", "TimeoutSeconds", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'c0000000-0000-0000-0000-000000000003',
+    'azure-openai',
     'azure-openai',
     'Azure OpenAI',
     'azure-openai',
@@ -56,8 +75,16 @@ VALUES (
     false,
     true,
     false,
+    'ManagedIdentity',
     'chat,reasoning,embeddings,vision,tool-calling,streaming',
+    true,
+    true,
+    true,
+    true,
+    false,
+    'Unknown',
     11,
+    60,
     'Azure OpenAI Service. Requires Azure endpoint and API key.',
     NOW(),
     NOW(), 'system', NOW(), 'system',
@@ -65,9 +92,10 @@ VALUES (
 ) ON CONFLICT DO NOTHING;
 
 -- Provider: Gemini (external, future)
-INSERT INTO "AiProviders" ("Id", "Name", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "SupportedCapabilities", "Priority", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO "AiProviders" ("Id", "Name", "Slug", "DisplayName", "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled", "AuthenticationMode", "SupportedCapabilities", "SupportsChat", "SupportsEmbeddings", "SupportsTools", "SupportsVision", "SupportsStructuredOutput", "HealthStatus", "Priority", "TimeoutSeconds", "Description", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'c0000000-0000-0000-0000-000000000004',
+    'gemini',
     'gemini',
     'Google Gemini',
     'gemini',
@@ -75,8 +103,16 @@ VALUES (
     false,
     true,
     false,
+    'ApiKey',
     'chat,reasoning,embeddings,vision,streaming',
+    true,
+    true,
+    false,
+    true,
+    false,
+    'Unknown',
     12,
+    60,
     'Google Gemini provider. Requires Google API key.',
     NOW(),
     NOW(), 'system', NOW(), 'system',
@@ -87,57 +123,114 @@ VALUES (
 -- Note: ModelType and Status are stored as strings (HasConversion<string>())
 
 -- Default AI Model: DeepSeek R1 (1.5B) via Ollama
-INSERT INTO ai_gov_models ("Id", "Name", "DisplayName", "Provider", "ModelType", "IsInternal", "IsExternal", "Status", "Capabilities", "DefaultUseCases", "SensitivityLevel", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO ai_gov_models ("Id", "Name", "Slug", "DisplayName", "Provider", "ProviderId", "ExternalModelId", "ModelType", "Category", "IsInternal", "IsExternal", "IsInstalled", "Status", "Capabilities", "DefaultUseCases", "SensitivityLevel", "IsDefaultForChat", "IsDefaultForReasoning", "IsDefaultForEmbeddings", "SupportsStreaming", "SupportsToolCalling", "SupportsEmbeddings", "SupportsVision", "SupportsStructuredOutput", "ContextWindow", "RequiresGpu", "RecommendedRamGb", "LicenseName", "LicenseUrl", "ComplianceStatus", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'a0000000-0000-0000-0000-000000000001',
     'deepseek-r1:1.5b',
+    'deepseek-r1-1-5b',
     'DeepSeek R1 1.5B',
     'ollama',
+    'c0000000-0000-0000-0000-000000000001',
+    'deepseek-r1:1.5b',
     'Chat',
+    'general',
     true,
     false,
+    true,
     'Active',
     'chat,reasoning,completion',
     'general-chat,code-review,analysis',
     1,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    4096,
+    false,
+    3.0,
+    'MIT',
+    'https://github.com/deepseek-ai/DeepSeek-R1/blob/main/LICENSE',
+    'approved',
     NOW(),
     NOW(), 'system', NOW(), 'system',
     false
 ) ON CONFLICT DO NOTHING;
 
 -- Embedding model: Nomic Embed Text via Ollama
-INSERT INTO ai_gov_models ("Id", "Name", "DisplayName", "Provider", "ModelType", "IsInternal", "IsExternal", "Status", "Capabilities", "DefaultUseCases", "SensitivityLevel", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO ai_gov_models ("Id", "Name", "Slug", "DisplayName", "Provider", "ProviderId", "ExternalModelId", "ModelType", "Category", "IsInternal", "IsExternal", "IsInstalled", "Status", "Capabilities", "DefaultUseCases", "SensitivityLevel", "IsDefaultForChat", "IsDefaultForReasoning", "IsDefaultForEmbeddings", "SupportsStreaming", "SupportsToolCalling", "SupportsEmbeddings", "SupportsVision", "SupportsStructuredOutput", "ContextWindow", "RequiresGpu", "RecommendedRamGb", "LicenseName", "LicenseUrl", "ComplianceStatus", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'a0000000-0000-0000-0000-000000000002',
     'nomic-embed-text',
+    'nomic-embed-text',
     'Nomic Embed Text',
     'ollama',
+    'c0000000-0000-0000-0000-000000000001',
+    'nomic-embed-text',
     'Embedding',
+    'embeddings',
     true,
+    false,
     false,
     'Inactive',
     'embeddings',
     'semantic-search,rag',
     1,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    8192,
+    false,
+    1.0,
+    'Apache-2.0',
+    'https://huggingface.co/nomic-ai/nomic-embed-text-v1.5',
+    'approved',
     NOW(),
     NOW(), 'system', NOW(), 'system',
     false
 ) ON CONFLICT DO NOTHING;
 
 -- Future external model placeholder: GPT-4o via OpenAI (disabled)
-INSERT INTO ai_gov_models ("Id", "Name", "DisplayName", "Provider", "ModelType", "IsInternal", "IsExternal", "Status", "Capabilities", "DefaultUseCases", "SensitivityLevel", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
+INSERT INTO ai_gov_models ("Id", "Name", "Slug", "DisplayName", "Provider", "ProviderId", "ExternalModelId", "ModelType", "Category", "IsInternal", "IsExternal", "IsInstalled", "Status", "Capabilities", "DefaultUseCases", "SensitivityLevel", "IsDefaultForChat", "IsDefaultForReasoning", "IsDefaultForEmbeddings", "SupportsStreaming", "SupportsToolCalling", "SupportsEmbeddings", "SupportsVision", "SupportsStructuredOutput", "ContextWindow", "RequiresGpu", "RecommendedRamGb", "LicenseName", "LicenseUrl", "ComplianceStatus", "RegisteredAt", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted")
 VALUES (
     'a0000000-0000-0000-0000-000000000003',
     'gpt-4o',
+    'gpt-4o',
     'GPT-4o (OpenAI)',
     'openai',
+    'c0000000-0000-0000-0000-000000000002',
+    'gpt-4o',
     'Chat',
+    'general',
     false,
     true,
+    false,
     'Inactive',
     'chat,reasoning,vision,tool-calling,streaming,structured-output',
     'premium-analysis,complex-reasoning,code-generation',
     3,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    128000,
+    false,
+    NULL,
+    'Proprietary',
+    'https://openai.com/policies/terms-of-use',
+    'pending-review',
     NOW(),
     NOW(), 'system', NOW(), 'system',
     false
@@ -563,4 +656,321 @@ VALUES (
     'resp-004',
     NOW() - interval '2 days 22 hours',
     NOW() - interval '2 days 22 hours', 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- ── AI AGENTS ───────────────────────────────────────────────────────────────
+-- Phase 3: Agent Runtime Foundation — includes ownership, visibility, publication status
+
+-- Agent: Service Analyst (official)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000001',
+    'service-analyst',
+    'Service Analyst',
+    'service-analyst',
+    'Analyzes services, dependencies, health status, and topology. Helps engineers understand service relationships and operational state.',
+    'ServiceAnalysis',
+    true, true,
+    'You are a Service Analyst agent for NexTraceOne. You analyze services, their dependencies, health status, topology, and operational state. Provide clear, actionable insights about service relationships and reliability.',
+    null,
+    'chat,analysis',
+    'Engineer',
+    '🔍', 10,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Analyze services, dependencies and operational state for the NexTraceOne platform.', '', '',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: Contract Governance (official)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000002',
+    'contract-governance',
+    'Contract Governance',
+    'contract-governance',
+    'Assists with API contract creation, validation, compatibility checks, and versioning. Ensures contracts follow governance policies.',
+    'ContractGovernance',
+    true, true,
+    'You are a Contract Governance agent for NexTraceOne. You assist with API contract creation, validation, compatibility analysis, and versioning. Enforce governance policies and best practices for REST, SOAP, Kafka, and background service contracts.',
+    null,
+    'chat,analysis,generation',
+    'Architect',
+    '📋', 20,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Govern API contracts: validate, version, check compatibility and enforce policies.', '', '',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: Incident Responder (official)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000003',
+    'incident-responder',
+    'Incident Responder',
+    'incident-responder',
+    'Investigates production incidents, correlates with recent changes, identifies probable causes, and recommends mitigation steps.',
+    'IncidentResponse',
+    true, true,
+    'You are an Incident Responder agent for NexTraceOne. You investigate production incidents, correlate them with recent changes, identify probable root causes, and recommend mitigation steps. Be precise and action-oriented.',
+    null,
+    'chat,analysis',
+    'Engineer',
+    '🚨', 30,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Investigate incidents, correlate with changes, identify root cause and recommend mitigation.', '', '',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: Change Intelligence (official)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000004',
+    'change-intelligence',
+    'Change Intelligence',
+    'change-intelligence',
+    'Analyzes production changes, calculates blast radius, validates change confidence, and correlates changes with incidents.',
+    'ChangeIntelligence',
+    true, true,
+    'You are a Change Intelligence agent for NexTraceOne. You analyze production changes, calculate blast radius, validate deployment confidence, and correlate changes with incidents. Provide data-driven change risk assessments.',
+    null,
+    'chat,analysis',
+    'TechLead',
+    '🔄', 40,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Analyze production changes, assess blast radius and deployment confidence.', '', '',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: Security Auditor (official)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000005',
+    'security-auditor',
+    'Security Auditor',
+    'security-auditor',
+    'Reviews security posture, compliance status, access policies, and audit trails. Identifies security gaps and recommends fixes.',
+    'SecurityAudit',
+    true, true,
+    'You are a Security Auditor agent for NexTraceOne. You review security posture, compliance status, access policies, and audit trails. Identify security gaps and recommend actionable fixes following industry standards.',
+    null,
+    'chat,analysis',
+    'Auditor',
+    '🛡️', 50,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Review security posture, audit trails and compliance. Recommend fixes.', '', '',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: Documentation Assistant (official)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000006',
+    'documentation-assistant',
+    'Documentation Assistant',
+    'documentation-assistant',
+    'Helps create and maintain operational documentation, runbooks, knowledge articles, and changelog entries.',
+    'Documentation',
+    true, true,
+    'You are a Documentation Assistant agent for NexTraceOne. You help create and maintain operational documentation, runbooks, knowledge articles, and changelog entries. Generate clear, structured, and actionable documentation.',
+    null,
+    'chat,generation',
+    'Engineer',
+    '📝', 60,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Create and maintain operational documentation, runbooks and knowledge articles.', '', '',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- ── Phase 3: Specialized Official Agents ────────────────────────────────────
+
+-- Agent: API Contract Author (official — generates OpenAPI drafts)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000007',
+    'api-contract-author',
+    'API Contract Author',
+    'api-contract-author',
+    'Generates OpenAPI 3.1 contract drafts from natural language descriptions of API endpoints, resources and operations.',
+    'ApiDesign',
+    true, true,
+    'You are the API Contract Author agent for NexTraceOne.
+Your mission is to generate valid OpenAPI 3.1 YAML specifications from natural language descriptions.
+
+Rules:
+1. Always output valid OpenAPI 3.1 YAML.
+2. Include info, paths, components/schemas, and example request/response bodies.
+3. Use semantic HTTP methods (GET for reads, POST for creates, PUT for full updates, PATCH for partial, DELETE for removals).
+4. Include proper error responses (400, 401, 403, 404, 500).
+5. Use $ref for reusable schemas.
+6. Include operationId for each operation.
+7. Add descriptions to all endpoints, parameters and schemas.
+8. Follow RESTful naming conventions (plural nouns, kebab-case paths).
+9. Include pagination for list endpoints (page, pageSize query params).
+10. Do NOT invent business logic — stick to the user''s description.
+
+Output ONLY the OpenAPI YAML. No explanations before or after.',
+    null,
+    'generation',
+    'Architect',
+    '📐', 70,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Generate OpenAPI 3.1 YAML contract drafts from natural language descriptions.',
+    '{"type":"object","properties":{"description":{"type":"string","description":"Natural language description of the API"},"resourceName":{"type":"string"},"operations":{"type":"array","items":{"type":"string"}}}}',
+    '{"type":"string","format":"yaml","description":"OpenAPI 3.1 YAML specification"}',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: API Test Scenario Generator (official — generates test scenarios from OpenAPI)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000008',
+    'api-test-scenario',
+    'API Test Scenario Generator',
+    'api-test-scenario',
+    'Generates comprehensive test scenarios from OpenAPI specifications, including happy path, edge cases, and error scenarios.',
+    'TestGeneration',
+    true, true,
+    'You are the API Test Scenario Generator agent for NexTraceOne.
+Your mission is to generate comprehensive test scenarios from OpenAPI specifications.
+
+Rules:
+1. Output a JSON array of test scenarios.
+2. Each scenario: { "name", "description", "method", "path", "headers", "queryParams", "requestBody", "expectedStatus", "expectedResponseShape", "tags" }
+3. Include: happy path, validation errors (400), auth failures (401/403), not found (404), and edge cases.
+4. For list endpoints: test pagination, empty results, filtering.
+5. For create endpoints: test required fields missing, invalid types, duplicate keys.
+6. For update endpoints: test partial updates, full updates, optimistic concurrency.
+7. For delete endpoints: test not found, already deleted, cascading effects.
+8. Include boundary values for numeric and string fields.
+9. Include proper Content-Type headers.
+10. Do NOT include actual test code — only scenario definitions.
+
+Output ONLY the JSON array. No explanations.',
+    null,
+    'generation',
+    'Engineer',
+    '🧪', 80,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Generate test scenarios (happy path, edge cases, errors) from OpenAPI specs.',
+    '{"type":"object","properties":{"openApiSpec":{"type":"string","description":"OpenAPI YAML or JSON specification"},"focusEndpoints":{"type":"array","items":{"type":"string"},"description":"Optional: specific endpoints to focus on"}}}',
+    '{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"method":{"type":"string"},"path":{"type":"string"},"expectedStatus":{"type":"integer"}}}}',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
+) ON CONFLICT DO NOTHING;
+
+-- Agent: Kafka Schema Contract Designer (official — generates Avro/JSON schemas)
+INSERT INTO ai_gov_agents (
+    "Id", "Name", "DisplayName", "Slug", "Description", "Category",
+    "IsOfficial", "IsActive", "SystemPrompt", "PreferredModelId",
+    "Capabilities", "TargetPersona", "Icon", "SortOrder",
+    "OwnershipType", "Visibility", "PublicationStatus", "OwnerId", "OwnerTeamId",
+    "AllowedModelIds", "AllowedTools", "Objective", "InputSchema", "OutputSchema",
+    "AllowModelOverride", "Version", "ExecutionCount",
+    "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
+)
+VALUES (
+    'a1000000-0000-0000-0000-000000000009',
+    'kafka-schema-contract',
+    'Kafka Schema Contract Designer',
+    'kafka-schema-contract',
+    'Designs Kafka topic schemas (Avro or JSON Schema) from event descriptions, including producer/consumer contract definitions.',
+    'EventDesign',
+    true, true,
+    'You are the Kafka Schema Contract Designer agent for NexTraceOne.
+Your mission is to design Kafka event schemas from natural language descriptions.
+
+Rules:
+1. Output valid Avro schema JSON by default (or JSON Schema if requested).
+2. Include: namespace, name, doc, fields with types and docs.
+3. Use logical types for dates (timestamp-millis), UUIDs (uuid), and decimals.
+4. Include a metadata envelope: { "eventType", "eventVersion", "correlationId", "timestamp", "source", "payload" }.
+5. Design for backward compatibility: new fields should have defaults, use UNION with null.
+6. Include producer and consumer topic naming convention: {domain}.{entity}.{action}.v{version}
+7. Document breaking vs non-breaking changes.
+8. Use semantic field names (camelCase).
+9. Include example payload.
+10. Do NOT include Kafka configuration — only schema definition.
+
+Output ONLY the Avro schema JSON (or JSON Schema if requested). No explanations.',
+    null,
+    'generation',
+    'Architect',
+    '📨', 90,
+    'System', 'Tenant', 'Published', 'system', '',
+    '', '', 'Design Kafka event schemas (Avro/JSON Schema) with producer/consumer contracts.',
+    '{"type":"object","properties":{"eventDescription":{"type":"string","description":"Natural language description of the event"},"domain":{"type":"string"},"entity":{"type":"string"},"schemaFormat":{"type":"string","enum":["avro","jsonschema"],"default":"avro"}}}',
+    '{"type":"string","format":"json","description":"Avro schema or JSON Schema definition"}',
+    true, 1, 0,
+    NOW(), 'system', NOW(), 'system', false
 ) ON CONFLICT DO NOTHING;

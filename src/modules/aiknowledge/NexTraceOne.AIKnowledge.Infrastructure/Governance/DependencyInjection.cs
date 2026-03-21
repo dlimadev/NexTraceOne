@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -27,7 +28,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("AiGovernanceDatabase")
             ?? configuration.GetConnectionString("NexTraceOne")
             ?? configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+            ?? throw new InvalidOperationException(
+                "Connection string 'AiGovernanceDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
 
         services.AddDbContext<AiGovernanceDbContext>((serviceProvider, options) =>
         {
@@ -63,6 +65,11 @@ public static class DependencyInjection
         services.AddScoped<IAiTokenQuotaPolicyRepository, AiTokenQuotaPolicyRepository>();
         services.AddScoped<IAiTokenUsageLedgerRepository, AiTokenUsageLedgerRepository>();
         services.AddScoped<IAiExternalInferenceRecordRepository, AiExternalInferenceRecordRepository>();
+        services.AddScoped<IAiAgentRepository, AiAgentRepository>();
+        services.AddScoped<IAiAgentExecutionRepository, AiAgentExecutionRepository>();
+        services.AddScoped<IAiAgentArtifactRepository, AiAgentArtifactRepository>();
+        services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
+        services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
 
         return services;
     }

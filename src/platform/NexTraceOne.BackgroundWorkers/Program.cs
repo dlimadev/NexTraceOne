@@ -8,7 +8,6 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
-using NexTraceOne.Identity.Infrastructure;
 using NexTraceOne.IdentityAccess.Infrastructure;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 

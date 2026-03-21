@@ -143,4 +143,62 @@ public static class AiGovernanceErrors
             "AiGovernance.ExecutionPlan.NotFound",
             "AI execution plan '{0}' was not found.",
             planId);
+
+    /// <summary>Acesso ao modelo de IA negado por política de autorização.</summary>
+    public static Error ModelAccessDenied(string modelId, string reason)
+        => Error.Forbidden(
+            "AiGovernance.Model.AccessDenied",
+            "Access to AI model '{0}' was denied: {1}.",
+            modelId, reason);
+
+    /// <summary>Agent de IA não encontrado pelo identificador informado.</summary>
+    public static Error AgentNotFound(string agentId)
+        => Error.NotFound(
+            "AiGovernance.Agent.NotFound",
+            "AI agent '{0}' was not found.",
+            agentId);
+
+    // ── Agent Runtime ──────────────────────────────────────────────────
+
+    /// <summary>Utilizador não tem autorização para aceder ao agent.</summary>
+    public static Error AgentAccessDenied(string agentId)
+        => Error.Forbidden(
+            "AiGovernance.Agent.AccessDenied",
+            "Access to AI agent '{0}' is denied for the current user.",
+            agentId);
+
+    /// <summary>Agent não está activo para execução.</summary>
+    public static Error AgentNotActive(string agentId)
+        => Error.Business(
+            "AiGovernance.Agent.NotActive",
+            "AI agent '{0}' is not active.",
+            agentId);
+
+    /// <summary>Modelo não permitido para o agent.</summary>
+    public static Error ModelNotAllowedForAgent(string modelId, string agentName)
+        => Error.Forbidden(
+            "AiGovernance.Agent.ModelNotAllowed",
+            "AI model '{0}' is not allowed for agent '{1}'.",
+            modelId, agentName);
+
+    /// <summary>Execução de agent falhou.</summary>
+    public static Error AgentExecutionFailed(string executionId, string reason)
+        => Error.Business(
+            "AiGovernance.AgentExecution.Failed",
+            "Agent execution '{0}' failed: {1}.",
+            executionId, reason);
+
+    /// <summary>Execução de agent não encontrada.</summary>
+    public static Error AgentExecutionNotFound(string executionId)
+        => Error.NotFound(
+            "AiGovernance.AgentExecution.NotFound",
+            "Agent execution '{0}' was not found.",
+            executionId);
+
+    /// <summary>Artefacto de agent não encontrado.</summary>
+    public static Error ArtifactNotFound(string artifactId)
+        => Error.NotFound(
+            "AiGovernance.Artifact.NotFound",
+            "Agent artifact '{0}' was not found.",
+            artifactId);
 }

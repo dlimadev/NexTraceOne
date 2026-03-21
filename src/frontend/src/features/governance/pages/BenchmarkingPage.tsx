@@ -12,6 +12,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { DemoBanner } from '../../../components/DemoBanner';
 import { executiveApi } from '../api/executive';
 import type {
   CostEfficiencyType,
@@ -62,6 +63,7 @@ export function BenchmarkingPage() {
 
   return (
     <PageContainer>
+      <DemoBanner className="mb-4" />
       <PageHeader
         title={t('governance.executive.benchmarkingTitle')}
         subtitle={t('governance.executive.benchmarkingSubtitle')}

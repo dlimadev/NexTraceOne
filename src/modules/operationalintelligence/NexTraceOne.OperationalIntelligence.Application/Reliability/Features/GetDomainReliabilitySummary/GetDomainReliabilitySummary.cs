@@ -54,5 +54,7 @@ public static class GetDomainReliabilitySummary
         int DegradedServices,
         int UnavailableServices,
         int NeedsAttentionServices,
-        int CriticalServicesImpacted);
+        int CriticalServicesImpacted,
+        bool IsSimulated = true,
+        string DataSource = "demo");
 }

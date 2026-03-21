@@ -15,7 +15,7 @@ internal sealed class RuntimeIntelligenceDbContextDesignTimeFactory : IDesignTim
     {
         var optionsBuilder = new DbContextOptionsBuilder<RuntimeIntelligenceDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone_operationalintelligence_runtime;Username=nextraceone;Password=ouro18";
+            ?? "Host=localhost;Port=5432;Database=nextraceone_operations;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(RuntimeIntelligenceDbContext).Assembly.FullName));

@@ -102,6 +102,156 @@ public sealed class AiGovernanceEntityTests
         model.Status.Should().Be(ModelStatus.Blocked);
     }
 
+    // ── AIModel: New fields (Phase 1: AI Runtime Foundation) ────────────
+
+    [Fact]
+    public void Model_Register_ShouldSetDefaultValues_ForNewFields()
+    {
+        var model = AIModel.Register(
+            "m", "M", "P", ModelType.Chat, false, "chat", 1, FixedNow);
+
+        model.Slug.Should().Be("m");
+        model.ProviderId.Should().BeNull();
+        model.ExternalModelId.Should().Be("m");
+        model.Category.Should().BeEmpty();
+        model.IsInstalled.Should().BeFalse();
+        model.IsDefaultForChat.Should().BeFalse();
+        model.IsDefaultForReasoning.Should().BeFalse();
+        model.IsDefaultForEmbeddings.Should().BeFalse();
+        model.SupportsStreaming.Should().BeFalse();
+        model.SupportsToolCalling.Should().BeFalse();
+        model.SupportsEmbeddings.Should().BeFalse();
+        model.SupportsVision.Should().BeFalse();
+        model.SupportsStructuredOutput.Should().BeFalse();
+        model.ContextWindow.Should().BeNull();
+        model.RequiresGpu.Should().BeFalse();
+        model.RecommendedRamGb.Should().BeNull();
+        model.LicenseName.Should().BeEmpty();
+        model.LicenseUrl.Should().BeEmpty();
+        model.ComplianceStatus.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Model_Register_WithAllNewFields_ShouldSetCorrectly()
+    {
+        var providerId = AiProviderId.New();
+        var model = AIModel.Register(
+            "deepseek-r1:1.5b", "DeepSeek R1 1.5B", "ollama", ModelType.Chat,
+            isInternal: true, "chat,reasoning", 1, FixedNow,
+            slug: "deepseek-r1-1-5b",
+            providerId: providerId,
+            externalModelId: "deepseek-r1:1.5b",
+            category: "general",
+            isInstalled: true,
+            isDefaultForChat: true,
+            isDefaultForReasoning: true,
+            supportsStreaming: true,
+            contextWindow: 4096,
+            requiresGpu: false,
+            recommendedRamGb: 3.0m,
+            licenseName: "MIT",
+            licenseUrl: "https://example.com/license",
+            complianceStatus: "approved");
+
+        model.Slug.Should().Be("deepseek-r1-1-5b");
+        model.ProviderId.Should().Be(providerId);
+        model.ExternalModelId.Should().Be("deepseek-r1:1.5b");
+        model.Category.Should().Be("general");
+        model.IsInstalled.Should().BeTrue();
+        model.IsDefaultForChat.Should().BeTrue();
+        model.IsDefaultForReasoning.Should().BeTrue();
+        model.IsDefaultForEmbeddings.Should().BeFalse();
+        model.SupportsStreaming.Should().BeTrue();
+        model.ContextWindow.Should().Be(4096);
+        model.RequiresGpu.Should().BeFalse();
+        model.RecommendedRamGb.Should().Be(3.0m);
+        model.LicenseName.Should().Be("MIT");
+        model.LicenseUrl.Should().Be("https://example.com/license");
+        model.ComplianceStatus.Should().Be("approved");
+    }
+
+    [Fact]
+    public void Model_Register_ShouldDeriveSlugFromName_WithColonReplacement()
+    {
+        var model = AIModel.Register(
+            "deepseek-r1:1.5b", "DS", "ollama", ModelType.Chat,
+            true, "chat", 1, FixedNow);
+
+        model.Slug.Should().Be("deepseek-r1-1.5b");
+    }
+
+    [Fact]
+    public void Model_Register_ShouldDefaultExternalModelId_ToName()
+    {
+        var model = AIModel.Register(
+            "llama3", "Llama 3", "ollama", ModelType.Chat,
+            true, "chat", 1, FixedNow);
+
+        model.ExternalModelId.Should().Be("llama3");
+    }
+
+    [Fact]
+    public void Model_UpdateCapabilityFlags_ShouldUpdateAllFlags()
+    {
+        var model = AIModel.Register(
+            "m", "M", "P", ModelType.Chat, false, "chat", 1, FixedNow);
+
+        var result = model.UpdateCapabilityFlags(
+            supportsStreaming: true,
+            supportsToolCalling: true,
+            supportsEmbeddings: false,
+            supportsVision: true,
+            supportsStructuredOutput: false);
+
+        result.IsSuccess.Should().BeTrue();
+        model.SupportsStreaming.Should().BeTrue();
+        model.SupportsToolCalling.Should().BeTrue();
+        model.SupportsEmbeddings.Should().BeFalse();
+        model.SupportsVision.Should().BeTrue();
+        model.SupportsStructuredOutput.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Model_SetDefaultFlags_ShouldUpdateFlags()
+    {
+        var model = AIModel.Register(
+            "m", "M", "P", ModelType.Chat, false, "chat", 1, FixedNow);
+
+        var result = model.SetDefaultFlags(
+            isDefaultForChat: true,
+            isDefaultForReasoning: false,
+            isDefaultForEmbeddings: true);
+
+        result.IsSuccess.Should().BeTrue();
+        model.IsDefaultForChat.Should().BeTrue();
+        model.IsDefaultForReasoning.Should().BeFalse();
+        model.IsDefaultForEmbeddings.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Model_MarkAsInstalled_ShouldSetTrue()
+    {
+        var model = AIModel.Register(
+            "m", "M", "P", ModelType.Chat, false, "chat", 1, FixedNow);
+        model.IsInstalled.Should().BeFalse();
+
+        model.MarkAsInstalled();
+
+        model.IsInstalled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Model_MarkAsUninstalled_ShouldSetFalse()
+    {
+        var model = AIModel.Register(
+            "m", "M", "P", ModelType.Chat, false, "chat", 1, FixedNow,
+            isInstalled: true);
+
+        model.MarkAsUninstalled();
+
+        model.IsInstalled.Should().BeFalse();
+    }
+
     // ── AIAccessPolicy ─────────────────────────────────────────────────────
 
     [Fact]

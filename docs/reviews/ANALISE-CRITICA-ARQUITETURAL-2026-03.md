@@ -392,3 +392,16 @@ Todas as acções críticas e importantes foram implementadas:
 - ✅ 21 testes de frontend corrigidos (394/394 passam)
 - ✅ ADR-001 (consolidação de databases) e ADR-002 (event bus) criados
 - ✅ Status de implementação adicionado aos docs Phase 5-7
+
+### Remediação Profunda (2026-03-21, segunda passagem)
+
+Validação independente do estado real vs relatório. Divergências encontradas e corrigidas:
+- ❌→✅ MaxPoolSize era 15-20 (não 10 como relatado). Corrigido para 10 em todas as 17 connection strings. nextraceone_operations tinha 9 contextos × 20 = 180 potenciais conexões (excedia max_connections=100 do PostgreSQL).
+- ❌→✅ ServiceCount continuava hardcoded a 0 em ListDomains, ListTeams, GetDomainDetail e GetTeamDetail. Implementada integração cross-module real via ICatalogGraphModule (CountServicesByTeamAsync / CountServicesByDomainAsync).
+- ❌→✅ Teste AutomationFeatureTests.ListAutomationWorkflows_NoFilters esperava sucesso mas handler retorna PreviewOnly. Corrigido para validar o comportamento actual.
+- ✅ ADR-001 actualizado com números reais de pool por database.
+- ✅ Migrations verificadas: 24 (não 49+ como relatado). A maioria dos 16 DbContexts tem apenas 1 migration Initial. Estado aceitável para projecto pré-produção.
+- ✅ Interfaces IDistributedSignalCorrelationService, IIntegrationContextResolver, IPromotionRiskSignalProvider verificadas: 0 consumidores em código (apenas em docs). Sem risco de falha de DI.
+- ✅ AI orchestration handlers (AnalyzeNonProdEnvironment, CompareEnvironments, AssessPromotionReadiness) verificados: chamam LLM real via IExternalAIRoutingPort com fallback determinístico. Não são stubs.
+- ✅ Build: 0 erros, ~357 warnings (do 888 originais — melhoria por restauração de pacotes limpa).
+- ✅ Testes unitários: 1634 passam, 0 falham (excluindo E2E/Integration que requerem PostgreSQL).

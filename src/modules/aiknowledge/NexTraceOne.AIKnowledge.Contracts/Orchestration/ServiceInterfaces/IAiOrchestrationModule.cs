@@ -1,5 +1,7 @@
 namespace NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 
+// IMPLEMENTATION STATUS: Planned — no methods defined, no implementation, no consumers.
+
 /// <summary>
 /// Interface pública do módulo AiOrchestration.
 /// Outros módulos que precisarem de dados deste módulo devem usar
@@ -7,5 +9,4 @@ namespace NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 /// </summary>
 public interface IAiOrchestrationModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
 }

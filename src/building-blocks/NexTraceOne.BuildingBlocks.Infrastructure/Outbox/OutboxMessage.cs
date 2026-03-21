@@ -20,19 +20,30 @@ public sealed class OutboxMessage
 
     /// <summary>
     /// Chave de idempotência para garantir processamento único.
-    /// Formato: {EventType}:{AggregateId}:{Timestamp}.
+    /// Formato: {EventType}:{ContentHash}:{Timestamp}.
+    /// Deterministic — the same logical event always produces the same key.
     /// Handlers devem verificar esta chave antes de executar side-effects.
     /// </summary>
     public string IdempotencyKey { get; init; } = string.Empty;
 
     /// <summary>Cria uma mensagem de outbox a partir de um evento de domínio serializado.</summary>
     public static OutboxMessage Create(object domainEvent, Guid tenantId, DateTimeOffset createdAt)
-        => new()
+    {
+        var eventTypeName = domainEvent.GetType().AssemblyQualifiedName ?? domainEvent.GetType().FullName ?? domainEvent.GetType().Name;
+        var payload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType());
+
+        // Deterministic idempotency key: hash of payload ensures same event = same key.
+        var contentHash = Convert.ToHexString(
+            System.Security.Cryptography.SHA256.HashData(
+                System.Text.Encoding.UTF8.GetBytes(payload)))[..16];
+
+        return new()
         {
-            EventType = domainEvent.GetType().AssemblyQualifiedName ?? domainEvent.GetType().FullName ?? domainEvent.GetType().Name,
-            Payload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType()),
+            EventType = eventTypeName,
+            Payload = payload,
             TenantId = tenantId,
             CreatedAt = createdAt,
-            IdempotencyKey = $"{domainEvent.GetType().AssemblyQualifiedName}:{Guid.NewGuid():N}:{createdAt:O}"
+            IdempotencyKey = $"{eventTypeName}:{contentHash}:{createdAt:O}"
         };
+    }
 }

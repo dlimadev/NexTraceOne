@@ -41,6 +41,9 @@ public interface IServiceAssetRepository
     /// <summary>Conta o total de serviços por equipa.</summary>
     Task<int> CountByTeamAsync(string teamName, CancellationToken cancellationToken);
 
+    /// <summary>Conta o total de serviços por domínio.</summary>
+    Task<int> CountByDomainAsync(string domain, CancellationToken cancellationToken);
+
     /// <summary>Adiciona um novo ativo de serviço para persistência.</summary>
     void Add(ServiceAsset serviceAsset);
 }

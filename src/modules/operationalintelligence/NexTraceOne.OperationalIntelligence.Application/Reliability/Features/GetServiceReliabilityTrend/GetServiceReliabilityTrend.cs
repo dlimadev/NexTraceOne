@@ -76,5 +76,7 @@ public static class GetServiceReliabilityTrend
         TrendDirection Direction,
         string Timeframe,
         string Summary,
-        IReadOnlyList<TrendDataPoint> DataPoints);
+        IReadOnlyList<TrendDataPoint> DataPoints,
+        bool IsSimulated = true,
+        string DataSource = "demo");
 }

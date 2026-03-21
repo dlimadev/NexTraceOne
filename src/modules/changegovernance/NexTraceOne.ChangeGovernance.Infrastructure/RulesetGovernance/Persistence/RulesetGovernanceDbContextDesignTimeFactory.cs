@@ -16,7 +16,7 @@ internal sealed class RulesetGovernanceDbContextDesignTimeFactory : IDesignTimeD
     {
         var optionsBuilder = new DbContextOptionsBuilder<RulesetGovernanceDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone_changegovernance;Username=nextraceone;Password=ouro18";
+            ?? "Host=localhost;Port=5432;Database=nextraceone_operations;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(RulesetGovernanceDbContext).Assembly.FullName));

@@ -12,4 +12,10 @@ public interface ICatalogGraphModule
 
     /// <summary>Verifica se um ativo de serviço existe pelo nome único.</summary>
     Task<bool> ServiceAssetExistsAsync(string serviceName, CancellationToken cancellationToken);
+
+    /// <summary>Conta o total de serviços associados a uma equipa.</summary>
+    Task<int> CountServicesByTeamAsync(string teamName, CancellationToken cancellationToken);
+
+    /// <summary>Conta o total de serviços associados a um domínio.</summary>
+    Task<int> CountServicesByDomainAsync(string domain, CancellationToken cancellationToken);
 }

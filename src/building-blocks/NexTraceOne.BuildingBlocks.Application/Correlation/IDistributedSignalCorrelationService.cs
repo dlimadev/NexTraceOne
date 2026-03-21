@@ -1,5 +1,10 @@
 namespace NexTraceOne.BuildingBlocks.Application.Correlation;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists.
+// This interface defines the distributed signal correlation service for AI-assisted analysis.
+// It will be implemented when the correlation pipeline is operational.
+// Do NOT register in DI or reference in handlers until an implementation exists.
+
 /// <summary>
 /// Serviço de correlação de sinais distribuídos para análise operacional e IA.
 ///

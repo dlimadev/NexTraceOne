@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 
@@ -15,7 +16,9 @@ public static class GetTeamDetail
     public sealed record Query(string TeamId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de uma equipa com serviços, contratos e dependências.</summary>
-    public sealed class Handler(ITeamRepository teamRepository) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        ITeamRepository teamRepository,
+        ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -26,7 +29,9 @@ public static class GetTeamDetail
             if (team is null)
                 return Error.NotFound("TEAM_NOT_FOUND", "Team '{0}' not found.", request.TeamId);
 
-            // TODO: enriquecer com dados reais de serviços, contratos e dependências cross-team
+            var serviceCount = await catalogGraph.CountServicesByTeamAsync(team.Name, cancellationToken);
+
+            // TODO: enriquecer com dados reais de contratos e dependências cross-team
             var services = new List<TeamServiceDto>();
             var contracts = new List<TeamContractDto>();
             var crossTeamDeps = new List<CrossTeamDependencyDto>();
@@ -38,8 +43,8 @@ public static class GetTeamDetail
                 Description: team.Description,
                 Status: team.Status.ToString(),
                 ParentOrganizationUnit: team.ParentOrganizationUnit,
-                ServiceCount: 0,
-                ContractCount: 0,
+                ServiceCount: serviceCount,
+                ContractCount: 0,   // Deferred: requires IContractsModule implementation
                 ActiveIncidentCount: 0,
                 RecentChangeCount: 0,
                 MaturityLevel: "Developing",
@@ -70,7 +75,12 @@ public static class GetTeamDetail
         IReadOnlyList<TeamServiceDto> Services,
         IReadOnlyList<TeamContractDto> Contracts,
         IReadOnlyList<CrossTeamDependencyDto> CrossTeamDependencies,
-        DateTimeOffset CreatedAt);
+        DateTimeOffset CreatedAt)
+    {
+        /// <summary>Fields not yet backed by real data.</summary>
+        public IReadOnlyList<string> DeferredFields { get; init; } =
+            ["ContractCount", "ActiveIncidentCount", "RecentChangeCount", "MaturityLevel", "ReliabilityScore"];
+    }
 
     /// <summary>DTO de serviço associado a uma equipa.</summary>
     public sealed record TeamServiceDto(

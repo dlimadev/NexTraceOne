@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
+using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,6 +35,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -57,12 +62,15 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Workflow.Domain.Entities.ApprovalDecision", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.ApprovalDecision", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -120,7 +128,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.ToTable("wf_approval_decisions", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Workflow.Domain.Entities.EvidencePack", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.EvidencePack", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -171,7 +179,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.ToTable("wf_evidence_packs", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Workflow.Domain.Entities.SlaPolicy", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.SlaPolicy", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -225,7 +233,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.ToTable("wf_sla_policies", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Workflow.Domain.Entities.WorkflowInstance", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.WorkflowInstance", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -266,7 +274,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.ToTable("wf_workflow_instances", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Workflow.Domain.Entities.WorkflowStage", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.WorkflowStage", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -336,7 +344,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.ToTable("wf_workflow_stages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Workflow.Domain.Entities.WorkflowTemplate", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.WorkflowTemplate", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

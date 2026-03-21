@@ -1,6 +1,6 @@
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Identity.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs;

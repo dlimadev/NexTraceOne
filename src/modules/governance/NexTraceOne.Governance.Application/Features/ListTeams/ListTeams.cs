@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.ListTeams;
@@ -16,7 +17,8 @@ public static class ListTeams
     /// <summary>Handler que retorna lista de equipas com indicadores sumários.</summary>
     public sealed class Handler(
         ITeamRepository teamRepository,
-        ITeamDomainLinkRepository teamDomainLinkRepository) : IQueryHandler<Query, Response>
+        ITeamDomainLinkRepository teamDomainLinkRepository,
+        ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -26,15 +28,16 @@ public static class ListTeams
             foreach (var t in teams)
             {
                 var links = await teamDomainLinkRepository.ListByTeamIdAsync(t.Id, cancellationToken);
+                var serviceCount = await catalogGraph.CountServicesByTeamAsync(t.Name, cancellationToken);
                 dtos.Add(new TeamSummaryDto(
                     TeamId: t.Id.Value.ToString(),
                     Name: t.Name,
                     DisplayName: t.DisplayName,
                     Description: t.Description,
                     Status: t.Status.ToString(),
-                    ServiceCount: 0,    // Cross-module: requires Catalog integration
-                    ContractCount: 0,   // Cross-module: requires Catalog integration
-                    MemberCount: 0,     // Cross-module: requires IdentityAccess integration
+                    ServiceCount: serviceCount,
+                    ContractCount: 0,   // Deferred: requires IContractsModule implementation
+                    MemberCount: 0,     // Deferred: requires IdentityAccess integration
                     MaturityLevel: "Developing",
                     ParentOrganizationUnit: t.ParentOrganizationUnit
                 ));
@@ -59,5 +62,10 @@ public static class ListTeams
         int ContractCount,
         int MemberCount,
         string MaturityLevel,
-        string? ParentOrganizationUnit);
+        string? ParentOrganizationUnit)
+    {
+        /// <summary>Fields not yet backed by real data.</summary>
+        public IReadOnlyList<string> DeferredFields { get; init; } =
+            ["ContractCount", "MemberCount", "MaturityLevel"];
+    }
 }

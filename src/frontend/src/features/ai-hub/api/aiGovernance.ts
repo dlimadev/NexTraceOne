@@ -125,6 +125,68 @@ export const aiGovernanceApi = {
   checkProvidersHealth: () =>
     client.get('/ai/providers/health').then(r => r.data),
 
+  // ── Available Models (per-user authorization) ──────────────────────
+  listAvailableModels: () =>
+    client.get('/ai/models/available').then(r => r.data),
+
+  // ── AI Agents ─────────────────────────────────────────────────────
+  listAgents: (params?: { isOfficial?: boolean }) =>
+    client.get('/ai/agents', { params }).then(r => r.data),
+  getAgent: (agentId: string) =>
+    client.get(`/ai/agents/${agentId}`).then(r => r.data),
+  createAgent: (data: {
+    name: string;
+    displayName: string;
+    description: string;
+    category: string;
+    systemPrompt: string;
+    objective?: string;
+    ownershipType: string;
+    visibility: string;
+    capabilities?: string;
+    targetPersona?: string;
+    icon?: string;
+    preferredModelId?: string | null;
+    allowedModelIds?: string;
+    allowedTools?: string;
+    inputSchema?: string;
+    outputSchema?: string;
+    allowModelOverride?: boolean;
+    sortOrder?: number;
+  }) =>
+    client.post('/ai/agents', data).then(r => r.data),
+  updateAgent: (agentId: string, data: {
+    displayName?: string;
+    description?: string;
+    systemPrompt?: string;
+    objective?: string;
+    capabilities?: string;
+    targetPersona?: string;
+    icon?: string;
+    preferredModelId?: string | null;
+    allowedModelIds?: string;
+    allowedTools?: string;
+    inputSchema?: string;
+    outputSchema?: string;
+    visibility?: string;
+    allowModelOverride?: boolean;
+    sortOrder?: number;
+  }) =>
+    client.put(`/ai/agents/${agentId}`, data).then(r => r.data),
+  executeAgent: (agentId: string, data: {
+    input: string;
+    modelIdOverride?: string | null;
+    contextJson?: string;
+  }) =>
+    client.post(`/ai/agents/${agentId}/execute`, data).then(r => r.data),
+  getAgentExecution: (executionId: string) =>
+    client.get(`/ai/agent-executions/${executionId}`).then(r => r.data),
+  reviewArtifact: (artifactId: string, data: {
+    decision: string;
+    notes?: string;
+  }) =>
+    client.post(`/ai/artifacts/${artifactId}/review`, data).then(r => r.data),
+
   // ── AI Environment Analysis (Phase 7) ────────────────────────────────
   analyzeNonProdEnvironment: (data: {
     tenantId: string;

@@ -1,5 +1,7 @@
 namespace NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
 
+// IMPLEMENTATION STATUS: Planned — no methods defined, no implementation, no consumers.
+
 /// <summary>
 /// Interface pública do módulo ExternalAi.
 /// Outros módulos que precisarem de dados deste módulo devem usar
@@ -7,5 +9,4 @@ namespace NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
 /// </summary>
 public interface IExternalAiModule
 {
-    // TODO: Definir operações de consulta que outros módulos podem usar
 }

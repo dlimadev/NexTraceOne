@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.ListDomains;
@@ -16,7 +17,8 @@ public static class ListDomains
     /// <summary>Handler que retorna lista de domínios com indicadores sumários.</summary>
     public sealed class Handler(
         IGovernanceDomainRepository domainRepository,
-        ITeamDomainLinkRepository teamDomainLinkRepository) : IQueryHandler<Query, Response>
+        ITeamDomainLinkRepository teamDomainLinkRepository,
+        ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -26,6 +28,7 @@ public static class ListDomains
             foreach (var d in domains)
             {
                 var links = await teamDomainLinkRepository.ListByDomainIdAsync(d.Id, cancellationToken);
+                var serviceCount = await catalogGraph.CountServicesByDomainAsync(d.Name, cancellationToken);
                 dtos.Add(new DomainSummaryDto(
                     DomainId: d.Id.Value.ToString(),
                     Name: d.Name,
@@ -33,8 +36,8 @@ public static class ListDomains
                     Description: d.Description,
                     Criticality: d.Criticality.ToString(),
                     TeamCount: links.Count,
-                    ServiceCount: 0,    // Cross-module: requires Catalog integration
-                    ContractCount: 0,   // Cross-module: requires Catalog integration
+                    ServiceCount: serviceCount,
+                    ContractCount: 0,   // Deferred: requires IContractsModule implementation
                     MaturityLevel: "Developing",
                     CapabilityClassification: d.CapabilityClassification
                 ));
@@ -59,5 +62,10 @@ public static class ListDomains
         int ServiceCount,
         int ContractCount,
         string MaturityLevel,
-        string? CapabilityClassification);
+        string? CapabilityClassification)
+    {
+        /// <summary>Fields not yet backed by real data.</summary>
+        public IReadOnlyList<string> DeferredFields { get; init; } =
+            ["ContractCount", "MaturityLevel"];
+    }
 }

@@ -3,14 +3,12 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NexTraceOne.Audit.Infrastructure.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
-
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace NexTraceOne.Audit.Infrastructure.Persistence.Migrations
+namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AuditDbContext))]
     partial class AuditDbContextModelSnapshot : ModelSnapshot
@@ -19,12 +17,12 @@ namespace NexTraceOne.Audit.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("NexTraceOne.Audit.Domain.Entities.AuditChainLink", b =>
+            modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.AuditChainLink", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -62,7 +60,7 @@ namespace NexTraceOne.Audit.Infrastructure.Persistence.Migrations
                     b.ToTable("aud_audit_chain_links", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Audit.Domain.Entities.AuditEvent", b =>
+            modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.AuditEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -116,7 +114,7 @@ namespace NexTraceOne.Audit.Infrastructure.Persistence.Migrations
                     b.ToTable("aud_audit_events", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Audit.Domain.Entities.RetentionPolicy", b =>
+            modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.RetentionPolicy", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -155,6 +153,11 @@ namespace NexTraceOne.Audit.Infrastructure.Persistence.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
@@ -176,20 +179,23 @@ namespace NexTraceOne.Audit.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Audit.Domain.Entities.AuditChainLink", b =>
+            modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.AuditChainLink", b =>
                 {
-                    b.HasOne("NexTraceOne.Audit.Domain.Entities.AuditEvent", null)
+                    b.HasOne("NexTraceOne.AuditCompliance.Domain.Entities.AuditEvent", null)
                         .WithOne("ChainLink")
-                        .HasForeignKey("NexTraceOne.Audit.Domain.Entities.AuditChainLink", "AuditEventId")
+                        .HasForeignKey("NexTraceOne.AuditCompliance.Domain.Entities.AuditChainLink", "AuditEventId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Audit.Domain.Entities.AuditEvent", b =>
+            modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.AuditEvent", b =>
                 {
                     b.Navigation("ChainLink");
                 });

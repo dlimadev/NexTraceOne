@@ -1,5 +1,7 @@
-/** Barrel export — bounded context AI Hub (assistente, model registry, políticas IA, budgets, auditoria, routing). */
+/** Barrel export — bounded context AI Hub (assistente, model registry, políticas IA, budgets, auditoria, routing, agents). */
 export { AiAssistantPage } from './pages/AiAssistantPage';
+export { AiAgentsPage } from './pages/AiAgentsPage';
+export { AgentDetailPage } from './pages/AgentDetailPage';
 export { ModelRegistryPage } from './pages/ModelRegistryPage';
 export { AiPoliciesPage } from './pages/AiPoliciesPage';
 export { TokenBudgetPage } from './pages/TokenBudgetPage';

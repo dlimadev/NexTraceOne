@@ -7,6 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetWasteSignals;
 /// <summary>
 /// Feature: GetWasteSignals — sinais de desperdício operacional filtrados por serviço, equipa ou domínio.
 /// Desperdício no NexTraceOne está ligado a comportamento operacional, não a billing cloud genérico.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetWasteSignals
 {
@@ -71,19 +72,23 @@ public static class GetWasteSignals
                     .Select(g => new WasteByTypeDto(g.Key, g.Count(), g.Sum(s => s.EstimatedWaste)))
                     .OrderByDescending(t => t.TotalWaste)
                     .ToList(),
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Resposta com sinais de desperdício.</summary>
+    /// <summary>Resposta com sinais de desperdício. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         decimal TotalWaste,
         int SignalCount,
         IReadOnlyList<WasteSignalDetailDto> Signals,
         IReadOnlyList<WasteByTypeDto> ByType,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Sinal de desperdício detalhado.</summary>
     public sealed record WasteSignalDetailDto(

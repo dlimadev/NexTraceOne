@@ -43,7 +43,11 @@
       "hours": "{{count}}h ago",
       "days": "{{count}}d ago"
     },
-    "somethingWentWrong": "Something went wrong"
+    "somethingWentWrong": "Something went wrong",
+    "demoBanner": {
+      "title": "Demo Data",
+      "description": "The data shown on this page is simulated for demonstration purposes. Real data will be available when the underlying integration is complete."
+    }
   },
   "auth": {
     "signIn": "Sign in to your account",
@@ -233,6 +237,7 @@
     "reliability": "Service Reliability",
     "automation": "Automation",
     "aiAssistant": "AI Assistant",
+    "aiAgents": "AI Agents",
     "modelRegistry": "Model Registry",
     "aiPolicies": "AI Policies",
     "reports": "Reports",
@@ -2088,6 +2093,110 @@
       "incidents": "Incidents"
     }
   },
+  "agents": {
+    "title": "AI Agents",
+    "subtitle": "Official and custom governed agents — create, execute, and review artifacts",
+    "createAgent": "Create Agent",
+    "createTitle": "Create Custom Agent",
+    "createButton": "Create Agent",
+    "createError": "Failed to create agent. Please try again.",
+    "loadError": "Failed to load agents. Please try again.",
+    "detailLoadError": "Failed to load agent details. Please try again.",
+    "detailNotFound": "Agent not found.",
+    "updateError": "Failed to update agent. Please try again.",
+    "executeError": "Failed to execute agent. Please try again.",
+    "executeTitle": "Execute Agent",
+    "executeButton": "Execute",
+    "searchPlaceholder": "Search agents...",
+    "filter": {
+      "all": "All",
+      "official": "Official",
+      "custom": "Custom"
+    },
+    "emptyTitle": "No agents found",
+    "emptyDescription": "Create a custom agent or adjust your filters.",
+    "officialSection": "Official Agents",
+    "customSection": "Custom Agents",
+    "governanceNotice": "All agent executions are governed, audited and tracked. Artifacts require review before publication.",
+    "view": "View",
+    "execute": "Execute",
+    "edit": "Edit",
+    "approve": "Approve",
+    "reject": "Reject",
+    "backToList": "Back to agents",
+    "saveChanges": "Save Changes",
+    "active": "Active",
+    "inactive": "Inactive",
+    "tokens": "tokens",
+    "executions": "executions",
+    "artifacts": "Artifacts",
+    "inputLabel": "Input",
+    "inputPlaceholder": "Describe what you want the agent to do...",
+    "outputLabel": "Output",
+    "allowModelOverrideLabel": "Allow model override at execution time",
+    "fieldName": "Name",
+    "fieldDisplayName": "Display Name",
+    "fieldDescription": "Description",
+    "fieldCategory": "Category",
+    "fieldVisibility": "Visibility",
+    "fieldObjective": "Objective",
+    "fieldSystemPrompt": "System Prompt",
+    "displayNamePlaceholder": "My Custom Agent",
+    "descriptionPlaceholder": "Describe what this agent does...",
+    "objectivePlaceholder": "What is the main objective of this agent?",
+    "systemPromptPlaceholder": "You are a specialized agent that...",
+    "descriptionLabel": "Description",
+    "objectiveLabel": "Objective",
+    "capabilitiesLabel": "Capabilities",
+    "statsLabel": "Statistics",
+    "totalExecutions": "Total executions",
+    "versionLabel": "Version",
+    "modelOverride": "Model override",
+    "targetPersonaLabel": "Target persona",
+    "metadataLabel": "Metadata",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "ownerId": "Owner",
+    "systemPromptLabel": "System Prompt",
+    "inputSchemaLabel": "Input Schema",
+    "outputSchemaLabel": "Output Schema",
+    "allowedModelsLabel": "Allowed Models",
+    "allowedToolsLabel": "Allowed Tools",
+    "tab": {
+      "overview": "Overview",
+      "definition": "Definition",
+      "edit": "Edit"
+    },
+    "status": {
+      "Draft": "Draft",
+      "PendingReview": "Pending Review",
+      "Active": "Active",
+      "Published": "Published",
+      "Archived": "Archived",
+      "Blocked": "Blocked"
+    },
+    "ownership": {
+      "System": "System",
+      "Tenant": "Organization",
+      "User": "Personal"
+    },
+    "visibility": {
+      "Private": "Private",
+      "Team": "Team",
+      "Tenant": "Organization"
+    },
+    "category": {
+      "General": "General",
+      "ApiDesign": "API Design",
+      "TestGeneration": "Test Generation",
+      "EventDesign": "Event Design",
+      "Documentation": "Documentation",
+      "Analysis": "Analysis",
+      "CodeReview": "Code Review",
+      "Security": "Security",
+      "Operations": "Operations"
+    }
+  },
   "aiHub": {
     "conversations": "Conversations",
     "messages": "messages",
@@ -2224,7 +2333,18 @@
     "routingWeightPrimary": "Primary",
     "routingWeightSecondary": "Secondary",
     "routingWeightSupplementary": "Supplementary",
-    "routingGovernanceNotice": "Routing strategies and source weights govern how the AI selects models, prioritizes knowledge sources and enriches context for each query."
+    "routingGovernanceNotice": "Routing strategies and source weights govern how the AI selects models, prioritizes knowledge sources and enriches context for each query.",
+    "selectModel": "Select model",
+    "internalModels": "Internal Models",
+    "externalModels": "External Models",
+    "defaultModel": "Default",
+    "noModelsAvailable": "No models available for your access policy.",
+    "policyApplied": "Policy applied",
+    "usingModel": "Using model",
+    "agents": "Agents",
+    "agentsPanel": "Available Agents",
+    "officialAgent": "Official",
+    "agentsHint": "Agents provide specialized governed AI capabilities."
   },
   "governance": {
     "policies": {

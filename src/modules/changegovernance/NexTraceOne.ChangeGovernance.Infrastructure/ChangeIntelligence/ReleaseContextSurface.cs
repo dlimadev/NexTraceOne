@@ -61,8 +61,9 @@ internal sealed class ReleaseContextSurface(ChangeIntelligenceDbContext db) : IR
             .AsNoTracking()
             .Where(r => r.TenantId == tenantId
                 && r.CreatedAt >= since
-                // TODO (Fase 5): substituir por lookup de IsProductionLike via EnvironmentId
-                // quando a entidade Environment estiver acessível neste módulo sem acoplamento direto.
+                // DEFERRED: Replace with IsProductionLike lookup via EnvironmentId
+                // when Environment entity is accessible cross-module without direct coupling.
+                // See docs/IMPLEMENTATION-STATUS.md — Foundation > Environments: PARTIAL
                 && !new[] { "production", "prod" }.Contains(r.Environment.ToLower()))
             .OrderByDescending(r => r.CreatedAt)
             .Select(r => new ReleaseContextEntry(

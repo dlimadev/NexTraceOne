@@ -15,16 +15,31 @@ internal sealed class AIModelConfiguration : IEntityTypeConfiguration<AIModel>
             .HasConversion(id => id.Value, value => AIModelId.From(value));
 
         builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.Slug).HasMaxLength(200).IsRequired();
         builder.Property(x => x.DisplayName).HasMaxLength(300).IsRequired();
         builder.Property(x => x.Provider).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.ProviderId)
+            .HasConversion(
+                id => id == null ? (Guid?)null : id.Value,
+                value => value == null ? null : AiProviderId.From(value.Value));
+        builder.Property(x => x.ExternalModelId).HasMaxLength(500).IsRequired();
         builder.Property(x => x.ModelType).HasMaxLength(100).HasConversion<string>().IsRequired();
+        builder.Property(x => x.Category).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Status).HasMaxLength(100).HasConversion<string>().IsRequired();
         builder.Property(x => x.Capabilities).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.DefaultUseCases).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.RegisteredAt).HasColumnType("timestamp with time zone").IsRequired();
+        builder.Property(x => x.ContextWindow);
+        builder.Property(x => x.RecommendedRamGb).HasColumnType("numeric(5,1)");
+        builder.Property(x => x.LicenseName).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.LicenseUrl).HasMaxLength(1000).IsRequired();
+        builder.Property(x => x.ComplianceStatus).HasMaxLength(100).IsRequired();
 
         builder.HasIndex(x => x.Name);
+        builder.HasIndex(x => x.Slug).IsUnique();
         builder.HasIndex(x => x.Provider);
         builder.HasIndex(x => x.Status);
+        builder.HasIndex(x => x.ProviderId);
+        builder.HasIndex(x => x.IsDefaultForChat);
     }
 }

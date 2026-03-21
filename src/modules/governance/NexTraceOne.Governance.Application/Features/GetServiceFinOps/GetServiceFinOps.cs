@@ -7,6 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetServiceFinOps;
 /// <summary>
 /// Feature: GetServiceFinOps — perfil de custo contextual de um serviço individual.
 /// Inclui waste, eficiência, correlação com confiabilidade e impacto de mudanças.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetServiceFinOps
 {
@@ -63,13 +64,15 @@ public static class GetServiceFinOps
                 ChangeImpacts: changeImpacts,
                 Optimizations: optimizations,
                 TotalPotentialSavings: optimizations.Sum(o => o.PotentialSavings),
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Perfil de FinOps completo de um serviço.</summary>
+    /// <summary>Perfil de FinOps completo de um serviço. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         string ServiceId,
         string ServiceName,
@@ -88,7 +91,9 @@ public static class GetServiceFinOps
         IReadOnlyList<ChangeImpactDto> ChangeImpacts,
         IReadOnlyList<OptimizationDto> Optimizations,
         decimal TotalPotentialSavings,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Sinal de desperdício operacional com timestamp.</summary>
     public sealed record WasteSignalDto(

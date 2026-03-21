@@ -43,7 +43,11 @@
       "hours": "{{count}}h atrás",
       "days": "{{count}}d atrás"
     },
-    "somethingWentWrong": "Algo salió mal"
+    "somethingWentWrong": "Algo salió mal",
+    "demoBanner": {
+      "title": "Datos de Demostración",
+      "description": "Los datos mostrados en esta página son simulados con fines de demostración. Los datos reales estarán disponibles cuando la integración subyacente esté completa."
+    }
   },
   "auth": {
     "signIn": "Iniciar sesión en su cuenta",

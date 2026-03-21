@@ -11,6 +11,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { DemoBanner } from '../../../components/DemoBanner';
 import type { CostEfficiencyType } from '../../../types';
 import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
@@ -66,6 +67,7 @@ export function TeamFinOpsPage() {
 
   return (
     <PageContainer>
+      <DemoBanner className="mb-4" />
       {/* Back + Header */}
       <div className="mb-6">
         <Link to="/governance/finops" className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover mb-3">

@@ -1,5 +1,7 @@
 namespace NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists, no consumers.
+
 /// <summary>
 /// Interface pública do módulo Promotion.
 /// Outros módulos que precisarem de dados deste módulo devem usar

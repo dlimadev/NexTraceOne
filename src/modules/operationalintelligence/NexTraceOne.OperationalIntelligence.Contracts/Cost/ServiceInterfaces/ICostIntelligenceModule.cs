@@ -1,5 +1,7 @@
 namespace NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists, no consumers.
+
 /// <summary>
 /// Interface pública do módulo CostIntelligence.
 /// Outros módulos que precisarem de dados de custo devem usar este contrato —

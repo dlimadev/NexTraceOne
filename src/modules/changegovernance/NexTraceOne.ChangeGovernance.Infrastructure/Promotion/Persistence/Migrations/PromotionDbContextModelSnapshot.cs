@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,6 +35,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -57,12 +62,15 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Promotion.Domain.Entities.DeploymentEnvironment", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Promotion.Entities.DeploymentEnvironment", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -106,7 +114,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                     b.ToTable("prm_deployment_environments", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Promotion.Domain.Entities.GateEvaluation", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Promotion.Entities.GateEvaluation", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -168,7 +176,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                     b.ToTable("prm_gate_evaluations", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Promotion.Domain.Entities.PromotionGate", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Promotion.Entities.PromotionGate", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -227,7 +235,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                     b.ToTable("prm_promotion_gates", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Promotion.Domain.Entities.PromotionRequest", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Promotion.Entities.PromotionRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

@@ -63,6 +63,8 @@ const IdeIntegrationsPage = lazy(() => import('./features/ai-hub/pages/IdeIntegr
 const TokenBudgetPage = lazy(() => import('./features/ai-hub/pages/TokenBudgetPage').then(m => ({ default: m.TokenBudgetPage })));
 const AiAuditPage = lazy(() => import('./features/ai-hub/pages/AiAuditPage').then(m => ({ default: m.AiAuditPage })));
 const AiAnalysisPage = lazy(() => import('./features/ai-hub/pages/AiAnalysisPage').then(m => ({ default: m.AiAnalysisPage })));
+const AiAgentsPage = lazy(() => import('./features/ai-hub/pages/AiAgentsPage').then(m => ({ default: m.AiAgentsPage })));
+const AgentDetailPage = lazy(() => import('./features/ai-hub/pages/AgentDetailPage').then(m => ({ default: m.AgentDetailPage })));
 
 // ── Governance (lazy) ──
 const ExecutiveOverviewPage = lazy(() => import('./features/governance/pages/ExecutiveOverviewPage').then(m => ({ default: m.ExecutiveOverviewPage })));
@@ -410,6 +412,22 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="ai:governance:read" redirectTo="/unauthorized">
                     <AiAuditPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai/agents"
+                element={
+                  <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+                    <AiAgentsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai/agents/:agentId"
+                element={
+                  <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+                    <AgentDetailPage />
                   </ProtectedRoute>
                 }
               />

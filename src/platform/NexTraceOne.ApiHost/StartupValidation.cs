@@ -70,7 +70,7 @@ public static class StartupValidation
             }
         }
 
-        // Validação básica de connection strings — apenas verifica se não estão vazias
+        // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
         if (connectionStrings.Exists())
         {
@@ -79,6 +79,16 @@ public static class StartupValidation
                 if (string.IsNullOrWhiteSpace(child.Value))
                 {
                     validationWarnings.Add($"ConnectionStrings:{child.Key}");
+
+                    if (!app.Environment.IsDevelopment())
+                    {
+                        logger.LogCritical(
+                            "Connection string '{Key}' is empty in non-Development environment. Aborting startup.", child.Key);
+                        throw new InvalidOperationException(
+                            $"NexTraceOne startup aborted: connection string '{child.Key}' must be configured " +
+                            "in non-Development environments via environment variables or a secrets manager.");
+                    }
+
                     logger.LogWarning("Connection string '{Key}' is empty.", child.Key);
                 }
             }

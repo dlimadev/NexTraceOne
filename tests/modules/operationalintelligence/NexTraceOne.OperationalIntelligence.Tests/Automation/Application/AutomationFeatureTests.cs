@@ -217,16 +217,15 @@ public sealed class AutomationFeatureTests
     // ── ListAutomationWorkflows ──────────────────────────────────────
 
     [Fact]
-    public async Task ListAutomationWorkflows_NoFilters_ShouldReturnWorkflowList()
+    public async Task ListAutomationWorkflows_NoFilters_ShouldReturnPreviewOnlyError()
     {
         var handler = new ListAutomationWorkflows.Handler();
         var query = new ListAutomationWorkflows.Query(null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Items.Should().NotBeEmpty();
-        result.Value.TotalCount.Should().BeGreaterThan(0);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("PreviewOnly");
     }
 
     [Fact]

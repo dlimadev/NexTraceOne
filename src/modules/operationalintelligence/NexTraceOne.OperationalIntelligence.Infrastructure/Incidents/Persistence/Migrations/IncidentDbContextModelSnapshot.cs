@@ -17,7 +17,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,6 +35,11 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -56,6 +61,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
 
                     b.HasIndex("ProcessedAt");
 
@@ -106,10 +114,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.Property<Guid?>("EnvironmentId")
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("tenant_id");
 
                     b.Property<string>("EscalationPath")
                         .HasMaxLength(2000)
@@ -203,6 +207,10 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
 
                     b.Property<string>("TimelineJson")
                         .HasColumnType("jsonb");

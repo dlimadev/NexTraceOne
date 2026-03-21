@@ -2,6 +2,11 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists.
+// These interfaces define telemetry lifecycle services (retention, aggregation).
+// They will be implemented as background jobs when the telemetry pipeline is operational.
+// Do NOT register in DI or reference in handlers until implementations exist.
+
 /// <summary>
 /// Serviço de retenção que gerencia o ciclo de vida dos dados de telemetria.
 /// Responsável por:

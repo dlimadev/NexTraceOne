@@ -213,7 +213,9 @@ deployments.MapPost("/events", async (
     return Results.Accepted(null, new
     {
         message = "Deployment event received",
-        status = "processed",
+        status = "accepted",
+        processingStatus = "metadata_recorded",
+        note = "Event metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
         correlationId,
         executionId = execution.Id.Value
     });
@@ -267,7 +269,9 @@ promotions.MapPost("/events", async (
     return Results.Accepted(null, new
     {
         message = "Promotion event received",
-        status = "processed",
+        status = "accepted",
+        processingStatus = "metadata_recorded",
+        note = "Event metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
         correlationId,
         executionId = execution.Id.Value
     });
@@ -320,7 +324,9 @@ runtime.MapPost("/signals", async (
     return Results.Accepted(null, new
     {
         message = "Runtime signal received",
-        status = "processed",
+        status = "accepted",
+        processingStatus = "metadata_recorded",
+        note = "Signal metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
         correlationId,
         executionId = execution.Id.Value
     });
@@ -377,7 +383,9 @@ consumers.MapPost("/sync", async (
     return Results.Accepted(null, new
     {
         message = "Consumer update received",
-        status = "processed",
+        status = "accepted",
+        processingStatus = "metadata_recorded",
+        note = "Update metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
         correlationId,
         executionId = execution.Id.Value
     });
@@ -433,7 +441,9 @@ contracts.MapPost("/sync", async (
     return Results.Accepted(null, new
     {
         message = "Contract sync received",
-        status = "processed",
+        status = "accepted",
+        processingStatus = "metadata_recorded",
+        note = "Sync metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
         correlationId,
         executionId = execution.Id.Value
     });

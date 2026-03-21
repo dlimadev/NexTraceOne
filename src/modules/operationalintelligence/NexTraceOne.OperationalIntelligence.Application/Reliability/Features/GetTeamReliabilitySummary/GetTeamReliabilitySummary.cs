@@ -9,7 +9,8 @@ namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.G
 /// Feature: GetTeamReliabilitySummary — obtém o resumo agregado de confiabilidade
 /// dos serviços de uma equipa. Retorna contagens por estado, serviços críticos
 /// impactados e indicadores de atenção.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data until service reliability
+/// entries are created from real runtime snapshots.
 /// </summary>
 public static class GetTeamReliabilitySummary
 {
@@ -47,7 +48,7 @@ public static class GetTeamReliabilitySummary
         }
     }
 
-    /// <summary>Resposta com resumo agregado de confiabilidade da equipa.</summary>
+    /// <summary>Resposta com resumo agregado de confiabilidade da equipa. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         string TeamId,
         int TotalServices,
@@ -55,5 +56,7 @@ public static class GetTeamReliabilitySummary
         int DegradedServices,
         int UnavailableServices,
         int NeedsAttentionServices,
-        int CriticalServicesImpacted);
+        int CriticalServicesImpacted,
+        bool IsSimulated = true,
+        string? DataSource = "demo");
 }

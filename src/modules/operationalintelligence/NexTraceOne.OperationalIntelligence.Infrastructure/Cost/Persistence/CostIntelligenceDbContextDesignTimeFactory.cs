@@ -15,7 +15,7 @@ internal sealed class CostIntelligenceDbContextDesignTimeFactory : IDesignTimeDb
     {
         var optionsBuilder = new DbContextOptionsBuilder<CostIntelligenceDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone_operationalintelligence_cost;Username=nextraceone;Password=ouro18";
+            ?? "Host=localhost;Port=5432;Database=nextraceone_operations;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(CostIntelligenceDbContext).Assembly.FullName));

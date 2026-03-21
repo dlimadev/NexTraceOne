@@ -71,6 +71,7 @@ const paletteItems: PaletteItem[] = [
   { id: 'automation', labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={16} />, group: 'commandPalette.operations', permission: 'operations:automation:read' },
   // ── AI Hub ──
   { id: 'ai-assistant', labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={16} />, group: 'commandPalette.aiHub', permission: 'ai:assistant:read' },
+  { id: 'ai-agents', labelKey: 'sidebar.aiAgents', to: '/ai/agents', icon: <Bot size={16} />, group: 'commandPalette.aiHub', permission: 'ai:assistant:read' },
   { id: 'ai-models', labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Search size={16} />, group: 'commandPalette.aiHub', permission: 'ai:governance:read' },
   { id: 'ai-policies', labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <ShieldCheck size={16} />, group: 'commandPalette.aiHub', permission: 'ai:governance:read' },
   { id: 'ai-budgets', labelKey: 'sidebar.aiBudgets', to: '/ai/budgets', icon: <BarChart3 size={16} />, group: 'commandPalette.aiHub', permission: 'ai:governance:read' },

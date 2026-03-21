@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
-using NexTraceOne.Identity.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using System.Text.Json;
 
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
@@ -11,6 +11,10 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 /// <summary>
 /// Worker que processa mensagens pendentes do Outbox do módulo Identity.
 /// Executa em lote, desserializa os eventos persistidos e os entrega ao EventBus in-process.
+///
+/// LIMITATION: Currently only processes IdentityDbContext outbox.
+/// Other module DbContexts (Governance, ChangeIntelligence, Contracts, AI, etc.)
+/// have outbox tables but no processor. Extend this job or create per-module processors.
 /// </summary>
 public sealed class OutboxProcessorJob(
     IServiceScopeFactory serviceScopeFactory,
@@ -92,6 +96,11 @@ public sealed class OutboxProcessorJob(
 
                 message.ProcessedAt = dateTimeProvider.UtcNow;
                 message.LastError = null;
+
+                // Atomic per-message save: prevents duplicate delivery on crash.
+                // If we crash after publish but before save, only this one message is redelivered.
+                await dbContext.SaveChangesAsync(cancellationToken);
+
                 logger.LogInformation("Outbox message {OutboxMessageId} processed successfully", message.Id);
             }
             catch (Exception ex)
@@ -100,11 +109,10 @@ public sealed class OutboxProcessorJob(
                 // Segurança: não armazenar a mensagem completa da exceção no banco,
                 // pois pode conter detalhes internos (stack trace, tipos, connection strings).
                 message.LastError = $"Processing failed at attempt {message.RetryCount}.";
+                await dbContext.SaveChangesAsync(cancellationToken);
                 logger.LogError(ex, "Failed to process outbox message {OutboxMessageId}", message.Id);
             }
         }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
 
         var exhaustedMessages = pendingMessages.Where(message => message.ProcessedAt == null && message.RetryCount >= MaxRetryCount).ToArray();
         foreach (var exhaustedMessage in exhaustedMessages)

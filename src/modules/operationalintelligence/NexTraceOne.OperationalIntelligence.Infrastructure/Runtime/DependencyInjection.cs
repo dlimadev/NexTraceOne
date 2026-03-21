@@ -29,7 +29,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("RuntimeIntelligenceDatabase")
             ?? configuration.GetConnectionString("NexTraceOne")
             ?? configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+            ?? throw new InvalidOperationException(
+                "Connection string 'RuntimeIntelligenceDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
 
         services.AddDbContext<RuntimeIntelligenceDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

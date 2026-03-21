@@ -55,5 +55,7 @@ public static class GetServiceReliabilityCoverage
         bool HasOwner,
         bool HasDependenciesMapped,
         bool HasRecentChangeContext,
-        bool HasIncidentLinkage);
+        bool HasIncidentLinkage,
+        bool IsSimulated = true,
+        string DataSource = "demo");
 }

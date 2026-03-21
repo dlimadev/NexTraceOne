@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 
-using NexTraceOne.Identity.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 

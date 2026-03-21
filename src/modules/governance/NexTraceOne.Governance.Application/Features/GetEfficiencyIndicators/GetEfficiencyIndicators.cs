@@ -7,6 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetEfficiencyIndicators;
 /// <summary>
 /// Feature: GetEfficiencyIndicators — indicadores de eficiência operacional filtrados por serviço ou equipa.
 /// Eficiência no NexTraceOne mede a relação entre custo e valor operacional real.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetEfficiencyIndicators
 {
@@ -74,18 +75,22 @@ public static class GetEfficiencyIndicators
                 OverallEfficiencyScore: Math.Round(overallScore, 1),
                 ServiceCount: result.Count,
                 Services: result,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Resposta com indicadores de eficiência.</summary>
+    /// <summary>Resposta com indicadores de eficiência. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         decimal OverallEfficiencyScore,
         int ServiceCount,
         IReadOnlyList<ServiceEfficiencyDto> Services,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Eficiência operacional de um serviço.</summary>
     public sealed record ServiceEfficiencyDto(

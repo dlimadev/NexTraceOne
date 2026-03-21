@@ -34,6 +34,9 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiTokenQuotaPolicy> TokenQuotaPolicies => Set<AiTokenQuotaPolicy>();
     public DbSet<AiTokenUsageLedger> TokenUsageLedger => Set<AiTokenUsageLedger>();
     public DbSet<AiExternalInferenceRecord> ExternalInferenceRecords => Set<AiExternalInferenceRecord>();
+    public DbSet<AiAgent> Agents => Set<AiAgent>();
+    public DbSet<AiAgentExecution> AgentExecutions => Set<AiAgentExecution>();
+    public DbSet<AiAgentArtifact> AgentArtifacts => Set<AiAgentArtifact>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;

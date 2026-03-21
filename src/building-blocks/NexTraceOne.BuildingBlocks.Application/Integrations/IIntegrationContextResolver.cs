@@ -1,5 +1,10 @@
 namespace NexTraceOne.BuildingBlocks.Application.Integrations;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists.
+// This interface defines multi-tenant integration binding resolution.
+// It will be implemented when the integration bindings subsystem is built.
+// Do NOT register in DI or reference in handlers until an implementation exists.
+
 /// <summary>
 /// Resolve o binding de integração correto para o contexto tenant + ambiente atual.
 ///

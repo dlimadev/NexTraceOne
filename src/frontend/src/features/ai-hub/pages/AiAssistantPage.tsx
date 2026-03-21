@@ -27,6 +27,10 @@ import {
   AlertCircle,
   Loader2,
   Inbox,
+  Zap,
+  Globe,
+  Lock,
+  Users,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -77,6 +81,49 @@ interface ChatMessage {
 }
 
 // ── API Response Types ──────────────────────────────────────────────────
+
+interface AvailableModelItem {
+  modelId: string;
+  name: string;
+  displayName: string;
+  provider: string;
+  modelType: string;
+  isInternal: boolean;
+  isExternal: boolean;
+  status: string;
+  capabilities: string;
+  isDefault: boolean;
+  slug: string | null;
+  contextWindow: number | null;
+}
+
+interface AvailableModelsResponse {
+  internalModels: AvailableModelItem[];
+  externalModels: AvailableModelItem[];
+  allowExternalModels: boolean;
+  appliedPolicyName: string | null;
+  totalCount: number;
+}
+
+interface AgentItem {
+  agentId: string;
+  name: string;
+  displayName: string;
+  slug: string;
+  description: string;
+  category: string;
+  isOfficial: boolean;
+  isActive: boolean;
+  capabilities: string;
+  targetPersona: string;
+  icon: string;
+  preferredModelId: string | null;
+}
+
+interface AgentsResponse {
+  items: AgentItem[];
+  totalCount: number;
+}
 
 interface ConversationApiItem {
   id: string;
@@ -202,6 +249,17 @@ export function AiAssistantPage() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [conversationsError, setConversationsError] = useState<string | null>(null);
   const [messagesError, setMessagesError] = useState<string | null>(null);
+
+  // ── Model selection state ─────────────────────────────────────────────
+  const [availableModels, setAvailableModels] = useState<AvailableModelsResponse | null>(null);
+  const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
+  const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
+  const modelSelectorRef = useRef<HTMLDivElement>(null);
+
+  // ── Agents state ──────────────────────────────────────────────────────
+  const [agents, setAgents] = useState<AgentItem[]>([]);
+  const [isAgentsPanelOpen, setIsAgentsPanelOpen] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const conversationLoadRequestRef = useRef(0);
   const messageLoadRequestRef = useRef(0);
@@ -366,6 +424,46 @@ export function AiAssistantPage() {
       });
   }, [t]);
 
+  // ── Load available models (filtered by user authorization) ────────────
+  useEffect(() => {
+    aiGovernanceApi.listAvailableModels()
+      .then((data: AvailableModelsResponse) => {
+        setAvailableModels(data);
+        // Auto-select default model
+        const allModels = [...(data.internalModels || []), ...(data.externalModels || [])];
+        const defaultModel = allModels.find(m => m.isDefault);
+        if (defaultModel && !selectedModelId) {
+          setSelectedModelId(defaultModel.modelId);
+        }
+      })
+      .catch(() => {
+        // Available models not loaded — model selector won't show
+      });
+  }, []);
+
+  // ── Load agents ───────────────────────────────────────────────────────
+  useEffect(() => {
+    aiGovernanceApi.listAgents()
+      .then((data: AgentsResponse) => {
+        setAgents(data.items || []);
+      })
+      .catch(() => {
+        // Agents not loaded — agent panel won't show
+      });
+  }, []);
+
+  // ── Close model selector on outside click ─────────────────────────────
+  useEffect(() => {
+    if (!isModelSelectorOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modelSelectorRef.current && !modelSelectorRef.current.contains(e.target as Node)) {
+        setIsModelSelectorOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isModelSelectorOpen]);
+
   const handleSelectConversation = (convId: string) => {
     setMessagesError(null);
     setSelectedConversationState(convId);
@@ -406,6 +504,7 @@ export function AiAssistantPage() {
         contextScope: activeContexts.join(','),
         persona,
         clientType: 'Web',
+        preferredModelId: selectedModelId || undefined,
       });
 
       const targetConversationId = response.conversationId || selectedConversation;
@@ -572,6 +671,142 @@ export function AiAssistantPage() {
                   {providerStatus}
                 </Badge>
               )}
+
+              {/* ── Model Selector ────────────────────────────────────── */}
+              {availableModels && (
+                <div className="relative" ref={modelSelectorRef}>
+                  <button
+                    onClick={() => setIsModelSelectorOpen(prev => !prev)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-edge text-xs font-medium text-body hover:bg-hover transition-colors"
+                  >
+                    {(() => {
+                      const allModels = [...(availableModels.internalModels || []), ...(availableModels.externalModels || [])];
+                      const selected = allModels.find(m => m.modelId === selectedModelId);
+                      if (selected) {
+                        return (
+                          <>
+                            {selected.isInternal ? <Shield size={12} className="text-success" /> : <Globe size={12} className="text-warning" />}
+                            <span className="max-w-[120px] truncate">{selected.displayName}</span>
+                          </>
+                        );
+                      }
+                      return (
+                        <>
+                          <Cpu size={12} className="text-muted" />
+                          <span>{t('aiHub.selectModel')}</span>
+                        </>
+                      );
+                    })()}
+                    {isModelSelectorOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  </button>
+
+                  {isModelSelectorOpen && (
+                    <div className="absolute right-0 top-full mt-1 w-[320px] bg-card border border-edge rounded-lg shadow-lg z-50 max-h-[400px] overflow-y-auto">
+                      {availableModels.appliedPolicyName && (
+                        <div className="px-3 py-2 border-b border-edge flex items-center gap-1.5 text-[10px] text-muted">
+                          <Lock size={10} />
+                          {t('aiHub.policyApplied')}: {availableModels.appliedPolicyName}
+                        </div>
+                      )}
+
+                      {/* Internal Models Group */}
+                      {availableModels.internalModels.length > 0 && (
+                        <div>
+                          <div className="px-3 py-2 border-b border-edge flex items-center gap-1.5">
+                            <Shield size={12} className="text-success" />
+                            <span className="text-xs font-semibold text-heading">{t('aiHub.internalModels')}</span>
+                            <Badge variant="success">{availableModels.internalModels.length}</Badge>
+                          </div>
+                          {availableModels.internalModels.map(model => (
+                            <button
+                              key={model.modelId}
+                              onClick={() => { setSelectedModelId(model.modelId); setIsModelSelectorOpen(false); }}
+                              className={`w-full text-left px-3 py-2 hover:bg-hover transition-colors flex items-center gap-2 ${
+                                selectedModelId === model.modelId ? 'bg-accent/10 border-l-2 border-accent' : ''
+                              }`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs font-medium text-heading truncate">{model.displayName}</span>
+                                  {model.isDefault && <Badge variant="info">{t('aiHub.defaultModel')}</Badge>}
+                                </div>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[10px] text-muted">{model.provider}</span>
+                                  {model.contextWindow && (
+                                    <span className="text-[10px] text-muted">· {(model.contextWindow / 1000).toFixed(0)}k ctx</span>
+                                  )}
+                                  <span className="text-[10px] text-muted">· {model.modelType}</span>
+                                </div>
+                              </div>
+                              <Badge variant={model.status === 'Active' ? 'success' : 'default'}>
+                                {model.status === 'Active' ? <CheckCircle2 size={8} /> : <AlertCircle size={8} />}
+                              </Badge>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* External Models Group */}
+                      {availableModels.allowExternalModels && availableModels.externalModels.length > 0 && (
+                        <div>
+                          <div className="px-3 py-2 border-b border-t border-edge flex items-center gap-1.5">
+                            <Globe size={12} className="text-warning" />
+                            <span className="text-xs font-semibold text-heading">{t('aiHub.externalModels')}</span>
+                            <Badge variant="warning">{availableModels.externalModels.length}</Badge>
+                          </div>
+                          {availableModels.externalModels.map(model => (
+                            <button
+                              key={model.modelId}
+                              onClick={() => { setSelectedModelId(model.modelId); setIsModelSelectorOpen(false); }}
+                              className={`w-full text-left px-3 py-2 hover:bg-hover transition-colors flex items-center gap-2 ${
+                                selectedModelId === model.modelId ? 'bg-accent/10 border-l-2 border-accent' : ''
+                              }`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs font-medium text-heading truncate">{model.displayName}</span>
+                                  {model.isDefault && <Badge variant="info">{t('aiHub.defaultModel')}</Badge>}
+                                </div>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[10px] text-muted">{model.provider}</span>
+                                  {model.contextWindow && (
+                                    <span className="text-[10px] text-muted">· {(model.contextWindow / 1000).toFixed(0)}k ctx</span>
+                                  )}
+                                  <span className="text-[10px] text-muted">· {model.modelType}</span>
+                                </div>
+                              </div>
+                              <Badge variant={model.status === 'Active' ? 'success' : 'default'}>
+                                {model.status === 'Active' ? <CheckCircle2 size={8} /> : <AlertCircle size={8} />}
+                              </Badge>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {availableModels.totalCount === 0 && (
+                        <div className="px-3 py-4 text-center text-xs text-muted">
+                          {t('aiHub.noModelsAvailable')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── Agents Panel Toggle ───────────────────────────────── */}
+              {agents.length > 0 && (
+                <button
+                  onClick={() => setIsAgentsPanelOpen(prev => !prev)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-xs font-medium transition-colors ${
+                    isAgentsPanelOpen ? 'border-accent bg-accent/10 text-accent' : 'border-edge text-body hover:bg-hover'
+                  }`}
+                >
+                  <Users size={12} />
+                  {t('aiHub.agents')}
+                  <Badge variant="default">{agents.length}</Badge>
+                </button>
+              )}
+
               <div className="flex items-center gap-1.5">
                 <User size={14} className="text-muted" />
                 <span className="text-xs text-muted">
@@ -883,12 +1118,97 @@ export function AiAssistantPage() {
                 {t('aiHub.send')}
               </Button>
             </div>
-            <div className="flex items-center gap-2 mt-2 text-[10px] text-faded">
-              <Info size={10} />
-              <span>{t('aiHub.governanceNotice')}</span>
+
+            {/* ── Selected model indicator ─────────────────────────────── */}
+            <div className="flex items-center gap-2 mt-2">
+              {selectedModelId && availableModels && (() => {
+                const allModels = [...(availableModels.internalModels || []), ...(availableModels.externalModels || [])];
+                const model = allModels.find(m => m.modelId === selectedModelId);
+                if (!model) return null;
+                return (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-muted">
+                    {model.isInternal ? <Shield size={9} className="text-success" /> : <Globe size={9} className="text-warning" />}
+                    {t('aiHub.usingModel')}: {model.displayName}
+                    {model.isInternal ? ` (${t('aiHub.internalLabel')})` : ` (${t('aiHub.externalLabel')})`}
+                  </span>
+                );
+              })()}
+              <span className="flex-1" />
+              <span className="inline-flex items-center gap-1 text-[10px] text-faded">
+                <Info size={10} />
+                {t('aiHub.governanceNotice')}
+              </span>
             </div>
           </div>
         </div>
+
+        {/* ── Agents Panel (sidebar) ─────────────────────────────────── */}
+        {isAgentsPanelOpen && agents.length > 0 && (
+          <div className="w-[280px] shrink-0 bg-card rounded-lg border border-edge flex flex-col">
+            <div className="px-4 py-3 border-b border-edge flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users size={16} className="text-accent" />
+                <h2 className="text-sm font-semibold text-heading">{t('aiHub.agentsPanel')}</h2>
+              </div>
+              <button
+                onClick={() => setIsAgentsPanelOpen(false)}
+                className="text-muted hover:text-body transition-colors"
+              >
+                <ChevronUp size={14} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {agents.map(agent => (
+                <div
+                  key={agent.agentId}
+                  className="px-4 py-3 border-b border-edge hover:bg-hover transition-colors"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-lg leading-none mt-0.5">{agent.icon || '🤖'}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-medium text-heading truncate">{agent.displayName}</span>
+                        {agent.isOfficial && (
+                          <Badge variant="info">
+                            <Zap size={8} className="mr-0.5" />
+                            {t('aiHub.officialAgent')}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted mt-0.5 line-clamp-2">{agent.description}</p>
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        <Badge variant="default">
+                          {agent.category}
+                        </Badge>
+                        {agent.targetPersona && (
+                          <span className="text-[10px] text-muted flex items-center gap-0.5">
+                            <User size={8} />
+                            {agent.targetPersona}
+                          </span>
+                        )}
+                      </div>
+                      {agent.capabilities && (
+                        <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                          {agent.capabilities.split(',').slice(0, 3).map(cap => (
+                            <span key={cap} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-elevated text-muted">
+                              {cap.trim()}
+                            </span>
+                          ))}
+                          {agent.capabilities.split(',').length > 3 && (
+                            <span className="text-[9px] text-muted">+{agent.capabilities.split(',').length - 3}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-4 py-2 border-t border-edge">
+              <p className="text-[10px] text-muted text-center">{t('aiHub.agentsHint')}</p>
+            </div>
+          </div>
+        )}
       </div>
     </PageContainer>
   );

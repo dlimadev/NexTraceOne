@@ -11,6 +11,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { DemoBanner } from '../../../components/DemoBanner';
 import type {
   RiskLevel,
   GovernanceTrendDirection,
@@ -72,6 +73,7 @@ export function ExecutiveDrillDownPage() {
 
   return (
     <PageContainer>
+      <DemoBanner className="mb-4" />
       {/* Header */}
       <PageHeader
         title={t('governance.executive.drillDownTitle')}

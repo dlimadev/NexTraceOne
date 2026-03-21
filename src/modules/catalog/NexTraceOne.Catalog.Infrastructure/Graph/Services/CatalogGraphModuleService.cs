@@ -25,4 +25,12 @@ internal sealed class CatalogGraphModuleService(
         var service = await serviceAssetRepository.GetByNameAsync(serviceName, cancellationToken);
         return service is not null;
     }
+
+    /// <inheritdoc />
+    public async Task<int> CountServicesByTeamAsync(string teamName, CancellationToken cancellationToken)
+        => await serviceAssetRepository.CountByTeamAsync(teamName, cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<int> CountServicesByDomainAsync(string domain, CancellationToken cancellationToken)
+        => await serviceAssetRepository.CountByDomainAsync(domain, cancellationToken);
 }

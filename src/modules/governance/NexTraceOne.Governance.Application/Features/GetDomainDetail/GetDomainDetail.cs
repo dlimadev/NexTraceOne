@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 
@@ -18,7 +19,8 @@ public static class GetDomainDetail
     public sealed class Handler(
         IGovernanceDomainRepository domainRepository,
         ITeamDomainLinkRepository teamDomainLinkRepository,
-        ITeamRepository teamRepository) : IQueryHandler<Query, Response>
+        ITeamRepository teamRepository,
+        ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -37,15 +39,17 @@ public static class GetDomainDetail
                 var team = await teamRepository.GetByIdAsync(link.TeamId, cancellationToken);
                 if (team is not null)
                 {
+                    var teamServiceCount = await catalogGraph.CountServicesByTeamAsync(team.Name, cancellationToken);
                     teams.Add(new DomainTeamDto(
                         TeamId: team.Id.Value.ToString(),
                         Name: team.Name,
                         DisplayName: team.DisplayName,
-                        ServiceCount: 0,
+                        ServiceCount: teamServiceCount,
                         OwnershipType: link.OwnershipType.ToString()));
                 }
             }
 
+            var domainServiceCount = await catalogGraph.CountServicesByDomainAsync(domain.Name, cancellationToken);
             var services = new List<DomainServiceDto>();
             var crossDomainDeps = new List<CrossDomainDependencyDto>();
 
@@ -57,7 +61,7 @@ public static class GetDomainDetail
                 Criticality: domain.Criticality.ToString(),
                 CapabilityClassification: domain.CapabilityClassification,
                 TeamCount: teams.Count,
-                ServiceCount: 0,
+                ServiceCount: domainServiceCount,
                 ActiveIncidentCount: 0,
                 RecentChangeCount: 0,
                 MaturityLevel: "Developing",
@@ -88,7 +92,12 @@ public static class GetDomainDetail
         IReadOnlyList<DomainTeamDto> Teams,
         IReadOnlyList<DomainServiceDto> Services,
         IReadOnlyList<CrossDomainDependencyDto> CrossDomainDependencies,
-        DateTimeOffset CreatedAt);
+        DateTimeOffset CreatedAt)
+    {
+        /// <summary>Fields not yet backed by real data.</summary>
+        public IReadOnlyList<string> DeferredFields { get; init; } =
+            ["ActiveIncidentCount", "RecentChangeCount", "MaturityLevel", "ReliabilityScore"];
+    }
 
     /// <summary>DTO de equipa associada a um domínio.</summary>
     public sealed record DomainTeamDto(

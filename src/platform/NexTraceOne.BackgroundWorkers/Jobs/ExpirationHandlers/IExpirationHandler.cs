@@ -1,4 +1,3 @@
-using NexTraceOne.Identity.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;

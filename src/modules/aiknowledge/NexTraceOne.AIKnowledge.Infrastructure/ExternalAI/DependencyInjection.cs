@@ -25,7 +25,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("ExternalAiDatabase")
             ?? configuration.GetConnectionString("NexTraceOne")
             ?? configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+            ?? throw new InvalidOperationException(
+                "Connection string 'ExternalAiDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
 
         services.AddDbContext<ExternalAiDbContext>((serviceProvider, options) =>
         {

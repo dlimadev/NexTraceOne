@@ -7,6 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetBenchmarking;
 /// <summary>
 /// Feature: GetBenchmarking — comparação contextualizada entre equipas ou domínios.
 /// Cada comparação inclui contexto para garantir fairness na interpretação dos resultados.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetBenchmarking
 {
@@ -68,17 +69,21 @@ public static class GetBenchmarking
             var response = new Response(
                 Dimension: dimension,
                 Comparisons: comparisons,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Resposta de benchmarking com comparações contextualizadas.</summary>
+    /// <summary>Resposta de benchmarking. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         string Dimension,
         IReadOnlyList<BenchmarkComparisonDto> Comparisons,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Comparação de benchmarking para um grupo com forças, gaps e contexto explicativo.</summary>
     public sealed record BenchmarkComparisonDto(

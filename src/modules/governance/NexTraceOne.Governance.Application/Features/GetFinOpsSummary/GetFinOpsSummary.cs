@@ -7,6 +7,8 @@ namespace NexTraceOne.Governance.Application.Features.GetFinOpsSummary;
 /// <summary>
 /// Feature: GetFinOpsSummary — resumo de FinOps contextual por serviço, equipa e domínio.
 /// FinOps no NexTraceOne é contextual: ligado a operação, comportamento e eficiência.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data. Will be replaced by real
+/// cost snapshot integration from the CostIntelligence submodule in a future sprint.
 /// </summary>
 public static class GetFinOpsSummary
 {
@@ -92,13 +94,15 @@ public static class GetFinOpsSummary
                 TopCostDrivers: topDrivers,
                 TopWasteSignals: topWasteSignals,
                 OptimizationOpportunities: optimizationOpportunities,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Resposta do resumo de FinOps.</summary>
+    /// <summary>Resposta do resumo de FinOps. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         decimal TotalMonthlyCost,
         decimal TotalWaste,
@@ -108,7 +112,9 @@ public static class GetFinOpsSummary
         IReadOnlyList<CostDriverDto> TopCostDrivers,
         IReadOnlyList<WasteSignalDto> TopWasteSignals,
         IReadOnlyList<OptimizationOpportunityDto> OptimizationOpportunities,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Custo contextual por serviço.</summary>
     public sealed record ServiceCostDto(

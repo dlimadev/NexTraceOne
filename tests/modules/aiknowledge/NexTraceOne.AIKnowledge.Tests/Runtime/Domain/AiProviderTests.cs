@@ -1,4 +1,5 @@
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Tests.Runtime.Domain;
 
@@ -91,5 +92,130 @@ public sealed class AiProviderTests
         provider.SupportedCapabilities.Should().Be("chat,vision");
         provider.Priority.Should().Be(5);
         provider.Description.Should().Be("new desc");
+    }
+
+    // ── New fields (Phase 1: AI Runtime Foundation) ─────────────────────
+
+    [Fact]
+    public void Register_ShouldSetSlugFromName_WhenNotProvided()
+    {
+        var provider = AiProvider.Register(
+            "Ollama Local", "Ollama", "ollama",
+            "http://localhost:11434", true, "chat", 1, "d", FixedNow);
+
+        provider.Slug.Should().Be("ollama-local");
+    }
+
+    [Fact]
+    public void Register_ShouldUseExplicitSlug_WhenProvided()
+    {
+        var provider = AiProvider.Register(
+            "ollama", "Ollama", "ollama",
+            "http://localhost:11434", true, "chat", 1, "d", FixedNow,
+            slug: "my-custom-slug");
+
+        provider.Slug.Should().Be("my-custom-slug");
+    }
+
+    [Fact]
+    public void Register_ShouldSetDefaultValues_ForNewFields()
+    {
+        var provider = AiProvider.Register(
+            "p", "P", "T", "http://url", true, "chat", 1, "d", FixedNow);
+
+        provider.AuthenticationMode.Should().Be(AuthenticationMode.None);
+        provider.SupportsChat.Should().BeFalse();
+        provider.SupportsEmbeddings.Should().BeFalse();
+        provider.SupportsTools.Should().BeFalse();
+        provider.SupportsVision.Should().BeFalse();
+        provider.SupportsStructuredOutput.Should().BeFalse();
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Unknown);
+        provider.TimeoutSeconds.Should().Be(30);
+    }
+
+    [Fact]
+    public void Register_WithAllNewFields_ShouldSetCorrectly()
+    {
+        var provider = AiProvider.Register(
+            "openai", "OpenAI", "openai",
+            "https://api.openai.com/v1", false, "chat,vision,tools",
+            10, "External provider", FixedNow,
+            slug: "openai",
+            authenticationMode: AuthenticationMode.ApiKey,
+            supportsChat: true,
+            supportsEmbeddings: true,
+            supportsTools: true,
+            supportsVision: true,
+            supportsStructuredOutput: true,
+            timeoutSeconds: 60);
+
+        provider.Slug.Should().Be("openai");
+        provider.AuthenticationMode.Should().Be(AuthenticationMode.ApiKey);
+        provider.SupportsChat.Should().BeTrue();
+        provider.SupportsEmbeddings.Should().BeTrue();
+        provider.SupportsTools.Should().BeTrue();
+        provider.SupportsVision.Should().BeTrue();
+        provider.SupportsStructuredOutput.Should().BeTrue();
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Unknown);
+        provider.TimeoutSeconds.Should().Be(60);
+    }
+
+    [Fact]
+    public void Register_WithZeroTimeout_ShouldThrow()
+    {
+        var act = () => AiProvider.Register(
+            "p", "P", "T", "http://url", true, "chat", 1, "d", FixedNow,
+            timeoutSeconds: 0);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void UpdateCapabilityFlags_ShouldUpdateAllFlags()
+    {
+        var provider = AiProvider.Register(
+            "p", "P", "T", "http://url", true, "chat", 1, "d", FixedNow);
+
+        var result = provider.UpdateCapabilityFlags(
+            supportsChat: true,
+            supportsEmbeddings: true,
+            supportsTools: false,
+            supportsVision: true,
+            supportsStructuredOutput: false);
+
+        result.IsSuccess.Should().BeTrue();
+        provider.SupportsChat.Should().BeTrue();
+        provider.SupportsEmbeddings.Should().BeTrue();
+        provider.SupportsTools.Should().BeFalse();
+        provider.SupportsVision.Should().BeTrue();
+        provider.SupportsStructuredOutput.Should().BeFalse();
+    }
+
+    [Fact]
+    public void RecordHealthStatus_ShouldUpdateStatus()
+    {
+        var provider = AiProvider.Register(
+            "p", "P", "T", "http://url", true, "chat", 1, "d", FixedNow);
+
+        provider.RecordHealthStatus(ProviderHealthStatus.Healthy);
+
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Healthy);
+    }
+
+    [Fact]
+    public void RecordHealthStatus_ShouldTransitionThroughStates()
+    {
+        var provider = AiProvider.Register(
+            "p", "P", "T", "http://url", true, "chat", 1, "d", FixedNow);
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Unknown);
+
+        provider.RecordHealthStatus(ProviderHealthStatus.Healthy);
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Healthy);
+
+        provider.RecordHealthStatus(ProviderHealthStatus.Degraded);
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Degraded);
+
+        provider.RecordHealthStatus(ProviderHealthStatus.Unhealthy);
+        provider.HealthStatus.Should().Be(ProviderHealthStatus.Unhealthy);
     }
 }

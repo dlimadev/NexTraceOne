@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
+using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,6 +35,11 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -57,12 +62,15 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.DeveloperPortal.Domain.Entities.CodeGenerationRecord", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.CodeGenerationRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -116,7 +124,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
                     b.ToTable("dp_code_generation_records", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.DeveloperPortal.Domain.Entities.PlaygroundSession", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.PlaygroundSession", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -174,7 +182,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
                     b.ToTable("dp_playground_sessions", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.DeveloperPortal.Domain.Entities.PortalAnalyticsEvent", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.PortalAnalyticsEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -222,7 +230,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
                     b.ToTable("dp_portal_analytics_events", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.DeveloperPortal.Domain.Entities.SavedSearch", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.SavedSearch", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -256,7 +264,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
                     b.ToTable("dp_saved_searches", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.DeveloperPortal.Domain.Entities.Subscription", b =>
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

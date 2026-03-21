@@ -43,7 +43,11 @@
       "hours": "{{count}}h atrás",
       "days": "{{count}}d atrás"
     },
-    "somethingWentWrong": "Algo correu mal"
+    "somethingWentWrong": "Algo correu mal",
+    "demoBanner": {
+      "title": "Dados de Demonstração",
+      "description": "Os dados apresentados nesta página são simulados para efeitos de demonstração. Dados reais ficarão disponíveis quando a integração subjacente estiver concluída."
+    }
   },
   "auth": {
     "signIn": "Iniciar sessão na sua conta",
@@ -1476,7 +1480,18 @@
     "routingWeightPrimary": "Primário",
     "routingWeightSecondary": "Secundário",
     "routingWeightSupplementary": "Suplementar",
-    "routingGovernanceNotice": "As estratégias de encaminhamento e pesos das fontes governam a forma como a IA seleciona modelos, prioriza fontes de conhecimento e enriquece o contexto para cada consulta."
+    "routingGovernanceNotice": "As estratégias de encaminhamento e pesos das fontes governam a forma como a IA seleciona modelos, prioriza fontes de conhecimento e enriquece o contexto para cada consulta.",
+    "selectModel": "Selecionar modelo",
+    "internalModels": "Modelos Internos",
+    "externalModels": "Modelos Externos",
+    "defaultModel": "Predefinido",
+    "noModelsAvailable": "Nenhum modelo disponível para a sua política de acesso.",
+    "policyApplied": "Política aplicada",
+    "usingModel": "A usar modelo",
+    "agents": "Agents",
+    "agentsPanel": "Agents Disponíveis",
+    "officialAgent": "Oficial",
+    "agentsHint": "Os agents proporcionam capacidades especializadas de IA governada."
   },
   "governance": {
     "policies": {

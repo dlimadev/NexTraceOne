@@ -64,5 +64,7 @@ public static class GetTeamReliabilityTrend
         TrendDirection Direction,
         string Timeframe,
         string Summary,
-        IReadOnlyList<TeamTrendDataPoint> DataPoints);
+        IReadOnlyList<TeamTrendDataPoint> DataPoints,
+        bool IsSimulated = true,
+        string DataSource = "demo");
 }

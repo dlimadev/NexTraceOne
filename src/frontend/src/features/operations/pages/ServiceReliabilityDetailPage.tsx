@@ -9,6 +9,7 @@ import { NavLink } from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
+import { DemoBanner } from '../../../components/DemoBanner';
 
 const mockDetails: Record<string, {
   identity: { serviceId: string; displayName: string; serviceType: string; domain: string; teamName: string; criticality: string };
@@ -119,10 +120,7 @@ export function ServiceReliabilityDetailPage() {
       </NavLink>
 
       {/* Demo data banner */}
-      <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200">
-        <span className="font-medium">{t('reliability.demoBanner.title')}</span>{' '}
-        {t('reliability.demoBanner.description')}
-      </div>
+      <DemoBanner className="mb-4" />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-6">

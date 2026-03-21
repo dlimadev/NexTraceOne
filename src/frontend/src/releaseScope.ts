@@ -33,7 +33,28 @@ export const finalProductionIncludedRoutePrefixes = [
   '/platform',
 ] as const;
 
-export const finalProductionExcludedRoutePrefixes = [] as const;
+/**
+ * Routes excluded from the final production scope (ZR-6).
+ * These are partial/planned/demo features not ready for production.
+ * The route is available only if it matches an included prefix
+ * AND does NOT match an excluded prefix.
+ */
+export const finalProductionExcludedRoutePrefixes = [
+  '/portal',
+  '/governance/teams',
+  '/governance/packs',
+  '/integrations/executions',
+  '/analytics/value',
+  '/operations/runbooks',
+  '/operations/reliability',
+  '/operations/automation',
+  '/ai/models',
+  '/ai/policies',
+  '/ai/routing',
+  '/ai/ide',
+  '/ai/budgets',
+  '/ai/audit',
+] as const;
 
 function normalizeRoute(route: string): string {
   if (!route) {

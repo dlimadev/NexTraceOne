@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
+using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,6 +35,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -57,12 +62,15 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.RulesetGovernance.Domain.Entities.LintResult", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities.LintResult", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -118,7 +126,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
                     b.ToTable("rg_lint_results", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.RulesetGovernance.Domain.Entities.Ruleset", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities.Ruleset", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -174,7 +182,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persiste
                     b.ToTable("rg_rulesets", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.RulesetGovernance.Domain.Entities.RulesetBinding", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities.RulesetBinding", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");

@@ -1,5 +1,4 @@
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
-using NexTraceOne.Audit.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
@@ -32,17 +31,32 @@ public static class WebApplicationExtensions
 {
     /// <summary>
     /// Aplica migrações pendentes de todos os DbContexts de módulos registrados.
-    /// Executado em ambiente Development ou quando NEXTRACE_AUTO_MIGRATE=true.
+    /// Executado apenas em ambiente Development ou quando NEXTRACE_AUTO_MIGRATE=true
+    /// em ambientes não-Production. Bloqueado incondicionalmente em Production.
     /// Cada módulo possui seu próprio DbContext com migrações independentes,
     /// garantindo isolamento entre bounded contexts.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
-        var shouldMigrate = app.Environment.IsDevelopment()
-            || string.Equals(
-                Environment.GetEnvironmentVariable("NEXTRACE_AUTO_MIGRATE"),
-                "true",
-                StringComparison.OrdinalIgnoreCase);
+        var isProduction = app.Environment.IsProduction();
+        var autoMigrateEnv = string.Equals(
+            Environment.GetEnvironmentVariable("NEXTRACE_AUTO_MIGRATE"),
+            "true",
+            StringComparison.OrdinalIgnoreCase);
+
+        if (isProduction && autoMigrateEnv)
+        {
+            var migrationLogger = app.Services.GetRequiredService<ILogger<Program>>();
+            migrationLogger.LogCritical(
+                "NEXTRACE_AUTO_MIGRATE=true is set in Production environment. " +
+                "Auto-migrations are blocked in Production to prevent data loss. " +
+                "Use a CI/CD migration pipeline instead. Aborting startup.");
+            throw new InvalidOperationException(
+                "Auto-migrations are not allowed in Production. " +
+                "Use a CI/CD pipeline with 'dotnet ef database update' or a migration runner.");
+        }
+
+        var shouldMigrate = app.Environment.IsDevelopment() || autoMigrateEnv;
 
         if (!shouldMigrate)
             return;
@@ -52,8 +66,8 @@ public static class WebApplicationExtensions
             var migrationLogger = app.Services.GetRequiredService<ILogger<Program>>();
             migrationLogger.LogWarning(
                 "Auto-migrations are running in non-Development environment '{Environment}'. " +
-                "This is unsafe for production deployments with multiple instances. " +
-                "Consider using a CI/CD migration pipeline instead.",
+                "This is acceptable for Staging/QA but should not be used in Production. " +
+                "Consider using a CI/CD migration pipeline for production deployments.",
                 app.Environment.EnvironmentName);
         }
 
@@ -182,15 +196,20 @@ public static class WebApplicationExtensions
     }
 
     /// <summary>
-    /// Aplica migrações de um DbContext específico e registra o nome no rastreamento.
+    /// Aplica migrações pendentes de um DbContext específico e registra o nome no rastreamento.
+    /// Apenas executa MigrateAsync se existirem migrações pendentes.
     /// </summary>
     private static async Task MigrateContextAsync<TContext>(
         IServiceScope scope,
-        List<string> pendingContexts)
+        List<string> pendingContexts,
+        CancellationToken cancellationToken = default)
         where TContext : DbContext
     {
         var db = scope.ServiceProvider.GetRequiredService<TContext>();
-        pendingContexts.Add(typeof(TContext).Name);
-        await db.Database.MigrateAsync();
+        var pending = (await db.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
+        if (pending.Count == 0) return;
+
+        pendingContexts.Add($"{typeof(TContext).Name}({pending.Count})");
+        await db.Database.MigrateAsync(cancellationToken);
     }
 }

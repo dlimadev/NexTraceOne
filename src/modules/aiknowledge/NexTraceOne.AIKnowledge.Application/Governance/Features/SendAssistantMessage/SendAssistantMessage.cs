@@ -94,6 +94,7 @@ public static class SendAssistantMessage
         IAiRoutingStrategyRepository routingStrategyRepository,
         IAiKnowledgeSourceRepository knowledgeSourceRepository,
         IAiModelCatalogService modelCatalogService,
+        IAiModelAuthorizationService modelAuthorizationService,
         IExternalAIRoutingPort externalAiRoutingPort,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider,
@@ -175,6 +176,24 @@ public static class SendAssistantMessage
                 selectedModel = resolvedModel.ModelName;
                 selectedProvider = resolvedModel.ProviderId;
                 isInternal = resolvedModel.IsInternal;
+            }
+
+            // ── Validar autorização do modelo selecionado ────────────────
+            if (request.PreferredModelId.HasValue)
+            {
+                var accessDecision = await modelAuthorizationService.ValidateModelAccessAsync(
+                    request.PreferredModelId.Value, cancellationToken);
+
+                if (!accessDecision.IsAllowed)
+                {
+                    logger.LogWarning(
+                        "User {UserId} denied access to model {ModelId}: {Reason}",
+                        currentUser.Id, request.PreferredModelId.Value, accessDecision.DenialReason);
+
+                    return AiGovernanceErrors.ModelAccessDenied(
+                        request.PreferredModelId.Value.ToString(),
+                        accessDecision.DenialReason ?? "Access denied by policy");
+                }
             }
 
             // ── Resolver fontes e pesos de contexto ──────────────────────

@@ -7,6 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetTeamFinOps;
 /// <summary>
 /// Feature: GetTeamFinOps — perfil de custo contextual agregado por equipa.
 /// Inclui resumo de custo, serviços, desperdício, eficiência e correlação com confiabilidade.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetTeamFinOps
 {
@@ -46,13 +47,15 @@ public static class GetTeamFinOps
                 AvgReliabilityScore: services.Average(s => s.ReliabilityScore),
                 TotalRecentIncidents: 11,
                 TopOptimizationFocus: "Reduce reprocessing waste in Order Processor and Catalog Sync",
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Perfil de FinOps agregado por equipa.</summary>
+    /// <summary>Perfil de FinOps agregado por equipa. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         string TeamId,
         string TeamName,
@@ -68,7 +71,9 @@ public static class GetTeamFinOps
         decimal AvgReliabilityScore,
         int TotalRecentIncidents,
         string TopOptimizationFocus,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Custo de serviço dentro da equipa.</summary>
     public sealed record TeamServiceCostDto(

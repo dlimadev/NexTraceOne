@@ -10,6 +10,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { DemoBanner } from '../../../components/DemoBanner';
 
 // Simulated data matching backend ListServiceReliability response
 const mockServices = [
@@ -70,10 +71,7 @@ export function TeamReliabilityPage() {
       />
 
       {/* Demo data banner */}
-      <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200">
-        <span className="font-medium">{t('reliability.demoBanner.title')}</span>{' '}
-        {t('reliability.demoBanner.description')}
-      </div>
+      <DemoBanner className="mb-4" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

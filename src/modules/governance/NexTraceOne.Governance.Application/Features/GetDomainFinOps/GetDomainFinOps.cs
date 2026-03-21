@@ -7,6 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetDomainFinOps;
 /// <summary>
 /// Feature: GetDomainFinOps — perfil de custo contextual agregado por domínio.
 /// Inclui resumo de custo, equipas, desperdício, eficiência e correlação com confiabilidade.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetDomainFinOps
 {
@@ -51,13 +52,15 @@ public static class GetDomainFinOps
                 TopWasteServices: topWasteServices,
                 TrendSeries: trendPoints,
                 AvgReliabilityScore: teams.Average(t => t.AvgReliabilityScore),
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Perfil de FinOps agregado por domínio.</summary>
+    /// <summary>Perfil de FinOps agregado por domínio. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         string DomainId,
         string DomainName,
@@ -72,7 +75,9 @@ public static class GetDomainFinOps
         IReadOnlyList<WasteServiceDto> TopWasteServices,
         IReadOnlyList<TrendPointDto> TrendSeries,
         decimal AvgReliabilityScore,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Custo de equipa dentro do domínio.</summary>
     public sealed record DomainTeamCostDto(

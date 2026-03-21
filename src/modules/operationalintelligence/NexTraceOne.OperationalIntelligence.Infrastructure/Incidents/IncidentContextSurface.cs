@@ -85,8 +85,9 @@ internal sealed class IncidentContextSurface(IncidentDbContext db) : IIncidentCo
             .AsNoTracking()
             .Where(i => i.TenantId == tenantId
                 && i.DetectedAt >= since
-                // TODO (Fase 5): substituir por lookup de IsProductionLike via EnvironmentId
-                // quando a entidade Environment estiver acessível neste módulo sem acoplamento direto.
+                // DEFERRED: Replace with IsProductionLike lookup via EnvironmentId
+                // when Environment entity is accessible cross-module without direct coupling.
+                // See docs/IMPLEMENTATION-STATUS.md — Foundation > Environments: PARTIAL
                 && !new[] { "production", "prod" }.Contains(i.Environment.ToLower()))
             .OrderByDescending(i => i.DetectedAt)
             .Select(i => new ListIncidents.IncidentListItem(

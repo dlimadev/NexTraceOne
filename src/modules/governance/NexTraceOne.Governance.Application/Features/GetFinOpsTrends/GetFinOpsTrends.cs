@@ -7,6 +7,8 @@ namespace NexTraceOne.Governance.Application.Features.GetFinOpsTrends;
 /// <summary>
 /// Feature: GetFinOpsTrends — tendências de custo por dimensão (serviço, equipa, domínio).
 /// Tendências no NexTraceOne são contextualizadas e ligadas a comportamento operacional.
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data. Will be replaced by real
+/// cost snapshot trend computation from CostIntelligence in a future sprint.
 /// </summary>
 public static class GetFinOpsTrends
 {
@@ -60,20 +62,24 @@ public static class GetFinOpsTrends
                 AggregatedTrend: aggregated,
                 OverallDirection: TrendDirection.Declining,
                 OverallChangePercent: 11.1m,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Resposta com tendências de custo.</summary>
+    /// <summary>Resposta com tendências de custo. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         CostDimension Dimension,
         IReadOnlyList<TrendSeriesDto> Series,
         IReadOnlyList<TrendDataPointDto> AggregatedTrend,
         TrendDirection OverallDirection,
         decimal OverallChangePercent,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Série temporal de custo para uma entidade.</summary>
     public sealed record TrendSeriesDto(

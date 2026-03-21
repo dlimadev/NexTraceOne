@@ -7,8 +7,7 @@ namespace NexTraceOne.Governance.Application.Features.GetFrictionIndicators;
 /// <summary>
 /// Retorna indicadores de fricção do produto.
 /// Responde: onde os utilizadores encontram mais dificuldade?
-/// Quais módulos têm maior abandono? Quais buscas falham?
-/// Onde há loops de navegação ou empty states frequentes?
+/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
 /// </summary>
 public static class GetFrictionIndicators
 {
@@ -71,13 +70,15 @@ public static class GetFrictionIndicators
                 ImprovingSignals: 3,
                 DecliningSignals: 3,
                 StableSignals: 3,
-                PeriodLabel: request.Range ?? "last_30d");
+                PeriodLabel: request.Range ?? "last_30d",
+                IsSimulated: true,
+                DataSource: "demo");
 
             return Task.FromResult(Result<Response>.Success(response));
         }
     }
 
-    /// <summary>Resposta com indicadores de fricção.</summary>
+    /// <summary>Resposta com indicadores de fricção. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         IReadOnlyList<FrictionIndicatorDto> Indicators,
         decimal OverallFrictionScore,
@@ -86,7 +87,9 @@ public static class GetFrictionIndicators
         int ImprovingSignals,
         int DecliningSignals,
         int StableSignals,
-        string PeriodLabel);
+        string PeriodLabel,
+        bool IsSimulated = false,
+        string? DataSource = null);
 
     /// <summary>Indicador de fricção individual.</summary>
     public sealed record FrictionIndicatorDto(

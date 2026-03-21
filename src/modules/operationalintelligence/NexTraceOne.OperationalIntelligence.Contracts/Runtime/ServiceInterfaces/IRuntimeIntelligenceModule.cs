@@ -1,5 +1,7 @@
 namespace NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists, no consumers.
+
 /// <summary>
 /// Interface pública do módulo RuntimeIntelligence.
 /// Outros módulos que precisarem de dados de runtime devem usar este contrato —

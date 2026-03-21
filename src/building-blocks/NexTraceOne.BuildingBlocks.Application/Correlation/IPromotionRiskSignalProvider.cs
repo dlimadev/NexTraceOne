@@ -1,5 +1,10 @@
 namespace NexTraceOne.BuildingBlocks.Application.Correlation;
 
+// IMPLEMENTATION STATUS: Planned — no implementation exists.
+// This interface defines the promotion risk signal provider for AI-assisted change confidence.
+// It will be implemented when the promotion risk analysis pipeline is built.
+// Do NOT register in DI or reference in handlers until an implementation exists.
+
 /// <summary>
 /// Provider de sinais de risco de promoção para a IA.
 ///

@@ -93,4 +93,8 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
     public async Task<int> CountByTeamAsync(string teamName, CancellationToken cancellationToken)
         => await _context.ServiceAssets
             .CountAsync(s => s.TeamName == teamName, cancellationToken);
+
+    public async Task<int> CountByDomainAsync(string domain, CancellationToken cancellationToken)
+        => await _context.ServiceAssets
+            .CountAsync(s => s.Domain == domain, cancellationToken);
 }

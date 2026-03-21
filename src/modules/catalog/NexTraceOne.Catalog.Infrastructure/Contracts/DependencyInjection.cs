@@ -27,7 +27,8 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("ContractsDatabase")
             ?? configuration.GetConnectionString("NexTraceOne")
             ?? configuration.GetConnectionString("DefaultConnection")
-            ?? "Host=localhost;Database=nextraceone;Username=postgres;Password=postgres";
+            ?? throw new InvalidOperationException(
+                "Connection string 'ContractsDatabase' (or fallback 'NexTraceOne'/'DefaultConnection') is not configured.");
 
         services.AddDbContext<ContractsDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)

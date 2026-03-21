@@ -224,7 +224,11 @@ public static class GetExecutiveOverview
         }
     }
 
-    /// <summary>Resposta da visão executiva agregada.</summary>
+    /// <summary>
+    /// Resposta da visão executiva agregada.
+    /// CrossModuleDataAvailable=false indica que métricas de incidentes e mudanças cross-module
+    /// retornam valores neutros (0) porque dependem de integração futura entre módulos.
+    /// </summary>
     public sealed record Response(
         OperationalTrendDto OperationalTrend,
         RiskSummaryDto RiskSummary,
@@ -234,7 +238,8 @@ public static class GetExecutiveOverview
         IncidentTrendSummaryDto IncidentTrendSummary,
         ComplianceCoverageSummaryDto ComplianceCoverageSummary,
         IReadOnlyList<DomainAttentionDto> TopDomainsRequiringAttention,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool CrossModuleDataAvailable = false);
 
     /// <summary>Tendência operacional com estabilidade e resolução de incidentes.</summary>
     public sealed record OperationalTrendDto(

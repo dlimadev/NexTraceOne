@@ -330,3 +330,101 @@ internal sealed class AiRoutingStrategyRepository(AiGovernanceDbContext context)
     public async Task AddAsync(AIRoutingStrategy strategy, CancellationToken ct)
         => await context.RoutingStrategies.AddAsync(strategy, ct);
 }
+
+internal sealed class AiAgentRepository(AiGovernanceDbContext context) : IAiAgentRepository
+{
+    public async Task<IReadOnlyList<AiAgent>> ListAsync(bool? isActive, bool? isOfficial, CancellationToken ct)
+    {
+        var query = context.Agents.AsQueryable();
+
+        if (isActive.HasValue)
+            query = query.Where(a => a.IsActive == isActive.Value);
+
+        if (isOfficial.HasValue)
+            query = query.Where(a => a.IsOfficial == isOfficial.Value);
+
+        return await query.OrderBy(a => a.SortOrder).ThenBy(a => a.DisplayName).ToListAsync(ct);
+    }
+
+    public async Task<AiAgent?> GetByIdAsync(AiAgentId id, CancellationToken ct)
+        => await context.Agents.SingleOrDefaultAsync(a => a.Id == id, ct);
+
+    public async Task AddAsync(AiAgent agent, CancellationToken ct)
+        => await context.Agents.AddAsync(agent, ct);
+
+    public Task UpdateAsync(AiAgent agent, CancellationToken ct)
+    {
+        context.Agents.Update(agent);
+        return Task.CompletedTask;
+    }
+
+    public async Task<AiAgent?> GetBySlugAsync(string slug, CancellationToken ct)
+        => await context.Agents.SingleOrDefaultAsync(a => a.Slug == slug, ct);
+}
+
+internal sealed class AiAgentExecutionRepository(AiGovernanceDbContext context) : IAiAgentExecutionRepository
+{
+    public async Task<AiAgentExecution?> GetByIdAsync(AiAgentExecutionId id, CancellationToken ct)
+        => await context.AgentExecutions.SingleOrDefaultAsync(e => e.Id == id, ct);
+
+    public async Task<IReadOnlyList<AiAgentExecution>> ListByAgentAsync(
+        AiAgentId agentId, int pageSize, CancellationToken ct)
+        => await context.AgentExecutions
+            .Where(e => e.AgentId == agentId)
+            .OrderByDescending(e => e.StartedAt)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<AiAgentExecution>> ListByUserAsync(
+        string userId, int pageSize, CancellationToken ct)
+        => await context.AgentExecutions
+            .Where(e => e.ExecutedBy == userId)
+            .OrderByDescending(e => e.StartedAt)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+    public async Task AddAsync(AiAgentExecution execution, CancellationToken ct)
+        => await context.AgentExecutions.AddAsync(execution, ct);
+
+    public Task UpdateAsync(AiAgentExecution execution, CancellationToken ct)
+    {
+        context.AgentExecutions.Update(execution);
+        return Task.CompletedTask;
+    }
+}
+
+internal sealed class AiAgentArtifactRepository(AiGovernanceDbContext context) : IAiAgentArtifactRepository
+{
+    public async Task<AiAgentArtifact?> GetByIdAsync(AiAgentArtifactId id, CancellationToken ct)
+        => await context.AgentArtifacts.SingleOrDefaultAsync(a => a.Id == id, ct);
+
+    public async Task<IReadOnlyList<AiAgentArtifact>> ListByExecutionAsync(
+        AiAgentExecutionId executionId, CancellationToken ct)
+        => await context.AgentArtifacts
+            .Where(a => a.ExecutionId == executionId)
+            .OrderBy(a => a.Title)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<AiAgentArtifact>> ListByAgentAsync(
+        AiAgentId agentId, ArtifactReviewStatus? reviewStatus, int pageSize, CancellationToken ct)
+    {
+        var query = context.AgentArtifacts.Where(a => a.AgentId == agentId);
+
+        if (reviewStatus.HasValue)
+            query = query.Where(a => a.ReviewStatus == reviewStatus.Value);
+
+        return await query
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(pageSize)
+            .ToListAsync(ct);
+    }
+
+    public async Task AddAsync(AiAgentArtifact artifact, CancellationToken ct)
+        => await context.AgentArtifacts.AddAsync(artifact, ct);
+
+    public Task UpdateAsync(AiAgentArtifact artifact, CancellationToken ct)
+    {
+        context.AgentArtifacts.Update(artifact);
+        return Task.CompletedTask;
+    }
+}

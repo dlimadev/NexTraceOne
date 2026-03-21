@@ -107,7 +107,9 @@ public static class GetExecutiveDrillDown
         IReadOnlyList<CriticalServiceDto> CriticalServices,
         IReadOnlyList<GapDto> TopGaps,
         IReadOnlyList<string> RecommendedFocus,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        bool IsSimulated = true,
+        string DataSource = "demo");
 
     /// <summary>Indicador-chave com valor, tendência e explicação contextual.</summary>
     public sealed record KeyIndicatorDto(

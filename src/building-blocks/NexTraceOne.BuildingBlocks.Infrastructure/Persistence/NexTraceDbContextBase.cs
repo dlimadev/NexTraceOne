@@ -39,8 +39,10 @@ public abstract class NexTraceDbContextBase(
             builder.Property(x => x.Payload).IsRequired();
             builder.Property(x => x.CreatedAt).IsRequired();
             builder.Property(x => x.LastError).HasMaxLength(4000);
+            builder.Property(x => x.IdempotencyKey).HasMaxLength(500).IsRequired();
             builder.HasIndex(x => x.CreatedAt);
             builder.HasIndex(x => x.ProcessedAt);
+            builder.HasIndex(x => x.IdempotencyKey).IsUnique();
         });
 
         var ns = ConfigurationsNamespace;

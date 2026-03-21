@@ -21,3 +21,8 @@ sign.pfx
 src/frontend/.vite/
 src/frontend/dist/
 src/frontend/node_modules/
+
+# Sensitive configuration — never commit real credentials
+appsettings.Development.json
+appsettings.*.local.json
+*.pfx

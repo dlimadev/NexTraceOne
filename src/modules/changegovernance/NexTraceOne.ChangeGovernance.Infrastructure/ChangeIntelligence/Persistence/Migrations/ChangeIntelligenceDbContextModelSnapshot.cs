@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,6 +35,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("LastError")
                         .HasMaxLength(4000)
@@ -57,12 +62,15 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("CreatedAt");
 
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.BlastRadiusReport", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.BlastRadiusReport", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -115,7 +123,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_blast_radius_reports", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.ChangeEvent", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -169,7 +177,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_change_events", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.ChangeIntelligenceScore", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeIntelligenceScore", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -224,7 +232,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_change_scores", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.ExternalMarker", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ExternalMarker", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -284,7 +292,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_external_markers", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.FreezeWindow", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.FreezeWindow", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -334,7 +342,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_freeze_windows", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.ObservationWindow", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ObservationWindow", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -414,7 +422,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_observation_windows", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.PostReleaseReview", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.PostReleaseReview", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -460,7 +468,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_post_release_reviews", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.Release", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.Release", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -506,10 +514,6 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                         .HasColumnType("uuid")
                         .HasColumnName("environment_id");
 
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("tenant_id");
-
                     b.Property<string>("PipelineSource")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -530,6 +534,10 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.Property<string>("TeamName")
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
 
                     b.Property<int>("ValidationStatus")
                         .HasColumnType("integer");
@@ -556,7 +564,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_releases", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.ReleaseBaseline", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ReleaseBaseline", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -626,7 +634,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("ci_release_baselines", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.ChangeIntelligence.Domain.Entities.RollbackAssessment", b =>
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.RollbackAssessment", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
