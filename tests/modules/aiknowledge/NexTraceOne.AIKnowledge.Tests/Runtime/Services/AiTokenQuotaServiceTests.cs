@@ -11,6 +11,7 @@ namespace NexTraceOne.AIKnowledge.Tests.Runtime.Services;
 public sealed class AiTokenQuotaServiceTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 15, 14, 30, 0, TimeSpan.Zero);
+    private static readonly Guid TenantId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
     private readonly IAiTokenQuotaPolicyRepository _policyRepo = Substitute.For<IAiTokenQuotaPolicyRepository>();
     private readonly IAiTokenUsageLedgerRepository _ledgerRepo = Substitute.For<IAiTokenUsageLedgerRepository>();
@@ -28,12 +29,12 @@ public sealed class AiTokenQuotaServiceTests
     {
         _policyRepo.GetForUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy>());
-        _policyRepo.GetForTenantAsync("tenant-1", Arg.Any<CancellationToken>())
+        _policyRepo.GetForTenantAsync(TenantId, Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy>());
 
         var svc = CreateService();
 
-        var result = await svc.ValidateQuotaAsync("user-1", "tenant-1", "openai", "gpt-4o", 500);
+        var result = await svc.ValidateQuotaAsync("user-1", TenantId, "openai", "gpt-4o", 500);
 
         result.IsAllowed.Should().BeTrue();
         result.BlockReason.Should().BeNull();
@@ -49,7 +50,7 @@ public sealed class AiTokenQuotaServiceTests
 
         _policyRepo.GetForUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy> { policy });
-        _policyRepo.GetForTenantAsync("tenant-1", Arg.Any<CancellationToken>())
+        _policyRepo.GetForTenantAsync(TenantId, Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy>());
 
         _ledgerRepo.GetTotalTokensForPeriodAsync("user-1", Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
@@ -57,7 +58,7 @@ public sealed class AiTokenQuotaServiceTests
 
         var svc = CreateService();
 
-        var result = await svc.ValidateQuotaAsync("user-1", "tenant-1", "openai", "gpt-4o", 500);
+        var result = await svc.ValidateQuotaAsync("user-1", TenantId, "openai", "gpt-4o", 500);
 
         result.IsAllowed.Should().BeTrue();
     }
@@ -72,7 +73,7 @@ public sealed class AiTokenQuotaServiceTests
 
         _policyRepo.GetForUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy> { policy });
-        _policyRepo.GetForTenantAsync("tenant-1", Arg.Any<CancellationToken>())
+        _policyRepo.GetForTenantAsync(TenantId, Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy>());
 
         var startOfDay = new DateTimeOffset(2025, 6, 15, 0, 0, 0, TimeSpan.Zero);
@@ -83,7 +84,7 @@ public sealed class AiTokenQuotaServiceTests
 
         var svc = CreateService();
 
-        var result = await svc.ValidateQuotaAsync("user-1", "tenant-1", "openai", "gpt-4o", 500);
+        var result = await svc.ValidateQuotaAsync("user-1", TenantId, "openai", "gpt-4o", 500);
 
         result.IsAllowed.Should().BeFalse();
         result.BlockReason.Should().Contain("Daily token limit");
@@ -100,7 +101,7 @@ public sealed class AiTokenQuotaServiceTests
 
         _policyRepo.GetForUserAsync("user-1", Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy> { policy });
-        _policyRepo.GetForTenantAsync("tenant-1", Arg.Any<CancellationToken>())
+        _policyRepo.GetForTenantAsync(TenantId, Arg.Any<CancellationToken>())
             .Returns(new List<AiTokenQuotaPolicy>());
 
         var startOfDay = new DateTimeOffset(2025, 6, 15, 0, 0, 0, TimeSpan.Zero);
@@ -115,7 +116,7 @@ public sealed class AiTokenQuotaServiceTests
 
         var svc = CreateService();
 
-        var result = await svc.ValidateQuotaAsync("user-1", "tenant-1", "openai", "gpt-4o", 500);
+        var result = await svc.ValidateQuotaAsync("user-1", TenantId, "openai", "gpt-4o", 500);
 
         result.IsAllowed.Should().BeFalse();
         result.BlockReason.Should().Contain("Monthly token limit");
@@ -128,14 +129,14 @@ public sealed class AiTokenQuotaServiceTests
         var svc = CreateService();
 
         await svc.RecordUsageAsync(
-            "user-1", "tenant-1", "openai", "gpt-4o", "GPT-4o",
+            "user-1", TenantId, "openai", "gpt-4o", "GPT-4o",
             promptTokens: 200, completionTokens: 300,
             "req-001", "exec-001", "Success", 1234.5);
 
         await _ledgerRepo.Received(1).AddAsync(
             Arg.Is<AiTokenUsageLedger>(e =>
                 e.UserId == "user-1" &&
-                e.TenantId == "tenant-1" &&
+                e.TenantId == TenantId &&
                 e.ProviderId == "openai" &&
                 e.ModelId == "gpt-4o" &&
                 e.ModelName == "GPT-4o" &&
