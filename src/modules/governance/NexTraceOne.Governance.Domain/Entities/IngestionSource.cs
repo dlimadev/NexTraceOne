@@ -46,6 +46,9 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
     /// <summary>Data/hora UTC do último dado recebido.</summary>
     public DateTimeOffset? LastDataReceivedAt { get; private set; }
 
+    /// <summary>Data/hora UTC da última conclusão de processamento.</summary>
+    public DateTimeOffset? LastProcessedAt { get; private set; }
+
     /// <summary>Contagem de itens processados.</summary>
     public long DataItemsProcessed { get; private set; }
 
@@ -101,8 +104,16 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
     public void RecordDataReceived(int itemCount, DateTimeOffset utcNow)
     {
         LastDataReceivedAt = utcNow;
+        LastProcessedAt = utcNow;
         DataItemsProcessed += itemCount;
         UpdateFreshnessStatus(utcNow);
+        UpdatedAt = utcNow;
+    }
+
+    /// <summary>Regista conclusão de processamento sem nova receção de dados.</summary>
+    public void RecordProcessingCompleted(DateTimeOffset utcNow)
+    {
+        LastProcessedAt = utcNow;
         UpdatedAt = utcNow;
     }
 

@@ -31,10 +31,21 @@ public static class GetTeamDetail
 
             var serviceCount = await catalogGraph.CountServicesByTeamAsync(team.Name, cancellationToken);
 
-            // TODO: enriquecer com dados reais de contratos e dependências cross-team
-            var services = new List<TeamServiceDto>();
-            var contracts = new List<TeamContractDto>();
-            var crossTeamDeps = new List<CrossTeamDependencyDto>();
+            // Enrich with real services, contracts and cross-team dependencies from Catalog
+            var catalogServices = await catalogGraph.ListServicesByTeamAsync(team.Name, cancellationToken);
+            var services = catalogServices
+                .Select(s => new TeamServiceDto(s.ServiceId, s.Name, s.Domain, s.Criticality, s.OwnershipType))
+                .ToList();
+
+            var catalogContracts = await catalogGraph.ListContractsByTeamAsync(team.Name, cancellationToken);
+            var contracts = catalogContracts
+                .Select(c => new TeamContractDto(c.ContractId, c.Name, c.Type, c.Version, c.Status))
+                .ToList();
+
+            var catalogDeps = await catalogGraph.ListCrossTeamDependenciesAsync(team.Name, cancellationToken);
+            var crossTeamDeps = catalogDeps
+                .Select(d => new CrossTeamDependencyDto(d.DependencyId, d.SourceServiceName, d.TargetServiceName, d.TargetTeamId, d.TargetTeamName, d.DependencyType))
+                .ToList();
 
             var response = new Response(
                 TeamId: team.Id.Value.ToString(),
@@ -44,7 +55,7 @@ public static class GetTeamDetail
                 Status: team.Status.ToString(),
                 ParentOrganizationUnit: team.ParentOrganizationUnit,
                 ServiceCount: serviceCount,
-                ContractCount: 0,   // Deferred: requires IContractsModule implementation
+                ContractCount: contracts.Count,
                 ActiveIncidentCount: 0,
                 RecentChangeCount: 0,
                 MaturityLevel: "Developing",
@@ -79,7 +90,7 @@ public static class GetTeamDetail
     {
         /// <summary>Fields not yet backed by real data.</summary>
         public IReadOnlyList<string> DeferredFields { get; init; } =
-            ["ContractCount", "ActiveIncidentCount", "RecentChangeCount", "MaturityLevel", "ReliabilityScore"];
+            ["ActiveIncidentCount", "RecentChangeCount", "MaturityLevel", "ReliabilityScore"];
     }
 
     /// <summary>DTO de serviço associado a uma equipa.</summary>

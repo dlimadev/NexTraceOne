@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.ListGovernancePacks;
@@ -19,7 +20,8 @@ public static class ListGovernancePacks
     /// <summary>Handler que retorna o catálogo de governance packs.</summary>
     public sealed class Handler(
         IGovernancePackRepository packRepository,
-        IGovernancePackVersionRepository versionRepository) : IQueryHandler<Query, Response>
+        IGovernancePackVersionRepository versionRepository,
+        IGovernanceRolloutRecordRepository rolloutRecordRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -43,6 +45,9 @@ public static class ListGovernancePacks
                 var latestVersion = await versionRepository.GetLatestByPackIdAsync(p.Id, cancellationToken);
                 int ruleCount = latestVersion?.Rules.Count ?? 0;
 
+                var rolloutRecords = await rolloutRecordRepository.ListByPackIdAsync(p.Id, cancellationToken);
+                int scopeCount = rolloutRecords.Count(r => r.Status == RolloutStatus.Completed);
+
                 dtos.Add(new GovernancePackDto(
                     PackId: p.Id.Value.ToString(),
                     Name: p.Name,
@@ -51,7 +56,7 @@ public static class ListGovernancePacks
                     Category: p.Category,
                     Status: p.Status,
                     CurrentVersion: p.CurrentVersion ?? "0.0.0",
-                    ScopeCount: 0,   // TODO: enriquecer com contagem real de scopes (future work)
+                    ScopeCount: scopeCount,
                     RuleCount: ruleCount,
                     CreatedAt: p.CreatedAt));
             }
