@@ -12,11 +12,11 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Collection.Open
 /// </summary>
 public sealed class OpenTelemetryCollectorStrategy : ICollectionModeStrategy
 {
-    private readonly OpenTelemetryCollectorModeOptions _options;
+    private readonly OpenTelemetryCollectorModeOptions _collectorOptions;
 
     public OpenTelemetryCollectorStrategy(IOptions<TelemetryStoreOptions> options)
     {
-        _options = options.Value.CollectionMode.OpenTelemetryCollector;
+        _collectorOptions = options.Value.CollectionMode.OpenTelemetryCollector;
     }
 
     /// <inheritdoc />
@@ -25,13 +25,13 @@ public sealed class OpenTelemetryCollectorStrategy : ICollectionModeStrategy
     /// <inheritdoc />
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
     {
-        if (!_options.Enabled)
+        if (!_collectorOptions.Enabled)
             return false;
 
         // Check Collector health via HTTP endpoint.
         // Full implementation will use HttpClient to check /health endpoint.
         return await Task.FromResult(
-            !string.IsNullOrWhiteSpace(_options.OtlpGrpcEndpoint));
+            !string.IsNullOrWhiteSpace(_collectorOptions.OtlpGrpcEndpoint));
     }
 
     /// <inheritdoc />
@@ -39,7 +39,7 @@ public sealed class OpenTelemetryCollectorStrategy : ICollectionModeStrategy
     {
         return new CollectionExportConfig
         {
-            OtlpEndpoint = _options.OtlpGrpcEndpoint,
+            OtlpEndpoint = _collectorOptions.OtlpGrpcEndpoint,
             Protocol = "grpc",
             UsesCollectorProxy = true
         };

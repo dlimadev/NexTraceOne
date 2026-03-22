@@ -20,11 +20,11 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Elast
 /// </summary>
 public sealed class ElasticObservabilityProvider : IObservabilityProvider
 {
-    private readonly ElasticProviderOptions _options;
+    private readonly ElasticProviderOptions _elasticOptions;
 
     public ElasticObservabilityProvider(IOptions<TelemetryStoreOptions> options)
     {
-        _options = options.Value.ObservabilityProvider.Elastic;
+        _elasticOptions = options.Value.ObservabilityProvider.Elastic;
     }
 
     /// <inheritdoc />
@@ -33,13 +33,13 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
     /// <inheritdoc />
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
     {
-        if (!_options.Enabled)
+        if (!_elasticOptions.Enabled)
             return false;
 
         // Health check will use Elastic client when fully integrated.
         // For now, validates configuration is present.
         return await Task.FromResult(
-            !string.IsNullOrWhiteSpace(_options.Endpoint));
+            !string.IsNullOrWhiteSpace(_elasticOptions.Endpoint));
     }
 
     /// <inheritdoc />
@@ -85,9 +85,9 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
 /// </summary>
 public sealed class ElasticHealthCheck : IHealthCheck
 {
-    private readonly IObservabilityProvider _provider;
+    private readonly ElasticObservabilityProvider _provider;
 
-    public ElasticHealthCheck(IObservabilityProvider provider)
+    public ElasticHealthCheck(ElasticObservabilityProvider provider)
     {
         _provider = provider;
     }

@@ -125,12 +125,16 @@ public static class DependencyInjection
 
         if (string.Equals(providerName, "Elastic", StringComparison.OrdinalIgnoreCase))
         {
-            services.AddSingleton<IObservabilityProvider, ElasticObservabilityProvider>();
+            services.AddSingleton<ElasticObservabilityProvider>();
+            services.AddSingleton<IObservabilityProvider>(sp =>
+                sp.GetRequiredService<ElasticObservabilityProvider>());
         }
         else
         {
             // Default: ClickHouse
-            services.AddSingleton<IObservabilityProvider, ClickHouseObservabilityProvider>();
+            services.AddSingleton<ClickHouseObservabilityProvider>();
+            services.AddSingleton<IObservabilityProvider>(sp =>
+                sp.GetRequiredService<ClickHouseObservabilityProvider>());
         }
     }
 

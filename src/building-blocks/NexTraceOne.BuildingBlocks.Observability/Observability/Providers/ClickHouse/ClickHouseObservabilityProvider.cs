@@ -17,11 +17,11 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Click
 /// </summary>
 public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
 {
-    private readonly ClickHouseProviderOptions _options;
+    private readonly ClickHouseProviderOptions _clickHouseOptions;
 
     public ClickHouseObservabilityProvider(IOptions<TelemetryStoreOptions> options)
     {
-        _options = options.Value.ObservabilityProvider.ClickHouse;
+        _clickHouseOptions = options.Value.ObservabilityProvider.ClickHouse;
     }
 
     /// <inheritdoc />
@@ -30,13 +30,13 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
     /// <inheritdoc />
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
     {
-        if (!_options.Enabled)
+        if (!_clickHouseOptions.Enabled)
             return false;
 
         // Health check will use ClickHouse client when fully integrated.
         // For now, validates configuration is present.
         return await Task.FromResult(
-            !string.IsNullOrWhiteSpace(_options.ConnectionString));
+            !string.IsNullOrWhiteSpace(_clickHouseOptions.ConnectionString));
     }
 
     /// <inheritdoc />
@@ -84,9 +84,9 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
 /// </summary>
 public sealed class ClickHouseHealthCheck : IHealthCheck
 {
-    private readonly IObservabilityProvider _provider;
+    private readonly ClickHouseObservabilityProvider _provider;
 
-    public ClickHouseHealthCheck(IObservabilityProvider provider)
+    public ClickHouseHealthCheck(ClickHouseObservabilityProvider provider)
     {
         _provider = provider;
     }

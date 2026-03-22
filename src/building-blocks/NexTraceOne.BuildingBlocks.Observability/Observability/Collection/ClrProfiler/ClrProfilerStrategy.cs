@@ -19,11 +19,11 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrP
 /// </summary>
 public sealed class ClrProfilerStrategy : ICollectionModeStrategy
 {
-    private readonly ClrProfilerModeOptions _options;
+    private readonly ClrProfilerModeOptions _profilerOptions;
 
     public ClrProfilerStrategy(IOptions<TelemetryStoreOptions> options)
     {
-        _options = options.Value.CollectionMode.ClrProfiler;
+        _profilerOptions = options.Value.CollectionMode.ClrProfiler;
     }
 
     /// <inheritdoc />
@@ -32,24 +32,24 @@ public sealed class ClrProfilerStrategy : ICollectionModeStrategy
     /// <inheritdoc />
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
     {
-        if (!_options.Enabled)
+        if (!_profilerOptions.Enabled)
             return false;
 
         // CLR Profiler health depends on the agent being installed on the target host.
         // This check validates configuration is present.
         return await Task.FromResult(
-            !string.IsNullOrWhiteSpace(_options.OtlpEndpoint));
+            !string.IsNullOrWhiteSpace(_profilerOptions.OtlpEndpoint));
     }
 
     /// <inheritdoc />
     public CollectionExportConfig GetExportConfig()
     {
         var usesCollector = string.Equals(
-            _options.ExportTarget, "Collector", StringComparison.OrdinalIgnoreCase);
+            _profilerOptions.ExportTarget, "Collector", StringComparison.OrdinalIgnoreCase);
 
         return new CollectionExportConfig
         {
-            OtlpEndpoint = _options.OtlpEndpoint,
+            OtlpEndpoint = _profilerOptions.OtlpEndpoint,
             Protocol = "grpc",
             UsesCollectorProxy = usesCollector
         };
