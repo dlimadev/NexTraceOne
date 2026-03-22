@@ -21,7 +21,7 @@ public interface IAiTokenQuotaPolicyRepository
     Task<IReadOnlyList<AiTokenQuotaPolicy>> GetForUserAsync(string userId, CancellationToken ct = default);
 
     /// <summary>Lista políticas aplicáveis a um tenant específico.</summary>
-    Task<IReadOnlyList<AiTokenQuotaPolicy>> GetForTenantAsync(string tenantId, CancellationToken ct = default);
+    Task<IReadOnlyList<AiTokenQuotaPolicy>> GetForTenantAsync(Guid tenantId, CancellationToken ct = default);
 
     /// <summary>Adiciona uma nova política para persistência.</summary>
     Task AddAsync(AiTokenQuotaPolicy entity, CancellationToken ct = default);

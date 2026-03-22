@@ -15,7 +15,7 @@ public interface IAiTokenUsageLedgerRepository
     Task<IReadOnlyList<AiTokenUsageLedger>> GetByUserAsync(string userId, CancellationToken ct = default);
 
     /// <summary>Lista entradas de consumo por tenant, ordenadas por timestamp descendente.</summary>
-    Task<IReadOnlyList<AiTokenUsageLedger>> GetByTenantAsync(string tenantId, CancellationToken ct = default);
+    Task<IReadOnlyList<AiTokenUsageLedger>> GetByTenantAsync(Guid tenantId, CancellationToken ct = default);
 
     /// <summary>Calcula o total de tokens consumidos por um utilizador num período específico.</summary>
     Task<long> GetTotalTokensForPeriodAsync(

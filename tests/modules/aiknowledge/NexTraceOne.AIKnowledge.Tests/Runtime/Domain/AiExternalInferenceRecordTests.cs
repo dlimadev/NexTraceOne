@@ -8,12 +8,14 @@ public sealed class AiExternalInferenceRecordTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
 
+    private static readonly Guid TestTenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
     [Fact]
     public void Create_WithValidData_ShouldCreateRecord()
     {
         var record = AiExternalInferenceRecord.Create(
             userId: "user-1",
-            tenantId: "tenant-1",
+            tenantId: TestTenantId,
             providerId: "openai",
             modelName: "gpt-4o",
             originalPrompt: "Explain this API contract",
@@ -23,7 +25,7 @@ public sealed class AiExternalInferenceRecordTests
             qualityScore: 4);
 
         record.UserId.Should().Be("user-1");
-        record.TenantId.Should().Be("tenant-1");
+        record.TenantId.Should().Be(TestTenantId);
         record.ProviderId.Should().Be("openai");
         record.ModelName.Should().Be("gpt-4o");
         record.OriginalPrompt.Should().Be("Explain this API contract");
@@ -85,7 +87,7 @@ public sealed class AiExternalInferenceRecordTests
 
     private static AiExternalInferenceRecord CreateDefaultRecord() =>
         AiExternalInferenceRecord.Create(
-            "user-1", "tenant-1", "openai", "gpt-4o",
+            "user-1", TestTenantId, "openai", "gpt-4o",
             "Test prompt", null, "Test response",
             "internal", null);
 }

@@ -79,6 +79,7 @@ internal static class CookieSessionEndpoints
                 user = loginData.User,
             });
         }).AllowAnonymous()
+          .RequireRateLimiting("auth-sensitive")
           .WithName("CookieSessionLogin")
           .WithSummary("Autentica e define sessão via cookie httpOnly (modelo alternativo seguro)");
 

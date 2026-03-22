@@ -108,6 +108,42 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 5
             });
     });
+
+    // Política "auth" — limite mais restritivo para endpoints de autenticação.
+    // Protege contra brute force, credential stuffing e abuso de login/register.
+    // 20 tentativas por minuto por IP para login/refresh/federated/oidc.
+    options.AddPolicy("auth", context =>
+    {
+        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"auth:{remoteIp ?? "unresolved-ip"}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 2
+            });
+    });
+
+    // Política "auth-sensitive" — limite mais restritivo para operações sensíveis.
+    // Protege contra abuso de registration, OIDC start e cookie session creation.
+    // 10 tentativas por minuto por IP.
+    options.AddPolicy("auth-sensitive", context =>
+    {
+        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"auth-sensitive:{remoteIp ?? "unresolved-ip"}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 2
+            });
+    });
 });
 
 // [9] Tratamento de exceções não capturadas

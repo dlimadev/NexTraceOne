@@ -33,7 +33,7 @@ public sealed class AiTokenQuotaService : IAiTokenQuotaService
 
     public async Task<TokenQuotaValidationResult> ValidateQuotaAsync(
         string userId,
-        string tenantId,
+        Guid tenantId,
         string providerId,
         string modelId,
         int estimatedTokens,
@@ -114,7 +114,7 @@ public sealed class AiTokenQuotaService : IAiTokenQuotaService
 
     public async Task RecordUsageAsync(
         string userId,
-        string tenantId,
+        Guid tenantId,
         string providerId,
         string modelId,
         string modelName,

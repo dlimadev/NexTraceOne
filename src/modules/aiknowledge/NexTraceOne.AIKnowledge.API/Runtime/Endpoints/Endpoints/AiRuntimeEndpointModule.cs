@@ -224,7 +224,7 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapGet("/token-usage", async (
             string? userId,
-            string? tenantId,
+            Guid? tenantId,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

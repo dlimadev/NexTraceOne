@@ -42,7 +42,8 @@ internal static class AuthEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).AllowAnonymous();
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
 
         authGroup.MapPost("/federated", async (
             FederatedLoginFeature.Command command,
@@ -52,7 +53,8 @@ internal static class AuthEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).AllowAnonymous();
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
 
         authGroup.MapPost("/refresh", async (
             RefreshTokenFeature.Command command,
@@ -62,7 +64,8 @@ internal static class AuthEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).AllowAnonymous();
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
 
         authGroup.MapPost("/logout", async (
             ISender sender,
@@ -112,7 +115,8 @@ internal static class AuthEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).AllowAnonymous();
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth-sensitive");
 
         // GET /auth/oidc/callback — recebe o callback do provider OIDC
         // Aceita tanto GET (redirect do browser) quanto POST (para testes)
@@ -131,6 +135,7 @@ internal static class AuthEndpoints
                 new OidcCallbackFeature.Command(provider, code, state, ip, userAgent),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        }).AllowAnonymous();
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
     }
 }
