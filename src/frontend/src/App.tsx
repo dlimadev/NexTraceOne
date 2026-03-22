@@ -52,6 +52,7 @@ const ServiceReliabilityDetailPage = lazy(() => import('./features/operations/pa
 const AutomationWorkflowsPage = lazy(() => import('./features/operations/pages/AutomationWorkflowsPage').then(m => ({ default: m.AutomationWorkflowsPage })));
 const AutomationAdminPage = lazy(() => import('./features/operations/pages/AutomationAdminPage').then(m => ({ default: m.AutomationAdminPage })));
 const AutomationWorkflowDetailPage = lazy(() => import('./features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
+const EnvironmentComparisonPage = lazy(() => import('./features/operations/pages/EnvironmentComparisonPage').then(m => ({ default: m.EnvironmentComparisonPage })));
 const PlatformOperationsPage = lazy(() => import('./features/operations/pages/PlatformOperationsPage').then(m => ({ default: m.PlatformOperationsPage })));
 
 // ── AI Hub (lazy) ──
@@ -355,6 +356,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="operations:automation:read" redirectTo="/unauthorized">
                     <AutomationWorkflowDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operations/runtime-comparison"
+                element={
+                  <ProtectedRoute permission="operations:runtime:read" redirectTo="/unauthorized">
+                    <EnvironmentComparisonPage />
                   </ProtectedRoute>
                 }
               />
