@@ -96,7 +96,7 @@ services:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
       - ./build/observability/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./build/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./build/observability/grafana/dashboards:/var/lib/grafana/dashboards/nextraceone:ro
       - grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"    # Grafana UI
