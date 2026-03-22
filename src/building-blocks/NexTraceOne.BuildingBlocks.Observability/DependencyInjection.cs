@@ -1,5 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Observability.Alerting;
+using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
+using NexTraceOne.BuildingBlocks.Observability.Alerting.Channels;
+using NexTraceOne.BuildingBlocks.Observability.Alerting.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability.Metrics;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
@@ -90,6 +94,46 @@ public static class DependencyInjection
             });
 
         services.AddNexTraceHealthChecks();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registra o sistema de alertas da plataforma: gateway central, canais
+    /// condicionais (Webhook, Email) e opções de configuração.
+    /// Canais são ativados com base na configuração da secção "Alerting".
+    /// </summary>
+    public static IServiceCollection AddBuildingBlocksAlerting(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<AlertingOptions>(
+            configuration.GetSection(AlertingOptions.SectionName));
+
+        services.AddSingleton<IAlertGateway, AlertGateway>();
+
+        var alertingOptions = new AlertingOptions();
+        configuration.GetSection(AlertingOptions.SectionName).Bind(alertingOptions);
+
+        if (!alertingOptions.Enabled)
+        {
+            return services;
+        }
+
+        if (alertingOptions.Webhook.Enabled)
+        {
+            services.AddHttpClient(WebhookAlertChannel.HttpClientName, client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(alertingOptions.Webhook.TimeoutSeconds);
+            });
+
+            services.AddSingleton<IAlertChannel, WebhookAlertChannel>();
+        }
+
+        if (alertingOptions.Email.Enabled)
+        {
+            services.AddSingleton<IAlertChannel, EmailAlertChannel>();
+        }
 
         return services;
     }
