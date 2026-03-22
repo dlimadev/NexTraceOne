@@ -1,4 +1,7 @@
 using FluentAssertions;
+using NSubstitute;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetDomainReliabilitySummary;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityCoverage;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityDetail;
@@ -6,6 +9,7 @@ using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetSe
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilitySummary;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilityTrend;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListServiceReliability;
+using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 using Xunit;
 
@@ -13,16 +17,38 @@ namespace NexTraceOne.OperationalIntelligence.Tests.Reliability.Application;
 
 /// <summary>
 /// Testes unitários para as features do subdomínio Reliability.
-/// Verificam handlers, validators e respostas de todas as queries.
+/// Verificam handlers com superfícies de dados mockadas via NSubstitute.
 /// </summary>
 public sealed class ReliabilityFeatureTests
 {
+    private static readonly Guid TenantId = Guid.NewGuid();
+
+    private static ICurrentTenant MockTenant()
+    {
+        var tenant = Substitute.For<ICurrentTenant>();
+        tenant.Id.Returns(TenantId);
+        return tenant;
+    }
+
     // ── ListServiceReliability ───────────────────────────────────────
 
     [Fact]
-    public async Task ListServiceReliability_WithNoFilters_ShouldReturnAllItems()
+    public async Task ListServiceReliability_WithRealData_ShouldReturnItems()
     {
-        var handler = new ListServiceReliability.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+
+        runtimeSurface.GetLatestSignalsAllServicesAsync(null, Arg.Any<CancellationToken>())
+            .Returns(new List<RuntimeServiceSignal>
+            {
+                new("svc-order-api", "production", "Healthy", 0.01m, 80m, 100m, DateTimeOffset.UtcNow)
+            });
+        runtimeSurface.GetObservabilityScoresAllServicesAsync(null, Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<string, decimal> { ["svc-order-api"] = 0.9m });
+        incidentSurface.GetAllServicesIncidentSignalsAsync(TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+
+        var handler = new ListServiceReliability.Handler(runtimeSurface, incidentSurface, MockTenant());
         var query = new ListServiceReliability.Query(null, null, null, null, null, null, null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -35,7 +61,21 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task ListServiceReliability_FilterByStatus_ShouldReturnFiltered()
     {
-        var handler = new ListServiceReliability.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+
+        runtimeSurface.GetLatestSignalsAllServicesAsync(null, Arg.Any<CancellationToken>())
+            .Returns(new List<RuntimeServiceSignal>
+            {
+                new("svc-degraded", "production", "Degraded", 0.1m, 500m, 50m, DateTimeOffset.UtcNow),
+                new("svc-healthy", "production", "Healthy", 0.0m, 50m, 200m, DateTimeOffset.UtcNow)
+            });
+        runtimeSurface.GetObservabilityScoresAllServicesAsync(null, Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<string, decimal>());
+        incidentSurface.GetAllServicesIncidentSignalsAsync(TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+
+        var handler = new ListServiceReliability.Handler(runtimeSurface, incidentSurface, MockTenant());
         var query = new ListServiceReliability.Query(null, null, null, null, ReliabilityStatus.Degraded, null, null, null, 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -47,7 +87,21 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task ListServiceReliability_FilterBySearch_ShouldReturnMatching()
     {
-        var handler = new ListServiceReliability.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+
+        runtimeSurface.GetLatestSignalsAllServicesAsync(null, Arg.Any<CancellationToken>())
+            .Returns(new List<RuntimeServiceSignal>
+            {
+                new("svc-payment-gateway", "production", "Healthy", 0.01m, 100m, 50m, DateTimeOffset.UtcNow),
+                new("svc-order-api", "production", "Healthy", 0.01m, 80m, 100m, DateTimeOffset.UtcNow)
+            });
+        runtimeSurface.GetObservabilityScoresAllServicesAsync(null, Arg.Any<CancellationToken>())
+            .Returns(new Dictionary<string, decimal>());
+        incidentSurface.GetAllServicesIncidentSignalsAsync(TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+
+        var handler = new ListServiceReliability.Handler(runtimeSurface, incidentSurface, MockTenant());
         var query = new ListServiceReliability.Query(null, null, null, null, null, null, null, "payment", 1, 100);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -83,7 +137,20 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task GetServiceReliabilityDetail_KnownService_ShouldReturnDetail()
     {
-        var handler = new GetServiceReliabilityDetail.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        var snapshotRepo = Substitute.For<IReliabilitySnapshotRepository>();
+
+        runtimeSurface.GetLatestSignalAsync("svc-order-api", string.Empty, Arg.Any<CancellationToken>())
+            .Returns(new RuntimeServiceSignal("svc-order-api", "production", "Healthy", 0.01m, 80m, 100m, DateTimeOffset.UtcNow));
+        runtimeSurface.GetObservabilityScoreAsync("svc-order-api", "production", Arg.Any<CancellationToken>())
+            .Returns((decimal?)0.9m);
+        incidentSurface.GetActiveIncidentsAsync("svc-order-api", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+        snapshotRepo.GetHistoryAsync("svc-order-api", TenantId, 2, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilitySnapshot>());
+
+        var handler = new GetServiceReliabilityDetail.Handler(runtimeSurface, incidentSurface, snapshotRepo, MockTenant());
         var query = new GetServiceReliabilityDetail.Query("svc-order-api");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -91,14 +158,26 @@ public sealed class ReliabilityFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Identity.ServiceId.Should().Be("svc-order-api");
         result.Value.Status.Should().Be(ReliabilityStatus.Healthy);
-        result.Value.RecentChanges.Should().NotBeEmpty();
         result.Value.Coverage.HasOperationalSignals.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetServiceReliabilityDetail_DegradedService_ShouldShowFlags()
     {
-        var handler = new GetServiceReliabilityDetail.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        var snapshotRepo = Substitute.For<IReliabilitySnapshotRepository>();
+
+        runtimeSurface.GetLatestSignalAsync("svc-payment-gateway", string.Empty, Arg.Any<CancellationToken>())
+            .Returns(new RuntimeServiceSignal("svc-payment-gateway", "production", "Degraded", 0.15m, 800m, 50m, DateTimeOffset.UtcNow));
+        runtimeSurface.GetObservabilityScoreAsync("svc-payment-gateway", "production", Arg.Any<CancellationToken>())
+            .Returns((decimal?)0.6m);
+        incidentSurface.GetActiveIncidentsAsync("svc-payment-gateway", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+        snapshotRepo.GetHistoryAsync("svc-payment-gateway", TenantId, 2, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilitySnapshot>());
+
+        var handler = new GetServiceReliabilityDetail.Handler(runtimeSurface, incidentSurface, snapshotRepo, MockTenant());
         var query = new GetServiceReliabilityDetail.Query("svc-payment-gateway");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -106,13 +185,23 @@ public sealed class ReliabilityFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(ReliabilityStatus.Degraded);
         result.Value.ActiveFlags.HasFlag(OperationalFlag.AnomalyDetected).Should().BeTrue();
-        result.Value.ActiveFlags.HasFlag(OperationalFlag.RecentChangeImpact).Should().BeTrue();
     }
 
     [Fact]
     public async Task GetServiceReliabilityDetail_UnknownService_ShouldReturnNotFound()
     {
-        var handler = new GetServiceReliabilityDetail.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        var snapshotRepo = Substitute.For<IReliabilitySnapshotRepository>();
+
+        runtimeSurface.GetLatestSignalAsync("svc-nonexistent", string.Empty, Arg.Any<CancellationToken>())
+            .Returns((RuntimeServiceSignal?)null);
+        incidentSurface.GetActiveIncidentsAsync("svc-nonexistent", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+        snapshotRepo.GetHistoryAsync("svc-nonexistent", TenantId, 2, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilitySnapshot>());
+
+        var handler = new GetServiceReliabilityDetail.Handler(runtimeSurface, incidentSurface, snapshotRepo, MockTenant());
         var query = new GetServiceReliabilityDetail.Query("svc-nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -136,7 +225,14 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task GetTeamReliabilitySummary_KnownTeam_ShouldReturnSummary()
     {
-        var handler = new GetTeamReliabilitySummary.Handler();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        incidentSurface.GetTeamIncidentsAsync("order-squad", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>
+            {
+                new("svc-order-api", "Order API", "order-squad", "Minor", "Open", DateTimeOffset.UtcNow)
+            });
+
+        var handler = new GetTeamReliabilitySummary.Handler(incidentSurface, MockTenant());
         var query = new GetTeamReliabilitySummary.Query("order-squad");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -150,7 +246,11 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task GetTeamReliabilitySummary_UnknownTeam_ShouldReturnZeros()
     {
-        var handler = new GetTeamReliabilitySummary.Handler();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        incidentSurface.GetTeamIncidentsAsync("unknown-squad", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+
+        var handler = new GetTeamReliabilitySummary.Handler(incidentSurface, MockTenant());
         var query = new GetTeamReliabilitySummary.Query("unknown-squad");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -164,8 +264,15 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task GetDomainReliabilitySummary_KnownDomain_ShouldReturnSummary()
     {
-        var handler = new GetDomainReliabilitySummary.Handler();
-        var query = new GetDomainReliabilitySummary.Query("orders");
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        incidentSurface.GetDomainIncidentsAsync("Orders", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>
+            {
+                new("svc-order-api", "Order API", "order-squad", "Minor", "Open", DateTimeOffset.UtcNow)
+            });
+
+        var handler = new GetDomainReliabilitySummary.Handler(incidentSurface, MockTenant());
+        var query = new GetDomainReliabilitySummary.Query("Orders");
 
         var result = await handler.Handle(query, CancellationToken.None);
 
@@ -177,28 +284,30 @@ public sealed class ReliabilityFeatureTests
     // ── GetServiceReliabilityTrend ──────────────────────────────────
 
     [Fact]
-    public async Task GetServiceReliabilityTrend_KnownService_ShouldReturnTrend()
+    public async Task GetServiceReliabilityTrend_NoHistory_ShouldReturnStable()
     {
-        var handler = new GetServiceReliabilityTrend.Handler();
+        var snapshotRepo = Substitute.For<IReliabilitySnapshotRepository>();
+        snapshotRepo.GetHistoryAsync("svc-order-api", TenantId, 30, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilitySnapshot>());
+
+        var handler = new GetServiceReliabilityTrend.Handler(snapshotRepo, MockTenant());
         var query = new GetServiceReliabilityTrend.Query("svc-order-api");
 
         var result = await handler.Handle(query, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Direction.Should().Be(TrendDirection.Stable);
-        result.Value.DataPoints.Should().NotBeEmpty();
     }
 
     [Fact]
-    public async Task GetServiceReliabilityTrend_DecliningService_ShouldShowDecline()
+    public async Task GetServiceReliabilityTrend_Validator_ShouldRejectEmptyId()
     {
-        var handler = new GetServiceReliabilityTrend.Handler();
-        var query = new GetServiceReliabilityTrend.Query("svc-payment-gateway");
+        var validator = new GetServiceReliabilityTrend.Validator();
+        var query = new GetServiceReliabilityTrend.Query("");
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = validator.Validate(query);
 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Direction.Should().Be(TrendDirection.Declining);
+        result.IsValid.Should().BeFalse();
     }
 
     // ── GetTeamReliabilityTrend ─────────────────────────────────────
@@ -206,7 +315,14 @@ public sealed class ReliabilityFeatureTests
     [Fact]
     public async Task GetTeamReliabilityTrend_ShouldReturnTrend()
     {
-        var handler = new GetTeamReliabilityTrend.Handler();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        incidentSurface.GetTeamIncidentsAsync("order-squad", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>
+            {
+                new("svc-order-api", "Order API", "order-squad", "Minor", "Open", DateTimeOffset.UtcNow)
+            });
+
+        var handler = new GetTeamReliabilityTrend.Handler(incidentSurface, MockTenant());
         var query = new GetTeamReliabilityTrend.Query("order-squad");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -219,9 +335,22 @@ public sealed class ReliabilityFeatureTests
     // ── GetServiceReliabilityCoverage ────────────────────────────────
 
     [Fact]
-    public async Task GetServiceReliabilityCoverage_WellCoveredService_ShouldShowFullCoverage()
+    public async Task GetServiceReliabilityCoverage_WellCoveredService_ShouldShowOperationalSignals()
     {
-        var handler = new GetServiceReliabilityCoverage.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        var snapshotRepo = Substitute.For<IReliabilitySnapshotRepository>();
+
+        runtimeSurface.GetLatestSignalAsync("svc-order-api", string.Empty, Arg.Any<CancellationToken>())
+            .Returns(new RuntimeServiceSignal("svc-order-api", "production", "Healthy", 0.01m, 80m, 100m, DateTimeOffset.UtcNow));
+        incidentSurface.HasRunbookAsync("svc-order-api", Arg.Any<CancellationToken>()).Returns(true);
+        incidentSurface.GetActiveIncidentsAsync("svc-order-api", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>
+            {
+                new("svc-order-api", "Order API", "order-squad", "Minor", "Open", DateTimeOffset.UtcNow)
+            });
+
+        var handler = new GetServiceReliabilityCoverage.Handler(runtimeSurface, incidentSurface, snapshotRepo, MockTenant());
         var query = new GetServiceReliabilityCoverage.Query("svc-order-api");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -233,9 +362,19 @@ public sealed class ReliabilityFeatureTests
     }
 
     [Fact]
-    public async Task GetServiceReliabilityCoverage_PoorlyCoveredService_ShouldShowGaps()
+    public async Task GetServiceReliabilityCoverage_NoData_ShouldShowGaps()
     {
-        var handler = new GetServiceReliabilityCoverage.Handler();
+        var runtimeSurface = Substitute.For<IReliabilityRuntimeSurface>();
+        var incidentSurface = Substitute.For<IReliabilityIncidentSurface>();
+        var snapshotRepo = Substitute.For<IReliabilitySnapshotRepository>();
+
+        runtimeSurface.GetLatestSignalAsync("svc-report-scheduler", string.Empty, Arg.Any<CancellationToken>())
+            .Returns((RuntimeServiceSignal?)null);
+        incidentSurface.HasRunbookAsync("svc-report-scheduler", Arg.Any<CancellationToken>()).Returns(false);
+        incidentSurface.GetActiveIncidentsAsync("svc-report-scheduler", TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<ReliabilityIncidentSignal>());
+
+        var handler = new GetServiceReliabilityCoverage.Handler(runtimeSurface, incidentSurface, snapshotRepo, MockTenant());
         var query = new GetServiceReliabilityCoverage.Query("svc-report-scheduler");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -243,7 +382,7 @@ public sealed class ReliabilityFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.HasOperationalSignals.Should().BeFalse();
         result.Value.HasRunbook.Should().BeFalse();
-        result.Value.HasOwner.Should().BeTrue();
+        result.Value.HasOwner.Should().BeFalse();
     }
 
     [Fact]

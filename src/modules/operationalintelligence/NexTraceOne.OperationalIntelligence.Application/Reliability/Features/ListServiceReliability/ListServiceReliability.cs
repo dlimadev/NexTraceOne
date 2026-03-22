@@ -1,22 +1,20 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListServiceReliability;
 
 /// <summary>
 /// Feature: ListServiceReliability — lista serviços com resumo de confiabilidade.
-/// Retorna a visão de equipa dos serviços sob sua responsabilidade com estado atual,
-/// criticidade, trend, flags operacionais e resumos de impacto.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
-///
-/// Nota: nesta fase a composição de dados cruza módulos (Catalog, ChangeGovernance,
-/// OperationalIntelligence). Os dados são simulados até integração completa entre módulos.
+/// Compõe dados reais de RuntimeIntelligence e Incidents para calcular scores de confiabilidade
+/// por serviço. Retorna paginação com OverallScore, TrendDirection e estado operacional.
 /// </summary>
 public static class ListServiceReliability
 {
-    /// <summary>Query para listar serviços com resumo de confiabilidade.</summary>
     public sealed record Query(
         string? TeamId,
         string? ServiceId,
@@ -29,7 +27,6 @@ public static class ListServiceReliability
         int Page,
         int PageSize) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -43,60 +40,72 @@ public static class ListServiceReliability
         }
     }
 
-    /// <summary>
-    /// Handler que compõe a listagem de confiabilidade de serviços.
-    /// Simula composição cross-module até integração completa.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilityRuntimeSurface runtimeSurface,
+        IReliabilityIncidentSurface incidentSurface,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Dados simulados para demonstrar a estrutura.
-            // Em produção, isto consulta Catalog (ServiceAsset), RuntimeIntelligence (snapshots),
-            // ChangeGovernance (releases) e SourceOfTruth (references) via contratos de módulo.
-            var items = GenerateSimulatedItems(request);
+            var runtimeSignals = await runtimeSurface
+                .GetLatestSignalsAllServicesAsync(request.Environment, cancellationToken);
 
-            var response = new Response(
-                Items: items,
-                TotalCount: items.Count,
-                Page: request.Page,
-                PageSize: request.PageSize,
-                IsSimulated: true);
+            var incidentSignals = await incidentSurface
+                .GetAllServicesIncidentSignalsAsync(tenant.Id, cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
-        }
+            var observabilityScores = await runtimeSurface
+                .GetObservabilityScoresAllServicesAsync(request.Environment, cancellationToken);
 
-        private static IReadOnlyList<ServiceReliabilityItem> GenerateSimulatedItems(Query request)
-        {
-            var allItems = new List<ServiceReliabilityItem>
+            // União de nomes de serviços de ambas as fontes.
+            var serviceNames = runtimeSignals.Select(r => r.ServiceName)
+                .Union(incidentSignals.Select(i => i.ServiceId))
+                .Distinct()
+                .ToList();
+
+            var runtimeByService = runtimeSignals.ToDictionary(r => r.ServiceName);
+            var incidentsByService = incidentSignals
+                .GroupBy(i => i.ServiceId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var now = DateTimeOffset.UtcNow;
+            var items = new List<ServiceReliabilityItem>();
+
+            foreach (var serviceName in serviceNames)
             {
-                new("svc-order-api", "Order API", "RestApi", "Orders", "order-squad",
-                    "Critical", ReliabilityStatus.Healthy, "Operating normally",
-                    TrendDirection.Stable, OperationalFlag.None, 0, false),
-                new("svc-payment-gateway", "Payment Gateway", "RestApi", "Payments", "payment-squad",
-                    "Critical", ReliabilityStatus.Degraded, "Elevated error rate detected",
-                    TrendDirection.Declining, OperationalFlag.AnomalyDetected | OperationalFlag.RecentChangeImpact, 0, true),
-                new("svc-notification-worker", "Notification Worker", "BackgroundService", "Notifications", "platform-squad",
-                    "High", ReliabilityStatus.Healthy, "Processing within expected parameters",
-                    TrendDirection.Improving, OperationalFlag.None, 0, false),
-                new("svc-inventory-consumer", "Inventory Consumer", "KafkaConsumer", "Inventory", "order-squad",
-                    "High", ReliabilityStatus.NeedsAttention, "Consumer lag increasing",
-                    TrendDirection.Declining, OperationalFlag.DependencyRisk, 0, false),
-                new("svc-user-service", "User Service", "RestApi", "Identity", "identity-squad",
-                    "Critical", ReliabilityStatus.Healthy, "All systems operational",
-                    TrendDirection.Stable, OperationalFlag.None, 0, false),
-                new("svc-catalog-sync", "Catalog Sync", "IntegrationComponent", "Catalog", "platform-squad",
-                    "Medium", ReliabilityStatus.Unavailable, "Integration partner unreachable",
-                    TrendDirection.Declining, OperationalFlag.IncidentLinked | OperationalFlag.DependencyRisk, 1, false),
-                new("svc-report-scheduler", "Report Scheduler", "ScheduledProcess", "Analytics", "data-squad",
-                    "Low", ReliabilityStatus.NeedsAttention, "Coverage gap detected — missing runbook",
-                    TrendDirection.Stable, OperationalFlag.CoverageGap, 0, false),
-                new("svc-auth-gateway", "Auth Gateway", "SharedPlatformService", "Security", "identity-squad",
-                    "Critical", ReliabilityStatus.Healthy, "All authentication flows healthy",
-                    TrendDirection.Stable, OperationalFlag.None, 0, false),
-            };
+                runtimeByService.TryGetValue(serviceName, out var signal);
+                incidentsByService.TryGetValue(serviceName, out var incidents);
+                observabilityScores.TryGetValue(serviceName, out var obsScore);
 
-            var filtered = allItems.AsEnumerable();
+                var runtimeHealthScore = ComputeRuntimeHealthScore(signal?.HealthStatus);
+                var incidentImpactScore = ComputeIncidentImpactScore(incidents);
+                var observabilityScore = obsScore > 0 ? obsScore * 100m : 50m;
+                var overallScore = (runtimeHealthScore * 0.50m) + (incidentImpactScore * 0.30m) + (observabilityScore * 0.20m);
+
+                var openIncidentCount = incidents?.Count ?? 0;
+                var reliabilityStatus = DeriveReliabilityStatus(signal?.HealthStatus, overallScore, openIncidentCount);
+                var operationalFlags = DeriveOperationalFlags(incidents, signal);
+                var teamName = incidents?.FirstOrDefault(i => !string.IsNullOrEmpty(i.TeamName))?.TeamName ?? string.Empty;
+
+                var item = new ServiceReliabilityItem(
+                    ServiceName: serviceName,
+                    DisplayName: serviceName,
+                    ServiceType: string.Empty,
+                    Domain: string.Empty,
+                    TeamName: teamName,
+                    Criticality: string.Empty,
+                    ReliabilityStatus: reliabilityStatus,
+                    OperationalSummary: BuildOperationalSummary(reliabilityStatus, signal, openIncidentCount),
+                    Trend: TrendDirection.Stable,
+                    ActiveFlags: operationalFlags,
+                    OpenIncidents: openIncidentCount,
+                    RecentChangeImpact: operationalFlags.HasFlag(OperationalFlag.RecentChangeImpact),
+                    OverallScore: Math.Round(overallScore, 2),
+                    LastComputedAt: now);
+
+                items.Add(item);
+            }
+
+            var filtered = items.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(request.TeamId))
                 filtered = filtered.Where(i => i.TeamName.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase));
@@ -118,11 +127,70 @@ public static class ListServiceReliability
                     i.ServiceName.Contains(request.Search, StringComparison.OrdinalIgnoreCase) ||
                     i.DisplayName.Contains(request.Search, StringComparison.OrdinalIgnoreCase));
 
-            return filtered.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
+            if (!string.IsNullOrWhiteSpace(request.ServiceId))
+                filtered = filtered.Where(i => i.ServiceName.Equals(request.ServiceId, StringComparison.OrdinalIgnoreCase));
+
+            var filteredList = filtered.ToList();
+            var totalCount = filteredList.Count;
+            var paged = filteredList.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize).ToList();
+
+            return Result<Response>.Success(new Response(paged, totalCount, request.Page, request.PageSize));
         }
+
+        private static decimal ComputeRuntimeHealthScore(string? healthStatus) =>
+            healthStatus switch
+            {
+                "Healthy" => 100m,
+                "Degraded" => 60m,
+                "Unhealthy" => 20m,
+                _ => 50m // Unknown or not found
+            };
+
+        private static decimal ComputeIncidentImpactScore(List<ReliabilityIncidentSignal>? incidents)
+        {
+            if (incidents is null or { Count: 0 }) return 100m;
+            var critical = incidents.Count(i => i.Severity == IncidentSeverity.Critical.ToString());
+            var major = incidents.Count(i => i.Severity == IncidentSeverity.Major.ToString());
+            var minor = incidents.Count(i => i.Severity == IncidentSeverity.Minor.ToString());
+            var warning = incidents.Count(i => i.Severity == IncidentSeverity.Warning.ToString());
+            return Math.Max(0m, 100m - (critical * 30m + major * 20m + minor * 10m + warning * 5m));
+        }
+
+        private static ReliabilityStatus DeriveReliabilityStatus(string? healthStatus, decimal overallScore, int openIncidents)
+        {
+            if (healthStatus == "Unhealthy" || openIncidents > 0 && overallScore < 40m)
+                return ReliabilityStatus.Unavailable;
+
+            if (healthStatus == "Degraded" || overallScore < 60m)
+                return ReliabilityStatus.Degraded;
+
+            if (overallScore < 75m || openIncidents > 0)
+                return ReliabilityStatus.NeedsAttention;
+
+            return ReliabilityStatus.Healthy;
+        }
+
+        private static OperationalFlag DeriveOperationalFlags(
+            List<ReliabilityIncidentSignal>? incidents, RuntimeServiceSignal? signal)
+        {
+            var flags = OperationalFlag.None;
+            if (incidents is { Count: > 0 }) flags |= OperationalFlag.IncidentLinked;
+            if (signal?.HealthStatus is "Degraded" or "Unhealthy") flags |= OperationalFlag.AnomalyDetected;
+            return flags;
+        }
+
+        private static string BuildOperationalSummary(
+            ReliabilityStatus status, RuntimeServiceSignal? signal, int openIncidents) =>
+            status switch
+            {
+                ReliabilityStatus.Healthy => "Service operating within expected parameters.",
+                ReliabilityStatus.Degraded => $"Degraded performance detected. Error rate: {signal?.ErrorRate * 100m:F1}%. P99: {signal?.P99LatencyMs:F0}ms.",
+                ReliabilityStatus.Unavailable => $"Service unavailable or severely impaired. {openIncidents} active incident(s).",
+                ReliabilityStatus.NeedsAttention => $"{openIncidents} open incident(s) require attention.",
+                _ => string.Empty
+            };
     }
 
-    /// <summary>Item resumido de confiabilidade de um serviço na listagem.</summary>
     public sealed record ServiceReliabilityItem(
         string ServiceName,
         string DisplayName,
@@ -135,13 +203,13 @@ public static class ListServiceReliability
         TrendDirection Trend,
         OperationalFlag ActiveFlags,
         int OpenIncidents,
-        bool RecentChangeImpact);
+        bool RecentChangeImpact,
+        decimal OverallScore,
+        DateTimeOffset LastComputedAt);
 
-    /// <summary>Resposta paginada da listagem de confiabilidade de serviços.</summary>
     public sealed record Response(
         IReadOnlyList<ServiceReliabilityItem> Items,
         int TotalCount,
         int Page,
-        int PageSize,
-        bool IsSimulated);
+        int PageSize);
 }

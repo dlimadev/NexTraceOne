@@ -1,22 +1,21 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilityTrend;
 
 /// <summary>
-/// Feature: GetTeamReliabilityTrend — obtém a tendência agregada de confiabilidade
-/// dos serviços de uma equipa. Útil para Tech Lead e Executive perceberem
-/// a direção geral de fiabilidade ao longo do tempo.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Feature: GetTeamReliabilityTrend — tendência agregada de confiabilidade da equipa.
+/// Baseia-se em dados reais de incidentes por equipa para representar o estado atual.
+/// Nota: trending histórico profundo requer integração futura com snapshot agregado por equipa.
 /// </summary>
 public static class GetTeamReliabilityTrend
 {
-    /// <summary>Query para obter tendência agregada de confiabilidade da equipa.</summary>
     public sealed record Query(string TeamId) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -25,31 +24,41 @@ public static class GetTeamReliabilityTrend
         }
     }
 
-    /// <summary>
-    /// Handler que compõe a tendência agregada de confiabilidade da equipa.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilityIncidentSurface incidentSurface,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = new Response(
-                request.TeamId,
-                TrendDirection.Stable,
-                "7d",
-                "Overall team reliability is stable. 1 service requires attention.",
-                [
-                    new TeamTrendDataPoint(DateTimeOffset.UtcNow.AddDays(-7), 3, 2, 1, 0, 0),
-                    new TeamTrendDataPoint(DateTimeOffset.UtcNow.AddDays(-5), 3, 3, 0, 0, 0),
-                    new TeamTrendDataPoint(DateTimeOffset.UtcNow.AddDays(-3), 3, 2, 0, 0, 1),
-                    new TeamTrendDataPoint(DateTimeOffset.UtcNow.AddDays(-1), 3, 2, 0, 0, 1),
-                    new TeamTrendDataPoint(DateTimeOffset.UtcNow, 3, 2, 0, 0, 1),
-                ]);
+            var incidents = await incidentSurface.GetTeamIncidentsAsync(request.TeamId, tenant.Id, cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var serviceIds = incidents.Select(i => i.ServiceId).Distinct().ToList();
+            var totalServices = serviceIds.Count;
+            var degradedCount = incidents.Where(i => i.Severity == "Major").Select(i => i.ServiceId).Distinct().Count();
+            var unavailableCount = incidents.Where(i => i.Severity == "Critical").Select(i => i.ServiceId).Distinct().Count();
+            var needsAttentionCount = incidents.Where(i => i.Severity is "Minor" or "Warning").Select(i => i.ServiceId).Distinct().Count();
+            var healthyCount = Math.Max(0, totalServices - unavailableCount - degradedCount - needsAttentionCount);
+
+            var now = DateTimeOffset.UtcNow;
+            var currentPoint = new TeamTrendDataPoint(now, totalServices, healthyCount, degradedCount, unavailableCount, needsAttentionCount);
+
+            var direction = unavailableCount > 0 || degradedCount > 0
+                ? TrendDirection.Declining
+                : TrendDirection.Stable;
+
+            var summary = totalServices == 0
+                ? "No active incidents found for this team."
+                : $"{healthyCount}/{totalServices} services healthy. {incidents.Count} active incident(s).";
+
+            return Result<Response>.Success(new Response(
+                request.TeamId,
+                direction,
+                "30d",
+                summary,
+                [currentPoint]));
         }
     }
 
-    /// <summary>Ponto de dados na tendência agregada da equipa.</summary>
     public sealed record TeamTrendDataPoint(
         DateTimeOffset Timestamp,
         int TotalServices,
@@ -58,13 +67,10 @@ public static class GetTeamReliabilityTrend
         int UnavailableCount,
         int NeedsAttentionCount);
 
-    /// <summary>Resposta com tendência agregada de confiabilidade da equipa.</summary>
     public sealed record Response(
         string TeamId,
         TrendDirection Direction,
         string Timeframe,
         string Summary,
-        IReadOnlyList<TeamTrendDataPoint> DataPoints,
-        bool IsSimulated = true,
-        string DataSource = "demo");
+        IReadOnlyList<TeamTrendDataPoint> DataPoints);
 }
