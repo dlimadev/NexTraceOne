@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Extensions.Options;
 using NexTraceOne.BackgroundWorkers.Configuration;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
@@ -29,13 +30,14 @@ public sealed class DriftDetectionJob(
     {
         jobHealthRegistry.MarkStarted(HealthCheckName);
 
-        // Executa imediatamente na inicialização e depois no intervalo configurado
+        // Executa o primeiro ciclo imediatamente na inicialização (no-op se disabled).
+        // A partir daí entra no loop de intervalo configurado.
         await RunDriftDetectionCycleAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
         {
             using var scope = serviceScopeFactory.CreateScope();
-            var options = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<DriftDetectionOptions>>().Value;
+            var options = scope.ServiceProvider.GetRequiredService<IOptions<DriftDetectionOptions>>().Value;
 
             if (!options.Enabled)
             {
@@ -63,7 +65,7 @@ public sealed class DriftDetectionJob(
     private async Task RunDriftDetectionCycleAsync(CancellationToken cancellationToken)
     {
         using var scope = serviceScopeFactory.CreateScope();
-        var options = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<DriftDetectionOptions>>().Value;
+        var options = scope.ServiceProvider.GetRequiredService<IOptions<DriftDetectionOptions>>().Value;
 
         if (!options.Enabled)
             return;

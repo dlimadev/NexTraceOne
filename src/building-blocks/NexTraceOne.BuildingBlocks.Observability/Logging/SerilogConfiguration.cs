@@ -37,7 +37,7 @@ public static class SerilogConfiguration
             if (!string.IsNullOrWhiteSpace(lokiEndpoint))
             {
                 var applicationName = configuration["OpenTelemetry:ServiceName"] ?? "NexTraceOne";
-                var environmentName = configuration["ASPNETCORE_ENVIRONMENT"] ?? "Production";
+                var environmentName = configuration["ASPNETCORE_ENVIRONMENT"] ?? "production";
 
                 var lokiLabels = new LokiLabel[]
                 {
