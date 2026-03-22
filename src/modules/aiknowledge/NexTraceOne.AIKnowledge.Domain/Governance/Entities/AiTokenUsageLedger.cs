@@ -24,7 +24,7 @@ public sealed class AiTokenUsageLedger : AuditableEntity<AiTokenUsageLedgerId>
     public string UserId { get; private set; } = string.Empty;
 
     /// <summary>Identificador do tenant do utilizador.</summary>
-    public string TenantId { get; private set; } = string.Empty;
+    public Guid TenantId { get; private set; }
 
     /// <summary>Identificador do provedor de IA utilizado.</summary>
     public string ProviderId { get; private set; } = string.Empty;
@@ -77,7 +77,7 @@ public sealed class AiTokenUsageLedger : AuditableEntity<AiTokenUsageLedgerId>
     /// </summary>
     public static AiTokenUsageLedger Record(
         string userId,
-        string tenantId,
+        Guid tenantId,
         string providerId,
         string modelId,
         string modelName,
@@ -95,7 +95,7 @@ public sealed class AiTokenUsageLedger : AuditableEntity<AiTokenUsageLedgerId>
         double durationMs)
     {
         Guard.Against.NullOrWhiteSpace(userId);
-        Guard.Against.NullOrWhiteSpace(tenantId);
+        Guard.Against.Default(tenantId);
         Guard.Against.NullOrWhiteSpace(providerId);
         Guard.Against.NullOrWhiteSpace(modelId);
         Guard.Against.NullOrWhiteSpace(modelName);

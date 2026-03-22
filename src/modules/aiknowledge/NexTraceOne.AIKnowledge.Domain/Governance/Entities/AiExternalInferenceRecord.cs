@@ -30,7 +30,7 @@ public sealed class AiExternalInferenceRecord : AuditableEntity<AiExternalInfere
     public string UserId { get; private set; } = string.Empty;
 
     /// <summary>Identificador do tenant do utilizador.</summary>
-    public string TenantId { get; private set; } = string.Empty;
+    public Guid TenantId { get; private set; }
 
     /// <summary>Identificador do provedor de IA externo utilizado.</summary>
     public string ProviderId { get; private set; } = string.Empty;
@@ -71,7 +71,7 @@ public sealed class AiExternalInferenceRecord : AuditableEntity<AiExternalInfere
     /// </summary>
     public static AiExternalInferenceRecord Create(
         string userId,
-        string tenantId,
+        Guid tenantId,
         string providerId,
         string modelName,
         string originalPrompt,
@@ -81,7 +81,7 @@ public sealed class AiExternalInferenceRecord : AuditableEntity<AiExternalInfere
         int? qualityScore)
     {
         Guard.Against.NullOrWhiteSpace(userId);
-        Guard.Against.NullOrWhiteSpace(tenantId);
+        Guard.Against.Default(tenantId);
         Guard.Against.NullOrWhiteSpace(providerId);
         Guard.Against.NullOrWhiteSpace(modelName);
         Guard.Against.NullOrWhiteSpace(originalPrompt);

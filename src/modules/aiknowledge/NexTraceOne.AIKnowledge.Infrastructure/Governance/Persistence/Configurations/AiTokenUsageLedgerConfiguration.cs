@@ -15,7 +15,7 @@ internal sealed class AiTokenUsageLedgerConfiguration : IEntityTypeConfiguration
             .HasConversion(id => id.Value, value => AiTokenUsageLedgerId.From(value));
 
         builder.Property(x => x.UserId).HasMaxLength(200).IsRequired();
-        builder.Property(x => x.TenantId).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.TenantId).IsRequired();
         builder.Property(x => x.ProviderId).HasMaxLength(200).IsRequired();
         builder.Property(x => x.ModelId).HasMaxLength(200).IsRequired();
         builder.Property(x => x.ModelName).HasMaxLength(300).IsRequired();

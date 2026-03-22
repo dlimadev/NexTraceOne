@@ -15,7 +15,7 @@ internal sealed class AiExternalInferenceRecordConfiguration : IEntityTypeConfig
             .HasConversion(id => id.Value, value => AiExternalInferenceRecordId.From(value));
 
         builder.Property(x => x.UserId).HasMaxLength(200).IsRequired();
-        builder.Property(x => x.TenantId).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.TenantId).IsRequired();
         builder.Property(x => x.ProviderId).HasMaxLength(200).IsRequired();
         builder.Property(x => x.ModelName).HasMaxLength(300).IsRequired();
         builder.Property(x => x.OriginalPrompt).HasMaxLength(8000).IsRequired();

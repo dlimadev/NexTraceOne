@@ -68,11 +68,14 @@ internal sealed class AiTokenQuotaPolicyRepository(AiGovernanceDbContext context
             .OrderBy(p => p.Name)
             .ToListAsync(ct);
 
-    public async Task<IReadOnlyList<AiTokenQuotaPolicy>> GetForTenantAsync(string tenantId, CancellationToken ct)
-        => await context.TokenQuotaPolicies
-            .Where(p => p.Scope == "tenant" && p.ScopeValue == tenantId && p.IsEnabled)
+    public async Task<IReadOnlyList<AiTokenQuotaPolicy>> GetForTenantAsync(Guid tenantId, CancellationToken ct)
+    {
+        var tenantIdStr = tenantId.ToString();
+        return await context.TokenQuotaPolicies
+            .Where(p => p.Scope == "tenant" && p.ScopeValue == tenantIdStr && p.IsEnabled)
             .OrderBy(p => p.Name)
             .ToListAsync(ct);
+    }
 
     public async Task AddAsync(AiTokenQuotaPolicy entity, CancellationToken ct)
         => await context.TokenQuotaPolicies.AddAsync(entity, ct);
@@ -89,7 +92,7 @@ internal sealed class AiTokenUsageLedgerRepository(AiGovernanceDbContext context
             .OrderByDescending(e => e.Timestamp)
             .ToListAsync(ct);
 
-    public async Task<IReadOnlyList<AiTokenUsageLedger>> GetByTenantAsync(string tenantId, CancellationToken ct)
+    public async Task<IReadOnlyList<AiTokenUsageLedger>> GetByTenantAsync(Guid tenantId, CancellationToken ct)
         => await context.TokenUsageLedger
             .Where(e => e.TenantId == tenantId)
             .OrderByDescending(e => e.Timestamp)

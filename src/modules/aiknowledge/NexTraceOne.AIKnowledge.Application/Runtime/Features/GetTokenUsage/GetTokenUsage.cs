@@ -14,7 +14,7 @@ public static class GetTokenUsage
 {
     public sealed record Query(
         string? UserId,
-        string? TenantId) : IQuery<Response>;
+        Guid? TenantId) : IQuery<Response>;
 
     public sealed class Handler(
         IAiTokenUsageLedgerRepository usageLedgerRepository) : IQueryHandler<Query, Response>
@@ -29,9 +29,9 @@ public static class GetTokenUsage
             {
                 entries = await usageLedgerRepository.GetByUserAsync(request.UserId, cancellationToken);
             }
-            else if (!string.IsNullOrWhiteSpace(request.TenantId))
+            else if (request.TenantId.HasValue && request.TenantId.Value != Guid.Empty)
             {
-                entries = await usageLedgerRepository.GetByTenantAsync(request.TenantId, cancellationToken);
+                entries = await usageLedgerRepository.GetByTenantAsync(request.TenantId.Value, cancellationToken);
             }
             else
             {
@@ -68,7 +68,7 @@ public static class GetTokenUsage
     public sealed record UsageItem(
         Guid Id,
         string UserId,
-        string TenantId,
+        Guid TenantId,
         string ProviderId,
         string ModelId,
         string ModelName,

@@ -6,6 +6,7 @@ namespace NexTraceOne.AIKnowledge.Tests.Runtime.Domain;
 public sealed class AiTokenUsageLedgerTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
+    private static readonly Guid TestTenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
     [Fact]
     public void Record_WithValidData_ShouldCreateEntry()
@@ -14,7 +15,7 @@ public sealed class AiTokenUsageLedgerTests
 
         var entry = AiTokenUsageLedger.Record(
             userId: "user-1",
-            tenantId: "tenant-1",
+            tenantId: TestTenantId,
             providerId: "openai",
             modelId: "gpt-4o",
             modelName: "GPT-4o",
@@ -32,7 +33,7 @@ public sealed class AiTokenUsageLedgerTests
             durationMs: 1234.5);
 
         entry.UserId.Should().Be("user-1");
-        entry.TenantId.Should().Be("tenant-1");
+        entry.TenantId.Should().Be(TestTenantId);
         entry.ProviderId.Should().Be("openai");
         entry.ModelId.Should().Be("gpt-4o");
         entry.ModelName.Should().Be("GPT-4o");
@@ -54,7 +55,7 @@ public sealed class AiTokenUsageLedgerTests
     public void Record_TotalTokens_ShouldSumPromptAndCompletion()
     {
         var entry = AiTokenUsageLedger.Record(
-            "user-1", "tenant-1", "ollama", "llama3", "Llama 3",
+            "user-1", TestTenantId, "ollama", "llama3", "Llama 3",
             promptTokens: 1000, completionTokens: 2500, totalTokens: 3500,
             null, null, false, null,
             "req-002", "exec-002", FixedNow, "Success", 500.0);
@@ -71,7 +72,7 @@ public sealed class AiTokenUsageLedgerTests
         var policyId = Guid.NewGuid();
 
         var entry = AiTokenUsageLedger.Record(
-            "user-1", "tenant-1", "openai", "gpt-4o", "GPT-4o",
+            "user-1", TestTenantId, "openai", "gpt-4o", "GPT-4o",
             0, 0, 0,
             policyId, "Strict Policy",
             isBlocked: true, blockReason: "Daily limit exceeded",

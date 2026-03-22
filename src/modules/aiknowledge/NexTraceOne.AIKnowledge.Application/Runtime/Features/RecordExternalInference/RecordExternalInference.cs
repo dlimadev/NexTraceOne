@@ -41,7 +41,8 @@ public static class RecordExternalInference
 
     public sealed class Handler(
         IAiExternalInferenceRecordRepository inferenceRecordRepository,
-        ICurrentUser currentUser) : ICommandHandler<Command, Response>
+        ICurrentUser currentUser,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -49,7 +50,7 @@ public static class RecordExternalInference
 
             var record = AiExternalInferenceRecord.Create(
                 userId: currentUser.IsAuthenticated ? currentUser.Id : "anonymous",
-                tenantId: string.Empty,
+                tenantId: currentTenant.Id,
                 providerId: request.ProviderId,
                 modelName: request.ModelName,
                 originalPrompt: request.OriginalPrompt,

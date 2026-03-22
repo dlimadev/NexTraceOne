@@ -10,7 +10,7 @@ public interface IAiTokenQuotaService
     /// <summary>Valida se o consumo estimado está dentro da quota permitida.</summary>
     Task<TokenQuotaValidationResult> ValidateQuotaAsync(
         string userId,
-        string tenantId,
+        Guid tenantId,
         string providerId,
         string modelId,
         int estimatedTokens,
@@ -19,7 +19,7 @@ public interface IAiTokenQuotaService
     /// <summary>Regista o consumo efetivo de tokens no ledger de auditoria.</summary>
     Task RecordUsageAsync(
         string userId,
-        string tenantId,
+        Guid tenantId,
         string providerId,
         string modelId,
         string modelName,
