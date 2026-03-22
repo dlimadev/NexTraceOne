@@ -6,6 +6,7 @@
 *.license
 *.suo
 *.user
+.env
 .env.local
 .idea/
 .vs/

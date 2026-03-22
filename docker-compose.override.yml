@@ -1,0 +1,70 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Docker Compose Override (Desenvolvimento Local)
+#
+# Uso: docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+#
+# Overrides para desenvolvimento:
+#   - ASPNETCORE_ENVIRONMENT=Development (seeds, logs verbose, auto-migrate)
+#   - Source-code bind mounts substituídos por builds de imagem
+#   - Portas adicionais para debug
+#   - auto-migrate ativado
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  apihost:
+    build:
+      context: .
+      dockerfile: Dockerfile.apihost
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      NEXTRACE_AUTO_MIGRATE: "true"
+      NEXTRACE_SKIP_INTEGRITY: "true"
+      # Em Development, as credentials vêm do appsettings.Development.json
+      ConnectionStrings__IdentityDatabase: >-
+        Host=postgres;Port=5432;Database=nextraceone_identity;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+      ConnectionStrings__CatalogDatabase: >-
+        Host=postgres;Port=5432;Database=nextraceone_catalog;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+      ConnectionStrings__NexTraceOne: >-
+        Host=postgres;Port=5432;Database=nextraceone_operations;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+      ConnectionStrings__AiDatabase: >-
+        Host=postgres;Port=5432;Database=nextraceone_ai;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+      Jwt__Secret: NexTraceOne-Development-SecretKey-AtLeast32BytesLong-2024!
+
+  workers:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      NEXTRACE_SKIP_INTEGRITY: "true"
+      ConnectionStrings__IdentityDatabase: >-
+        Host=postgres;Port=5432;Database=nextraceone_identity;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+      ConnectionStrings__NexTraceOne: >-
+        Host=postgres;Port=5432;Database=nextraceone_operations;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+
+  ingestion:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      NEXTRACE_SKIP_INTEGRITY: "true"
+      ConnectionStrings__NexTraceOne: >-
+        Host=postgres;Port=5432;Database=nextraceone_operations;
+        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
+        Maximum Pool Size=15
+      Jwt__Secret: NexTraceOne-Development-SecretKey-AtLeast32BytesLong-2024!
+
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_USER: ${POSTGRES_USER:-nextraceone}
+    ports:
+      - "5432:5432"
