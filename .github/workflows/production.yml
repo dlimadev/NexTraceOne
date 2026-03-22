@@ -1,0 +1,289 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Production Deployment Pipeline
+#
+# Trigger: workflow_dispatch apenas (deploy manual com aprovação)
+# Jobs:
+#   pre-deploy-validation → Valida inputs e regista intenção de deploy
+#   deploy-production     → Migra BD e deploya imagens (requer aprovação via environment)
+#   smoke-check           → Validações pós-deploy
+#   rollback              → Rollback automático em caso de falha (se rollback_tag fornecido)
+#
+# IMPORTANTE: Utiliza imagens pré-construídas do staging — NÃO faz build.
+# A gate de aprovação é gerida pelo GitHub Environment Protection Rules
+# configuradas no environment "production".
+#
+# Requisitos (GitHub Secrets — environment: production):
+#   PRODUCTION_CONN_IDENTITY       Connection string banco identity (production)
+#   PRODUCTION_CONN_CATALOG        Connection string banco catalog (production)
+#   PRODUCTION_CONN_OPERATIONS     Connection string banco operations (production)
+#   PRODUCTION_CONN_AI             Connection string banco ai (production)
+#
+# Requisitos (GitHub Variables — environment: production):
+#   PRODUCTION_APIHOST_URL         URL pública do ApiHost production
+#   PRODUCTION_FRONTEND_URL        URL pública do Frontend production
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to deploy (e.g., staging SHA like abc12345)"
+        required: true
+        type: string
+      rollback_tag:
+        description: "Previous tag to rollback to on failure (optional)"
+        required: false
+        type: string
+        default: ""
+      skip_smoke:
+        description: "Skip smoke checks after deployment"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/nextraceone
+
+jobs:
+
+  # ── pre-deploy-validation ──────────────────────────────────────────────────
+  pre-deploy-validation:
+    name: Pre-Deploy Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate image tag
+        run: |
+          if [[ -z "${{ inputs.image_tag }}" ]]; then
+            echo "::error::image_tag is required and cannot be empty"
+            exit 1
+          fi
+          echo "Image tag validated: ${{ inputs.image_tag }}"
+
+      - name: Log deployment intent
+        run: |
+          echo "## 🚀 Production Deployment Intent" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image Tag | \`${{ inputs.image_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rollback Tag | \`${{ inputs.rollback_tag || 'none' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Skip Smoke | ${{ inputs.skip_smoke }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Triggered by | ${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Timestamp | $(date -u '+%Y-%m-%dT%H:%M:%SZ') |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Git SHA | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── deploy-production ──────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: pre-deploy-validation
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 10.0.5
+
+      - name: Restore solution
+        run: dotnet restore NexTraceOne.sln
+
+      - name: Build (for ef tools)
+        run: dotnet build NexTraceOne.sln --configuration Release --no-restore
+
+      - name: Apply migrations — Production
+        run: |
+          # The interactive confirmation in apply-migrations.sh is a safety net for
+          # manual CLI usage. In this workflow, the approval gate is the GitHub
+          # environment protection rule on the "production" environment — a human
+          # must approve before this job starts. Auto-confirm is safe here.
+          echo "confirmo" | bash scripts/db/apply-migrations.sh --env Production
+        env:
+          MIGRATION_ENV: Production
+          CONN_IDENTITY: ${{ secrets.PRODUCTION_CONN_IDENTITY }}
+          CONN_CATALOG: ${{ secrets.PRODUCTION_CONN_CATALOG }}
+          CONN_OPERATIONS: ${{ secrets.PRODUCTION_CONN_OPERATIONS }}
+          CONN_AI: ${{ secrets.PRODUCTION_CONN_AI }}
+
+      - name: Deploy services — pull and tag for production
+        run: |
+          SERVICES=("apihost" "workers" "ingestion" "frontend")
+          TAG="${{ inputs.image_tag }}"
+
+          for SERVICE in "${SERVICES[@]}"; do
+            SOURCE="${{ env.IMAGE_PREFIX }}-${SERVICE}:${TAG}"
+            TARGET="${{ env.IMAGE_PREFIX }}-${SERVICE}:production"
+
+            echo "Pulling ${SOURCE}..."
+            docker pull "${SOURCE}"
+
+            echo "Tagging ${TARGET}..."
+            docker tag "${SOURCE}" "${TARGET}"
+
+            echo "Pushing ${TARGET}..."
+            docker push "${TARGET}"
+
+            echo "✓ ${SERVICE} deployed with tag ${TAG}"
+          done
+
+      - name: Log deployment metadata
+        run: |
+          echo "## ✅ Production Deployment Complete" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image Tag | \`${{ inputs.image_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Deployed by | ${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Timestamp | $(date -u '+%Y-%m-%dT%H:%M:%SZ') |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Git SHA | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Run ID | ${{ github.run_id }} |" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── smoke-check ────────────────────────────────────────────────────────────
+  smoke-check:
+    name: Post-Deploy Smoke Check
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    if: ${{ !inputs.skip_smoke }}
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for services to stabilize
+        run: |
+          echo "Waiting 30s for production services to be ready..."
+          sleep 30
+
+      - name: Run smoke checks
+        run: |
+          ARGS=()
+
+          APIHOST_URL="${{ vars.PRODUCTION_APIHOST_URL || '' }}"
+          FRONTEND_URL="${{ vars.PRODUCTION_FRONTEND_URL || '' }}"
+
+          if [[ -n "$APIHOST_URL" ]]; then
+            ARGS+=("--api-url" "$APIHOST_URL")
+          else
+            echo "::warning::PRODUCTION_APIHOST_URL not configured — skipping API checks"
+          fi
+
+          if [[ -n "$FRONTEND_URL" ]]; then
+            ARGS+=("--frontend-url" "$FRONTEND_URL")
+          else
+            echo "::warning::PRODUCTION_FRONTEND_URL not configured — skipping frontend checks"
+          fi
+
+          if [[ ${#ARGS[@]} -eq 0 ]]; then
+            echo "::warning::No URLs configured — smoke check has nothing to verify"
+            exit 0
+          fi
+
+          bash scripts/deploy/smoke-check.sh "${ARGS[@]}"
+
+      - name: Report smoke check results
+        if: always()
+        run: |
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "## ✅ Smoke Check Passed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## ❌ Smoke Check Failed" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image Tag | \`${{ inputs.image_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Timestamp | $(date -u '+%Y-%m-%dT%H:%M:%SZ') |" >> "$GITHUB_STEP_SUMMARY"
+
+  # ── rollback ───────────────────────────────────────────────────────────────
+  rollback:
+    name: Rollback Production
+    runs-on: ubuntu-latest
+    needs: smoke-check
+    if: ${{ failure() && inputs.rollback_tag != '' }}
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log rollback initiation
+        run: |
+          echo "## ⚠️ Production Rollback Initiated" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Failed Tag | \`${{ inputs.image_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rolling back to | \`${{ inputs.rollback_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Initiated by | ${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Timestamp | $(date -u '+%Y-%m-%dT%H:%M:%SZ') |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Execute rollback
+        run: |
+          bash scripts/deploy/rollback.sh \
+            --tag "${{ inputs.rollback_tag }}" \
+            --registry "${{ env.IMAGE_PREFIX }}" \
+            --skip-health
+        env:
+          PRODUCTION_APIHOST_URL: ${{ vars.PRODUCTION_APIHOST_URL }}
+          PRODUCTION_FRONTEND_URL: ${{ vars.PRODUCTION_FRONTEND_URL }}
+
+      - name: Verify rollback health
+        run: |
+          echo "Waiting 30s for services to stabilize after rollback..."
+          sleep 30
+
+          ARGS=()
+          APIHOST_URL="${{ vars.PRODUCTION_APIHOST_URL || '' }}"
+          FRONTEND_URL="${{ vars.PRODUCTION_FRONTEND_URL || '' }}"
+
+          if [[ -n "$APIHOST_URL" ]]; then
+            ARGS+=("--api-url" "$APIHOST_URL")
+          fi
+          if [[ -n "$FRONTEND_URL" ]]; then
+            ARGS+=("--frontend-url" "$FRONTEND_URL")
+          fi
+
+          if [[ ${#ARGS[@]} -gt 0 ]]; then
+            bash scripts/deploy/smoke-check.sh "${ARGS[@]}"
+          else
+            echo "::warning::No URLs configured — skipping rollback health verification"
+          fi
+
+      - name: Report rollback status
+        if: always()
+        run: |
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "## ✅ Rollback Successful" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## ❌ Rollback Failed — MANUAL INTERVENTION REQUIRED" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rollback Tag | \`${{ inputs.rollback_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Timestamp | $(date -u '+%Y-%m-%dT%H:%M:%SZ') |" >> "$GITHUB_STEP_SUMMARY"
