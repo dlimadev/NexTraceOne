@@ -110,6 +110,9 @@ public static class ListServiceReliability
             if (!string.IsNullOrWhiteSpace(request.TeamId))
                 filtered = filtered.Where(i => i.TeamName.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase));
 
+            if (!string.IsNullOrWhiteSpace(request.ServiceId))
+                filtered = filtered.Where(i => i.ServiceName.Equals(request.ServiceId, StringComparison.OrdinalIgnoreCase));
+
             if (request.Status.HasValue)
                 filtered = filtered.Where(i => i.ReliabilityStatus == request.Status.Value);
 
@@ -126,9 +129,6 @@ public static class ListServiceReliability
                 filtered = filtered.Where(i =>
                     i.ServiceName.Contains(request.Search, StringComparison.OrdinalIgnoreCase) ||
                     i.DisplayName.Contains(request.Search, StringComparison.OrdinalIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(request.ServiceId))
-                filtered = filtered.Where(i => i.ServiceName.Equals(request.ServiceId, StringComparison.OrdinalIgnoreCase));
 
             var filteredList = filtered.ToList();
             var totalCount = filteredList.Count;

@@ -41,9 +41,9 @@ public static class GetServiceReliabilityCoverage
 
             await Task.WhenAll(signalTask, runbookTask, incidentTask);
 
-            var signal = signalTask.Result;
-            var hasRunbook = runbookTask.Result;
-            var incidents = incidentTask.Result;
+            var signal = await signalTask;
+            var hasRunbook = await runbookTask;
+            var incidents = await incidentTask;
 
             // Sinal operacional válido se capturado nas últimas 24 horas.
             var hasOperationalSignals = signal is not null &&
