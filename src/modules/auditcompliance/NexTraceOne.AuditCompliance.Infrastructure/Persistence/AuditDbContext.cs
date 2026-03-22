@@ -26,6 +26,15 @@ public sealed class AuditDbContext(
     /// <summary>Políticas de retenção.</summary>
     public DbSet<RetentionPolicy> RetentionPolicies => Set<RetentionPolicy>();
 
+    /// <summary>Políticas de compliance.</summary>
+    public DbSet<CompliancePolicy> CompliancePolicies => Set<CompliancePolicy>();
+
+    /// <summary>Campanhas de auditoria.</summary>
+    public DbSet<AuditCampaign> AuditCampaigns => Set<AuditCampaign>();
+
+    /// <summary>Resultados de compliance.</summary>
+    public DbSet<ComplianceResult> ComplianceResults => Set<ComplianceResult>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AuditDbContext).Assembly;
 
