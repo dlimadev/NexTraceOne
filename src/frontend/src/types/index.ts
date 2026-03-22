@@ -2145,6 +2145,115 @@ export interface PlatformOperationsResponse {
   generatedAt: string;
 }
 
+// ── Platform Operations: Health ──────────────────────────────────
+
+export type PlatformSubsystemStatus = 'Healthy' | 'Degraded' | 'Unhealthy';
+
+export interface SubsystemHealthDto {
+  name: string;
+  status: PlatformSubsystemStatus;
+  description: string;
+  lastCheckedAt: string;
+}
+
+export interface PlatformHealthResponse {
+  overallStatus: PlatformSubsystemStatus;
+  subsystems: SubsystemHealthDto[];
+  uptimeSeconds: number;
+  version: string;
+  checkedAt: string;
+}
+
+// ── Platform Operations: Jobs ────────────────────────────────────
+
+export type BackgroundJobStatus = 'Running' | 'Completed' | 'Failed' | 'Scheduled' | 'Disabled';
+
+export interface BackgroundJobSummaryDto {
+  jobId: string;
+  name: string;
+  status: BackgroundJobStatus;
+  lastRunAt: string;
+  nextRunAt: string | null;
+  executionCount: number;
+  failureCount: number;
+  lastError: string | null;
+}
+
+export interface PlatformJobsResponse {
+  jobs: BackgroundJobSummaryDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+// ── Platform Operations: Queues ──────────────────────────────────
+
+export interface QueueSummaryDto {
+  queueName: string;
+  pendingCount: number;
+  processingCount: number;
+  failedCount: number;
+  deadLetterCount: number;
+  averageProcessingMs: number;
+  lastActivityAt: string;
+}
+
+export interface PlatformQueuesResponse {
+  queues: QueueSummaryDto[];
+  checkedAt: string;
+}
+
+// ── Platform Operations: Events ──────────────────────────────────
+
+export type PlatformEventSeverity = 'Info' | 'Warning' | 'Error' | 'Critical';
+
+export interface PlatformOperationalEventDto {
+  eventId: string;
+  timestamp: string;
+  severity: PlatformEventSeverity;
+  subsystem: string;
+  message: string;
+  correlationId: string | null;
+  resolved: boolean;
+}
+
+export interface PlatformEventsResponse {
+  events: PlatformOperationalEventDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+// ── Platform Operations: Config ──────────────────────────────────
+
+export interface FeatureFlagDto {
+  name: string;
+  enabled: boolean;
+  description: string;
+}
+
+export interface SubsystemConfigDto {
+  name: string;
+  enabled: boolean;
+  description: string;
+}
+
+export interface DatabaseConnectivityDto {
+  name: string;
+  provider: string;
+  connected: boolean;
+  statusDescription: string;
+}
+
+export interface PlatformConfigResponse {
+  environmentName: string;
+  deploymentMode: string;
+  featureFlags: FeatureFlagDto[];
+  subsystems: SubsystemConfigDto[];
+  databases: DatabaseConnectivityDto[];
+  generatedAt: string;
+}
+
 // ── Product Analytics: Persona Usage ────────────────────────────
 
 export interface PersonaModuleUsageDto {
@@ -2153,59 +2262,73 @@ export interface PersonaModuleUsageDto {
   actionCount: number;
 }
 
-export interface PersonaUsageDto {
+export interface PersonaUsageProfileDto {
   persona: string;
   activeUsers: number;
   totalActions: number;
-  adoptionDepth: number;
   topModules: PersonaModuleUsageDto[];
   topActions: string[];
-  frictionPoints: string[];
-  milestones: string[];
+  adoptionDepth: number;
+  commonFrictionPoints: string[];
+  milestonesReached: string[];
 }
 
 export interface PersonaUsageResponse {
-  personas: PersonaUsageDto[];
-  generatedAt: string;
+  profiles: PersonaUsageProfileDto[];
+  totalPersonas: number;
+  mostActivePersona: string;
+  deepestAdoptionPersona: string;
+  periodLabel: string;
 }
 
 // ── Product Analytics: Journeys ─────────────────────────────────
 
 export interface JourneyStepDto {
-  step: string;
-  count: number;
-  dropoff: number;
+  stepId: string;
+  stepName: string;
+  completionPercent: number;
+  order: number;
 }
 
-export interface JourneyDto {
+export interface JourneyItemDto {
   journeyId: string;
-  name: string;
-  persona: string;
+  journeyName: string;
   steps: JourneyStepDto[];
   completionRate: number;
-  avgDuration: string;
+  avgDurationMinutes: number;
+  status: string;
+  biggestDropOff: string;
 }
 
 export interface JourneysResponse {
-  journeys: JourneyDto[];
-  generatedAt: string;
+  journeys: JourneyItemDto[];
+  averageCompletionRate: number;
+  mostCompletedJourney: string;
+  highestDropOffJourney: string;
+  periodLabel: string;
 }
 
 // ── Product Analytics: Value Milestones ─────────────────────────
 
-export interface ValueMilestoneDto {
-  milestoneId: string;
-  name: string;
-  description: string;
-  persona: string;
-  reachedByPercent: number;
-  totalReached: number;
-  trend: GovernanceTrendDirection;
+export type MilestoneTrend = 'Improving' | 'Stable' | 'Declining';
+
+export interface MilestoneItemDto {
+  milestoneType: string;
+  milestoneName: string;
+  completionRate: number;
+  avgTimeToReachMinutes: number;
+  usersReached: number;
+  trend: MilestoneTrend;
 }
 
 export interface ValueMilestonesResponse {
-  milestones: ValueMilestoneDto[];
-  generatedAt: string;
+  milestones: MilestoneItemDto[];
+  avgTimeToFirstValueMinutes: number;
+  avgTimeToCoreValueMinutes: number;
+  overallCompletionRate: number;
+  fastestMilestone: string;
+  slowestMilestone: string;
+  periodLabel: string;
 }
 
 // ── Product Analytics: Friction Indicators ──────────────────────
