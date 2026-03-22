@@ -1,21 +1,20 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityTrend;
 
 /// <summary>
-/// Feature: GetServiceReliabilityTrend — obtém a tendência de confiabilidade
-/// de um serviço ao longo do tempo. Retorna direção, período, e indicadores resumidos.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Feature: GetServiceReliabilityTrend — tendência histórica de confiabilidade de um serviço.
+/// Baseada em ReliabilitySnapshot persistidos pelo domínio Reliability.
 /// </summary>
 public static class GetServiceReliabilityTrend
 {
-    /// <summary>Query para obter tendência de confiabilidade de um serviço.</summary>
     public sealed record Query(string ServiceId) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -24,59 +23,86 @@ public static class GetServiceReliabilityTrend
         }
     }
 
-    /// <summary>
-    /// Handler que compõe a tendência de confiabilidade do serviço.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilitySnapshotRepository snapshotRepository,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = request.ServiceId.ToLowerInvariant() switch
+            var history = await snapshotRepository.GetHistoryAsync(
+                request.ServiceId, tenant.Id, 30, cancellationToken);
+
+            if (history.Count == 0)
             {
-                "svc-order-api" => new Response(
-                    "svc-order-api", TrendDirection.Stable, "7d",
-                    "Availability, latency and error rate all within normal ranges over the last 7 days.",
-                    [
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddDays(-7), ReliabilityStatus.Healthy, 99.95m, 0.3m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddDays(-5), ReliabilityStatus.Healthy, 99.97m, 0.2m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddDays(-3), ReliabilityStatus.Healthy, 99.93m, 0.4m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddDays(-1), ReliabilityStatus.Healthy, 99.95m, 0.3m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow, ReliabilityStatus.Healthy, 99.96m, 0.3m),
-                    ]),
-                "svc-payment-gateway" => new Response(
-                    "svc-payment-gateway", TrendDirection.Declining, "24h",
-                    "Error rate increased from 1.0% to 5.2% after deployment v3.1.0.",
-                    [
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddHours(-24), ReliabilityStatus.Healthy, 99.0m, 1.0m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddHours(-18), ReliabilityStatus.Healthy, 99.1m, 0.9m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddHours(-12), ReliabilityStatus.Healthy, 98.8m, 1.2m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow.AddHours(-6), ReliabilityStatus.Degraded, 94.8m, 5.2m),
-                        new TrendDataPoint(DateTimeOffset.UtcNow, ReliabilityStatus.Degraded, 94.5m, 5.5m),
-                    ]),
-                _ => new Response(
-                    request.ServiceId, TrendDirection.Stable, "7d",
+                return Result<Response>.Success(new Response(
+                    request.ServiceId,
+                    TrendDirection.Stable,
+                    "30d",
                     "Insufficient data to determine trend.",
-                    [])
+                    []));
+            }
+
+            var dataPoints = history
+                .OrderBy(s => s.ComputedAt)
+                .Select(s => new TrendDataPoint(
+                    s.ComputedAt,
+                    DeriveReliabilityStatus(s.OverallScore),
+                    s.OverallScore,
+                    ComputeErrorRateFromScore(s.RuntimeHealthScore)))
+                .ToList();
+
+            var latest = history[0];
+            var previous = history.Count > 1 ? history[1] : null;
+            var trend = ComputeTrend(latest.OverallScore, previous?.OverallScore);
+
+            var summary = trend switch
+            {
+                TrendDirection.Improving => $"Reliability improved: score {previous?.OverallScore:F1} → {latest.OverallScore:F1}.",
+                TrendDirection.Declining => $"Reliability declined: score {previous?.OverallScore:F1} → {latest.OverallScore:F1}.",
+                _ => $"Reliability stable at {latest.OverallScore:F1} over the last {history.Count} snapshots."
             };
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(new Response(
+                request.ServiceId, trend, "30d", summary, dataPoints));
         }
+
+        private static TrendDirection ComputeTrend(decimal current, decimal? previous)
+        {
+            if (previous is null) return TrendDirection.Stable;
+            if (current > previous.Value + 5m) return TrendDirection.Improving;
+            if (current < previous.Value - 5m) return TrendDirection.Declining;
+            return TrendDirection.Stable;
+        }
+
+        private static ReliabilityStatus DeriveReliabilityStatus(decimal overallScore) =>
+            overallScore switch
+            {
+                >= 75m => ReliabilityStatus.Healthy,
+                >= 60m => ReliabilityStatus.NeedsAttention,
+                >= 40m => ReliabilityStatus.Degraded,
+                _ => ReliabilityStatus.Unavailable
+            };
+
+        private static decimal ComputeErrorRateFromScore(decimal runtimeHealthScore) =>
+            runtimeHealthScore switch
+            {
+                100m => 0m,
+                60m => 5m,
+                20m => 15m,
+                _ => 0m
+            };
     }
 
-    /// <summary>Ponto de dados na tendência de confiabilidade.</summary>
     public sealed record TrendDataPoint(
         DateTimeOffset Timestamp,
         ReliabilityStatus Status,
-        decimal AvailabilityPercent,
+        decimal OverallScore,
         decimal ErrorRatePercent);
 
-    /// <summary>Resposta com tendência de confiabilidade do serviço.</summary>
     public sealed record Response(
         string ServiceId,
         TrendDirection Direction,
         string Timeframe,
         string Summary,
-        IReadOnlyList<TrendDataPoint> DataPoints,
-        bool IsSimulated = true,
-        string DataSource = "demo");
+        IReadOnlyList<TrendDataPoint> DataPoints);
 }

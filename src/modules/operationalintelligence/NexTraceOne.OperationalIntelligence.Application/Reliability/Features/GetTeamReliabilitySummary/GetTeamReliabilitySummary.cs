@@ -1,23 +1,20 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilitySummary;
 
 /// <summary>
-/// Feature: GetTeamReliabilitySummary — obtém o resumo agregado de confiabilidade
-/// dos serviços de uma equipa. Retorna contagens por estado, serviços críticos
-/// impactados e indicadores de atenção.
-/// IMPLEMENTATION STATUS: Demo — returns illustrative data until service reliability
-/// entries are created from real runtime snapshots.
+/// Feature: GetTeamReliabilitySummary — resumo agregado de confiabilidade dos serviços de uma equipa.
+/// Baseia-se em dados reais de incidentes associados ao teamId.
 /// </summary>
 public static class GetTeamReliabilitySummary
 {
-    /// <summary>Query para obter resumo de confiabilidade por equipa.</summary>
     public sealed record Query(string TeamId) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -26,29 +23,52 @@ public static class GetTeamReliabilitySummary
         }
     }
 
-    /// <summary>
-    /// Handler que compõe o resumo agregado de confiabilidade da equipa.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilityIncidentSurface incidentSurface,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Simula dados agregados da equipa.
-            var response = request.TeamId.ToLowerInvariant() switch
-            {
-                "order-squad" => new Response("order-squad", 3, 2, 0, 0, 1, 1),
-                "payment-squad" => new Response("payment-squad", 1, 0, 1, 0, 0, 1),
-                "platform-squad" => new Response("platform-squad", 2, 1, 0, 1, 0, 1),
-                "identity-squad" => new Response("identity-squad", 2, 2, 0, 0, 0, 0),
-                "data-squad" => new Response("data-squad", 1, 0, 0, 0, 1, 0),
-                _ => new Response(request.TeamId, 0, 0, 0, 0, 0, 0)
-            };
+            var incidents = await incidentSurface.GetTeamIncidentsAsync(request.TeamId, tenant.Id, cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var serviceIds = incidents.Select(i => i.ServiceId).Distinct().ToList();
+            var totalServices = serviceIds.Count;
+
+            var criticalServices = incidents
+                .Where(i => i.Severity == IncidentSeverity.Critical.ToString())
+                .Select(i => i.ServiceId)
+                .Distinct()
+                .Count();
+
+            // Classificação simplificada por serviço baseada em incidentes activos.
+            var unavailableCount = incidents
+                .Where(i => i.Severity == IncidentSeverity.Critical.ToString() &&
+                    (i.Status == IncidentStatus.Open.ToString() || i.Status == IncidentStatus.Investigating.ToString()))
+                .Select(i => i.ServiceId).Distinct().Count();
+
+            var degradedCount = incidents
+                .Where(i => i.Severity == IncidentSeverity.Major.ToString())
+                .Select(i => i.ServiceId).Distinct().Count();
+
+            var needsAttentionCount = incidents
+                .Where(i => i.Severity == IncidentSeverity.Minor.ToString() || i.Severity == IncidentSeverity.Warning.ToString())
+                .Select(i => i.ServiceId).Distinct().Count();
+
+            var healthyCount = Math.Max(0, totalServices - unavailableCount - degradedCount - needsAttentionCount);
+
+            var response = new Response(
+                request.TeamId,
+                totalServices,
+                healthyCount,
+                degradedCount,
+                unavailableCount,
+                needsAttentionCount,
+                criticalServices);
+
+            return Result<Response>.Success(response);
         }
     }
 
-    /// <summary>Resposta com resumo agregado de confiabilidade da equipa. IsSimulated=true indica dados demonstrativos.</summary>
     public sealed record Response(
         string TeamId,
         int TotalServices,
@@ -56,7 +76,5 @@ public static class GetTeamReliabilitySummary
         int DegradedServices,
         int UnavailableServices,
         int NeedsAttentionServices,
-        int CriticalServicesImpacted,
-        bool IsSimulated = true,
-        string? DataSource = "demo");
+        int CriticalServicesImpacted);
 }

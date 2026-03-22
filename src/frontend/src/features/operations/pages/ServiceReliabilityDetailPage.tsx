@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Activity, CheckCircle, AlertTriangle, XCircle,
   TrendingUp, TrendingDown, Minus, Shield, ArrowLeft,
@@ -9,72 +10,9 @@ import { NavLink } from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
-import { DemoBanner } from '../../../components/DemoBanner';
-
-const mockDetails: Record<string, {
-  identity: { serviceId: string; displayName: string; serviceType: string; domain: string; teamName: string; criticality: string };
-  status: string;
-  summary: string;
-  trend: { direction: string; timeframe: string; summary: string };
-  metrics: { availability: number; latency: number; errorRate: number; rps: number };
-  flags: number;
-  changes: { id: string; description: string; type: string; confidence: string; date: string }[];
-  incidents: { id: string; ref: string; title: string; status: string; date: string }[];
-  dependencies: { serviceId: string; displayName: string; status: string }[];
-  contracts: { id: string; name: string; version: string; protocol: string; state: string }[];
-  runbooks: { title: string; url: string }[];
-  anomaly: string;
-  coverage: { signals: boolean; runbook: boolean; owner: boolean; deps: boolean; changes: boolean; incidents: boolean };
-}> = {
-  'svc-order-api': {
-    identity: { serviceId: 'svc-order-api', displayName: 'Order API', serviceType: 'RestApi', domain: 'Orders', teamName: 'order-squad', criticality: 'Critical' },
-    status: 'Healthy',
-    summary: 'reliability.mock.orderApiSummary',
-    trend: { direction: 'Stable', timeframe: '7d', summary: 'reliability.mock.orderApiTrend' },
-    metrics: { availability: 99.95, latency: 45.2, errorRate: 0.3, rps: 1250 },
-    flags: 0,
-    changes: [{ id: '1', description: 'v2.4.1 — Performance tuning', type: 'Deployment', confidence: 'Validated', date: '3 days ago' }],
-    incidents: [],
-    dependencies: [
-      { serviceId: 'svc-payment-gateway', displayName: 'Payment Gateway', status: 'Degraded' },
-      { serviceId: 'svc-inventory-consumer', displayName: 'Inventory Consumer', status: 'NeedsAttention' },
-    ],
-    contracts: [{ id: '1', name: 'Order API v2', version: '2.4.0', protocol: 'REST', state: 'Published' }],
-    runbooks: [{ title: 'Order API — Incident Response', url: '#' }],
-    anomaly: 'reliability.mock.noAnomalies',
-    coverage: { signals: true, runbook: true, owner: true, deps: true, changes: true, incidents: true },
-  },
-  'svc-payment-gateway': {
-    identity: { serviceId: 'svc-payment-gateway', displayName: 'Payment Gateway', serviceType: 'RestApi', domain: 'Payments', teamName: 'payment-squad', criticality: 'Critical' },
-    status: 'Degraded',
-    summary: 'reliability.mock.paymentGwSummary',
-    trend: { direction: 'Declining', timeframe: '24h', summary: 'reliability.mock.paymentGwTrend' },
-    metrics: { availability: 94.8, latency: 320.5, errorRate: 5.2, rps: 890 },
-    flags: 5,
-    changes: [{ id: '2', description: 'v3.1.0 — New retry logic', type: 'Deployment', confidence: 'NeedsAttention', date: '6 hours ago' }],
-    incidents: [],
-    dependencies: [{ serviceId: 'svc-auth-gateway', displayName: 'Auth Gateway', status: 'Healthy' }],
-    contracts: [{ id: '2', name: 'Payment API v3', version: '3.1.0', protocol: 'REST', state: 'Published' }],
-    runbooks: [{ title: 'Payment Gateway — Degradation Playbook', url: '#' }],
-    anomaly: 'reliability.mock.paymentGwAnomaly',
-    coverage: { signals: true, runbook: true, owner: true, deps: true, changes: true, incidents: true },
-  },
-  'svc-catalog-sync': {
-    identity: { serviceId: 'svc-catalog-sync', displayName: 'Catalog Sync', serviceType: 'IntegrationComponent', domain: 'Catalog', teamName: 'platform-squad', criticality: 'Medium' },
-    status: 'Unavailable',
-    summary: 'reliability.mock.catalogSyncSummary',
-    trend: { direction: 'Declining', timeframe: '2h', summary: 'reliability.mock.catalogSyncTrend' },
-    metrics: { availability: 0, latency: 0, errorRate: 100, rps: 0 },
-    flags: 10,
-    changes: [],
-    incidents: [{ id: '1', ref: 'INC-2024-0042', title: 'Integration partner outage', status: 'Open', date: '2 hours ago' }],
-    dependencies: [],
-    contracts: [],
-    runbooks: [],
-    anomaly: 'reliability.mock.catalogSyncAnomaly',
-    coverage: { signals: true, runbook: false, owner: true, deps: false, changes: false, incidents: true },
-  },
-};
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { reliabilityApi } from '../api/reliability';
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
@@ -98,18 +36,31 @@ export function ServiceReliabilityDetailPage() {
   const { serviceId } = useParams<{ serviceId: string }>();
   const { t } = useTranslation();
 
-  const data = serviceId ? mockDetails[serviceId] : undefined;
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['reliability-detail', serviceId],
+    queryFn: () => reliabilityApi.getServiceDetail(serviceId!),
+    enabled: !!serviceId,
+    staleTime: 30_000,
+    retry: false,
+  });
 
-  if (!data) {
+  if (isLoading) return <PageLoadingState />;
+
+  if (isError) {
+    const isNotFound = (error as { response?: { status?: number } })?.response?.status === 404;
     return (
       <PageContainer>
         <NavLink to="/operations/reliability" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
-          <ArrowLeft size={14} /> {t('common.back')}
+          <ArrowLeft size={14} /> {t('reliability.detail.backToOverview')}
         </NavLink>
-        <div className="text-center text-muted py-12">{t('reliability.detail.notFound')}</div>
+        <div className="text-center text-muted py-12">
+          {isNotFound ? t('reliability.detail.notFound') : t('reliability.loadError')}
+        </div>
       </PageContainer>
     );
   }
+
+  if (!data) return null;
 
   const badge = statusBadge(data.status);
 
@@ -118,9 +69,6 @@ export function ServiceReliabilityDetailPage() {
       <NavLink to="/operations/reliability" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
         <ArrowLeft size={14} /> {t('reliability.detail.backToOverview')}
       </NavLink>
-
-      {/* Demo data banner */}
-      <DemoBanner className="mb-4" />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
@@ -136,10 +84,10 @@ export function ServiceReliabilityDetailPage() {
 
       {/* Overview Cards */}
       <div className="grid md:grid-cols-4 gap-4 mb-6">
-        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.availability')}</p><p className="text-lg font-semibold text-heading">{data.metrics.availability}%</p></CardBody></Card>
-        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.latencyP99')}</p><p className="text-lg font-semibold text-heading">{data.metrics.latency} ms</p></CardBody></Card>
-        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.errorRate')}</p><p className="text-lg font-semibold text-heading">{data.metrics.errorRate}%</p></CardBody></Card>
-        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.throughput')}</p><p className="text-lg font-semibold text-heading">{data.metrics.rps} rps</p></CardBody></Card>
+        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.availability')}</p><p className="text-lg font-semibold text-heading">{data.metrics.availabilityPercent.toFixed(2)}%</p></CardBody></Card>
+        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.latencyP99')}</p><p className="text-lg font-semibold text-heading">{data.metrics.latencyP99Ms.toFixed(1)} ms</p></CardBody></Card>
+        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.errorRate')}</p><p className="text-lg font-semibold text-heading">{data.metrics.errorRatePercent.toFixed(2)}%</p></CardBody></Card>
+        <Card><CardBody><p className="text-xs text-muted">{t('reliability.detail.throughput')}</p><p className="text-lg font-semibold text-heading">{data.metrics.requestsPerSecond.toFixed(0)} rps</p></CardBody></Card>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -147,12 +95,12 @@ export function ServiceReliabilityDetailPage() {
         <Card>
           <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><Activity size={16} className="text-accent" />{t('reliability.detail.operationalSummary')}</h2></CardHeader>
           <CardBody>
-            <p className="text-sm text-body">{t(data.summary)}</p>
+            <p className="text-sm text-body">{data.operationalSummary}</p>
             <div className="mt-3 flex items-center gap-2 text-xs text-muted">
               {trendIcon(data.trend.direction)}
               <span>{t(`reliability.trend.${data.trend.direction}`)} · {data.trend.timeframe}</span>
             </div>
-            <p className="text-xs text-muted mt-1">{t(data.trend.summary)}</p>
+            {data.trend.summary && <p className="text-xs text-muted mt-1">{data.trend.summary}</p>}
           </CardBody>
         </Card>
 
@@ -160,7 +108,7 @@ export function ServiceReliabilityDetailPage() {
         <Card>
           <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><AlertTriangle size={16} className="text-amber-500" />{t('reliability.detail.anomalySummary')}</h2></CardHeader>
           <CardBody>
-            <p className="text-sm text-body">{t(data.anomaly)}</p>
+            <p className="text-sm text-body">{data.anomalySummary}</p>
           </CardBody>
         </Card>
 
@@ -179,15 +127,15 @@ export function ServiceReliabilityDetailPage() {
         <Card>
           <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><GitBranch size={16} className="text-accent" />{t('reliability.detail.recentChanges')}</h2></CardHeader>
           <CardBody>
-            {data.changes.length === 0 ? (
+            {data.recentChanges.length === 0 ? (
               <p className="text-sm text-muted">{t('reliability.detail.noRecentChanges')}</p>
             ) : (
               <ul className="space-y-2">
-                {data.changes.map(c => (
-                  <li key={c.id} className="text-sm">
+                {data.recentChanges.map(c => (
+                  <li key={c.changeId} className="text-sm">
                     <span className="text-body">{c.description}</span>
-                    <span className="text-xs text-muted ml-2">{c.date}</span>
-                    <Badge variant={c.confidence === 'Validated' ? 'success' : 'warning'} className="ml-2 text-[10px]">{c.confidence}</Badge>
+                    <span className="text-xs text-muted ml-2">{new Date(c.deployedAt).toLocaleDateString()}</span>
+                    <Badge variant={c.confidenceStatus === 'Validated' ? 'success' : 'warning'} className="ml-2 text-[10px]">{c.confidenceStatus}</Badge>
                   </li>
                 ))}
               </ul>
@@ -199,16 +147,16 @@ export function ServiceReliabilityDetailPage() {
         <Card>
           <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><AlertTriangle size={16} className="text-red-500" />{t('reliability.detail.linkedIncidents')}</h2></CardHeader>
           <CardBody>
-            {data.incidents.length === 0 ? (
+            {data.linkedIncidents.length === 0 ? (
               <p className="text-sm text-muted">{t('reliability.detail.noIncidents')}</p>
             ) : (
               <ul className="space-y-2">
-                {data.incidents.map(inc => (
-                  <li key={inc.id} className="text-sm">
-                    <span className="font-medium text-heading">{inc.ref}</span>
+                {data.linkedIncidents.map(inc => (
+                  <li key={inc.incidentId} className="text-sm">
+                    <span className="font-medium text-heading">{inc.reference}</span>
                     <span className="text-body ml-2">{inc.title}</span>
                     <Badge variant="danger" className="ml-2 text-[10px]">{inc.status}</Badge>
-                    <span className="text-xs text-muted ml-2">{inc.date}</span>
+                    <span className="text-xs text-muted ml-2">{new Date(inc.reportedAt).toLocaleDateString()}</span>
                   </li>
                 ))}
               </ul>
@@ -244,14 +192,14 @@ export function ServiceReliabilityDetailPage() {
         <Card>
           <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><FileText size={16} className="text-accent" />{t('reliability.detail.linkedContracts')}</h2></CardHeader>
           <CardBody>
-            {data.contracts.length === 0 ? (
+            {data.linkedContracts.length === 0 ? (
               <p className="text-sm text-muted">{t('reliability.detail.noContracts')}</p>
             ) : (
               <ul className="space-y-2">
-                {data.contracts.map(c => (
-                  <li key={c.id} className="text-sm">
+                {data.linkedContracts.map(c => (
+                  <li key={c.contractVersionId} className="text-sm">
                     <span className="text-body">{c.name}</span>
-                    <span className="text-xs text-muted ml-2">v{c.version} · {c.protocol} · {c.state}</span>
+                    <span className="text-xs text-muted ml-2">v{c.version} · {c.protocol} · {c.lifecycleState}</span>
                   </li>
                 ))}
               </ul>
@@ -269,7 +217,11 @@ export function ServiceReliabilityDetailPage() {
               <ul className="space-y-2">
                 {data.runbooks.map((r, i) => (
                   <li key={i} className="text-sm">
-                    <a href={r.url} className="text-accent hover:underline">{r.title}</a>
+                    {r.url ? (
+                      <a href={r.url} className="text-accent hover:underline">{r.title}</a>
+                    ) : (
+                      <span className="text-body">{r.title}</span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -283,7 +235,14 @@ export function ServiceReliabilityDetailPage() {
         <CardHeader><h2 className="text-sm font-semibold text-heading">{t('reliability.detail.coverage')}</h2></CardHeader>
         <CardBody>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {Object.entries(data.coverage).map(([key, value]) => (
+            {[
+              { key: 'signals', value: data.coverage.hasOperationalSignals },
+              { key: 'runbook', value: data.coverage.hasRunbook },
+              { key: 'owner', value: data.coverage.hasOwner },
+              { key: 'deps', value: data.coverage.hasDependenciesMapped },
+              { key: 'changes', value: data.coverage.hasRecentChangeContext },
+              { key: 'incidents', value: data.coverage.hasIncidentLinkage },
+            ].map(({ key, value }) => (
               <div key={key} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border ${value ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600' : 'border-red-500/20 bg-red-500/5 text-red-500'}`}>
                 {value ? <CheckCircle size={14} /> : <XCircle size={14} />}
                 {t(`reliability.coverage.${key}`)}

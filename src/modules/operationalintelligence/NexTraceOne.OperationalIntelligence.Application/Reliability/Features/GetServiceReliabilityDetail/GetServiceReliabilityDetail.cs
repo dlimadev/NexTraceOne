@@ -1,22 +1,21 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityDetail;
 
 /// <summary>
-/// Feature: GetServiceReliabilityDetail — obtém a visão consolidada de confiabilidade
-/// para um serviço específico. Inclui identidade, estado atual, resumo operacional,
-/// tendência, mudanças recentes, incidentes, dependências, contratos e runbooks.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Feature: GetServiceReliabilityDetail — visão consolidada real de confiabilidade de um serviço.
+/// Compõe dados de RuntimeIntelligence, Incidents e Reliability snapshots históricos.
 /// </summary>
 public static class GetServiceReliabilityDetail
 {
-    /// <summary>Query para obter detalhe de confiabilidade de um serviço.</summary>
     public sealed record Query(string ServiceId) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -25,149 +24,195 @@ public static class GetServiceReliabilityDetail
         }
     }
 
-    /// <summary>
-    /// Handler que compõe a visão detalhada de confiabilidade de um serviço.
-    /// Simula composição cross-module até integração completa.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilityRuntimeSurface runtimeSurface,
+        IReliabilityIncidentSurface incidentSurface,
+        IReliabilitySnapshotRepository snapshotRepository,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Simula dados do serviço para demonstrar a estrutura da resposta.
-            // Em produção, compõe dados de Catalog, RuntimeIntelligence,
-            // ChangeGovernance e SourceOfTruth via contratos de módulo.
+            var signal = await runtimeSurface.GetLatestSignalAsync(request.ServiceId, string.Empty, cancellationToken);
+            var incidents = await incidentSurface.GetActiveIncidentsAsync(request.ServiceId, tenant.Id, cancellationToken);
+            var history = await snapshotRepository.GetHistoryAsync(request.ServiceId, tenant.Id, 2, cancellationToken);
 
-            var response = BuildSimulatedResponse(request.ServiceId);
-
-            if (response is null)
+            if (signal is null && incidents.Count == 0)
             {
-                Result<Response> error = Error.NotFound("Reliability.ServiceNotFound",
+                Result<Response> notFound = Error.NotFound("Reliability.ServiceNotFound",
                     "Service '{0}' not found", request.ServiceId);
-                return Task.FromResult(error);
+                return notFound;
             }
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var obsScore = await runtimeSurface.GetObservabilityScoreAsync(
+                request.ServiceId, signal?.Environment ?? string.Empty, cancellationToken);
+
+            var runtimeHealthScore = ComputeRuntimeHealthScore(signal?.HealthStatus);
+            var incidentImpactScore = ComputeIncidentImpactScore(incidents);
+            var observabilityScore = obsScore is not null ? obsScore.Value * 100m : 50m;
+            var overallScore = Math.Round((runtimeHealthScore * 0.50m) + (incidentImpactScore * 0.30m) + (observabilityScore * 0.20m), 2);
+
+            var trend = ComputeTrend(overallScore, history);
+            var openIncidentCount = incidents.Count;
+            var reliabilityStatus = DeriveReliabilityStatus(signal?.HealthStatus, overallScore, openIncidentCount);
+            var flags = DeriveOperationalFlags(incidents, signal);
+            var teamName = incidents.FirstOrDefault(i => !string.IsNullOrEmpty(i.TeamName))?.TeamName ?? string.Empty;
+
+            var linkedIncidents = incidents.Select(i => new IncidentSummaryItem(
+                Guid.Empty,
+                string.Empty,
+                $"{i.Severity} incident",
+                i.Status,
+                i.DetectedAt)).ToList();
+
+            var coverage = new ReliabilityCoverageIndicators(
+                HasOperationalSignals: signal is not null,
+                HasRunbook: false,
+                HasOwner: !string.IsNullOrEmpty(teamName),
+                HasDependenciesMapped: false,
+                HasRecentChangeContext: false,
+                HasIncidentLinkage: openIncidentCount > 0);
+
+            var metrics = signal is not null
+                ? new OperationalMetrics(
+                    AvailabilityPercent: signal.ErrorRate > 0 ? Math.Round((1m - signal.ErrorRate) * 100m, 2) : 100m,
+                    LatencyP99Ms: signal.P99LatencyMs,
+                    ErrorRatePercent: Math.Round(signal.ErrorRate * 100m, 2),
+                    RequestsPerSecond: signal.RequestsPerSecond,
+                    QueueLag: null,
+                    ProcessingDelay: null)
+                : new OperationalMetrics(0m, 0m, 0m, 0m, null, null);
+
+            var anomalySummary = signal?.HealthStatus is "Degraded" or "Unhealthy"
+                ? $"Health anomaly detected: service is {signal.HealthStatus}. Error rate: {signal.ErrorRate * 100m:F1}%, P99: {signal.P99LatencyMs:F0}ms."
+                : "No anomalies detected.";
+
+            var response = new Response(
+                Identity: new ServiceIdentity(request.ServiceId, request.ServiceId, string.Empty, string.Empty, teamName, string.Empty),
+                Status: reliabilityStatus,
+                OperationalSummary: BuildOperationalSummary(reliabilityStatus, signal, openIncidentCount),
+                Trend: new TrendSummary(trend, "30d", BuildTrendSummary(trend, history)),
+                Metrics: metrics,
+                ActiveFlags: flags,
+                RecentChanges: [],
+                LinkedIncidents: linkedIncidents,
+                Dependencies: [],
+                LinkedContracts: [],
+                Runbooks: [],
+                AnomalySummary: anomalySummary,
+                Coverage: coverage);
+
+            return Result<Response>.Success(response);
         }
 
-        private static Response? BuildSimulatedResponse(string serviceId)
-        {
-            return serviceId.ToLowerInvariant() switch
+        private static decimal ComputeRuntimeHealthScore(string? healthStatus) =>
+            healthStatus switch
             {
-                "svc-order-api" => new Response(
-                    Identity: new ServiceIdentity("svc-order-api", "Order API", "RestApi", "Orders", "order-squad", "Critical"),
-                    Status: ReliabilityStatus.Healthy,
-                    OperationalSummary: "Service operating within expected parameters. All health checks passing.",
-                    Trend: new TrendSummary(TrendDirection.Stable, "7d", "All indicators stable over the last 7 days"),
-                    Metrics: new OperationalMetrics(99.95m, 45.2m, 0.3m, 1250m, null, null),
-                    ActiveFlags: OperationalFlag.None,
-                    RecentChanges: [
-                        new ChangeSummaryItem(Guid.NewGuid(), "v2.4.1 — Performance tuning", "Deployment", "Validated", DateTimeOffset.UtcNow.AddDays(-3)),
-                    ],
-                    LinkedIncidents: [],
-                    Dependencies: [
-                        new DependencySummaryItem("svc-payment-gateway", "Payment Gateway", ReliabilityStatus.Degraded),
-                        new DependencySummaryItem("svc-inventory-consumer", "Inventory Consumer", ReliabilityStatus.NeedsAttention),
-                    ],
-                    LinkedContracts: [
-                        new ContractSummaryItem(Guid.NewGuid(), "Order API v2", "2.4.0", "REST", "Published"),
-                    ],
-                    Runbooks: [
-                        new RunbookSummaryItem("Order API — Incident Response", "https://docs.internal/runbooks/order-api"),
-                    ],
-                    AnomalySummary: "No anomalies detected in the last 24 hours.",
-                    Coverage: new ReliabilityCoverageIndicators(true, true, true, true, true, true),
-                    IsSimulated: true),
-
-                "svc-payment-gateway" => new Response(
-                    Identity: new ServiceIdentity("svc-payment-gateway", "Payment Gateway", "RestApi", "Payments", "payment-squad", "Critical"),
-                    Status: ReliabilityStatus.Degraded,
-                    OperationalSummary: "Elevated error rate (5.2%) detected since last deployment. Latency P99 above threshold.",
-                    Trend: new TrendSummary(TrendDirection.Declining, "24h", "Error rate increased 40% after deployment v3.1.0"),
-                    Metrics: new OperationalMetrics(94.8m, 320.5m, 5.2m, 890m, null, null),
-                    ActiveFlags: OperationalFlag.AnomalyDetected | OperationalFlag.RecentChangeImpact,
-                    RecentChanges: [
-                        new ChangeSummaryItem(Guid.NewGuid(), "v3.1.0 — New retry logic", "Deployment", "NeedsAttention", DateTimeOffset.UtcNow.AddHours(-6)),
-                    ],
-                    LinkedIncidents: [],
-                    Dependencies: [
-                        new DependencySummaryItem("svc-auth-gateway", "Auth Gateway", ReliabilityStatus.Healthy),
-                    ],
-                    LinkedContracts: [
-                        new ContractSummaryItem(Guid.NewGuid(), "Payment API v3", "3.1.0", "REST", "Published"),
-                    ],
-                    Runbooks: [
-                        new RunbookSummaryItem("Payment Gateway — Degradation Playbook", "https://docs.internal/runbooks/payment-gw"),
-                    ],
-                    AnomalySummary: "Error rate anomaly detected: 5.2% vs expected 1.0%. Correlated with recent change v3.1.0.",
-                    Coverage: new ReliabilityCoverageIndicators(true, true, true, true, true, true),
-                    IsSimulated: true),
-
-                "svc-catalog-sync" => new Response(
-                    Identity: new ServiceIdentity("svc-catalog-sync", "Catalog Sync", "IntegrationComponent", "Catalog", "platform-squad", "Medium"),
-                    Status: ReliabilityStatus.Unavailable,
-                    OperationalSummary: "Integration partner unreachable. Service unable to complete sync operations.",
-                    Trend: new TrendSummary(TrendDirection.Declining, "2h", "Connectivity lost 2 hours ago"),
-                    Metrics: new OperationalMetrics(0m, 0m, 100m, 0m, null, null),
-                    ActiveFlags: OperationalFlag.IncidentLinked | OperationalFlag.DependencyRisk,
-                    RecentChanges: [],
-                    LinkedIncidents: [
-                        new IncidentSummaryItem(Guid.NewGuid(), "INC-2024-0042", "Integration partner outage", "Open", DateTimeOffset.UtcNow.AddHours(-2)),
-                    ],
-                    Dependencies: [],
-                    LinkedContracts: [],
-                    Runbooks: [],
-                    AnomalySummary: "Complete service failure — dependency unavailable.",
-                    Coverage: new ReliabilityCoverageIndicators(true, false, false, false, false, true),
-                    IsSimulated: true),
-
-                _ => null
+                "Healthy" => 100m,
+                "Degraded" => 60m,
+                "Unhealthy" => 20m,
+                _ => 50m
             };
+
+        private static decimal ComputeIncidentImpactScore(IReadOnlyList<ReliabilityIncidentSignal> incidents)
+        {
+            if (incidents.Count == 0) return 100m;
+            var penaltyTotal = 0m;
+            foreach (var incident in incidents)
+            {
+                penaltyTotal += incident.Severity switch
+                {
+                    _ when incident.Severity == IncidentSeverity.Critical.ToString() => 30m,
+                    _ when incident.Severity == IncidentSeverity.Major.ToString() => 20m,
+                    _ when incident.Severity == IncidentSeverity.Minor.ToString() => 10m,
+                    _ when incident.Severity == IncidentSeverity.Warning.ToString() => 5m,
+                    _ => 0m
+                };
+            }
+            return Math.Max(0m, 100m - penaltyTotal);
         }
+
+        private static TrendDirection ComputeTrend(decimal currentScore, IReadOnlyList<Domain.Reliability.Entities.ReliabilitySnapshot> history)
+        {
+            if (history.Count < 2) return TrendDirection.Stable;
+            var previous = history[1].OverallScore;
+            if (currentScore > previous + 5m) return TrendDirection.Improving;
+            if (currentScore < previous - 5m) return TrendDirection.Declining;
+            return TrendDirection.Stable;
+        }
+
+        private static string BuildTrendSummary(TrendDirection trend, IReadOnlyList<Domain.Reliability.Entities.ReliabilitySnapshot> history) =>
+            trend switch
+            {
+                TrendDirection.Improving => "Reliability score improved over the last period.",
+                TrendDirection.Declining => "Reliability score declined over the last period.",
+                _ => history.Count == 0 ? "Insufficient history to determine trend." : "Score stable over the last period."
+            };
+
+        private static ReliabilityStatus DeriveReliabilityStatus(string? healthStatus, decimal overallScore, int openIncidents)
+        {
+            if (healthStatus == "Unhealthy" || openIncidents > 0 && overallScore < 40m)
+                return ReliabilityStatus.Unavailable;
+            if (healthStatus == "Degraded" || overallScore < 60m)
+                return ReliabilityStatus.Degraded;
+            if (overallScore < 75m || openIncidents > 0)
+                return ReliabilityStatus.NeedsAttention;
+            return ReliabilityStatus.Healthy;
+        }
+
+        private static OperationalFlag DeriveOperationalFlags(
+            IReadOnlyList<ReliabilityIncidentSignal> incidents, RuntimeServiceSignal? signal)
+        {
+            var flags = OperationalFlag.None;
+            if (incidents.Count > 0) flags |= OperationalFlag.IncidentLinked;
+            if (signal?.HealthStatus is "Degraded" or "Unhealthy") flags |= OperationalFlag.AnomalyDetected;
+            return flags;
+        }
+
+        private static string BuildOperationalSummary(
+            ReliabilityStatus status, RuntimeServiceSignal? signal, int openIncidents) =>
+            status switch
+            {
+                ReliabilityStatus.Healthy => "Service operating within expected parameters. All health checks passing.",
+                ReliabilityStatus.Degraded => $"Degraded performance detected. Error rate: {signal?.ErrorRate * 100m:F1}%. P99 latency: {signal?.P99LatencyMs:F0}ms.",
+                ReliabilityStatus.Unavailable => $"Service unavailable or severely impaired. {openIncidents} active incident(s).",
+                ReliabilityStatus.NeedsAttention => $"{openIncidents} open incident(s) require attention.",
+                _ => string.Empty
+            };
     }
 
-    /// <summary>Identidade do serviço.</summary>
     public sealed record ServiceIdentity(
         string ServiceId, string DisplayName, string ServiceType,
         string Domain, string TeamName, string Criticality);
 
-    /// <summary>Resumo da tendência de confiabilidade.</summary>
     public sealed record TrendSummary(
         TrendDirection Direction, string Timeframe, string Summary);
 
-    /// <summary>Métricas operacionais resumidas.</summary>
     public sealed record OperationalMetrics(
         decimal AvailabilityPercent, decimal LatencyP99Ms, decimal ErrorRatePercent,
         decimal RequestsPerSecond, decimal? QueueLag, decimal? ProcessingDelay);
 
-    /// <summary>Mudança recente associada ao serviço.</summary>
     public sealed record ChangeSummaryItem(
         Guid ChangeId, string Description, string ChangeType,
         string ConfidenceStatus, DateTimeOffset DeployedAt);
 
-    /// <summary>Incidente associado ao serviço.</summary>
     public sealed record IncidentSummaryItem(
         Guid IncidentId, string Reference, string Title,
         string Status, DateTimeOffset ReportedAt);
 
-    /// <summary>Dependência do serviço com estado de confiabilidade.</summary>
     public sealed record DependencySummaryItem(
         string ServiceId, string DisplayName, ReliabilityStatus Status);
 
-    /// <summary>Contrato associado ao serviço.</summary>
     public sealed record ContractSummaryItem(
         Guid ContractVersionId, string Name, string Version,
         string Protocol, string LifecycleState);
 
-    /// <summary>Runbook associado ao serviço.</summary>
     public sealed record RunbookSummaryItem(string Title, string? Url);
 
-    /// <summary>Indicadores de cobertura operacional.</summary>
     public sealed record ReliabilityCoverageIndicators(
         bool HasOperationalSignals, bool HasRunbook, bool HasOwner,
         bool HasDependenciesMapped, bool HasRecentChangeContext,
         bool HasIncidentLinkage);
 
-    /// <summary>Resposta consolidada de confiabilidade do serviço.</summary>
     public sealed record Response(
         ServiceIdentity Identity,
         ReliabilityStatus Status,
@@ -181,6 +226,5 @@ public static class GetServiceReliabilityDetail
         IReadOnlyList<ContractSummaryItem> LinkedContracts,
         IReadOnlyList<RunbookSummaryItem> Runbooks,
         string AnomalySummary,
-        ReliabilityCoverageIndicators Coverage,
-        bool IsSimulated);
+        ReliabilityCoverageIndicators Coverage);
 }

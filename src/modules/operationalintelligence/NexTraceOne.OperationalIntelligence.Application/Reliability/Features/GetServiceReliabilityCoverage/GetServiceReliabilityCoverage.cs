@@ -1,22 +1,24 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityCoverage;
 
 /// <summary>
-/// Feature: GetServiceReliabilityCoverage — obtém os indicadores de cobertura
-/// e prontidão operacional de um serviço. Indica se o serviço tem sinais,
-/// runbooks, ownership, dependências mapeadas, contexto de mudanças e linkage
-/// com incidentes. Relevante para Platform Admin e Auditor.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Feature: GetServiceReliabilityCoverage — indicadores reais de cobertura operacional de um serviço.
+/// HasOperationalSignals: runtime signal dentro de 24h.
+/// HasRunbook: RunbookRecord.LinkedService == serviceId.
+/// HasOwner: incidente com OwnerTeam preenchido.
+/// HasDependenciesMapped: false (catálogo não integrado).
+/// HasRecentChangeContext: false (ChangeGovernance não integrado).
+/// HasIncidentLinkage: qualquer incidente ativo.
 /// </summary>
 public static class GetServiceReliabilityCoverage
 {
-    /// <summary>Query para obter cobertura operacional de um serviço.</summary>
     public sealed record Query(string ServiceId) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -25,29 +27,42 @@ public static class GetServiceReliabilityCoverage
         }
     }
 
-    /// <summary>
-    /// Handler que compõe os indicadores de cobertura operacional do serviço.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilityRuntimeSurface runtimeSurface,
+        IReliabilityIncidentSurface incidentSurface,
+        IReliabilitySnapshotRepository snapshotRepository,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = request.ServiceId.ToLowerInvariant() switch
-            {
-                "svc-order-api" => new Response("svc-order-api", true, true, true, true, true, true),
-                "svc-payment-gateway" => new Response("svc-payment-gateway", true, true, true, true, true, true),
-                "svc-notification-worker" => new Response("svc-notification-worker", true, false, true, true, false, false),
-                "svc-inventory-consumer" => new Response("svc-inventory-consumer", true, false, true, true, true, false),
-                "svc-catalog-sync" => new Response("svc-catalog-sync", true, false, true, false, false, true),
-                "svc-report-scheduler" => new Response("svc-report-scheduler", false, false, true, false, false, false),
-                _ => new Response(request.ServiceId, false, false, false, false, false, false)
-            };
+            var signalTask = runtimeSurface.GetLatestSignalAsync(request.ServiceId, string.Empty, cancellationToken);
+            var runbookTask = incidentSurface.HasRunbookAsync(request.ServiceId, cancellationToken);
+            var incidentTask = incidentSurface.GetActiveIncidentsAsync(request.ServiceId, tenant.Id, cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            await Task.WhenAll(signalTask, runbookTask, incidentTask);
+
+            var signal = await signalTask;
+            var hasRunbook = await runbookTask;
+            var incidents = await incidentTask;
+
+            // Sinal operacional válido se capturado nas últimas 24 horas.
+            var hasOperationalSignals = signal is not null &&
+                signal.CapturedAt >= DateTimeOffset.UtcNow.AddHours(-24);
+
+            var hasOwner = incidents.Any(i => !string.IsNullOrEmpty(i.TeamName));
+            var hasIncidentLinkage = incidents.Count > 0;
+
+            return Result<Response>.Success(new Response(
+                request.ServiceId,
+                hasOperationalSignals,
+                hasRunbook,
+                hasOwner,
+                HasDependenciesMapped: false,
+                HasRecentChangeContext: false,
+                hasIncidentLinkage));
         }
     }
 
-    /// <summary>Resposta com indicadores de cobertura operacional do serviço.</summary>
     public sealed record Response(
         string ServiceId,
         bool HasOperationalSignals,
@@ -55,7 +70,5 @@ public static class GetServiceReliabilityCoverage
         bool HasOwner,
         bool HasDependenciesMapped,
         bool HasRecentChangeContext,
-        bool HasIncidentLinkage,
-        bool IsSimulated = true,
-        string DataSource = "demo");
+        bool HasIncidentLinkage);
 }

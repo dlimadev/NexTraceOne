@@ -2007,60 +2007,125 @@ export interface IngestionFreshnessResponse {
 
 // ── Reliability ─────────────────────────────────────────────────
 
-export interface ServiceReliabilityDto {
-  serviceId: string;
+export interface ServiceReliabilityItem {
   serviceName: string;
-  team: string;
-  domain: string;
-  environment: string;
+  displayName: string;
   serviceType: string;
+  domain: string;
+  teamName: string;
   criticality: string;
-  reliabilityScore: number;
-  status: string;
+  reliabilityStatus: string;
+  operationalSummary: string;
+  trend: string;
+  activeFlags: number;
   openIncidents: number;
-  sloCompliance: number;
-  mttr: string;
-  runbookCoverage: number;
-  lastIncidentAt: string | null;
+  recentChangeImpact: boolean;
+  overallScore: number;
+  lastComputedAt: string;
 }
 
 export interface ServiceReliabilityListResponse {
-  services: ServiceReliabilityDto[];
+  items: ServiceReliabilityItem[];
   totalCount: number;
   page: number;
   pageSize: number;
 }
 
-export interface ServiceReliabilityDetailResponse {
+export interface ServiceReliabilityDetailIdentity {
   serviceId: string;
-  serviceName: string;
-  team: string;
-  domain: string;
-  environment: string;
+  displayName: string;
   serviceType: string;
+  domain: string;
+  teamName: string;
   criticality: string;
-  reliabilityScore: number;
+}
+
+export interface ServiceReliabilityDetailMetrics {
+  availabilityPercent: number;
+  latencyP99Ms: number;
+  errorRatePercent: number;
+  requestsPerSecond: number;
+  queueLag: number | null;
+  processingDelay: number | null;
+}
+
+export interface ServiceReliabilityDetailTrend {
+  direction: string;
+  timeframe: string;
+  summary: string;
+}
+
+export interface ServiceReliabilityCoverage {
+  hasOperationalSignals: boolean;
+  hasRunbook: boolean;
+  hasOwner: boolean;
+  hasDependenciesMapped: boolean;
+  hasRecentChangeContext: boolean;
+  hasIncidentLinkage: boolean;
+}
+
+export interface ServiceReliabilityDetailIncident {
+  incidentId: string;
+  reference: string;
+  title: string;
   status: string;
-  sloCompliance: number;
-  mttr: string;
-  runbookCoverage: number;
-  openIncidents: number;
-  recentIncidents: Array<{ incidentId: string; title: string; severity: string; createdAt: string }>;
-  coverageIndicators: { hasRunbook: boolean; hasSlo: boolean; hasOwnership: boolean; hasDependencyMap: boolean; hasAlerts: boolean };
-  generatedAt: string;
+  reportedAt: string;
+}
+
+export interface ServiceReliabilityDetailChange {
+  changeId: string;
+  description: string;
+  changeType: string;
+  confidenceStatus: string;
+  deployedAt: string;
+}
+
+export interface ServiceReliabilityDetailDependency {
+  serviceId: string;
+  displayName: string;
+  status: string;
+}
+
+export interface ServiceReliabilityDetailContract {
+  contractVersionId: string;
+  name: string;
+  version: string;
+  protocol: string;
+  lifecycleState: string;
+}
+
+export interface ServiceReliabilityDetailRunbook {
+  title: string;
+  url: string | null;
+}
+
+export interface ServiceReliabilityDetailResponse {
+  identity: ServiceReliabilityDetailIdentity;
+  status: string;
+  operationalSummary: string;
+  trend: ServiceReliabilityDetailTrend;
+  metrics: ServiceReliabilityDetailMetrics;
+  activeFlags: number;
+  recentChanges: ServiceReliabilityDetailChange[];
+  linkedIncidents: ServiceReliabilityDetailIncident[];
+  dependencies: ServiceReliabilityDetailDependency[];
+  linkedContracts: ServiceReliabilityDetailContract[];
+  runbooks: ServiceReliabilityDetailRunbook[];
+  anomalySummary: string;
+  coverage: ServiceReliabilityCoverage;
 }
 
 export interface TeamReliabilitySummaryResponse {
   teamId: string;
-  teamName: string;
-  overallScore: number;
-  serviceCount: number;
-  criticalServices: number;
+  totalServices: number;
+  healthyServices: number;
+  degradedServices: number;
+  unavailableServices: number;
+  needsAttentionServices: number;
+  criticalServicesImpacted: number;
   openIncidents: number;
-  avgSloCompliance: number;
-  avgRunbookCoverage: number;
-  services: ServiceReliabilityDto[];
-  generatedAt: string;
+  overallScore: number;
+  trend: string;
 }
 
 // ── Platform Operations ─────────────────────────────────────────

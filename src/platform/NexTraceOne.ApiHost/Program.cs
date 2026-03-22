@@ -28,6 +28,7 @@ using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
 using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
 using NexTraceOne.IdentityAccess.API.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
+using NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -65,6 +66,7 @@ builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddGovernanceModule(builder.Configuration);
 builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
+builder.Services.AddReliabilityModule(builder.Configuration);
 builder.Services.AddCostIntelligenceModule(builder.Configuration);
 builder.Services.AddAiGovernanceModule(builder.Configuration);
 builder.Services.AddExternalAiModule(builder.Configuration);

@@ -1266,10 +1266,7 @@
   "reliability": {
     "title": "Confiabilidade de Serviços",
     "subtitle": "Visão de confiabilidade por equipa — saúde, tendências e contexto operacional",
-    "demoBanner": {
-      "title": "Dados de Demonstração:",
-      "description": "Os dados apresentados nesta página são simulados para fins de demonstração. Dados reais estarão disponíveis quando a integração entre módulos estiver completa."
-    },
+    "loadError": "Falha ao carregar dados de confiabilidade. Por favor, tente novamente.",
     "totalServices": "Total de Serviços",
     "healthyServices": "Saudáveis",
     "degradedServices": "Degradados",

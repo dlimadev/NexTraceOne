@@ -1,21 +1,20 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetDomainReliabilitySummary;
 
 /// <summary>
-/// Feature: GetDomainReliabilitySummary — obtém o resumo agregado de confiabilidade
-/// dos serviços de um domínio de negócio. Similar ao resumo por equipa, mas agrupado
-/// por domínio para visão de Architect e Executive.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Feature: GetDomainReliabilitySummary — resumo agregado de confiabilidade por domínio de negócio.
+/// Baseia-se em dados reais de incidentes com ImpactedDomain == domainId.
 /// </summary>
 public static class GetDomainReliabilitySummary
 {
-    /// <summary>Query para obter resumo de confiabilidade por domínio.</summary>
     public sealed record Query(string DomainId) : IQuery<Response>;
 
-    /// <summary>Valida os parâmetros de consulta.</summary>
     public sealed class Validator : AbstractValidator<Query>
     {
         public Validator()
@@ -24,29 +23,51 @@ public static class GetDomainReliabilitySummary
         }
     }
 
-    /// <summary>
-    /// Handler que compõe o resumo agregado de confiabilidade do domínio.
-    /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IReliabilityIncidentSurface incidentSurface,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = request.DomainId.ToLowerInvariant() switch
-            {
-                "orders" => new Response("Orders", 2, 2, 0, 0, 0, 0),
-                "payments" => new Response("Payments", 1, 0, 1, 0, 0, 1),
-                "identity" => new Response("Identity", 2, 2, 0, 0, 0, 0),
-                "catalog" => new Response("Catalog", 1, 0, 0, 1, 0, 0),
-                "notifications" => new Response("Notifications", 1, 1, 0, 0, 0, 0),
-                "analytics" => new Response("Analytics", 1, 0, 0, 0, 1, 0),
-                _ => new Response(request.DomainId, 0, 0, 0, 0, 0, 0)
-            };
+            var incidents = await incidentSurface.GetDomainIncidentsAsync(request.DomainId, tenant.Id, cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var serviceIds = incidents.Select(i => i.ServiceId).Distinct().ToList();
+            var totalServices = serviceIds.Count;
+
+            var criticalServices = incidents
+                .Where(i => i.Severity == IncidentSeverity.Critical.ToString())
+                .Select(i => i.ServiceId)
+                .Distinct()
+                .Count();
+
+            var unavailableCount = incidents
+                .Where(i => i.Severity == IncidentSeverity.Critical.ToString() &&
+                    (i.Status == IncidentStatus.Open.ToString() || i.Status == IncidentStatus.Investigating.ToString()))
+                .Select(i => i.ServiceId).Distinct().Count();
+
+            var degradedCount = incidents
+                .Where(i => i.Severity == IncidentSeverity.Major.ToString())
+                .Select(i => i.ServiceId).Distinct().Count();
+
+            var needsAttentionCount = incidents
+                .Where(i => i.Severity == IncidentSeverity.Minor.ToString() || i.Severity == IncidentSeverity.Warning.ToString())
+                .Select(i => i.ServiceId).Distinct().Count();
+
+            var healthyCount = Math.Max(0, totalServices - unavailableCount - degradedCount - needsAttentionCount);
+
+            var response = new Response(
+                request.DomainId,
+                totalServices,
+                healthyCount,
+                degradedCount,
+                unavailableCount,
+                needsAttentionCount,
+                criticalServices);
+
+            return Result<Response>.Success(response);
         }
     }
 
-    /// <summary>Resposta com resumo agregado de confiabilidade do domínio.</summary>
     public sealed record Response(
         string DomainId,
         int TotalServices,
@@ -54,7 +75,5 @@ public static class GetDomainReliabilitySummary
         int DegradedServices,
         int UnavailableServices,
         int NeedsAttentionServices,
-        int CriticalServicesImpacted,
-        bool IsSimulated = true,
-        string DataSource = "demo");
+        int CriticalServicesImpacted);
 }
