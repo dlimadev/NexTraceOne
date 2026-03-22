@@ -59,6 +59,10 @@ internal sealed class IngestionExecutionConfiguration : IEntityTypeConfiguration
         builder.Property(x => x.ErrorCode)
             .HasMaxLength(100);
 
+        builder.Property(x => x.RetryAttempt)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         builder.Property(x => x.CreatedAt)
             .HasColumnType("timestamp with time zone")
             .IsRequired();
@@ -80,6 +84,7 @@ internal sealed class IngestionExecutionConfiguration : IEntityTypeConfiguration
         builder.HasIndex(x => x.CorrelationId);
         builder.HasIndex(x => x.StartedAt);
         builder.HasIndex(x => x.Result);
+        builder.HasIndex(x => x.RetryAttempt);
         builder.HasIndex(x => new { x.ConnectorId, x.StartedAt });
     }
 }

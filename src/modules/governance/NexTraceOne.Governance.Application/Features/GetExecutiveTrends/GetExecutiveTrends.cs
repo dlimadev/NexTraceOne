@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetExecutiveTrends;
@@ -15,76 +16,102 @@ public static class GetExecutiveTrends
         string Category) : IQuery<Response>;
 
     /// <summary>Handler que computa séries temporais e insights para tendências executivas.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IGovernanceAnalyticsRepository analyticsRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var category = request.Category;
 
+            // Get real data from repository for 6 months
+            var waiverCounts = await analyticsRepository.GetWaiverCountsByMonthAsync(6, cancellationToken);
+            var packCounts = await analyticsRepository.GetPublishedPackCountsByMonthAsync(6, cancellationToken);
+            var rolloutCounts = await analyticsRepository.GetRolloutCountsByMonthAsync(6, cancellationToken);
+
+            // Build trend series from real data
             var series = new List<TrendSeriesDto>
             {
-                new("Reliability Score", TrendDirection.Improving, new List<TrendDataPointDto>
-                {
-                    new("2024-07", 72.0m),
-                    new("2024-08", 74.5m),
-                    new("2024-09", 73.0m),
-                    new("2024-10", 78.0m),
-                    new("2024-11", 80.5m),
-                    new("2024-12", 82.0m)
-                }),
-                new("Change Safety Score", TrendDirection.Improving, new List<TrendDataPointDto>
-                {
-                    new("2024-07", 65.0m),
-                    new("2024-08", 68.0m),
-                    new("2024-09", 66.5m),
-                    new("2024-10", 71.0m),
-                    new("2024-11", 74.0m),
-                    new("2024-12", 76.5m)
-                }),
-                new("Incident Rate", TrendDirection.Improving, new List<TrendDataPointDto>
-                {
-                    new("2024-07", 14.0m),
-                    new("2024-08", 12.5m),
-                    new("2024-09", 13.0m),
-                    new("2024-10", 11.0m),
-                    new("2024-11", 9.5m),
-                    new("2024-12", 8.0m)
-                }),
-                new("Maturity Index", TrendDirection.Stable, new List<TrendDataPointDto>
-                {
-                    new("2024-07", 55.0m),
-                    new("2024-08", 56.5m),
-                    new("2024-09", 57.0m),
-                    new("2024-10", 58.0m),
-                    new("2024-11", 58.5m),
-                    new("2024-12", 59.0m)
-                })
+                new("Governance Waiver Requests", CalculateTrend(waiverCounts), waiverCounts.Select(w => new TrendDataPointDto(w.Period, w.Count)).ToList()),
+                new("Published Governance Packs", CalculateTrend(packCounts), packCounts.Select(p => new TrendDataPointDto(p.Period, p.Count)).ToList()),
+                new("Pack Rollouts", CalculateTrend(rolloutCounts), rolloutCounts.Select(r => new TrendDataPointDto(r.Period, r.Count)).ToList())
             };
 
-            var insights = new List<TrendInsightDto>
-            {
-                new("Reliability score improved 14% over 6 months driven by reduced timeout incidents in Payments domain",
-                    "Fewer customer-facing errors and improved SLA compliance",
-                    "Continue investment in retry-pattern improvements and circuit breaker adoption"),
-                new("Change safety score shows consistent upward trend after introduction of automated blast radius analysis",
-                    "Reduced rollback frequency from 12% to 5% of deployments",
-                    "Expand automated validation to Integration and Analytics domains"),
-                new("Incident rate declined 43% with strongest improvement in last quarter",
-                    "Lower operational burden and improved team focus on feature delivery",
-                    "Address recurring incidents in Commerce domain to sustain improvement trajectory"),
-                new("Maturity index advancing slowly despite significant gains in individual dimensions",
-                    "Integration and Commerce teams pulling down aggregate scores",
-                    "Prioritize targeted maturity programs for lowest-scoring teams with clear milestones")
-            };
+            // Generate insights based on data
+            var insights = GenerateInsights(waiverCounts, packCounts, rolloutCounts);
 
             var response = new Response(
                 Category: category,
                 Series: series,
                 Insights: insights,
                 GeneratedAt: DateTimeOffset.UtcNow,
-                IsSimulated: true);
+                IsSimulated: false);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
+        }
+
+        private static TrendDirection CalculateTrend(IReadOnlyList<MonthlyCount> data)
+        {
+            if (data.Count < 2) return TrendDirection.Stable;
+
+            var firstHalf = data.Take(data.Count / 2).Average(d => d.Count);
+            var secondHalf = data.Skip(data.Count / 2).Average(d => d.Count);
+
+            var changePercent = firstHalf > 0 ? ((secondHalf - firstHalf) / firstHalf) * 100 : 0;
+
+            return changePercent switch
+            {
+                > 10 => TrendDirection.Improving,
+                < -10 => TrendDirection.Declining,
+                _ => TrendDirection.Stable
+            };
+        }
+
+        private static List<TrendInsightDto> GenerateInsights(
+            IReadOnlyList<MonthlyCount> waiverCounts,
+            IReadOnlyList<MonthlyCount> packCounts,
+            IReadOnlyList<MonthlyCount> rolloutCounts)
+        {
+            var insights = new List<TrendInsightDto>();
+
+            // Waiver insights
+            var totalWaivers = waiverCounts.Sum(w => w.Count);
+            if (totalWaivers > 0)
+            {
+                insights.Add(new TrendInsightDto(
+                    Insight: $"{totalWaivers} governance waiver requests in the last {waiverCounts.Count} months",
+                    Impact: "Indicates areas where standard governance may need refinement",
+                    Recommendation: "Review waiver patterns to identify systematic governance gaps"));
+            }
+
+            // Pack insights
+            var totalPacks = packCounts.Sum(p => p.Count);
+            if (totalPacks > 0)
+            {
+                insights.Add(new TrendInsightDto(
+                    Insight: $"{totalPacks} governance packs published in the last {packCounts.Count} months",
+                    Impact: "Growing governance coverage across domains",
+                    Recommendation: "Ensure pack adoption through rollout tracking and compliance monitoring"));
+            }
+
+            // Rollout insights
+            var totalRollouts = rolloutCounts.Sum(r => r.Count);
+            if (totalRollouts > 0)
+            {
+                insights.Add(new TrendInsightDto(
+                    Insight: $"{totalRollouts} governance pack rollouts executed in the last {rolloutCounts.Count} months",
+                    Impact: "Active governance enforcement across scopes",
+                    Recommendation: "Monitor rollout success rates and address blocked rollouts"));
+            }
+
+            // Fallback insight if no data
+            if (insights.Count == 0)
+            {
+                insights.Add(new TrendInsightDto(
+                    Insight: "Limited governance activity data available",
+                    Impact: "Unable to assess governance maturity trends",
+                    Recommendation: "Activate governance packs and establish baseline metrics"));
+            }
+
+            return insights;
         }
     }
 

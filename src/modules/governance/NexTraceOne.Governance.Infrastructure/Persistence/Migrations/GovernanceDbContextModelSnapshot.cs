@@ -532,6 +532,11 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("SourceId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("RetryAttempt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -542,6 +547,8 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("CorrelationId");
 
                     b.HasIndex("Result");
+
+                    b.HasIndex("RetryAttempt");
 
                     b.HasIndex("SourceId");
 
@@ -565,6 +572,13 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
                     b.Property<long>("DataItemsProcessed")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("DataDomain")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
@@ -612,6 +626,8 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ConnectorId");
 
+                    b.HasIndex("DataDomain");
+
                     b.HasIndex("FreshnessStatus");
 
                     b.HasIndex("Name");
@@ -630,6 +646,17 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AllowedTeams")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("AuthenticationMode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasDefaultValue("Not configured");
+
                     b.Property<string>("ConnectorType")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -645,6 +672,13 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<string>("Endpoint")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("Production");
 
                     b.Property<long>("FailedExecutions")
                         .HasColumnType("bigint");
@@ -672,6 +706,13 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("PollingMode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasDefaultValue("Not configured");
+
                     b.Property<string>("Provider")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -694,6 +735,8 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ConnectorType");
+
+                    b.HasIndex("Environment");
 
                     b.HasIndex("Health");
 

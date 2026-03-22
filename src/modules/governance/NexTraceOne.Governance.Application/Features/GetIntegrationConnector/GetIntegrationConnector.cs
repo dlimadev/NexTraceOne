@@ -48,7 +48,7 @@ public static class GetIntegrationConnector
                 ConnectorType: connector.ConnectorType,
                 Provider: connector.Provider,
                 Status: connector.Status.ToString(),
-                Environment: "Production", // TODO: add Environment field to entity
+                Environment: connector.Environment,
                 HealthStatus: connector.Health.ToString(),
                 LastSuccessAt: connector.LastSuccessAt,
                 LastFailureAt: connector.LastErrorAt,
@@ -57,8 +57,8 @@ public static class GetIntegrationConnector
                 Description: connector.Description ?? "No description available",
                 Configuration: new ConfigurationSummary(
                     Endpoint: connector.Endpoint ?? "Not configured",
-                    AuthenticationMode: "OAuth2 App Token", // TODO: add to entity
-                    PollingMode: "Webhook + Polling", // TODO: add to entity
+                    AuthenticationMode: connector.AuthenticationMode,
+                    PollingMode: connector.PollingMode,
                     RetryPolicy: "Exponential backoff, max 3 retries",
                     IsEnabled: connector.Status == Domain.Enums.ConnectorStatus.Active,
                     AllowedDataDomains: new[] { "Changes", "Runtime", "Alerts" }),
@@ -72,7 +72,7 @@ public static class GetIntegrationConnector
                     Errors: e.Result == Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
                     .ToList(),
                 SourceScope: sources.Select(s => s.Name).ToList(),
-                AllowedTeams: new List<string> { "platform-squad" }); // TODO: add ownership
+                AllowedTeams: connector.AllowedTeams.ToList());
 
             return Result<Response>.Success(response);
         }

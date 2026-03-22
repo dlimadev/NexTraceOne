@@ -17,7 +17,9 @@ public static class ListGovernancePacks
         string? Status = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna o catálogo de governance packs.</summary>
-    public sealed class Handler(IGovernancePackRepository packRepository) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernancePackRepository packRepository,
+        IGovernancePackVersionRepository versionRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -34,18 +36,25 @@ public static class ListGovernancePacks
 
             var packs = await packRepository.ListAsync(categoryFilter, statusFilter, cancellationToken);
 
-            var dtos = packs.Select(p => new GovernancePackDto(
-                PackId: p.Id.Value.ToString(),
-                Name: p.Name,
-                DisplayName: p.DisplayName,
-                Description: p.Description ?? string.Empty,
-                Category: p.Category,
-                Status: p.Status,
-                CurrentVersion: p.CurrentVersion ?? "0.0.0",
-                ScopeCount: 0,   // TODO: enriquecer com contagem real de scopes
-                RuleCount: 0,    // TODO: enriquecer com contagem real de rules
-                CreatedAt: p.CreatedAt
-            )).ToList();
+            // Build DTOs with rule counts from latest versions
+            var dtos = new List<GovernancePackDto>();
+            foreach (var p in packs)
+            {
+                var latestVersion = await versionRepository.GetLatestByPackIdAsync(p.Id, cancellationToken);
+                int ruleCount = latestVersion?.Rules.Count ?? 0;
+
+                dtos.Add(new GovernancePackDto(
+                    PackId: p.Id.Value.ToString(),
+                    Name: p.Name,
+                    DisplayName: p.DisplayName,
+                    Description: p.Description ?? string.Empty,
+                    Category: p.Category,
+                    Status: p.Status,
+                    CurrentVersion: p.CurrentVersion ?? "0.0.0",
+                    ScopeCount: 0,   // TODO: enriquecer com contagem real de scopes (future work)
+                    RuleCount: ruleCount,
+                    CreatedAt: p.CreatedAt));
+            }
 
             var response = new Response(
                 TotalPacks: dtos.Count,

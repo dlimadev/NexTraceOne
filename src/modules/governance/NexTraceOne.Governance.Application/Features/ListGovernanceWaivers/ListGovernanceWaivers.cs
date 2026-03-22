@@ -20,7 +20,8 @@ public static class ListGovernanceWaivers
     /// <summary>Handler que retorna o catálogo de waivers de governança.</summary>
     public sealed class Handler(
         IGovernanceWaiverRepository waiverRepository,
-        IGovernancePackRepository packRepository) : IQueryHandler<Query, Response>
+        IGovernancePackRepository packRepository,
+        IGovernancePackVersionRepository versionRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -39,11 +40,17 @@ public static class ListGovernanceWaivers
             // Obter nomes dos packs para enriquecer DTOs
             var packIds = waivers.Select(w => w.PackId).Distinct().ToList();
             var packs = new Dictionary<GovernancePackId, GovernancePack>();
+            var packVersions = new Dictionary<GovernancePackId, IReadOnlyList<GovernanceRuleBinding>>();
+            
             foreach (var pid in packIds)
             {
                 var pack = await packRepository.GetByIdAsync(pid, cancellationToken);
                 if (pack is not null)
                     packs[pid] = pack;
+
+                var latestVersion = await versionRepository.GetLatestByPackIdAsync(pid, cancellationToken);
+                if (latestVersion is not null)
+                    packVersions[pid] = latestVersion.Rules;
             }
 
             var dtos = waivers.Select(w => new WaiverDto(
@@ -51,7 +58,7 @@ public static class ListGovernanceWaivers
                 PackId: w.PackId.Value.ToString(),
                 PackName: packs.TryGetValue(w.PackId, out var p) ? p.DisplayName : "Unknown",
                 RuleId: w.RuleId ?? string.Empty,
-                RuleName: w.RuleId ?? "(Entire Pack)", // TODO: resolver nome real da regra
+                RuleName: ResolveRuleName(w.RuleId, w.PackId, packVersions),
                 Scope: w.Scope,
                 ScopeType: w.ScopeType.ToString(),
                 Justification: w.Justification,
@@ -70,6 +77,17 @@ public static class ListGovernanceWaivers
                 Waivers: dtos);
 
             return Result<Response>.Success(response);
+        }
+
+        private static string ResolveRuleName(string? ruleId, GovernancePackId packId, Dictionary<GovernancePackId, IReadOnlyList<GovernanceRuleBinding>> packVersions)
+        {
+            if (string.IsNullOrEmpty(ruleId)) return "(Entire Pack)";
+            if (packVersions.TryGetValue(packId, out var rules))
+            {
+                var rule = rules.FirstOrDefault(r => r.RuleId.Equals(ruleId, StringComparison.OrdinalIgnoreCase));
+                if (rule is not null) return rule.RuleName;
+            }
+            return ruleId; // fallback: show rule ID if name not found
         }
     }
 

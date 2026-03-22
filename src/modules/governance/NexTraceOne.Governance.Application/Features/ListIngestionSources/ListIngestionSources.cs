@@ -76,7 +76,7 @@ public static class ListIngestionSources
                     ConnectorId: s.ConnectorId.Value,
                     ConnectorName: connectorNames.TryGetValue(s.ConnectorId, out var name) ? name : "Unknown",
                     SourceType: s.SourceType,
-                    DataDomain: s.SourceType, // TODO: add DataDomain field to entity
+                    DataDomain: string.IsNullOrEmpty(s.DataDomain) ? s.SourceType : s.DataDomain,
                     TrustLevel: s.TrustLevel.ToString(),
                     Freshness: s.FreshnessStatus.ToString(),
                     LastReceivedAt: s.LastDataReceivedAt,

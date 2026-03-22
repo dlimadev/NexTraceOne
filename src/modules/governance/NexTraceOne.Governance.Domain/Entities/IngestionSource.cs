@@ -25,6 +25,9 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
     /// <summary>Tipo de fonte (ex: "Webhook", "API Polling", "Stream").</summary>
     public string SourceType { get; private set; } = string.Empty;
 
+    /// <summary>Data domain this source provides data for (ex: "Changes", "Incidents", "Runtime").</summary>
+    public string DataDomain { get; private set; } = string.Empty;
+
     /// <summary>Descrição da fonte e seu propósito.</summary>
     public string? Description { get; private set; }
 
@@ -64,6 +67,7 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
         IntegrationConnectorId connectorId,
         string name,
         string sourceType,
+        string? dataDomain,
         string? description,
         string? endpoint,
         int? expectedIntervalMinutes,
@@ -81,6 +85,7 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
             ConnectorId = connectorId,
             Name = name.Trim(),
             SourceType = sourceType.Trim(),
+            DataDomain = dataDomain?.Trim() ?? sourceType.Trim(),
             Description = description?.Trim(),
             Endpoint = endpoint?.Trim(),
             TrustLevel = SourceTrustLevel.Unverified,
@@ -127,6 +132,14 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
     public void Activate(DateTimeOffset utcNow)
     {
         Status = SourceStatus.Active;
+        UpdatedAt = utcNow;
+    }
+
+    /// <summary>Atualiza o domínio de dados da fonte.</summary>
+    public void UpdateDataDomain(string dataDomain, DateTimeOffset utcNow)
+    {
+        Guard.Against.NullOrWhiteSpace(dataDomain, nameof(dataDomain));
+        DataDomain = dataDomain.Trim();
         UpdatedAt = utcNow;
     }
 
