@@ -425,7 +425,9 @@ export const EnvironmentComparisonPage: React.FC = () => {
                               before: compareQuery.data.beforeMetrics.p99LatencyMs,
                               after: compareQuery.data.afterMetrics.p99LatencyMs,
                               unit: 'ms',
-                              delta: compareQuery.data.latencyDeltaPercent,
+                              delta: compareQuery.data.beforeMetrics.p99LatencyMs > 0
+                                ? Math.round(((compareQuery.data.afterMetrics.p99LatencyMs - compareQuery.data.beforeMetrics.p99LatencyMs) / compareQuery.data.beforeMetrics.p99LatencyMs) * 100 * 100) / 100
+                                : 0,
                             },
                             {
                               label: t('environmentComparison.metrics.errorRate'),
