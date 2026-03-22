@@ -69,12 +69,7 @@ export function ExecutiveFinOpsPage() {
       <PageHeader
         title={t('governance.finops.executiveTitle')}
         subtitle={t('governance.finops.executiveSubtitle')}
-      >
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
-          <span className="text-xs text-muted">{t('governance.preview.finopsReason')}</span>
-        </div>
-      </PageHeader>
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

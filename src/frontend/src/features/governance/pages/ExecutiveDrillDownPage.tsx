@@ -11,7 +11,6 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { DemoBanner } from '../../../components/DemoBanner';
 import type {
   RiskLevel,
   GovernanceTrendDirection,
@@ -73,7 +72,6 @@ export function ExecutiveDrillDownPage() {
 
   return (
     <PageContainer>
-      <DemoBanner className="mb-4" />
       {/* Header */}
       <PageHeader
         title={t('governance.executive.drillDownTitle')}
@@ -82,11 +80,7 @@ export function ExecutiveDrillDownPage() {
           entityName: d.entityName,
         })}
       >
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
-          <span className="text-xs text-muted">{t('governance.preview.drilldownReason')}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-3 mt-3">
+        <div className="flex flex-wrap items-center gap-3 mt-2">
           <div className="flex items-center gap-2">
             <ShieldAlert size={14} className="text-muted" />
             <span className="text-xs text-muted">{t('governance.executive.drillDownRiskLevel')}</span>
