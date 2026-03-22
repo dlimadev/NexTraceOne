@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp,
   TrendingDown,
@@ -11,38 +12,21 @@ import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { productAnalyticsApi } from '../api/productAnalyticsApi';
+import type { MilestoneTrend } from '../../../types';
 
 /**
  * Página de value tracking — marcos de valor.
  *
  * Mostra progressão dos utilizadores em atingir marcos de valor do produto.
- * Responde: quanto tempo até o primeiro valor? Quais milestones são mais atingidos?
- * Qual a progressão de valor por persona?
+ * Alimentada pelo endpoint real /product-analytics/value-milestones.
  *
  * @see docs/PRODUCT-VISION.md — marcos de valor do produto
  */
 
-/* ── Dados de demonstração (MVP) ── */
-
-const mockMilestones = [
-  { type: 'FirstSearchSuccess', completionRate: 94.2, avgTimeMinutes: 3.2, usersReached: 221, trend: 'Stable' as const },
-  { type: 'FirstServiceLookup', completionRate: 88.5, avgTimeMinutes: 5.8, usersReached: 208, trend: 'Improving' as const },
-  { type: 'FirstContractView', completionRate: 82.1, avgTimeMinutes: 8.4, usersReached: 193, trend: 'Stable' as const },
-  { type: 'FirstSourceOfTruthUsed', completionRate: 86.2, avgTimeMinutes: 7.2, usersReached: 202, trend: 'Improving' as const },
-  { type: 'FirstExecutiveOverviewConsumed', completionRate: 78.6, avgTimeMinutes: 6.1, usersReached: 184, trend: 'Improving' as const },
-  { type: 'FirstAiUsefulInteraction', completionRate: 72.4, avgTimeMinutes: 12.3, usersReached: 170, trend: 'Improving' as const },
-  { type: 'FirstIncidentInvestigation', completionRate: 58.1, avgTimeMinutes: 28.6, usersReached: 136, trend: 'Stable' as const },
-  { type: 'FirstContractDraftCreated', completionRate: 52.3, avgTimeMinutes: 42.5, usersReached: 123, trend: 'Improving' as const },
-  { type: 'FirstReliabilityViewed', completionRate: 48.7, avgTimeMinutes: 22.8, usersReached: 114, trend: 'Declining' as const },
-  { type: 'FirstReportGenerated', completionRate: 45.2, avgTimeMinutes: 48.0, usersReached: 106, trend: 'Stable' as const },
-  { type: 'FirstMitigationCompleted', completionRate: 42.3, avgTimeMinutes: 95.4, usersReached: 99, trend: 'Stable' as const },
-  { type: 'FirstRunbookConsulted', completionRate: 38.4, avgTimeMinutes: 35.2, usersReached: 90, trend: 'Declining' as const },
-  { type: 'FirstContractPublished', completionRate: 34.8, avgTimeMinutes: 168.0, usersReached: 82, trend: 'Improving' as const },
-  { type: 'FirstAutomationCreated', completionRate: 28.1, avgTimeMinutes: 180.0, usersReached: 66, trend: 'Improving' as const },
-  { type: 'FirstEvidenceExported', completionRate: 18.6, avgTimeMinutes: 210.0, usersReached: 44, trend: 'Stable' as const },
-];
-
-function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
+function trendIcon(trend: MilestoneTrend) {
   switch (trend) {
     case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
     case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
@@ -67,7 +51,39 @@ function formatTime(minutes: number): string {
 export function ValueTrackingPage() {
   const { t } = useTranslation();
 
-  const avgCompletionRate = mockMilestones.reduce((sum, m) => sum + m.completionRate, 0) / mockMilestones.length;
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['product-analytics-value-milestones'],
+    queryFn: () => productAnalyticsApi.getValueMilestones({ range: 'last_30d' }),
+    staleTime: 15_000,
+  });
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <PageLoadingState message={t('common.loading')} />
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <PageErrorState
+          action={
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="px-3 py-2 rounded-md bg-panel border border-edge text-heading text-xs hover:border-accent/50"
+            >
+              {t('common.retry')}
+            </button>
+          }
+        />
+      </PageContainer>
+    );
+  }
+
+  const milestones = data.milestones;
 
   return (
     <PageContainer>
@@ -80,73 +96,78 @@ export function ValueTrackingPage() {
       <StatsGrid columns={4}>
         <StatCard
           title={t('analytics.timeToFirstValue')}
-          value="18.5 min"
+          value={formatTime(data.avgTimeToFirstValueMinutes)}
           icon={<Clock size={20} />}
           color="text-accent"
           trend={{ direction: 'down', label: t('analytics.trendImproving') }}
         />
         <StatCard
           title={t('analytics.timeToCoreValue')}
-          value="2h 22m"
+          value={formatTime(data.avgTimeToCoreValueMinutes)}
           icon={<CheckCircle size={20} />}
           color="text-emerald-400"
           trend={{ direction: 'down', label: t('analytics.trendImproving') }}
         />
         <StatCard
           title={t('analytics.value.avgCompletion')}
-          value={`${avgCompletionRate.toFixed(1)}%`}
+          value={`${data.overallCompletionRate.toFixed(1)}%`}
           icon={<TrendingUp size={20} />}
           color="text-blue-400"
         />
         <StatCard
           title={t('analytics.value.totalMilestones')}
-          value={mockMilestones.length}
+          value={milestones.length}
           icon={<Users size={20} />}
           color="text-amber-400"
         />
       </StatsGrid>
-      <Card>
-        <CardHeader>
-          <span className="font-semibold text-heading">{t('analytics.value.milestoneProgress')}</span>
-        </CardHeader>
-        <CardBody>
-          <div className="space-y-4">
-            {mockMilestones.map((m) => (
-              <div key={m.type} className="flex flex-col md:flex-row md:items-center gap-3">
-                {/* Milestone name & trend */}
-                <div className="md:w-72 flex items-center gap-2">
-                  <CheckCircle size={16} className={m.completionRate >= 50 ? 'text-emerald-400' : 'text-zinc-600'} />
-                  <span className="text-sm text-heading">{t(`analytics.milestone.${m.type}`)}</span>
-                  {trendIcon(m.trend)}
-                </div>
 
-                {/* Progress bar */}
-                <div className="flex-1 flex items-center gap-3">
-                  <div className="flex-1 h-2 rounded-full bg-elevated overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${completionColor(m.completionRate)} transition-all`}
-                      style={{ width: `${m.completionRate}%` }}
-                    />
+      {milestones.length === 0 ? (
+        <div className="text-center py-12 text-faded">{t('common.noData')}</div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <span className="font-semibold text-heading">{t('analytics.value.milestoneProgress')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-4">
+              {milestones.map((m) => (
+                <div key={m.milestoneType} className="flex flex-col md:flex-row md:items-center gap-3">
+                  {/* Milestone name & trend */}
+                  <div className="md:w-72 flex items-center gap-2">
+                    <CheckCircle size={16} className={m.completionRate >= 50 ? 'text-emerald-400' : 'text-zinc-600'} />
+                    <span className="text-sm text-heading">{t(`analytics.milestone.${m.milestoneType}`, { defaultValue: m.milestoneName })}</span>
+                    {trendIcon(m.trend)}
                   </div>
-                  <span className="text-sm text-heading font-medium w-14 text-right">{m.completionRate}%</span>
-                </div>
 
-                {/* Stats */}
-                <div className="flex items-center gap-4 text-sm md:w-48">
-                  <span className="text-muted flex items-center gap-1">
-                    <Clock size={12} />
-                    {formatTime(m.avgTimeMinutes)}
-                  </span>
-                  <span className="text-muted flex items-center gap-1">
-                    <Users size={12} />
-                    {m.usersReached}
-                  </span>
+                  {/* Progress bar */}
+                  <div className="flex-1 flex items-center gap-3">
+                    <div className="flex-1 h-2 rounded-full bg-elevated overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${completionColor(m.completionRate)} transition-all`}
+                        style={{ width: `${m.completionRate}%` }}
+                      />
+                    </div>
+                    <span className="text-sm text-heading font-medium w-14 text-right">{m.completionRate}%</span>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 text-sm md:w-48">
+                    <span className="text-muted flex items-center gap-1">
+                      <Clock size={12} />
+                      {formatTime(m.avgTimeToReachMinutes)}
+                    </span>
+                    <span className="text-muted flex items-center gap-1">
+                      <Users size={12} />
+                      {m.usersReached}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
     </PageContainer>
   );
 }
