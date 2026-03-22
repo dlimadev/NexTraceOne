@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -10,6 +11,11 @@ using SuggestSemanticVersionWithAIFeature = NexTraceOne.AIKnowledge.Application.
 using AnalyzeNonProdEnvironmentFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeNonProdEnvironment.AnalyzeNonProdEnvironment;
 using CompareEnvironmentsFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments.CompareEnvironments;
 using AssessPromotionReadinessFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotionReadiness.AssessPromotionReadiness;
+using GetAiConversationHistoryFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAiConversationHistory.GetAiConversationHistory;
+using ValidateKnowledgeCaptureFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ValidateKnowledgeCapture.ValidateKnowledgeCapture;
+using GenerateTestScenariosFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateTestScenarios.GenerateTestScenarios;
+using GenerateRobotFrameworkDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft.GenerateRobotFrameworkDraft;
+using SummarizeReleaseForApprovalFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.SummarizeReleaseForApproval.SummarizeReleaseForApproval;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -19,6 +25,7 @@ namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 ///
 /// Política de autorização:
 /// - Escrita: "ai:runtime:write" para endpoints de execução de orquestração de IA.
+/// - Leitura: "ai:runtime:read" para histórico e validação.
 /// </summary>
 public sealed class AiOrchestrationEndpointModule
 {
@@ -29,6 +36,9 @@ public sealed class AiOrchestrationEndpointModule
         MapChangeEndpoints(app);
         MapContractEndpoints(app);
         MapEnvironmentAnalysisEndpoints(app);
+        MapConversationEndpoints(app);
+        MapKnowledgeEndpoints(app);
+        MapGenerationEndpoints(app);
     }
 
     private static void MapCatalogEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
@@ -110,4 +120,98 @@ public sealed class AiOrchestrationEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:write");
     }
+
+    private static void MapConversationEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration/conversations");
+
+        group.MapGet("/history", async (
+            Guid? releaseId,
+            string? serviceName,
+            string? topicFilter,
+            ConversationStatus? status,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetAiConversationHistoryFeature.Query(
+                releaseId, serviceName, topicFilter, status, from, to,
+                page == 0 ? 1 : page,
+                pageSize == 0 ? 20 : pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:read");
+    }
+
+    private static void MapKnowledgeEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration/knowledge");
+
+        group.MapPost("/entries/{entryId:guid}/validate", async (
+            Guid entryId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ValidateKnowledgeCaptureFeature.Command(entryId);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+    }
+
+    private static void MapGenerationEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration/generate");
+
+        group.MapPost("/test-scenarios", async (
+            GenerateTestScenariosFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/robot-framework", async (
+            GenerateRobotFrameworkDraftFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/releases/{releaseId:guid}/approval-summary", async (
+            Guid releaseId,
+            SummarizeReleaseForApprovalRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new SummarizeReleaseForApprovalFeature.Command(
+                releaseId,
+                req.ReleaseName,
+                req.Scope,
+                req.ImpactedServices,
+                req.KnownRisks,
+                req.AdditionalContext,
+                req.PreferredProvider);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+    }
+
+    private sealed record SummarizeReleaseForApprovalRequest(
+        string ReleaseName,
+        string? Scope,
+        IReadOnlyList<string>? ImpactedServices,
+        IReadOnlyList<string>? KnownRisks,
+        string? AdditionalContext,
+        string? PreferredProvider);
 }

@@ -14,8 +14,9 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.EnrichContext;
 /// Feature: EnrichContext — executa pipeline de enriquecimento de contexto para IA.
 /// Consulta fontes prioritárias baseadas no caso de uso e persona, agrega contexto
 /// ponderado e retorna bundle de conhecimento com metadados de confiança.
+/// As fontes activas são lidas do repositório real; o resumo de cada fonte
+/// provém da sua descrição registada — sem dados simulados.
 /// Estrutura VSA: Command + Validator + Handler + Response num único ficheiro.
-/// Stub: retorna contexto simulado — integração real com fontes em evolução futura.
 /// </summary>
 public static class EnrichContext
 {
@@ -47,7 +48,7 @@ public static class EnrichContext
         {
             Guard.Against.Null(request);
 
-            var now = dateTimeProvider.UtcNow;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             var correlationId = Guid.NewGuid().ToString();
             var persona = request.Persona ?? "Engineer";
 
@@ -57,7 +58,7 @@ public static class EnrichContext
                 ? parsed
                 : ClassifyFromQuery(request.InputQuery);
 
-            // ── Obter fontes ativas ──────────────────────────────────────
+            // ── Obter fontes activas do repositório real ──────────────────
             var sources = await knowledgeSourceRepository.ListAsync(
                 sourceType: null, isActive: true, cancellationToken);
 
@@ -75,34 +76,72 @@ public static class EnrichContext
                     queriedSources.Add(source.Name);
                     resolvedSources.Add(source.Name);
 
-                    // Stub: gerar itens de contexto simulados
+                    // Usar a descrição real da fonte registada — sem simulação
+                    var summary = !string.IsNullOrWhiteSpace(source.Description)
+                        ? source.Description
+                        : $"Knowledge source: {source.Name} (type: {sourceType})";
+
                     contextItems.Add(new ContextItem(
                         source.SourceType.ToString(),
                         source.Name,
-                        $"Contextual data from {source.Name} for '{useCaseType}' analysis",
+                        summary,
                         weight,
                         source.Priority));
                 }
             }
 
-            // ── Adicionar referências de entidade ────────────────────────
+            // ── Adicionar referências de entidade como hints ──────────────
             var entityHints = new List<string>();
-            if (request.ServiceId.HasValue) entityHints.Add($"service:{request.ServiceId.Value}");
-            if (request.ContractId.HasValue) entityHints.Add($"contract:{request.ContractId.Value}");
-            if (request.IncidentId.HasValue) entityHints.Add($"incident:{request.IncidentId.Value}");
+            if (request.ServiceId.HasValue)
+                entityHints.Add($"service:{request.ServiceId.Value}");
+            if (request.ContractId.HasValue)
+                entityHints.Add($"contract:{request.ContractId.Value}");
+            if (request.IncidentId.HasValue)
+                entityHints.Add($"incident:{request.IncidentId.Value}");
+
+            // Adicionar itens de contexto para entidades referenciadas
+            if (request.ServiceId.HasValue)
+                contextItems.Add(new ContextItem(
+                    "Service",
+                    $"service:{request.ServiceId.Value}",
+                    $"Specific service referenced in this query (ID: {request.ServiceId.Value})",
+                    70,
+                    0));
+
+            if (request.ContractId.HasValue)
+                contextItems.Add(new ContextItem(
+                    "Contract",
+                    $"contract:{request.ContractId.Value}",
+                    $"Specific contract referenced in this query (ID: {request.ContractId.Value})",
+                    65,
+                    0));
+
+            if (request.IncidentId.HasValue)
+                contextItems.Add(new ContextItem(
+                    "Incident",
+                    $"incident:{request.IncidentId.Value}",
+                    $"Specific incident referenced in this query (ID: {request.IncidentId.Value})",
+                    60,
+                    0));
 
             // ── Avaliar confiança ────────────────────────────────────────
-            var confidenceLevel = resolvedSources.Count >= 3
+            var sourceCount = resolvedSources.Count + entityHints.Count;
+            var confidenceLevel = sourceCount >= 3
                 ? AIConfidenceLevel.High
-                : resolvedSources.Count >= 2
+                : sourceCount >= 2
                     ? AIConfidenceLevel.Medium
-                    : resolvedSources.Count >= 1
+                    : sourceCount >= 1
                         ? AIConfidenceLevel.Low
                         : AIConfidenceLevel.Unknown;
 
             var contextSummary = resolvedSources.Count > 0
                 ? $"Enriched with {resolvedSources.Count} source(s) for {useCaseType}: {string.Join(", ", resolvedSources)}"
-                : "No relevant sources available for enrichment";
+                : "No matching knowledge sources registered for this use case";
+
+            if (entityHints.Count > 0)
+                contextSummary += $". Entity references: {string.Join(", ", entityHints)}";
+
+            sw.Stop();
 
             return new Response(
                 correlationId,
@@ -115,7 +154,7 @@ public static class EnrichContext
                 contextItems.Count,
                 confidenceLevel.ToString(),
                 contextSummary,
-                12);
+                (int)sw.ElapsedMilliseconds);
         }
 
         private static AIUseCaseType ClassifyFromQuery(string query)
