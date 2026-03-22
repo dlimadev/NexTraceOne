@@ -33,4 +33,9 @@ public interface IRuntimeSnapshotRepository
 
     /// <summary>Adiciona um novo snapshot de runtime ao repositório.</summary>
     void Add(RuntimeSnapshot snapshot);
+
+    /// <summary>Retorna pares únicos (serviceName, environment) que possuem snapshots após a data especificada.</summary>
+    Task<IReadOnlyList<(string ServiceName, string Environment)>> GetServicesWithRecentSnapshotsAsync(
+        DateTimeOffset since,
+        CancellationToken cancellationToken = default);
 }
