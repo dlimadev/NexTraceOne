@@ -80,7 +80,7 @@ public static class ListIngestionSources
                     TrustLevel: s.TrustLevel.ToString(),
                     Freshness: s.FreshnessStatus.ToString(),
                     LastReceivedAt: s.LastDataReceivedAt,
-                    LastProcessedAt: s.LastDataReceivedAt, // TODO: add LastProcessedAt field
+                    LastProcessedAt: s.LastProcessedAt,
                     Status: s.Status.ToString(),
                     ProvenanceSummary: s.Description ?? "No description available"))
                 .ToList();

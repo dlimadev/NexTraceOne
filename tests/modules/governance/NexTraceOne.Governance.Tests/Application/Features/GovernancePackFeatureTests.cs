@@ -16,6 +16,7 @@ public sealed class GovernancePackFeatureTests
 {
     private readonly IGovernancePackRepository _packRepository = Substitute.For<IGovernancePackRepository>();
     private readonly IGovernancePackVersionRepository _versionRepository = Substitute.For<IGovernancePackVersionRepository>();
+    private readonly IGovernanceRolloutRecordRepository _rolloutRecordRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
 
     // ── CreateGovernancePack ──
@@ -121,8 +122,10 @@ public sealed class GovernancePackFeatureTests
             .Returns(packs);
         _versionRepository.GetLatestByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
             .Returns((GovernancePackVersion?)null);
+        _rolloutRecordRepository.ListByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceRolloutRecord>());
 
-        var handler = new ListGovernancePacks.Handler(_packRepository, _versionRepository);
+        var handler = new ListGovernancePacks.Handler(_packRepository, _versionRepository, _rolloutRecordRepository);
         var query = new ListGovernancePacks.Query();
 
         // Act
@@ -141,7 +144,7 @@ public sealed class GovernancePackFeatureTests
         _packRepository.ListAsync(Arg.Any<GovernanceRuleCategory?>(), Arg.Any<GovernancePackStatus?>(), Arg.Any<CancellationToken>())
             .Returns(new List<GovernancePack>());
 
-        var handler = new ListGovernancePacks.Handler(_packRepository, _versionRepository);
+        var handler = new ListGovernancePacks.Handler(_packRepository, _versionRepository, _rolloutRecordRepository);
 
         // Act
         var result = await handler.Handle(new ListGovernancePacks.Query(), CancellationToken.None);
@@ -165,8 +168,10 @@ public sealed class GovernancePackFeatureTests
             .Returns(new List<GovernancePackVersion>());
         _versionRepository.GetLatestByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
             .Returns((GovernancePackVersion?)null);
+        _rolloutRecordRepository.ListByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceRolloutRecord>());
 
-        var handler = new GetGovernancePack.Handler(_packRepository, _versionRepository);
+        var handler = new GetGovernancePack.Handler(_packRepository, _versionRepository, _rolloutRecordRepository);
         var query = new GetGovernancePack.Query(pack.Id.Value.ToString());
 
         // Act
@@ -182,7 +187,7 @@ public sealed class GovernancePackFeatureTests
     public async Task GetPack_InvalidGuidFormat_ShouldReturnValidationError()
     {
         // Arrange
-        var handler = new GetGovernancePack.Handler(_packRepository, _versionRepository);
+        var handler = new GetGovernancePack.Handler(_packRepository, _versionRepository, _rolloutRecordRepository);
 
         // Act
         var result = await handler.Handle(new GetGovernancePack.Query("not-a-guid"), CancellationToken.None);
@@ -199,7 +204,7 @@ public sealed class GovernancePackFeatureTests
         _packRepository.GetByIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
             .Returns((GovernancePack?)null);
 
-        var handler = new GetGovernancePack.Handler(_packRepository, _versionRepository);
+        var handler = new GetGovernancePack.Handler(_packRepository, _versionRepository, _rolloutRecordRepository);
 
         // Act
         var result = await handler.Handle(new GetGovernancePack.Query(Guid.NewGuid().ToString()), CancellationToken.None);

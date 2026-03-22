@@ -1,4 +1,5 @@
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.Graph.DTOs;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 
@@ -33,4 +34,16 @@ internal sealed class CatalogGraphModuleService(
     /// <inheritdoc />
     public async Task<int> CountServicesByDomainAsync(string domain, CancellationToken cancellationToken)
         => await serviceAssetRepository.CountByDomainAsync(domain, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<TeamServiceInfo>> ListServicesByTeamAsync(string teamName, CancellationToken cancellationToken)
+        => Task.FromResult<IReadOnlyList<TeamServiceInfo>>(Array.Empty<TeamServiceInfo>());
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<TeamContractInfo>> ListContractsByTeamAsync(string teamName, CancellationToken cancellationToken)
+        => Task.FromResult<IReadOnlyList<TeamContractInfo>>(Array.Empty<TeamContractInfo>());
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<CrossTeamDependencyInfo>> ListCrossTeamDependenciesAsync(string teamName, CancellationToken cancellationToken)
+        => Task.FromResult<IReadOnlyList<CrossTeamDependencyInfo>>(Array.Empty<CrossTeamDependencyInfo>());
 }

@@ -1,3 +1,5 @@
+using NexTraceOne.Catalog.Contracts.Graph.DTOs;
+
 namespace NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 
 /// <summary>
@@ -18,4 +20,13 @@ public interface ICatalogGraphModule
 
     /// <summary>Conta o total de serviços associados a um domínio.</summary>
     Task<int> CountServicesByDomainAsync(string domain, CancellationToken cancellationToken);
+
+    /// <summary>Lista serviços associados a uma equipa.</summary>
+    Task<IReadOnlyList<TeamServiceInfo>> ListServicesByTeamAsync(string teamName, CancellationToken cancellationToken);
+
+    /// <summary>Lista contratos associados a uma equipa.</summary>
+    Task<IReadOnlyList<TeamContractInfo>> ListContractsByTeamAsync(string teamName, CancellationToken cancellationToken);
+
+    /// <summary>Lista dependências cross-team de uma equipa.</summary>
+    Task<IReadOnlyList<CrossTeamDependencyInfo>> ListCrossTeamDependenciesAsync(string teamName, CancellationToken cancellationToken);
 }

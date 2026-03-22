@@ -18,4 +18,12 @@ public static class AuditErrors
     /// <summary>Política de retenção não encontrada.</summary>
     public static Error RetentionPolicyNotFound(Guid policyId)
         => Error.NotFound("Audit.RetentionPolicy.NotFound", "Retention policy '{0}' was not found.", policyId);
+
+    /// <summary>Política de compliance não encontrada.</summary>
+    public static Error CompliancePolicyNotFound(Guid policyId)
+        => Error.NotFound("Audit.CompliancePolicy.NotFound", "Compliance policy '{0}' was not found.", policyId);
+
+    /// <summary>Campanha de auditoria não encontrada.</summary>
+    public static Error CampaignNotFound(Guid campaignId)
+        => Error.NotFound("Audit.Campaign.NotFound", "Audit campaign '{0}' was not found.", campaignId);
 }

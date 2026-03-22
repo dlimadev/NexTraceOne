@@ -36,6 +36,9 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AuditDbContext>());
         services.AddScoped<IAuditEventRepository, AuditEventRepository>();
         services.AddScoped<IAuditChainRepository, AuditChainRepository>();
+        services.AddScoped<ICompliancePolicyRepository, CompliancePolicyRepository>();
+        services.AddScoped<IAuditCampaignRepository, AuditCampaignRepository>();
+        services.AddScoped<IComplianceResultRepository, ComplianceResultRepository>();
         services.AddScoped<IAuditModule, AuditModuleService>();
 
         return services;

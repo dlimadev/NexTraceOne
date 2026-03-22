@@ -68,6 +68,9 @@ public static class StartupValidation
         // Validação de Jwt:Secret em ambientes não-Development
         ValidateJwtSecret(app, configuration, logger);
 
+        // Validação de configuração OIDC
+        ValidateOidcProviders(app, configuration, logger);
+
         // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
         if (connectionStrings.Exists())
@@ -164,5 +167,68 @@ public static class StartupValidation
             "Jwt:Secret validated — length {Length} characters, adequate for HS256, environment {Environment}.",
             jwtSecret.Length,
             app.Environment.EnvironmentName);
+    }
+
+    /// <summary>
+    /// Valida a configuração de providers OIDC.
+    /// Em Development: regista warning informativo sobre providers configurados.
+    /// Em Staging/Production: regista os providers disponíveis e alerta se nenhum está configurado.
+    /// Um provider é considerado configurado se tem Authority e ClientId preenchidos.
+    /// </summary>
+    private static void ValidateOidcProviders(WebApplication app, IConfiguration configuration, ILogger logger)
+    {
+        var oidcSection = configuration.GetSection("OidcProviders");
+        if (!oidcSection.Exists())
+        {
+            logger.LogInformation("OIDC providers section not found. Federated authentication is disabled.");
+            return;
+        }
+
+        var configuredProviders = new List<string>();
+        var incompleteProviders = new List<string>();
+
+        foreach (var providerSection in oidcSection.GetChildren())
+        {
+            var providerName = providerSection.Key;
+            var authority = providerSection["Authority"];
+            var clientId = providerSection["ClientId"];
+            var clientSecret = providerSection["ClientSecret"];
+
+            if (!string.IsNullOrWhiteSpace(authority) &&
+                !string.IsNullOrWhiteSpace(clientId) &&
+                !string.IsNullOrWhiteSpace(clientSecret) &&
+                !authority.Contains("{tenant-id}"))
+            {
+                configuredProviders.Add(providerName);
+            }
+            else if (!string.IsNullOrWhiteSpace(clientId) || !string.IsNullOrWhiteSpace(authority))
+            {
+                incompleteProviders.Add(providerName);
+            }
+        }
+
+        if (configuredProviders.Count > 0)
+        {
+            logger.LogInformation(
+                "OIDC providers configured: {Providers}. Federated authentication is available.",
+                string.Join(", ", configuredProviders));
+        }
+
+        if (incompleteProviders.Count > 0)
+        {
+            logger.LogWarning(
+                "OIDC providers with incomplete configuration: {Providers}. " +
+                "Ensure Authority, ClientId and ClientSecret are set for each active provider.",
+                string.Join(", ", incompleteProviders));
+        }
+
+        if (configuredProviders.Count == 0 && !app.Environment.IsDevelopment())
+        {
+            logger.LogWarning(
+                "No OIDC providers are fully configured in {Environment}. " +
+                "Enterprise SSO (federated authentication) will not be available. " +
+                "Configure at least one provider in the OidcProviders section.",
+                app.Environment.EnvironmentName);
+        }
     }
 }

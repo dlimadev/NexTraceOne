@@ -18,7 +18,8 @@ public static class GetGovernancePack
     /// <summary>Handler que retorna os detalhes completos de um governance pack.</summary>
     public sealed class Handler(
         IGovernancePackRepository packRepository,
-        IGovernancePackVersionRepository versionRepository) : IQueryHandler<Query, Response>
+        IGovernancePackVersionRepository versionRepository,
+        IGovernanceRolloutRecordRepository rolloutRecordRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -54,8 +55,15 @@ public static class GetGovernancePack
                 ))
                 .ToList();
 
-            // TODO: implementar Scopes quando tiver escopo completo no domínio
-            var scopes = new List<ScopeDto>();
+            // Build scopes from completed rollout records
+            var rolloutRecords = await rolloutRecordRepository.ListByPackIdAsync(pack.Id, cancellationToken);
+            var completedRecords = rolloutRecords.Where(r => r.Status == RolloutStatus.Completed).ToList();
+            var scopes = completedRecords
+                .Select(r => new ScopeDto(
+                    ScopeType: r.ScopeType,
+                    ScopeValue: r.Scope,
+                    EnforcementMode: r.EnforcementMode))
+                .ToList();
 
             var detail = new GovernancePackDetailDto(
                 PackId: pack.Id.Value.ToString(),
@@ -65,7 +73,7 @@ public static class GetGovernancePack
                 Category: pack.Category,
                 Status: pack.Status,
                 CurrentVersion: pack.CurrentVersion ?? "0.0.0",
-                ScopeCount: 0,
+                ScopeCount: completedRecords.Count,
                 RuleCount: rules.Count,
                 CreatedAt: pack.CreatedAt,
                 UpdatedAt: pack.UpdatedAt,

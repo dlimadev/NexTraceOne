@@ -7,6 +7,11 @@ using NexTraceOne.AuditCompliance.Application.Features.ConfigureRetention;
 using NexTraceOne.AuditCompliance.Application.Features.ExportAuditReport;
 using NexTraceOne.AuditCompliance.Application.Features.GetAuditTrail;
 using NexTraceOne.AuditCompliance.Application.Features.RecordAuditEvent;
+using NexTraceOne.AuditCompliance.Application.Features.CreateAuditCampaign;
+using NexTraceOne.AuditCompliance.Application.Features.CreateCompliancePolicy;
+using NexTraceOne.AuditCompliance.Application.Features.GetAuditCampaign;
+using NexTraceOne.AuditCompliance.Application.Features.GetCompliancePolicy;
+using NexTraceOne.AuditCompliance.Application.Features.RecordComplianceResult;
 using NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog;
 using NexTraceOne.BuildingBlocks.Application;
 
@@ -29,6 +34,11 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SearchAuditLog.Query>, SearchAuditLog.Validator>();
         services.AddTransient<IValidator<ExportAuditReport.Query>, ExportAuditReport.Validator>();
         services.AddTransient<IValidator<ConfigureRetention.Command>, ConfigureRetention.Validator>();
+        services.AddTransient<IValidator<CreateCompliancePolicy.Command>, CreateCompliancePolicy.Validator>();
+        services.AddTransient<IValidator<GetCompliancePolicy.Query>, GetCompliancePolicy.Validator>();
+        services.AddTransient<IValidator<CreateAuditCampaign.Command>, CreateAuditCampaign.Validator>();
+        services.AddTransient<IValidator<GetAuditCampaign.Query>, GetAuditCampaign.Validator>();
+        services.AddTransient<IValidator<RecordComplianceResult.Command>, RecordComplianceResult.Validator>();
 
         return services;
     }

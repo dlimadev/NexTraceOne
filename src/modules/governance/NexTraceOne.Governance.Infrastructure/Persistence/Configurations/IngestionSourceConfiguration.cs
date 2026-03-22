@@ -61,6 +61,9 @@ internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<In
         builder.Property(x => x.LastDataReceivedAt)
             .HasColumnType("timestamp with time zone");
 
+        builder.Property(x => x.LastProcessedAt)
+            .HasColumnType("timestamp with time zone");
+
         builder.Property(x => x.DataItemsProcessed)
             .IsRequired();
 
