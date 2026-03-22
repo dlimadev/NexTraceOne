@@ -1,12 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetExecutiveDrillDown;
 
 /// <summary>
 /// Feature: GetExecutiveDrillDown — drill-down executivo para domínio, equipa ou serviço.
 /// Fornece visão detalhada com indicadores, serviços críticos, gaps e recomendações de foco.
+/// Consome dados reais do módulo CostIntelligence via contrato público.
 /// </summary>
 public static class GetExecutiveDrillDown
 {
@@ -18,82 +20,84 @@ public static class GetExecutiveDrillDown
     /// <summary>Handler que computa drill-down executivo detalhado para uma entidade.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        private readonly ICostIntelligenceModule _costModule;
+
+        public Handler(ICostIntelligenceModule costModule)
         {
+            _costModule = costModule;
+        }
+
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            var records = request.EntityType.ToLowerInvariant() switch
+            {
+                "domain" => await _costModule.GetCostsByDomainAsync(request.EntityId, cancellationToken: cancellationToken),
+                "team" => await _costModule.GetCostsByTeamAsync(request.EntityId, cancellationToken: cancellationToken),
+                "service" => await GetServiceRecordsAsync(request.EntityId, cancellationToken),
+                _ => await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken)
+            };
+
+            var totalCost = records.Sum(r => r.TotalCost);
+            var avgCost = records.Count > 0 ? records.Average(r => r.TotalCost) : 0m;
+            var efficiency = ComputeEfficiency(avgCost);
+
             var keyIndicators = new List<KeyIndicatorDto>
             {
-                new("Reliability Score", "62.0%", TrendDirection.Declining,
-                    "Below target of 80%, driven by Order Processor degradation"),
-                new("Change Safety", "48.0%", TrendDirection.Declining,
-                    "High rollback rate: 3 rollbacks in last 30 days"),
-                new("Incident Recurrence", "35.0%", TrendDirection.Stable,
-                    "Recurring incidents in Order Processor and Inventory Sync"),
-                new("Contract Coverage", "62.5%", TrendDirection.Improving,
-                    "5 of 8 services have defined contracts, up from 3 last quarter"),
-                new("Runbook Coverage", "25.0%", TrendDirection.Stable,
-                    "Only 2 of 8 services have runbooks, critical gap"),
-                new("Maturity Index", "41.3%", TrendDirection.Improving,
-                    "Slow improvement, still lowest across all domains"),
-                new("FinOps Efficiency", "Wasteful", TrendDirection.Declining,
-                    "€18,700/month waste from rollbacks and idle compute"),
-                new("Dependency Health", "Medium", TrendDirection.Stable,
-                    "6 unmapped minor dependencies across 3 services")
+                new("Total Monthly Cost", $"{totalCost:N2}", TrendDirection.Stable,
+                    $"Aggregated cost from {records.Count} service(s)"),
+                new("FinOps Efficiency", efficiency.ToString(), TrendDirection.Stable,
+                    $"Based on average service cost of {avgCost:N2}"),
+                new("Service Count", records.Count.ToString(), TrendDirection.Stable,
+                    "Number of services with cost data"),
+                new("Reliability Score", "N/A", TrendDirection.Stable,
+                    "Requires integration with reliability module"),
+                new("Change Safety", "N/A", TrendDirection.Stable,
+                    "Requires integration with change intelligence module"),
+                new("Contract Coverage", "N/A", TrendDirection.Stable,
+                    "Requires integration with contract governance module")
             };
 
-            var criticalServices = new List<CriticalServiceDto>
-            {
-                new("svc-order-processor", "Order Processor", RiskLevel.Critical,
-                    "Service degradation with frequent rollbacks and recurring incidents"),
-                new("svc-inventory-sync", "Inventory Sync", RiskLevel.Medium,
-                    "No contract defined, missing documentation and redundant sync cycles"),
-                new("svc-cart-service", "Cart Service", RiskLevel.Medium,
-                    "Missing runbook and incomplete dependency mapping"),
-                new("svc-pricing-engine", "Pricing Engine", RiskLevel.High,
-                    "Outdated contract, no automated change validation")
-            };
-
-            var topGaps = new List<GapDto>
-            {
-                new("Runbook Coverage", RiskLevel.Critical,
-                    "6 of 8 services lack operational runbooks for incident response",
-                    "Prioritize runbook creation for Order Processor and Pricing Engine as critical services"),
-                new("Change Validation", RiskLevel.High,
-                    "No automated blast radius analysis; manual deployment process",
-                    "Implement automated change validation in CI/CD pipeline with rollback gates"),
-                new("Contract Governance", RiskLevel.Medium,
-                    "3 services without formal contracts, 2 with outdated versions",
-                    "Schedule contract definition sprint with AI-assisted generation for missing contracts"),
-                new("Documentation", RiskLevel.Medium,
-                    "Sparse documentation, key business flows undocumented",
-                    "Adopt documentation-as-code approach and mandate docs for new features"),
-                new("AI Governance", RiskLevel.Low,
-                    "No AI governance framework, uncontrolled usage of external models",
-                    "Define AI usage policy and implement audit trail for AI-assisted operations")
-            };
-
-            var recommendedFocus = new List<string>
-            {
-                "Stabilize Order Processor: address root cause of degradation and implement circuit breakers",
-                "Create runbooks for all critical services within 30 days",
-                "Implement automated change validation to reduce rollback rate below 5%",
-                "Complete contract definitions for remaining 3 services using AI-assisted generation",
-                "Establish FinOps review cadence to address €18,700/month waste"
-            };
+            var criticalServices = records
+                .Where(r => ComputeEfficiency(r.TotalCost) is CostEfficiency.Wasteful)
+                .OrderByDescending(r => r.TotalCost)
+                .Take(5)
+                .Select(r => new CriticalServiceDto(
+                    r.ServiceId,
+                    r.ServiceName,
+                    RiskLevel.High,
+                    $"High cost: {r.TotalCost:N2} {r.Currency}"))
+                .ToList();
 
             var response = new Response(
                 EntityType: request.EntityType,
                 EntityId: request.EntityId,
-                EntityName: "Commerce",
-                RiskLevel: RiskLevel.Critical,
+                EntityName: request.EntityId,
+                RiskLevel: efficiency >= CostEfficiency.Inefficient ? RiskLevel.High : RiskLevel.Medium,
                 MaturityLevel: MaturityLevel.Developing,
                 KeyIndicators: keyIndicators,
                 CriticalServices: criticalServices,
-                TopGaps: topGaps,
-                RecommendedFocus: recommendedFocus,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                TopGaps: Array.Empty<GapDto>(),
+                RecommendedFocus: Array.Empty<string>(),
+                GeneratedAt: DateTimeOffset.UtcNow,
+                IsSimulated: false,
+                DataSource: "cost-intelligence");
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
+
+        private async Task<IReadOnlyList<CostRecordSummary>> GetServiceRecordsAsync(string serviceId, CancellationToken cancellationToken)
+        {
+            var record = await _costModule.GetServiceCostAsync(serviceId, cancellationToken: cancellationToken);
+            return record is not null ? new[] { record } : Array.Empty<CostRecordSummary>();
+        }
+
+        private static CostEfficiency ComputeEfficiency(decimal cost) => cost switch
+        {
+            > 15000m => CostEfficiency.Wasteful,
+            > 10000m => CostEfficiency.Inefficient,
+            > 5000m => CostEfficiency.Acceptable,
+            _ => CostEfficiency.Efficient
+        };
     }
 
     /// <summary>Resposta de drill-down executivo com indicadores, serviços críticos, gaps e foco recomendado.</summary>

@@ -1,13 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetServiceFinOps;
 
 /// <summary>
 /// Feature: GetServiceFinOps — perfil de custo contextual de um serviço individual.
 /// Inclui waste, eficiência, correlação com confiabilidade e impacto de mudanças.
-/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
+/// Consome dados reais do módulo CostIntelligence via contrato público.
 /// </summary>
 public static class GetServiceFinOps
 {
@@ -17,59 +18,54 @@ public static class GetServiceFinOps
     /// <summary>Handler que retorna perfil de FinOps do serviço.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        private readonly ICostIntelligenceModule _costModule;
+
+        public Handler(ICostIntelligenceModule costModule)
         {
-            var wasteSignals = new List<WasteSignalDto>
-            {
-                new("Excessive retries on timeout", "retry-pattern", WasteSignalType.ExcessiveRetries, 3200m, "2026-03-10T08:00:00Z"),
-                new("Over-provisioned compute instances", "over-provisioned", WasteSignalType.OverProvisioned, 2100m, "2026-03-12T14:00:00Z")
-            };
+            _costModule = costModule;
+        }
 
-            var efficiencyIndicators = new List<EfficiencyIndicatorDto>
-            {
-                new("CPU Utilization", EfficiencyCategory.ResourceUtilization, 42.5m, 75.0m, "Below optimal range"),
-                new("Cost per Request", EfficiencyCategory.CostPerTransaction, 0.032m, 0.015m, "Above target threshold"),
-                new("Error Rate Impact", EfficiencyCategory.ErrorRate, 4.2m, 1.0m, "Errors adding operational cost"),
-                new("Throughput Efficiency", EfficiencyCategory.ThroughputOptimization, 68.0m, 85.0m, "Room for improvement")
-            };
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            var record = await _costModule.GetServiceCostAsync(request.ServiceId, cancellationToken: cancellationToken);
 
-            var changeImpacts = new List<ChangeImpactDto>
-            {
-                new("chg-2026-0312", "Deploy v3.2.1 — Payment retry logic", "2026-03-12T10:00:00Z", 1200m, "Cost increase after deployment due to retry amplification"),
-                new("chg-2026-0305", "Scale-up instance tier", "2026-03-05T16:00:00Z", 2800m, "Planned capacity increase for peak traffic")
-            };
+            if (record is null)
+                return Error.NotFound("FINOPS.SERVICE_NOT_FOUND", "No cost data found for service {0}", request.ServiceId);
 
-            var optimizations = new List<OptimizationDto>
-            {
-                new("Reduce retry backoff threshold", 1800m, "High", "Excessive retries are adding $1,800/mo in wasted compute"),
-                new("Right-size compute instances", 2100m, "Medium", "CPU utilization consistently below 45% — downsize recommended"),
-                new("Implement circuit breaker", 800m, "Medium", "Reduce cascading failure cost from upstream timeouts")
-            };
+            var efficiency = ComputeEfficiency(record.TotalCost);
 
             var response = new Response(
-                ServiceId: request.ServiceId,
-                ServiceName: "Payment API",
-                Domain: "Payments",
-                Team: "Team Payments",
-                MonthlyCost: 12500m,
-                PreviousMonthCost: 11200m,
-                CostTrend: TrendDirection.Declining,
-                Efficiency: CostEfficiency.Inefficient,
-                WasteSignals: wasteSignals,
-                TotalWaste: wasteSignals.Sum(w => w.EstimatedWaste),
-                EfficiencyIndicators: efficiencyIndicators,
-                ReliabilityScore: 72.5m,
-                RecentIncidents: 3,
-                ReliabilityTrend: TrendDirection.Declining,
-                ChangeImpacts: changeImpacts,
-                Optimizations: optimizations,
-                TotalPotentialSavings: optimizations.Sum(o => o.PotentialSavings),
+                ServiceId: record.ServiceId,
+                ServiceName: record.ServiceName,
+                Domain: record.Domain ?? string.Empty,
+                Team: record.Team ?? string.Empty,
+                MonthlyCost: record.TotalCost,
+                PreviousMonthCost: 0m,
+                CostTrend: TrendDirection.Stable,
+                Efficiency: efficiency,
+                WasteSignals: Array.Empty<WasteSignalDto>(),
+                TotalWaste: 0m,
+                EfficiencyIndicators: Array.Empty<EfficiencyIndicatorDto>(),
+                ReliabilityScore: 0m,
+                RecentIncidents: 0,
+                ReliabilityTrend: TrendDirection.Stable,
+                ChangeImpacts: Array.Empty<ChangeImpactDto>(),
+                Optimizations: Array.Empty<OptimizationDto>(),
+                TotalPotentialSavings: 0m,
                 GeneratedAt: DateTimeOffset.UtcNow,
-                IsSimulated: true,
-                DataSource: "demo");
+                IsSimulated: false,
+                DataSource: "cost-intelligence");
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
+
+        private static CostEfficiency ComputeEfficiency(decimal cost) => cost switch
+        {
+            > 15000m => CostEfficiency.Wasteful,
+            > 10000m => CostEfficiency.Inefficient,
+            > 5000m => CostEfficiency.Acceptable,
+            _ => CostEfficiency.Efficient
+        };
     }
 
     /// <summary>Perfil de FinOps completo de um serviço. IsSimulated=true indica dados demonstrativos.</summary>
