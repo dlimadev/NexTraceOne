@@ -7,8 +7,10 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost;
 
@@ -38,6 +40,9 @@ public static class DependencyInjection
         services.AddScoped<ICostSnapshotRepository, CostSnapshotRepository>();
         services.AddScoped<ICostAttributionRepository, CostAttributionRepository>();
         services.AddScoped<IServiceCostProfileRepository, ServiceCostProfileRepository>();
+        services.AddScoped<ICostImportBatchRepository, CostImportBatchRepository>();
+        services.AddScoped<ICostRecordRepository, CostRecordRepository>();
+        services.AddScoped<ICostIntelligenceModule, CostIntelligenceModuleService>();
 
         return services;
     }

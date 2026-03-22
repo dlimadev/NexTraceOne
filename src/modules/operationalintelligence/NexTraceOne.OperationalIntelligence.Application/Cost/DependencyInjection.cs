@@ -11,6 +11,7 @@ using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRel
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRoute;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostDelta;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostReport;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ImportCostBatch;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.IngestCostSnapshot;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Cost;
@@ -37,6 +38,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<AttributeCostToService.Command>, AttributeCostToService.Validator>();
         services.AddTransient<IValidator<ComputeCostTrend.Command>, ComputeCostTrend.Validator>();
         services.AddTransient<IValidator<AlertCostAnomaly.Command>, AlertCostAnomaly.Validator>();
+        services.AddTransient<IValidator<ImportCostBatch.Command>, ImportCostBatch.Validator>();
 
         return services;
     }
