@@ -599,6 +599,9 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("LastDataReceivedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("LastProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
