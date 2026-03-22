@@ -1,0 +1,158 @@
+using NexTraceOne.Governance.Application.Features.GetBenchmarking;
+using NexTraceOne.Governance.Application.Features.GetComplianceGaps;
+using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
+using NexTraceOne.Governance.Domain.Enums;
+
+namespace NexTraceOne.Governance.Tests.Application.Features;
+
+/// <summary>
+/// Testes de unidade para as features de compliance e risco.
+/// Handlers sem dependências que retornam dados demonstrativos.
+/// </summary>
+public sealed class ComplianceRiskFeatureTests
+{
+    // ── GetComplianceGaps ──
+
+    [Fact]
+    public async Task GetComplianceGaps_ShouldReturnGaps()
+    {
+        // Arrange
+        var handler = new GetComplianceGaps.Handler();
+        var query = new GetComplianceGaps.Query();
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.TotalGaps.Should().BeGreaterThan(0);
+        result.Value.Gaps.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetComplianceGaps_ShouldContainCriticalAndHighCounts()
+    {
+        // Arrange
+        var handler = new GetComplianceGaps.Handler();
+
+        // Act
+        var result = await handler.Handle(new GetComplianceGaps.Query(), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.CriticalCount.Should().BeGreaterThanOrEqualTo(0);
+        result.Value.HighCount.Should().BeGreaterThanOrEqualTo(0);
+        result.Value.MediumCount.Should().BeGreaterThanOrEqualTo(0);
+        result.Value.LowCount.Should().BeGreaterThanOrEqualTo(0);
+        (result.Value.CriticalCount + result.Value.HighCount + result.Value.MediumCount + result.Value.LowCount)
+            .Should().Be(result.Value.TotalGaps);
+    }
+
+    [Fact]
+    public async Task GetComplianceGaps_GapsShouldHaveViolatedPolicies()
+    {
+        // Arrange
+        var handler = new GetComplianceGaps.Handler();
+
+        // Act
+        var result = await handler.Handle(new GetComplianceGaps.Query(), CancellationToken.None);
+
+        // Assert
+        result.Value.Gaps.Should().AllSatisfy(gap =>
+        {
+            gap.GapId.Should().NotBeNullOrWhiteSpace();
+            gap.ViolatedPolicyIds.Should().NotBeEmpty();
+            gap.ViolationCount.Should().BeGreaterThan(0);
+        });
+    }
+
+    // ── GetBenchmarking ──
+
+    [Fact]
+    public async Task GetBenchmarking_ShouldReturnComparisons()
+    {
+        // Arrange
+        var handler = new GetBenchmarking.Handler();
+        var query = new GetBenchmarking.Query("teams");
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Comparisons.Should().NotBeEmpty();
+        result.Value.Dimension.Should().Be("teams");
+        result.Value.IsSimulated.Should().BeTrue();
+        result.Value.DataSource.Should().Be("demo");
+    }
+
+    [Fact]
+    public async Task GetBenchmarking_ComparisonsShouldHaveContextAndScores()
+    {
+        // Arrange
+        var handler = new GetBenchmarking.Handler();
+
+        // Act
+        var result = await handler.Handle(new GetBenchmarking.Query("teams"), CancellationToken.None);
+
+        // Assert
+        result.Value.Comparisons.Should().AllSatisfy(c =>
+        {
+            c.GroupId.Should().NotBeNullOrWhiteSpace();
+            c.GroupName.Should().NotBeNullOrWhiteSpace();
+            c.Context.Should().NotBeNullOrWhiteSpace();
+            c.Strengths.Should().NotBeEmpty();
+        });
+    }
+
+    // ── RunComplianceChecks ──
+
+    [Fact]
+    public async Task RunComplianceChecks_ShouldReturnResults()
+    {
+        // Arrange
+        var handler = new RunComplianceChecks.Handler();
+        var query = new RunComplianceChecks.Query();
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.TotalChecks.Should().BeGreaterThan(0);
+        result.Value.Results.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task RunComplianceChecks_CountsShouldSumToTotal()
+    {
+        // Arrange
+        var handler = new RunComplianceChecks.Handler();
+
+        // Act
+        var result = await handler.Handle(new RunComplianceChecks.Query(), CancellationToken.None);
+
+        // Assert
+        (result.Value.PassedCount + result.Value.FailedCount + result.Value.WarningCount)
+            .Should().Be(result.Value.TotalChecks);
+    }
+
+    [Fact]
+    public async Task RunComplianceChecks_ResultsShouldHaveRequiredFields()
+    {
+        // Arrange
+        var handler = new RunComplianceChecks.Handler();
+
+        // Act
+        var result = await handler.Handle(new RunComplianceChecks.Query(), CancellationToken.None);
+
+        // Assert
+        result.Value.Results.Should().AllSatisfy(r =>
+        {
+            r.CheckId.Should().NotBeNullOrWhiteSpace();
+            r.CheckName.Should().NotBeNullOrWhiteSpace();
+            r.PolicyId.Should().NotBeNullOrWhiteSpace();
+            r.ServiceId.Should().NotBeNullOrWhiteSpace();
+        });
+    }
+}
