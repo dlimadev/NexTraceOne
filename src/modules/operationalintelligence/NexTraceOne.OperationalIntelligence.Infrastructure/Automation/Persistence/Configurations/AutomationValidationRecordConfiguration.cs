@@ -24,7 +24,7 @@ internal sealed class AutomationValidationRecordConfiguration : IEntityTypeConfi
             .HasConversion<string>()
             .HasMaxLength(50)
             .IsRequired()
-            .HasDefaultValue(AutomationOutcome.Success);
+            .HasDefaultValue(AutomationOutcome.Successful);
 
         builder.Property(x => x.ValidatedBy).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Notes).HasMaxLength(2000).IsRequired();

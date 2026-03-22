@@ -1,0 +1,16 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Grafana Dashboard Provisioning
+# Carrega automaticamente os dashboards do repositório.
+# ═══════════════════════════════════════════════════════════════════════════════
+apiVersion: 1
+
+providers:
+  - name: NexTraceOne
+    orgId: 1
+    folder: NexTraceOne
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/nextraceone
