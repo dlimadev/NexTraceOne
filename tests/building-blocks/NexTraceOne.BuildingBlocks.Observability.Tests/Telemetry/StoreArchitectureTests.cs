@@ -5,12 +5,14 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 namespace NexTraceOne.BuildingBlocks.Observability.Tests.Telemetry;
 
 /// <summary>
-/// Testes de validação da separação arquitetural entre Product Store e Telemetry Store.
+/// Testes de validação da separação arquitetural entre Product Store e provider de observabilidade.
 /// Garante que:
 /// - Product Store (PostgreSQL) armazena apenas agregados, correlações, topologia e referências
-/// - Telemetry Store (Tempo/Loki) armazena traces e logs crus
-/// - Referências do Product Store apontam para dados crus no Telemetry Store
+/// - Provider de observabilidade (ClickHouse/Elastic) armazena traces e logs crus
+/// - Referências do Product Store apontam para dados crus no provider de observabilidade
 /// - Política de retenção diferencia bruto de agregado
+/// - Provider é configurável (ClickHouse ou Elastic)
+/// - Modo de coleta é configurável (OpenTelemetryCollector ou ClrProfiler)
 /// </summary>
 public sealed class StoreArchitectureTests
 {
@@ -33,24 +35,24 @@ public sealed class StoreArchitectureTests
 
         // Métricas no Product Store são sempre agregadas, nunca raw
         serviceMetrics.AggregationLevel.Should().NotBe(AggregationLevel.Raw,
-            "Product Store (PostgreSQL) nunca armazena dados no nível Raw — esses ficam no Telemetry Store");
+            "Product Store (PostgreSQL) nunca armazena dados no nível Raw — esses ficam no provider de observabilidade");
     }
 
     [Fact]
-    public void TelemetryReference_ShouldBridgeProductStoreToTelemetryStore()
+    public void TelemetryReference_ShouldBridgeProductStoreToObservabilityProvider()
     {
-        // Referências permitem navegação do Product Store para dados crus no Telemetry Store
+        // Referências permitem navegação do Product Store para dados crus no provider de observabilidade
         var reference = new TelemetryReference
         {
             SignalType = TelemetrySignalType.Traces,
             ExternalId = "trace-id-abc123",
-            BackendType = "tempo",
-            AccessUri = "http://tempo:3200/api/traces/trace-id-abc123",
+            BackendType = "clickhouse",
+            AccessUri = "SELECT * FROM nextraceone_obs.otel_traces WHERE TraceId = 'trace-id-abc123'",
             OriginalTimestamp = DateTimeOffset.UtcNow
         };
 
         reference.ExternalId.Should().NotBeNullOrEmpty(
-            "referência deve ter ID externo para buscar dado cru no Telemetry Store");
+            "referência deve ter ID externo para buscar dado cru no provider de observabilidade");
         reference.BackendType.Should().NotBeNullOrEmpty(
             "referência deve indicar qual backend contém o dado cru");
     }
@@ -60,7 +62,7 @@ public sealed class StoreArchitectureTests
     {
         var policy = new RetentionPolicyOptions();
 
-        // Dados crus (Telemetry Store) devem ter retenção mais curta
+        // Dados crus (provider de observabilidade) devem ter retenção mais curta
         policy.RawTraces.TotalRetentionDays
             .Should().BeLessThan(policy.HourlyAggregates.TotalRetentionDays,
                 "traces crus devem expirar antes dos agregados para controlar custo");
@@ -86,15 +88,10 @@ public sealed class StoreArchitectureTests
     {
         var options = new TelemetryStoreOptions();
 
-        // Product Store e Telemetry Store são independentes
+        // Product Store e provider de observabilidade são independentes
         options.ProductStore.ConnectionStringName.Should().NotBeNullOrEmpty();
-        options.TelemetryStore.TracesEndpoint.Should().NotBeNullOrEmpty();
-        options.TelemetryStore.LogsEndpoint.Should().NotBeNullOrEmpty();
-
-        // Endpoints de traces e logs são separados (Tempo vs Loki)
-        options.TelemetryStore.TracesEndpoint
-            .Should().NotBe(options.TelemetryStore.LogsEndpoint,
-                "traces e logs vão para backends diferentes");
+        options.ObservabilityProvider.Provider.Should().NotBeNullOrEmpty();
+        options.ObservabilityProvider.ClickHouse.ConnectionString.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
@@ -133,12 +130,32 @@ public sealed class StoreArchitectureTests
     }
 
     [Fact]
-    public void Collector_ShouldExportToSeparateBackends()
+    public void Provider_ShouldNotBePostgreSQL()
     {
         var options = new TelemetryStoreOptions();
 
-        // O Collector exporta traces para Tempo e logs para Loki (não para PostgreSQL)
-        options.TelemetryStore.TracesBackend.Should().NotBe("postgresql");
-        options.TelemetryStore.LogsBackend.Should().NotBe("postgresql");
+        // O provider de observabilidade não deve ser PostgreSQL
+        options.ObservabilityProvider.Provider.Should().NotBe("postgresql",
+            "PostgreSQL é exclusivo para dados transacionais e de domínio, não para logs/traces crus");
+    }
+
+    [Fact]
+    public void Configuration_ShouldSupportConfigurableProvider()
+    {
+        var options = new TelemetryStoreOptions();
+
+        // ClickHouse e Elastic são os providers suportados
+        options.ObservabilityProvider.ClickHouse.Should().NotBeNull();
+        options.ObservabilityProvider.Elastic.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Configuration_ShouldSupportConfigurableCollectionMode()
+    {
+        var options = new TelemetryStoreOptions();
+
+        // OpenTelemetryCollector e ClrProfiler são os modos de coleta suportados
+        options.CollectionMode.OpenTelemetryCollector.Should().NotBeNull();
+        options.CollectionMode.ClrProfiler.Should().NotBeNull();
     }
 }

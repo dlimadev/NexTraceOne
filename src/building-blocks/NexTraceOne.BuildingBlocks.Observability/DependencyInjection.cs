@@ -6,6 +6,11 @@ using NexTraceOne.BuildingBlocks.Observability.Alerting.Channels;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability.Metrics;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrProfiler;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.OpenTelemetryCollector;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.ClickHouse;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Elastic;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using OpenTelemetry.Metrics;
@@ -16,26 +21,30 @@ namespace NexTraceOne.BuildingBlocks.Observability;
 
 /// <summary>
 /// Registra toda a infraestrutura de observabilidade da plataforma:
-/// OpenTelemetry (tracing + metrics via OTLP), configuração de telemetria
-/// (Product Store vs Telemetry Store, retenção, collector) e health checks.
+/// OpenTelemetry (tracing + metrics via OTLP), provider de observabilidade
+/// configurável (ClickHouse ou Elastic), estratégia de coleta por ambiente
+/// (OpenTelemetry Collector ou CLR Profiler) e health checks.
 ///
 /// A plataforma é OpenTelemetry-native na ingestão, correlation-first no produto
 /// e storage-aware na persistência. O PostgreSQL serve como Product Store
-/// (agregados, correlações, topologia) e os backends especializados
-/// (Tempo, Loki) como Telemetry Store (traces e logs crus).
+/// (agregados, correlações, topologia) e o provider configurável (ClickHouse ou Elastic)
+/// como storage analítico para traces, logs e métricas crus.
+///
+/// Coleta, transporte, storage e análise são preocupações separadas.
 /// </summary>
 public static class DependencyInjection
 {
     /// <summary>
     /// Registra observabilidade base compartilhada da plataforma.
-    /// Configura: OpenTelemetry (tracing + metrics), opções de telemetria
-    /// (Product Store, Telemetry Store, retenção, collector) e health checks.
+    /// Configura: OpenTelemetry (tracing + metrics), provider de observabilidade
+    /// (ClickHouse ou Elastic), modo de coleta (Collector ou CLR Profiler),
+    /// opções de telemetria (Product Store, retenção, collector) e health checks.
     /// </summary>
     public static IServiceCollection AddBuildingBlocksObservability(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Configuração de telemetria: Product Store vs Telemetry Store, retenção, collector
+        // Configuração de telemetria: Product Store, provider, collection mode, retenção, collector
         services.Configure<TelemetryStoreOptions>(
             configuration.GetSection(TelemetryStoreOptions.SectionName));
 
@@ -93,9 +102,57 @@ public static class DependencyInjection
                 }
             });
 
+        // Registrar provider de observabilidade baseado na configuração
+        RegisterObservabilityProvider(services, configuration);
+
+        // Registrar estratégia de coleta baseada na configuração
+        RegisterCollectionModeStrategy(services, configuration);
+
         services.AddNexTraceHealthChecks();
 
         return services;
+    }
+
+    /// <summary>
+    /// Registra o provider de observabilidade configurado (ClickHouse ou Elastic).
+    /// A escolha é feita por configuração em Telemetry:ObservabilityProvider:Provider.
+    /// </summary>
+    private static void RegisterObservabilityProvider(
+        IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var providerName = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "ClickHouse";
+
+        if (string.Equals(providerName, "Elastic", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddSingleton<IObservabilityProvider, ElasticObservabilityProvider>();
+        }
+        else
+        {
+            // Default: ClickHouse
+            services.AddSingleton<IObservabilityProvider, ClickHouseObservabilityProvider>();
+        }
+    }
+
+    /// <summary>
+    /// Registra a estratégia de coleta configurada (OpenTelemetryCollector ou ClrProfiler).
+    /// A escolha é feita por configuração em Telemetry:CollectionMode:ActiveMode.
+    /// </summary>
+    private static void RegisterCollectionModeStrategy(
+        IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var collectionMode = configuration["Telemetry:CollectionMode:ActiveMode"] ?? "OpenTelemetryCollector";
+
+        if (string.Equals(collectionMode, "ClrProfiler", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddSingleton<ICollectionModeStrategy, ClrProfilerStrategy>();
+        }
+        else
+        {
+            // Default: OpenTelemetryCollector
+            services.AddSingleton<ICollectionModeStrategy, OpenTelemetryCollectorStrategy>();
+        }
     }
 
     /// <summary>
