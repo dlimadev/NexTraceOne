@@ -2,7 +2,7 @@
 
 ## Escopo da Fase
 
-A Fase 4 do NexTraceOne tem como objectivo transformar o pilar de **AI Governance** de "implementado porém escondido" em **capacidade real de produto enterprise em escopo de produção**.
+A Fase 4 do NexTraceOne tem como objetivo transformar o pilar de **AI Governance** de "implementado porém escondido" em **capacidade real de produto enterprise em escopo de produção**.
 
 ## Features Reabilitadas
 
