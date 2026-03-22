@@ -68,6 +68,10 @@ function DeltaIcon({ delta }: { delta: number }) {
   );
 }
 
+// ── Constants ────────────────────────────────────────────────────────────────
+
+const MILLIS_PER_HOUR = 3_600_000;
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 interface CompareForm {
@@ -82,9 +86,9 @@ interface CompareForm {
 const defaultForm: CompareForm = {
   serviceName: '',
   environment: 'production',
-  beforeStart: new Date(Date.now() - 14 * 24 * 3600_000).toISOString().slice(0, 16),
-  beforeEnd: new Date(Date.now() - 7 * 24 * 3600_000).toISOString().slice(0, 16),
-  afterStart: new Date(Date.now() - 7 * 24 * 3600_000).toISOString().slice(0, 16),
+  beforeStart: new Date(Date.now() - 14 * 24 * MILLIS_PER_HOUR).toISOString().slice(0, 16),
+  beforeEnd: new Date(Date.now() - 7 * 24 * MILLIS_PER_HOUR).toISOString().slice(0, 16),
+  afterStart: new Date(Date.now() - 7 * 24 * MILLIS_PER_HOUR).toISOString().slice(0, 16),
   afterEnd: new Date().toISOString().slice(0, 16),
 };
 
@@ -149,7 +153,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
             environment: submitted.environment,
             windowStart: submitted
               ? new Date(submitted.beforeStart).toISOString()
-              : new Date(Date.now() - 14 * 24 * 3600_000).toISOString(),
+              : new Date(Date.now() - 14 * 24 * MILLIS_PER_HOUR).toISOString(),
             windowEnd: submitted
               ? new Date(submitted.afterEnd).toISOString()
               : new Date().toISOString(),
@@ -442,14 +446,15 @@ export const EnvironmentComparisonPage: React.FC = () => {
                               before: compareQuery.data.beforeMetrics.cpuUsagePercent,
                               after: compareQuery.data.afterMetrics.cpuUsagePercent,
                               unit: '%',
-                              delta: 0,
+                              // API does not provide a pre-computed delta for resource metrics
+                              delta: null as number | null,
                             },
                             {
                               label: t('environmentComparison.metrics.memory'),
                               before: compareQuery.data.beforeMetrics.memoryUsageMb,
                               after: compareQuery.data.afterMetrics.memoryUsageMb,
                               unit: 'MB',
-                              delta: 0,
+                              delta: null as number | null,
                             },
                           ].map((row) => (
                             <tr key={row.label} className="text-text-primary">
@@ -461,7 +466,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                                 {row.after.toFixed(2)} {row.unit}
                               </td>
                               <td className="py-2">
-                                {row.delta !== 0 ? (
+                                {row.delta !== null && row.delta !== 0 ? (
                                   <div className="flex items-center gap-1">
                                     <DeltaIcon delta={row.delta} />
                                     <Badge variant={deltaVariant(row.delta)}>
