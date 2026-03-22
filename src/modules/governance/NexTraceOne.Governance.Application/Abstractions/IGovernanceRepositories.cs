@@ -404,3 +404,30 @@ public interface IIngestionExecutionRepository
         DateTimeOffset to,
         CancellationToken ct);
 }
+
+/// <summary>
+/// DTO for monthly count aggregation.
+/// </summary>
+public sealed record MonthlyCount(string Period, int Count);
+
+/// <summary>
+/// Interface do repositório de Analytics para Governance Trends.
+/// Define consultas agregadas para trends executivos.
+/// </summary>
+public interface IGovernanceAnalyticsRepository
+{
+    /// <summary>Retorna contagem de waivers criados por mês.</summary>
+    Task<IReadOnlyList<MonthlyCount>> GetWaiverCountsByMonthAsync(int months, CancellationToken ct);
+
+    /// <summary>Retorna contagem de packs publicados por mês.</summary>
+    Task<IReadOnlyList<MonthlyCount>> GetPublishedPackCountsByMonthAsync(int months, CancellationToken ct);
+
+    /// <summary>Retorna contagem de rollouts criados por mês.</summary>
+    Task<IReadOnlyList<MonthlyCount>> GetRolloutCountsByMonthAsync(int months, CancellationToken ct);
+
+    /// <summary>Retorna contagem total de waivers pendentes.</summary>
+    Task<int> GetPendingWaiverCountAsync(CancellationToken ct);
+
+    /// <summary>Retorna contagem total de packs publicados ativos.</summary>
+    Task<int> GetPublishedPackCountAsync(CancellationToken ct);
+}

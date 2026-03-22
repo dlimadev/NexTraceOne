@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Automation;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
@@ -43,6 +44,9 @@ public static class DependencyInjection
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);
+
+        // ── Automation (Workflow Persistence) infrastructure ──
+        services.AddAutomationInfrastructure(configuration);
 
         return services;
     }

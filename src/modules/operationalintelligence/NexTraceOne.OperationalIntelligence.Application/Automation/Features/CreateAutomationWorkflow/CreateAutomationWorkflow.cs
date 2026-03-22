@@ -1,6 +1,9 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Errors;
 
@@ -10,8 +13,6 @@ namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.Cr
 /// Feature: CreateAutomationWorkflow — cria um novo workflow de automação operacional,
 /// associando uma ação do catálogo a um serviço, incidente ou alteração com rastreabilidade completa.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
-///
-/// Nota: nesta fase os dados são simulados até integração completa entre módulos.
 /// </summary>
 public static class CreateAutomationWorkflow
 {
@@ -42,25 +43,56 @@ public static class CreateAutomationWorkflow
         }
     }
 
-    /// <summary>Handler que cria o workflow de automação com dados simulados.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que cria e persiste o workflow de automação.</summary>
+    public sealed class Handler(
+        IAutomationWorkflowRepository workflowRepository,
+        IAutomationAuditRepository auditRepository,
+        IAutomationUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             var catalog = AutomationActionCatalog.GetAll();
             var action = catalog.FirstOrDefault(a =>
                 a.ActionId.Equals(request.ActionId, StringComparison.OrdinalIgnoreCase));
 
             if (action is null)
-                return Task.FromResult<Result<Response>>(AutomationErrors.ActionNotFound(request.ActionId));
+                return AutomationErrors.ActionNotFound(request.ActionId);
+
+            var utcNow = clock.UtcNow;
+
+            var workflow = AutomationWorkflowRecord.Create(
+                actionId: request.ActionId,
+                serviceId: request.ServiceId,
+                incidentId: request.IncidentId,
+                changeId: request.ChangeId,
+                rationale: request.Rationale,
+                requestedBy: request.RequestedBy,
+                targetScope: request.TargetScope,
+                targetEnvironment: request.TargetEnvironment,
+                riskLevel: action.RiskLevel,
+                utcNow: utcNow);
+
+            await workflowRepository.AddAsync(workflow, cancellationToken);
+
+            var auditEntry = AutomationAuditRecord.Create(
+                workflowId: workflow.Id,
+                action: AutomationAuditAction.WorkflowCreated,
+                actor: request.RequestedBy,
+                details: $"Workflow created for action '{action.DisplayName}'. Rationale: {request.Rationale}",
+                utcNow: utcNow,
+                serviceId: request.ServiceId);
+
+            await auditRepository.AddAsync(auditEntry, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
             var response = new Response(
-                WorkflowId: Guid.NewGuid(),
+                WorkflowId: workflow.Id.Value,
                 Status: AutomationWorkflowStatus.Draft,
                 ActionId: request.ActionId,
-                CreatedAt: DateTimeOffset.UtcNow);
+                CreatedAt: utcNow);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

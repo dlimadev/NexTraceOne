@@ -60,7 +60,7 @@ public static class ListIntegrationConnectors
                     ConnectorType: c.ConnectorType,
                     Provider: c.Provider,
                     Status: c.Status.ToString(),
-                    Environment: "Production", // TODO: add Environment field to entity
+                    Environment: c.Environment,
                     HealthStatus: c.Health.ToString(),
                     LastSuccessAt: c.LastSuccessAt,
                     LastFailureAt: c.LastErrorAt,

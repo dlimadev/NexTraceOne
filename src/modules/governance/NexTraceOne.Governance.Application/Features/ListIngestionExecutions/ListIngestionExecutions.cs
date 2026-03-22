@@ -90,7 +90,7 @@ public static class ListIngestionExecutions
                 RecordsNormalized: e.ItemsSucceeded,
                 Warnings: e.ItemsFailed > 0 && e.ItemsSucceeded > 0 ? e.ItemsFailed : 0,
                 Errors: e.Result == ExecutionResult.Failed ? e.ItemsFailed : 0,
-                RetryAttempt: 0, // TODO: add retry tracking
+                RetryAttempt: e.RetryAttempt,
                 CorrelationId: e.CorrelationId ?? ""))
                 .ToList();
 

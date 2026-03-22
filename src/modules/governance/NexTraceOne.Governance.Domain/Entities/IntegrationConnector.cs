@@ -59,6 +59,18 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
     /// <summary>Execuções com falha.</summary>
     public long FailedExecutions { get; private set; }
 
+    /// <summary>Environment this connector operates in (ex: "Production", "Staging").</summary>
+    public string Environment { get; private set; } = "Production";
+
+    /// <summary>Authentication mode used by the connector (ex: "OAuth2 App Token", "API Key").</summary>
+    public string AuthenticationMode { get; private set; } = "Not configured";
+
+    /// <summary>Polling mode of the connector (ex: "Webhook", "Polling", "Webhook + Polling").</summary>
+    public string PollingMode { get; private set; } = "Not configured";
+
+    /// <summary>Teams allowed to use this connector (stored as JSON).</summary>
+    public IReadOnlyList<string> AllowedTeams { get; private set; } = [];
+
     /// <summary>Data/hora UTC de criação.</summary>
     public DateTimeOffset CreatedAt { get; private init; }
 
@@ -76,6 +88,10 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
         string? description,
         string provider,
         string? endpoint,
+        string? environment,
+        string? authenticationMode,
+        string? pollingMode,
+        IReadOnlyList<string>? allowedTeams,
         DateTimeOffset utcNow)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
@@ -93,6 +109,10 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
             Description = description?.Trim(),
             Provider = provider.Trim(),
             Endpoint = endpoint?.Trim(),
+            Environment = environment?.Trim() ?? "Production",
+            AuthenticationMode = authenticationMode?.Trim() ?? "Not configured",
+            PollingMode = pollingMode?.Trim() ?? "Not configured",
+            AllowedTeams = allowedTeams ?? [],
             Status = ConnectorStatus.Active,
             Health = ConnectorHealth.Unknown,
             TotalExecutions = 0,
@@ -169,6 +189,16 @@ public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
     public void UpdateEndpoint(string? endpoint, DateTimeOffset utcNow)
     {
         Endpoint = endpoint?.Trim();
+        UpdatedAt = utcNow;
+    }
+
+    /// <summary>Atualiza a configuração do conector.</summary>
+    public void UpdateConfiguration(string? environment, string? authenticationMode, string? pollingMode, IReadOnlyList<string>? allowedTeams, DateTimeOffset utcNow)
+    {
+        if (environment is not null) Environment = environment.Trim();
+        if (authenticationMode is not null) AuthenticationMode = authenticationMode.Trim();
+        if (pollingMode is not null) PollingMode = pollingMode.Trim();
+        if (allowedTeams is not null) AllowedTeams = allowedTeams;
         UpdatedAt = utcNow;
     }
 }

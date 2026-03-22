@@ -1,0 +1,49 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
+
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence.Configurations;
+
+/// <summary>Configuração EF Core da entidade AutomationValidationRecord.</summary>
+internal sealed class AutomationValidationRecordConfiguration : IEntityTypeConfiguration<AutomationValidationRecord>
+{
+    public void Configure(EntityTypeBuilder<AutomationValidationRecord> builder)
+    {
+        builder.ToTable("oi_automation_validations");
+
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(id => id.Value, value => new AutomationValidationRecordId(value));
+
+        builder.Property(x => x.WorkflowId)
+            .HasConversion(id => id.Value, value => new AutomationWorkflowRecordId(value))
+            .IsRequired();
+
+        builder.Property(x => x.Outcome)
+            .HasConversion<string>()
+            .HasMaxLength(50)
+            .IsRequired()
+            .HasDefaultValue(AutomationOutcome.Success);
+
+        builder.Property(x => x.ValidatedBy).HasMaxLength(200).IsRequired();
+        builder.Property(x => x.Notes).HasMaxLength(2000).IsRequired();
+        builder.Property(x => x.ObservedOutcome).HasMaxLength(2000);
+
+        builder.Property(x => x.ValidatedAt)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired();
+
+        builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired();
+
+        builder.HasOne<AutomationWorkflowRecord>()
+            .WithMany()
+            .HasForeignKey(x => x.WorkflowId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.WorkflowId).IsUnique();
+        builder.HasIndex(x => x.Outcome);
+    }
+}

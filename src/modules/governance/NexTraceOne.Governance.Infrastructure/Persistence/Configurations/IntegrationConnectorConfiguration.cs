@@ -68,6 +68,28 @@ internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfigurati
         builder.Property(x => x.FailedExecutions)
             .IsRequired();
 
+        builder.Property(x => x.Environment)
+            .HasMaxLength(100)
+            .IsRequired()
+            .HasDefaultValue("Production");
+
+        builder.Property(x => x.AuthenticationMode)
+            .HasMaxLength(200)
+            .IsRequired()
+            .HasDefaultValue("Not configured");
+
+        builder.Property(x => x.PollingMode)
+            .HasMaxLength(200)
+            .IsRequired()
+            .HasDefaultValue("Not configured");
+
+        builder.Property(x => x.AllowedTeams)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                teams => System.Text.Json.JsonSerializer.Serialize(teams, (System.Text.Json.JsonSerializerOptions?)null),
+                json => System.Text.Json.JsonSerializer.Deserialize<List<string>>(json, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>())
+            .IsRequired();
+
         builder.Property(x => x.CreatedAt)
             .HasColumnType("timestamp with time zone")
             .IsRequired();
@@ -81,5 +103,6 @@ internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfigurati
         builder.HasIndex(x => x.Provider);
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Health);
+        builder.HasIndex(x => x.Environment);
     }
 }

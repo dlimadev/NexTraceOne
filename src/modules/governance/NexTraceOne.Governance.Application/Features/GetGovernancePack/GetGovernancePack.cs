@@ -31,6 +31,17 @@ public static class GetGovernancePack
 
             // Obtem versões do pack
             var versions = await versionRepository.ListByPackIdAsync(pack.Id, cancellationToken);
+            
+            // Get latest version for rules
+            var latestVersion = await versionRepository.GetLatestByPackIdAsync(pack.Id, cancellationToken);
+            var rules = latestVersion?.Rules.Select(r => new RuleBindingDto(
+                RuleId: r.RuleId,
+                RuleName: r.RuleName,
+                Description: r.Description ?? string.Empty,
+                Category: r.Category,
+                DefaultEnforcementMode: r.DefaultEnforcementMode,
+                IsRequired: r.IsRequired)).ToList() ?? new List<RuleBindingDto>();
+
             var versionDtos = versions
                 .OrderByDescending(v => v.CreatedAt)
                 .Take(5)
@@ -39,12 +50,11 @@ public static class GetGovernancePack
                     Version: v.Version,
                     CreatedAt: v.CreatedAt,
                     CreatedBy: v.CreatedBy,
-                    RuleCount: 0 // TODO: enriquecer com contagem real de rules
+                    RuleCount: v.Rules.Count
                 ))
                 .ToList();
 
-            // TODO: implementar RuleBindings quando tiver GovernanceRuleBinding no domínio
-            var rules = new List<RuleBindingDto>();
+            // TODO: implementar Scopes quando tiver escopo completo no domínio
             var scopes = new List<ScopeDto>();
 
             var detail = new GovernancePackDetailDto(
@@ -56,7 +66,7 @@ public static class GetGovernancePack
                 Status: pack.Status,
                 CurrentVersion: pack.CurrentVersion ?? "0.0.0",
                 ScopeCount: 0,
-                RuleCount: 0,
+                RuleCount: rules.Count,
                 CreatedAt: pack.CreatedAt,
                 UpdatedAt: pack.UpdatedAt,
                 Rules: rules,

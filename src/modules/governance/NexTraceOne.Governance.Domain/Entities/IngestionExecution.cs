@@ -52,6 +52,9 @@ public sealed class IngestionExecution : Entity<IngestionExecutionId>
     /// <summary>Código de erro, se aplicável.</summary>
     public string? ErrorCode { get; private set; }
 
+    /// <summary>Number of retry attempts for this execution (0 = first attempt).</summary>
+    public int RetryAttempt { get; private set; }
+
     /// <summary>Data/hora UTC de criação.</summary>
     public DateTimeOffset CreatedAt { get; private init; }
 
@@ -64,7 +67,8 @@ public sealed class IngestionExecution : Entity<IngestionExecutionId>
         IntegrationConnectorId connectorId,
         IngestionSourceId? sourceId,
         string? correlationId,
-        DateTimeOffset utcNow)
+        DateTimeOffset utcNow,
+        int retryAttempt = 0)
     {
         Guard.Against.Null(connectorId, nameof(connectorId));
 
@@ -76,6 +80,7 @@ public sealed class IngestionExecution : Entity<IngestionExecutionId>
             CorrelationId = correlationId ?? $"exec-{Guid.NewGuid():N}"[..20],
             StartedAt = utcNow,
             Result = ExecutionResult.Running,
+            RetryAttempt = retryAttempt,
             CreatedAt = utcNow
         };
     }

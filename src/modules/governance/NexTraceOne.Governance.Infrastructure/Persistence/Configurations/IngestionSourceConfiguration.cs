@@ -32,6 +32,11 @@ internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<In
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.Property(x => x.DataDomain)
+            .HasMaxLength(100)
+            .IsRequired()
+            .HasDefaultValue("");
+
         builder.Property(x => x.Description)
             .HasMaxLength(2000);
 
@@ -78,6 +83,7 @@ internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<In
         builder.HasIndex(x => x.ConnectorId);
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => x.SourceType);
+        builder.HasIndex(x => x.DataDomain);
         builder.HasIndex(x => x.TrustLevel);
         builder.HasIndex(x => x.FreshnessStatus);
         builder.HasIndex(x => x.Status);

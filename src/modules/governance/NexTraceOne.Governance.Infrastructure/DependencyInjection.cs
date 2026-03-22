@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
         services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
         services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
+        services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
 
         return services;
     }

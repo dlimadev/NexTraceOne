@@ -93,6 +93,10 @@ public sealed class IntegrationHubFeatureTests
             description: "GitHub CI/CD",
             provider: "GitHub",
             endpoint: "https://api.github.com",
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
             utcNow: DateTimeOffset.UtcNow);
 
         _connectorRepository.GetByIdAsync(Arg.Any<IntegrationConnectorId>(), Arg.Any<CancellationToken>())
@@ -153,11 +157,11 @@ public sealed class IntegrationHubFeatureTests
     public async Task ListSources_WithData_ShouldReturnItems()
     {
         // Arrange
-        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, DateTimeOffset.UtcNow);
+        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, null, null, null, null, DateTimeOffset.UtcNow);
         var sources = new List<IngestionSource>
         {
-            IngestionSource.Create(connector.Id, "Webhook", "Webhook", null, null, 30, DateTimeOffset.UtcNow),
-            IngestionSource.Create(connector.Id, "Polling", "API Polling", null, null, 60, DateTimeOffset.UtcNow)
+            IngestionSource.Create(connector.Id, "Webhook", "Webhook", null, null, null, 30, DateTimeOffset.UtcNow),
+            IngestionSource.Create(connector.Id, "Polling", "API Polling", null, null, null, 60, DateTimeOffset.UtcNow)
         };
 
         _sourceRepository.ListAsync(
@@ -186,7 +190,7 @@ public sealed class IntegrationHubFeatureTests
     public async Task ListExecutions_WithData_ShouldReturnItems()
     {
         // Arrange
-        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, DateTimeOffset.UtcNow);
+        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, null, null, null, null, DateTimeOffset.UtcNow);
         var executions = new List<IngestionExecution>
         {
             IngestionExecution.Start(connector.Id, null, "corr-1", DateTimeOffset.UtcNow),
@@ -249,7 +253,7 @@ public sealed class IntegrationHubFeatureTests
         var connector = connectors[0];
         var sources = new List<IngestionSource>
         {
-            IngestionSource.Create(connector.Id, "test", "Webhook", null, null, 30, DateTimeOffset.UtcNow)
+            IngestionSource.Create(connector.Id, "test", "Webhook", null, null, null, 30, DateTimeOffset.UtcNow)
         };
         _sourceRepository.ListAsync(
             Arg.Any<IntegrationConnectorId?>(),
@@ -277,10 +281,10 @@ public sealed class IntegrationHubFeatureTests
     public async Task GetFreshness_ShouldReturnFreshnessSummary()
     {
         // Arrange
-        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, DateTimeOffset.UtcNow);
+        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, null, null, null, null, DateTimeOffset.UtcNow);
         var sources = new List<IngestionSource>
         {
-            IngestionSource.Create(connector.Id, "test", "Webhook", null, null, 30, DateTimeOffset.UtcNow)
+            IngestionSource.Create(connector.Id, "test", "Webhook", null, null, null, 30, DateTimeOffset.UtcNow)
         };
 
         _sourceRepository.ListAsync(
@@ -309,7 +313,7 @@ public sealed class IntegrationHubFeatureTests
     {
         // Arrange
         var connectorId = Guid.NewGuid();
-        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, DateTimeOffset.UtcNow);
+        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, null, null, null, null, DateTimeOffset.UtcNow);
 
         _connectorRepository.GetByIdAsync(Arg.Any<IntegrationConnectorId>(), Arg.Any<CancellationToken>())
             .Returns(connector);
@@ -358,7 +362,7 @@ public sealed class IntegrationHubFeatureTests
     public async Task ReprocessExecution_ValidId_ShouldReturnQueued()
     {
         // Arrange
-        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, DateTimeOffset.UtcNow);
+        var connector = IntegrationConnector.Create("test", "CI/CD", null, "Test", null, null, null, null, null, DateTimeOffset.UtcNow);
         var originalExecution = IngestionExecution.Start(connector.Id, null, "original-corr", DateTimeOffset.UtcNow);
 
         _executionRepository.GetByIdAsync(Arg.Any<IngestionExecutionId>(), Arg.Any<CancellationToken>())
@@ -415,6 +419,10 @@ public sealed class IntegrationHubFeatureTests
                 description: $"Test connector {i}",
                 provider: "TestProvider",
                 endpoint: null,
+                environment: null,
+                authenticationMode: null,
+                pollingMode: null,
+                allowedTeams: null,
                 utcNow: DateTimeOffset.UtcNow));
         }
         return connectors;

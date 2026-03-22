@@ -170,6 +170,10 @@ deployments.MapPost("/events", async (
             description: $"Auto-registered {request.Provider} connector",
             provider: request.Provider,
             endpoint: null,
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
             utcNow: clock.UtcNow);
         await connectorRepo.AddAsync(connector, ct);
     }
@@ -182,6 +186,7 @@ deployments.MapPost("/events", async (
             connectorId: connector.Id,
             name: request.Source ?? "default",
             sourceType: "Webhook",
+            dataDomain: null,
             description: $"Deployment events from {request.Provider}",
             endpoint: null,
             expectedIntervalMinutes: 30,
@@ -249,6 +254,10 @@ promotions.MapPost("/events", async (
             description: "Environment promotion events",
             provider: "Internal",
             endpoint: null,
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
             utcNow: clock.UtcNow);
         await connectorRepo.AddAsync(connector, ct);
     }
@@ -303,6 +312,10 @@ runtime.MapPost("/signals", async (
             description: "Runtime signals and markers",
             provider: "Internal",
             endpoint: null,
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
             utcNow: clock.UtcNow);
         await connectorRepo.AddAsync(connector, ct);
     }
@@ -359,6 +372,10 @@ consumers.MapPost("/sync", async (
             description: "Consumer and dependency updates",
             provider: "Internal",
             endpoint: null,
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
             utcNow: clock.UtcNow);
         await connectorRepo.AddAsync(connector, ct);
     }
@@ -417,6 +434,10 @@ contracts.MapPost("/sync", async (
             description: "External contract synchronization",
             provider: request.Provider ?? "External",
             endpoint: null,
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
             utcNow: clock.UtcNow);
         await connectorRepo.AddAsync(connector, ct);
     }
