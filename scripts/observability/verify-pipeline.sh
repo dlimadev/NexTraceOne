@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════════════
 # NexTraceOne — Observability Pipeline Verification
-# Verifies end-to-end: OTLP Collector → Tempo (traces) / Loki (logs) / Grafana
+# Verifies end-to-end: OTLP Collector → ClickHouse (traces, logs, metrics)
+#
+# Providers suportados: ClickHouse (default local) ou Elastic (enterprise)
+# Modos de coleta: OpenTelemetry Collector (Kubernetes) ou CLR Profiler (IIS)
 # ═══════════════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
 OTEL_COLLECTOR_URL="${OTEL_COLLECTOR_URL:-http://localhost:4318}"
-TEMPO_URL="${TEMPO_URL:-http://localhost:3200}"
-LOKI_URL="${LOKI_URL:-http://localhost:3100}"
-GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
+CLICKHOUSE_URL="${CLICKHOUSE_URL:-http://localhost:8123}"
 TIMEOUT="${TIMEOUT:-10}"
 VERBOSE="${VERBOSE:-false}"
 
@@ -55,21 +56,18 @@ usage() {
 Usage: $(basename "$0") [options]
 
 Verifies the NexTraceOne observability pipeline end-to-end.
+Supports configurable providers (ClickHouse/Elastic) and collection modes.
 
 Options:
-  --otel-url <url>     OTel Collector HTTP endpoint (default: $OTEL_COLLECTOR_URL)
-  --tempo-url <url>    Tempo endpoint (default: $TEMPO_URL)
-  --loki-url <url>     Loki endpoint (default: $LOKI_URL)
-  --grafana-url <url>  Grafana endpoint (default: $GRAFANA_URL)
-  --timeout <seconds>  HTTP timeout per check (default: $TIMEOUT)
-  --verbose            Verbose output
-  --help               Show this help
+  --otel-url <url>       OTel Collector HTTP endpoint (default: $OTEL_COLLECTOR_URL)
+  --clickhouse-url <url> ClickHouse HTTP endpoint (default: $CLICKHOUSE_URL)
+  --timeout <seconds>    HTTP timeout per check (default: $TIMEOUT)
+  --verbose              Verbose output
+  --help                 Show this help
 
 Environment Variables:
   OTEL_COLLECTOR_URL   OTel Collector HTTP endpoint
-  TEMPO_URL            Tempo endpoint
-  LOKI_URL             Loki endpoint
-  GRAFANA_URL          Grafana endpoint
+  CLICKHOUSE_URL       ClickHouse HTTP endpoint
 
 Exit Codes:
   0  All checks passed
@@ -81,14 +79,12 @@ EOF
 # ── Parse Arguments ───────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --otel-url)    OTEL_COLLECTOR_URL="$2"; shift 2 ;;
-        --tempo-url)   TEMPO_URL="$2"; shift 2 ;;
-        --loki-url)    LOKI_URL="$2"; shift 2 ;;
-        --grafana-url) GRAFANA_URL="$2"; shift 2 ;;
-        --timeout)     TIMEOUT="$2"; shift 2 ;;
-        --verbose)     VERBOSE="true"; shift ;;
-        --help)        usage ;;
-        *)             echo "Unknown option: $1"; usage ;;
+        --otel-url)       OTEL_COLLECTOR_URL="$2"; shift 2 ;;
+        --clickhouse-url) CLICKHOUSE_URL="$2"; shift 2 ;;
+        --timeout)        TIMEOUT="$2"; shift 2 ;;
+        --verbose)        VERBOSE="true"; shift ;;
+        --help)           usage ;;
+        *)                echo "Unknown option: $1"; usage ;;
     esac
 done
 
@@ -99,9 +95,7 @@ echo "  NexTraceOne — Observability Pipeline Verification"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 info "OTel Collector: $OTEL_COLLECTOR_URL"
-info "Tempo:          $TEMPO_URL"
-info "Loki:           $LOKI_URL"
-info "Grafana:        $GRAFANA_URL"
+info "ClickHouse:     $CLICKHOUSE_URL"
 echo ""
 
 # ── 1. OTel Collector Health ─────────────────────────────────────────────────
@@ -109,36 +103,36 @@ log "── OpenTelemetry Collector ──"
 check_endpoint "OTel Collector OTLP/HTTP endpoint" "$OTEL_COLLECTOR_URL/v1/traces" "405" || true
 # 405 = Method Not Allowed is expected for GET on a POST-only endpoint — means it's alive
 
-# ── 2. Tempo Health ──────────────────────────────────────────────────────────
-log "── Grafana Tempo (Traces) ──"
-check_endpoint "Tempo readiness" "$TEMPO_URL/ready" || true
-check_endpoint "Tempo status" "$TEMPO_URL/status" || true
+# ── 2. ClickHouse Health ────────────────────────────────────────────────────
+log "── ClickHouse (Observability Provider) ──"
+check_endpoint "ClickHouse HTTP interface" "$CLICKHOUSE_URL/?query=SELECT%201" || true
 
-# ── 3. Loki Health ───────────────────────────────────────────────────────────
-log "── Grafana Loki (Logs) ──"
-check_endpoint "Loki readiness" "$LOKI_URL/ready" || true
-check_endpoint "Loki ring status" "$LOKI_URL/ring" || true
+# Check ClickHouse database exists
+info "Checking ClickHouse database..."
+ch_db_check=$(curl -s --max-time "$TIMEOUT" \
+    "$CLICKHOUSE_URL/?query=SELECT+name+FROM+system.databases+WHERE+name='nextraceone_obs'" \
+    2>/dev/null) || ch_db_check=""
 
-# ── 4. Grafana Health ────────────────────────────────────────────────────────
-log "── Grafana (Dashboards) ──"
-check_endpoint "Grafana health" "$GRAFANA_URL/api/health" || true
-
-# Check Grafana datasources provisioning
-info "Checking Grafana datasources..."
-ds_response=$(curl -s --max-time "$TIMEOUT" "$GRAFANA_URL/api/datasources" 2>/dev/null) || ds_response=""
-if echo "$ds_response" | grep -q "tempo" 2>/dev/null; then
-    pass "Grafana datasource 'Tempo' provisioned"
+if echo "$ch_db_check" | grep -q "nextraceone_obs" 2>/dev/null; then
+    pass "ClickHouse database 'nextraceone_obs' exists"
 else
-    warn "Grafana datasource 'Tempo' not found (may require authentication)"
+    warn "ClickHouse database 'nextraceone_obs' not found (may need initialization)"
 fi
 
-if echo "$ds_response" | grep -q "loki" 2>/dev/null; then
-    pass "Grafana datasource 'Loki' provisioned"
-else
-    warn "Grafana datasource 'Loki' not found (may require authentication)"
-fi
+# Check ClickHouse tables exist
+for table in otel_logs otel_traces otel_metrics; do
+    ch_table_check=$(curl -s --max-time "$TIMEOUT" \
+        "$CLICKHOUSE_URL/?query=SELECT+name+FROM+system.tables+WHERE+database='nextraceone_obs'+AND+name='$table'" \
+        2>/dev/null) || ch_table_check=""
 
-# ── 5. Send Test Trace ───────────────────────────────────────────────────────
+    if echo "$ch_table_check" | grep -q "$table" 2>/dev/null; then
+        pass "ClickHouse table '$table' exists"
+    else
+        warn "ClickHouse table '$table' not found"
+    fi
+done
+
+# ── 3. Send Test Trace ───────────────────────────────────────────────────────
 log "── OTLP Trace Ingestion Test ──"
 TRACE_ID=$(printf '%032x' $((RANDOM * RANDOM * RANDOM)))
 SPAN_ID=$(printf '%016x' $((RANDOM * RANDOM)))
@@ -162,8 +156,8 @@ trace_payload=$(cat <<EOJSON
         "startTimeUnixNano": "$(date +%s)000000000",
         "endTimeUnixNano": "$(date +%s)100000000",
         "attributes": [{
-          "key": "verification.phase",
-          "value": { "stringValue": "phase-7" }
+          "key": "verification.type",
+          "value": { "stringValue": "clickhouse-provider" }
         }]
       }]
     }]
@@ -183,7 +177,7 @@ else
     fail "OTLP trace ingestion — HTTP $trace_response (expected 200)"
 fi
 
-# ── 6. Send Test Log ─────────────────────────────────────────────────────────
+# ── 4. Send Test Log ─────────────────────────────────────────────────────────
 log "── OTLP Log Ingestion Test ──"
 log_payload=$(cat <<EOJSON
 {
@@ -200,10 +194,10 @@ log_payload=$(cat <<EOJSON
         "timeUnixNano": "$(date +%s)000000000",
         "severityNumber": 9,
         "severityText": "INFO",
-        "body": { "stringValue": "NexTraceOne pipeline verification — Phase 7" },
+        "body": { "stringValue": "NexTraceOne pipeline verification — ClickHouse provider" },
         "attributes": [{
-          "key": "verification.phase",
-          "value": { "stringValue": "phase-7" }
+          "key": "verification.type",
+          "value": { "stringValue": "clickhouse-provider" }
         }]
       }]
     }]
@@ -223,51 +217,28 @@ else
     fail "OTLP log ingestion — HTTP $log_response (expected 200)"
 fi
 
-# ── 7. Verify Trace in Tempo ─────────────────────────────────────────────────
-log "── Trace Verification in Tempo ──"
-sleep 2  # Allow propagation
-tempo_trace=$(curl -s --max-time "$TIMEOUT" "$TEMPO_URL/api/traces/$TRACE_ID" 2>/dev/null) || tempo_trace=""
+# ── 5. Verify Data in ClickHouse ─────────────────────────────────────────────
+log "── Data Verification in ClickHouse ──"
+sleep 3  # Allow propagation through Collector pipeline
 
-if echo "$tempo_trace" | grep -q "pipeline-verification-check" 2>/dev/null; then
-    pass "Trace found in Tempo — traceId=$TRACE_ID"
-elif [[ -n "$tempo_trace" && "$tempo_trace" != *"error"* ]]; then
-    warn "Trace submitted but not yet queryable in Tempo (propagation delay)"
+ch_traces=$(curl -s --max-time "$TIMEOUT" \
+    "$CLICKHOUSE_URL/?query=SELECT+count()+FROM+nextraceone_obs.otel_traces+WHERE+TraceId='$TRACE_ID'" \
+    2>/dev/null) || ch_traces=""
+
+if [[ -n "$ch_traces" && "$ch_traces" != "0" && "$ch_traces" != "" ]]; then
+    pass "Trace found in ClickHouse — traceId=$TRACE_ID"
 else
-    warn "Could not verify trace in Tempo (service may be unreachable or trace not yet flushed)"
+    warn "Trace not yet visible in ClickHouse (propagation delay or Collector not connected)"
 fi
 
-# ── 8. Verify Logs in Loki ───────────────────────────────────────────────────
-log "── Log Verification in Loki ──"
-loki_query=$(curl -s --max-time "$TIMEOUT" \
-    "$LOKI_URL/loki/api/v1/query?query=%7Bservice_name%3D%22nextraceone-verification%22%7D&limit=5" \
-    2>/dev/null) || loki_query=""
+ch_logs=$(curl -s --max-time "$TIMEOUT" \
+    "$CLICKHOUSE_URL/?query=SELECT+count()+FROM+nextraceone_obs.otel_logs+WHERE+ServiceName='nextraceone-verification'" \
+    2>/dev/null) || ch_logs=""
 
-if echo "$loki_query" | grep -q "result" 2>/dev/null; then
-    pass "Loki query API responding"
+if [[ -n "$ch_logs" && "$ch_logs" != "0" && "$ch_logs" != "" ]]; then
+    pass "Logs found in ClickHouse for verification service"
 else
-    warn "Loki query did not return expected results (service may be unreachable)"
-fi
-
-# ── 9. Grafana Dashboard Verification ────────────────────────────────────────
-log "── Grafana Dashboard Provisioning ──"
-dashboard_search=$(curl -s --max-time "$TIMEOUT" "$GRAFANA_URL/api/search?type=dash-db" 2>/dev/null) || dashboard_search=""
-
-if echo "$dashboard_search" | grep -q "platform-health" 2>/dev/null; then
-    pass "Dashboard 'platform-health' provisioned in Grafana"
-else
-    warn "Dashboard 'platform-health' not found (may require auth or provisioning)"
-fi
-
-if echo "$dashboard_search" | grep -q "business-observability" 2>/dev/null; then
-    pass "Dashboard 'business-observability' provisioned in Grafana"
-else
-    warn "Dashboard 'business-observability' not found (may require auth or provisioning)"
-fi
-
-if echo "$dashboard_search" | grep -q "runtime-environment" 2>/dev/null; then
-    pass "Dashboard 'runtime-environment-comparison' provisioned in Grafana"
-else
-    warn "Dashboard 'runtime-environment-comparison' not found (may require auth or provisioning)"
+    warn "Logs not yet visible in ClickHouse (propagation delay or Collector not connected)"
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────

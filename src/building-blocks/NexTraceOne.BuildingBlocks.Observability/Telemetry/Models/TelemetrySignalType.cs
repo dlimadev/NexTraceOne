@@ -7,13 +7,13 @@ namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 /// </summary>
 public enum TelemetrySignalType
 {
-    /// <summary>Traces distribuídos (spans) — traces crus vão para Telemetry Store.</summary>
+    /// <summary>Traces distribuídos (spans) — traces crus vão para o provider de observabilidade.</summary>
     Traces = 1,
 
-    /// <summary>Métricas de runtime — agregados vão para Product Store, alta cardinalidade para Telemetry Store.</summary>
+    /// <summary>Métricas de runtime — agregados vão para Product Store, alta cardinalidade para provider de observabilidade.</summary>
     Metrics = 2,
 
-    /// <summary>Logs estruturados — logs crus vão para Telemetry Store.</summary>
+    /// <summary>Logs estruturados — logs crus vão para o provider de observabilidade.</summary>
     Logs = 3
 }
 
@@ -23,7 +23,7 @@ public enum TelemetrySignalType
 /// </summary>
 public enum AggregationLevel
 {
-    /// <summary>Dados crus (não armazenados no Product Store — ficam no Telemetry Store).</summary>
+    /// <summary>Dados crus (não armazenados no Product Store — ficam no provider de observabilidade).</summary>
     Raw = 0,
 
     /// <summary>Agregados por minuto — alta granularidade para investigação recente.</summary>

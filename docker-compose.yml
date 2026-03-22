@@ -3,11 +3,15 @@
 #
 # Stack mínima para desenvolvimento local e staging:
 #   - PostgreSQL (4 bancos lógicos)
+#   - ClickHouse (observabilidade — provider configurável)
+#   - OpenTelemetry Collector (pipeline de ingestão — modo de coleta configurável)
 #   - ApiHost (API principal)
 #   - BackgroundWorkers (jobs assíncronos)
 #   - Ingestion.Api (integrações externas)
 #   - Frontend (React SPA via nginx)
-#   - OpenTelemetry Collector + Tempo + Loki + Grafana (observabilidade)
+#
+# Providers suportados: ClickHouse (default local) ou Elastic (enterprise externo)
+# Modos de coleta: OpenTelemetry Collector (Kubernetes) ou CLR Profiler (IIS/Windows)
 #
 # Uso:
 #   cp .env.example .env && nano .env   # Configurar variáveis
@@ -42,6 +46,30 @@ services:
     networks:
       - nextraceone-net
 
+  # ── ClickHouse (observabilidade — provider padrão) ─────────────────────────
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: nextraceone_obs
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./build/clickhouse/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql:ro
+    ports:
+      - "8123:8123"    # HTTP interface
+      - "9000:9000"    # Native protocol
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - nextraceone-net
+
   # ── OpenTelemetry Collector ─────────────────────────────────────────────────
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.115.0
@@ -54,55 +82,8 @@ services:
       - "4318:4318"    # OTLP HTTP
       - "8888:8888"    # Prometheus metrics
     depends_on:
-      - tempo
-      - loki
-    networks:
-      - nextraceone-net
-
-  # ── Tempo (traces) ──────────────────────────────────────────────────────────
-  tempo:
-    image: grafana/tempo:2.6.1
-    restart: unless-stopped
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-      - ./build/otel-collector/tempo.yaml:/etc/tempo.yaml:ro
-      - tempo-data:/var/tempo
-    ports:
-      - "3200:3200"    # Tempo API
-    networks:
-      - nextraceone-net
-
-  # ── Loki (logs) ─────────────────────────────────────────────────────────────
-  loki:
-    image: grafana/loki:3.3.2
-    restart: unless-stopped
-    command: ["-config.file=/etc/loki.yaml"]
-    volumes:
-      - ./build/otel-collector/loki.yaml:/etc/loki.yaml:ro
-      - loki-data:/loki
-    ports:
-      - "3100:3100"    # Loki API
-    networks:
-      - nextraceone-net
-
-  # ── Grafana (dashboards) ────────────────────────────────────────────────────
-  grafana:
-    image: grafana/grafana:11.4.0
-    restart: unless-stopped
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
-      GF_AUTH_ANONYMOUS_ENABLED: "false"
-      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
-    volumes:
-      - ./build/observability/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./build/observability/grafana/dashboards:/var/lib/grafana/dashboards/nextraceone:ro
-      - grafana-data:/var/lib/grafana
-    ports:
-      - "3000:3000"    # Grafana UI
-    depends_on:
-      - tempo
-      - loki
+      clickhouse:
+        condition: service_healthy
     networks:
       - nextraceone-net
 
@@ -133,7 +114,9 @@ services:
 
       # Observability
       OpenTelemetry__Endpoint: http://otel-collector:4317
-      Serilog__WriteTo__1__Args__serverUrl: http://loki:3100
+      Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
+      Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=${CLICKHOUSE_PASSWORD:-}"
+      Telemetry__CollectionMode__ActiveMode: ${COLLECTION_MODE:-OpenTelemetryCollector}
 
       # Integrity check (desabilitar apenas em CI)
       NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
@@ -171,7 +154,8 @@ services:
       ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
 
       OpenTelemetry__Endpoint: http://otel-collector:4317
-      Serilog__WriteTo__1__Args__serverUrl: http://loki:3100
+      Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
+      Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=${CLICKHOUSE_PASSWORD:-}"
 
       NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
     ports:
@@ -208,7 +192,8 @@ services:
       Jwt__Audience: ${JWT_AUDIENCE:-NexTraceOne}
 
       OpenTelemetry__Endpoint: http://otel-collector:4317
-      Serilog__WriteTo__1__Args__serverUrl: http://loki:3100
+      Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
+      Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=${CLICKHOUSE_PASSWORD:-}"
 
       NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
     ports:
@@ -255,11 +240,7 @@ services:
 volumes:
   postgres-data:
     driver: local
-  tempo-data:
-    driver: local
-  loki-data:
-    driver: local
-  grafana-data:
+  clickhouse-data:
     driver: local
 
 # ── Networks ─────────────────────────────────────────────────────────────────

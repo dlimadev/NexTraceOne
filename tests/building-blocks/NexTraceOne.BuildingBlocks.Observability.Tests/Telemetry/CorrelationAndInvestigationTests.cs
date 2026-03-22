@@ -6,7 +6,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Tests.Telemetry;
 /// <summary>
 /// Testes de correlação release/runtime e contexto investigativo.
 /// Valida: correlation com markers, impacto de deploy, investigation context bundles,
-/// referências para dados crus no Telemetry Store.
+/// referências para dados crus no provider de observabilidade.
 /// </summary>
 public sealed class CorrelationAndInvestigationTests
 {
@@ -60,7 +60,7 @@ public sealed class CorrelationAndInvestigationTests
     }
 
     [Fact]
-    public void ReleaseCorrelation_ShouldReferenceTelemetryStore()
+    public void ReleaseCorrelation_ShouldReferenceObservabilityProvider()
     {
         var refIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
 
@@ -77,7 +77,7 @@ public sealed class CorrelationAndInvestigationTests
         };
 
         correlation.TelemetryReferenceIds.Should().HaveCount(3,
-            "referências para traces/logs crus no Telemetry Store devem ser preservadas");
+            "referências para traces/logs crus no provider de observabilidade devem ser preservadas");
     }
 
     [Fact]
@@ -128,14 +128,14 @@ public sealed class CorrelationAndInvestigationTests
     }
 
     [Fact]
-    public void TelemetryReference_ShouldPointToExternalStore()
+    public void TelemetryReference_ShouldPointToObservabilityProvider()
     {
         var reference = new TelemetryReference
         {
             SignalType = TelemetrySignalType.Traces,
             ExternalId = "abc123def456",
-            BackendType = "tempo",
-            AccessUri = "http://tempo:3200/api/traces/abc123def456",
+            BackendType = "clickhouse",
+            AccessUri = "SELECT * FROM nextraceone_obs.otel_traces WHERE TraceId = 'abc123def456'",
             ServiceId = Guid.NewGuid(),
             ServiceName = "payment-api",
             Environment = "production",
@@ -144,7 +144,7 @@ public sealed class CorrelationAndInvestigationTests
         };
 
         reference.SignalType.Should().Be(TelemetrySignalType.Traces);
-        reference.BackendType.Should().Be("tempo");
+        reference.BackendType.Should().Be("clickhouse");
         reference.AccessUri.Should().Contain("traces");
         reference.CorrelationId.Should().NotBeNull(
             "referências devem ser navegáveis a partir de anomalias e correlações");
@@ -156,13 +156,13 @@ public sealed class CorrelationAndInvestigationTests
         var reference = new TelemetryReference
         {
             SignalType = TelemetrySignalType.Logs,
-            ExternalId = "{job=\"nextraceone\"} |= \"ERROR\"",
-            BackendType = "loki",
+            ExternalId = "SELECT * FROM nextraceone_obs.otel_logs WHERE ServiceName = 'nextraceone' AND SeverityText = 'ERROR'",
+            BackendType = "clickhouse",
             OriginalTimestamp = DateTimeOffset.UtcNow
         };
 
         reference.SignalType.Should().Be(TelemetrySignalType.Logs);
-        reference.BackendType.Should().Be("loki");
+        reference.BackendType.Should().Be("clickhouse");
     }
 
     [Fact]
