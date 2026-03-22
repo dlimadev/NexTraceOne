@@ -1,0 +1,268 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Docker Compose (Aplicação Completa)
+#
+# Stack mínima para desenvolvimento local e staging:
+#   - PostgreSQL (4 bancos lógicos)
+#   - ApiHost (API principal)
+#   - BackgroundWorkers (jobs assíncronos)
+#   - Ingestion.Api (integrações externas)
+#   - Frontend (React SPA via nginx)
+#   - OpenTelemetry Collector + Tempo + Loki + Grafana (observabilidade)
+#
+# Uso:
+#   cp .env.example .env && nano .env   # Configurar variáveis
+#   docker compose up -d                # Subir stack completa
+#   docker compose down -v              # Parar e remover volumes
+#
+# Para desenvolvimento local (com override):
+#   docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nextraceone}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nextraceone}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - nextraceone-net
+
+  # ── OpenTelemetry Collector ─────────────────────────────────────────────────
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.115.0
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./build/otel-collector/otel-collector.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+      - "8888:8888"    # Prometheus metrics
+    depends_on:
+      - tempo
+      - loki
+    networks:
+      - nextraceone-net
+
+  # ── Tempo (traces) ──────────────────────────────────────────────────────────
+  tempo:
+    image: grafana/tempo:2.6.1
+    restart: unless-stopped
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./build/otel-collector/tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200"    # Tempo API
+    networks:
+      - nextraceone-net
+
+  # ── Loki (logs) ─────────────────────────────────────────────────────────────
+  loki:
+    image: grafana/loki:3.3.2
+    restart: unless-stopped
+    command: ["-config.file=/etc/loki.yaml"]
+    volumes:
+      - ./build/otel-collector/loki.yaml:/etc/loki.yaml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"    # Loki API
+    networks:
+      - nextraceone-net
+
+  # ── Grafana (dashboards) ────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:11.4.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - ./build/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./build/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"    # Grafana UI
+    depends_on:
+      - tempo
+      - loki
+    networks:
+      - nextraceone-net
+
+  # ── ApiHost ─────────────────────────────────────────────────────────────────
+  apihost:
+    build:
+      context: .
+      dockerfile: Dockerfile.apihost
+    image: nextraceone/apihost:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
+      ASPNETCORE_URLS: http://+:8080
+
+      # Connection strings (4 bancos lógicos)
+      ConnectionStrings__IdentityDatabase: ${CONNECTION_STRING_IDENTITY:?CONNECTION_STRING_IDENTITY is required}
+      ConnectionStrings__CatalogDatabase: ${CONNECTION_STRING_CATALOG:?CONNECTION_STRING_CATALOG is required}
+      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
+      ConnectionStrings__AiDatabase: ${CONNECTION_STRING_AI:?CONNECTION_STRING_AI is required}
+
+      # JWT
+      Jwt__Secret: ${JWT_SECRET:?JWT_SECRET is required}
+      Jwt__Issuer: ${JWT_ISSUER:-NexTraceOne}
+      Jwt__Audience: ${JWT_AUDIENCE:-NexTraceOne}
+
+      # Migrations (apenas Staging com consentimento explícito)
+      NEXTRACE_AUTO_MIGRATE: ${NEXTRACE_AUTO_MIGRATE:-false}
+
+      # Observability
+      OpenTelemetry__Endpoint: http://otel-collector:4317
+      Serilog__WriteTo__1__Args__serverUrl: http://loki:3100
+
+      # Integrity check (desabilitar apenas em CI)
+      NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
+
+      # CORS
+      Cors__AllowedOrigins__0: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+    ports:
+      - "${APIHOST_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    networks:
+      - nextraceone-net
+
+  # ── BackgroundWorkers ────────────────────────────────────────────────────────
+  workers:
+    build:
+      context: .
+      dockerfile: Dockerfile.workers
+    image: nextraceone/workers:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
+      ASPNETCORE_URLS: http://+:8081
+
+      ConnectionStrings__IdentityDatabase: ${CONNECTION_STRING_IDENTITY:?CONNECTION_STRING_IDENTITY is required}
+      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
+
+      OpenTelemetry__Endpoint: http://otel-collector:4317
+      Serilog__WriteTo__1__Args__serverUrl: http://loki:3100
+
+      NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
+    ports:
+      - "${WORKERS_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      apihost:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    networks:
+      - nextraceone-net
+
+  # ── Ingestion API ────────────────────────────────────────────────────────────
+  ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile.ingestion
+    image: nextraceone/ingestion:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
+      ASPNETCORE_URLS: http://+:8082
+
+      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
+
+      Jwt__Secret: ${JWT_SECRET:?JWT_SECRET is required}
+      Jwt__Issuer: ${JWT_ISSUER:-NexTraceOne}
+      Jwt__Audience: ${JWT_AUDIENCE:-NexTraceOne}
+
+      OpenTelemetry__Endpoint: http://otel-collector:4317
+      Serilog__WriteTo__1__Args__serverUrl: http://loki:3100
+
+      NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
+    ports:
+      - "${INGESTION_PORT:-8082}:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - nextraceone-net
+
+  # ── Frontend ─────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+        VITE_INGESTION_URL: ${VITE_INGESTION_URL:-http://localhost:8082}
+    image: nextraceone/frontend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      apihost:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - nextraceone-net
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  postgres-data:
+    driver: local
+  tempo-data:
+    driver: local
+  loki-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# ── Networks ─────────────────────────────────────────────────────────────────
+networks:
+  nextraceone-net:
+    driver: bridge

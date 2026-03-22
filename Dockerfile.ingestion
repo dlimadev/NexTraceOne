@@ -1,0 +1,55 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Ingestion API (Dockerfile.ingestion)
+# Multi-stage build: restore → build → publish → runtime
+# Entry point para integrações externas: CI/CD events, deployments, promotions
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── Stage 1: restore ──────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS restore
+WORKDIR /src
+
+COPY NexTraceOne.sln Directory.Build.props Directory.Packages.props global.json ./
+COPY src/ src/
+COPY tests/ tests/
+
+RUN dotnet restore src/platform/NexTraceOne.Ingestion.Api/NexTraceOne.Ingestion.Api.csproj \
+    --runtime linux-x64
+
+# ── Stage 2: build & publish ──────────────────────────────────────────────────
+FROM restore AS publish
+WORKDIR /src
+
+RUN dotnet publish src/platform/NexTraceOne.Ingestion.Api/NexTraceOne.Ingestion.Api.csproj \
+    --configuration Release \
+    --runtime linux-x64 \
+    --self-contained false \
+    --no-restore \
+    --output /app/publish \
+    -p:PublishSingleFile=false \
+    -p:DebugType=None \
+    -p:DebugSymbols=false
+
+# ── Stage 3: runtime ──────────────────────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
+
+RUN addgroup -S nextraceone && adduser -S nextraceone -G nextraceone
+
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+
+RUN chown -R nextraceone:nextraceone /app
+
+USER nextraceone
+
+# Ingestion API port
+EXPOSE 8082
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD wget -qO- http://localhost:8082/live || exit 1
+
+ENV ASPNETCORE_URLS=http://+:8082 \
+    ASPNETCORE_ENVIRONMENT=Production \
+    DOTNET_GCConserveMemory=2
+
+ENTRYPOINT ["dotnet", "NexTraceOne.Ingestion.Api.dll"]
