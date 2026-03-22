@@ -31,6 +31,12 @@ public sealed class CostIntelligenceDbContext(
     /// <summary>Perfis de custo de serviços com orçamento e alertas.</summary>
     public DbSet<ServiceCostProfile> ServiceCostProfiles => Set<ServiceCostProfile>();
 
+    /// <summary>Batches de importação de registos de custo.</summary>
+    public DbSet<CostImportBatch> CostImportBatches => Set<CostImportBatch>();
+
+    /// <summary>Registos individuais de custo importados com atribuição a serviço/equipa/domínio.</summary>
+    public DbSet<CostRecord> CostRecords => Set<CostRecord>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CostIntelligenceDbContext).Assembly;

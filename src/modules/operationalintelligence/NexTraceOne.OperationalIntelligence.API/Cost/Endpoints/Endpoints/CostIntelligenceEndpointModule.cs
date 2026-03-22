@@ -14,6 +14,7 @@ using GetCostDeltaFeature = NexTraceOne.OperationalIntelligence.Application.Cost
 using AttributeCostToServiceFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.AttributeCostToService.AttributeCostToService;
 using ComputeCostTrendFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ComputeCostTrend.ComputeCostTrend;
 using AlertCostAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAnomaly.AlertCostAnomaly;
+using ImportCostBatchFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ImportCostBatch.ImportCostBatch;
 
 namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
@@ -23,6 +24,7 @@ namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 ///
 /// Endpoints disponíveis:
 /// - POST   /snapshots          → Ingerir snapshot de custo
+/// - POST   /import             → Importar batch de registos de custo reais
 /// - GET    /report              → Relatório de custo por serviço/ambiente
 /// - GET    /by-release/{id}     → Custo por release
 /// - GET    /by-route            → Custo por rota/serviço
@@ -129,6 +131,17 @@ public sealed class CostIntelligenceEndpointModule
         {
             var result = await sender.Send(command, ct);
             return result.ToCreatedResult("/api/v1/cost/trends/{0}", localizer);
+        })
+        .RequirePermission("operations:cost:write");
+
+        group.MapPost("/import", async (
+            ImportCostBatchFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToCreatedResult("/api/v1/cost/import/{0}", localizer);
         })
         .RequirePermission("operations:cost:write");
 

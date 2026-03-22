@@ -40,4 +40,16 @@ public static class CostIntelligenceErrors
     /// <summary>Já existe um snapshot para o mesmo serviço, ambiente e período no instante informado.</summary>
     public static Error DuplicateSnapshot(string serviceName, string environment, DateTimeOffset capturedAt)
         => Error.Conflict("CostIntelligence.CostSnapshot.Duplicate", "A cost snapshot already exists for service '{0}' in environment '{1}' at '{2}'.", serviceName, environment, capturedAt);
+
+    /// <summary>O batch de importação não contém nenhum registo de custo.</summary>
+    public static Error EmptyImportBatch()
+        => Error.Validation("CostIntelligence.CostImportBatch.Empty", "Import batch must contain at least one cost record.");
+
+    /// <summary>Batch de importação de custo não encontrado pelo identificador informado.</summary>
+    public static Error ImportBatchNotFound(string batchId)
+        => Error.NotFound("CostIntelligence.CostImportBatch.NotFound", "Cost import batch '{0}' was not found.", batchId);
+
+    /// <summary>Já existe um batch de importação para a mesma fonte e período.</summary>
+    public static Error DuplicateImportBatch(string source, string period)
+        => Error.Conflict("CostIntelligence.CostImportBatch.Duplicate", "An import batch already exists for source '{0}' and period '{1}'.", source, period);
 }

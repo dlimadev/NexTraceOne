@@ -1,14 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetFinOpsTrends;
 
 /// <summary>
 /// Feature: GetFinOpsTrends — tendências de custo por dimensão (serviço, equipa, domínio).
 /// Tendências no NexTraceOne são contextualizadas e ligadas a comportamento operacional.
-/// IMPLEMENTATION STATUS: Demo — returns illustrative data. Will be replaced by real
-/// cost snapshot trend computation from CostIntelligence in a future sprint.
+/// Consome dados reais do módulo CostIntelligence via contrato público.
 /// </summary>
 public static class GetFinOpsTrends
 {
@@ -20,53 +20,79 @@ public static class GetFinOpsTrends
     /// <summary>Handler que retorna tendências de custo.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        private readonly ICostIntelligenceModule _costModule;
+
+        public Handler(ICostIntelligenceModule costModule)
         {
-            var series = new List<TrendSeriesDto>
+            _costModule = costModule;
+        }
+
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            var records = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+
+            var grouped = request.Dimension switch
             {
-                new("svc-order-processor", "Order Processor", new TrendDataPointDto[]
-                {
-                    new("2025-10", 16200m), new("2025-11", 17100m),
-                    new("2025-12", 17800m), new("2026-01", 18100m),
-                    new("2026-02", 18400m), new("2026-03", 18700m)
-                }, TrendDirection.Declining, 15.4m),
-                new("svc-payment-api", "Payment API", new TrendDataPointDto[]
-                {
-                    new("2025-10", 10800m), new("2025-11", 11200m),
-                    new("2025-12", 11500m), new("2026-01", 11800m),
-                    new("2026-02", 12100m), new("2026-03", 12500m)
-                }, TrendDirection.Declining, 15.7m),
-                new("svc-notification-hub", "Notification Hub", new TrendDataPointDto[]
-                {
-                    new("2025-10", 2200m), new("2025-11", 2100m),
-                    new("2025-12", 2000m), new("2026-01", 1950m),
-                    new("2026-02", 1900m), new("2026-03", 1800m)
-                }, TrendDirection.Improving, -18.2m),
-                new("svc-user-service", "User Service", new TrendDataPointDto[]
-                {
-                    new("2025-10", 4100m), new("2025-11", 4150m),
-                    new("2025-12", 4200m), new("2026-01", 4180m),
-                    new("2026-02", 4200m), new("2026-03", 4200m)
-                }, TrendDirection.Stable, 2.4m)
+                CostDimension.Team => records.GroupBy(r => (Id: r.Team ?? string.Empty, Name: r.Team ?? string.Empty)),
+                CostDimension.Domain => records.GroupBy(r => (Id: r.Domain ?? string.Empty, Name: r.Domain ?? string.Empty)),
+                _ => records.GroupBy(r => (Id: r.ServiceId, Name: r.ServiceName))
             };
 
-            var aggregated = new List<TrendDataPointDto>
+            if (!string.IsNullOrWhiteSpace(request.FilterId))
+                grouped = grouped.Where(g => g.Key.Id.Equals(request.FilterId, StringComparison.OrdinalIgnoreCase));
+
+            var series = grouped
+                .Select(g =>
+                {
+                    var points = g
+                        .GroupBy(r => r.Period)
+                        .OrderBy(p => p.Key)
+                        .Select(p => new TrendDataPointDto(p.Key, p.Sum(r => r.TotalCost)))
+                        .ToList();
+
+                    var changePercent = points.Count >= 2 && points[0].Cost != 0m
+                        ? (points[^1].Cost - points[0].Cost) / points[0].Cost * 100m
+                        : 0m;
+
+                    var direction = changePercent switch
+                    {
+                        > 5m => TrendDirection.Declining,
+                        < -5m => TrendDirection.Improving,
+                        _ => TrendDirection.Stable
+                    };
+
+                    return new TrendSeriesDto(g.Key.Id, g.Key.Name, points, direction, Math.Round(changePercent, 1));
+                })
+                .ToList();
+
+            var aggregated = records
+                .GroupBy(r => r.Period)
+                .OrderBy(p => p.Key)
+                .Select(p => new TrendDataPointDto(p.Key, p.Sum(r => r.TotalCost)))
+                .ToList();
+
+            var overallChange = aggregated.Count >= 2 && aggregated[0].Cost != 0m
+                ? (aggregated[^1].Cost - aggregated[0].Cost) / aggregated[0].Cost * 100m
+                : 0m;
+
+            var overallDirection = overallChange switch
             {
-                new("2025-10", 55200m), new("2025-11", 57100m), new("2025-12", 58500m),
-                new("2026-01", 59800m), new("2026-02", 60500m), new("2026-03", 61300m)
+                > 5m => TrendDirection.Declining,
+                < -5m => TrendDirection.Improving,
+                _ => TrendDirection.Stable
             };
 
             var response = new Response(
                 Dimension: request.Dimension,
                 Series: series,
                 AggregatedTrend: aggregated,
-                OverallDirection: TrendDirection.Declining,
-                OverallChangePercent: 11.1m,
+                OverallDirection: overallDirection,
+                OverallChangePercent: Math.Round(overallChange, 1),
                 GeneratedAt: DateTimeOffset.UtcNow,
-                IsSimulated: true,
-                DataSource: "demo");
+                IsSimulated: false,
+                DataSource: "cost-intelligence");
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

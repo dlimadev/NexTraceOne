@@ -2,15 +2,30 @@ using NexTraceOne.Governance.Application.Features.GetBenchmarking;
 using NexTraceOne.Governance.Application.Features.GetComplianceGaps;
 using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using NSubstitute;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
 /// <summary>
 /// Testes de unidade para as features de compliance e risco.
-/// Handlers sem dependências que retornam dados demonstrativos.
 /// </summary>
 public sealed class ComplianceRiskFeatureTests
 {
+    private static readonly CostRecordSummary[] SampleRecords =
+    [
+        new("svc-payment-api", "Payment API", "Team Payments", "Payments", "Production", 12500m, "EUR", "2026-03", "azure"),
+        new("svc-order-processor", "Order Processor", "Team Commerce", "Commerce", "Production", 18700m, "EUR", "2026-03", "azure")
+    ];
+
+    private static ICostIntelligenceModule CreateMock()
+    {
+        var mock = Substitute.For<ICostIntelligenceModule>();
+        mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(SampleRecords);
+        return mock;
+    }
+
     // ── GetComplianceGaps ──
 
     [Fact]
@@ -72,7 +87,7 @@ public sealed class ComplianceRiskFeatureTests
     public async Task GetBenchmarking_ShouldReturnComparisons()
     {
         // Arrange
-        var handler = new GetBenchmarking.Handler();
+        var handler = new GetBenchmarking.Handler(CreateMock());
         var query = new GetBenchmarking.Query("teams");
 
         // Act
@@ -82,15 +97,15 @@ public sealed class ComplianceRiskFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Comparisons.Should().NotBeEmpty();
         result.Value.Dimension.Should().Be("teams");
-        result.Value.IsSimulated.Should().BeTrue();
-        result.Value.DataSource.Should().Be("demo");
+        result.Value.IsSimulated.Should().BeFalse();
+        result.Value.DataSource.Should().Be("cost-intelligence");
     }
 
     [Fact]
-    public async Task GetBenchmarking_ComparisonsShouldHaveContextAndScores()
+    public async Task GetBenchmarking_ComparisonsShouldHaveGroupInfo()
     {
         // Arrange
-        var handler = new GetBenchmarking.Handler();
+        var handler = new GetBenchmarking.Handler(CreateMock());
 
         // Act
         var result = await handler.Handle(new GetBenchmarking.Query("teams"), CancellationToken.None);
@@ -100,8 +115,6 @@ public sealed class ComplianceRiskFeatureTests
         {
             c.GroupId.Should().NotBeNullOrWhiteSpace();
             c.GroupName.Should().NotBeNullOrWhiteSpace();
-            c.Context.Should().NotBeNullOrWhiteSpace();
-            c.Strengths.Should().NotBeEmpty();
         });
     }
 

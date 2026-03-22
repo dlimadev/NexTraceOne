@@ -1,13 +1,14 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetDomainFinOps;
 
 /// <summary>
 /// Feature: GetDomainFinOps — perfil de custo contextual agregado por domínio.
 /// Inclui resumo de custo, equipas, desperdício, eficiência e correlação com confiabilidade.
-/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
+/// Consome dados reais do módulo CostIntelligence via contrato público.
 /// </summary>
 public static class GetDomainFinOps
 {
@@ -17,47 +18,74 @@ public static class GetDomainFinOps
     /// <summary>Handler que retorna perfil de FinOps do domínio.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        private readonly ICostIntelligenceModule _costModule;
+
+        public Handler(ICostIntelligenceModule costModule)
         {
-            var teams = new List<DomainTeamCostDto>
-            {
-                new("team-commerce", "Team Commerce", 3, 42800m, 17000m, CostEfficiency.Inefficient, 68.2m),
-                new("team-platform", "Team Platform", 2, 22000m, 6700m, CostEfficiency.Acceptable, 82.5m)
-            };
+            _costModule = costModule;
+        }
 
-            var topWasteServices = new List<WasteServiceDto>
-            {
-                new("svc-order-processor", "Order Processor", "Team Commerce", 7500m, CostEfficiency.Wasteful),
-                new("svc-catalog-sync", "Catalog Sync", "Team Platform", 6700m, CostEfficiency.Wasteful),
-                new("svc-inventory-sync", "Inventory Sync", "Team Commerce", 2800m, CostEfficiency.Inefficient)
-            };
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        {
+            var records = await _costModule.GetCostsByDomainAsync(request.DomainId, cancellationToken: cancellationToken);
 
-            var trendPoints = new List<TrendPointDto>
-            {
-                new("2025-10", 58200m), new("2025-11", 60100m), new("2025-12", 61500m),
-                new("2026-01", 62800m), new("2026-02", 63500m), new("2026-03", 64800m)
-            };
+            var teams = records
+                .GroupBy(r => r.Team ?? string.Empty)
+                .Select(g => new DomainTeamCostDto(
+                    g.Key,
+                    g.Key,
+                    g.Count(),
+                    g.Sum(r => r.TotalCost),
+                    0m,
+                    ComputeEfficiency(g.Average(r => r.TotalCost)),
+                    0m))
+                .ToList();
+
+            var topWasteServices = records
+                .OrderByDescending(r => r.TotalCost)
+                .Where(r => ComputeEfficiency(r.TotalCost) is CostEfficiency.Wasteful or CostEfficiency.Inefficient)
+                .Take(5)
+                .Select(r => new WasteServiceDto(
+                    r.ServiceId,
+                    r.ServiceName,
+                    r.Team ?? string.Empty,
+                    0m,
+                    ComputeEfficiency(r.TotalCost)))
+                .ToList();
+
+            var totalCost = teams.Sum(t => t.MonthlyCost);
+            var overallEfficiency = teams.Count == 0
+                ? CostEfficiency.Efficient
+                : ComputeEfficiency(teams.Average(t => t.MonthlyCost));
 
             var response = new Response(
                 DomainId: request.DomainId,
-                DomainName: "Commerce",
-                TotalMonthlyCost: teams.Sum(t => t.MonthlyCost),
-                PreviousMonthCost: 63500m,
-                CostTrend: TrendDirection.Declining,
-                OverallEfficiency: CostEfficiency.Inefficient,
-                TotalWaste: teams.Sum(t => t.WasteAmount),
+                DomainName: request.DomainId,
+                TotalMonthlyCost: totalCost,
+                PreviousMonthCost: 0m,
+                CostTrend: TrendDirection.Stable,
+                OverallEfficiency: overallEfficiency,
+                TotalWaste: 0m,
                 TeamCount: teams.Count,
-                ServiceCount: teams.Sum(t => t.ServiceCount),
+                ServiceCount: records.Count,
                 Teams: teams,
                 TopWasteServices: topWasteServices,
-                TrendSeries: trendPoints,
-                AvgReliabilityScore: teams.Average(t => t.AvgReliabilityScore),
+                TrendSeries: Array.Empty<TrendPointDto>(),
+                AvgReliabilityScore: 0m,
                 GeneratedAt: DateTimeOffset.UtcNow,
-                IsSimulated: true,
-                DataSource: "demo");
+                IsSimulated: false,
+                DataSource: "cost-intelligence");
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
+
+        private static CostEfficiency ComputeEfficiency(decimal cost) => cost switch
+        {
+            > 15000m => CostEfficiency.Wasteful,
+            > 10000m => CostEfficiency.Inefficient,
+            > 5000m => CostEfficiency.Acceptable,
+            _ => CostEfficiency.Efficient
+        };
     }
 
     /// <summary>Perfil de FinOps agregado por domínio. IsSimulated=true indica dados demonstrativos.</summary>
