@@ -6,21 +6,6 @@ import {
 
 describe('releaseScope ZR-6 final scope', () => {
   it.each([
-    '/portal',
-    '/portal/catalog',
-    '/governance/teams',
-    '/governance/packs/123',
-    '/integrations/executions',
-    '/analytics/value',
-    '/operations/runbooks',
-    '/operations/reliability',
-    '/operations/automation/admin',
-  ])('marks %s as explicitly removed from the final production scope', (route) => {
-    expect(isRouteExplicitlyExcludedFromFinalProductionScope(route)).toBe(true);
-    expect(isRouteAvailableInFinalProductionScope(route)).toBe(false);
-  });
-
-  it.each([
     '/services',
     '/source-of-truth',
     '/contracts',
@@ -51,5 +36,44 @@ describe('releaseScope ZR-6 final scope', () => {
   ])('keeps AI Governance route %s available in final production scope (Phase 4)', (route) => {
     expect(isRouteExplicitlyExcludedFromFinalProductionScope(route)).toBe(false);
     expect(isRouteAvailableInFinalProductionScope(route)).toBe(true);
+  });
+
+  // Phase 5: All 8 previously excluded routes promoted to production scope
+  it.each([
+    '/portal',
+    '/portal/catalog',
+    '/governance/teams',
+    '/governance/teams/123',
+    '/governance/packs',
+    '/governance/packs/123',
+    '/integrations/executions',
+    '/analytics/value',
+    '/operations/runbooks',
+    '/operations/reliability',
+    '/operations/reliability/svc-1',
+    '/operations/automation',
+    '/operations/automation/admin',
+    '/operations/automation/wf-1',
+  ])('keeps Phase 5 recovered route %s available in final production scope', (route) => {
+    expect(isRouteExplicitlyExcludedFromFinalProductionScope(route)).toBe(false);
+    expect(isRouteAvailableInFinalProductionScope(route)).toBe(true);
+  });
+
+  it('has no routes excluded from production after Phase 5', () => {
+    // All 8 route prefixes that were previously excluded are now in production
+    const previouslyExcluded = [
+      '/portal',
+      '/governance/teams',
+      '/governance/packs',
+      '/integrations/executions',
+      '/analytics/value',
+      '/operations/runbooks',
+      '/operations/reliability',
+      '/operations/automation',
+    ];
+    for (const route of previouslyExcluded) {
+      expect(isRouteExplicitlyExcludedFromFinalProductionScope(route)).toBe(false);
+      expect(isRouteAvailableInFinalProductionScope(route)).toBe(true);
+    }
   });
 });
