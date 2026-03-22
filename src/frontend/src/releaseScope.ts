@@ -40,14 +40,6 @@ export const finalProductionIncludedRoutePrefixes = [
  * AND does NOT match an excluded prefix.
  */
 export const finalProductionExcludedRoutePrefixes = [
-  '/portal',
-  '/governance/teams',
-  '/governance/packs',
-  '/integrations/executions',
-  '/analytics/value',
-  '/operations/runbooks',
-  '/operations/reliability',
-  '/operations/automation',
 ] as const;
 
 function normalizeRoute(route: string): string {
