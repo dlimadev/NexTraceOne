@@ -116,11 +116,19 @@ public static class GetServiceReliabilityDetail
         private static decimal ComputeIncidentImpactScore(IReadOnlyList<ReliabilityIncidentSignal> incidents)
         {
             if (incidents.Count == 0) return 100m;
-            var critical = incidents.Count(i => i.Severity == IncidentSeverity.Critical.ToString());
-            var major = incidents.Count(i => i.Severity == IncidentSeverity.Major.ToString());
-            var minor = incidents.Count(i => i.Severity == IncidentSeverity.Minor.ToString());
-            var warning = incidents.Count(i => i.Severity == IncidentSeverity.Warning.ToString());
-            return Math.Max(0m, 100m - (critical * 30m + major * 20m + minor * 10m + warning * 5m));
+            var penaltyTotal = 0m;
+            foreach (var incident in incidents)
+            {
+                penaltyTotal += incident.Severity switch
+                {
+                    _ when incident.Severity == IncidentSeverity.Critical.ToString() => 30m,
+                    _ when incident.Severity == IncidentSeverity.Major.ToString() => 20m,
+                    _ when incident.Severity == IncidentSeverity.Minor.ToString() => 10m,
+                    _ when incident.Severity == IncidentSeverity.Warning.ToString() => 5m,
+                    _ => 0m
+                };
+            }
+            return Math.Max(0m, 100m - penaltyTotal);
         }
 
         private static TrendDirection ComputeTrend(decimal currentScore, IReadOnlyList<Domain.Reliability.Entities.ReliabilitySnapshot> history)

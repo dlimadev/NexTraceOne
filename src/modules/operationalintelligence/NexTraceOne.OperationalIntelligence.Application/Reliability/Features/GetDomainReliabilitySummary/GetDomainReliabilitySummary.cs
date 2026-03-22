@@ -50,7 +50,7 @@ public static class GetDomainReliabilitySummary
                 .Select(i => i.ServiceId).Distinct().Count();
 
             var needsAttentionCount = incidents
-                .Where(i => i.Severity is "Minor" or "Warning")
+                .Where(i => i.Severity == IncidentSeverity.Minor.ToString() || i.Severity == IncidentSeverity.Warning.ToString())
                 .Select(i => i.ServiceId).Distinct().Count();
 
             var healthyCount = Math.Max(0, totalServices - unavailableCount - degradedCount - needsAttentionCount);

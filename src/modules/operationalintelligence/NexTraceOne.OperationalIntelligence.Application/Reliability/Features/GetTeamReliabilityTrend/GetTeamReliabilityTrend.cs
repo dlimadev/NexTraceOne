@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilityTrend;
@@ -34,9 +35,9 @@ public static class GetTeamReliabilityTrend
 
             var serviceIds = incidents.Select(i => i.ServiceId).Distinct().ToList();
             var totalServices = serviceIds.Count;
-            var degradedCount = incidents.Where(i => i.Severity == "Major").Select(i => i.ServiceId).Distinct().Count();
-            var unavailableCount = incidents.Where(i => i.Severity == "Critical").Select(i => i.ServiceId).Distinct().Count();
-            var needsAttentionCount = incidents.Where(i => i.Severity is "Minor" or "Warning").Select(i => i.ServiceId).Distinct().Count();
+            var degradedCount = incidents.Where(i => i.Severity == IncidentSeverity.Major.ToString()).Select(i => i.ServiceId).Distinct().Count();
+            var unavailableCount = incidents.Where(i => i.Severity == IncidentSeverity.Critical.ToString()).Select(i => i.ServiceId).Distinct().Count();
+            var needsAttentionCount = incidents.Where(i => i.Severity == IncidentSeverity.Minor.ToString() || i.Severity == IncidentSeverity.Warning.ToString()).Select(i => i.ServiceId).Distinct().Count();
             var healthyCount = Math.Max(0, totalServices - unavailableCount - degradedCount - needsAttentionCount);
 
             var now = DateTimeOffset.UtcNow;
