@@ -37,6 +37,7 @@
     "errorDescription": "Something went wrong. Please try again later.",
     "collapse": "Collapse",
     "expand": "Expand",
+    "vs": "vs",
     "errorLoading": "Error loading data",
     "timeAgo": {
       "lessThanHour": "< 1h ago",
@@ -285,7 +286,8 @@
     "teams": "Teams",
     "domains": "Domains",
     "delegatedAdmin": "Delegated Admin",
-    "aiAnalysis": "AI Analysis"
+    "aiAnalysis": "AI Analysis",
+    "environmentComparison": "Environment Comparison"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -4127,6 +4129,55 @@
       "Medium": "Medium",
       "High": "High",
       "Critical": "Critical"
+    }
+  },
+  "environmentComparison": {
+    "title": "Environment Comparison",
+    "subtitle": "Compare runtime behaviour across environments and releases to identify risks before production",
+    "compareParameters": "Comparison Parameters",
+    "serviceName": "Service Name",
+    "serviceNamePlaceholder": "e.g. payment-service",
+    "environment": "Environment",
+    "beforePeriodStart": "Before Period Start",
+    "beforePeriodEnd": "Before Period End",
+    "afterPeriodStart": "After Period Start",
+    "afterPeriodEnd": "After Period End",
+    "compare": "Compare",
+    "emptyState": "Enter a service name and select time periods to compare runtime behaviour",
+    "errorTitle": "Comparison failed",
+    "errorMessage": "Could not load comparison data. Please check that the service exists and has snapshots for the selected period.",
+    "observabilityScore": "Observability Score",
+    "grade": "Grade",
+    "metricsComparison": "Metrics Comparison",
+    "baselineLabel": "Comparing",
+    "beforePeriod": "Before",
+    "afterPeriod": "After",
+    "dataPoints": "data points",
+    "noDataForPeriod": "No snapshot data found for the selected periods. Ingest runtime snapshots to enable comparison.",
+    "metric": "Metric",
+    "before": "Before",
+    "after": "After",
+    "delta": "Delta",
+    "driftFindings": "Drift Findings",
+    "noDriftFindings": "No unacknowledged drift findings detected for this service/environment",
+    "releaseTimeline": "Release Health Timeline",
+    "expected": "Expected",
+    "actual": "Actual",
+    "deviation": "Deviation",
+    "snapshots": "Snapshots",
+    "metrics": {
+      "avgLatency": "Avg Latency",
+      "p99Latency": "P99 Latency",
+      "errorRate": "Error Rate",
+      "throughput": "Throughput",
+      "cpu": "CPU Usage",
+      "memory": "Memory Usage"
+    },
+    "breakdown": {
+      "latencyScore": "Latency",
+      "errorScore": "Error Rate",
+      "throughputScore": "Throughput",
+      "resourceScore": "Resources"
     }
   }
 }

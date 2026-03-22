@@ -1,13 +1,18 @@
+using Serilog;
+using Serilog.Sinks.Grafana.Loki;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Serilog;
 
 namespace NexTraceOne.BuildingBlocks.Observability.Logging;
 
 /// <summary>
 /// Configuração centralizada do Serilog para toda a plataforma.
 /// Inclui: enrichers (Environment, MachineName, ThreadId),
-/// sinks (Console, File, PostgreSQL), destructuring de objetos de domínio.
+/// sinks (Console, File, Loki), destructuring de objetos de domínio.
+/// 
+/// Loki sink: controlado pela secção Observability:Serilog:Loki.
+/// Labels recomendadas: application, environment, module.
+/// Nunca logar secrets, tokens, connection strings ou payloads sensíveis.
 /// </summary>
 public static class SerilogConfiguration
 {
@@ -26,6 +31,25 @@ public static class SerilogConfiguration
             if (!string.IsNullOrWhiteSpace(filePath))
             {
                 loggerConfiguration.WriteTo.File(filePath, rollingInterval: RollingInterval.Day);
+            }
+
+            var lokiEndpoint = configuration["Observability:Serilog:Loki:Endpoint"];
+            if (!string.IsNullOrWhiteSpace(lokiEndpoint))
+            {
+                var applicationName = configuration["OpenTelemetry:ServiceName"] ?? "NexTraceOne";
+                var environmentName = configuration["ASPNETCORE_ENVIRONMENT"] ?? "unknown";
+
+                var lokiLabels = new LokiLabel[]
+                {
+                    new() { Key = "application", Value = applicationName },
+                    new() { Key = "environment", Value = environmentName }
+                };
+
+                loggerConfiguration.WriteTo.GrafanaLoki(
+                    lokiEndpoint,
+                    labels: lokiLabels,
+                    propertiesAsLabels: ["module"],
+                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
             }
         });
     }

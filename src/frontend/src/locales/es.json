@@ -37,6 +37,7 @@
     "errorDescription": "Algo salió mal. Inténtelo de nuevo más tarde.",
     "collapse": "Contraer",
     "expand": "Expandir",
+    "vs": "vs",
     "errorLoading": "Error al cargar datos",
     "timeAgo": {
       "lessThanHour": "< 1h atrás",
@@ -174,7 +175,8 @@
     "platformOperations": "Operaciones de la Plataforma",
     "governancePacks": "Packs de Gobernanza",
     "waivers": "Excepciones y Exenciones",
-    "aiAnalysis": "Análisis de IA"
+    "aiAnalysis": "Análisis de IA",
+    "environmentComparison": "Comparación de Entornos"
   },
   "platformOps": {
     "title": "Operaciones de la Plataforma",
@@ -3055,6 +3057,55 @@
       "Medium": "Media",
       "High": "Alta",
       "Critical": "Crítica"
+    }
+  },
+  "environmentComparison": {
+    "title": "Comparación de Entornos",
+    "subtitle": "Compare el comportamiento de runtime entre entornos y releases para identificar riesgos antes de producción",
+    "compareParameters": "Parámetros de Comparación",
+    "serviceName": "Nombre del Servicio",
+    "serviceNamePlaceholder": "ej: payment-service",
+    "environment": "Entorno",
+    "beforePeriodStart": "Inicio del Período Anterior",
+    "beforePeriodEnd": "Fin del Período Anterior",
+    "afterPeriodStart": "Inicio del Período Posterior",
+    "afterPeriodEnd": "Fin del Período Posterior",
+    "compare": "Comparar",
+    "emptyState": "Ingrese un nombre de servicio y seleccione períodos de tiempo para comparar el comportamiento de runtime",
+    "errorTitle": "Falló la comparación",
+    "errorMessage": "No se pudieron cargar los datos de comparación. Verifique que el servicio exista y tenga snapshots para el período seleccionado.",
+    "observabilityScore": "Puntuación de Observabilidad",
+    "grade": "Grado",
+    "metricsComparison": "Comparación de Métricas",
+    "baselineLabel": "Comparando",
+    "beforePeriod": "Antes",
+    "afterPeriod": "Después",
+    "dataPoints": "puntos de datos",
+    "noDataForPeriod": "No se encontraron datos de snapshot para los períodos seleccionados.",
+    "metric": "Métrica",
+    "before": "Antes",
+    "after": "Después",
+    "delta": "Delta",
+    "driftFindings": "Hallazgos de Drift",
+    "noDriftFindings": "No se detectaron hallazgos de drift no reconocidos para este servicio/entorno",
+    "releaseTimeline": "Línea de Tiempo de Salud por Release",
+    "expected": "Esperado",
+    "actual": "Real",
+    "deviation": "Desviación",
+    "snapshots": "Snapshots",
+    "metrics": {
+      "avgLatency": "Latencia Promedio",
+      "p99Latency": "Latencia P99",
+      "errorRate": "Tasa de Error",
+      "throughput": "Rendimiento",
+      "cpu": "Uso de CPU",
+      "memory": "Uso de Memoria"
+    },
+    "breakdown": {
+      "latencyScore": "Latencia",
+      "errorScore": "Tasa de Error",
+      "throughputScore": "Rendimiento",
+      "resourceScore": "Recursos"
     }
   }
 }

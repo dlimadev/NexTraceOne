@@ -69,6 +69,7 @@ export type Permission =
   | 'operations:automation:read'
   | 'operations:automation:write'
   | 'operations:automation:admin'
+  | 'operations:runtime:read'
   // ── AI Hub ──
   | 'ai:assistant:read'
   | 'ai:models:read'

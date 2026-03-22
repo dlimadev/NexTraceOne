@@ -44,7 +44,11 @@ public static class DependencyInjection
                     serviceName: serviceName,
                     serviceNamespace: "nextraceone",
                     serviceVersion: typeof(DependencyInjection).Assembly
-                        .GetName().Version?.ToString() ?? "0.0.0"))
+                        .GetName().Version?.ToString() ?? "0.0.0")
+                .AddAttributes(new Dictionary<string, object>
+                {
+                    ["deployment.environment"] = configuration["ASPNETCORE_ENVIRONMENT"] ?? "production"
+                }))
             .WithTracing(tracing =>
             {
                 tracing

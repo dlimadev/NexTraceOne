@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.BackgroundWorkers;
+using NexTraceOne.BackgroundWorkers.Configuration;
 using NexTraceOne.BackgroundWorkers.Jobs;
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -10,6 +11,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.IdentityAccess.Infrastructure;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Background Workers
@@ -25,6 +27,9 @@ builder.Services.AddSingleton<WorkerJobHealthRegistry>();
 
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
+builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
+builder.Services.Configure<DriftDetectionOptions>(
+    builder.Configuration.GetSection(DriftDetectionOptions.SectionName));
 builder.Services.AddNexTraceHealthChecks();
 builder.Services.AddHealthChecks()
     .AddCheck<DbContextConnectivityHealthCheck<IdentityDbContext>>(
@@ -40,7 +45,12 @@ builder.Services.AddHealthChecks()
         "identity-expiration-job",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
-        args: [IdentityExpirationJob.HealthCheckName, TimeSpan.FromMinutes(5)]);
+        args: [IdentityExpirationJob.HealthCheckName, TimeSpan.FromMinutes(5)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "drift-detection-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [DriftDetectionJob.HealthCheckName, TimeSpan.FromMinutes(10)]);
 
 // Handlers de expiração — cada um processa um único tipo de entidade expirável.
 // A ordem de registro define a ordem de execução no IdentityExpirationJob.
@@ -52,6 +62,7 @@ builder.Services.AddSingleton<IExpirationHandler, EnvironmentAccessExpirationHan
 
 builder.Services.AddHostedService<OutboxProcessorJob>();
 builder.Services.AddHostedService<IdentityExpirationJob>();
+builder.Services.AddHostedService<DriftDetectionJob>();
 
 var app = builder.Build();
 

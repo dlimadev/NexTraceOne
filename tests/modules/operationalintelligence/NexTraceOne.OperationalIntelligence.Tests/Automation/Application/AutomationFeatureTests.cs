@@ -1,4 +1,7 @@
 using System.Linq;
+using NSubstitute;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.CreateAutomationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.EvaluatePreconditions;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.GetAutomationAction;
@@ -98,10 +101,20 @@ public sealed class AutomationFeatureTests
 
     // ── CreateAutomationWorkflow ─────────────────────────────────────
 
+    private static CreateAutomationWorkflow.Handler CreateAutomationWorkflowHandler()
+    {
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var unitOfWork = Substitute.For<IAutomationUnitOfWork>();
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        return new CreateAutomationWorkflow.Handler(workflowRepo, auditRepo, unitOfWork, clock);
+    }
+
     [Fact]
     public async Task CreateAutomationWorkflow_ValidData_ShouldReturnDraftStatus()
     {
-        var handler = new CreateAutomationWorkflow.Handler();
+        var handler = CreateAutomationWorkflowHandler();
         var command = new CreateAutomationWorkflow.Command(
             ActionId: "action-restart-controlled",
             ServiceId: "svc-payment-gateway",
@@ -123,7 +136,7 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task CreateAutomationWorkflow_UnknownActionId_ShouldReturnError()
     {
-        var handler = new CreateAutomationWorkflow.Handler();
+        var handler = CreateAutomationWorkflowHandler();
         var command = new CreateAutomationWorkflow.Command(
             ActionId: "nonexistent-action",
             ServiceId: null,
@@ -217,15 +230,19 @@ public sealed class AutomationFeatureTests
     // ── ListAutomationWorkflows ──────────────────────────────────────
 
     [Fact]
-    public async Task ListAutomationWorkflows_NoFilters_ShouldReturnPreviewOnlyError()
+    public async Task ListAutomationWorkflows_NoFilters_ShouldReturnEmptyList()
     {
-        var handler = new ListAutomationWorkflows.Handler();
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.ListAsync(null, null, 1, 20, Arg.Any<CancellationToken>())
+            .Returns(new List<NexTraceOne.OperationalIntelligence.Domain.Automation.Entities.AutomationWorkflowRecord>());
+        workflowRepo.CountAsync(null, null, Arg.Any<CancellationToken>()).Returns(0);
+        var handler = new ListAutomationWorkflows.Handler(workflowRepo);
         var query = new ListAutomationWorkflows.Query(null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
 
-        result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Contain("PreviewOnly");
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().BeEmpty();
     }
 
     [Fact]

@@ -41,4 +41,21 @@ internal sealed class RuntimeSnapshotRepository(RuntimeIntelligenceDbContext con
             .Where(s => s.ServiceName == serviceName && s.Environment == environment)
             .OrderByDescending(s => s.CapturedAt)
             .FirstOrDefaultAsync(cancellationToken);
+
+    /// <summary>Retorna pares únicos (serviceName, environment) que possuem snapshots após a data especificada.</summary>
+    public async Task<IReadOnlyList<(string ServiceName, string Environment)>> GetServicesWithRecentSnapshotsAsync(
+        DateTimeOffset since,
+        CancellationToken cancellationToken = default)
+    {
+        var results = await context.RuntimeSnapshots
+            .Where(s => s.CapturedAt >= since)
+            .Select(s => new { s.ServiceName, s.Environment })
+            .Distinct()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return results
+            .Select(x => (x.ServiceName, x.Environment))
+            .ToList();
+    }
 }

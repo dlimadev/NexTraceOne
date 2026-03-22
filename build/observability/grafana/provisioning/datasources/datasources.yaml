@@ -1,0 +1,60 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Grafana Datasource Provisioning
+# Provisiona automaticamente Tempo (traces) e Loki (logs) no Grafana.
+# ═══════════════════════════════════════════════════════════════════════════════
+apiVersion: 1
+
+datasources:
+  # ── Grafana Tempo (Telemetry Store — Traces) ─────────────────────────
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    uid: nextraceone-tempo
+    orgId: 1
+    isDefault: false
+    jsonData:
+      httpMethod: GET
+      serviceMap:
+        datasourceUid: nextraceone-prometheus
+      tracesToLogsV2:
+        datasourceUid: nextraceone-loki
+        filterByTraceID: true
+        filterBySpanID: false
+        customQuery: false
+      tracesToMetrics:
+        datasourceUid: nextraceone-prometheus
+    version: 1
+    editable: false
+
+  # ── Grafana Loki (Telemetry Store — Logs) ────────────────────────────
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    uid: nextraceone-loki
+    orgId: 1
+    isDefault: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: nextraceone-tempo
+          matcherRegex: '"TraceId":"([a-f0-9]{32})"'
+          name: TraceID
+          url: "$${__value.raw}"
+    version: 1
+    editable: false
+
+  # ── Prometheus (OTel Collector self-monitoring) ───────────────────────
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://otel-collector:8888
+    uid: nextraceone-prometheus
+    orgId: 1
+    isDefault: true
+    jsonData:
+      httpMethod: GET
+      timeInterval: 30s
+    version: 1
+    editable: false
