@@ -1,6 +1,8 @@
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.GetBenchmarking;
 using NexTraceOne.Governance.Application.Features.GetComplianceGaps;
 using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NSubstitute;
@@ -24,6 +26,37 @@ public sealed class ComplianceRiskFeatureTests
         mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(SampleRecords);
         return mock;
+    }
+
+    private static (ITeamRepository, IGovernanceDomainRepository, IGovernancePackRepository, IGovernanceWaiverRepository) CreateGovernanceMocks()
+    {
+        var teamRepo = Substitute.For<ITeamRepository>();
+        teamRepo.ListAsync(Arg.Any<TeamStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<Team>
+            {
+                Team.Create("platform-core", "Platform Core"),
+                Team.Create("payments-squad", "Payments Squad")
+            });
+
+        var domainRepo = Substitute.For<IGovernanceDomainRepository>();
+        domainRepo.ListAsync(Arg.Any<DomainCriticality?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceDomain>
+            {
+                GovernanceDomain.Create("payments", "Payments", criticality: DomainCriticality.Critical),
+                GovernanceDomain.Create("platform", "Platform", criticality: DomainCriticality.High)
+            });
+
+        var packRepo = Substitute.For<IGovernancePackRepository>();
+        var publishedPack = GovernancePack.Create("contracts-baseline", "Contracts Baseline", "Contract governance policies", GovernanceRuleCategory.Contracts);
+        publishedPack.Publish("1.0.0");
+        packRepo.ListAsync(Arg.Any<GovernanceRuleCategory?>(), Arg.Any<GovernancePackStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernancePack> { publishedPack });
+
+        var waiverRepo = Substitute.For<IGovernanceWaiverRepository>();
+        waiverRepo.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<WaiverStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceWaiver>());
+
+        return (teamRepo, domainRepo, packRepo, waiverRepo);
     }
 
     // ── GetComplianceGaps ──
@@ -124,7 +157,8 @@ public sealed class ComplianceRiskFeatureTests
     public async Task RunComplianceChecks_ShouldReturnResults()
     {
         // Arrange
-        var handler = new RunComplianceChecks.Handler();
+        var (teamRepo, domainRepo, packRepo, waiverRepo) = CreateGovernanceMocks();
+        var handler = new RunComplianceChecks.Handler(teamRepo, domainRepo, packRepo, waiverRepo);
         var query = new RunComplianceChecks.Query();
 
         // Act
@@ -140,7 +174,8 @@ public sealed class ComplianceRiskFeatureTests
     public async Task RunComplianceChecks_CountsShouldSumToTotal()
     {
         // Arrange
-        var handler = new RunComplianceChecks.Handler();
+        var (teamRepo, domainRepo, packRepo, waiverRepo) = CreateGovernanceMocks();
+        var handler = new RunComplianceChecks.Handler(teamRepo, domainRepo, packRepo, waiverRepo);
 
         // Act
         var result = await handler.Handle(new RunComplianceChecks.Query(), CancellationToken.None);
@@ -154,7 +189,8 @@ public sealed class ComplianceRiskFeatureTests
     public async Task RunComplianceChecks_ResultsShouldHaveRequiredFields()
     {
         // Arrange
-        var handler = new RunComplianceChecks.Handler();
+        var (teamRepo, domainRepo, packRepo, waiverRepo) = CreateGovernanceMocks();
+        var handler = new RunComplianceChecks.Handler(teamRepo, domainRepo, packRepo, waiverRepo);
 
         // Act
         var result = await handler.Handle(new RunComplianceChecks.Query(), CancellationToken.None);

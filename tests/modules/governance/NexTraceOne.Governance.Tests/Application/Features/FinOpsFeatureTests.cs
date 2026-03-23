@@ -208,10 +208,10 @@ public sealed class FinOpsFeatureTests
     // ── GetWasteSignals ──
 
     [Fact]
-    public async Task GetWasteSignals_ShouldReturnSignals()
+    public async Task GetWasteSignals_ShouldReturnSignalsForHighCostServices()
     {
         // Arrange
-        var handler = new GetWasteSignals.Handler();
+        var handler = new GetWasteSignals.Handler(CreateMock());
         var query = new GetWasteSignals.Query();
 
         // Act
@@ -219,17 +219,36 @@ public sealed class FinOpsFeatureTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Signals.Should().NotBeEmpty();
-        result.Value.TotalWaste.Should().BeGreaterThan(0);
-        result.Value.ByType.Should().NotBeEmpty();
-        result.Value.IsSimulated.Should().BeTrue();
+        result.Value.IsSimulated.Should().BeFalse("handler now uses real cost data");
+        result.Value.DataSource.Should().Be("cost-intelligence");
+    }
+
+    [Fact]
+    public async Task GetWasteSignals_ShouldReturnEmptyWhenNoCostData()
+    {
+        // Arrange
+        var mock = Substitute.For<ICostIntelligenceModule>();
+        mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<CostRecordSummary>());
+
+        var handler = new GetWasteSignals.Handler(mock);
+        var query = new GetWasteSignals.Query();
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Signals.Should().BeEmpty();
+        result.Value.TotalWaste.Should().Be(0);
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     [Fact]
     public async Task GetWasteSignals_SignalsShouldHaveRequiredFields()
     {
         // Arrange
-        var handler = new GetWasteSignals.Handler();
+        var handler = new GetWasteSignals.Handler(CreateMock());
 
         // Act
         var result = await handler.Handle(new GetWasteSignals.Query(), CancellationToken.None);
@@ -246,10 +265,10 @@ public sealed class FinOpsFeatureTests
     // ── GetEfficiencyIndicators ──
 
     [Fact]
-    public async Task GetEfficiencyIndicators_ShouldReturnIndicators()
+    public async Task GetEfficiencyIndicators_ShouldReturnIndicatorsFromRealData()
     {
         // Arrange
-        var handler = new GetEfficiencyIndicators.Handler();
+        var handler = new GetEfficiencyIndicators.Handler(CreateMock());
         var query = new GetEfficiencyIndicators.Query();
 
         // Act
@@ -259,14 +278,36 @@ public sealed class FinOpsFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Services.Should().NotBeEmpty();
         result.Value.OverallEfficiencyScore.Should().BeGreaterThan(0);
-        result.Value.IsSimulated.Should().BeTrue();
+        result.Value.IsSimulated.Should().BeFalse("handler now uses real cost data");
+        result.Value.DataSource.Should().Be("cost-intelligence");
+    }
+
+    [Fact]
+    public async Task GetEfficiencyIndicators_ShouldReturnEmptyWhenNoCostData()
+    {
+        // Arrange
+        var mock = Substitute.For<ICostIntelligenceModule>();
+        mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<CostRecordSummary>());
+
+        var handler = new GetEfficiencyIndicators.Handler(mock);
+        var query = new GetEfficiencyIndicators.Query();
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Services.Should().BeEmpty();
+        result.Value.OverallEfficiencyScore.Should().Be(0);
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     [Fact]
     public async Task GetEfficiencyIndicators_ServicesShouldHaveMetrics()
     {
         // Arrange
-        var handler = new GetEfficiencyIndicators.Handler();
+        var handler = new GetEfficiencyIndicators.Handler(CreateMock());
 
         // Act
         var result = await handler.Handle(new GetEfficiencyIndicators.Query(), CancellationToken.None);
