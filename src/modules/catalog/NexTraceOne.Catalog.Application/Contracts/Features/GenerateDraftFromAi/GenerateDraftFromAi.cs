@@ -12,8 +12,9 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 namespace NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
 
 /// <summary>
-/// Feature: GenerateDraftFromAi — gera um draft de contrato assistido por IA.
-/// Por ora, gera um template baseado no protocolo informado (stub para IA real).
+/// Feature: GenerateDraftFromAi — gera um draft de contrato assistido por IA real.
+/// Integra com IAiDraftGenerator para gerar conteúdo real via provider de IA governado.
+/// Fallback para template estático quando IA não está disponível.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GenerateDraftFromAi
@@ -41,19 +42,43 @@ public static class GenerateDraftFromAi
     }
 
     /// <summary>
-    /// Handler que gera um draft de contrato assistido por IA.
-    /// Utiliza um template stub baseado no protocolo para simular a geração.
-    /// Quando a integração com IA real estiver disponível, o template será substituído.
+    /// Handler que gera um draft de contrato assistido por IA real.
+    /// Usa IAiDraftGenerator quando disponível, com fallback para template estático.
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository repository,
-        IContractsUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IContractsUnitOfWork unitOfWork,
+        IAiDraftGenerator? aiGenerator = null) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            var (content, format) = GenerateTemplate(request.Protocol, request.Title);
+            string content;
+            string format;
+
+            if (aiGenerator is not null)
+            {
+                var generated = await aiGenerator.GenerateAsync(
+                    request.Protocol,
+                    request.Title,
+                    request.Prompt,
+                    cancellationToken);
+
+                if (generated is not null)
+                {
+                    content = generated.Value.Content;
+                    format = generated.Value.Format;
+                }
+                else
+                {
+                    (content, format) = GenerateTemplate(request.Protocol, request.Title);
+                }
+            }
+            else
+            {
+                (content, format) = GenerateTemplate(request.Protocol, request.Title);
+            }
 
             var result = ContractDraft.CreateFromAi(
                 request.Title,
@@ -87,8 +112,7 @@ public static class GenerateDraftFromAi
         }
 
         /// <summary>
-        /// Gera template stub baseado no protocolo.
-        /// Será substituído por integração com IA governada quando disponível.
+        /// Gera template estático como fallback quando IA não está disponível.
         /// </summary>
         private static (string Content, string Format) GenerateTemplate(
             ContractProtocol protocol,
@@ -133,4 +157,18 @@ public static class GenerateDraftFromAi
     public sealed record Response(
         Guid DraftId,
         string GeneratedContent);
+}
+
+/// <summary>
+/// Abstração para geração de draft de contrato por IA.
+/// Implementada na camada de infraestrutura com integração ao provider real.
+/// </summary>
+public interface IAiDraftGenerator
+{
+    /// <summary>Gera conteúdo de contrato via IA baseado no protocolo, título e prompt.</summary>
+    Task<(string Content, string Format)?> GenerateAsync(
+        ContractProtocol protocol,
+        string title,
+        string prompt,
+        CancellationToken cancellationToken = default);
 }

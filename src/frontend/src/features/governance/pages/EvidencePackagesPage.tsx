@@ -89,12 +89,7 @@ export function EvidencePackagesPage() {
       <PageHeader
         title={t('governance.evidence.title')}
         subtitle={t('governance.evidence.subtitle')}
-      >
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="warning">{t('governance.preview.badge')}</Badge>
-          <span className="text-xs text-muted">{t('governance.preview.evidenceReason')}</span>
-        </div>
-      </PageHeader>
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

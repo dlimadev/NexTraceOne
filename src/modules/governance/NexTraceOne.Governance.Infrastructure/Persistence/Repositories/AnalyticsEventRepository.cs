@@ -23,6 +23,16 @@ internal sealed class AnalyticsEventRepository(GovernanceDbContext context) : IA
             .Where(e => e.OccurredAt >= from && e.OccurredAt <= to)
             .LongCountAsync(ct);
 
+    public async Task<long> CountByEventTypeAsync(
+        AnalyticsEventType eventType,
+        string? persona,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId: null, domainId: null)
+            .Where(e => e.EventType == eventType && e.OccurredAt >= from && e.OccurredAt <= to)
+            .LongCountAsync(ct);
+
     public async Task<int> CountUniqueUsersAsync(
         string? persona,
         ProductModule? module,
