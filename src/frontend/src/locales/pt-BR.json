@@ -2477,5 +2477,48 @@
       "throughputScore": "Vazão",
       "resourceScore": "Recursos"
     }
+  },
+  "notifications": {
+    "title": "Central de Notificações",
+    "subtitle": "Gerencie e revise suas notificações",
+    "markAllRead": "Marcar todas como lidas",
+    "markRead": "Marcar como lida",
+    "markUnread": "Marcar como não lida",
+    "noNotifications": "Nenhuma notificação",
+    "noNotificationsDescription": "Tudo em dia! Novas notificações aparecerão aqui.",
+    "loadMore": "Carregar mais",
+    "viewAll": "Ver todas as notificações",
+    "errorLoading": "Falha ao carregar notificações",
+    "dropdownTitle": "Notificações",
+    "timeAgo": {
+      "justNow": "Agora",
+      "minutesAgo": "{{count}}min atrás",
+      "hoursAgo": "{{count}}h atrás",
+      "daysAgo": "{{count}}d atrás"
+    },
+    "filter": {
+      "all": "Todas",
+      "unread": "Não lidas",
+      "read": "Lidas"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "warning": "Alerta",
+      "actionRequired": "Ação Necessária",
+      "info": "Info"
+    },
+    "category": {
+      "incident": "Incidente",
+      "approval": "Aprovação",
+      "change": "Mudança",
+      "contract": "Contrato",
+      "security": "Segurança",
+      "compliance": "Compliance",
+      "finops": "FinOps",
+      "ai": "IA",
+      "integration": "Integração",
+      "platform": "Plataforma",
+      "informational": "Informativo"
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, Globe, Check } from 'lucide-react';
+import { Globe, Check } from 'lucide-react';
+import { NotificationBell } from '../../features/notifications';
 
 const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -56,13 +57,7 @@ export function AppTopbarActions() {
       </div>
 
       {/* Notifications */}
-      <button
-        className="p-2 rounded-md text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)] relative"
-        title={t('header.notifications')}
-        aria-label={t('header.notifications')}
-      >
-        <Bell size={17} />
-      </button>
+      <NotificationBell />
     </>
   );
 }

@@ -109,6 +109,9 @@ const ValueTrackingPage = lazy(() => import('./features/product-analytics/pages/
 // ── Audit-compliance (lazy) ──
 const AuditPage = lazy(() => import('./features/audit-compliance/pages/AuditPage').then(m => ({ default: m.AuditPage })));
 
+// ── Notifications (lazy) ──
+const NotificationCenterPage = lazy(() => import('./features/notifications/pages/NotificationCenterPage').then(m => ({ default: m.NotificationCenterPage })));
+
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 
@@ -737,6 +740,15 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="audit:read" redirectTo="/unauthorized">
                     <AuditPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Notifications ── */}
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute permission="notifications:inbox:read" redirectTo="/unauthorized">
+                    <NotificationCenterPage />
                   </ProtectedRoute>
                 }
               />

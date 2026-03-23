@@ -4195,5 +4195,48 @@
       "throughputScore": "Throughput",
       "resourceScore": "Resources"
     }
+  },
+  "notifications": {
+    "title": "Notification Center",
+    "subtitle": "Manage and review your notifications",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread",
+    "noNotifications": "No notifications",
+    "noNotificationsDescription": "You're all caught up! New notifications will appear here.",
+    "loadMore": "Load more",
+    "viewAll": "View all notifications",
+    "errorLoading": "Failed to load notifications",
+    "dropdownTitle": "Notifications",
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    },
+    "filter": {
+      "all": "All",
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "severity": {
+      "critical": "Critical",
+      "warning": "Warning",
+      "actionRequired": "Action Required",
+      "info": "Info"
+    },
+    "category": {
+      "incident": "Incident",
+      "approval": "Approval",
+      "change": "Change",
+      "contract": "Contract",
+      "security": "Security",
+      "compliance": "Compliance",
+      "finops": "FinOps",
+      "ai": "AI",
+      "integration": "Integration",
+      "platform": "Platform",
+      "informational": "Informational"
+    }
   }
 }

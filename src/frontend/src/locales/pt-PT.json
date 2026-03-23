@@ -3414,5 +3414,48 @@
       "throughputScore": "Débito",
       "resourceScore": "Recursos"
     }
+  },
+  "notifications": {
+    "title": "Central de Notificações",
+    "subtitle": "Gerir e rever as suas notificações",
+    "markAllRead": "Marcar todas como lidas",
+    "markRead": "Marcar como lida",
+    "markUnread": "Marcar como não lida",
+    "noNotifications": "Sem notificações",
+    "noNotificationsDescription": "Está tudo em dia! Novas notificações aparecerão aqui.",
+    "loadMore": "Carregar mais",
+    "viewAll": "Ver todas as notificações",
+    "errorLoading": "Falha ao carregar notificações",
+    "dropdownTitle": "Notificações",
+    "timeAgo": {
+      "justNow": "Agora",
+      "minutesAgo": "{{count}}min atrás",
+      "hoursAgo": "{{count}}h atrás",
+      "daysAgo": "{{count}}d atrás"
+    },
+    "filter": {
+      "all": "Todas",
+      "unread": "Não lidas",
+      "read": "Lidas"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "warning": "Alerta",
+      "actionRequired": "Ação Necessária",
+      "info": "Info"
+    },
+    "category": {
+      "incident": "Incidente",
+      "approval": "Aprovação",
+      "change": "Alteração",
+      "contract": "Contrato",
+      "security": "Segurança",
+      "compliance": "Conformidade",
+      "finops": "FinOps",
+      "ai": "IA",
+      "integration": "Integração",
+      "platform": "Plataforma",
+      "informational": "Informativo"
+    }
   }
 }
