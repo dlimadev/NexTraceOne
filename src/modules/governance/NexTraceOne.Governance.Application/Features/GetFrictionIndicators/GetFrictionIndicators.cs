@@ -30,6 +30,16 @@ public static class GetFrictionIndicators
             (AnalyticsEventType.JourneyAbandoned, FrictionSignalType.AbortedJourney, "Journey Abandoned")
         ];
 
+        private static TrendDirection ClassifyTrend(long current, long previous)
+        {
+            if (previous == 0) return TrendDirection.Stable;
+            return current < (long)(previous * 0.95m)
+                ? TrendDirection.Improving
+                : current > (long)(previous * 1.05m)
+                    ? TrendDirection.Declining
+                    : TrendDirection.Stable;
+        }
+
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var range = request.Range ?? "last_30d";
@@ -66,13 +76,7 @@ public static class GetFrictionIndicators
                 var previousCount = await analyticsRepo.CountByEventTypeAsync(
                     eventType, request.Persona, previousFrom, from, cancellationToken);
 
-                var trend = previousCount == 0
-                    ? TrendDirection.Stable
-                    : count < (long)(previousCount * 0.95m)
-                        ? TrendDirection.Improving
-                        : count > (long)(previousCount * 1.05m)
-                            ? TrendDirection.Declining
-                            : TrendDirection.Stable;
+                var trend = ClassifyTrend(count, previousCount);
 
                 var impactPercent = totalEvents > 0
                     ? Math.Round((decimal)count / totalEvents * 100, 1)

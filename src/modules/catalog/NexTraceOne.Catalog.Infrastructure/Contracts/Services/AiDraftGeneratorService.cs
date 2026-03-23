@@ -80,12 +80,20 @@ public sealed class AiDraftGeneratorService : IAiDraftGenerator
     private static (string Format, string SystemPrompt) BuildPromptContext(
         ContractProtocol protocol, string title)
     {
+        // Sanitize title to prevent prompt injection — strip control characters and limit length
+        var safeTitle = new string(title
+            .Where(c => !char.IsControl(c))
+            .Take(200)
+            .ToArray())
+            .Replace("```", "")
+            .Replace("###", "");
+
         return protocol switch
         {
             ContractProtocol.AsyncApi => ("yaml",
                 $"""
                  You are a contract generation assistant for NexTraceOne.
-                 Generate a valid AsyncAPI 2.6.0 YAML contract for '{title}'.
+                 Generate a valid AsyncAPI 2.6.0 YAML contract for '{safeTitle}'.
                  Include channels, message schemas, and server bindings where applicable.
                  Output only the YAML content, no explanations.
                  """),
@@ -93,7 +101,7 @@ public sealed class AiDraftGeneratorService : IAiDraftGenerator
             ContractProtocol.Wsdl => ("xml",
                 $"""
                  You are a contract generation assistant for NexTraceOne.
-                 Generate a valid WSDL 1.1 XML contract for '{title}'.
+                 Generate a valid WSDL 1.1 XML contract for '{safeTitle}'.
                  Include types, messages, portType, binding, and service elements.
                  Output only the XML content, no explanations.
                  """),
@@ -101,7 +109,7 @@ public sealed class AiDraftGeneratorService : IAiDraftGenerator
             _ => ("yaml",
                 $"""
                  You are a contract generation assistant for NexTraceOne.
-                 Generate a valid OpenAPI 3.1.0 YAML contract for '{title}'.
+                 Generate a valid OpenAPI 3.1.0 YAML contract for '{safeTitle}'.
                  Include paths, schemas, and response definitions.
                  Output only the YAML content, no explanations.
                  """)
