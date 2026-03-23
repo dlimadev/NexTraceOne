@@ -16,7 +16,7 @@
 | **Completude Funcional Estimada** | ~88% |
 | **Staging Readiness** | ~95% |
 | **Production Enterprise Readiness** | ~78% |
-| **Blockers Finais (Produção)** | 2 (infrastructure) + 2 (code stubs in governance packs) |
+| **Blockers Finais (Produção)** | 2 (infrastructure: GATE-P0, GATE-P1) |
 | **Riscos Residuais Classificados** | 10 (all non-blocking for staging) |
 | **Testes Unitários (.NET)** | 2,313+ (all passing, 0 failures) |
 | **Build Errors** | 0 |
