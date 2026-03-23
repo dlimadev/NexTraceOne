@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
-  Globe, Search, Server, BarChart3, Users, ArrowRight, Tag, Loader2, AlertTriangle,
+  Globe, Search, Server, BarChart3, Users, ArrowRight, Tag,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -13,8 +13,6 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { DomainSummary } from '../../../types';
-
-type Criticality = 'Critical' | 'High' | 'Medium' | 'Low';
 
 const maturityBadgeVariant = (level: string): 'success' | 'info' | 'warning' | 'danger' => {
   switch (level) {

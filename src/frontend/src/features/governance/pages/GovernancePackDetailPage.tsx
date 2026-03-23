@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import {
-  Package, ArrowLeft, Info, List, Globe, History,
+  ArrowLeft, Info, List, Globe, History,
   Play, Shield, ShieldCheck,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';

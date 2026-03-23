@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Package, Search, Lock, Download, FileCheck, FileText,
-  Clock, Shield, Bot, AlertTriangle, ClipboardList,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -16,7 +15,6 @@ import { evidenceApi } from '../api/evidence';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import type {
   EvidencePackageStatusType,
-  EvidenceTypeValue,
 } from '../../../types';
 type StatusFilter = 'all' | EvidencePackageStatusType;
 
@@ -26,20 +24,6 @@ const statusBadge = (st: EvidencePackageStatusType): 'success' | 'warning' | 'in
     case 'Exported': return 'info';
     case 'Draft': return 'warning';
     default: return 'default';
-  }
-};
-
-const evidenceIcon = (type: string) => {
-  switch (type) {
-    case 'Approval': return <FileCheck size={14} />;
-    case 'ChangeHistory': return <Clock size={14} />;
-    case 'ContractPublication': return <FileText size={14} />;
-    case 'MitigationRecord': return <AlertTriangle size={14} />;
-    case 'AiUsageRecord': return <Bot size={14} />;
-    case 'PolicyDecision': return <Shield size={14} />;
-    case 'ComplianceResult': return <ClipboardList size={14} />;
-    case 'AuditReference': return <ClipboardList size={14} />;
-    default: return <FileText size={14} />;
   }
 };
 

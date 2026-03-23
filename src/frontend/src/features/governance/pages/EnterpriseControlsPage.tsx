@@ -10,7 +10,7 @@ import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import type {
-  ControlDimensionDto, ControlsSummaryResponse, ControlDimensionType,
+  ControlsSummaryResponse, ControlDimensionType,
   MaturityLevelType, GovernanceTrendDirection,
 } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';

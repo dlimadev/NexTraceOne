@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Loader2, AlertTriangle } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { MaturityScorecardsResponse, MaturityLevelType } from '../../../types';

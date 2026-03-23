@@ -1,17 +1,14 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  DollarSign, TrendingUp, TrendingDown, Minus, AlertTriangle,
-  CheckCircle, AlertCircle, XCircle, Layers, Users,
-  ArrowRight, Target, BarChart3,
+  DollarSign, AlertTriangle,
+  Layers,
+  Target, BarChart3,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
-import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import type { CostEfficiencyType } from '../../../types';
 import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
@@ -21,23 +18,6 @@ function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
 }
 
-const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'danger' | 'default' => {
-  switch (eff) {
-    case 'Efficient': return 'success';
-    case 'Acceptable': return 'default';
-    case 'Inefficient': return 'warning';
-    case 'Wasteful': return 'danger';
-    default: return 'default';
-  }
-};
-
-const trendIcon = (dir: string) => {
-  switch (dir) {
-    case 'Improving': return <TrendingUp size={14} className="text-success" />;
-    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
-    default: return <Minus size={14} className="text-muted" />;
-  }
-};
 export function ExecutiveFinOpsPage() {
   const { t, i18n } = useTranslation();
   const fmt = (v: number) => formatCurrency(v, i18n.language);

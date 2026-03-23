@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save, FileText, Building2, Shield, Link as LinkIcon, Calendar } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
-import { SERVICE_TYPES, PROTOCOLS, LIFECYCLE_STATES } from '../../shared/constants';
+import { SERVICE_TYPES, LIFECYCLE_STATES } from '../../shared/constants';
 import type { StudioContract } from '../studioTypes';
 
 interface DefinitionSectionProps {

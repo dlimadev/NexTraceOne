@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Package, Search, FileText, Shield, Zap, Bot, AlertTriangle,
-  Activity, Settings, CheckCircle, Archive, Loader2,
+  Activity, Settings, CheckCircle, Archive,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
