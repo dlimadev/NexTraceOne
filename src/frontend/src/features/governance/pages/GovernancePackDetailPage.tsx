@@ -292,15 +292,6 @@ export function GovernancePackDetailPage() {
             <p className="text-xs text-muted mt-1">{t('governancePacks.detail.simulationDescription')}</p>
           </CardHeader>
           <CardBody>
-            <div className="mb-4 flex items-center gap-2 text-xs text-muted">
-              <Badge variant="warning">{t('governance.preview.badge')}</Badge>
-              <span>
-                {t(
-                  'governance.preview.simulationReason',
-                  'Simulation remains preview-only until the impact model is backed by production data.',
-                )}
-              </span>
-            </div>
             <Link
               to={`/governance/packs/${pack.packId}/simulate`}
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border border-accent/30 bg-accent/10 text-accent hover:bg-accent/15 transition-colors"
