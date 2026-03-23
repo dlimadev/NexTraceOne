@@ -13,6 +13,7 @@ using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Infrastructure.Engine;
 using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
+using NexTraceOne.Notifications.Infrastructure.Governance;
 using NexTraceOne.Notifications.Infrastructure.Intelligence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
@@ -138,6 +139,12 @@ public static class DependencyInjection
         // Integrations & Ingestion
         services.AddScoped<IIntegrationEventHandler<SyncFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<ConnectorAuthFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
+
+        // ── Phase 7: Metrics, Audit & Governance ──
+        services.AddScoped<INotificationMetricsService, NotificationMetricsService>();
+        services.AddScoped<INotificationAuditService, NotificationAuditService>();
+        services.AddScoped<INotificationHealthProvider, NotificationHealthProvider>();
+        services.AddScoped<INotificationCatalogGovernance, NotificationCatalogGovernance>();
 
         return services;
     }
