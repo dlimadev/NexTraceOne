@@ -1,9 +1,10 @@
 # CLASSIFICAÇÃO ATUALIZADA DE GAPS — NexTraceOne
 
 > **Data:** 2026-03-23
+> **Última atualização:** 2026-03-23 (Wave 5 — Final Consolidation)
 > **Referência:** Onda 0 — Realinhamento de Baseline
 > **Base:** NEXTRACEONE-CURRENT-STATE-AND-100-PERCENT-GAP-REPORT.md (24 gaps originais)
-> **Contexto:** Reclassificação pós-remoção de Grafana como premissa e revisão completa do backlog
+> **Contexto:** Classificação final pós-Wave 5 — todos os gaps têm decisão formal explícita
 
 ---
 
@@ -404,5 +405,51 @@
 
 ---
 
-> **Este documento é a classificação oficial de gaps do NexTraceOne após a Onda 0 de realinhamento de baseline.**
-> **Ver também:** `NEXTRACEONE-WAVE-0-BASELINE-REALIGNMENT.md` e `NEXTRACEONE-UPDATED-WAVES-PLAN.md`
+## ESTADO FINAL PÓS-WAVE 5 (Atualização 2026-03-23)
+
+> Seção adicionada na Wave 5 — Final Consolidation para refletir o estado final de todos os gaps.
+
+### Estado de cada gap
+
+| Gap | Estado Final | Onda de Resolução |
+|-----|-------------|-------------------|
+| GAP-001 | ✅ Resolvido | Wave 1 |
+| GAP-002 | ✅ Resolvido | Wave 1 |
+| GAP-003 | ✅ Resolvido | Wave 2 |
+| GAP-004 | ✅ Resolvido | Wave 2 |
+| GAP-005 | ✅ Resolvido | Wave 2 |
+| GAP-006 | ✅ Resolvido | Wave 2 |
+| GAP-007 | ✅ Resolvido | Wave 2 |
+| GAP-008 | ✅ Resolvido | Wave 2 |
+| GAP-009 | ✅ Resolvido | Wave 4 |
+| GAP-010 | ✅ Resolvido | Wave 2 + Wave 3 |
+| GAP-011 | ✅ Resolvido | Wave 4 |
+| GAP-012 | 🗑️ Substituído por GAP-012-R | Wave 0 |
+| GAP-012-R | ✅ Resolvido | Wave 5 |
+| GAP-013 | ✅ Resolvido (já limpo) | Wave 5 |
+| GAP-014 | ✅ Resolvido (badge removido) | Wave 5 |
+| GAP-015 | ✅ Resolvido | Wave 3 |
+| GAP-016 | ✅ Resolvido | Wave 3 |
+| GAP-017 | 📋 PGLI confirmado | Wave 5 |
+| GAP-018 | 📋 PGLI confirmado | Wave 5 |
+| GAP-019 | 📋 PGLI confirmado | Wave 5 |
+| GAP-020 | ✅ Resolvido | Wave 4 |
+| GAP-021 | ✅ Resolvido | Wave 3 |
+| GAP-022 | ✅ Resolvido | Wave 3 |
+| GAP-023 | 🗑️ Descartado oficialmente | Wave 5 |
+| GAP-024 | 📋 PGLI confirmado | Wave 5 |
+
+### Resumo final
+
+| Classificação | Total |
+|--------------|-------|
+| ✅ Resolvido | 20 |
+| 🗑️ Descartado | 2 (GAP-012, GAP-023) |
+| 📋 PGLI confirmado | 4 (GAP-017, GAP-018, GAP-019, GAP-024) |
+| ❌ Em aberto | 0 |
+
+---
+
+> **Este documento é a classificação oficial de gaps do NexTraceOne, atualizado após a Wave 5 — Final Consolidation.**
+> **Todos os 24 gaps originais + 1 substituto (GAP-012-R) possuem decisão formal explícita.**
+> **Ver também:** `NEXTRACEONE-WAVE-0-BASELINE-REALIGNMENT.md`, `NEXTRACEONE-UPDATED-WAVES-PLAN.md` e `WAVE-5-FINAL-CONSOLIDATION-REPORT.md`
