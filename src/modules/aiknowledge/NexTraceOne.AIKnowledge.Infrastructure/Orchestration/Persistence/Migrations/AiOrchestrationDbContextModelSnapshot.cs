@@ -333,7 +333,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migra
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("outbox_messages", (string)null);
+                    b.ToTable("ai_orch_outbox_messages", (string)null);
                 });
 #pragma warning restore 612, 618
         }

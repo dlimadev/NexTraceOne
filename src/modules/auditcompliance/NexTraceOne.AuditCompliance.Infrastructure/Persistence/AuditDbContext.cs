@@ -39,6 +39,9 @@ public sealed class AuditDbContext(
         => typeof(AuditDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "aud_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

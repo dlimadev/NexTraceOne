@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -110,7 +110,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                 });
 
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "oi_cost_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -125,7 +125,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_oi_cost_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
@@ -167,19 +167,19 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_oi_cost_outbox_messages_CreatedAt",
+                table: "oi_cost_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_oi_cost_outbox_messages_IdempotencyKey",
+                table: "oi_cost_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_oi_cost_outbox_messages_ProcessedAt",
+                table: "oi_cost_outbox_messages",
                 column: "ProcessedAt");
         }
 
@@ -199,7 +199,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                 name: "oi_service_cost_profiles");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "oi_cost_outbox_messages");
         }
     }
 }

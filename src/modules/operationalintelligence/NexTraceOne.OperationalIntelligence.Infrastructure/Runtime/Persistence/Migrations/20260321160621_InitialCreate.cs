@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -119,7 +119,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                 });
 
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "oi_rt_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -134,7 +134,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_oi_rt_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
@@ -185,19 +185,19 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                 columns: new[] { "ServiceName", "Environment", "CapturedAt" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_oi_rt_outbox_messages_CreatedAt",
+                table: "oi_rt_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_oi_rt_outbox_messages_IdempotencyKey",
+                table: "oi_rt_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_oi_rt_outbox_messages_ProcessedAt",
+                table: "oi_rt_outbox_messages",
                 column: "ProcessedAt");
         }
 
@@ -217,7 +217,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                 name: "oi_runtime_snapshots");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "oi_rt_outbox_messages");
         }
     }
 }

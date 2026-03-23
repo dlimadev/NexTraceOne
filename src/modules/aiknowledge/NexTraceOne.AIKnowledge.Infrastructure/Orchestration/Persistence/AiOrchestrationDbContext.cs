@@ -37,6 +37,9 @@ public sealed class AiOrchestrationDbContext(
         => "NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "ai_orch_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

@@ -29,8 +29,8 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 /// <summary>
 /// Fixture de integração com PostgreSQL real via Testcontainers.
 /// Gerencia 4 bancos de dados consolidados cobrindo todos os 16 DbContexts da plataforma (ADR-001).
-/// Todas as tabelas usam prefixos de módulo únicos e outbox_messages usa CREATE TABLE IF NOT EXISTS,
-/// permitindo múltiplos DbContexts por database sem conflitos.
+/// Todas as tabelas usam prefixos de módulo únicos — incluindo a tabela outbox de cada módulo
+/// (ex: wf_outbox_messages, ci_outbox_messages) — permitindo múltiplos DbContexts por database sem conflitos.
 ///
 /// nextrace_it_identity   → IdentityDbContext, AuditDbContext
 /// nextrace_it_catalog    → CatalogGraphDbContext, ContractsDbContext, DeveloperPortalDbContext

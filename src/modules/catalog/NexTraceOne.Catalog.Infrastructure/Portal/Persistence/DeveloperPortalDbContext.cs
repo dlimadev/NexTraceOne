@@ -42,6 +42,9 @@ public sealed class DeveloperPortalDbContext(
         => "NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "dp_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

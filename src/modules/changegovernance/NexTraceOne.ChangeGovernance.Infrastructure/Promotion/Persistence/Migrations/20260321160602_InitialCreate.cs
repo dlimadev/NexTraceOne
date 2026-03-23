@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -12,7 +12,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "prm_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -27,7 +27,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_prm_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -112,19 +112,19 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_prm_outbox_messages_CreatedAt",
+                table: "prm_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_prm_outbox_messages_IdempotencyKey",
+                table: "prm_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_prm_outbox_messages_ProcessedAt",
+                table: "prm_outbox_messages",
                 column: "ProcessedAt");
 
             migrationBuilder.CreateIndex(
@@ -199,7 +199,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "prm_outbox_messages");
 
             migrationBuilder.DropTable(
                 name: "prm_deployment_environments");

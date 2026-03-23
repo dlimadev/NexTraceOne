@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -250,7 +250,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                 });
 
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "ci_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -265,7 +265,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_ci_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
@@ -333,19 +333,19 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_ci_outbox_messages_CreatedAt",
+                table: "ci_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_ci_outbox_messages_IdempotencyKey",
+                table: "ci_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_ci_outbox_messages_ProcessedAt",
+                table: "ci_outbox_messages",
                 column: "ProcessedAt");
         }
 
@@ -383,7 +383,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                 name: "ci_rollback_assessments");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "ci_outbox_messages");
         }
     }
 }

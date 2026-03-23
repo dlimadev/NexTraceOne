@@ -11,7 +11,8 @@ public sealed record IncidentCreatedIntegrationEvent(
     string ServiceName,
     string IncidentSeverity,
     string Description,
-    Guid? OwnerUserId) : IntegrationEventBase("OperationalIntelligence");
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
 
 /// <summary>
 /// Publicado quando um incidente é escalado (severidade aumentada ou prazo expirado).
@@ -22,7 +23,8 @@ public sealed record IncidentEscalatedIntegrationEvent(
     string ServiceName,
     string PreviousSeverity,
     string NewSeverity,
-    Guid? OwnerUserId) : IntegrationEventBase("OperationalIntelligence");
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
 
 /// <summary>
 /// Publicado quando uma anomalia de custo é detetada que excede o orçamento.
@@ -33,7 +35,8 @@ public sealed record BudgetExceededIntegrationEvent(
     string ServiceName,
     decimal ExpectedCost,
     decimal ActualCost,
-    Guid? OwnerUserId) : IntegrationEventBase("OperationalIntelligence");
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
 
 /// <summary>
 /// Publicado quando uma falha crítica de integração ou ingestão é detetada.
@@ -43,4 +46,5 @@ public sealed record IntegrationFailedIntegrationEvent(
     Guid IntegrationId,
     string IntegrationName,
     string ErrorMessage,
-    Guid? OwnerUserId) : IntegrationEventBase("OperationalIntelligence");
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");

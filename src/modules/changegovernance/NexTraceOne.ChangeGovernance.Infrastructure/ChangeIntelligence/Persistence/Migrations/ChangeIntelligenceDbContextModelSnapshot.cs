@@ -67,7 +67,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("outbox_messages", (string)null);
+                    b.ToTable("ci_outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.BlastRadiusReport", b =>

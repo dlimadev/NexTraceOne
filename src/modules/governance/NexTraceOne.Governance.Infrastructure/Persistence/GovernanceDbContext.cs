@@ -58,6 +58,9 @@ public sealed class GovernanceDbContext(
         => typeof(GovernanceDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "gov_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

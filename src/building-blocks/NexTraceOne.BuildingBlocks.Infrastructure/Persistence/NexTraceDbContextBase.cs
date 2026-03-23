@@ -33,11 +33,19 @@ public abstract class NexTraceDbContextBase(
     /// </summary>
     protected virtual string? ConfigurationsNamespace => null;
 
+    /// <summary>
+    /// Nome da tabela de outbox para este DbContext.
+    /// Cada módulo deve sobrescrever com um nome prefixado para evitar colisões entre
+    /// DbContexts que partilham o mesmo schema PostgreSQL.
+    /// Exemplo: "wf_outbox_messages" para WorkflowDbContext.
+    /// </summary>
+    protected virtual string OutboxTableName => "outbox_messages";
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<OutboxMessage>(builder =>
         {
-            builder.ToTable("outbox_messages");
+            builder.ToTable(OutboxTableName);
             builder.HasKey(x => x.Id);
             builder.Property(x => x.EventType).HasMaxLength(1000).IsRequired();
             builder.Property(x => x.Payload).IsRequired();

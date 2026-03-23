@@ -36,6 +36,9 @@ public sealed class RulesetGovernanceDbContext(
         => "NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "rg_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

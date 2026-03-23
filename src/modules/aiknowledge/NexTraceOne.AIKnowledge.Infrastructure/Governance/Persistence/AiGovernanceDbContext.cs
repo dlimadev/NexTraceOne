@@ -42,6 +42,13 @@ public sealed class AiGovernanceDbContext(
         => typeof(AiGovernanceDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string? ConfigurationsNamespace
+        => "NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Configurations";
+
+    /// <inheritdoc />
+    protected override string OutboxTableName => "ai_gov_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

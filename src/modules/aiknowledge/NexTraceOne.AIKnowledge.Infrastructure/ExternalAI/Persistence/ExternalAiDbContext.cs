@@ -37,6 +37,9 @@ public sealed class ExternalAiDbContext(
         => "NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "ext_ai_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

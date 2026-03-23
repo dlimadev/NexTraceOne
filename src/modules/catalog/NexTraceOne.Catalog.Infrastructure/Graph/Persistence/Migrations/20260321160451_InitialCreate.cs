@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -88,7 +88,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "eg_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -103,7 +103,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_eg_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -281,19 +281,19 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                 columns: new[] { "NodeId", "OverlayMode" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_eg_outbox_messages_CreatedAt",
+                table: "eg_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_eg_outbox_messages_IdempotencyKey",
+                table: "eg_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_eg_outbox_messages_ProcessedAt",
+                table: "eg_outbox_messages",
                 column: "ProcessedAt");
 
             migrationBuilder.CreateIndex(
@@ -336,7 +336,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                 name: "node_health_records");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "eg_outbox_messages");
 
             migrationBuilder.DropTable(
                 name: "saved_graph_views");

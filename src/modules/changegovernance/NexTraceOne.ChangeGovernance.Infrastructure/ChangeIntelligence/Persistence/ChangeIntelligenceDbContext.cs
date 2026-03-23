@@ -57,6 +57,9 @@ public sealed class ChangeIntelligenceDbContext(
         => "NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "ci_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

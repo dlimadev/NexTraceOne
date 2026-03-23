@@ -39,6 +39,9 @@ public sealed class PromotionDbContext(
         => "NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "prm_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

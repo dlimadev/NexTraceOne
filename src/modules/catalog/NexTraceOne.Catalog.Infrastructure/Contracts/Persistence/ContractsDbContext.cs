@@ -50,6 +50,9 @@ public sealed class ContractsDbContext(
         => "NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "ct_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

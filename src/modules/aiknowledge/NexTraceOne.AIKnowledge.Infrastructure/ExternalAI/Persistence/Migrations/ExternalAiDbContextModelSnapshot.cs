@@ -344,7 +344,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migratio
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("outbox_messages", (string)null);
+                    b.ToTable("ext_ai_outbox_messages", (string)null);
                 });
 #pragma warning restore 612, 618
         }

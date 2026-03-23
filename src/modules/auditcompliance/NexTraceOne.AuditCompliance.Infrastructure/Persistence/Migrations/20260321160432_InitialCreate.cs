@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -45,7 +45,7 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "aud_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -60,7 +60,7 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_aud_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,19 +134,19 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                 column: "IsActive");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_aud_outbox_messages_CreatedAt",
+                table: "aud_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_aud_outbox_messages_IdempotencyKey",
+                table: "aud_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_aud_outbox_messages_ProcessedAt",
+                table: "aud_outbox_messages",
                 column: "ProcessedAt");
         }
 
@@ -160,7 +160,7 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                 name: "aud_retention_policies");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "aud_outbox_messages");
 
             migrationBuilder.DropTable(
                 name: "aud_audit_events");

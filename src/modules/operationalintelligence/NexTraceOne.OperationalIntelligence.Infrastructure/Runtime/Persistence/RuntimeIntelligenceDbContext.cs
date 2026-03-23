@@ -40,6 +40,9 @@ public sealed class RuntimeIntelligenceDbContext(
         => "NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "oi_rt_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

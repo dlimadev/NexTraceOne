@@ -184,7 +184,7 @@ public sealed class AiRuntimeEndpointModule
     {
         var group = app.MapGroup("/api/v1/ai/models");
 
-        group.MapGet("/", async (
+        group.MapGet("/active", async (
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

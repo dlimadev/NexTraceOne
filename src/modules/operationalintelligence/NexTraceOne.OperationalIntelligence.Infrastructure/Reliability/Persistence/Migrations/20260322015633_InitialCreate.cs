@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -39,7 +39,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                 });
 
             migrationBuilder.CreateTable(
-                name: "outbox_messages",
+                name: "oi_rel_outbox_messages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -54,7 +54,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_outbox_messages", x => x.Id);
+                    table.PrimaryKey("PK_oi_rel_outbox_messages", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
@@ -68,19 +68,19 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                 columns: new[] { "TenantId", "ServiceId", "ComputedAt" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_CreatedAt",
-                table: "outbox_messages",
+                name: "IX_oi_rel_outbox_messages_CreatedAt",
+                table: "oi_rel_outbox_messages",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_IdempotencyKey",
-                table: "outbox_messages",
+                name: "IX_oi_rel_outbox_messages_IdempotencyKey",
+                table: "oi_rel_outbox_messages",
                 column: "IdempotencyKey",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_outbox_messages_ProcessedAt",
-                table: "outbox_messages",
+                name: "IX_oi_rel_outbox_messages_ProcessedAt",
+                table: "oi_rel_outbox_messages",
                 column: "ProcessedAt");
         }
 
@@ -91,7 +91,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                 name: "oi_reliability_snapshots");
 
             migrationBuilder.DropTable(
-                name: "outbox_messages");
+                name: "oi_rel_outbox_messages");
         }
     }
 }

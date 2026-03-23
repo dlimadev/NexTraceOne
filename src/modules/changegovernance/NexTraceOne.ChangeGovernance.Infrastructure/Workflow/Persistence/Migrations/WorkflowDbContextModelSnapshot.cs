@@ -67,7 +67,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("outbox_messages", (string)null);
+                    b.ToTable("wf_outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.ApprovalDecision", b =>
