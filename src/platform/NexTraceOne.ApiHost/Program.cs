@@ -27,6 +27,7 @@ using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
 using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
 using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
 using NexTraceOne.IdentityAccess.API.Endpoints;
+using NexTraceOne.Notifications.API.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
@@ -76,6 +77,7 @@ builder.Services.AddAiGovernanceModule(builder.Configuration);
 builder.Services.AddExternalAiModule(builder.Configuration);
 builder.Services.AddAiOrchestrationModule(builder.Configuration);
 builder.Services.AddAiRuntimeModule(builder.Configuration);
+builder.Services.AddNotificationsModule(builder.Configuration);
 
 // [5] JSON — serialização de enums como strings para Minimal API
 builder.Services.ConfigureHttpJsonOptions(options =>
