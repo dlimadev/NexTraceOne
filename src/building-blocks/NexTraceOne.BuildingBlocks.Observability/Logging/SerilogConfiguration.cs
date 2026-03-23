@@ -11,7 +11,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Logging;
 /// 
 /// A plataforma envia logs via OpenTelemetry (OTLP) para o Collector,
 /// que roteia para o provider de observabilidade configurado (ClickHouse ou Elastic).
-/// Não há dependência direta de Loki ou Grafana.
+/// Não há dependência direta de ferramentas externas de visualização.
 /// </summary>
 public static class SerilogConfiguration
 {

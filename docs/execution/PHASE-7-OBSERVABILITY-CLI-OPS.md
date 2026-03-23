@@ -1,5 +1,7 @@
 # Phase 7 — Observability, CLI & Operational Completeness
 
+> **Nota:** Este documento é um relatório histórico. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 ## Scope
 
 Phase 7 closes the operational maturity gaps that prevent NexTraceOne from being treated as a production-ready enterprise platform. This phase delivers:

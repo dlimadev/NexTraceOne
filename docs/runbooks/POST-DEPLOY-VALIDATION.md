@@ -110,9 +110,10 @@ curl -sf "${WORKERS}/health" | jq '.entries'
 # OTel Collector health
 curl -sf http://localhost:13133/
 
-# Grafana acessível
-curl -sf http://localhost:3000/api/health | jq .
-# Esperado: {"database":"ok","version":"..."}
+# Provider de observabilidade acessível (ClickHouse ou Elastic, conforme configuração)
+# ClickHouse:
+curl -sf http://localhost:8123/ping
+# Esperado: Ok
 ```
 
 ---
@@ -125,11 +126,11 @@ curl -sf http://localhost:3000/api/health | jq .
 [ ] BackgroundWorkers /live → Healthy
 [ ] Ingestion /live → Healthy
 [ ] Frontend carregando (HTTP 200)
-[ ] Sem aumento de erros 5xx nos logs (Grafana)
+[ ] Sem aumento de erros 5xx nos logs (provider de observabilidade)
 [ ] Workers registados e ativos
 [ ] Migrations aplicadas (última migration presente)
 [ ] OTel Collector recebendo dados
-[ ] Grafana dashboards operacionais
+[ ] Dashboards de observabilidade operacionais
 ```
 
 ---
@@ -141,8 +142,8 @@ curl -sf http://localhost:3000/api/health | jq .
 | `/live` → `Healthy` | Todos os serviços |
 | `/ready` → `Healthy` | ApiHost, Ingestion |
 | Frontend HTTP 200 | Browser / curl |
-| Logs sem critical errors | Grafana / Loki |
-| Traces chegando ao Tempo | Grafana Tempo |
+| Logs sem critical errors | Provider de observabilidade (ClickHouse/Elastic) |
+| Traces chegando ao provider | ClickHouse/Elastic |
 | DB acessível | Health check |
 
 ---

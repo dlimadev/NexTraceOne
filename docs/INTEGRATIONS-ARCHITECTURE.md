@@ -8,7 +8,7 @@ GitHub Azure DevOps GitLab
 
 ### Observability
 
-OpenTelemetry Prometheus Grafana
+OpenTelemetry Prometheus ClickHouse/Elastic
 
 ### Messaging
 

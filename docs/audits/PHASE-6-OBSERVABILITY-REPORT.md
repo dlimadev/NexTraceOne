@@ -1,5 +1,7 @@
 # Phase 6 — Observability Report
 
+> **Nota:** Este documento é um relatório histórico. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 ## 1. Resumo Executivo
 
 ### Estado Inicial
