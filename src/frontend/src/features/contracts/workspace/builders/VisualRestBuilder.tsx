@@ -196,7 +196,7 @@ export function VisualRestBuilder({
               label={t('contracts.builder.rest.title', 'Title')}
               value={state.title}
               onChange={(v) => update({ title: v })}
-              placeholder="User Management API"
+              placeholder={t('contracts.builder.rest.titlePlaceholder', 'User Management API')}
               required
               error={fieldError('title') ? t(fieldError('title')!.messageKey, fieldError('title')!.fallback) : undefined}
               disabled={isReadOnly}
@@ -205,7 +205,7 @@ export function VisualRestBuilder({
               label={t('contracts.builder.rest.version', 'Version')}
               value={state.version}
               onChange={(v) => update({ version: v })}
-              placeholder="1.0.0"
+              placeholder={t('contracts.builder.rest.versionPlaceholder', '1.0.0')}
               mono
               disabled={isReadOnly}
             />
@@ -214,7 +214,7 @@ export function VisualRestBuilder({
             label={t('contracts.builder.rest.basePath', 'Base Path')}
             value={state.basePath}
             onChange={(v) => update({ basePath: v })}
-            placeholder="/api/v1"
+            placeholder={t('contracts.builder.rest.basePathPlaceholder', '/api/v1')}
             required
             mono
             error={fieldError('basePath') ? t(fieldError('basePath')!.messageKey, fieldError('basePath')!.fallback) : undefined}
@@ -232,14 +232,14 @@ export function VisualRestBuilder({
               label={t('contracts.builder.rest.contact', 'Contact')}
               value={state.contact}
               onChange={(v) => update({ contact: v })}
-              placeholder="API Team"
+              placeholder={t('contracts.builder.rest.contactPlaceholder', 'API Team')}
               disabled={isReadOnly}
             />
             <Field
               label={t('contracts.builder.rest.license', 'License')}
               value={state.license}
               onChange={(v) => update({ license: v })}
-              placeholder="MIT"
+              placeholder={t('contracts.builder.rest.licensePlaceholder', 'MIT')}
               disabled={isReadOnly}
             />
           </div>
@@ -247,7 +247,7 @@ export function VisualRestBuilder({
             label={t('contracts.builder.rest.servers', 'Servers')}
             tags={state.servers}
             onChange={(v) => update({ servers: v })}
-            placeholder="https://api.example.com"
+            placeholder={t('contracts.builder.rest.serverPlaceholder', 'https://api.example.com')}
           />
         </CardBody>
       </Card>
@@ -337,7 +337,7 @@ export function VisualRestBuilder({
                           label={t('contracts.builder.rest.path', 'Path')}
                           value={ep.path}
                           onChange={(v) => updateEndpoint(ep.id, { path: v })}
-                          placeholder="/users/{id}"
+                          placeholder={t('contracts.builder.rest.pathPlaceholder', '/users/{id}')}
                           required
                           mono
                           disabled={isReadOnly}
@@ -346,7 +346,7 @@ export function VisualRestBuilder({
                           label={t('contracts.builder.rest.operationId', 'Operation ID')}
                           value={ep.operationId}
                           onChange={(v) => updateEndpoint(ep.id, { operationId: v })}
-                          placeholder="getUser"
+                          placeholder={t('contracts.builder.rest.operationIdPlaceholder', 'getUser')}
                           mono
                           disabled={isReadOnly}
                         />
@@ -387,7 +387,7 @@ export function VisualRestBuilder({
                             <Field label={pi === 0 ? t('contracts.builder.rest.paramName', 'Name') : ''} value={param.name} onChange={(v) => {
                               const next = [...ep.parameters]; next[pi] = { ...param, name: v };
                               updateEndpoint(ep.id, { parameters: next });
-                            }} placeholder="id" mono disabled={isReadOnly} />
+                            }} placeholder={t('contracts.builder.rest.paramNamePlaceholder', 'id')} mono disabled={isReadOnly} />
                             <FieldSelect label={pi === 0 ? t('contracts.builder.rest.paramIn', 'In') : ''} value={param.in} onChange={(v) => {
                               const next = [...ep.parameters]; next[pi] = { ...param, in: v as RestParameter['in'] };
                               updateEndpoint(ep.id, { parameters: next });
@@ -427,13 +427,13 @@ export function VisualRestBuilder({
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <Field label={t('contracts.builder.rest.contentType', 'Content Type')} value={ep.requestBody.contentType}
                                   onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, contentType: v } })}
-                                  placeholder="application/json" mono disabled={isReadOnly} />
+                                  placeholder={t('contracts.builder.rest.contentTypePlaceholder', 'application/json')} mono disabled={isReadOnly} />
                                 <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={ep.requestBody.required}
                                   onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, required: v } })} disabled={isReadOnly} />
                               </div>
                               <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={ep.requestBody.schema}
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, schema: v } })}
-                                placeholder="#/components/schemas/CreateUserRequest" mono disabled={isReadOnly} />
+                                placeholder={t('contracts.builder.rest.schemaPlaceholder', '#/components/schemas/CreateUserRequest')} mono disabled={isReadOnly} />
                               <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={ep.requestBody.example}
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: v } })}
                                 rows={3} mono disabled={isReadOnly} />
@@ -468,14 +468,14 @@ export function VisualRestBuilder({
                                 options={STATUS_CODES} disabled={isReadOnly} />
                               <Field label={t('contracts.builder.rest.resDescription', 'Description')} value={res.description}
                                 onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, description: v }; updateEndpoint(ep.id, { responses: next }); }}
-                                placeholder="OK" disabled={isReadOnly} />
+                                placeholder={t('contracts.builder.rest.resDescPlaceholder', 'OK')} disabled={isReadOnly} />
                               <Field label={t('contracts.builder.rest.contentType', 'Content Type')} value={res.contentType}
                                 onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, contentType: v }; updateEndpoint(ep.id, { responses: next }); }}
-                                placeholder="application/json" mono disabled={isReadOnly} />
+                                placeholder={t('contracts.builder.rest.contentTypePlaceholder', 'application/json')} mono disabled={isReadOnly} />
                             </div>
                             <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={res.schema}
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, schema: v }; updateEndpoint(ep.id, { responses: next }); }}
-                              placeholder="#/components/schemas/User" mono disabled={isReadOnly} />
+                              placeholder={t('contracts.builder.rest.resSchemaPlaceholder', '#/components/schemas/User')} mono disabled={isReadOnly} />
                             <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={res.example}
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, example: v }; updateEndpoint(ep.id, { responses: next }); }}
                               rows={2} mono disabled={isReadOnly} />
@@ -503,7 +503,7 @@ export function VisualRestBuilder({
                         onToggle={() => toggleSubSection(ep.id, 'auth')}
                       >
                         <FieldTagInput label={t('contracts.builder.rest.authScopes', 'OAuth2 Scopes')} tags={ep.authScopes}
-                          onChange={(v) => updateEndpoint(ep.id, { authScopes: v })} placeholder="read:users" />
+                          onChange={(v) => updateEndpoint(ep.id, { authScopes: v })} placeholder={t('contracts.builder.rest.authScopePlaceholder', 'read:users')} />
                       </CollapsibleSubSection>
 
                       {/* ── Rate Limits & Behavior ── */}
@@ -515,9 +515,9 @@ export function VisualRestBuilder({
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <Field label={t('contracts.builder.rest.rateLimit', 'Rate Limit')} value={ep.rateLimit}
-                            onChange={(v) => updateEndpoint(ep.id, { rateLimit: v })} placeholder="100/min" disabled={isReadOnly} />
+                            onChange={(v) => updateEndpoint(ep.id, { rateLimit: v })} placeholder={t('contracts.builder.rest.rateLimitPlaceholder', '100/min')} disabled={isReadOnly} />
                           <Field label={t('contracts.builder.rest.idempotencyKey', 'Idempotency Key')} value={ep.idempotencyKey}
-                            onChange={(v) => updateEndpoint(ep.id, { idempotencyKey: v })} placeholder="X-Idempotency-Key" mono disabled={isReadOnly} />
+                            onChange={(v) => updateEndpoint(ep.id, { idempotencyKey: v })} placeholder={t('contracts.builder.rest.idempotencyPlaceholder', 'X-Idempotency-Key')} mono disabled={isReadOnly} />
                         </div>
                       </CollapsibleSubSection>
 
