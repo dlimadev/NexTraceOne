@@ -11,6 +11,8 @@ using GetUnreadCountFeature = NexTraceOne.Notifications.Application.Features.Get
 using MarkNotificationReadFeature = NexTraceOne.Notifications.Application.Features.MarkNotificationRead.MarkNotificationRead;
 using MarkNotificationUnreadFeature = NexTraceOne.Notifications.Application.Features.MarkNotificationUnread.MarkNotificationUnread;
 using MarkAllNotificationsReadFeature = NexTraceOne.Notifications.Application.Features.MarkAllNotificationsRead.MarkAllNotificationsRead;
+using GetPreferencesFeature = NexTraceOne.Notifications.Application.Features.GetPreferences.GetPreferences;
+using UpdatePreferenceFeature = NexTraceOne.Notifications.Application.Features.UpdatePreference.UpdatePreference;
 
 namespace NexTraceOne.Notifications.API.Endpoints;
 
@@ -82,5 +84,26 @@ public sealed class NotificationCenterEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("notifications:inbox:write");
+
+        group.MapGet("/preferences", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetPreferencesFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:preferences:read");
+
+        group.MapPut("/preferences", async (
+            UpdatePreferenceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:preferences:write");
     }
 }

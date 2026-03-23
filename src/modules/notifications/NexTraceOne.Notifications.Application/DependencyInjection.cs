@@ -7,6 +7,7 @@ using NexTraceOne.Notifications.Application.Engine;
 using NexTraceOne.Notifications.Application.Features.ListNotifications;
 using NexTraceOne.Notifications.Application.Features.MarkNotificationRead;
 using NexTraceOne.Notifications.Application.Features.MarkNotificationUnread;
+using NexTraceOne.Notifications.Application.Features.UpdatePreference;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 
 namespace NexTraceOne.Notifications.Application;
@@ -27,6 +28,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListNotifications.Query>, ListNotifications.Validator>();
         services.AddTransient<IValidator<MarkNotificationRead.Command>, MarkNotificationRead.Validator>();
         services.AddTransient<IValidator<MarkNotificationUnread.Command>, MarkNotificationUnread.Validator>();
+        services.AddTransient<IValidator<UpdatePreference.Command>, UpdatePreference.Validator>();
 
         // Engine de notificações — Fase 2
         services.AddScoped<INotificationOrchestrator, NotificationOrchestrator>();
