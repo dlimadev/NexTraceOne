@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Shield, Search, ShieldCheck, ShieldAlert, FileText, AlertTriangle,
-  Settings, BookOpen, Bot, Lock, Loader2,
+  Settings, BookOpen, Bot, Lock,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import type { PolicyDto, PolicyListResponse, PolicyCategoryType, PolicyStatusType } from '../../../types';
+import type { PolicyListResponse, PolicyCategoryType, PolicyStatusType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';

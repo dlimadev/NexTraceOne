@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   BarChart3, FileText, AlertTriangle,
   ShieldCheck, TrendingUp, TrendingDown, Minus,
-  Activity, ClipboardCheck, Download, Package, Loader2,
+  Activity, ClipboardCheck, Download, Package,
   CheckCircle, XCircle, Clock,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';

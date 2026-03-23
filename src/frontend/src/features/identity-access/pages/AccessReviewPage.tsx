@@ -7,10 +7,9 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
-import type { AccessReviewCampaign, AccessReviewCampaignDetail } from '../../../types';
+import type { AccessReviewCampaign } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * Página de gestão de campanhas de revisão de acessos (Access Review) do módulo Identity.

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldAlert, Search, AlertTriangle, AlertCircle,
-  Shield, CheckCircle, Loader2,
+  Shield, CheckCircle,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

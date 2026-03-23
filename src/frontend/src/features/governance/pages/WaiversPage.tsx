@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  FileCheck, Search, Clock, CheckCircle, XCircle, Shield, Loader2, AlertTriangle,
+  FileCheck, Search, Clock, CheckCircle, XCircle, Shield,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
