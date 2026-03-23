@@ -25,7 +25,10 @@ public static class MarkAllNotificationsRead
         {
             Guard.Against.Null(request);
 
-            var userId = Guid.Parse(currentUser.Id);
+            if (!Guid.TryParse(currentUser.Id, out var userId))
+                return Error.Unauthorized(
+                    "Notification.InvalidUserId",
+                    "Current user identifier is not a valid GUID.");
             await notificationStore.MarkAllAsReadAsync(userId, cancellationToken);
 
             return Result<Unit>.Success(Unit.Value);

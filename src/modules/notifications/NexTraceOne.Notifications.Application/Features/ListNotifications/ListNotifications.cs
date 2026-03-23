@@ -53,7 +53,10 @@ public static class ListNotifications
         {
             Guard.Against.Null(request);
 
-            var userId = Guid.Parse(currentUser.Id);
+            if (!Guid.TryParse(currentUser.Id, out var userId))
+                return Error.Unauthorized(
+                    "Notification.InvalidUserId",
+                    "Current user identifier is not a valid GUID.");
 
             var status = request.Status is not null
                 ? Enum.Parse<NotificationStatus>(request.Status, ignoreCase: true)
