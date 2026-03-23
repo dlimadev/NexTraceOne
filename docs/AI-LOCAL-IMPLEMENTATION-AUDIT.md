@@ -1,5 +1,7 @@
 # Auditoria Técnica Completa — IA Local no NexTraceOne
 
+> **Nota:** Este documento é um relatório histórico. Referências a Grafana/Tempo/Loki no contexto do Docker Compose refletem a stack planeada inicialmente. A stack de observabilidade foi migrada para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 **Data:** 2026-03-17  
 **Escopo:** Análise rigorosa do código-fonte, configurações, dependências e fluxos reais.  
 **Metodologia:** Varredura completa do repositório com inspeção de conteúdo real de cada ficheiro.
