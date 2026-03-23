@@ -7,6 +7,13 @@
     <ProjectReference Include="..\..\..\..\src\modules\notifications\NexTraceOne.Notifications.Domain\NexTraceOne.Notifications.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\notifications\NexTraceOne.Notifications.Application\NexTraceOne.Notifications.Application.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\notifications\NexTraceOne.Notifications.Contracts\NexTraceOne.Notifications.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\notifications\NexTraceOne.Notifications.Infrastructure\NexTraceOne.Notifications.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup Label="Cross-module Contracts for Event Handler tests">
+    <ProjectReference Include="..\..\..\..\src\modules\changegovernance\NexTraceOne.ChangeGovernance.Contracts\NexTraceOne.ChangeGovernance.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Contracts\NexTraceOne.Governance.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
