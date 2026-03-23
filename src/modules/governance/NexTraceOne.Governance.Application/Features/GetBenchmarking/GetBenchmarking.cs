@@ -52,11 +52,14 @@ public static class GetBenchmarking
                     else
                         gaps.Add("Cost efficiency needs improvement");
 
-                    if (serviceCount > 0 && avgCost / serviceCount < 5000m)
+                    // Threshold: average cost per service below 5000 indicates good cost distribution
+                    const decimal costPerServiceThreshold = 5000m;
+                    if (serviceCount > 0 && avgCost / serviceCount < costPerServiceThreshold)
                         strengths.Add("Low average cost per service");
 
+                    var currency = g.Select(r => r.Currency).FirstOrDefault() ?? "EUR";
                     var context = $"Based on {g.Count()} cost records across {serviceCount} service(s). " +
-                                  $"Average cost: {avgCost:N2} {g.First().Currency}.";
+                                  $"Average cost: {avgCost:N2} {currency}.";
 
                     return new BenchmarkComparisonDto(
                         GroupId: g.Key.Id,

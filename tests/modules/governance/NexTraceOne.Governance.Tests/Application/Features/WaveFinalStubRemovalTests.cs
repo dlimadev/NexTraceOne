@@ -1,3 +1,4 @@
+using System.Linq;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ApplyGovernancePack;
@@ -345,5 +346,26 @@ public sealed class WaveFinalStubRemovalTests
         result.Value.Dimension.Should().Be("domains");
         result.Value.Comparisons.Should().NotBeEmpty();
         result.Value.DataSource.Should().Be("cost-intelligence");
+    }
+
+    [Fact]
+    public async Task GetBenchmarking_ShouldComputeCorrectEfficiencyForKnownData()
+    {
+        // Mock data: Team Alpha has avgCost = (8500+12000)/2 = 10250 → Inefficient
+        //            Team Beta has avgCost = 5200 → Acceptable
+        var handler = new GetBenchmarking.Handler(CreateCostModuleMock());
+        var query = new GetBenchmarking.Query("teams");
+
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+
+        var teamAlpha = result.Value.Comparisons.FirstOrDefault(c => c.GroupName == "Team Alpha");
+        teamAlpha.Should().NotBeNull();
+        teamAlpha!.FinopsEfficiency.Should().Be(CostEfficiency.Inefficient, "avg cost 10250 > 10000 is Inefficient");
+
+        var teamBeta = result.Value.Comparisons.FirstOrDefault(c => c.GroupName == "Team Beta");
+        teamBeta.Should().NotBeNull();
+        teamBeta!.FinopsEfficiency.Should().Be(CostEfficiency.Acceptable, "avg cost 5200 > 5000 is Acceptable");
     }
 }
