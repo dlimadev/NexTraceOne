@@ -26,7 +26,7 @@ public sealed class GovernanceFinOpsEndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/finops");
+        var group = app.MapGroup("/api/v1/finops").RequireRateLimiting("data-intensive");
 
         // ── Resumo contextual de FinOps ──
         group.MapGet("/summary", async (

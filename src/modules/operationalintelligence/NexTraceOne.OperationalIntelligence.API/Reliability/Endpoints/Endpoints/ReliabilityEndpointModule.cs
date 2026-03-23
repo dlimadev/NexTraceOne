@@ -39,7 +39,7 @@ public sealed class ReliabilityEndpointModule
     /// <summary>Registra endpoints de Reliability no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/reliability");
+        var group = app.MapGroup("/api/v1/reliability").RequireRateLimiting("operations");
 
         // ── Lista de serviços com resumo de confiabilidade ──────────
 

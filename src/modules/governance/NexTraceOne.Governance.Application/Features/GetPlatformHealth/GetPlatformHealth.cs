@@ -2,45 +2,67 @@ using System.Diagnostics;
 using System.Reflection;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetPlatformHealth;
 
 /// <summary>
 /// Feature: GetPlatformHealth — saúde agregada da plataforma com estado por subsistema.
-/// Fornece visão consolidada de API, base de dados, jobs, ingestão e IA para dashboards de operações.
-/// Utiliza dados reais de uptime e versão do processo em execução.
+/// Consulta health checks reais via IPlatformHealthProvider para obter estado verdadeiro
+/// de cada subsistema. Não utiliza valores hardcoded — subsistemas sem fonte real
+/// são reportados como Unknown.
 /// </summary>
 public static class GetPlatformHealth
 {
     /// <summary>Query sem parâmetros — retorna estado atual de todos os subsistemas.</summary>
     public sealed record Query() : IQuery<Response>;
 
-    /// <summary>Handler que agrega estado de saúde de cada subsistema da plataforma.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que agrega estado de saúde real de cada subsistema da plataforma.</summary>
+    public sealed class Handler(IPlatformHealthProvider healthProvider) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var subsystems = new List<SubsystemHealthDto>
-            {
-                new("API", PlatformSubsystemStatus.Healthy, "All API endpoints responding normally.", DateTimeOffset.UtcNow),
-                new("Database", PlatformSubsystemStatus.Healthy, "PostgreSQL primary and replicas healthy.", DateTimeOffset.UtcNow),
-                new("BackgroundJobs", PlatformSubsystemStatus.Healthy, "All scheduled jobs executing on time.", DateTimeOffset.UtcNow),
-                new("Ingestion", PlatformSubsystemStatus.Healthy, "Ingestion pipeline processing within SLA.", DateTimeOffset.UtcNow),
-                new("AI", PlatformSubsystemStatus.Healthy, "AI model registry and inference endpoints operational.", DateTimeOffset.UtcNow)
-            };
+            var subsystemInfos = await healthProvider.GetSubsystemHealthAsync(cancellationToken);
+            var now = DateTimeOffset.UtcNow;
+
+            var subsystems = subsystemInfos
+                .Select(info => new SubsystemHealthDto(info.Name, info.Status, info.Description, now))
+                .ToList();
+
+            var overallStatus = ComputeOverallStatus(subsystems);
 
             var uptime = DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime();
             var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "1.0.0-preview";
 
             var response = new Response(
-                OverallStatus: PlatformSubsystemStatus.Healthy,
+                OverallStatus: overallStatus,
                 Subsystems: subsystems,
                 UptimeSeconds: (long)uptime.TotalSeconds,
                 Version: version,
-                CheckedAt: DateTimeOffset.UtcNow);
+                CheckedAt: now);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
+        }
+
+        private static PlatformSubsystemStatus ComputeOverallStatus(IReadOnlyList<SubsystemHealthDto> subsystems)
+        {
+            if (subsystems.Count == 0)
+            {
+                return PlatformSubsystemStatus.Unknown;
+            }
+
+            if (subsystems.Any(s => s.Status == PlatformSubsystemStatus.Unhealthy))
+            {
+                return PlatformSubsystemStatus.Unhealthy;
+            }
+
+            if (subsystems.Any(s => s.Status is PlatformSubsystemStatus.Degraded or PlatformSubsystemStatus.Unknown))
+            {
+                return PlatformSubsystemStatus.Degraded;
+            }
+
+            return PlatformSubsystemStatus.Healthy;
         }
     }
 

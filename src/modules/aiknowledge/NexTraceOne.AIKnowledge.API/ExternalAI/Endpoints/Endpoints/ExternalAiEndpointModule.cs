@@ -35,7 +35,7 @@ public sealed class ExternalAiEndpointModule
 
     private static void MapQueryEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/externalai/query");
+        var group = app.MapGroup("/api/v1/externalai/query").RequireRateLimiting("ai");
 
         group.MapPost("/simple", async (
             QueryExternalAISimpleFeature.Command command,
@@ -60,7 +60,7 @@ public sealed class ExternalAiEndpointModule
 
     private static void MapKnowledgeCaptureEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/externalai/knowledge");
+        var group = app.MapGroup("/api/v1/externalai/knowledge").RequireRateLimiting("ai");
 
         group.MapPost("/capture", async (
             CaptureExternalAIResponseFeature.Command command,

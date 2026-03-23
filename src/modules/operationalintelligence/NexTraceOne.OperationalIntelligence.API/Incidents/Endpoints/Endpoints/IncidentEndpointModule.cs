@@ -31,7 +31,7 @@ public sealed class IncidentEndpointModule
     /// <summary>Mapeia os endpoints de incidentes no pipeline HTTP.</summary>
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/incidents");
+        var group = app.MapGroup("/api/v1/incidents").RequireRateLimiting("operations");
 
         // ── POST /api/v1/incidents — Criação real de incidente ──
         group.MapPost("/", async (

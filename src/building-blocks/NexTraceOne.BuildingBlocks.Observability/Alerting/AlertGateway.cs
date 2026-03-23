@@ -8,18 +8,23 @@ namespace NexTraceOne.BuildingBlocks.Observability.Alerting;
 /// Gateway central de alertas da plataforma.
 /// Faz fan-out para todos os canais registados, recolhe resultados individuais
 /// e isola falhas de canal (um canal falhado não bloqueia os restantes).
+/// Após dispatch, invoca o IOperationalAlertHandler (se registado) para integrar
+/// alertas ao fluxo operacional/incidentes.
 /// </summary>
 public sealed class AlertGateway : IAlertGateway
 {
     private readonly IEnumerable<IAlertChannel> _channels;
+    private readonly IOperationalAlertHandler? _operationalHandler;
     private readonly ILogger<AlertGateway> _logger;
 
     public AlertGateway(
         IEnumerable<IAlertChannel> channels,
-        ILogger<AlertGateway> logger)
+        ILogger<AlertGateway> logger,
+        IOperationalAlertHandler? operationalHandler = null)
     {
         _channels = channels ?? throw new ArgumentNullException(nameof(channels));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _operationalHandler = operationalHandler;
     }
 
     /// <inheritdoc />
@@ -53,6 +58,8 @@ public sealed class AlertGateway : IAlertGateway
         var result = new AlertDispatchResult { ChannelResults = channelResults };
 
         LogDispatchSummary(payload, result);
+
+        await NotifyOperationalHandlerAsync(payload, result, cancellationToken);
 
         return result;
     }
@@ -96,6 +103,8 @@ public sealed class AlertGateway : IAlertGateway
         };
 
         LogDispatchSummary(payload, result);
+
+        await NotifyOperationalHandlerAsync(payload, result, cancellationToken);
 
         return result;
     }
@@ -150,6 +159,30 @@ public sealed class AlertGateway : IAlertGateway
                 "Alert '{Title}' dispatch failed on all {Total} channel(s)",
                 payload.Title,
                 result.TotalChannels);
+        }
+    }
+
+    private async Task NotifyOperationalHandlerAsync(
+        AlertPayload payload,
+        AlertDispatchResult result,
+        CancellationToken cancellationToken)
+    {
+        if (_operationalHandler is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _operationalHandler.HandleAlertAsync(payload, result, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Operational alert handler failed for alert '{Title}'. " +
+                "This does not affect alert channel dispatch.",
+                payload.Title);
         }
     }
 }

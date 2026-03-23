@@ -1,5 +1,8 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Core.Attributes;
+using NexTraceOne.BuildingBlocks.Infrastructure.Converters;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using System.Linq.Expressions;
@@ -10,7 +13,8 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 /// Classe base para todos os DbContexts dos módulos.
 /// Configura automaticamente: TenantRlsInterceptor (RLS PostgreSQL),
 /// AuditInterceptor (CreatedAt/By, UpdatedAt/By),
-/// EncryptionInterceptor (AES-256-GCM), OutboxInterceptor (Domain Events → Outbox).
+/// EncryptionInterceptor (AES-256-GCM via EncryptedStringConverter para propriedades
+/// marcadas com [EncryptedField]), OutboxInterceptor (Domain Events → Outbox).
 /// </summary>
 public abstract class NexTraceDbContextBase(
     DbContextOptions options,
@@ -58,6 +62,7 @@ public abstract class NexTraceDbContextBase(
         }
 
         ApplyGlobalSoftDeleteFilter(modelBuilder);
+        ApplyEncryptedFieldConvention(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
     }
@@ -135,6 +140,37 @@ public abstract class NexTraceDbContextBase(
             var lambda = Expression.Lambda(compare, parameter);
 
             modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+        }
+    }
+
+    /// <summary>
+    /// Aplica automaticamente o EncryptedStringConverter a todas as propriedades string
+    /// marcadas com [EncryptedField], garantindo encriptação at-rest transparente via AES-256-GCM.
+    /// </summary>
+    private static void ApplyEncryptedFieldConvention(ModelBuilder modelBuilder)
+    {
+        var converter = new EncryptedStringConverter();
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var clrType = entityType.ClrType;
+
+            foreach (var propertyInfo in clrType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (propertyInfo.PropertyType != typeof(string))
+                {
+                    continue;
+                }
+
+                var encryptedAttr = propertyInfo.GetCustomAttribute<EncryptedFieldAttribute>();
+                if (encryptedAttr is null)
+                {
+                    continue;
+                }
+
+                var efProperty = entityType.FindProperty(propertyInfo.Name);
+                efProperty?.SetValueConverter(converter);
+            }
         }
     }
 }

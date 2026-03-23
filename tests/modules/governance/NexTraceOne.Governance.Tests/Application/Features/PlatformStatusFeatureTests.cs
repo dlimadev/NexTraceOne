@@ -1,10 +1,12 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.GetPlatformEvents;
 using NexTraceOne.Governance.Application.Features.GetPlatformHealth;
 using NexTraceOne.Governance.Application.Features.GetPlatformJobs;
 using NexTraceOne.Governance.Application.Features.GetPlatformQueues;
 using NexTraceOne.Governance.Application.Features.GetPlatformReadiness;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
@@ -54,12 +56,67 @@ public sealed class PlatformStatusFeatureTests
     [Fact]
     public async Task GetPlatformHealth_Handler_ShouldReturnRealUptimeGreaterThanZero()
     {
-        var handler = new GetPlatformHealth.Handler();
+        var healthProvider = Substitute.For<IPlatformHealthProvider>();
+        healthProvider.GetSubsystemHealthAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<SubsystemHealthInfo>
+            {
+                new("API", PlatformSubsystemStatus.Healthy, "API is responding."),
+                new("Database", PlatformSubsystemStatus.Healthy, "All checks healthy.")
+            });
+
+        var handler = new GetPlatformHealth.Handler(healthProvider);
         var query = new GetPlatformHealth.Query();
         var result = await handler.Handle(query, CancellationToken.None);
         result.IsSuccess.Should().BeTrue();
         result.Value.UptimeSeconds.Should().BeGreaterThanOrEqualTo(0);
         result.Value.Version.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task GetPlatformHealth_Handler_ShouldAggregateOverallAsUnhealthy_WhenAnySubsystemIsUnhealthy()
+    {
+        var healthProvider = Substitute.For<IPlatformHealthProvider>();
+        healthProvider.GetSubsystemHealthAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<SubsystemHealthInfo>
+            {
+                new("API", PlatformSubsystemStatus.Healthy, "OK"),
+                new("Database", PlatformSubsystemStatus.Unhealthy, "Connection failed")
+            });
+
+        var handler = new GetPlatformHealth.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.OverallStatus.Should().Be(PlatformSubsystemStatus.Unhealthy);
+    }
+
+    [Fact]
+    public async Task GetPlatformHealth_Handler_ShouldAggregateOverallAsDegraded_WhenAnySubsystemIsUnknown()
+    {
+        var healthProvider = Substitute.For<IPlatformHealthProvider>();
+        healthProvider.GetSubsystemHealthAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<SubsystemHealthInfo>
+            {
+                new("API", PlatformSubsystemStatus.Healthy, "OK"),
+                new("BackgroundJobs", PlatformSubsystemStatus.Unknown, "Not evaluated")
+            });
+
+        var handler = new GetPlatformHealth.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.OverallStatus.Should().Be(PlatformSubsystemStatus.Degraded);
+    }
+
+    [Fact]
+    public async Task GetPlatformHealth_Handler_ShouldReturnUnknown_WhenNoSubsystems()
+    {
+        var healthProvider = Substitute.For<IPlatformHealthProvider>();
+        healthProvider.GetSubsystemHealthAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<SubsystemHealthInfo>());
+
+        var handler = new GetPlatformHealth.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.OverallStatus.Should().Be(PlatformSubsystemStatus.Unknown);
     }
 
     // ── GetPlatformJobs ──

@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using NexTraceOne.BuildingBlocks.Core.Attributes;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
@@ -36,7 +37,9 @@ public sealed class EnvironmentIntegrationBinding : Entity<EnvironmentIntegratio
     /// <summary>
     /// Configuração específica do ambiente para este conector (ex.: endpoint URL, credenciais).
     /// Armazenado como JSON — estrutura depende do IntegrationType.
+    /// Encriptado em repouso via AES-256-GCM (EncryptedStringConverter).
     /// </summary>
+    [EncryptedField]
     public string BindingConfigJson { get; private set; } = "{}";
 
     /// <summary>Indica se o vínculo está ativo.</summary>
