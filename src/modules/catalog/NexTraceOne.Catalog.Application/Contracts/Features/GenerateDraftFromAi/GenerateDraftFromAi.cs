@@ -14,7 +14,7 @@ namespace NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi
 /// <summary>
 /// Feature: GenerateDraftFromAi — gera um draft de contrato assistido por IA real.
 /// Integra com IAiDraftGenerator para gerar conteúdo real via provider de IA governado.
-/// Fallback para template estático quando IA não está disponível.
+/// Quando IA não está disponível, retorna template estrutural mínimo com AiGenerated=false.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GenerateDraftFromAi
@@ -43,7 +43,8 @@ public static class GenerateDraftFromAi
 
     /// <summary>
     /// Handler que gera um draft de contrato assistido por IA real.
-    /// Usa IAiDraftGenerator quando disponível, com fallback para template estático.
+    /// Usa IAiDraftGenerator quando disponível. Quando IA não está disponível,
+    /// usa template estrutural mínimo e indica AiGenerated=false na resposta.
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository repository,
@@ -56,6 +57,7 @@ public static class GenerateDraftFromAi
 
             string content;
             string format;
+            var aiGenerated = false;
 
             if (aiGenerator is not null)
             {
@@ -69,6 +71,7 @@ public static class GenerateDraftFromAi
                 {
                     content = generated.Value.Content;
                     format = generated.Value.Format;
+                    aiGenerated = true;
                 }
                 else
                 {
@@ -108,7 +111,7 @@ public static class GenerateDraftFromAi
                 .FirstOrDefault(item => item.Title == request.Title && item.Protocol == request.Protocol)
                 ?? draft;
 
-            return new Response(persistedDraft.Id.Value, content);
+            return new Response(persistedDraft.Id.Value, content, aiGenerated);
         }
 
         /// <summary>
@@ -156,7 +159,8 @@ public static class GenerateDraftFromAi
     /// <summary>Resposta da geração de draft por IA com preview do conteúdo gerado.</summary>
     public sealed record Response(
         Guid DraftId,
-        string GeneratedContent);
+        string GeneratedContent,
+        bool AiGenerated = false);
 }
 
 /// <summary>

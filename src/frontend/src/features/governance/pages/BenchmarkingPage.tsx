@@ -107,37 +107,37 @@ export function BenchmarkingPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
                 <StatCard
                   title={t('governance.executive.benchmarkingReliability')}
-                  value={comp.reliabilityScore}
+                  value={comp.reliabilityScore ?? '—'}
                   icon={<Shield size={16} />}
                   color="text-accent"
-                  trend={{
+                  trend={comp.reliabilityTrend ? {
                     direction: comp.reliabilityTrend === 'Declining' ? 'down' as const : 'up' as const,
                     label: t(`governance.trend.${comp.reliabilityTrend}`),
-                  }}
+                  } : undefined}
                 />
                 <StatCard
                   title={t('governance.executive.benchmarkingChangeSafety')}
-                  value={comp.changeSafetyScore}
+                  value={comp.changeSafetyScore ?? '—'}
                   icon={<Activity size={16} />}
                   color="text-accent"
                 />
                 <StatCard
                   title={t('governance.executive.benchmarkingIncidentRecurrence')}
-                  value={`${comp.incidentRecurrenceRate}%`}
+                  value={comp.incidentRecurrenceRate != null ? `${comp.incidentRecurrenceRate}%` : '—'}
                   icon={<RefreshCw size={16} />}
-                  color={comp.incidentRecurrenceRate > 15 ? 'text-critical' : 'text-amber-500'}
+                  color={comp.incidentRecurrenceRate != null && comp.incidentRecurrenceRate > 15 ? 'text-critical' : 'text-amber-500'}
                 />
                 <StatCard
                   title={t('governance.executive.benchmarkingMaturity')}
-                  value={comp.maturityScore}
+                  value={comp.maturityScore ?? '—'}
                   icon={<Award size={16} />}
                   color="text-accent"
                 />
                 <StatCard
                   title={t('governance.executive.benchmarkingRisk')}
-                  value={comp.riskScore}
+                  value={comp.riskScore ?? '—'}
                   icon={<TrendingUp size={16} />}
-                  color={comp.riskScore > 60 ? 'text-critical' : 'text-amber-500'}
+                  color={comp.riskScore != null && comp.riskScore > 60 ? 'text-critical' : 'text-amber-500'}
                 />
                 <div className="bg-card rounded-lg shadow-sm border border-edge p-3 flex flex-col items-center justify-center">
                   <DollarSign size={16} className="text-accent mb-1" />

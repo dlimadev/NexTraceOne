@@ -5,8 +5,8 @@ using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
 /// <summary>
-/// Implementação stub da superfície de consulta contextual de releases para a IA.
-/// Filtra releases por TenantId e, opcionalmente, por EnvironmentId e ServiceName.
+/// Implementação real da superfície de consulta contextual de releases para a IA.
+/// Consulta releases persistidos via EF Core com filtragem por TenantId, EnvironmentId e ServiceName.
 /// Toda consulta é tenant-isolated por design.
 /// </summary>
 internal sealed class ReleaseContextSurface(ChangeIntelligenceDbContext db) : IReleaseContextSurface

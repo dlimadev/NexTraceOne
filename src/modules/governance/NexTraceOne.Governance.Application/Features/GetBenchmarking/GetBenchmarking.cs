@@ -9,6 +9,7 @@ namespace NexTraceOne.Governance.Application.Features.GetBenchmarking;
 /// Feature: GetBenchmarking — comparação contextualizada entre equipas ou domínios.
 /// Cada comparação inclui contexto para garantir fairness na interpretação dos resultados.
 /// Consome dados reais do módulo CostIntelligence via contrato público.
+/// Scores não disponíveis são retornados como null em vez de placeholder fixo.
 /// </summary>
 public static class GetBenchmarking
 {
@@ -41,22 +42,40 @@ public static class GetBenchmarking
                 {
                     var avgCost = g.Average(r => r.TotalCost);
                     var efficiency = ComputeEfficiency(avgCost);
+                    var serviceCount = g.Select(r => r.ServiceId).Distinct().Count();
+
+                    var strengths = new List<string>();
+                    var gaps = new List<string>();
+
+                    if (efficiency is CostEfficiency.Efficient or CostEfficiency.Acceptable)
+                        strengths.Add("Cost efficiency within acceptable range");
+                    else
+                        gaps.Add("Cost efficiency needs improvement");
+
+                    // Threshold: average cost per service below 5000 indicates good cost distribution
+                    const decimal costPerServiceThreshold = 5000m;
+                    if (serviceCount > 0 && avgCost / serviceCount < costPerServiceThreshold)
+                        strengths.Add("Low average cost per service");
+
+                    var currency = g.Select(r => r.Currency).FirstOrDefault() ?? "EUR";
+                    var context = $"Based on {g.Count()} cost records across {serviceCount} service(s). " +
+                                  $"Average cost: {avgCost:N2} {currency}.";
 
                     return new BenchmarkComparisonDto(
                         GroupId: g.Key.Id,
                         GroupName: g.Key.Name,
-                        ServiceCount: g.Count(),
-                        Criticality: "Medium",
-                        ReliabilityScore: 50.0m,
-                        ReliabilityTrend: TrendDirection.Stable,
-                        ChangeSafetyScore: 50.0m,
-                        IncidentRecurrenceRate: 0m,
-                        MaturityScore: 50.0m,
-                        RiskScore: 50.0m,
+                        ServiceCount: serviceCount,
+                        Criticality: null,
+                        ReliabilityScore: null,
+                        ReliabilityTrend: null,
+                        ChangeSafetyScore: null,
+                        IncidentRecurrenceRate: null,
+                        MaturityScore: null,
+                        RiskScore: null,
                         FinopsEfficiency: efficiency,
-                        Strengths: Array.Empty<string>(),
-                        Gaps: Array.Empty<string>(),
-                        Context: string.Empty);
+                        Strengths: strengths,
+                        Gaps: gaps,
+                        Context: context);
                 })
                 .ToList();
 
@@ -87,18 +106,21 @@ public static class GetBenchmarking
         bool IsSimulated = false,
         string? DataSource = null);
 
-    /// <summary>Comparação de benchmarking para um grupo com forças, gaps e contexto explicativo.</summary>
+    /// <summary>
+    /// Comparação de benchmarking para um grupo com forças, gaps e contexto explicativo.
+    /// Scores retornados como null quando dados insuficientes para cálculo real.
+    /// </summary>
     public sealed record BenchmarkComparisonDto(
         string GroupId,
         string GroupName,
         int ServiceCount,
-        string Criticality,
-        decimal ReliabilityScore,
-        TrendDirection ReliabilityTrend,
-        decimal ChangeSafetyScore,
-        decimal IncidentRecurrenceRate,
-        decimal MaturityScore,
-        decimal RiskScore,
+        string? Criticality,
+        decimal? ReliabilityScore,
+        TrendDirection? ReliabilityTrend,
+        decimal? ChangeSafetyScore,
+        decimal? IncidentRecurrenceRate,
+        decimal? MaturityScore,
+        decimal? RiskScore,
         CostEfficiency FinopsEfficiency,
         IReadOnlyList<string> Strengths,
         IReadOnlyList<string> Gaps,
