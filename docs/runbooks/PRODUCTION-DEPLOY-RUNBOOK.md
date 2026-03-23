@@ -13,14 +13,17 @@
 - [ ] Backup do banco de produção confirmado (ou snapshot automático)
 - [ ] Janela de manutenção comunicada (se aplicável)
 - [ ] GitHub Secrets configurados no environment `production`:
-  - `PROD_CONN_IDENTITY`
-  - `PROD_CONN_CATALOG`
-  - `PROD_CONN_OPERATIONS`
-  - `PROD_CONN_AI`
-  - `JWT_SECRET` (mínimo 32 chars)
+  - `PRODUCTION_CONN_IDENTITY`
+  - `PRODUCTION_CONN_CATALOG`
+  - `PRODUCTION_CONN_OPERATIONS`
+  - `PRODUCTION_CONN_AI`
 - [ ] GitHub Variables configurados:
-  - `PROD_APIHOST_URL`
-  - `PROD_FRONTEND_URL`
+  - `PRODUCTION_APIHOST_URL`
+  - `PRODUCTION_FRONTEND_URL`
+- [ ] Runtime environment variables definidas nos containers:
+  - `Jwt__Secret` (mínimo 32 chars, gerar com `openssl rand -base64 48`)
+  - `ASPNETCORE_ENVIRONMENT=Production`
+  - Connection strings para todos os 19 DbContexts (ver [PRODUCTION-SECRETS-PROVISIONING.md](PRODUCTION-SECRETS-PROVISIONING.md))
 
 ---
 
