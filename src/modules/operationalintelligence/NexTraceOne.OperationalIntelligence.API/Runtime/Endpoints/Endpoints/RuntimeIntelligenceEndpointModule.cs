@@ -36,7 +36,7 @@ public sealed class RuntimeIntelligenceEndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/runtime");
+        var group = app.MapGroup("/api/v1/runtime").RequireRateLimiting("operations");
 
         group.MapPost("/snapshots", async (
             IngestRuntimeSnapshotFeature.Command command,

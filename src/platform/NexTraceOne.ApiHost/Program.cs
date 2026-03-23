@@ -54,6 +54,10 @@ builder.Services.AddBuildingBlocksObservability(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddApiHostOperationalHealthChecks();
 
+// [3.1] Platform health provider — liga GetPlatformHealth a health checks reais
+builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IPlatformHealthProvider,
+    NexTraceOne.ApiHost.HealthCheckPlatformHealthProvider>();
+
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddCatalogGraphModule(builder.Configuration);
@@ -142,6 +146,60 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(1),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 2
+            });
+    });
+
+    // Política "ai" — protege endpoints de IA (chat, geração, retrieval, análise).
+    // Limita a 30 requisições por minuto por IP para evitar abuso de recursos de IA
+    // que são computacionalmente custosos e podem ter custo financeiro associado.
+    options.AddPolicy("ai", context =>
+    {
+        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"ai:{remoteIp ?? "unresolved-ip"}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 3
+            });
+    });
+
+    // Política "data-intensive" — protege endpoints de dados intensivos
+    // (catálogo, governance analytics, runtime queries, relatórios).
+    // 50 requisições por minuto por IP para prevenir scraping e overload de queries.
+    options.AddPolicy("data-intensive", context =>
+    {
+        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"data-intensive:{remoteIp ?? "unresolved-ip"}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 50,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 3
+            });
+    });
+
+    // Política "operations" — protege endpoints operacionais
+    // (incidentes, automação, observabilidade, health agregada).
+    // 40 requisições por minuto por IP para prevenir abuso de operações administrativas.
+    options.AddPolicy("operations", context =>
+    {
+        var remoteIp = context.Connection.RemoteIpAddress?.ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"operations:{remoteIp ?? "unresolved-ip"}",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 40,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 3
             });
     });
 });

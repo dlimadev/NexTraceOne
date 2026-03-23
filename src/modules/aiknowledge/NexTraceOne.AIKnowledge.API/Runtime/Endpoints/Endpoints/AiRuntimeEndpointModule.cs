@@ -48,7 +48,7 @@ public sealed class AiRuntimeEndpointModule
 
     private static void MapChatEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/ai");
+        var group = app.MapGroup("/api/v1/ai").RequireRateLimiting("ai");
 
         group.MapPost("/chat", async (
             ExecuteAiChatRequest body,

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 
@@ -29,6 +30,7 @@ public static class DependencyInjection
 
         services.AddScoped<IIncidentStore, EfIncidentStore>();
         services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
+        services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();
 
         return services;
     }

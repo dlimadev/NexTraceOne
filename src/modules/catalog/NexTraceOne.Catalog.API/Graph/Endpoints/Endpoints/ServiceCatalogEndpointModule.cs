@@ -48,7 +48,7 @@ public sealed class ServiceCatalogEndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/catalog");
+        var group = app.MapGroup("/api/v1/catalog").RequireRateLimiting("data-intensive");
 
         // ── Ativos: Registro e Consulta ──────────────────────────────────
 

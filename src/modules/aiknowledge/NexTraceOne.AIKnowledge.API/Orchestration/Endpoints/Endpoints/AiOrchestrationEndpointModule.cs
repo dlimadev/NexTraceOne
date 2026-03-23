@@ -43,7 +43,7 @@ public sealed class AiOrchestrationEndpointModule
 
     private static void MapCatalogEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/aiorchestration/catalog");
+        var group = app.MapGroup("/api/v1/aiorchestration/catalog").RequireRateLimiting("ai");
 
         group.MapPost("/ask", async (
             AskCatalogQuestionFeature.Command command,
@@ -58,7 +58,7 @@ public sealed class AiOrchestrationEndpointModule
 
     private static void MapChangeEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/aiorchestration/changes");
+        var group = app.MapGroup("/api/v1/aiorchestration/changes").RequireRateLimiting("ai");
 
         group.MapPost("/classify", async (
             ClassifyChangeWithAIFeature.Command command,
@@ -73,7 +73,7 @@ public sealed class AiOrchestrationEndpointModule
 
     private static void MapContractEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/aiorchestration/contracts");
+        var group = app.MapGroup("/api/v1/aiorchestration/contracts").RequireRateLimiting("ai");
 
         group.MapPost("/suggest-version", async (
             SuggestSemanticVersionWithAIFeature.Command command,
@@ -88,7 +88,7 @@ public sealed class AiOrchestrationEndpointModule
 
     private static void MapEnvironmentAnalysisEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/aiorchestration/analysis");
+        var group = app.MapGroup("/api/v1/aiorchestration/analysis").RequireRateLimiting("ai");
 
         group.MapPost("/non-prod", async (
             AnalyzeNonProdEnvironmentFeature.Command command,
@@ -165,7 +165,7 @@ public sealed class AiOrchestrationEndpointModule
 
     private static void MapGenerationEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/aiorchestration/generate");
+        var group = app.MapGroup("/api/v1/aiorchestration/generate").RequireRateLimiting("ai");
 
         group.MapPost("/test-scenarios", async (
             GenerateTestScenariosFeature.Command command,
