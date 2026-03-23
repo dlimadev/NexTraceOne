@@ -3193,5 +3193,48 @@
       "throughputScore": "Rendimiento",
       "resourceScore": "Recursos"
     }
+  },
+  "notifications": {
+    "title": "Centro de Notificaciones",
+    "subtitle": "Gestiona y revisa tus notificaciones",
+    "markAllRead": "Marcar todas como leídas",
+    "markRead": "Marcar como leída",
+    "markUnread": "Marcar como no leída",
+    "noNotifications": "Sin notificaciones",
+    "noNotificationsDescription": "¡Todo al día! Las nuevas notificaciones aparecerán aquí.",
+    "loadMore": "Cargar más",
+    "viewAll": "Ver todas las notificaciones",
+    "errorLoading": "Error al cargar notificaciones",
+    "dropdownTitle": "Notificaciones",
+    "timeAgo": {
+      "justNow": "Ahora",
+      "minutesAgo": "hace {{count}}min",
+      "hoursAgo": "hace {{count}}h",
+      "daysAgo": "hace {{count}}d"
+    },
+    "filter": {
+      "all": "Todas",
+      "unread": "No leídas",
+      "read": "Leídas"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "warning": "Alerta",
+      "actionRequired": "Acción Requerida",
+      "info": "Info"
+    },
+    "category": {
+      "incident": "Incidente",
+      "approval": "Aprobación",
+      "change": "Cambio",
+      "contract": "Contrato",
+      "security": "Seguridad",
+      "compliance": "Cumplimiento",
+      "finops": "FinOps",
+      "ai": "IA",
+      "integration": "Integración",
+      "platform": "Plataforma",
+      "informational": "Informativo"
+    }
   }
 }
