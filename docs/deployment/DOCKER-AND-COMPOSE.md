@@ -101,10 +101,8 @@ Serviços incluídos:
 | Serviço | Imagem/Build | Porta host | Propósito |
 |---|---|---|---|
 | `postgres` | `postgres:16-alpine` | 5432 | Banco de dados (4 DBs lógicos) |
-| `otel-collector` | `otel/opentelemetry-collector-contrib:0.115.0` | 4317, 4318 | OTLP ingestion |
-| `tempo` | `grafana/tempo:2.6.1` | 3200 | Armazenamento de traces |
-| `loki` | `grafana/loki:3.3.2` | 3100 | Armazenamento de logs |
-| `grafana` | `grafana/grafana:11.4.0` | 3000 | Dashboards |
+| `clickhouse` | `clickhouse/clickhouse-server:24.8-alpine` | 8123, 9000 | Provider de observabilidade (logs, traces, métricas) |
+| `otel-collector` | `otel/opentelemetry-collector-contrib:0.115.0` | 4317, 4318 | OTLP ingestion pipeline |
 | `apihost` | `Dockerfile.apihost` | 8080 | API principal |
 | `workers` | `Dockerfile.workers` | 8081 | Background jobs |
 | `ingestion` | `Dockerfile.ingestion` | 8082 | Integrations endpoint |
@@ -114,10 +112,9 @@ Dependências:
 ```
 postgres → (health) → apihost → (health) → workers
 postgres → (health) → ingestion
+clickhouse → (health) → otel-collector
 otel-collector → apihost, workers, ingestion
 apihost → (health) → frontend
-tempo, loki → otel-collector
-tempo, loki → grafana
 ```
 
 ### `docker-compose.override.yml` — Overrides de desenvolvimento
@@ -156,7 +153,7 @@ cd NexTraceOne
 
 # 2. Configurar variáveis de ambiente
 cp .env.example .env
-# Editar .env — mínimo: POSTGRES_PASSWORD, JWT_SECRET, GRAFANA_ADMIN_PASSWORD
+# Editar .env — mínimo: POSTGRES_PASSWORD, JWT_SECRET
 
 # 3. Subir stack completa
 docker compose up -d
@@ -180,8 +177,8 @@ curl http://localhost:8082/live
 # Frontend
 curl http://localhost:3000/health
 
-# Grafana
-open http://localhost:3000  # (se grafana na porta 3000)
+# ClickHouse
+curl http://localhost:8123/?query=SELECT%201
 ```
 
 ### Parar e limpar
@@ -205,7 +202,7 @@ docker compose config
 Para desenvolvimento com hot-reload:
 ```bash
 # Terminal 1: Infraestrutura
-docker compose up -d postgres otel-collector loki tempo
+docker compose up -d postgres clickhouse otel-collector
 
 # Terminal 2: ApiHost
 cd src/platform/NexTraceOne.ApiHost
@@ -225,8 +222,7 @@ Browser :3000
   └→ nginx (frontend container)
        └→ /api/* proxy → ApiHost :8080
             ├→ PostgreSQL :5432 (4 databases)
-            ├→ OTel Collector :4317 (traces/metrics)
-            └→ Loki :3100 (logs via Serilog)
+            └→ OTel Collector :4317 (traces/logs/metrics → ClickHouse)
 
 ApiHost :8080
   └→ BackgroundWorkers :8081 (indireta via PostgreSQL/EventBus)

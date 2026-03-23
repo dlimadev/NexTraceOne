@@ -71,10 +71,9 @@ jobs:
           cp .env.example .env
           sed -i 's/POSTGRES_PASSWORD=change-me-in-production/POSTGRES_PASSWORD=e2e_test_pass/' .env
           sed -i 's/JWT_SECRET=REPLACE-WITH-AT-LEAST-32-CHAR-SECRET-KEY/JWT_SECRET=E2E-Test-SecretKey-AtLeast32BytesLong-2024!/' .env
-          sed -i 's/GRAFANA_ADMIN_PASSWORD=change-me-in-staging/GRAFANA_ADMIN_PASSWORD=e2e_test_pass/' .env
           sed -i 's/NEXTRACE_AUTO_MIGRATE=false/NEXTRACE_AUTO_MIGRATE=true/' .env
           sed -i 's/ASPNETCORE_ENVIRONMENT=Staging/ASPNETCORE_ENVIRONMENT=Development/' .env
-          docker compose up -d postgres otel-collector loki tempo 2>&1 | tail -20
+          docker compose up -d postgres clickhouse otel-collector 2>&1 | tail -20
           echo "Waiting for infrastructure..."
           sleep 30
 

@@ -8,7 +8,8 @@ namespace NexTraceOne.BuildingBlocks.Observability.Tracing;
 ///
 /// Registrados automaticamente via AddBuildingBlocksObservability().
 /// Spans criados com estes sources são exportados via OTLP para o Collector,
-/// que roteia para o Telemetry Store (Tempo) e gera métricas derivadas (SpanMetrics).
+/// que roteia para o provider de observabilidade configurado (ClickHouse ou Elastic)
+/// e gera métricas derivadas (SpanMetrics).
 /// </summary>
 public static class NexTraceActivitySources
 {

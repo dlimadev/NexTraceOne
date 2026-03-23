@@ -31,9 +31,9 @@ obrigatórios. Toda a observabilidade, persistência e inteligência funciona on
 │  └─────────────────────────────────────────────────────────────┘   │
 │                                                                     │
 │  ┌──────────────────┐   ┌──────────┐   ┌────────────────────────┐  │
-│  │ BackgroundWorkers│   │  Ollama  │   │  OTel Stack (opcional) │  │
-│  │  (Quartz jobs)   │   │  (LLM)   │   │  Collector · Tempo     │  │
-│  └──────────────────┘   └──────────┘   │  Loki · Grafana        │  │
+│  │ BackgroundWorkers│   │  Ollama  │   │  Observability Stack   │  │
+│  │  (Quartz jobs)   │   │  (LLM)   │   │  OTel Collector        │  │
+│  └──────────────────┘   └──────────┘   │  ClickHouse / Elastic  │  │
 │                                         └────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -88,17 +88,18 @@ obrigatórios. Toda a observabilidade, persistência e inteligência funciona on
 - **Modelos testados:** `deepseek-r1:1.5b` (padrão)
 - **Alternativa:** OpenAI (configurável via `AiRuntime__OpenAI__*`)
 
-### Stack de Observabilidade (Opcional)
+### Stack de Observabilidade (Configurável)
 
 | Componente | Porta | Papel |
 |-----------|-------|-------|
-| OTel Collector | 4317 (gRPC), 4318 (HTTP) | Receptor de traces e métricas |
-| Grafana Tempo | 3200 | Backend de traces distribuídos |
-| Grafana Loki | 3100 | Backend de logs estruturados |
-| Grafana | 3000 | Dashboards unificados |
+| OTel Collector | 4317 (gRPC), 4318 (HTTP) | Receptor e pipeline de traces, logs e métricas |
+| ClickHouse | 8123 (HTTP), 9000 (native) | Provider de observabilidade (default) — logs, traces, métricas |
+| Elastic | Configurável | Provider de observabilidade alternativo (integração com stack existente) |
 
-> A stack OTLP é **opcional** — o ApiHost funciona sem ela. Sem collector configurado,
+> A stack de observabilidade é **configurável** — o provider pode ser ClickHouse (default, local)
+> ou Elastic (integração com stack existente). O ApiHost funciona sem collector configurado;
 > traces e métricas são silenciosamente descartados sem impacto na disponibilidade.
+> Ver `docs/observability/` para documentação completa.
 
 ---
 
@@ -113,8 +114,8 @@ docker compose up -d
 # Apenas PostgreSQL (mínimo para desenvolvimento backend)
 docker compose up -d postgres
 
-# Com stack de observabilidade
-docker compose up -d postgres otel-collector tempo loki grafana
+# Com stack de observabilidade (ClickHouse + OTel Collector)
+docker compose up -d postgres clickhouse otel-collector
 ```
 
 ---
@@ -202,7 +203,7 @@ O ApiHost configura automaticamente no startup via `UseSecurityHeaders()`:
 - Formato: JSON estruturado via Serilog
 - Destinos padrão: Console + ficheiro rotativo em `logs/nextraceone-YYYY-MM-DD.log`
 - Retenção de ficheiros: 30 dias
-- Para centralização: adicionar `WriteTo.Loki` ou equivalente
+- Para centralização: logs fluem via OTLP para o provider configurado (ClickHouse ou Elastic)
 
 ### Traces
 
