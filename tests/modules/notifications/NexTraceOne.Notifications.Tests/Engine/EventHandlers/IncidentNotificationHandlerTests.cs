@@ -37,7 +37,8 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "payments-api",
             IncidentSeverity: "Critical",
             Description: "Service is down",
-            OwnerUserId: ownerUserId) { TenantId = tenantId };
+            OwnerUserId: ownerUserId,
+            TenantId: tenantId) { TenantId = tenantId };
 
         await _handler.HandleAsync(@event);
 
@@ -55,12 +56,14 @@ public sealed class IncidentNotificationHandlerTests
     [Fact]
     public async Task HandleAsync_IncidentCreated_MissingOwner_Skips()
     {
+        var skipTenantId = Guid.NewGuid();
         var @event = new IncidentCreatedIntegrationEvent(
             IncidentId: Guid.NewGuid(),
             ServiceName: "api",
             IncidentSeverity: "Warning",
             Description: "Test",
-            OwnerUserId: null) { TenantId = Guid.NewGuid() };
+            OwnerUserId: null,
+            TenantId: skipTenantId) { TenantId = skipTenantId };
 
         await _handler.HandleAsync(@event);
 
@@ -75,7 +78,8 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "api",
             IncidentSeverity: "Warning",
             Description: "Test",
-            OwnerUserId: Guid.NewGuid()) { TenantId = null };
+            OwnerUserId: Guid.NewGuid(),
+            TenantId: null) { TenantId = null };
 
         await _handler.HandleAsync(@event);
 
@@ -85,12 +89,14 @@ public sealed class IncidentNotificationHandlerTests
     [Fact]
     public async Task HandleAsync_IncidentEscalated_SubmitsNotification()
     {
+        var escalatedTenantId = Guid.NewGuid();
         var @event = new IncidentEscalatedIntegrationEvent(
             IncidentId: Guid.NewGuid(),
             ServiceName: "auth-service",
             PreviousSeverity: "Warning",
             NewSeverity: "Critical",
-            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
+            OwnerUserId: Guid.NewGuid(),
+            TenantId: escalatedTenantId) { TenantId = escalatedTenantId };
 
         await _handler.HandleAsync(@event);
 
@@ -103,12 +109,14 @@ public sealed class IncidentNotificationHandlerTests
     public async Task HandleAsync_IncidentCreated_IncludesDeepLink()
     {
         var incidentId = Guid.NewGuid();
+        var deepLinkTenantId = Guid.NewGuid();
         var @event = new IncidentCreatedIntegrationEvent(
             IncidentId: incidentId,
             ServiceName: "api",
             IncidentSeverity: "Critical",
             Description: "Down",
-            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
+            OwnerUserId: Guid.NewGuid(),
+            TenantId: deepLinkTenantId) { TenantId = deepLinkTenantId };
 
         await _handler.HandleAsync(@event);
 

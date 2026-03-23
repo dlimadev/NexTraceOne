@@ -4237,6 +4237,22 @@
       "integration": "Integration",
       "platform": "Platform",
       "informational": "Informational"
+    },
+    "preferences": {
+      "title": "Notification Preferences",
+      "subtitle": "Manage how and where you receive notifications",
+      "category": "Category",
+      "inApp": "In-App",
+      "email": "Email",
+      "teams": "Teams",
+      "mandatory": "Mandatory",
+      "mandatoryTooltip": "This notification cannot be disabled — it is required by platform security and governance policies",
+      "saved": "Preference saved successfully",
+      "saveFailed": "Failed to save preference",
+      "loading": "Loading preferences...",
+      "errorLoading": "Failed to load preferences",
+      "channelHeader": "Delivery Channels",
+      "description": "Configure which notifications you want to receive and through which channels. Some critical notifications are mandatory and cannot be disabled."
     }
   }
 }

@@ -3235,6 +3235,22 @@
       "integration": "Integración",
       "platform": "Plataforma",
       "informational": "Informativo"
+    },
+    "preferences": {
+      "title": "Preferencias de Notificación",
+      "subtitle": "Gestionar cómo y dónde recibes notificaciones",
+      "category": "Categoría",
+      "inApp": "En App",
+      "email": "Email",
+      "teams": "Teams",
+      "mandatory": "Obligatoria",
+      "mandatoryTooltip": "Esta notificación no puede desactivarse — es requerida por las políticas de seguridad y gobernanza de la plataforma",
+      "saved": "Preferencia guardada con éxito",
+      "saveFailed": "Error al guardar preferencia",
+      "loading": "Cargando preferencias...",
+      "errorLoading": "Error al cargar preferencias",
+      "channelHeader": "Canales de Entrega",
+      "description": "Configura qué notificaciones deseas recibir y a través de qué canales. Algunas notificaciones críticas son obligatorias y no se pueden desactivar."
     }
   }
 }

@@ -54,12 +54,14 @@ public sealed class ComplianceAndBudgetHandlerTests
             _module,
             NullLoggerFactory.Instance.CreateLogger<BudgetNotificationHandler>());
 
+        var budgetTenantId = Guid.NewGuid();
         var @event = new BudgetExceededIntegrationEvent(
             AnomalyId: Guid.NewGuid(),
             ServiceName: "data-pipeline",
             ExpectedCost: 500.00m,
             ActualCost: 1200.00m,
-            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
+            OwnerUserId: Guid.NewGuid(),
+            TenantId: budgetTenantId) { TenantId = budgetTenantId };
 
         await handler.HandleAsync(@event);
 
@@ -79,11 +81,13 @@ public sealed class ComplianceAndBudgetHandlerTests
             NullLoggerFactory.Instance.CreateLogger<IntegrationFailureNotificationHandler>());
 
         var integrationId = Guid.NewGuid();
+        var intFailTenantId = Guid.NewGuid();
         var @event = new IntegrationFailedIntegrationEvent(
             IntegrationId: integrationId,
             IntegrationName: "Azure DevOps",
             ErrorMessage: "Connection timeout after 30s",
-            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
+            OwnerUserId: Guid.NewGuid(),
+            TenantId: intFailTenantId) { TenantId = intFailTenantId };
 
         await handler.HandleAsync(@event);
 
@@ -124,7 +128,8 @@ public sealed class ComplianceAndBudgetHandlerTests
             ServiceName: "svc",
             ExpectedCost: 100m,
             ActualCost: 200m,
-            OwnerUserId: Guid.NewGuid()) { TenantId = null };
+            OwnerUserId: Guid.NewGuid(),
+            TenantId: null) { TenantId = null };
 
         await handler.HandleAsync(@event);
 

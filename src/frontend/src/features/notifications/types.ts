@@ -30,3 +30,21 @@ export interface NotificationListParams {
   page?: number;
   pageSize?: number;
 }
+
+export interface NotificationPreferenceDto {
+  category: string;
+  channel: string;
+  enabled: boolean;
+  isMandatory: boolean;
+  updatedAt: string | null;
+}
+
+export interface NotificationPreferencesResponse {
+  preferences: NotificationPreferenceDto[];
+}
+
+export interface UpdatePreferenceRequest {
+  category: string;
+  channel: string;
+  enabled: boolean;
+}

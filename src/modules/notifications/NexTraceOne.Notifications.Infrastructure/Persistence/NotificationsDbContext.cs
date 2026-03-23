@@ -23,6 +23,9 @@ public sealed class NotificationsDbContext(
     /// <summary>Registos de entrega externa (email, Teams).</summary>
     public DbSet<NotificationDelivery> Deliveries => Set<NotificationDelivery>();
 
+    /// <summary>Preferências de notificação dos utilizadores.</summary>
+    public DbSet<NotificationPreference> Preferences => Set<NotificationPreference>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(NotificationsDbContext).Assembly;
 

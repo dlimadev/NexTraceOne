@@ -13,6 +13,8 @@ using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Notifications.Infrastructure.Preferences;
+using NexTraceOne.Notifications.Infrastructure.Routing;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -44,6 +46,12 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<NotificationsDbContext>());
         services.AddScoped<INotificationStore, NotificationStoreRepository>();
+
+        // ── Fase 4: Preferências, resolução de destinatários, políticas obrigatórias ──
+        services.AddScoped<INotificationPreferenceStore, NotificationPreferenceStoreRepository>();
+        services.AddScoped<INotificationPreferenceService, NotificationPreferenceService>();
+        services.AddSingleton<IMandatoryNotificationPolicy, MandatoryNotificationPolicy>();
+        services.AddScoped<INotificationRecipientResolver, NotificationRecipientResolver>();
 
         // Engine — Fase 2: deduplicação básica
         services.AddScoped<INotificationDeduplicationService, NotificationDeduplicationService>();

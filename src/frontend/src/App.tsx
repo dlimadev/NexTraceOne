@@ -111,6 +111,7 @@ const AuditPage = lazy(() => import('./features/audit-compliance/pages/AuditPage
 
 // ── Notifications (lazy) ──
 const NotificationCenterPage = lazy(() => import('./features/notifications/pages/NotificationCenterPage').then(m => ({ default: m.NotificationCenterPage })));
+const NotificationPreferencesPage = lazy(() => import('./features/notifications/pages/NotificationPreferencesPage').then(m => ({ default: m.NotificationPreferencesPage })));
 
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -749,6 +750,14 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="notifications:inbox:read" redirectTo="/unauthorized">
                     <NotificationCenterPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/notifications/preferences"
+                element={
+                  <ProtectedRoute permission="notifications:inbox:read" redirectTo="/unauthorized">
+                    <NotificationPreferencesPage />
                   </ProtectedRoute>
                 }
               />

@@ -3,7 +3,9 @@ import type {
   NotificationDto,
   NotificationListParams,
   NotificationListResponse,
+  NotificationPreferencesResponse,
   UnreadCountResponse,
+  UpdatePreferenceRequest,
 } from '../types';
 
 export type { NotificationDto };
@@ -27,4 +29,12 @@ export const notificationsApi = {
 
   markAllAsRead: () =>
     client.post('/notifications/mark-all-read').then((r) => r.data),
+
+  getPreferences: () =>
+    client
+      .get<NotificationPreferencesResponse>('/notifications/preferences')
+      .then((r) => r.data),
+
+  updatePreference: (data: UpdatePreferenceRequest) =>
+    client.put('/notifications/preferences', data).then((r) => r.data),
 };
