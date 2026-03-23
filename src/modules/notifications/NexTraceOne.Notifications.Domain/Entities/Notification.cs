@@ -116,11 +116,52 @@ public sealed class Notification : AggregateRoot<NotificationId>
     /// <summary>Data/hora UTC em que foi acknowledged pelo destinatário.</summary>
     public DateTimeOffset? AcknowledgedAt { get; private set; }
 
+    /// <summary>Id do utilizador que fez acknowledge.</summary>
+    public Guid? AcknowledgedBy { get; private set; }
+
+    /// <summary>Comentário opcional do acknowledge.</summary>
+    public string? AcknowledgeComment { get; private set; }
+
     /// <summary>Data/hora UTC em que foi arquivada.</summary>
     public DateTimeOffset? ArchivedAt { get; private set; }
 
     /// <summary>Data/hora UTC de expiração (após a qual a notificação é descartável).</summary>
     public DateTimeOffset? ExpiresAt { get; private set; }
+
+    // ── Phase 6: Intelligence & Automation ──
+
+    /// <summary>Chave de correlação para agrupar notificações relacionadas.</summary>
+    public string? CorrelationKey { get; private set; }
+
+    /// <summary>Id do grupo ao qual esta notificação pertence.</summary>
+    public Guid? GroupId { get; private set; }
+
+    /// <summary>Contagem de ocorrências (para deduplicação com incremento).</summary>
+    public int OccurrenceCount { get; private set; } = 1;
+
+    /// <summary>Data/hora UTC da última ocorrência (actualizada por deduplicação).</summary>
+    public DateTimeOffset? LastOccurrenceAt { get; private set; }
+
+    /// <summary>Data/hora UTC até à qual a notificação está snoozed.</summary>
+    public DateTimeOffset? SnoozedUntil { get; private set; }
+
+    /// <summary>Id do utilizador que fez snooze.</summary>
+    public Guid? SnoozedBy { get; private set; }
+
+    /// <summary>Indica se a notificação foi escalada.</summary>
+    public bool IsEscalated { get; private set; }
+
+    /// <summary>Data/hora UTC da escalação.</summary>
+    public DateTimeOffset? EscalatedAt { get; private set; }
+
+    /// <summary>Id do incidente correlacionado (se existir).</summary>
+    public Guid? CorrelatedIncidentId { get; private set; }
+
+    /// <summary>Indica se a notificação foi suprimida por regra.</summary>
+    public bool IsSuppressed { get; private set; }
+
+    /// <summary>Razão da supressão (para auditabilidade).</summary>
+    public string? SuppressionReason { get; private set; }
 
     /// <summary>
     /// Cria uma nova notificação com contexto de negócio completo.
@@ -190,12 +231,14 @@ public sealed class Notification : AggregateRoot<NotificationId>
     }
 
     /// <summary>Regista acknowledge explícito pelo destinatário.</summary>
-    public void Acknowledge()
+    public void Acknowledge(Guid? userId = null, string? comment = null)
     {
         if (Status is NotificationStatus.Unread or NotificationStatus.Read)
         {
             Status = NotificationStatus.Acknowledged;
             AcknowledgedAt = DateTimeOffset.UtcNow;
+            AcknowledgedBy = userId;
+            AcknowledgeComment = comment;
             if (ReadAt is null) ReadAt = AcknowledgedAt;
         }
     }
@@ -217,6 +260,66 @@ public sealed class Notification : AggregateRoot<NotificationId>
         {
             Status = NotificationStatus.Dismissed;
         }
+    }
+
+    // ── Phase 6: Intelligence & Automation methods ──
+
+    /// <summary>Define a chave de correlação e/ou grupo.</summary>
+    public void SetCorrelation(string? correlationKey, Guid? groupId = null)
+    {
+        CorrelationKey = correlationKey;
+        GroupId = groupId;
+    }
+
+    /// <summary>Incrementa o contador de ocorrências (deduplicação com merge).</summary>
+    public void IncrementOccurrence()
+    {
+        OccurrenceCount++;
+        LastOccurrenceAt = DateTimeOffset.UtcNow;
+    }
+
+    /// <summary>Adia a notificação até a data especificada.</summary>
+    public void Snooze(DateTimeOffset until, Guid snoozedBy)
+    {
+        if (Status is NotificationStatus.Dismissed or NotificationStatus.Archived)
+            return;
+
+        SnoozedUntil = until;
+        SnoozedBy = snoozedBy;
+    }
+
+    /// <summary>Remove o snooze (reactivação manual ou por expiração).</summary>
+    public void Unsnooze()
+    {
+        SnoozedUntil = null;
+        SnoozedBy = null;
+    }
+
+    /// <summary>Verifica se a notificação está actualmente snoozed.</summary>
+    public bool IsSnoozed() => SnoozedUntil.HasValue && DateTimeOffset.UtcNow < SnoozedUntil.Value;
+
+    /// <summary>Marca a notificação como escalada.</summary>
+    public void MarkAsEscalated()
+    {
+        if (!IsEscalated)
+        {
+            IsEscalated = true;
+            EscalatedAt = DateTimeOffset.UtcNow;
+        }
+    }
+
+    /// <summary>Correlaciona a notificação com um incidente.</summary>
+    public void CorrelateWithIncident(Guid incidentId)
+    {
+        CorrelatedIncidentId = incidentId;
+    }
+
+    /// <summary>Marca a notificação como suprimida.</summary>
+    public void Suppress(string reason)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+        IsSuppressed = true;
+        SuppressionReason = reason;
     }
 
     /// <summary>Verifica se a notificação está expirada.</summary>

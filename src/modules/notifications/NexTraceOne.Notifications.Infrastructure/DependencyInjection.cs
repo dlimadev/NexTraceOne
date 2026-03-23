@@ -13,6 +13,7 @@ using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Infrastructure.Engine;
 using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
+using NexTraceOne.Notifications.Infrastructure.Intelligence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Notifications.Infrastructure.Preferences;
@@ -57,6 +58,13 @@ public static class DependencyInjection
 
         // Engine — Fase 2: deduplicação básica
         services.AddScoped<INotificationDeduplicationService, NotificationDeduplicationService>();
+
+        // ── Phase 6: Intelligence & Automation ──
+        services.AddScoped<INotificationGroupingService, NotificationGroupingService>();
+        services.AddSingleton<IQuietHoursService, QuietHoursService>();
+        services.AddScoped<INotificationEscalationService, NotificationEscalationService>();
+        services.AddScoped<INotificationSuppressionService, NotificationSuppressionService>();
+        services.AddScoped<INotificationDigestService, NotificationDigestService>();
 
         // ── Fase 3: Canais Externos ──
 
