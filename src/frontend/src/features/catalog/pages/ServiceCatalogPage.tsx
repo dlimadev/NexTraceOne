@@ -15,9 +15,6 @@ import {
   GitBranch,
   Shield,
   X,
-  Activity,
-  TrendingUp,
-  Timer,
   BarChart3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

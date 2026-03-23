@@ -17,7 +17,6 @@ import {
   History,
   ClipboardCheck,
   Link2,
-  Loader2,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

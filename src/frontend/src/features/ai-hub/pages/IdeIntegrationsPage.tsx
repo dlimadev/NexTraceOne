@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Monitor, Code, Search, Shield, ShieldCheck, Users, Plug, Terminal,
-  CheckCircle, XCircle, Clock, FileText, AlertTriangle, Zap, Eye,
+  Monitor, Code, Search, Shield, ShieldCheck, Plug,
+  Clock, FileText, AlertTriangle, Zap,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

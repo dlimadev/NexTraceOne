@@ -359,7 +359,7 @@ function generateContextualResponse(
  *
  * @see docs/AI-ASSISTED-OPERATIONS.md
  */
-export function AssistantPanel({ contextType, contextId, contextSummary, contextData, activeEnvironmentId: _activeEnvironmentId, activeEnvironmentName, isNonProductionEnvironment }: AssistantPanelProps) {
+export function AssistantPanel({ contextType, contextId, contextSummary, contextData, activeEnvironmentName, isNonProductionEnvironment }: AssistantPanelProps) {
   const { t } = useTranslation();
   const { persona } = usePersona();
   const [messages, setMessages] = useState<ChatMessage[]>([]);

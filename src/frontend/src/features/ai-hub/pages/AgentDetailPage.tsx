@@ -13,14 +13,11 @@ import {
   AlertCircle,
   CheckCircle2,
   Ban,
-  Archive,
-  Eye,
   Cpu,
   Globe,
   Lock,
   Clock,
   Hash,
-  Sparkles,
   Save,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
@@ -60,16 +57,6 @@ interface AgentDetail {
   sortOrder: number;
   createdAt: string;
   updatedAt: string | null;
-}
-
-interface ExecutionSummary {
-  executionId: string;
-  status: string;
-  modelUsed: string;
-  durationMs: number;
-  totalTokens: number;
-  artifactCount: number;
-  startedAt: string;
 }
 
 /**
