@@ -93,7 +93,7 @@ public interface ITelemetryReferenceWriter
 /// <summary>
 /// Porta de leitura para referências de telemetria.
 /// Permite navegar do Product Store (anomalias, correlações, investigações)
-/// para os dados crus armazenados no Telemetry Store (Tempo, Loki, etc.).
+/// para os dados crus armazenados no provider de observabilidade (ClickHouse, Elastic).
 /// </summary>
 public interface ITelemetryReferenceReader
 {

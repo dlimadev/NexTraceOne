@@ -9,15 +9,22 @@
 # - .NET (OTLP nativo via OpenTelemetry SDK)
 # - Java (OTLP via OpenTelemetry Java Agent)
 # - JavaScript/Node.js (OTLP via @opentelemetry/sdk-node)
-# - IIS / Windows (via OTLP HTTP exporter ou Prometheus scraping)
+# - IIS / Windows (via CLR Profiler com OTLP HTTP export)
 # - Kubernetes (via k8s_observer e kubeletstats receiver)
 # - Sistemas externos (via OTLP HTTP/gRPC)
 #
 # PIPELINE:
 # Fontes → Receivers → Processors → Exporters
 #                                    ├── Product Store (PostgreSQL via OTLP connector/custom)
-#                                    ├── Tempo (traces crus)
-#                                    └── Loki (logs crus)
+#                                    └── ClickHouse (traces, logs e métricas crus)
+#
+# PROVIDER DE OBSERVABILIDADE:
+# Esta configuração exporta para ClickHouse por padrão.
+# Para Elastic, substituir os exporters de ClickHouse pelos exporters do Elastic.
+#
+# MODOS DE COLETA:
+# - OpenTelemetry Collector (Kubernetes): esta configuração
+# - CLR Profiler (IIS/Windows): o profiler exporta via OTLP HTTP para este Collector
 #
 # SEGURANÇA:
 # - TLS habilitado em receivers para ambientes de produção
@@ -33,7 +40,7 @@
 receivers:
   # OTLP — receptor principal para todas as fontes que suportam OpenTelemetry nativo.
   # Suporta gRPC (porta 4317) e HTTP (porta 4318).
-  # Compatível com: .NET, Java, Node.js, Go, Python, Rust, C++.
+  # Compatível com: .NET, Java, Node.js, Go, Python, Rust, C++, CLR Profiler.
   otlp:
     protocols:
       grpc:
@@ -179,30 +186,33 @@ processors:
 
 # ── Exporters ────────────────────────────────────────────────────────────────
 # Destinos finais para cada tipo de sinal.
+# Provider padrão: ClickHouse. Para Elastic, substituir os exporters abaixo.
 exporters:
+  # ClickHouse — provider de observabilidade para traces, logs e métricas crus.
+  # O ClickHouse recebe todos os sinais crus. PostgreSQL NÃO é usado para isto.
+  clickhouse:
+    endpoint: "${CLICKHOUSE_ENDPOINT:-tcp://clickhouse:9000?database=nextraceone_obs}"
+    database: nextraceone_obs
+    ttl: 720h
+    logs_table_name: otel_logs
+    traces_table_name: otel_traces
+    metrics_table_name: otel_metrics
+    timeout: 10s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 120s
+    sending_queue:
+      num_consumers: 10
+      queue_size: 1000
+
   # OTLP/gRPC — exporter genérico para backends compatíveis com OTLP.
-  # Usado como fallback ou para backends que suportam OTLP diretamente.
+  # Usado para enviar métricas derivadas (spanmetrics) para Product Store aggregator.
   otlp:
     endpoint: "localhost:4317"
     tls:
       insecure: true
-
-  # Tempo — backend de traces crus (Grafana Tempo).
-  # Traces crus vão para cá, NÃO para PostgreSQL.
-  otlp/tempo:
-    endpoint: "${TEMPO_ENDPOINT:-localhost:4317}"
-    tls:
-      insecure: true
-
-  # Loki — backend de logs crus (Grafana Loki).
-  # Logs crus vão para cá, NÃO para PostgreSQL.
-  loki:
-    endpoint: "${LOKI_ENDPOINT:-http://localhost:3100/loki/api/v1/push}"
-
-  # Prometheus Remote Write — para métricas de alta cardinalidade (opcional).
-  # Métricas agregadas de baixa cardinalidade vão para o Product Store (PostgreSQL).
-  # prometheusremotewrite:
-  #   endpoint: "${PROMETHEUS_ENDPOINT:-http://localhost:9090/api/v1/write}"
 
   # Debug — apenas para desenvolvimento local.
   debug:
@@ -247,7 +257,7 @@ service:
     # Pipeline de TRACES:
     # Receivers → Memory Limiter → Resource Detection → Normalize →
     # Filter → Correlation → Redaction → Tail Sampling → Batch →
-    # Tempo (crus) + SpanMetrics (derivar métricas)
+    # ClickHouse (crus) + SpanMetrics (derivar métricas)
     traces:
       receivers: [otlp]
       processors:
@@ -259,12 +269,12 @@ service:
         - redaction
         - tail_sampling
         - batch
-      exporters: [otlp/tempo, spanmetrics]
+      exporters: [clickhouse, spanmetrics]
 
     # Pipeline de METRICS:
-    # Receivers (OTLP + Prometheus + HostMetrics + SpanMetrics) →
+    # Receivers (OTLP + HostMetrics + SpanMetrics) →
     # Memory Limiter → Resource Detection → Normalize → Batch →
-    # OTLP (para Product Store aggregator)
+    # ClickHouse (crus) + OTLP (para Product Store aggregator)
     metrics:
       receivers: [otlp, hostmetrics, spanmetrics]
       processors:
@@ -272,11 +282,11 @@ service:
         - resourcedetection
         - attributes/normalize
         - batch
-      exporters: [otlp]
+      exporters: [clickhouse, otlp]
 
     # Pipeline de LOGS:
     # Receivers → Memory Limiter → Resource Detection → Normalize →
-    # Filter → Correlation → Redaction → Batch → Loki (crus)
+    # Filter → Correlation → Redaction → Batch → ClickHouse (crus)
     logs:
       receivers: [otlp]
       processors:
@@ -287,7 +297,7 @@ service:
         - transform/correlation
         - redaction
         - batch
-      exporters: [loki]
+      exporters: [clickhouse]
 
   # Extensions para health check e z-pages do próprio Collector.
   extensions: [health_check, zpages]

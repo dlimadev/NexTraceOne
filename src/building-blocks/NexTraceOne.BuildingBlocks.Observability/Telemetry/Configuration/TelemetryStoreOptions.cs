@@ -3,14 +3,16 @@ namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 /// <summary>
 /// Configuração central de telemetria da plataforma NexTraceOne.
 /// Define a separação entre Product Store (PostgreSQL — agregados, correlações, topologia)
-/// e Telemetry Store (storage especializado — traces e logs crus em alto volume).
+/// e Observability Provider (storage analítico configurável — ClickHouse ou Elastic).
 ///
 /// Princípio arquitetural: o NexTraceOne é OpenTelemetry-native na ingestão,
 /// correlation-first no produto e storage-aware na persistência.
 ///
 /// PostgreSQL NÃO deve ser usado como storage principal de logs/traces crus em larga escala.
-/// Os dados crus residem em backends especializados (Tempo, Loki, ClickHouse, etc.),
+/// Os dados crus residem em providers analíticos configuráveis (ClickHouse, Elastic),
 /// e o Product Store mantém apenas referências, agregados e contextos investigativos.
+///
+/// A plataforma trata coleta, transporte, storage e análise como preocupações separadas.
 /// </summary>
 public sealed class TelemetryStoreOptions
 {
@@ -20,16 +22,22 @@ public sealed class TelemetryStoreOptions
     /// <summary>
     /// Configuração do Product Store (PostgreSQL).
     /// Armazena: métricas agregadas, topologia observada, anomalias, correlações,
-    /// contextos investigativos e referências para dados crus no Telemetry Store.
+    /// contextos investigativos e referências para dados crus no provider de observabilidade.
     /// </summary>
     public ProductStoreOptions ProductStore { get; set; } = new();
 
     /// <summary>
-    /// Configuração do Telemetry Store (storage especializado para traces e logs crus).
-    /// Backends suportados: Tempo (traces), Loki (logs), ClickHouse, ou qualquer
-    /// backend compatível com OTLP via OpenTelemetry Collector.
+    /// Configuração do provider de observabilidade (storage analítico para traces, logs e métricas crus).
+    /// Providers suportados: ClickHouse, Elastic.
+    /// A escolha do provider é feita por configuração e não acopla o domínio do NexTraceOne.
     /// </summary>
-    public TelemetryBackendOptions TelemetryStore { get; set; } = new();
+    public ObservabilityProviderOptions ObservabilityProvider { get; set; } = new();
+
+    /// <summary>
+    /// Configuração do modo de coleta de telemetria por ambiente.
+    /// Modos suportados: OpenTelemetryCollector (Kubernetes), ClrProfiler (IIS/Windows).
+    /// </summary>
+    public CollectionModeOptions CollectionMode { get; set; } = new();
 
     /// <summary>
     /// Configuração do OpenTelemetry Collector usado como pipeline de ingestão.
@@ -84,51 +92,200 @@ public sealed class ProductStoreOptions
 }
 
 /// <summary>
-/// Configuração dos backends de Telemetry Store para traces e logs crus.
-/// Estes backends recebem dados crus diretamente do OpenTelemetry Collector,
-/// sem passar pelo PostgreSQL do produto.
+/// Configuração do provider de observabilidade — storage analítico configurável.
+/// O NexTraceOne suporta dois providers: ClickHouse e Elastic.
+/// A empresa escolhe o provider por configuração, sem acoplar o domínio.
+///
+/// Combinações suportadas:
+/// - CLR Profiler + ClickHouse
+/// - CLR Profiler + Elastic
+/// - OpenTelemetry Collector + ClickHouse
+/// - OpenTelemetry Collector + Elastic
 /// </summary>
-public sealed class TelemetryBackendOptions
+public sealed class ObservabilityProviderOptions
 {
     /// <summary>
-    /// Backend para armazenamento de traces crus.
-    /// Exemplos: "tempo" (Grafana Tempo), "jaeger", "clickhouse", "otlp".
-    /// O Collector exporta traces diretamente para este backend.
+    /// Provider ativo de observabilidade: "ClickHouse" ou "Elastic".
+    /// Determina onde traces, logs e métricas crus são armazenados e consultados.
     /// </summary>
-    public string TracesBackend { get; set; } = "tempo";
+    public string Provider { get; set; } = "ClickHouse";
 
     /// <summary>
-    /// Endpoint do backend de traces (ex: "http://tempo:3200", "http://jaeger:4317").
+    /// Configuração do provider ClickHouse.
+    /// Usado quando Provider = "ClickHouse".
+    /// ClickHouse é stateful — requer volume persistente.
     /// </summary>
-    public string TracesEndpoint { get; set; } = "http://localhost:3200";
+    public ClickHouseProviderOptions ClickHouse { get; set; } = new();
 
     /// <summary>
-    /// Backend para armazenamento de logs crus.
-    /// Exemplos: "loki" (Grafana Loki), "elasticsearch", "clickhouse", "otlp".
-    /// O Collector exporta logs diretamente para este backend.
+    /// Configuração do provider Elastic.
+    /// Usado quando Provider = "Elastic".
+    /// Prioriza integração com stack Elastic já existente na empresa.
     /// </summary>
-    public string LogsBackend { get; set; } = "loki";
+    public ElasticProviderOptions Elastic { get; set; } = new();
+}
+
+/// <summary>
+/// Configuração do provider ClickHouse para armazenamento analítico de observabilidade.
+/// Usado para logs, traces e métricas de alta cardinalidade em larga escala.
+///
+/// ClickHouse é stateful — não usar filesystem efêmero do container como armazenamento.
+/// Utilizar volume persistente e documentar claramente.
+/// </summary>
+public sealed class ClickHouseProviderOptions
+{
+    /// <summary>Habilita o provider ClickHouse.</summary>
+    public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// Endpoint do backend de logs (ex: "http://loki:3100", "http://elasticsearch:9200").
+    /// Connection string do ClickHouse.
+    /// Formato: Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=
     /// </summary>
-    public string LogsEndpoint { get; set; } = "http://localhost:3100";
+    public string ConnectionString { get; set; } = "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=";
+
+    /// <summary>Database dedicada para dados de observabilidade.</summary>
+    public string Database { get; set; } = "nextraceone_obs";
 
     /// <summary>
-    /// Backend para métricas de alta cardinalidade (opcional).
-    /// Métricas agregadas de baixa cardinalidade ficam no Product Store (PostgreSQL).
-    /// Métricas de alta cardinalidade podem ir para Mimir, Prometheus, ClickHouse.
+    /// Retenção em dias para logs no ClickHouse. Default: 30 dias.
+    /// Dados expirados são removidos automaticamente via TTL.
     /// </summary>
-    public string? MetricsBackend { get; set; }
+    public int LogsRetentionDays { get; set; } = 30;
 
-    /// <summary>Endpoint do backend de métricas de alta cardinalidade (opcional).</summary>
-    public string? MetricsEndpoint { get; set; }
+    /// <summary>
+    /// Retenção em dias para traces no ClickHouse. Default: 30 dias.
+    /// </summary>
+    public int TracesRetentionDays { get; set; } = 30;
+
+    /// <summary>
+    /// Retenção em dias para métricas no ClickHouse. Default: 90 dias.
+    /// </summary>
+    public int MetricsRetentionDays { get; set; } = 90;
+}
+
+/// <summary>
+/// Configuração do provider Elastic para armazenamento analítico de observabilidade.
+/// Prioriza integração com stack Elastic já existente na empresa,
+/// evitando duplicação desnecessária de infraestrutura.
+/// </summary>
+public sealed class ElasticProviderOptions
+{
+    /// <summary>Habilita o provider Elastic.</summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>Endpoint do cluster Elastic (ex: "https://elastic.example.com:9200").</summary>
+    public string Endpoint { get; set; } = string.Empty;
+
+    /// <summary>API Key para autenticação no Elastic (recomendado sobre user/password).</summary>
+    public string ApiKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Prefixo para índices criados pelo NexTraceOne no Elastic.
+    /// Exemplo: "nextraceone" gera índices como "nextraceone-logs-2024.01.15".
+    /// </summary>
+    public string IndexPrefix { get; set; } = "nextraceone";
+
+    /// <summary>
+    /// Retenção em dias para logs no Elastic. Default: 30 dias.
+    /// Managed via ILM (Index Lifecycle Management).
+    /// </summary>
+    public int LogsRetentionDays { get; set; } = 30;
+
+    /// <summary>Retenção em dias para traces no Elastic. Default: 30 dias.</summary>
+    public int TracesRetentionDays { get; set; } = 30;
+
+    /// <summary>Retenção em dias para métricas no Elastic. Default: 90 dias.</summary>
+    public int MetricsRetentionDays { get; set; } = 90;
+}
+
+/// <summary>
+/// Configuração do modo de coleta de telemetria por ambiente.
+/// O NexTraceOne reconhece que nem todos os clientes terão a mesma topologia operacional.
+///
+/// Modos suportados:
+/// - OpenTelemetryCollector: para ambientes Kubernetes (padrão)
+/// - ClrProfiler: para ambientes IIS/Windows com aplicações .NET
+///
+/// A modelagem separa como os dados são coletados, armazenados e analisados.
+/// </summary>
+public sealed class CollectionModeOptions
+{
+    /// <summary>
+    /// Modo de coleta ativo: "OpenTelemetryCollector" ou "ClrProfiler".
+    /// Default: "OpenTelemetryCollector" (mais comum em ambientes Kubernetes).
+    /// </summary>
+    public string ActiveMode { get; set; } = "OpenTelemetryCollector";
+
+    /// <summary>
+    /// Configuração do OpenTelemetry Collector (modo Kubernetes).
+    /// Usado quando ActiveMode = "OpenTelemetryCollector".
+    /// </summary>
+    public OpenTelemetryCollectorModeOptions OpenTelemetryCollector { get; set; } = new();
+
+    /// <summary>
+    /// Configuração do CLR Profiler (modo IIS/Windows).
+    /// Usado quando ActiveMode = "ClrProfiler".
+    /// </summary>
+    public ClrProfilerModeOptions ClrProfiler { get; set; } = new();
+}
+
+/// <summary>
+/// Configuração do modo de coleta via OpenTelemetry Collector (Kubernetes).
+/// O Collector atua como pipeline de ingestão, normalização e roteamento de telemetria.
+/// </summary>
+public sealed class OpenTelemetryCollectorModeOptions
+{
+    /// <summary>Habilita o modo de coleta via OpenTelemetry Collector.</summary>
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Endpoint gRPC do Collector OTLP (ex: "http://otel-collector:4317").
+    /// </summary>
+    public string OtlpGrpcEndpoint { get; set; } = "http://localhost:4317";
+
+    /// <summary>
+    /// Endpoint HTTP do Collector OTLP (ex: "http://otel-collector:4318").
+    /// </summary>
+    public string OtlpHttpEndpoint { get; set; } = "http://localhost:4318";
+}
+
+/// <summary>
+/// Configuração do modo de coleta via CLR Profiler (IIS/Windows).
+/// Para aplicações .NET hospedadas em IIS com menor intrusão manual.
+/// O profiler captura sinais relevantes sem exigir reescrita da aplicação.
+/// </summary>
+public sealed class ClrProfilerModeOptions
+{
+    /// <summary>Habilita o modo de coleta via CLR Profiler.</summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>Modo de hospedagem: "IIS" ou "SelfHosted".</summary>
+    public string Mode { get; set; } = "IIS";
+
+    /// <summary>
+    /// Tipo de profiler: "AutoInstrumentation" (recomendado) ou "Manual".
+    /// Auto-instrumentação captura sinais sem alterações no código da aplicação.
+    /// </summary>
+    public string ProfilerType { get; set; } = "AutoInstrumentation";
+
+    /// <summary>
+    /// Destino de exportação dos dados coletados pelo profiler.
+    /// "Collector" envia via OTLP para o OTel Collector.
+    /// "Direct" envia diretamente para o provider configurado.
+    /// </summary>
+    public string ExportTarget { get; set; } = "Collector";
+
+    /// <summary>
+    /// Endpoint OTLP do destino de exportação.
+    /// Quando ExportTarget = "Collector", aponta para o OTel Collector.
+    /// </summary>
+    public string OtlpEndpoint { get; set; } = "http://localhost:4317";
 }
 
 /// <summary>
 /// Configuração do OpenTelemetry Collector — pipeline central de ingestão.
 /// O Collector normaliza, enriquece, filtra e roteia sinais de telemetria
-/// para os backends corretos (Product Store e Telemetry Store).
+/// para o provider de observabilidade configurado (ClickHouse ou Elastic).
 /// </summary>
 public sealed class CollectorOptions
 {

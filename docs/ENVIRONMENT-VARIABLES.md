@@ -161,9 +161,8 @@ O `docker-compose.yml` na raiz inclui os serviços de observabilidade:
 |--------|-------|-----------|
 | PostgreSQL | 5432 | Base de dados principal |
 | OTel Collector | 4317, 4318 | Receptor de traces e métricas |
-| Grafana Tempo | 3200 | Backend de traces |
-| Grafana Loki | 3100 | Backend de logs |
-| Grafana | 3000 | Dashboard de observabilidade |
+| ClickHouse HTTP | 8123 | Provider de observabilidade |
+| ClickHouse Native | 9000 | Provider de observabilidade (protocol nativo) |
 
 ---
 

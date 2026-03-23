@@ -1,16 +1,16 @@
 namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 /// <summary>
-/// Referência do Product Store para dados crus no Telemetry Store.
+/// Referência do Product Store para dados crus no provider de observabilidade.
 /// Serve como ponteiro/link entre os dados agregados (PostgreSQL) e
-/// os traces/logs crus armazenados em backends especializados (Tempo, Loki, etc.).
+/// os traces/logs crus armazenados no provider configurado (ClickHouse, Elastic).
 ///
 /// Tabela-alvo: telemetry_references (Product Store — PostgreSQL).
 ///
 /// Princípio: o Product Store nunca armazena traces/logs crus em volume,
 /// mas mantém referências indexáveis para navegação investigativa.
 /// Um investigador pode partir de uma anomalia ou correlação no Product Store
-/// e seguir a referência para acessar os dados crus no Telemetry Store.
+/// e seguir a referência para acessar os dados crus no provider de observabilidade.
 /// </summary>
 public sealed record TelemetryReference
 {
@@ -27,14 +27,14 @@ public sealed record TelemetryReference
     public required string ExternalId { get; init; }
 
     /// <summary>
-    /// Backend onde o dado cru reside ("tempo", "loki", "clickhouse", etc.).
+    /// Backend onde o dado cru reside ("clickhouse", "elastic", etc.).
     /// Permite que a UI saiba qual API chamar para buscar o dado original.
     /// </summary>
     public required string BackendType { get; init; }
 
     /// <summary>
-    /// URI ou query para acesso direto ao dado no Telemetry Store.
-    /// Ex: "http://tempo:3200/api/traces/{traceId}" ou query Loki.
+    /// URI ou query para acesso direto ao dado no provider de observabilidade.
+    /// Ex: query SQL para ClickHouse ou query DSL para Elastic.
     /// </summary>
     public string? AccessUri { get; init; }
 
