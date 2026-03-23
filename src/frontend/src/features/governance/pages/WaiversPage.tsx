@@ -43,7 +43,9 @@ export function WaiversPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setError(null);
 
     organizationGovernanceApi.listGovernanceWaivers()

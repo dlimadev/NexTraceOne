@@ -82,7 +82,9 @@ export function TeamDetailPage() {
   useEffect(() => {
     if (!teamId) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setError(null);
 
     Promise.all([
