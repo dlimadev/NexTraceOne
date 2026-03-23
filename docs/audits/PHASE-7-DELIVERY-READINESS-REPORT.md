@@ -1,5 +1,7 @@
 # PHASE-7-DELIVERY-READINESS-REPORT
 
+> **Nota:** Este documento é um relatório histórico. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 **Data de execução**: 2026-03-22
 **Responsável**: Principal Platform Engineer / DevSecOps Lead
 **Fase**: 7 — CI/CD + Containerização + Estratégia de Deploy + Hardening de Release

@@ -1,5 +1,7 @@
 # 09 — Observability and AI Readiness
 
+> **Nota:** Este documento reflete a avaliação original. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic) com suporte a IIS (CLR Profiler), Kubernetes (OpenTelemetry Collector) e Kafka.
+
 **Date:** 2026-03-22
 
 ---

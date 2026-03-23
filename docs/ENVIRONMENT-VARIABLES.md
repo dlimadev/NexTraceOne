@@ -176,7 +176,7 @@ O `docker-compose.yml` na raiz inclui os serviços de observabilidade:
 - [ ] Source maps desativados (padrão de build — `vite build`)
 - [ ] HTTPS ativado (via proxy reverso ou `ASPNETCORE_URLS=https://...`)
 - [ ] Verificar `/ready` retorna 200 antes de ativar em produção
-- [ ] Logs estruturados a enviar para centralização (Loki ou sistema equivalente)
+- [ ] Logs estruturados a enviar para centralização (provider de observabilidade configurado — ClickHouse ou Elastic)
 
 ---
 

@@ -1,5 +1,7 @@
 # Phase 6 — Observabilidade Aplicada ao Diferencial do Produto
 
+> **Nota:** Este documento é um relatório histórico. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 ## Sumário Executivo
 
 Esta fase transforma a base de observabilidade já existente no NexTraceOne em uma capability real

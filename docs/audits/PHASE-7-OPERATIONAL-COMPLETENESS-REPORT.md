@@ -1,5 +1,7 @@
 # Phase 7 — Operational Completeness Report
 
+> **Nota:** Este documento é um relatório histórico. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 **Date**: 2026-03-22  
 **Phase**: 7 — Observability, CLI & Operational Completeness
 
