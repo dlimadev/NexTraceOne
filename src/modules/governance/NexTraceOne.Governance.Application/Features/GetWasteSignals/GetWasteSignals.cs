@@ -1,13 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetWasteSignals;
 
 /// <summary>
 /// Feature: GetWasteSignals — sinais de desperdício operacional filtrados por serviço, equipa ou domínio.
 /// Desperdício no NexTraceOne está ligado a comportamento operacional, não a billing cloud genérico.
-/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
+/// Consome dados reais do módulo CostIntelligence via contrato público.
+/// Heurística: serviços com custo acima do percentil 75 do tenant são sinalizados como desperdício potencial.
 /// </summary>
 public static class GetWasteSignals
 {
@@ -17,42 +19,58 @@ public static class GetWasteSignals
         string? TeamId = null,
         string? DomainId = null) : IQuery<Response>;
 
-    /// <summary>Handler que retorna sinais de desperdício operacional.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que retorna sinais de desperdício operacional baseados em dados reais de custo.</summary>
+    public sealed class Handler(ICostIntelligenceModule costModule) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var signals = new List<WasteSignalDetailDto>
+            var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+
+            if (records.Count == 0)
             {
-                new("ws-001", "svc-order-processor", "Order Processor", "Commerce", "Team Commerce",
-                    WasteSignalType.RepeatedReprocessing, "Frequent rollbacks causing reprocessing",
-                    "rollback-waste", 5400m, "High", "2026-03-14T10:00:00Z",
-                    "Change chg-2026-0312 introduced instability"),
-                new("ws-002", "svc-catalog-sync", "Catalog Sync", "Catalog", "Team Platform",
-                    WasteSignalType.RepeatedReprocessing, "Duplicate data processing pipelines",
-                    "duplicate-etl", 4200m, "High", "2026-03-13T08:00:00Z",
-                    null),
-                new("ws-003", "svc-payment-api", "Payment API", "Payments", "Team Payments",
-                    WasteSignalType.ExcessiveRetries, "Excessive retries on timeout",
-                    "retry-pattern", 3200m, "Medium", "2026-03-10T08:00:00Z",
-                    "Upstream latency causing retry storms"),
-                new("ws-004", "svc-inventory-sync", "Inventory Sync", "Commerce", "Team Commerce",
-                    WasteSignalType.RepeatedReprocessing, "Redundant sync cycles",
-                    "redundant-sync", 2800m, "Medium", "2026-03-11T12:00:00Z",
-                    null),
-                new("ws-005", "svc-catalog-sync", "Catalog Sync", "Catalog", "Team Platform",
-                    WasteSignalType.IdleCostlyResource, "Idle staging environment",
-                    "idle-staging", 2500m, "Low", "2026-03-09T06:00:00Z",
-                    null),
-                new("ws-006", "svc-order-processor", "Order Processor", "Commerce", "Team Commerce",
-                    WasteSignalType.IdleCostlyResource, "Idle compute during off-peak",
-                    "idle-compute", 2100m, "Low", "2026-03-08T20:00:00Z",
-                    null),
-                new("ws-007", "svc-payment-api", "Payment API", "Payments", "Team Payments",
-                    WasteSignalType.OverProvisioned, "Over-provisioned compute instances",
-                    "over-provisioned", 2100m, "Medium", "2026-03-12T14:00:00Z",
-                    "CPU utilization below 45% consistently")
-            };
+                return Result<Response>.Success(new Response(
+                    TotalWaste: 0m,
+                    SignalCount: 0,
+                    Signals: Array.Empty<WasteSignalDetailDto>(),
+                    ByType: Array.Empty<WasteByTypeDto>(),
+                    GeneratedAt: DateTimeOffset.UtcNow,
+                    IsSimulated: false,
+                    DataSource: "cost-intelligence"));
+            }
+
+            var avgCost = records.Average(r => r.TotalCost);
+            var sortedCosts = records.Select(r => r.TotalCost).OrderBy(c => c).ToList();
+            var p75Index = (int)(sortedCosts.Count * 0.75);
+            var p75Threshold = sortedCosts.Count > 0 ? sortedCosts[Math.Min(p75Index, sortedCosts.Count - 1)] : 0m;
+
+            var signals = new List<WasteSignalDetailDto>();
+            var signalIndex = 0;
+
+            foreach (var r in records)
+            {
+                if (r.TotalCost <= p75Threshold) continue;
+
+                var waste = r.TotalCost - avgCost;
+                if (waste <= 0) continue;
+
+                var (type, pattern, description) = ClassifyWaste(r.TotalCost, avgCost, p75Threshold);
+                var severity = waste > avgCost ? "High" : waste > avgCost * 0.5m ? "Medium" : "Low";
+
+                signalIndex++;
+                signals.Add(new WasteSignalDetailDto(
+                    SignalId: $"ws-{signalIndex:D3}",
+                    ServiceId: r.ServiceId,
+                    ServiceName: r.ServiceName,
+                    Domain: r.Domain ?? "Unknown",
+                    Team: r.Team ?? "Unknown",
+                    Type: type,
+                    Description: description,
+                    Pattern: pattern,
+                    EstimatedWaste: Math.Round(waste, 2),
+                    Severity: severity,
+                    DetectedAt: DateTimeOffset.UtcNow.ToString("o"),
+                    CorrelatedCause: null));
+            }
 
             var filtered = signals.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(request.ServiceId))
@@ -64,7 +82,7 @@ public static class GetWasteSignals
 
             var result = filtered.ToList();
 
-            var response = new Response(
+            return Result<Response>.Success(new Response(
                 TotalWaste: result.Sum(s => s.EstimatedWaste),
                 SignalCount: result.Count,
                 Signals: result,
@@ -73,14 +91,27 @@ public static class GetWasteSignals
                     .OrderByDescending(t => t.TotalWaste)
                     .ToList(),
                 GeneratedAt: DateTimeOffset.UtcNow,
-                IsSimulated: true,
-                DataSource: "demo");
+                IsSimulated: false,
+                DataSource: "cost-intelligence"));
+        }
 
-            return Task.FromResult(Result<Response>.Success(response));
+        private static (WasteSignalType Type, string Pattern, string Description) ClassifyWaste(
+            decimal cost, decimal avgCost, decimal p75)
+        {
+            var ratio = avgCost > 0 ? cost / avgCost : 1m;
+            return ratio switch
+            {
+                > 3.0m => (WasteSignalType.OverProvisioned, "over-provisioned",
+                    $"Cost {cost:N2} is {ratio:N1}x above average — likely over-provisioned"),
+                > 2.0m => (WasteSignalType.IdleCostlyResource, "idle-costly-resource",
+                    $"Cost {cost:N2} is significantly above average — possible idle/underutilized resource"),
+                _ => (WasteSignalType.DegradedCostAmplification, "cost-amplification",
+                    $"Cost {cost:N2} exceeds p75 threshold {p75:N2} — cost amplification detected")
+            };
         }
     }
 
-    /// <summary>Resposta com sinais de desperdício. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>Resposta com sinais de desperdício baseados em dados reais.</summary>
     public sealed record Response(
         decimal TotalWaste,
         int SignalCount,

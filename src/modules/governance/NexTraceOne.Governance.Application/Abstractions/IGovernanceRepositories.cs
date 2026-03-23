@@ -41,6 +41,14 @@ public interface IAnalyticsEventRepository
         DateTimeOffset to,
         CancellationToken ct);
 
+    /// <summary>Conta eventos filtrados por tipo de evento (ex: ZeroResultSearch, JourneyAbandoned).</summary>
+    Task<long> CountByEventTypeAsync(
+        AnalyticsEventType eventType,
+        string? persona,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct);
+
     Task<int> CountUniqueUsersAsync(
         string? persona,
         ProductModule? module,

@@ -1,13 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetEfficiencyIndicators;
 
 /// <summary>
 /// Feature: GetEfficiencyIndicators — indicadores de eficiência operacional filtrados por serviço ou equipa.
 /// Eficiência no NexTraceOne mede a relação entre custo e valor operacional real.
-/// IMPLEMENTATION STATUS: Demo — returns illustrative data.
+/// Consome dados reais do módulo CostIntelligence via contrato público.
+/// Heurística: custo do serviço vs. custo médio do tenant determina eficiência relativa.
 /// </summary>
 public static class GetEfficiencyIndicators
 {
@@ -16,35 +18,51 @@ public static class GetEfficiencyIndicators
         string? ServiceId = null,
         string? TeamId = null) : IQuery<Response>;
 
-    /// <summary>Handler que retorna indicadores de eficiência operacional.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que retorna indicadores de eficiência operacional baseados em dados reais de custo.</summary>
+    public sealed class Handler(ICostIntelligenceModule costModule) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var indicators = new List<ServiceEfficiencyDto>
+            var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+
+            if (records.Count == 0)
             {
-                new("svc-payment-api", "Payment API", "Team Payments", CostEfficiency.Inefficient, new EfficiencyMetricDto[]
+                return Result<Response>.Success(new Response(
+                    OverallEfficiencyScore: 0m,
+                    ServiceCount: 0,
+                    Services: Array.Empty<ServiceEfficiencyDto>(),
+                    GeneratedAt: DateTimeOffset.UtcNow,
+                    IsSimulated: false,
+                    DataSource: "cost-intelligence"));
+            }
+
+            var avgCost = records.Average(r => r.TotalCost);
+
+            var indicators = records.Select(r =>
+            {
+                var efficiency = ClassifyEfficiency(r.TotalCost, avgCost);
+                var costRatio = avgCost > 0 ? r.TotalCost / avgCost : 1m;
+                var costScore = Math.Max(0m, Math.Min(200m, (1m / Math.Max(costRatio, 0.01m)) * 100m));
+
+                var metrics = new List<EfficiencyMetricDto>
                 {
-                    new("CPU Utilization", EfficiencyCategory.ResourceUtilization, 42.5m, 75.0m, "%", "Below optimal range"),
-                    new("Cost per Request", EfficiencyCategory.CostPerTransaction, 0.032m, 0.015m, "USD", "Above target"),
-                    new("Error Rate", EfficiencyCategory.ErrorRate, 4.2m, 1.0m, "%", "Errors contributing to waste"),
-                    new("Throughput Efficiency", EfficiencyCategory.ThroughputOptimization, 68.0m, 85.0m, "%", "Below target")
-                }),
-                new("svc-order-processor", "Order Processor", "Team Commerce", CostEfficiency.Wasteful, new EfficiencyMetricDto[]
-                {
-                    new("CPU Utilization", EfficiencyCategory.ResourceUtilization, 35.0m, 75.0m, "%", "Significantly under-utilized"),
-                    new("Cost per Request", EfficiencyCategory.CostPerTransaction, 0.048m, 0.015m, "USD", "Very high cost per request"),
-                    new("Error Rate", EfficiencyCategory.ErrorRate, 8.1m, 1.0m, "%", "High error rate amplifying cost"),
-                    new("Scaling Efficiency", EfficiencyCategory.ScalingEfficiency, 52.0m, 80.0m, "%", "Poor auto-scaling response")
-                }),
-                new("svc-notification-hub", "Notification Hub", "Team Messaging", CostEfficiency.Efficient, new EfficiencyMetricDto[]
-                {
-                    new("CPU Utilization", EfficiencyCategory.ResourceUtilization, 72.0m, 75.0m, "%", "Near optimal"),
-                    new("Cost per Request", EfficiencyCategory.CostPerTransaction, 0.008m, 0.015m, "USD", "Below target — efficient"),
-                    new("Error Rate", EfficiencyCategory.ErrorRate, 0.3m, 1.0m, "%", "Very low error rate"),
-                    new("Throughput Efficiency", EfficiencyCategory.ThroughputOptimization, 91.0m, 85.0m, "%", "Above target")
-                })
-            };
+                    new("Cost vs Average",
+                        EfficiencyCategory.CostPerTransaction,
+                        r.TotalCost,
+                        avgCost,
+                        r.Currency,
+                        costRatio > 1.5m ? "Significantly above average"
+                            : costRatio > 1.0m ? "Above average"
+                            : "At or below average")
+                };
+
+                return new ServiceEfficiencyDto(
+                    r.ServiceId,
+                    r.ServiceName,
+                    r.Team ?? "Unknown",
+                    efficiency,
+                    metrics);
+            }).ToList();
 
             var filtered = indicators.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(request.ServiceId))
@@ -54,14 +72,11 @@ public static class GetEfficiencyIndicators
 
             var result = filtered.ToList();
 
-            // Normaliza pontuação considerando que para algumas categorias menor é melhor.
             static decimal NormalizeMetric(EfficiencyMetricDto m)
             {
                 if (m.TargetValue == 0) return 100m;
-
                 var isLowerBetter = m.Category is EfficiencyCategory.ErrorRate
                     or EfficiencyCategory.CostPerTransaction;
-
                 return isLowerBetter
                     ? Math.Min(m.TargetValue / m.CurrentValue * 100, 200m)
                     : Math.Min(m.CurrentValue / m.TargetValue * 100, 200m);
@@ -71,19 +86,30 @@ public static class GetEfficiencyIndicators
                 ? result.Average(s => s.Metrics.Average(NormalizeMetric))
                 : 0m;
 
-            var response = new Response(
+            return Result<Response>.Success(new Response(
                 OverallEfficiencyScore: Math.Round(overallScore, 1),
                 ServiceCount: result.Count,
                 Services: result,
                 GeneratedAt: DateTimeOffset.UtcNow,
-                IsSimulated: true,
-                DataSource: "demo");
+                IsSimulated: false,
+                DataSource: "cost-intelligence"));
+        }
 
-            return Task.FromResult(Result<Response>.Success(response));
+        private static CostEfficiency ClassifyEfficiency(decimal cost, decimal avgCost)
+        {
+            if (avgCost == 0) return CostEfficiency.Efficient;
+            var ratio = cost / avgCost;
+            return ratio switch
+            {
+                > 2.0m => CostEfficiency.Wasteful,
+                > 1.5m => CostEfficiency.Inefficient,
+                > 0.8m => CostEfficiency.Acceptable,
+                _ => CostEfficiency.Efficient
+            };
         }
     }
 
-    /// <summary>Resposta com indicadores de eficiência. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>Resposta com indicadores de eficiência baseados em dados reais.</summary>
     public sealed record Response(
         decimal OverallEfficiencyScore,
         int ServiceCount,

@@ -112,8 +112,8 @@ public static class GetExecutiveDrillDown
         IReadOnlyList<GapDto> TopGaps,
         IReadOnlyList<string> RecommendedFocus,
         DateTimeOffset GeneratedAt,
-        bool IsSimulated = true,
-        string DataSource = "demo");
+        bool IsSimulated = false,
+        string DataSource = "cost-intelligence");
 
     /// <summary>Indicador-chave com valor, tendência e explicação contextual.</summary>
     public sealed record KeyIndicatorDto(
