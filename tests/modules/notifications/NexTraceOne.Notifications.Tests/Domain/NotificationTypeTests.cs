@@ -7,21 +7,39 @@ public sealed class NotificationTypeTests
     [Fact]
     public void All_ShouldContainAllDeclaredTypes()
     {
-        NotificationType.All.Should().HaveCount(11);
+        NotificationType.All.Should().HaveCount(29);
     }
 
     [Theory]
     [InlineData(NotificationType.IncidentCreated)]
     [InlineData(NotificationType.IncidentEscalated)]
+    [InlineData(NotificationType.IncidentResolved)]
+    [InlineData(NotificationType.AnomalyDetected)]
+    [InlineData(NotificationType.HealthDegradation)]
     [InlineData(NotificationType.ApprovalPending)]
     [InlineData(NotificationType.ApprovalApproved)]
     [InlineData(NotificationType.ApprovalRejected)]
+    [InlineData(NotificationType.ApprovalExpiring)]
+    [InlineData(NotificationType.ContractPublished)]
+    [InlineData(NotificationType.BreakingChangeDetected)]
+    [InlineData(NotificationType.ContractValidationFailed)]
     [InlineData(NotificationType.BreakGlassActivated)]
     [InlineData(NotificationType.JitAccessPending)]
+    [InlineData(NotificationType.JitAccessGranted)]
+    [InlineData(NotificationType.UserRoleChanged)]
+    [InlineData(NotificationType.AccessReviewPending)]
     [InlineData(NotificationType.ComplianceCheckFailed)]
+    [InlineData(NotificationType.PolicyViolated)]
+    [InlineData(NotificationType.EvidenceExpiring)]
     [InlineData(NotificationType.BudgetExceeded)]
+    [InlineData(NotificationType.BudgetThresholdReached)]
     [InlineData(NotificationType.IntegrationFailed)]
+    [InlineData(NotificationType.SyncFailed)]
+    [InlineData(NotificationType.ConnectorAuthFailed)]
     [InlineData(NotificationType.AiProviderUnavailable)]
+    [InlineData(NotificationType.TokenBudgetExceeded)]
+    [InlineData(NotificationType.AiGenerationFailed)]
+    [InlineData(NotificationType.AiActionBlockedByPolicy)]
     public void IsValid_ShouldReturnTrue_ForCatalogTypes(string eventType)
     {
         NotificationType.IsValid(eventType).Should().BeTrue();

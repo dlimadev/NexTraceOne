@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.Governance.Contracts;
 using NexTraceOne.IdentityAccess.Contracts.IntegrationEvents;
@@ -92,6 +94,42 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.ComplianceCheckFailedIntegrationEvent>, ComplianceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<BudgetExceededIntegrationEvent>, BudgetNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
+
+        // ── Phase 5: High-Value Domain Event Handlers ──
+
+        // Operations & Incidents
+        services.AddScoped<IIntegrationEventHandler<IncidentResolvedIntegrationEvent>, IncidentNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<AnomalyDetectedIntegrationEvent>, IncidentNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<HealthDegradationIntegrationEvent>, IncidentNotificationHandler>();
+
+        // Approvals & Workflow
+        services.AddScoped<IIntegrationEventHandler<ApprovalApprovedIntegrationEvent>, ApprovalNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<ApprovalExpiringIntegrationEvent>, ApprovalNotificationHandler>();
+
+        // Catalog & Contracts
+        services.AddScoped<IIntegrationEventHandler<ContractPublishedIntegrationEvent>, CatalogNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<BreakingChangeDetectedIntegrationEvent>, CatalogNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<ContractValidationFailedIntegrationEvent>, CatalogNotificationHandler>();
+
+        // Security & Access
+        services.AddScoped<IIntegrationEventHandler<UserRoleChangedIntegrationEvent>, SecurityNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<JitAccessGrantedIntegrationEvent>, SecurityNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<AccessReviewPendingIntegrationEvent>, SecurityNotificationHandler>();
+
+        // Governance & Compliance
+        services.AddScoped<IIntegrationEventHandler<IntegrationEvents.PolicyViolatedIntegrationEvent>, ComplianceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<IntegrationEvents.EvidenceExpiringIntegrationEvent>, ComplianceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<IntegrationEvents.BudgetThresholdReachedIntegrationEvent>, ComplianceNotificationHandler>();
+
+        // AI Governance
+        services.AddScoped<IIntegrationEventHandler<AiProviderUnavailableIntegrationEvent>, AiGovernanceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<TokenBudgetExceededIntegrationEvent>, AiGovernanceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<AiGenerationFailedIntegrationEvent>, AiGovernanceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<AiActionBlockedByPolicyIntegrationEvent>, AiGovernanceNotificationHandler>();
+
+        // Integrations & Ingestion
+        services.AddScoped<IIntegrationEventHandler<SyncFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<ConnectorAuthFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
 
         return services;
     }

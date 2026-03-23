@@ -10,13 +10,16 @@ namespace NexTraceOne.Notifications.Infrastructure.EventHandlers;
 
 /// <summary>
 /// Handler para eventos de workflow/aprovação do módulo Change Governance.
-/// Gera notificações internas quando aprovações ficam pendentes ou são rejeitadas.
+/// Gera notificações internas quando aprovações ficam pendentes, são aprovadas, rejeitadas ou expiram.
+/// Fase 5: adicionados ApprovalApproved e ApprovalExpiring.
 /// </summary>
 internal sealed class ApprovalNotificationHandler(
     INotificationModule notificationModule,
     ILogger<ApprovalNotificationHandler> logger)
     : IIntegrationEventHandler<ApprovalPendingIntegrationEvent>,
-      IIntegrationEventHandler<WorkflowRejectedIntegrationEvent>
+      IIntegrationEventHandler<WorkflowRejectedIntegrationEvent>,
+      IIntegrationEventHandler<ApprovalApprovedIntegrationEvent>,
+      IIntegrationEventHandler<ApprovalExpiringIntegrationEvent>
 {
     public async Task HandleAsync(ApprovalPendingIntegrationEvent @event, CancellationToken ct = default)
     {
@@ -87,6 +90,78 @@ internal sealed class ApprovalNotificationHandler(
             RequiresAction = false,
             TenantId = @event.TenantId,
             RecipientUserIds = [@event.OwnerUserId.Value],
+            PayloadJson = payload
+        }, ct);
+    }
+
+    public async Task HandleAsync(ApprovalApprovedIntegrationEvent @event, CancellationToken ct = default)
+    {
+        logger.LogInformation(
+            "Processing ApprovalApproved notification for workflow {WorkflowId}, stage {StageId}",
+            @event.WorkflowId, @event.StageId);
+
+        if (@event.OwnerUserId is null || @event.TenantId is null)
+        {
+            logger.LogWarning("ApprovalApproved event missing OwnerUserId or TenantId. Skipping.");
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new
+        {
+            @event.WorkflowName,
+            @event.ApprovedBy
+        });
+
+        await notificationModule.SubmitAsync(new NotificationRequest
+        {
+            EventType = NotificationType.ApprovalApproved,
+            Category = nameof(NotificationCategory.Approval),
+            Severity = nameof(NotificationSeverity.Info),
+            Title = $"Approved — {@event.WorkflowName}",
+            Message = $"The approval for {@event.WorkflowName} was granted by {@event.ApprovedBy}.",
+            SourceModule = "ChangeGovernance",
+            SourceEntityType = "WorkflowStage",
+            SourceEntityId = @event.StageId.ToString(),
+            ActionUrl = $"/workflows/{@event.WorkflowId}/stages/{@event.StageId}",
+            RequiresAction = false,
+            TenantId = @event.TenantId,
+            RecipientUserIds = [@event.OwnerUserId.Value],
+            PayloadJson = payload
+        }, ct);
+    }
+
+    public async Task HandleAsync(ApprovalExpiringIntegrationEvent @event, CancellationToken ct = default)
+    {
+        logger.LogInformation(
+            "Processing ApprovalExpiring notification for workflow {WorkflowId}, stage {StageId}",
+            @event.WorkflowId, @event.StageId);
+
+        if (@event.ApproverUserId is null || @event.TenantId is null)
+        {
+            logger.LogWarning("ApprovalExpiring event missing ApproverUserId or TenantId. Skipping.");
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new
+        {
+            @event.WorkflowName,
+            ExpiresAt = @event.ExpiresAt.ToString("O")
+        });
+
+        await notificationModule.SubmitAsync(new NotificationRequest
+        {
+            EventType = NotificationType.ApprovalExpiring,
+            Category = nameof(NotificationCategory.Approval),
+            Severity = nameof(NotificationSeverity.Warning),
+            Title = $"Approval expiring — {@event.WorkflowName}",
+            Message = $"The approval for {@event.WorkflowName} is expiring at {@event.ExpiresAt:g}. Act before the deadline.",
+            SourceModule = "ChangeGovernance",
+            SourceEntityType = "WorkflowStage",
+            SourceEntityId = @event.StageId.ToString(),
+            ActionUrl = $"/workflows/{@event.WorkflowId}/stages/{@event.StageId}",
+            RequiresAction = true,
+            TenantId = @event.TenantId,
+            RecipientUserIds = [@event.ApproverUserId.Value],
             PayloadJson = payload
         }, ct);
     }

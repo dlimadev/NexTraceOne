@@ -24,3 +24,27 @@ public sealed record WorkflowRejectedIntegrationEvent(
     string RejectedBy,
     string Reason,
     Guid? OwnerUserId) : IntegrationEventBase("ChangeGovernance");
+
+// ── Phase 5: High-Value Domain Events ──
+
+/// <summary>
+/// Publicado quando uma aprovação de workflow é concedida.
+/// Consumidores: módulo de notificações (informar o solicitante da aprovação).
+/// </summary>
+public sealed record ApprovalApprovedIntegrationEvent(
+    Guid WorkflowId,
+    Guid StageId,
+    string WorkflowName,
+    string ApprovedBy,
+    Guid? OwnerUserId) : IntegrationEventBase("ChangeGovernance");
+
+/// <summary>
+/// Publicado quando uma aprovação está prestes a expirar.
+/// Consumidores: módulo de notificações (alertar aprovador sobre prazo).
+/// </summary>
+public sealed record ApprovalExpiringIntegrationEvent(
+    Guid WorkflowId,
+    Guid StageId,
+    string WorkflowName,
+    DateTimeOffset ExpiresAt,
+    Guid? ApproverUserId) : IntegrationEventBase("ChangeGovernance");
