@@ -23,7 +23,7 @@ public sealed class NotificationOrchestratorTests
             Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
-        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, _logger);
+        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, null, _logger);
     }
 
     [Fact]

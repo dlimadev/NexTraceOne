@@ -35,8 +35,7 @@ public sealed class SecurityNotificationHandlerTests
             UserId: userId,
             ActivatedBy: "admin.user",
             Resource: "production-db",
-            Reason: "Emergency recovery",
-            TenantId: Guid.NewGuid());
+            Reason: "Emergency recovery") { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -56,8 +55,7 @@ public sealed class SecurityNotificationHandlerTests
             UserId: Guid.NewGuid(),
             ActivatedBy: "user",
             Resource: "db",
-            Reason: "reason",
-            TenantId: null);
+            Reason: "reason") { TenantId = null };
 
         await _handler.HandleAsync(@event);
 
@@ -72,8 +70,7 @@ public sealed class SecurityNotificationHandlerTests
             UserId: userId,
             ActivatedBy: "admin",
             Resource: "prod-db",
-            Reason: "Emergency",
-            TenantId: Guid.NewGuid());
+            Reason: "Emergency") { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
