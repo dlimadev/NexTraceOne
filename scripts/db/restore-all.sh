@@ -157,6 +157,8 @@ main() {
   for db in "${ALL_DATABASES[@]}"; do
     # Find latest backup for this database
     local backup_file
+    # Sort reverse alphabetically — works correctly because backup filenames use
+    # the YYYYMMDD_HHMMSS timestamp format which sorts chronologically
     backup_file=$(find "$INPUT_DIR" -maxdepth 1 -name "${db}_*.sql.gz" -type f 2>/dev/null | sort -r | head -n 1)
 
     if [[ -z "$backup_file" ]]; then
