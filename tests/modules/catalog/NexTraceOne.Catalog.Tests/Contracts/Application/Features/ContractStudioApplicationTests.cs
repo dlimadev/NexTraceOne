@@ -14,6 +14,7 @@ using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.A
 using RejectDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft.RejectDraft;
 using PublishDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft.PublishDraft;
 using GenerateDraftFromAiFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi.GenerateDraftFromAi;
+using IAiDraftGenerator = NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi.IAiDraftGenerator;
 using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample.AddDraftExample;
 
 namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
@@ -421,8 +422,59 @@ public sealed class ContractStudioApplicationTests
         result.IsSuccess.Should().BeTrue();
         result.Value.DraftId.Should().NotBeEmpty();
         result.Value.GeneratedContent.Should().NotBeNullOrWhiteSpace();
+        result.Value.AiGenerated.Should().BeFalse("no AI generator was injected, so template fallback was used");
         draftRepo.Received(1).Add(Arg.Any<ContractDraft>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GenerateDraftFromAi_WithAiGenerator_Should_ReturnAiGeneratedTrue()
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var aiGenerator = Substitute.For<IAiDraftGenerator>();
+        aiGenerator.GenerateAsync(
+                Arg.Any<ContractProtocol>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(("openapi: '3.1.0'\ninfo:\n  title: 'Test'\n  version: '1.0.0'\npaths: {}", "yaml"));
+
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork, aiGenerator);
+
+        var result = await sut.Handle(
+            new GenerateDraftFromAiFeature.Command(
+                "AI Generated API",
+                "engineer@company.com",
+                ContractType.RestApi,
+                ContractProtocol.OpenApi,
+                "Generate a user management API"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.AiGenerated.Should().BeTrue("AI generator was available and succeeded");
+    }
+
+    [Fact]
+    public async Task GenerateDraftFromAi_WithAiGeneratorReturningNull_Should_ReturnAiGeneratedFalse()
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var aiGenerator = Substitute.For<IAiDraftGenerator>();
+        aiGenerator.GenerateAsync(
+                Arg.Any<ContractProtocol>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(((string Content, string Format)?)null);
+
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork, aiGenerator);
+
+        var result = await sut.Handle(
+            new GenerateDraftFromAiFeature.Command(
+                "AI Generated API",
+                "engineer@company.com",
+                ContractType.RestApi,
+                ContractProtocol.OpenApi,
+                "Generate a user management API"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.AiGenerated.Should().BeFalse("AI generator returned null, so template fallback was used");
     }
 
     // ── AddDraftExample ─────────────────────────────────────────────────
