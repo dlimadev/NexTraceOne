@@ -28,6 +28,5 @@ public static class IntegrationEvents
         string ReportId,
         string ServiceName,
         int GapCount,
-        Guid? OwnerUserId,
-        Guid? TenantId) : IntegrationEventBase("Governance");
+        Guid? OwnerUserId) : IntegrationEventBase("Governance");
 }

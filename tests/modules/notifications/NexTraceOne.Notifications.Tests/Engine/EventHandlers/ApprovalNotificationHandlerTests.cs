@@ -36,8 +36,7 @@ public sealed class ApprovalNotificationHandlerTests
             StageId: Guid.NewGuid(),
             WorkflowName: "Release v2.0",
             RequestedBy: "john.doe",
-            ApproverUserId: approverUserId,
-            TenantId: Guid.NewGuid());
+            ApproverUserId: approverUserId) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -56,8 +55,7 @@ public sealed class ApprovalNotificationHandlerTests
             StageId: Guid.NewGuid(),
             WorkflowName: "Test",
             RequestedBy: "user",
-            ApproverUserId: null,
-            TenantId: Guid.NewGuid());
+            ApproverUserId: null) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -74,8 +72,7 @@ public sealed class ApprovalNotificationHandlerTests
             WorkflowName: "Release v2.0",
             RejectedBy: "security.lead",
             Reason: "Missing tests",
-            OwnerUserId: ownerUserId,
-            TenantId: Guid.NewGuid());
+            OwnerUserId: ownerUserId) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -95,8 +92,7 @@ public sealed class ApprovalNotificationHandlerTests
             WorkflowName: "Test",
             RejectedBy: "user",
             Reason: "Reason",
-            OwnerUserId: null,
-            TenantId: Guid.NewGuid());
+            OwnerUserId: null) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -113,8 +109,7 @@ public sealed class ApprovalNotificationHandlerTests
             StageId: stageId,
             WorkflowName: "Release",
             RequestedBy: "user",
-            ApproverUserId: Guid.NewGuid(),
-            TenantId: Guid.NewGuid());
+            ApproverUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 

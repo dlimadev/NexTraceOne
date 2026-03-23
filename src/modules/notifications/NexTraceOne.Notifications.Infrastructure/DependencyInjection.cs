@@ -7,8 +7,10 @@ using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.Governance.Contracts;
 using NexTraceOne.IdentityAccess.Contracts.IntegrationEvents;
 using NexTraceOne.Notifications.Application.Abstractions;
+using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Infrastructure.Engine;
 using NexTraceOne.Notifications.Infrastructure.EventHandlers;
+using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -21,7 +23,8 @@ namespace NexTraceOne.Notifications.Infrastructure;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo Notifications.
-/// Inclui engine de deduplicação e event handlers da Fase 2.
+/// Inclui engine de deduplicação (Fase 2), event handlers (Fase 2) e
+/// canais externos de entrega — Email e Microsoft Teams (Fase 3).
 /// </summary>
 public static class DependencyInjection
 {
@@ -44,6 +47,33 @@ public static class DependencyInjection
 
         // Engine — Fase 2: deduplicação básica
         services.AddScoped<INotificationDeduplicationService, NotificationDeduplicationService>();
+
+        // ── Fase 3: Canais Externos ──
+
+        // Configuração por ambiente
+        services.Configure<NotificationChannelOptions>(
+            configuration.GetSection(NotificationChannelOptions.SectionName));
+        services.Configure<DeliveryRetryOptions>(
+            configuration.GetSection(DeliveryRetryOptions.SectionName));
+
+        // Delivery store (persistência de delivery logs)
+        services.AddScoped<INotificationDeliveryStore, NotificationDeliveryStoreRepository>();
+
+        // Routing engine (decisão de canais)
+        services.AddScoped<INotificationRoutingEngine, NotificationRoutingEngine>();
+
+        // Template resolver para canais externos
+        services.AddSingleton<IExternalChannelTemplateResolver, ExternalChannelTemplateResolver>();
+
+        // Channel dispatchers
+        services.AddScoped<INotificationChannelDispatcher, EmailNotificationDispatcher>();
+        services.AddScoped<INotificationChannelDispatcher, TeamsNotificationDispatcher>();
+
+        // HttpClientFactory para Teams webhook
+        services.AddHttpClient("NexTraceOneTeams");
+
+        // External delivery service (coordena roteamento + dispatch + logging)
+        services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();
 
         // Event Handlers — Fase 2: primeiros eventos automáticos de alto valor
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentNotificationHandler>();

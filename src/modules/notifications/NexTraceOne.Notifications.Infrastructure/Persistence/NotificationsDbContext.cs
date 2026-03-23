@@ -20,6 +20,9 @@ public sealed class NotificationsDbContext(
     /// <summary>Notificações da central interna.</summary>
     public DbSet<Notification> Notifications => Set<Notification>();
 
+    /// <summary>Registos de entrega externa (email, Teams).</summary>
+    public DbSet<NotificationDelivery> Deliveries => Set<NotificationDelivery>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(NotificationsDbContext).Assembly;
 

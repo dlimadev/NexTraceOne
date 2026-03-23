@@ -11,8 +11,7 @@ public sealed record ApprovalPendingIntegrationEvent(
     Guid StageId,
     string WorkflowName,
     string RequestedBy,
-    Guid? ApproverUserId,
-    Guid? TenantId) : IntegrationEventBase("ChangeGovernance");
+    Guid? ApproverUserId) : IntegrationEventBase("ChangeGovernance");
 
 /// <summary>
 /// Publicado quando um workflow é rejeitado.
@@ -24,5 +23,4 @@ public sealed record WorkflowRejectedIntegrationEvent(
     string WorkflowName,
     string RejectedBy,
     string Reason,
-    Guid? OwnerUserId,
-    Guid? TenantId) : IntegrationEventBase("ChangeGovernance");
+    Guid? OwnerUserId) : IntegrationEventBase("ChangeGovernance");

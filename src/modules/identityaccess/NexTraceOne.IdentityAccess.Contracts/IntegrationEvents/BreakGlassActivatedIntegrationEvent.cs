@@ -10,5 +10,4 @@ public sealed record BreakGlassActivatedIntegrationEvent(
     Guid UserId,
     string ActivatedBy,
     string Resource,
-    string Reason,
-    Guid? TenantId) : IntegrationEventBase("Identity");
+    string Reason) : IntegrationEventBase("Identity");

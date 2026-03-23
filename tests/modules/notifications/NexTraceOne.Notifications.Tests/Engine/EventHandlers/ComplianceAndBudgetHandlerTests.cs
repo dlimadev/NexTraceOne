@@ -35,8 +35,7 @@ public sealed class ComplianceAndBudgetHandlerTests
             ReportId: "RPT-001",
             ServiceName: "billing-api",
             GapCount: 3,
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: Guid.NewGuid());
+            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
 
         await handler.HandleAsync(@event);
 
@@ -60,8 +59,7 @@ public sealed class ComplianceAndBudgetHandlerTests
             ServiceName: "data-pipeline",
             ExpectedCost: 500.00m,
             ActualCost: 1200.00m,
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: Guid.NewGuid());
+            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
 
         await handler.HandleAsync(@event);
 
@@ -85,8 +83,7 @@ public sealed class ComplianceAndBudgetHandlerTests
             IntegrationId: integrationId,
             IntegrationName: "Azure DevOps",
             ErrorMessage: "Connection timeout after 30s",
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: Guid.NewGuid());
+            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
 
         await handler.HandleAsync(@event);
 
@@ -108,8 +105,7 @@ public sealed class ComplianceAndBudgetHandlerTests
             ReportId: "RPT",
             ServiceName: "svc",
             GapCount: 1,
-            OwnerUserId: null,
-            TenantId: Guid.NewGuid());
+            OwnerUserId: null) { TenantId = Guid.NewGuid() };
 
         await handler.HandleAsync(@event);
 
@@ -128,8 +124,7 @@ public sealed class ComplianceAndBudgetHandlerTests
             ServiceName: "svc",
             ExpectedCost: 100m,
             ActualCost: 200m,
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: null);
+            OwnerUserId: Guid.NewGuid()) { TenantId = null };
 
         await handler.HandleAsync(@event);
 

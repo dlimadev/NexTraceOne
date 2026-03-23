@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.Notifications.Application.Abstractions;
+using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Entities;
 using NexTraceOne.Notifications.Domain.Enums;
@@ -10,13 +11,15 @@ namespace NexTraceOne.Notifications.Application.Engine;
 /// <summary>
 /// Orquestrador central da engine de notificações do NexTraceOne.
 /// Recebe pedidos de notificação, decide se notifica, resolve template e destinatários,
-/// aplica deduplicação básica, persiste na central interna e regista rastreabilidade completa.
+/// aplica deduplicação básica, persiste na central interna, e agenda entrega externa
+/// para canais elegíveis (email, Teams) via IExternalDeliveryService.
 /// Ponto único de decisão — nenhum módulo deve criar notificações fora desta engine.
 /// </summary>
 public sealed class NotificationOrchestrator(
     INotificationStore store,
     INotificationTemplateResolver templateResolver,
     INotificationDeduplicationService deduplicationService,
+    IExternalDeliveryService? externalDeliveryService,
     ILogger<NotificationOrchestrator> logger) : INotificationOrchestrator
 {
     /// <inheritdoc/>
@@ -91,6 +94,23 @@ public sealed class NotificationOrchestrator(
 
             await store.AddAsync(notification, cancellationToken);
             createdIds.Add(notification.Id.Value);
+
+            // 4c. Agendar entrega externa (email, Teams) se o serviço estiver disponível
+            if (externalDeliveryService is not null)
+            {
+                try
+                {
+                    await externalDeliveryService.ProcessExternalDeliveryAsync(notification, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(
+                        ex,
+                        "External delivery failed for notification {NotificationId}. Internal notification persisted.",
+                        notification.Id.Value);
+                    // Não falhar a notificação interna por causa de falha de entrega externa
+                }
+            }
 
             logger.LogInformation(
                 "Notification created: Type={EventType}, Recipient={UserId}, Module={SourceModule}, Entity={EntityType}/{EntityId}",

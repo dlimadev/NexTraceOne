@@ -37,8 +37,7 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "payments-api",
             IncidentSeverity: "Critical",
             Description: "Service is down",
-            OwnerUserId: ownerUserId,
-            TenantId: tenantId);
+            OwnerUserId: ownerUserId) { TenantId = tenantId };
 
         await _handler.HandleAsync(@event);
 
@@ -61,8 +60,7 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "api",
             IncidentSeverity: "Warning",
             Description: "Test",
-            OwnerUserId: null,
-            TenantId: Guid.NewGuid());
+            OwnerUserId: null) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -77,8 +75,7 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "api",
             IncidentSeverity: "Warning",
             Description: "Test",
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: null);
+            OwnerUserId: Guid.NewGuid()) { TenantId = null };
 
         await _handler.HandleAsync(@event);
 
@@ -93,8 +90,7 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "auth-service",
             PreviousSeverity: "Warning",
             NewSeverity: "Critical",
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: Guid.NewGuid());
+            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
@@ -112,8 +108,7 @@ public sealed class IncidentNotificationHandlerTests
             ServiceName: "api",
             IncidentSeverity: "Critical",
             Description: "Down",
-            OwnerUserId: Guid.NewGuid(),
-            TenantId: Guid.NewGuid());
+            OwnerUserId: Guid.NewGuid()) { TenantId = Guid.NewGuid() };
 
         await _handler.HandleAsync(@event);
 
