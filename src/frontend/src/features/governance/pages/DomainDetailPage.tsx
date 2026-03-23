@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   Globe, Users, Server, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Tag, Calendar, ArrowLeft, BarChart3, Loader2,
+  CheckCircle, Tag, Calendar, ArrowLeft, BarChart3,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -95,6 +95,7 @@ export function DomainDetailPage() {
   useEffect(() => {
     if (!domainId) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
 

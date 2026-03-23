@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  FileCheck, Search, Clock, CheckCircle, XCircle, Shield, Loader2, AlertTriangle,
+  FileCheck, Search, Clock, CheckCircle, XCircle, Shield,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -43,6 +43,7 @@ export function WaiversPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
 

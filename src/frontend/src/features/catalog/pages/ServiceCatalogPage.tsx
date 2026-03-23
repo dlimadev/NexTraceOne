@@ -15,9 +15,6 @@ import {
   GitBranch,
   Shield,
   X,
-  Activity,
-  TrendingUp,
-  Timer,
   BarChart3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -134,24 +131,27 @@ export function ServiceCatalogPage() {
     },
   });
 
+  const services = graph?.services;
+  const apis = graph?.apis;
+
   // ── Dados derivados ─────────────────────────────────────────────────
   const filteredServices = useMemo(() => {
-    if (!graph?.services) return [];
-    if (!searchTerm) return graph.services;
+    if (!services) return [];
+    if (!searchTerm) return services;
     const term = searchTerm.toLowerCase();
-    return graph.services.filter(
+    return services.filter(
       (s) => s.name.toLowerCase().includes(term) || s.teamName.toLowerCase().includes(term) || s.domain.toLowerCase().includes(term)
     );
-  }, [graph?.services, searchTerm]);
+  }, [services, searchTerm]);
 
   const filteredApis = useMemo(() => {
-    if (!graph?.apis) return [];
-    if (!searchTerm) return graph.apis;
+    if (!apis) return [];
+    if (!searchTerm) return apis;
     const term = searchTerm.toLowerCase();
-    return graph.apis.filter(
+    return apis.filter(
       (a) => a.name.toLowerCase().includes(term) || a.routePattern.toLowerCase().includes(term)
     );
-  }, [graph?.apis, searchTerm]);
+  }, [apis, searchTerm]);
 
   const graphStats = useMemo(() => {
     if (!graph) return { services: 0, apis: 0, edges: 0, domains: 0 };

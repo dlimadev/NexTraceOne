@@ -47,7 +47,7 @@ export function ContractGovernancePage() {
   });
 
   const summary = summaryQuery.data;
-  const contracts = listQuery.data?.items ?? [];
+  const contracts = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items]);
   const insights = useMemo(() => computeGovernanceInsights(contracts), [contracts]);
   const policyResults = useMemo(() => computePolicyChecks(contracts), [contracts]);
 
@@ -249,7 +249,6 @@ function ApprovalsView({ contracts }: { contracts: ContractListItem[] }) {
 
   const pendingApproval = contracts.filter((c) => c.lifecycleState === 'InReview');
   const recentlyApproved = contracts.filter((c) => c.lifecycleState === 'Approved').slice(0, 10);
-  const recentlyRejected = contracts.filter((c) => c.lifecycleState === 'Draft' && c.isLocked === false).slice(0, 5);
 
   const workflowSteps = [
     { state: 'Draft', labelKey: 'contracts.governance.workflow.draft', icon: <FileText size={14} /> },
@@ -362,7 +361,7 @@ function ApprovalsView({ contracts }: { contracts: ContractListItem[] }) {
 
 // ── Compliance View ───────────────────────────────────────────────────────────
 
-function ComplianceView({ policyResults, contracts }: { policyResults: PolicySummary; contracts: ContractListItem[] }) {
+function ComplianceView({ policyResults }: { policyResults: PolicySummary; contracts: ContractListItem[] }) {
   const { t } = useTranslation();
 
   const policyChecks: { id: string; name: string; category: string; result: 'pass' | 'warning' | 'violation' | 'blocked' }[] = [

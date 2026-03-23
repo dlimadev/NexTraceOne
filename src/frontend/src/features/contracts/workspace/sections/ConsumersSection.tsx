@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { Users, ArrowUpRight, ArrowDownLeft, ExternalLink, Clock, Tag } from 'lucide-react';
-import { cn } from '../../../../lib/cn';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
 import type { StudioContract, StudioRelationship } from '../studioTypes';

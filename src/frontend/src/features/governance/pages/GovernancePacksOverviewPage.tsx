@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Package, Search, FileText, Shield, Zap, Bot, AlertTriangle,
-  Activity, Settings, CheckCircle, Archive, Loader2,
+  Activity, Settings, CheckCircle, Archive,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -58,6 +58,7 @@ export function GovernancePacksOverviewPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
 

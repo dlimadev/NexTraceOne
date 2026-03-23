@@ -17,7 +17,7 @@ import type { Permission } from '../auth/permissions';
 export function usePermissions() {
   const { user } = useAuth();
 
-  const permissions = user?.permissions ?? [];
+  const permissions = useMemo(() => user?.permissions ?? [], [user?.permissions]);
   const roleName = user?.roleName ?? '';
 
   const permissionSet = useMemo(

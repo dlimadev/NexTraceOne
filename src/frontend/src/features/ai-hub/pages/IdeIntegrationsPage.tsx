@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Monitor, Code, Search, Shield, ShieldCheck, Users, Plug, Terminal,
-  CheckCircle, XCircle, Clock, FileText, AlertTriangle, Zap, Eye,
+  Monitor, Code, Search, Shield, ShieldCheck, Plug,
+  Clock, FileText, AlertTriangle, Zap,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -243,7 +243,7 @@ export function IdeIntegrationsPage() {
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge variant="info">{t('aiHub.ideActiveClientsLabel')}: {vsCodeCount}</Badge>
-                <Badge variant={summary?.clientTypes?.some((ct: any) => ct.clientType === 'VsCode' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
+                <Badge variant={summary?.clientTypes?.some((ct: { clientType: string; hasCapabilityPolicy: boolean }) => ct.clientType === 'VsCode' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
                   <Shield size={10} className="mr-1 inline" />{t('aiHub.idePolicyConfigured')}
                 </Badge>
               </div>
@@ -273,7 +273,7 @@ export function IdeIntegrationsPage() {
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge variant="info">{t('aiHub.ideActiveClientsLabel')}: {vsCount}</Badge>
-                <Badge variant={summary?.clientTypes?.some((ct: any) => ct.clientType === 'VisualStudio' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
+                <Badge variant={summary?.clientTypes?.some((ct: { clientType: string; hasCapabilityPolicy: boolean }) => ct.clientType === 'VisualStudio' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
                   <Shield size={10} className="mr-1 inline" />{t('aiHub.idePolicyConfigured')}
                 </Badge>
               </div>

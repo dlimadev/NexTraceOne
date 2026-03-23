@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ArrowUpCircle, BarChart3, CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowUpCircle, BarChart3, Loader2, XCircle } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -336,7 +336,6 @@ function ReadinessTab({
   tenantId,
   environmentId,
   environmentName,
-  environmentProfile,
   availableEnvironments,
 }: {
   tenantId: string;

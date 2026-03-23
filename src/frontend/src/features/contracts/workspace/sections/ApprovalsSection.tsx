@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, Circle, Clock, AlertTriangle, ArrowRight, ChevronRight } from 'lucide-react';
+import { CheckCircle, Circle, AlertTriangle, ArrowRight, ChevronRight } from 'lucide-react';
 import { cn } from '../../../../lib/cn';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { LifecycleBadge } from '../../shared/components/LifecycleBadge';

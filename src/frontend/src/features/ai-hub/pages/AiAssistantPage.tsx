@@ -398,7 +398,7 @@ export function AiAssistantPage() {
   // ── Initial load ──────────────────────────────────────────────────────
   useEffect(() => {
     void loadConversations();
-  }, []);
+  }, [loadConversations]);
 
   // ── Load messages when conversation changes ───────────────────────────
   useEffect(() => {
@@ -439,6 +439,7 @@ export function AiAssistantPage() {
       .catch(() => {
         // Available models not loaded — model selector won't show
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only run on mount; selectedModelId read is intentional guard
   }, []);
 
   // ── Load agents ───────────────────────────────────────────────────────

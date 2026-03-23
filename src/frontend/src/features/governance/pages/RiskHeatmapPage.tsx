@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Grid3X3, AlertTriangle, ShieldAlert, FileWarning, BookOpen,
-  GitBranch, RotateCcw, AlertCircle, Loader2,
+  Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -51,6 +51,7 @@ export function RiskHeatmapPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
     organizationGovernanceApi.getRiskHeatmap(dimension)

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Network, ArrowUp, ArrowDown, ExternalLink, Tag, Workflow } from 'lucide-react';
+import { Network, ArrowUp, ArrowDown, ExternalLink, Workflow } from 'lucide-react';
 import { cn } from '../../../../lib/cn';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';

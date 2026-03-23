@@ -75,7 +75,6 @@ interface ContractVersionDetailPanelProps {
  * Recebe do pai: dados do detalhe (query gerida externamente), callbacks de fecho e notificação.
  */
 export function ContractVersionDetailPanel({
-  selectedVersionId,
   detail,
   detailLoading,
   onClose,

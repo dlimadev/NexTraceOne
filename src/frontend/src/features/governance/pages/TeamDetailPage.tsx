@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   Users, Server, FileText, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Building2, Calendar, ArrowLeft, Loader2, BarChart3,
+  CheckCircle, Building2, Calendar, ArrowLeft, BarChart3,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -16,7 +16,6 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { TeamDetail, GovernanceSummary, TeamServiceDto, TeamContractDto, CrossTeamDependencyDto } from '../../../types';
 
-type MaturityLevel = 'Initial' | 'Developing' | 'Defined' | 'Managed' | 'Optimizing';
 type TabId = 'overview' | 'services' | 'contracts' | 'governance' | 'dependencies';
 
 const maturityBadgeVariant = (level: string): 'success' | 'info' | 'warning' | 'danger' => {
@@ -83,6 +82,7 @@ export function TeamDetailPage() {
   useEffect(() => {
     if (!teamId) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
 

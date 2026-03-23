@@ -104,6 +104,7 @@ export function ChangeCatalogPage() {
 
   // Reset de página ao mudar filtros
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting page on filter change is intentional
     setPage(1);
   }, [serviceName, environment, changeType, confidenceStatus, debouncedSearch]);
 

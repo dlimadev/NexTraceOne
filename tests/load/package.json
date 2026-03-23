@@ -1,0 +1,13 @@
+{
+  "name": "nextrace-load-tests",
+  "private": true,
+  "description": "k6 load testing suite for NexTraceOne API",
+  "scripts": {
+    "test:auth": "k6 run scenarios/auth-load.js",
+    "test:catalog": "k6 run scenarios/catalog-load.js",
+    "test:contracts": "k6 run scenarios/contracts-load.js",
+    "test:governance": "k6 run scenarios/governance-load.js",
+    "test:mixed": "k6 run scenarios/mixed-load.js",
+    "test:all": "bash run-all.sh"
+  }
+}

@@ -11,7 +11,7 @@ import {
   ArrowUpRight,
   BookOpen,
 } from 'lucide-react';
-import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';

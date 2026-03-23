@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   BarChart3, FileText, AlertTriangle,
   ShieldCheck, TrendingUp, TrendingDown, Minus,
-  Activity, ClipboardCheck, Download, Package, Loader2,
+  Activity, ClipboardCheck, Download, Package,
   CheckCircle, XCircle, Clock,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -65,6 +65,7 @@ export function ReportsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
     organizationGovernanceApi.getReportsSummary()

@@ -10,7 +10,7 @@ import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import type {
-  ControlDimensionDto, ControlsSummaryResponse, ControlDimensionType,
+  ControlsSummaryResponse, ControlDimensionType,
   MaturityLevelType, GovernanceTrendDirection,
 } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -66,6 +66,7 @@ export function EnterpriseControlsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
     organizationGovernanceApi.getControlsSummary()

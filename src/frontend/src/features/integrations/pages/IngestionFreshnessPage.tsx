@@ -108,7 +108,7 @@ export function IngestionFreshnessPage() {
     staleTime: 30_000,
   });
 
-  const indicators = freshnessResponse?.indicators ?? [];
+  const indicators = useMemo(() => freshnessResponse?.indicators ?? [], [freshnessResponse?.indicators]);
   const overallHealth = health?.overallHealth ?? 'Degraded';
 
   const domains: DomainFreshness[] = useMemo(() => indicators.map(ind => ({

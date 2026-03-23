@@ -19,7 +19,7 @@ vi.mock('../../api', () => ({
 vi.mock('../../utils/tokenStorage', () => {
   let store: Record<string, string> = {};
   return {
-    storeTokens: vi.fn((access: string, _refresh: string) => { store['access_token'] = access; }),
+    storeTokens: vi.fn((access: string) => { store['access_token'] = access; }),
     updateAccessToken: vi.fn((access: string) => { store['access_token'] = access; }),
     getAccessToken: vi.fn(() => store['access_token'] ?? null),
     getTenantId: vi.fn(() => store['tenant_id'] ?? null),

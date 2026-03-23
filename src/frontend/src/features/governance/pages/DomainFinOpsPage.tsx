@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, TrendingUp, TrendingDown, Minus, AlertTriangle,
-  CheckCircle, AlertCircle, XCircle, Activity, ArrowLeft,
-  Layers, Users, ArrowRight,
+  CheckCircle, AlertCircle, XCircle, ArrowLeft,
+  Layers, ArrowRight,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

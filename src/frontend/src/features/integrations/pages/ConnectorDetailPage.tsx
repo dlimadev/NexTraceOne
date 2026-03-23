@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
-  Cable, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, XCircle, Clock,
+  Cable, ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, XCircle,
   Settings, Activity, Heart, List,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';

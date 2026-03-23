@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Cable, Search, CheckCircle, AlertTriangle, XCircle, Clock,
+  Cable, Search, CheckCircle, AlertTriangle, Clock,
   ArrowRight, Activity, Plug2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';

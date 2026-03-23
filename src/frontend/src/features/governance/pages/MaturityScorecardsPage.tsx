@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Loader2, AlertTriangle } from 'lucide-react';
+import { Award } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import type { MaturityScorecardsResponse, MaturityLevelType } from '../../../types';
@@ -49,6 +49,7 @@ export function MaturityScorecardsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
     setLoading(true);
     setError(null);
     organizationGovernanceApi.getMaturityScorecards(dimension)
