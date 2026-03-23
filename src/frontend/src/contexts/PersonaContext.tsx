@@ -52,6 +52,7 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
  * Deve ser usado dentro de AuthProvider e PersonaProvider.
  * Retorna a persona derivada e toda a configuração de experiência.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePersona(): PersonaContextValue {
   const ctx = useContext(PersonaContext);
   if (!ctx) throw new Error('usePersona must be used within PersonaProvider');

@@ -379,6 +379,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
 
   // Reset when context changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting state on context change is intentional
     setMessages([]);
     setIsOpen(false);
     setExpandedMeta(null);
@@ -393,7 +394,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
       setIsOpen(true);
       if (messages.length === 0) {
         const welcomeMsg: ChatMessage = {
-          id: `w-${Date.now()}`,
+          id: `w-${crypto.randomUUID()}`,
           role: 'assistant',
           content: t(`assistantPanel.welcome.${contextType}`, { name: contextSummary.name }),
           modelName: 'NexTrace-Internal-v1',
@@ -424,7 +425,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
     if (!text) return;
 
     const userMsg: ChatMessage = {
-      id: `u-${Date.now()}`,
+      id: `u-${crypto.randomUUID()}`,
       role: 'user',
       content: text,
       timestamp: new Date().toISOString(),

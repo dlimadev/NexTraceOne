@@ -65,6 +65,7 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
   }));
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync local form state from contract prop is intentional
     setFields({
       technicalName: contract.technicalName,
       friendlyName: contract.friendlyName,

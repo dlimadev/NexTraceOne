@@ -243,7 +243,7 @@ export function IdeIntegrationsPage() {
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge variant="info">{t('aiHub.ideActiveClientsLabel')}: {vsCodeCount}</Badge>
-                <Badge variant={summary?.clientTypes?.some((ct: any) => ct.clientType === 'VsCode' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
+                <Badge variant={summary?.clientTypes?.some((ct: { clientType: string; hasCapabilityPolicy: boolean }) => ct.clientType === 'VsCode' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
                   <Shield size={10} className="mr-1 inline" />{t('aiHub.idePolicyConfigured')}
                 </Badge>
               </div>
@@ -273,7 +273,7 @@ export function IdeIntegrationsPage() {
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge variant="info">{t('aiHub.ideActiveClientsLabel')}: {vsCount}</Badge>
-                <Badge variant={summary?.clientTypes?.some((ct: any) => ct.clientType === 'VisualStudio' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
+                <Badge variant={summary?.clientTypes?.some((ct: { clientType: string; hasCapabilityPolicy: boolean }) => ct.clientType === 'VisualStudio' && ct.hasCapabilityPolicy) ? 'success' : 'default'}>
                   <Shield size={10} className="mr-1 inline" />{t('aiHub.idePolicyConfigured')}
                 </Badge>
               </div>

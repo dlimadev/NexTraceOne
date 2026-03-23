@@ -48,6 +48,7 @@ export function CatalogToolbar({
       SEARCH_DEBOUNCE_MS,
     );
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce should only re-fire on localSearch change
   }, [localSearch]);
 
   const filterCount = activeFilterCount(filters);

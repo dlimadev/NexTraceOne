@@ -146,6 +146,7 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
   // Load environments from the real API when authentication state changes
   useEffect(() => {
     if (!isAuthenticated) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset state on auth change is intentional
       setAvailableEnvironments([]);
       setActiveEnvironmentId(null);
       clearEnvironmentId();

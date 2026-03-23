@@ -47,7 +47,7 @@ export function ContractGovernancePage() {
   });
 
   const summary = summaryQuery.data;
-  const contracts = listQuery.data?.items ?? [];
+  const contracts = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items]);
   const insights = useMemo(() => computeGovernanceInsights(contracts), [contracts]);
   const policyResults = useMemo(() => computePolicyChecks(contracts), [contracts]);
 

@@ -234,6 +234,7 @@ export function OnboardingHints({ module }: OnboardingHintsProps) {
   const [dismissed, setDismissed] = useState<Set<string>>(() => getDismissedIds());
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync setState from external storage on module change is intentional
     setDismissed(getDismissedIds());
   }, [module]);
 
