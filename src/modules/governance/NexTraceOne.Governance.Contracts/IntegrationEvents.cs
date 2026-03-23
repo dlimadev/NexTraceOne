@@ -1,3 +1,5 @@
+using NexTraceOne.BuildingBlocks.Core.Events;
+
 namespace NexTraceOne.Governance.Contracts;
 
 /// <summary>
@@ -17,4 +19,15 @@ public static class IntegrationEvents
         string ReportId,
         int GapCount,
         DateTimeOffset DetectedAt);
+
+    /// <summary>
+    /// Publicado quando verificações de compliance falham para um serviço.
+    /// Consumidores: módulo de notificações (alertar owner e papel de governança).
+    /// </summary>
+    public sealed record ComplianceCheckFailedIntegrationEvent(
+        string ReportId,
+        string ServiceName,
+        int GapCount,
+        Guid? OwnerUserId,
+        Guid? TenantId) : IntegrationEventBase("Governance");
 }
