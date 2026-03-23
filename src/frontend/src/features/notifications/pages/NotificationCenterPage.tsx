@@ -7,6 +7,7 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
+  Settings,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell/PageContainer';
 import { PageHeader } from '../../../components/PageHeader';
@@ -72,15 +73,25 @@ export function NotificationCenterPage() {
         title={t('notifications.title')}
         subtitle={t('notifications.subtitle')}
         actions={
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => markAllAsRead.mutate()}
-            loading={markAllAsRead.isPending}
-          >
-            <CheckCheck className="h-4 w-4 mr-1.5" />
-            {t('notifications.markAllRead')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/notifications/preferences')}
+            >
+              <Settings className="h-4 w-4 mr-1.5" />
+              {t('notifications.preferences.title')}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => markAllAsRead.mutate()}
+              loading={markAllAsRead.isPending}
+            >
+              <CheckCheck className="h-4 w-4 mr-1.5" />
+              {t('notifications.markAllRead')}
+            </Button>
+          </div>
         }
       />
 
