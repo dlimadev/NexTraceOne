@@ -1,6 +1,8 @@
 # ANÁLISE CRÍTICA ARQUITETURAL — NexTraceOne
 ## Principal Solution Architect Review
 
+> **Nota:** Este documento é uma análise arquitetural original. Referências a Grafana/Jaeger/Tempo refletem a stack planeada inicialmente. A stack de observabilidade foi migrada para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 > **Data:** Março 2026
 > **Autor:** Análise crítica profunda — Arquiteto Principal de Solução
 > **Scope:** Avaliação integral do projeto: arquitetura, código, maturidade, gaps, dívidas técnicas e plano de finalização

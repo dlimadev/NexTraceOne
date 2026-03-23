@@ -1,5 +1,7 @@
 # 12 — Recommended Execution Plan
 
+> **Nota:** Este documento é um plano de execução original. Referências a Grafana dashboard provisioning refletem a stack planeada inicialmente. A stack de observabilidade foi migrada para provider configurável (ClickHouse ou Elastic). Ver `docs/audits/NEXTRACEONE-UPDATED-WAVES-PLAN.md` para o plano oficial atualizado.
+
 **Date:** 2026-03-22
 
 ---

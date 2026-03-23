@@ -5,7 +5,9 @@
 > **Auditor**: Principal Staff Engineer / Enterprise Product Auditor  
 > **Methodology**: Deep static code inspection, cross-referencing of 19 existing audit reports, grep-based evidence gathering, architecture review, security audit, test coverage analysis  
 > **Repository**: `dlimadev/NexTraceOne`  
-> **Commit**: HEAD of `copilot/nextracione-master-audit` branch  
+> **Commit**: HEAD of `copilot/nextracione-master-audit` branch
+
+> **⚠️ Nota de Reclassificação (Onda 0 — 2026-03-23):** Este relatório foi revisado pela Onda 0 de realinhamento de baseline. O **GAP-012 (Grafana dashboards ausentes) foi reclassificado** — Grafana não faz mais parte da solução oficial. Ver `NEXTRACEONE-WAVE-0-BASELINE-REALIGNMENT.md`, `NEXTRACEONE-UPDATED-GAP-CLASSIFICATION.md` e `NEXTRACEONE-UPDATED-WAVES-PLAN.md` para o backlog oficial atualizado.  
 
 ---
 

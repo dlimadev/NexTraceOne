@@ -1,5 +1,7 @@
 # NexTraceOne — Arquitetura de Telemetria
 
+> **Nota:** Referências a Tempo/Loki/Grafana neste documento são contextuais e explicam a decisão de migração. A stack de observabilidade oficial é provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação completa.
+
 ## Visão Geral
 
 A arquitetura de telemetria do NexTraceOne segue três princípios fundamentais:

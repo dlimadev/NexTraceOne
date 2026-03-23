@@ -1,5 +1,7 @@
 # 10 — Production Readiness
 
+> **Nota:** Este documento é um assessment original. Referências a Grafana refletem a stack planeada inicialmente. A stack de observabilidade foi migrada para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual e `docs/audits/NEXTRACEONE-WAVE-0-BASELINE-REALIGNMENT.md` para a decisão arquitetural.
+
 **Date:** 2026-03-22
 
 ---

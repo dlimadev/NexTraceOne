@@ -1,5 +1,7 @@
 # Fase 5 — Fundação de Telemetria com Contexto Operacional
 
+> **Nota:** Este documento é um relatório histórico. Referências a Grafana refletem a stack planeada inicialmente. A stack de observabilidade foi migrada de Tempo/Loki/Grafana para provider configurável (ClickHouse ou Elastic). Ver `docs/observability/` para a documentação atual.
+
 ## Objetivo
 
 Garantir que todos os traces, spans e logs gerados pelo NexTraceOne carregem contexto operacional (TenantId, EnvironmentId, CorrelationId) como atributos padrão — permitindo filtragem, correlação e análise por tenant/ambiente em qualquer ferramenta de observabilidade.
