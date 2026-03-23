@@ -6,9 +6,9 @@ import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('../../features/identity-access/api', () => ({
   identityApi: {
-    listDelegations: vi.fn(),
-    createDelegation: vi.fn(),
-    revokeDelegation: vi.fn(),
+    listPendingJitRequests: vi.fn(),
+    requestJitAccess: vi.fn(),
+    decideJitAccess: vi.fn(),
   },
 }));
 
@@ -29,19 +29,20 @@ vi.mock('react-i18next', () => ({
 }));
 
 import { identityApi } from '../../features/identity-access/api';
-import { DelegationPage } from '../../features/identity-access/pages/DelegationPage';
+import { JitAccessPage } from '../../features/identity-access/pages/JitAccessPage';
 
-const mockDelegations = [
+const mockRequests = [
   {
-    id: 'del-1',
-    grantorId: 'user-1',
-    delegateeId: 'user-2',
-    permissions: ['read:services', 'write:contracts'],
-    reason: 'Vacation coverage',
-    validFrom: '2025-06-01T00:00:00Z',
-    validUntil: '2025-06-15T00:00:00Z',
-    status: 'Active' as const,
-    createdAt: '2025-05-30T00:00:00Z',
+    id: 'jit-1',
+    requestedBy: 'alice@example.com',
+    permissionCode: 'admin:write',
+    scope: 'Service:order-svc',
+    justification: 'Need to deploy hotfix',
+    status: 'Pending' as const,
+    requestedAt: '2025-06-01T10:00:00Z',
+    approvalDeadline: '2025-06-02T10:00:00Z',
+    grantedFrom: null,
+    grantedUntil: null,
   },
 ];
 
@@ -49,45 +50,45 @@ function renderPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter><DelegationPage /></MemoryRouter>
+      <MemoryRouter><JitAccessPage /></MemoryRouter>
     </QueryClientProvider>,
   );
 }
 
-describe('DelegationPage', () => {
+describe('JitAccessPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(identityApi.listDelegations).mockResolvedValue(mockDelegations);
+    vi.mocked(identityApi.listPendingJitRequests).mockResolvedValue(mockRequests);
   });
 
   it('renders page heading', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('identity.delegation.title')).toBeInTheDocument();
+      expect(screen.getByText('identity.jitAccess.title')).toBeInTheDocument();
     });
   });
 
   it('renders data after loading', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('user-2')).toBeInTheDocument();
+      expect(screen.getByText('admin:write')).toBeInTheDocument();
     });
   });
 
   it('shows loading state while fetching', () => {
-    vi.mocked(identityApi.listDelegations).mockReturnValue(new Promise(() => {}));
+    vi.mocked(identityApi.listPendingJitRequests).mockReturnValue(new Promise(() => {}));
     renderPage();
-    expect(screen.queryByText('user-2')).not.toBeInTheDocument();
+    expect(screen.queryByText('admin:write')).not.toBeInTheDocument();
   });
 
   it('does not render DemoBanner', async () => {
     renderPage();
-    await waitFor(() => screen.getByText('user-2'));
+    await waitFor(() => screen.getByText('admin:write'));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 
-  it('calls identityApi.listDelegations on mount', async () => {
+  it('calls listPendingJitRequests on mount', async () => {
     renderPage();
-    await waitFor(() => expect(identityApi.listDelegations).toHaveBeenCalled());
+    await waitFor(() => expect(identityApi.listPendingJitRequests).toHaveBeenCalled());
   });
 });
