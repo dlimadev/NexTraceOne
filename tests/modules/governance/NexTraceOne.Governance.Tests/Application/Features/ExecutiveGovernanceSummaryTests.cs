@@ -1,8 +1,12 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ApplyGovernancePack;
 using NexTraceOne.Governance.Application.Features.GetDomainGovernanceSummary;
 using NexTraceOne.Governance.Application.Features.GetPackApplicability;
 using NexTraceOne.Governance.Application.Features.GetPackCoverage;
 using NexTraceOne.Governance.Application.Features.GetTeamGovernanceSummary;
+using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
@@ -88,12 +92,26 @@ public sealed class ExecutiveGovernanceSummaryTests
     // ── ApplyGovernancePack ──
 
     [Fact]
-    public async Task ApplyGovernancePack_ShouldReturnRolloutId()
+    public async Task ApplyGovernancePack_WithValidPack_ShouldReturnRolloutId()
     {
         // Arrange
-        var handler = new ApplyGovernancePack.Handler();
+        var pack = GovernancePack.Create("test-pack", "Test Pack", "desc", GovernanceRuleCategory.Contracts);
+        var version = GovernancePackVersion.Create(
+            pack.Id, "1.0.0", Array.Empty<GovernanceRuleBinding>(),
+            EnforcementMode.Advisory, "Initial version", "admin@test.com");
+
+        var packRepo = Substitute.For<IGovernancePackRepository>();
+        packRepo.GetByIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>()).Returns(pack);
+
+        var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
+        versionRepo.GetLatestByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>()).Returns(version);
+
+        var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+
+        var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(
-            Guid.NewGuid().ToString(), "Domain", "payments", "Blocking", "admin@company.com");
+            pack.Id.Value.ToString(), "Domain", "payments", "Blocking", "admin@company.com");
 
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
@@ -102,6 +120,10 @@ public sealed class ExecutiveGovernanceSummaryTests
         result.IsSuccess.Should().BeTrue();
         result.Value.RolloutId.Should().NotBeNullOrWhiteSpace();
         Guid.TryParse(result.Value.RolloutId, out _).Should().BeTrue();
+        result.Value.PackId.Should().Be(pack.Id.Value.ToString());
+        result.Value.Status.Should().Be("Completed");
+        await rolloutRepo.Received(1).AddAsync(Arg.Any<GovernanceRolloutRecord>(), Arg.Any<CancellationToken>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     // ── GetPackApplicability ──

@@ -6,8 +6,8 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
 /// <summary>
-/// Implementação stub da superfície de consulta contextual de incidentes para a IA.
-/// Filtra incidentes por TenantId e, opcionalmente, por EnvironmentId.
+/// Implementação real da superfície de consulta contextual de incidentes para a IA.
+/// Consulta incidentes persistidos via EF Core com filtragem por TenantId e EnvironmentId.
 /// Toda consulta é tenant-isolated por design.
 /// </summary>
 internal sealed class IncidentContextSurface(IncidentDbContext db) : IIncidentContextSurface

@@ -11,8 +11,10 @@ using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
 
 /// <summary>
-/// Feature: SyncJiraWorkItems — stub de sincronização com Jira (integração não configurada).
-/// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
+/// Feature: SyncJiraWorkItems — sincronização de work items do Jira.
+/// Integração formalmente diferida (PGLI) — retorna erro explícito quando invocada.
+/// Decisão arquitetural: a integração Jira requer configuração de connector externo
+/// e será disponibilizada como extensão via Integration Connectors do módulo Governance.
 /// </summary>
 public static class SyncJiraWorkItems
 {
@@ -28,7 +30,10 @@ public static class SyncJiraWorkItems
         }
     }
 
-    /// <summary>Handler stub de sincronização com Jira — integração não configurada neste ambiente.</summary>
+    /// <summary>
+    /// Handler que retorna erro explícito indicando que a integração Jira
+    /// está formalmente diferida e requer configuração de connector externo.
+    /// </summary>
     public sealed class Handler(IReleaseRepository repository) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -39,10 +44,12 @@ public static class SyncJiraWorkItems
             if (release is null)
                 return ChangeIntelligenceErrors.ReleaseNotFound(request.ReleaseId.ToString());
 
-            return new Response(release.Id.Value, "Jira sync not configured. Configure the Jira integration to enable this feature.");
+            return Error.Validation(
+                "JIRA_INTEGRATION_DEFERRED",
+                "Jira work item sync is formally deferred (PGLI). Configure a Jira connector via Governance Integration Connectors to enable this capability.");
         }
     }
 
     /// <summary>Resposta do comando de sincronização com Jira.</summary>
-    public sealed record Response(Guid ReleaseId, string Message);
+    public sealed record Response(Guid ReleaseId, int SyncedItemCount);
 }
