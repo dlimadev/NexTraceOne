@@ -548,7 +548,7 @@ public static class ConfigurationDefinitionSeeder
             defaultValue: "60",
             validationRules: """{"min":5,"max":1440}""",
             uiEditorType: "text",
-            sortOrder: 199),
+            sortOrder: 200),
 
         ConfigurationDefinition.Create(
             key: "notifications.grouping.window_minutes",
@@ -560,7 +560,7 @@ public static class ConfigurationDefinitionSeeder
             defaultValue: "60",
             validationRules: """{"min":5,"max":1440}""",
             uiEditorType: "text",
-            sortOrder: 199),
+            sortOrder: 201),
 
         // ── END PHASE 2 ───────────────────────────────────────────────────
 

@@ -66,8 +66,8 @@ public sealed class NotificationConfigurationDefinitionsTests
         ConfigurationDefinition.Create("notifications.incident_linkage.enabled", "Incident Linkage Enabled", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "false", uiEditorType: "toggle", sortOrder: 197),
         ConfigurationDefinition.Create("notifications.incident_linkage.auto_create_enabled", "Auto-Create Incident", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "false", uiEditorType: "toggle", sortOrder: 198),
         ConfigurationDefinition.Create("notifications.incident_linkage.eligible_types", "Incident Linkage Eligible Types", ConfigurationCategory.Functional, ConfigurationValueType.Json, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: """["IncidentCreated"]""", uiEditorType: "json-editor", sortOrder: 199),
-        ConfigurationDefinition.Create("notifications.incident_linkage.correlation_window_minutes", "Incident Correlation Window", ConfigurationCategory.Functional, ConfigurationValueType.Integer, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "60", validationRules: """{"min":5,"max":1440}""", uiEditorType: "text", sortOrder: 199),
-        ConfigurationDefinition.Create("notifications.grouping.window_minutes", "Grouping Window (Minutes)", ConfigurationCategory.Functional, ConfigurationValueType.Integer, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "60", validationRules: """{"min":5,"max":1440}""", uiEditorType: "text", sortOrder: 199),
+        ConfigurationDefinition.Create("notifications.incident_linkage.correlation_window_minutes", "Incident Correlation Window", ConfigurationCategory.Functional, ConfigurationValueType.Integer, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "60", validationRules: """{"min":5,"max":1440}""", uiEditorType: "text", sortOrder: 200),
+        ConfigurationDefinition.Create("notifications.grouping.window_minutes", "Grouping Window (Minutes)", ConfigurationCategory.Functional, ConfigurationValueType.Integer, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "60", validationRules: """{"min":5,"max":1440}""", uiEditorType: "text", sortOrder: 201),
     ];
 
     // ── All notification definitions have unique keys ───────────────────
@@ -79,6 +79,17 @@ public sealed class NotificationConfigurationDefinitionsTests
         var keys = definitions.Select(d => d.Key).ToList();
 
         keys.Should().OnlyHaveUniqueItems("each notification configuration key must be unique");
+    }
+
+    // ── All notification definitions have unique sort orders ────────────
+
+    [Fact]
+    public void Phase2Definitions_ShouldHaveUniqueSortOrders()
+    {
+        var definitions = BuildPhase2Definitions();
+        var sortOrders = definitions.Select(d => d.SortOrder).ToList();
+
+        sortOrders.Should().OnlyHaveUniqueItems("each notification definition must have a unique sort order");
     }
 
     // ── All notification definitions have at least one scope ────────────
