@@ -11,27 +11,47 @@ public static class NotificationType
     // ── Operações / Incidentes ──
     public const string IncidentCreated = "IncidentCreated";
     public const string IncidentEscalated = "IncidentEscalated";
+    public const string IncidentResolved = "IncidentResolved";
+    public const string AnomalyDetected = "AnomalyDetected";
+    public const string HealthDegradation = "HealthDegradation";
 
     // ── Workflow / Aprovação ──
     public const string ApprovalPending = "ApprovalPending";
     public const string ApprovalApproved = "ApprovalApproved";
     public const string ApprovalRejected = "ApprovalRejected";
+    public const string ApprovalExpiring = "ApprovalExpiring";
+
+    // ── Catálogo / Contratos ──
+    public const string ContractPublished = "ContractPublished";
+    public const string BreakingChangeDetected = "BreakingChangeDetected";
+    public const string ContractValidationFailed = "ContractValidationFailed";
 
     // ── Segurança / Acesso ──
     public const string BreakGlassActivated = "BreakGlassActivated";
     public const string JitAccessPending = "JitAccessPending";
+    public const string JitAccessGranted = "JitAccessGranted";
+    public const string UserRoleChanged = "UserRoleChanged";
+    public const string AccessReviewPending = "AccessReviewPending";
 
     // ── Compliance / Governance ──
     public const string ComplianceCheckFailed = "ComplianceCheckFailed";
+    public const string PolicyViolated = "PolicyViolated";
+    public const string EvidenceExpiring = "EvidenceExpiring";
 
     // ── FinOps / Budget ──
     public const string BudgetExceeded = "BudgetExceeded";
+    public const string BudgetThresholdReached = "BudgetThresholdReached";
 
     // ── Integrações / Operações ──
     public const string IntegrationFailed = "IntegrationFailed";
+    public const string SyncFailed = "SyncFailed";
+    public const string ConnectorAuthFailed = "ConnectorAuthFailed";
 
     // ── AI / Plataforma ──
     public const string AiProviderUnavailable = "AiProviderUnavailable";
+    public const string TokenBudgetExceeded = "TokenBudgetExceeded";
+    public const string AiGenerationFailed = "AiGenerationFailed";
+    public const string AiActionBlockedByPolicy = "AiActionBlockedByPolicy";
 
     /// <summary>
     /// Todos os tipos de notificação registados no catálogo.
@@ -41,15 +61,33 @@ public static class NotificationType
     [
         IncidentCreated,
         IncidentEscalated,
+        IncidentResolved,
+        AnomalyDetected,
+        HealthDegradation,
         ApprovalPending,
         ApprovalApproved,
         ApprovalRejected,
+        ApprovalExpiring,
+        ContractPublished,
+        BreakingChangeDetected,
+        ContractValidationFailed,
         BreakGlassActivated,
         JitAccessPending,
+        JitAccessGranted,
+        UserRoleChanged,
+        AccessReviewPending,
         ComplianceCheckFailed,
+        PolicyViolated,
+        EvidenceExpiring,
         BudgetExceeded,
+        BudgetThresholdReached,
         IntegrationFailed,
-        AiProviderUnavailable
+        SyncFailed,
+        ConnectorAuthFailed,
+        AiProviderUnavailable,
+        TokenBudgetExceeded,
+        AiGenerationFailed,
+        AiActionBlockedByPolicy
     ];
 
     /// <summary>

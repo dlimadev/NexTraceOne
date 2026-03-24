@@ -19,6 +19,10 @@
     <ProjectReference Include="..\..\governance\NexTraceOne.Governance.Contracts\NexTraceOne.Governance.Contracts.csproj" />
     <ProjectReference Include="..\..\identityaccess\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup Label="Cross-module Contracts for Event Handlers (Phase 5)">
+    <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\aiknowledge\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

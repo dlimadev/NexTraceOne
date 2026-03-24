@@ -48,3 +48,62 @@ public sealed record IntegrationFailedIntegrationEvent(
     string ErrorMessage,
     Guid? OwnerUserId,
     Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
+
+// ── Phase 5: High-Value Domain Events ──
+
+/// <summary>
+/// Publicado quando um incidente é resolvido.
+/// Consumidores: módulo de notificações (informar owner e equipa operacional).
+/// </summary>
+public sealed record IncidentResolvedIntegrationEvent(
+    Guid IncidentId,
+    string ServiceName,
+    string ResolvedBy,
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
+
+/// <summary>
+/// Publicado quando uma anomalia operacional é detetada (runtime, performance, drift).
+/// Consumidores: módulo de notificações (alertar owner do serviço).
+/// </summary>
+public sealed record AnomalyDetectedIntegrationEvent(
+    Guid AnomalyId,
+    string ServiceName,
+    string AnomalyType,
+    string Description,
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
+
+/// <summary>
+/// Publicado quando degradação de health significativa é detetada num serviço.
+/// Consumidores: módulo de notificações (alertar owner e equipa operacional).
+/// </summary>
+public sealed record HealthDegradationIntegrationEvent(
+    Guid ServiceId,
+    string ServiceName,
+    string PreviousStatus,
+    string CurrentStatus,
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
+
+/// <summary>
+/// Publicado quando autenticação de conector falha.
+/// Consumidores: módulo de notificações (alertar owner da integração).
+/// </summary>
+public sealed record ConnectorAuthFailedIntegrationEvent(
+    Guid ConnectorId,
+    string ConnectorName,
+    string ErrorMessage,
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");
+
+/// <summary>
+/// Publicado quando sincronização de integração falha.
+/// Consumidores: módulo de notificações (alertar owner da integração).
+/// </summary>
+public sealed record SyncFailedIntegrationEvent(
+    Guid IntegrationId,
+    string IntegrationName,
+    string ErrorMessage,
+    Guid? OwnerUserId,
+    Guid? TenantId) : IntegrationEventBase("OperationalIntelligence");

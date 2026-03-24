@@ -14,6 +14,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Contracts\NexTraceOne.Governance.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\aiknowledge\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
