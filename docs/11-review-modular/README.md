@@ -25,25 +25,38 @@ A revisão cobre **todas as camadas do produto**:
 
 ## Organização da Pasta
 
-A pasta está organizada por **domínio funcional**, cada um com o seu próprio diretório:
+A pasta está organizada por **domínio funcional**, cada um com o seu próprio diretório.
+
+> **Ficheiro mestre:** Para a visão consolidada completa de todos os módulos, decisões de saneamento e estado de cada consolidado, consultar [`modular-review-master.md`](./modular-review-master.md).
 
 ```
 docs/11-review-modular/
-├── 00-governance/               # Relatórios transversais, metodologia e acompanhamento
-├── 01-contracts/                # Revisão do módulo de contratos
-├── 02-identity-access/          # Revisão de identidade e acesso
-├── 03-catalog/                  # Revisão do catálogo de serviços
-├── 04-change-governance/        # Revisão de change intelligence / change confidence
-├── 05-operational-intelligence/ # Revisão de operações, incidentes, AIOps
-├── 06-governance/               # Revisão de governança, reports, compliance
-├── 07-configuration/            # Revisão de configuração, ambientes, integrações
-├── 08-ai-knowledge/             # Revisão de IA, knowledge hub, model registry
-├── 09-audit-compliance/         # Revisão de auditoria e compliance
-├── 10-notifications/            # Revisão de notificações e alertas
-├── 11-integrations/             # Revisão de integrações externas
-├── 12-product-analytics/        # Revisão de analytics e métricas de produto
-└── README.md                    # Este ficheiro
+├── 00-governance/                  # Relatórios transversais, metodologia e acompanhamento
+├── 01-identity-access/             # Identity & Access Management
+├── 02-environment-management/      # Gestão de Ambientes
+├── 03-catalog/                     # Service Catalog
+├── 04-contracts/                   # Contract Governance
+├── 05-change-governance/           # Change Governance & Change Intelligence
+├── 06-operational-intelligence/    # Operational Intelligence
+├── 07-ai-knowledge/                # AI, Knowledge & Agents
+├── 08-governance/                  # Governance, Reports & Compliance
+├── 09-configuration/               # Configuration & Environments
+├── 10-audit-compliance/            # Audit & Compliance
+├── 11-notifications/               # Notifications & Alerts
+├── 12-integrations/                # External Integrations
+├── 13-product-analytics/           # Product Analytics & Metrics
+├── modular-review-master.md        # Ficheiro mestre da revisão modular
+└── README.md                       # Este ficheiro
 ```
+
+### Ficheiros padrão por módulo
+
+Cada módulo oficial contém:
+
+- `module-review.md` — Revisão detalhada do módulo (funcionalidades, gaps, ações)
+- `module-consolidated-review.md` — Relatório consolidado com visão geral, estado e recomendações
+
+Alguns módulos (01-identity-access, 02-environment-management, 07-ai-knowledge) possuem também estrutura multi-layer com subdirectórios para review por camada (backend/, database/, frontend/, ai/, documentation/, quality/).
 
 ---
 
@@ -73,16 +86,16 @@ Cada módulo segue a **mesma estrutura de revisão**, documentada no ficheiro `m
 
 A revisão deve seguir a **ordem de prioridade do produto**, não a ordem numérica das pastas:
 
-| Fase | Módulos                                         | Justificação                                         |
-|------|--------------------------------------------------|------------------------------------------------------|
-| 1    | 03-catalog, 01-contracts                         | Núcleo central: serviços e contratos como pilares    |
-| 2    | 02-identity-access                               | Fundação: sem identidade, nada funciona              |
-| 3    | 04-change-governance                             | Diferenciador: change confidence é core do produto   |
-| 4    | 05-operational-intelligence                      | Operações: incidentes, runbooks, AIOps               |
-| 5    | 08-ai-knowledge                                  | IA governada e knowledge hub                         |
-| 6    | 06-governance, 09-audit-compliance               | Governança, reports, compliance                      |
-| 7    | 07-configuration, 11-integrations                | Configuração e integrações                           |
-| 8    | 10-notifications, 12-product-analytics           | Notificações e analytics                             |
+| Fase | Módulos                                               | Justificação                                         |
+|------|-------------------------------------------------------|------------------------------------------------------|
+| 1    | 03-catalog, 04-contracts                              | Núcleo central: serviços e contratos como pilares    |
+| 2    | 01-identity-access                                    | Fundação: sem identidade, nada funciona              |
+| 3    | 05-change-governance                                  | Diferenciador: change confidence é core do produto   |
+| 4    | 06-operational-intelligence                           | Operações: incidentes, runbooks, AIOps               |
+| 5    | 07-ai-knowledge                                       | IA governada e knowledge hub                         |
+| 6    | 08-governance, 10-audit-compliance                    | Governança, reports, compliance                      |
+| 7    | 09-configuration, 12-integrations                     | Configuração e integrações                           |
+| 8    | 02-environment-management, 11-notifications, 13-product-analytics | Ambientes, notificações e analytics       |
 
 ---
 
@@ -160,6 +173,7 @@ A revisão modular é essencial para:
 
 ## Ficheiros de Referência
 
+- [**Ficheiro Mestre da Revisão Modular**](./modular-review-master.md)
 - [Metodologia de Revisão](./00-governance/review-methodology.md)
 - [Status Geral da Revisão](./00-governance/review-status-overview.md)
 - [Checklist Global](./00-governance/review-checklist-global.md)
