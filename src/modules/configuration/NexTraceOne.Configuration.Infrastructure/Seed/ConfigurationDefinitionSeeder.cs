@@ -2219,5 +2219,565 @@ public static class ConfigurationDefinitionSeeder
             defaultValue: """{"Production":{"minScore":70,"requiredProfile":"Enhanced","allBlockingPoliciesMet":true},"PreProduction":{"minScore":50,"allBlockingPoliciesMet":true}}""",
             uiEditorType: "json-editor",
             sortOrder: 3540),
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PHASE 5 — CATALOG, CONTRACTS, APIS & CHANGE GOVERNANCE
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ── Block A — Contract Types, Versioning & Breaking Change ──────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.types_enabled",
+            displayName: "Enabled Contract Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Contract types supported and enabled (REST, SOAP, GraphQL, gRPC, AsyncAPI, Event, SharedSchema)",
+            defaultValue: """["REST","SOAP","GraphQL","gRPC","AsyncAPI","Event","SharedSchema"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 4000),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.api_types_enabled",
+            displayName: "Enabled API Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "API classification types enabled (Public, Internal, Partner, ThirdParty)",
+            defaultValue: """["Public","Internal","Partner","ThirdParty"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 4010),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.versioning_policy",
+            displayName: "Contract Versioning Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Versioning strategy per contract type (SemVer, CalVer, Sequential, Header-based)",
+            defaultValue: """{"REST":"SemVer","SOAP":"Sequential","GraphQL":"SemVer","gRPC":"SemVer","AsyncAPI":"SemVer","Event":"SemVer","SharedSchema":"SemVer"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4020),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.breaking_change_policy",
+            displayName: "Breaking Change Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Behavior on breaking change detection per type (Block, Warn, RequireApproval, Allow)",
+            defaultValue: """{"REST":"RequireApproval","SOAP":"Block","GraphQL":"RequireApproval","gRPC":"RequireApproval","AsyncAPI":"Warn","Event":"Warn","SharedSchema":"Block"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4030),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.breaking_change_severity",
+            displayName: "Breaking Change Default Severity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default severity for detected breaking changes (Critical, High, Medium, Low)",
+            defaultValue: "High",
+            validationRules: """{"enum":["Critical","High","Medium","Low"]}""",
+            uiEditorType: "select",
+            sortOrder: 4040),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.version_increment_rules",
+            displayName: "Version Increment Rules",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Rules for automatic version increment (breaking=major, feature=minor, fix=patch)",
+            defaultValue: """{"breakingChange":"major","newFeature":"minor","bugfix":"patch","documentation":"patch"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4050),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.breaking_promotion_restriction",
+            displayName: "Breaking Change Promotion Restriction",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Block promotion to production when unresolved breaking changes exist",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4060),
+
+        // ── Block B — Validation, Linting, Rulesets & Templates ────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.validation.lint_severity_defaults",
+            displayName: "Lint Severity Defaults",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default lint severity levels (error, warn, info, off) for validation rules",
+            defaultValue: """{"missingDescription":"warn","missingExample":"info","unusedSchema":"warn","invalidReference":"error","securitySchemeUndefined":"error"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4100),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.validation.rulesets_by_contract_type",
+            displayName: "Rulesets by Contract Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Validation ruleset bindings per contract type",
+            defaultValue: """{"REST":["openapi-standard","security-best-practices"],"SOAP":["wsdl-compliance"],"GraphQL":["graphql-best-practices"],"gRPC":["protobuf-lint"],"AsyncAPI":["asyncapi-standard"],"Event":["event-schema-validation"],"SharedSchema":["schema-consistency"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4110),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.validation.blocking_vs_warning",
+            displayName: "Validation Blocking vs Warning Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Which validation rules block publication vs only warn",
+            defaultValue: """{"blocking":["invalidReference","securitySchemeUndefined"],"warning":["missingDescription","missingExample","unusedSchema"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4120),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.validation.min_validations_by_type",
+            displayName: "Minimum Validations by Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum validation requirements per contract type before publication",
+            defaultValue: """{"REST":{"schemaValid":true,"securityDefined":true,"pathsDocumented":true},"SOAP":{"wsdlValid":true},"GraphQL":{"schemaValid":true},"gRPC":{"protoValid":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4130),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.templates.by_contract_type",
+            displayName: "Contract Templates by Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default templates to use when creating new contracts per type",
+            defaultValue: """{"REST":"openapi-3.1-standard","SOAP":"wsdl-2.0-standard","GraphQL":"graphql-standard","gRPC":"protobuf-standard","AsyncAPI":"asyncapi-2.6-standard","Event":"cloudevents-standard","SharedSchema":"json-schema-standard"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4140),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.templates.metadata_defaults",
+            displayName: "Contract Metadata Defaults",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default metadata fields pre-filled in new contract drafts",
+            defaultValue: """{"license":"Proprietary","termsOfService":"","contact":"","externalDocs":""}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4150),
+
+        // ── Block C — Minimum Requirements & Publication ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.owner_required",
+            displayName: "Owner Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether a service/contract must have an assigned owner before publication",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4200),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.changelog_required",
+            displayName: "Changelog Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether a changelog entry is required for publication",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4210),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.glossary_required",
+            displayName: "Glossary Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether a glossary/term definitions section is required",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 4220),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.use_cases_required",
+            displayName: "Use Cases Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether documented use cases are required before publication",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 4230),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.min_documentation",
+            displayName: "Minimum Documentation Requirements",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum documentation requirements for publication (description, examples, etc.)",
+            defaultValue: """{"descriptionMinLength":20,"operationDescriptions":true,"responseExamples":false,"errorDocumentation":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4240),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.min_catalog_fields",
+            displayName: "Minimum Catalog Fields",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum required fields for a service catalog entry",
+            defaultValue: """{"name":true,"description":true,"owner":true,"team":true,"domain":false,"tier":false,"lifecycle":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4250),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.min_contract_fields",
+            displayName: "Minimum Contract Fields",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum required fields for a contract to be considered complete",
+            defaultValue: """{"title":true,"version":true,"description":true,"servers":true,"securityScheme":true,"contact":false}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4260),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.by_contract_type",
+            displayName: "Requirements by Contract Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional minimum requirements per contract type",
+            defaultValue: """{"REST":{"securityScheme":true,"pathDescriptions":true},"SOAP":{"wsdlValid":true},"GraphQL":{"schemaValid":true},"gRPC":{"protoValid":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4270),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.by_environment",
+            displayName: "Requirements by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional requirements for specific environments (e.g. Production stricter)",
+            defaultValue: """{"Production":{"ownerRequired":true,"changelogRequired":true,"minDocumentation":true,"allBlockingValidationsPass":true},"Development":{"ownerRequired":false,"changelogRequired":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4280),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.requirements.by_criticality",
+            displayName: "Requirements by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional requirements based on service/API criticality",
+            defaultValue: """{"critical":{"ownerRequired":true,"changelogRequired":true,"glossaryRequired":true,"useCasesRequired":true},"standard":{"ownerRequired":true,"changelogRequired":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4290),
+
+        // ── Block D — Publication & Promotion Policy ───────────────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.publication.pre_publish_review",
+            displayName: "Pre-Publication Review Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether contracts require review/approval before publication",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4300),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.publication.visibility_defaults",
+            displayName: "Publication Visibility Defaults",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default visibility settings for newly published contracts",
+            defaultValue: """{"Internal":"team","Public":"organization","Partner":"restricted"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4310),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.publication.portal_defaults",
+            displayName: "Developer Portal Publishing Defaults",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default settings for developer portal publication",
+            defaultValue: """{"autoPublishToPortal":true,"includeExamples":true,"includeChangelog":true,"includeTryItOut":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4320),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.publication.promotion_readiness",
+            displayName: "Contract Promotion Readiness Criteria",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Criteria a contract must meet to be promoted to next environment",
+            defaultValue: """{"allBlockingValidationsPass":true,"ownerAssigned":true,"changelogUpdated":true,"noUnresolvedBreakingChanges":true,"minGovernanceScore":60}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4330),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.publication.gating_by_environment",
+            displayName: "Publication Gating by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Publication gating rules per environment",
+            defaultValue: """{"Production":{"requireApproval":true,"requireAllGatesPass":true},"PreProduction":{"requireApproval":false,"requireAllGatesPass":true},"Development":{"requireApproval":false,"requireAllGatesPass":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4340),
+
+        // ── Block E — Import/Export Policy ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.import.types_allowed",
+            displayName: "Allowed Import Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Contract types that can be imported (file upload, URL, Git sync)",
+            defaultValue: """{"fileUpload":["OpenAPI","WSDL","GraphQL","Protobuf","AsyncAPI","JSONSchema"],"urlImport":["OpenAPI","AsyncAPI"],"gitSync":["OpenAPI","AsyncAPI","Protobuf"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4400),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.export.types_allowed",
+            displayName: "Allowed Export Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Export formats allowed for contracts",
+            defaultValue: """["OpenAPI-JSON","OpenAPI-YAML","WSDL","GraphQL-SDL","Protobuf","AsyncAPI-YAML","Markdown","HTML"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 4410),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.import.overwrite_policy",
+            displayName: "Import Overwrite Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Behavior when importing a contract that already exists (Merge, Overwrite, Block, AskUser)",
+            defaultValue: "AskUser",
+            validationRules: """{"enum":["Merge","Overwrite","Block","AskUser"]}""",
+            uiEditorType: "select",
+            sortOrder: 4420),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.import.validation_on_import",
+            displayName: "Validate on Import",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether imported contracts are automatically validated against rulesets",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4430),
+
+        // ── Block F — Change Types, Criticality & Blast Radius ─────────
+
+        ConfigurationDefinition.Create(
+            key: "change.types_enabled",
+            displayName: "Enabled Change Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Types of changes supported (Feature, Bugfix, Hotfix, Refactor, Config, Infrastructure, Rollback)",
+            defaultValue: """["Feature","Bugfix","Hotfix","Refactor","Config","Infrastructure","Rollback"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 4500),
+
+        ConfigurationDefinition.Create(
+            key: "change.criticality_defaults",
+            displayName: "Change Criticality Defaults",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default criticality level per change type (Critical, High, Medium, Low)",
+            defaultValue: """{"Feature":"Medium","Bugfix":"Medium","Hotfix":"Critical","Refactor":"Low","Config":"Low","Infrastructure":"High","Rollback":"Critical"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4510),
+
+        ConfigurationDefinition.Create(
+            key: "change.risk_classification",
+            displayName: "Change Risk Classification",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Risk classification rules by change type",
+            defaultValue: """{"Hotfix":{"baseRisk":"High","requiresApproval":true},"Infrastructure":{"baseRisk":"High","requiresApproval":true},"Feature":{"baseRisk":"Medium","requiresApproval":false},"Rollback":{"baseRisk":"High","requiresApproval":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4520),
+
+        ConfigurationDefinition.Create(
+            key: "change.blast_radius.thresholds",
+            displayName: "Blast Radius Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Blast radius score thresholds for classification (Critical, High, Medium, Low)",
+            defaultValue: """{"Critical":90,"High":70,"Medium":40,"Low":0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4530),
+
+        ConfigurationDefinition.Create(
+            key: "change.blast_radius.categories",
+            displayName: "Blast Radius Categories",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Blast radius category definitions with labels and colors",
+            defaultValue: """{"Critical":{"label":"Critical","color":"#DC2626","action":"RequireApproval"},"High":{"label":"High","color":"#F59E0B","action":"RequireReview"},"Medium":{"label":"Medium","color":"#3B82F6","action":"Notify"},"Low":{"label":"Low","color":"#10B981","action":"AutoApprove"}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4540),
+
+        ConfigurationDefinition.Create(
+            key: "change.blast_radius.environment_weights",
+            displayName: "Blast Radius Environment Weights",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Impact weight multiplier per environment for blast radius calculation",
+            defaultValue: """{"Production":1.0,"PreProduction":0.6,"Staging":0.4,"Development":0.2}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4550),
+
+        ConfigurationDefinition.Create(
+            key: "change.severity_criteria",
+            displayName: "Change Severity Criteria",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Criteria for determining change severity based on affected services, dependencies, etc.",
+            defaultValue: """{"affectedServicesHigh":5,"affectedDependenciesHigh":10,"crossDomainChange":true,"dataSchemaChange":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4560),
+
+        // ── Block G — Release Scoring, Evidence Pack & Rollback ────────
+
+        ConfigurationDefinition.Create(
+            key: "change.release_score.weights",
+            displayName: "Release Confidence Score Weights",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Weights for each factor in the release confidence/change score calculation (must sum to 100)",
+            defaultValue: """{"testCoverage":20,"codeReview":15,"blastRadius":20,"historicalSuccess":15,"documentationComplete":10,"governanceCompliance":10,"evidencePack":10}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4600),
+
+        ConfigurationDefinition.Create(
+            key: "change.release_score.thresholds",
+            displayName: "Release Score Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Release confidence score thresholds (HighConfidence, Moderate, LowConfidence, Block)",
+            defaultValue: """{"HighConfidence":80,"Moderate":60,"LowConfidence":40,"Block":0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4610),
+
+        ConfigurationDefinition.Create(
+            key: "change.evidence_pack.required",
+            displayName: "Evidence Pack Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether an evidence pack is required for releases",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4620),
+
+        ConfigurationDefinition.Create(
+            key: "change.evidence_pack.requirements",
+            displayName: "Evidence Pack Requirements",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Minimum evidence pack requirements by environment and change type",
+            defaultValue: """{"Production":{"testReport":true,"securityScan":true,"approvalRecord":true,"rollbackPlan":true},"PreProduction":{"testReport":true,"securityScan":false,"approvalRecord":false},"Development":{"testReport":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4630),
+
+        ConfigurationDefinition.Create(
+            key: "change.evidence_pack.by_criticality",
+            displayName: "Evidence Pack Requirements by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional evidence pack requirements based on change criticality",
+            defaultValue: """{"Critical":{"securityScan":true,"approvalRecord":true,"rollbackPlan":true,"impactAnalysis":true},"High":{"securityScan":true,"approvalRecord":true,"rollbackPlan":true},"Medium":{"testReport":true},"Low":{}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4640),
+
+        ConfigurationDefinition.Create(
+            key: "change.rollback.recommendation_policy",
+            displayName: "Rollback Recommendation Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Policy for when rollback is recommended based on score, incidents and risk",
+            defaultValue: """{"autoRecommendOnScoreBelow":40,"autoRecommendOnIncidentCorrelation":true,"requireRollbackPlanForProduction":true,"requireRollbackPlanForCriticalChanges":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4650),
+
+        ConfigurationDefinition.Create(
+            key: "change.release_calendar.window_policy",
+            displayName: "Release Calendar Window Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Release window constraints by change type (links to Phase 3 release windows)",
+            defaultValue: """{"Hotfix":{"allowOutsideWindow":true,"requireApproval":true},"Feature":{"allowOutsideWindow":false,"requireApproval":false},"Infrastructure":{"allowOutsideWindow":false,"requireApproval":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4660),
+
+        ConfigurationDefinition.Create(
+            key: "change.release_calendar.by_environment",
+            displayName: "Release Calendar by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Release calendar restrictions per environment",
+            defaultValue: """{"Production":{"allowedDays":["Monday","Tuesday","Wednesday","Thursday"],"blockedHours":{"start":"18:00","end":"08:00"},"requireWindow":true},"PreProduction":{"requireWindow":false},"Development":{"requireWindow":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 4670),
+
+        ConfigurationDefinition.Create(
+            key: "change.incident_correlation.enabled",
+            displayName: "Release-to-Incident Correlation Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether release-to-incident correlation analysis is active",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4680),
+
+        ConfigurationDefinition.Create(
+            key: "change.incident_correlation.window_hours",
+            displayName: "Incident Correlation Window (Hours)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Time window in hours after a release to correlate with incidents",
+            defaultValue: "24",
+            validationRules: """{"min":1,"max":168}""",
+            uiEditorType: "text",
+            sortOrder: 4690),
     ];
 }

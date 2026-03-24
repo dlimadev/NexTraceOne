@@ -4573,5 +4573,60 @@
       "message": "Could not load governance and compliance configuration.",
       "retry": "Retry"
     }
+  },
+  "catalogContractsConfig": {
+    "title": "Catalog, Contracts & Change Governance Configuration",
+    "subtitle": "Configure contract types, versioning, validation, publication policies, change types, blast radius and release scoring",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} catalog, contracts & change governance definitions configured",
+    "sections": {
+      "contracts": "Contract Types & Versioning",
+      "validation": "Validation & Rulesets",
+      "requirements": "Minimum Requirements",
+      "publication": "Publication & Promotion",
+      "importExport": "Import / Export",
+      "changeTypes": "Change Types & Blast Radius",
+      "releaseScoring": "Release Scoring & Rollback"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "audit": {
+      "title": "Audit History",
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "by": "By",
+      "reason": "Reason"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No catalog or change governance configuration definitions match the current filters."
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load catalog, contracts and change governance configuration.",
+      "retry": "Retry"
+    }
   }
 }

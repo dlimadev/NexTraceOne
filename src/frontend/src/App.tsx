@@ -118,6 +118,7 @@ const ConfigurationAdminPage = lazy(() => import('./features/configuration/pages
 const NotificationConfigurationPage = lazy(() => import('./features/notifications/pages/NotificationConfigurationPage').then(m => ({ default: m.NotificationConfigurationPage })));
 const WorkflowConfigurationPage = lazy(() => import('./features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
 const GovernanceConfigurationPage = lazy(() => import('./features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
+const CatalogContractsConfigurationPage = lazy(() => import('./features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
 
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -849,6 +850,15 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
                     <GovernanceConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Catalog, Contracts & Change Governance Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/catalog-contracts"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <CatalogContractsConfigurationPage />
                   </ProtectedRoute>
                 }
               />

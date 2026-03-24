@@ -3571,5 +3571,60 @@
       "message": "No se pudo cargar la configuración de gobernanza y compliance.",
       "retry": "Reintentar"
     }
+  },
+  "catalogContractsConfig": {
+    "title": "Configuración de Catálogo, Contratos & Change Governance",
+    "subtitle": "Configure tipos de contrato, versionado, validación, políticas de publicación, tipos de cambio, blast radius y scoring de release",
+    "scope": "Ámbito",
+    "scopeReference": "ID de Referencia del Ámbito",
+    "scopeReferencePlaceholder": "Introduzca el ID del tenant/entorno...",
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por clave o nombre...",
+    "effectiveValue": "Valor Efectivo",
+    "resolvedFrom": "Resuelto desde",
+    "footer": "{{count}} definiciones de catálogo, contratos y change governance configuradas",
+    "sections": {
+      "contracts": "Tipos de Contrato & Versionado",
+      "validation": "Validación & Rulesets",
+      "requirements": "Requisitos Mínimos",
+      "publication": "Publicación & Promoción",
+      "importExport": "Importación / Exportación",
+      "changeTypes": "Tipos de Cambio & Blast Radius",
+      "releaseScoring": "Scoring de Release & Rollback"
+    },
+    "badges": {
+      "sensitive": "Sensible",
+      "nonInheritable": "No heredable",
+      "default": "Predeterminado",
+      "inherited": "Heredado",
+      "override": "Anulación"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo del Cambio",
+      "reasonPlaceholder": "Motivo opcional para este cambio...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Historial de Auditoría"
+    },
+    "audit": {
+      "title": "Historial de Auditoría",
+      "loading": "Cargando historial de auditoría...",
+      "empty": "Sin historial de auditoría disponible.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "empty": {
+      "title": "Sin definiciones encontradas",
+      "description": "Ninguna definición de catálogo o change governance coincide con los filtros actuales."
+    },
+    "error": {
+      "title": "Error al cargar configuración",
+      "message": "No se pudo cargar la configuración de catálogo, contratos y change governance.",
+      "retry": "Reintentar"
+    }
   }
 }
