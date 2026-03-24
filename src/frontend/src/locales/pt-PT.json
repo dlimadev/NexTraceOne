@@ -3930,5 +3930,100 @@
       "inheritable": "Herdável",
       "defaultValue": "Valor Predefinido"
     }
+  },
+  "advancedConfig": {
+    "title": "Consola Avançada de Configuração",
+    "subtitle": "Administração enterprise: explore, compare, exporte, reverta e governe configurações",
+    "loading": "A carregar consola avançada de configuração...",
+    "errorTitle": "Falha ao carregar configuração",
+    "errorMessage": "Não foi possível carregar as definições de configuração para a consola avançada.",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "tabs": {
+      "explorer": "Explorador Efetivo",
+      "diff": "Diff e Comparação",
+      "importExport": "Importar / Exportar",
+      "rollback": "Rollback e Restauração",
+      "history": "Histórico e Timeline",
+      "health": "Saúde e Troubleshooting"
+    },
+    "domains": {
+      "all": "Todos os Domínios",
+      "instance": "Instância / Tenant / Ambiente",
+      "notifications": "Notificações",
+      "workflows": "Workflows e Promoção",
+      "governance": "Governança e Compliance",
+      "catalog": "Catálogo e Contratos",
+      "operations": "Operações e FinOps",
+      "ai": "Governança de IA",
+      "integrations": "Integrações"
+    },
+    "explorer": {
+      "showing": "A mostrar",
+      "definitions": "definições",
+      "type": "Tipo",
+      "scopes": "Âmbitos",
+      "editor": "Editor",
+      "inheritable": "Herdável",
+      "defaultValue": "Valor Predefinido",
+      "effectiveValue": "Valor Efetivo",
+      "viewHistory": "Ver Histórico",
+      "noResults": "Nenhuma definição encontrada."
+    },
+    "diff": {
+      "leftScope": "Âmbito Esquerdo",
+      "rightScope": "Âmbito Direito",
+      "differences": "diferenças encontradas",
+      "noDifferences": "Sem diferenças entre os âmbitos selecionados."
+    },
+    "export": {
+      "title": "Exportar Configuração",
+      "description": "Exporte definições e valores efetivos como JSON validado. Valores sensíveis são mascarados automaticamente.",
+      "scope": "Âmbito",
+      "domain": "Domínio",
+      "sensitiveWarning": "Valores sensíveis serão mascarados na exportação por segurança.",
+      "button": "Exportar JSON"
+    },
+    "import": {
+      "title": "Importar Configuração",
+      "description": "Importe um ficheiro de configuração exportado anteriormente. Todos os valores serão validados antes da aplicação.",
+      "dropzone": "Arraste um ficheiro JSON aqui ou clique para selecionar",
+      "format": "Aceita formato de exportação NexTraceOne",
+      "previewNote": "A importação mostrará uma pré-visualização e relatório de validação antes de aplicar as alterações."
+    },
+    "rollback": {
+      "title": "Rollback de Configuração",
+      "description": "Selecione uma chave de configuração para ver o seu histórico de versões e restaurar um valor anterior.",
+      "searchKey": "Pesquisar chave para rollback...",
+      "historyFor": "Histórico de Versões para",
+      "restore": "Restaurar",
+      "selectKey": "Pesquise e selecione uma chave de configuração para ver o seu histórico de versões."
+    },
+    "history": {
+      "title": "Timeline de Alterações de Configuração",
+      "description": "Visualize todas as alterações de configuração entre domínios. Filtre por chave, utilizador ou período.",
+      "searchPlaceholder": "Pesquisar por chave...",
+      "empty": "Introduza uma chave de configuração para ver a sua timeline de alterações."
+    },
+    "health": {
+      "title": "Saúde da Plataforma de Configuração",
+      "definitionCount": "Contagem de Definições",
+      "definitionsLoaded": "definições carregadas",
+      "effectiveResolution": "Resolução Efetiva",
+      "settingsResolved": "configurações resolvidas",
+      "sensitiveProtection": "Proteção de Sensíveis",
+      "sensitiveKeys": "chaves sensíveis protegidas",
+      "orphanCheck": "Verificação de Órfãos",
+      "noOrphans": "Sem entradas órfãs",
+      "orphansFound": "entradas órfãs encontradas",
+      "duplicateCheck": "Verificação de Duplicatas",
+      "noDuplicates": "Sem chaves duplicadas",
+      "duplicatesFound": "chaves duplicadas encontradas",
+      "governanceTitle": "Governança de Definições",
+      "totalDefinitions": "Total de Definições",
+      "sensitiveDefinitions": "Sensíveis",
+      "editableDefinitions": "Editáveis",
+      "mandatoryDefinitions": "Mandatórias (System-only)",
+      "domainBreakdown": "Distribuição por Domínio"
+    }
   }
 }
