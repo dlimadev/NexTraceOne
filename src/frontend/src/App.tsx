@@ -113,6 +113,9 @@ const AuditPage = lazy(() => import('./features/audit-compliance/pages/AuditPage
 const NotificationCenterPage = lazy(() => import('./features/notifications/pages/NotificationCenterPage').then(m => ({ default: m.NotificationCenterPage })));
 const NotificationPreferencesPage = lazy(() => import('./features/notifications/pages/NotificationPreferencesPage').then(m => ({ default: m.NotificationPreferencesPage })));
 
+// ── Configuration (lazy) ──
+const ConfigurationAdminPage = lazy(() => import('./features/configuration/pages/ConfigurationAdminPage').then(m => ({ default: m.ConfigurationAdminPage })));
+
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 
@@ -807,6 +810,15 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
                     <PlatformOperationsPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Configuration Admin ── */}
+              <Route
+                path="/platform/configuration"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <ConfigurationAdminPage />
                   </ProtectedRoute>
                 }
               />

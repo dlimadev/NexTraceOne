@@ -4294,7 +4294,12 @@
       "updatedAt": "Updated",
       "updatedBy": "Updated By",
       "sensitive": "Sensitive",
-      "actions": "Actions"
+      "actions": "Actions",
+      "defaultValue": "Default Value",
+      "scopes": "Scopes",
+      "resolvedScope": "Resolved Scope",
+      "inheritable": "Inheritable",
+      "inheritance": "Inheritance"
     },
     "actions": {
       "edit": "Edit",
@@ -4304,7 +4309,9 @@
       "activate": "Activate",
       "deactivate": "Deactivate",
       "refresh": "Refresh",
-      "viewAudit": "View History"
+      "viewAudit": "View History",
+      "audit": "Audit History",
+      "removeOverride": "Remove Override"
     },
     "edit": {
       "title": "Edit Configuration",
@@ -4312,7 +4319,8 @@
       "newValue": "New Value",
       "changeReason": "Change Reason",
       "changeReasonPlaceholder": "Describe the reason for this change",
-      "scopeReference": "Scope Reference ID"
+      "scopeReference": "Scope Reference ID",
+      "key": "Configuration Key"
     },
     "audit": {
       "title": "Audit History",
@@ -4322,7 +4330,9 @@
       "changedBy": "Changed By",
       "changedAt": "Changed At",
       "reason": "Reason",
-      "noHistory": "No audit history available for this configuration."
+      "noHistory": "No audit history available for this configuration.",
+      "empty": "No audit history available.",
+      "scope": "Scope"
     },
     "filter": {
       "search": "Search configurations...",
@@ -4371,6 +4381,34 @@
     "policies": {
       "title": "Environment Policies",
       "subtitle": "Configure structural policies that control behavior per environment."
+    },
+    "views": {
+      "definitions": "Definitions",
+      "entries": "Configured Values",
+      "effective": "Effective Settings"
+    },
+    "filters": {
+      "search": "Search configurations...",
+      "searchPlaceholder": "Search by key or name...",
+      "category": "Filter by category",
+      "allCategories": "All Categories",
+      "scope": "Scope",
+      "scopeReferenceId": "Scope Reference ID",
+      "scopeReferenceIdPlaceholder": "Enter scope reference ID..."
+    },
+    "inheritance": {
+      "inherited": "Inherited",
+      "override": "Override",
+      "default": "Default"
+    },
+    "definitions": {
+      "title": "Configuration Definitions"
+    },
+    "entries": {
+      "title": "Configured Values"
+    },
+    "effective": {
+      "title": "Effective Settings"
     }
   }
 }

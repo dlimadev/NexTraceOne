@@ -3292,7 +3292,12 @@
       "updatedAt": "Actualizado",
       "updatedBy": "Actualizado por",
       "sensitive": "Sensible",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "defaultValue": "Valor Predeterminado",
+      "scopes": "Ámbitos",
+      "resolvedScope": "Ámbito Resuelto",
+      "inheritable": "Heredable",
+      "inheritance": "Herencia"
     },
     "actions": {
       "edit": "Editar",
@@ -3302,7 +3307,9 @@
       "activate": "Activar",
       "deactivate": "Desactivar",
       "refresh": "Actualizar",
-      "viewAudit": "Ver Historial"
+      "viewAudit": "Ver Historial",
+      "audit": "Historial de Auditoría",
+      "removeOverride": "Eliminar Sobreescritura"
     },
     "edit": {
       "title": "Editar Configuración",
@@ -3310,7 +3317,8 @@
       "newValue": "Nuevo Valor",
       "changeReason": "Motivo del Cambio",
       "changeReasonPlaceholder": "Describa el motivo de este cambio",
-      "scopeReference": "ID de Referencia del Ámbito"
+      "scopeReference": "ID de Referencia del Ámbito",
+      "key": "Clave de Configuración"
     },
     "audit": {
       "title": "Historial de Auditoría",
@@ -3320,7 +3328,9 @@
       "changedBy": "Modificado por",
       "changedAt": "Modificado el",
       "reason": "Motivo",
-      "noHistory": "No hay historial de auditoría disponible para esta configuración."
+      "noHistory": "No hay historial de auditoría disponible para esta configuración.",
+      "empty": "No hay historial de auditoría disponible.",
+      "scope": "Ámbito"
     },
     "filter": {
       "search": "Buscar configuraciones...",
@@ -3369,6 +3379,34 @@
     "policies": {
       "title": "Políticas de Entorno",
       "subtitle": "Configure políticas estructurales que controlan el comportamiento por entorno."
+    },
+    "views": {
+      "definitions": "Definiciones",
+      "entries": "Valores Configurados",
+      "effective": "Configuración Efectiva"
+    },
+    "filters": {
+      "search": "Buscar configuraciones...",
+      "searchPlaceholder": "Buscar por clave o nombre...",
+      "category": "Filtrar por categoría",
+      "allCategories": "Todas las Categorías",
+      "scope": "Ámbito",
+      "scopeReferenceId": "ID de Referencia del Ámbito",
+      "scopeReferenceIdPlaceholder": "Introduzca el ID de referencia del ámbito..."
+    },
+    "inheritance": {
+      "inherited": "Heredado",
+      "override": "Sobreescrito",
+      "default": "Predeterminado"
+    },
+    "definitions": {
+      "title": "Definiciones de Configuración"
+    },
+    "entries": {
+      "title": "Valores Configurados"
+    },
+    "effective": {
+      "title": "Configuración Efectiva"
     }
   }
 }

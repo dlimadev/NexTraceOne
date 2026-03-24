@@ -2576,7 +2576,12 @@
       "updatedAt": "Atualizado em",
       "updatedBy": "Atualizado por",
       "sensitive": "Sensível",
-      "actions": "Ações"
+      "actions": "Ações",
+      "defaultValue": "Valor Padrão",
+      "scopes": "Escopos",
+      "resolvedScope": "Escopo Resolvido",
+      "inheritable": "Herdável",
+      "inheritance": "Herança"
     },
     "actions": {
       "edit": "Editar",
@@ -2586,7 +2591,9 @@
       "activate": "Ativar",
       "deactivate": "Desativar",
       "refresh": "Atualizar",
-      "viewAudit": "Ver Histórico"
+      "viewAudit": "Ver Histórico",
+      "audit": "Histórico de Auditoria",
+      "removeOverride": "Remover Sobrescrita"
     },
     "edit": {
       "title": "Editar Configuração",
@@ -2594,7 +2601,8 @@
       "newValue": "Novo Valor",
       "changeReason": "Motivo da Alteração",
       "changeReasonPlaceholder": "Descreva o motivo desta alteração",
-      "scopeReference": "ID de Referência do Escopo"
+      "scopeReference": "ID de Referência do Escopo",
+      "key": "Chave de Configuração"
     },
     "audit": {
       "title": "Histórico de Auditoria",
@@ -2604,7 +2612,9 @@
       "changedBy": "Alterado por",
       "changedAt": "Alterado em",
       "reason": "Motivo",
-      "noHistory": "Nenhum histórico de auditoria disponível para esta configuração."
+      "noHistory": "Nenhum histórico de auditoria disponível para esta configuração.",
+      "empty": "Nenhum histórico de auditoria disponível.",
+      "scope": "Escopo"
     },
     "filter": {
       "search": "Buscar configurações...",
@@ -2653,6 +2663,34 @@
     "policies": {
       "title": "Políticas de Ambiente",
       "subtitle": "Configure políticas estruturais que controlam o comportamento por ambiente."
+    },
+    "views": {
+      "definitions": "Definições",
+      "entries": "Valores Configurados",
+      "effective": "Configurações Efetivas"
+    },
+    "filters": {
+      "search": "Buscar configurações...",
+      "searchPlaceholder": "Buscar por chave ou nome...",
+      "category": "Filtrar por categoria",
+      "allCategories": "Todas as Categorias",
+      "scope": "Escopo",
+      "scopeReferenceId": "ID de Referência do Escopo",
+      "scopeReferenceIdPlaceholder": "Insira o ID de referência do escopo..."
+    },
+    "inheritance": {
+      "inherited": "Herdado",
+      "override": "Sobrescrito",
+      "default": "Padrão"
+    },
+    "definitions": {
+      "title": "Definições de Configuração"
+    },
+    "entries": {
+      "title": "Valores Configurados"
+    },
+    "effective": {
+      "title": "Configurações Efetivas"
     }
   }
 }

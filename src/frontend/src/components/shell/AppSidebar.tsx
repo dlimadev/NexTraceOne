@@ -17,7 +17,7 @@ import {
   Shield, ClipboardList, AlertTriangle, Clock, UserCheck,
   ClipboardCheck, Monitor, Bot, Database, ShieldCheck,
   FileCode, Share2, Server, Layers,
-  Globe, Activity, Plus,
+  Globe, Activity, Plus, Settings,
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
 } from 'lucide-react';
@@ -81,6 +81,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.mySessions', to: '/my-sessions', icon: <Monitor size={18} />, permission: 'identity:sessions:read', section: 'admin' },
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:read', section: 'admin' },
   { labelKey: 'sidebar.platformOperations', to: '/platform/operations', icon: <Server size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
 ];
 
 const sectionLabels: Record<NavSection, string> = {
