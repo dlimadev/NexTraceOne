@@ -262,7 +262,8 @@
     "governancePacks": "Packs de Governança",
     "waivers": "Exceções e Isenções",
     "aiAnalysis": "Análise de IA",
-    "environmentComparison": "Comparação de Ambientes"
+    "environmentComparison": "Comparação de Ambientes",
+    "platformConfiguration": "Configuração da Plataforma"
   },
   "platformOps": {
     "title": "Operações da Plataforma",
@@ -2535,6 +2536,161 @@
       "errorLoading": "Falha ao carregar preferências",
       "channelHeader": "Canais de Entrega",
       "description": "Configure quais notificações deseja receber e por quais canais. Algumas notificações críticas são obrigatórias e não podem ser desativadas."
+    }
+  },
+  "configuration": {
+    "title": "Configuração da Plataforma",
+    "subtitle": "Gerencie configurações de instância, tenant e ambiente. Configure identidade visual, feature flags e políticas estruturais.",
+    "scope": {
+      "system": "Sistema (Global)",
+      "tenant": "Tenant",
+      "environment": "Ambiente",
+      "role": "Papel",
+      "team": "Equipe",
+      "user": "Usuário"
+    },
+    "category": {
+      "bootstrap": "Bootstrap",
+      "sensitiveOperational": "Sensível",
+      "functional": "Funcional"
+    },
+    "view": {
+      "definitions": "Definições",
+      "entries": "Valores Configurados",
+      "effective": "Configurações Efetivas"
+    },
+    "table": {
+      "key": "Chave",
+      "displayName": "Nome",
+      "category": "Categoria",
+      "valueType": "Tipo",
+      "value": "Valor",
+      "effectiveValue": "Valor Efetivo",
+      "scope": "Escopo",
+      "inherited": "Herdado",
+      "override": "Sobrescrito",
+      "default": "Padrão",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "version": "Versão",
+      "updatedAt": "Atualizado em",
+      "updatedBy": "Atualizado por",
+      "sensitive": "Sensível",
+      "actions": "Ações",
+      "defaultValue": "Valor Padrão",
+      "scopes": "Escopos",
+      "resolvedScope": "Escopo Resolvido",
+      "inheritable": "Herdável",
+      "inheritance": "Herança"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "remove": "Remover Sobrescrita",
+      "activate": "Ativar",
+      "deactivate": "Desativar",
+      "refresh": "Atualizar",
+      "viewAudit": "Ver Histórico",
+      "audit": "Histórico de Auditoria",
+      "removeOverride": "Remover Sobrescrita"
+    },
+    "edit": {
+      "title": "Editar Configuração",
+      "currentValue": "Valor Atual",
+      "newValue": "Novo Valor",
+      "changeReason": "Motivo da Alteração",
+      "changeReasonPlaceholder": "Descreva o motivo desta alteração",
+      "scopeReference": "ID de Referência do Escopo",
+      "key": "Chave de Configuração"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "action": "Ação",
+      "previousValue": "Anterior",
+      "newValue": "Novo",
+      "changedBy": "Alterado por",
+      "changedAt": "Alterado em",
+      "reason": "Motivo",
+      "noHistory": "Nenhum histórico de auditoria disponível para esta configuração.",
+      "empty": "Nenhum histórico de auditoria disponível.",
+      "scope": "Escopo"
+    },
+    "filter": {
+      "search": "Buscar configurações...",
+      "category": "Filtrar por categoria",
+      "allCategories": "Todas as Categorias",
+      "scope": "Escopo",
+      "scopeReference": "ID de Referência do Escopo"
+    },
+    "empty": {
+      "title": "Nenhuma configuração encontrada",
+      "description": "Nenhuma entrada de configuração corresponde aos seus filtros atuais. Tente ajustar o escopo ou os critérios de busca.",
+      "noDefinitions": "Nenhuma definição de configuração disponível."
+    },
+    "badges": {
+      "inherited": "Herdado",
+      "override": "Sobrescrito",
+      "default": "Padrão",
+      "sensitive": "Sensível",
+      "encrypted": "Criptografado",
+      "production": "Produção"
+    },
+    "instance": {
+      "title": "Configurações da Instância",
+      "subtitle": "Configuração global da plataforma que se aplica a toda a instância do NexTraceOne."
+    },
+    "tenant": {
+      "title": "Configurações do Tenant",
+      "subtitle": "Configurações específicas de cada tenant. Os valores herdam da instância, salvo quando sobrescritos."
+    },
+    "environment": {
+      "title": "Configurações do Ambiente",
+      "subtitle": "Configurações para cada ambiente de implantação. Configure classificação, criticidade e políticas.",
+      "classification": "Classificação",
+      "isProduction": "Ambiente de Produção",
+      "productionWarning": "Marcar um ambiente como produção aplica políticas de governança mais rígidas.",
+      "criticality": "Criticidade"
+    },
+    "branding": {
+      "title": "Identidade Visual e Padrões",
+      "subtitle": "Personalize a identidade visual e a experiência padrão da plataforma e dos tenants."
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "subtitle": "Habilite ou desabilite módulos da plataforma e funcionalidades em prévia por tenant."
+    },
+    "policies": {
+      "title": "Políticas de Ambiente",
+      "subtitle": "Configure políticas estruturais que controlam o comportamento por ambiente."
+    },
+    "views": {
+      "definitions": "Definições",
+      "entries": "Valores Configurados",
+      "effective": "Configurações Efetivas"
+    },
+    "filters": {
+      "search": "Buscar configurações...",
+      "searchPlaceholder": "Buscar por chave ou nome...",
+      "category": "Filtrar por categoria",
+      "allCategories": "Todas as Categorias",
+      "scope": "Escopo",
+      "scopeReferenceId": "ID de Referência do Escopo",
+      "scopeReferenceIdPlaceholder": "Insira o ID de referência do escopo..."
+    },
+    "inheritance": {
+      "inherited": "Herdado",
+      "override": "Sobrescrito",
+      "default": "Padrão"
+    },
+    "definitions": {
+      "title": "Definições de Configuração"
+    },
+    "entries": {
+      "title": "Valores Configurados"
+    },
+    "effective": {
+      "title": "Configurações Efetivas"
     }
   }
 }

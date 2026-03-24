@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>NexTraceOne.Configuration.Domain</RootNamespace>
+    <AssemblyName>NexTraceOne.Configuration.Domain</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
+  </ItemGroup>
+</Project>

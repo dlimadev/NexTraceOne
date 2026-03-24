@@ -176,7 +176,8 @@
     "governancePacks": "Packs de Gobernanza",
     "waivers": "Excepciones y Exenciones",
     "aiAnalysis": "Análisis de IA",
-    "environmentComparison": "Comparación de Entornos"
+    "environmentComparison": "Comparación de Entornos",
+    "platformConfiguration": "Configuración de la Plataforma"
   },
   "platformOps": {
     "title": "Operaciones de la Plataforma",
@@ -3251,6 +3252,161 @@
       "errorLoading": "Error al cargar preferencias",
       "channelHeader": "Canales de Entrega",
       "description": "Configura qué notificaciones deseas recibir y a través de qué canales. Algunas notificaciones críticas son obligatorias y no se pueden desactivar."
+    }
+  },
+  "configuration": {
+    "title": "Configuración de la Plataforma",
+    "subtitle": "Gestione la configuración de instancia, tenant y entorno. Configure la identidad visual, feature flags y políticas estructurales.",
+    "scope": {
+      "system": "Sistema (Global)",
+      "tenant": "Tenant",
+      "environment": "Entorno",
+      "role": "Rol",
+      "team": "Equipo",
+      "user": "Usuario"
+    },
+    "category": {
+      "bootstrap": "Bootstrap",
+      "sensitiveOperational": "Sensible",
+      "functional": "Funcional"
+    },
+    "view": {
+      "definitions": "Definiciones",
+      "entries": "Valores Configurados",
+      "effective": "Configuración Efectiva"
+    },
+    "table": {
+      "key": "Clave",
+      "displayName": "Nombre",
+      "category": "Categoría",
+      "valueType": "Tipo",
+      "value": "Valor",
+      "effectiveValue": "Valor Efectivo",
+      "scope": "Ámbito",
+      "inherited": "Heredado",
+      "override": "Sobreescrito",
+      "default": "Predeterminado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "version": "Versión",
+      "updatedAt": "Actualizado",
+      "updatedBy": "Actualizado por",
+      "sensitive": "Sensible",
+      "actions": "Acciones",
+      "defaultValue": "Valor Predeterminado",
+      "scopes": "Ámbitos",
+      "resolvedScope": "Ámbito Resuelto",
+      "inheritable": "Heredable",
+      "inheritance": "Herencia"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "remove": "Eliminar Sobreescritura",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "refresh": "Actualizar",
+      "viewAudit": "Ver Historial",
+      "audit": "Historial de Auditoría",
+      "removeOverride": "Eliminar Sobreescritura"
+    },
+    "edit": {
+      "title": "Editar Configuración",
+      "currentValue": "Valor Actual",
+      "newValue": "Nuevo Valor",
+      "changeReason": "Motivo del Cambio",
+      "changeReasonPlaceholder": "Describa el motivo de este cambio",
+      "scopeReference": "ID de Referencia del Ámbito",
+      "key": "Clave de Configuración"
+    },
+    "audit": {
+      "title": "Historial de Auditoría",
+      "action": "Acción",
+      "previousValue": "Anterior",
+      "newValue": "Nuevo",
+      "changedBy": "Modificado por",
+      "changedAt": "Modificado el",
+      "reason": "Motivo",
+      "noHistory": "No hay historial de auditoría disponible para esta configuración.",
+      "empty": "No hay historial de auditoría disponible.",
+      "scope": "Ámbito"
+    },
+    "filter": {
+      "search": "Buscar configuraciones...",
+      "category": "Filtrar por categoría",
+      "allCategories": "Todas las Categorías",
+      "scope": "Ámbito",
+      "scopeReference": "ID de Referencia del Ámbito"
+    },
+    "empty": {
+      "title": "No se encontraron configuraciones",
+      "description": "Ninguna entrada de configuración coincide con sus filtros actuales. Intente ajustar el ámbito o los criterios de búsqueda.",
+      "noDefinitions": "No hay definiciones de configuración disponibles."
+    },
+    "badges": {
+      "inherited": "Heredado",
+      "override": "Sobreescrito",
+      "default": "Predeterminado",
+      "sensitive": "Sensible",
+      "encrypted": "Cifrado",
+      "production": "Producción"
+    },
+    "instance": {
+      "title": "Configuración de Instancia",
+      "subtitle": "Configuración global de la plataforma que se aplica a toda la instancia de NexTraceOne."
+    },
+    "tenant": {
+      "title": "Configuración del Tenant",
+      "subtitle": "Configuración específica de cada tenant. Los valores se heredan de la instancia salvo que se sobreescriban."
+    },
+    "environment": {
+      "title": "Configuración del Entorno",
+      "subtitle": "Configuración para cada entorno de despliegue. Configure clasificación, criticidad y políticas.",
+      "classification": "Clasificación",
+      "isProduction": "Entorno de Producción",
+      "productionWarning": "Marcar un entorno como producción aplica políticas de gobernanza más estrictas.",
+      "criticality": "Criticidad"
+    },
+    "branding": {
+      "title": "Identidad Visual y Valores Predeterminados",
+      "subtitle": "Personalice la identidad visual y la experiencia predeterminada de la plataforma y los tenants."
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "subtitle": "Habilite o deshabilite módulos de la plataforma y funcionalidades en vista previa por tenant."
+    },
+    "policies": {
+      "title": "Políticas de Entorno",
+      "subtitle": "Configure políticas estructurales que controlan el comportamiento por entorno."
+    },
+    "views": {
+      "definitions": "Definiciones",
+      "entries": "Valores Configurados",
+      "effective": "Configuración Efectiva"
+    },
+    "filters": {
+      "search": "Buscar configuraciones...",
+      "searchPlaceholder": "Buscar por clave o nombre...",
+      "category": "Filtrar por categoría",
+      "allCategories": "Todas las Categorías",
+      "scope": "Ámbito",
+      "scopeReferenceId": "ID de Referencia del Ámbito",
+      "scopeReferenceIdPlaceholder": "Introduzca el ID de referencia del ámbito..."
+    },
+    "inheritance": {
+      "inherited": "Heredado",
+      "override": "Sobreescrito",
+      "default": "Predeterminado"
+    },
+    "definitions": {
+      "title": "Definiciones de Configuración"
+    },
+    "entries": {
+      "title": "Valores Configurados"
+    },
+    "effective": {
+      "title": "Configuración Efectiva"
     }
   }
 }

@@ -9,6 +9,7 @@ using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Catalog.API.Graph;
 using NexTraceOne.Governance.API;
+using NexTraceOne.Configuration.API;
 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
@@ -78,6 +79,7 @@ builder.Services.AddExternalAiModule(builder.Configuration);
 builder.Services.AddAiOrchestrationModule(builder.Configuration);
 builder.Services.AddAiRuntimeModule(builder.Configuration);
 builder.Services.AddNotificationsModule(builder.Configuration);
+builder.Services.AddConfigurationModule(builder.Configuration);
 
 // [5] JSON — serialização de enums como strings para Minimal API
 builder.Services.ConfigureHttpJsonOptions(options =>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>NexTraceOne.Configuration.Application</RootNamespace>
+    <AssemblyName>NexTraceOne.Configuration.Application</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Configuration.Domain\NexTraceOne.Configuration.Domain.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Configuration.Contracts\NexTraceOne.Configuration.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>

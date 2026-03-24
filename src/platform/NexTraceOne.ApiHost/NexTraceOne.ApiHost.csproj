@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\modules\auditcompliance\NexTraceOne.AuditCompliance.API\NexTraceOne.AuditCompliance.API.csproj" />
     <ProjectReference Include="..\..\modules\governance\NexTraceOne.Governance.API\NexTraceOne.Governance.API.csproj" />
     <ProjectReference Include="..\..\modules\notifications\NexTraceOne.Notifications.API\NexTraceOne.Notifications.API.csproj" />
+    <ProjectReference Include="..\..\modules\configuration\NexTraceOne.Configuration.API\NexTraceOne.Configuration.API.csproj" />
   </ItemGroup>
   <ItemGroup Label="Seed Data">
     <Content Include="SeedData\**" CopyToOutputDirectory="PreserveNewest" />
