@@ -281,7 +281,8 @@
     "domains": "Domínios",
     "delegatedAdmin": "Admin Delegado",
     "aiAnalysis": "Análise de IA",
-    "environmentComparison": "Comparação de Ambientes"
+    "environmentComparison": "Comparação de Ambientes",
+    "platformConfiguration": "Configuração da Plataforma"
   },
   "platformOps": {
     "title": "Operações da Plataforma",
@@ -3472,6 +3473,123 @@
       "errorLoading": "Falha ao carregar preferências",
       "channelHeader": "Canais de Entrega",
       "description": "Configure quais notificações deseja receber e por que canais. Algumas notificações críticas são obrigatórias e não podem ser desativadas."
+    }
+  },
+  "configuration": {
+    "title": "Configuração da Plataforma",
+    "subtitle": "Gerir definições de instância, tenant e ambiente. Configurar identidade visual, feature flags e políticas estruturais.",
+    "scope": {
+      "system": "Sistema (Global)",
+      "tenant": "Tenant",
+      "environment": "Ambiente",
+      "role": "Função",
+      "team": "Equipa",
+      "user": "Utilizador"
+    },
+    "category": {
+      "bootstrap": "Bootstrap",
+      "sensitiveOperational": "Sensível",
+      "functional": "Funcional"
+    },
+    "view": {
+      "definitions": "Definições",
+      "entries": "Valores Configurados",
+      "effective": "Definições Efetivas"
+    },
+    "table": {
+      "key": "Chave",
+      "displayName": "Nome",
+      "category": "Categoria",
+      "valueType": "Tipo",
+      "value": "Valor",
+      "effectiveValue": "Valor Efetivo",
+      "scope": "Âmbito",
+      "inherited": "Herdado",
+      "override": "Sobreposto",
+      "default": "Predefinição",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "version": "Versão",
+      "updatedAt": "Atualizado em",
+      "updatedBy": "Atualizado por",
+      "sensitive": "Sensível",
+      "actions": "Ações"
+    },
+    "actions": {
+      "edit": "Editar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "remove": "Remover Sobreposição",
+      "activate": "Ativar",
+      "deactivate": "Desativar",
+      "refresh": "Atualizar",
+      "viewAudit": "Ver Histórico"
+    },
+    "edit": {
+      "title": "Editar Configuração",
+      "currentValue": "Valor Atual",
+      "newValue": "Novo Valor",
+      "changeReason": "Motivo da Alteração",
+      "changeReasonPlaceholder": "Descreva o motivo desta alteração",
+      "scopeReference": "ID de Referência do Âmbito"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "action": "Ação",
+      "previousValue": "Anterior",
+      "newValue": "Novo",
+      "changedBy": "Alterado por",
+      "changedAt": "Alterado em",
+      "reason": "Motivo",
+      "noHistory": "Nenhum histórico de auditoria disponível para esta configuração."
+    },
+    "filter": {
+      "search": "Pesquisar configurações...",
+      "category": "Filtrar por categoria",
+      "allCategories": "Todas as Categorias",
+      "scope": "Âmbito",
+      "scopeReference": "ID de Referência do Âmbito"
+    },
+    "empty": {
+      "title": "Nenhuma configuração encontrada",
+      "description": "Nenhuma entrada de configuração corresponde aos seus filtros atuais. Tente ajustar o âmbito ou os critérios de pesquisa.",
+      "noDefinitions": "Nenhuma definição de configuração disponível."
+    },
+    "badges": {
+      "inherited": "Herdado",
+      "override": "Sobreposto",
+      "default": "Predefinição",
+      "sensitive": "Sensível",
+      "encrypted": "Encriptado",
+      "production": "Produção"
+    },
+    "instance": {
+      "title": "Definições da Instância",
+      "subtitle": "Configuração global da plataforma que se aplica a toda a instância do NexTraceOne."
+    },
+    "tenant": {
+      "title": "Definições do Tenant",
+      "subtitle": "Definições específicas de cada tenant. Os valores herdam da instância, salvo quando sobrepostos."
+    },
+    "environment": {
+      "title": "Definições do Ambiente",
+      "subtitle": "Definições para cada ambiente de implementação. Configure classificação, criticidade e políticas.",
+      "classification": "Classificação",
+      "isProduction": "Ambiente de Produção",
+      "productionWarning": "Marcar um ambiente como produção aplica políticas de governação mais rigorosas.",
+      "criticality": "Criticidade"
+    },
+    "branding": {
+      "title": "Identidade Visual e Predefinições",
+      "subtitle": "Personalize a identidade visual e a experiência predefinida da plataforma e dos tenants."
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "subtitle": "Ative ou desative módulos da plataforma e funcionalidades em pré-visualização por tenant."
+    },
+    "policies": {
+      "title": "Políticas de Ambiente",
+      "subtitle": "Configure políticas estruturais que controlam o comportamento por ambiente."
     }
   }
 }

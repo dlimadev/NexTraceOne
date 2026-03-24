@@ -287,7 +287,8 @@
     "domains": "Domains",
     "delegatedAdmin": "Delegated Admin",
     "aiAnalysis": "AI Analysis",
-    "environmentComparison": "Environment Comparison"
+    "environmentComparison": "Environment Comparison",
+    "platformConfiguration": "Platform Configuration"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -4253,6 +4254,123 @@
       "errorLoading": "Failed to load preferences",
       "channelHeader": "Delivery Channels",
       "description": "Configure which notifications you want to receive and through which channels. Some critical notifications are mandatory and cannot be disabled."
+    }
+  },
+  "configuration": {
+    "title": "Platform Configuration",
+    "subtitle": "Manage instance, tenant, and environment settings. Configure branding, feature flags, and structural policies.",
+    "scope": {
+      "system": "System (Global)",
+      "tenant": "Tenant",
+      "environment": "Environment",
+      "role": "Role",
+      "team": "Team",
+      "user": "User"
+    },
+    "category": {
+      "bootstrap": "Bootstrap",
+      "sensitiveOperational": "Sensitive",
+      "functional": "Functional"
+    },
+    "view": {
+      "definitions": "Definitions",
+      "entries": "Configured Values",
+      "effective": "Effective Settings"
+    },
+    "table": {
+      "key": "Key",
+      "displayName": "Name",
+      "category": "Category",
+      "valueType": "Type",
+      "value": "Value",
+      "effectiveValue": "Effective Value",
+      "scope": "Scope",
+      "inherited": "Inherited",
+      "override": "Override",
+      "default": "Default",
+      "active": "Active",
+      "inactive": "Inactive",
+      "version": "Version",
+      "updatedAt": "Updated",
+      "updatedBy": "Updated By",
+      "sensitive": "Sensitive",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "remove": "Remove Override",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "refresh": "Refresh",
+      "viewAudit": "View History"
+    },
+    "edit": {
+      "title": "Edit Configuration",
+      "currentValue": "Current Value",
+      "newValue": "New Value",
+      "changeReason": "Change Reason",
+      "changeReasonPlaceholder": "Describe the reason for this change",
+      "scopeReference": "Scope Reference ID"
+    },
+    "audit": {
+      "title": "Audit History",
+      "action": "Action",
+      "previousValue": "Previous",
+      "newValue": "New",
+      "changedBy": "Changed By",
+      "changedAt": "Changed At",
+      "reason": "Reason",
+      "noHistory": "No audit history available for this configuration."
+    },
+    "filter": {
+      "search": "Search configurations...",
+      "category": "Filter by category",
+      "allCategories": "All Categories",
+      "scope": "Scope",
+      "scopeReference": "Scope Reference ID"
+    },
+    "empty": {
+      "title": "No configurations found",
+      "description": "No configuration entries match your current filters. Try adjusting your scope or search criteria.",
+      "noDefinitions": "No configuration definitions available."
+    },
+    "badges": {
+      "inherited": "Inherited",
+      "override": "Override",
+      "default": "Default",
+      "sensitive": "Sensitive",
+      "encrypted": "Encrypted",
+      "production": "Production"
+    },
+    "instance": {
+      "title": "Instance Settings",
+      "subtitle": "Global platform configuration that applies to the entire NexTraceOne instance."
+    },
+    "tenant": {
+      "title": "Tenant Settings",
+      "subtitle": "Settings specific to each tenant. Values inherit from instance unless overridden."
+    },
+    "environment": {
+      "title": "Environment Settings",
+      "subtitle": "Settings for each deployment environment. Configure classification, criticality, and policies.",
+      "classification": "Classification",
+      "isProduction": "Production Environment",
+      "productionWarning": "Marking an environment as production applies stricter governance policies.",
+      "criticality": "Criticality"
+    },
+    "branding": {
+      "title": "Branding & Defaults",
+      "subtitle": "Customize the visual identity and default experience for the platform and tenants."
+    },
+    "featureFlags": {
+      "title": "Feature Flags",
+      "subtitle": "Enable or disable platform modules and preview features per tenant."
+    },
+    "policies": {
+      "title": "Environment Policies",
+      "subtitle": "Configure structural policies that control behavior per environment."
     }
   }
 }
