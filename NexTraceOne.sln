@@ -199,6 +199,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Configuration.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Configuration.API", "src\modules\configuration\NexTraceOne.Configuration.API\NexTraceOne.Configuration.API.csproj", "{86981A4E-E301-40F5-B8ED-9DDB917F66FA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configuration", "configuration", "{1600C0A2-7740-37F5-D1DF-BBF9BDBFCBCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NexTraceOne.Configuration.Tests", "tests\modules\configuration\NexTraceOne.Configuration.Tests\NexTraceOne.Configuration.Tests.csproj", "{42998146-CA08-41DF-8663-93D2741EFB69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1055,6 +1059,18 @@ Global
 		{86981A4E-E301-40F5-B8ED-9DDB917F66FA}.Release|x64.Build.0 = Release|Any CPU
 		{86981A4E-E301-40F5-B8ED-9DDB917F66FA}.Release|x86.ActiveCfg = Release|Any CPU
 		{86981A4E-E301-40F5-B8ED-9DDB917F66FA}.Release|x86.Build.0 = Release|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Debug|x64.Build.0 = Debug|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Debug|x86.Build.0 = Debug|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Release|x64.ActiveCfg = Release|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Release|x64.Build.0 = Release|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Release|x86.ActiveCfg = Release|Any CPU
+		{42998146-CA08-41DF-8663-93D2741EFB69}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1154,6 +1170,8 @@ Global
 		{931B0A6B-A1C0-426A-A403-CB2E480C69FE} = {AD543401-B4A7-AC95-DA94-6718F3C81BEB}
 		{298B0B92-3310-44C2-8F7A-4DFE18B92476} = {AD543401-B4A7-AC95-DA94-6718F3C81BEB}
 		{86981A4E-E301-40F5-B8ED-9DDB917F66FA} = {AD543401-B4A7-AC95-DA94-6718F3C81BEB}
+		{1600C0A2-7740-37F5-D1DF-BBF9BDBFCBCE} = {D7DC9B74-6BC4-2470-2038-1E57C2DCB73B}
+		{42998146-CA08-41DF-8663-93D2741EFB69} = {1600C0A2-7740-37F5-D1DF-BBF9BDBFCBCE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DFF94D6C-02B3-46BC-9488-BE53A9C29BAD}
