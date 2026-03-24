@@ -198,5 +198,518 @@ public static class ConfigurationDefinitionSeeder
             validationRules: """{"min": 0, "max": 100}""",
             uiEditorType: "text",
             sortOrder: 700),
+
+        // ── BLOCK B — Instance Configuration ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "instance.name",
+            displayName: "Instance Name",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Display name of the platform instance",
+            defaultValue: "NexTraceOne",
+            uiEditorType: "text",
+            sortOrder: 1000),
+
+        ConfigurationDefinition.Create(
+            key: "instance.commercial_name",
+            displayName: "Instance Commercial Name",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Commercial/marketing name shown to users",
+            defaultValue: "NexTraceOne Platform",
+            uiEditorType: "text",
+            sortOrder: 1010),
+
+        ConfigurationDefinition.Create(
+            key: "instance.default_language",
+            displayName: "Instance Default Language",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Default language for the platform instance",
+            defaultValue: "en",
+            validationRules: """{"enum":["en","pt-BR","pt-PT","es"]}""",
+            uiEditorType: "select",
+            sortOrder: 1020),
+
+        ConfigurationDefinition.Create(
+            key: "instance.default_timezone",
+            displayName: "Instance Default Timezone",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Default timezone for the instance",
+            defaultValue: "UTC",
+            uiEditorType: "text",
+            sortOrder: 1030),
+
+        ConfigurationDefinition.Create(
+            key: "instance.date_format",
+            displayName: "Instance Date Format",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Default date format pattern",
+            defaultValue: "yyyy-MM-dd",
+            uiEditorType: "text",
+            sortOrder: 1040),
+
+        ConfigurationDefinition.Create(
+            key: "instance.support_url",
+            displayName: "Instance Support URL",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "URL for platform support documentation",
+            uiEditorType: "text",
+            sortOrder: 1050),
+
+        ConfigurationDefinition.Create(
+            key: "instance.terms_url",
+            displayName: "Instance Terms URL",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "URL for terms of service",
+            uiEditorType: "text",
+            sortOrder: 1060),
+
+        ConfigurationDefinition.Create(
+            key: "instance.privacy_url",
+            displayName: "Instance Privacy URL",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "URL for privacy policy",
+            uiEditorType: "text",
+            sortOrder: 1070),
+
+        // ── BLOCK C — Tenant Configuration ────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "tenant.display_name",
+            displayName: "Tenant Display Name",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Tenant],
+            description: "Custom display name for the tenant",
+            uiEditorType: "text",
+            sortOrder: 1100),
+
+        ConfigurationDefinition.Create(
+            key: "tenant.default_language",
+            displayName: "Tenant Default Language",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default language for the tenant",
+            defaultValue: "en",
+            isInheritable: true,
+            validationRules: """{"enum":["en","pt-BR","pt-PT","es"]}""",
+            uiEditorType: "select",
+            sortOrder: 1110),
+
+        ConfigurationDefinition.Create(
+            key: "tenant.default_timezone",
+            displayName: "Tenant Default Timezone",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default timezone for the tenant",
+            defaultValue: "UTC",
+            isInheritable: true,
+            uiEditorType: "text",
+            sortOrder: 1120),
+
+        ConfigurationDefinition.Create(
+            key: "tenant.contact_email",
+            displayName: "Tenant Contact Email",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Tenant],
+            description: "Primary contact email for the tenant",
+            uiEditorType: "text",
+            sortOrder: 1130),
+
+        ConfigurationDefinition.Create(
+            key: "tenant.max_users",
+            displayName: "Tenant Maximum Users",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of users allowed in the tenant",
+            defaultValue: "100",
+            validationRules: """{"min":1,"max":10000}""",
+            uiEditorType: "text",
+            sortOrder: 1140),
+
+        ConfigurationDefinition.Create(
+            key: "tenant.max_environments",
+            displayName: "Tenant Maximum Environments",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of environments per tenant",
+            defaultValue: "10",
+            validationRules: """{"min":1,"max":50}""",
+            uiEditorType: "text",
+            sortOrder: 1150),
+
+        // ── BLOCK D — Environment Configuration ───────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "environment.classification",
+            displayName: "Environment Classification",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Environment],
+            description: "Classification/profile of the environment",
+            validationRules: """{"enum":["Development","Test","QA","PreProduction","Production","Lab"]}""",
+            uiEditorType: "select",
+            sortOrder: 1200),
+
+        ConfigurationDefinition.Create(
+            key: "environment.is_production",
+            displayName: "Environment Is Production",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment],
+            description: "Whether this environment is the production environment. Only one environment per tenant should be marked as production.",
+            defaultValue: "false",
+            isInheritable: false,
+            uiEditorType: "toggle",
+            sortOrder: 1210),
+
+        ConfigurationDefinition.Create(
+            key: "environment.criticality",
+            displayName: "Environment Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Criticality level of the environment",
+            defaultValue: "medium",
+            validationRules: """{"enum":["low","medium","high","critical"]}""",
+            uiEditorType: "select",
+            sortOrder: 1220),
+
+        ConfigurationDefinition.Create(
+            key: "environment.lifecycle_order",
+            displayName: "Environment Lifecycle Order",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.Environment],
+            description: "Order in the deployment lifecycle pipeline",
+            defaultValue: "0",
+            validationRules: """{"min":0,"max":100}""",
+            uiEditorType: "text",
+            sortOrder: 1230),
+
+        ConfigurationDefinition.Create(
+            key: "environment.description",
+            displayName: "Environment Description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Environment],
+            description: "Description of the environment purpose",
+            uiEditorType: "text",
+            sortOrder: 1240),
+
+        ConfigurationDefinition.Create(
+            key: "environment.active",
+            displayName: "Environment Active",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment],
+            description: "Whether the environment is currently active",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1250),
+
+        // ── BLOCK F — Branding & Experience Defaults ──────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "branding.logo_url",
+            displayName: "Branding Logo URL",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "URL for the organization logo (light variant)",
+            uiEditorType: "text",
+            sortOrder: 1300),
+
+        ConfigurationDefinition.Create(
+            key: "branding.logo_dark_url",
+            displayName: "Branding Logo Dark URL",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "URL for the organization logo (dark variant)",
+            uiEditorType: "text",
+            sortOrder: 1310),
+
+        ConfigurationDefinition.Create(
+            key: "branding.accent_color",
+            displayName: "Branding Accent Color",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Primary accent color in hex format",
+            defaultValue: "#3B82F6",
+            validationRules: """{"pattern":"^#[0-9a-fA-F]{6}$"}""",
+            uiEditorType: "text",
+            sortOrder: 1320),
+
+        ConfigurationDefinition.Create(
+            key: "branding.favicon_url",
+            displayName: "Branding Favicon URL",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "URL for the custom favicon",
+            uiEditorType: "text",
+            sortOrder: 1330),
+
+        ConfigurationDefinition.Create(
+            key: "branding.welcome_message",
+            displayName: "Branding Welcome Message",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Custom welcome message displayed on the dashboard",
+            uiEditorType: "text",
+            sortOrder: 1340),
+
+        ConfigurationDefinition.Create(
+            key: "branding.footer_text",
+            displayName: "Branding Footer Text",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Custom footer text displayed on all pages",
+            uiEditorType: "text",
+            sortOrder: 1350),
+
+        // ── BLOCK G — Feature Flags ───────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.catalog.enabled",
+            displayName: "Feature: Service Catalog",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Service Catalog module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1400),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.contracts.enabled",
+            displayName: "Feature: Contract Governance",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Contract Governance module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1410),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.changes.enabled",
+            displayName: "Feature: Change Intelligence",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Change Intelligence module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1420),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.operations.enabled",
+            displayName: "Feature: Operations",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Operations module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1430),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.ai.enabled",
+            displayName: "Feature: AI Hub",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the AI Hub module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1440),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.governance.enabled",
+            displayName: "Feature: Governance",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Governance module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1450),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.finops.enabled",
+            displayName: "Feature: FinOps",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the FinOps module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1460),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.integrations.enabled",
+            displayName: "Feature: Integration Hub",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Integration Hub module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1470),
+
+        ConfigurationDefinition.Create(
+            key: "feature.module.analytics.enabled",
+            displayName: "Feature: Product Analytics",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable/disable the Product Analytics module",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1480),
+
+        ConfigurationDefinition.Create(
+            key: "feature.preview.ai_agents.enabled",
+            displayName: "Preview: AI Agents",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable AI Agents preview feature (beta)",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 1490),
+
+        ConfigurationDefinition.Create(
+            key: "feature.preview.environment_comparison.enabled",
+            displayName: "Preview: Environment Comparison",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Enable Environment Comparison preview feature",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1495),
+
+        // ── BLOCK H — Environment Policies ────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.allow_automation",
+            displayName: "Policy: Allow Automation",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether automated operations are allowed in this environment",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1500),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.allow_promotion_target",
+            displayName: "Policy: Allow Promotion Target",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether this environment can be a promotion target",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1510),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.allow_promotion_source",
+            displayName: "Policy: Allow Promotion Source",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether this environment can be a promotion source",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1520),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.require_approval_for_changes",
+            displayName: "Policy: Require Approval for Changes",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether changes in this environment require approval",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1530),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.allow_drift_analysis",
+            displayName: "Policy: Allow Drift Analysis",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether drift analysis is active for this environment",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1540),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.restrict_sensitive_features",
+            displayName: "Policy: Restrict Sensitive Features",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether sensitive features are restricted in this environment",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1550),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.change_freeze.enabled",
+            displayName: "Policy: Change Freeze Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Whether a change freeze is currently active for this environment",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 1560),
+
+        ConfigurationDefinition.Create(
+            key: "policy.environment.change_freeze.reason",
+            displayName: "Policy: Change Freeze Reason",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "Reason for the current change freeze",
+            isInheritable: true,
+            uiEditorType: "text",
+            sortOrder: 1570),
     ];
 }
