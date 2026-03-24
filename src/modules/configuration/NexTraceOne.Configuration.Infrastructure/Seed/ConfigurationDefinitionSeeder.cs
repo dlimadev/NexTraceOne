@@ -1709,5 +1709,515 @@ public static class ConfigurationDefinitionSeeder
             isInheritable: false,
             uiEditorType: "json-editor",
             sortOrder: 2650),
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PHASE 4 — GOVERNANCE, COMPLIANCE, WAIVERS & PACKS
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ── Block A — Policy Catalog & Compliance Profiles ─────────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.policies.enabled",
+            displayName: "Enabled Governance Policies",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of governance policy IDs enabled for evaluation",
+            defaultValue: """["SecurityBaseline","ApiVersioning","DocumentationCoverage","TestCoverage","OwnershipRequired"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 3000),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policies.severity",
+            displayName: "Policy Severity Map",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Severity level per policy (Critical, High, Medium, Low)",
+            defaultValue: """{"SecurityBaseline":"Critical","ApiVersioning":"High","DocumentationCoverage":"Medium","TestCoverage":"High","OwnershipRequired":"Critical"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3010),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policies.criticality",
+            displayName: "Policy Criticality Map",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Criticality classification per policy (Blocking, NonBlocking, Advisory)",
+            defaultValue: """{"SecurityBaseline":"Blocking","ApiVersioning":"NonBlocking","DocumentationCoverage":"Advisory","TestCoverage":"NonBlocking","OwnershipRequired":"Blocking"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3020),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policies.category_map",
+            displayName: "Policy Category Map",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Category classification per policy (Security, Quality, Operational, Documentation)",
+            defaultValue: """{"SecurityBaseline":"Security","ApiVersioning":"Quality","DocumentationCoverage":"Documentation","TestCoverage":"Quality","OwnershipRequired":"Operational"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3030),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policies.applicability",
+            displayName: "Policy Applicability Rules",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Applicability rules per policy by system type, API type, or service classification",
+            defaultValue: """{"SecurityBaseline":{"applies_to":"all"},"ApiVersioning":{"applies_to":["REST","SOAP"]},"TestCoverage":{"applies_to":"all"}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3040),
+
+        ConfigurationDefinition.Create(
+            key: "governance.compliance.profiles.enabled",
+            displayName: "Enabled Compliance Profiles",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Active compliance profiles (e.g. Standard, Enhanced, Strict)",
+            defaultValue: """["Standard","Enhanced","Strict"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 3050),
+
+        ConfigurationDefinition.Create(
+            key: "governance.compliance.profiles.default",
+            displayName: "Default Compliance Profile",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Default compliance profile applied when no specific binding exists",
+            defaultValue: "Standard",
+            validationRules: """{"enum":["Standard","Enhanced","Strict"]}""",
+            uiEditorType: "select",
+            sortOrder: 3060),
+
+        ConfigurationDefinition.Create(
+            key: "governance.compliance.profiles.policies_map",
+            displayName: "Compliance Profile Policy Map",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Policies included in each compliance profile",
+            defaultValue: """{"Standard":["SecurityBaseline","OwnershipRequired"],"Enhanced":["SecurityBaseline","OwnershipRequired","ApiVersioning","TestCoverage"],"Strict":["SecurityBaseline","OwnershipRequired","ApiVersioning","TestCoverage","DocumentationCoverage"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3070),
+
+        ConfigurationDefinition.Create(
+            key: "governance.compliance.profiles.by_environment",
+            displayName: "Compliance Profile by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Override compliance profile per environment classification",
+            defaultValue: """{"Production":"Strict","PreProduction":"Enhanced","Development":"Standard"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3080),
+
+        // ── Block B — Evidence Requirements ────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.evidence.types_accepted",
+            displayName: "Accepted Evidence Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of accepted evidence types (e.g. Document, Screenshot, TestReport, ScanResult, AuditLog)",
+            defaultValue: """["Document","Screenshot","TestReport","ScanResult","AuditLog","Attestation"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 3100),
+
+        ConfigurationDefinition.Create(
+            key: "governance.evidence.required_by_policy",
+            displayName: "Evidence Required by Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Evidence requirements per policy (type, mandatory flag, minimum count)",
+            defaultValue: """{"SecurityBaseline":{"mandatory":true,"types":["ScanResult"],"minCount":1},"TestCoverage":{"mandatory":true,"types":["TestReport"],"minCount":1}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3110),
+
+        ConfigurationDefinition.Create(
+            key: "governance.evidence.expiry_days",
+            displayName: "Evidence Default Expiry (Days)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Default number of days before evidence expires and must be renewed",
+            defaultValue: "90",
+            validationRules: """{"min":1,"max":730}""",
+            uiEditorType: "text",
+            sortOrder: 3120),
+
+        ConfigurationDefinition.Create(
+            key: "governance.evidence.expiry_by_criticality",
+            displayName: "Evidence Expiry by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Evidence expiry days per policy criticality level",
+            defaultValue: """{"critical":30,"high":60,"medium":90,"low":180}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3130),
+
+        ConfigurationDefinition.Create(
+            key: "governance.evidence.expired_action",
+            displayName: "Expired Evidence Action",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Action when evidence expires (Notify, Block, Degrade)",
+            defaultValue: "Notify",
+            validationRules: """{"enum":["Notify","Block","Degrade"]}""",
+            uiEditorType: "select",
+            sortOrder: 3140),
+
+        ConfigurationDefinition.Create(
+            key: "governance.evidence.required_by_environment",
+            displayName: "Evidence Required by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional evidence requirements per environment classification",
+            defaultValue: """{"Production":{"mandatory":true,"minCount":1},"PreProduction":{"mandatory":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3150),
+
+        // ── Block C — Waiver Rules ─────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.eligible_policies",
+            displayName: "Policies Eligible for Waiver",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Policies that can be waived (empty = all non-critical)",
+            defaultValue: """["ApiVersioning","DocumentationCoverage","TestCoverage"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 3200),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.blocked_severities",
+            displayName: "Waiver Blocked Severities",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Severity levels that cannot be waived (system-level only)",
+            defaultValue: """["Critical"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 3210),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.validity_days_default",
+            displayName: "Default Waiver Validity (Days)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default validity period for waivers in days",
+            defaultValue: "30",
+            validationRules: """{"min":1,"max":365}""",
+            uiEditorType: "text",
+            sortOrder: 3220),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.validity_days_max",
+            displayName: "Maximum Waiver Validity (Days)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum validity period for waivers in days",
+            defaultValue: "90",
+            validationRules: """{"min":1,"max":365}""",
+            uiEditorType: "text",
+            sortOrder: 3230),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.require_approval",
+            displayName: "Waiver Requires Approval",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether waiver requests require explicit approval",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 3240),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.require_evidence",
+            displayName: "Waiver Requires Evidence",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether waiver requests must include supporting evidence/justification",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 3250),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.allowed_environments",
+            displayName: "Waiver Allowed Environments",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Environments where waivers are permitted (empty = all)",
+            defaultValue: """["Development","Test","QA"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 3260),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.blocked_environments",
+            displayName: "Waiver Blocked Environments",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Environments where waivers are never allowed",
+            defaultValue: """["Production"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 3270),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.renewal.allowed",
+            displayName: "Waiver Renewal Allowed",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether expired waivers can be renewed",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 3280),
+
+        ConfigurationDefinition.Create(
+            key: "governance.waiver.renewal.max_count",
+            displayName: "Maximum Waiver Renewals",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of times a waiver can be renewed",
+            defaultValue: "2",
+            validationRules: """{"min":0,"max":10}""",
+            uiEditorType: "text",
+            sortOrder: 3290),
+
+        // ── Block D — Governance Packs & Bindings ──────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.packs.enabled",
+            displayName: "Enabled Governance Packs",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of enabled governance pack identifiers",
+            defaultValue: """["CoreGovernance","ApiGovernance","SecurityHardening"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 3300),
+
+        ConfigurationDefinition.Create(
+            key: "governance.packs.active_version",
+            displayName: "Active Governance Pack Version",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Currently active version number for the governance pack set",
+            defaultValue: "1",
+            validationRules: """{"min":1,"max":9999}""",
+            uiEditorType: "text",
+            sortOrder: 3310),
+
+        ConfigurationDefinition.Create(
+            key: "governance.packs.binding_policy",
+            displayName: "Pack Binding Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default binding rules for governance packs (by tenant, environment, domain, team, system type)",
+            defaultValue: """{"bindBy":["tenant","environment","systemType"],"precedence":"most_specific_wins"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3320),
+
+        ConfigurationDefinition.Create(
+            key: "governance.packs.by_environment",
+            displayName: "Governance Packs by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Governance pack bindings per environment classification",
+            defaultValue: """{"Production":["CoreGovernance","SecurityHardening"],"PreProduction":["CoreGovernance"],"Development":["CoreGovernance"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3330),
+
+        ConfigurationDefinition.Create(
+            key: "governance.packs.by_system_type",
+            displayName: "Governance Packs by System Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Governance pack bindings per system type (REST API, SOAP, Event, Background)",
+            defaultValue: """{"REST":["ApiGovernance","CoreGovernance"],"SOAP":["ApiGovernance","CoreGovernance"],"Event":["CoreGovernance"],"Background":["CoreGovernance"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3340),
+
+        ConfigurationDefinition.Create(
+            key: "governance.packs.overlap_resolution",
+            displayName: "Pack Overlap Resolution Strategy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "How to resolve policy conflicts between overlapping packs (MostRestrictive, MostSpecific, Merge)",
+            defaultValue: "MostRestrictive",
+            validationRules: """{"enum":["MostRestrictive","MostSpecific","Merge"]}""",
+            uiEditorType: "select",
+            sortOrder: 3350),
+
+        // ── Block E — Scorecards, Thresholds & Risk Matrix ─────────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.scorecard.enabled",
+            displayName: "Governance Scorecard Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether governance scorecards are active and calculated",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 3400),
+
+        ConfigurationDefinition.Create(
+            key: "governance.scorecard.thresholds",
+            displayName: "Scorecard Score Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Score thresholds for governance scorecard classification (e.g. Excellent ≥90, Good ≥70, etc.)",
+            defaultValue: """{"Excellent":90,"Good":70,"Fair":50,"Poor":0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3410),
+
+        ConfigurationDefinition.Create(
+            key: "governance.scorecard.weights",
+            displayName: "Scorecard Category Weights",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Weight of each governance category in the overall score (must sum to 100)",
+            defaultValue: """{"Security":30,"Quality":25,"Operational":25,"Documentation":20}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3420),
+
+        ConfigurationDefinition.Create(
+            key: "governance.scorecard.thresholds_by_environment",
+            displayName: "Scorecard Thresholds by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Override score thresholds per environment (e.g. Production requires higher scores)",
+            defaultValue: """{"Production":{"Excellent":95,"Good":80,"Fair":60,"Poor":0},"Development":{"Excellent":80,"Good":60,"Fair":40,"Poor":0}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3430),
+
+        ConfigurationDefinition.Create(
+            key: "governance.risk.matrix",
+            displayName: "Risk Matrix Definition",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Risk matrix mapping likelihood x impact to risk level (Critical, High, Medium, Low)",
+            defaultValue: """{"High_High":"Critical","High_Medium":"High","High_Low":"Medium","Medium_High":"High","Medium_Medium":"Medium","Medium_Low":"Low","Low_High":"Medium","Low_Medium":"Low","Low_Low":"Low"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3440),
+
+        ConfigurationDefinition.Create(
+            key: "governance.risk.thresholds",
+            displayName: "Risk Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Numeric risk score thresholds for classification",
+            defaultValue: """{"Critical":90,"High":70,"Medium":40,"Low":0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3450),
+
+        ConfigurationDefinition.Create(
+            key: "governance.risk.labels",
+            displayName: "Risk Classification Labels",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Display labels and colors for risk classification levels",
+            defaultValue: """{"Critical":{"label":"Critical","color":"#DC2626"},"High":{"label":"High","color":"#F59E0B"},"Medium":{"label":"Medium","color":"#3B82F6"},"Low":{"label":"Low","color":"#10B981"}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3460),
+
+        ConfigurationDefinition.Create(
+            key: "governance.risk.thresholds_by_criticality",
+            displayName: "Risk Thresholds by Service Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Override risk thresholds per service criticality level",
+            defaultValue: """{"critical":{"Critical":80,"High":60,"Medium":30,"Low":0},"standard":{"Critical":90,"High":70,"Medium":40,"Low":0}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3470),
+
+        // ── Block F — Minimum Requirements by System/API Type ──────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.requirements.by_system_type",
+            displayName: "Minimum Requirements by System Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum governance requirements per system type (mandatory policies, evidence, packs)",
+            defaultValue: """{"REST":{"mandatoryPolicies":["SecurityBaseline","ApiVersioning"],"mandatoryPack":"ApiGovernance","minScore":70},"SOAP":{"mandatoryPolicies":["SecurityBaseline","ApiVersioning"],"mandatoryPack":"ApiGovernance","minScore":70},"Event":{"mandatoryPolicies":["SecurityBaseline"],"mandatoryPack":"CoreGovernance","minScore":60},"Background":{"mandatoryPolicies":["SecurityBaseline"],"mandatoryPack":"CoreGovernance","minScore":50}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3500),
+
+        ConfigurationDefinition.Create(
+            key: "governance.requirements.by_api_type",
+            displayName: "Minimum Requirements by API Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum governance requirements per API classification (Public, Internal, Partner)",
+            defaultValue: """{"Public":{"mandatoryPolicies":["SecurityBaseline","ApiVersioning","DocumentationCoverage"],"minScore":80},"Internal":{"mandatoryPolicies":["SecurityBaseline","ApiVersioning"],"minScore":60},"Partner":{"mandatoryPolicies":["SecurityBaseline","ApiVersioning","DocumentationCoverage"],"minScore":75}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3510),
+
+        ConfigurationDefinition.Create(
+            key: "governance.requirements.mandatory_evidence_by_classification",
+            displayName: "Mandatory Evidence by Classification",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Evidence requirements per system classification (critical, standard)",
+            defaultValue: """{"critical":{"types":["ScanResult","TestReport","Attestation"],"minCount":2},"standard":{"types":["ScanResult"],"minCount":1}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3520),
+
+        ConfigurationDefinition.Create(
+            key: "governance.requirements.min_compliance_profile",
+            displayName: "Minimum Compliance Profile by Classification",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum compliance profile required per service classification",
+            defaultValue: """{"critical":"Strict","standard":"Standard"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3530),
+
+        ConfigurationDefinition.Create(
+            key: "governance.requirements.promotion_gates",
+            displayName: "Governance Promotion Gates",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Minimum governance gates required for promotion (links to Phase 3 workflow gates)",
+            defaultValue: """{"Production":{"minScore":70,"requiredProfile":"Enhanced","allBlockingPoliciesMet":true},"PreProduction":{"minScore":50,"allBlockingPoliciesMet":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 3540),
     ];
 }

@@ -4519,5 +4519,59 @@
       "message": "Could not load workflow and promotion governance configuration.",
       "retry": "Retry"
     }
+  },
+  "governanceConfig": {
+    "title": "Governance & Compliance Configuration",
+    "subtitle": "Configure policies, compliance profiles, evidence, waivers, governance packs, scorecards and risk matrix",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} governance & compliance definitions configured",
+    "sections": {
+      "policies": "Policies & Profiles",
+      "evidence": "Evidence",
+      "waivers": "Waivers",
+      "packs": "Packs & Bindings",
+      "scorecards": "Scorecards & Risk",
+      "requirements": "Minimum Requirements"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "audit": {
+      "title": "Audit History",
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "by": "By",
+      "reason": "Reason"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No governance configuration definitions match the current filters."
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load governance and compliance configuration.",
+      "retry": "Retry"
+    }
   }
 }

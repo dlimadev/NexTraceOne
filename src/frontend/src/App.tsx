@@ -117,6 +117,7 @@ const NotificationPreferencesPage = lazy(() => import('./features/notifications/
 const ConfigurationAdminPage = lazy(() => import('./features/configuration/pages/ConfigurationAdminPage').then(m => ({ default: m.ConfigurationAdminPage })));
 const NotificationConfigurationPage = lazy(() => import('./features/notifications/pages/NotificationConfigurationPage').then(m => ({ default: m.NotificationConfigurationPage })));
 const WorkflowConfigurationPage = lazy(() => import('./features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
+const GovernanceConfigurationPage = lazy(() => import('./features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
 
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -839,6 +840,15 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
                     <WorkflowConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Governance & Compliance Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/governance"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <GovernanceConfigurationPage />
                   </ProtectedRoute>
                 }
               />

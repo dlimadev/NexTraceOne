@@ -3517,5 +3517,59 @@
       "message": "No se pudo cargar la configuración de workflow y gobernanza de promoción.",
       "retry": "Reintentar"
     }
+  },
+  "governanceConfig": {
+    "title": "Configuración de Gobernanza & Compliance",
+    "subtitle": "Configure políticas, perfiles de compliance, evidencias, waivers, packs de gobernanza, scorecards y matriz de riesgo",
+    "scope": "Ámbito",
+    "scopeReference": "ID de Referencia del Ámbito",
+    "scopeReferencePlaceholder": "Introduzca el ID del tenant/entorno...",
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por clave o nombre...",
+    "effectiveValue": "Valor Efectivo",
+    "resolvedFrom": "Resuelto desde",
+    "footer": "{{count}} definiciones de gobernanza y compliance configuradas",
+    "sections": {
+      "policies": "Políticas & Perfiles",
+      "evidence": "Evidencias",
+      "waivers": "Waivers",
+      "packs": "Packs & Bindings",
+      "scorecards": "Scorecards & Riesgo",
+      "requirements": "Requisitos Mínimos"
+    },
+    "badges": {
+      "sensitive": "Sensible",
+      "nonInheritable": "No heredable",
+      "default": "Predeterminado",
+      "inherited": "Heredado",
+      "override": "Anulación"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo del Cambio",
+      "reasonPlaceholder": "Motivo opcional para este cambio...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Historial de Auditoría"
+    },
+    "audit": {
+      "title": "Historial de Auditoría",
+      "loading": "Cargando historial de auditoría...",
+      "empty": "Sin historial de auditoría disponible.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "empty": {
+      "title": "Sin definiciones encontradas",
+      "description": "Ninguna definición de gobernanza coincide con los filtros actuales."
+    },
+    "error": {
+      "title": "Error al cargar configuración",
+      "message": "No se pudo cargar la configuración de gobernanza y compliance.",
+      "retry": "Reintentar"
+    }
   }
 }
