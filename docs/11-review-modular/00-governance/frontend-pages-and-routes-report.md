@@ -1,234 +1,248 @@
-# Inventário de Páginas e Rotas — NexTraceOne Frontend
+# Relatório de Páginas e Rotas do Frontend — NexTraceOne
 
-> **Data:** 2026-03-24  
-> **Tipo:** Auditoria Estrutural — Parte 3  
-> **Fonte de verdade:** App.tsx, AppSidebar.tsx e ficheiros de páginas do repositório
+> **Data:** 2025-07-14  
+> **Versão:** 2.0  
+> **Escopo:** Inventário completo de 108 páginas e 130+ rotas  
+> **Status global:** GAP_IDENTIFIED  
+> **Caminho do router:** `src/frontend/src/App.tsx`
 
 ---
 
-## Resumo
+## 1. Resumo
 
 | Métrica | Valor |
 |---------|-------|
-| Total de páginas (ficheiros *Page.tsx) | 105 |
-| Rotas definidas no App.tsx | 85+ |
-| Rotas públicas | 7 |
-| Rotas protegidas | 78+ |
-| Itens no menu (navItems) | 49 |
-| Páginas órfãs (sem rota no App.tsx) | 7 |
-| Itens de menu sem rota real | 3 |
-| Rotas sem item no menu (intencional) | ~30 |
+| Total de páginas (componentes Page) | 108 |
+| Total de rotas registadas em App.tsx | 130+ |
+| Rotas públicas (sem auth) | 7 |
+| Rotas protegidas | 123+ |
+| Rotas quebradas (sidebar sem App.tsx) | 3 |
+| Páginas órfãs (sem rota) | 9 |
+| Páginas vazias (0 bytes) | 1 |
+| Redirects configurados | 3 |
 
 ---
 
-## 1. Rotas Públicas (Autenticação)
+## 2. Rotas Públicas (7)
 
-| Rota | Página | Módulo | Menu | Funcional | i18n |
-|------|--------|--------|------|-----------|------|
-| `/login` | LoginPage | identity-access | Não | ✅ | ✅ |
-| `/forgot-password` | ForgotPasswordPage | identity-access | Não | ✅ | ✅ |
-| `/reset-password` | ResetPasswordPage | identity-access | Não | ✅ | ✅ |
-| `/activate` | ActivationPage | identity-access | Não | ✅ | ✅ |
-| `/mfa` | MfaPage | identity-access | Não | ✅ | ✅ |
-| `/invitation` | InvitationPage | identity-access | Não | ✅ | ✅ |
-| `/select-tenant` | TenantSelectionPage | identity-access | Não | ✅ | ✅ |
-
----
-
-## 2. Rotas Protegidas — Services & Knowledge
-
-| Rota | Página | Módulo | Menu | Permissão | Estado | Observações |
-|------|--------|--------|------|-----------|--------|-------------|
-| `/` | DashboardPage | — | ✅ home | — | ✅ Funcional | Dashboard principal |
-| `/services` | ServiceCatalogListPage | catalog | ✅ services | catalog:assets:read | ✅ Funcional | Lista de serviços |
-| `/services/graph` | ServiceCatalogPage | catalog | ✅ services | catalog:assets:read | ✅ Funcional | Grafo de dependências (1010 linhas) |
-| `/services/:serviceId` | ServiceDetailPage | catalog | Não (detalhe) | catalog:assets:read | ✅ Funcional | Detalhe de serviço |
-| `/source-of-truth` | SourceOfTruthExplorerPage | catalog | ✅ knowledge | catalog:assets:read | ✅ Funcional | Explorador Source of Truth |
-| `/source-of-truth/service/:serviceId` | ServiceSourceOfTruthPage | catalog | Não (detalhe) | catalog:assets:read | ✅ Funcional | Source of Truth por serviço |
-| `/source-of-truth/contract/:contractId` | ContractSourceOfTruthPage | catalog | Não (detalhe) | catalog:assets:read | ✅ Funcional | Source of Truth por contrato |
-| `/portal` | DeveloperPortalPage | catalog | ✅ knowledge | developer-portal:read | ✅ Funcional | Portal do developer |
-| `/search` | GlobalSearchPage | catalog | Não (header) | catalog:assets:read | ✅ Funcional | Pesquisa global |
+| Rota | Página | Ficheiro | Status |
+|------|--------|----------|--------|
+| `/login` | LoginPage | `features/identity-access/pages/LoginPage.tsx` | ✅ FUNCIONAL |
+| `/forgot-password` | ForgotPasswordPage | `features/identity-access/pages/ForgotPasswordPage.tsx` | ✅ FUNCIONAL |
+| `/reset-password` | ResetPasswordPage | `features/identity-access/pages/ResetPasswordPage.tsx` | ✅ FUNCIONAL |
+| `/activate` | ActivationPage | `features/identity-access/pages/ActivationPage.tsx` | ✅ FUNCIONAL |
+| `/mfa` | MfaPage | `features/identity-access/pages/MfaPage.tsx` | ✅ FUNCIONAL |
+| `/invitation` | InvitationPage | `features/identity-access/pages/InvitationPage.tsx` | ⚠️ Eager import (redirect) |
+| `/select-tenant` | TenantSelectionPage | `features/identity-access/pages/TenantSelectionPage.tsx` | ✅ FUNCIONAL |
 
 ---
 
-## 3. Rotas Protegidas — Contracts
+## 3. Rotas Protegidas por Módulo
 
-| Rota | Página | Módulo | Menu | Permissão | Estado | Observações |
-|------|--------|--------|------|-----------|--------|-------------|
-| `/contracts` | ContractCatalogPage | contracts | ✅ contracts | contracts:read | ✅ Funcional | Catálogo de contratos |
-| `/contracts/new` | CreateServicePage | contracts | ✅ contracts | contracts:write | ✅ Funcional | Criação de contrato |
-| `/contracts/studio` | DraftStudioPage | contracts | ✅ contracts | contracts:read | ✅ Funcional | Studio de drafts |
-| `/contracts/studio/:draftId` | DraftStudioPage | contracts | Não (detalhe) | contracts:write | ✅ Funcional | Edição de draft |
-| `/contracts/:contractVersionId` | ContractWorkspacePage | contracts | Não (detalhe) | contracts:read | ✅ Funcional | Workspace de contrato |
-| `/contracts/governance` | — | — | ✅ contracts | — | ❌ **SEM ROTA** | Menu aponta para rota inexistente |
-| `/contracts/spectral` | — | — | ✅ contracts | — | ❌ **SEM ROTA** | Menu aponta para rota inexistente |
-| `/contracts/canonical` | — | — | ✅ contracts | — | ❌ **SEM ROTA** | Menu aponta para rota inexistente |
+### 3.1 Home e Busca Global
 
-> **⚠️ Alerta:** 3 itens de menu de contratos apontam para rotas que **não existem** no App.tsx. As páginas existem como ficheiros (`ContractGovernancePage.tsx`, `SpectralRulesetManagerPage.tsx`, `CanonicalEntityCatalogPage.tsx`) mas não estão importadas nem roteadas.
+| Rota | Página | Permissão | Menu | Status |
+|------|--------|-----------|------|--------|
+| `/` | DashboardPage | *(nenhuma)* | ✅ home | ✅ FUNCIONAL |
+| `/search` | GlobalSearchPage | `catalog:assets:read` | Via topbar | ✅ FUNCIONAL |
 
----
+### 3.2 Catalog & Source of Truth
 
-## 4. Rotas Protegidas — Changes
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/services` | ServiceCatalogListPage | `catalog/pages/ServiceCatalogListPage.tsx` | `catalog:assets:read` | ✅ services | ✅ FUNCIONAL |
+| `/services/graph` | ServiceCatalogPage | `catalog/pages/ServiceCatalogPage.tsx` | `catalog:assets:read` | ✅ services | ✅ FUNCIONAL |
+| `/services/:serviceId` | ServiceDetailPage | `catalog/pages/ServiceDetailPage.tsx` | `catalog:assets:read` | Navegação | ✅ FUNCIONAL |
+| `/source-of-truth` | SourceOfTruthExplorerPage | `catalog/pages/SourceOfTruthExplorerPage.tsx` | `catalog:assets:read` | ✅ knowledge | ✅ FUNCIONAL |
+| `/source-of-truth/services/:serviceId` | ServiceSourceOfTruthPage | `catalog/pages/ServiceSourceOfTruthPage.tsx` | `catalog:assets:read` | Navegação | ✅ FUNCIONAL |
+| `/source-of-truth/contracts/:contractVersionId` | ContractSourceOfTruthPage | `catalog/pages/ContractSourceOfTruthPage.tsx` | `catalog:assets:read` | Navegação | ✅ FUNCIONAL |
+| `/portal/*` | DeveloperPortalPage | `catalog/pages/DeveloperPortalPage.tsx` | `developer-portal:read` | ✅ knowledge | ✅ FUNCIONAL |
+| `/graph` | *(redirect)* | — | — | — | → `/services/graph` |
 
-| Rota | Página | Módulo | Menu | Permissão | Estado | Observações |
-|------|--------|--------|------|-----------|--------|-------------|
-| `/changes` | ChangeCatalogPage | change-governance | ✅ changes | change-intelligence:read | ✅ Funcional | Catálogo de mudanças |
-| `/changes/:changeId` | ChangeDetailPage | change-governance | Não (detalhe) | change-intelligence:read | ✅ Funcional | Detalhe de mudança |
-| `/releases` | ReleasesPage | change-governance | ✅ changes | change-intelligence:releases:read | ✅ Funcional | Releases |
-| `/workflow` | WorkflowPage | change-governance | ✅ changes | workflow:read | ✅ Funcional | Workflows |
-| `/promotion` | PromotionPage | change-governance | ✅ changes | promotion:read | ✅ Funcional | Promoções |
+**Páginas órfãs do catalog:**
 
----
+| Página | Ficheiro | Referência | Status |
+|--------|----------|-----------|--------|
+| ContractDetailPage | `catalog/pages/ContractDetailPage.tsx` | Nenhuma | ❌ ÓRFÃ |
+| ContractListPage | `catalog/pages/ContractListPage.tsx` | Nenhuma | ❌ ÓRFÃ |
+| ContractsPage | `catalog/pages/ContractsPage.tsx` | Nenhuma | ❌ ÓRFÃ |
+| CatalogContractsConfigurationPage | `catalog/pages/CatalogContractsConfigurationPage.tsx` | Via admin | ⚠️ ROTA ADMIN |
 
-## 5. Rotas Protegidas — Operations
+### 3.3 Contracts
 
-| Rota | Página | Módulo | Menu | Permissão | Estado | Observações |
-|------|--------|--------|------|-----------|--------|-------------|
-| `/operations/incidents` | IncidentsPage | operations | ✅ operations | operations:incidents:read | ✅ Funcional | Incidentes |
-| `/operations/incidents/:incidentId` | IncidentDetailPage | operations | Não (detalhe) | operations:incidents:read | ✅ Funcional | Detalhe de incidente |
-| `/operations/runbooks` | RunbooksPage | operations | ✅ operations | operations:runbooks:read | ✅ Funcional | Runbooks |
-| `/operations/reliability` | TeamReliabilityPage | operations | ✅ operations | operations:reliability:read | ✅ Funcional | Fiabilidade por equipa |
-| `/operations/reliability/:serviceId` | ServiceReliabilityDetailPage | operations | Não (detalhe) | operations:reliability:read | ✅ Funcional | Fiabilidade por serviço |
-| `/operations/automation` | AutomationWorkflowsPage | operations | ✅ operations | operations:automation:read | ✅ Funcional | Automação |
-| `/operations/automation/admin` | AutomationAdminPage | operations | Não (admin) | operations:automation:read | ✅ Funcional | Admin de automação |
-| `/operations/automation/:workflowId` | AutomationWorkflowDetailPage | operations | Não (detalhe) | operations:automation:read | ✅ Funcional | Detalhe de workflow |
-| `/operations/runtime-comparison` | EnvironmentComparisonPage | operations | ✅ operations | operations:runtime:read | ✅ Funcional | Comparação de ambientes |
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/contracts` | ContractCatalogPage | `contracts/catalog/ContractCatalogPage.tsx` | `contracts:read` | ✅ contracts | ✅ FUNCIONAL |
+| `/contracts/new` | CreateServicePage | `contracts/create/CreateServicePage.tsx` | `contracts:write` | ✅ contracts | ✅ FUNCIONAL |
+| `/contracts/studio/:draftId` | DraftStudioPage | `contracts/studio/DraftStudioPage.tsx` | `contracts:write` | ✅ contracts | ✅ FUNCIONAL |
+| `/contracts/studio` | *(redirect)* | — | — | — | → `/contracts` |
+| `/contracts/legacy` | *(redirect)* | — | — | — | → `/contracts` |
+| `/contracts/:contractVersionId` | ContractWorkspacePage | `contracts/workspace/ContractWorkspacePage.tsx` | `contracts:read` | Navegação | ✅ FUNCIONAL |
 
----
+**Rotas quebradas (sidebar → sem registo em App.tsx):**
 
-## 6. Rotas Protegidas — AI Hub
+| Rota do Sidebar | Página existente | Ficheiro | Status |
+|-----------------|-----------------|----------|--------|
+| `/contracts/governance` | ContractGovernancePage | `contracts/governance/ContractGovernancePage.tsx` | ❌ QUEBRADA |
+| `/contracts/spectral` | SpectralRulesetManagerPage | `contracts/spectral/SpectralRulesetManagerPage.tsx` | ❌ QUEBRADA |
+| `/contracts/canonical` | CanonicalEntityCatalogPage | `contracts/canonical/CanonicalEntityCatalogPage.tsx` | ❌ QUEBRADA |
 
-| Rota | Página | Módulo | Menu | Permissão | Estado | Observações |
-|------|--------|--------|------|-----------|--------|-------------|
-| `/ai/assistant` | AiAssistantPage | ai-hub | ✅ aiHub | ai:assistant:read | ✅ Parcial | Assistente IA (483 linhas) — UI completa, backend com stubs |
-| `/ai/agents` | AiAgentsPage | ai-hub | ✅ aiHub | ai:assistant:read | ✅ Parcial | Agentes IA |
-| `/ai/agents/:agentId` | AgentDetailPage | ai-hub | Não (detalhe) | ai:assistant:read | ✅ Parcial | Detalhe de agente |
-| `/ai/models` | ModelRegistryPage | ai-hub | ✅ aiHub | ai:governance:read | ✅ Parcial | Registo de modelos |
-| `/ai/policies` | AiPoliciesPage | ai-hub | ✅ aiHub | ai:governance:read | ✅ Parcial | Políticas IA |
-| `/ai/routing` | AiRoutingPage | ai-hub | ✅ aiHub | ai:governance:read | ✅ Parcial | Routing IA |
-| `/ai/ide` | IdeIntegrationsPage | ai-hub | ✅ aiHub | ai:governance:read | ✅ Parcial | Integrações IDE |
-| `/ai/budgets` | TokenBudgetPage | ai-hub | ✅ aiHub | ai:governance:read | ✅ Parcial | Orçamento de tokens |
-| `/ai/audit` | AiAuditPage | ai-hub | ✅ aiHub | ai:governance:read | ✅ Parcial | Auditoria IA |
-| `/ai/analysis` | AiAnalysisPage | ai-hub | ✅ aiHub | ai:runtime:write | ✅ Parcial | Análise IA |
+**Página órfã adicional:**
 
----
+| Página | Ficheiro | Status |
+|--------|----------|--------|
+| ContractPortalPage | `contracts/portal/ContractPortalPage.tsx` | ❌ ÓRFÃ (sem referência) |
 
-## 7. Rotas Protegidas — Governance
+### 3.4 Change Governance
 
-| Rota | Página | Módulo | Menu | Permissão | Estado |
-|------|--------|--------|------|-----------|--------|
-| `/governance/executive` | ExecutiveOverviewPage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/executive/drilldown` | ExecutiveDrillDownPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/executive/finops` | ExecutiveFinOpsPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/reports` | ReportsPage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/compliance` | CompliancePage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/risk` | RiskCenterPage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/risk/heatmap` | RiskHeatmapPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/finops` | FinOpsPage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/finops/service/:serviceId` | ServiceFinOpsPage | governance | Não (detalhe) | governance:read | ✅ Funcional |
-| `/governance/finops/team/:teamId` | TeamFinOpsPage | governance | Não (detalhe) | governance:read | ✅ Funcional |
-| `/governance/finops/domain/:domainId` | DomainFinOpsPage | governance | Não (detalhe) | governance:read | ✅ Funcional |
-| `/governance/policies` | PolicyCatalogPage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/controls` | EnterpriseControlsPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/evidence` | EvidencePackagesPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/maturity` | MaturityScorecardsPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/benchmarking` | BenchmarkingPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/teams` | TeamsOverviewPage | governance | ✅ organization | governance:read | ✅ Funcional |
-| `/governance/teams/:teamId` | TeamDetailPage | governance | Não (detalhe) | governance:read | ✅ Funcional |
-| `/governance/domains` | DomainsOverviewPage | governance | ✅ organization | governance:read | ✅ Funcional |
-| `/governance/domains/:domainId` | DomainDetailPage | governance | Não (detalhe) | governance:read | ✅ Funcional |
-| `/governance/packs` | GovernancePacksOverviewPage | governance | ✅ governance | governance:read | ✅ Funcional |
-| `/governance/packs/:packId` | GovernancePackDetailPage | governance | Não (detalhe) | governance:read | ✅ Funcional |
-| `/governance/waivers` | WaiversPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
-| `/governance/delegated-admin` | DelegatedAdminPage | governance | Não (sub-rota) | governance:read | ✅ Funcional |
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/changes` | ChangeCatalogPage | `change-governance/pages/ChangeCatalogPage.tsx` | `change-intelligence:read` | ✅ changes | ✅ FUNCIONAL |
+| `/changes/:changeId` | ChangeDetailPage | `change-governance/pages/ChangeDetailPage.tsx` | `change-intelligence:read` | Navegação | ✅ FUNCIONAL |
+| `/releases` | ReleasesPage | `change-governance/pages/ReleasesPage.tsx` | `change-intelligence:releases:read` | ✅ changes | ✅ FUNCIONAL |
+| `/workflow` | WorkflowPage | `change-governance/pages/WorkflowPage.tsx` | `workflow:read` | ✅ changes | ✅ FUNCIONAL |
+| `/promotion` | PromotionPage | `change-governance/pages/PromotionPage.tsx` | `promotion:read` | ✅ changes | ✅ FUNCIONAL |
+| `/workflow/configuration` | WorkflowConfigurationPage | `change-governance/pages/WorkflowConfigurationPage.tsx` | Admin | Via admin | ✅ FUNCIONAL |
 
----
+### 3.5 Operations
 
-## 8. Rotas Protegidas — Integrations
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/operations/incidents` | IncidentsPage | `operations/pages/IncidentsPage.tsx` | `operations:incidents:read` | ✅ operations | ✅ FUNCIONAL |
+| `/operations/incidents/:incidentId` | IncidentDetailPage | `operations/pages/IncidentDetailPage.tsx` | `operations:incidents:read` | Navegação | ✅ FUNCIONAL |
+| `/operations/runbooks` | RunbooksPage | `operations/pages/RunbooksPage.tsx` | `operations:runbooks:read` | ✅ operations | ✅ FUNCIONAL |
+| `/operations/reliability` | TeamReliabilityPage | `operations/pages/TeamReliabilityPage.tsx` | `operations:reliability:read` | ✅ operations | ✅ FUNCIONAL |
+| `/operations/reliability/:serviceId` | ServiceReliabilityDetailPage | `operations/pages/ServiceReliabilityDetailPage.tsx` | `operations:reliability:read` | Navegação | ✅ FUNCIONAL |
+| `/operations/automation` | AutomationWorkflowsPage | `operations/pages/AutomationWorkflowsPage.tsx` | `operations:automation:read` | ✅ operations | ✅ FUNCIONAL |
+| `/operations/automation/:workflowId` | AutomationWorkflowDetailPage | `operations/pages/AutomationWorkflowDetailPage.tsx` | `operations:automation:read` | Navegação | ✅ FUNCIONAL |
+| `/operations/runtime-comparison` | EnvironmentComparisonPage | `operations/pages/EnvironmentComparisonPage.tsx` | `operations:runtime:read` | ✅ operations | ✅ FUNCIONAL |
+| `/platform/operations` | PlatformOperationsPage | `operations/pages/PlatformOperationsPage.tsx` | `platform:admin:read` | ✅ admin | ✅ FUNCIONAL |
 
-| Rota | Página | Módulo | Menu | Permissão | Estado |
-|------|--------|--------|------|-----------|--------|
-| `/integrations` | IntegrationHubPage | integrations | ✅ integrations | integrations:read | ✅ Funcional |
-| `/integrations/:connectorId` | ConnectorDetailPage | integrations | Não (detalhe) | integrations:read | ✅ Funcional |
-| `/integrations/executions` | IngestionExecutionsPage | integrations | Não (sub-rota) | integrations:read | ✅ Funcional |
-| `/integrations/freshness` | IngestionFreshnessPage | integrations | Não (sub-rota) | integrations:read | ✅ Funcional |
+### 3.6 AI Hub
 
----
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/ai/assistant` | AiAssistantPage | `ai-hub/pages/AiAssistantPage.tsx` | `ai:assistant:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/agents` | AiAgentsPage | `ai-hub/pages/AiAgentsPage.tsx` | `ai:assistant:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/agents/:agentId` | AgentDetailPage | `ai-hub/pages/AgentDetailPage.tsx` | `ai:assistant:read` | Navegação | ✅ FUNCIONAL |
+| `/ai/models` | ModelRegistryPage | `ai-hub/pages/ModelRegistryPage.tsx` | `ai:governance:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/policies` | AiPoliciesPage | `ai-hub/pages/AiPoliciesPage.tsx` | `ai:governance:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/routing` | AiRoutingPage | `ai-hub/pages/AiRoutingPage.tsx` | `ai:governance:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/ide` | IdeIntegrationsPage | `ai-hub/pages/IdeIntegrationsPage.tsx` | `ai:governance:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/budgets` | TokenBudgetPage | `ai-hub/pages/TokenBudgetPage.tsx` | `ai:governance:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/audit` | AiAuditPage | `ai-hub/pages/AiAuditPage.tsx` | `ai:governance:read` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/analysis` | AiAnalysisPage | `ai-hub/pages/AiAnalysisPage.tsx` | `ai:runtime:write` | ✅ aiHub | ✅ FUNCIONAL |
+| `/ai/integrations/config` | AiIntegrationsConfigurationPage | `ai-hub/pages/AiIntegrationsConfigurationPage.tsx` | Admin | Via admin | ✅ FUNCIONAL |
 
-## 9. Rotas Protegidas — Analytics
+### 3.7 Governance
 
-| Rota | Página | Módulo | Menu | Permissão | Estado |
-|------|--------|--------|------|-----------|--------|
-| `/analytics` | ProductAnalyticsOverviewPage | product-analytics | ✅ analytics | analytics:read | ✅ Parcial |
-| `/analytics/adoption` | ModuleAdoptionPage | product-analytics | Não (sub-rota) | analytics:read | ✅ Parcial |
-| `/analytics/personas` | PersonaUsagePage | product-analytics | Não (sub-rota) | analytics:read | ✅ Parcial |
-| `/analytics/journeys` | JourneyFunnelPage | product-analytics | Não (sub-rota) | analytics:read | ✅ Parcial |
-| `/analytics/value` | ValueTrackingPage | product-analytics | Não (sub-rota) | analytics:read | ✅ Parcial |
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/governance/executive` | ExecutiveOverviewPage | `governance/pages/ExecutiveOverviewPage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/executive/:area` | ExecutiveDrillDownPage | `governance/pages/ExecutiveDrillDownPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/executive/finops` | ExecutiveFinOpsPage | `governance/pages/ExecutiveFinOpsPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/reports` | ReportsPage | `governance/pages/ReportsPage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/compliance` | CompliancePage | `governance/pages/CompliancePage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/risk` | RiskCenterPage | `governance/pages/RiskCenterPage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/risk/heatmap` | RiskHeatmapPage | `governance/pages/RiskHeatmapPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/finops` | FinOpsPage | `governance/pages/FinOpsPage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/finops/domain/:id` | DomainFinOpsPage | `governance/pages/DomainFinOpsPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/finops/service/:id` | ServiceFinOpsPage | `governance/pages/ServiceFinOpsPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/finops/team/:id` | TeamFinOpsPage | `governance/pages/TeamFinOpsPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/policies` | PolicyCatalogPage | `governance/pages/PolicyCatalogPage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/packs` | GovernancePacksOverviewPage | `governance/pages/GovernancePacksOverviewPage.tsx` | `governance:read` | ✅ governance | ✅ FUNCIONAL |
+| `/governance/packs/:packId` | GovernancePackDetailPage | `governance/pages/GovernancePackDetailPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/teams` | TeamsOverviewPage | `governance/pages/TeamsOverviewPage.tsx` | `governance:read` | ✅ organization | ✅ FUNCIONAL |
+| `/governance/teams/:teamId` | TeamDetailPage | `governance/pages/TeamDetailPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/domains` | DomainsOverviewPage | `governance/pages/DomainsOverviewPage.tsx` | `governance:read` | ✅ organization | ✅ FUNCIONAL |
+| `/governance/domains/:domainId` | DomainDetailPage | `governance/pages/DomainDetailPage.tsx` | `governance:read` | Navegação | ✅ FUNCIONAL |
+| `/governance/benchmarking` | BenchmarkingPage | `governance/pages/BenchmarkingPage.tsx` | `governance:read` | Via reports | ✅ FUNCIONAL |
+| `/governance/maturity` | MaturityScorecardsPage | `governance/pages/MaturityScorecardsPage.tsx` | `governance:read` | Via reports | ✅ FUNCIONAL |
+| `/governance/controls` | EnterpriseControlsPage | `governance/pages/EnterpriseControlsPage.tsx` | `governance:read` | Via compliance | ✅ FUNCIONAL |
+| `/governance/evidence` | EvidencePackagesPage | `governance/pages/EvidencePackagesPage.tsx` | `governance:read` | Via compliance | ✅ FUNCIONAL |
+| `/governance/waivers` | WaiversPage | `governance/pages/WaiversPage.tsx` | `governance:read` | Via policies | ✅ FUNCIONAL |
+| `/governance/delegated-admin` | DelegatedAdminPage | `governance/pages/DelegatedAdminPage.tsx` | `governance:read` | Via admin | ✅ FUNCIONAL |
+| `/governance/configuration` | GovernanceConfigurationPage | `governance/pages/GovernanceConfigurationPage.tsx` | `governance:read` | Via admin | ✅ FUNCIONAL |
 
----
+### 3.8 Identity & Access (Admin)
 
-## 10. Rotas Protegidas — Administration
+| Rota | Página | Ficheiro | Permissão | Menu | Status |
+|------|--------|----------|-----------|------|--------|
+| `/users` | UsersPage | `identity-access/pages/UsersPage.tsx` | `identity:users:read` | ✅ admin | ✅ FUNCIONAL |
+| `/break-glass` | BreakGlassPage | `identity-access/pages/BreakGlassPage.tsx` | `identity:sessions:read` | ✅ admin | ✅ FUNCIONAL |
+| `/jit-access` | JitAccessPage | `identity-access/pages/JitAccessPage.tsx` | `identity:users:read` | ✅ admin | ✅ FUNCIONAL |
+| `/delegations` | DelegationPage | `identity-access/pages/DelegationPage.tsx` | `identity:users:read` | ✅ admin | ✅ FUNCIONAL |
+| `/access-reviews` | AccessReviewPage | `identity-access/pages/AccessReviewPage.tsx` | `identity:users:read` | ✅ admin | ✅ FUNCIONAL |
+| `/my-sessions` | MySessionsPage | `identity-access/pages/MySessionsPage.tsx` | `identity:sessions:read` | ✅ admin | ✅ FUNCIONAL |
+| `/environments` | EnvironmentsPage | `identity-access/pages/EnvironmentsPage.tsx` | Admin | Via admin | ✅ FUNCIONAL |
+| `/unauthorized` | UnauthorizedPage | `identity-access/pages/UnauthorizedPage.tsx` | *(nenhuma)* | — | ✅ FUNCIONAL |
 
-| Rota | Página | Módulo | Menu | Permissão | Estado |
-|------|--------|--------|------|-----------|--------|
-| `/users` | UsersPage | identity-access | ✅ admin | identity:users:read | ✅ Funcional |
-| `/environments` | EnvironmentsPage | identity-access | Não (sub-rota) | identity:users:read | ✅ Funcional |
-| `/break-glass` | BreakGlassPage | identity-access | ✅ admin | identity:sessions:read | ✅ Funcional |
-| `/jit-access` | JitAccessPage | identity-access | ✅ admin | identity:users:read | ✅ Funcional |
-| `/delegations` | DelegationPage | identity-access | ✅ admin | identity:users:read | ✅ Funcional |
-| `/access-reviews` | AccessReviewPage | identity-access | ✅ admin | identity:users:read | ✅ Funcional |
-| `/my-sessions` | MySessionsPage | identity-access | ✅ admin | identity:sessions:read | ✅ Funcional |
-| `/audit` | AuditPage | audit-compliance | ✅ admin | audit:read | ✅ Funcional |
-| `/platform/operations` | PlatformOperationsPage | operations | ✅ admin | platform:admin:read | ✅ Funcional |
-| `/platform/configuration` | ConfigurationAdminPage | configuration | ✅ admin | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/notifications` | NotificationConfigurationPage | notifications | Não (sub) | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/workflows` | WorkflowConfigurationPage | change-governance | Não (sub) | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/governance` | GovernanceConfigurationPage | governance | Não (sub) | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/catalog-contracts` | CatalogContractsConfigurationPage | catalog | Não (sub) | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/operations-finops` | OperationsFinOpsConfigurationPage | operational-intelligence | Não (sub) | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/ai-integrations` | AiIntegrationsConfigurationPage | ai-hub | Não (sub) | platform:admin:read | ✅ Funcional |
-| `/platform/configuration/advanced` | AdvancedConfigurationConsolePage | configuration | Não (sub) | platform:admin:read | ✅ Funcional |
+### 3.9 Outros Módulos
 
----
-
-## 11. Páginas Órfãs (Sem Rota no App.tsx)
-
-| Ficheiro | Módulo | Observação |
-|----------|--------|------------|
-| `ContractGovernancePage.tsx` | contracts/governance | No menu mas sem rota — **candidato a integração** |
-| `SpectralRulesetManagerPage.tsx` | contracts/spectral | No menu mas sem rota — **candidato a integração** |
-| `CanonicalEntityCatalogPage.tsx` | contracts/canonical | No menu mas sem rota — **candidato a integração** |
-| `ContractPortalPage.tsx` | contracts/portal | Sem menu e sem rota — **órfã** |
-| `ContractDetailPage.tsx` | catalog/pages | Sem rota — pode ser versão antiga da ContractWorkspacePage |
-| `ContractListPage.tsx` | catalog/pages | Sem rota — pode ser versão antiga da ContractCatalogPage |
-| `ContractsPage.tsx` | catalog/pages | Sem rota — pode ser versão antiga da ContractCatalogPage |
-
----
-
-## 12. Rotas Especiais
-
-| Rota | Comportamento | Observação |
-|------|--------------|------------|
-| `/graph` | Redirect → `/services/graph` | Rota legacy de compatibilidade |
-| `/unauthorized` | UnauthorizedPage | Página de acesso negado |
-| `*` (catch-all) | Redirect → `/` | Qualquer rota desconhecida vai para a home |
+| Rota | Página | Módulo | Permissão | Menu | Status |
+|------|--------|--------|-----------|------|--------|
+| `/integrations` | IntegrationHubPage | integrations | `integrations:read` | ✅ integrations | ✅ FUNCIONAL |
+| `/integrations/:connectorId` | ConnectorDetailPage | integrations | `integrations:read` | Navegação | ✅ FUNCIONAL |
+| `/integrations/executions` | IngestionExecutionsPage | integrations | `integrations:read` | Navegação | ✅ FUNCIONAL |
+| `/integrations/freshness` | IngestionFreshnessPage | integrations | `integrations:read` | Navegação | ✅ FUNCIONAL |
+| `/analytics` | ProductAnalyticsOverviewPage | product-analytics | `analytics:read` | ✅ analytics | ✅ FUNCIONAL |
+| `/analytics/adoption` | ModuleAdoptionPage | product-analytics | `analytics:read` | Navegação | ✅ FUNCIONAL |
+| `/analytics/personas` | PersonaUsagePage | product-analytics | `analytics:read` | Navegação | ✅ FUNCIONAL |
+| `/analytics/journeys` | JourneyFunnelPage | product-analytics | `analytics:read` | Navegação | ✅ FUNCIONAL |
+| `/analytics/value` | ValueTrackingPage | product-analytics | `analytics:read` | Navegação | ✅ FUNCIONAL |
+| `/audit` | AuditPage | audit-compliance | `audit:read` | ✅ admin | ✅ FUNCIONAL |
+| `/platform/configuration` | ConfigurationAdminPage | configuration | `platform:admin:read` | ✅ admin | ✅ FUNCIONAL |
+| `/notifications` | NotificationCenterPage | notifications | *(nenhuma)* | Via topbar | ✅ FUNCIONAL |
+| `/notifications/configuration` | NotificationConfigurationPage | notifications | Admin | Via admin | ✅ FUNCIONAL |
+| `/notifications/preferences` | NotificationPreferencesPage | notifications | *(nenhuma)* | Via perfil | ✅ FUNCIONAL |
 
 ---
 
-## Problemas Identificados
+## 4. Redirects Configurados
 
-### Críticos
+| De | Para | Tipo |
+|----|------|------|
+| `/graph` | `/services/graph` | Navigate (redirect) |
+| `/contracts/studio` (sem parâmetro) | `/contracts` | Navigate (redirect) |
+| `/contracts/legacy` | `/contracts` | Navigate (redirect) |
 
-1. **3 itens de menu sem rota real** — `/contracts/governance`, `/contracts/spectral`, `/contracts/canonical`
-2. **7 páginas órfãs** — existem como ficheiros mas não estão acessíveis
+---
 
-### Moderados
+## 5. Consolidação de Problemas
 
-3. **Páginas possivelmente duplicadas** — ContractDetailPage vs ContractWorkspacePage; ContractListPage vs ContractCatalogPage; ContractsPage
-4. **AI Hub inteiro marcado como Parcial** — 11 páginas com UI mas backend com stubs
-5. **Product Analytics sem documentação** — 5 páginas sem documentação dedicada
+### 5.1 Rotas Quebradas (3) — Prioridade CRITICAL
 
-### Menores
+| # | Rota | Problema | Ação necessária |
+|---|------|---------|----------------|
+| 1 | `/contracts/governance` | Sidebar link existe, rota NÃO registada em App.tsx | Adicionar Route em App.tsx |
+| 2 | `/contracts/spectral` | Sidebar link existe, rota NÃO registada em App.tsx | Adicionar Route em App.tsx |
+| 3 | `/contracts/canonical` | Sidebar link existe, rota NÃO registada em App.tsx | Adicionar Route em App.tsx |
 
-6. **Muitas sub-rotas não aparecem no menu** — ~30 rotas são acessíveis apenas por navegação interna (intencional mas pode dificultar descoberta)
-7. **EnterpriseControls, EvidencePackages, MaturityScorecards, Benchmarking, Waivers, DelegatedAdmin** — rotas existem mas não têm item direto no menu (acessíveis via sub-navegação)
+### 5.2 Páginas Órfãs (9) — Prioridade HIGH/MEDIUM
+
+| # | Página | Ficheiro | Tipo | Prioridade | Ação sugerida |
+|---|--------|----------|------|------------|--------------|
+| 1 | ContractGovernancePage | `contracts/governance/ContractGovernancePage.tsx` | Sidebar sem rota | CRITICAL | Registar rota |
+| 2 | SpectralRulesetManagerPage | `contracts/spectral/SpectralRulesetManagerPage.tsx` | Sidebar sem rota | CRITICAL | Registar rota |
+| 3 | CanonicalEntityCatalogPage | `contracts/canonical/CanonicalEntityCatalogPage.tsx` | Sidebar sem rota | CRITICAL | Registar rota |
+| 4 | ContractPortalPage | `contracts/portal/ContractPortalPage.tsx` | Sem referência | HIGH | Integrar ou remover |
+| 5 | ContractDetailPage | `catalog/pages/ContractDetailPage.tsx` | Sem referência | HIGH | Legacy — remover |
+| 6 | ContractListPage | `catalog/pages/ContractListPage.tsx` | Sem referência | HIGH | Legacy — remover |
+| 7 | ContractsPage | `catalog/pages/ContractsPage.tsx` | Sem referência | HIGH | Legacy — remover |
+| 8 | ProductAnalyticsOverviewPage | `product-analytics/ProductAnalyticsOverviewPage.tsx` | Ficheiro vazio | MEDIUM | Eliminar ficheiro |
+| 9 | InvitationPage | `identity-access/pages/InvitationPage.tsx` | Eager import only | LOW | Documentar padrão |
+
+---
+
+## 6. Estatísticas por Status
+
+| Status | Quantidade | Percentagem |
+|--------|-----------|-------------|
+| ✅ FUNCIONAL | 96 | ~89% |
+| ❌ QUEBRADA (sidebar sem rota) | 3 | ~3% |
+| ❌ ÓRFÃ (sem referência) | 6 | ~5% |
+| ⚠️ PARCIAL (vazia ou especial) | 3 | ~3% |
+
+---
+
+*Documento gerado como parte da auditoria modular do NexTraceOne.*
