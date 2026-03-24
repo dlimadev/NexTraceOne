@@ -2692,5 +2692,59 @@
     "effective": {
       "title": "Configurações Efetivas"
     }
+  },
+  "notificationConfig": {
+    "title": "Configuração de Notificações",
+    "subtitle": "Gerencie comportamento, canais, templates, roteamento e políticas de inteligência de notificações",
+    "scope": "Escopo",
+    "scopeReference": "ID de Referência do Escopo",
+    "scopeReferencePlaceholder": "Informe o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido a partir de",
+    "footer": "{{count}} definições de notificação configuradas",
+    "sections": {
+      "types": "Tipos e Severidades",
+      "channels": "Canais",
+      "templates": "Templates",
+      "routing": "Roteamento e Fallback",
+      "consumption": "Silêncio / Digest / Supressão",
+      "escalation": "Escalação / Dedup / Incidentes"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Padrão",
+      "inherited": "Herdado",
+      "override": "Sobrescrito"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "loading": "Carregando histórico de auditoria...",
+      "empty": "Nenhum histórico de auditoria disponível.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar as definições de configuração de notificações.",
+      "retry": "Tentar novamente"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de configuração de notificação corresponde aos filtros atuais."
+    }
   }
 }

@@ -3629,5 +3629,59 @@
     "effective": {
       "title": "Definições Efetivas"
     }
+  },
+  "notificationConfig": {
+    "title": "Configuração de Notificações",
+    "subtitle": "Gerir comportamento, canais, templates, encaminhamento e políticas de inteligência de notificações",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido a partir de",
+    "footer": "{{count}} definições de notificação configuradas",
+    "sections": {
+      "types": "Tipos e Severidades",
+      "channels": "Canais",
+      "templates": "Templates",
+      "routing": "Encaminhamento e Fallback",
+      "consumption": "Silêncio / Digest / Supressão",
+      "escalation": "Escalação / Dedup / Incidentes"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituído"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Sem histórico de auditoria disponível.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar as definições de configuração de notificações.",
+      "retry": "Tentar novamente"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de configuração de notificação corresponde aos filtros atuais."
+    }
   }
 }

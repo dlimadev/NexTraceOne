@@ -4410,5 +4410,59 @@
     "effective": {
       "title": "Effective Settings"
     }
+  },
+  "notificationConfig": {
+    "title": "Notification Configuration",
+    "subtitle": "Manage notification behavior, channels, templates, routing and intelligence policies",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} notification definitions configured",
+    "sections": {
+      "types": "Types & Severities",
+      "channels": "Channels",
+      "templates": "Templates",
+      "routing": "Routing & Fallback",
+      "consumption": "Quiet Hours / Digest / Suppress",
+      "escalation": "Escalation / Dedup / Incidents"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "audit": {
+      "title": "Audit History",
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "by": "By",
+      "reason": "Reason"
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load notification configuration definitions.",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No notification configuration definitions match the current filters."
+    }
   }
 }
