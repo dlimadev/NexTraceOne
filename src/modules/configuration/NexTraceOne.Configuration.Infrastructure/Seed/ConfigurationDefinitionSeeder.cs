@@ -1182,5 +1182,532 @@ public static class ConfigurationDefinitionSeeder
             isInheritable: true,
             uiEditorType: "text",
             sortOrder: 1570),
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PHASE 3 — WORKFLOW, APPROVALS & PROMOTION GOVERNANCE
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ── Block A — Workflow Types & Templates ────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "workflow.types.enabled",
+            displayName: "Enabled Workflow Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of enabled workflow types (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
+            defaultValue: """["ReleaseApproval","PromotionApproval","WaiverApproval","GovernanceReview"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 2000),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.templates.default",
+            displayName: "Default Workflow Template",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Default workflow template definition with stages, quorum and approver rules",
+            defaultValue: """{"name":"Standard Approval","stages":[{"name":"Review","order":1,"requiredApprovals":1,"approvalRule":"SingleApprover"}]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2010),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.templates.by_change_level",
+            displayName: "Workflow Templates by Change Level",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Map of change level to workflow template name (e.g. {\"1\":\"Standard\",\"2\":\"Enhanced\",\"3\":\"FullGovernance\"})",
+            defaultValue: """{"1":"Standard","2":"Enhanced","3":"FullGovernance"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2020),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.templates.active_version",
+            displayName: "Active Workflow Template Version",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Currently active version number for the workflow template set",
+            defaultValue: "1",
+            validationRules: """{"min":1,"max":9999}""",
+            uiEditorType: "text",
+            sortOrder: 2030),
+
+        // ── Block B — Stages, Sequencing & Quorum ──────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "workflow.stages.max_count",
+            displayName: "Maximum Workflow Stages",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of stages allowed in a single workflow",
+            defaultValue: "10",
+            validationRules: """{"min":1,"max":50}""",
+            uiEditorType: "text",
+            sortOrder: 2100),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.stages.allow_parallel",
+            displayName: "Allow Parallel Stages",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether parallel stage execution is permitted in workflows",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 2110),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.quorum.default_rule",
+            displayName: "Default Quorum Rule",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Default quorum rule for approval stages (SingleApprover, Majority, Unanimous)",
+            defaultValue: "SingleApprover",
+            validationRules: """{"enum":["SingleApprover","Majority","Unanimous"]}""",
+            uiEditorType: "select",
+            sortOrder: 2120),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.quorum.minimum_approvers",
+            displayName: "Minimum Approvers per Stage",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Minimum number of approvers required per workflow stage",
+            defaultValue: "1",
+            validationRules: """{"min":1,"max":20}""",
+            uiEditorType: "text",
+            sortOrder: 2130),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.stages.allow_optional",
+            displayName: "Allow Optional Stages",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether optional (skippable) stages are permitted in workflows",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 2140),
+
+        // ── Block C — Approvers, Fallback & Escalation ─────────────────
+
+        ConfigurationDefinition.Create(
+            key: "workflow.approvers.policy",
+            displayName: "Approver Assignment Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Policy for resolving approvers (by role, ownership, team, or explicit list)",
+            defaultValue: """{"strategy":"ByOwnership","roles":["TechLead","Architect"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2200),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.approvers.fallback",
+            displayName: "Fallback Approver Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Fallback approvers when primary approver is unavailable",
+            defaultValue: """{"enabled":true,"fallbackRoles":["PlatformAdmin"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2210),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.approvers.self_approval_allowed",
+            displayName: "Self-Approval Allowed",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether the requester can approve their own workflow (separation of duties control)",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 2220),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.escalation.enabled",
+            displayName: "Workflow Escalation Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether automatic escalation is enabled for workflow approvals",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 2230),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.escalation.delay_minutes",
+            displayName: "Escalation Delay (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Time in minutes before an unanswered approval is escalated",
+            defaultValue: "240",
+            validationRules: """{"min":15,"max":10080}""",
+            uiEditorType: "text",
+            sortOrder: 2240),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.escalation.target_roles",
+            displayName: "Escalation Target Roles",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Roles to receive escalated approval requests",
+            defaultValue: """["PlatformAdmin","Architect"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 2250),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.escalation.by_criticality",
+            displayName: "Escalation Policy by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Escalation delay and targets per criticality level (e.g. critical=60min, high=120min)",
+            defaultValue: """{"critical":{"delayMinutes":60,"targets":["PlatformAdmin"]},"high":{"delayMinutes":120,"targets":["TechLead"]},"medium":{"delayMinutes":240,"targets":["TechLead"]}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2260),
+
+        // ── Block D — SLAs, Deadlines, Timeout & Expiration ────────────
+
+        ConfigurationDefinition.Create(
+            key: "workflow.sla.default_hours",
+            displayName: "Default Workflow SLA (Hours)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Default SLA in hours for workflow completion",
+            defaultValue: "48",
+            validationRules: """{"min":1,"max":720}""",
+            uiEditorType: "text",
+            sortOrder: 2300),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.sla.by_type",
+            displayName: "Workflow SLA by Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "SLA hours per workflow type (e.g. {\"ReleaseApproval\":24,\"PromotionApproval\":8})",
+            defaultValue: """{"ReleaseApproval":24,"PromotionApproval":8,"WaiverApproval":48,"GovernanceReview":72}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2310),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.sla.by_environment",
+            displayName: "Workflow SLA by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "SLA overrides by environment classification (e.g. {\"Production\":4,\"PreProduction\":8})",
+            defaultValue: """{"Production":4,"PreProduction":8}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2320),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.timeout.approval_hours",
+            displayName: "Approval Timeout (Hours)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Hours before an individual approval step times out",
+            defaultValue: "72",
+            validationRules: """{"min":1,"max":720}""",
+            uiEditorType: "text",
+            sortOrder: 2330),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.expiry.hours",
+            displayName: "Workflow Expiry (Hours)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Hours before an entire workflow expires if not completed",
+            defaultValue: "168",
+            validationRules: """{"min":1,"max":2160}""",
+            uiEditorType: "text",
+            sortOrder: 2340),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.expiry.action",
+            displayName: "Expiry Action",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Action when a workflow expires (Cancel, Escalate, Notify)",
+            defaultValue: "Cancel",
+            validationRules: """{"enum":["Cancel","Escalate","Notify"]}""",
+            uiEditorType: "select",
+            sortOrder: 2350),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.resubmission.allowed",
+            displayName: "Re-submission Allowed",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether rejected workflows can be resubmitted after corrections",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 2360),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.resubmission.max_attempts",
+            displayName: "Maximum Re-submission Attempts",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of times a workflow can be resubmitted",
+            defaultValue: "3",
+            validationRules: """{"min":1,"max":10}""",
+            uiEditorType: "text",
+            sortOrder: 2370),
+
+        // ── Block E — Gates, Checklists & Auto-Approval ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "workflow.gates.enabled",
+            displayName: "Gates Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether gate evaluations are enforced in workflows",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 2400),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.gates.by_environment",
+            displayName: "Gates by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Gate requirements per environment (e.g. Production requires all gates, Dev requires none)",
+            defaultValue: """{"Production":["SecurityScan","TestCoverage","ApprovalComplete","EvidencePack"],"PreProduction":["TestCoverage","ApprovalComplete"],"Development":[]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2410),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.gates.by_criticality",
+            displayName: "Gates by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Gate requirements per criticality level",
+            defaultValue: """{"critical":["SecurityScan","TestCoverage","ApprovalComplete","EvidencePack"],"high":["TestCoverage","ApprovalComplete"],"medium":["ApprovalComplete"],"low":[]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2420),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.checklist.by_type",
+            displayName: "Checklist by Workflow Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Required checklist items per workflow type",
+            defaultValue: """{"ReleaseApproval":["ChangeDescriptionReviewed","RiskAssessed","RollbackPlanDefined"],"PromotionApproval":["TargetEnvironmentVerified","DependenciesChecked"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2430),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.checklist.by_environment",
+            displayName: "Checklist by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional checklist items required per environment",
+            defaultValue: """{"Production":["ProductionReadinessConfirmed","MonitoringVerified","RollbackTested"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2440),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.auto_approval.enabled",
+            displayName: "Auto-Approval Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether automatic approval is permitted for qualifying workflows",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 2450),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.auto_approval.conditions",
+            displayName: "Auto-Approval Conditions",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Conditions that must be met for auto-approval (e.g. changeLevel, environment, allGatesPassed)",
+            defaultValue: """{"maxChangeLevel":1,"excludeEnvironments":["Production","PreProduction"],"requireAllGatesPassed":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2460),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.auto_approval.blocked_environments",
+            displayName: "Auto-Approval Blocked Environments",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Environments where auto-approval is never allowed",
+            defaultValue: """["Production"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 2470),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.evidence_pack.required",
+            displayName: "Evidence Pack Required",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether an evidence pack is required before workflow completion",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 2480),
+
+        ConfigurationDefinition.Create(
+            key: "workflow.rejection.require_reason",
+            displayName: "Require Rejection Reason",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether a reason must be provided when rejecting a workflow",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 2490),
+
+        // ── Block F — Promotion Governance ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "promotion.paths.allowed",
+            displayName: "Allowed Promotion Paths",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Allowed source→target environment promotion paths",
+            defaultValue: """[{"source":"Development","targets":["Test"]},{"source":"Test","targets":["QA"]},{"source":"QA","targets":["PreProduction"]},{"source":"PreProduction","targets":["Production"]}]""",
+            uiEditorType: "json-editor",
+            sortOrder: 2500),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.production.extra_approvers_required",
+            displayName: "Extra Approvers for Production",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional approvers required when promoting to production",
+            defaultValue: "1",
+            validationRules: """{"min":0,"max":10}""",
+            uiEditorType: "text",
+            sortOrder: 2510),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.production.extra_gates",
+            displayName: "Extra Gates for Production Promotion",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Additional gates required when promoting to production environment",
+            defaultValue: """["SecurityScan","ComplianceCheck","PerformanceBaseline"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 2520),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.restrictions.by_criticality",
+            displayName: "Promotion Restrictions by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Promotion restrictions based on service/change criticality",
+            defaultValue: """{"critical":{"requireAdditionalApprovers":2,"requireEvidencePack":true},"high":{"requireAdditionalApprovers":1,"requireEvidencePack":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2530),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.rollback.recommendation_enabled",
+            displayName: "Rollback Recommendation Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether the system recommends rollback procedures during promotion",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 2540),
+
+        // ── Block G — Release Windows & Freeze Policies ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "promotion.release_window.enabled",
+            displayName: "Release Windows Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether release window restrictions are enforced",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 2600),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.release_window.schedule",
+            displayName: "Release Window Schedule",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Allowed release windows (e.g. weekdays 06:00-18:00 UTC)",
+            defaultValue: """{"days":["Monday","Tuesday","Wednesday","Thursday","Friday"],"startTimeUtc":"06:00","endTimeUtc":"18:00"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 2610),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.freeze.enabled",
+            displayName: "Freeze Policy Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether freeze windows are enforced for promotions",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 2620),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.freeze.windows",
+            displayName: "Freeze Windows",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Defined freeze periods where promotions are blocked",
+            defaultValue: "[]",
+            uiEditorType: "json-editor",
+            sortOrder: 2630),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.freeze.override_allowed",
+            displayName: "Freeze Override Allowed",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Whether freeze windows can be overridden with justification (system-level control)",
+            defaultValue: "false",
+            isInheritable: false,
+            uiEditorType: "toggle",
+            sortOrder: 2640),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.freeze.override_roles",
+            displayName: "Freeze Override Authorized Roles",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Roles authorized to override freeze windows",
+            defaultValue: """["PlatformAdmin"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 2650),
     ];
 }

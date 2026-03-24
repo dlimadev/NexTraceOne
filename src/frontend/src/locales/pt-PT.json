@@ -3683,5 +3683,60 @@
       "title": "Nenhuma definição encontrada",
       "description": "Nenhuma definição de configuração de notificação corresponde aos filtros atuais."
     }
+  },
+  "workflowConfig": {
+    "title": "Workflows & Governança de Promoção",
+    "subtitle": "Configure fluxos de aprovação, SLAs, gates, caminhos de promoção, janelas de release e políticas de congelamento",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido de",
+    "footer": "{{count}} definições de workflow e governança de promoção configuradas",
+    "sections": {
+      "templates": "Tipos & Templates",
+      "stages": "Etapas & Quórum",
+      "approvers": "Aprovadores & Escalonamento",
+      "sla": "SLA / Timeout / Expiração",
+      "gates": "Gates / Checklists / Auto-Aprovação",
+      "promotion": "Governança de Promoção",
+      "freeze": "Janelas de Release & Congelamento"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituição"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Sem histórico de auditoria disponível.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de configuração de workflow corresponde aos filtros atuais."
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar a configuração de workflow e governança de promoção.",
+      "retry": "Tentar novamente"
+    }
   }
 }
