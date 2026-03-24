@@ -34,26 +34,10 @@ internal sealed class ConfigurationCacheService(IMemoryCache memoryCache) : ICon
 
     public Task InvalidateAsync(string key, ConfigurationScope? scope, CancellationToken cancellationToken)
     {
-        if (scope.HasValue)
-        {
-            // Invalidar chaves específicas de resolução para este key+scope
-            // Dado que IMemoryCache não suporta enumeração, usamos prefixo convencional
-            var pattern = $"cfg:resolve:{key}:{scope.Value}:";
-            memoryCache.Remove(BuildVersionedKey(pattern));
-        }
-
-        // Invalidar a chave genérica de resolução individual
-        var resolveKeyPrefix = $"cfg:resolve:{key}:";
-
-        // Invalidar resolve-all para todos os scopes na hierarquia
-        foreach (var s in Enum.GetValues<ConfigurationScope>())
-        {
-            memoryCache.Remove(BuildVersionedKey($"cfg:resolve-all:{s}:null"));
-        }
-
-        // Incrementar versão para garantir que qualquer chave residual expire
+        // IMemoryCache does not support prefix/pattern-based eviction.
+        // Incrementing the version counter causes all existing versioned keys
+        // to become cache misses, effectively invalidating every cached entry.
         Interlocked.Increment(ref _version);
-
         return Task.CompletedTask;
     }
 
