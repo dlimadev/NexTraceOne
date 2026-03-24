@@ -605,6 +605,10 @@ function AuditHistoryPanel({ configKey }: { configKey: string }) {
   );
 }
 
+// ── Constants ──────────────────────────────────────────────────────────
+
+const MAX_JSON_PREVIEW_LENGTH = 200;
+
 // ── Helper ─────────────────────────────────────────────────────────────
 
 function formatJsonPreview(value: string | null | undefined): string {
@@ -612,8 +616,8 @@ function formatJsonPreview(value: string | null | undefined): string {
   try {
     const parsed = JSON.parse(value);
     const formatted = JSON.stringify(parsed, null, 2);
-    return formatted.length > 200 ? formatted.substring(0, 200) + '...' : formatted;
+    return formatted.length > MAX_JSON_PREVIEW_LENGTH ? formatted.substring(0, MAX_JSON_PREVIEW_LENGTH) + '...' : formatted;
   } catch {
-    return value.length > 200 ? value.substring(0, 200) + '...' : value;
+    return value.length > MAX_JSON_PREVIEW_LENGTH ? value.substring(0, MAX_JSON_PREVIEW_LENGTH) + '...' : value;
   }
 }
