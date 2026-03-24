@@ -4682,5 +4682,34 @@
       "by": "By",
       "reason": "Reason"
     }
+  },
+  "aiIntegrationsConfig": {
+    "title": "AI & Integrations Configuration",
+    "subtitle": "Manage AI providers, models, budgets, connectors, and integration governance",
+    "loading": "Loading AI & integrations configuration...",
+    "errorTitle": "Failed to load configuration",
+    "errorMessage": "Unable to load AI & integrations configuration definitions.",
+    "empty": "No AI & integrations configuration definitions found. Ensure Phase 7 definitions have been seeded.",
+    "searchPlaceholder": "Search configuration...",
+    "effectiveSettings": "Effective Settings",
+    "effectiveValue": "Effective Value",
+    "mandatory": "Mandatory",
+    "auditHistory": "Recent Changes",
+    "noResults": "No matching configuration definitions found.",
+    "sections": {
+      "providersModels": "Providers & Models",
+      "budgetsQuotas": "Budgets & Quotas",
+      "promptsRetrieval": "Prompts & Retrieval",
+      "connectorsSchedules": "Connectors & Schedules",
+      "filtersMappings": "Filters & Sync",
+      "failureGovernance": "Failure & Governance"
+    },
+    "detail": {
+      "type": "Type",
+      "scopes": "Scopes",
+      "editor": "Editor",
+      "inheritable": "Inheritable",
+      "defaultValue": "Default Value"
+    }
   }
 }

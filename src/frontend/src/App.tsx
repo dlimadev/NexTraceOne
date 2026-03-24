@@ -120,6 +120,7 @@ const WorkflowConfigurationPage = lazy(() => import('./features/change-governanc
 const GovernanceConfigurationPage = lazy(() => import('./features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
 const CatalogContractsConfigurationPage = lazy(() => import('./features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
 const OperationsFinOpsConfigurationPage = lazy(() => import('./features/operational-intelligence/pages/OperationsFinOpsConfigurationPage').then(m => ({ default: m.OperationsFinOpsConfigurationPage })));
+const AiIntegrationsConfigurationPage = lazy(() => import('./features/ai-hub/pages/AiIntegrationsConfigurationPage').then(m => ({ default: m.AiIntegrationsConfigurationPage })));
 
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -869,6 +870,15 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
                     <OperationsFinOpsConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── AI & Integrations Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/ai-integrations"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <AiIntegrationsConfigurationPage />
                   </ProtectedRoute>
                 }
               />

@@ -3387,5 +3387,644 @@ public static class ConfigurationDefinitionSeeder
             defaultValue: """{"minor":{"maxDriftedConfigs":5},"major":{"maxDriftedConfigs":15},"critical":{"maxDriftedConfigs":30}}""",
             uiEditorType: "json-editor",
             sortOrder: 5620),
+
+        // ══════════════════════════════════════════════════════════════════
+        // ██  PHASE 7 — AI & INTEGRATIONS PARAMETERIZATION               ██
+        // ══════════════════════════════════════════════════════════════════
+
+        // ── Block A — AI Provider & Model Enablement ───────────────────
+
+        ConfigurationDefinition.Create(
+            key: "ai.providers.enabled",
+            displayName: "Enabled AI Providers",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of AI providers enabled for use in the platform",
+            defaultValue: """["OpenAI","AzureOpenAI","Internal"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6000),
+
+        ConfigurationDefinition.Create(
+            key: "ai.models.enabled",
+            displayName: "Enabled AI Models",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of AI models enabled for use in the platform",
+            defaultValue: """["gpt-4o","gpt-4o-mini","gpt-3.5-turbo","internal-llm"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6010),
+
+        ConfigurationDefinition.Create(
+            key: "ai.providers.default_by_capability",
+            displayName: "Default Provider by Capability",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default AI provider mapped to each product capability",
+            defaultValue: """{"chat":"OpenAI","analysis":"AzureOpenAI","classification":"Internal","draftGeneration":"OpenAI","retrievalAugmented":"AzureOpenAI","codeReview":"OpenAI"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6020),
+
+        ConfigurationDefinition.Create(
+            key: "ai.models.default_by_capability",
+            displayName: "Default Model by Capability",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default AI model mapped to each product capability",
+            defaultValue: """{"chat":"gpt-4o","analysis":"gpt-4o","classification":"internal-llm","draftGeneration":"gpt-4o","retrievalAugmented":"gpt-4o","codeReview":"gpt-4o-mini"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6030),
+
+        ConfigurationDefinition.Create(
+            key: "ai.providers.fallback_order",
+            displayName: "Provider Fallback Order",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Ordered fallback list of providers when primary is unavailable",
+            defaultValue: """["AzureOpenAI","OpenAI","Internal"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6040),
+
+        ConfigurationDefinition.Create(
+            key: "ai.usage.allow_external",
+            displayName: "Allow External AI Usage",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether external AI providers are allowed (false = internal only)",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 6050),
+
+        ConfigurationDefinition.Create(
+            key: "ai.usage.blocked_environments",
+            displayName: "AI Blocked Environments",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Environments where external AI usage is permanently blocked",
+            defaultValue: """[]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 6060),
+
+        ConfigurationDefinition.Create(
+            key: "ai.usage.internal_only_capabilities",
+            displayName: "Internal-Only AI Capabilities",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Capabilities that must only use internal AI provider",
+            defaultValue: """["classification"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6070),
+
+        // ── Block B — AI Budgets, Quotas & Usage Policies ──────────────
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.by_user",
+            displayName: "AI Token Budget by User",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default monthly token budget per user",
+            defaultValue: """{"monthlyTokens":100000,"alertOnExceed":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6100),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.by_team",
+            displayName: "AI Token Budget by Team",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default monthly token budget per team",
+            defaultValue: """{"monthlyTokens":500000,"alertOnExceed":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6110),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.by_tenant",
+            displayName: "AI Token Budget by Tenant",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default monthly token budget per tenant",
+            defaultValue: """{"monthlyTokens":2000000,"alertOnExceed":true,"hardLimit":false}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6120),
+
+        ConfigurationDefinition.Create(
+            key: "ai.quota.by_capability",
+            displayName: "AI Quota by Capability",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Token quota limits per capability per time window",
+            defaultValue: """{"chat":{"dailyTokens":50000},"analysis":{"dailyTokens":100000},"draftGeneration":{"dailyTokens":30000},"retrievalAugmented":{"dailyTokens":80000}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6130),
+
+        ConfigurationDefinition.Create(
+            key: "ai.usage.limits_by_environment",
+            displayName: "AI Usage Limits by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Token limits per environment to control non-production usage",
+            defaultValue: """{"Production":{"dailyTokens":500000},"PreProduction":{"dailyTokens":100000},"Development":{"dailyTokens":50000}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6140),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.exceed_policy",
+            displayName: "Budget Exceed Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Behavior when AI budget is exceeded (Warn, Block, Throttle)",
+            defaultValue: "Warn",
+            validationRules: """{"enum":["Warn","Block","Throttle"]}""",
+            uiEditorType: "select",
+            sortOrder: 6150),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.warning_thresholds",
+            displayName: "AI Budget Warning Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Percentage thresholds for AI budget warnings",
+            defaultValue: """[{"percent":70,"severity":"Low"},{"percent":85,"severity":"Medium"},{"percent":95,"severity":"High"},{"percent":100,"severity":"Critical"}]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6160),
+
+        // ── Block C — Retention, Audit, Prompts & Retrieval ────────────
+
+        ConfigurationDefinition.Create(
+            key: "ai.retention.conversation_days",
+            displayName: "AI Conversation Retention Days",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Number of days to retain AI conversation history",
+            defaultValue: "90",
+            validationRules: """{"min":1,"max":365}""",
+            uiEditorType: "text",
+            sortOrder: 6200),
+
+        ConfigurationDefinition.Create(
+            key: "ai.retention.artifact_days",
+            displayName: "AI Artifact Retention Days",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Number of days to retain AI-generated artifacts",
+            defaultValue: "180",
+            validationRules: """{"min":1,"max":730}""",
+            uiEditorType: "text",
+            sortOrder: 6210),
+
+        ConfigurationDefinition.Create(
+            key: "ai.audit.level",
+            displayName: "AI Audit Level",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Level of AI usage auditing (Minimal, Standard, Full)",
+            defaultValue: "Standard",
+            validationRules: """{"enum":["Minimal","Standard","Full"]}""",
+            uiEditorType: "select",
+            sortOrder: 6220),
+
+        ConfigurationDefinition.Create(
+            key: "ai.audit.log_prompts",
+            displayName: "Log AI Prompts",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether to log full prompts sent to AI providers for audit",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 6230),
+
+        ConfigurationDefinition.Create(
+            key: "ai.audit.log_responses",
+            displayName: "Log AI Responses",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether to log full AI responses for audit",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 6240),
+
+        ConfigurationDefinition.Create(
+            key: "ai.prompts.base_by_capability",
+            displayName: "Base Prompts by Capability",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Base system prompts for each AI capability",
+            defaultValue: """{"chat":"You are NexTraceOne AI Assistant, a helpful operational intelligence assistant.","analysis":"You are an expert operational analyst. Analyze the data provided and give actionable insights.","classification":"Classify the following operational event into the appropriate category and severity.","draftGeneration":"Generate a professional draft based on the provided context and requirements."}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6250),
+
+        ConfigurationDefinition.Create(
+            key: "ai.prompts.allow_tenant_override",
+            displayName: "Allow Tenant Prompt Override",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Whether tenants can override base prompts",
+            defaultValue: "false",
+            isInheritable: false,
+            uiEditorType: "toggle",
+            sortOrder: 6260),
+
+        ConfigurationDefinition.Create(
+            key: "ai.retrieval.top_k",
+            displayName: "Retrieval Top-K",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Number of top documents to retrieve for RAG",
+            defaultValue: "5",
+            validationRules: """{"min":1,"max":50}""",
+            uiEditorType: "text",
+            sortOrder: 6270),
+
+        ConfigurationDefinition.Create(
+            key: "ai.defaults.temperature",
+            displayName: "Default Temperature",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default temperature for AI model inference (0.0-2.0)",
+            defaultValue: "0.7",
+            validationRules: """{"min":0.0,"max":2.0}""",
+            uiEditorType: "text",
+            sortOrder: 6280),
+
+        ConfigurationDefinition.Create(
+            key: "ai.defaults.max_tokens",
+            displayName: "Default Max Tokens",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default maximum tokens per AI request",
+            defaultValue: "4096",
+            validationRules: """{"min":100,"max":128000}""",
+            uiEditorType: "text",
+            sortOrder: 6290),
+
+        ConfigurationDefinition.Create(
+            key: "ai.retrieval.similarity_threshold",
+            displayName: "Retrieval Similarity Threshold",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minimum similarity score for document retrieval (0.0-1.0)",
+            defaultValue: "0.7",
+            validationRules: """{"min":0.0,"max":1.0}""",
+            uiEditorType: "text",
+            sortOrder: 6300),
+
+        ConfigurationDefinition.Create(
+            key: "ai.retrieval.source_allowlist",
+            displayName: "Retrieval Source Allowlist",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Allowed sources for document retrieval (empty = all allowed)",
+            defaultValue: """[]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6310),
+
+        ConfigurationDefinition.Create(
+            key: "ai.retrieval.source_denylist",
+            displayName: "Retrieval Source Denylist",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Denied sources for document retrieval",
+            defaultValue: """[]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6320),
+
+        ConfigurationDefinition.Create(
+            key: "ai.retrieval.context_by_environment",
+            displayName: "Context Sources by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Which context sources are available per environment",
+            defaultValue: """{"Production":{"telemetry":true,"documents":true,"incidents":true},"Development":{"telemetry":true,"documents":true,"incidents":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6330),
+
+        // ── Block D — Connector Enablement, Schedules, Retries & Timeouts ──
+
+        ConfigurationDefinition.Create(
+            key: "integrations.connectors.enabled",
+            displayName: "Enabled Connectors",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "List of connectors enabled in the platform",
+            defaultValue: """["AzureDevOps","GitHub","Jira","ServiceNow","PagerDuty","Datadog","Prometheus"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 6400),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.connectors.enabled_by_environment",
+            displayName: "Connectors Enabled by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Per-environment connector enablement overrides",
+            defaultValue: """{"Production":["AzureDevOps","GitHub","ServiceNow","PagerDuty","Datadog","Prometheus"],"Development":["AzureDevOps","GitHub","Jira"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6410),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.schedule.default",
+            displayName: "Default Sync Schedule",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default cron-like sync schedule for connectors",
+            defaultValue: "0 */6 * * *",
+            uiEditorType: "text",
+            sortOrder: 6420),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.schedule.by_connector",
+            displayName: "Sync Schedule by Connector",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Custom sync schedule per connector type",
+            defaultValue: """{"AzureDevOps":"0 */4 * * *","GitHub":"0 */4 * * *","Jira":"0 */6 * * *","ServiceNow":"0 */2 * * *","PagerDuty":"*/30 * * * *","Datadog":"*/15 * * * *","Prometheus":"*/5 * * * *"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6430),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.retry.max_attempts",
+            displayName: "Max Retry Attempts",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of retry attempts for failed integrations",
+            defaultValue: "3",
+            validationRules: """{"min":0,"max":10}""",
+            uiEditorType: "text",
+            sortOrder: 6440),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.retry.backoff_seconds",
+            displayName: "Retry Backoff Seconds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Base backoff interval in seconds between retries",
+            defaultValue: "30",
+            validationRules: """{"min":5,"max":600}""",
+            uiEditorType: "text",
+            sortOrder: 6450),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.retry.exponential_backoff",
+            displayName: "Exponential Backoff Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether to use exponential backoff for retry intervals",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 6460),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.timeout.default_seconds",
+            displayName: "Default Integration Timeout",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default timeout in seconds for integration operations",
+            defaultValue: "120",
+            validationRules: """{"min":10,"max":3600}""",
+            uiEditorType: "text",
+            sortOrder: 6470),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.timeout.by_connector",
+            displayName: "Timeout by Connector",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Custom timeout in seconds per connector type",
+            defaultValue: """{"AzureDevOps":180,"GitHub":120,"Jira":120,"ServiceNow":180,"PagerDuty":60,"Datadog":90,"Prometheus":60}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6480),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.execution.max_concurrent",
+            displayName: "Max Concurrent Executions",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Maximum number of concurrent integration executions",
+            defaultValue: "5",
+            validationRules: """{"min":1,"max":20}""",
+            uiEditorType: "text",
+            sortOrder: 6490),
+
+        // ── Block E — Filters, Mappings, Import/Export & Sync Policy ───
+
+        ConfigurationDefinition.Create(
+            key: "integrations.sync.filter_policy",
+            displayName: "Sync Filter Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default filters applied to sync operations",
+            defaultValue: """{"excludeArchived":true,"excludeDeleted":true,"maxAgeHours":720}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6500),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.sync.mapping_policy",
+            displayName: "Sync Mapping Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default field mapping rules for sync operations",
+            defaultValue: """{"autoMapByName":true,"strictTypeValidation":true,"unmappedFieldAction":"Ignore"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6510),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.import.policy",
+            displayName: "Import Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default import behavior and validation rules",
+            defaultValue: """{"allowOverwrite":false,"requireValidation":true,"onConflict":"Skip","maxBatchSize":1000}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6520),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.export.policy",
+            displayName: "Export Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default export behavior and format rules",
+            defaultValue: """{"includeMetadata":true,"defaultFormat":"JSON","maxRecords":10000,"sanitizeSensitive":true}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6530),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.sync.overwrite_behavior",
+            displayName: "Sync Overwrite Behavior",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default behavior when sync detects existing data (Overwrite, Merge, Skip)",
+            defaultValue: "Merge",
+            validationRules: """{"enum":["Overwrite","Merge","Skip"]}""",
+            uiEditorType: "select",
+            sortOrder: 6540),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.sync.pre_validation_enabled",
+            displayName: "Pre-Sync Validation Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether to validate data before sync operations",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 6550),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.freshness.staleness_threshold_hours",
+            displayName: "Staleness Threshold Hours",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Hours after which ingested data is considered stale",
+            defaultValue: "24",
+            validationRules: """{"min":1,"max":168}""",
+            uiEditorType: "text",
+            sortOrder: 6560),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.freshness.by_connector",
+            displayName: "Freshness Thresholds by Connector",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Custom staleness threshold in hours per connector",
+            defaultValue: """{"AzureDevOps":12,"GitHub":12,"Jira":24,"ServiceNow":6,"PagerDuty":1,"Datadog":1,"Prometheus":1}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6570),
+
+        // ── Block F — Failure Reaction, Notification & Governance ───────
+
+        ConfigurationDefinition.Create(
+            key: "integrations.failure.notification_policy",
+            displayName: "Integration Failure Notification Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Notification rules for integration failures",
+            defaultValue: """{"notifyOnFirstFailure":true,"notifyOnConsecutiveFailures":3,"notifyOnAuthFailure":true,"notifyOnStaleness":true,"digestFrequency":"Hourly"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6600),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.failure.severity_mapping",
+            displayName: "Failure Severity Mapping",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Severity levels for different integration failure types",
+            defaultValue: """{"authFailure":"Critical","syncFailure":"High","timeoutFailure":"Medium","validationFailure":"Low","staleData":"Medium"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6610),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.failure.escalation_policy",
+            displayName: "Failure Escalation Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Escalation rules based on failure severity and duration",
+            defaultValue: """{"Critical":{"escalateAfterMinutes":15,"recipient":"platform-admin"},"High":{"escalateAfterMinutes":60,"recipient":"integration-owner"},"Medium":{"escalateAfterMinutes":240},"Low":{"escalateAfterMinutes":1440}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6620),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.failure.auto_disable_enabled",
+            displayName: "Auto-Disable on Failure Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether to auto-disable connectors after repeated failures",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 6630),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.failure.auto_disable_threshold",
+            displayName: "Auto-Disable Failure Threshold",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Number of consecutive failures before auto-disabling a connector",
+            defaultValue: "5",
+            validationRules: """{"min":2,"max":50}""",
+            uiEditorType: "text",
+            sortOrder: 6640),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.failure.auth_reaction_policy",
+            displayName: "Auth Failure Reaction Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Reaction when connector authentication fails",
+            defaultValue: """{"pauseSync":true,"notifyOwner":true,"autoRetryAfterMinutes":60,"maxAuthRetries":3}""",
+            uiEditorType: "json-editor",
+            sortOrder: 6650),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.owner.fallback_recipient",
+            displayName: "Integration Fallback Owner",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Fallback owner/recipient for integration notifications",
+            defaultValue: "platform-admin",
+            uiEditorType: "text",
+            sortOrder: 6660),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.governance.blocked_in_production",
+            displayName: "Integration Operations Blocked in Production",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Integration operations permanently blocked in production",
+            defaultValue: """["bulkDelete","schemaOverwrite","forceReSync"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 6670),
     ];
 }

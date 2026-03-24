@@ -2964,5 +2964,34 @@
       "by": "Por",
       "reason": "Motivo"
     }
+  },
+  "aiIntegrationsConfig": {
+    "title": "Configuração de IA e Integrações",
+    "subtitle": "Gerencie provedores de IA, modelos, orçamentos, conectores e governança de integrações",
+    "loading": "Carregando configuração de IA e integrações...",
+    "errorTitle": "Falha ao carregar configuração",
+    "errorMessage": "Não foi possível carregar as definições de configuração de IA e integrações.",
+    "empty": "Nenhuma definição de configuração de IA e integrações encontrada. Certifique-se de que as definições da Fase 7 foram semeadas.",
+    "searchPlaceholder": "Pesquisar configuração...",
+    "effectiveSettings": "Configurações Efetivas",
+    "effectiveValue": "Valor Efetivo",
+    "mandatory": "Obrigatório",
+    "auditHistory": "Alterações Recentes",
+    "noResults": "Nenhuma definição de configuração correspondente encontrada.",
+    "sections": {
+      "providersModels": "Provedores e Modelos",
+      "budgetsQuotas": "Orçamentos e Cotas",
+      "promptsRetrieval": "Prompts e Recuperação",
+      "connectorsSchedules": "Conectores e Agendamentos",
+      "filtersMappings": "Filtros e Sincronização",
+      "failureGovernance": "Falhas e Governança"
+    },
+    "detail": {
+      "type": "Tipo",
+      "scopes": "Escopos",
+      "editor": "Editor",
+      "inheritable": "Herdável",
+      "defaultValue": "Valor Padrão"
+    }
   }
 }
