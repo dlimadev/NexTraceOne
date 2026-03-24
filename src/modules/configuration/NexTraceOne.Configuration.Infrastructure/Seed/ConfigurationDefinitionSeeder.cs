@@ -93,6 +93,477 @@ public static class ConfigurationDefinitionSeeder
             uiEditorType: "text",
             sortOrder: 140),
 
+        // ── PHASE 2: Notification & Communication Parameterization ─────────────
+
+        // --- Types, Categories & Severities ---
+
+        ConfigurationDefinition.Create(
+            key: "notifications.types.enabled",
+            displayName: "Enabled Notification Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "JSON array of enabled notification type identifiers. Only listed types will be processed.",
+            defaultValue: """["IncidentCreated","IncidentEscalated","IncidentResolved","AnomalyDetected","HealthDegradation","ApprovalPending","ApprovalApproved","ApprovalRejected","ApprovalExpiring","ContractPublished","BreakingChangeDetected","ContractValidationFailed","BreakGlassActivated","JitAccessPending","JitAccessGranted","UserRoleChanged","AccessReviewPending","ComplianceCheckFailed","PolicyViolated","EvidenceExpiring","BudgetExceeded","BudgetThresholdReached","IntegrationFailed","SyncFailed","ConnectorAuthFailed","AiProviderUnavailable","TokenBudgetExceeded","AiGenerationFailed","AiActionBlockedByPolicy"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 150),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.categories.enabled",
+            displayName: "Enabled Notification Categories",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON array of enabled notification categories. Only listed categories will be active.",
+            defaultValue: """["Incident","Approval","Change","Contract","Security","Compliance","FinOps","AI","Integration","Platform","Informational"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 151),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.severity.default",
+            displayName: "Default Notification Severity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default severity assigned to notifications when not explicitly specified by the event.",
+            defaultValue: "Info",
+            validationRules: """{"enum":["Info","ActionRequired","Warning","Critical"]}""",
+            uiEditorType: "select",
+            sortOrder: 152),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.severity.minimum_for_external",
+            displayName: "Minimum Severity for External Channels",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Minimum severity level required for notifications to be delivered via external channels (Email, Teams).",
+            defaultValue: "Warning",
+            validationRules: """{"enum":["Info","ActionRequired","Warning","Critical"]}""",
+            uiEditorType: "select",
+            sortOrder: 153),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.mandatory.types",
+            displayName: "Mandatory Notification Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "JSON array of notification types that are mandatory and cannot be disabled by user preferences.",
+            defaultValue: """["BreakGlassActivated","IncidentCreated","IncidentEscalated","ApprovalPending","ComplianceCheckFailed"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 154),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.mandatory.severities",
+            displayName: "Mandatory Notification Severities",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "JSON array of severities that are always mandatory regardless of user preferences.",
+            defaultValue: """["Critical"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 155),
+
+        // --- Channels Allowed & Mandatory ---
+
+        ConfigurationDefinition.Create(
+            key: "notifications.channels.inapp.enabled",
+            displayName: "In-App Notifications Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Controls whether in-app notifications are active. In-App is always the baseline channel.",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 160),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.channels.allowed_by_type",
+            displayName: "Allowed Channels per Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object mapping notification types to arrays of allowed delivery channels.",
+            defaultValue: """{}""",
+            uiEditorType: "json-editor",
+            sortOrder: 161),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.channels.mandatory_by_severity",
+            displayName: "Mandatory Channels per Severity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "JSON object mapping severities to arrays of mandatory channels that override user preferences.",
+            defaultValue: """{"Critical":["InApp","Email","MicrosoftTeams"],"Warning":["InApp","Email"]}""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 162),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.channels.mandatory_by_type",
+            displayName: "Mandatory Channels per Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "JSON object mapping specific notification types to their mandatory channels.",
+            defaultValue: """{"BreakGlassActivated":["InApp","Email","MicrosoftTeams"],"ApprovalPending":["InApp","Email"],"ComplianceCheckFailed":["InApp","Email"]}""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 163),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.channels.disabled_in_environment",
+            displayName: "Channels Disabled by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.Environment],
+            description: "JSON array of channels disabled in this environment. Example: [\"Email\",\"MicrosoftTeams\"] for dev environments.",
+            defaultValue: "[]",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 164),
+
+        // --- Templates ---
+
+        ConfigurationDefinition.Create(
+            key: "notifications.templates.internal",
+            displayName: "Internal Notification Templates",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object with internal notification templates. Each key is a notification type, value is {title, message, placeholders}.",
+            defaultValue: """{"IncidentCreated":{"title":"Incident created — {ServiceName}","message":"A new incident with severity {IncidentSeverity} has been created for service {ServiceName}.","placeholders":["ServiceName","IncidentSeverity"]},"ApprovalPending":{"title":"Approval required — {EntityName}","message":"A new approval has been requested by {RequestedBy} for {EntityName}.","placeholders":["EntityName","RequestedBy"]},"BreakGlassActivated":{"title":"Break-glass access activated","message":"Emergency break-glass access was activated by {ActivatedBy}.","placeholders":["ActivatedBy"]}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 170),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.templates.email",
+            displayName: "Email Notification Templates",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object with email templates per notification type. Each contains subject, bodyHtml, and placeholders.",
+            defaultValue: """{"default":{"subject":"[NexTraceOne] {Title}","bodyHtml":"<h2>{Title}</h2><p>{Message}</p><p><a href='{ActionUrl}'>View details</a></p>","placeholders":["Title","Message","ActionUrl"]}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 171),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.templates.teams",
+            displayName: "Teams Notification Templates",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object with Microsoft Teams adaptive card templates per notification type.",
+            defaultValue: """{"default":{"cardTitle":"NexTraceOne — {Title}","cardBody":"{Message}","actionUrl":"{ActionUrl}","placeholders":["Title","Message","ActionUrl"]}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 172),
+
+        // --- Routing & Fallback ---
+
+        ConfigurationDefinition.Create(
+            key: "notifications.routing.default_policy",
+            displayName: "Default Routing Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object defining default recipient routing policy. Keys: ownerFirst, adminFallback, approverRouting.",
+            defaultValue: """{"ownerFirst":true,"adminFallback":true,"approverRouting":false}""",
+            uiEditorType: "json-editor",
+            sortOrder: 175),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.routing.fallback_recipients",
+            displayName: "Fallback Recipients",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON array of fallback recipient user IDs or role identifiers when primary routing fails.",
+            defaultValue: "[]",
+            uiEditorType: "json-editor",
+            sortOrder: 176),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.routing.by_category",
+            displayName: "Routing Rules per Category",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object mapping categories to routing rules.",
+            defaultValue: """{"Incident":{"recipientType":"owner","fallbackToAdmin":true},"Approval":{"recipientType":"approver","fallbackToAdmin":true},"Security":{"recipientType":"admin","fallbackToAdmin":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 177),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.routing.by_severity",
+            displayName: "Routing Rules per Severity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object mapping severities to additional routing behavior.",
+            defaultValue: """{"Critical":{"notifyAdmins":true,"broadcastToTeam":true},"Warning":{"notifyAdmins":false,"broadcastToTeam":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 178),
+
+        // --- Preferences, Quiet Hours, Digest & Suppression ---
+
+        ConfigurationDefinition.Create(
+            key: "notifications.preferences.default_by_tenant",
+            displayName: "Default Notification Preferences by Tenant",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object with default notification preferences applied to all users in a tenant.",
+            defaultValue: """{"emailEnabled":true,"teamsEnabled":true,"digestEnabled":false}""",
+            uiEditorType: "json-editor",
+            sortOrder: 180),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.preferences.default_by_role",
+            displayName: "Default Notification Preferences by Role",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Role],
+            description: "JSON object with default notification preferences per role.",
+            defaultValue: "{}",
+            uiEditorType: "json-editor",
+            sortOrder: 181),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.enabled",
+            displayName: "Quiet Hours Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "Controls whether quiet hours are active for deferring non-critical notifications.",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 182),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.bypass_categories",
+            displayName: "Categories that Bypass Quiet Hours",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "JSON array of notification categories that are never deferred by quiet hours.",
+            defaultValue: """["Incident","Security"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 183),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.enabled",
+            displayName: "Digest Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "Controls whether digest summaries are generated for accumulated notifications.",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 184),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.period_hours",
+            displayName: "Digest Period (Hours)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "Period in hours between digest summary generations.",
+            defaultValue: "24",
+            validationRules: """{"min":1,"max":168}""",
+            uiEditorType: "text",
+            sortOrder: 185),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.eligible_categories",
+            displayName: "Digest Eligible Categories",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON array of categories eligible for digest aggregation. Critical categories should NOT be included.",
+            defaultValue: """["Informational","Change","Integration","Platform"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 186),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.suppress.enabled",
+            displayName: "Suppression Rules Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Controls whether automatic suppression of duplicate/acknowledged notifications is active.",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 187),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.suppress.acknowledged_window_minutes",
+            displayName: "Acknowledged Suppression Window (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Time window in minutes during which a notification for the same entity is suppressed after acknowledgment.",
+            defaultValue: "30",
+            validationRules: """{"min":5,"max":1440}""",
+            uiEditorType: "text",
+            sortOrder: 188),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.acknowledge.required_categories",
+            displayName: "Categories Requiring Acknowledgment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON array of categories where explicit acknowledgment is required before dismissal.",
+            defaultValue: """["Incident","Security","Compliance"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 189),
+
+        // --- Escalation, Dedup & Incident Linkage ---
+
+        ConfigurationDefinition.Create(
+            key: "notifications.dedup.enabled",
+            displayName: "Deduplication Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Controls whether notification deduplication is active.",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 190),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.dedup.window_minutes",
+            displayName: "Deduplication Window (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default time window in minutes for notification deduplication.",
+            defaultValue: "5",
+            validationRules: """{"min":1,"max":1440}""",
+            uiEditorType: "text",
+            sortOrder: 191),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.dedup.window_by_category",
+            displayName: "Deduplication Window per Category",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON object mapping categories to specific deduplication windows in minutes.",
+            defaultValue: """{"Incident":10,"Security":10,"Integration":15}""",
+            uiEditorType: "json-editor",
+            sortOrder: 192),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.escalation.enabled",
+            displayName: "Escalation Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Controls whether unacknowledged notifications are automatically escalated.",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 193),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.escalation.critical_threshold_minutes",
+            displayName: "Critical Escalation Threshold (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minutes before an unacknowledged Critical notification is escalated.",
+            defaultValue: "30",
+            validationRules: """{"min":5,"max":1440}""",
+            uiEditorType: "text",
+            sortOrder: 194),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.escalation.action_required_threshold_minutes",
+            displayName: "ActionRequired Escalation Threshold (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Minutes before an unacknowledged ActionRequired notification is escalated.",
+            defaultValue: "120",
+            validationRules: """{"min":15,"max":2880}""",
+            uiEditorType: "text",
+            sortOrder: 195),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.escalation.channels",
+            displayName: "Escalation Delivery Channels",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON array of channels used when escalating notifications.",
+            defaultValue: """["InApp","Email","MicrosoftTeams"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 196),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.incident_linkage.enabled",
+            displayName: "Incident Linkage Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Controls whether critical notifications can be automatically linked to or create incidents.",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 197),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.incident_linkage.auto_create_enabled",
+            displayName: "Auto-Create Incident from Notification",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Controls whether incidents are automatically created from critical notifications when no matching incident exists.",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 198),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.incident_linkage.eligible_types",
+            displayName: "Incident Linkage Eligible Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "JSON array of notification types eligible for automatic incident linkage/creation.",
+            defaultValue: """["IncidentCreated","IncidentEscalated","HealthDegradation","AnomalyDetected"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 199),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.incident_linkage.correlation_window_minutes",
+            displayName: "Incident Correlation Window (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Time window in minutes to correlate notifications with existing incidents.",
+            defaultValue: "60",
+            validationRules: """{"min":5,"max":1440}""",
+            uiEditorType: "text",
+            sortOrder: 200),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.grouping.window_minutes",
+            displayName: "Notification Grouping Window (Minutes)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Time window in minutes for grouping related notifications under the same correlation key.",
+            defaultValue: "60",
+            validationRules: """{"min":5,"max":1440}""",
+            uiEditorType: "text",
+            sortOrder: 201),
+
+        // ── END PHASE 2 ───────────────────────────────────────────────────
+
         ConfigurationDefinition.Create(
             key: "ai.default_temperature",
             displayName: "AI Default Temperature",

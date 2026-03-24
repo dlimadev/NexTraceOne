@@ -3408,5 +3408,59 @@
     "effective": {
       "title": "Configuración Efectiva"
     }
+  },
+  "notificationConfig": {
+    "title": "Configuración de Notificaciones",
+    "subtitle": "Administre comportamiento, canales, plantillas, enrutamiento y políticas de inteligencia de notificaciones",
+    "scope": "Ámbito",
+    "scopeReference": "ID de Referencia del Ámbito",
+    "scopeReferencePlaceholder": "Ingrese el ID del tenant/ambiente...",
+    "search": "Buscar",
+    "searchPlaceholder": "Buscar por clave o nombre...",
+    "effectiveValue": "Valor Efectivo",
+    "resolvedFrom": "Resuelto desde",
+    "footer": "{{count}} definiciones de notificación configuradas",
+    "sections": {
+      "types": "Tipos y Severidades",
+      "channels": "Canales",
+      "templates": "Plantillas",
+      "routing": "Enrutamiento y Fallback",
+      "consumption": "Silencio / Digest / Supresión",
+      "escalation": "Escalación / Dedup / Incidentes"
+    },
+    "badges": {
+      "sensitive": "Sensible",
+      "nonInheritable": "No heredable",
+      "default": "Predeterminado",
+      "inherited": "Heredado",
+      "override": "Sobrescrito"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Razón del Cambio",
+      "reasonPlaceholder": "Razón opcional para este cambio...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Historial de Auditoría"
+    },
+    "audit": {
+      "title": "Historial de Auditoría",
+      "loading": "Cargando historial de auditoría...",
+      "empty": "No hay historial de auditoría disponible.",
+      "by": "Por",
+      "reason": "Razón"
+    },
+    "error": {
+      "title": "Error al cargar configuración",
+      "message": "No se pudieron cargar las definiciones de configuración de notificaciones.",
+      "retry": "Reintentar"
+    },
+    "empty": {
+      "title": "No se encontraron definiciones",
+      "description": "Ninguna definición de configuración de notificación coincide con los filtros actuales."
+    }
   }
 }
