@@ -116,6 +116,12 @@ const NotificationPreferencesPage = lazy(() => import('./features/notifications/
 // ── Configuration (lazy) ──
 const ConfigurationAdminPage = lazy(() => import('./features/configuration/pages/ConfigurationAdminPage').then(m => ({ default: m.ConfigurationAdminPage })));
 const NotificationConfigurationPage = lazy(() => import('./features/notifications/pages/NotificationConfigurationPage').then(m => ({ default: m.NotificationConfigurationPage })));
+const WorkflowConfigurationPage = lazy(() => import('./features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
+const GovernanceConfigurationPage = lazy(() => import('./features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
+const CatalogContractsConfigurationPage = lazy(() => import('./features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
+const OperationsFinOpsConfigurationPage = lazy(() => import('./features/operational-intelligence/pages/OperationsFinOpsConfigurationPage').then(m => ({ default: m.OperationsFinOpsConfigurationPage })));
+const AiIntegrationsConfigurationPage = lazy(() => import('./features/ai-hub/pages/AiIntegrationsConfigurationPage').then(m => ({ default: m.AiIntegrationsConfigurationPage })));
+const AdvancedConfigurationConsolePage = lazy(() => import('./features/configuration/pages/AdvancedConfigurationConsolePage').then(m => ({ default: m.AdvancedConfigurationConsolePage })));
 
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -829,6 +835,60 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
                     <NotificationConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Workflow & Promotion Governance Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/workflows"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <WorkflowConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Governance & Compliance Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/governance"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <GovernanceConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Catalog, Contracts & Change Governance Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/catalog-contracts"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <CatalogContractsConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Operations, Incidents, FinOps & Benchmarking Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/operations-finops"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <OperationsFinOpsConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── AI & Integrations Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/ai-integrations"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <AiIntegrationsConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Advanced Configuration Console ── */}
+              <Route
+                path="/platform/configuration/advanced"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <AdvancedConfigurationConsolePage />
                   </ProtectedRoute>
                 }
               />

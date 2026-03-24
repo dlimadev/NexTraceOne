@@ -4464,5 +4464,347 @@
       "title": "No definitions found",
       "description": "No notification configuration definitions match the current filters."
     }
+  },
+  "workflowConfig": {
+    "title": "Workflow & Promotion Governance",
+    "subtitle": "Configure approval workflows, SLAs, gates, promotion paths, release windows and freeze policies",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} workflow & promotion governance definitions configured",
+    "sections": {
+      "templates": "Types & Templates",
+      "stages": "Stages & Quorum",
+      "approvers": "Approvers & Escalation",
+      "sla": "SLA / Timeout / Expiry",
+      "gates": "Gates / Checklists / Auto-Approval",
+      "promotion": "Promotion Governance",
+      "freeze": "Release Windows & Freeze"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "audit": {
+      "title": "Audit History",
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "by": "By",
+      "reason": "Reason"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No workflow configuration definitions match the current filters."
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load workflow and promotion governance configuration.",
+      "retry": "Retry"
+    }
+  },
+  "governanceConfig": {
+    "title": "Governance & Compliance Configuration",
+    "subtitle": "Configure policies, compliance profiles, evidence, waivers, governance packs, scorecards and risk matrix",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} governance & compliance definitions configured",
+    "sections": {
+      "policies": "Policies & Profiles",
+      "evidence": "Evidence",
+      "waivers": "Waivers",
+      "packs": "Packs & Bindings",
+      "scorecards": "Scorecards & Risk",
+      "requirements": "Minimum Requirements"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "audit": {
+      "title": "Audit History",
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "by": "By",
+      "reason": "Reason"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No governance configuration definitions match the current filters."
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load governance and compliance configuration.",
+      "retry": "Retry"
+    }
+  },
+  "catalogContractsConfig": {
+    "title": "Catalog, Contracts & Change Governance Configuration",
+    "subtitle": "Configure contract types, versioning, validation, publication policies, change types, blast radius and release scoring",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} catalog, contracts & change governance definitions configured",
+    "sections": {
+      "contracts": "Contract Types & Versioning",
+      "validation": "Validation & Rulesets",
+      "requirements": "Minimum Requirements",
+      "publication": "Publication & Promotion",
+      "importExport": "Import / Export",
+      "changeTypes": "Change Types & Blast Radius",
+      "releaseScoring": "Release Scoring & Rollback"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "audit": {
+      "title": "Audit History",
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "by": "By",
+      "reason": "Reason"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No catalog or change governance configuration definitions match the current filters."
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load catalog, contracts and change governance configuration.",
+      "retry": "Retry"
+    }
+  },
+  "opsFinOpsConfig": {
+    "title": "Operations, Incidents, FinOps & Benchmarking Configuration",
+    "subtitle": "Configure incident taxonomy, SLAs, owners, automation, budgets, anomaly detection, waste policies and benchmarking",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} operations, incidents, FinOps & benchmarking definitions configured",
+    "sections": {
+      "incidentTaxonomy": "Incident Taxonomy & SLA",
+      "ownersCorrelation": "Owners & Correlation",
+      "playbooksAutomation": "Playbooks & Automation",
+      "budgets": "Budgets & Thresholds",
+      "anomalyWaste": "Anomaly, Waste & Health",
+      "benchmarking": "Benchmarking & Scores"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load operations, incidents, FinOps and benchmarking configuration.",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No operations, incidents, FinOps or benchmarking definitions match the current filters."
+    },
+    "audit": {
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "title": "Audit History",
+      "by": "By",
+      "reason": "Reason"
+    }
+  },
+  "aiIntegrationsConfig": {
+    "title": "AI & Integrations Configuration",
+    "subtitle": "Manage AI providers, models, budgets, connectors, and integration governance",
+    "loading": "Loading AI & integrations configuration...",
+    "errorTitle": "Failed to load configuration",
+    "errorMessage": "Unable to load AI & integrations configuration definitions.",
+    "empty": "No AI & integrations configuration definitions found. Ensure Phase 7 definitions have been seeded.",
+    "searchPlaceholder": "Search configuration...",
+    "effectiveSettings": "Effective Settings",
+    "effectiveValue": "Effective Value",
+    "mandatory": "Mandatory",
+    "auditHistory": "Recent Changes",
+    "noResults": "No matching configuration definitions found.",
+    "sections": {
+      "providersModels": "Providers & Models",
+      "budgetsQuotas": "Budgets & Quotas",
+      "promptsRetrieval": "Prompts & Retrieval",
+      "connectorsSchedules": "Connectors & Schedules",
+      "filtersMappings": "Filters & Sync",
+      "failureGovernance": "Failure & Governance"
+    },
+    "detail": {
+      "type": "Type",
+      "scopes": "Scopes",
+      "editor": "Editor",
+      "inheritable": "Inheritable",
+      "defaultValue": "Default Value"
+    }
+  },
+  "advancedConfig": {
+    "title": "Advanced Configuration Console",
+    "subtitle": "Enterprise administration: explore, compare, export, rollback, and govern configuration",
+    "loading": "Loading advanced configuration console...",
+    "errorTitle": "Failed to load configuration",
+    "errorMessage": "Unable to load configuration definitions for the advanced console.",
+    "searchPlaceholder": "Search by key or name...",
+    "tabs": {
+      "explorer": "Effective Explorer",
+      "diff": "Diff & Compare",
+      "importExport": "Import / Export",
+      "rollback": "Rollback & Restore",
+      "history": "History & Timeline",
+      "health": "Health & Troubleshooting"
+    },
+    "domains": {
+      "all": "All Domains",
+      "instance": "Instance / Tenant / Environment",
+      "notifications": "Notifications",
+      "workflows": "Workflows & Promotion",
+      "governance": "Governance & Compliance",
+      "catalog": "Catalog & Contracts",
+      "operations": "Operations & FinOps",
+      "ai": "AI Governance",
+      "integrations": "Integrations"
+    },
+    "explorer": {
+      "showing": "Showing",
+      "definitions": "definitions",
+      "type": "Type",
+      "scopes": "Scopes",
+      "editor": "Editor",
+      "inheritable": "Inheritable",
+      "defaultValue": "Default Value",
+      "effectiveValue": "Effective Value",
+      "viewHistory": "View History",
+      "noResults": "No matching definitions found."
+    },
+    "diff": {
+      "leftScope": "Left Scope",
+      "rightScope": "Right Scope",
+      "differences": "differences found",
+      "noDifferences": "No differences between the selected scopes."
+    },
+    "export": {
+      "title": "Export Configuration",
+      "description": "Export configuration definitions and effective values as a validated JSON file. Sensitive values are automatically masked.",
+      "scope": "Scope",
+      "domain": "Domain",
+      "sensitiveWarning": "Sensitive values will be masked in the export for security.",
+      "button": "Export JSON"
+    },
+    "import": {
+      "title": "Import Configuration",
+      "description": "Import a previously exported configuration file. All values will be validated against current definitions before applying.",
+      "dropzone": "Drop JSON file here or click to select",
+      "format": "Accepts NexTraceOne configuration export format",
+      "previewNote": "Import will show a preview and validation report before applying any changes."
+    },
+    "rollback": {
+      "title": "Configuration Rollback",
+      "description": "Select a configuration key to view its version history and restore a previous value. All rollbacks are audited and validated.",
+      "searchKey": "Search key to rollback...",
+      "historyFor": "Version History for",
+      "restore": "Restore",
+      "selectKey": "Search and select a configuration key to view its version history."
+    },
+    "history": {
+      "title": "Configuration Change Timeline",
+      "description": "View all configuration changes across domains. Filter by key, user, or time period.",
+      "searchPlaceholder": "Search by key...",
+      "empty": "Enter a configuration key to view its change timeline."
+    },
+    "health": {
+      "title": "Configuration Platform Health",
+      "definitionCount": "Definition Count",
+      "definitionsLoaded": "definitions loaded",
+      "effectiveResolution": "Effective Resolution",
+      "settingsResolved": "settings resolved",
+      "sensitiveProtection": "Sensitive Protection",
+      "sensitiveKeys": "sensitive keys protected",
+      "orphanCheck": "Orphan Check",
+      "noOrphans": "No orphaned entries",
+      "orphansFound": "orphaned entries found",
+      "duplicateCheck": "Duplicate Check",
+      "noDuplicates": "No duplicate keys",
+      "duplicatesFound": "duplicate keys found",
+      "governanceTitle": "Definition Governance",
+      "totalDefinitions": "Total Definitions",
+      "sensitiveDefinitions": "Sensitive",
+      "editableDefinitions": "Editable",
+      "mandatoryDefinitions": "Mandatory (System-only)",
+      "domainBreakdown": "Domain Breakdown"
+    }
   }
 }

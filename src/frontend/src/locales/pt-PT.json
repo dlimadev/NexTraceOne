@@ -3683,5 +3683,347 @@
       "title": "Nenhuma definição encontrada",
       "description": "Nenhuma definição de configuração de notificação corresponde aos filtros atuais."
     }
+  },
+  "workflowConfig": {
+    "title": "Workflows & Governança de Promoção",
+    "subtitle": "Configure fluxos de aprovação, SLAs, gates, caminhos de promoção, janelas de release e políticas de congelamento",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido de",
+    "footer": "{{count}} definições de workflow e governança de promoção configuradas",
+    "sections": {
+      "templates": "Tipos & Templates",
+      "stages": "Etapas & Quórum",
+      "approvers": "Aprovadores & Escalonamento",
+      "sla": "SLA / Timeout / Expiração",
+      "gates": "Gates / Checklists / Auto-Aprovação",
+      "promotion": "Governança de Promoção",
+      "freeze": "Janelas de Release & Congelamento"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituição"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Sem histórico de auditoria disponível.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de configuração de workflow corresponde aos filtros atuais."
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar a configuração de workflow e governança de promoção.",
+      "retry": "Tentar novamente"
+    }
+  },
+  "governanceConfig": {
+    "title": "Configuração de Governança & Compliance",
+    "subtitle": "Configure políticas, perfis de compliance, evidências, waivers, packs de governança, scorecards e matriz de risco",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido de",
+    "footer": "{{count}} definições de governança e compliance configuradas",
+    "sections": {
+      "policies": "Políticas & Perfis",
+      "evidence": "Evidências",
+      "waivers": "Waivers",
+      "packs": "Packs & Bindings",
+      "scorecards": "Scorecards & Risco",
+      "requirements": "Requisitos Mínimos"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituição"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Sem histórico de auditoria disponível.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de governança corresponde aos filtros atuais."
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar a configuração de governança e compliance.",
+      "retry": "Tentar novamente"
+    }
+  },
+  "catalogContractsConfig": {
+    "title": "Configuração de Catálogo, Contratos & Change Governance",
+    "subtitle": "Configure tipos de contrato, versionamento, validação, políticas de publicação, tipos de mudança, blast radius e scoring de release",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido de",
+    "footer": "{{count}} definições de catálogo, contratos e change governance configuradas",
+    "sections": {
+      "contracts": "Tipos de Contrato & Versionamento",
+      "validation": "Validação & Rulesets",
+      "requirements": "Requisitos Mínimos",
+      "publication": "Publicação & Promoção",
+      "importExport": "Importação / Exportação",
+      "changeTypes": "Tipos de Mudança & Blast Radius",
+      "releaseScoring": "Scoring de Release & Rollback"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituição"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "audit": {
+      "title": "Histórico de Auditoria",
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Sem histórico de auditoria disponível.",
+      "by": "Por",
+      "reason": "Motivo"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de catálogo ou change governance corresponde aos filtros atuais."
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar a configuração de catálogo, contratos e change governance.",
+      "retry": "Tentar novamente"
+    }
+  },
+  "opsFinOpsConfig": {
+    "title": "Configuração de Operações, Incidentes, FinOps e Benchmarking",
+    "subtitle": "Configure taxonomia de incidentes, SLAs, responsáveis, automação, orçamentos, deteção de anomalias, políticas de desperdício e benchmarking",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido de",
+    "footer": "{{count}} definições de operações, incidentes, FinOps e benchmarking configuradas",
+    "sections": {
+      "incidentTaxonomy": "Taxonomia de Incidentes e SLA",
+      "ownersCorrelation": "Responsáveis e Correlação",
+      "playbooksAutomation": "Playbooks e Automação",
+      "budgets": "Orçamentos e Limiares",
+      "anomalyWaste": "Anomalia, Desperdício e Saúde",
+      "benchmarking": "Benchmarking e Pontuações"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituição"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar a configuração de operações, incidentes, FinOps e benchmarking.",
+      "retry": "Tentar novamente"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de operações, incidentes, FinOps ou benchmarking corresponde aos filtros atuais."
+    },
+    "audit": {
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Nenhum histórico de auditoria disponível.",
+      "title": "Histórico de Auditoria",
+      "by": "Por",
+      "reason": "Motivo"
+    }
+  },
+  "aiIntegrationsConfig": {
+    "title": "Configuração de IA e Integrações",
+    "subtitle": "Gerir fornecedores de IA, modelos, orçamentos, conectores e governança de integrações",
+    "loading": "A carregar configuração de IA e integrações...",
+    "errorTitle": "Falha ao carregar configuração",
+    "errorMessage": "Não foi possível carregar as definições de configuração de IA e integrações.",
+    "empty": "Nenhuma definição de configuração de IA e integrações encontrada. Assegure-se de que as definições da Fase 7 foram semeadas.",
+    "searchPlaceholder": "Pesquisar configuração...",
+    "effectiveSettings": "Configurações Efetivas",
+    "effectiveValue": "Valor Efetivo",
+    "mandatory": "Obrigatório",
+    "auditHistory": "Alterações Recentes",
+    "noResults": "Nenhuma definição de configuração correspondente encontrada.",
+    "sections": {
+      "providersModels": "Fornecedores e Modelos",
+      "budgetsQuotas": "Orçamentos e Quotas",
+      "promptsRetrieval": "Prompts e Recuperação",
+      "connectorsSchedules": "Conectores e Agendamentos",
+      "filtersMappings": "Filtros e Sincronização",
+      "failureGovernance": "Falhas e Governança"
+    },
+    "detail": {
+      "type": "Tipo",
+      "scopes": "Âmbitos",
+      "editor": "Editor",
+      "inheritable": "Herdável",
+      "defaultValue": "Valor Predefinido"
+    }
+  },
+  "advancedConfig": {
+    "title": "Consola Avançada de Configuração",
+    "subtitle": "Administração enterprise: explore, compare, exporte, reverta e governe configurações",
+    "loading": "A carregar consola avançada de configuração...",
+    "errorTitle": "Falha ao carregar configuração",
+    "errorMessage": "Não foi possível carregar as definições de configuração para a consola avançada.",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "tabs": {
+      "explorer": "Explorador Efetivo",
+      "diff": "Diff e Comparação",
+      "importExport": "Importar / Exportar",
+      "rollback": "Rollback e Restauração",
+      "history": "Histórico e Timeline",
+      "health": "Saúde e Troubleshooting"
+    },
+    "domains": {
+      "all": "Todos os Domínios",
+      "instance": "Instância / Tenant / Ambiente",
+      "notifications": "Notificações",
+      "workflows": "Workflows e Promoção",
+      "governance": "Governança e Compliance",
+      "catalog": "Catálogo e Contratos",
+      "operations": "Operações e FinOps",
+      "ai": "Governança de IA",
+      "integrations": "Integrações"
+    },
+    "explorer": {
+      "showing": "A mostrar",
+      "definitions": "definições",
+      "type": "Tipo",
+      "scopes": "Âmbitos",
+      "editor": "Editor",
+      "inheritable": "Herdável",
+      "defaultValue": "Valor Predefinido",
+      "effectiveValue": "Valor Efetivo",
+      "viewHistory": "Ver Histórico",
+      "noResults": "Nenhuma definição encontrada."
+    },
+    "diff": {
+      "leftScope": "Âmbito Esquerdo",
+      "rightScope": "Âmbito Direito",
+      "differences": "diferenças encontradas",
+      "noDifferences": "Sem diferenças entre os âmbitos selecionados."
+    },
+    "export": {
+      "title": "Exportar Configuração",
+      "description": "Exporte definições e valores efetivos como JSON validado. Valores sensíveis são mascarados automaticamente.",
+      "scope": "Âmbito",
+      "domain": "Domínio",
+      "sensitiveWarning": "Valores sensíveis serão mascarados na exportação por segurança.",
+      "button": "Exportar JSON"
+    },
+    "import": {
+      "title": "Importar Configuração",
+      "description": "Importe um ficheiro de configuração exportado anteriormente. Todos os valores serão validados antes da aplicação.",
+      "dropzone": "Arraste um ficheiro JSON aqui ou clique para selecionar",
+      "format": "Aceita formato de exportação NexTraceOne",
+      "previewNote": "A importação mostrará uma pré-visualização e relatório de validação antes de aplicar as alterações."
+    },
+    "rollback": {
+      "title": "Rollback de Configuração",
+      "description": "Selecione uma chave de configuração para ver o seu histórico de versões e restaurar um valor anterior.",
+      "searchKey": "Pesquisar chave para rollback...",
+      "historyFor": "Histórico de Versões para",
+      "restore": "Restaurar",
+      "selectKey": "Pesquise e selecione uma chave de configuração para ver o seu histórico de versões."
+    },
+    "history": {
+      "title": "Timeline de Alterações de Configuração",
+      "description": "Visualize todas as alterações de configuração entre domínios. Filtre por chave, utilizador ou período.",
+      "searchPlaceholder": "Pesquisar por chave...",
+      "empty": "Introduza uma chave de configuração para ver a sua timeline de alterações."
+    },
+    "health": {
+      "title": "Saúde da Plataforma de Configuração",
+      "definitionCount": "Contagem de Definições",
+      "definitionsLoaded": "definições carregadas",
+      "effectiveResolution": "Resolução Efetiva",
+      "settingsResolved": "configurações resolvidas",
+      "sensitiveProtection": "Proteção de Sensíveis",
+      "sensitiveKeys": "chaves sensíveis protegidas",
+      "orphanCheck": "Verificação de Órfãos",
+      "noOrphans": "Sem entradas órfãs",
+      "orphansFound": "entradas órfãs encontradas",
+      "duplicateCheck": "Verificação de Duplicatas",
+      "noDuplicates": "Sem chaves duplicadas",
+      "duplicatesFound": "chaves duplicadas encontradas",
+      "governanceTitle": "Governança de Definições",
+      "totalDefinitions": "Total de Definições",
+      "sensitiveDefinitions": "Sensíveis",
+      "editableDefinitions": "Editáveis",
+      "mandatoryDefinitions": "Mandatórias (System-only)",
+      "domainBreakdown": "Distribuição por Domínio"
+    }
   }
 }
