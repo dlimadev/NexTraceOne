@@ -253,7 +253,7 @@ export function ConfigurationAdminPage() {
         : refetchEffective;
 
   if (isLoading) return <PageLoadingState />;
-  if (isError) return <PageErrorState onRetry={() => refetch()} />;
+  if (isError) return <PageErrorState action={<button className="text-xs text-accent hover:underline" onClick={() => refetch()}>{t('common.retry')}</button>} />;
 
   const renderValue = (
     value: string | null,
