@@ -87,16 +87,16 @@
 
 ---
 
-### OI-07 — Configuration and Notifications may lack proper migrations
+### OI-07 — Configuration and Notifications have 0 migrations
 
 | Attribute | Value |
 |-----------|-------|
-| **Item** | `ConfigurationDbContext` and `NotificationsDbContext` were reported as having 0 migrations in audit reports, potentially using `EnsureCreated` instead of EF Core migrations |
-| **Why it blocks** | `EnsureCreated` is incompatible with incremental schema evolution. Cannot apply table prefixes or schema changes without migrations. Blocks migration baseline reset. |
+| **Item** | `ConfigurationDbContext` and `NotificationsDbContext` have 0 EF Core migrations. Code search confirms `EnsureCreated` is **not present** in the current codebase — the schema initialization mechanism is unclear (possibly external or manual). Regardless, both modules lack proper migration files. |
+| **Why it blocks** | Without migrations, schema cannot evolve incrementally. Cannot apply table prefixes, add concurrency tokens, FK constraints, or check constraints. Blocks migration baseline reset. |
 | **Modules affected** | Configuration, Notifications |
 | **Priority** | **MEDIUM** |
-| **Action** | Verify current state. If `EnsureCreated` is still in use, create initial migrations for both modules. If migrations now exist, update audit documentation. |
-| **Evidence** | `docs/11-review-modular/00-governance/database-structural-audit.md` reports 0 migrations for both. `docs/11-review-modular/00-governance/dbcontexts-and-persistence-inventory.md` flags both as FRAGMENTED. |
+| **Action** | Create initial baseline migrations for both modules once their data models are finalized. Configuration model is finalized (see `docs/11-review-modular/09-configuration/persistence-model-finalization.md`). Notifications model needs review. |
+| **Evidence** | `docs/11-review-modular/00-governance/database-structural-audit.md` reports 0 migrations for both. Codebase search for `EnsureCreated` returns no matches in `src/`. |
 
 ---
 

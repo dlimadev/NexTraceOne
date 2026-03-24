@@ -82,7 +82,7 @@ Each definition has a `DefaultValue` property that serves as the fallback when n
 
 | # | Missing Seed | Impact | Priority |
 |---|-------------|--------|----------|
-| S-01 | **Production seeding not enabled** — seeder only runs in Development | Platform non-functional in Staging/Production without definitions | **CRITICAL** |
+| S-01 | **Production seeding not enabled** — seeder only runs in Development | Platform non-functional in Staging/Production without definitions. Must align with migration baseline approach in `docs/architecture/persistence-strategy-final.md` | **CRITICAL** |
 | S-02 | No seed verification/reconciliation — if a definition is added in a new phase, existing environments don't get it | Environments fall behind on available configurations | MEDIUM |
 | S-03 | No seed versioning — no way to know which phase's seeds have been applied | Difficult to track seed state across environments | LOW |
 
