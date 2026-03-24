@@ -3847,5 +3847,59 @@
       "message": "Não foi possível carregar a configuração de catálogo, contratos e change governance.",
       "retry": "Tentar novamente"
     }
+  },
+  "opsFinOpsConfig": {
+    "title": "Configuração de Operações, Incidentes, FinOps e Benchmarking",
+    "subtitle": "Configure taxonomia de incidentes, SLAs, responsáveis, automação, orçamentos, deteção de anomalias, políticas de desperdício e benchmarking",
+    "scope": "Âmbito",
+    "scopeReference": "ID de Referência do Âmbito",
+    "scopeReferencePlaceholder": "Introduza o ID do tenant/ambiente...",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar por chave ou nome...",
+    "effectiveValue": "Valor Efetivo",
+    "resolvedFrom": "Resolvido de",
+    "footer": "{{count}} definições de operações, incidentes, FinOps e benchmarking configuradas",
+    "sections": {
+      "incidentTaxonomy": "Taxonomia de Incidentes e SLA",
+      "ownersCorrelation": "Responsáveis e Correlação",
+      "playbooksAutomation": "Playbooks e Automação",
+      "budgets": "Orçamentos e Limiares",
+      "anomalyWaste": "Anomalia, Desperdício e Saúde",
+      "benchmarking": "Benchmarking e Pontuações"
+    },
+    "badges": {
+      "sensitive": "Sensível",
+      "nonInheritable": "Não herdável",
+      "default": "Predefinição",
+      "inherited": "Herdado",
+      "override": "Substituição"
+    },
+    "actions": {
+      "edit": "Editar",
+      "audit": "Histórico de Auditoria"
+    },
+    "edit": {
+      "value": "Valor",
+      "reason": "Motivo da Alteração",
+      "reasonPlaceholder": "Motivo opcional para esta alteração...",
+      "save": "Guardar",
+      "cancel": "Cancelar"
+    },
+    "error": {
+      "title": "Erro ao carregar configuração",
+      "message": "Não foi possível carregar a configuração de operações, incidentes, FinOps e benchmarking.",
+      "retry": "Tentar novamente"
+    },
+    "empty": {
+      "title": "Nenhuma definição encontrada",
+      "description": "Nenhuma definição de operações, incidentes, FinOps ou benchmarking corresponde aos filtros atuais."
+    },
+    "audit": {
+      "loading": "A carregar histórico de auditoria...",
+      "empty": "Nenhum histórico de auditoria disponível.",
+      "title": "Histórico de Auditoria",
+      "by": "Por",
+      "reason": "Motivo"
+    }
   }
 }

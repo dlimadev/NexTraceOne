@@ -4628,5 +4628,59 @@
       "message": "Could not load catalog, contracts and change governance configuration.",
       "retry": "Retry"
     }
+  },
+  "opsFinOpsConfig": {
+    "title": "Operations, Incidents, FinOps & Benchmarking Configuration",
+    "subtitle": "Configure incident taxonomy, SLAs, owners, automation, budgets, anomaly detection, waste policies and benchmarking",
+    "scope": "Scope",
+    "scopeReference": "Scope Reference ID",
+    "scopeReferencePlaceholder": "Enter tenant/environment ID...",
+    "search": "Search",
+    "searchPlaceholder": "Search by key or name...",
+    "effectiveValue": "Effective Value",
+    "resolvedFrom": "Resolved from",
+    "footer": "{{count}} operations, incidents, FinOps & benchmarking definitions configured",
+    "sections": {
+      "incidentTaxonomy": "Incident Taxonomy & SLA",
+      "ownersCorrelation": "Owners & Correlation",
+      "playbooksAutomation": "Playbooks & Automation",
+      "budgets": "Budgets & Thresholds",
+      "anomalyWaste": "Anomaly, Waste & Health",
+      "benchmarking": "Benchmarking & Scores"
+    },
+    "badges": {
+      "sensitive": "Sensitive",
+      "nonInheritable": "Non-inheritable",
+      "default": "Default",
+      "inherited": "Inherited",
+      "override": "Override"
+    },
+    "actions": {
+      "edit": "Edit",
+      "audit": "Audit History"
+    },
+    "edit": {
+      "value": "Value",
+      "reason": "Change Reason",
+      "reasonPlaceholder": "Optional reason for this change...",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "error": {
+      "title": "Error loading configuration",
+      "message": "Could not load operations, incidents, FinOps and benchmarking configuration.",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "No definitions found",
+      "description": "No operations, incidents, FinOps or benchmarking definitions match the current filters."
+    },
+    "audit": {
+      "loading": "Loading audit history...",
+      "empty": "No audit history available.",
+      "title": "Audit History",
+      "by": "By",
+      "reason": "Reason"
+    }
   }
 }

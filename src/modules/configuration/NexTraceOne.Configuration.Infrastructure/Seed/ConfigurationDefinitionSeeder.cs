@@ -2779,5 +2779,613 @@ public static class ConfigurationDefinitionSeeder
             validationRules: """{"min":1,"max":168}""",
             uiEditorType: "text",
             sortOrder: 4690),
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PHASE 6 — OPERATIONS, INCIDENTS, FINOPS & BENCHMARKING
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ── Block A — Incident Taxonomy, Severity, Criticality & SLA ───
+
+        ConfigurationDefinition.Create(
+            key: "incidents.taxonomy.categories",
+            displayName: "Incident Categories",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Defined incident categories (Infrastructure, Application, Security, Data, Network, ThirdParty)",
+            defaultValue: """["Infrastructure","Application","Security","Data","Network","ThirdParty"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5000),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.taxonomy.types",
+            displayName: "Incident Types",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Defined incident types (Outage, Degradation, Latency, ErrorSpike, SecurityBreach, DataLoss, ConfigDrift)",
+            defaultValue: """["Outage","Degradation","Latency","ErrorSpike","SecurityBreach","DataLoss","ConfigDrift"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5010),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.severity.defaults_by_type",
+            displayName: "Default Severity by Incident Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default severity assigned per incident type (Critical, High, Medium, Low)",
+            defaultValue: """{"Outage":"Critical","Degradation":"High","Latency":"Medium","ErrorSpike":"High","SecurityBreach":"Critical","DataLoss":"Critical","ConfigDrift":"Low"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5020),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.severity.defaults_by_category",
+            displayName: "Default Severity by Incident Category",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default severity assigned per incident category",
+            defaultValue: """{"Infrastructure":"High","Application":"Medium","Security":"Critical","Data":"High","Network":"High","ThirdParty":"Medium"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5030),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.criticality.defaults",
+            displayName: "Incident Criticality Defaults",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default criticality per incident type/category combination",
+            defaultValue: """{"Outage_Infrastructure":"Critical","SecurityBreach_Security":"Critical","Degradation_Application":"High","Latency_Network":"Medium","ConfigDrift_Application":"Low"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5040),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.severity.mapping",
+            displayName: "Severity Mapping Table",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Severity mapping with labels, colors and numeric weights",
+            defaultValue: """{"Critical":{"label":"Critical","color":"#DC2626","weight":4},"High":{"label":"High","color":"#F59E0B","weight":3},"Medium":{"label":"Medium","color":"#3B82F6","weight":2},"Low":{"label":"Low","color":"#10B981","weight":1}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5050),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.sla.by_severity",
+            displayName: "SLA by Severity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "SLA targets in minutes by severity (acknowledgement, firstResponse, resolution)",
+            defaultValue: """{"Critical":{"acknowledgementMinutes":5,"firstResponseMinutes":15,"resolutionMinutes":240},"High":{"acknowledgementMinutes":15,"firstResponseMinutes":60,"resolutionMinutes":480},"Medium":{"acknowledgementMinutes":60,"firstResponseMinutes":240,"resolutionMinutes":1440},"Low":{"acknowledgementMinutes":240,"firstResponseMinutes":480,"resolutionMinutes":4320}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5060),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.sla.by_environment",
+            displayName: "SLA Adjustments by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "SLA multiplier or override per environment (Production stricter)",
+            defaultValue: """{"Production":{"multiplier":1.0},"PreProduction":{"multiplier":2.0},"Staging":{"multiplier":3.0},"Development":{"multiplier":5.0}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5070),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.sla.production_behavior",
+            displayName: "Production Severity Behavior",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Special SLA behavior for production environment by severity",
+            defaultValue: """{"Critical":{"autoEscalate":true,"pageOnCall":true,"requirePostMortem":true},"High":{"autoEscalate":true,"pageOnCall":false,"requirePostMortem":true},"Medium":{"autoEscalate":false},"Low":{"autoEscalate":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5080),
+
+        // ── Block B — Owners, Classification, Correlation & Auto-Incident ─
+
+        ConfigurationDefinition.Create(
+            key: "incidents.owner.default_by_category",
+            displayName: "Default Owner by Category",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default operational owner (team/role) per incident category",
+            defaultValue: """{"Infrastructure":"platform-ops","Application":"service-owner","Security":"security-team","Data":"data-engineering","Network":"network-ops","ThirdParty":"vendor-management"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5100),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.owner.fallback",
+            displayName: "Fallback Incident Owner",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Fallback owner when no specific owner can be determined",
+            defaultValue: "platform-admin",
+            uiEditorType: "text",
+            sortOrder: 5110),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.classification.auto_enabled",
+            displayName: "Automatic Classification Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether incidents are automatically classified based on alerts and context",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5120),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.correlation.policy",
+            displayName: "Alert-to-Incident Correlation Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Rules for correlating alerts and notifications into incidents",
+            defaultValue: """{"correlateByService":true,"correlateByEnvironment":true,"correlateBySeverity":false,"correlationWindowMinutes":30,"correlationKeyFields":["service","environment","alertType"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5130),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.auto_creation.enabled",
+            displayName: "Auto-Incident Creation Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Whether incidents can be automatically created from alerts",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5140),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.auto_creation.policy",
+            displayName: "Auto-Incident Creation Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Rules governing automatic incident creation (thresholds, conditions, limits)",
+            defaultValue: """{"minSeverityForAutoCreate":"High","maxAutoIncidentsPerHour":10,"requireCorrelationMatch":true,"blockedCategories":[]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5150),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.auto_creation.blocked_environments",
+            displayName: "Auto-Incident Blocked Environments",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Environments where auto-incident creation is blocked",
+            defaultValue: """[]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 5160),
+
+        ConfigurationDefinition.Create(
+            key: "incidents.enrichment.enabled",
+            displayName: "Incident Enrichment Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether existing incidents are enriched with new correlated alerts",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5170),
+
+        // ── Block C — Playbooks, Runbooks & Operational Automation ─────
+
+        ConfigurationDefinition.Create(
+            key: "operations.playbook.defaults_by_type",
+            displayName: "Default Playbook by Incident Type",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default playbook identifier per incident type",
+            defaultValue: """{"Outage":"playbook-outage-standard","Degradation":"playbook-degradation-triage","SecurityBreach":"playbook-security-response","DataLoss":"playbook-data-recovery","Latency":"playbook-performance-investigation"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5200),
+
+        ConfigurationDefinition.Create(
+            key: "operations.runbook.defaults_by_category",
+            displayName: "Default Runbook by Category",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default runbook identifier per incident category",
+            defaultValue: """{"Infrastructure":"runbook-infra-ops","Application":"runbook-app-debug","Security":"runbook-sec-incident","Network":"runbook-network-diag"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5210),
+
+        ConfigurationDefinition.Create(
+            key: "operations.playbook.required_by_environment",
+            displayName: "Playbook Required by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether a playbook is required per environment for incident response",
+            defaultValue: """{"Production":true,"PreProduction":false,"Development":false}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5220),
+
+        ConfigurationDefinition.Create(
+            key: "operations.playbook.required_by_criticality",
+            displayName: "Playbook Required by Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether a playbook is mandatory for Critical severity incidents",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5230),
+
+        ConfigurationDefinition.Create(
+            key: "operations.automation.enabled_by_environment",
+            displayName: "Automation Enabled by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Operational automation enablement per environment",
+            defaultValue: """{"Production":{"autoRestart":false,"autoScale":false,"autoRemediate":false},"PreProduction":{"autoRestart":true,"autoScale":true,"autoRemediate":false},"Development":{"autoRestart":true,"autoScale":true,"autoRemediate":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5240),
+
+        ConfigurationDefinition.Create(
+            key: "operations.automation.blocked_in_production",
+            displayName: "Automation Blocked in Production",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System],
+            description: "Automations explicitly blocked in production environments",
+            defaultValue: """["autoRemediate","autoDeleteResources","autoModifyData"]""",
+            isInheritable: false,
+            uiEditorType: "json-editor",
+            sortOrder: 5250),
+
+        ConfigurationDefinition.Create(
+            key: "operations.automation.by_severity",
+            displayName: "Automation Allowed by Severity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Which automations are allowed per incident severity",
+            defaultValue: """{"Critical":["autoNotify","autoEscalate"],"High":["autoNotify","autoEscalate","autoRestart"],"Medium":["autoNotify","autoRestart"],"Low":["autoNotify"]}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5260),
+
+        ConfigurationDefinition.Create(
+            key: "operations.postincident.template_enabled",
+            displayName: "Post-Incident Template Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether post-incident review template is automatically applied",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5270),
+
+        // ── Block D — FinOps Budgets & Thresholds ──────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.default_currency",
+            displayName: "Default Budget Currency",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default currency for FinOps budgets (ISO 4217)",
+            defaultValue: "USD",
+            validationRules: """{"maxLength":3,"minLength":3}""",
+            uiEditorType: "text",
+            sortOrder: 5300),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.by_tenant",
+            displayName: "Budget by Tenant",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Monthly budget allocation per tenant",
+            defaultValue: """{"default":{"monthlyBudget":10000,"alertOnExceed":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5310),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.by_team",
+            displayName: "Budget by Team",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Monthly budget allocation per team",
+            defaultValue: """{"default":{"monthlyBudget":5000,"alertOnExceed":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5320),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.by_service",
+            displayName: "Budget by Service",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Monthly budget allocation per service",
+            defaultValue: """{"default":{"monthlyBudget":2000,"alertOnExceed":true}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5330),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.alert_thresholds",
+            displayName: "Budget Alert Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Alert thresholds as percentage of budget (ordered ascending)",
+            defaultValue: """[{"percent":80,"severity":"Low","action":"Notify"},{"percent":90,"severity":"Medium","action":"Notify"},{"percent":100,"severity":"High","action":"NotifyAndBlock"},{"percent":120,"severity":"Critical","action":"Escalate"}]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5340),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.by_environment",
+            displayName: "Budget by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Budget constraints per environment",
+            defaultValue: """{"Production":{"monthlyBudget":8000,"hardLimit":true},"PreProduction":{"monthlyBudget":3000,"hardLimit":false},"Development":{"monthlyBudget":1000,"hardLimit":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5350),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.periodicity",
+            displayName: "Budget Periodicity",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Budget period (Monthly, Quarterly, Yearly)",
+            defaultValue: "Monthly",
+            validationRules: """{"enum":["Monthly","Quarterly","Yearly"]}""",
+            uiEditorType: "select",
+            sortOrder: 5360),
+
+        ConfigurationDefinition.Create(
+            key: "finops.budget.rollover_enabled",
+            displayName: "Budget Rollover Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether unused budget rolls over to the next period",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5370),
+
+        // ── Block E — Anomaly, Waste & Financial Recommendations ───────
+
+        ConfigurationDefinition.Create(
+            key: "finops.anomaly.detection_enabled",
+            displayName: "Cost Anomaly Detection Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether cost anomaly detection is active",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5400),
+
+        ConfigurationDefinition.Create(
+            key: "finops.anomaly.thresholds",
+            displayName: "Anomaly Detection Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Thresholds for anomaly detection (deviation percentage from baseline)",
+            defaultValue: """{"warning":20,"high":50,"critical":100}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5410),
+
+        ConfigurationDefinition.Create(
+            key: "finops.anomaly.comparison_window_days",
+            displayName: "Anomaly Comparison Window (Days)",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Number of days for the baseline comparison window",
+            defaultValue: "30",
+            validationRules: """{"min":7,"max":90}""",
+            uiEditorType: "text",
+            sortOrder: 5420),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.detection_enabled",
+            displayName: "Waste Detection Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether waste detection analysis is active",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5430),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.thresholds",
+            displayName: "Waste Detection Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Thresholds for waste detection (idle percentage, underutilization)",
+            defaultValue: """{"idleResourcePercent":90,"underutilizationPercent":20,"unusedDaysThreshold":14}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5440),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.categories",
+            displayName: "Waste Categories",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Categories of waste for classification",
+            defaultValue: """["IdleResources","Overprovisioned","UnattachedStorage","UnusedLicenses","OrphanedResources","OverlappingServices"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5450),
+
+        ConfigurationDefinition.Create(
+            key: "finops.recommendation.policy",
+            displayName: "Financial Recommendation Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Policy governing financial recommendations and savings suggestions",
+            defaultValue: """{"autoRecommend":true,"minSavingsThreshold":50,"showInDashboard":true,"notifyOnHighSavings":true,"highSavingsThreshold":500}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5460),
+
+        ConfigurationDefinition.Create(
+            key: "finops.notification.policy",
+            displayName: "Financial Notification Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Notification policy for FinOps events (anomalies, budget breaches, waste)",
+            defaultValue: """{"notifyOnAnomaly":true,"notifyOnBudgetBreach":true,"notifyOnWasteDetected":true,"notifyOnRecommendation":false,"digestFrequency":"Weekly"}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5470),
+
+        ConfigurationDefinition.Create(
+            key: "finops.anomaly.by_criticality",
+            displayName: "Anomaly Policy by Service Criticality",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Anomaly detection sensitivity per service criticality level",
+            defaultValue: """{"critical":{"warningDeviation":10,"autoEscalate":true},"standard":{"warningDeviation":20,"autoEscalate":false}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5480),
+
+        // ── Block F — Benchmarking Weights, Thresholds & Formulas ──────
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.score.weights",
+            displayName: "Benchmarking Score Weights",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Weights for each benchmarking dimension (must sum to 100)",
+            defaultValue: """{"reliability":25,"performance":20,"costEfficiency":20,"security":15,"operationalExcellence":10,"documentation":10}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5500),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.score.thresholds",
+            displayName: "Benchmarking Score Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Score classification thresholds (Excellent, Good, Needs Improvement, Critical)",
+            defaultValue: """{"Excellent":90,"Good":70,"NeedsImprovement":50,"Critical":0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5510),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.score.bands",
+            displayName: "Benchmarking Score Bands",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Score bands with labels and colors for visualization",
+            defaultValue: """{"Excellent":{"label":"Excellent","color":"#10B981","minScore":90},"Good":{"label":"Good","color":"#3B82F6","minScore":70},"NeedsImprovement":{"label":"Needs Improvement","color":"#F59E0B","minScore":50},"Critical":{"label":"Critical","color":"#DC2626","minScore":0}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5520),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.formula.components",
+            displayName: "Benchmarking Formula Components",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Configurable components of the benchmarking score formula",
+            defaultValue: """{"reliability":{"uptimeWeight":0.5,"mttrWeight":0.3,"incidentRateWeight":0.2},"performance":{"p99LatencyWeight":0.4,"throughputWeight":0.3,"errorRateWeight":0.3},"costEfficiency":{"budgetAdherenceWeight":0.5,"wasteReductionWeight":0.3,"optimizationAdoptionWeight":0.2}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5530),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.score.by_dimension",
+            displayName: "Score Weights by Dimension",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Detailed weight distribution within each benchmarking dimension",
+            defaultValue: """{"reliability":{"uptime":50,"mttr":30,"incidentRate":20},"performance":{"latency":40,"throughput":30,"errorRate":30},"costEfficiency":{"budgetAdherence":50,"waste":30,"optimization":20},"security":{"vulnerabilities":40,"compliance":30,"patchCurrency":30},"operationalExcellence":{"automation":40,"documentation":30,"changeSuccess":30},"documentation":{"coverage":50,"freshness":30,"quality":20}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5540),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.thresholds.by_environment",
+            displayName: "Benchmarking Thresholds by Environment",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Override benchmarking thresholds per environment",
+            defaultValue: """{"Production":{"Excellent":95,"Good":80,"NeedsImprovement":60,"Critical":0},"Development":{"Excellent":80,"Good":60,"NeedsImprovement":40,"Critical":0}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5550),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.missing_data.policy",
+            displayName: "Missing Data Calculation Policy",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "How to handle missing data in benchmarking (SkipDimension, UseDefault, Penalize)",
+            defaultValue: "UseDefault",
+            validationRules: """{"enum":["SkipDimension","UseDefault","Penalize"]}""",
+            uiEditorType: "select",
+            sortOrder: 5560),
+
+        ConfigurationDefinition.Create(
+            key: "benchmarking.missing_data.default_score",
+            displayName: "Missing Data Default Score",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Default score to use when data is missing (used with UseDefault policy)",
+            defaultValue: "50",
+            validationRules: """{"min":0,"max":100}""",
+            uiEditorType: "text",
+            sortOrder: 5570),
+
+        // ── Block G — Functional Health/Anomaly/Drift Thresholds ───────
+
+        ConfigurationDefinition.Create(
+            key: "operations.health.anomaly_thresholds",
+            displayName: "Operational Health Anomaly Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "Functional thresholds for operational health anomaly detection",
+            defaultValue: """{"errorRateWarning":1.0,"errorRateCritical":5.0,"latencyP99Warning":500,"latencyP99Critical":2000,"availabilityWarning":99.5,"availabilityCritical":99.0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5600),
+
+        ConfigurationDefinition.Create(
+            key: "operations.health.drift_detection_enabled",
+            displayName: "Configuration Drift Detection Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Whether configuration drift detection between environments is active",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5610),
+
+        ConfigurationDefinition.Create(
+            key: "operations.health.drift_thresholds",
+            displayName: "Drift Detection Thresholds",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "Thresholds for drift severity classification",
+            defaultValue: """{"minor":{"maxDriftedConfigs":5},"major":{"maxDriftedConfigs":15},"critical":{"maxDriftedConfigs":30}}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5620),
     ];
 }

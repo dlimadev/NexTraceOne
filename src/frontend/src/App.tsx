@@ -119,6 +119,7 @@ const NotificationConfigurationPage = lazy(() => import('./features/notification
 const WorkflowConfigurationPage = lazy(() => import('./features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
 const GovernanceConfigurationPage = lazy(() => import('./features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
 const CatalogContractsConfigurationPage = lazy(() => import('./features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
+const OperationsFinOpsConfigurationPage = lazy(() => import('./features/operational-intelligence/pages/OperationsFinOpsConfigurationPage').then(m => ({ default: m.OperationsFinOpsConfigurationPage })));
 
 // ── Shared (lazy) ──
 const DashboardPage = lazy(() => import('./features/shared/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
@@ -859,6 +860,15 @@ export default function App() {
                 element={
                   <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
                     <CatalogContractsConfigurationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ── Operations, Incidents, FinOps & Benchmarking Configuration Admin ── */}
+              <Route
+                path="/platform/configuration/operations-finops"
+                element={
+                  <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+                    <OperationsFinOpsConfigurationPage />
                   </ProtectedRoute>
                 }
               />
