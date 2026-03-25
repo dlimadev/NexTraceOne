@@ -14,7 +14,7 @@ internal sealed class BreakGlassRequestConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<BreakGlassRequest> builder)
     {
-        builder.ToTable("identity_break_glass_requests");
+        builder.ToTable("iam_break_glass_requests");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

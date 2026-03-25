@@ -90,7 +90,7 @@ public sealed class IdentityDbContext(
         => typeof(IdentityDbContext).Assembly;
 
     /// <inheritdoc />
-    protected override string OutboxTableName => "identity_outbox_messages";
+    protected override string OutboxTableName => "iam_outbox_messages";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

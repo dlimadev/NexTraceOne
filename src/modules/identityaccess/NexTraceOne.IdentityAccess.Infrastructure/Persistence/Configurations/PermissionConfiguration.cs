@@ -14,7 +14,7 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
 {
     public void Configure(EntityTypeBuilder<Permission> builder)
     {
-        builder.ToTable("identity_permissions");
+        builder.ToTable("iam_permissions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PermissionId.From(value));

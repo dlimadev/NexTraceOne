@@ -14,7 +14,7 @@ internal sealed class JitAccessRequestConfiguration : IEntityTypeConfiguration<J
 {
     public void Configure(EntityTypeBuilder<JitAccessRequest> builder)
     {
-        builder.ToTable("identity_jit_access_requests");
+        builder.ToTable("iam_jit_access_requests");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

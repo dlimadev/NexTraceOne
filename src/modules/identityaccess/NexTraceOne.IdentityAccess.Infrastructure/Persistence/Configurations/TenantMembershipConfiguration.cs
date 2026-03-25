@@ -9,7 +9,7 @@ internal sealed class TenantMembershipConfiguration : IEntityTypeConfiguration<T
 {
     public void Configure(EntityTypeBuilder<TenantMembership> builder)
     {
-        builder.ToTable("identity_tenant_memberships");
+        builder.ToTable("iam_tenant_memberships");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => TenantMembershipId.From(value));

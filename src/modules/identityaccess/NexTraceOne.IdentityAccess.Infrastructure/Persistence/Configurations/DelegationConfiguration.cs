@@ -16,7 +16,7 @@ internal sealed class DelegationConfiguration : IEntityTypeConfiguration<Delegat
 {
     public void Configure(EntityTypeBuilder<Delegation> builder)
     {
-        builder.ToTable("identity_delegations");
+        builder.ToTable("iam_delegations");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

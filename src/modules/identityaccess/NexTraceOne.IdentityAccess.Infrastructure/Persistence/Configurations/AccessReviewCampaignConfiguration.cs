@@ -14,7 +14,7 @@ internal sealed class AccessReviewCampaignConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<AccessReviewCampaign> builder)
     {
-        builder.ToTable("identity_access_review_campaigns");
+        builder.ToTable("iam_access_review_campaigns");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
