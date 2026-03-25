@@ -142,6 +142,12 @@ public static class RolePermissionCatalog
                 "licensing:vendor:featurepack:read",
                 "licensing:vendor:license:manage",
 
+                // Notifications
+                "notifications:inbox:read",
+                "notifications:inbox:write",
+                "notifications:preferences:read",
+                "notifications:preferences:write",
+
                 // Environment Management
                 "env:environments:read",
                 "env:environments:write",
@@ -184,6 +190,10 @@ public static class RolePermissionCatalog
                 "ai:assistant:write",
                 "integrations:read",
                 "licensing:read",
+                "notifications:inbox:read",
+                "notifications:inbox:write",
+                "notifications:preferences:read",
+                "notifications:preferences:write",
                 "env:environments:read",
                 "env:environments:write",
                 "env:access:read"],
@@ -209,6 +219,10 @@ public static class RolePermissionCatalog
                 "ai:assistant:read",
                 "ai:assistant:write",
                 "integrations:read",
+                "notifications:inbox:read",
+                "notifications:inbox:write",
+                "notifications:preferences:read",
+                "notifications:preferences:write",
                 "env:environments:read",
                 "env:access:read"],
             Role.Viewer => [
@@ -224,6 +238,8 @@ public static class RolePermissionCatalog
                 "promotion:requests:read",
                 "rulesets:read",
                 "audit:trail:read",
+                "notifications:inbox:read",
+                "notifications:preferences:read",
                 "env:environments:read"],
             Role.Auditor => [
                 "identity:users:read",
@@ -245,7 +261,9 @@ public static class RolePermissionCatalog
                 "audit:reports:read",
                 "audit:compliance:read",
                 "env:environments:read",
-                "env:access:read"],
+                "env:access:read",
+                "notifications:inbox:read",
+                "notifications:preferences:read"],
             Role.SecurityReview => [
                 "identity:users:read",
                 "identity:roles:read",
@@ -267,6 +285,8 @@ public static class RolePermissionCatalog
                 "audit:trail:read",
                 "audit:reports:read",
                 "audit:compliance:read",
+                "notifications:inbox:read",
+                "notifications:preferences:read",
                 "env:environments:read",
                 "env:access:read"],
             Role.ApprovalOnly => [
@@ -274,7 +294,10 @@ public static class RolePermissionCatalog
                 "promotion:requests:read",
                 "promotion:requests:write",
                 "promotion:gates:override",
-                "audit:trail:read"],
+                "audit:trail:read",
+                "notifications:inbox:read",
+                "notifications:inbox:write",
+                "notifications:preferences:read"],
             _ => []
         };
 }
