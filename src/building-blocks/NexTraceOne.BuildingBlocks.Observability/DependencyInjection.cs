@@ -174,14 +174,13 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<AnalyticsOptions>(
-            configuration.GetSection(AnalyticsOptions.SectionName));
-
         var analyticsOptions = new AnalyticsOptions();
         configuration.GetSection(AnalyticsOptions.SectionName).Bind(analyticsOptions);
 
         if (analyticsOptions.Enabled)
         {
+            services.Configure<AnalyticsOptions>(
+                configuration.GetSection(AnalyticsOptions.SectionName));
             services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);

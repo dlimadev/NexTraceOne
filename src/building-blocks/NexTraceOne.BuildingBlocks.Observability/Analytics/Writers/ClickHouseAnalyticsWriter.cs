@@ -26,7 +26,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Analytics.Writers;
 /// NOTA: Esta implementação usa o HttpClient com timeout configurável.
 /// A base de dados alvo é nextraceone_analytics (separada de nextraceone_obs).
 /// </summary>
-public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter, IDisposable
+public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -37,7 +37,6 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter, IDisposable
     private readonly HttpClient _httpClient;
     private readonly AnalyticsOptions _options;
     private readonly ILogger<ClickHouseAnalyticsWriter> _logger;
-    private bool _disposed;
 
     public ClickHouseAnalyticsWriter(
         HttpClient httpClient,
@@ -57,6 +56,17 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter, IDisposable
     public async Task WriteProductEventsBatchAsync(IReadOnlyList<ProductAnalyticsRecord> records, CancellationToken cancellationToken = default)
     {
         if (records.Count == 0) return;
+
+        // Respeitar MaxBatchSize — dividir em lotes quando necessário
+        if (records.Count > _options.MaxBatchSize)
+        {
+            for (var i = 0; i < records.Count; i += _options.MaxBatchSize)
+            {
+                var batch = records.Skip(i).Take(_options.MaxBatchSize).ToList();
+                await WriteProductEventsBatchAsync(batch, cancellationToken);
+            }
+            return;
+        }
 
         var rows = records.Select(r => new
         {
@@ -252,12 +262,10 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter, IDisposable
 
     /// <summary>
     /// Executa um INSERT em formato JSONEachRow via HTTP interface do ClickHouse.
+    /// O timeout é aplicado via HttpClient.Timeout configurado no DI.
     /// </summary>
     private async Task InsertAsync<T>(string table, IEnumerable<T> rows, CancellationToken cancellationToken)
     {
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(TimeSpan.FromSeconds(_options.WriteTimeoutSeconds));
-
         try
         {
             var jsonLines = string.Join('\n', rows.Select(r => JsonSerializer.Serialize(r, JsonOptions)));
@@ -267,13 +275,15 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter, IDisposable
             using var content = new StringContent(jsonLines, Encoding.UTF8);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            var response = await _httpClient.PostAsync(requestUri, content, cts.Token);
+            var response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                var body = await response.Content.ReadAsStringAsync(cts.Token);
+                // Limitar o body do erro para evitar exposição de dados sensíveis nos logs
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                var sanitizedBody = body.Length > 200 ? body[..200] + "..." : body;
                 throw new InvalidOperationException(
-                    $"ClickHouse INSERT into {table} failed: HTTP {(int)response.StatusCode} — {body}");
+                    $"ClickHouse INSERT into {table} failed: HTTP {(int)response.StatusCode} — {sanitizedBody}");
             }
         }
         catch (Exception ex) when (_options.SuppressWriteErrors)
@@ -290,11 +300,4 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter, IDisposable
     /// </summary>
     private static string FormatDateTime(DateTimeOffset dt)
         => dt.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        if (_disposed) return;
-        _disposed = true;
-    }
 }
