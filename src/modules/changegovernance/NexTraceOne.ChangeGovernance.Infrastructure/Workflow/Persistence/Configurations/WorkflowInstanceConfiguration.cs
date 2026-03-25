@@ -7,10 +7,15 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Confi
 
 internal sealed class WorkflowInstanceConfiguration : IEntityTypeConfiguration<WorkflowInstance>
 {
-    /// <summary>Configura o mapeamento da entidade WorkflowInstance para a tabela wf_workflow_instances.</summary>
+    /// <summary>Configura o mapeamento da entidade WorkflowInstance para a tabela chg_workflow_instances.</summary>
     public void Configure(EntityTypeBuilder<WorkflowInstance> builder)
     {
-        builder.ToTable("chg_workflow_instances");
+        builder.ToTable("chg_workflow_instances", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_chg_workflow_instances_status",
+                "\"Status\" IN ('Draft', 'Pending', 'InReview', 'Approved', 'Rejected', 'Cancelled')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => WorkflowInstanceId.From(value));

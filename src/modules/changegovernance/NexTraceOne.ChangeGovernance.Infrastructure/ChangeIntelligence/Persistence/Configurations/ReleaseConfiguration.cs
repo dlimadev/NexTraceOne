@@ -7,10 +7,21 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
 internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
 {
-    /// <summary>Configura o mapeamento da entidade Release para a tabela ci_releases.</summary>
+    /// <summary>Configura o mapeamento da entidade Release para a tabela chg_releases.</summary>
     public void Configure(EntityTypeBuilder<Release> builder)
     {
-        builder.ToTable("chg_releases");
+        builder.ToTable("chg_releases", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_chg_releases_status",
+                "\"Status\" >= 0 AND \"Status\" <= 4");
+            t.HasCheckConstraint(
+                "CK_chg_releases_change_level",
+                "\"ChangeLevel\" >= 0 AND \"ChangeLevel\" <= 4");
+            t.HasCheckConstraint(
+                "CK_chg_releases_change_score",
+                "\"ChangeScore\" >= 0.0 AND \"ChangeScore\" <= 1.0");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ReleaseId.From(value));
