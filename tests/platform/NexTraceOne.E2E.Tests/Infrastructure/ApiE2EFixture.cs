@@ -41,8 +41,6 @@ public sealed class ApiE2EFixture : IAsyncLifetime
     [
         Environment.GetEnvironmentVariable("NEXTRACE_TEST_ADMIN_CONNECTION_STRING") ?? string.Empty,
         "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres;Include Error Detail=true",
-        "Host=localhost;Port=5432;Database=postgres;Username=nextraceone;Password=ouro18;Include Error Detail=true",
-        "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=ouro18;Include Error Detail=true",
     ];
 
     // ── Test user credentials ─────────────────────────────────────────────────

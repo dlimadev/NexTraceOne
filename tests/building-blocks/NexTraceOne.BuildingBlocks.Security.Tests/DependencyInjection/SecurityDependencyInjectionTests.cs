@@ -127,16 +127,16 @@ public sealed class SecurityDependencyInjectionTests : IDisposable
     }
 
     [Fact]
-    public void AddBuildingBlocksSecurity_InDevelopment_WithNoKey_UsesFallback()
+    public void AddBuildingBlocksSecurity_WithNoKey_AlwaysThrows()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
         var services = new ServiceCollection();
         services.AddLogging();
         var configuration = CreateConfiguration(signingKey: null);
 
         var act = () => services.AddBuildingBlocksSecurity(configuration);
 
-        act.Should().NotThrow();
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*JWT signing key*");
     }
 
     [Fact]

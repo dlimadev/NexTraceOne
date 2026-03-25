@@ -22,12 +22,16 @@ public sealed class AppSettingsSecurityTests
     }
 
     [Fact]
-    public void BaseAppSettings_JwtSecret_ShouldBeEmpty()
+    public void BaseAppSettings_JwtSecret_ShouldBeAbsent()
     {
         var json = ReadJson(BaseAppSettings);
-        var secret = json.GetProperty("Jwt").GetProperty("Secret").GetString();
+        var jwtSection = json.GetProperty("Jwt");
 
-        secret.Should().BeNullOrEmpty("base appsettings.json must not contain a real JWT secret");
+        // The "Secret" key must not exist in base appsettings.json.
+        // Production deployments must supply Jwt__Secret via environment variable or secrets manager.
+        jwtSection.TryGetProperty("Secret", out _).Should().BeFalse(
+            "base appsettings.json must not contain a Jwt:Secret key — " +
+            "supply the secret at runtime via the Jwt__Secret environment variable");
     }
 
     [Fact]
@@ -102,13 +106,21 @@ public sealed class AppSettingsSecurityTests
     }
 
     [Fact]
-    public void DevAppSettings_JwtSecret_ShouldBeExplicitlyDevelopmentOnly()
+    public void DevAppSettings_JwtSecret_ShouldNotBeHardcoded()
     {
         var json = ReadJson(DevAppSettings);
-        var secret = json.GetProperty("Jwt").GetProperty("Secret").GetString();
 
-        secret.Should().NotBeNullOrEmpty("dev config should have a JWT secret for local development");
-        secret.Should().Contain("Development", "dev JWT secret should clearly identify as development-only");
+        // The dev config must NOT have a hardcoded JWT secret committed to source control.
+        // The secret must be provided externally via dotnet user-secrets or environment variable.
+        if (json.TryGetProperty("Jwt", out var jwtSection) && jwtSection.TryGetProperty("Secret", out var secretProp))
+        {
+            var secret = secretProp.GetString();
+            secret.Should().Match(
+                s => string.IsNullOrEmpty(s) || s == "REPLACE_VIA_ENV",
+                "dev config must not contain a real hardcoded JWT secret — " +
+                "configure via dotnet user-secrets or the Jwt__Secret environment variable");
+        }
+        // If the Jwt section or Secret key is absent, the constraint is automatically satisfied.
     }
 
     [Fact]

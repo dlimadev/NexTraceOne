@@ -47,24 +47,18 @@ public static class DependencyInjection
             ?? configuration["Security:Jwt:Audience"]
             ?? "NexTraceOne.Clients";
 
-        // Segurança: a chave JWT DEVE ser configurada externamente em ambientes não-Development.
-        // Em Development, permite fallback para chave conhecida — apenas para conveniência local.
-        // Em qualquer outro ambiente, a ausência da chave impede a inicialização para evitar
-        // que tokens possam ser forjados com uma chave publicamente conhecida.
+        // Segurança: a chave JWT DEVE ser configurada externamente em todos os ambientes.
+        // Configurar via variável de ambiente Jwt__Secret, dotnet user-secrets ou gestor de segredos.
         var signingKey = configuration["Jwt:Secret"]
             ?? configuration["Security:Jwt:SigningKey"];
 
         if (string.IsNullOrWhiteSpace(signingKey))
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-            if (!string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException(
-                    "JWT signing key is not configured. Set 'Jwt:Secret' or 'Security:Jwt:SigningKey' in configuration, " +
-                    "or define it via environment variables. A signing key is mandatory in non-development environments.");
-            }
-
-            signingKey = "development-signing-key-development-signing-key-1234567890";
+            throw new InvalidOperationException(
+                "JWT signing key is not configured. Set 'Jwt:Secret' or 'Security:Jwt:SigningKey' in configuration, " +
+                "or define it via the 'Jwt__Secret' environment variable or dotnet user-secrets. " +
+                "A signing key is mandatory in all environments. " +
+                "Generate a strong key with: openssl rand -base64 48");
         }
 
         services.Configure<CookieSessionOptions>(configuration.GetSection(CookieSessionOptions.SectionName));
