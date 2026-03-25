@@ -13,7 +13,13 @@ internal sealed class AnalyticsEventConfiguration : IEntityTypeConfiguration<Ana
 {
     public void Configure(EntityTypeBuilder<AnalyticsEvent> builder)
     {
-        builder.ToTable("gov_analytics_events");
+        builder.ToTable("pan_analytics_events", t =>
+        {
+            t.HasCheckConstraint("CK_pan_analytics_events_module",
+                "\"Module\" IN ('Dashboard','ServiceCatalog','SourceOfTruth','ContractStudio','ChangeIntelligence','Incidents','Reliability','Runbooks','AiAssistant','Governance','ExecutiveViews','FinOps','IntegrationHub','DeveloperPortal','Admin','Automation','Search')");
+            t.HasCheckConstraint("CK_pan_analytics_events_event_type",
+                "\"EventType\" IN ('ModuleViewed','EntityViewed','SearchExecuted','SearchResultClicked','ZeroResultSearch','QuickActionTriggered','AssistantPromptSubmitted','AssistantResponseUsed','ContractDraftCreated','ContractPublished','ChangeViewed','IncidentInvestigated','MitigationWorkflowStarted','MitigationWorkflowCompleted','EvidencePackageExported','PolicyViewed','ExecutiveOverviewViewed','RunbookViewed','SourceOfTruthQueried','ReportGenerated','OnboardingStepCompleted','JourneyAbandoned','EmptyStateEncountered','ReliabilityDashboardViewed','AutomationWorkflowManaged')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -76,5 +82,9 @@ internal sealed class AnalyticsEventConfiguration : IEntityTypeConfiguration<Ana
         builder.HasIndex(x => x.EventType);
         builder.HasIndex(x => x.Persona);
         builder.HasIndex(x => x.UserId);
+
+        // ── Índice composto para consultas analíticas por tenant ──────────
+        builder.HasIndex(x => new { x.TenantId, x.OccurredAt });
+        builder.HasIndex(x => new { x.TenantId, x.Module, x.OccurredAt });
     }
 }
