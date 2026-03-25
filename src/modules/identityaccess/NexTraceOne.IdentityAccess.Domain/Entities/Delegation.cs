@@ -62,6 +62,9 @@ public sealed class Delegation : AggregateRoot<DelegationId>
     /// <summary>Usuário que revogou a delegação (pode ser o delegante ou admin).</summary>
     public UserId? RevokedBy { get; private set; }
 
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria uma nova delegação formal.
     /// O chamador deve validar que o delegante possui as permissões sendo delegadas

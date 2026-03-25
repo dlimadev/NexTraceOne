@@ -67,5 +67,7 @@ internal sealed class JitAccessRequestConfiguration : IEntityTypeConfiguration<J
         builder.HasIndex(x => new { x.TenantId, x.Status });
         builder.HasIndex(x => x.RequestedBy);
         builder.HasIndex(x => x.Status);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

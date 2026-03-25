@@ -50,6 +50,9 @@ public sealed class AccessReviewCampaign : AggregateRoot<AccessReviewCampaignId>
     /// <summary>Itens individuais de revisão da campanha.</summary>
     public IReadOnlyList<AccessReviewItem> Items => _items.AsReadOnly();
 
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Cria uma nova campanha de recertificação de acessos.</summary>
     public static AccessReviewCampaign Create(
         TenantId tenantId,

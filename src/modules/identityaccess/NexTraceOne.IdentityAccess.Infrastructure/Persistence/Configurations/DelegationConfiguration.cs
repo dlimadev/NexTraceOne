@@ -63,5 +63,7 @@ internal sealed class DelegationConfiguration : IEntityTypeConfiguration<Delegat
         builder.HasIndex(x => new { x.TenantId, x.Status });
         builder.HasIndex(x => x.DelegateeId);
         builder.HasIndex(x => x.GrantorId);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

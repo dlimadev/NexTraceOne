@@ -36,6 +36,9 @@ public sealed class Tenant : AggregateRoot<TenantId>
     /// <summary>Data/hora UTC da última atualização do tenant.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
 
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Factory method para criação de um novo tenant.
     /// Garante que nome e slug são informados e gera o Id automaticamente.

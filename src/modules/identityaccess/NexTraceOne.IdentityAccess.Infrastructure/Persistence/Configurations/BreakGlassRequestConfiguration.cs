@@ -56,5 +56,7 @@ internal sealed class BreakGlassRequestConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(x => new { x.RequestedBy, x.Status });
         builder.HasIndex(x => x.TenantId);
         builder.HasIndex(x => x.Status);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

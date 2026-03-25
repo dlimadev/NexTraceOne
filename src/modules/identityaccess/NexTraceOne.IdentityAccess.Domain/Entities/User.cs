@@ -119,6 +119,9 @@ public sealed class User : AggregateRoot<UserId>
     /// <summary>Reativa um usuário previamente desativado.</summary>
     public void Activate() => IsActive = true;
 
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Indica se o usuário está bloqueado na data informada.</summary>
     public bool IsLocked(DateTimeOffset now)
         => LockoutEnd.HasValue && LockoutEnd.Value > now;

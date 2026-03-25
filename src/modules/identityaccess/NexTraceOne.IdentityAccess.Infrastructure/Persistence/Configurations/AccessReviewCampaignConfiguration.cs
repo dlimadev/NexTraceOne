@@ -48,5 +48,7 @@ internal sealed class AccessReviewCampaignConfiguration : IEntityTypeConfigurati
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => new { x.TenantId, x.Status });
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

@@ -39,5 +39,7 @@ internal sealed class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.HasIndex(x => x.Slug)
             .IsUnique()
             .HasDatabaseName("IX_iam_tenants_slug");
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

@@ -46,5 +46,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.FailedLoginAttempts).IsRequired();
         builder.Property(x => x.LastLoginAt);
         builder.Property(x => x.LockoutEnd);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
