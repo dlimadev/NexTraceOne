@@ -42,6 +42,9 @@ public sealed class PromotionRequest : AggregateRoot<PromotionRequestId>
     /// <summary>Data/hora UTC em que a promoção foi concluída (aprovada, rejeitada, bloqueada ou cancelada).</summary>
     public DateTimeOffset? CompletedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria uma nova solicitação de promoção de release entre ambientes.
     /// </summary>

@@ -31,6 +31,9 @@ public sealed class BlastRadiusReport : AuditableEntity<BlastRadiusReportId>
     /// <summary>Momento em que o blast radius foi calculado.</summary>
     public DateTimeOffset CalculatedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Calcula e cria um relatório de blast radius para a release informada.
     /// </summary>

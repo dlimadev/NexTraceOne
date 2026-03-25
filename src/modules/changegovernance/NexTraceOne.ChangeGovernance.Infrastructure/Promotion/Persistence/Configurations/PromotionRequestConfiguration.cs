@@ -35,5 +35,8 @@ internal sealed class PromotionRequestConfiguration : IEntityTypeConfiguration<P
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.TargetEnvironmentId);
         builder.HasIndex(x => x.RequestedAt);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

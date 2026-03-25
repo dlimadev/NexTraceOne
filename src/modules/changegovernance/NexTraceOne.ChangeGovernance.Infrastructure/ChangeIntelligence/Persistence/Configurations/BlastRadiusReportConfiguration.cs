@@ -42,5 +42,8 @@ internal sealed class BlastRadiusReportConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.IsDeleted).IsRequired().HasDefaultValue(false);
 
         builder.HasIndex(x => x.ReleaseId);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

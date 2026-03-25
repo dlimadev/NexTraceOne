@@ -31,5 +31,8 @@ internal sealed class WorkflowInstanceConfiguration : IEntityTypeConfiguration<W
         builder.HasIndex(x => x.WorkflowTemplateId);
         builder.HasIndex(x => x.ReleaseId);
         builder.HasIndex(x => x.Status);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

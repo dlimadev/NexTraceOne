@@ -41,5 +41,8 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.HasIndex(x => x.ApiAssetId);
         builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_ci_releases_tenant_id");
         builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_ci_releases_tenant_environment");
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

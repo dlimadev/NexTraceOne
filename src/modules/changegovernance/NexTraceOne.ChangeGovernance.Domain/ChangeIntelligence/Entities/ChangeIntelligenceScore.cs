@@ -31,6 +31,9 @@ public sealed class ChangeIntelligenceScore : AuditableEntity<ChangeIntelligence
     /// <summary>Momento em que o score foi computado.</summary>
     public DateTimeOffset ComputedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     private const int ScorePrecision = 4;
     private const decimal NumberOfFactors = 3m;
 

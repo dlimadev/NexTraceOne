@@ -27,5 +27,8 @@ internal sealed class RulesetConfiguration : IEntityTypeConfiguration<Ruleset>
         builder.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.UpdatedBy).HasMaxLength(500).IsRequired();
         builder.Property(x => x.IsDeleted).IsRequired().HasDefaultValue(false);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
