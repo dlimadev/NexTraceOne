@@ -16,6 +16,7 @@ public static class StartupValidation
 {
     private static readonly string[] CriticalSections = ["ConnectionStrings", "Jwt"];
     private static readonly string[] OptionalSections = ["NexTraceOne", "Serilog", "OpenTelemetry"];
+    private const string EncryptionKeyEnvironmentVariable = "NEXTRACE_ENCRYPTION_KEY";
 
     /// <summary>
     /// Comprimento mínimo do Jwt:Secret para garantir material de chave adequado para HS256.
@@ -70,6 +71,9 @@ public static class StartupValidation
 
         // Validação de configuração OIDC
         ValidateOidcProviders(app, configuration, logger);
+
+        // Validação de chave de encriptação obrigatória
+        ValidateEncryptionKey(app, logger);
 
         // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
@@ -209,6 +213,65 @@ public static class StartupValidation
                 "Enterprise SSO (federated authentication) will not be available. " +
                 "Configure at least one provider in the OidcProviders section.",
                 app.Environment.EnvironmentName);
+        }
+    }
+
+    /// <summary>
+    /// Valida a configuração de chave de encriptação AES obrigatória.
+    /// Em todos os ambientes: falha se ausente, nula, whitespace ou inválida.
+    /// O valor deve ser Base64 de 32 bytes ou string UTF-8 com 32 caracteres.
+    /// </summary>
+    private static void ValidateEncryptionKey(WebApplication app, ILogger logger)
+    {
+        var configuredKey = Environment.GetEnvironmentVariable(EncryptionKeyEnvironmentVariable);
+        if (string.IsNullOrWhiteSpace(configuredKey))
+        {
+            logger.LogCritical(
+                "{VariableName} is absent or empty in {Environment} environment. Field encryption will fail. Aborting startup.",
+                EncryptionKeyEnvironmentVariable,
+                app.Environment.EnvironmentName);
+            throw new InvalidOperationException(
+                $"NexTraceOne startup aborted: {EncryptionKeyEnvironmentVariable} must be configured in all environments. " +
+                "Set it via environment variable, .env, dotnet user-secrets, or a secrets manager. " +
+                "Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
+        }
+
+        if (TryDecodeValidBase64Key(configuredKey))
+        {
+            logger.LogInformation(
+                "{VariableName} validated in {Environment} environment using Base64 key format.",
+                EncryptionKeyEnvironmentVariable,
+                app.Environment.EnvironmentName);
+            return;
+        }
+
+        if (configuredKey.Length == 32)
+        {
+            logger.LogInformation(
+                "{VariableName} validated in {Environment} environment using UTF-8 32-character key format.",
+                EncryptionKeyEnvironmentVariable,
+                app.Environment.EnvironmentName);
+            return;
+        }
+
+        logger.LogCritical(
+            "{VariableName} is invalid in {Environment} environment. Expected Base64 32-byte key or UTF-8 32-character key. Aborting startup.",
+            EncryptionKeyEnvironmentVariable,
+            app.Environment.EnvironmentName);
+        throw new InvalidOperationException(
+            $"NexTraceOne startup aborted: {EncryptionKeyEnvironmentVariable} is invalid. " +
+            "Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
+    }
+
+    private static bool TryDecodeValidBase64Key(string configuredKey)
+    {
+        try
+        {
+            return Convert.FromBase64String(configuredKey).Length == 32;
+        }
+        catch (FormatException)
+        {
+            return false;
         }
     }
 }
