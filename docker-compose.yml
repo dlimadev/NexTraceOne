@@ -57,7 +57,8 @@ services:
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
       - clickhouse-data:/var/lib/clickhouse
-      - ./build/clickhouse/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql:ro
+      - ./build/clickhouse/init-schema.sql:/docker-entrypoint-initdb.d/01-init-schema.sql:ro
+      - ./build/clickhouse/analytics-schema.sql:/docker-entrypoint-initdb.d/02-analytics-schema.sql:ro
     ports:
       - "8123:8123"    # HTTP interface
       - "9000:9000"    # Native protocol
