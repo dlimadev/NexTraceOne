@@ -1,103 +1,128 @@
 # Audit & Compliance — Module Role Finalization
 
-> **Module:** Audit & Compliance  
+> **Module:** 10 — Audit & Compliance  
 > **Prefix:** `aud_`  
 > **Date:** 2026-03-25  
-> **Status:** Consolidation Phase — B1
+> **Status:** Consolidation Phase — B1  
+> **Maturity:** 53% (Backend 80%, Frontend 40%)
 
 ---
 
-## 1. Role Definition
+## 1. Official Role Definition
 
-The **Audit & Compliance** module is the **transversal foundation of traceability, integrity and compliance** for the entire NexTraceOne platform.
+**Audit & Compliance is the transversal, foundational module responsible for providing an immutable, cryptographically verifiable audit trail across the entire NexTraceOne platform, combined with compliance policy management, audit campaigns, retention governance, and evidence-grade reporting.**
 
-It is responsible for:
+It materialises:
 
-- Receiving, persisting and making available **every auditable event** produced by any module in the platform
-- Maintaining a **cryptographic hash chain** (SHA-256) that guarantees event immutability and non-repudiation
-- Providing **compliance policies, audit campaigns and compliance evaluations** to support regulatory and internal governance requirements
-- Offering **retention policies** for data lifecycle management
-- Serving as the **single source of truth** for "who did what, when, and with what outcome" across all modules
-
-### Positioning
-
-Audit & Compliance is not an optional add-on. It is a **core infrastructure module** that every other module depends on for:
-
-- Regulatory compliance evidence
-- Operational audit trail
-- Change traceability
-- Security event logging
-- Incident evidence preservation
+- **Immutable Audit Trail** — every auditable action from every module is recorded as an `AuditEvent` with full actor/tenant/resource context
+- **Cryptographic Integrity** — SHA-256 hash chain (`AuditChainLink`) ensures tamper detection across the entire event log
+- **Compliance Policies** — configurable policies with severity, category, and evaluation criteria, validated against resources
+- **Audit Campaigns** — structured audit exercises (periodic, ad-hoc, regulatory) that group compliance evaluations
+- **Retention Management** — configurable retention periods for audit data lifecycle
+- **Evidence-Grade Reporting** — exportable audit reports and compliance reports with chain integrity verification
 
 ---
 
-## 2. Ownership Confirmation
+## 2. Why Audit & Compliance Is Transversal and Critical
 
-| Responsibility | Owner? | Notes |
-|---|---|---|
-| Audit event storage and retrieval | ✅ YES | `AuditEvent` aggregate root, `RecordAuditEvent` command |
-| Immutable audit trail | ✅ YES | Events are append-only; `AuditEvent.Record()` factory enforces immutability |
-| Hash chain integrity | ✅ YES | `AuditChainLink` entity with SHA-256 chain; `VerifyChainIntegrity` query |
-| Evidence linked to changes/approvals | ✅ YES | Via `ResourceType`/`ResourceId` correlation to Change Governance entities |
-| Verifiable history | ✅ YES | `GetAuditTrail`, `SearchAuditLog`, `ExportAuditReport` queries |
-| Compliance policies | ✅ YES | `CompliancePolicy` entity with CRUD |
-| Audit campaigns | ✅ YES | `AuditCampaign` entity with lifecycle (Planned→InProgress→Completed/Cancelled) |
-| Compliance evaluation results | ✅ YES | `ComplianceResult` entity linked to policies and campaigns |
-| Retention management | ✅ YES | `RetentionPolicy` entity (partial — `ConfigureRetention` is placeholder) |
-| Compliance reporting | ✅ YES | `GetComplianceReport` query with module breakdown |
+| Aspect | Description |
+|--------|-------------|
+| **Regulatory Foundation** | Required for SOC 2, ISO 27001, GDPR, and enterprise compliance. Without it, NexTraceOne cannot position itself as an enterprise platform |
+| **Cross-Module Scope** | Every module in NexTraceOne is a potential producer of audit events. Audit & Compliance is the single consumer and source of truth |
+| **Tamper Detection** | The SHA-256 hash chain provides cryptographic proof that no events have been modified or deleted after recording |
+| **Trust Anchor** | Change Governance decisions, Identity security events, and Operational incidents all derive their auditability from this module |
+| **Evidence for Approvals** | Workflow approvals, gate overrides, and promotion decisions in Change Governance are only trustworthy if their audit trail is immutable |
 
 ---
 
-## 3. What the Module Must NOT Own
+## 3. What the Module Owns
 
-| Responsibility | Correct Owner | Reason |
-|---|---|---|
-| Generating auditable actions | Each source module | Audit is a consumer, not a producer of business actions |
-| Authentication / authorization | Identity & Access | Audit trusts the identity context provided by IAM |
-| Security event classification | Identity & Access | `SecurityEvent` entity lives in Identity module |
-| Change lifecycle management | Change Governance | Audit records change events but does not manage change state |
-| Incident management | Operational Intelligence | Audit records incident events but does not own incident lifecycle |
-| Notification routing | Notifications | Audit may trigger events that Notifications consumes |
-| Service catalog data | Catalog | Audit references services by ID but does not own service definitions |
-| Configuration management | Configuration | Audit records config changes but does not own configuration state |
+### 3.1 Owned Entities (6)
+
+| Entity | Type | Table | Description |
+|--------|------|-------|-------------|
+| `AuditEvent` | Aggregate Root | `aud_audit_events` | Core immutable event record with source module, action type, resource, actor, tenant, payload |
+| `AuditChainLink` | Entity | `aud_audit_chain_links` | SHA-256 hash chain link with sequence number, current hash, previous hash |
+| `CompliancePolicy` | Entity | `aud_compliance_policies` | Compliance policy definition with name, category, severity, evaluation criteria |
+| `ComplianceResult` | Entity | `aud_compliance_results` | Compliance evaluation result linked to policy and optional campaign |
+| `AuditCampaign` | Entity | `aud_campaigns` | Structured audit exercise with lifecycle (Planned → InProgress → Completed/Cancelled) |
+| `RetentionPolicy` | Entity | `aud_retention_policies` | Retention period configuration for audit data |
+
+### 3.2 Owned Capabilities
+
+- Recording immutable audit events from any module via `IAuditModule` interface
+- SHA-256 hash chain computation and linking for every audit event
+- Hash chain integrity verification (full chain traversal and hash recomputation)
+- Compliance policy CRUD (create, list, get, activate, deactivate)
+- Compliance result recording with policy and campaign linkage
+- Audit campaign lifecycle management (Planned → InProgress → Completed/Cancelled)
+- Retention policy configuration (1–3650 days)
+- Audit log search with filtering by module, action type, date range
+- Audit trail retrieval by resource type and ID
+- Audit report export for time periods
+- Compliance report with chain integrity and module breakdown
+- Domain events for integration (`AuditEventRecordedEvent`, `AuditIntegrityCheckpointCreatedEvent`)
+
+### 3.3 Owned API Surface (15 endpoints)
+
+- 6 audit trail endpoints (record, trail, search, verify chain, export report, compliance report)
+- 3 compliance policy endpoints (create, list, get)
+- 3 campaign endpoints (create, list, get)
+- 2 compliance result endpoints (record, list)
+- 1 retention configuration endpoint (placeholder)
+
+### 3.4 Cross-Module Integration Contract
+
+**File:** `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Contracts/ServiceInterfaces/IAuditModule.cs`
+
+```csharp
+public interface IAuditModule
+{
+    Task RecordEventAsync(string sourceModule, string actionType,
+        string resourceId, string resourceType, string performedBy,
+        Guid tenantId, string? payload, CancellationToken cancellationToken);
+    Task<bool> VerifyChainIntegrityAsync(CancellationToken cancellationToken);
+}
+```
+
+This contract is the **primary interface** for all other modules to send audit events.
 
 ---
 
-## 4. Modules That Feed Audit & Compliance
+## 4. What the Module Does NOT Own
 
-| Source Module | Events Produced | Integration Status |
-|---|---|---|
-| **Identity & Access** | Login, permission changes, role assignments, delegation, break-glass, JIT access | ⚠️ SecurityAuditBridge exists but systematic validation pending |
-| **Change Governance** | Change requests, approvals, deployments, rollbacks | ❌ Not confirmed — audit event publication not validated |
-| **Operational Intelligence** | Incident creation, automation execution, automation approval | ❌ Not integrated |
-| **Catalog** | Service creation/update, dependency changes | ❌ Not confirmed |
-| **Configuration** | Configuration value changes | ❌ Not confirmed |
-| **Governance** | Report generation, risk assessments | ❌ Not confirmed |
-| **Notifications** | Notification delivery events | ❌ Not confirmed |
-
-**Critical gap:** Only Identity & Access has a known bridge (`SecurityAuditBridge`). All other modules need validation of audit event publication.
+| Responsibility | Belongs To | Reason |
+|---------------|------------|--------|
+| Application logging (structured logs, traces, metrics) | **Platform / Infrastructure** | Audit events are business-level actions, not technical logs |
+| Security event detection and risk scoring | **Identity & Access** | Identity owns `SecurityEvent` entities with risk scoring (0-100); Audit receives them via `SecurityAuditBridge` |
+| Approval workflow decisions | **Change Governance** | Change Governance owns the approval lifecycle; Audit records the evidence |
+| Incident lifecycle management | **Operational Intelligence** | OI owns incidents; Audit records incident-related actions |
+| Executive dashboards and analytics | **Governance** | Governance owns reporting and dashboards; Audit provides the raw data |
+| ClickHouse analytics pipeline | **Platform / Cross-cutting** | Audit stores in PostgreSQL; analytics projection to ClickHouse is platform-level |
+| Notification delivery | **Notifications** | Audit may trigger compliance notifications but does not deliver them |
 
 ---
 
-## 5. Why the Module Is Transversal and Critical
+## 5. Why Audit & Compliance Must Not Be Confused With
 
-1. **Regulatory compliance**: Enterprise customers require verifiable audit trails for SOC 2, ISO 27001, GDPR and similar frameworks
-2. **Non-repudiation**: The SHA-256 hash chain provides cryptographic proof that events have not been tampered with
-3. **Operational trust**: Every sensitive action in the platform should be traceable
-4. **Cross-module evidence**: A single incident may involve changes from Change Governance, actions from Operational Intelligence, and approvals from Identity — Audit correlates all of them
-5. **Legal defensibility**: Exported audit reports serve as evidence in compliance audits
+### 5.1 Not Generic Logging
+
+Application logging (Serilog, OpenTelemetry traces) is technical infrastructure for debugging and monitoring. Audit events are **business-level records** of who did what, when, and to which resource. They are immutable, hash-chained, and designed for regulatory evidence. Logging is ephemeral; audit is permanent.
+
+### 5.2 Not Generic Reporting
+
+The Governance module owns executive dashboards, product analytics, and cross-module reporting. Audit & Compliance provides **evidence-grade data** — the raw, tamper-proof record that feeds into governance reports. Audit owns the truth; Governance owns the presentation.
+
+### 5.3 Not Security Events Alone
+
+Identity & Access owns `SecurityEvent` entities with risk scoring, failed login tracking, and access anomaly detection. These are security-domain concepts. Audit & Compliance receives security events via `SecurityAuditBridge` as one of many event sources, but does not define or manage security policy.
+
+### 5.4 Not Change Governance Evidence Packs
+
+Change Governance generates `EvidencePack` entities for workflow approval decisions. These are workflow-specific artefacts. Audit & Compliance provides the **underlying immutable record** that confirms the evidence pack is trustworthy.
 
 ---
 
-## 6. Key Code References
+## 6. Summary
 
-| Component | File |
-|---|---|
-| AuditEvent aggregate root | `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Domain/Entities/AuditEvent.cs` |
-| AuditChainLink entity | `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Domain/Entities/AuditChainLink.cs` |
-| Hash chain verification | `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Application/Features/VerifyChainIntegrity/VerifyChainIntegrity.cs` |
-| RecordAuditEvent command | `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Application/Features/RecordAuditEvent/RecordAuditEvent.cs` |
-| AuditDbContext | `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Infrastructure/Persistence/AuditDbContext.cs` |
-| API endpoints | `src/modules/auditcompliance/NexTraceOne.AuditCompliance.API/Endpoints/Endpoints/AuditEndpointModule.cs` |
-| Frontend page | `src/frontend/src/features/audit-compliance/pages/AuditPage.tsx` |
-| Frontend API client | `src/frontend/src/features/audit-compliance/api/audit.ts` |
+Audit & Compliance is a **transversal, foundational module** with 6 domain entities, 15 API endpoints, SHA-256 hash chain integrity, and a well-defined cross-module integration contract (`IAuditModule`). The backend is mature (80%) with real implementation, but the frontend is minimal (1 page out of 4+ needed). The module is the **trust anchor** for the entire NexTraceOne platform — without it, no other module's actions can be considered verifiable for compliance purposes.
