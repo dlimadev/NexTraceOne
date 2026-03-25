@@ -11,7 +11,7 @@ namespace NexTraceOne.AuditCompliance.Application.Features.ConfigureRetention;
 
 /// <summary>
 /// Feature: ConfigureRetention — configura a política de retenção de eventos de auditoria.
-/// Placeholder para configuração futura via admin.
+/// LIMITATION: handler não persiste no banco. Aguarda integração com <see cref="NexTraceOne.AuditCompliance.Domain.Entities.RetentionPolicy"/>.
 /// </summary>
 public static class ConfigureRetention
 {
@@ -28,7 +28,8 @@ public static class ConfigureRetention
         }
     }
 
-    /// <summary>Handler placeholder para configuração de retenção.</summary>
+    /// <summary>Handler que valida a entrada mas não persiste dados.
+    /// LIMITATION: persistência no RetentionPolicy do AuditDbContext ainda não implementada.</summary>
     public sealed class Handler : ICommandHandler<Command>
     {
         public Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)

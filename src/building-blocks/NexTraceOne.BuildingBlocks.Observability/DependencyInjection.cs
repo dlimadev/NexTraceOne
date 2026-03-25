@@ -4,6 +4,9 @@ using NexTraceOne.BuildingBlocks.Observability.Alerting;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Channels;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Configuration;
+using NexTraceOne.BuildingBlocks.Observability.Analytics.Abstractions;
+using NexTraceOne.BuildingBlocks.Observability.Analytics.Configuration;
+using NexTraceOne.BuildingBlocks.Observability.Analytics.Writers;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability.Metrics;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
@@ -157,6 +160,39 @@ public static class DependencyInjection
             // Default: OpenTelemetryCollector
             services.AddSingleton<ICollectionModeStrategy, OpenTelemetryCollectorStrategy>();
         }
+    }
+
+    /// <summary>
+    /// Registra a camada de escrita analítica ClickHouse do NexTraceOne.
+    /// Quando Analytics:Enabled = true, registra ClickHouseAnalyticsWriter.
+    /// Quando false, registra NullAnalyticsWriter (graceful degradation).
+    ///
+    /// Módulos suportados: Product Analytics, Operational Intelligence,
+    /// Integrations, Governance Analytics.
+    /// </summary>
+    public static IServiceCollection AddBuildingBlocksAnalytics(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var analyticsOptions = new AnalyticsOptions();
+        configuration.GetSection(AnalyticsOptions.SectionName).Bind(analyticsOptions);
+
+        if (analyticsOptions.Enabled)
+        {
+            services.Configure<AnalyticsOptions>(
+                configuration.GetSection(AnalyticsOptions.SectionName));
+            services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
+            });
+            services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
+        }
+        else
+        {
+            services.AddSingleton<IAnalyticsWriter, NullAnalyticsWriter>();
+        }
+
+        return services;
     }
 
     /// <summary>

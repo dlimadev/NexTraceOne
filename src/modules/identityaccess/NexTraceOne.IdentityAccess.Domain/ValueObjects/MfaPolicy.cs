@@ -6,7 +6,7 @@ namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 /// Política de Multi-Factor Authentication (MFA) aplicável a um tenant ou contexto.
 /// Define quando e como MFA é exigido, incluindo step-up para operações críticas.
 /// <para>
-/// Preparação para enforcement real de MFA em ações como vendor ops,
+/// Preparação para enforcement real de MFA em ações como operações de integração externa,
 /// break glass, delegação e operações administrativas sensíveis.
 /// </para>
 /// <para>
@@ -135,7 +135,7 @@ public sealed class MfaPolicy : ValueObject
         => new(true, true, true, "TOTP,WebAuthn", 15, 5);
 
     /// <summary>
-    /// Política MFA para self-hosted: MFA apenas para operações privilegiadas e vendor.
+    /// Política MFA para self-hosted: MFA apenas para operações privilegiadas e de integração externa.
     /// Step-up de 30 minutos, máximo 5 tentativas, inclui SMS como método adicional.
     /// </summary>
     public static MfaPolicy ForSelfHosted()
