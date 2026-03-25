@@ -969,14 +969,12 @@
       "defaultLimit": "Límite Predeterminado"
     },
     "generateKey": {
-      "title": "Generar Clave de Licencia",
-      "licenseId": "ID de Licencia",
-      "licenseIdPlaceholder": "Ingrese el UUID de la licencia",
+      "title": "Generar Clave",
       "generate": "Generar Clave",
       "newKey": "Clave Generada",
       "copyKey": "Copiar Clave",
       "keyCopied": "Clave copiada al portapapeles.",
-      "generateSuccess": "Clave de licencia generada exitosamente.",
+      "generateSuccess": "Clave generada exitosamente.",
       "generateFailed": "Error al generar clave."
     },
     "commercialModels": {
@@ -2403,7 +2401,7 @@
     "guidanceOperations": "Operaciones centraliza gestión de incidentes, runbooks y métricas de confiabilidad de servicios por equipo.",
     "guidanceAiHub": "AI Hub proporciona asistencia IA gobernada, gestión de modelos, políticas e integraciones IDE para su equipo.",
     "guidanceGovernance": "Gobernanza ofrece reportes ejecutivos, análisis de riesgo, seguimiento de cumplimiento y controles empresariales.",
-    "guidanceAdmin": "Administración cubre gestión de usuarios, controles de acceso, licencias y auditoría.",
+    "guidanceAdmin": "Administración cubre gestión de usuarios, controles de acceso, entornos y auditoría.",
     "guidanceKnowledge": "Source of Truth es su referencia central para todos los servicios, contratos y conocimiento operacional.",
     "quickstart": {
       "Engineer": {

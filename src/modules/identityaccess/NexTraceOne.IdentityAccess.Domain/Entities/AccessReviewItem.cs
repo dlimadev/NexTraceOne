@@ -107,6 +107,9 @@ public sealed class AccessReviewItem : Entity<AccessReviewItemId>
         DecidedAt = now;
         ReviewerComment = "Auto-revoked: review deadline exceeded.";
     }
+
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
 }
 
 /// <summary>

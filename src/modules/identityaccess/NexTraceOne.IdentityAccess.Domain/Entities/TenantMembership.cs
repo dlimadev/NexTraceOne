@@ -48,6 +48,9 @@ public sealed class TenantMembership : Entity<TenantMembershipId>
 
     /// <summary>Reativa um vínculo previamente desativado.</summary>
     public void Activate() => IsActive = true;
+
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
 }
 
 /// <summary>Identificador fortemente tipado de TenantMembership.</summary>

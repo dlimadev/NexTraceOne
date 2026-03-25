@@ -4,6 +4,7 @@ using FluentValidation;
 
 using MediatR;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
@@ -18,7 +19,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features.DeactivateUser;
 public static class DeactivateUser
 {
     /// <summary>Comando de desativação de usuário.</summary>
-    public sealed record Command(Guid UserId) : ICommand;
+    public sealed record Command(Guid UserId, Guid TenantId) : ICommand;
 
     /// <summary>Valida a entrada de desativação.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -26,14 +27,16 @@ public static class DeactivateUser
         public Validator()
         {
             RuleFor(x => x.UserId).NotEmpty();
+            RuleFor(x => x.TenantId).NotEmpty();
         }
     }
 
-    /// <summary>Handler que desativa o usuário e revoga a sessão ativa.</summary>
+    /// <summary>Handler que desativa o usuário, revoga a sessão ativa e regista evento de segurança.</summary>
     public sealed class Handler(
         IUserRepository userRepository,
         ISessionRepository sessionRepository,
-        NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
+        ISecurityEventRepository securityEventRepository,
+        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -49,6 +52,18 @@ public static class DeactivateUser
 
             var session = await sessionRepository.GetActiveByUserIdAsync(user.Id, cancellationToken);
             session?.Revoke(dateTimeProvider.UtcNow);
+
+            securityEventRepository.Add(SecurityEvent.Create(
+                TenantId.From(request.TenantId),
+                user.Id,
+                sessionId: null,
+                SecurityEventType.UserDeactivated,
+                $"User '{user.Email.Value}' deactivated.",
+                riskScore: 30,
+                ipAddress: null,
+                userAgent: null,
+                metadataJson: null,
+                dateTimeProvider.UtcNow));
 
             return Unit.Value;
         }

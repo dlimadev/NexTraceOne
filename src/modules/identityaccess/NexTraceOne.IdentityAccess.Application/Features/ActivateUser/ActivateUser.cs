@@ -4,6 +4,7 @@ using FluentValidation;
 
 using MediatR;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
@@ -18,7 +19,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features.ActivateUser;
 public static class ActivateUser
 {
     /// <summary>Comando de ativação de usuário.</summary>
-    public sealed record Command(Guid UserId) : ICommand;
+    public sealed record Command(Guid UserId, Guid TenantId) : ICommand;
 
     /// <summary>Valida a entrada de ativação.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -26,11 +27,15 @@ public static class ActivateUser
         public Validator()
         {
             RuleFor(x => x.UserId).NotEmpty();
+            RuleFor(x => x.TenantId).NotEmpty();
         }
     }
 
-    /// <summary>Handler que reativa o usuário.</summary>
-    public sealed class Handler(IUserRepository userRepository) : ICommandHandler<Command>
+    /// <summary>Handler que reativa o usuário e regista evento de segurança.</summary>
+    public sealed class Handler(
+        IUserRepository userRepository,
+        ISecurityEventRepository securityEventRepository,
+        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -43,6 +48,19 @@ public static class ActivateUser
             }
 
             user.Activate();
+
+            securityEventRepository.Add(SecurityEvent.Create(
+                TenantId.From(request.TenantId),
+                user.Id,
+                sessionId: null,
+                SecurityEventType.UserActivated,
+                $"User '{user.Email.Value}' reactivated.",
+                riskScore: 15,
+                ipAddress: null,
+                userAgent: null,
+                metadataJson: null,
+                dateTimeProvider.UtcNow));
+
             return Unit.Value;
         }
     }

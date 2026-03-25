@@ -32,6 +32,9 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C005")), "identity:roles:read", "View available roles", "Identity"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C006")), "identity:sessions:read", "View active sessions", "Identity"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C007")), "identity:permissions:read", "View available permissions", "Identity"),
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C008")), "identity:jit-access:decide", "Approve or reject JIT access requests", "Identity"),
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C009")), "identity:break-glass:decide", "Approve, revoke or audit break glass requests", "Identity"),
+            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C00A")), "identity:delegations:manage", "Create and revoke delegations", "Identity"),
 
             // Engineering Graph
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C010")), "catalog:assets:read", "View service and API assets", "Catalog"),

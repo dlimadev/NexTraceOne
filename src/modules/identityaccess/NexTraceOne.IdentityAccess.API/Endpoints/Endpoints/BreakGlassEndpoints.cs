@@ -47,7 +47,7 @@ internal static class BreakGlassEndpoints
         {
             var result = await sender.Send(new RevokeBreakGlassFeature.Command(requestId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:sessions:revoke");
+        }).RequirePermission("identity:break-glass:decide");
 
         bgGroup.MapGet("/", async (
             ISender sender,

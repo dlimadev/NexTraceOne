@@ -40,6 +40,7 @@ internal sealed class ExternalIdentityConfiguration : IEntityTypeConfiguration<E
 
         builder.Property(x => x.LastSyncAt).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.RowVersion).IsRowVersion();
 
         builder.HasIndex(x => new { x.Provider, x.ExternalUserId }).IsUnique();
         builder.HasIndex(x => x.UserId);

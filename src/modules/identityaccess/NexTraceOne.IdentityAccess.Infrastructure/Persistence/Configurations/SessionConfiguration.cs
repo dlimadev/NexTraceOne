@@ -25,6 +25,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
         builder.Property(x => x.CreatedByIp).HasMaxLength(64).IsRequired();
         builder.Property(x => x.UserAgent).HasMaxLength(512).IsRequired();
         builder.Property(x => x.RevokedAt);
+        builder.Property(x => x.RowVersion).IsRowVersion();
         builder.HasIndex(x => x.RefreshToken).IsUnique();
         builder.HasIndex(x => x.UserId);
     }

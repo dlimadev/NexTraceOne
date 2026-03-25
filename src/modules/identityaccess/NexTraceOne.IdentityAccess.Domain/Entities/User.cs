@@ -36,6 +36,15 @@ public sealed class User : AggregateRoot<UserId>
     /// <summary>Fim do período de bloqueio por tentativas inválidas.</summary>
     public DateTimeOffset? LockoutEnd { get; private set; }
 
+    /// <summary>Indica se MFA está habilitado para este usuário.</summary>
+    public bool MfaEnabled { get; private set; }
+
+    /// <summary>Método MFA configurado pelo usuário (TOTP, WebAuthn, SMS). Nulo quando MFA desativado.</summary>
+    public string? MfaMethod { get; private set; }
+
+    /// <summary>Secret MFA codificado em base32 (para TOTP). Nulo para outros métodos ou MFA desativado.</summary>
+    public string? MfaSecret { get; private set; }
+
     /// <summary>Provider federado associado ao usuário, quando houver.</summary>
     public string? FederationProvider { get; private set; }
 
@@ -118,6 +127,22 @@ public sealed class User : AggregateRoot<UserId>
 
     /// <summary>Reativa um usuário previamente desativado.</summary>
     public void Activate() => IsActive = true;
+
+    /// <summary>Habilita MFA para o usuário com o método e secret fornecidos.</summary>
+    public void EnableMfa(string method, string? secret = null)
+    {
+        MfaEnabled = true;
+        MfaMethod = Ardalis.GuardClauses.Guard.Against.NullOrWhiteSpace(method);
+        MfaSecret = secret;
+    }
+
+    /// <summary>Desabilita MFA para o usuário, removendo method e secret.</summary>
+    public void DisableMfa()
+    {
+        MfaEnabled = false;
+        MfaMethod = null;
+        MfaSecret = null;
+    }
 
     /// <summary>Concurrency token (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
