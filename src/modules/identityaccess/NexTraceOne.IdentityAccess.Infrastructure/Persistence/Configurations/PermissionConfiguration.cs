@@ -69,10 +69,6 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C070")), "audit:read", "View audit trail", "Audit"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C071")), "audit:export", "Export audit data", "Audit"),
 
-            // Licensing
-            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C080")), "licensing:read", "View license information", "Licensing"),
-            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C081")), "licensing:write", "Manage licenses", "Licensing"),
-
             // Platform
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C090")), "platform:settings:read", "View platform settings", "Platform"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C091")), "platform:settings:write", "Manage platform settings", "Platform"));

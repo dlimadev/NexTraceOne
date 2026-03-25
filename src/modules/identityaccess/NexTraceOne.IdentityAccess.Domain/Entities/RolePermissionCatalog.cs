@@ -125,24 +125,6 @@ public static class RolePermissionCatalog
                 "platform:settings:read",
                 "platform:settings:write",
 
-                // Licensing
-                "licensing:read",
-                "licensing:write",
-                "licensing:vendor:license:create",
-                "licensing:vendor:license:revoke",
-                "licensing:vendor:license:rehost",
-                "licensing:vendor:license:read",
-                "licensing:vendor:key:generate",
-                "licensing:vendor:trial:extend",
-                "licensing:vendor:activation:issue",
-                "licensing:vendor:tenant:manage",
-                "licensing:vendor:telemetry:view",
-                "licensing:vendor:plan:create",
-                "licensing:vendor:plan:read",
-                "licensing:vendor:featurepack:create",
-                "licensing:vendor:featurepack:read",
-                "licensing:vendor:license:manage",
-
                 // Notifications
                 "notifications:inbox:read",
                 "notifications:inbox:write",
@@ -193,7 +175,6 @@ public static class RolePermissionCatalog
                 "ai:governance:read",
                 "integrations:read",
                 "integrations:write",
-                "licensing:read",
                 "notifications:inbox:read",
                 "notifications:inbox:write",
                 "notifications:preferences:read",

@@ -7,7 +7,7 @@ namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 /// Define quando e como MFA é exigido, incluindo step-up para operações críticas.
 /// <para>
 /// Preparação para enforcement real de MFA em ações como vendor ops,
-/// break glass, delegação e alterações de licenciamento.
+/// break glass, delegação e operações administrativas sensíveis.
 /// </para>
 /// <para>
 /// Regras de negócio aplicadas:
@@ -55,7 +55,7 @@ public sealed class MfaPolicy : ValueObject
     /// <summary>Indica se MFA step-up é exigido para operações privilegiadas.</summary>
     public bool RequiredForPrivilegedOps { get; }
 
-    /// <summary>Indica se MFA step-up é exigido para operações de vendor/licensing.</summary>
+    /// <summary>Indica se MFA step-up é exigido para operações administrativas sensíveis.</summary>
     public bool RequiredForVendorOps { get; }
 
     /// <summary>Métodos MFA aceitos (TOTP, WebAuthn, SMS).</summary>

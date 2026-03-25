@@ -61,7 +61,6 @@ public static class CreateDelegation
             "identity:users:write",
             "identity:roles:assign",
             "identity:sessions:revoke",
-            "licensing:write",
             "platform:settings:write"
         ];
 
