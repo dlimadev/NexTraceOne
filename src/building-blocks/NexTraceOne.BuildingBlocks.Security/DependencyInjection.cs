@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.Authorization;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
+using NexTraceOne.BuildingBlocks.Security.Encryption;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using System.Text;
 
@@ -61,7 +62,7 @@ public static class DependencyInjection
                 "Generate a strong key with: openssl rand -base64 48");
         }
 
-        ValidateEncryptionKey();
+        EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable();
 
         services.Configure<CookieSessionOptions>(configuration.GetSection(CookieSessionOptions.SectionName));
 
@@ -145,37 +146,5 @@ public static class DependencyInjection
         services.AddAuthorization();
 
         return services;
-    }
-
-    private static void ValidateEncryptionKey()
-    {
-        var configuredKey = Environment.GetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY");
-        if (string.IsNullOrWhiteSpace(configuredKey))
-        {
-            throw new InvalidOperationException(
-                "NEXTRACE_ENCRYPTION_KEY environment variable is required. " +
-                "Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
-        }
-
-        try
-        {
-            if (Convert.FromBase64String(configuredKey).Length == 32)
-            {
-                return;
-            }
-        }
-        catch (FormatException)
-        {
-            // Key is not valid Base64 — validate as UTF-8 32-char string.
-        }
-
-        if (Encoding.UTF8.GetByteCount(configuredKey) == 32)
-        {
-            return;
-        }
-
-        throw new InvalidOperationException(
-            "NEXTRACE_ENCRYPTION_KEY is invalid. " +
-            "Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
     }
 }

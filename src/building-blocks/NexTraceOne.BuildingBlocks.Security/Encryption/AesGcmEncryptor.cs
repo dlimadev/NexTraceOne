@@ -70,35 +70,5 @@ public sealed class AesGcmEncryptor
     /// para evitar que dados sensíveis sejam protegidos por uma chave conhecida publicamente.
     /// </summary>
     private static byte[] ResolveEncryptionKey()
-    {
-        var configuredKey = Environment.GetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY");
-        if (string.IsNullOrWhiteSpace(configuredKey))
-        {
-            throw new InvalidOperationException(
-                "NEXTRACE_ENCRYPTION_KEY environment variable is required. " +
-                "Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
-        }
-
-        try
-        {
-            var decoded = Convert.FromBase64String(configuredKey);
-            if (decoded.Length == 32)
-            {
-                return decoded;
-            }
-        }
-        catch (FormatException)
-        {
-            // Chave não é Base64 válida — tenta como UTF-8 direto
-        }
-
-        var utf8Bytes = Encoding.UTF8.GetBytes(configuredKey);
-        if (utf8Bytes.Length == 32)
-        {
-            return utf8Bytes;
-        }
-
-        throw new InvalidOperationException(
-            "NEXTRACE_ENCRYPTION_KEY is invalid. Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
-    }
+        => EncryptionKeyMaterial.ResolveFromEnvironment();
 }
