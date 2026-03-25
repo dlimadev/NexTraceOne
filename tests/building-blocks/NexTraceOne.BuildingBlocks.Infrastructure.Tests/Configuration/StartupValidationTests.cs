@@ -184,7 +184,7 @@ public sealed class StartupValidationTests
     }
 
     [Fact]
-    public void BaseAppSettings_All4LogicalDatabases_AreRepresented()
+    public void BaseAppSettings_AllConnectionStrings_PointToSingleDatabase()
     {
         var baseConfigPath = Path.Combine(SolutionRoot, "src", "platform", "NexTraceOne.ApiHost", "appsettings.json");
         var config = new ConfigurationBuilder()
@@ -196,12 +196,12 @@ public sealed class StartupValidationTests
             .Select(c => c.Value ?? "")
             .ToList();
 
-        // All 4 logical databases must be referenced
-        var databases = new[] { "nextraceone_identity", "nextraceone_catalog", "nextraceone_operations", "nextraceone_ai" };
-        foreach (var db in databases)
+        // Since E14: all connection strings point to the single 'nextraceone' database.
+        // The old 4-database pattern (nextraceone_identity/catalog/operations/ai) was removed.
+        foreach (var value in allValues)
         {
-            allValues.Should().Contain(v => v.Contains(db, StringComparison.OrdinalIgnoreCase),
-                $"At least one connection string must reference database '{db}'");
+            value.Should().Contain("nextraceone",
+                "all connection strings must reference the consolidated 'nextraceone' database (E14 architecture)");
         }
     }
 

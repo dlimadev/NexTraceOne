@@ -56,6 +56,9 @@ builder.Services.AddBuildingBlocksObservability(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddApiHostOperationalHealthChecks();
 
+// [3.0] In-process caching — required by ConfigurationCacheService and other modules
+builder.Services.AddMemoryCache();
+
 // [3.1] Platform health provider — liga GetPlatformHealth a health checks reais
 builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IPlatformHealthProvider,
     NexTraceOne.ApiHost.HealthCheckPlatformHealthProvider>();
