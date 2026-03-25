@@ -186,8 +186,7 @@ public static class SetConfigurationValue
             return valueType switch
             {
                 ConfigurationValueType.Boolean when
-                    !string.Equals(value, "true", StringComparison.OrdinalIgnoreCase) &&
-                    !string.Equals(value, "false", StringComparison.OrdinalIgnoreCase)
+                    !bool.TryParse(value, out _)
                     => "Expected 'true' or 'false'.",
 
                 ConfigurationValueType.Integer when

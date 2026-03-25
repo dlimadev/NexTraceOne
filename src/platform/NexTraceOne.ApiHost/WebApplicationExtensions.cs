@@ -138,8 +138,8 @@ public static class WebApplicationExtensions
         {
             logger.LogWarning(
                 ex,
-                "Configuration definitions seeding skipped or failed. " +
-                "This is expected if the Configuration database schema has not been created yet.");
+                "Configuration definitions seeding failed. " +
+                "This may be expected if the Configuration database schema has not been created yet.");
         }
     }
 
