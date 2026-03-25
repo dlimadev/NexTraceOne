@@ -10,7 +10,7 @@ internal sealed class DriftFindingConfiguration : IEntityTypeConfiguration<Drift
 {
     public void Configure(EntityTypeBuilder<DriftFinding> builder)
     {
-        builder.ToTable("oi_drift_findings");
+        builder.ToTable("ops_drift_findings");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

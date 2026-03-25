@@ -11,7 +11,10 @@ internal sealed class RuntimeSnapshotConfiguration : IEntityTypeConfiguration<Ru
 {
     public void Configure(EntityTypeBuilder<RuntimeSnapshot> builder)
     {
-        builder.ToTable("oi_runtime_snapshots");
+        builder.ToTable("ops_runtime_snapshots", t =>
+        {
+            t.HasCheckConstraint("CK_ops_runtime_snapshots_health", "\"HealthStatus\" >= 0 AND \"HealthStatus\" <= 3");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -34,5 +37,8 @@ internal sealed class RuntimeSnapshotConfiguration : IEntityTypeConfiguration<Ru
 
         builder.HasIndex(x => new { x.ServiceName, x.Environment, x.CapturedAt });
         builder.HasIndex(x => x.HealthStatus);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

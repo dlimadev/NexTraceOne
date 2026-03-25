@@ -56,6 +56,9 @@ public sealed class CostSnapshot : AuditableEntity<CostSnapshotId>
     /// <summary>Granularidade do período capturado: "hourly", "daily" ou "monthly".</summary>
     public string Period { get; private set; } = string.Empty;
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Soma das parcelas de custo — propriedade computada, sem persistência.
     /// Facilita verificação de consistência sem recalcular a cada acesso.

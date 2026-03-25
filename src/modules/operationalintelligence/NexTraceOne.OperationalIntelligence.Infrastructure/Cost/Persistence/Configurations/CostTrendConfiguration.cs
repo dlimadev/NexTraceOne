@@ -10,7 +10,7 @@ internal sealed class CostTrendConfiguration : IEntityTypeConfiguration<CostTren
 {
     public void Configure(EntityTypeBuilder<CostTrend> builder)
     {
-        builder.ToTable("oi_cost_trends");
+        builder.ToTable("ops_cost_trends");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

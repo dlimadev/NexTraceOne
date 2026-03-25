@@ -42,7 +42,7 @@ public sealed class IncidentDbContext(
         => "NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Configurations";
 
     /// <inheritdoc />
-    protected override string OutboxTableName => "oi_inc_outbox_messages";
+    protected override string OutboxTableName => "ops_inc_outbox_messages";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

@@ -27,6 +27,9 @@ public sealed class ReliabilitySnapshot : AuditableEntity<ReliabilitySnapshotId>
     public TrendDirection TrendDirection { get; private set; }
     public DateTimeOffset ComputedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     public static ReliabilitySnapshot Create(
         Guid tenantId,
         string serviceId,

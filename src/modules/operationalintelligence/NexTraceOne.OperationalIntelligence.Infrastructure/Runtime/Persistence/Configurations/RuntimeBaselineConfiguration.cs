@@ -10,7 +10,7 @@ internal sealed class RuntimeBaselineConfiguration : IEntityTypeConfiguration<Ru
 {
     public void Configure(EntityTypeBuilder<RuntimeBaseline> builder)
     {
-        builder.ToTable("oi_runtime_baselines");
+        builder.ToTable("ops_runtime_baselines");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

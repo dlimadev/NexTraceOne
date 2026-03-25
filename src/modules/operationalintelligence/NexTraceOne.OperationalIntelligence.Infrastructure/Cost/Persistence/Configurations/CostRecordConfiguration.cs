@@ -10,7 +10,7 @@ internal sealed class CostRecordConfiguration : IEntityTypeConfiguration<CostRec
 {
     public void Configure(EntityTypeBuilder<CostRecord> builder)
     {
-        builder.ToTable("oi_cost_records");
+        builder.ToTable("ops_cost_records");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

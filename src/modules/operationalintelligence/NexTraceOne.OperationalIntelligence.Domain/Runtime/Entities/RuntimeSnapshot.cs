@@ -71,6 +71,9 @@ public sealed class RuntimeSnapshot : AuditableEntity<RuntimeSnapshotId>
     /// <summary>Fonte dos dados de runtime (ex: "Prometheus", "Datadog", "CloudWatch").</summary>
     public string Source { get; private set; } = string.Empty;
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Indica se o serviço está operando normalmente — derivado do HealthStatus.</summary>
     public bool IsHealthy => HealthStatus == HealthStatus.Healthy;
 

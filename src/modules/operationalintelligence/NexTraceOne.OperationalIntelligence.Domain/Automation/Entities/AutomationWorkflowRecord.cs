@@ -61,6 +61,9 @@ public sealed class AutomationWorkflowRecord : Entity<AutomationWorkflowRecordId
     /// <summary>Data/hora da última atualização do registo.</summary>
     public DateTimeOffset UpdatedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Construtor privado para EF Core.</summary>
     private AutomationWorkflowRecord() { }
 

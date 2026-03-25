@@ -10,7 +10,7 @@ internal sealed class CostImportBatchConfiguration : IEntityTypeConfiguration<Co
 {
     public void Configure(EntityTypeBuilder<CostImportBatch> builder)
     {
-        builder.ToTable("oi_cost_import_batches");
+        builder.ToTable("ops_cost_import_batches");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

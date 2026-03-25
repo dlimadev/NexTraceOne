@@ -10,7 +10,7 @@ internal sealed class AutomationValidationRecordConfiguration : IEntityTypeConfi
 {
     public void Configure(EntityTypeBuilder<AutomationValidationRecord> builder)
     {
-        builder.ToTable("oi_automation_validations");
+        builder.ToTable("ops_automation_validations");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

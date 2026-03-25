@@ -9,7 +9,10 @@ internal sealed class ReliabilitySnapshotConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<ReliabilitySnapshot> builder)
     {
-        builder.ToTable("oi_reliability_snapshots");
+        builder.ToTable("ops_reliability_snapshots", t =>
+        {
+            t.HasCheckConstraint("CK_ops_reliability_snapshots_trend", "\"TrendDirection\" >= 0 AND \"TrendDirection\" <= 2");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -31,5 +34,8 @@ internal sealed class ReliabilitySnapshotConfiguration : IEntityTypeConfiguratio
 
         builder.HasIndex(x => new { x.TenantId, x.ServiceId, x.ComputedAt });
         builder.HasIndex(x => new { x.TenantId, x.ComputedAt });
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

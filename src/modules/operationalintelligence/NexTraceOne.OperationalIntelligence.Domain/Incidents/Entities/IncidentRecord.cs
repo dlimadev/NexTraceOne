@@ -131,6 +131,11 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     /// <summary>Runbooks recomendados para mitigação (JSON).</summary>
     public string? MitigationRecommendedRunbooksJson { get; private set; }
 
+    // ── Concorrência otimista ───────────────────────────────────────────
+
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     // ── Fase 4: Contexto de Tenant/Ambiente ────────────────────────────────
 
     /// <summary>

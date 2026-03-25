@@ -10,7 +10,7 @@ internal sealed class AutomationAuditRecordConfiguration : IEntityTypeConfigurat
 {
     public void Configure(EntityTypeBuilder<AutomationAuditRecord> builder)
     {
-        builder.ToTable("oi_automation_audit_records");
+        builder.ToTable("ops_automation_audit_records");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

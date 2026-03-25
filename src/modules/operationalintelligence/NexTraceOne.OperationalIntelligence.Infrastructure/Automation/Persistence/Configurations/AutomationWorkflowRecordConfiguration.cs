@@ -11,7 +11,15 @@ internal sealed class AutomationWorkflowRecordConfiguration : IEntityTypeConfigu
 {
     public void Configure(EntityTypeBuilder<AutomationWorkflowRecord> builder)
     {
-        builder.ToTable("oi_automation_workflows");
+        builder.ToTable("ops_automation_workflows", t =>
+        {
+            t.HasCheckConstraint("CK_ops_automation_workflows_status",
+                "\"Status\" IN ('Draft','PendingPreconditions','AwaitingApproval','Approved','ReadyToExecute','Executing','AwaitingValidation','Completed','Failed','Cancelled','Rejected')");
+            t.HasCheckConstraint("CK_ops_automation_workflows_approval_status",
+                "\"ApprovalStatus\" IN ('NotRequired','Pending','Approved','Rejected','Escalated')");
+            t.HasCheckConstraint("CK_ops_automation_workflows_risk_level",
+                "\"RiskLevel\" IN ('Low','Medium','High','Critical')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -60,5 +68,8 @@ internal sealed class AutomationWorkflowRecordConfiguration : IEntityTypeConfigu
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.RequestedBy);
         builder.HasIndex(x => x.CreatedAt);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
