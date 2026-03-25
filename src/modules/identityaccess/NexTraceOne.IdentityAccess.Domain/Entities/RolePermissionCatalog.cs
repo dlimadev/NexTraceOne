@@ -87,6 +87,8 @@ public static class RolePermissionCatalog
                 "governance:analytics:read",
                 "governance:analytics:write",
                 "governance:finops:read",
+                "governance:admin:read",
+                "governance:admin:write",
 
                 // Promotion
                 "promotion:requests:read",
