@@ -110,6 +110,9 @@ public sealed class AiAgent : AuditableEntity<AiAgentId>
     /// <summary>Total de execuções do agent.</summary>
     public long ExecutionCount { get; private set; }
 
+    /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Regista um agent oficial da plataforma (System).
     /// Agents System iniciam Active e Published imediatamente.

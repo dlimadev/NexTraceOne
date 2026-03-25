@@ -88,6 +88,9 @@ public sealed class AiProvider : AuditableEntity<AiProviderId>
     /// <summary>Data/hora UTC em que o provedor foi registado na plataforma.</summary>
     public DateTimeOffset RegisteredAt { get; private set; }
 
+    /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Regista um novo provedor de IA com validações de invariantes.
     /// O provedor inicia ativo e IsExternal é derivado automaticamente de !IsLocal.
