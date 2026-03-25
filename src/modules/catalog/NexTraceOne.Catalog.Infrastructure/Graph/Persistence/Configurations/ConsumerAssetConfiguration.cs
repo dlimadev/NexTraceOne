@@ -8,7 +8,7 @@ internal sealed class ConsumerAssetConfiguration : IEntityTypeConfiguration<Cons
 {
     public void Configure(EntityTypeBuilder<ConsumerAsset> builder)
     {
-        builder.ToTable("eg_consumer_assets");
+        builder.ToTable("cat_consumer_assets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ConsumerAssetId.From(value));

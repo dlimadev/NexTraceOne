@@ -8,7 +8,7 @@ internal sealed class ConsumerRelationshipConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<ConsumerRelationship> builder)
     {
-        builder.ToTable("eg_consumer_relationships");
+        builder.ToTable("cat_consumer_relationships");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ConsumerRelationshipId.From(value));

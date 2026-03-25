@@ -13,7 +13,7 @@ internal sealed class SavedSearchConfiguration : IEntityTypeConfiguration<SavedS
 {
     public void Configure(EntityTypeBuilder<SavedSearch> builder)
     {
-        builder.ToTable("dp_saved_searches");
+        builder.ToTable("cat_saved_searches");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => SavedSearchId.From(value));

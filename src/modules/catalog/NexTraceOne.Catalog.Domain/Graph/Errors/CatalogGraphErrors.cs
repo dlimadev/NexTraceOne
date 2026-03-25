@@ -85,4 +85,13 @@ public static class CatalogGraphErrors
     /// <summary>Ativo de serviço não encontrado pelo identificador.</summary>
     public static Error ServiceAssetNotFoundById(Guid serviceAssetId)
         => Error.NotFound("CatalogGraph.ServiceAsset.NotFoundById", "Service asset with id '{0}' was not found.", serviceAssetId);
+
+    /// <summary>Transição de ciclo de vida inválida para o serviço.</summary>
+    public static Error InvalidLifecycleTransition(string assetName, string currentStatus, string targetStatus)
+        => Error.Business(
+            "CatalogGraph.ServiceAsset.InvalidLifecycleTransition",
+            "Cannot transition service '{0}' from '{1}' to '{2}'.",
+            assetName,
+            currentStatus,
+            targetStatus);
 }

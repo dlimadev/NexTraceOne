@@ -13,7 +13,7 @@ internal sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subsc
 {
     public void Configure(EntityTypeBuilder<Subscription> builder)
     {
-        builder.ToTable("dp_subscriptions");
+        builder.ToTable("cat_subscriptions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => SubscriptionId.From(value));

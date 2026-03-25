@@ -13,7 +13,7 @@ internal sealed class PortalAnalyticsEventConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<PortalAnalyticsEvent> builder)
     {
-        builder.ToTable("dp_portal_analytics_events");
+        builder.ToTable("cat_portal_analytics_events");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PortalAnalyticsEventId.From(value));

@@ -12,7 +12,7 @@ internal sealed class SavedGraphViewConfiguration : IEntityTypeConfiguration<Sav
 {
     public void Configure(EntityTypeBuilder<SavedGraphView> builder)
     {
-        builder.ToTable("saved_graph_views");
+        builder.ToTable("cat_saved_graph_views");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

@@ -8,7 +8,7 @@ internal sealed class DiscoverySourceConfiguration : IEntityTypeConfiguration<Di
 {
     public void Configure(EntityTypeBuilder<DiscoverySource> builder)
     {
-        builder.ToTable("eg_discovery_sources");
+        builder.ToTable("cat_discovery_sources");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => DiscoverySourceId.From(value));

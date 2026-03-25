@@ -13,7 +13,7 @@ internal sealed class PlaygroundSessionConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<PlaygroundSession> builder)
     {
-        builder.ToTable("dp_playground_sessions");
+        builder.ToTable("cat_playground_sessions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PlaygroundSessionId.From(value));
