@@ -1,3 +1,7 @@
+// DEPRECATED — kept for unit tests only.
+// Production registration uses EfIncidentStore (registered in DependencyInjection.cs).
+// Do NOT register this class in production DI. This file will be removed when the
+// unit test suite migrates to use EfIncidentStore with an in-process test database.
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;

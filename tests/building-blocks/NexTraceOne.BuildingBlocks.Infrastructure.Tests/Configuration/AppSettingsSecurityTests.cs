@@ -48,12 +48,15 @@ public sealed class AppSettingsSecurityTests
         foreach (var prop in connStrings.EnumerateObject())
         {
             var value = prop.Value.GetString()!;
-            // Password= should be empty (Password=;) — no actual value after it
+            // Password must be empty or the REPLACE_VIA_ENV placeholder — no real credentials in base config.
+            // Real credentials must be injected via environment variables (Npgsql env var or NEXTRACE_ prefix).
             if (value.Contains("Password=", StringComparison.OrdinalIgnoreCase))
             {
                 var passwordSegment = value.Split("Password=", StringSplitOptions.None)[1];
                 var passwordValue = passwordSegment.Split(';')[0].Trim();
-                passwordValue.Should().BeNullOrEmpty($"connection string '{prop.Name}' must not have a real password in base appsettings.json");
+                passwordValue.Should().Match(
+                    p => string.IsNullOrEmpty(p) || p == "REPLACE_VIA_ENV",
+                    $"connection string '{prop.Name}' must not have a real password in base appsettings.json (use REPLACE_VIA_ENV or empty)");
             }
         }
     }

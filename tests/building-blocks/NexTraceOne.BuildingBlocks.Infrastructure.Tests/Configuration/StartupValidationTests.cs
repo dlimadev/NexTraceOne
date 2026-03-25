@@ -159,7 +159,7 @@ public sealed class StartupValidationTests
     }
 
     [Fact]
-    public void BaseAppSettings_AllConnectionStrings_HaveEmptyPasswords()
+    public void BaseAppSettings_AllConnectionStrings_HaveNoRealPasswords()
     {
         var baseConfigPath = Path.Combine(SolutionRoot, "src", "platform", "NexTraceOne.ApiHost", "appsettings.json");
         var config = new ConfigurationBuilder()
@@ -176,9 +176,12 @@ public sealed class StartupValidationTests
             {
                 var passwordSegment = value.Split("Password=", StringSplitOptions.None)[1];
                 var passwordValue = passwordSegment.Split(';')[0].Trim();
-                passwordValue.Should().BeNullOrEmpty(
+                // Acceptable values: empty string or the REPLACE_VIA_ENV placeholder.
+                // Real credentials must be injected via environment variables at runtime.
+                passwordValue.Should().Match(
+                    p => string.IsNullOrEmpty(p) || p == "REPLACE_VIA_ENV",
                     $"ConnectionString '{cs.Key}' must not contain a real password in base config — " +
-                    "passwords must be injected via environment variables in non-Development environments");
+                    "use REPLACE_VIA_ENV or empty; inject real credentials via environment variables");
             }
         }
     }

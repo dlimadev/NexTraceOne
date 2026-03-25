@@ -10,7 +10,9 @@ namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.Ge
 /// filtrável por workflow, serviço ou equipa para rastreabilidade completa.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 ///
-/// Nota: nesta fase os dados são simulados até integração completa entre módulos.
+/// LIMITATION: dados são simulados com entradas hardcoded.
+/// Substituir pela leitura real dos eventos de auditoria persistidos no AutomationDbContext
+/// quando a integração entre módulos estiver completa.
 /// </summary>
 public static class GetAutomationAuditTrail
 {
@@ -37,7 +39,8 @@ public static class GetAutomationAuditTrail
         }
     }
 
-    /// <summary>Handler que compõe a trilha de auditoria com dados simulados.</summary>
+    /// <summary>Handler que compõe a trilha de auditoria com dados simulados hardcoded.
+    /// LIMITATION: substituir por leitura real do AutomationDbContext.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)

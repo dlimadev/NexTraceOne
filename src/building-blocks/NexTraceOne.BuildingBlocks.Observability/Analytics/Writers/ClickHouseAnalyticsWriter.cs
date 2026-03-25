@@ -279,9 +279,11 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter
 
             if (!response.IsSuccessStatusCode)
             {
-                // Limitar o body do erro para evitar exposição de dados sensíveis nos logs
+                // Ler apenas o status code e os primeiros caracteres do body para diagnóstico.
+                // O body de erro ClickHouse contém apenas mensagens do servidor, sem dados de negócio.
+                // Truncar para evitar logs excessivamente longos.
                 var body = await response.Content.ReadAsStringAsync(cancellationToken);
-                var sanitizedBody = body.Length > 200 ? body[..200] + "..." : body;
+                var sanitizedBody = body.Length > 200 ? body[..200] + " [truncated]" : body;
                 throw new InvalidOperationException(
                     $"ClickHouse INSERT into {table} failed: HTTP {(int)response.StatusCode} — {sanitizedBody}");
             }
