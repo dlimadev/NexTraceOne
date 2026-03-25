@@ -10,7 +10,7 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
     /// <summary>Configura o mapeamento da entidade Release para a tabela ci_releases.</summary>
     public void Configure(EntityTypeBuilder<Release> builder)
     {
-        builder.ToTable("ci_releases");
+        builder.ToTable("chg_releases");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ReleaseId.From(value));
@@ -39,8 +39,8 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.Property(x => x.EnvironmentId).HasColumnName("environment_id");
 
         builder.HasIndex(x => x.ApiAssetId);
-        builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_ci_releases_tenant_id");
-        builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_ci_releases_tenant_environment");
+        builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_chg_releases_tenant_id");
+        builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_chg_releases_tenant_environment");
 
         // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
         builder.Property(x => x.RowVersion).IsRowVersion();

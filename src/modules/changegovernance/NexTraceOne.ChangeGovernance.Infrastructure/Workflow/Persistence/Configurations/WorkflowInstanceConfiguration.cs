@@ -10,7 +10,7 @@ internal sealed class WorkflowInstanceConfiguration : IEntityTypeConfiguration<W
     /// <summary>Configura o mapeamento da entidade WorkflowInstance para a tabela wf_workflow_instances.</summary>
     public void Configure(EntityTypeBuilder<WorkflowInstance> builder)
     {
-        builder.ToTable("wf_workflow_instances");
+        builder.ToTable("chg_workflow_instances");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => WorkflowInstanceId.From(value));

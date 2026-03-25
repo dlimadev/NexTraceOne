@@ -10,7 +10,7 @@ internal sealed class EvidencePackConfiguration : IEntityTypeConfiguration<Evide
     /// <summary>Configura o mapeamento da entidade EvidencePack para a tabela wf_evidence_packs.</summary>
     public void Configure(EntityTypeBuilder<EvidencePack> builder)
     {
-        builder.ToTable("wf_evidence_packs");
+        builder.ToTable("chg_evidence_packs");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => EvidencePackId.From(value));

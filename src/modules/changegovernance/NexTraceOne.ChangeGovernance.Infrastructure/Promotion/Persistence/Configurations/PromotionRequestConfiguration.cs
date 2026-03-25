@@ -10,7 +10,7 @@ internal sealed class PromotionRequestConfiguration : IEntityTypeConfiguration<P
     /// <summary>Configura o mapeamento da entidade PromotionRequest para a tabela prm_promotion_requests.</summary>
     public void Configure(EntityTypeBuilder<PromotionRequest> builder)
     {
-        builder.ToTable("prm_promotion_requests");
+        builder.ToTable("chg_promotion_requests");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PromotionRequestId.From(value));

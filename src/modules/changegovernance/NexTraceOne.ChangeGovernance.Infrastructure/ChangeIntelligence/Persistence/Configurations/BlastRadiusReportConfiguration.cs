@@ -10,7 +10,7 @@ internal sealed class BlastRadiusReportConfiguration : IEntityTypeConfiguration<
     /// <summary>Configura o mapeamento da entidade BlastRadiusReport para a tabela ci_blast_radius_reports.</summary>
     public void Configure(EntityTypeBuilder<BlastRadiusReport> builder)
     {
-        builder.ToTable("ci_blast_radius_reports");
+        builder.ToTable("chg_blast_radius_reports");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => BlastRadiusReportId.From(value));

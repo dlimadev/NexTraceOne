@@ -10,7 +10,7 @@ internal sealed class LintResultConfiguration : IEntityTypeConfiguration<LintRes
     /// <summary>Configura o mapeamento da entidade LintResult para a tabela rg_lint_results.</summary>
     public void Configure(EntityTypeBuilder<LintResult> builder)
     {
-        builder.ToTable("rg_lint_results");
+        builder.ToTable("chg_lint_results");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => LintResultId.From(value));

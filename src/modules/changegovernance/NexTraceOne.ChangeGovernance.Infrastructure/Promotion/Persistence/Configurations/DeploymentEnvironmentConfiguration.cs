@@ -10,7 +10,7 @@ internal sealed class DeploymentEnvironmentConfiguration : IEntityTypeConfigurat
     /// <summary>Configura o mapeamento da entidade DeploymentEnvironment para a tabela prm_deployment_environments.</summary>
     public void Configure(EntityTypeBuilder<DeploymentEnvironment> builder)
     {
-        builder.ToTable("prm_deployment_environments");
+        builder.ToTable("chg_deployment_environments");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => DeploymentEnvironmentId.From(value));
