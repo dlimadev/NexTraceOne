@@ -72,6 +72,7 @@ export type Permission =
   | 'operations:runtime:read'
   // ── AI Hub ──
   | 'ai:assistant:read'
+  | 'ai:assistant:write'
   | 'ai:models:read'
   | 'ai:models:write'
   | 'ai:policies:read'
@@ -81,6 +82,7 @@ export type Permission =
   | 'ai:runtime:read'
   | 'ai:runtime:write'
   | 'ai:governance:read'
+  | 'ai:governance:write'
   // ── Governance ──
   | 'governance:read'
   | 'governance:reports:read'
