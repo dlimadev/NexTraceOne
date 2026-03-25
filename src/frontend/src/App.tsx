@@ -35,6 +35,10 @@ const ContractCatalogPage = lazy(() => import('./features/contracts/catalog/Cont
 const CreateServicePage = lazy(() => import('./features/contracts/create/CreateServicePage').then(m => ({ default: m.CreateServicePage })));
 const DraftStudioPage = lazy(() => import('./features/contracts/studio/DraftStudioPage').then(m => ({ default: m.DraftStudioPage })));
 const ContractWorkspacePage = lazy(() => import('./features/contracts/workspace/ContractWorkspacePage').then(m => ({ default: m.ContractWorkspacePage })));
+const SpectralRulesetManagerPage = lazy(() => import('./features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
+const CanonicalEntityCatalogPage = lazy(() => import('./features/contracts/canonical/CanonicalEntityCatalogPage').then(m => ({ default: m.CanonicalEntityCatalogPage })));
+const ContractGovernancePage = lazy(() => import('./features/contracts/governance/ContractGovernancePage').then(m => ({ default: m.ContractGovernancePage })));
+const ContractPortalPage = lazy(() => import('./features/contracts/portal/ContractPortalPage').then(m => ({ default: m.ContractPortalPage })));
 
 // ── Change-governance (lazy) ──
 const ReleasesPage = lazy(() => import('./features/change-governance/pages/ReleasesPage').then(m => ({ default: m.ReleasesPage })));
@@ -259,6 +263,38 @@ export default function App() {
               />
               <Route path="/contracts/studio" element={<Navigate to="/contracts" replace />} />
               <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
+              <Route
+                path="/contracts/governance"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <ContractGovernancePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/spectral"
+                element={
+                  <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+                    <SpectralRulesetManagerPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/canonical"
+                element={
+                  <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+                    <CanonicalEntityCatalogPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contracts/portal/:contractVersionId"
+                element={
+                  <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
+                    <ContractPortalPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/contracts/:contractVersionId"
                 element={
