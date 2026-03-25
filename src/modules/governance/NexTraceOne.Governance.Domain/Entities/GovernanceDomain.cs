@@ -56,6 +56,12 @@ public sealed class GovernanceDomain : Entity<GovernanceDomainId>
     /// <summary>Data/hora UTC da última atualização do domínio.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Construtor privado para EF Core e serialização.</summary>
     private GovernanceDomain() { }
 

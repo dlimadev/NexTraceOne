@@ -8,13 +8,19 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade Team.
-/// Define mapeamento de tabela, typed ID, enums e índices.
+/// Define mapeamento de tabela, typed ID, enums, concorrência otimista e índices.
+/// Prefixo gov_ — alinhado com a futura baseline do módulo Governance.
 /// </summary>
 internal sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
 {
     public void Configure(EntityTypeBuilder<Team> builder)
     {
-        builder.ToTable("gov_teams");
+        builder.ToTable("gov_teams", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_gov_teams_status",
+                "\"Status\" IN ('Active', 'Inactive', 'Archived')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -45,6 +51,10 @@ internal sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
 
         builder.Property(x => x.UpdatedAt)
             .HasColumnType("timestamp with time zone");
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Name).IsUnique();

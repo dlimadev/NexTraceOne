@@ -22,7 +22,12 @@ internal sealed class GovernanceWaiverConfiguration : IEntityTypeConfiguration<G
 
     public void Configure(EntityTypeBuilder<GovernanceWaiver> builder)
     {
-        builder.ToTable("gov_waivers");
+        builder.ToTable("gov_waivers", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_gov_waivers_status",
+                "\"Status\" IN ('Pending', 'Approved', 'Rejected', 'Revoked', 'Expired')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -78,6 +83,16 @@ internal sealed class GovernanceWaiverConfiguration : IEntityTypeConfiguration<G
                 json => JsonSerializer.Deserialize<List<string>>(json, JsonOptions)
                     ?? new List<string>())
             .IsRequired();
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
+
+        // FK: Waiver → GovernancePack
+        builder.HasOne<GovernancePack>()
+            .WithMany()
+            .HasForeignKey(x => x.PackId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Índices para consultas frequentes
         builder.HasIndex(x => x.PackId);

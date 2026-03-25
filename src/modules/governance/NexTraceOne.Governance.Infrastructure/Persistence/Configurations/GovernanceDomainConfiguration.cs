@@ -8,13 +8,18 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade GovernanceDomain.
-/// Define mapeamento de tabela, typed ID, enums e índices.
+/// Define mapeamento de tabela, typed ID, enums, concorrência otimista e índices.
 /// </summary>
 internal sealed class GovernanceDomainConfiguration : IEntityTypeConfiguration<GovernanceDomain>
 {
     public void Configure(EntityTypeBuilder<GovernanceDomain> builder)
     {
-        builder.ToTable("gov_domains");
+        builder.ToTable("gov_domains", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_gov_domains_criticality",
+                "\"Criticality\" IN ('Low', 'Medium', 'High', 'Critical')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -38,6 +43,10 @@ internal sealed class GovernanceDomainConfiguration : IEntityTypeConfiguration<G
 
         builder.Property(x => x.CapabilityClassification)
             .HasMaxLength(200);
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Name).IsUnique();
