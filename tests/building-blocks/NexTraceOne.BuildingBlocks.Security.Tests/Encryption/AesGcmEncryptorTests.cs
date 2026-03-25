@@ -5,6 +5,8 @@ namespace NexTraceOne.BuildingBlocks.Security.Tests.Encryption;
 
 public sealed class AesGcmEncryptorTests : IDisposable
 {
+    private const string ValidUtf8Key = "12345678901234567890123456789012";
+
     private readonly string? _originalEncryptionKey;
     private readonly string? _originalEnvironment;
 
@@ -13,6 +15,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
         _originalEncryptionKey = Environment.GetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY");
         _originalEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        SetEncryptionKey(ValidUtf8Key);
     }
 
     public void Dispose()
@@ -29,7 +32,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [Fact]
     public void EncryptDecrypt_Roundtrip_ReturnsOriginalText()
     {
-        SetEncryptionKey("12345678901234567890123456789012"); // 32-byte UTF-8 key
+        SetEncryptionKey(ValidUtf8Key); // 32-byte UTF-8 key
 
         var plainText = "Sensitive data to protect";
         var encrypted = AesGcmEncryptor.Encrypt(plainText);
@@ -41,7 +44,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [Fact]
     public void Encrypt_ProducesDifferentCiphertextEachTime()
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         var plainText = "Same text encrypted twice";
         var encrypted1 = AesGcmEncryptor.Encrypt(plainText);
@@ -53,7 +56,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [Fact]
     public void Decrypt_WithTamperedCiphertext_Throws()
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         var encrypted = AesGcmEncryptor.Encrypt("Secret data");
         var bytes = Convert.FromBase64String(encrypted);
@@ -70,7 +73,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [InlineData("")]
     public void Encrypt_WithNullOrEmpty_ReturnsSameValue(string? input)
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         var result = AesGcmEncryptor.Encrypt(input!);
 
@@ -82,7 +85,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [InlineData("")]
     public void Decrypt_WithNullOrEmpty_ReturnsSameValue(string? input)
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         var result = AesGcmEncryptor.Decrypt(input!);
 
@@ -105,16 +108,13 @@ public sealed class AesGcmEncryptorTests : IDisposable
     }
 
     [Fact]
-    public void EncryptDecrypt_WithDevelopmentFallbackKey_Works()
+    public void Encrypt_WithoutConfiguredKey_Throws()
     {
         SetEncryptionKey(null);
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        var act = () => AesGcmEncryptor.Encrypt("test");
 
-        var plainText = "Development data";
-        var encrypted = AesGcmEncryptor.Encrypt(plainText);
-        var decrypted = AesGcmEncryptor.Decrypt(encrypted);
-
-        decrypted.Should().Be(plainText);
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*NEXTRACE_ENCRYPTION_KEY*");
     }
 
     [Fact]
@@ -134,17 +134,15 @@ public sealed class AesGcmEncryptorTests : IDisposable
     {
         SetEncryptionKey("short-key");
 
-        var plainText = "Data with derived key";
-        var encrypted = AesGcmEncryptor.Encrypt(plainText);
-        var decrypted = AesGcmEncryptor.Decrypt(encrypted);
-
-        decrypted.Should().Be(plainText);
+        var act = () => AesGcmEncryptor.Encrypt("Data with invalid key");
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*NEXTRACE_ENCRYPTION_KEY*invalid*");
     }
 
     [Fact]
     public void Decrypt_WithInvalidBase64_Throws()
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         var act = () => AesGcmEncryptor.Decrypt("not-valid-base64!!!");
 
@@ -154,7 +152,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [Fact]
     public void Decrypt_WithPayloadTooShort_Throws()
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         // Create a Base64 payload that's too short (less than nonce + tag = 28 bytes)
         var shortPayload = Convert.ToBase64String(new byte[10]);
@@ -168,7 +166,7 @@ public sealed class AesGcmEncryptorTests : IDisposable
     [Fact]
     public void EncryptDecrypt_WithUnicodeText_Roundtrips()
     {
-        SetEncryptionKey("12345678901234567890123456789012");
+        SetEncryptionKey(ValidUtf8Key);
 
         var plainText = "Dados sensíveis: アクセストークン 🔐";
         var encrypted = AesGcmEncryptor.Encrypt(plainText);

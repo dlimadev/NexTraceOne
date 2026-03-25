@@ -12,16 +12,18 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.Tests.Encryption;
 /// </summary>
 public sealed class EncryptionAtRestTests : IDisposable
 {
+    private const string ValidUtf8Key = "12345678901234567890123456789012";
+
     private readonly string? _previousEncryptionKey;
     private readonly string? _previousEnvironment;
 
     public EncryptionAtRestTests()
     {
-        // Preserve existing env vars and set Development fallback
+        // Preserve existing env vars and set explicit encryption key
         _previousEncryptionKey = Environment.GetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY");
         _previousEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-        Environment.SetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY", null);
+        Environment.SetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY", ValidUtf8Key);
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
     }
 

@@ -13,18 +13,23 @@ namespace NexTraceOne.BuildingBlocks.Security.Tests.DependencyInjection;
 public sealed class SecurityDependencyInjectionTests : IDisposable
 {
     private const string TestSigningKey = "test-signing-key-that-is-long-enough-for-hmac-sha256-validation!!";
+    private const string ValidEncryptionKey = "12345678901234567890123456789012";
 
     private readonly string? _originalEnvironment;
+    private readonly string? _originalEncryptionKey;
 
     public SecurityDependencyInjectionTests()
     {
         _originalEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        _originalEncryptionKey = Environment.GetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY");
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        Environment.SetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY", ValidEncryptionKey);
     }
 
     public void Dispose()
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", _originalEnvironment);
+        Environment.SetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY", _originalEncryptionKey);
     }
 
     private static IConfiguration CreateConfiguration(
@@ -151,6 +156,20 @@ public sealed class SecurityDependencyInjectionTests : IDisposable
 
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("*JWT signing key*");
+    }
+
+    [Fact]
+    public void AddBuildingBlocksSecurity_WithNoEncryptionKey_Throws()
+    {
+        Environment.SetEnvironmentVariable("NEXTRACE_ENCRYPTION_KEY", null);
+        var services = new ServiceCollection();
+        services.AddLogging();
+        var configuration = CreateConfiguration();
+
+        var act = () => services.AddBuildingBlocksSecurity(configuration);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*NEXTRACE_ENCRYPTION_KEY*");
     }
 
     [Fact]

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace NexTraceOne.ApiHost;
 
@@ -245,10 +246,10 @@ public static class StartupValidation
             return;
         }
 
-        if (configuredKey.Length == 32)
+        if (Encoding.UTF8.GetByteCount(configuredKey) == 32)
         {
             logger.LogInformation(
-                "{VariableName} validated in {Environment} environment using UTF-8 32-character key format.",
+                "{VariableName} validated in {Environment} environment using UTF-8 32-byte key format.",
                 EncryptionKeyEnvironmentVariable,
                 app.Environment.EnvironmentName);
             return;

@@ -80,6 +80,19 @@ public sealed class StartupValidationTests
     }
 
     [Fact]
+    public void StartupValidation_ValidatesEncryptionKeyConfiguration()
+    {
+        var content = File.ReadAllText(StartupValidationPath);
+
+        content.Should().Contain("NEXTRACE_ENCRYPTION_KEY",
+            "StartupValidation must validate NEXTRACE_ENCRYPTION_KEY explicitly");
+        content.Should().Contain("ValidateEncryptionKey",
+            "StartupValidation should have a dedicated encryption key validation method");
+        content.Should().Contain("Base64-encoded 32-byte key",
+            "StartupValidation must enforce encryption key format requirements");
+    }
+
+    [Fact]
     public void StartupValidation_ValidatesOidcProviders()
     {
         var content = File.ReadAllText(StartupValidationPath);
