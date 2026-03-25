@@ -105,6 +105,7 @@ public static class RolePermissionCatalog
                 "audit:trail:read",
                 "audit:reports:read",
                 "audit:compliance:read",
+                "audit:compliance:write",
                 "audit:events:write",
 
                 // AI
@@ -260,6 +261,7 @@ public static class RolePermissionCatalog
                 "audit:trail:read",
                 "audit:reports:read",
                 "audit:compliance:read",
+                "audit:compliance:write",
                 "env:environments:read",
                 "env:access:read",
                 "notifications:inbox:read",

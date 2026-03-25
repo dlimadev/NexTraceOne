@@ -44,6 +44,9 @@ public sealed class AuditCampaign : Entity<AuditCampaignId>
     /// <summary>Data/hora de criação.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Cria uma nova campanha de auditoria.</summary>
     public static AuditCampaign Create(
         string name,

@@ -10,7 +10,11 @@ internal sealed class CompliancePolicyConfiguration : IEntityTypeConfiguration<C
     /// <summary>Configura o mapeamento da entidade CompliancePolicy para a tabela aud_compliance_policies.</summary>
     public void Configure(EntityTypeBuilder<CompliancePolicy> builder)
     {
-        builder.ToTable("aud_compliance_policies");
+        builder.ToTable("aud_compliance_policies", t =>
+        {
+            t.HasCheckConstraint("CK_aud_compliance_policies_severity",
+                "\"Severity\" IN ('Low','Medium','High','Critical')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => CompliancePolicyId.From(value));
@@ -30,5 +34,8 @@ internal sealed class CompliancePolicyConfiguration : IEntityTypeConfiguration<C
         builder.HasIndex(x => x.IsActive);
         builder.HasIndex(x => x.Category);
         builder.HasIndex(x => x.Severity);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
