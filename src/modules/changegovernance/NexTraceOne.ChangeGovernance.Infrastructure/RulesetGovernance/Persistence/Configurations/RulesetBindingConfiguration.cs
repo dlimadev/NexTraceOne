@@ -10,7 +10,7 @@ internal sealed class RulesetBindingConfiguration : IEntityTypeConfiguration<Rul
     /// <summary>Configura o mapeamento da entidade RulesetBinding para a tabela rg_ruleset_bindings.</summary>
     public void Configure(EntityTypeBuilder<RulesetBinding> builder)
     {
-        builder.ToTable("rg_ruleset_bindings");
+        builder.ToTable("chg_ruleset_bindings");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => RulesetBindingId.From(value));

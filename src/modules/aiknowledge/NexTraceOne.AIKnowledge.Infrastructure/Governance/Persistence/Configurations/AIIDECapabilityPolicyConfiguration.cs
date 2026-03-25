@@ -9,7 +9,7 @@ internal sealed class AIIDECapabilityPolicyConfiguration : IEntityTypeConfigurat
 {
     public void Configure(EntityTypeBuilder<AIIDECapabilityPolicy> builder)
     {
-        builder.ToTable("ai_gov_ide_capability_policies");
+        builder.ToTable("aik_ide_capability_policies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIIDECapabilityPolicyId.From(value));

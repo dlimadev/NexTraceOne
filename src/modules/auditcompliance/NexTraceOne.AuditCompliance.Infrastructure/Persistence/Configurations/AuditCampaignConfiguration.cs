@@ -10,7 +10,11 @@ internal sealed class AuditCampaignConfiguration : IEntityTypeConfiguration<Audi
     /// <summary>Configura o mapeamento da entidade AuditCampaign para a tabela aud_campaigns.</summary>
     public void Configure(EntityTypeBuilder<AuditCampaign> builder)
     {
-        builder.ToTable("aud_campaigns");
+        builder.ToTable("aud_campaigns", t =>
+        {
+            t.HasCheckConstraint("CK_aud_campaigns_status",
+                "\"Status\" IN ('Planned','InProgress','Completed','Cancelled')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AuditCampaignId.From(value));
@@ -29,5 +33,8 @@ internal sealed class AuditCampaignConfiguration : IEntityTypeConfiguration<Audi
         builder.HasIndex(x => x.TenantId);
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.CampaignType);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

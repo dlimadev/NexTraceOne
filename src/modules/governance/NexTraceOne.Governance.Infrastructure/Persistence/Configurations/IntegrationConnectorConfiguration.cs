@@ -14,7 +14,13 @@ internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<IntegrationConnector> builder)
     {
-        builder.ToTable("gov_integration_connectors");
+        builder.ToTable("int_connectors", t =>
+        {
+            t.HasCheckConstraint("CK_int_connectors_status",
+                "\"Status\" IN ('Pending','Active','Paused','Disabled','Failed','Configuring')");
+            t.HasCheckConstraint("CK_int_connectors_health",
+                "\"Health\" IN ('Unknown','Healthy','Degraded','Unhealthy','Critical')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -104,5 +110,8 @@ internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfigurati
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Health);
         builder.HasIndex(x => x.Environment);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

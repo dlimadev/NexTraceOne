@@ -10,7 +10,7 @@ internal sealed class CostSnapshotConfiguration : IEntityTypeConfiguration<CostS
 {
     public void Configure(EntityTypeBuilder<CostSnapshot> builder)
     {
-        builder.ToTable("oi_cost_snapshots");
+        builder.ToTable("ops_cost_snapshots");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -32,5 +32,8 @@ internal sealed class CostSnapshotConfiguration : IEntityTypeConfiguration<CostS
 
         builder.HasIndex(x => new { x.ServiceName, x.Environment, x.CapturedAt });
         builder.HasIndex(x => x.Period);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

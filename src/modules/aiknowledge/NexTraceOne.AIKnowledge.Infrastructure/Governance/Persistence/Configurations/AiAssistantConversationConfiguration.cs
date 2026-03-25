@@ -9,7 +9,7 @@ internal sealed class AiAssistantConversationConfiguration : IEntityTypeConfigur
 {
     public void Configure(EntityTypeBuilder<AiAssistantConversation> builder)
     {
-        builder.ToTable("ai_gov_conversations");
+        builder.ToTable("aik_conversations");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiAssistantConversationId.From(value));

@@ -64,6 +64,12 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
     /// <summary>Usuário que realizou a última edição.</summary>
     public string? LastEditedBy { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Exemplos associados ao draft.</summary>
     public IReadOnlyList<ContractExample> Examples => _examples.AsReadOnly();
 

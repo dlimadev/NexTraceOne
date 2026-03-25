@@ -11,7 +11,7 @@ internal sealed class ReleaseBaselineConfiguration : IEntityTypeConfiguration<Re
     /// <summary>Configura o mapeamento da entidade ReleaseBaseline para a tabela ci_release_baselines.</summary>
     public void Configure(EntityTypeBuilder<ReleaseBaseline> builder)
     {
-        builder.ToTable("ci_release_baselines");
+        builder.ToTable("chg_release_baselines");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ReleaseBaselineId.From(value));

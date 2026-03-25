@@ -8,14 +8,19 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
 /// <summary>
 /// Configuração EF Core para a entidade EnvironmentAccess.
 /// Define tabela, conversões de IDs fortemente tipados, constraints e índices.
-/// Índice composto em (UserId, TenantId, EnvironmentId) otimiza a consulta principal
-/// de verificação de acesso a um ambiente específico.
+/// Prefixo env_ — prepara o módulo para a futura baseline de Environment Management.
 /// </summary>
 internal sealed class EnvironmentAccessConfiguration : IEntityTypeConfiguration<EnvironmentAccess>
 {
     public void Configure(EntityTypeBuilder<EnvironmentAccess> builder)
     {
-        builder.ToTable("identity_environment_accesses");
+        builder.ToTable("env_environment_accesses", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_env_environment_accesses_access_level",
+                "\"AccessLevel\" IN ('read', 'write', 'admin', 'none')");
+        });
+
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
@@ -42,21 +47,49 @@ internal sealed class EnvironmentAccessConfiguration : IEntityTypeConfiguration<
             .IsRequired();
 
         builder.Property(x => x.GrantedAt)
+            .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        builder.Property(x => x.ExpiresAt);
+        builder.Property(x => x.ExpiresAt)
+            .HasColumnType("timestamp with time zone");
 
-        builder.Property(x => x.RevokedAt);
+        builder.Property(x => x.RevokedAt)
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(x => x.IsActive)
             .HasDefaultValue(true)
             .IsRequired();
 
-        builder.HasIndex(x => new { x.UserId, x.TenantId, x.EnvironmentId })
-            .HasDatabaseName("IX_identity_environment_accesses_user_tenant_env");
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
-        // Índice para processamento de expiração por jobs periódicos (ListExpiredAccessesAsync).
+        // FK: EnvironmentAccess → Environment
+        builder.HasOne<Domain.Entities.Environment>()
+            .WithMany()
+            .HasForeignKey(x => x.EnvironmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Índice composto para verificação rápida de acesso
+        builder.HasIndex(x => new { x.UserId, x.TenantId, x.EnvironmentId })
+            .HasDatabaseName("IX_env_environment_accesses_user_tenant_env");
+
+        // Índice único: apenas um acesso ativo por utilizador/ambiente/tenant
+        builder.HasIndex(x => new { x.UserId, x.EnvironmentId, x.TenantId })
+            .IsUnique()
+            .HasFilter("\"IsActive\" = true")
+            .HasDatabaseName("IX_env_environment_accesses_unique_active");
+
+        // Índice para processamento de expiração por jobs periódicos
         builder.HasIndex(x => new { x.IsActive, x.ExpiresAt })
-            .HasDatabaseName("IX_identity_environment_accesses_active_expires");
+            .HasDatabaseName("IX_env_environment_accesses_active_expires");
+
+        // Índice por environment_id para consultas por ambiente
+        builder.HasIndex(x => x.EnvironmentId)
+            .HasDatabaseName("IX_env_environment_accesses_env_id");
+
+        // Índice para acessos ativos por utilizador
+        builder.HasIndex(x => new { x.UserId, x.IsActive })
+            .HasDatabaseName("IX_env_environment_accesses_user_active");
     }
 }

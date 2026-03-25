@@ -11,7 +11,7 @@ internal sealed class PostReleaseReviewConfiguration : IEntityTypeConfiguration<
     /// <summary>Configura o mapeamento da entidade PostReleaseReview para a tabela ci_post_release_reviews.</summary>
     public void Configure(EntityTypeBuilder<PostReleaseReview> builder)
     {
-        builder.ToTable("ci_post_release_reviews");
+        builder.ToTable("chg_post_release_reviews");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PostReleaseReviewId.From(value));

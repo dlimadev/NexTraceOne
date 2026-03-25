@@ -228,6 +228,9 @@ lifetime.ApplicationStopping.Register(() => app.Logger.LogInformation("NexTraceO
 // ── Auto-migrations ──
 await app.ApplyDatabaseMigrationsAsync();
 
+// ── Seed de definições de configuração (idempotente, todos os ambientes) ──
+await app.SeedConfigurationDefinitionsAsync();
+
 // ── Seed data de desenvolvimento (idempotente, apenas em Development) ──
 await app.SeedDevelopmentDataAsync();
 

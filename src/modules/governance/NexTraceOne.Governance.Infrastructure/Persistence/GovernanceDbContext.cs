@@ -10,6 +10,11 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 /// DbContext do módulo Governance.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
+///
+/// NOTA SOBRE ESCOPO: Este DbContext contém temporariamente DbSets de Integrations
+/// (IntegrationConnectors, IngestionSources, IngestionExecutions) e Product Analytics
+/// (AnalyticsEvents) que serão extraídos para módulos próprios em OI-02 e OI-03.
+/// Após extração, apenas os 8 DbSets de Governance permanecerão.
 /// </summary>
 public sealed class GovernanceDbContext(
     DbContextOptions<GovernanceDbContext> options,

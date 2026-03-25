@@ -10,7 +10,7 @@ internal sealed class PromotionGateConfiguration : IEntityTypeConfiguration<Prom
     /// <summary>Configura o mapeamento da entidade PromotionGate para a tabela prm_promotion_gates.</summary>
     public void Configure(EntityTypeBuilder<PromotionGate> builder)
     {
-        builder.ToTable("prm_promotion_gates");
+        builder.ToTable("chg_promotion_gates");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PromotionGateId.From(value));

@@ -13,7 +13,7 @@ internal sealed class CodeGenerationRecordConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<CodeGenerationRecord> builder)
     {
-        builder.ToTable("dp_code_generation_records");
+        builder.ToTable("cat_code_generation_records");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => CodeGenerationRecordId.From(value));

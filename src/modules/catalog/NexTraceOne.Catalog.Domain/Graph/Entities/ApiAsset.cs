@@ -109,6 +109,12 @@ public sealed class ApiAsset : AggregateRoot<ApiAssetId>
     /// <summary>Indica se o ativo está descomissionado.</summary>
     public bool IsDecommissioned { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Atualiza metadados do ativo sem alterar o proprietário.</summary>
     public Result<Unit> UpdateMetadata(string name, string routePattern, string version, string visibility)
     {

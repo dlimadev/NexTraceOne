@@ -123,6 +123,9 @@ public sealed class AIModel : AuditableEntity<AIModelId>
     /// <summary>Data/hora UTC em que o modelo foi registrado no Model Registry.</summary>
     public DateTimeOffset RegisteredAt { get; private set; }
 
+    /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Registra um novo modelo de IA no Model Registry com validações de invariantes.
     /// O modelo inicia com status Active e IsExternal é derivado automaticamente.

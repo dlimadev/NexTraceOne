@@ -16,6 +16,8 @@ export interface ConfigurationDefinitionDto {
   validationRules: string | null;
   uiEditorType: string | null;
   sortOrder: number;
+  isDeprecated: boolean;
+  deprecatedMessage: string | null;
 }
 
 export interface ConfigurationEntryDto {

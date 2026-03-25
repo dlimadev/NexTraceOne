@@ -9,7 +9,7 @@ internal sealed class AIAccessPolicyConfiguration : IEntityTypeConfiguration<AIA
 {
     public void Configure(EntityTypeBuilder<AIAccessPolicy> builder)
     {
-        builder.ToTable("ai_gov_access_policies");
+        builder.ToTable("aik_access_policies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIAccessPolicyId.From(value));

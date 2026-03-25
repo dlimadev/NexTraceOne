@@ -10,7 +10,12 @@ internal sealed class IncidentRecordConfiguration : IEntityTypeConfiguration<Inc
 {
     public void Configure(EntityTypeBuilder<IncidentRecord> builder)
     {
-        builder.ToTable("oi_incidents");
+        builder.ToTable("ops_incidents", t =>
+        {
+            t.HasCheckConstraint("CK_ops_incidents_severity", "\"Severity\" >= 0 AND \"Severity\" <= 3");
+            t.HasCheckConstraint("CK_ops_incidents_status", "\"Status\" >= 0 AND \"Status\" <= 5");
+            t.HasCheckConstraint("CK_ops_incidents_type", "\"Type\" >= 0 AND \"Type\" <= 6");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => IncidentRecordId.From(value));
@@ -61,7 +66,10 @@ internal sealed class IncidentRecordConfiguration : IEntityTypeConfiguration<Inc
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Severity);
         builder.HasIndex(x => x.DetectedAt);
-        builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_oi_incidents_tenant_id");
-        builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_oi_incidents_tenant_environment");
+        builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_ops_incidents_tenant_id");
+        builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_ops_incidents_tenant_environment");
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

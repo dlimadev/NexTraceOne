@@ -11,7 +11,7 @@ internal sealed class ObservationWindowConfiguration : IEntityTypeConfiguration<
     /// <summary>Configura o mapeamento da entidade ObservationWindow para a tabela ci_observation_windows.</summary>
     public void Configure(EntityTypeBuilder<ObservationWindow> builder)
     {
-        builder.ToTable("ci_observation_windows");
+        builder.ToTable("chg_observation_windows");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ObservationWindowId.From(value));

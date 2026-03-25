@@ -8,13 +8,18 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Configur
 
 /// <summary>
 /// Configuração EF Core da entidade AiAgentExecution.
-/// Tabela: ai_gov_agent_executions.
+/// Tabela: aik_agent_executions.
 /// </summary>
 public sealed class AiAgentExecutionConfiguration : IEntityTypeConfiguration<AiAgentExecution>
 {
     public void Configure(EntityTypeBuilder<AiAgentExecution> builder)
     {
-        builder.ToTable("ai_gov_agent_executions");
+        builder.ToTable("aik_agent_executions", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_aik_agent_executions_Status",
+                "\"Status\" IN ('Pending','Running','Completed','Failed','Cancelled')");
+        });
 
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
@@ -47,5 +52,7 @@ public sealed class AiAgentExecutionConfiguration : IEntityTypeConfiguration<AiA
         builder.HasIndex(e => e.Status);
         builder.HasIndex(e => e.CorrelationId);
         builder.HasIndex(e => e.StartedAt);
+
+        builder.Property(e => e.RowVersion).IsRowVersion();
     }
 }

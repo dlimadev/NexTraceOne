@@ -10,7 +10,11 @@ internal sealed class ComplianceResultConfiguration : IEntityTypeConfiguration<C
     /// <summary>Configura o mapeamento da entidade ComplianceResult para a tabela aud_compliance_results.</summary>
     public void Configure(EntityTypeBuilder<ComplianceResult> builder)
     {
-        builder.ToTable("aud_compliance_results");
+        builder.ToTable("aud_compliance_results", t =>
+        {
+            t.HasCheckConstraint("CK_aud_compliance_results_outcome",
+                "\"Outcome\" IN ('Compliant','NonCompliant','PartiallyCompliant','NotApplicable')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ComplianceResultId.From(value));

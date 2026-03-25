@@ -9,7 +9,12 @@ internal sealed class AiProviderConfiguration : IEntityTypeConfiguration<AiProvi
 {
     public void Configure(EntityTypeBuilder<AiProvider> builder)
     {
-        builder.ToTable("AiProviders");
+        builder.ToTable("aik_providers", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_aik_providers_HealthStatus",
+                "\"HealthStatus\" IN ('Unknown','Healthy','Degraded','Unhealthy','Offline')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiProviderId.From(value));
@@ -30,5 +35,7 @@ internal sealed class AiProviderConfiguration : IEntityTypeConfiguration<AiProvi
         builder.HasIndex(x => x.Slug).IsUnique();
         builder.HasIndex(x => x.ProviderType);
         builder.HasIndex(x => x.IsEnabled);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

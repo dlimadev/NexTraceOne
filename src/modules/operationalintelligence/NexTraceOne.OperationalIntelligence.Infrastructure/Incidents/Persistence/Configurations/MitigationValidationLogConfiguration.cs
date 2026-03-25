@@ -9,7 +9,7 @@ internal sealed class MitigationValidationLogConfiguration : IEntityTypeConfigur
 {
     public void Configure(EntityTypeBuilder<MitigationValidationLog> builder)
     {
-        builder.ToTable("oi_mitigation_validations");
+        builder.ToTable("ops_mitigation_validations");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => MitigationValidationLogId.From(value));

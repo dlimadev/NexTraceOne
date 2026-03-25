@@ -10,7 +10,7 @@ internal sealed class RulesetConfiguration : IEntityTypeConfiguration<Ruleset>
     /// <summary>Configura o mapeamento da entidade Ruleset para a tabela rg_rulesets.</summary>
     public void Configure(EntityTypeBuilder<Ruleset> builder)
     {
-        builder.ToTable("rg_rulesets");
+        builder.ToTable("chg_rulesets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => RulesetId.From(value));
@@ -27,5 +27,8 @@ internal sealed class RulesetConfiguration : IEntityTypeConfiguration<Ruleset>
         builder.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.UpdatedBy).HasMaxLength(500).IsRequired();
         builder.Property(x => x.IsDeleted).IsRequired().HasDefaultValue(false);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

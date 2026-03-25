@@ -10,7 +10,7 @@ internal sealed class MitigationWorkflowRecordConfiguration : IEntityTypeConfigu
 {
     public void Configure(EntityTypeBuilder<MitigationWorkflowRecord> builder)
     {
-        builder.ToTable("oi_mitigation_workflows");
+        builder.ToTable("ops_mitigation_workflows");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => MitigationWorkflowRecordId.From(value));

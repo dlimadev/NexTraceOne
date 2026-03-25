@@ -21,6 +21,9 @@ public sealed class RetentionPolicy : Entity<RetentionPolicyId>
     /// <summary>Indica se a política está ativa.</summary>
     public bool IsActive { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Cria uma nova política de retenção.</summary>
     public static RetentionPolicy Create(string name, int retentionDays)
     {

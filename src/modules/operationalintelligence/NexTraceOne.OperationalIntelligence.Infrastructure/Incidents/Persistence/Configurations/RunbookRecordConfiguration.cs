@@ -9,7 +9,7 @@ internal sealed class RunbookRecordConfiguration : IEntityTypeConfiguration<Runb
 {
     public void Configure(EntityTypeBuilder<RunbookRecord> builder)
     {
-        builder.ToTable("oi_runbooks");
+        builder.ToTable("ops_runbooks");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => RunbookRecordId.From(value));

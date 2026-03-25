@@ -10,7 +10,7 @@ internal sealed class ServiceCostProfileConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<ServiceCostProfile> builder)
     {
-        builder.ToTable("oi_service_cost_profiles");
+        builder.ToTable("ops_service_cost_profiles");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

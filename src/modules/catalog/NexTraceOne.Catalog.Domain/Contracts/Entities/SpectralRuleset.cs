@@ -60,6 +60,12 @@ public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
     /// <summary>URL de origem, quando importado de fonte externa.</summary>
     public string? SourceUrl { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Cria novo ruleset Spectral.</summary>
     public static SpectralRuleset Create(
         string name,

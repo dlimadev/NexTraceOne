@@ -14,7 +14,7 @@ internal sealed class ExternalIdentityConfiguration : IEntityTypeConfiguration<E
 {
     public void Configure(EntityTypeBuilder<ExternalIdentity> builder)
     {
-        builder.ToTable("identity_external_identities");
+        builder.ToTable("iam_external_identities");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

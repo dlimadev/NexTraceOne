@@ -14,6 +14,10 @@ namespace NexTraceOne.Governance.API.Endpoints;
 /// Endpoints de administração delegada no módulo Governance.
 /// Permite listar e criar delegações de administração para equipas e domínios.
 /// Suporta governança descentralizada com controlo de expiração e auditoria.
+///
+/// Permissões:
+/// - GET: governance:admin:read (listar delegações)
+/// - POST: governance:admin:write (criar delegação — ação sensível)
 /// </summary>
 public sealed class DelegatedAdminEndpointModule
 {
@@ -31,9 +35,9 @@ public sealed class DelegatedAdminEndpointModule
             var query = new ListDelegatedAdministrationsFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:teams:read");
+        }).RequirePermission("governance:admin:read");
 
-        // ── Criar nova delegação de administração ──
+        // ── Criar nova delegação de administração (ação sensível) ──
         group.MapPost("/", async (
             CreateDelegatedAdministrationFeature.Command command,
             ISender sender,
@@ -44,6 +48,6 @@ public sealed class DelegatedAdminEndpointModule
             if (result.IsSuccess)
                 return Results.Created($"/api/v1/admin/delegations/{result.Value.DelegationId}", result.Value);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:teams:write");
+        }).RequirePermission("governance:admin:write");
     }
 }

@@ -9,7 +9,7 @@ internal sealed class LinkedReferenceConfiguration : IEntityTypeConfiguration<Li
 {
     public void Configure(EntityTypeBuilder<LinkedReference> builder)
     {
-        builder.ToTable("sot_linked_references");
+        builder.ToTable("cat_linked_references");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => LinkedReferenceId.From(value));

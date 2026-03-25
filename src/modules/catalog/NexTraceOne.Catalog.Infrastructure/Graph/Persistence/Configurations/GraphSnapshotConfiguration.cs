@@ -12,7 +12,7 @@ internal sealed class GraphSnapshotConfiguration : IEntityTypeConfiguration<Grap
 {
     public void Configure(EntityTypeBuilder<GraphSnapshot> builder)
     {
-        builder.ToTable("graph_snapshots");
+        builder.ToTable("cat_graph_snapshots");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

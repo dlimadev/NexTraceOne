@@ -61,6 +61,12 @@ public sealed class GovernancePack : Entity<GovernancePackId>
     /// <summary>Data/hora UTC da última atualização do pack.</summary>
     public DateTimeOffset UpdatedAt { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Construtor privado para EF Core e serialização.</summary>
     private GovernancePack() { }
 
@@ -132,12 +138,17 @@ public sealed class GovernancePack : Entity<GovernancePackId>
     /// <summary>
     /// Publica o pack com a versão especificada.
     /// Transiciona o estado para Published e regista a versão corrente.
+    /// Apenas packs em Draft podem ser publicados.
     /// </summary>
     /// <param name="version">Versão a publicar (máx. 50 caracteres, ex: "1.0.0").</param>
+    /// <exception cref="InvalidOperationException">Se o pack não estiver em Draft.</exception>
     public void Publish(string version)
     {
         Guard.Against.NullOrWhiteSpace(version, nameof(version));
         Guard.Against.StringTooLong(version, 50, nameof(version));
+
+        if (Status != GovernancePackStatus.Draft)
+            throw new InvalidOperationException($"Cannot publish a governance pack with status '{Status}'. Only Draft packs can be published.");
 
         Status = GovernancePackStatus.Published;
         CurrentVersion = version.Trim();
@@ -146,20 +157,29 @@ public sealed class GovernancePack : Entity<GovernancePackId>
 
     /// <summary>
     /// Deprecia o pack, sinalizando que não deve ser adotado em novos contextos.
-    /// Packs já aplicados continuam válidos até substituição ou remoção explícita.
+    /// Apenas packs Published podem ser depreciados.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Se o pack não estiver Published.</exception>
     public void Deprecate()
     {
+        if (Status != GovernancePackStatus.Published)
+            throw new InvalidOperationException($"Cannot deprecate a governance pack with status '{Status}'. Only Published packs can be deprecated.");
+
         Status = GovernancePackStatus.Deprecated;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     /// <summary>
     /// Arquiva o pack permanentemente.
+    /// Apenas packs Deprecated podem ser arquivados.
     /// Mantido apenas para histórico e auditoria — não pode ser redistribuído.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Se o pack não estiver Deprecated.</exception>
     public void Archive()
     {
+        if (Status != GovernancePackStatus.Deprecated)
+            throw new InvalidOperationException($"Cannot archive a governance pack with status '{Status}'. Only Deprecated packs can be archived.");
+
         Status = GovernancePackStatus.Archived;
         UpdatedAt = DateTimeOffset.UtcNow;
     }

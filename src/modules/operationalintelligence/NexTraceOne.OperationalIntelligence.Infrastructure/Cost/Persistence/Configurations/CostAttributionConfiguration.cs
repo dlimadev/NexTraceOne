@@ -10,7 +10,7 @@ internal sealed class CostAttributionConfiguration : IEntityTypeConfiguration<Co
 {
     public void Configure(EntityTypeBuilder<CostAttribution> builder)
     {
-        builder.ToTable("oi_cost_attributions");
+        builder.ToTable("ops_cost_attributions");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

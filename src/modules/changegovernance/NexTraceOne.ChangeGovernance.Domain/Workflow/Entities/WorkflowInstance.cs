@@ -39,6 +39,9 @@ public sealed class WorkflowInstance : AggregateRoot<WorkflowInstanceId>
     /// <summary>Data/hora UTC em que o workflow foi concluído (aprovado, rejeitado ou cancelado).</summary>
     public DateTimeOffset? CompletedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria uma nova instância de workflow vinculada a um template e a uma release.
     /// </summary>

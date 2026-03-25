@@ -10,7 +10,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("identity_users");
+        builder.ToTable("iam_users");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => UserId.From(value));
@@ -46,5 +46,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.FailedLoginAttempts).IsRequired();
         builder.Property(x => x.LastLoginAt);
         builder.Property(x => x.LockoutEnd);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

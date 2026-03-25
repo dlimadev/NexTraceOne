@@ -9,7 +9,7 @@ internal sealed class MitigationWorkflowActionLogConfiguration : IEntityTypeConf
 {
     public void Configure(EntityTypeBuilder<MitigationWorkflowActionLog> builder)
     {
-        builder.ToTable("oi_mitigation_workflow_actions");
+        builder.ToTable("ops_mitigation_workflow_actions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => MitigationWorkflowActionLogId.From(value));

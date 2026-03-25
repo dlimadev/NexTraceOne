@@ -10,7 +10,7 @@ internal sealed class GateEvaluationConfiguration : IEntityTypeConfiguration<Gat
     /// <summary>Configura o mapeamento da entidade GateEvaluation para a tabela prm_gate_evaluations.</summary>
     public void Configure(EntityTypeBuilder<GateEvaluation> builder)
     {
-        builder.ToTable("prm_gate_evaluations");
+        builder.ToTable("chg_gate_evaluations");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => GateEvaluationId.From(value));

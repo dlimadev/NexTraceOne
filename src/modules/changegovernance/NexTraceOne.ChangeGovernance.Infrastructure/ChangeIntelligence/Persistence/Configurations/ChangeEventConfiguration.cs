@@ -10,7 +10,7 @@ internal sealed class ChangeEventConfiguration : IEntityTypeConfiguration<Change
     /// <summary>Configura o mapeamento da entidade ChangeEvent para a tabela ci_change_events.</summary>
     public void Configure(EntityTypeBuilder<ChangeEvent> builder)
     {
-        builder.ToTable("ci_change_events");
+        builder.ToTable("chg_change_events");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ChangeEventId.From(value));

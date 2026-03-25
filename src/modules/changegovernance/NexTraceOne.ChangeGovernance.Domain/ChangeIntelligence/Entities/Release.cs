@@ -88,6 +88,9 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// </summary>
     public Guid? EnvironmentId { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria uma nova release a partir de um evento de deployment recebido do CI/CD.
     /// Validações de negócio mais profundas são feitas no command handler.

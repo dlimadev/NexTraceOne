@@ -16,7 +16,11 @@ internal sealed class DelegationConfiguration : IEntityTypeConfiguration<Delegat
 {
     public void Configure(EntityTypeBuilder<Delegation> builder)
     {
-        builder.ToTable("identity_delegations");
+        builder.ToTable("iam_delegations", t =>
+        {
+            t.HasCheckConstraint("CK_iam_delegations_Status",
+                "\"Status\" IN ('Active', 'Expired', 'Revoked')");
+        });
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
@@ -63,5 +67,7 @@ internal sealed class DelegationConfiguration : IEntityTypeConfiguration<Delegat
         builder.HasIndex(x => new { x.TenantId, x.Status });
         builder.HasIndex(x => x.DelegateeId);
         builder.HasIndex(x => x.GrantorId);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

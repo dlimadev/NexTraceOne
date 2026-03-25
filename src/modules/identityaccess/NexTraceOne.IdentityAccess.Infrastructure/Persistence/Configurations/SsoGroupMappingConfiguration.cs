@@ -14,7 +14,7 @@ internal sealed class SsoGroupMappingConfiguration : IEntityTypeConfiguration<Ss
 {
     public void Configure(EntityTypeBuilder<SsoGroupMapping> builder)
     {
-        builder.ToTable("identity_sso_group_mappings");
+        builder.ToTable("iam_sso_group_mappings");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

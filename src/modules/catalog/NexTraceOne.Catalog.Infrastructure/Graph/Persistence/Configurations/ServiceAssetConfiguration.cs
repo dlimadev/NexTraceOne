@@ -9,7 +9,21 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
 {
     public void Configure(EntityTypeBuilder<ServiceAsset> builder)
     {
-        builder.ToTable("eg_service_assets");
+        builder.ToTable("cat_service_assets", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_cat_service_assets_service_type",
+                "\"ServiceType\" IN ('RestApi', 'GraphqlApi', 'GrpcService', 'KafkaProducer', 'KafkaConsumer', 'BackgroundService', 'LegacySystem', 'Gateway', 'ThirdParty')");
+            t.HasCheckConstraint(
+                "CK_cat_service_assets_criticality",
+                "\"Criticality\" IN ('Critical', 'High', 'Medium', 'Low')");
+            t.HasCheckConstraint(
+                "CK_cat_service_assets_lifecycle_status",
+                "\"LifecycleStatus\" IN ('Planning', 'Development', 'Staging', 'Active', 'Deprecating', 'Deprecated', 'Retired')");
+            t.HasCheckConstraint(
+                "CK_cat_service_assets_exposure_type",
+                "\"ExposureType\" IN ('Internal', 'Partner', 'Public')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ServiceAssetId.From(value));
@@ -43,5 +57,9 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         builder.HasIndex(x => x.ServiceType);
         builder.HasIndex(x => x.Criticality);
         builder.HasIndex(x => x.LifecycleStatus);
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
     }
 }

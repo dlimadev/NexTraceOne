@@ -10,7 +10,7 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
 {
     public void Configure(EntityTypeBuilder<Session> builder)
     {
-        builder.ToTable("identity_sessions");
+        builder.ToTable("iam_sessions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => SessionId.From(value));

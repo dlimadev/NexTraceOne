@@ -8,7 +8,7 @@ internal sealed class ApiAssetConfiguration : IEntityTypeConfiguration<ApiAsset>
 {
     public void Configure(EntityTypeBuilder<ApiAsset> builder)
     {
-        builder.ToTable("eg_api_assets");
+        builder.ToTable("cat_api_assets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ApiAssetId.From(value));
@@ -34,5 +34,9 @@ internal sealed class ApiAssetConfiguration : IEntityTypeConfiguration<ApiAsset>
             .HasForeignKey("ApiAssetId")
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
     }
 }

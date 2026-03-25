@@ -14,7 +14,7 @@ internal sealed class ContractRuleViolationConfiguration : IEntityTypeConfigurat
     /// <summary>Configura o mapeamento para a tabela ct_contract_rule_violations.</summary>
     public void Configure(EntityTypeBuilder<ContractRuleViolation> builder)
     {
-        builder.ToTable("ct_contract_rule_violations");
+        builder.ToTable("ctr_contract_rule_violations");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractRuleViolationId.From(value));

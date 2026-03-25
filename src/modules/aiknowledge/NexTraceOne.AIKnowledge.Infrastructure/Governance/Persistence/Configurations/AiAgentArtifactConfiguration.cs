@@ -8,13 +8,13 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Configur
 
 /// <summary>
 /// Configuração EF Core da entidade AiAgentArtifact.
-/// Tabela: ai_gov_agent_artifacts.
+/// Tabela: aik_agent_artifacts.
 /// </summary>
 public sealed class AiAgentArtifactConfiguration : IEntityTypeConfiguration<AiAgentArtifact>
 {
     public void Configure(EntityTypeBuilder<AiAgentArtifact> builder)
     {
-        builder.ToTable("ai_gov_agent_artifacts");
+        builder.ToTable("aik_agent_artifacts");
 
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)

@@ -55,6 +55,12 @@ public sealed class Team : Entity<TeamId>
     /// <summary>Data/hora UTC da última atualização da equipa.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Construtor privado para EF Core e serialização.</summary>
     private Team() { }
 

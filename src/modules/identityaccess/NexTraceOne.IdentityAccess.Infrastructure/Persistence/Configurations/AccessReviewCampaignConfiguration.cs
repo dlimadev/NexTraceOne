@@ -14,7 +14,11 @@ internal sealed class AccessReviewCampaignConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<AccessReviewCampaign> builder)
     {
-        builder.ToTable("identity_access_review_campaigns");
+        builder.ToTable("iam_access_review_campaigns", t =>
+        {
+            t.HasCheckConstraint("CK_iam_access_review_campaigns_Status",
+                "\"Status\" IN ('Open', 'Completed')");
+        });
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
@@ -48,5 +52,7 @@ internal sealed class AccessReviewCampaignConfiguration : IEntityTypeConfigurati
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => new { x.TenantId, x.Status });
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

@@ -74,6 +74,9 @@ public sealed class BreakGlassRequest : AggregateRoot<BreakGlassRequestId>
     /// <summary>User agent de origem da solicitação.</summary>
     public string UserAgent { get; private set; } = string.Empty;
 
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Solicita acesso emergencial. O acesso é ativado imediatamente.</summary>
     public static BreakGlassRequest Create(
         UserId requestedBy,

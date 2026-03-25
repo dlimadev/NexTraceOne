@@ -10,7 +10,7 @@ internal sealed class ObservabilityProfileConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<ObservabilityProfile> builder)
     {
-        builder.ToTable("oi_observability_profiles");
+        builder.ToTable("ops_observability_profiles");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

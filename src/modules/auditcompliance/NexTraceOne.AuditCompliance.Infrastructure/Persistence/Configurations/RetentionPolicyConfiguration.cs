@@ -12,6 +12,9 @@ internal sealed class RetentionPolicyConfiguration : IEntityTypeConfiguration<Re
     {
         builder.ToTable("aud_retention_policies");
         builder.HasKey(x => x.Id);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => RetentionPolicyId.From(value));
 

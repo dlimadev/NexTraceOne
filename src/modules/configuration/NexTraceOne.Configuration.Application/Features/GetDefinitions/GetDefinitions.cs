@@ -38,7 +38,9 @@ public static class GetDefinitions
                 IsInheritable: d.IsInheritable,
                 ValidationRules: d.ValidationRules,
                 UiEditorType: d.UiEditorType,
-                SortOrder: d.SortOrder)).ToList();
+                SortOrder: d.SortOrder,
+                IsDeprecated: d.IsDeprecated,
+                DeprecatedMessage: d.DeprecatedMessage)).ToList();
 
             return dtos;
         }

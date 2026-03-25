@@ -14,7 +14,11 @@ internal sealed class IngestionExecutionConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<IngestionExecution> builder)
     {
-        builder.ToTable("gov_ingestion_executions");
+        builder.ToTable("int_ingestion_executions", t =>
+        {
+            t.HasCheckConstraint("CK_int_ingestion_executions_result",
+                "\"Result\" IN ('Running','Success','PartialSuccess','Failed','Cancelled','TimedOut')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

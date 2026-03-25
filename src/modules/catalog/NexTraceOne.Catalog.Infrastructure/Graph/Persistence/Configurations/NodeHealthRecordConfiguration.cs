@@ -13,7 +13,7 @@ internal sealed class NodeHealthRecordConfiguration : IEntityTypeConfiguration<N
 {
     public void Configure(EntityTypeBuilder<NodeHealthRecord> builder)
     {
-        builder.ToTable("node_health_records");
+        builder.ToTable("cat_node_health_records");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

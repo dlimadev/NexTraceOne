@@ -11,7 +11,7 @@ internal sealed class FreezeWindowConfiguration : IEntityTypeConfiguration<Freez
     /// <summary>Configura o mapeamento da entidade FreezeWindow para a tabela ci_freeze_windows.</summary>
     public void Configure(EntityTypeBuilder<FreezeWindow> builder)
     {
-        builder.ToTable("ci_freeze_windows");
+        builder.ToTable("chg_freeze_windows");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => FreezeWindowId.From(value));

@@ -10,7 +10,7 @@ internal sealed class ChangeIntelligenceScoreConfiguration : IEntityTypeConfigur
     /// <summary>Configura o mapeamento da entidade ChangeIntelligenceScore para a tabela ci_change_scores.</summary>
     public void Configure(EntityTypeBuilder<ChangeIntelligenceScore> builder)
     {
-        builder.ToTable("ci_change_scores");
+        builder.ToTable("chg_change_scores");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ChangeIntelligenceScoreId.From(value));
@@ -31,5 +31,8 @@ internal sealed class ChangeIntelligenceScoreConfiguration : IEntityTypeConfigur
         builder.Property(x => x.IsDeleted).IsRequired().HasDefaultValue(false);
 
         builder.HasIndex(x => x.ReleaseId);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

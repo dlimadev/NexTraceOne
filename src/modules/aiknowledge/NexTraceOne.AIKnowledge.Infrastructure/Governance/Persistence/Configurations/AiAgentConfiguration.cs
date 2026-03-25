@@ -8,13 +8,21 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Configur
 
 /// <summary>
 /// Configuração EF Core da entidade AiAgent.
-/// Tabela: ai_gov_agents.
+/// Tabela: aik_agents.
 /// </summary>
 public sealed class AiAgentConfiguration : IEntityTypeConfiguration<AiAgent>
 {
     public void Configure(EntityTypeBuilder<AiAgent> builder)
     {
-        builder.ToTable("ai_gov_agents");
+        builder.ToTable("aik_agents", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_aik_agents_Category",
+                "\"Category\" IN ('General','ServiceAnalysis','ContractGovernance','IncidentResponse','ChangeIntelligence','SecurityAudit','FinOps','CodeReview','Documentation','Testing','Compliance','ApiDesign','TestGeneration','EventDesign','DocumentationAssistance','SoapDesign')");
+            t.HasCheckConstraint(
+                "CK_aik_agents_PublicationStatus",
+                "\"PublicationStatus\" IN ('Draft','PendingReview','Active','Published','Archived','Blocked')");
+        });
 
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
@@ -66,5 +74,7 @@ public sealed class AiAgentConfiguration : IEntityTypeConfiguration<AiAgent>
         builder.HasIndex(e => e.OwnershipType);
         builder.HasIndex(e => e.OwnerId);
         builder.HasIndex(e => e.PublicationStatus);
+
+        builder.Property(e => e.RowVersion).IsRowVersion();
     }
 }

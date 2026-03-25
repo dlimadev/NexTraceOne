@@ -45,7 +45,7 @@ public sealed class WorkflowDbContext(
         => "NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Configurations";
 
     /// <inheritdoc />
-    protected override string OutboxTableName => "wf_outbox_messages";
+    protected override string OutboxTableName => "chg_wf_outbox_messages";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

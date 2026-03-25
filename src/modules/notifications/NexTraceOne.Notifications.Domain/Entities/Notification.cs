@@ -163,6 +163,9 @@ public sealed class Notification : AggregateRoot<NotificationId>
     /// <summary>Razão da supressão (para auditabilidade).</summary>
     public string? SuppressionReason { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria uma nova notificação com contexto de negócio completo.
     /// </summary>

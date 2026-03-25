@@ -55,7 +55,7 @@ public sealed class CatalogGraphDbContext(
         => "NexTraceOne.Catalog.Infrastructure.Graph";
 
     /// <inheritdoc />
-    protected override string OutboxTableName => "eg_outbox_messages";
+    protected override string OutboxTableName => "cat_outbox_messages";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

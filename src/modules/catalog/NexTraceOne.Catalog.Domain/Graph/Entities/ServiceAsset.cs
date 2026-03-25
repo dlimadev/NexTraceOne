@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Errors;
 
 namespace NexTraceOne.Catalog.Domain.Graph.Entities;
 
@@ -67,6 +68,14 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
     /// <summary>URL ou referência para o repositório de código.</summary>
     public string RepositoryUrl { get; private set; } = string.Empty;
 
+    // ── Concorrência ──────────────────────────────────────────────────
+
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     // ── Factory method ────────────────────────────────────────────────
 
     /// <summary>Cria um novo serviço no catálogo com os campos obrigatórios.</summary>
@@ -114,6 +123,39 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
         TeamName = Guard.Against.NullOrWhiteSpace(teamName);
         TechnicalOwner = technicalOwner ?? string.Empty;
         BusinessOwner = businessOwner ?? string.Empty;
+    }
+
+    // ── Lifecycle ─────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Transiciona o ciclo de vida do serviço, validando transições permitidas.
+    /// Transições válidas: Planning→Development→Staging→Active→Deprecating→Deprecated→Retired.
+    /// </summary>
+    /// <param name="target">Estado de ciclo de vida pretendido.</param>
+    /// <returns>Result indicando sucesso ou erro de transição inválida.</returns>
+    public Result<LifecycleStatus> TransitionTo(LifecycleStatus target)
+    {
+        if (target == LifecycleStatus)
+            return LifecycleStatus;
+
+        var allowed = LifecycleStatus switch
+        {
+            LifecycleStatus.Planning => target == LifecycleStatus.Development,
+            LifecycleStatus.Development => target == LifecycleStatus.Staging,
+            LifecycleStatus.Staging => target is LifecycleStatus.Active or LifecycleStatus.Development,
+            LifecycleStatus.Active => target == LifecycleStatus.Deprecating,
+            LifecycleStatus.Deprecating => target is LifecycleStatus.Deprecated or LifecycleStatus.Active,
+            LifecycleStatus.Deprecated => target == LifecycleStatus.Retired,
+            LifecycleStatus.Retired => false,
+            _ => false
+        };
+
+        if (!allowed)
+            return CatalogGraphErrors.InvalidLifecycleTransition(
+                Name, LifecycleStatus.ToString(), target.ToString());
+
+        LifecycleStatus = target;
+        return LifecycleStatus;
     }
 }
 

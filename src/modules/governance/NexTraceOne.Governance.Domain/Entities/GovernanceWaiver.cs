@@ -82,6 +82,12 @@ public sealed class GovernanceWaiver : Entity<GovernanceWaiverId>
     /// </summary>
     public IReadOnlyList<string> EvidenceLinks { get; private init; } = [];
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Construtor privado para EF Core e serialização.</summary>
     private GovernanceWaiver() { }
 
@@ -142,12 +148,17 @@ public sealed class GovernanceWaiver : Entity<GovernanceWaiverId>
 
     /// <summary>
     /// Aprova o waiver, registando o revisor e a data de aprovação.
+    /// Apenas waivers em Pending podem ser aprovados.
     /// </summary>
     /// <param name="reviewedBy">Identificador do utilizador que aprovou (máx. 200 caracteres).</param>
+    /// <exception cref="InvalidOperationException">Se o waiver não estiver Pending.</exception>
     public void Approve(string reviewedBy)
     {
         Guard.Against.NullOrWhiteSpace(reviewedBy, nameof(reviewedBy));
         Guard.Against.StringTooLong(reviewedBy, 200, nameof(reviewedBy));
+
+        if (Status != WaiverStatus.Pending)
+            throw new InvalidOperationException($"Cannot approve a waiver with status '{Status}'. Only Pending waivers can be approved.");
 
         Status = WaiverStatus.Approved;
         ReviewedBy = reviewedBy.Trim();
@@ -156,12 +167,17 @@ public sealed class GovernanceWaiver : Entity<GovernanceWaiverId>
 
     /// <summary>
     /// Rejeita o waiver, registando o revisor e a data de rejeição.
+    /// Apenas waivers em Pending podem ser rejeitados.
     /// </summary>
     /// <param name="reviewedBy">Identificador do utilizador que rejeitou (máx. 200 caracteres).</param>
+    /// <exception cref="InvalidOperationException">Se o waiver não estiver Pending.</exception>
     public void Reject(string reviewedBy)
     {
         Guard.Against.NullOrWhiteSpace(reviewedBy, nameof(reviewedBy));
         Guard.Against.StringTooLong(reviewedBy, 200, nameof(reviewedBy));
+
+        if (Status != WaiverStatus.Pending)
+            throw new InvalidOperationException($"Cannot reject a waiver with status '{Status}'. Only Pending waivers can be rejected.");
 
         Status = WaiverStatus.Rejected;
         ReviewedBy = reviewedBy.Trim();
@@ -170,12 +186,17 @@ public sealed class GovernanceWaiver : Entity<GovernanceWaiverId>
 
     /// <summary>
     /// Revoga um waiver previamente aprovado, registando o revisor e a data de revogação.
+    /// Apenas waivers Approved podem ser revogados.
     /// </summary>
     /// <param name="reviewedBy">Identificador do utilizador que revogou (máx. 200 caracteres).</param>
+    /// <exception cref="InvalidOperationException">Se o waiver não estiver Approved.</exception>
     public void Revoke(string reviewedBy)
     {
         Guard.Against.NullOrWhiteSpace(reviewedBy, nameof(reviewedBy));
         Guard.Against.StringTooLong(reviewedBy, 200, nameof(reviewedBy));
+
+        if (Status != WaiverStatus.Approved)
+            throw new InvalidOperationException($"Cannot revoke a waiver with status '{Status}'. Only Approved waivers can be revoked.");
 
         Status = WaiverStatus.Revoked;
         ReviewedBy = reviewedBy.Trim();

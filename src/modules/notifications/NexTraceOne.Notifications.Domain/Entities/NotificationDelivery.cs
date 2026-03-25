@@ -55,6 +55,9 @@ public sealed class NotificationDelivery : Entity<NotificationDeliveryId>
     /// <summary>Número de tentativas de entrega realizadas.</summary>
     public int RetryCount { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria um novo registo de entrega para um canal específico.
     /// </summary>

@@ -12,7 +12,15 @@ internal sealed class NotificationPreferenceConfiguration : IEntityTypeConfigura
 {
     public void Configure(EntityTypeBuilder<NotificationPreference> builder)
     {
-        builder.ToTable("ntf_preferences");
+        builder.ToTable("ntf_preferences", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ntf_preferences_category",
+                "\"Category\" IN ('Incident', 'Approval', 'Change', 'Contract', 'Security', 'Compliance', 'FinOps', 'AI', 'Integration', 'Platform', 'Informational')");
+            t.HasCheckConstraint(
+                "CK_ntf_preferences_channel",
+                "\"Channel\" IN ('InApp', 'Email', 'MicrosoftTeams')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new NotificationPreferenceId(value));

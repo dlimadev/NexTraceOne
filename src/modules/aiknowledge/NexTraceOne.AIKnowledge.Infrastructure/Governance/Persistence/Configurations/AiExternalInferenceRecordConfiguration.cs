@@ -9,7 +9,7 @@ internal sealed class AiExternalInferenceRecordConfiguration : IEntityTypeConfig
 {
     public void Configure(EntityTypeBuilder<AiExternalInferenceRecord> builder)
     {
-        builder.ToTable("AiExternalInferenceRecords");
+        builder.ToTable("aik_external_inference_records");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiExternalInferenceRecordId.From(value));

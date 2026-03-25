@@ -44,6 +44,9 @@ public sealed class CompliancePolicy : Entity<CompliancePolicyId>
     /// <summary>Data/hora da última atualização.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Cria uma nova política de compliance.</summary>
     public static CompliancePolicy Create(
         string name,

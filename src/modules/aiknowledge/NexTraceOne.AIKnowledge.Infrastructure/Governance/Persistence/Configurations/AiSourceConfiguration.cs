@@ -9,7 +9,7 @@ internal sealed class AiSourceConfiguration : IEntityTypeConfiguration<AiSource>
 {
     public void Configure(EntityTypeBuilder<AiSource> builder)
     {
-        builder.ToTable("AiSources");
+        builder.ToTable("aik_sources");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiSourceId.From(value));

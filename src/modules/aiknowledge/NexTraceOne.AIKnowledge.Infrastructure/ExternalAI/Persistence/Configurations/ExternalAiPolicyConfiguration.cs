@@ -9,7 +9,7 @@ internal sealed class ExternalAiPolicyConfiguration : IEntityTypeConfiguration<E
 {
     public void Configure(EntityTypeBuilder<ExternalAiPolicy> builder)
     {
-        builder.ToTable("ext_ai_policies");
+        builder.ToTable("aik_policies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ExternalAiPolicyId.From(value));

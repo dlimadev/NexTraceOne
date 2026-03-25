@@ -8,7 +8,8 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade ConfigurationAuditEntry.
-/// Define mapeamento de tabela, typed ID e índices para consultas de auditoria.
+/// Define mapeamento de tabela, typed ID, FK, índices para consultas de auditoria.
+/// A entidade é imutável — registos de auditoria nunca são atualizados após criação.
 /// </summary>
 internal sealed class ConfigurationAuditEntryConfiguration : IEntityTypeConfiguration<ConfigurationAuditEntry>
 {
@@ -57,9 +58,16 @@ internal sealed class ConfigurationAuditEntryConfiguration : IEntityTypeConfigur
         builder.Property(x => x.ChangeReason)
             .HasMaxLength(500);
 
+        // FK: ConfigurationAuditEntry → ConfigurationEntry
+        builder.HasOne<ConfigurationEntry>()
+            .WithMany()
+            .HasForeignKey(x => x.EntryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Índices para consultas de auditoria frequentes
         builder.HasIndex(x => x.Key);
         builder.HasIndex(x => x.ChangedAt);
         builder.HasIndex(x => x.EntryId);
+        builder.HasIndex(x => x.ChangedBy);
     }
 }

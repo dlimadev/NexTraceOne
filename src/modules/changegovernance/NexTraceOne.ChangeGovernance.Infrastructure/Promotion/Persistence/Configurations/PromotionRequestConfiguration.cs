@@ -7,10 +7,15 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Conf
 
 internal sealed class PromotionRequestConfiguration : IEntityTypeConfiguration<PromotionRequest>
 {
-    /// <summary>Configura o mapeamento da entidade PromotionRequest para a tabela prm_promotion_requests.</summary>
+    /// <summary>Configura o mapeamento da entidade PromotionRequest para a tabela chg_promotion_requests.</summary>
     public void Configure(EntityTypeBuilder<PromotionRequest> builder)
     {
-        builder.ToTable("prm_promotion_requests");
+        builder.ToTable("chg_promotion_requests", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_chg_promotion_requests_status",
+                "\"Status\" IN ('Pending', 'InEvaluation', 'Approved', 'Rejected', 'Blocked', 'Cancelled')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PromotionRequestId.From(value));
@@ -35,5 +40,8 @@ internal sealed class PromotionRequestConfiguration : IEntityTypeConfiguration<P
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.TargetEnvironmentId);
         builder.HasIndex(x => x.RequestedAt);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

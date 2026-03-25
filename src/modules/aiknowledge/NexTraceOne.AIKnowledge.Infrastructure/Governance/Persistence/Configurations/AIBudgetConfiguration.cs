@@ -9,7 +9,7 @@ internal sealed class AIBudgetConfiguration : IEntityTypeConfiguration<AIBudget>
 {
     public void Configure(EntityTypeBuilder<AIBudget> builder)
     {
-        builder.ToTable("ai_gov_budgets");
+        builder.ToTable("aik_budgets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIBudgetId.From(value));

@@ -9,7 +9,7 @@ internal sealed class AIIDEClientRegistrationConfiguration : IEntityTypeConfigur
 {
     public void Configure(EntityTypeBuilder<AIIDEClientRegistration> builder)
     {
-        builder.ToTable("ai_gov_ide_client_registrations");
+        builder.ToTable("aik_ide_client_registrations");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIIDEClientRegistrationId.From(value));

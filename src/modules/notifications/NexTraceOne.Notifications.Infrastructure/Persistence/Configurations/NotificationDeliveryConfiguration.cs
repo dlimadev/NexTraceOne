@@ -15,7 +15,15 @@ internal sealed class NotificationDeliveryConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<NotificationDelivery> builder)
     {
-        builder.ToTable("ntf_deliveries");
+        builder.ToTable("ntf_deliveries", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ntf_deliveries_status",
+                "\"Status\" IN ('Pending', 'Delivered', 'Failed', 'Skipped')");
+            t.HasCheckConstraint(
+                "CK_ntf_deliveries_channel",
+                "\"Channel\" IN ('InApp', 'Email', 'MicrosoftTeams')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new NotificationDeliveryId(value));
@@ -58,5 +66,14 @@ internal sealed class NotificationDeliveryConfiguration : IEntityTypeConfigurati
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Channel);
         builder.HasIndex(x => new { x.Status, x.RetryCount });
+
+        // ── FK → Notification ────────────────────────────────────────────────
+        builder.HasOne<Notification>()
+            .WithMany()
+            .HasForeignKey(x => x.NotificationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

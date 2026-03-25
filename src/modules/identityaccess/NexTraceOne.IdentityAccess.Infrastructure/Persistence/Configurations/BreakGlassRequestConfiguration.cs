@@ -14,7 +14,11 @@ internal sealed class BreakGlassRequestConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<BreakGlassRequest> builder)
     {
-        builder.ToTable("identity_break_glass_requests");
+        builder.ToTable("iam_break_glass_requests", t =>
+        {
+            t.HasCheckConstraint("CK_iam_break_glass_requests_Status",
+                "\"Status\" IN ('Active', 'Expired', 'Revoked', 'PostMortemCompleted')");
+        });
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
@@ -56,5 +60,7 @@ internal sealed class BreakGlassRequestConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(x => new { x.RequestedBy, x.Status });
         builder.HasIndex(x => x.TenantId);
         builder.HasIndex(x => x.Status);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.Json;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -11,8 +13,8 @@ namespace NexTraceOne.Configuration.Application.Features.SetConfigurationValue;
 
 /// <summary>
 /// Feature: SetConfigurationValue — creates or updates a configuration entry.
-/// Validates against the definition (allowed scopes, value type), encrypts sensitive values,
-/// creates an audit trail entry, and invalidates cache.
+/// Validates against the definition (allowed scopes, value type, editability, deprecation),
+/// encrypts sensitive values, creates an audit trail entry, and invalidates cache.
 /// </summary>
 public static class SetConfigurationValue
 {
@@ -63,6 +65,13 @@ public static class SetConfigurationValue
                     "Configuration '{0}' is not editable.",
                     request.Key);
 
+            if (definition.IsDeprecated)
+                return Error.Business(
+                    "CONFIG_DEPRECATED",
+                    "Configuration '{0}' is deprecated. {1}",
+                    request.Key,
+                    definition.DeprecatedMessage ?? "No new values should be set for this configuration.");
+
             if (!definition.AllowedScopes.Contains(request.Scope))
                 return Error.Validation(
                     "CONFIG_SCOPE_NOT_ALLOWED",
@@ -70,6 +79,15 @@ public static class SetConfigurationValue
                     request.Scope.ToString(),
                     request.Key,
                     string.Join(", ", definition.AllowedScopes));
+
+            var valueTypeError = ValidateValueType(request.Value, definition.ValueType);
+            if (valueTypeError is not null)
+                return Error.Validation(
+                    "CONFIG_VALUE_TYPE_INVALID",
+                    "Value '{0}' is not valid for type '{1}'. {2}",
+                    request.Value,
+                    definition.ValueType.ToString(),
+                    valueTypeError);
 
             var existingEntry = await entryRepository.GetByKeyAndScopeAsync(
                 request.Key,
@@ -157,6 +175,46 @@ public static class SetConfigurationValue
                 UpdatedBy: entry.UpdatedBy ?? entry.CreatedBy);
 
             return dto;
+        }
+
+        /// <summary>
+        /// Validates that the provided value is compatible with the expected ConfigurationValueType.
+        /// Returns null if valid, or an error message string if invalid.
+        /// </summary>
+        private static string? ValidateValueType(string value, ConfigurationValueType valueType)
+        {
+            return valueType switch
+            {
+                ConfigurationValueType.Boolean when
+                    !bool.TryParse(value, out _)
+                    => "Expected 'true' or 'false'.",
+
+                ConfigurationValueType.Integer when
+                    !long.TryParse(value, CultureInfo.InvariantCulture, out _)
+                    => "Expected a valid integer number.",
+
+                ConfigurationValueType.Decimal when
+                    !decimal.TryParse(value, CultureInfo.InvariantCulture, out _)
+                    => "Expected a valid decimal number.",
+
+                ConfigurationValueType.Json when !IsValidJson(value)
+                    => "Expected valid JSON.",
+
+                _ => null
+            };
+        }
+
+        private static bool IsValidJson(string value)
+        {
+            try
+            {
+                JsonDocument.Parse(value);
+                return true;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
         }
     }
 }

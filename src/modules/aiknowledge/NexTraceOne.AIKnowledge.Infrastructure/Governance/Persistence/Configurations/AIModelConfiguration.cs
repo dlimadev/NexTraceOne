@@ -9,7 +9,15 @@ internal sealed class AIModelConfiguration : IEntityTypeConfiguration<AIModel>
 {
     public void Configure(EntityTypeBuilder<AIModel> builder)
     {
-        builder.ToTable("ai_gov_models");
+        builder.ToTable("aik_models", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_aik_models_Status",
+                "\"Status\" IN ('Active','Inactive','Deprecated','Blocked')");
+            t.HasCheckConstraint(
+                "CK_aik_models_ModelType",
+                "\"ModelType\" IN ('Chat','Completion','Embedding','CodeGeneration','Analysis')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIModelId.From(value));
@@ -41,5 +49,7 @@ internal sealed class AIModelConfiguration : IEntityTypeConfiguration<AIModel>
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.ProviderId);
         builder.HasIndex(x => x.IsDefaultForChat);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

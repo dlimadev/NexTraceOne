@@ -11,7 +11,7 @@ internal sealed class ExternalMarkerConfiguration : IEntityTypeConfiguration<Ext
     /// <summary>Configura o mapeamento da entidade ExternalMarker para a tabela ci_external_markers.</summary>
     public void Configure(EntityTypeBuilder<ExternalMarker> builder)
     {
-        builder.ToTable("ci_external_markers");
+        builder.ToTable("chg_external_markers");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ExternalMarkerId.From(value));

@@ -10,7 +10,7 @@ internal sealed class ApprovalDecisionConfiguration : IEntityTypeConfiguration<A
     /// <summary>Configura o mapeamento da entidade ApprovalDecision para a tabela wf_approval_decisions.</summary>
     public void Configure(EntityTypeBuilder<ApprovalDecision> builder)
     {
-        builder.ToTable("wf_approval_decisions");
+        builder.ToTable("chg_approval_decisions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ApprovalDecisionId.From(value));

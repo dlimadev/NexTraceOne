@@ -12,7 +12,18 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
 {
     public void Configure(EntityTypeBuilder<Notification> builder)
     {
-        builder.ToTable("ntf_notifications");
+        builder.ToTable("ntf_notifications", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ntf_notifications_status",
+                "\"Status\" IN ('Unread', 'Read', 'Acknowledged', 'Archived', 'Dismissed')");
+            t.HasCheckConstraint(
+                "CK_ntf_notifications_category",
+                "\"Category\" IN ('Incident', 'Approval', 'Change', 'Contract', 'Security', 'Compliance', 'FinOps', 'AI', 'Integration', 'Platform', 'Informational')");
+            t.HasCheckConstraint(
+                "CK_ntf_notifications_severity",
+                "\"Severity\" IN ('Info', 'ActionRequired', 'Warning', 'Critical')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => new NotificationId(value));
@@ -43,5 +54,8 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.CreatedAt);
         builder.HasIndex(x => new { x.RecipientUserId, x.Status });
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

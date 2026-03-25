@@ -10,7 +10,7 @@ internal sealed class SlaPolicyConfiguration : IEntityTypeConfiguration<SlaPolic
     /// <summary>Configura o mapeamento da entidade SlaPolicy para a tabela wf_sla_policies.</summary>
     public void Configure(EntityTypeBuilder<SlaPolicy> builder)
     {
-        builder.ToTable("wf_sla_policies");
+        builder.ToTable("chg_sla_policies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => SlaPolicyId.From(value));

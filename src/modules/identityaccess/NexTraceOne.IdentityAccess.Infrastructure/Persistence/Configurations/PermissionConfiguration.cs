@@ -14,7 +14,7 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
 {
     public void Configure(EntityTypeBuilder<Permission> builder)
     {
-        builder.ToTable("identity_permissions");
+        builder.ToTable("iam_permissions");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => PermissionId.From(value));
@@ -68,10 +68,6 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             // Audit
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C070")), "audit:read", "View audit trail", "Audit"),
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C071")), "audit:export", "Export audit data", "Audit"),
-
-            // Licensing
-            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C080")), "licensing:read", "View license information", "Licensing"),
-            Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C081")), "licensing:write", "Manage licenses", "Licensing"),
 
             // Platform
             Permission.Create(PermissionId.From(new Guid("2E91A557-FADE-46DF-B248-0F5F5899C090")), "platform:settings:read", "View platform settings", "Platform"),

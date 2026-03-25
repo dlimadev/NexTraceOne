@@ -34,6 +34,9 @@ public sealed class Ruleset : AuditableEntity<RulesetId>
     /// <summary>Data/hora UTC em que o ruleset foi criado.</summary>
     public DateTimeOffset RulesetCreatedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Cria um novo ruleset com validações de domínio.
     /// </summary>

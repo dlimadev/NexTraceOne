@@ -11,7 +11,7 @@ internal sealed class RollbackAssessmentConfiguration : IEntityTypeConfiguration
     /// <summary>Configura o mapeamento da entidade RollbackAssessment para a tabela ci_rollback_assessments.</summary>
     public void Configure(EntityTypeBuilder<RollbackAssessment> builder)
     {
-        builder.ToTable("ci_rollback_assessments");
+        builder.ToTable("chg_rollback_assessments");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => RollbackAssessmentId.From(value));

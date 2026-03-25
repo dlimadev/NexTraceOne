@@ -61,6 +61,9 @@ public sealed class IngestionSource : Entity<IngestionSourceId>
     /// <summary>Data/hora UTC da última atualização.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
 
+    /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     private IngestionSource() { }
 
     /// <summary>

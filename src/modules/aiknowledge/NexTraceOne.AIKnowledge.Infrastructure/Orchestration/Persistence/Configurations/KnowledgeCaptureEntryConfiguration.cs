@@ -9,7 +9,7 @@ internal sealed class KnowledgeCaptureEntryConfiguration : IEntityTypeConfigurat
 {
     public void Configure(EntityTypeBuilder<KnowledgeCaptureEntry> builder)
     {
-        builder.ToTable("ai_orch_knowledge_entries");
+        builder.ToTable("aik_knowledge_entries");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => KnowledgeCaptureEntryId.From(value));

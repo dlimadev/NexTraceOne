@@ -90,11 +90,29 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
     /// </summary>
     public int SortOrder { get; private set; }
 
+    /// <summary>
+    /// Indica se a definição está marcada como obsoleta.
+    /// Definições obsoletas permanecem consultáveis, mas não devem ser utilizadas em novas configurações.
+    /// </summary>
+    public bool IsDeprecated { get; private set; }
+
+    /// <summary>
+    /// Mensagem explicativa sobre a descontinuação da definição (ex: alternativa recomendada).
+    /// Apenas relevante quando IsDeprecated é verdadeiro.
+    /// </summary>
+    public string? DeprecatedMessage { get; private set; }
+
     /// <summary>Data/hora UTC de criação da definição.</summary>
     public DateTimeOffset CreatedAt { get; private init; }
 
     /// <summary>Data/hora UTC da última atualização da definição.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
+
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
 
     /// <summary>Construtor privado para EF Core e serialização.</summary>
     private ConfigurationDefinition() { }
@@ -116,6 +134,8 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
     /// <param name="validationRules">Regras de validação em JSON opcional (máx. 4000 caracteres).</param>
     /// <param name="uiEditorType">Tipo de editor na UI opcional (máx. 100 caracteres).</param>
     /// <param name="sortOrder">Ordem de apresentação.</param>
+    /// <param name="isDeprecated">Indica se a definição está obsoleta.</param>
+    /// <param name="deprecatedMessage">Mensagem de descontinuação opcional (máx. 500 caracteres).</param>
     /// <returns>Nova instância válida de ConfigurationDefinition.</returns>
     public static ConfigurationDefinition Create(
         string key,
@@ -130,7 +150,9 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         bool isInheritable = true,
         string? validationRules = null,
         string? uiEditorType = null,
-        int sortOrder = 0)
+        int sortOrder = 0,
+        bool isDeprecated = false,
+        string? deprecatedMessage = null)
     {
         Guard.Against.NullOrWhiteSpace(key, nameof(key));
         Guard.Against.StringTooLong(key, 256, nameof(key));
@@ -151,6 +173,9 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         if (uiEditorType is not null)
             Guard.Against.StringTooLong(uiEditorType, 100, nameof(uiEditorType));
 
+        if (deprecatedMessage is not null)
+            Guard.Against.StringTooLong(deprecatedMessage, 500, nameof(deprecatedMessage));
+
         return new ConfigurationDefinition
         {
             Id = new ConfigurationDefinitionId(Guid.NewGuid()),
@@ -167,6 +192,8 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
             ValidationRules = validationRules?.Trim(),
             UiEditorType = uiEditorType?.Trim(),
             SortOrder = sortOrder,
+            IsDeprecated = isDeprecated,
+            DeprecatedMessage = deprecatedMessage?.Trim(),
             CreatedAt = DateTimeOffset.UtcNow
         };
     }
@@ -185,6 +212,8 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
     /// <param name="validationRules">Novas regras de validação em JSON (máx. 4000 caracteres).</param>
     /// <param name="uiEditorType">Novo tipo de editor na UI (máx. 100 caracteres).</param>
     /// <param name="sortOrder">Nova ordem de apresentação.</param>
+    /// <param name="isDeprecated">Indica se a definição está obsoleta.</param>
+    /// <param name="deprecatedMessage">Mensagem de descontinuação opcional (máx. 500 caracteres).</param>
     public void Update(
         string displayName,
         string? description,
@@ -195,7 +224,9 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         bool isInheritable,
         string? validationRules,
         string? uiEditorType,
-        int sortOrder)
+        int sortOrder,
+        bool isDeprecated = false,
+        string? deprecatedMessage = null)
     {
         Guard.Against.NullOrWhiteSpace(displayName, nameof(displayName));
         Guard.Against.StringTooLong(displayName, 200, nameof(displayName));
@@ -214,6 +245,9 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         if (uiEditorType is not null)
             Guard.Against.StringTooLong(uiEditorType, 100, nameof(uiEditorType));
 
+        if (deprecatedMessage is not null)
+            Guard.Against.StringTooLong(deprecatedMessage, 500, nameof(deprecatedMessage));
+
         DisplayName = displayName.Trim();
         Description = description?.Trim();
         AllowedScopes = allowedScopes;
@@ -224,6 +258,8 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         ValidationRules = validationRules?.Trim();
         UiEditorType = uiEditorType?.Trim();
         SortOrder = sortOrder;
+        IsDeprecated = isDeprecated;
+        DeprecatedMessage = deprecatedMessage?.Trim();
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

@@ -13,10 +13,19 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configuration
 /// </summary>
 internal sealed class ContractVersionConfiguration : IEntityTypeConfiguration<ContractVersion>
 {
-    /// <summary>Configura o mapeamento da entidade ContractVersion para a tabela ct_contract_versions.</summary>
+    /// <summary>Configura o mapeamento da entidade ContractVersion para a tabela ctr_contract_versions.</summary>
     public void Configure(EntityTypeBuilder<ContractVersion> builder)
     {
-        builder.ToTable("ct_contract_versions");
+        builder.ToTable("ctr_contract_versions", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ctr_contract_versions_protocol",
+                "protocol IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
+
+            t.HasCheckConstraint(
+                "CK_ctr_contract_versions_lifecycle_state",
+                "lifecycle_state IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractVersionId.From(value));
@@ -78,6 +87,11 @@ internal sealed class ContractVersionConfiguration : IEntityTypeConfiguration<Co
         builder.HasIndex(x => new { x.ApiAssetId, x.SemVer }).IsUnique();
         builder.HasIndex(x => x.Protocol);
         builder.HasIndex(x => x.LifecycleState);
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
         // Relacionamentos
         builder.HasMany(x => x.Diffs)
