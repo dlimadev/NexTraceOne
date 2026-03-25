@@ -18,6 +18,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
+import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { useSpectralRulesets, useToggleSpectralRuleset, useDeleteSpectralRuleset } from '../hooks';
 import { SEVERITY_COLORS } from '../shared/constants';
 import type { SpectralRuleset, SpectralRulesetOrigin } from '../types';
@@ -46,6 +47,9 @@ export function SpectralRulesetManagerPage() {
   const deleteMutation = useDeleteSpectralRuleset();
 
   const rulesets = rulesetsQuery.data?.items ?? [];
+
+  if (rulesetsQuery.isLoading) return <PageContainer><LoadingState /></PageContainer>;
+  if (rulesetsQuery.isError) return <PageContainer><ErrorState onRetry={() => rulesetsQuery.refetch()} /></PageContainer>;
 
   const handleToggle = (ruleset: SpectralRuleset) => {
     toggleMutation.mutate({ rulesetId: ruleset.id, isActive: !ruleset.isActive });

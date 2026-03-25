@@ -15,6 +15,7 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
+import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
 import { useCanonicalEntities, useCanonicalEntityUsages } from '../hooks';
 import type { CanonicalEntity, CanonicalEntityState } from '../types';
 
@@ -44,6 +45,9 @@ export function CanonicalEntityCatalogPage() {
 
   const entities = entitiesQuery.data?.items ?? [];
   const total = entitiesQuery.data?.total ?? 0;
+
+  if (entitiesQuery.isLoading) return <PageContainer><LoadingState /></PageContainer>;
+  if (entitiesQuery.isError) return <PageContainer><ErrorState onRetry={() => entitiesQuery.refetch()} /></PageContainer>;
 
   const domains = [...new Set(entities.map((e) => e.domain).filter(Boolean))];
 
