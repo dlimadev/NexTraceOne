@@ -169,10 +169,8 @@ public sealed class JwtTokenServiceTests : IDisposable
     }
 
     [Fact]
-    public void Constructor_InDevelopment_WithNoKey_UsesFallbackKey()
+    public void Constructor_WithNoKey_Throws()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -184,10 +182,10 @@ public sealed class JwtTokenServiceTests : IDisposable
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(DateTimeOffset.UtcNow);
 
-        var service = new JwtTokenService(config, dateTimeProvider);
-        var token = service.GenerateAccessToken("user", "e@t.com", "N", Guid.NewGuid(), []);
+        var act = () => new JwtTokenService(config, dateTimeProvider);
 
-        token.Should().NotBeNullOrWhiteSpace();
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*JWT signing key*");
     }
 
     [Fact]

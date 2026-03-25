@@ -144,18 +144,22 @@ public sealed class StartupValidationTests
     }
 
     [Fact]
-    public void DevAppSettings_JwtSecret_IsSetForDevelopment()
+    public void DevAppSettings_JwtSecret_IsAbsentOrPlaceholder()
     {
+        // The Development appsettings must NOT contain a real hardcoded JWT secret.
+        // The secret must be provided externally via dotnet user-secrets, environment variable,
+        // or a secrets manager. This test ensures no real key is committed to source control.
         var devConfigPath = Path.Combine(SolutionRoot, "src", "platform", "NexTraceOne.ApiHost", "appsettings.Development.json");
         var config = new ConfigurationBuilder()
             .AddJsonFile(devConfigPath)
             .Build();
 
         var jwtSecret = config["Jwt:Secret"];
-        jwtSecret.Should().NotBeNullOrEmpty(
-            "Development appsettings should provide a JWT secret for local development convenience");
-        jwtSecret!.Length.Should().BeGreaterThanOrEqualTo(32,
-            "Development JWT secret should meet the minimum length requirement for HS256");
+        jwtSecret.Should().Match(
+            s => string.IsNullOrEmpty(s) || s == "REPLACE_VIA_ENV",
+            "Development appsettings must not contain a real hardcoded JWT secret — " +
+            "configure via dotnet user-secrets (dotnet user-secrets set \"Jwt:Secret\" \"...\") " +
+            "or set the Jwt__Secret environment variable");
     }
 
     [Fact]

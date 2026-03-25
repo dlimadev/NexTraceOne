@@ -23,10 +23,8 @@ public sealed class JwtTokenService(
     private readonly string _audience = configuration["Jwt:Audience"]
         ?? configuration["Security:Jwt:Audience"]
         ?? "NexTraceOne.Clients";
-    // Segurança: a chave JWT DEVE ser configurada externamente em produção.
-    // Em Development, permite fallback para chave conhecida — apenas para conveniência local.
-    // A ausência da chave em ambientes não-Development impede a inicialização, evitando
-    // que tokens possam ser forjados usando uma chave publicamente conhecida.
+    // Segurança: a chave JWT DEVE ser configurada externamente em todos os ambientes.
+    // Configurar via variável de ambiente Jwt__Secret, dotnet user-secrets ou gestor de segredos.
     private readonly string _signingKey = ResolveSigningKey(configuration);
 
     private static string ResolveSigningKey(IConfiguration configuration)
@@ -37,15 +35,11 @@ public sealed class JwtTokenService(
         if (!string.IsNullOrWhiteSpace(key))
             return key;
 
-        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-        if (!string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException(
-                "JWT signing key is not configured. Set 'Security:Jwt:SigningKey' or 'Jwt:Secret'. " +
-                "A signing key is mandatory in non-development environments.");
-        }
-
-        return "development-signing-key-development-signing-key-1234567890";
+        throw new InvalidOperationException(
+            "JWT signing key is not configured. Set 'Jwt:Secret' via environment variable (Jwt__Secret), " +
+            "dotnet user-secrets, or a secrets manager. " +
+            "A signing key is mandatory in all environments. " +
+            "Generate a strong key with: openssl rand -base64 48");
     }
     private readonly int _accessTokenLifetimeMinutes = int.TryParse(configuration["Security:Jwt:AccessTokenLifetimeMinutes"], out var minutes)
         ? minutes

@@ -28,7 +28,10 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
 
     private readonly string _signingKey = configuration["Jwt:Secret"]
         ?? configuration["Security:Jwt:SigningKey"]
-        ?? "development-signing-key-development-signing-key-1234567890";
+        ?? throw new InvalidOperationException(
+            "JWT signing key is not configured. Set 'Jwt:Secret' via environment variable (Jwt__Secret), " +
+            "dotnet user-secrets, or a secrets manager. " +
+            "A signing key is mandatory in all environments.");
 
     private readonly int _accessTokenLifetimeMinutes = int.TryParse(
             configuration["Jwt:AccessTokenExpirationMinutes"]
