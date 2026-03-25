@@ -75,7 +75,8 @@ internal sealed class ConfigurationEntryConfiguration : IEntityTypeConfiguration
             .HasColumnType("timestamp with time zone");
 
         // Concorrência otimista via PostgreSQL xmin
-        builder.UseXminAsConcurrencyToken();
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
         // FK: ConfigurationEntry → ConfigurationDefinition
         builder.HasOne<ConfigurationDefinition>()
