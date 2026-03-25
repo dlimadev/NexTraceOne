@@ -41,6 +41,18 @@ public sealed class ContractsDbContext(
     /// <summary>Exemplos associados a drafts ou versões publicadas de contrato.</summary>
     public DbSet<ContractExample> Examples => Set<ContractExample>();
 
+    /// <summary>Rulesets Spectral para governança de linting de contratos.</summary>
+    public DbSet<SpectralRuleset> SpectralRulesets => Set<SpectralRuleset>();
+
+    /// <summary>Entidades canónicas reutilizáveis (schemas/modelos padrão).</summary>
+    public DbSet<CanonicalEntity> CanonicalEntities => Set<CanonicalEntity>();
+
+    /// <summary>Scorecards de avaliação técnica de versões de contrato.</summary>
+    public DbSet<ContractScorecard> ContractScorecards => Set<ContractScorecard>();
+
+    /// <summary>Pacotes de evidência associados a mudanças contratuais.</summary>
+    public DbSet<ContractEvidencePack> ContractEvidencePacks => Set<ContractEvidencePack>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
@@ -50,7 +62,7 @@ public sealed class ContractsDbContext(
         => "NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configurations";
 
     /// <inheritdoc />
-    protected override string OutboxTableName => "ct_outbox_messages";
+    protected override string OutboxTableName => "ctr_outbox_messages";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)

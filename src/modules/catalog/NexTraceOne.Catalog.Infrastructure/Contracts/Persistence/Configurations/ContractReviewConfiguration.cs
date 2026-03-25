@@ -15,7 +15,7 @@ internal sealed class ContractReviewConfiguration : IEntityTypeConfiguration<Con
     /// <summary>Configura o mapeamento da entidade ContractReview para a tabela ct_contract_reviews.</summary>
     public void Configure(EntityTypeBuilder<ContractReview> builder)
     {
-        builder.ToTable("ct_contract_reviews");
+        builder.ToTable("ctr_contract_reviews");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractReviewId.From(value));

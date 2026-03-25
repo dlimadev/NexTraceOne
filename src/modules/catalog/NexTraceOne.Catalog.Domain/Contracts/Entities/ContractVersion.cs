@@ -71,6 +71,12 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     /// <summary>Mensagem de depreciação para consumers.</summary>
     public string? DeprecationNotice { get; private set; }
 
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Diffs computados associados a esta versão.</summary>
     public IReadOnlyList<ContractDiff> Diffs => _diffs.AsReadOnly();
 

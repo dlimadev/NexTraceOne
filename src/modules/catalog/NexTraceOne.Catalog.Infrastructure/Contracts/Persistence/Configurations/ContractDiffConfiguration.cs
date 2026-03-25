@@ -16,7 +16,7 @@ internal sealed class ContractDiffConfiguration : IEntityTypeConfiguration<Contr
     /// <summary>Configura o mapeamento da entidade ContractDiff para a tabela ct_contract_diffs.</summary>
     public void Configure(EntityTypeBuilder<ContractDiff> builder)
     {
-        builder.ToTable("ct_contract_diffs");
+        builder.ToTable("ctr_contract_diffs");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractDiffId.From(value));

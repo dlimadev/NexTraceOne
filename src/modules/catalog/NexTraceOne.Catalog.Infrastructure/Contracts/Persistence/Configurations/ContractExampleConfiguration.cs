@@ -15,7 +15,7 @@ internal sealed class ContractExampleConfiguration : IEntityTypeConfiguration<Co
     /// <summary>Configura o mapeamento da entidade ContractExample para a tabela ct_contract_examples.</summary>
     public void Configure(EntityTypeBuilder<ContractExample> builder)
     {
-        builder.ToTable("ct_contract_examples");
+        builder.ToTable("ctr_contract_examples");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractExampleId.From(value));

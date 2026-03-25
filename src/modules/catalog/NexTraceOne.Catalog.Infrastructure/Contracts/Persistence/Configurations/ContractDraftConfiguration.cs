@@ -13,10 +13,15 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configuration
 /// </summary>
 internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<ContractDraft>
 {
-    /// <summary>Configura o mapeamento da entidade ContractDraft para a tabela ct_contract_drafts.</summary>
+    /// <summary>Configura o mapeamento da entidade ContractDraft para a tabela ctr_contract_drafts.</summary>
     public void Configure(EntityTypeBuilder<ContractDraft> builder)
     {
-        builder.ToTable("ct_contract_drafts");
+        builder.ToTable("ctr_contract_drafts", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ctr_contract_drafts_status",
+                "status IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
+        });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractDraftId.From(value));
@@ -63,6 +68,11 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         builder.HasIndex(x => x.ServiceId);
         builder.HasIndex(x => x.Author);
         builder.HasIndex(x => x.Protocol);
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+
+        // Concorrência otimista via PostgreSQL xmin
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
         // Relacionamento com exemplos
         builder.HasMany(x => x.Examples)

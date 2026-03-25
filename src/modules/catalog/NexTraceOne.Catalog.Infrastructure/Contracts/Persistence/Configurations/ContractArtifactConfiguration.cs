@@ -14,7 +14,7 @@ internal sealed class ContractArtifactConfiguration : IEntityTypeConfiguration<C
     /// <summary>Configura o mapeamento para a tabela ct_contract_artifacts.</summary>
     public void Configure(EntityTypeBuilder<ContractArtifact> builder)
     {
-        builder.ToTable("ct_contract_artifacts");
+        builder.ToTable("ctr_contract_artifacts");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ContractArtifactId.From(value));
