@@ -34,8 +34,13 @@ public static class WebApplicationExtensions
     /// Aplica migrações pendentes de todos os DbContexts de módulos registrados.
     /// Executado apenas em ambiente Development ou quando NEXTRACE_AUTO_MIGRATE=true
     /// em ambientes não-Production. Bloqueado incondicionalmente em Production.
-    /// Cada módulo possui seu próprio DbContext com migrações independentes,
-    /// garantindo isolamento entre bounded contexts.
+    ///
+    /// Architecture: All DbContexts use a single physical PostgreSQL database `nextraceone`.
+    /// Module isolation is enforced by table prefix per module (iam_, env_, cat_, etc.)
+    /// and by independent DbContext per module (or sub-domain).
+    ///
+    /// E14 Note: All legacy migrations have been removed. New baseline migrations
+    /// will be generated per module during E15. Until then, no migrations are applied.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -80,29 +85,48 @@ public static class WebApplicationExtensions
 
         try
         {
-            logger.LogInformation("Applying pending database migrations...");
+            logger.LogInformation(
+                "Applying pending database migrations (E15: new baselines will be generated per module)...");
 
+            // Wave 1 — Foundation (highest priority, all other modules depend on these)
+            await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IdentityDbContext>(migrationScope, pendingContexts);
+
+            // Wave 2 — Catalog & Contracts
             await MigrateContextAsync<CatalogGraphDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ContractsDbContext>(migrationScope, pendingContexts);
+
+            // Wave 3 — Change Governance & Operational Intelligence
             await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<RulesetGovernanceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<WorkflowDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<PromotionDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IncidentDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<RuntimeIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
+
+            // Wave 4 — Audit & Governance
+            await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
+
+            // Wave 6 — AI & Knowledge (highest complexity, lowest maturity)
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ExternalAiDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AiOrchestrationDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
-            await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
 
-            logger.LogInformation(
-                "Migrations applied successfully for: {Contexts}",
-                string.Join(", ", pendingContexts));
+            if (pendingContexts.Count > 0)
+            {
+                logger.LogInformation(
+                    "Migrations applied successfully for: {Contexts}",
+                    string.Join(", ", pendingContexts));
+            }
+            else
+            {
+                logger.LogInformation(
+                    "No pending migrations found. " +
+                    "E15 will generate new baseline migrations for all modules.");
+            }
         }
         catch (Exception ex)
         {

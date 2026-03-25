@@ -21,45 +21,30 @@ services:
       NEXTRACE_AUTO_MIGRATE: "true"
       NEXTRACE_SKIP_INTEGRITY: "true"
       # Em Development, as credentials vêm do appsettings.Development.json
-      ConnectionStrings__IdentityDatabase: >-
-        Host=postgres;Port=5432;Database=nextraceone_identity;
-        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
-      ConnectionStrings__CatalogDatabase: >-
-        Host=postgres;Port=5432;Database=nextraceone_catalog;
-        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
+      # Architecture: 1 single physical database for all modules
       ConnectionStrings__NexTraceOne: >-
-        Host=postgres;Port=5432;Database=nextraceone_operations;
+        Host=postgres;Port=5432;Database=nextraceone;
         Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
-      ConnectionStrings__AiDatabase: >-
-        Host=postgres;Port=5432;Database=nextraceone_ai;
-        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
+        Maximum Pool Size=20
       Jwt__Secret: NexTraceOne-Development-SecretKey-AtLeast32BytesLong-2024!
 
   workers:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       NEXTRACE_SKIP_INTEGRITY: "true"
-      ConnectionStrings__IdentityDatabase: >-
-        Host=postgres;Port=5432;Database=nextraceone_identity;
-        Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
       ConnectionStrings__NexTraceOne: >-
-        Host=postgres;Port=5432;Database=nextraceone_operations;
+        Host=postgres;Port=5432;Database=nextraceone;
         Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
+        Maximum Pool Size=20
 
   ingestion:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       NEXTRACE_SKIP_INTEGRITY: "true"
       ConnectionStrings__NexTraceOne: >-
-        Host=postgres;Port=5432;Database=nextraceone_operations;
+        Host=postgres;Port=5432;Database=nextraceone;
         Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
-        Maximum Pool Size=15
+        Maximum Pool Size=20
       Jwt__Secret: NexTraceOne-Development-SecretKey-AtLeast32BytesLong-2024!
 
   postgres:
