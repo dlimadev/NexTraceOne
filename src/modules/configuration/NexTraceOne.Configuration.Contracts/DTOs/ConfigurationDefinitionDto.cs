@@ -2,7 +2,7 @@ namespace NexTraceOne.Configuration.Contracts.DTOs;
 
 /// <summary>
 /// Represents the schema/definition of a configuration key,
-/// including allowed scopes, validation rules and UI metadata.
+/// including allowed scopes, validation rules, deprecation status and UI metadata.
 /// </summary>
 public sealed record ConfigurationDefinitionDto(
     string Key,
@@ -17,4 +17,6 @@ public sealed record ConfigurationDefinitionDto(
     bool IsInheritable,
     string? ValidationRules,
     string? UiEditorType,
-    int SortOrder);
+    int SortOrder,
+    bool IsDeprecated,
+    string? DeprecatedMessage);

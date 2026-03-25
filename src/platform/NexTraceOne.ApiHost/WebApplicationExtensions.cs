@@ -16,6 +16,7 @@ using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using System.Diagnostics;
@@ -97,6 +98,7 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<ExternalAiDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AiOrchestrationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
 
             logger.LogInformation(
                 "Migrations applied successfully for: {Contexts}",
@@ -109,6 +111,35 @@ public static class WebApplicationExtensions
                 "Error applying migrations for contexts: {Contexts}",
                 string.Join(", ", pendingContexts));
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Seeds mandatory configuration definitions in ALL environments.
+    /// The configuration module requires a baseline set of 345+ definitions
+    /// to function correctly. This seeder is idempotent — it only inserts
+    /// definitions that do not yet exist (checked by key).
+    /// Unlike development seed data, this runs in every environment including Production.
+    /// </summary>
+    public static async Task SeedConfigurationDefinitionsAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        try
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+            await NexTraceOne.Configuration.Infrastructure.Seed.ConfigurationDefinitionSeeder
+                .SeedDefaultDefinitionsAsync(dbContext);
+
+            logger.LogInformation("Configuration definitions seeded successfully.");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Configuration definitions seeding skipped or failed. " +
+                "This is expected if the Configuration database schema has not been created yet.");
         }
     }
 

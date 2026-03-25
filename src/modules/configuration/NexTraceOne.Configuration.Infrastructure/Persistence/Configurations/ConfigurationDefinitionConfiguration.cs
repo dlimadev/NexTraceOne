@@ -8,13 +8,22 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade ConfigurationDefinition.
-/// Define mapeamento de tabela, typed ID, enums e índices.
+/// Define mapeamento de tabela, typed ID, enums, constraints, índices e concorrência otimista.
 /// </summary>
 internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfiguration<ConfigurationDefinition>
 {
     public void Configure(EntityTypeBuilder<ConfigurationDefinition> builder)
     {
-        builder.ToTable("cfg_definitions");
+        builder.ToTable("cfg_definitions", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_cfg_definitions_category",
+                "category IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
+
+            t.HasCheckConstraint(
+                "CK_cfg_definitions_value_type",
+                "value_type IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -56,6 +65,13 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
         builder.Property(x => x.UiEditorType)
             .HasMaxLength(100);
 
+        builder.Property(x => x.IsDeprecated)
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        builder.Property(x => x.DeprecatedMessage)
+            .HasMaxLength(500);
+
         builder.Property(x => x.CreatedAt)
             .HasColumnType("timestamp with time zone")
             .IsRequired();
@@ -63,8 +79,12 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
         builder.Property(x => x.UpdatedAt)
             .HasColumnType("timestamp with time zone");
 
+        // Concorrência otimista via PostgreSQL xmin
+        builder.UseXminAsConcurrencyToken();
+
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Key).IsUnique();
         builder.HasIndex(x => x.Category);
+        builder.HasIndex(x => x.SortOrder);
     }
 }
