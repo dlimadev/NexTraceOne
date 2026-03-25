@@ -190,6 +190,7 @@ public static class RolePermissionCatalog
                 "ai:assistant:read",
                 "ai:assistant:write",
                 "integrations:read",
+                "integrations:write",
                 "licensing:read",
                 "notifications:inbox:read",
                 "notifications:inbox:write",

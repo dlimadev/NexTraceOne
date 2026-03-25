@@ -14,7 +14,15 @@ internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<In
 {
     public void Configure(EntityTypeBuilder<IngestionSource> builder)
     {
-        builder.ToTable("gov_ingestion_sources");
+        builder.ToTable("int_ingestion_sources", t =>
+        {
+            t.HasCheckConstraint("CK_int_ingestion_sources_status",
+                "\"Status\" IN ('Pending','Active','Paused','Disabled','Error')");
+            t.HasCheckConstraint("CK_int_ingestion_sources_freshness_status",
+                "\"FreshnessStatus\" IN ('Unknown','Fresh','Stale','Outdated','Expired')");
+            t.HasCheckConstraint("CK_int_ingestion_sources_trust_level",
+                "\"TrustLevel\" IN ('Unverified','Basic','Verified','Trusted','Official')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -90,5 +98,8 @@ internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<In
         builder.HasIndex(x => x.TrustLevel);
         builder.HasIndex(x => x.FreshnessStatus);
         builder.HasIndex(x => x.Status);
+
+        // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
