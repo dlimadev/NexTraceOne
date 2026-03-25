@@ -97,7 +97,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("Scope");
 
-                    b.ToTable("ai_gov_access_policies", (string)null);
+                    b.ToTable("aik_access_policies", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIBudget", b =>
@@ -166,7 +166,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("Scope");
 
-                    b.ToTable("ai_gov_budgets", (string)null);
+                    b.ToTable("aik_budgets", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIIDECapabilityPolicy", b =>
@@ -236,7 +236,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("IsActive");
 
-                    b.ToTable("ai_gov_ide_capability_policies", (string)null);
+                    b.ToTable("aik_ide_capability_policies", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIIDEClientRegistration", b =>
@@ -300,7 +300,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ai_gov_ide_client_registrations", (string)null);
+                    b.ToTable("aik_ide_client_registrations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIKnowledgeSource", b =>
@@ -360,7 +360,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("SourceType");
 
-                    b.ToTable("ai_gov_knowledge_sources", (string)null);
+                    b.ToTable("aik_knowledge_sources", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIModel", b =>
@@ -466,6 +466,12 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.Property<bool>("RequiresGpu")
                         .HasColumnType("boolean");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<int>("SensitivityLevel")
                         .HasColumnType("integer");
 
@@ -516,7 +522,12 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("Status");
 
-                    b.ToTable("ai_gov_models", (string)null);
+                    b.ToTable("aik_models", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_aik_models_ModelType", "\"ModelType\" IN ('Chat','Completion','Embedding','CodeGeneration','Analysis')");
+
+                            t.HasCheckConstraint("CK_aik_models_Status", "\"Status\" IN ('Active','Inactive','Deprecated','Blocked')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIRoutingDecision", b =>
@@ -627,7 +638,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("SelectedPath");
 
-                    b.ToTable("ai_gov_routing_decisions", (string)null);
+                    b.ToTable("aik_routing_decisions", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIRoutingStrategy", b =>
@@ -705,7 +716,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("Priority");
 
-                    b.ToTable("ai_gov_routing_strategies", (string)null);
+                    b.ToTable("aik_routing_strategies", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIUsageEntry", b =>
@@ -811,7 +822,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ai_gov_usage_entries", (string)null);
+                    b.ToTable("aik_usage_entries", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiAgent", b =>
@@ -919,6 +930,12 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -967,7 +984,12 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("ai_gov_agents", (string)null);
+                    b.ToTable("aik_agents", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_aik_agents_Category", "\"Category\" IN ('General','ServiceAnalysis','ContractGovernance','IncidentResponse','ChangeIntelligence','SecurityAudit','FinOps','CodeReview','Documentation','Testing','Compliance','ApiDesign','TestGeneration','EventDesign','DocumentationAssistance','SoapDesign')");
+
+                            t.HasCheckConstraint("CK_aik_agents_PublicationStatus", "\"PublicationStatus\" IN ('Draft','PendingReview','Active','Published','Archived','Blocked')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiAgentArtifact", b =>
@@ -1046,7 +1068,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("ReviewStatus");
 
-                    b.ToTable("ai_gov_agent_artifacts", (string)null);
+                    b.ToTable("aik_agent_artifacts", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiAgentExecution", b =>
@@ -1116,6 +1138,12 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1151,7 +1179,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("Status");
 
-                    b.ToTable("ai_gov_agent_executions", (string)null);
+                    b.ToTable("aik_agent_executions", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_aik_agent_executions_Status", "\"Status\" IN ('Pending','Running','Completed','Failed','Cancelled')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiAssistantConversation", b =>
@@ -1238,7 +1269,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("LastMessageAt");
 
-                    b.ToTable("ai_gov_conversations", (string)null);
+                    b.ToTable("aik_conversations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiExternalInferenceRecord", b =>
@@ -1326,7 +1357,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AiExternalInferenceRecords", (string)null);
+                    b.ToTable("aik_external_inference_records", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiMessage", b =>
@@ -1410,7 +1441,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("Timestamp");
 
-                    b.ToTable("ai_gov_messages", (string)null);
+                    b.ToTable("aik_messages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiProvider", b =>
@@ -1478,6 +1509,12 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.Property<DateTimeOffset>("RegisteredAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1524,7 +1561,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("AiProviders", (string)null);
+                    b.ToTable("aik_providers", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_aik_providers_HealthStatus", "\"HealthStatus\" IN ('Unknown','Healthy','Degraded','Unhealthy','Offline')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiSource", b =>
@@ -1610,7 +1650,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("SourceType");
 
-                    b.ToTable("AiSources", (string)null);
+                    b.ToTable("aik_sources", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiTokenQuotaPolicy", b =>
@@ -1701,7 +1741,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("ScopeValue");
 
-                    b.ToTable("AiTokenQuotaPolicies", (string)null);
+                    b.ToTable("aik_token_quota_policies", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiTokenUsageLedger", b =>
@@ -1803,7 +1843,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AiTokenUsageLedger", (string)null);
+                    b.ToTable("aik_token_usage_ledger", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.BuildingBlocks.Infrastructure.Outbox.OutboxMessage", b =>
@@ -1851,7 +1891,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("ai_gov_outbox_messages", (string)null);
+                    b.ToTable("aik_gov_outbox_messages", (string)null);
                 });
 #pragma warning restore 612, 618
         }

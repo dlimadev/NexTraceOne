@@ -98,11 +98,8 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
       ASPNETCORE_URLS: http://+:8080
 
-      # Connection strings (4 bancos lógicos)
-      ConnectionStrings__IdentityDatabase: ${CONNECTION_STRING_IDENTITY:?CONNECTION_STRING_IDENTITY is required}
-      ConnectionStrings__CatalogDatabase: ${CONNECTION_STRING_CATALOG:?CONNECTION_STRING_CATALOG is required}
-      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
-      ConnectionStrings__AiDatabase: ${CONNECTION_STRING_AI:?CONNECTION_STRING_AI is required}
+      # Connection string — 1 single physical database (architecture: 1 DB, isolation by prefix + DbContext)
+      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_NEXTRACEONE:?CONNECTION_STRING_NEXTRACEONE is required}
 
       # JWT
       Jwt__Secret: ${JWT_SECRET:?JWT_SECRET is required}
@@ -150,8 +147,7 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
       ASPNETCORE_URLS: http://+:8081
 
-      ConnectionStrings__IdentityDatabase: ${CONNECTION_STRING_IDENTITY:?CONNECTION_STRING_IDENTITY is required}
-      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
+      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_NEXTRACEONE:?CONNECTION_STRING_NEXTRACEONE is required}
 
       OpenTelemetry__Endpoint: http://otel-collector:4317
       Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
@@ -185,7 +181,7 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Staging}
       ASPNETCORE_URLS: http://+:8082
 
-      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_OPERATIONS:?CONNECTION_STRING_OPERATIONS is required}
+      ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_NEXTRACEONE:?CONNECTION_STRING_NEXTRACEONE is required}
 
       Jwt__Secret: ${JWT_SECRET:?JWT_SECRET is required}
       Jwt__Issuer: ${JWT_ISSUER:-NexTraceOne}

@@ -65,6 +65,9 @@ public sealed class Session : AggregateRoot<SessionId>
 
     /// <summary>Indica se a sessão está ativa na data informada.</summary>
     public bool IsActive(DateTimeOffset now) => !IsExpired(now) && RevokedAt is null;
+
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
 }
 
 /// <summary>Identificador fortemente tipado de Session.</summary>

@@ -30,6 +30,9 @@ public sealed class NotificationsDbContext(
         => typeof(NotificationsDbContext).Assembly;
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "ntf_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }

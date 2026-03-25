@@ -46,6 +46,7 @@ public static class CreateUser
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         ITenantMembershipRepository membershipRepository,
+        ISecurityEventRepository securityEventRepository,
         IDateTimeProvider dateTimeProvider,
         IPasswordHasher passwordHasher) : ICommandHandler<Command, Guid>
     {
@@ -82,6 +83,18 @@ public static class CreateUser
                 user.Id,
                 TenantId.From(request.TenantId),
                 role.Id,
+                dateTimeProvider.UtcNow));
+
+            securityEventRepository.Add(SecurityEvent.Create(
+                TenantId.From(request.TenantId),
+                user.Id,
+                sessionId: null,
+                SecurityEventType.UserCreated,
+                $"User '{email.Value}' created with role '{role.Name}' in tenant '{request.TenantId}'.",
+                riskScore: 10,
+                ipAddress: null,
+                userAgent: null,
+                $"{{\"roleId\":\"{request.RoleId}\",\"roleName\":\"{role.Name}\"}}",
                 dateTimeProvider.UtcNow));
 
             return user.Id.Value;

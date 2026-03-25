@@ -1786,14 +1786,12 @@
       "defaultLimit": "Default Limit"
     },
     "generateKey": {
-      "title": "Generate License Key",
-      "licenseId": "License ID",
-      "licenseIdPlaceholder": "Enter license UUID",
+      "title": "Generate Key",
       "generate": "Generate Key",
       "newKey": "Generated Key",
       "copyKey": "Copy Key",
       "keyCopied": "Key copied to clipboard.",
-      "generateSuccess": "License key generated successfully.",
+      "generateSuccess": "Key generated successfully.",
       "generateFailed": "Failed to generate key."
     },
     "commercialModels": {
@@ -3356,7 +3354,7 @@
     "guidanceOperations": "Operations centralizes incident management, runbooks, and team-owned service reliability metrics.",
     "guidanceAiHub": "AI Hub provides governed AI assistance, model management, policies, and IDE integrations for your team.",
     "guidanceGovernance": "Governance delivers executive reporting, risk analysis, compliance tracking, and enterprise controls.",
-    "guidanceAdmin": "Administration covers user management, access controls, licensing, and audit trails.",
+    "guidanceAdmin": "Administration covers user management, access controls, environments, and audit trails.",
     "guidanceKnowledge": "Source of Truth is your central reference for all services, contracts, and operational knowledge.",
     "quickstart": {
       "Engineer": {

@@ -93,7 +93,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migratio
 
                     b.HasIndex("Status");
 
-                    b.ToTable("ext_ai_consultations", (string)null);
+                    b.ToTable("aik_consultations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities.ExternalAiPolicy", b =>
@@ -152,7 +152,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migratio
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ext_ai_policies", (string)null);
+                    b.ToTable("aik_policies", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities.ExternalAiProvider", b =>
@@ -216,7 +216,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migratio
 
                     b.HasIndex("Priority");
 
-                    b.ToTable("ext_ai_providers", (string)null);
+                    b.ToTable("aik_ext_providers", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities.KnowledgeCapture", b =>
@@ -296,7 +296,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migratio
 
                     b.HasIndex("Status");
 
-                    b.ToTable("ext_ai_knowledge_captures", (string)null);
+                    b.ToTable("aik_knowledge_captures", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.BuildingBlocks.Infrastructure.Outbox.OutboxMessage", b =>
@@ -344,7 +344,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migratio
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("ext_ai_outbox_messages", (string)null);
+                    b.ToTable("aik_ext_outbox_messages", (string)null);
                 });
 #pragma warning restore 612, 618
         }

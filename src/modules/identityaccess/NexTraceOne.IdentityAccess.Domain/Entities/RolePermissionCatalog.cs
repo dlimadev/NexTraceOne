@@ -35,6 +35,9 @@ public static class RolePermissionCatalog
                 "identity:sessions:read",
                 "identity:sessions:revoke",
                 "identity:permissions:read",
+                "identity:jit-access:decide",
+                "identity:break-glass:decide",
+                "identity:delegations:manage",
 
                 // Catalog
                 "catalog:assets:read",
@@ -141,6 +144,9 @@ public static class RolePermissionCatalog
                 "identity:users:read",
                 "identity:roles:read",
                 "identity:sessions:read",
+                "identity:jit-access:decide",
+                "identity:break-glass:decide",
+                "identity:delegations:manage",
                 "catalog:assets:read",
                 "catalog:assets:write",
                 "contracts:read",
@@ -257,6 +263,7 @@ public static class RolePermissionCatalog
                 "identity:roles:read",
                 "identity:sessions:read",
                 "identity:sessions:revoke",
+                "identity:break-glass:decide",
                 "catalog:assets:read",
                 "contracts:read",
                 "developer-portal:read",

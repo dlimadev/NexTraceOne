@@ -19,7 +19,7 @@ public sealed class RolePermissionCatalogTests
         permissions.Should().NotBeEmpty();
         permissions.Should().Contain("identity:users:write");
         permissions.Should().Contain("platform:settings:write");
-        permissions.Should().Contain("licensing:write");
+        permissions.Should().Contain("identity:jit-access:decide");
         permissions.Should().Contain("audit:trail:read");
     }
 

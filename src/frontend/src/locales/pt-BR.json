@@ -1087,14 +1087,12 @@
       "defaultLimit": "Limite Padrão"
     },
     "generateKey": {
-      "title": "Gerar Chave de Licença",
-      "licenseId": "ID da Licença",
-      "licenseIdPlaceholder": "Insira o UUID da licença",
+      "title": "Gerar Chave",
       "generate": "Gerar Chave",
       "newKey": "Chave Gerada",
       "copyKey": "Copiar Chave",
       "keyCopied": "Chave copiada para a área de transferência.",
-      "generateSuccess": "Chave de licença gerada com sucesso.",
+      "generateSuccess": "Chave gerada com sucesso.",
       "generateFailed": "Falha ao gerar chave."
     },
     "commercialModels": {

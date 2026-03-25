@@ -2,6 +2,7 @@ using MediatR;
 
 using Microsoft.AspNetCore.Builder;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -77,21 +78,23 @@ internal static class UserEndpoints
 
         group.MapPut("/users/{userId:guid}/deactivate", async (
             Guid userId,
+            ICurrentTenant currentTenant,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new DeactivateUserFeature.Command(userId), cancellationToken);
+            var result = await sender.Send(new DeactivateUserFeature.Command(userId, currentTenant.Id), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:users:write");
 
         group.MapPut("/users/{userId:guid}/activate", async (
             Guid userId,
+            ICurrentTenant currentTenant,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new ActivateUserFeature.Command(userId), cancellationToken);
+            var result = await sender.Send(new ActivateUserFeature.Command(userId, currentTenant.Id), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:users:write");
 

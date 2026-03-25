@@ -20,11 +20,13 @@ public sealed class CreateUserTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
+        var securityEventRepository = Substitute.For<ISecurityEventRepository>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var sut = new CreateUserFeature.Handler(
             userRepository,
             roleRepository,
             membershipRepository,
+            securityEventRepository,
             new TestDateTimeProvider(now),
             passwordHasher);
 
@@ -39,6 +41,7 @@ public sealed class CreateUserTests
         result.IsSuccess.Should().BeTrue();
         userRepository.Received(1).Add(Arg.Any<User>());
         membershipRepository.Received(1).Add(Arg.Any<TenantMembership>());
+        securityEventRepository.Received(1).Add(Arg.Any<SecurityEvent>());
     }
 
     [Fact]
@@ -49,6 +52,7 @@ public sealed class CreateUserTests
             userRepository,
             Substitute.For<IRoleRepository>(),
             Substitute.For<ITenantMembershipRepository>(),
+            Substitute.For<ISecurityEventRepository>(),
             new TestDateTimeProvider(DateTimeOffset.UtcNow),
             Substitute.For<IPasswordHasher>());
 

@@ -49,7 +49,7 @@ internal static class JitAccessEndpoints
                 new DecideJitAccessFeature.Command(requestId, body.Approve, body.RejectionReason),
                 cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:sessions:revoke");
+        }).RequirePermission("identity:jit-access:decide");
 
         jitGroup.MapGet("/pending", async (
             ISender sender,

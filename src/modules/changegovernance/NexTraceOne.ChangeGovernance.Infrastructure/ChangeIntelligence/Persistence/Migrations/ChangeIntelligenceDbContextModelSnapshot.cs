@@ -67,7 +67,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("ci_outbox_messages", (string)null);
+                    b.ToTable("chg_outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.BlastRadiusReport", b =>
@@ -101,6 +101,12 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<int>("TotalAffectedConsumers")
                         .HasColumnType("integer");
 
@@ -120,7 +126,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ci_blast_radius_reports", (string)null);
+                    b.ToTable("chg_blast_radius_reports", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeEvent", b =>
@@ -174,7 +180,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ci_change_events", (string)null);
+                    b.ToTable("chg_change_events", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeIntelligenceScore", b =>
@@ -213,6 +219,12 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<decimal>("Score")
                         .HasPrecision(5, 4)
                         .HasColumnType("numeric(5,4)");
@@ -229,7 +241,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ci_change_scores", (string)null);
+                    b.ToTable("chg_change_scores", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ExternalMarker", b =>
@@ -289,7 +301,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ci_external_markers", (string)null);
+                    b.ToTable("chg_external_markers", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.FreezeWindow", b =>
@@ -339,7 +351,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("StartsAt", "EndsAt", "IsActive");
 
-                    b.ToTable("ci_freeze_windows", (string)null);
+                    b.ToTable("chg_freeze_windows", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ObservationWindow", b =>
@@ -419,7 +431,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ReleaseId", "Phase")
                         .IsUnique();
 
-                    b.ToTable("ci_observation_windows", (string)null);
+                    b.ToTable("chg_observation_windows", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.PostReleaseReview", b =>
@@ -465,7 +477,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ReleaseId")
                         .IsUnique();
 
-                    b.ToTable("ci_post_release_reviews", (string)null);
+                    b.ToTable("chg_post_release_reviews", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.Release", b =>
@@ -522,6 +534,12 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.Property<Guid?>("RolledBackFromReleaseId")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -556,12 +574,19 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ApiAssetId");
 
                     b.HasIndex("TenantId")
-                        .HasDatabaseName("ix_ci_releases_tenant_id");
+                        .HasDatabaseName("ix_chg_releases_tenant_id");
 
                     b.HasIndex("TenantId", "EnvironmentId")
-                        .HasDatabaseName("ix_ci_releases_tenant_environment");
+                        .HasDatabaseName("ix_chg_releases_tenant_environment");
 
-                    b.ToTable("ci_releases", (string)null);
+                    b.ToTable("chg_releases", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_chg_releases_change_level", "\"ChangeLevel\" >= 0 AND \"ChangeLevel\" <= 4");
+
+                            t.HasCheckConstraint("CK_chg_releases_change_score", "\"ChangeScore\" >= 0.0 AND \"ChangeScore\" <= 1.0");
+
+                            t.HasCheckConstraint("CK_chg_releases_status", "\"Status\" >= 0 AND \"Status\" <= 4");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ReleaseBaseline", b =>
@@ -631,7 +656,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ReleaseId")
                         .IsUnique();
 
-                    b.ToTable("ci_release_baselines", (string)null);
+                    b.ToTable("chg_release_baselines", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.RollbackAssessment", b =>
@@ -700,7 +725,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ReleaseId")
                         .IsUnique();
 
-                    b.ToTable("ci_rollback_assessments", (string)null);
+                    b.ToTable("chg_rollback_assessments", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,236 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "aik_consultations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProviderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Context = table.Column<string>(type: "character varying(10000)", maxLength: 10000, nullable: false),
+                    Query = table.Column<string>(type: "character varying(10000)", maxLength: 10000, nullable: false),
+                    Response = table.Column<string>(type: "character varying(50000)", maxLength: 50000, nullable: true),
+                    TokensUsed = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    RequestedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    RequestedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CompletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Confidence = table.Column<decimal>(type: "numeric(5,4)", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_aik_consultations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "aik_ext_outbox_messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventType = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Payload = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ProcessedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    RetryCount = table.Column<int>(type: "integer", nullable: false),
+                    LastError = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IdempotencyKey = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_aik_ext_outbox_messages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "aik_ext_providers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Endpoint = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    ModelName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    MaxTokensPerRequest = table.Column<int>(type: "integer", nullable: false),
+                    CostPerToken = table.Column<decimal>(type: "numeric(18,8)", nullable: false),
+                    Priority = table.Column<int>(type: "integer", nullable: false),
+                    RegisteredAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_aik_ext_providers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "aik_knowledge_captures",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConsultationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Content = table.Column<string>(type: "character varying(50000)", maxLength: 50000, nullable: false),
+                    Category = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Tags = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ReviewedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    ReviewedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    RejectionReason = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    ReuseCount = table.Column<int>(type: "integer", nullable: false),
+                    CapturedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_aik_knowledge_captures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "aik_policies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    MaxDailyQueries = table.Column<int>(type: "integer", nullable: false),
+                    MaxTokensPerDay = table.Column<long>(type: "bigint", nullable: false),
+                    RequiresApproval = table.Column<bool>(type: "boolean", nullable: false),
+                    AllowedContexts = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_aik_policies", x => x.Id);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_consultations_ProviderId",
+                table: "aik_consultations",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_consultations_RequestedAt",
+                table: "aik_consultations",
+                column: "RequestedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_consultations_RequestedBy",
+                table: "aik_consultations",
+                column: "RequestedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_consultations_Status",
+                table: "aik_consultations",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_ext_outbox_messages_CreatedAt",
+                table: "aik_ext_outbox_messages",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_ext_outbox_messages_IdempotencyKey",
+                table: "aik_ext_outbox_messages",
+                column: "IdempotencyKey",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_ext_outbox_messages_ProcessedAt",
+                table: "aik_ext_outbox_messages",
+                column: "ProcessedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_ext_providers_IsActive",
+                table: "aik_ext_providers",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_ext_providers_Name",
+                table: "aik_ext_providers",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_ext_providers_Priority",
+                table: "aik_ext_providers",
+                column: "Priority");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_knowledge_captures_CapturedAt",
+                table: "aik_knowledge_captures",
+                column: "CapturedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_knowledge_captures_Category",
+                table: "aik_knowledge_captures",
+                column: "Category");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_knowledge_captures_ConsultationId",
+                table: "aik_knowledge_captures",
+                column: "ConsultationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_knowledge_captures_Status",
+                table: "aik_knowledge_captures",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_policies_IsActive",
+                table: "aik_policies",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_aik_policies_Name",
+                table: "aik_policies",
+                column: "Name",
+                unique: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "aik_consultations");
+
+            migrationBuilder.DropTable(
+                name: "aik_ext_outbox_messages");
+
+            migrationBuilder.DropTable(
+                name: "aik_ext_providers");
+
+            migrationBuilder.DropTable(
+                name: "aik_knowledge_captures");
+
+            migrationBuilder.DropTable(
+                name: "aik_policies");
+        }
+    }
+}

@@ -75,6 +75,9 @@ public sealed class ExternalIdentity : Entity<ExternalIdentityId>
         ExternalEmail = email;
         LastSyncAt = now;
     }
+
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
 }
 
 /// <summary>Identificador fortemente tipado de ExternalIdentity.</summary>

@@ -47,6 +47,7 @@ internal sealed class AccessReviewItemConfiguration : IEntityTypeConfiguration<A
 
         builder.Property(x => x.ReviewerComment).HasMaxLength(1000);
         builder.Property(x => x.DecidedAt);
+        builder.Property(x => x.RowVersion).IsRowVersion();
 
         builder.HasIndex(x => x.CampaignId);
         builder.HasIndex(x => x.ReviewerId);

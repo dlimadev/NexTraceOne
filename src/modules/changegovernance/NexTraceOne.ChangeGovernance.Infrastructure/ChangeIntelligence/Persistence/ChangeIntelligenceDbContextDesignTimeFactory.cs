@@ -16,7 +16,7 @@ internal sealed class ChangeIntelligenceDbContextDesignTimeFactory : IDesignTime
     {
         var optionsBuilder = new DbContextOptionsBuilder<ChangeIntelligenceDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone_operations;Username=nextraceone;Password=";
+            ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(ChangeIntelligenceDbContext).Assembly.FullName));

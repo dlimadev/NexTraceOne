@@ -24,6 +24,7 @@ internal sealed class TenantMembershipConfiguration : IEntityTypeConfiguration<T
             .IsRequired();
         builder.Property(x => x.JoinedAt).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
+        builder.Property(x => x.RowVersion).IsRowVersion();
         builder.HasIndex(x => new { x.UserId, x.TenantId }).IsUnique();
         builder.HasIndex(x => x.TenantId);
     }

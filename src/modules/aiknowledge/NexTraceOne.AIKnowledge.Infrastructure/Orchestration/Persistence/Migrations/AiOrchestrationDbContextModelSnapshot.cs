@@ -75,7 +75,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migra
 
                     b.HasIndex("ServiceName");
 
-                    b.ToTable("ai_orch_contexts", (string)null);
+                    b.ToTable("aik_contexts", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Orchestration.Entities.AiConversation", b =>
@@ -146,7 +146,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migra
 
                     b.HasIndex("Status");
 
-                    b.ToTable("ai_orch_conversations", (string)null);
+                    b.ToTable("aik_orch_conversations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Orchestration.Entities.GeneratedTestArtifact", b =>
@@ -216,7 +216,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migra
 
                     b.HasIndex("Status");
 
-                    b.ToTable("ai_orch_test_artifacts", (string)null);
+                    b.ToTable("aik_test_artifacts", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Orchestration.Entities.KnowledgeCaptureEntry", b =>
@@ -285,7 +285,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migra
 
                     b.HasIndex("SuggestedAt");
 
-                    b.ToTable("ai_orch_knowledge_entries", (string)null);
+                    b.ToTable("aik_knowledge_entries", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.BuildingBlocks.Infrastructure.Outbox.OutboxMessage", b =>
@@ -333,7 +333,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migra
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("ai_orch_outbox_messages", (string)null);
+                    b.ToTable("aik_orch_outbox_messages", (string)null);
                 });
 #pragma warning restore 612, 618
         }

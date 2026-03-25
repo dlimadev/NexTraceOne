@@ -67,7 +67,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("identity_outbox_messages", (string)null);
+                    b.ToTable("iam_outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", b =>
@@ -92,6 +92,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -104,7 +110,10 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "Status");
 
-                    b.ToTable("identity_access_review_campaigns", (string)null);
+                    b.ToTable("iam_access_review_campaigns", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_iam_access_review_campaigns_Status", "\"Status\" IN ('Open', 'Completed')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewItem", b =>
@@ -138,6 +147,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -149,7 +164,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("identity_access_review_items", (string)null);
+                    b.ToTable("iam_access_review_items", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.BreakGlassRequest", b =>
@@ -192,6 +207,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("RevokedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -213,7 +234,10 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("RequestedBy", "Status");
 
-                    b.ToTable("identity_break_glass_requests", (string)null);
+                    b.ToTable("iam_break_glass_requests", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_iam_break_glass_requests_Status", "\"Status\" IN ('Active', 'Expired', 'Revoked', 'PostMortemCompleted')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Delegation", b =>
@@ -245,6 +269,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("RevokedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -267,7 +297,10 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "Status");
 
-                    b.ToTable("identity_delegations", (string)null);
+                    b.ToTable("iam_delegations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_iam_delegations_Status", "\"Status\" IN ('Active', 'Expired', 'Revoked')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Environment", b =>
@@ -282,6 +315,10 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<int>("Criticality")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -294,6 +331,11 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsPrimaryProduction")
                         .ValueGeneratedOnAdd()
@@ -319,6 +361,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -330,18 +378,46 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_env_environments_not_deleted")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TenantId", "Criticality")
+                        .HasDatabaseName("IX_env_environments_tenant_criticality");
+
+                    b.HasIndex("TenantId", "IsActive")
+                        .HasDatabaseName("IX_env_environments_tenant_active")
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("TenantId", "IsPrimaryProduction")
                         .IsUnique()
-                        .HasDatabaseName("IX_identity_environments_tenant_primary_production_unique")
-                        .HasFilter("\"IsPrimaryProduction\" = true AND \"IsActive\" = true");
+                        .HasDatabaseName("IX_env_environments_tenant_primary_production_unique")
+                        .HasFilter("\"IsPrimaryProduction\" = true AND \"IsActive\" = true AND \"IsDeleted\" = false");
+
+                    b.HasIndex("TenantId", "Profile")
+                        .HasDatabaseName("IX_env_environments_tenant_profile");
 
                     b.HasIndex("TenantId", "Slug")
                         .IsUnique()
-                        .HasDatabaseName("IX_identity_environments_tenant_slug");
+                        .HasDatabaseName("IX_env_environments_tenant_slug");
 
-                    b.ToTable("identity_environments", (string)null);
+                    b.ToTable("env_environments", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_env_environments_criticality", "\"Criticality\" BETWEEN 1 AND 4");
+
+                            t.HasCheckConstraint("CK_env_environments_profile", "\"Profile\" BETWEEN 1 AND 9");
+
+                            t.HasCheckConstraint("CK_env_environments_sort_order", "\"SortOrder\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.EnvironmentAccess", b =>
@@ -374,6 +450,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
@@ -382,13 +464,27 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EnvironmentId")
+                        .HasDatabaseName("IX_env_environment_accesses_env_id");
+
                     b.HasIndex("IsActive", "ExpiresAt")
-                        .HasDatabaseName("IX_identity_environment_accesses_active_expires");
+                        .HasDatabaseName("IX_env_environment_accesses_active_expires");
+
+                    b.HasIndex("UserId", "IsActive")
+                        .HasDatabaseName("IX_env_environment_accesses_user_active");
+
+                    b.HasIndex("UserId", "EnvironmentId", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_env_environment_accesses_unique_active")
+                        .HasFilter("\"IsActive\" = true");
 
                     b.HasIndex("UserId", "TenantId", "EnvironmentId")
-                        .HasDatabaseName("IX_identity_environment_accesses_user_tenant_env");
+                        .HasDatabaseName("IX_env_environment_accesses_user_tenant_env");
 
-                    b.ToTable("identity_environment_accesses", (string)null);
+                    b.ToTable("env_environment_accesses", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_env_environment_accesses_access_level", "\"AccessLevel\" IN ('read', 'write', 'admin', 'none')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.ExternalIdentity", b =>
@@ -419,6 +515,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -429,7 +531,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasIndex("Provider", "ExternalUserId")
                         .IsUnique();
 
-                    b.ToTable("identity_external_identities", (string)null);
+                    b.ToTable("iam_external_identities", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.JitAccessRequest", b =>
@@ -478,6 +580,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("RevokedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Scope")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -499,7 +607,10 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "Status");
 
-                    b.ToTable("identity_jit_access_requests", (string)null);
+                    b.ToTable("iam_jit_access_requests", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_iam_jit_access_requests_Status", "\"Status\" IN ('Pending', 'Approved', 'Rejected', 'Expired', 'Revoked')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Permission", b =>
@@ -527,7 +638,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("identity_permissions", (string)null);
+                    b.ToTable("iam_permissions", (string)null);
 
                     b.HasData(
                         new
@@ -578,6 +689,27 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                             Code = "identity:permissions:read",
                             Module = "Identity",
                             Name = "View available permissions"
+                        },
+                        new
+                        {
+                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c008"),
+                            Code = "identity:jit-access:decide",
+                            Module = "Identity",
+                            Name = "Approve or reject JIT access requests"
+                        },
+                        new
+                        {
+                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c009"),
+                            Code = "identity:break-glass:decide",
+                            Module = "Identity",
+                            Name = "Approve, revoke or audit break glass requests"
+                        },
+                        new
+                        {
+                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c00a"),
+                            Code = "identity:delegations:manage",
+                            Module = "Identity",
+                            Name = "Create and revoke delegations"
                         },
                         new
                         {
@@ -721,20 +853,6 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c080"),
-                            Code = "licensing:read",
-                            Module = "Licensing",
-                            Name = "View license information"
-                        },
-                        new
-                        {
-                            Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c081"),
-                            Code = "licensing:write",
-                            Module = "Licensing",
-                            Name = "Manage licenses"
-                        },
-                        new
-                        {
                             Id = new Guid("2e91a557-fade-46df-b248-0f5f5899c090"),
                             Code = "platform:settings:read",
                             Module = "Platform",
@@ -772,7 +890,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("identity_roles", (string)null);
+                    b.ToTable("iam_roles", (string)null);
 
                     b.HasData(
                         new
@@ -888,7 +1006,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "OccurredAt");
 
-                    b.ToTable("identity_security_events", (string)null);
+                    b.ToTable("iam_security_events", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Session", b =>
@@ -912,6 +1030,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("RevokedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("UserAgent")
                         .IsRequired()
                         .HasMaxLength(512)
@@ -927,7 +1051,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("identity_sessions", (string)null);
+                    b.ToTable("iam_sessions", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.SsoGroupMapping", b =>
@@ -969,7 +1093,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "Provider", "ExternalGroupId")
                         .IsUnique();
 
-                    b.ToTable("identity_sso_group_mappings", (string)null);
+                    b.ToTable("iam_sso_group_mappings", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Tenant", b =>
@@ -988,6 +1112,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -1000,9 +1130,9 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Slug")
                         .IsUnique()
-                        .HasDatabaseName("IX_identity_tenants_slug");
+                        .HasDatabaseName("IX_iam_tenants_slug");
 
-                    b.ToTable("identity_tenants", (string)null);
+                    b.ToTable("iam_tenants", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.TenantMembership", b =>
@@ -1019,6 +1149,12 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
@@ -1032,7 +1168,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId", "TenantId")
                         .IsUnique();
 
-                    b.ToTable("identity_tenant_memberships", (string)null);
+                    b.ToTable("iam_tenant_memberships", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.User", b =>
@@ -1065,16 +1201,33 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("MfaEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MfaMethod")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("MfaSecret")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("identity_users", (string)null);
+                    b.ToTable("iam_users", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewItem", b =>
@@ -1082,6 +1235,15 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.HasOne("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", null)
                         .WithMany("Items")
                         .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.EnvironmentAccess", b =>
+                {
+                    b.HasOne("NexTraceOne.IdentityAccess.Domain.Entities.Environment", null)
+                        .WithMany()
+                        .HasForeignKey("EnvironmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1107,7 +1269,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("identity_users", (string)null);
+                            b1.ToTable("iam_users");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");

@@ -67,7 +67,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("wf_outbox_messages", (string)null);
+                    b.ToTable("chg_wf_outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.ApprovalDecision", b =>
@@ -125,7 +125,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.HasIndex("WorkflowStageId");
 
-                    b.ToTable("wf_approval_decisions", (string)null);
+                    b.ToTable("chg_approval_decisions", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.EvidencePack", b =>
@@ -176,7 +176,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.HasIndex("WorkflowInstanceId")
                         .IsUnique();
 
-                    b.ToTable("wf_evidence_packs", (string)null);
+                    b.ToTable("chg_evidence_packs", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.SlaPolicy", b =>
@@ -230,7 +230,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.HasIndex("WorkflowTemplateId", "StageName")
                         .IsUnique();
 
-                    b.ToTable("wf_sla_policies", (string)null);
+                    b.ToTable("chg_sla_policies", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.WorkflowInstance", b =>
@@ -246,6 +246,12 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -271,7 +277,10 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.HasIndex("WorkflowTemplateId");
 
-                    b.ToTable("wf_workflow_instances", (string)null);
+                    b.ToTable("chg_workflow_instances", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_chg_workflow_instances_status", "\"Status\" IN ('Draft', 'Pending', 'InReview', 'Approved', 'Rejected', 'Cancelled')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.WorkflowStage", b =>
@@ -341,7 +350,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.HasIndex("WorkflowInstanceId", "StageOrder")
                         .IsUnique();
 
-                    b.ToTable("wf_workflow_stages", (string)null);
+                    b.ToTable("chg_workflow_stages", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Workflow.Entities.WorkflowTemplate", b =>
@@ -391,7 +400,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.HasIndex("IsActive");
 
-                    b.ToTable("wf_workflow_templates", (string)null);
+                    b.ToTable("chg_workflow_templates", (string)null);
                 });
 #pragma warning restore 612, 618
         }

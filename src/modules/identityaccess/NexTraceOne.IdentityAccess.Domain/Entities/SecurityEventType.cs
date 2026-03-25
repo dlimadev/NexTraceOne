@@ -60,6 +60,18 @@ public static class SecurityEventType
     // ── Gestão de Identidade ─────────────────────────────────────────────
 
     /// <summary>
+    /// Novo usuário criado na plataforma dentro de um tenant.
+    /// Evento crítico para trilha de auditoria de conformidade (SOX, LGPD, ISO 27001).
+    /// </summary>
+    public const string UserCreated = "security.identity.user_created";
+
+    /// <summary>Usuário desativado por um administrador, impedindo novos logins.</summary>
+    public const string UserDeactivated = "security.identity.user_deactivated";
+
+    /// <summary>Usuário reativado por um administrador.</summary>
+    public const string UserActivated = "security.identity.user_activated";
+
+    /// <summary>
     /// Papel/perfil atribuído ou alterado para um usuário em um tenant.
     /// Evento crítico para trilha de auditoria de conformidade (SOX, LGPD, ISO 27001).
     /// </summary>

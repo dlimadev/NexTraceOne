@@ -47,6 +47,10 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.LastLoginAt);
         builder.Property(x => x.LockoutEnd);
 
+        builder.Property(x => x.MfaEnabled).IsRequired();
+        builder.Property(x => x.MfaMethod).HasMaxLength(32);
+        builder.Property(x => x.MfaSecret).HasMaxLength(256);
+
         builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
