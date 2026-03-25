@@ -9,7 +9,7 @@ internal sealed class AIKnowledgeSourceConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<AIKnowledgeSource> builder)
     {
-        builder.ToTable("ai_gov_knowledge_sources");
+        builder.ToTable("aik_knowledge_sources");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIKnowledgeSourceId.From(value));

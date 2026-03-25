@@ -9,7 +9,7 @@ internal sealed class KnowledgeCaptureConfiguration : IEntityTypeConfiguration<K
 {
     public void Configure(EntityTypeBuilder<KnowledgeCapture> builder)
     {
-        builder.ToTable("ext_ai_knowledge_captures");
+        builder.ToTable("aik_knowledge_captures");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => KnowledgeCaptureId.From(value));

@@ -9,7 +9,7 @@ internal sealed class AiTokenQuotaPolicyConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<AiTokenQuotaPolicy> builder)
     {
-        builder.ToTable("AiTokenQuotaPolicies");
+        builder.ToTable("aik_token_quota_policies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiTokenQuotaPolicyId.From(value));

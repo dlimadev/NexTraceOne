@@ -9,7 +9,7 @@ internal sealed class AiMessageConfiguration : IEntityTypeConfiguration<AiMessag
 {
     public void Configure(EntityTypeBuilder<AiMessage> builder)
     {
-        builder.ToTable("ai_gov_messages");
+        builder.ToTable("aik_messages");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiMessageId.From(value));

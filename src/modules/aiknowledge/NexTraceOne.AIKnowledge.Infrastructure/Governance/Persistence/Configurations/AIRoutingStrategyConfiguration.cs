@@ -9,7 +9,7 @@ internal sealed class AIRoutingStrategyConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<AIRoutingStrategy> builder)
     {
-        builder.ToTable("ai_gov_routing_strategies");
+        builder.ToTable("aik_routing_strategies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIRoutingStrategyId.From(value));

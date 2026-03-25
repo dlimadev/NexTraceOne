@@ -9,7 +9,7 @@ internal sealed class ExternalAiConsultationConfiguration : IEntityTypeConfigura
 {
     public void Configure(EntityTypeBuilder<ExternalAiConsultation> builder)
     {
-        builder.ToTable("ext_ai_consultations");
+        builder.ToTable("aik_consultations");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => ExternalAiConsultationId.From(value));

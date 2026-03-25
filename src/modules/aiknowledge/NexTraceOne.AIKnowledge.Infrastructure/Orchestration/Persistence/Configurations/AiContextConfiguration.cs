@@ -9,7 +9,7 @@ internal sealed class AiContextConfiguration : IEntityTypeConfiguration<AiContex
 {
     public void Configure(EntityTypeBuilder<AiContext> builder)
     {
-        builder.ToTable("ai_orch_contexts");
+        builder.ToTable("aik_contexts");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiContextId.From(value));

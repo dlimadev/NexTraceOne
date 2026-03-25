@@ -9,7 +9,7 @@ internal sealed class AIUsageEntryConfiguration : IEntityTypeConfiguration<AIUsa
 {
     public void Configure(EntityTypeBuilder<AIUsageEntry> builder)
     {
-        builder.ToTable("ai_gov_usage_entries");
+        builder.ToTable("aik_usage_entries");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIUsageEntryId.From(value));

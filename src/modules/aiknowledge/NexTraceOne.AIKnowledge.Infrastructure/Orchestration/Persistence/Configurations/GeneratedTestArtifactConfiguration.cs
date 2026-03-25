@@ -9,7 +9,7 @@ internal sealed class GeneratedTestArtifactConfiguration : IEntityTypeConfigurat
 {
     public void Configure(EntityTypeBuilder<GeneratedTestArtifact> builder)
     {
-        builder.ToTable("ai_orch_test_artifacts");
+        builder.ToTable("aik_test_artifacts");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => GeneratedTestArtifactId.From(value));

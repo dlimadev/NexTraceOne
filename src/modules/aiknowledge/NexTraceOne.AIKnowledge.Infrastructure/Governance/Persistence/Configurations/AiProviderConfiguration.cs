@@ -9,7 +9,7 @@ internal sealed class AiProviderConfiguration : IEntityTypeConfiguration<AiProvi
 {
     public void Configure(EntityTypeBuilder<AiProvider> builder)
     {
-        builder.ToTable("AiProviders");
+        builder.ToTable("aik_providers");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AiProviderId.From(value));

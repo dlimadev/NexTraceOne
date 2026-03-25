@@ -9,7 +9,7 @@ internal sealed class AIModelConfiguration : IEntityTypeConfiguration<AIModel>
 {
     public void Configure(EntityTypeBuilder<AIModel> builder)
     {
-        builder.ToTable("ai_gov_models");
+        builder.ToTable("aik_models");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, value => AIModelId.From(value));
