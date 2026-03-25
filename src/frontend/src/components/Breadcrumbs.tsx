@@ -31,7 +31,6 @@ const segmentLabels: Record<string, string> = {
   'finops': 'sidebar.finops',
   'users': 'sidebar.users',
   'audit': 'sidebar.audit',
-  'licensing': 'sidebar.licensing',
   'break-glass': 'sidebar.breakGlass',
   'jit-access': 'sidebar.jitAccess',
   'delegations': 'sidebar.delegations',
@@ -45,7 +44,6 @@ const segmentLabels: Record<string, string> = {
   'heatmap': 'sidebar.riskHeatmap',
   'maturity': 'sidebar.maturityScorecards',
   'benchmarking': 'sidebar.benchmarking',
-  'vendor': 'sidebar.vendorLicensing',
 };
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

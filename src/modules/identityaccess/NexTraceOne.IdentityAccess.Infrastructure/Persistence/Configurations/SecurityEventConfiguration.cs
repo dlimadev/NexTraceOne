@@ -15,7 +15,7 @@ internal sealed class SecurityEventConfiguration : IEntityTypeConfiguration<Secu
 {
     public void Configure(EntityTypeBuilder<SecurityEvent> builder)
     {
-        builder.ToTable("identity_security_events");
+        builder.ToTable("iam_security_events");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

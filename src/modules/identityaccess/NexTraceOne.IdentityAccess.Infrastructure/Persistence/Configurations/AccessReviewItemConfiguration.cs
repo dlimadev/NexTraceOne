@@ -14,7 +14,7 @@ internal sealed class AccessReviewItemConfiguration : IEntityTypeConfiguration<A
 {
     public void Configure(EntityTypeBuilder<AccessReviewItem> builder)
     {
-        builder.ToTable("identity_access_review_items");
+        builder.ToTable("iam_access_review_items");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)

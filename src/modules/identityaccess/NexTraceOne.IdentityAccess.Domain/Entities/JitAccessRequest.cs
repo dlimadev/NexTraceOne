@@ -84,6 +84,9 @@ public sealed class JitAccessRequest : AggregateRoot<JitAccessRequestId>
     /// <summary>Usuário que revogou antecipadamente, quando aplicável.</summary>
     public UserId? RevokedBy { get; private set; }
 
+    /// <summary>Concurrency token (PostgreSQL xmin).</summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>Cria uma nova solicitação de acesso JIT.</summary>
     public static JitAccessRequest Create(
         UserId requestedBy,

@@ -14,7 +14,11 @@ internal sealed class JitAccessRequestConfiguration : IEntityTypeConfiguration<J
 {
     public void Configure(EntityTypeBuilder<JitAccessRequest> builder)
     {
-        builder.ToTable("identity_jit_access_requests");
+        builder.ToTable("iam_jit_access_requests", t =>
+        {
+            t.HasCheckConstraint("CK_iam_jit_access_requests_Status",
+                "\"Status\" IN ('Pending', 'Approved', 'Rejected', 'Expired', 'Revoked')");
+        });
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
@@ -67,5 +71,7 @@ internal sealed class JitAccessRequestConfiguration : IEntityTypeConfiguration<J
         builder.HasIndex(x => new { x.TenantId, x.Status });
         builder.HasIndex(x => x.RequestedBy);
         builder.HasIndex(x => x.Status);
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }

@@ -14,7 +14,7 @@ internal sealed class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 {
     public void Configure(EntityTypeBuilder<Tenant> builder)
     {
-        builder.ToTable("identity_tenants");
+        builder.ToTable("iam_tenants");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
@@ -38,6 +38,8 @@ internal sealed class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 
         builder.HasIndex(x => x.Slug)
             .IsUnique()
-            .HasDatabaseName("IX_identity_tenants_slug");
+            .HasDatabaseName("IX_iam_tenants_slug");
+
+        builder.Property(x => x.RowVersion).IsRowVersion();
     }
 }
