@@ -53,6 +53,12 @@ public sealed class EnvironmentAccess : Entity<EnvironmentAccessId>
     public DateTimeOffset? RevokedAt { get; private set; }
 
     /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
+    /// <summary>
     /// Factory method para criação de um novo acesso a ambiente.
     /// Valida que todos os campos obrigatórios estão preenchidos e que o nível de acesso é válido.
     /// Se ExpiresAt for informado, deve ser posterior a GrantedAt.

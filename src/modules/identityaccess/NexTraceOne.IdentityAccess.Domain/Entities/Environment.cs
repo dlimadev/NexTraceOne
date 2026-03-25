@@ -96,6 +96,24 @@ public sealed class Environment : Entity<EnvironmentId>
     /// <summary>Data/hora UTC de criação do ambiente.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
+    /// <summary>Identificador do utilizador que criou o ambiente.</summary>
+    public string? CreatedBy { get; private set; }
+
+    /// <summary>Data/hora UTC da última atualização do ambiente.</summary>
+    public DateTimeOffset? UpdatedAt { get; private set; }
+
+    /// <summary>Identificador do utilizador que realizou a última atualização.</summary>
+    public string? UpdatedBy { get; private set; }
+
+    /// <summary>Indica se o ambiente foi removido logicamente (soft-delete).</summary>
+    public bool IsDeleted { get; private set; }
+
+    /// <summary>
+    /// Token de concorrência otimista (PostgreSQL xmin).
+    /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
+    /// </summary>
+    public uint RowVersion { get; set; }
+
     /// <summary>
     /// Factory method para criação de um novo ambiente.
     /// Garante que nome, slug e tenant são informados.
@@ -219,11 +237,17 @@ public sealed class Environment : Entity<EnvironmentId>
     /// <summary>Remove a designação de produção principal deste ambiente.</summary>
     public void RevokePrimaryProductionDesignation() => IsPrimaryProduction = false;
 
-    /// <summary>Desativa o ambiente, impedindo novos acessos e operações.</summary>
+    /// <summary>
+    /// Desativa o ambiente, impedindo novos acessos e operações.
+    /// Um ambiente marcado como produção principal não pode ser desativado diretamente.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Se o ambiente for produção principal.</exception>
     public void Deactivate()
     {
+        if (IsPrimaryProduction)
+            throw new InvalidOperationException("Cannot deactivate the primary production environment. Remove the primary production designation first.");
+
         IsActive = false;
-        IsPrimaryProduction = false; // Um ambiente inativo não pode ser produção principal
     }
 
     /// <summary>Atualiza a ordem de exibição do ambiente.</summary>
@@ -232,6 +256,30 @@ public sealed class Environment : Entity<EnvironmentId>
     {
         Guard.Against.Negative(sortOrder, message: "Environment sort order must be zero or positive.");
         SortOrder = sortOrder;
+    }
+
+    /// <summary>
+    /// Marca o registo de atualização com utilizador e timestamp.
+    /// Deve ser chamado pelo handler após qualquer mutação.
+    /// </summary>
+    public void SetUpdated(string updatedBy, DateTimeOffset now)
+    {
+        UpdatedBy = updatedBy;
+        UpdatedAt = now;
+    }
+
+    /// <summary>
+    /// Remove logicamente o ambiente (soft-delete).
+    /// Um ambiente marcado como produção principal não pode ser removido.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Se o ambiente for produção principal.</exception>
+    public void SoftDelete()
+    {
+        if (IsPrimaryProduction)
+            throw new InvalidOperationException("Cannot delete the primary production environment.");
+
+        IsDeleted = true;
+        IsActive = false;
     }
 }
 

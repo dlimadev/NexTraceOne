@@ -138,7 +138,14 @@ public static class RolePermissionCatalog
                 "licensing:vendor:plan:read",
                 "licensing:vendor:featurepack:create",
                 "licensing:vendor:featurepack:read",
-                "licensing:vendor:license:manage"],
+                "licensing:vendor:license:manage",
+
+                // Environment Management
+                "env:environments:read",
+                "env:environments:write",
+                "env:environments:admin",
+                "env:access:read",
+                "env:access:admin"],
             Role.TechLead => [
                 "identity:users:read",
                 "identity:roles:read",
@@ -174,7 +181,10 @@ public static class RolePermissionCatalog
                 "ai:assistant:read",
                 "ai:assistant:write",
                 "integrations:read",
-                "licensing:read"],
+                "licensing:read",
+                "env:environments:read",
+                "env:environments:write",
+                "env:access:read"],
             Role.Developer => [
                 "identity:users:read",
                 "catalog:assets:read",
@@ -196,7 +206,9 @@ public static class RolePermissionCatalog
                 "audit:trail:read",
                 "ai:assistant:read",
                 "ai:assistant:write",
-                "integrations:read"],
+                "integrations:read",
+                "env:environments:read",
+                "env:access:read"],
             Role.Viewer => [
                 "identity:users:read",
                 "catalog:assets:read",
@@ -209,7 +221,8 @@ public static class RolePermissionCatalog
                 "governance:reports:read",
                 "promotion:requests:read",
                 "rulesets:read",
-                "audit:trail:read"],
+                "audit:trail:read",
+                "env:environments:read"],
             Role.Auditor => [
                 "identity:users:read",
                 "identity:sessions:read",
@@ -228,7 +241,9 @@ public static class RolePermissionCatalog
                 "rulesets:read",
                 "audit:trail:read",
                 "audit:reports:read",
-                "audit:compliance:read"],
+                "audit:compliance:read",
+                "env:environments:read",
+                "env:access:read"],
             Role.SecurityReview => [
                 "identity:users:read",
                 "identity:roles:read",
@@ -249,7 +264,9 @@ public static class RolePermissionCatalog
                 "rulesets:write",
                 "audit:trail:read",
                 "audit:reports:read",
-                "audit:compliance:read"],
+                "audit:compliance:read",
+                "env:environments:read",
+                "env:access:read"],
             Role.ApprovalOnly => [
                 "change-intelligence:read",
                 "promotion:requests:read",

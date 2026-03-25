@@ -16,14 +16,18 @@ using GetPrimaryProductionFeature = NexTraceOne.IdentityAccess.Application.Featu
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
 /// <summary>
-/// Endpoints de gestão de ambientes (Environment) do módulo Identity.
+/// Endpoints de gestão de ambientes (Environment) do módulo Environment Management.
 ///
 /// Ambientes representam estágios do ciclo de vida configuráveis por tenant.
 /// Cada tenant pode definir os seus próprios ambientes (DEV, QA, UAT, PROD, DR, etc.),
 /// com perfil operacional, criticidade e designação do ambiente produtivo principal.
 ///
-/// A separação entre Tenant (organização/cliente) e Environment (estágio operacional)
-/// é fundamental para a governança enterprise do NexTraceOne.
+/// Permissões seguem o namespace env:* (separado do identity:*):
+/// - env:environments:read — listar e consultar ambientes
+/// - env:environments:write — criar e editar ambientes
+/// - env:environments:admin — designar produção principal, soft-delete
+/// - env:access:read — consultar acessos
+/// - env:access:admin — conceder e revogar acessos
 /// </summary>
 internal static class EnvironmentEndpoints
 {
@@ -34,7 +38,7 @@ internal static class EnvironmentEndpoints
     {
         var envGroup = group.MapGroup("/environments");
 
-        // Lista ambientes ativos do tenant — qualquer utilizador autenticado pode visualizar
+        // Lista ambientes ativos do tenant
         envGroup.MapGet("/", async (
             ISender sender,
             IErrorLocalizer localizer,
@@ -42,7 +46,7 @@ internal static class EnvironmentEndpoints
         {
             var result = await sender.Send(new ListEnvironmentsFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:read");
+        }).RequirePermission("env:environments:read");
 
         // Obtém o ambiente produtivo principal do tenant
         envGroup.MapGet("/primary-production", async (
@@ -52,9 +56,9 @@ internal static class EnvironmentEndpoints
         {
             var result = await sender.Send(new GetPrimaryProductionFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:read");
+        }).RequirePermission("env:environments:read");
 
-        // Cria um novo ambiente para o tenant — requer permissão administrativa
+        // Cria um novo ambiente para o tenant — requer permissão de escrita
         envGroup.MapPost("/", async (
             CreateEnvironmentFeature.Command command,
             ISender sender,
@@ -63,9 +67,9 @@ internal static class EnvironmentEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:write");
+        }).RequirePermission("env:environments:write");
 
-        // Atualiza metadados de um ambiente existente — requer permissão administrativa
+        // Atualiza metadados de um ambiente existente — requer permissão de escrita
         envGroup.MapPut("/{environmentId:guid}", async (
             Guid environmentId,
             UpdateEnvironmentFeature.Command command,
@@ -77,7 +81,7 @@ internal static class EnvironmentEndpoints
             var cmd = command with { EnvironmentId = environmentId };
             var result = await sender.Send(cmd, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:write");
+        }).RequirePermission("env:environments:write");
 
         // Designa um ambiente como produção principal do tenant — requer permissão administrativa
         envGroup.MapPatch("/{environmentId:guid}/primary-production", async (
@@ -88,9 +92,9 @@ internal static class EnvironmentEndpoints
         {
             var result = await sender.Send(new SetPrimaryProductionFeature.Command(environmentId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:write");
+        }).RequirePermission("env:environments:admin");
 
-        // Concede acesso a um ambiente para um utilizador — requer permissão administrativa
+        // Concede acesso a um ambiente para um utilizador — requer permissão administrativa de acesso
         envGroup.MapPost("/access", async (
             GrantEnvironmentAccessFeature.Command command,
             ISender sender,
@@ -99,6 +103,6 @@ internal static class EnvironmentEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("identity:users:write");
+        }).RequirePermission("env:access:admin");
     }
 }
