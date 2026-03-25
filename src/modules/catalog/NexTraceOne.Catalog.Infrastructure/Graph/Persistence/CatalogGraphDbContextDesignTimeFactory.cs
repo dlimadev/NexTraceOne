@@ -15,7 +15,7 @@ internal sealed class CatalogGraphDbContextDesignTimeFactory : IDesignTimeDbCont
     {
         var optionsBuilder = new DbContextOptionsBuilder<CatalogGraphDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone_catalog;Username=nextraceone;Password=";
+            ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(CatalogGraphDbContext).Assembly.FullName));

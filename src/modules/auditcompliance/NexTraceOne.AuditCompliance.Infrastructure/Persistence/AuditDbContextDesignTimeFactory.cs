@@ -16,7 +16,7 @@ internal sealed class AuditDbContextDesignTimeFactory : IDesignTimeDbContextFact
     {
         var optionsBuilder = new DbContextOptionsBuilder<AuditDbContext>();
         var connectionString = Environment.GetEnvironmentVariable("NEXTRACEONE_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=nextraceone_identity;Username=nextraceone;Password=";
+            ?? "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=";
 
         optionsBuilder.UseNpgsql(connectionString,
             npgsql => npgsql.MigrationsAssembly(typeof(AuditDbContext).Assembly.FullName));

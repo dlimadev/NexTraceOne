@@ -36,6 +36,9 @@ public sealed class AutomationDbContext(
         => "NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence.Configurations";
 
     /// <inheritdoc />
+    protected override string OutboxTableName => "ops_auto_outbox_messages";
+
+    /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
         => SaveChangesAsync(cancellationToken);
 }
