@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" role="img" aria-label="NexTraceOne icon">
+  <defs>
+    <!-- Globe gradient: blue (bottom-left) → mint (top-right) -->
+    <linearGradient id="globeGrad" x1="20" y1="140" x2="140" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="55%" stop-color="#18CFF2"/>
+      <stop offset="100%" stop-color="#18E8B8"/>
+    </linearGradient>
+
+    <!-- N letterform gradient -->
+    <linearGradient id="nGrad" x1="55" y1="110" x2="108" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="50%" stop-color="#18CFF2"/>
+      <stop offset="100%" stop-color="#18E8B8"/>
+    </linearGradient>
+
+    <!-- Node glow: cyan -->
+    <radialGradient id="nodeCyan" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#79FCE0"/>
+      <stop offset="100%" stop-color="#18CFF2"/>
+    </radialGradient>
+
+    <!-- Node glow: blue -->
+    <radialGradient id="nodeBlue" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#6ED7F5"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </radialGradient>
+
+    <!-- Clip to globe circle -->
+    <clipPath id="globeClip">
+      <circle cx="80" cy="80" r="66"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Globe grid (clipped to circle) ─────────────────────────── -->
+  <g clip-path="url(#globeClip)" opacity="0.55">
+    <!-- Latitude: equator ellipse -->
+    <ellipse cx="80" cy="80" rx="66" ry="20" stroke="url(#globeGrad)" stroke-width="1" fill="none"/>
+    <!-- Latitude: upper third -->
+    <ellipse cx="80" cy="57" rx="52" ry="15" stroke="url(#globeGrad)" stroke-width="0.8" fill="none"/>
+    <!-- Latitude: lower third -->
+    <ellipse cx="80" cy="103" rx="52" ry="15" stroke="url(#globeGrad)" stroke-width="0.8" fill="none"/>
+    <!-- Meridian: left curve -->
+    <path d="M 80 14 Q 42 80 80 146" stroke="url(#globeGrad)" stroke-width="1" fill="none"/>
+    <!-- Meridian: right curve -->
+    <path d="M 80 14 Q 118 80 80 146" stroke="url(#globeGrad)" stroke-width="1" fill="none"/>
+    <!-- Meridian: far left -->
+    <path d="M 80 14 Q 18 60 16 80" stroke="url(#globeGrad)" stroke-width="0.7" fill="none" opacity="0.6"/>
+    <!-- Meridian: far right -->
+    <path d="M 80 14 Q 142 60 144 80" stroke="url(#globeGrad)" stroke-width="0.7" fill="none" opacity="0.6"/>
+  </g>
+
+  <!-- ── Globe outer ring ────────────────────────────────────────── -->
+  <circle cx="80" cy="80" r="66" stroke="url(#globeGrad)" stroke-width="1.8" fill="none"/>
+
+  <!-- ── Network connection arc (top, outside ring) ─────────────── -->
+  <path d="M 80 14 Q 114 10 140 36" stroke="url(#globeGrad)" stroke-width="1.6" fill="none"/>
+
+  <!-- ── Network nodes ───────────────────────────────────────────── -->
+  <!-- Top node (small) -->
+  <circle cx="80" cy="14" r="3.5" fill="url(#nodeCyan)"/>
+  <!-- Top-right node (large, outside ring) -->
+  <circle cx="140" cy="36" r="5.5" fill="url(#nodeCyan)"/>
+  <!-- Left node (on ring) -->
+  <circle cx="17" cy="88" r="3.5" fill="url(#nodeBlue)"/>
+  <!-- Bottom-right node (on ring) -->
+  <circle cx="138" cy="112" r="3" fill="url(#nodeCyan)" opacity="0.7"/>
+  <!-- Bottom-left node -->
+  <circle cx="40" cy="136" r="3" fill="url(#nodeBlue)" opacity="0.6"/>
+
+  <!-- Node ring indicator (left node) -->
+  <circle cx="17" cy="88" r="6.5" stroke="url(#globeGrad)" stroke-width="0.9" fill="none" opacity="0.5"/>
+
+  <!-- ── N Letterform ─────────────────────────────────────────────── -->
+  <!-- Left vertical bar -->
+  <rect x="54" y="52" width="14" height="56" rx="4" fill="url(#nGrad)"/>
+  <!-- Right vertical bar -->
+  <rect x="92" y="52" width="14" height="56" rx="4" fill="url(#nGrad)"/>
+  <!-- Diagonal connector (parallelogram) -->
+  <polygon points="68,52 82,52 92,108 78,108" fill="url(#nGrad)"/>
+
+  <!-- N right-bar top extension (decorative hook) -->
+  <path d="M 106 52 C 112 48 118 43 122 38"
+        stroke="url(#nGrad)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <!-- Hook tip dot -->
+  <circle cx="123" cy="37" r="4" fill="url(#nodeCyan)"/>
+</svg>
