@@ -25,85 +25,8 @@ public interface ITeamRepository
     Task UpdateAsync(Team team, CancellationToken ct);
 }
 
-/// <summary>
-/// Interface do repositório de AnalyticsEvents para Product Analytics.
-/// </summary>
-public interface IAnalyticsEventRepository
-{
-    Task AddAsync(AnalyticsEvent analyticsEvent, CancellationToken ct);
-
-    Task<long> CountAsync(
-        string? persona,
-        ProductModule? module,
-        string? teamId,
-        string? domainId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-
-    /// <summary>Conta eventos filtrados por tipo de evento (ex: ZeroResultSearch, JourneyAbandoned).</summary>
-    Task<long> CountByEventTypeAsync(
-        AnalyticsEventType eventType,
-        string? persona,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-
-    Task<int> CountUniqueUsersAsync(
-        string? persona,
-        ProductModule? module,
-        string? teamId,
-        string? domainId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-
-    Task<int> CountActivePersonasAsync(
-        string? module,
-        string? teamId,
-        string? domainId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-
-    Task<IReadOnlyList<ModuleUsageRow>> GetTopModulesAsync(
-        string? persona,
-        string? teamId,
-        string? domainId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        int top,
-        CancellationToken ct);
-
-    Task<IReadOnlyList<ModuleAdoptionRow>> GetModuleAdoptionAsync(
-        string? persona,
-        string? teamId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-
-    Task<IReadOnlyList<ModuleFeatureCountRow>> GetFeatureCountsAsync(
-        string? persona,
-        string? teamId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-
-    Task<IReadOnlyList<SessionEventRow>> ListSessionEventsAsync(
-        string? persona,
-        string? teamId,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-}
-
-public sealed record ModuleUsageRow(ProductModule Module, long EventCount, int UniqueUsers);
-
-public sealed record ModuleAdoptionRow(ProductModule Module, long TotalActions, int UniqueUsers);
-
-public sealed record ModuleFeatureCountRow(ProductModule Module, string Feature, long Count);
-
-public sealed record SessionEventRow(string SessionId, AnalyticsEventType EventType, DateTimeOffset OccurredAt);
+// NOTE P2.3: IAnalyticsEventRepository and analytics DTOs (ModuleUsageRow, ModuleAdoptionRow,
+// ModuleFeatureCountRow, SessionEventRow) moved to NexTraceOne.ProductAnalytics.Application.Abstractions.
 
 /// <summary>
 /// Interface do repositório de GovernanceDomains para o módulo Governance.

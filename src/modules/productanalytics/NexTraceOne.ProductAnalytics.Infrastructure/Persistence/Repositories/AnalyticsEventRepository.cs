@@ -1,12 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 
-using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Domain.Entities;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
+namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 
-internal sealed class AnalyticsEventRepository(GovernanceDbContext context) : IAnalyticsEventRepository
+/// <summary>
+/// Implementação EF Core do repositório de AnalyticsEvents para o módulo Product Analytics.
+/// Extraído de GovernanceDbContext em P2.3.
+/// </summary>
+internal sealed class AnalyticsEventRepository(ProductAnalyticsDbContext context) : IAnalyticsEventRepository
 {
     public async Task AddAsync(AnalyticsEvent analyticsEvent, CancellationToken ct)
         => await context.AnalyticsEvents.AddAsync(analyticsEvent, ct);

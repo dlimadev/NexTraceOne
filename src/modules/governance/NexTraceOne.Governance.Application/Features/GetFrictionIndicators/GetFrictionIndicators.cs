@@ -1,7 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetFrictionIndicators;
 

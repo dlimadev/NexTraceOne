@@ -1,4 +1,4 @@
-namespace NexTraceOne.Governance.Domain.Enums;
+namespace NexTraceOne.ProductAnalytics.Domain.Enums;
 
 /// <summary>
 /// Taxonomia de eventos de product analytics.

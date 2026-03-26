@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Domain.Entities;
+namespace NexTraceOne.ProductAnalytics.Domain.Entities;
 
 /// <summary>
 /// Identificador fortemente tipado para AnalyticsEvent.
@@ -13,6 +13,7 @@ public sealed record AnalyticsEventId(Guid Value) : TypedIdBase(Value);
 /// <summary>
 /// Evento mínimo de Product Analytics.
 /// Base para resumo e adoção por módulo.
+/// Entidade imutável — sem RowVersion, sem soft-delete.
 /// </summary>
 public sealed class AnalyticsEvent : Entity<AnalyticsEventId>
 {

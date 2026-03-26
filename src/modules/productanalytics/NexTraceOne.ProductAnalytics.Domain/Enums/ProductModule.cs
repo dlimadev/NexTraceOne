@@ -1,4 +1,4 @@
-namespace NexTraceOne.Governance.Domain.Enums;
+namespace NexTraceOne.ProductAnalytics.Domain.Enums;
 
 /// <summary>
 /// Módulos do produto NexTraceOne para medição de adoção e uso.

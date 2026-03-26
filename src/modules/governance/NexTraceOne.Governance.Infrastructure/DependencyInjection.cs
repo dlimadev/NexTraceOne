@@ -10,6 +10,7 @@ using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Integrations.Infrastructure;
+using NexTraceOne.ProductAnalytics.Infrastructure;
 
 namespace NexTraceOne.Governance.Infrastructure;
 
@@ -48,15 +49,15 @@ public static class DependencyInjection
         services.AddScoped<IGovernanceRolloutRecordRepository, GovernanceRolloutRecordRepository>();
         // NOTE: IIntegrationConnectorRepository removed from Governance in P2.1.
         //       Registered via AddIntegrationsInfrastructure below.
-        // NOTE: IIngestionSourceRepository removed from Governance in P2.2.
-        //       Registered via AddIntegrationsInfrastructure below.
-        // NOTE: IIngestionExecutionRepository removed from Governance in P2.2.
-        //       Registered via AddIntegrationsInfrastructure below.
-        services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
+        // NOTE: IAnalyticsEventRepository removed from Governance in P2.3.
+        //       Registered via AddProductAnalyticsInfrastructure below.
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
 
-        // Integrations module infrastructure (P2.1: IntegrationConnector extracted here)
+        // Integrations module infrastructure (P2.1: IntegrationConnector, P2.2: IngestionSource + IngestionExecution)
         services.AddIntegrationsInfrastructure(configuration);
+
+        // Product Analytics module infrastructure (P2.3: AnalyticsEvent extracted here)
+        services.AddProductAnalyticsInfrastructure(configuration);
 
         return services;
     }

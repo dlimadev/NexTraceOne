@@ -13,8 +13,8 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 ///
 /// P2.1: IntegrationConnectors extraído para IntegrationsDbContext.
 /// P2.2: IngestionSources e IngestionExecutions extraídos para IntegrationsDbContext.
-/// OI-03 (pendente): AnalyticsEvents a extrair para módulo próprio.
-/// Após OI-03, apenas os 8 DbSets de Governance permanecerão.
+/// P2.3: AnalyticsEvents extraído para ProductAnalyticsDbContext.
+/// Após P2.3, apenas os 8 DbSets de Governance permanecem.
 /// </summary>
 public sealed class GovernanceDbContext(
     DbContextOptions<GovernanceDbContext> options,
@@ -50,9 +50,7 @@ public sealed class GovernanceDbContext(
     // NOTE: IntegrationConnectors extracted to IntegrationsDbContext in P2.1.
     // NOTE: IngestionSources extracted to IntegrationsDbContext in P2.2.
     // NOTE: IngestionExecutions extracted to IntegrationsDbContext in P2.2.
-
-    /// <summary>Eventos de Product Analytics (a ser extraído para módulo próprio em OI-03).</summary>
-    public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
+    // NOTE: AnalyticsEvents extracted to ProductAnalyticsDbContext in P2.3.
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;

@@ -1,11 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.GetAnalyticsSummary;
 using NexTraceOne.Governance.Application.Features.GetModuleAdoption;
 using NexTraceOne.Governance.Application.Features.GetPersonaUsage;
 using NexTraceOne.Governance.Application.Features.RecordAnalyticsEvent;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Domain.Entities;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 

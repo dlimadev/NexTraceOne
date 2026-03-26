@@ -5,9 +5,9 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Domain.Entities;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.RecordAnalyticsEvent;
 

@@ -12,6 +12,9 @@
     <!-- P2.1: Governance.Application references Integrations.Application for IIntegrationConnectorRepository.
          Handlers using IIntegrationConnectorRepository alongside Governance repos remain here until P2.2. -->
     <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Application\NexTraceOne.Integrations.Application.csproj" />
+    <!-- P2.3: Governance.Application references ProductAnalytics.Application for IAnalyticsEventRepository.
+         Analytics handlers remain here until a future migration to ProductAnalytics.Application. -->
+    <ProjectReference Include="..\..\productanalytics\NexTraceOne.ProductAnalytics.Application\NexTraceOne.ProductAnalytics.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" />

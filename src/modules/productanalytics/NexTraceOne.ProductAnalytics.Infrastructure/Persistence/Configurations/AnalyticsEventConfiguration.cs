@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.ProductAnalytics.Domain.Entities;
 
-namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade AnalyticsEvent.
