@@ -51,12 +51,22 @@ public static class DependencyInjection
         //       Registered via AddIntegrationsInfrastructure below.
         // NOTE: IAnalyticsEventRepository removed from Governance in P2.3.
         //       Registered via AddProductAnalyticsInfrastructure below.
+        // NOTE: IGovernanceAnalyticsRepository is a legitimate Governance repository:
+        //       it queries Governance entities (Waivers, Packs, RolloutRecords) for executive trends.
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
 
-        // Integrations module infrastructure (P2.1: IntegrationConnector, P2.2: IngestionSource + IngestionExecution)
+        // COMPATIBILIDADE TRANSITÓRIA (P2.4):
+        // Integrations module infrastructure is wired from here because integration handlers
+        // (ListIntegrationConnectors, GetIngestionHealth, etc.) remain temporarily in Governance.Application.
+        // These handlers already consume Integrations.Application.Abstractions correctly.
+        // Full separation into Integrations.API and Integrations.Application is pending.
         services.AddIntegrationsInfrastructure(configuration);
 
-        // Product Analytics module infrastructure (P2.3: AnalyticsEvent extracted here)
+        // COMPATIBILIDADE TRANSITÓRIA (P2.4):
+        // Product Analytics module infrastructure is wired from here because analytics handlers
+        // (RecordAnalyticsEvent, GetAnalyticsSummary, etc.) remain temporarily in Governance.Application.
+        // These handlers already consume ProductAnalytics.Application.Abstractions correctly.
+        // Full separation into ProductAnalytics.API and ProductAnalytics.Application is pending.
         services.AddProductAnalyticsInfrastructure(configuration);
 
         return services;

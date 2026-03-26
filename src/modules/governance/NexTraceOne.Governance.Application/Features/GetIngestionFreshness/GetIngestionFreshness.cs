@@ -9,6 +9,8 @@ namespace NexTraceOne.Governance.Application.Features.GetIngestionFreshness;
 /// <summary>
 /// Feature: GetIngestionFreshness — detalhe de frescura por fonte de ingestão.
 /// Permite visualizar o estado de frescura de cada feed por domínio, conector e tipo de fonte.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class GetIngestionFreshness
 {

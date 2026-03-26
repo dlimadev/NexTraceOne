@@ -16,10 +16,17 @@ using GetFrictionIndicatorsFeature = NexTraceOne.Governance.Application.Features
 namespace NexTraceOne.Governance.API.Endpoints;
 
 /// <summary>
-/// Endpoints de Product Analytics do módulo Governance.
-/// Disponibiliza métricas de adoção, valor, fricção, jornadas e milestones.
+/// Endpoints de Product Analytics — disponibiliza métricas de adoção, valor, fricção, jornadas e milestones.
 /// Analytics orientados a decisão de produto, não a vanity metrics.
 /// Privacy-aware: sem coleta excessiva de PII.
+///
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4):
+/// Este endpoint module está temporariamente alojado em Governance.API por compatibilidade de rota.
+/// O ownership real pertence ao módulo Product Analytics.
+/// Os handlers já consomem NexTraceOne.ProductAnalytics.Application.Abstractions e NexTraceOne.ProductAnalytics.Domain.
+/// As permissões "governance:analytics:*" são residuais e serão renomeadas para "analytics:*" em fase futura.
+/// A migração definitiva para ProductAnalytics.API está prevista para fase futura.
+/// A rota /api/v1/product-analytics é do módulo Product Analytics, não de Governance.
 /// </summary>
 public sealed class ProductAnalyticsEndpointModule
 {

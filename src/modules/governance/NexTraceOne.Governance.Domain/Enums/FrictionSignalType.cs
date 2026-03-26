@@ -4,6 +4,9 @@ namespace NexTraceOne.Governance.Domain.Enums;
 /// Tipos de sinais de fricção no produto.
 /// Cada tipo indica um ponto onde o utilizador pode estar a encontrar dificuldade
 /// ou onde a experiência não está a entregar valor esperado.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Enum pertence semanticamente ao módulo Product Analytics.
+/// Permanece em Governance.Domain.Enums enquanto GetFrictionIndicators handler residir em Governance.Application.
+/// Extração para ProductAnalytics.Domain.Enums prevista em fase futura.
 /// </summary>
 public enum FrictionSignalType
 {

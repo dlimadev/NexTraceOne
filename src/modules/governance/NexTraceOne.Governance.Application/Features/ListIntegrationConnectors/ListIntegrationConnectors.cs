@@ -8,6 +8,8 @@ namespace NexTraceOne.Governance.Application.Features.ListIntegrationConnectors;
 /// <summary>
 /// Feature: ListIntegrationConnectors — lista conectores de integração registados no Integration Hub.
 /// Permite filtragem por tipo, status, ambiente e pesquisa textual com paginação.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class ListIntegrationConnectors
 {

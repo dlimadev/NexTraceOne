@@ -19,6 +19,13 @@ namespace NexTraceOne.Governance.API.Endpoints;
 /// <summary>
 /// Endpoints do Integration Hub &amp; Ingestion Maturity — gestão de conectores, fontes de ingestão,
 /// execuções, saúde e frescura do pipeline de dados.
+///
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4):
+/// Este endpoint module está temporariamente alojado em Governance.API por compatibilidade de rota.
+/// O ownership real pertence ao módulo Integrations.
+/// Os handlers já consomem NexTraceOne.Integrations.Application.Abstractions e NexTraceOne.Integrations.Domain.
+/// A migração definitiva para Integrations.API está prevista para fase futura.
+/// As rotas /api/v1/integrations e /api/v1/ingestion são do módulo Integrations, não de Governance.
 /// </summary>
 public sealed class IntegrationHubEndpointModule
 {

@@ -9,6 +9,8 @@ namespace NexTraceOne.Governance.Application.Features.GetIngestionHealth;
 /// <summary>
 /// Feature: GetIngestionHealth — resumo de saúde do pipeline de ingestão.
 /// Apresenta estado global, contadores por estado de conector, resumo de frescura por domínio e problemas críticos.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class GetIngestionHealth
 {

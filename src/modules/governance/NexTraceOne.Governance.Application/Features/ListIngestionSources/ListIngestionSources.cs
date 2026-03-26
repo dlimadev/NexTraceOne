@@ -10,6 +10,8 @@ namespace NexTraceOne.Governance.Application.Features.ListIngestionSources;
 /// <summary>
 /// Feature: ListIngestionSources — lista fontes de ingestão registadas.
 /// Cada fonte está associada a um conector e tem domínio de dados, nível de confiança e estado de frescura.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class ListIngestionSources
 {

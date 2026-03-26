@@ -11,6 +11,8 @@ namespace NexTraceOne.Governance.Application.Features.GetAnalyticsSummary;
 /// Retorna resumo consolidado de product analytics.
 /// Fornece visão de adoção, valor, fricção e tendências do produto.
 /// Suporta filtros por persona, módulo, equipa, domínio e período.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
 /// </summary>
 public static class GetAnalyticsSummary
 {

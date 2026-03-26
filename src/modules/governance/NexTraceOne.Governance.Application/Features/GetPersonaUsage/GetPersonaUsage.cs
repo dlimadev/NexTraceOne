@@ -9,6 +9,8 @@ namespace NexTraceOne.Governance.Application.Features.GetPersonaUsage;
 /// Retorna perfil de uso por persona.
 /// Responde: quais personas usam quais capacidades? Qual a profundidade de uso?
 /// Quais são os pontos de fricção e milestones atingidos por persona?
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
 /// </summary>
 public static class GetPersonaUsage
 {

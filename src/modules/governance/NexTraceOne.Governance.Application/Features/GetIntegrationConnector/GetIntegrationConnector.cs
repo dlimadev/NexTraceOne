@@ -10,6 +10,8 @@ namespace NexTraceOne.Governance.Application.Features.GetIntegrationConnector;
 /// <summary>
 /// Feature: GetIntegrationConnector — detalhe completo de um conector de integração.
 /// Inclui configuração, execuções recentes, escopo e permissões.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class GetIntegrationConnector
 {

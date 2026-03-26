@@ -15,6 +15,8 @@ namespace NexTraceOne.Governance.Application.Features.RecordAnalyticsEvent;
 /// Regista um evento de product analytics.
 /// Cada evento responde a uma pergunta real sobre adoção, valor ou fricção.
 /// Privacy-aware: não captura PII desnecessário nem payloads sensíveis.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
 /// </summary>
 public static class RecordAnalyticsEvent
 {

@@ -14,7 +14,12 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 /// P2.1: IntegrationConnectors extraído para IntegrationsDbContext.
 /// P2.2: IngestionSources e IngestionExecutions extraídos para IntegrationsDbContext.
 /// P2.3: AnalyticsEvents extraído para ProductAnalyticsDbContext.
-/// Após P2.3, apenas os 8 DbSets de Governance permanecem.
+/// P2.4: Limpeza residual concluída. GovernanceDbContext contém apenas 8 DbSets de Governance.
+///
+/// Responsabilidades restantes temporárias em Governance (ver P2.4 cleanup report):
+/// - handlers de Integrations ainda em Governance.Application (ownership: Integrations)
+/// - handlers de Product Analytics ainda em Governance.Application (ownership: ProductAnalytics)
+/// - IntegrationHubEndpointModule e ProductAnalyticsEndpointModule em Governance.API (facades transitórias)
 /// </summary>
 public sealed class GovernanceDbContext(
     DbContextOptions<GovernanceDbContext> options,
