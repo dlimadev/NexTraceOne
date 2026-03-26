@@ -92,3 +92,47 @@ export type ConfigurationView =
   | 'definitions'
   | 'entries'
   | 'effective';
+
+// ── Feature Flags ──────────────────────────────────────────────────────────
+
+export interface FeatureFlagDefinitionDto {
+  id: string;
+  key: string;
+  displayName: string;
+  description: string | null;
+  defaultEnabled: boolean;
+  allowedScopes: string[];
+  moduleId: string | null;
+  isActive: boolean;
+  isEditable: boolean;
+}
+
+export interface FeatureFlagEntryDto {
+  id: string;
+  key: string;
+  scope: string;
+  scopeReferenceId: string | null;
+  isEnabled: boolean;
+  isActive: boolean;
+  changeReason: string | null;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+export interface EvaluatedFeatureFlagDto {
+  key: string;
+  isEnabled: boolean;
+  resolvedScope: string;
+  resolvedScopeReferenceId: string | null;
+  isInherited: boolean;
+  isDefault: boolean;
+  displayName: string;
+  description: string | null;
+}
+
+export interface SetFeatureFlagOverrideRequest {
+  scope: string;
+  scopeReferenceId?: string | null;
+  isEnabled: boolean;
+  changeReason?: string;
+}

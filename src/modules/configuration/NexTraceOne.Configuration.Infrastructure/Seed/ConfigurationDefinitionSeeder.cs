@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Entities;
 using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
@@ -9,13 +10,24 @@ namespace NexTraceOne.Configuration.Infrastructure.Seed;
 /// <summary>
 /// Seeder idempotente para definições de configuração padrão da plataforma.
 /// Apenas insere definições que ainda não existem (verificação por chave).
+/// Implementa <see cref="IConfigurationDefinitionSeeder"/> para ser injetável via DI.
+///
+/// Execução segura em todos os ambientes (Development, Staging, Production).
+/// Comportamento em primeira execução: insere todas as 345+ definições.
+/// Comportamento em re-execuções: ignora definições já existentes (IsNoOp).
 /// </summary>
-public static class ConfigurationDefinitionSeeder
+public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbContext)
+    : IConfigurationDefinitionSeeder
 {
+    /// <inheritdoc />
+    public Task<SeedingResult> SeedAsync(CancellationToken cancellationToken = default)
+        => SeedDefaultDefinitionsAsync(dbContext, cancellationToken);
+
     /// <summary>
     /// Insere as definições de configuração iniciais se ainda não existirem.
+    /// Retorna um <see cref="SeedingResult"/> com o número de definições inseridas e ignoradas.
     /// </summary>
-    public static async Task SeedDefaultDefinitionsAsync(
+    public static async Task<SeedingResult> SeedDefaultDefinitionsAsync(
         ConfigurationDbContext dbContext,
         CancellationToken cancellationToken = default)
     {
@@ -24,16 +36,26 @@ public static class ConfigurationDefinitionSeeder
             .ToHashSetAsync(cancellationToken);
 
         var definitions = BuildDefaultDefinitions();
+        var added = 0;
+        var skipped = 0;
 
         foreach (var definition in definitions)
         {
-            if (!existingKeys.Contains(definition.Key))
+            if (existingKeys.Contains(definition.Key))
+            {
+                skipped++;
+            }
+            else
             {
                 await dbContext.Definitions.AddAsync(definition, cancellationToken);
+                added++;
             }
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        if (added > 0)
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+        return new SeedingResult(added, skipped);
     }
 
     private static List<ConfigurationDefinition> BuildDefaultDefinitions() =>

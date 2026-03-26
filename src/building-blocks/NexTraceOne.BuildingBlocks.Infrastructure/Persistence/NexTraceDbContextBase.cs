@@ -78,7 +78,16 @@ public abstract class NexTraceDbContextBase(
     public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
         WriteDomainEventsToOutbox();
-        return await base.SaveChangesAsync(ct);
+
+        try
+        {
+            return await base.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            var entityType = ex.Entries.FirstOrDefault()?.Entity.GetType().Name ?? "Unknown";
+            throw new NexTraceOne.BuildingBlocks.Application.Abstractions.ConcurrencyException(entityType, ex);
+        }
     }
 
     private void WriteDomainEventsToOutbox()

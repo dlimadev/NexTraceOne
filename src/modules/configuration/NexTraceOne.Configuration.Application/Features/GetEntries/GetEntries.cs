@@ -42,7 +42,8 @@ public static class GetEntries
                 Version: e.Version,
                 ChangeReason: e.ChangeReason,
                 UpdatedAt: e.UpdatedAt ?? e.CreatedAt,
-                UpdatedBy: e.UpdatedBy ?? e.CreatedBy)).ToList();
+                UpdatedBy: e.UpdatedBy ?? e.CreatedBy,
+                RowVersion: e.RowVersion)).ToList();
 
             return dtos;
         }

@@ -158,18 +158,33 @@ public static class WebApplicationExtensions
 
         try
         {
-            var dbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-            await NexTraceOne.Configuration.Infrastructure.Seed.ConfigurationDefinitionSeeder
-                .SeedDefaultDefinitionsAsync(dbContext);
+            var seeder = scope.ServiceProvider
+                .GetRequiredService<NexTraceOne.Configuration.Application.Abstractions.IConfigurationDefinitionSeeder>();
 
-            logger.LogInformation("Configuration definitions seeded successfully.");
+            var result = await seeder.SeedAsync();
+
+            if (result.IsNoOp)
+            {
+                logger.LogInformation(
+                    "Configuration definitions already up-to-date. " +
+                    "{Skipped} definitions verified (no changes).",
+                    result.Skipped);
+            }
+            else
+            {
+                logger.LogInformation(
+                    "Configuration definitions seeded. " +
+                    "Added: {Added}, Already existing: {Skipped}, Total: {Total}.",
+                    result.Added, result.Skipped, result.Total);
+            }
         }
         catch (Exception ex)
         {
             logger.LogWarning(
                 ex,
                 "Configuration definitions seeding failed. " +
-                "This may be expected if the Configuration database schema has not been created yet.");
+                "This may be expected if the Configuration database schema has not been created yet. " +
+                "The application will start without baseline configuration definitions.");
         }
     }
 

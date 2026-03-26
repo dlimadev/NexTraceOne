@@ -91,6 +91,13 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
     public int SortOrder { get; private set; }
 
     /// <summary>
+    /// Referência opcional ao módulo de configuração ao qual esta definição pertence.
+    /// Torna explícita a dimensão "módulo" da hierarquia Instance → Tenant → Environment → Module.
+    /// Nulo para definições legadas criadas antes da introdução do modelo de módulos.
+    /// </summary>
+    public ConfigurationModuleId? ModuleId { get; private set; }
+
+    /// <summary>
     /// Indica se a definição está marcada como obsoleta.
     /// Definições obsoletas permanecem consultáveis, mas não devem ser utilizadas em novas configurações.
     /// </summary>
@@ -136,6 +143,7 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
     /// <param name="sortOrder">Ordem de apresentação.</param>
     /// <param name="isDeprecated">Indica se a definição está obsoleta.</param>
     /// <param name="deprecatedMessage">Mensagem de descontinuação opcional (máx. 500 caracteres).</param>
+    /// <param name="moduleId">Referência opcional ao módulo de configuração ao qual pertence.</param>
     /// <returns>Nova instância válida de ConfigurationDefinition.</returns>
     public static ConfigurationDefinition Create(
         string key,
@@ -152,7 +160,8 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         string? uiEditorType = null,
         int sortOrder = 0,
         bool isDeprecated = false,
-        string? deprecatedMessage = null)
+        string? deprecatedMessage = null,
+        ConfigurationModuleId? moduleId = null)
     {
         Guard.Against.NullOrWhiteSpace(key, nameof(key));
         Guard.Against.StringTooLong(key, 256, nameof(key));
@@ -194,6 +203,7 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
             SortOrder = sortOrder,
             IsDeprecated = isDeprecated,
             DeprecatedMessage = deprecatedMessage?.Trim(),
+            ModuleId = moduleId,
             CreatedAt = DateTimeOffset.UtcNow
         };
     }
@@ -214,6 +224,7 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
     /// <param name="sortOrder">Nova ordem de apresentação.</param>
     /// <param name="isDeprecated">Indica se a definição está obsoleta.</param>
     /// <param name="deprecatedMessage">Mensagem de descontinuação opcional (máx. 500 caracteres).</param>
+    /// <param name="moduleId">Referência opcional ao módulo de configuração ao qual pertence.</param>
     public void Update(
         string displayName,
         string? description,
@@ -226,7 +237,8 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         string? uiEditorType,
         int sortOrder,
         bool isDeprecated = false,
-        string? deprecatedMessage = null)
+        string? deprecatedMessage = null,
+        ConfigurationModuleId? moduleId = null)
     {
         Guard.Against.NullOrWhiteSpace(displayName, nameof(displayName));
         Guard.Against.StringTooLong(displayName, 200, nameof(displayName));
@@ -260,6 +272,7 @@ public sealed class ConfigurationDefinition : Entity<ConfigurationDefinitionId>
         SortOrder = sortOrder;
         IsDeprecated = isDeprecated;
         DeprecatedMessage = deprecatedMessage?.Trim();
+        ModuleId = moduleId;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

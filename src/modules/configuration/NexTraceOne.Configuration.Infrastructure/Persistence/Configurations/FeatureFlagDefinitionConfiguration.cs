@@ -7,27 +7,19 @@ using NexTraceOne.Configuration.Domain.Enums;
 namespace NexTraceOne.Configuration.Infrastructure.Persistence.Configurations;
 
 /// <summary>
-/// Configuração EF Core para a entidade ConfigurationDefinition.
-/// Define mapeamento de tabela, typed ID, enums, constraints, índices e concorrência otimista.
+/// Configuração EF Core para a entidade FeatureFlagDefinition.
+/// Define mapeamento de tabela, typed ID, enums, FK para módulo, índices e concorrência otimista.
+/// Esta entidade prepara o terreno para a resolução de feature flags por âmbito (P3.2).
 /// </summary>
-internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfiguration<ConfigurationDefinition>
+internal sealed class FeatureFlagDefinitionConfiguration : IEntityTypeConfiguration<FeatureFlagDefinition>
 {
-    public void Configure(EntityTypeBuilder<ConfigurationDefinition> builder)
+    public void Configure(EntityTypeBuilder<FeatureFlagDefinition> builder)
     {
-        builder.ToTable("cfg_definitions", t =>
-        {
-            t.HasCheckConstraint(
-                "CK_cfg_definitions_category",
-                "category IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
-
-            t.HasCheckConstraint(
-                "CK_cfg_definitions_value_type",
-                "value_type IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
-        });
+        builder.ToTable("cfg_feature_flag_definitions");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
-            .HasConversion(id => id.Value, value => new ConfigurationDefinitionId(value));
+            .HasConversion(id => id.Value, value => new FeatureFlagDefinitionId(value));
 
         builder.Property(x => x.Key)
             .HasMaxLength(256)
@@ -40,9 +32,8 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
         builder.Property(x => x.Description)
             .HasMaxLength(1000);
 
-        builder.Property(x => x.Category)
-            .HasConversion<string>()
-            .HasMaxLength(50)
+        builder.Property(x => x.DefaultEnabled)
+            .HasDefaultValue(false)
             .IsRequired();
 
         builder.Property(x => x.AllowedScopes)
@@ -51,31 +42,18 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
                 scopes => scopes.Select(s => s.ToString()).ToArray(),
                 values => values.Select(v => Enum.Parse<ConfigurationScope>(v)).ToArray());
 
-        builder.Property(x => x.DefaultValue)
-            .HasMaxLength(4000);
-
-        builder.Property(x => x.ValueType)
-            .HasConversion<string>()
-            .HasMaxLength(50)
-            .IsRequired();
-
-        builder.Property(x => x.ValidationRules)
-            .HasMaxLength(4000);
-
-        builder.Property(x => x.UiEditorType)
-            .HasMaxLength(100);
-
-        builder.Property(x => x.IsDeprecated)
-            .HasDefaultValue(false)
-            .IsRequired();
-
-        builder.Property(x => x.DeprecatedMessage)
-            .HasMaxLength(500);
-
         builder.Property(x => x.ModuleId)
             .HasConversion(
                 id => id == null ? (Guid?)null : id.Value,
                 value => value == null ? null : new ConfigurationModuleId(value.Value));
+
+        builder.Property(x => x.IsActive)
+            .HasDefaultValue(true)
+            .IsRequired();
+
+        builder.Property(x => x.IsEditable)
+            .HasDefaultValue(true)
+            .IsRequired();
 
         builder.Property(x => x.CreatedAt)
             .HasColumnType("timestamp with time zone")
@@ -88,7 +66,7 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
         builder.Property(x => x.RowVersion)
             .IsRowVersion();
 
-        // FK: ConfigurationDefinition → ConfigurationModule (opcional)
+        // FK: FeatureFlagDefinition → ConfigurationModule (opcional)
         builder.HasOne<ConfigurationModule>()
             .WithMany()
             .HasForeignKey(x => x.ModuleId)
@@ -97,8 +75,7 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
 
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Key).IsUnique();
-        builder.HasIndex(x => x.Category);
-        builder.HasIndex(x => x.SortOrder);
         builder.HasIndex(x => x.ModuleId);
+        builder.HasIndex(x => x.IsActive).HasFilter("\"is_active\" = true");
     }
 }

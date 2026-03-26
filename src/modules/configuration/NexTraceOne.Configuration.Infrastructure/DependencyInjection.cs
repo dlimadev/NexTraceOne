@@ -9,6 +9,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Configuration.Infrastructure.Seed;
 using NexTraceOne.Configuration.Infrastructure.Services;
 
 namespace NexTraceOne.Configuration.Infrastructure;
@@ -41,6 +42,10 @@ public static class DependencyInjection
         services.AddScoped<IConfigurationDefinitionRepository, ConfigurationDefinitionRepository>();
         services.AddScoped<IConfigurationEntryRepository, ConfigurationEntryRepository>();
         services.AddScoped<IConfigurationAuditRepository, ConfigurationAuditRepository>();
+        services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+
+        // Seeders — Scoped porque dependem do DbContext (Scoped)
+        services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();
 
         // Services
         services.AddScoped<IConfigurationResolutionService, ConfigurationResolutionService>();
