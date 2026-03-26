@@ -72,17 +72,10 @@ export function AppShell() {
         className={cn(
           'flex-1 flex flex-col min-h-0 min-w-0',
           'lg:transition-[margin] lg:duration-[var(--nto-motion-medium)] lg:ease-[var(--ease-standard)]',
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-[272px]',
         )}
-        style={{
-          ['--shell-sidebar-w' as string]: `${sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED}px`,
-        }}
         data-testid="app-shell-main"
       >
-        <style>{`
-          @media (min-width: 1024px) {
-            [data-testid="app-shell-main"] { margin-left: var(--shell-sidebar-w); }
-          }
-        `}</style>
         <AppTopbar
           onOpenCommandPalette={openPalette}
           onOpenMobileMenu={openMobile}

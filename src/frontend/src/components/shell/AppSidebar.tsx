@@ -20,6 +20,7 @@ import {
   Globe, Activity, Plus, Settings,
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
+  Network, Workflow,
 } from 'lucide-react';
 
 interface NavItem {
@@ -51,10 +52,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
   { labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={18} />, permission: 'operations:reliability:read', section: 'operations' },
-  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={18} />, permission: 'operations:automation:read', section: 'operations' },
+  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
   { labelKey: 'sidebar.environmentComparison', to: '/operations/runtime-comparison', icon: <BarChart3 size={18} />, permission: 'operations:runtime:read', section: 'operations' },
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
-  { labelKey: 'sidebar.aiAgents', to: '/ai/agents', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiAgents', to: '/ai/agents', icon: <Network size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
   { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <Shield size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiRouting', to: '/ai/routing', icon: <Share2 size={18} />, permission: 'ai:governance:read', section: 'aiHub' },

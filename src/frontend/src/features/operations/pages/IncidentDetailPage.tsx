@@ -206,7 +206,7 @@ export function IncidentDetailPage() {
           <Card>
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <Clock size={16} className="text-accent" /> {t('incidents.detail.timeline')}
+                <Clock size={16} className="text-accent" aria-hidden="true" /> {t('incidents.detail.timeline')}
               </h2>
             </CardHeader>
             <CardBody>
@@ -232,7 +232,7 @@ export function IncidentDetailPage() {
             <CardHeader>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                  <GitBranch size={16} className="text-accent" /> {t('incidents.correlation.title')}
+                  <GitBranch size={16} className="text-accent" aria-hidden="true" /> {t('incidents.correlation.title')}
                 </h2>
                 <button
                   type="button"
@@ -269,7 +269,7 @@ export function IncidentDetailPage() {
                   {correlation.relatedChanges.length > 0 ? (
                     correlation.relatedChanges.map((change, idx) => (
                       <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated text-sm">
-                        <GitBranch size={14} className="text-amber-400 shrink-0" />
+                        <GitBranch size={14} className="text-warning shrink-0" aria-hidden="true" />
                         <span className="text-body">{change.description}</span>
                         <Badge variant="warning" className="text-[10px] ml-auto shrink-0">{change.confidenceStatus}</Badge>
                       </div>
@@ -283,7 +283,7 @@ export function IncidentDetailPage() {
                   {correlation.relatedServices.length > 0 ? (
                     correlation.relatedServices.map((svc, idx) => (
                       <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated text-sm">
-                        <Activity size={14} className="text-accent shrink-0" />
+                        <Activity size={14} className="text-accent shrink-0" aria-hidden="true" />
                         <NavLink to={`/services/${svc.serviceId}`} className="text-accent hover:underline">{svc.displayName}</NavLink>
                         <span className="text-muted text-xs ml-auto">{svc.impactDescription}</span>
                       </div>
@@ -300,7 +300,7 @@ export function IncidentDetailPage() {
           <Card>
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <Shield size={16} className="text-accent" /> {t('incidents.evidence.title')}
+                <Shield size={16} className="text-accent" aria-hidden="true" /> {t('incidents.evidence.title')}
               </h2>
             </CardHeader>
             <CardBody>
@@ -337,7 +337,7 @@ export function IncidentDetailPage() {
           <Card>
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <Activity size={16} className="text-accent" /> {t('incidents.detail.impactedServices')}
+                <Activity size={16} className="text-accent" aria-hidden="true" /> {t('incidents.detail.impactedServices')}
               </h2>
             </CardHeader>
             <CardBody>
@@ -367,7 +367,7 @@ export function IncidentDetailPage() {
           <Card>
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <Wrench size={16} className="text-accent" /> {t('incidents.mitigation.title')}
+                <Wrench size={16} className="text-accent" aria-hidden="true" /> {t('incidents.mitigation.title')}
               </h2>
             </CardHeader>
             <CardBody>
@@ -385,8 +385,8 @@ export function IncidentDetailPage() {
                       {mitigation.actions.map((action, idx) => (
                         <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated">
                           {action.completed
-                            ? <CheckCircle size={14} className="text-emerald-400 shrink-0" />
-                            : <Clock size={14} className="text-amber-400 shrink-0" />
+                            ? <CheckCircle size={14} className="text-success shrink-0" aria-hidden="true" />
+                            : <Clock size={14} className="text-warning shrink-0" aria-hidden="true" />
                           }
                           <span className="text-sm text-body flex-1">{action.description}</span>
                           <span className="text-xs text-muted">{action.status}</span>
@@ -417,7 +417,7 @@ export function IncidentDetailPage() {
           <Card>
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <BookOpen size={16} className="text-accent" /> {t('incidents.runbooks.title')}
+                <BookOpen size={16} className="text-accent" aria-hidden="true" /> {t('incidents.runbooks.title')}
               </h2>
             </CardHeader>
             <CardBody>
@@ -425,7 +425,7 @@ export function IncidentDetailPage() {
                 <div className="space-y-2">
                   {runbooks.map((rb, idx) => (
                     <div key={idx} className="flex items-center gap-2 p-2 rounded bg-elevated">
-                      <FileText size={14} className="text-accent shrink-0" />
+                      <FileText size={14} className="text-accent shrink-0" aria-hidden="true" />
                       {rb.url ? (
                         <a href={rb.url} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline flex items-center gap-1">
                           {rb.title} <ExternalLink size={12} />
@@ -447,7 +447,7 @@ export function IncidentDetailPage() {
             <Card>
               <CardHeader>
                 <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                  <FileText size={16} className="text-accent" /> {t('incidents.detail.relatedContracts')}
+                  <FileText size={16} className="text-accent" aria-hidden="true" /> {t('incidents.detail.relatedContracts')}
                 </h2>
               </CardHeader>
               <CardBody>

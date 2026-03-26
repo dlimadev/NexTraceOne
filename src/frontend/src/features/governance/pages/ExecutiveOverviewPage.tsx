@@ -1,22 +1,21 @@
-import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, ShieldAlert, AlertTriangle, BarChart3, Activity,
-  CheckCircle, RefreshCw, Clock, Target, AlertCircle, Loader2,
+  CheckCircle, RefreshCw, Clock, Target, AlertCircle,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import type {
-  ExecutiveOverviewResponse,
   RiskLevel,
   GovernanceTrendDirection,
 } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-
-
 
 /** Mapeia RiskLevel para variante do Badge. */
 const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 'default' => {
@@ -46,38 +45,25 @@ const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'info' | 
  */
 export function ExecutiveOverviewPage() {
   const { t } = useTranslation();
-  const [data, setData] = useState<ExecutiveOverviewResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getExecutiveOverview()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [t]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['executive-overview'],
+    queryFn: () => organizationGovernanceApi.getExecutiveOverview(),
+    staleTime: 60_000,
+  });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+        <PageLoadingState size="lg" />
       </PageContainer>
     );
   }
 
-  if (error || !data) {
+  if (isError || !data) {
     return (
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <AlertTriangle size={48} className="text-critical" />
-          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
-        </div>
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }
@@ -104,7 +90,7 @@ export function ExecutiveOverviewPage() {
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <TrendingUp size={16} className="text-accent" />
+                <TrendingUp size={16} className="text-accent" aria-hidden="true" />
                 {t('governance.executive.operationalTrend')}
               </h2>
             </CardHeader>
@@ -120,7 +106,7 @@ export function ExecutiveOverviewPage() {
                   title={t('governance.executive.incidentRateChange')}
                   value={`${d.operationalTrend.incidentRateChange}%`}
                   icon={<AlertTriangle size={20} />}
-                  color={d.operationalTrend.incidentRateChange < 0 ? 'text-emerald-500' : 'text-critical'}
+                  color={d.operationalTrend.incidentRateChange < 0 ? 'text-success' : 'text-critical'}
                 />
                 <StatCard
                   title={t('governance.executive.avgResolutionHours')}
@@ -136,7 +122,7 @@ export function ExecutiveOverviewPage() {
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <ShieldAlert size={16} className="text-accent" />
+                <ShieldAlert size={16} className="text-accent" aria-hidden="true" />
                 {t('governance.executive.riskSummary')}
               </h2>
             </CardHeader>
@@ -158,7 +144,7 @@ export function ExecutiveOverviewPage() {
                   title={t('governance.executive.highRiskServices')}
                   value={d.riskSummary.highRiskServices}
                   icon={<AlertTriangle size={20} />}
-                  color="text-orange-500"
+                  color="text-warning"
                 />
                 <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
                   <p className="text-xs text-muted mb-1">{t('governance.executive.riskTrend')}</p>
@@ -174,14 +160,14 @@ export function ExecutiveOverviewPage() {
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <BarChart3 size={16} className="text-accent" />
+                <BarChart3 size={16} className="text-accent" aria-hidden="true" />
                 {t('governance.executive.maturitySummary')}
               </h2>
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {maturityItems.map(item => {
-                  const barColor = item.value >= 80 ? 'bg-emerald-500' : item.value >= 60 ? 'bg-amber-500' : 'bg-critical';
+                  const barColor = item.value >= 80 ? 'bg-success' : item.value >= 60 ? 'bg-warning' : 'bg-critical';
                   return (
                     <div key={item.key}>
                       <div className="flex items-center justify-between mb-1">
@@ -205,7 +191,7 @@ export function ExecutiveOverviewPage() {
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <RefreshCw size={16} className="text-accent" />
+                <RefreshCw size={16} className="text-accent" aria-hidden="true" />
                 {t('governance.executive.changeSafety')}
               </h2>
             </CardHeader>
@@ -215,13 +201,13 @@ export function ExecutiveOverviewPage() {
                   title={t('governance.executive.safeChanges')}
                   value={d.changeSafetySummary.safeChanges}
                   icon={<CheckCircle size={20} />}
-                  color="text-emerald-500"
+                  color="text-success"
                 />
                 <StatCard
                   title={t('governance.executive.riskyChanges')}
                   value={d.changeSafetySummary.riskyChanges}
                   icon={<AlertTriangle size={20} />}
-                  color="text-orange-500"
+                  color="text-warning"
                 />
                 <StatCard
                   title={t('governance.executive.rollbacks')}
@@ -243,7 +229,7 @@ export function ExecutiveOverviewPage() {
           <Card className="mb-6">
             <CardHeader>
               <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-                <Activity size={16} className="text-accent" />
+                <Activity size={16} className="text-accent" aria-hidden="true" />
                 {t('governance.executive.incidentTrend')}
               </h2>
             </CardHeader>
@@ -259,7 +245,7 @@ export function ExecutiveOverviewPage() {
                   title={t('governance.executive.resolvedLast30Days')}
                   value={d.incidentTrendSummary.resolvedLast30Days}
                   icon={<CheckCircle size={20} />}
-                  color="text-emerald-500"
+                  color="text-success"
                 />
                 <StatCard
                   title={t('governance.executive.avgResolutionHours')}
@@ -271,7 +257,7 @@ export function ExecutiveOverviewPage() {
                   title={t('governance.executive.recurrenceRate')}
                   value={`${d.incidentTrendSummary.recurrenceRate}%`}
                   icon={<RefreshCw size={20} />}
-                  color="text-amber-500"
+                  color="text-warning"
                 />
                 <div className="bg-card rounded-lg shadow-sm border border-edge p-5 flex flex-col items-center justify-center">
                   <p className="text-xs text-muted mb-1">{t('governance.executive.incidentTrend')}</p>
@@ -290,7 +276,7 @@ export function ExecutiveOverviewPage() {
         <Card className="mb-6">
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <Target size={16} className="text-accent" />
+            <Target size={16} className="text-accent" aria-hidden="true" />
             {t('governance.executive.criticalFocusAreas')}
           </h2>
         </CardHeader>
@@ -320,7 +306,7 @@ export function ExecutiveOverviewPage() {
         <Card>
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-              <ShieldAlert size={16} className="text-accent" />
+              <ShieldAlert size={16} className="text-accent" aria-hidden="true" />
               {t('governance.executive.topDomainsAttention')}
             </h2>
           </CardHeader>
