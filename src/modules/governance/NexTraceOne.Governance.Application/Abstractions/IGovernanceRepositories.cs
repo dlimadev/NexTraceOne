@@ -1,6 +1,5 @@
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
-using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Abstractions;
 
@@ -290,96 +289,8 @@ public interface IGovernanceRolloutRecordRepository
     Task UpdateAsync(GovernanceRolloutRecord record, CancellationToken ct);
 }
 
-/// <summary>
-/// Interface do repositório de IngestionSources para o módulo Governance.
-/// Define operações CRUD e consultas para fontes de ingestão.
-/// </summary>
-public interface IIngestionSourceRepository
-{
-    /// <summary>Lista todas as fontes com filtros opcionais.</summary>
-    Task<IReadOnlyList<IngestionSource>> ListAsync(
-        IntegrationConnectorId? connectorId,
-        SourceStatus? status,
-        FreshnessStatus? freshnessStatus,
-        CancellationToken ct);
-
-    /// <summary>Lista fontes por conector.</summary>
-    Task<IReadOnlyList<IngestionSource>> ListByConnectorIdAsync(
-        IntegrationConnectorId connectorId,
-        CancellationToken ct);
-
-    /// <summary>Obtém uma fonte pelo seu identificador.</summary>
-    Task<IngestionSource?> GetByIdAsync(IngestionSourceId id, CancellationToken ct);
-
-    /// <summary>Obtém uma fonte pelo nome dentro de um conector.</summary>
-    Task<IngestionSource?> GetByConnectorAndNameAsync(
-        IntegrationConnectorId connectorId,
-        string name,
-        CancellationToken ct);
-
-    /// <summary>Adiciona uma nova fonte ao repositório.</summary>
-    Task AddAsync(IngestionSource source, CancellationToken ct);
-
-    /// <summary>Atualiza uma fonte existente.</summary>
-    Task UpdateAsync(IngestionSource source, CancellationToken ct);
-
-    /// <summary>Conta fontes por freshness status.</summary>
-    Task<int> CountByFreshnessStatusAsync(FreshnessStatus status, CancellationToken ct);
-}
-
-/// <summary>
-/// Interface do repositório de IngestionExecutions para o módulo Governance.
-/// Define operações CRUD e consultas para execuções de ingestão.
-/// </summary>
-public interface IIngestionExecutionRepository
-{
-    /// <summary>Lista execuções com filtros e paginação.</summary>
-    Task<IReadOnlyList<IngestionExecution>> ListAsync(
-        IntegrationConnectorId? connectorId,
-        IngestionSourceId? sourceId,
-        ExecutionResult? result,
-        DateTimeOffset? from,
-        DateTimeOffset? to,
-        int page,
-        int pageSize,
-        CancellationToken ct);
-
-    /// <summary>Conta total de execuções com filtros.</summary>
-    Task<int> CountAsync(
-        IntegrationConnectorId? connectorId,
-        IngestionSourceId? sourceId,
-        ExecutionResult? result,
-        DateTimeOffset? from,
-        DateTimeOffset? to,
-        CancellationToken ct);
-
-    /// <summary>Lista execuções por conector.</summary>
-    Task<IReadOnlyList<IngestionExecution>> ListByConnectorIdAsync(
-        IntegrationConnectorId connectorId,
-        int limit,
-        CancellationToken ct);
-
-    /// <summary>Obtém uma execução pelo seu identificador.</summary>
-    Task<IngestionExecution?> GetByIdAsync(IngestionExecutionId id, CancellationToken ct);
-
-    /// <summary>Obtém a última execução de um conector.</summary>
-    Task<IngestionExecution?> GetLastByConnectorIdAsync(
-        IntegrationConnectorId connectorId,
-        CancellationToken ct);
-
-    /// <summary>Adiciona uma nova execução ao repositório.</summary>
-    Task AddAsync(IngestionExecution execution, CancellationToken ct);
-
-    /// <summary>Atualiza uma execução existente.</summary>
-    Task UpdateAsync(IngestionExecution execution, CancellationToken ct);
-
-    /// <summary>Conta execuções por resultado num período.</summary>
-    Task<int> CountByResultInPeriodAsync(
-        ExecutionResult result,
-        DateTimeOffset from,
-        DateTimeOffset to,
-        CancellationToken ct);
-}
+// NOTE P2.2: IIngestionSourceRepository moved to NexTraceOne.Integrations.Application.Abstractions.
+// NOTE P2.2: IIngestionExecutionRepository moved to NexTraceOne.Integrations.Application.Abstractions.
 
 /// <summary>
 /// DTO for monthly count aggregation.

@@ -11,11 +11,10 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 ///
-/// NOTA SOBRE ESCOPO: Este DbContext contém temporariamente DbSets de Integrations
-/// (IngestionSources, IngestionExecutions) que serão extraídos para IntegrationsDbContext em P2.2.
-/// O DbSet de IntegrationConnectors foi extraído para IntegrationsDbContext em P2.1.
-/// Product Analytics (AnalyticsEvents) será extraído para módulo próprio em OI-03.
-/// Após essas extrações, apenas os 8 DbSets de Governance permanecerão.
+/// P2.1: IntegrationConnectors extraído para IntegrationsDbContext.
+/// P2.2: IngestionSources e IngestionExecutions extraídos para IntegrationsDbContext.
+/// OI-03 (pendente): AnalyticsEvents a extrair para módulo próprio.
+/// Após OI-03, apenas os 8 DbSets de Governance permanecerão.
 /// </summary>
 public sealed class GovernanceDbContext(
     DbContextOptions<GovernanceDbContext> options,
@@ -48,13 +47,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Registos de rollout de pacotes de governança.</summary>
     public DbSet<GovernanceRolloutRecord> RolloutRecords => Set<GovernanceRolloutRecord>();
 
-    // NOTE: IntegrationConnectors was extracted to IntegrationsDbContext in P2.1.
-
-    /// <summary>Fontes de ingestão de dados (a ser extraído para IntegrationsDbContext em P2.2).</summary>
-    public DbSet<IngestionSource> IngestionSources => Set<IngestionSource>();
-
-    /// <summary>Execuções de ingestão de dados (a ser extraído para IntegrationsDbContext em P2.2).</summary>
-    public DbSet<IngestionExecution> IngestionExecutions => Set<IngestionExecution>();
+    // NOTE: IntegrationConnectors extracted to IntegrationsDbContext in P2.1.
+    // NOTE: IngestionSources extracted to IntegrationsDbContext in P2.2.
+    // NOTE: IngestionExecutions extracted to IntegrationsDbContext in P2.2.
 
     /// <summary>Eventos de Product Analytics (a ser extraído para módulo próprio em OI-03).</summary>
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();

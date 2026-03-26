@@ -1,10 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Integrations.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.ListIngestionSources;
 

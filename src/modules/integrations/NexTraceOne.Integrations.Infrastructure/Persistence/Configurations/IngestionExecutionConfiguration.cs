@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.Integrations.Domain.Entities;
 
-namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Integrations.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade IngestionExecution.
@@ -72,17 +70,17 @@ internal sealed class IngestionExecutionConfiguration : IEntityTypeConfiguration
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        // Relacionamentos
-        // NOTE P2.1: FK navigation to IntegrationConnector removed because IntegrationConnector
-        // moved to IntegrationsDbContext. ConnectorId is preserved as a cross-context reference.
-        // EF navigation will be restored when IngestionExecution is extracted in P2.2.
+        // FK navigations restored in P2.2: all three entities now in same IntegrationsDbContext.
+        builder.HasOne<IntegrationConnector>()
+            .WithMany()
+            .HasForeignKey(x => x.ConnectorId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<IngestionSource>()
             .WithMany()
             .HasForeignKey(x => x.SourceId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // Índices para consultas frequentes
         builder.HasIndex(x => x.ConnectorId);
         builder.HasIndex(x => x.SourceId);
         builder.HasIndex(x => x.CorrelationId);

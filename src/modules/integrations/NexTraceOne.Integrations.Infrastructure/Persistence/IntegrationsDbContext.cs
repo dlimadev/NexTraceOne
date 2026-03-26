@@ -8,8 +8,10 @@ namespace NexTraceOne.Integrations.Infrastructure.Persistence;
 
 /// <summary>
 /// DbContext do módulo Integrations.
-/// Contém apenas a entidade IntegrationConnector, extraída de GovernanceDbContext em P2.1.
-/// IngestionSource e IngestionExecution serão migradas para cá em P2.2.
+/// Contém as entidades de Integrations extraídas de GovernanceDbContext em P2.1 e P2.2:
+///   - IntegrationConnector (extraído em P2.1)
+///   - IngestionSource (extraído em P2.2)
+///   - IngestionExecution (extraído em P2.2)
 ///
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 /// </summary>
@@ -20,8 +22,14 @@ public sealed class IntegrationsDbContext(
     IDateTimeProvider clock)
     : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
 {
-    /// <summary>Connectors de integração com sistemas externos.</summary>
+    /// <summary>Connectors de integração com sistemas externos (extraído em P2.1).</summary>
     public DbSet<IntegrationConnector> IntegrationConnectors => Set<IntegrationConnector>();
+
+    /// <summary>Fontes de ingestão de dados (extraído em P2.2).</summary>
+    public DbSet<IngestionSource> IngestionSources => Set<IngestionSource>();
+
+    /// <summary>Execuções de ingestão de dados (extraído em P2.2).</summary>
+    public DbSet<IngestionExecution> IngestionExecutions => Set<IngestionExecution>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IntegrationsDbContext).Assembly;

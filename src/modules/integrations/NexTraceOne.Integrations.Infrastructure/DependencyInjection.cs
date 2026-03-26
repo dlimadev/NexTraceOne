@@ -16,8 +16,8 @@ namespace NexTraceOne.Integrations.Infrastructure;
 /// Registra serviços de infraestrutura do módulo Integrations.
 /// Inclui: DbContext, Repositórios, UnitOfWork.
 ///
-/// Módulo criado em P2.1 para receber IntegrationConnector extraído de Governance.
-/// Em P2.2, IngestionSource e IngestionExecution também serão migradas para cá.
+/// P2.1: IntegrationConnector extraído de Governance.
+/// P2.2: IngestionSource e IngestionExecution extraídos de Governance.
 /// </summary>
 public static class DependencyInjection
 {
@@ -34,8 +34,12 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
-        // Repositories
+        // Repositories — P2.1
         services.AddScoped<IIntegrationConnectorRepository, IntegrationConnectorRepository>();
+
+        // Repositories — P2.2
+        services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
+        services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
 
         return services;
     }

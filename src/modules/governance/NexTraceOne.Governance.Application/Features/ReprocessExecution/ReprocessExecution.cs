@@ -2,8 +2,8 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.ReprocessExecution;
 

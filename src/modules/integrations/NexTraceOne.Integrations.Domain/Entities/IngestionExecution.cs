@@ -1,10 +1,9 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
-using NexTraceOne.Governance.Domain.Enums;
-using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Integrations.Domain.Enums;
 
-namespace NexTraceOne.Governance.Domain.Entities;
+namespace NexTraceOne.Integrations.Domain.Entities;
 
 /// <summary>
 /// Identificador fortemente tipado para IngestionExecution.

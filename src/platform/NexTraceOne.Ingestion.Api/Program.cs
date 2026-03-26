@@ -10,8 +10,6 @@ using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.Governance.Infrastructure;
 using NexTraceOne.Governance.Infrastructure.Persistence;
-using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 using Serilog;

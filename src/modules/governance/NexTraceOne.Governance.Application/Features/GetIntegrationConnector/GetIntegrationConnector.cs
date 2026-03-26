@@ -1,7 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 using IntegrationConnectorStatus = NexTraceOne.Integrations.Domain.Enums.ConnectorStatus;
@@ -72,7 +71,7 @@ public static class GetIntegrationConnector
                     Result: e.Result.ToString(),
                     RecordsProcessed: e.ItemsProcessed,
                     Warnings: e.ItemsFailed > 0 && e.ItemsSucceeded > 0 ? e.ItemsFailed : 0,
-                    Errors: e.Result == NexTraceOne.Governance.Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
+                    Errors: e.Result == NexTraceOne.Integrations.Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
                     .ToList(),
                 SourceScope: sources.Select(s => s.Name).ToList(),
                 AllowedTeams: connector.AllowedTeams.ToList());

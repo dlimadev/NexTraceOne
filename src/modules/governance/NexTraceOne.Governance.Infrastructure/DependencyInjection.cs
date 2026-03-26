@@ -48,8 +48,10 @@ public static class DependencyInjection
         services.AddScoped<IGovernanceRolloutRecordRepository, GovernanceRolloutRecordRepository>();
         // NOTE: IIntegrationConnectorRepository removed from Governance in P2.1.
         //       Registered via AddIntegrationsInfrastructure below.
-        services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
-        services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
+        // NOTE: IIngestionSourceRepository removed from Governance in P2.2.
+        //       Registered via AddIntegrationsInfrastructure below.
+        // NOTE: IIngestionExecutionRepository removed from Governance in P2.2.
+        //       Registered via AddIntegrationsInfrastructure below.
         services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
 
