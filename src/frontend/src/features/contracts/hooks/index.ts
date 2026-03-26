@@ -51,3 +51,10 @@ export {
   useEventContractDetail,
   eventKeys,
 } from './useEventWorkflow';
+
+export {
+  useRegisterBackgroundService,
+  useCreateBackgroundServiceDraft,
+  useBackgroundServiceContractDetail,
+  backgroundServiceKeys,
+} from './useBackgroundServiceWorkflow';

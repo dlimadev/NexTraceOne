@@ -8,6 +8,7 @@ import type {
   DraftStatus,
   SoapDraftCreateResponse,
   EventDraftCreateResponse,
+  BackgroundServiceDraftCreateResponse,
 } from '../types';
 
 function readValue<T>(source: Record<string, unknown>, camel: string, pascal?: string): T | undefined {
@@ -203,5 +204,36 @@ export const contractStudioApi = {
       defaultContentType: data.defaultContentType ?? 'application/json',
       channelsJson: data.channelsJson,
       messagesJson: data.messagesJson,
+    }).then((r) => r.data),
+
+  /**
+   * Cria um draft específico para Background Service Contracts com metadados do processo.
+   * Cria ContractDraft (ContractType=BackgroundService) + BackgroundServiceDraftMetadata.
+   */
+  createBackgroundServiceDraft: (data: {
+    title: string;
+    author: string;
+    serviceName: string;
+    category?: string;
+    triggerType?: string;
+    serviceId?: string;
+    description?: string;
+    scheduleExpression?: string;
+    inputsJson?: string;
+    outputsJson?: string;
+    sideEffectsJson?: string;
+  }) =>
+    client.post<BackgroundServiceDraftCreateResponse>('/contracts/drafts/background-service', {
+      title: data.title,
+      author: data.author,
+      serviceName: data.serviceName,
+      category: data.category ?? 'Job',
+      triggerType: data.triggerType ?? 'OnDemand',
+      serviceId: data.serviceId,
+      description: data.description,
+      scheduleExpression: data.scheduleExpression,
+      inputsJson: data.inputsJson,
+      outputsJson: data.outputsJson,
+      sideEffectsJson: data.sideEffectsJson,
     }).then((r) => r.data),
 };

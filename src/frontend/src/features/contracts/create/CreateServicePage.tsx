@@ -77,8 +77,15 @@ export function CreateServicePage() {
   const [asyncApiVersion, setAsyncApiVersion] = useState('2.6.0');
   const [defaultContentType, setDefaultContentType] = useState('application/json');
 
+  // Background Service-specific fields
+  const [bgServiceName, setBgServiceName] = useState('');
+  const [bgCategory, setBgCategory] = useState('Job');
+  const [bgTriggerType, setBgTriggerType] = useState('OnDemand');
+  const [bgScheduleExpression, setBgScheduleExpression] = useState('');
+
   const isSoapType = selectedType === 'Soap';
   const isEventType = selectedType === 'Event';
+  const isBackgroundServiceType = selectedType === 'BackgroundService';
 
   const servicesQuery = useQuery({
     queryKey: ['catalog-services-for-contracts'],
@@ -135,6 +142,22 @@ export function CreateServicePage() {
         }
 
         return { draftId: eventDraft.draftId };
+      }
+
+      // Background Service type uses dedicated createBackgroundServiceDraft to populate BackgroundServiceDraftMetadata
+      if (isBackgroundServiceType) {
+        const bgDraft = await contractStudioApi.createBackgroundServiceDraft({
+          title,
+          author: currentActor,
+          serviceName: bgServiceName || title,
+          category: bgCategory,
+          triggerType: bgTriggerType,
+          serviceId: linkedServiceId || undefined,
+          description,
+          scheduleExpression: bgScheduleExpression || undefined,
+        });
+
+        return { draftId: bgDraft.draftId };
       }
 
       // Generic draft creation for other types
@@ -533,6 +556,82 @@ export function CreateServicePage() {
                       </select>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Background Service-specific metadata fields */}
+              {isBackgroundServiceType && (
+                <div className="space-y-3 pt-1 border-t border-edge">
+                  <p className="text-[10px] text-muted font-medium uppercase tracking-wider">
+                    {t('contracts.create.bgServiceMetadata', 'Background Service Metadata')}
+                  </p>
+
+                  <div>
+                    <label className="block text-xs font-medium text-heading mb-1">
+                      {t('contracts.create.bgServiceName', 'Service / Job Name')} *
+                    </label>
+                    <input
+                      type="text"
+                      value={bgServiceName}
+                      onChange={(e) => setBgServiceName(e.target.value)}
+                      placeholder={t('contracts.create.bgServiceNamePlaceholder', 'e.g., OrderExpirationJob, ReportGeneratorWorker')}
+                      className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.bgCategory', 'Category')}
+                      </label>
+                      <select
+                        value={bgCategory}
+                        onChange={(e) => setBgCategory(e.target.value)}
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                      >
+                        <option value="Job">Job</option>
+                        <option value="Worker">Worker</option>
+                        <option value="Scheduler">Scheduler</option>
+                        <option value="Processor">Processor</option>
+                        <option value="Exporter">Exporter</option>
+                        <option value="Notifier">Notifier</option>
+                      </select>
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.bgTriggerType', 'Trigger Type')}
+                      </label>
+                      <select
+                        value={bgTriggerType}
+                        onChange={(e) => setBgTriggerType(e.target.value)}
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                      >
+                        <option value="OnDemand">On Demand</option>
+                        <option value="Cron">Cron</option>
+                        <option value="Interval">Interval</option>
+                        <option value="EventTriggered">Event Triggered</option>
+                        <option value="Continuous">Continuous</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {(bgTriggerType === 'Cron' || bgTriggerType === 'Interval') && (
+                    <div>
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.bgScheduleExpression', 'Schedule Expression')}
+                      </label>
+                      <input
+                        type="text"
+                        value={bgScheduleExpression}
+                        onChange={(e) => setBgScheduleExpression(e.target.value)}
+                        placeholder={bgTriggerType === 'Cron'
+                          ? t('contracts.create.bgCronPlaceholder', 'e.g., 0 * * * * (every hour)')
+                          : t('contracts.create.bgIntervalPlaceholder', 'e.g., PT5M (ISO 8601 interval)')}
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </CardBody>

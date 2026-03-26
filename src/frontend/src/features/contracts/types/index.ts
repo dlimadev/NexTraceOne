@@ -87,4 +87,7 @@ export type {
   EventContractDetail,
   AsyncApiImportResponse,
   EventDraftCreateResponse,
+  BackgroundServiceContractDetail,
+  BackgroundServiceRegisterResponse,
+  BackgroundServiceDraftCreateResponse,
 } from '../../../types';

@@ -8,6 +8,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample;
 using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
 using NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateBackgroundServiceDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateEventDraft;
@@ -20,6 +21,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetBackgroundServiceContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetEventContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSoapContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.ImportAsyncApiContract;
@@ -31,6 +33,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview;
+using NexTraceOne.Catalog.Application.Contracts.Features.RegisterBackgroundServiceContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.SuggestSemanticVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata;
@@ -93,6 +96,11 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ImportAsyncApiContract.Command>, ImportAsyncApiContract.Validator>();
         services.AddTransient<IValidator<CreateEventDraft.Command>, CreateEventDraft.Validator>();
         services.AddTransient<IValidator<GetEventContractDetail.Query>, GetEventContractDetail.Validator>();
+
+        // Background Service Contracts — workflow específico de jobs/workers/schedulers
+        services.AddTransient<IValidator<RegisterBackgroundServiceContract.Command>, RegisterBackgroundServiceContract.Validator>();
+        services.AddTransient<IValidator<CreateBackgroundServiceDraft.Command>, CreateBackgroundServiceDraft.Validator>();
+        services.AddTransient<IValidator<GetBackgroundServiceContractDetail.Query>, GetBackgroundServiceContractDetail.Validator>();
 
         return services;
     }

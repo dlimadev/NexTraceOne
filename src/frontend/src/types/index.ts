@@ -1413,6 +1413,56 @@ export interface EventDraftCreateResponse {
   createdAt: string;
 }
 
+/**
+ * Detalhes de Background Service Contract de uma versão publicada.
+ * Retornados pelo endpoint GET /api/v1/contracts/{id}/background-service-detail.
+ */
+export interface BackgroundServiceContractDetail {
+  detailId: string;
+  contractVersionId: string;
+  serviceName: string;
+  category: string;
+  triggerType: string;
+  scheduleExpression?: string | null;
+  timeoutExpression?: string | null;
+  allowsConcurrency: boolean;
+  inputsJson: string;
+  outputsJson: string;
+  sideEffectsJson: string;
+}
+
+/**
+ * Resposta do registo de Background Service Contract.
+ * Retornada pelo endpoint POST /api/v1/contracts/background-services/register.
+ */
+export interface BackgroundServiceRegisterResponse {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  serviceName: string;
+  category: string;
+  triggerType: string;
+  scheduleExpression?: string | null;
+  timeoutExpression?: string | null;
+  allowsConcurrency: boolean;
+  registeredAt: string;
+}
+
+/**
+ * Resposta da criação de draft de Background Service.
+ * Retornada pelo endpoint POST /api/v1/contracts/drafts/background-service.
+ */
+export interface BackgroundServiceDraftCreateResponse {
+  draftId: string;
+  title: string;
+  status: string;
+  serviceName: string;
+  category: string;
+  triggerType: string;
+  scheduleExpression?: string | null;
+  createdAt: string;
+}
+
 export interface SignatureVerificationResult {
   contractVersionId: string;
   hasSignature: boolean;

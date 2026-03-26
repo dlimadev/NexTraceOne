@@ -17,6 +17,8 @@ import type {
   WsdlImportResponse,
   EventContractDetail,
   AsyncApiImportResponse,
+  BackgroundServiceContractDetail,
+  BackgroundServiceRegisterResponse,
 } from '../types';
 import type {
   ValidationIssue,
@@ -305,4 +307,34 @@ export const contractsApi = {
    */
   getEventContractDetail: (contractVersionId: string) =>
     client.get<EventContractDetail>(`/contracts/${contractVersionId}/event-detail`).then((r) => r.data),
+
+  // ── Background Service Contracts workflow ─────────────────────────
+
+  /**
+   * Regista um Background Service Contract com metadados específicos do processo.
+   * Cria ContractVersion (ContractType=BackgroundService) + BackgroundServiceContractDetail.
+   */
+  registerBackgroundService: (data: {
+    apiAssetId: string;
+    semVer: string;
+    serviceName: string;
+    category: string;
+    triggerType: string;
+    scheduleExpression?: string;
+    timeoutExpression?: string;
+    allowsConcurrency?: boolean;
+    inputsJson?: string;
+    outputsJson?: string;
+    sideEffectsJson?: string;
+    specContent?: string;
+  }) =>
+    client.post<BackgroundServiceRegisterResponse>('/contracts/background-services/register', data)
+      .then((r) => r.data),
+
+  /**
+   * Obtém os detalhes de Background Service de uma versão de contrato publicada.
+   */
+  getBackgroundServiceContractDetail: (contractVersionId: string) =>
+    client.get<BackgroundServiceContractDetail>(`/contracts/${contractVersionId}/background-service-detail`)
+      .then((r) => r.data),
 };

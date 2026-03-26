@@ -149,6 +149,20 @@ public static class ContractsErrors
     public static Error InvalidAsyncApiContent()
         => Error.Validation("Contracts.Event.InvalidAsyncApiContent", "The provided content is not a valid AsyncAPI document. Expected JSON with 'asyncapi' field.");
 
+    // ── Background Service Contracts ─────────────────────────────────────────────
+
+    /// <summary>Detalhe de Background Service Contract não encontrado para a versão de contrato informada.</summary>
+    public static Error BackgroundServiceDetailNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.BackgroundService.DetailNotFound", "Background service contract detail not found for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Metadado de Background Service Draft não encontrado para o draft informado.</summary>
+    public static Error BackgroundServiceDraftMetadataNotFound(string draftId)
+        => Error.NotFound("Contracts.BackgroundService.DraftMetadataNotFound", "Background service draft metadata not found for draft '{0}'.", draftId);
+
+    /// <summary>Nome do serviço em background é obrigatório para registro deste tipo contratual.</summary>
+    public static Error BackgroundServiceNameRequired()
+        => Error.Validation("Contracts.BackgroundService.ServiceNameRequired", "Service name is required for background service contracts.");
+
     // ── ContractExample ─────────────────────────────────────────────
 
     /// <summary>Exemplo de contrato não encontrado.</summary>
