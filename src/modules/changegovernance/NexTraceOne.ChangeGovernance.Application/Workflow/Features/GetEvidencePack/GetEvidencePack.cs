@@ -53,7 +53,11 @@ public static class GetEvidencePack
                 evidencePack.ApprovalHistory,
                 evidencePack.ContractHash,
                 evidencePack.CompletenessPercentage,
-                evidencePack.GeneratedAt);
+                evidencePack.GeneratedAt,
+                evidencePack.PipelineSource,
+                evidencePack.BuildId,
+                evidencePack.CommitSha,
+                evidencePack.CiChecksResult);
         }
     }
 
@@ -69,5 +73,9 @@ public static class GetEvidencePack
         string? ApprovalHistory,
         string? ContractHash,
         decimal CompletenessPercentage,
-        DateTimeOffset GeneratedAt);
+        DateTimeOffset GeneratedAt,
+        string? PipelineSource,
+        string? BuildId,
+        string? CommitSha,
+        string? CiChecksResult);
 }

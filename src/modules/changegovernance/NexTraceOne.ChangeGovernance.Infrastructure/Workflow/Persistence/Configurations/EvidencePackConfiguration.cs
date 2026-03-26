@@ -28,6 +28,12 @@ internal sealed class EvidencePackConfiguration : IEntityTypeConfiguration<Evide
         builder.Property(x => x.CompletenessPercentage).HasPrecision(5, 2).IsRequired();
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
 
+        // ── CI/CD fields (P5.4) ──────────────────────────────────────────────
+        builder.Property(x => x.PipelineSource).HasMaxLength(500);
+        builder.Property(x => x.BuildId).HasMaxLength(500);
+        builder.Property(x => x.CommitSha).HasMaxLength(100);
+        builder.Property(x => x.CiChecksResult).HasMaxLength(50);
+
         builder.HasIndex(x => x.WorkflowInstanceId).IsUnique();
         builder.HasIndex(x => x.ReleaseId);
     }

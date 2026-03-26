@@ -93,7 +93,11 @@ public static class ExportEvidencePackPdf
                 evidencePack.CompletenessPercentage,
                 evidencePack.GeneratedAt,
                 stageDetails,
-                decisionDetails);
+                decisionDetails,
+                evidencePack.PipelineSource,
+                evidencePack.BuildId,
+                evidencePack.CommitSha,
+                evidencePack.CiChecksResult);
         }
     }
 
@@ -134,5 +138,9 @@ public static class ExportEvidencePackPdf
         decimal CompletenessPercentage,
         DateTimeOffset GeneratedAt,
         IReadOnlyList<StageDetail> Stages,
-        IReadOnlyList<DecisionDetail> Decisions);
+        IReadOnlyList<DecisionDetail> Decisions,
+        string? PipelineSource,
+        string? BuildId,
+        string? CommitSha,
+        string? CiChecksResult);
 }

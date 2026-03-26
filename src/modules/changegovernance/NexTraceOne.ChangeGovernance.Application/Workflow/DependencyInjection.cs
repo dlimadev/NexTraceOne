@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.AddObservation;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.ApproveStage;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.AttachCiCdEvidence;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.EscalateSlaViolation;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf;
@@ -40,6 +41,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RequestChanges.Command>, RequestChanges.Validator>();
         services.AddTransient<IValidator<AddObservation.Command>, AddObservation.Validator>();
         services.AddTransient<IValidator<GenerateEvidencePack.Command>, GenerateEvidencePack.Validator>();
+        services.AddTransient<IValidator<AttachCiCdEvidence.Command>, AttachCiCdEvidence.Validator>();
         services.AddTransient<IValidator<EscalateSlaViolation.Command>, EscalateSlaViolation.Validator>();
         services.AddTransient<IValidator<GetWorkflowStatus.Query>, GetWorkflowStatus.Validator>();
         services.AddTransient<IValidator<ListPendingApprovals.Query>, ListPendingApprovals.Validator>();
