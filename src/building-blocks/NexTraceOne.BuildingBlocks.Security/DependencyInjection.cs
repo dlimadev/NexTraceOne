@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.Authorization;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
+using NexTraceOne.BuildingBlocks.Security.Encryption;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using System.Text;
 
@@ -60,6 +61,8 @@ public static class DependencyInjection
                 "A signing key is mandatory in all environments. " +
                 "Generate a strong key with: openssl rand -base64 48");
         }
+
+        EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable();
 
         services.Configure<CookieSessionOptions>(configuration.GetSection(CookieSessionOptions.SectionName));
 

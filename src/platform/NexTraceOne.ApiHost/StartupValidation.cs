@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NexTraceOne.BuildingBlocks.Security.Encryption;
 
 namespace NexTraceOne.ApiHost;
 
@@ -70,6 +71,9 @@ public static class StartupValidation
 
         // Validação de configuração OIDC
         ValidateOidcProviders(app, configuration, logger);
+
+        // Validação de chave de encriptação obrigatória
+        ValidateEncryptionKey(app, logger);
 
         // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
@@ -209,6 +213,34 @@ public static class StartupValidation
                 "Enterprise SSO (federated authentication) will not be available. " +
                 "Configure at least one provider in the OidcProviders section.",
                 app.Environment.EnvironmentName);
+        }
+    }
+
+    /// <summary>
+    /// Valida a configuração de chave de encriptação AES obrigatória.
+    /// Em todos os ambientes: falha se ausente, nula, whitespace ou inválida.
+    /// O valor deve ser Base64 de 32 bytes ou string UTF-8 com 32 caracteres.
+    /// </summary>
+    private static void ValidateEncryptionKey(WebApplication app, ILogger logger)
+    {
+        try
+        {
+            EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable();
+            logger.LogInformation(
+                "{VariableName} validated in {Environment} environment.",
+                EncryptionKeyMaterial.EnvironmentVariableName,
+                app.Environment.EnvironmentName);
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogCritical(
+                "{VariableName} is invalid in {Environment} environment. Aborting startup.",
+                EncryptionKeyMaterial.EnvironmentVariableName,
+                app.Environment.EnvironmentName);
+            throw new InvalidOperationException(
+                $"NexTraceOne startup aborted: {ex.Message} " +
+                "Set it via environment variable, .env, dotnet user-secrets, or a secrets manager.",
+                ex);
         }
     }
 }
