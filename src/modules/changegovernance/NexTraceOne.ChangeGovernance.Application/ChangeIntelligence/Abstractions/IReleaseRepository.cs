@@ -12,6 +12,12 @@ public interface IReleaseRepository
     /// <summary>Busca releases de um ativo de API por versão.</summary>
     Task<Release?> GetByApiAssetAndVersionAsync(Guid apiAssetId, string version, string environment, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Busca uma release existente pelo nome do serviço, versão e ambiente.
+    /// Usado na correlação de eventos de deploy externos que não têm ApiAssetId.
+    /// </summary>
+    Task<Release?> GetByServiceNameVersionEnvironmentAsync(string serviceName, string version, string environment, CancellationToken cancellationToken = default);
+
     /// <summary>Lista releases de um ativo de API ordenadas por data de criação descendente.</summary>
     Task<IReadOnlyList<Release>> ListByApiAssetAsync(Guid apiAssetId, int page, int pageSize, CancellationToken cancellationToken = default);
 

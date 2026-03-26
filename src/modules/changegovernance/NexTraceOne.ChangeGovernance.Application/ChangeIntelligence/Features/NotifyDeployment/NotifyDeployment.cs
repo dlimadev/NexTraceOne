@@ -7,41 +7,55 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
 
 /// <summary>
-/// Feature: NotifyDeployment — recebe eventos de deployment do CI/CD e cria uma Release.
+/// Feature: NotifyDeployment — recebe eventos de deployment do CI/CD, correlaciona com uma Release
+/// existente ou cria uma nova, e regista rastreabilidade via ChangeEvent e ExternalMarker.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class NotifyDeployment
 {
-    /// <summary>Comando de notificação de deployment do CI/CD.</summary>
+    /// <summary>
+    /// Comando de notificação de deployment do CI/CD.
+    /// <para>
+    /// <see cref="ApiAssetId"/> é opcional — pode ser <c>null</c> quando o evento chega via
+    /// ingestão externa e ainda não foi correlacionado ao catálogo de serviços.
+    /// </para>
+    /// </summary>
     public sealed record Command(
-        Guid ApiAssetId,
+        Guid? ApiAssetId,
         string ServiceName,
         string Version,
         string Environment,
         string PipelineSource,
-        string CommitSha) : ICommand<Response>;
+        string CommitSha,
+        string? ExternalDeploymentId = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de notificação de deployment.</summary>
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
         {
-            RuleFor(x => x.ApiAssetId).NotEmpty();
             RuleFor(x => x.ServiceName).NotEmpty().MaximumLength(200);
             RuleFor(x => x.Version).NotEmpty().MaximumLength(50);
             RuleFor(x => x.Environment).NotEmpty().MaximumLength(100);
             RuleFor(x => x.PipelineSource).NotEmpty().MaximumLength(500);
             RuleFor(x => x.CommitSha).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.ExternalDeploymentId).MaximumLength(500).When(x => x.ExternalDeploymentId is not null);
         }
     }
 
-    /// <summary>Handler que cria uma Release a partir de um evento de deployment recebido.</summary>
+    /// <summary>
+    /// Handler que correlaciona um evento de deployment a uma Release existente ou cria uma nova.
+    /// Regista rastreabilidade via <see cref="ChangeEvent"/> e <see cref="ExternalMarker"/>.
+    /// </summary>
     public sealed class Handler(
         IReleaseRepository repository,
+        IChangeEventRepository changeEventRepository,
+        IExternalMarkerRepository markerRepository,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
@@ -49,16 +63,73 @@ public static class NotifyDeployment
         {
             Guard.Against.Null(request);
 
-            var release = Release.Create(
-                request.ApiAssetId,
+            var now = dateTimeProvider.UtcNow;
+
+            // ── Correlação: procura Release existente por ServiceName + Version + Environment ──
+            var existing = await repository.GetByServiceNameVersionEnvironmentAsync(
                 request.ServiceName,
                 request.Version,
                 request.Environment,
-                request.PipelineSource,
-                request.CommitSha,
-                dateTimeProvider.UtcNow);
+                cancellationToken);
 
-            repository.Add(release);
+            bool isNewRelease;
+            Release release;
+
+            if (existing is not null)
+            {
+                // Enriquece a release existente com o novo evento de deploy
+                release = existing;
+                isNewRelease = false;
+
+                var enrichEvent = ChangeEvent.Create(
+                    release.Id,
+                    eventType: "deploy_notified",
+                    description: $"Deploy event received from '{request.PipelineSource}' for {request.ServiceName}@{request.Version} in {request.Environment}. CommitSha: {request.CommitSha}",
+                    source: request.PipelineSource,
+                    occurredAt: now);
+
+                changeEventRepository.Add(enrichEvent);
+            }
+            else
+            {
+                // Cria nova Release e regista o evento inicial
+                release = Release.Create(
+                    request.ApiAssetId ?? Guid.Empty,
+                    request.ServiceName,
+                    request.Version,
+                    request.Environment,
+                    request.PipelineSource,
+                    request.CommitSha,
+                    now);
+
+                repository.Add(release);
+                isNewRelease = true;
+
+                var createEvent = ChangeEvent.Create(
+                    release.Id,
+                    eventType: "deploy_created",
+                    description: $"Release created via deploy event from '{request.PipelineSource}' for {request.ServiceName}@{request.Version} in {request.Environment}. CommitSha: {request.CommitSha}",
+                    source: request.PipelineSource,
+                    occurredAt: now);
+
+                changeEventRepository.Add(createEvent);
+            }
+
+            // ── ExternalMarker: regista o evento de pipeline para rastreabilidade ────────────
+            var externalId = request.ExternalDeploymentId
+                ?? $"{request.ServiceName}-{request.Version}-{request.Environment}-{now:yyyyMMddHHmmss}";
+
+            var marker = ExternalMarker.Create(
+                release.Id,
+                MarkerType.DeploymentStarted,
+                sourceSystem: request.PipelineSource,
+                externalId: externalId,
+                payload: null,
+                occurredAt: now,
+                receivedAt: now);
+
+            markerRepository.Add(marker);
+
             await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(
@@ -67,16 +138,20 @@ public static class NotifyDeployment
                 release.Version,
                 release.Environment,
                 release.Status.ToString(),
-                release.CreatedAt);
+                release.CreatedAt,
+                isNewRelease,
+                marker.Id.Value);
         }
     }
 
-    /// <summary>Resposta da criação da Release via evento de deployment.</summary>
+    /// <summary>Resposta da correlação de evento de deployment com uma Release.</summary>
     public sealed record Response(
         Guid ReleaseId,
         string ServiceName,
         string Version,
         string Environment,
         string Status,
-        DateTimeOffset CreatedAt);
+        DateTimeOffset CreatedAt,
+        bool IsNewRelease,
+        Guid ExternalMarkerId);
 }

@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius.CalculateBlastRadius;
 using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
@@ -25,11 +26,13 @@ public sealed class ChangeIntelligenceApplicationTests
     public async Task NotifyDeployment_Should_CreateRelease_AndReturnResponse()
     {
         var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+        var markerRepository = Substitute.For<IExternalMarkerRepository>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, unitOfWork, dateTimeProvider);
 
-        repository.GetByApiAssetAndVersionAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+        repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((Release?)null);
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -42,8 +45,69 @@ public sealed class ChangeIntelligenceApplicationTests
         result.Value.ServiceName.Should().Be(command.ServiceName);
         result.Value.Version.Should().Be(command.Version);
         result.Value.Environment.Should().Be(command.Environment);
+        result.Value.IsNewRelease.Should().BeTrue();
         repository.Received(1).Add(Arg.Any<Release>());
+        changeEventRepository.Received(1).Add(Arg.Any<ChangeEvent>());
+        markerRepository.Received(1).Add(Arg.Any<ExternalMarker>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task NotifyDeployment_Should_EnrichExistingRelease_WhenSameServiceVersionEnvironment()
+    {
+        var existingRelease = CreateRelease();
+        var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+        var markerRepository = Substitute.For<IExternalMarkerRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, unitOfWork, dateTimeProvider);
+
+        repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(existingRelease);
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        var command = new NotifyDeploymentFeature.Command(
+            null, existingRelease.ServiceName, existingRelease.Version, existingRelease.Environment,
+            "https://ci/pipeline/99", "aabbccdd1234");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.ReleaseId.Should().Be(existingRelease.Id.Value);
+        result.Value.IsNewRelease.Should().BeFalse();
+        repository.DidNotReceive().Add(Arg.Any<Release>());
+        changeEventRepository.Received(1).Add(Arg.Any<ChangeEvent>());
+        markerRepository.Received(1).Add(Arg.Any<ExternalMarker>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task NotifyDeployment_Should_RecordExternalMarker_WithDeploymentStartedType()
+    {
+        var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+        var markerRepository = Substitute.For<IExternalMarkerRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, unitOfWork, dateTimeProvider);
+
+        repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns((Release?)null);
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        var command = new NotifyDeploymentFeature.Command(
+            null, "PaymentService", "3.1.0", "production", "github-actions", "cafebabe5678",
+            ExternalDeploymentId: "run-12345");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.ExternalMarkerId.Should().NotBe(Guid.Empty);
+        markerRepository.Received(1).Add(Arg.Is<ExternalMarker>(m =>
+            m.MarkerType == MarkerType.DeploymentStarted
+            && m.SourceSystem == command.PipelineSource
+            && m.ExternalId == "run-12345"));
     }
 
     // ── ClassifyChangeLevel ───────────────────────────────────────────────
