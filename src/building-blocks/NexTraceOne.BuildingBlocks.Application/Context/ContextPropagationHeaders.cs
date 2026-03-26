@@ -5,12 +5,20 @@ namespace NexTraceOne.BuildingBlocks.Application.Context;
 /// na plataforma NexTraceOne.
 ///
 /// Convenção:
-/// - X-Tenant-Id: identificador do tenant (Guid) — obrigatório em requisições operacionais
+/// - X-Tenant-Id: identificador do tenant (Guid) — contexto de tenant na requisição
 /// - X-Environment-Id: identificador do ambiente (Guid) — obrigatório em requisições operacionais
 /// - X-Correlation-Id: identificador de correlação distribuída — gerado automaticamente se ausente
 /// - X-Request-Id: identificador único da requisição — diferente do correlation, não propagado downstream
 ///
-/// REGRA DE SEGURANÇA:
+/// REGRA DE SEGURANÇA — X-Tenant-Id:
+/// O header X-Tenant-Id é aceito pelo TenantResolutionMiddleware APENAS quando o pedido
+/// está autenticado (context.User.Identity?.IsAuthenticated == true).
+/// Pedidos não autenticados com este header têm o valor ignorado.
+/// A fonte principal de tenant é sempre o JWT claim "tenant_id".
+/// O header serve como fallback controlado para casos em que o JWT autenticado não
+/// contém o claim tenant_id (situação de transição controlada).
+///
+/// REGRA DE SEGURANÇA — geral:
 /// Nenhum cabeçalho de contexto é suficiente para autorizar operações por si só.
 /// TenantId é sempre validado contra o JWT. EnvironmentId é validado contra o TenantId.
 /// Estes headers servem para propagar contexto, não para substituir autenticação.

@@ -32,6 +32,12 @@ const apiClient = axios.create({
 /**
  * Interceptor de request: injeta access token e tenant ID de forma segura.
  * Tokens são obtidos do módulo tokenStorage (sessionStorage + memória).
+ *
+ * Política de segurança — X-Tenant-Id:
+ * O backend (TenantResolutionMiddleware) aceita este header APENAS quando o pedido
+ * está autenticado. Para pedidos não autenticados, o header é ignorado pelo servidor.
+ * A fonte principal de tenant é o JWT claim "tenant_id"; o header serve como
+ * contexto auxiliar para casos onde o JWT não contém o claim (situação controlada).
  */
 apiClient.interceptors.request.use((config) => {
   const token = getAccessToken();
