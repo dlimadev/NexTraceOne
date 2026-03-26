@@ -14,9 +14,11 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetCh
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeScore;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetTraceCorrelations;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordTraceCorrelation;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState;
@@ -53,6 +55,8 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetChangeAdvisory.Query>, GetChangeAdvisory.Validator>();
         services.AddTransient<IValidator<RecordChangeDecision.Command>, RecordChangeDecision.Validator>();
         services.AddTransient<IValidator<GetChangeDecisionHistory.Query>, GetChangeDecisionHistory.Validator>();
+        services.AddTransient<IValidator<RecordTraceCorrelation.Command>, RecordTraceCorrelation.Validator>();
+        services.AddTransient<IValidator<GetTraceCorrelations.Query>, GetTraceCorrelations.Validator>();
 
         return services;
     }

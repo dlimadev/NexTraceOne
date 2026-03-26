@@ -241,3 +241,38 @@ public sealed record FinOpsAggregateRecord(
     bool AnomalyDetected,
     DateTimeOffset CapturedAt
 );
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHANGE INTELLIGENCE EVENTS (chg_*)
+// Módulo: Change Governance (10)
+// Tabela destino: nextraceone_analytics.chg_trace_release_mapping
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>
+/// Registo analítico de correlação trace → release.
+/// Representa o mapeamento entre um trace distribuído (OTel) e uma Release do
+/// módulo Change Governance, para armazenamento no ClickHouse (chg_trace_release_mapping).
+///
+/// Chaves de correlação com PostgreSQL:
+///   - TenantId     → iam_tenants.Id
+///   - ReleaseId    → chg_releases.Id
+///   - ServiceId    → cat_service_assets.Id (opcional)
+///   - EnvironmentId → env_environments.Id (opcional)
+///
+/// Correlação com nextraceone_obs:
+///   - TraceId      → otel_traces.TraceId (sem FK — ClickHouse não suporta)
+/// </summary>
+public sealed record TraceReleaseMappingRecord(
+    Guid Id,
+    Guid TenantId,
+    Guid ReleaseId,
+    string TraceId,
+    string ServiceName,
+    Guid? ServiceId,
+    string Environment,
+    Guid? EnvironmentId,
+    string CorrelationSource,
+    DateTimeOffset? TraceStartedAt,
+    DateTimeOffset? TraceEndedAt,
+    DateTimeOffset CorrelatedAt
+);

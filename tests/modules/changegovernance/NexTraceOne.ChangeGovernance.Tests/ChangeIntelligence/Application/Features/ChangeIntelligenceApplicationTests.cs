@@ -8,7 +8,9 @@ using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.Cha
 using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
 using ComputeChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeScore.ComputeChangeScore;
 using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
+using GetTraceCorrelationsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetTraceCorrelations.GetTraceCorrelations;
 using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
+using RecordTraceCorrelationFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordTraceCorrelation.RecordTraceCorrelation;
 
 namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Application.Features;
 
@@ -236,6 +238,131 @@ public sealed class ChangeIntelligenceApplicationTests
             .Returns((Release?)null);
 
         var result = await sut.Handle(new GetReleaseFeature.Query(Guid.NewGuid()), CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("Release.NotFound");
+    }
+
+    // ── RecordTraceCorrelation ─────────────────────────────────────────────────
+
+    [Fact]
+    public async Task RecordTraceCorrelation_Should_CreateChangeEvent_AndWriteToAnalytics()
+    {
+        var release = CreateRelease();
+        var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+        var traceWriter = Substitute.For<ITraceCorrelationWriter>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        var sut = new RecordTraceCorrelationFeature.Handler(
+            repository, changeEventRepository, traceWriter, unitOfWork, dateTimeProvider);
+
+        repository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+            .Returns(release);
+
+        var command = new RecordTraceCorrelationFeature.Command(
+            ReleaseId: release.Id.Value,
+            TraceId: "4bf92f3577b34da6a3ce929d0e0e4736",
+            ServiceName: "TestService",
+            Environment: "staging",
+            CorrelationSource: "deployment_event");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.TraceId.Should().Be(command.TraceId);
+        result.Value.ReleaseId.Should().Be(release.Id.Value);
+        result.Value.CorrelationSource.Should().Be("deployment_event");
+        changeEventRepository.Received(1).Add(Arg.Is<ChangeEvent>(e =>
+            e.EventType == "trace_correlated" && e.Source == command.TraceId));
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+        await traceWriter.Received(1).WriteAsync(
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>(),
+            command.TraceId, command.ServiceName, Arg.Any<Guid?>(),
+            command.Environment, Arg.Any<Guid?>(), command.CorrelationSource,
+            Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
+            FixedNow, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RecordTraceCorrelation_Should_ReturnError_WhenReleaseNotFound()
+    {
+        var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+        var traceWriter = Substitute.For<ITraceCorrelationWriter>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+
+        var sut = new RecordTraceCorrelationFeature.Handler(
+            repository, changeEventRepository, traceWriter, unitOfWork, dateTimeProvider);
+
+        repository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+            .Returns((Release?)null);
+
+        var command = new RecordTraceCorrelationFeature.Command(
+            ReleaseId: Guid.NewGuid(),
+            TraceId: "4bf92f3577b34da6a3ce929d0e0e4736",
+            ServiceName: "TestService",
+            Environment: "staging");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("Release.NotFound");
+        changeEventRepository.DidNotReceive().Add(Arg.Any<ChangeEvent>());
+        await traceWriter.DidNotReceive().WriteAsync(
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<Guid>(),
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Guid?>(),
+            Arg.Any<string>(), Arg.Any<Guid?>(), Arg.Any<string>(),
+            Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>());
+    }
+
+    // ── GetTraceCorrelations ───────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetTraceCorrelations_Should_ReturnCorrelations_ForRelease()
+    {
+        var release = CreateRelease();
+        var traceEvent = ChangeEvent.Create(
+            release.Id,
+            "trace_correlated",
+            "Trace '4bf92f3577b34da6a3ce929d0e0e4736' correlated",
+            "4bf92f3577b34da6a3ce929d0e0e4736",
+            FixedNow);
+
+        var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+
+        var sut = new GetTraceCorrelationsFeature.Handler(repository, changeEventRepository);
+
+        repository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+            .Returns(release);
+        changeEventRepository.ListByReleaseIdAndEventTypeAsync(
+            Arg.Any<ReleaseId>(), "trace_correlated", Arg.Any<CancellationToken>())
+            .Returns(new List<ChangeEvent> { traceEvent });
+
+        var result = await sut.Handle(new GetTraceCorrelationsFeature.Query(release.Id.Value), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.ReleaseId.Should().Be(release.Id.Value);
+        result.Value.Correlations.Should().HaveCount(1);
+        result.Value.Correlations[0].TraceId.Should().Be("4bf92f3577b34da6a3ce929d0e0e4736");
+    }
+
+    [Fact]
+    public async Task GetTraceCorrelations_Should_ReturnError_WhenReleaseNotFound()
+    {
+        var repository = Substitute.For<IReleaseRepository>();
+        var changeEventRepository = Substitute.For<IChangeEventRepository>();
+        var sut = new GetTraceCorrelationsFeature.Handler(repository, changeEventRepository);
+
+        repository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
+            .Returns((Release?)null);
+
+        var result = await sut.Handle(new GetTraceCorrelationsFeature.Query(Guid.NewGuid()), CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("Release.NotFound");

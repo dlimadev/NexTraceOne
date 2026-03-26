@@ -11,6 +11,7 @@
     <ProjectReference Include="..\NexTraceOne.ChangeGovernance.Application\NexTraceOne.ChangeGovernance.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.ChangeGovernance.Domain\NexTraceOne.ChangeGovernance.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
   </ItemGroup>
   <ItemGroup>
