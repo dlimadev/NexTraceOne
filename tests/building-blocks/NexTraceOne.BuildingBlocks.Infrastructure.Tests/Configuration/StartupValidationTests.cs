@@ -237,4 +237,30 @@ public sealed class StartupValidationTests
         requireSecure.Should().Be("False",
             "Development environment should not require secure cookies (HTTP allowed locally)");
     }
+
+    [Fact]
+    public void BaseAppSettings_RequireSecureCookies_IsTrueForProduction()
+    {
+        var baseConfigPath = Path.Combine(SolutionRoot, "src", "platform", "NexTraceOne.ApiHost", "appsettings.json");
+        var config = new ConfigurationBuilder()
+            .AddJsonFile(baseConfigPath)
+            .Build();
+
+        var requireSecure = config["Auth:CookieSession:RequireSecureCookies"];
+        requireSecure.Should().Be("True",
+            "base appsettings.json must enforce secure cookies (RequireSecureCookies=true) so all non-Development deployments are safe by default");
+    }
+
+    [Fact]
+    public void StartupValidation_EnforcesSecureCookiesInNonDevelopment()
+    {
+        var content = File.ReadAllText(StartupValidationPath);
+
+        content.Should().Contain("RequireSecureCookies",
+            "StartupValidation must validate Auth:CookieSession:RequireSecureCookies");
+        content.Should().Contain("ValidateSecureCookiesPolicy",
+            "StartupValidation must have a dedicated method for secure cookies policy enforcement");
+        content.Should().Contain("non-Development",
+            "Startup validation error message must reference non-Development environments explicitly");
+    }
 }
