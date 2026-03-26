@@ -157,7 +157,6 @@ jobs:
           docker build \
             -f ${{ matrix.dockerfile }} \
             -t ${{ matrix.image }}:scan \
-            --build-arg NEXTRACE_SKIP_INTEGRITY=true \
             .
         env:
           DOCKER_BUILDKIT: "1"
