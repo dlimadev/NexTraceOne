@@ -7,6 +7,7 @@ import type {
   ContractProtocol,
   DraftStatus,
   SoapDraftCreateResponse,
+  EventDraftCreateResponse,
 } from '../types';
 
 function readValue<T>(source: Record<string, unknown>, camel: string, pascal?: string): T | undefined {
@@ -177,5 +178,30 @@ export const contractStudioApi = {
       portTypeName: data.portTypeName,
       bindingName: data.bindingName,
       operationsJson: data.operationsJson,
+    }).then((r) => r.data),
+
+  /**
+   * Cria um draft específico para contratos Event/AsyncAPI com metadados de evento inicializados.
+   * Cria ContractDraft (ContractType=Event, Protocol=AsyncApi) + EventDraftMetadata.
+   */
+  createEventDraft: (data: {
+    title: string;
+    author: string;
+    asyncApiVersion?: string;
+    serviceId?: string;
+    description?: string;
+    defaultContentType?: string;
+    channelsJson?: string;
+    messagesJson?: string;
+  }) =>
+    client.post<EventDraftCreateResponse>('/contracts/drafts/event', {
+      title: data.title,
+      author: data.author,
+      asyncApiVersion: data.asyncApiVersion ?? '2.6.0',
+      serviceId: data.serviceId,
+      description: data.description,
+      defaultContentType: data.defaultContentType ?? 'application/json',
+      channelsJson: data.channelsJson,
+      messagesJson: data.messagesJson,
     }).then((r) => r.data),
 };

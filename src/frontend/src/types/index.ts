@@ -1368,6 +1368,51 @@ export interface SoapDraftCreateResponse {
   createdAt: string;
 }
 
+/**
+ * Detalhes AsyncAPI específicos de uma versão de contrato de evento publicada.
+ * Retornados pelo endpoint GET /api/v1/contracts/{id}/event-detail.
+ */
+export interface EventContractDetail {
+  eventDetailId: string;
+  contractVersionId: string;
+  title: string;
+  asyncApiVersion: string;
+  defaultContentType: string;
+  channelsJson: string;
+  messagesJson: string;
+  serversJson: string;
+}
+
+/**
+ * Resposta da importação de spec AsyncAPI.
+ * Retornada pelo endpoint POST /api/v1/contracts/asyncapi/import.
+ */
+export interface AsyncApiImportResponse {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  title: string;
+  asyncApiVersion: string;
+  defaultContentType: string;
+  channelsJson: string;
+  messagesJson: string;
+  serversJson: string;
+  importedAt: string;
+}
+
+/**
+ * Resposta da criação de draft de evento.
+ * Retornada pelo endpoint POST /api/v1/contracts/drafts/event.
+ */
+export interface EventDraftCreateResponse {
+  draftId: string;
+  title: string;
+  status: string;
+  asyncApiVersion: string;
+  defaultContentType: string;
+  createdAt: string;
+}
+
 export interface SignatureVerificationResult {
   contractVersionId: string;
   hasSignature: boolean;

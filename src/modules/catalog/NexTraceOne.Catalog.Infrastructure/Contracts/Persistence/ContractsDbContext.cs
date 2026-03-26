@@ -59,6 +59,12 @@ public sealed class ContractsDbContext(
     /// <summary>Metadados SOAP/WSDL específicos de drafts de contrato em edição (ContractType = Soap).</summary>
     public DbSet<SoapDraftMetadata> SoapDraftMetadata => Set<SoapDraftMetadata>();
 
+    /// <summary>Detalhes AsyncAPI específicos de versões de contrato publicadas (Protocol = AsyncApi).</summary>
+    public DbSet<EventContractDetail> EventContractDetails => Set<EventContractDetail>();
+
+    /// <summary>Metadados AsyncAPI específicos de drafts de contrato em edição (ContractType = Event).</summary>
+    public DbSet<EventDraftMetadata> EventDraftMetadata => Set<EventDraftMetadata>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

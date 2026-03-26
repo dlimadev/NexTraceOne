@@ -135,6 +135,20 @@ public static class ContractsErrors
     public static Error InvalidWsdlContent()
         => Error.Validation("Contracts.Soap.InvalidWsdlContent", "The provided content is not a valid WSDL document. Expected XML with WSDL definitions.");
 
+    // ── Event Contracts / AsyncAPI ────────────────────────────────────────────────
+
+    /// <summary>Detalhe de Event Contract não encontrado para a versão de contrato informada.</summary>
+    public static Error EventDetailNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.Event.DetailNotFound", "Event contract detail not found for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Metadado de Event Draft não encontrado para o draft informado.</summary>
+    public static Error EventDraftMetadataNotFound(string draftId)
+        => Error.NotFound("Contracts.Event.DraftMetadataNotFound", "Event draft metadata not found for draft '{0}'.", draftId);
+
+    /// <summary>Operação de importação AsyncAPI requer conteúdo JSON válido com campo asyncapi.</summary>
+    public static Error InvalidAsyncApiContent()
+        => Error.Validation("Contracts.Event.InvalidAsyncApiContent", "The provided content is not a valid AsyncAPI document. Expected JSON with 'asyncapi' field.");
+
     // ── ContractExample ─────────────────────────────────────────────
 
     /// <summary>Exemplo de contrato não encontrado.</summary>

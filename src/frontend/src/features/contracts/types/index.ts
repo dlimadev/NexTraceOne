@@ -84,4 +84,7 @@ export type {
   SoapContractDetail,
   WsdlImportResponse,
   SoapDraftCreateResponse,
+  EventContractDetail,
+  AsyncApiImportResponse,
+  EventDraftCreateResponse,
 } from '../../../types';

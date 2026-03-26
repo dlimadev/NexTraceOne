@@ -73,7 +73,12 @@ export function CreateServicePage() {
   const [soapVersion, setSoapVersion] = useState<'1.1' | '1.2'>('1.1');
   const [soapEndpointUrl, setSoapEndpointUrl] = useState('');
 
+  // Event/AsyncAPI-specific fields
+  const [asyncApiVersion, setAsyncApiVersion] = useState('2.6.0');
+  const [defaultContentType, setDefaultContentType] = useState('application/json');
+
   const isSoapType = selectedType === 'Soap';
+  const isEventType = selectedType === 'Event';
 
   const servicesQuery = useQuery({
     queryKey: ['catalog-services-for-contracts'],
@@ -107,6 +112,29 @@ export function CreateServicePage() {
         }
 
         return { draftId: soapDraft.draftId };
+      }
+
+      // Event type uses dedicated createEventDraft to populate EventDraftMetadata
+      if (isEventType) {
+        const eventDraft = await contractStudioApi.createEventDraft({
+          title,
+          author: currentActor,
+          asyncApiVersion,
+          serviceId: linkedServiceId || undefined,
+          description,
+          defaultContentType,
+        });
+
+        // If import mode and AsyncAPI content provided, update draft spec content
+        if (selectedMode === 'import' && importContent.trim()) {
+          await contractStudioApi.updateContent(eventDraft.draftId, {
+            specContent: importContent,
+            format: 'json',
+            editedBy: currentActor,
+          });
+        }
+
+        return { draftId: eventDraft.draftId };
       }
 
       // Generic draft creation for other types
@@ -383,6 +411,11 @@ export function CreateServicePage() {
                         {t('contracts.create.wsdlXmlHint', '(WSDL XML)')}
                       </span>
                     )}
+                    {isEventType && (
+                      <span className="ml-1 text-muted font-normal">
+                        {t('contracts.create.asyncApiJsonHint', '(AsyncAPI JSON)')}
+                      </span>
+                    )}
                   </label>
                   <textarea
                     value={importContent}
@@ -390,7 +423,9 @@ export function CreateServicePage() {
                     rows={8}
                     placeholder={isSoapType
                       ? t('contracts.create.wsdlPlaceholder', 'Paste your WSDL XML here (<?xml version="1.0"?><definitions ...>)...')
-                      : t('contracts.specContentPlaceholder', 'Paste your specification here (JSON/YAML/XML)...')}
+                      : isEventType
+                        ? t('contracts.create.asyncApiPlaceholder', 'Paste your AsyncAPI JSON here ({"asyncapi":"2.6.0","info":{"title":"..."},...})...')
+                        : t('contracts.specContentPlaceholder', 'Paste your specification here (JSON/YAML/XML)...')}
                     className="w-full text-xs font-mono bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none"
                   />
                 </div>
@@ -456,6 +491,46 @@ export function CreateServicePage() {
                         placeholder="http://example.com/service"
                         className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
                       />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Event/AsyncAPI-specific metadata fields */}
+              {isEventType && (
+                <div className="space-y-3 pt-1 border-t border-edge">
+                  <p className="text-[10px] text-muted font-medium uppercase tracking-wider">
+                    {t('contracts.create.asyncApiMetadata', 'AsyncAPI Event Metadata')}
+                  </p>
+
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.asyncApiVersion', 'AsyncAPI Version')}
+                      </label>
+                      <select
+                        value={asyncApiVersion}
+                        onChange={(e) => setAsyncApiVersion(e.target.value)}
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                      >
+                        <option value="2.6.0">AsyncAPI 2.6.0</option>
+                        <option value="3.0.0">AsyncAPI 3.0.0</option>
+                      </select>
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.defaultContentType', 'Default Content Type')}
+                      </label>
+                      <select
+                        value={defaultContentType}
+                        onChange={(e) => setDefaultContentType(e.target.value)}
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                      >
+                        <option value="application/json">application/json</option>
+                        <option value="application/avro">application/avro</option>
+                        <option value="application/protobuf">application/protobuf</option>
+                      </select>
                     </div>
                   </div>
                 </div>

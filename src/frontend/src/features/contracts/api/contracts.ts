@@ -15,6 +15,8 @@ import type {
   ServiceContractsResponse,
   SoapContractDetail,
   WsdlImportResponse,
+  EventContractDetail,
+  AsyncApiImportResponse,
 } from '../types';
 import type {
   ValidationIssue,
@@ -276,4 +278,31 @@ export const contractsApi = {
    */
   getSoapContractDetail: (contractVersionId: string) =>
     client.get<SoapContractDetail>(`/contracts/${contractVersionId}/soap-detail`).then((r) => r.data),
+
+  // ── Event Contracts / AsyncAPI workflow ──────────────────────────
+
+  /**
+   * Importa uma spec AsyncAPI e extrai metadados específicos de evento.
+   * Cria ContractVersion com Protocol=AsyncApi e popula EventContractDetail.
+   */
+  importAsyncApi: (data: {
+    apiAssetId: string;
+    semVer: string;
+    asyncApiContent: string;
+    importedFrom: string;
+    defaultContentType?: string;
+  }) =>
+    client.post<AsyncApiImportResponse>('/contracts/asyncapi/import', {
+      apiAssetId: data.apiAssetId,
+      semVer: data.semVer,
+      asyncApiContent: data.asyncApiContent,
+      importedFrom: data.importedFrom,
+      defaultContentType: data.defaultContentType,
+    }).then((r) => r.data),
+
+  /**
+   * Obtém os detalhes AsyncAPI específicos de uma versão de contrato de evento publicada.
+   */
+  getEventContractDetail: (contractVersionId: string) =>
+    client.get<EventContractDetail>(`/contracts/${contractVersionId}/event-detail`).then((r) => r.data),
 };
