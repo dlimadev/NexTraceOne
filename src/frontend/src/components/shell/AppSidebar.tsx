@@ -12,6 +12,7 @@ import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
+import { useNavCounters } from '../../hooks/useNavCounters';
 import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
   Shield, ClipboardList, AlertTriangle, Clock, UserCheck,
@@ -20,6 +21,7 @@ import {
   Globe, Activity, Plus, Settings,
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
+  Network, Workflow,
 } from 'lucide-react';
 
 interface NavItem {
@@ -51,10 +53,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={18} />, permission: 'operations:runbooks:read', section: 'operations' },
   { labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={18} />, permission: 'operations:reliability:read', section: 'operations' },
-  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={18} />, permission: 'operations:automation:read', section: 'operations' },
+  { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
   { labelKey: 'sidebar.environmentComparison', to: '/operations/runtime-comparison', icon: <BarChart3 size={18} />, permission: 'operations:runtime:read', section: 'operations' },
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
-  { labelKey: 'sidebar.aiAgents', to: '/ai/agents', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiAgents', to: '/ai/agents', icon: <Network size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
   { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <Shield size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiRouting', to: '/ai/routing', icon: <Share2 size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
@@ -132,8 +134,38 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
     });
   };
 
-  const visibleItems = navItems.filter(item => !item.permission || can(item.permission));
+  const { openIncidents } = useNavCounters();
+
+  // Permission-based filter
+  const permittedItems = navItems.filter(item => !item.permission || can(item.permission));
+
+  // Persona-based limit: respect sectionOrder priority, keep home always visible
+  const visibleItems = (() => {
+    const max = config.maxSidebarItems;
+    if (!max) return permittedItems;
+
+    // Always include the home item regardless of limit
+    const homeItems = permittedItems.filter(i => i.section === 'home');
+    const remaining = permittedItems.filter(i => i.section !== 'home');
+
+    // Reorder remaining by sectionOrder priority
+    const ordered: typeof permittedItems = [];
+    for (const section of config.sectionOrder) {
+      if (section === 'home') continue;
+      ordered.push(...remaining.filter(i => i.section === section));
+    }
+
+    const limit = Math.max(0, max - homeItems.length);
+    return [...homeItems, ...ordered.slice(0, limit)];
+  })();
+
   const isHighlighted = (section: NavSection): boolean => config.highlightedSections.includes(section);
+
+  /** Returns the counter value for a given nav item route. */
+  const getCounter = (to: string): number => {
+    if (to === '/operations/incidents') return openIncidents;
+    return 0;
+  };
 
   return (
     <div
@@ -182,6 +214,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                   labelKey={item.labelKey}
                   collapsed={collapsed}
                   preview={item.preview}
+                  counter={getCounter(item.to)}
                 />
               ))}
             </AppSidebarGroup>

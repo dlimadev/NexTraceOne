@@ -20,7 +20,7 @@
      ──────────────────────────────────────────────────────────────────────────── */
   --color-canvas: #081120;
   --color-deep: #0A1730;
-  --color-panel: #0F1E38;
+  --color-panel: #0F1E38;  /* alias for card — prefer card */
   --color-card: #0F1E38;
   --color-elevated: #132543;
   --color-subtle: #0D1B32;
@@ -44,30 +44,31 @@
   --color-on-accent: #04111E;
 
   /* ─── Accent (Cyan / Mint / Blue CTA) ────────────────────────────────────── */
-  --color-accent: #2BB7E3;
-  --color-accent-hover: #6ED7F5;
-  --color-accent-muted: rgba(43, 183, 227, 0.12);
-  --color-focus-ring: rgba(43, 183, 227, 0.50);
-  --color-cyan: #18CFF2;
-  --color-cyan-hover: #47DBFF;
-  --color-mint: #1EF2C1;
-  --color-mint-hover: #79FCE0;
+  /* F4-02: saturation reduced ~15% — enterprise-grade, not neon */
+  --color-accent: #27ABDA;
+  --color-accent-hover: #62CBEC;
+  --color-accent-muted: rgba(39, 171, 218, 0.12);
+  --color-focus-ring: rgba(39, 171, 218, 0.50);
+  --color-cyan: #12C4E8;
+  --color-cyan-hover: #3DD2F5;
+  --color-mint: #18E8B8;
+  --color-mint-hover: #6CF5D8;
 
   /* ─── Semantic Status ────────────────────────────────────────────────────── */
-  --color-success: #1EF2C1;
-  --color-success-muted: rgba(30, 242, 193, 0.12);
-  --color-info: #18CFF2;
-  --color-info-muted: rgba(24, 207, 242, 0.12);
+  --color-success: #18E8B8;
+  --color-success-muted: rgba(24, 232, 184, 0.12);
+  --color-info: #12C4E8;
+  --color-info-muted: rgba(18, 196, 232, 0.12);
   --color-warning: #F5C062;
   --color-warning-muted: rgba(245, 192, 98, 0.12);
   --color-critical: #FF7A86;
   --color-critical-muted: rgba(255, 122, 134, 0.12);
-  --color-danger: #FF6A78;
+  --color-danger: #FF7A86;  /* consolidated with critical — same semantic intent */
   --color-neutral: #8EA0B7;
 
   /* ─── Data Visualization ─────────────────────────────────────────────────── */
-  --color-data-1: #18CFF2;
-  --color-data-2: #1EF2C1;
+  --color-data-1: #12C4E8;
+  --color-data-2: #18E8B8;
   --color-data-3: #8EA0B7;
   --color-data-4: #F5C062;
   --color-data-5: #FF7A86;
@@ -89,17 +90,17 @@
   /* ─── Shadows (escuras e difusas para dark UI) ───────────────────────────── */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.30);
-  --shadow-surface: 0 10px 30px rgba(0, 0, 0, 0.28);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.28);
-  --shadow-elevated: 0 18px 40px rgba(0, 0, 0, 0.34);
+  --shadow-surface: var(--shadow-md);  /* semantic alias */
   --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.34);
-  --shadow-floating: 0 24px 60px rgba(0, 0, 0, 0.42);
+  --shadow-elevated: var(--shadow-lg);  /* semantic alias */
   --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.42);
-  --shadow-glow-cyan: 0 0 0 1px rgba(24, 207, 242, 0.22), 0 0 24px rgba(24, 207, 242, 0.16);
-  --shadow-glow-mint: 0 0 0 1px rgba(30, 242, 193, 0.20), 0 0 24px rgba(30, 242, 193, 0.14);
+  --shadow-floating: var(--shadow-xl);  /* semantic alias */
+  --shadow-glow-cyan: 0 0 0 1px rgba(18, 196, 232, 0.22), 0 0 24px rgba(18, 196, 232, 0.16);
+  --shadow-glow-mint: 0 0 0 1px rgba(24, 232, 184, 0.20), 0 0 24px rgba(24, 232, 184, 0.14);
   --shadow-glow-danger: 0 0 0 1px rgba(255, 122, 134, 0.24), 0 0 20px rgba(255, 122, 134, 0.14);
-  --shadow-glow: 0 0 24px rgba(24, 207, 242, 0.16);
-  --shadow-glow-sm: 0 0 12px rgba(24, 207, 242, 0.10);
+  --shadow-glow: 0 0 24px rgba(18, 196, 232, 0.16);
+  --shadow-glow-sm: 0 0 12px rgba(18, 196, 232, 0.10);
 
   /* ─── Spacing (base 8pt) ─────────────────────────────────────────────────── */
   --spacing-1: 4px;

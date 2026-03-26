@@ -212,7 +212,7 @@ export function DashboardPage() {
 
       {/* ── KPI Stats ────────────────────────────────────────────────────────── */}
       <PageSection>
-        <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
+        <ContentGrid columns={5}>
           {stats.map((s) => (
             <StatCard key={s.title} {...s} />
           ))}
@@ -222,9 +222,9 @@ export function DashboardPage() {
       {/* ── Attention Alerts ─────────────────────────────────────────────────── */}
       {attentionAlerts.length > 0 && (
         <div className="mb-6 space-y-2">
-          {attentionAlerts.map((alert, idx) => (
+          {attentionAlerts.map((alert) => (
             <Link
-              key={idx}
+              key={alert.to}
               to={alert.to}
               className={`flex items-center gap-3 rounded-lg border px-4 py-2.5 text-sm transition-colors hover:opacity-80 ${severityColors[alert.severity]}`}
             >

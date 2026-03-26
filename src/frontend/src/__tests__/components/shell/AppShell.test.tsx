@@ -1,8 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { AppShell } from '../../../components/shell/AppShell';
+
+// Mock incidents API used by useNavCounters
+vi.mock('../../../features/operations/api/incidents', () => ({
+  incidentsApi: {
+    getIncidentsSummary: vi.fn().mockResolvedValue({ totalOpen: 0, criticalIncidents: 0 }),
+  },
+}));
 
 // Mock auth context
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -72,17 +80,24 @@ vi.mock('../../../components/CommandPalette', () => ({
     open ? <div data-testid="command-palette">Command Palette</div> : null,
 }));
 
+function createWrapper() {
+  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
+}
+
 function renderShell(route = '/') {
+  const queryClient = createWrapper();
   return render(
-    <MemoryRouter initialEntries={[route]}>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route path="/" element={<div data-testid="dashboard">Dashboard</div>} />
-          <Route path="/services" element={<div data-testid="services">Services</div>} />
-          <Route path="/contracts" element={<div data-testid="contracts">Contracts</div>} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[route]}>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route path="/" element={<div data-testid="dashboard">Dashboard</div>} />
+            <Route path="/services" element={<div data-testid="services">Services</div>} />
+            <Route path="/contracts" element={<div data-testid="contracts">Contracts</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
