@@ -52,4 +52,26 @@ public static class DeveloperPortalErrors
     /// <summary>API não encontrada no catálogo.</summary>
     public static Error ApiNotFound(string apiAssetId) =>
         Error.NotFound("DeveloperPortal.Api.NotFound", "API '{0}' was not found in the catalog.", apiAssetId);
+
+    // ── Publication Center ────────────────────────────────────────────────────
+
+    /// <summary>Entrada de publicação não encontrada.</summary>
+    public static Error PublicationEntryNotFound(string entryId) =>
+        Error.NotFound("DeveloperPortal.Publication.NotFound", "Contract publication entry '{0}' was not found.", entryId);
+
+    /// <summary>Já existe uma publicação ativa para esta versão de contrato.</summary>
+    public static Error PublicationAlreadyExists(string contractVersionId) =>
+        Error.Conflict("DeveloperPortal.Publication.AlreadyExists", "A publication entry for contract version '{0}' already exists.", contractVersionId);
+
+    /// <summary>Transição de estado de publicação inválida.</summary>
+    public static Error PublicationInvalidTransition(string from, string to) =>
+        Error.Business("DeveloperPortal.Publication.InvalidTransition", "Cannot transition publication from '{0}' to '{1}'.", from, to);
+
+    /// <summary>Versão de contrato não encontrada para publicação.</summary>
+    public static Error ContractVersionNotFoundForPublication(string contractVersionId) =>
+        Error.NotFound("DeveloperPortal.Publication.ContractVersionNotFound", "Contract version '{0}' was not found or is not in a publishable state.", contractVersionId);
+
+    /// <summary>Versão de contrato não está num estado publicável (deve ser Approved ou Locked).</summary>
+    public static Error ContractVersionNotPublishable(string contractVersionId, string lifecycleState) =>
+        Error.Business("DeveloperPortal.Publication.NotPublishable", "Contract version '{0}' is in state '{1}' and cannot be published to the portal.", contractVersionId, lifecycleState);
 }

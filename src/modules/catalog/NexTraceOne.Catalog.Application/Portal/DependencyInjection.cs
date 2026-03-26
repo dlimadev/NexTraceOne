@@ -12,13 +12,17 @@ using NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume;
 using NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline;
+using NexTraceOne.Catalog.Application.Portal.Features.GetContractPublicationStatus;
 using NexTraceOne.Catalog.Application.Portal.Features.GetMyApis;
 using NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory;
 using NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics;
+using NexTraceOne.Catalog.Application.Portal.Features.GetPublicationCenterEntries;
 using NexTraceOne.Catalog.Application.Portal.Features.GetSubscriptions;
+using NexTraceOne.Catalog.Application.Portal.Features.PublishContractToPortal;
 using NexTraceOne.Catalog.Application.Portal.Features.RecordAnalyticsEvent;
 using NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract;
 using NexTraceOne.Catalog.Application.Portal.Features.SearchCatalog;
+using NexTraceOne.Catalog.Application.Portal.Features.WithdrawContractFromPortal;
 
 namespace NexTraceOne.Catalog.Application.Portal;
 
@@ -55,6 +59,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RecordAnalyticsEvent.Command>, RecordAnalyticsEvent.Validator>();
         services.AddTransient<IValidator<RenderOpenApiContract.Query>, RenderOpenApiContract.Validator>();
         services.AddTransient<IValidator<SearchCatalog.Query>, SearchCatalog.Validator>();
+
+        // Publication Center — workflow de publicação de contratos no Developer Portal
+        services.AddTransient<IValidator<PublishContractToPortal.Command>, PublishContractToPortal.Validator>();
+        services.AddTransient<IValidator<WithdrawContractFromPortal.Command>, WithdrawContractFromPortal.Validator>();
+        services.AddTransient<IValidator<GetPublicationCenterEntries.Query>, GetPublicationCenterEntries.Validator>();
+        services.AddTransient<IValidator<GetContractPublicationStatus.Query>, GetContractPublicationStatus.Validator>();
 
         return services;
     }

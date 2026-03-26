@@ -1463,6 +1463,87 @@ export interface BackgroundServiceDraftCreateResponse {
   createdAt: string;
 }
 
+/**
+ * Entrada do Publication Center — governa a visibilidade de um contrato no Developer Portal.
+ */
+export interface ContractPublicationEntry {
+  publicationEntryId: string;
+  contractVersionId: string;
+  apiAssetId: string;
+  contractTitle: string;
+  semVer: string;
+  status: ContractPublicationStatus;
+  visibility: PublicationVisibility;
+  publishedBy: string;
+  publishedAt?: string | null;
+  withdrawnAt?: string | null;
+  withdrawalReason?: string | null;
+  releaseNotes?: string | null;
+}
+
+/** Estado de publicação de um contrato no Developer Portal. */
+export type ContractPublicationStatus =
+  | 'PendingPublication'
+  | 'Published'
+  | 'Withdrawn'
+  | 'Deprecated'
+  | 'NotPublished';
+
+/** Escopo de visibilidade no Developer Portal. */
+export type PublicationVisibility = 'Internal' | 'External' | 'RestrictedToTeams';
+
+/**
+ * Resposta da publicação de um contrato no Developer Portal.
+ * Retornada pelo endpoint POST /api/v1/publication-center/publish.
+ */
+export interface PublishContractToPortalResponse {
+  publicationEntryId: string;
+  contractVersionId: string;
+  apiAssetId: string;
+  contractTitle: string;
+  semVer: string;
+  status: ContractPublicationStatus;
+  visibility: PublicationVisibility;
+  publishedAt: string;
+}
+
+/**
+ * Resposta da retirada de publicação do Developer Portal.
+ * Retornada pelo endpoint POST /api/v1/publication-center/{entryId}/withdraw.
+ */
+export interface WithdrawContractFromPortalResponse {
+  publicationEntryId: string;
+  contractVersionId: string;
+  status: ContractPublicationStatus;
+  withdrawnBy: string;
+  withdrawnAt: string;
+  withdrawalReason?: string | null;
+}
+
+/**
+ * Estado de publicação de uma versão de contrato específica.
+ * Retornado pelo endpoint GET /api/v1/publication-center/contracts/{id}/status.
+ */
+export interface ContractPublicationStatusResponse {
+  contractVersionId: string;
+  isPublished: boolean;
+  status: ContractPublicationStatus;
+  publicationEntryId?: string | null;
+  visibility?: PublicationVisibility | null;
+  publishedBy?: string | null;
+  publishedAt?: string | null;
+  releaseNotes?: string | null;
+}
+
+/**
+ * Lista paginada de entradas do Publication Center.
+ * Retornada pelo endpoint GET /api/v1/publication-center.
+ */
+export interface PublicationCenterListResponse {
+  items: ContractPublicationEntry[];
+  totalCount: number;
+}
+
 export interface SignatureVerificationResult {
   contractVersionId: string;
   hasSignature: boolean;

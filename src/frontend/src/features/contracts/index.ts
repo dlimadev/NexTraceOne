@@ -25,3 +25,14 @@ export {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type { WorkspaceSectionId, ServiceKind, AuthoringMode, SpecFormat } from './types/index';
+
+// ── Publication Center ─────────────────────────────────────────────────────────
+export { PublicationCenterPage } from './publication/PublicationCenterPage';
+export { publicationCenterApi } from './api/publicationCenter';
+export {
+  usePublishContractToPortal,
+  useWithdrawContractFromPortal,
+  usePublicationCenterEntries,
+  useContractPublicationStatus,
+  publicationCenterKeys,
+} from './hooks/usePublicationCenter';
