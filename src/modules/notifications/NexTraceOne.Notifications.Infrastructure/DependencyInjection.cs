@@ -24,6 +24,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
+using IntegrationsContracts = NexTraceOne.Integrations.Contracts.IntegrationEvents;
 
 namespace NexTraceOne.Notifications.Infrastructure;
 
@@ -137,8 +138,10 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<AiActionBlockedByPolicyIntegrationEvent>, AiGovernanceNotificationHandler>();
 
         // Integrations & Ingestion
-        services.AddScoped<IIntegrationEventHandler<SyncFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
-        services.AddScoped<IIntegrationEventHandler<ConnectorAuthFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
+        // P2.5: SyncFailedIntegrationEvent and ConnectorAuthFailedIntegrationEvent now from Integrations.Contracts
+        //       (ownership corrected from OperationalIntelligence.Contracts).
+        services.AddScoped<IIntegrationEventHandler<IntegrationsContracts.SyncFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<IntegrationsContracts.ConnectorAuthFailedIntegrationEvent>, IntegrationFailureNotificationHandler>();
 
         // ── Phase 7: Metrics, Audit & Governance ──
         services.AddScoped<INotificationMetricsService, NotificationMetricsService>();

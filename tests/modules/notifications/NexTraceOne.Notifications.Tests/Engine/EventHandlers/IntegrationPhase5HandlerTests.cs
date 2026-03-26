@@ -5,12 +5,15 @@ using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
+using IntegrationsContracts = NexTraceOne.Integrations.Contracts.IntegrationEvents;
 
 namespace NexTraceOne.Notifications.Tests.Engine.EventHandlers;
 
 /// <summary>
 /// Testes para os handlers de integração expandidos na Fase 5:
 /// SyncFailed, ConnectorAuthFailed.
+/// P2.5: SyncFailedIntegrationEvent e ConnectorAuthFailedIntegrationEvent agora usam
+///       NexTraceOne.Integrations.Contracts (ownership correto: módulo Integrations).
 /// </summary>
 public sealed class IntegrationPhase5HandlerTests
 {
@@ -39,7 +42,7 @@ public sealed class IntegrationPhase5HandlerTests
         var tenantId = Guid.NewGuid();
         var ownerUserId = Guid.NewGuid();
         var integrationId = Guid.NewGuid();
-        var @event = new SyncFailedIntegrationEvent(
+        var @event = new IntegrationsContracts.SyncFailedIntegrationEvent(
             IntegrationId: integrationId,
             IntegrationName: "Jira Sync",
             ErrorMessage: "Remote API returned 429 Too Many Requests",
@@ -53,7 +56,7 @@ public sealed class IntegrationPhase5HandlerTests
         r.EventType.Should().Be(NotificationType.SyncFailed);
         r.Category.Should().Be(nameof(NotificationCategory.Integration));
         r.Severity.Should().Be(nameof(NotificationSeverity.Warning));
-        r.SourceModule.Should().Be("OperationalIntelligence");
+        r.SourceModule.Should().Be("Integrations");
         r.SourceEntityType.Should().Be("Integration");
         r.SourceEntityId.Should().Be(integrationId.ToString());
         r.ActionUrl.Should().Be($"/integrations/{integrationId}/sync");
@@ -67,7 +70,7 @@ public sealed class IntegrationPhase5HandlerTests
     public async Task HandleAsync_SyncFailed_MissingOwner_Skips()
     {
         var tenantId = Guid.NewGuid();
-        var @event = new SyncFailedIntegrationEvent(
+        var @event = new IntegrationsContracts.SyncFailedIntegrationEvent(
             IntegrationId: Guid.NewGuid(),
             IntegrationName: "Sync",
             ErrorMessage: "Error",
@@ -82,7 +85,7 @@ public sealed class IntegrationPhase5HandlerTests
     [Fact]
     public async Task HandleAsync_SyncFailed_MissingTenant_Skips()
     {
-        var @event = new SyncFailedIntegrationEvent(
+        var @event = new IntegrationsContracts.SyncFailedIntegrationEvent(
             IntegrationId: Guid.NewGuid(),
             IntegrationName: "Sync",
             ErrorMessage: "Error",
@@ -102,7 +105,7 @@ public sealed class IntegrationPhase5HandlerTests
         var tenantId = Guid.NewGuid();
         var ownerUserId = Guid.NewGuid();
         var connectorId = Guid.NewGuid();
-        var @event = new ConnectorAuthFailedIntegrationEvent(
+        var @event = new IntegrationsContracts.ConnectorAuthFailedIntegrationEvent(
             ConnectorId: connectorId,
             ConnectorName: "Azure DevOps Connector",
             ErrorMessage: "OAuth token expired and refresh failed",
@@ -128,7 +131,7 @@ public sealed class IntegrationPhase5HandlerTests
     public async Task HandleAsync_ConnectorAuthFailed_MissingOwner_Skips()
     {
         var tenantId = Guid.NewGuid();
-        var @event = new ConnectorAuthFailedIntegrationEvent(
+        var @event = new IntegrationsContracts.ConnectorAuthFailedIntegrationEvent(
             ConnectorId: Guid.NewGuid(),
             ConnectorName: "Connector",
             ErrorMessage: "Error",

@@ -89,6 +89,11 @@ public sealed record HealthDegradationIntegrationEvent(
 /// <summary>
 /// Publicado quando autenticação de conector falha.
 /// Consumidores: módulo de notificações (alertar owner da integração).
+/// COMPATIBILIDADE TRANSITÓRIA (P2.5): Este evento pertence semanticamente ao módulo Integrations.
+/// Definição canónica migrada para NexTraceOne.Integrations.Contracts.IntegrationEvents.
+/// Esta cópia em OperationalIntelligence.Contracts é mantida apenas para evitar quebra de contratos
+/// de publicadores OI que ainda não foram migrados para Integrations.
+/// Remover em fase futura quando todos os publicadores usarem Integrations.Contracts.
 /// </summary>
 public sealed record ConnectorAuthFailedIntegrationEvent(
     Guid ConnectorId,
@@ -100,6 +105,11 @@ public sealed record ConnectorAuthFailedIntegrationEvent(
 /// <summary>
 /// Publicado quando sincronização de integração falha.
 /// Consumidores: módulo de notificações (alertar owner da integração).
+/// COMPATIBILIDADE TRANSITÓRIA (P2.5): Este evento pertence semanticamente ao módulo Integrations.
+/// Definição canónica migrada para NexTraceOne.Integrations.Contracts.IntegrationEvents.
+/// Esta cópia em OperationalIntelligence.Contracts é mantida apenas para evitar quebra de contratos
+/// de publicadores OI que ainda não foram migrados para Integrations.
+/// Remover em fase futura quando todos os publicadores usarem Integrations.Contracts.
 /// </summary>
 public sealed record SyncFailedIntegrationEvent(
     Guid IntegrationId,
