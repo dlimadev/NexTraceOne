@@ -67,6 +67,12 @@ export interface PersonaConfig {
   aiContextScopes: string[];
   /** Prompts sugeridos na IA para esta persona. */
   aiSuggestedPromptKeys: string[];
+  /**
+   * Maximum total sidebar nav items shown for this persona (F4-06).
+   * Items beyond this limit are hidden; priority follows sectionOrder.
+   * undefined = no limit (show all permitted items).
+   */
+  maxSidebarItems?: number;
 }
 
 export interface HomeWidget {
@@ -119,6 +125,7 @@ const engineerConfig: PersonaConfig = {
     'persona.Engineer.ai.prompt2',
     'persona.Engineer.ai.prompt3',
   ],
+  maxSidebarItems: 15,
 };
 
 const techLeadConfig: PersonaConfig = {
@@ -216,6 +223,7 @@ const executiveConfig: PersonaConfig = {
     'persona.Executive.ai.prompt2',
     'persona.Executive.ai.prompt3',
   ],
+  maxSidebarItems: 6,
 };
 
 const platformAdminConfig: PersonaConfig = {
@@ -264,6 +272,7 @@ const auditorConfig: PersonaConfig = {
     'persona.Auditor.ai.prompt2',
     'persona.Auditor.ai.prompt3',
   ],
+  maxSidebarItems: 8,
 };
 
 /**

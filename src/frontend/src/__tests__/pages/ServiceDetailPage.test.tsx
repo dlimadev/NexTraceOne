@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ServiceDetailPage } from '../../features/catalog/pages/ServiceDetailPage';
@@ -158,7 +158,8 @@ describe('ServiceDetailPage', () => {
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
     await waitFor(() => {
-      expect(screen.getByText('Payments Team')).toBeInTheDocument();
+      // teamName appears in both EntityHeader meta and Ownership card
+      expect(screen.getAllByText('Payments Team').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('john.doe')).toBeInTheDocument();
       expect(screen.getByText('jane.smith')).toBeInTheDocument();
     });
@@ -168,6 +169,10 @@ describe('ServiceDetailPage', () => {
     vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue(mockService);
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
+    // Wait for data to load, then navigate to APIs tab
+    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    const apisTab = screen.getAllByRole('tab').find(el => el.textContent?.includes('APIs') || el.textContent?.match(/api/i));
+    if (apisTab) fireEvent.click(apisTab);
     await waitFor(() => {
       expect(screen.getAllByText('/api/payments').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Payments API').length).toBeGreaterThanOrEqual(1);
@@ -178,6 +183,9 @@ describe('ServiceDetailPage', () => {
     vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue(mockService);
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
+    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
+    if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {
       expect(screen.getByText('v2.0.0')).toBeInTheDocument();
       expect(screen.getByText('v1.0.0')).toBeInTheDocument();
@@ -188,6 +196,9 @@ describe('ServiceDetailPage', () => {
     vi.mocked(serviceCatalogApi.getServiceDetail).mockResolvedValue(mockService);
     vi.mocked(contractsApi.listContractsByService).mockResolvedValue(mockContracts);
     renderServiceDetail();
+    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
+    if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {
       const viewLinks = screen.getAllByText(/view contract/i);
       expect(viewLinks.length).toBeGreaterThanOrEqual(1);
@@ -202,6 +213,9 @@ describe('ServiceDetailPage', () => {
       totalCount: 0,
     });
     renderServiceDetail();
+    await waitFor(() => expect(screen.getByText('Payments Service')).toBeInTheDocument());
+    const contractsTab = screen.getAllByRole('tab').find(el => el.textContent?.match(/contract/i));
+    if (contractsTab) fireEvent.click(contractsTab);
     await waitFor(() => {
       expect(screen.getByText(/no contracts linked/i)).toBeInTheDocument();
     });

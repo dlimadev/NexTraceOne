@@ -12,6 +12,7 @@ import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
+import { useNavCounters } from '../../hooks/useNavCounters';
 import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
   Shield, ClipboardList, AlertTriangle, Clock, UserCheck,
@@ -133,8 +134,38 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
     });
   };
 
-  const visibleItems = navItems.filter(item => !item.permission || can(item.permission));
+  const { openIncidents } = useNavCounters();
+
+  // Permission-based filter
+  const permittedItems = navItems.filter(item => !item.permission || can(item.permission));
+
+  // Persona-based limit: respect sectionOrder priority, keep home always visible
+  const visibleItems = (() => {
+    const max = config.maxSidebarItems;
+    if (!max) return permittedItems;
+
+    // Always include the home item regardless of limit
+    const homeItems = permittedItems.filter(i => i.section === 'home');
+    const remaining = permittedItems.filter(i => i.section !== 'home');
+
+    // Reorder remaining by sectionOrder priority
+    const ordered: typeof permittedItems = [];
+    for (const section of config.sectionOrder) {
+      if (section === 'home') continue;
+      ordered.push(...remaining.filter(i => i.section === section));
+    }
+
+    const limit = Math.max(0, max - homeItems.length);
+    return [...homeItems, ...ordered.slice(0, limit)];
+  })();
+
   const isHighlighted = (section: NavSection): boolean => config.highlightedSections.includes(section);
+
+  /** Returns the counter value for a given nav item route. */
+  const getCounter = (to: string): number => {
+    if (to === '/operations/incidents') return openIncidents;
+    return 0;
+  };
 
   return (
     <div
@@ -183,6 +214,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                   labelKey={item.labelKey}
                   collapsed={collapsed}
                   preview={item.preview}
+                  counter={getCounter(item.to)}
                 />
               ))}
             </AppSidebarGroup>
