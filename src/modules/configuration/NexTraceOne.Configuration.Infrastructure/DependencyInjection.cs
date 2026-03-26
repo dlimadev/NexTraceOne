@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IConfigurationDefinitionRepository, ConfigurationDefinitionRepository>();
         services.AddScoped<IConfigurationEntryRepository, ConfigurationEntryRepository>();
         services.AddScoped<IConfigurationAuditRepository, ConfigurationAuditRepository>();
+        services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
 
         // Services
         services.AddScoped<IConfigurationResolutionService, ConfigurationResolutionService>();

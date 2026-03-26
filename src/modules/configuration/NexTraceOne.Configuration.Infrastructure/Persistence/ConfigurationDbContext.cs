@@ -13,7 +13,7 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence;
 ///
 /// Hierarquia de configuração suportada: Instance → Tenant → Environment → Module.
 /// A dimensão Module é representada explicitamente pela entidade ConfigurationModule.
-/// Feature flags são preparadas pela entidade FeatureFlagDefinition (resolução por âmbito em P3.2).
+/// Feature flags persistidas: FeatureFlagDefinition (metadados) + FeatureFlagEntry (valores por âmbito).
 /// </summary>
 public sealed class ConfigurationDbContext(
     DbContextOptions<ConfigurationDbContext> options,
@@ -42,6 +42,12 @@ public sealed class ConfigurationDbContext(
     /// Prepara o terreno para resolução de flags por âmbito (implementação em P3.2).
     /// </summary>
     public DbSet<FeatureFlagDefinition> FeatureFlagDefinitions => Set<FeatureFlagDefinition>();
+
+    /// <summary>
+    /// Substituições de valor de feature flags por âmbito.
+    /// Permite sobrepor o valor padrão de uma flag para um tenant, environment ou outro âmbito específico.
+    /// </summary>
+    public DbSet<FeatureFlagEntry> FeatureFlagEntries => Set<FeatureFlagEntry>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ConfigurationDbContext).Assembly;
