@@ -8,11 +8,10 @@ using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
-using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.Governance.Infrastructure;
 using NexTraceOne.Governance.Infrastructure.Persistence;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
 using Serilog;
 using System.Diagnostics;
 

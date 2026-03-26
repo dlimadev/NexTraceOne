@@ -23,6 +23,10 @@
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\aiknowledge\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
   </ItemGroup>
+  <!-- P2.5: Integrations.Contracts criado para ownership correto de ConnectorAuthFailed/SyncFailed events. -->
+  <ItemGroup Label="Cross-module Contracts for Event Handlers (P2.5 — Integrations)">
+    <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

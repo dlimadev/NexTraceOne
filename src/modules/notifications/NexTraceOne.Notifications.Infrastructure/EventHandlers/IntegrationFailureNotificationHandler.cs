@@ -5,20 +5,23 @@ using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
+using IntegrationsContracts = NexTraceOne.Integrations.Contracts.IntegrationEvents;
 
 namespace NexTraceOne.Notifications.Infrastructure.EventHandlers;
 
 /// <summary>
-/// Handler para eventos de falha de integração do módulo Operational Intelligence.
+/// Handler para eventos de falha de integração.
 /// Gera notificações internas quando integrações, sincronizações ou conectores falham.
 /// Fase 5: adicionados SyncFailed e ConnectorAuthFailed.
+/// P2.5: SyncFailedIntegrationEvent e ConnectorAuthFailedIntegrationEvent migrados para
+///       NexTraceOne.Integrations.Contracts (ownership correto: módulo Integrations).
 /// </summary>
 internal sealed class IntegrationFailureNotificationHandler(
     INotificationModule notificationModule,
     ILogger<IntegrationFailureNotificationHandler> logger)
     : IIntegrationEventHandler<IntegrationFailedIntegrationEvent>,
-      IIntegrationEventHandler<SyncFailedIntegrationEvent>,
-      IIntegrationEventHandler<ConnectorAuthFailedIntegrationEvent>
+      IIntegrationEventHandler<IntegrationsContracts.SyncFailedIntegrationEvent>,
+      IIntegrationEventHandler<IntegrationsContracts.ConnectorAuthFailedIntegrationEvent>
 {
     public async Task HandleAsync(IntegrationFailedIntegrationEvent @event, CancellationToken ct = default)
     {
@@ -56,7 +59,7 @@ internal sealed class IntegrationFailureNotificationHandler(
         }, ct);
     }
 
-    public async Task HandleAsync(SyncFailedIntegrationEvent @event, CancellationToken ct = default)
+    public async Task HandleAsync(IntegrationsContracts.SyncFailedIntegrationEvent @event, CancellationToken ct = default)
     {
         logger.LogInformation(
             "Processing SyncFailed notification for integration {IntegrationId}, name {IntegrationName}",
@@ -81,7 +84,7 @@ internal sealed class IntegrationFailureNotificationHandler(
             Severity = nameof(NotificationSeverity.Warning),
             Title = $"Sync failed — {@event.IntegrationName}",
             Message = $"Synchronization for {@event.IntegrationName} has failed: {@event.ErrorMessage}. Check data source and retry.",
-            SourceModule = "OperationalIntelligence",
+            SourceModule = "Integrations",
             SourceEntityType = "Integration",
             SourceEntityId = @event.IntegrationId.ToString(),
             ActionUrl = $"/integrations/{@event.IntegrationId}/sync",
@@ -92,7 +95,7 @@ internal sealed class IntegrationFailureNotificationHandler(
         }, ct);
     }
 
-    public async Task HandleAsync(ConnectorAuthFailedIntegrationEvent @event, CancellationToken ct = default)
+    public async Task HandleAsync(IntegrationsContracts.ConnectorAuthFailedIntegrationEvent @event, CancellationToken ct = default)
     {
         logger.LogInformation(
             "Processing ConnectorAuthFailed notification for connector {ConnectorId}, name {ConnectorName}",
@@ -117,7 +120,7 @@ internal sealed class IntegrationFailureNotificationHandler(
             Severity = nameof(NotificationSeverity.Critical),
             Title = $"Connector auth failed — {@event.ConnectorName}",
             Message = $"Authentication for connector {@event.ConnectorName} has failed: {@event.ErrorMessage}. Re-authenticate to restore data flow.",
-            SourceModule = "OperationalIntelligence",
+            SourceModule = "Integrations",
             SourceEntityType = "Connector",
             SourceEntityId = @event.ConnectorId.ToString(),
             ActionUrl = $"/integrations/connectors/{@event.ConnectorId}",

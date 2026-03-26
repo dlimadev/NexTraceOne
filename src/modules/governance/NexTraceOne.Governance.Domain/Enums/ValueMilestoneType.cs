@@ -4,6 +4,9 @@ namespace NexTraceOne.Governance.Domain.Enums;
 /// Marcos de valor do produto.
 /// Cada milestone corresponde a um momento em que o utilizador atinge valor real no NexTraceOne.
 /// Usado para medir time-to-first-value e time-to-core-value.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Enum pertence semanticamente ao módulo Product Analytics.
+/// Permanece em Governance.Domain.Enums enquanto GetValueMilestones handler residir em Governance.Application.
+/// Extração para ProductAnalytics.Domain.Enums prevista em fase futura.
 /// </summary>
 public enum ValueMilestoneType
 {

@@ -11,10 +11,15 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 ///
-/// NOTA SOBRE ESCOPO: Este DbContext contém temporariamente DbSets de Integrations
-/// (IntegrationConnectors, IngestionSources, IngestionExecutions) e Product Analytics
-/// (AnalyticsEvents) que serão extraídos para módulos próprios em OI-02 e OI-03.
-/// Após extração, apenas os 8 DbSets de Governance permanecerão.
+/// P2.1: IntegrationConnectors extraído para IntegrationsDbContext.
+/// P2.2: IngestionSources e IngestionExecutions extraídos para IntegrationsDbContext.
+/// P2.3: AnalyticsEvents extraído para ProductAnalyticsDbContext.
+/// P2.4: Limpeza residual concluída. GovernanceDbContext contém apenas 8 DbSets de Governance.
+///
+/// Responsabilidades restantes temporárias em Governance (ver P2.4 cleanup report):
+/// - handlers de Integrations ainda em Governance.Application (ownership: Integrations)
+/// - handlers de Product Analytics ainda em Governance.Application (ownership: ProductAnalytics)
+/// - IntegrationHubEndpointModule e ProductAnalyticsEndpointModule em Governance.API (facades transitórias)
 /// </summary>
 public sealed class GovernanceDbContext(
     DbContextOptions<GovernanceDbContext> options,
@@ -47,17 +52,10 @@ public sealed class GovernanceDbContext(
     /// <summary>Registos de rollout de pacotes de governança.</summary>
     public DbSet<GovernanceRolloutRecord> RolloutRecords => Set<GovernanceRolloutRecord>();
 
-    /// <summary>Connectors de integração com sistemas externos.</summary>
-    public DbSet<IntegrationConnector> IntegrationConnectors => Set<IntegrationConnector>();
-
-    /// <summary>Fontes de ingestão de dados.</summary>
-    public DbSet<IngestionSource> IngestionSources => Set<IngestionSource>();
-
-    /// <summary>Execuções de ingestão de dados.</summary>
-    public DbSet<IngestionExecution> IngestionExecutions => Set<IngestionExecution>();
-
-    /// <summary>Eventos de Product Analytics.</summary>
-    public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
+    // NOTE: IntegrationConnectors extracted to IntegrationsDbContext in P2.1.
+    // NOTE: IngestionSources extracted to IntegrationsDbContext in P2.2.
+    // NOTE: IngestionExecutions extracted to IntegrationsDbContext in P2.2.
+    // NOTE: AnalyticsEvents extracted to ProductAnalyticsDbContext in P2.3.
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;

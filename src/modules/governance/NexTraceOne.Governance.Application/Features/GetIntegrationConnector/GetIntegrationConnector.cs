@@ -1,13 +1,17 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
+using IntegrationConnectorStatus = NexTraceOne.Integrations.Domain.Enums.ConnectorStatus;
 
 namespace NexTraceOne.Governance.Application.Features.GetIntegrationConnector;
 
 /// <summary>
 /// Feature: GetIntegrationConnector — detalhe completo de um conector de integração.
 /// Inclui configuração, execuções recentes, escopo e permissões.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class GetIntegrationConnector
 {
@@ -60,7 +64,7 @@ public static class GetIntegrationConnector
                     AuthenticationMode: connector.AuthenticationMode,
                     PollingMode: connector.PollingMode,
                     RetryPolicy: "Exponential backoff, max 3 retries",
-                    IsEnabled: connector.Status == Domain.Enums.ConnectorStatus.Active,
+                    IsEnabled: connector.Status == IntegrationConnectorStatus.Active,
                     AllowedDataDomains: new[] { "Changes", "Runtime", "Alerts" }),
                 RecentExecutions: executions.Select(e => new ExecutionSummaryItem(
                     ExecutionId: e.Id.Value,
@@ -69,7 +73,7 @@ public static class GetIntegrationConnector
                     Result: e.Result.ToString(),
                     RecordsProcessed: e.ItemsProcessed,
                     Warnings: e.ItemsFailed > 0 && e.ItemsSucceeded > 0 ? e.ItemsFailed : 0,
-                    Errors: e.Result == Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
+                    Errors: e.Result == NexTraceOne.Integrations.Domain.Enums.ExecutionResult.Failed ? e.ItemsFailed : 0))
                     .ToList(),
                 SourceScope: sources.Select(s => s.Name).ToList(),
                 AllowedTeams: connector.AllowedTeams.ToList());

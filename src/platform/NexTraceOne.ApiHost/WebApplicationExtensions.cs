@@ -19,6 +19,8 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.Integrations.Infrastructure.Persistence;
+using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using System.Diagnostics;
 
 namespace NexTraceOne.ApiHost;
@@ -109,6 +111,10 @@ public static class WebApplicationExtensions
             // Wave 4 — Audit & Governance
             await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
+
+            // Wave 5 — Integrations & Product Analytics (P2.5: added after bounded context extraction)
+            await MigrateContextAsync<IntegrationsDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<ProductAnalyticsDbContext>(migrationScope, pendingContexts);
 
             // Wave 6 — AI & Knowledge (highest complexity, lowest maturity)
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);

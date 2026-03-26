@@ -16,6 +16,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\identityaccess\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\aiknowledge\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
+    <!-- P2.5: Integrations.Contracts added — SyncFailed/ConnectorAuthFailed tests updated to use correct ownership -->
+    <ProjectReference Include="..\..\..\..\src\modules\integrations\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

@@ -8,8 +8,9 @@ using NexTraceOne.Governance.Application.Features.ListIngestionSources;
 using NexTraceOne.Governance.Application.Features.ListIntegrationConnectors;
 using NexTraceOne.Governance.Application.Features.ReprocessExecution;
 using NexTraceOne.Governance.Application.Features.RetryConnector;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Integrations.Domain.Enums;
 using NSubstitute;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;

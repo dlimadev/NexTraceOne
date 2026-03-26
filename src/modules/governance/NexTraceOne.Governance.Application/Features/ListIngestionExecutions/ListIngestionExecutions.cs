@@ -1,14 +1,17 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Integrations.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.ListIngestionExecutions;
 
 /// <summary>
 /// Feature: ListIngestionExecutions — lista execuções de ingestão com filtros temporais e de resultado.
 /// Permite rastrear histórico de execuções por conector, fonte, resultado e intervalo de tempo.
+/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
+/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
 /// </summary>
 public static class ListIngestionExecutions
 {
