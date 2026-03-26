@@ -14,6 +14,10 @@ using GetDomainReliabilitySummaryFeature = NexTraceOne.OperationalIntelligence.A
 using GetServiceReliabilityTrendFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityTrend.GetServiceReliabilityTrend;
 using GetTeamReliabilityTrendFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilityTrend.GetTeamReliabilityTrend;
 using GetServiceReliabilityCoverageFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityCoverage.GetServiceReliabilityCoverage;
+using RegisterSloDefinitionFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.RegisterSloDefinition.RegisterSloDefinition;
+using RegisterSlaDefinitionFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.RegisterSlaDefinition.RegisterSlaDefinition;
+using GetErrorBudgetFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetErrorBudget.GetErrorBudget;
+using GetBurnRateFeature = NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetBurnRate.GetBurnRate;
 
 namespace NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints.Endpoints;
 
@@ -30,9 +34,14 @@ namespace NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints.Endpoint
 /// - GET /api/v1/reliability/teams/{teamId}/summary            → Resumo por equipa
 /// - GET /api/v1/reliability/teams/{teamId}/trend              → Tendência por equipa
 /// - GET /api/v1/reliability/domains/{domainId}/summary        → Resumo por domínio
+/// - POST /api/v1/reliability/slos                             → Regista definição de SLO
+/// - POST /api/v1/reliability/slas                             → Regista definição de SLA
+/// - GET /api/v1/reliability/slos/{sloId}/error-budget         → Consulta error budget do SLO
+/// - GET /api/v1/reliability/slos/{sloId}/burn-rate            → Consulta burn rate do SLO
 ///
 /// Política de autorização:
-/// - Todos os endpoints exigem "operations:reliability:read".
+/// - Leitura: "operations:reliability:read"
+/// - Escrita: "operations:reliability:write"
 /// </summary>
 public sealed class ReliabilityEndpointModule
 {
@@ -139,6 +148,51 @@ public sealed class ReliabilityEndpointModule
             CancellationToken ct) =>
         {
             var query = new GetDomainReliabilitySummaryFeature.Query(domainId);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("operations:reliability:read");
+
+        // ── P6.1: SLO / SLA / ErrorBudget / BurnRate ────────────────
+
+        group.MapPost("/slos", async (
+            RegisterSloDefinitionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("operations:reliability:write");
+
+        group.MapPost("/slas", async (
+            RegisterSlaDefinitionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("operations:reliability:write");
+
+        group.MapGet("/slos/{sloId:guid}/error-budget", async (
+            Guid sloId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetErrorBudgetFeature.Query(sloId);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("operations:reliability:read");
+
+        group.MapGet("/slos/{sloId:guid}/burn-rate", async (
+            Guid sloId,
+            BurnRateWindow window,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetBurnRateFeature.Query(sloId, window);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
         }).RequirePermission("operations:reliability:read");

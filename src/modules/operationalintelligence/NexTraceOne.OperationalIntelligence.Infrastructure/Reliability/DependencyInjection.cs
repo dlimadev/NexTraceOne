@@ -11,6 +11,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability;
 
 /// <summary>
 /// Registra serviços de infraestrutura do subdomínio Reliability.
+/// P6.1: adicionados repositórios de SLO, SLA, ErrorBudget e BurnRate.
 /// </summary>
 public static class DependencyInjection
 {
@@ -29,6 +30,12 @@ public static class DependencyInjection
         services.AddScoped<IReliabilitySnapshotRepository, ReliabilitySnapshotRepository>();
         services.AddScoped<IReliabilityRuntimeSurface, ReliabilityRuntimeSurface>();
         services.AddScoped<IReliabilityIncidentSurface, ReliabilityIncidentSurface>();
+
+        // P6.1 — SLO / SLA / ErrorBudget / BurnRate
+        services.AddScoped<ISloDefinitionRepository, SloDefinitionRepository>();
+        services.AddScoped<ISlaDefinitionRepository, SlaDefinitionRepository>();
+        services.AddScoped<IErrorBudgetSnapshotRepository, ErrorBudgetSnapshotRepository>();
+        services.AddScoped<IBurnRateSnapshotRepository, BurnRateSnapshotRepository>();
 
         return services;
     }
