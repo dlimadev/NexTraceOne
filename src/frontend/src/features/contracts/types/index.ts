@@ -81,4 +81,13 @@ export type {
   ContractDiffResult,
   SignatureVerificationResult,
   ServiceListItem,
+  SoapContractDetail,
+  WsdlImportResponse,
+  SoapDraftCreateResponse,
+  EventContractDetail,
+  AsyncApiImportResponse,
+  EventDraftCreateResponse,
+  BackgroundServiceContractDetail,
+  BackgroundServiceRegisterResponse,
+  BackgroundServiceDraftCreateResponse,
 } from '../../../types';

@@ -33,6 +33,9 @@ public sealed class DeveloperPortalDbContext(
     /// <summary>Pesquisas salvas no catálogo.</summary>
     public DbSet<SavedSearch> SavedSearches => Set<SavedSearch>();
 
+    /// <summary>Entradas do Publication Center — governa a exposição de contratos no Developer Portal.</summary>
+    public DbSet<ContractPublicationEntry> ContractPublications => Set<ContractPublicationEntry>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(DeveloperPortalDbContext).Assembly;

@@ -40,6 +40,12 @@ public static class DependencyInjection
         services.AddScoped<IContractVersionRepository, ContractVersionRepository>();
         services.AddScoped<IContractDraftRepository, ContractDraftRepository>();
         services.AddScoped<IContractReviewRepository, ContractReviewRepository>();
+        services.AddScoped<ISoapContractDetailRepository, SoapContractDetailRepository>();
+        services.AddScoped<ISoapDraftMetadataRepository, SoapDraftMetadataRepository>();
+        services.AddScoped<IEventContractDetailRepository, EventContractDetailRepository>();
+        services.AddScoped<IEventDraftMetadataRepository, EventDraftMetadataRepository>();
+        services.AddScoped<IBackgroundServiceContractDetailRepository, BackgroundServiceContractDetailRepository>();
+        services.AddScoped<IBackgroundServiceDraftMetadataRepository, BackgroundServiceDraftMetadataRepository>();
 
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();

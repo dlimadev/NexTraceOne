@@ -37,3 +37,32 @@ export {
   useUpdateCanonicalEntity,
   usePromoteToCanonical,
 } from './useCanonicalEntities';
+
+export {
+  useWsdlImport,
+  useCreateSoapDraft,
+  useSoapContractDetail,
+  soapKeys,
+} from './useSoapWorkflow';
+
+export {
+  useAsyncApiImport,
+  useCreateEventDraft,
+  useEventContractDetail,
+  eventKeys,
+} from './useEventWorkflow';
+
+export {
+  useRegisterBackgroundService,
+  useCreateBackgroundServiceDraft,
+  useBackgroundServiceContractDetail,
+  backgroundServiceKeys,
+} from './useBackgroundServiceWorkflow';
+
+export {
+  usePublishContractToPortal,
+  useWithdrawContractFromPortal,
+  usePublicationCenterEntries,
+  useContractPublicationStatus,
+  publicationCenterKeys,
+} from './usePublicationCenter';

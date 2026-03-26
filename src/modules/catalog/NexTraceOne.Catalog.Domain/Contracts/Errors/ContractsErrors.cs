@@ -117,6 +117,52 @@ public static class ContractsErrors
             "No service or API asset was found for linked identifier '{0}'.",
             linkedId);
 
+    // ── SOAP/WSDL ────────────────────────────────────────────────────
+
+    /// <summary>Detalhe SOAP não encontrado para a versão de contrato informada.</summary>
+    public static Error SoapDetailNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.Soap.DetailNotFound", "SOAP detail not found for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Detalhe SOAP já existe para a versão de contrato informada.</summary>
+    public static Error SoapDetailAlreadyExists(string contractVersionId)
+        => Error.Conflict("Contracts.Soap.DetailAlreadyExists", "SOAP detail already exists for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Metadado SOAP de draft não encontrado para o draft informado.</summary>
+    public static Error SoapDraftMetadataNotFound(string draftId)
+        => Error.NotFound("Contracts.Soap.DraftMetadataNotFound", "SOAP draft metadata not found for draft '{0}'.", draftId);
+
+    /// <summary>Operação de importação WSDL requer conteúdo XML válido.</summary>
+    public static Error InvalidWsdlContent()
+        => Error.Validation("Contracts.Soap.InvalidWsdlContent", "The provided content is not a valid WSDL document. Expected XML with WSDL definitions.");
+
+    // ── Event Contracts / AsyncAPI ────────────────────────────────────────────────
+
+    /// <summary>Detalhe de Event Contract não encontrado para a versão de contrato informada.</summary>
+    public static Error EventDetailNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.Event.DetailNotFound", "Event contract detail not found for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Metadado de Event Draft não encontrado para o draft informado.</summary>
+    public static Error EventDraftMetadataNotFound(string draftId)
+        => Error.NotFound("Contracts.Event.DraftMetadataNotFound", "Event draft metadata not found for draft '{0}'.", draftId);
+
+    /// <summary>Operação de importação AsyncAPI requer conteúdo JSON válido com campo asyncapi.</summary>
+    public static Error InvalidAsyncApiContent()
+        => Error.Validation("Contracts.Event.InvalidAsyncApiContent", "The provided content is not a valid AsyncAPI document. Expected JSON with 'asyncapi' field.");
+
+    // ── Background Service Contracts ─────────────────────────────────────────────
+
+    /// <summary>Detalhe de Background Service Contract não encontrado para a versão de contrato informada.</summary>
+    public static Error BackgroundServiceDetailNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.BackgroundService.DetailNotFound", "Background service contract detail not found for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Metadado de Background Service Draft não encontrado para o draft informado.</summary>
+    public static Error BackgroundServiceDraftMetadataNotFound(string draftId)
+        => Error.NotFound("Contracts.BackgroundService.DraftMetadataNotFound", "Background service draft metadata not found for draft '{0}'.", draftId);
+
+    /// <summary>Nome do serviço em background é obrigatório para registro deste tipo contratual.</summary>
+    public static Error BackgroundServiceNameRequired()
+        => Error.Validation("Contracts.BackgroundService.ServiceNameRequired", "Service name is required for background service contracts.");
+
     // ── ContractExample ─────────────────────────────────────────────
 
     /// <summary>Exemplo de contrato não encontrado.</summary>

@@ -8,8 +8,11 @@ using NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample;
 using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
 using NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateBackgroundServiceDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateEventDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateSoapDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.EvaluateContractRules;
 using NexTraceOne.Catalog.Application.Contracts.Features.ExportContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
@@ -18,13 +21,19 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetBackgroundServiceContractDetail;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetEventContractDetail;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetSoapContractDetail;
+using NexTraceOne.Catalog.Application.Contracts.Features.ImportAsyncApiContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.ImportContract;
+using NexTraceOne.Catalog.Application.Contracts.Features.ImportWsdlContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews;
 using NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts;
 using NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview;
+using NexTraceOne.Catalog.Application.Contracts.Features.RegisterBackgroundServiceContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.SuggestSemanticVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata;
@@ -77,6 +86,21 @@ public static class DependencyInjection
         services.AddTransient<IValidator<PublishDraft.Command>, PublishDraft.Validator>();
         services.AddTransient<IValidator<GenerateDraftFromAi.Command>, GenerateDraftFromAi.Validator>();
         services.AddTransient<IValidator<AddDraftExample.Command>, AddDraftExample.Validator>();
+
+        // SOAP/WSDL — workflow específico de contratos SOAP
+        services.AddTransient<IValidator<ImportWsdlContract.Command>, ImportWsdlContract.Validator>();
+        services.AddTransient<IValidator<CreateSoapDraft.Command>, CreateSoapDraft.Validator>();
+        services.AddTransient<IValidator<GetSoapContractDetail.Query>, GetSoapContractDetail.Validator>();
+
+        // Event Contracts / AsyncAPI — workflow específico de contratos de eventos
+        services.AddTransient<IValidator<ImportAsyncApiContract.Command>, ImportAsyncApiContract.Validator>();
+        services.AddTransient<IValidator<CreateEventDraft.Command>, CreateEventDraft.Validator>();
+        services.AddTransient<IValidator<GetEventContractDetail.Query>, GetEventContractDetail.Validator>();
+
+        // Background Service Contracts — workflow específico de jobs/workers/schedulers
+        services.AddTransient<IValidator<RegisterBackgroundServiceContract.Command>, RegisterBackgroundServiceContract.Validator>();
+        services.AddTransient<IValidator<CreateBackgroundServiceDraft.Command>, CreateBackgroundServiceDraft.Validator>();
+        services.AddTransient<IValidator<GetBackgroundServiceContractDetail.Query>, GetBackgroundServiceContractDetail.Validator>();
 
         return services;
     }

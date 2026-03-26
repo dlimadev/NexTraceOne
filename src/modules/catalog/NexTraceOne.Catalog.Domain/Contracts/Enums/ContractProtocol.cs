@@ -26,5 +26,8 @@ public enum ContractProtocol
     Protobuf = 4,
 
     /// <summary>GraphQL SDL — capacidade evolutiva para APIs GraphQL.</summary>
-    GraphQl = 5
+    GraphQl = 5,
+
+    /// <summary>Worker/Background Service — processo em background declarado por metadados estruturados (trigger, inputs, outputs, side effects).</summary>
+    WorkerService = 6
 }

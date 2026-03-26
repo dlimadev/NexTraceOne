@@ -12,6 +12,8 @@ import {
   GitCompare,
   Copy,
   Plus,
+  Globe,
+  EyeOff,
 } from 'lucide-react';
 import { LIFECYCLE_TRANSITIONS } from '../constants';
 import type { ContractLifecycleState } from '../../types';
@@ -20,12 +22,15 @@ interface ContractQuickActionsProps {
   lifecycleState: ContractLifecycleState;
   isLocked?: boolean;
   isSigned?: boolean;
+  isPublishedToPortal?: boolean;
   onTransition?: (targetState: ContractLifecycleState) => void;
   onSign?: () => void;
   onExport?: () => void;
   onDiff?: () => void;
   onClone?: () => void;
   onNewVersion?: () => void;
+  onPublishToPortal?: () => void;
+  onWithdrawFromPortal?: () => void;
   className?: string;
 }
 
@@ -45,12 +50,15 @@ const TRANSITION_ICONS: Record<string, React.ComponentType<{ size?: number; clas
 export function ContractQuickActions({
   lifecycleState,
   isSigned,
+  isPublishedToPortal = false,
   onTransition,
   onSign,
   onExport,
   onDiff,
   onClone,
   onNewVersion,
+  onPublishToPortal,
+  onWithdrawFromPortal,
   className = '',
 }: ContractQuickActionsProps) {
   const { t } = useTranslation();
@@ -125,6 +133,30 @@ export function ContractQuickActions({
         >
           <Plus size={12} />
           {t('contracts.newVersion', 'New Version')}
+        </button>
+      )}
+
+      {/* Publish to Developer Portal — disponível para Approved e Locked */}
+      {!isPublishedToPortal
+        && (lifecycleState === 'Approved' || lifecycleState === 'Locked')
+        && onPublishToPortal && (
+        <button
+          onClick={onPublishToPortal}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-green/10 text-green hover:bg-green/20 transition-colors"
+        >
+          <Globe size={12} />
+          {t('contracts.publishToPortal', 'Publish to Portal')}
+        </button>
+      )}
+
+      {/* Withdraw from Developer Portal — disponível para contratos publicados */}
+      {isPublishedToPortal && onWithdrawFromPortal && (
+        <button
+          onClick={onWithdrawFromPortal}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-elevated text-muted hover:text-heading transition-colors"
+        >
+          <EyeOff size={12} />
+          {t('contracts.withdrawFromPortal', 'Withdraw from Portal')}
         </button>
       )}
     </div>

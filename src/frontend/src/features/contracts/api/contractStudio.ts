@@ -6,6 +6,9 @@ import type {
   ContractType,
   ContractProtocol,
   DraftStatus,
+  SoapDraftCreateResponse,
+  EventDraftCreateResponse,
+  BackgroundServiceDraftCreateResponse,
 } from '../types';
 
 function readValue<T>(source: Record<string, unknown>, camel: string, pascal?: string): T | undefined {
@@ -144,4 +147,93 @@ export const contractStudioApi = {
 
   listReviews: (draftId: string) =>
     client.get(`/contracts/drafts/${draftId}/reviews`).then((r) => ((r.data as unknown[]) ?? []).map(mapReview)),
+
+  // ── SOAP/WSDL draft workflow ──────────────────────────────────────
+
+  /**
+   * Cria um draft específico para contratos SOAP/WSDL com metadados SOAP inicializados.
+   * Cria ContractDraft (ContractType=Soap, Protocol=Wsdl) + SoapDraftMetadata.
+   */
+  createSoapDraft: (data: {
+    title: string;
+    author: string;
+    serviceName: string;
+    targetNamespace: string;
+    soapVersion?: '1.1' | '1.2';
+    serviceId?: string;
+    description?: string;
+    endpointUrl?: string;
+    portTypeName?: string;
+    bindingName?: string;
+    operationsJson?: string;
+  }) =>
+    client.post<SoapDraftCreateResponse>('/contracts/drafts/soap', {
+      title: data.title,
+      author: data.author,
+      serviceName: data.serviceName,
+      targetNamespace: data.targetNamespace,
+      soapVersion: data.soapVersion ?? '1.1',
+      serviceId: data.serviceId,
+      description: data.description,
+      endpointUrl: data.endpointUrl,
+      portTypeName: data.portTypeName,
+      bindingName: data.bindingName,
+      operationsJson: data.operationsJson,
+    }).then((r) => r.data),
+
+  /**
+   * Cria um draft específico para contratos Event/AsyncAPI com metadados de evento inicializados.
+   * Cria ContractDraft (ContractType=Event, Protocol=AsyncApi) + EventDraftMetadata.
+   */
+  createEventDraft: (data: {
+    title: string;
+    author: string;
+    asyncApiVersion?: string;
+    serviceId?: string;
+    description?: string;
+    defaultContentType?: string;
+    channelsJson?: string;
+    messagesJson?: string;
+  }) =>
+    client.post<EventDraftCreateResponse>('/contracts/drafts/event', {
+      title: data.title,
+      author: data.author,
+      asyncApiVersion: data.asyncApiVersion ?? '2.6.0',
+      serviceId: data.serviceId,
+      description: data.description,
+      defaultContentType: data.defaultContentType ?? 'application/json',
+      channelsJson: data.channelsJson,
+      messagesJson: data.messagesJson,
+    }).then((r) => r.data),
+
+  /**
+   * Cria um draft específico para Background Service Contracts com metadados do processo.
+   * Cria ContractDraft (ContractType=BackgroundService) + BackgroundServiceDraftMetadata.
+   */
+  createBackgroundServiceDraft: (data: {
+    title: string;
+    author: string;
+    serviceName: string;
+    category?: string;
+    triggerType?: string;
+    serviceId?: string;
+    description?: string;
+    scheduleExpression?: string;
+    inputsJson?: string;
+    outputsJson?: string;
+    sideEffectsJson?: string;
+  }) =>
+    client.post<BackgroundServiceDraftCreateResponse>('/contracts/drafts/background-service', {
+      title: data.title,
+      author: data.author,
+      serviceName: data.serviceName,
+      category: data.category ?? 'Job',
+      triggerType: data.triggerType ?? 'OnDemand',
+      serviceId: data.serviceId,
+      description: data.description,
+      scheduleExpression: data.scheduleExpression,
+      inputsJson: data.inputsJson,
+      outputsJson: data.outputsJson,
+      sideEffectsJson: data.sideEffectsJson,
+    }).then((r) => r.data),
 };

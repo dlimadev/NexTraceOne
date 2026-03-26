@@ -53,6 +53,24 @@ public sealed class ContractsDbContext(
     /// <summary>Pacotes de evidência associados a mudanças contratuais.</summary>
     public DbSet<ContractEvidencePack> ContractEvidencePacks => Set<ContractEvidencePack>();
 
+    /// <summary>Detalhes SOAP/WSDL específicos de versões de contrato publicadas (Protocol = Wsdl).</summary>
+    public DbSet<SoapContractDetail> SoapContractDetails => Set<SoapContractDetail>();
+
+    /// <summary>Metadados SOAP/WSDL específicos de drafts de contrato em edição (ContractType = Soap).</summary>
+    public DbSet<SoapDraftMetadata> SoapDraftMetadata => Set<SoapDraftMetadata>();
+
+    /// <summary>Detalhes AsyncAPI específicos de versões de contrato publicadas (Protocol = AsyncApi).</summary>
+    public DbSet<EventContractDetail> EventContractDetails => Set<EventContractDetail>();
+
+    /// <summary>Metadados AsyncAPI específicos de drafts de contrato em edição (ContractType = Event).</summary>
+    public DbSet<EventDraftMetadata> EventDraftMetadata => Set<EventDraftMetadata>();
+
+    /// <summary>Detalhes de Background Service Contracts publicados (ContractType = BackgroundService).</summary>
+    public DbSet<BackgroundServiceContractDetail> BackgroundServiceContractDetails => Set<BackgroundServiceContractDetail>();
+
+    /// <summary>Metadados de Background Service para drafts de contrato em edição (ContractType = BackgroundService).</summary>
+    public DbSet<BackgroundServiceDraftMetadata> BackgroundServiceDraftMetadata => Set<BackgroundServiceDraftMetadata>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

@@ -466,7 +466,7 @@ export interface SubgraphResult {
 // ─── Contracts ───────────────────────────────────────────────────────────────
 
 /** Protocolo de contrato suportado pelo módulo multi-protocolo. */
-export type ContractProtocol = 'OpenApi' | 'Swagger' | 'Wsdl' | 'AsyncApi' | 'Protobuf' | 'GraphQl';
+export type ContractProtocol = 'OpenApi' | 'Swagger' | 'Wsdl' | 'AsyncApi' | 'Protobuf' | 'GraphQl' | 'WorkerService';
 
 /** Estado do ciclo de vida de uma versão de contrato. */
 export type ContractLifecycleState = 'Draft' | 'InReview' | 'Approved' | 'Locked' | 'Deprecated' | 'Sunset' | 'Retired';
@@ -1317,6 +1317,231 @@ export interface DraftListResponse {
   totalCount: number;
   page: number;
   pageSize: number;
+}
+
+/**
+ * Detalhes SOAP/WSDL específicos de uma versão de contrato publicada.
+ * Retornados pelo endpoint GET /api/v1/contracts/{id}/soap-detail.
+ */
+export interface SoapContractDetail {
+  soapDetailId: string;
+  contractVersionId: string;
+  serviceName: string;
+  targetNamespace: string;
+  soapVersion: '1.1' | '1.2';
+  endpointUrl?: string | null;
+  wsdlSourceUrl?: string | null;
+  portTypeName?: string | null;
+  bindingName?: string | null;
+  extractedOperationsJson: string;
+}
+
+/**
+ * Resposta da importação de WSDL.
+ * Retornada pelo endpoint POST /api/v1/contracts/wsdl/import.
+ */
+export interface WsdlImportResponse {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  soapVersion: string;
+  serviceName: string;
+  targetNamespace: string;
+  portTypeName?: string | null;
+  bindingName?: string | null;
+  endpointUrl?: string | null;
+  extractedOperationsJson: string;
+  importedAt: string;
+}
+
+/**
+ * Resposta da criação de draft SOAP.
+ * Retornada pelo endpoint POST /api/v1/contracts/drafts/soap.
+ */
+export interface SoapDraftCreateResponse {
+  draftId: string;
+  title: string;
+  status: string;
+  serviceName: string;
+  targetNamespace: string;
+  soapVersion: string;
+  createdAt: string;
+}
+
+/**
+ * Detalhes AsyncAPI específicos de uma versão de contrato de evento publicada.
+ * Retornados pelo endpoint GET /api/v1/contracts/{id}/event-detail.
+ */
+export interface EventContractDetail {
+  eventDetailId: string;
+  contractVersionId: string;
+  title: string;
+  asyncApiVersion: string;
+  defaultContentType: string;
+  channelsJson: string;
+  messagesJson: string;
+  serversJson: string;
+}
+
+/**
+ * Resposta da importação de spec AsyncAPI.
+ * Retornada pelo endpoint POST /api/v1/contracts/asyncapi/import.
+ */
+export interface AsyncApiImportResponse {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  title: string;
+  asyncApiVersion: string;
+  defaultContentType: string;
+  channelsJson: string;
+  messagesJson: string;
+  serversJson: string;
+  importedAt: string;
+}
+
+/**
+ * Resposta da criação de draft de evento.
+ * Retornada pelo endpoint POST /api/v1/contracts/drafts/event.
+ */
+export interface EventDraftCreateResponse {
+  draftId: string;
+  title: string;
+  status: string;
+  asyncApiVersion: string;
+  defaultContentType: string;
+  createdAt: string;
+}
+
+/**
+ * Detalhes de Background Service Contract de uma versão publicada.
+ * Retornados pelo endpoint GET /api/v1/contracts/{id}/background-service-detail.
+ */
+export interface BackgroundServiceContractDetail {
+  detailId: string;
+  contractVersionId: string;
+  serviceName: string;
+  category: string;
+  triggerType: string;
+  scheduleExpression?: string | null;
+  timeoutExpression?: string | null;
+  allowsConcurrency: boolean;
+  inputsJson: string;
+  outputsJson: string;
+  sideEffectsJson: string;
+}
+
+/**
+ * Resposta do registo de Background Service Contract.
+ * Retornada pelo endpoint POST /api/v1/contracts/background-services/register.
+ */
+export interface BackgroundServiceRegisterResponse {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  serviceName: string;
+  category: string;
+  triggerType: string;
+  scheduleExpression?: string | null;
+  timeoutExpression?: string | null;
+  allowsConcurrency: boolean;
+  registeredAt: string;
+}
+
+/**
+ * Resposta da criação de draft de Background Service.
+ * Retornada pelo endpoint POST /api/v1/contracts/drafts/background-service.
+ */
+export interface BackgroundServiceDraftCreateResponse {
+  draftId: string;
+  title: string;
+  status: string;
+  serviceName: string;
+  category: string;
+  triggerType: string;
+  scheduleExpression?: string | null;
+  createdAt: string;
+}
+
+/**
+ * Entrada do Publication Center — governa a visibilidade de um contrato no Developer Portal.
+ */
+export interface ContractPublicationEntry {
+  publicationEntryId: string;
+  contractVersionId: string;
+  apiAssetId: string;
+  contractTitle: string;
+  semVer: string;
+  status: ContractPublicationStatus;
+  visibility: PublicationVisibility;
+  publishedBy: string;
+  publishedAt?: string | null;
+  withdrawnAt?: string | null;
+  withdrawalReason?: string | null;
+  releaseNotes?: string | null;
+}
+
+/** Estado de publicação de um contrato no Developer Portal. */
+export type ContractPublicationStatus =
+  | 'PendingPublication'
+  | 'Published'
+  | 'Withdrawn'
+  | 'Deprecated'
+  | 'NotPublished';
+
+/** Escopo de visibilidade no Developer Portal. */
+export type PublicationVisibility = 'Internal' | 'External' | 'RestrictedToTeams';
+
+/**
+ * Resposta da publicação de um contrato no Developer Portal.
+ * Retornada pelo endpoint POST /api/v1/publication-center/publish.
+ */
+export interface PublishContractToPortalResponse {
+  publicationEntryId: string;
+  contractVersionId: string;
+  apiAssetId: string;
+  contractTitle: string;
+  semVer: string;
+  status: ContractPublicationStatus;
+  visibility: PublicationVisibility;
+  publishedAt: string;
+}
+
+/**
+ * Resposta da retirada de publicação do Developer Portal.
+ * Retornada pelo endpoint POST /api/v1/publication-center/{entryId}/withdraw.
+ */
+export interface WithdrawContractFromPortalResponse {
+  publicationEntryId: string;
+  contractVersionId: string;
+  status: ContractPublicationStatus;
+  withdrawnBy: string;
+  withdrawnAt: string;
+  withdrawalReason?: string | null;
+}
+
+/**
+ * Estado de publicação de uma versão de contrato específica.
+ * Retornado pelo endpoint GET /api/v1/publication-center/contracts/{id}/status.
+ */
+export interface ContractPublicationStatusResponse {
+  contractVersionId: string;
+  isPublished: boolean;
+  status: ContractPublicationStatus;
+  publicationEntryId?: string | null;
+  visibility?: PublicationVisibility | null;
+  publishedBy?: string | null;
+  publishedAt?: string | null;
+  releaseNotes?: string | null;
+}
+
+/**
+ * Lista paginada de entradas do Publication Center.
+ * Retornada pelo endpoint GET /api/v1/publication-center.
+ */
+export interface PublicationCenterListResponse {
+  items: ContractPublicationEntry[];
+  totalCount: number;
 }
 
 export interface SignatureVerificationResult {

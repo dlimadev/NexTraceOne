@@ -13,6 +13,12 @@ import type {
   ContractListResponse,
   ContractsSummary,
   ServiceContractsResponse,
+  SoapContractDetail,
+  WsdlImportResponse,
+  EventContractDetail,
+  AsyncApiImportResponse,
+  BackgroundServiceContractDetail,
+  BackgroundServiceRegisterResponse,
 } from '../types';
 import type {
   ValidationIssue,
@@ -243,4 +249,92 @@ export const contractsApi = {
 
   promoteToCanonical: (data: { sourceContractVersionId: string; schemaName: string; name: string; domain: string; category: string }) =>
     client.post<{ id: string }>('/contracts/canonical-entities/promote', data).then((r) => r.data),
+
+  // ── SOAP/WSDL workflow ─────────────────────────────────────────────
+
+  /**
+   * Importa um contrato WSDL e extrai metadados SOAP específicos.
+   * Cria ContractVersion com Protocol=Wsdl e popula SoapContractDetail.
+   */
+  importWsdl: (data: {
+    apiAssetId: string;
+    semVer: string;
+    wsdlContent: string;
+    importedFrom: string;
+    endpointUrl?: string;
+    wsdlSourceUrl?: string;
+    soapVersion?: '1.1' | '1.2';
+  }) =>
+    client.post<WsdlImportResponse>('/contracts/wsdl/import', {
+      apiAssetId: data.apiAssetId,
+      semVer: data.semVer,
+      wsdlContent: data.wsdlContent,
+      importedFrom: data.importedFrom,
+      endpointUrl: data.endpointUrl,
+      wsdlSourceUrl: data.wsdlSourceUrl,
+      soapVersion: data.soapVersion,
+    }).then((r) => r.data),
+
+  /**
+   * Obtém os detalhes SOAP/WSDL específicos de uma versão de contrato publicada.
+   */
+  getSoapContractDetail: (contractVersionId: string) =>
+    client.get<SoapContractDetail>(`/contracts/${contractVersionId}/soap-detail`).then((r) => r.data),
+
+  // ── Event Contracts / AsyncAPI workflow ──────────────────────────
+
+  /**
+   * Importa uma spec AsyncAPI e extrai metadados específicos de evento.
+   * Cria ContractVersion com Protocol=AsyncApi e popula EventContractDetail.
+   */
+  importAsyncApi: (data: {
+    apiAssetId: string;
+    semVer: string;
+    asyncApiContent: string;
+    importedFrom: string;
+    defaultContentType?: string;
+  }) =>
+    client.post<AsyncApiImportResponse>('/contracts/asyncapi/import', {
+      apiAssetId: data.apiAssetId,
+      semVer: data.semVer,
+      asyncApiContent: data.asyncApiContent,
+      importedFrom: data.importedFrom,
+      defaultContentType: data.defaultContentType,
+    }).then((r) => r.data),
+
+  /**
+   * Obtém os detalhes AsyncAPI específicos de uma versão de contrato de evento publicada.
+   */
+  getEventContractDetail: (contractVersionId: string) =>
+    client.get<EventContractDetail>(`/contracts/${contractVersionId}/event-detail`).then((r) => r.data),
+
+  // ── Background Service Contracts workflow ─────────────────────────
+
+  /**
+   * Regista um Background Service Contract com metadados específicos do processo.
+   * Cria ContractVersion (ContractType=BackgroundService) + BackgroundServiceContractDetail.
+   */
+  registerBackgroundService: (data: {
+    apiAssetId: string;
+    semVer: string;
+    serviceName: string;
+    category: string;
+    triggerType: string;
+    scheduleExpression?: string;
+    timeoutExpression?: string;
+    allowsConcurrency?: boolean;
+    inputsJson?: string;
+    outputsJson?: string;
+    sideEffectsJson?: string;
+    specContent?: string;
+  }) =>
+    client.post<BackgroundServiceRegisterResponse>('/contracts/background-services/register', data)
+      .then((r) => r.data),
+
+  /**
+   * Obtém os detalhes de Background Service de uma versão de contrato publicada.
+   */
+  getBackgroundServiceContractDetail: (contractVersionId: string) =>
+    client.get<BackgroundServiceContractDetail>(`/contracts/${contractVersionId}/background-service-detail`)
+      .then((r) => r.data),
 };

@@ -108,4 +108,65 @@ public sealed class ContractRuleEngineTests
 
         violations.Should().Contain(v => v.RuleName == "DeprecationDocumentation");
     }
+
+    [Fact]
+    public void Evaluate_Should_NotRaiseSecurityViolation_For_WorkerServiceProtocol()
+    {
+        // WorkerService does not require security definitions — should not raise SecurityDefinition error
+        var model = new ContractCanonicalModel(
+            ContractProtocol.WorkerService, "OrderExpirationJob", "Cron", "0 * * * *",
+            [new ContractOperation("OrderExpirationJob", "OrderExpirationJob", "Cron background service", "Cron", "OrderExpirationJob", [], [])],
+            [], // No security schemes — expected for worker services
+            [], [], ["Job"],
+            1, 0, false, true, true);
+
+        var violations = ContractRuleEngine.Evaluate(ContractVersionId.New(), model, "1.0.0", ContractProtocol.WorkerService);
+
+        violations.Should().NotContain(v => v.RuleName == "SecurityDefinition");
+    }
+
+    [Fact]
+    public void Evaluate_Should_RaiseWorkerOperationMissing_When_NoOperationsDeclared()
+    {
+        var model = new ContractCanonicalModel(
+            ContractProtocol.WorkerService, "EmptyWorker", "OnDemand", null,
+            [],
+            [], [], [], [],
+            0, 0, false, false, false);
+
+        var violations = ContractRuleEngine.Evaluate(ContractVersionId.New(), model, "1.0.0", ContractProtocol.WorkerService);
+
+        violations.Should().Contain(v => v.RuleName == "WorkerOperationMissing");
+    }
+
+    [Fact]
+    public void Evaluate_Should_NotRaiseExtraViolations_For_FullyCompliantWorkerService()
+    {
+        // A well-defined WorkerService should have very low violation count
+        var model = new ContractCanonicalModel(
+            ContractProtocol.WorkerService, "OrderExpirationJob", "Cron", "0 * * * *",
+            [new ContractOperation("OrderExpirationJob", "OrderExpirationJob", "Cron background service", "Cron", "OrderExpirationJob", [], [])],
+            [new ContractSchemaElement("expiredCount", "int", false)],
+            [], [], ["Job"],
+            1, 1, false, true, true);
+
+        var violations = ContractRuleEngine.Evaluate(ContractVersionId.New(), model, "1.0.0", ContractProtocol.WorkerService);
+
+        violations.Where(v => v.Severity == "Error").Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Evaluate_Should_NotRaiseSecurityViolation_For_WsdlProtocol()
+    {
+        // WSDL also does not require OAuth/API Key security definitions — handled by WS-Security
+        var model = new ContractCanonicalModel(
+            ContractProtocol.Wsdl, "OrderService", "1.1", null,
+            [new ContractOperation("GetOrder", "GetOrder", "Get order by id", "request-response", "OrderPort", [], [])],
+            [], [], [], [],
+            1, 0, false, false, true);
+
+        var violations = ContractRuleEngine.Evaluate(ContractVersionId.New(), model, "1.0.0", ContractProtocol.Wsdl);
+
+        violations.Should().NotContain(v => v.RuleName == "SecurityDefinition");
+    }
 }
