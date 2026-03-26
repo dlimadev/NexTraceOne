@@ -18,4 +18,8 @@ internal sealed class PostReleaseReviewRepository(ChangeIntelligenceDbContext co
     /// <summary>Adiciona uma review pós-release.</summary>
     public void Add(PostReleaseReview review)
         => context.PostReleaseReviews.Add(review);
+
+    /// <summary>Atualiza uma review pós-release existente.</summary>
+    public void Update(PostReleaseReview review)
+        => context.PostReleaseReviews.Update(review);
 }

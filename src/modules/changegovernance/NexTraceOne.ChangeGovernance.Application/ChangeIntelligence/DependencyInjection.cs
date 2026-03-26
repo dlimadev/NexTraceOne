@@ -13,12 +13,14 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetBl
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeScore;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetTraceCorrelations;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordTraceCorrelation;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
@@ -44,6 +46,9 @@ public static class DependencyInjection
         // Serviço de cálculo automático de score (P5.3)
         services.AddSingleton<IChangeScoreCalculator, ChangeScoreCalculator>();
 
+        // Serviço de verificação pós-mudança (P5.5)
+        services.AddSingleton<IPostChangeVerificationService, PostChangeVerificationService>();
+
         services.AddTransient<IValidator<NotifyDeployment.Command>, NotifyDeployment.Validator>();
         services.AddTransient<IValidator<ClassifyChangeLevel.Command>, ClassifyChangeLevel.Validator>();
         services.AddTransient<IValidator<CalculateBlastRadius.Command>, CalculateBlastRadius.Validator>();
@@ -62,6 +67,8 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetChangeDecisionHistory.Query>, GetChangeDecisionHistory.Validator>();
         services.AddTransient<IValidator<RecordTraceCorrelation.Command>, RecordTraceCorrelation.Validator>();
         services.AddTransient<IValidator<GetTraceCorrelations.Query>, GetTraceCorrelations.Validator>();
+        services.AddTransient<IValidator<RecordObservationMetrics.Command>, RecordObservationMetrics.Validator>();
+        services.AddTransient<IValidator<GetPostReleaseReview.Query>, GetPostReleaseReview.Validator>();
 
         return services;
     }

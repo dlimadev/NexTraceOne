@@ -10,4 +10,7 @@ public interface IPostReleaseReviewRepository
 
     /// <summary>Adiciona uma review pós-release.</summary>
     void Add(PostReleaseReview review);
+
+    /// <summary>Atualiza uma review pós-release existente.</summary>
+    void Update(PostReleaseReview review);
 }

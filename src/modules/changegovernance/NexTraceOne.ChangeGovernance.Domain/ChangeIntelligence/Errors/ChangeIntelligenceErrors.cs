@@ -44,4 +44,8 @@ public static class ChangeIntelligenceErrors
     /// <summary>Review pós-release não encontrada para a release informada.</summary>
     public static Error PostReleaseReviewNotFound(string releaseId)
         => Error.NotFound("ChangeIntelligence.PostReleaseReview.NotFound", "Post-release review for release '{0}' was not found.", releaseId);
+
+    /// <summary>Baseline não encontrado para a release informada. Necessário para post-change verification.</summary>
+    public static Error BaselineNotFound(string releaseId)
+        => Error.NotFound("ChangeIntelligence.ReleaseBaseline.NotFound", "Baseline for release '{0}' was not found. Record a baseline before submitting observation metrics.", releaseId);
 }

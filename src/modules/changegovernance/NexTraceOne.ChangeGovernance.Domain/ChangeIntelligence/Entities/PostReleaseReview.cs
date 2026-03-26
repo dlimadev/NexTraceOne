@@ -107,6 +107,41 @@ public sealed class PostReleaseReview : AggregateRoot<PostReleaseReviewId>
 
         return Result<Unit>.Success(Unit.Value);
     }
+
+    /// <summary>
+    /// Registra o resultado da observação inicial sem avançar de fase.
+    /// Usado pelo pipeline automático (RecordObservationMetrics) quando a review
+    /// acaba de ser criada e está na fase InitialObservation — o primeiro sinal de
+    /// verificação pós-deploy ainda não constitui um avanço de fase.
+    /// </summary>
+    public Result<Unit> RecordInitialObservation(
+        ReviewOutcome outcome,
+        decimal confidenceScore,
+        string summary)
+    {
+        if (IsCompleted)
+            return Error.Conflict(
+                "change_intelligence.review.already_completed",
+                "Post-release review has already been completed.");
+
+        if (CurrentPhase != ObservationPhase.InitialObservation)
+            return Error.Conflict(
+                "change_intelligence.review.not_at_initial_phase",
+                "RecordInitialObservation can only be called when the review is at InitialObservation phase.");
+
+        if (confidenceScore < 0m || confidenceScore > 1m)
+            return Error.Validation(
+                "change_intelligence.review.invalid_confidence",
+                "Confidence score must be between 0.0 and 1.0.");
+
+        Guard.Against.NullOrWhiteSpace(summary, nameof(summary));
+
+        Outcome = outcome;
+        ConfidenceScore = confidenceScore;
+        Summary = summary;
+
+        return Result<Unit>.Success(Unit.Value);
+    }
 }
 
 /// <summary>Identificador fortemente tipado para PostReleaseReview.</summary>
