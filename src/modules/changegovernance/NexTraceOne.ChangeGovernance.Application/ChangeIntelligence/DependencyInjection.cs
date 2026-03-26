@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AttachWorkItemContext;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel;
@@ -22,6 +23,7 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.Recor
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
 
@@ -38,6 +40,9 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksApplication(configuration);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        // Serviço de cálculo automático de score (P5.3)
+        services.AddSingleton<IChangeScoreCalculator, ChangeScoreCalculator>();
 
         services.AddTransient<IValidator<NotifyDeployment.Command>, NotifyDeployment.Validator>();
         services.AddTransient<IValidator<ClassifyChangeLevel.Command>, ClassifyChangeLevel.Validator>();

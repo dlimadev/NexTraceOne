@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
@@ -30,9 +31,11 @@ public sealed class ChangeIntelligenceApplicationTests
         var repository = Substitute.For<IReleaseRepository>();
         var changeEventRepository = Substitute.For<IChangeEventRepository>();
         var markerRepository = Substitute.For<IExternalMarkerRepository>();
+        var scoreRepository = Substitute.For<IChangeScoreRepository>();
+        var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
 
         repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((Release?)null);
@@ -48,9 +51,11 @@ public sealed class ChangeIntelligenceApplicationTests
         result.Value.Version.Should().Be(command.Version);
         result.Value.Environment.Should().Be(command.Environment);
         result.Value.IsNewRelease.Should().BeTrue();
+        result.Value.AutoScore.Should().BeInRange(0m, 1m);
         repository.Received(1).Add(Arg.Any<Release>());
         changeEventRepository.Received(1).Add(Arg.Any<ChangeEvent>());
         markerRepository.Received(1).Add(Arg.Any<ExternalMarker>());
+        scoreRepository.Received(1).Add(Arg.Any<ChangeIntelligenceScore>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
@@ -61,9 +66,11 @@ public sealed class ChangeIntelligenceApplicationTests
         var repository = Substitute.For<IReleaseRepository>();
         var changeEventRepository = Substitute.For<IChangeEventRepository>();
         var markerRepository = Substitute.For<IExternalMarkerRepository>();
+        var scoreRepository = Substitute.For<IChangeScoreRepository>();
+        var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
 
         repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(existingRelease);
@@ -90,9 +97,11 @@ public sealed class ChangeIntelligenceApplicationTests
         var repository = Substitute.For<IReleaseRepository>();
         var changeEventRepository = Substitute.For<IChangeEventRepository>();
         var markerRepository = Substitute.For<IExternalMarkerRepository>();
+        var scoreRepository = Substitute.For<IChangeScoreRepository>();
+        var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
 
         repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((Release?)null);
@@ -160,9 +169,11 @@ public sealed class ChangeIntelligenceApplicationTests
         var release = CreateRelease();
         var releaseRepository = Substitute.For<IReleaseRepository>();
         var blastRadiusRepository = Substitute.For<IBlastRadiusRepository>();
+        var scoreRepository = Substitute.For<IChangeScoreRepository>();
+        var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new CalculateBlastRadiusFeature.Handler(releaseRepository, blastRadiusRepository, unitOfWork, dateTimeProvider);
+        var sut = new CalculateBlastRadiusFeature.Handler(releaseRepository, blastRadiusRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
 
         releaseRepository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(release);
@@ -177,7 +188,9 @@ public sealed class ChangeIntelligenceApplicationTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.TotalAffectedConsumers.Should().Be(direct.Count + transitive.Count);
+        result.Value.UpdatedScore.Should().BeInRange(0m, 1m);
         blastRadiusRepository.Received(1).Add(Arg.Any<BlastRadiusReport>());
+        scoreRepository.Received(1).Add(Arg.Any<ChangeIntelligenceScore>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 

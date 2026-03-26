@@ -51,11 +51,14 @@ public static class NotifyDeployment
     /// <summary>
     /// Handler que correlaciona um evento de deployment a uma Release existente ou cria uma nova.
     /// Regista rastreabilidade via <see cref="ChangeEvent"/> e <see cref="ExternalMarker"/>.
+    /// Calcula automaticamente o ChangeIntelligenceScore a partir dos metadados da release.
     /// </summary>
     public sealed class Handler(
         IReleaseRepository repository,
         IChangeEventRepository changeEventRepository,
         IExternalMarkerRepository markerRepository,
+        IChangeScoreRepository scoreRepository,
+        IChangeScoreCalculator scoreCalculator,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
@@ -130,6 +133,20 @@ public static class NotifyDeployment
 
             markerRepository.Add(marker);
 
+            // ── Auto-compute ChangeIntelligenceScore ────────────────────────────────────
+            // Calcula automaticamente o score com blast radius = null (ainda não disponível).
+            // O score será recalculado quando CalculateBlastRadius for chamado.
+            var factors = scoreCalculator.Compute(release.ChangeLevel, release.Environment, blastRadius: null);
+            var autoScore = ChangeIntelligenceScore.Compute(
+                release.Id,
+                factors.BreakingChangeWeight,
+                factors.BlastRadiusWeight,
+                factors.EnvironmentWeight,
+                now,
+                factors.ScoreSource);
+            _ = release.SetChangeScore(autoScore.Score);
+            scoreRepository.Add(autoScore);
+
             await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(
@@ -140,7 +157,9 @@ public static class NotifyDeployment
                 release.Status.ToString(),
                 release.CreatedAt,
                 isNewRelease,
-                marker.Id.Value);
+                marker.Id.Value,
+                autoScore.Score,
+                factors.ScoreSource);
         }
     }
 
@@ -153,5 +172,7 @@ public static class NotifyDeployment
         string Status,
         DateTimeOffset CreatedAt,
         bool IsNewRelease,
-        Guid ExternalMarkerId);
+        Guid ExternalMarkerId,
+        decimal AutoScore,
+        string ScoreSource);
 }
