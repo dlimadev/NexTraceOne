@@ -56,3 +56,27 @@ public enum ApprovalAction
     /// <summary>Observação — comentário informativo sem aprovação ou rejeição.</summary>
     Observation = 3
 }
+
+
+/// <summary>
+/// Valores válidos para o campo CiChecksResult do EvidencePack.
+/// Representa o resultado consolidado dos checks de CI/CD.
+/// </summary>
+public static class CiChecksResults
+{
+    /// <summary>Todos os checks passaram.</summary>
+    public const string Passed = "passed";
+
+    /// <summary>Pelo menos um check falhou.</summary>
+    public const string Failed = "failed";
+
+    /// <summary>Alguns checks passaram, outros falharam.</summary>
+    public const string Partial = "partial";
+
+    /// <summary>Estado dos checks ainda não determinado.</summary>
+    public const string Unknown = "unknown";
+
+    /// <summary>Todos os valores válidos.</summary>
+    public static readonly IReadOnlySet<string> ValidValues = new HashSet<string>
+        { Passed, Failed, Partial, Unknown };
+}

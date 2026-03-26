@@ -14,6 +14,8 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
 {
     private EvidencePack() { }
 
+    private const int TotalCompletenessFields = 6;
+
     /// <summary>Identificador da instância de workflow à qual este evidence pack pertence.</summary>
     public WorkflowInstanceId WorkflowInstanceId { get; private set; } = null!;
 
@@ -155,8 +157,7 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
         if (!string.IsNullOrWhiteSpace(ApprovalHistory)) filledFields++;
         if (!string.IsNullOrWhiteSpace(PipelineSource)) filledFields++;
 
-        const int totalFields = 6;
-        CompletenessPercentage = Math.Round((decimal)filledFields / totalFields * 100m, 2);
+        CompletenessPercentage = Math.Round((decimal)filledFields / TotalCompletenessFields * 100m, 2);
     }
 }
 

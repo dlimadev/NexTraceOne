@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 using NexTraceOne.ChangeGovernance.Domain.Workflow.Errors;
 
 namespace NexTraceOne.ChangeGovernance.Application.Workflow.Features.AttachCiCdEvidence;
@@ -43,8 +44,8 @@ public static class AttachCiCdEvidence
             RuleFor(x => x.BuildId).MaximumLength(500).When(x => x.BuildId is not null);
             RuleFor(x => x.CommitSha).MaximumLength(100).When(x => x.CommitSha is not null);
             RuleFor(x => x.CiChecksResult)
-                .Must(v => v is null or "passed" or "failed" or "partial" or "unknown")
-                .WithMessage("CiChecksResult must be one of: passed, failed, partial, unknown");
+                .Must(v => v is null || CiChecksResults.ValidValues.Contains(v))
+                .WithMessage($"CiChecksResult must be one of: {string.Join(", ", CiChecksResults.ValidValues)}");
         }
     }
 
