@@ -1319,6 +1319,55 @@ export interface DraftListResponse {
   pageSize: number;
 }
 
+/**
+ * Detalhes SOAP/WSDL específicos de uma versão de contrato publicada.
+ * Retornados pelo endpoint GET /api/v1/contracts/{id}/soap-detail.
+ */
+export interface SoapContractDetail {
+  soapDetailId: string;
+  contractVersionId: string;
+  serviceName: string;
+  targetNamespace: string;
+  soapVersion: '1.1' | '1.2';
+  endpointUrl?: string | null;
+  wsdlSourceUrl?: string | null;
+  portTypeName?: string | null;
+  bindingName?: string | null;
+  extractedOperationsJson: string;
+}
+
+/**
+ * Resposta da importação de WSDL.
+ * Retornada pelo endpoint POST /api/v1/contracts/wsdl/import.
+ */
+export interface WsdlImportResponse {
+  contractVersionId: string;
+  apiAssetId: string;
+  semVer: string;
+  soapVersion: string;
+  serviceName: string;
+  targetNamespace: string;
+  portTypeName?: string | null;
+  bindingName?: string | null;
+  endpointUrl?: string | null;
+  extractedOperationsJson: string;
+  importedAt: string;
+}
+
+/**
+ * Resposta da criação de draft SOAP.
+ * Retornada pelo endpoint POST /api/v1/contracts/drafts/soap.
+ */
+export interface SoapDraftCreateResponse {
+  draftId: string;
+  title: string;
+  status: string;
+  serviceName: string;
+  targetNamespace: string;
+  soapVersion: string;
+  createdAt: string;
+}
+
 export interface SignatureVerificationResult {
   contractVersionId: string;
   hasSignature: boolean;

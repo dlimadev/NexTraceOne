@@ -117,6 +117,24 @@ public static class ContractsErrors
             "No service or API asset was found for linked identifier '{0}'.",
             linkedId);
 
+    // ── SOAP/WSDL ────────────────────────────────────────────────────
+
+    /// <summary>Detalhe SOAP não encontrado para a versão de contrato informada.</summary>
+    public static Error SoapDetailNotFound(string contractVersionId)
+        => Error.NotFound("Contracts.Soap.DetailNotFound", "SOAP detail not found for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Detalhe SOAP já existe para a versão de contrato informada.</summary>
+    public static Error SoapDetailAlreadyExists(string contractVersionId)
+        => Error.Conflict("Contracts.Soap.DetailAlreadyExists", "SOAP detail already exists for contract version '{0}'.", contractVersionId);
+
+    /// <summary>Metadado SOAP de draft não encontrado para o draft informado.</summary>
+    public static Error SoapDraftMetadataNotFound(string draftId)
+        => Error.NotFound("Contracts.Soap.DraftMetadataNotFound", "SOAP draft metadata not found for draft '{0}'.", draftId);
+
+    /// <summary>Operação de importação WSDL requer conteúdo XML válido.</summary>
+    public static Error InvalidWsdlContent()
+        => Error.Validation("Contracts.Soap.InvalidWsdlContent", "The provided content is not a valid WSDL document. Expected XML with WSDL definitions.");
+
     // ── ContractExample ─────────────────────────────────────────────
 
     /// <summary>Exemplo de contrato não encontrado.</summary>

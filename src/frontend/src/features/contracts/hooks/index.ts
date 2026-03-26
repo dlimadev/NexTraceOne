@@ -37,3 +37,10 @@ export {
   useUpdateCanonicalEntity,
   usePromoteToCanonical,
 } from './useCanonicalEntities';
+
+export {
+  useWsdlImport,
+  useCreateSoapDraft,
+  useSoapContractDetail,
+  soapKeys,
+} from './useSoapWorkflow';

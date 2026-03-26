@@ -53,6 +53,12 @@ public sealed class ContractsDbContext(
     /// <summary>Pacotes de evidência associados a mudanças contratuais.</summary>
     public DbSet<ContractEvidencePack> ContractEvidencePacks => Set<ContractEvidencePack>();
 
+    /// <summary>Detalhes SOAP/WSDL específicos de versões de contrato publicadas (Protocol = Wsdl).</summary>
+    public DbSet<SoapContractDetail> SoapContractDetails => Set<SoapContractDetail>();
+
+    /// <summary>Metadados SOAP/WSDL específicos de drafts de contrato em edição (ContractType = Soap).</summary>
+    public DbSet<SoapDraftMetadata> SoapDraftMetadata => Set<SoapDraftMetadata>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

@@ -6,6 +6,7 @@ import type {
   ContractType,
   ContractProtocol,
   DraftStatus,
+  SoapDraftCreateResponse,
 } from '../types';
 
 function readValue<T>(source: Record<string, unknown>, camel: string, pascal?: string): T | undefined {
@@ -144,4 +145,37 @@ export const contractStudioApi = {
 
   listReviews: (draftId: string) =>
     client.get(`/contracts/drafts/${draftId}/reviews`).then((r) => ((r.data as unknown[]) ?? []).map(mapReview)),
+
+  // ── SOAP/WSDL draft workflow ──────────────────────────────────────
+
+  /**
+   * Cria um draft específico para contratos SOAP/WSDL com metadados SOAP inicializados.
+   * Cria ContractDraft (ContractType=Soap, Protocol=Wsdl) + SoapDraftMetadata.
+   */
+  createSoapDraft: (data: {
+    title: string;
+    author: string;
+    serviceName: string;
+    targetNamespace: string;
+    soapVersion?: '1.1' | '1.2';
+    serviceId?: string;
+    description?: string;
+    endpointUrl?: string;
+    portTypeName?: string;
+    bindingName?: string;
+    operationsJson?: string;
+  }) =>
+    client.post<SoapDraftCreateResponse>('/contracts/drafts/soap', {
+      title: data.title,
+      author: data.author,
+      serviceName: data.serviceName,
+      targetNamespace: data.targetNamespace,
+      soapVersion: data.soapVersion ?? '1.1',
+      serviceId: data.serviceId,
+      description: data.description,
+      endpointUrl: data.endpointUrl,
+      portTypeName: data.portTypeName,
+      bindingName: data.bindingName,
+      operationsJson: data.operationsJson,
+    }).then((r) => r.data),
 };

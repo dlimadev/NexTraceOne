@@ -48,6 +48,8 @@ type Step = 'type' | 'mode' | 'details';
 /**
  * Página de criação de novo serviço/contrato.
  * Fluxo em 3 passos: escolha de tipo → modo de criação → detalhes.
+ * Para contratos SOAP com modo import, usa o endpoint dedicado createSoapDraft
+ * que popula o SoapDraftMetadata com os campos específicos do serviço.
  */
 export function CreateServicePage() {
   const { t } = useTranslation();
@@ -65,6 +67,14 @@ export function CreateServicePage() {
   const [description, setDescription] = useState('');
   const [importContent, setImportContent] = useState('');
 
+  // SOAP-specific fields for import/create flows
+  const [soapServiceName, setSoapServiceName] = useState('');
+  const [soapTargetNamespace, setSoapTargetNamespace] = useState('http://example.com/service');
+  const [soapVersion, setSoapVersion] = useState<'1.1' | '1.2'>('1.1');
+  const [soapEndpointUrl, setSoapEndpointUrl] = useState('');
+
+  const isSoapType = selectedType === 'Soap';
+
   const servicesQuery = useQuery({
     queryKey: ['catalog-services-for-contracts'],
     queryFn: () => serviceCatalogApi.listServices(),
@@ -74,6 +84,32 @@ export function CreateServicePage() {
     mutationFn: async () => {
       if (!selectedType || !selectedProtocol) throw new Error('Missing required fields');
 
+      // SOAP type uses dedicated createSoapDraft to populate SoapDraftMetadata
+      if (isSoapType) {
+        const soapDraft = await contractStudioApi.createSoapDraft({
+          title,
+          author: currentActor,
+          serviceName: soapServiceName || title,
+          targetNamespace: soapTargetNamespace || 'http://example.com/service',
+          soapVersion,
+          serviceId: linkedServiceId || undefined,
+          description,
+          endpointUrl: soapEndpointUrl || undefined,
+        });
+
+        // If import mode and WSDL content provided, update draft spec content
+        if (selectedMode === 'import' && importContent.trim()) {
+          await contractStudioApi.updateContent(soapDraft.draftId, {
+            specContent: importContent,
+            format: 'xml',
+            editedBy: currentActor,
+          });
+        }
+
+        return { draftId: soapDraft.draftId };
+      }
+
+      // Generic draft creation for other types
       const createdDraft = await contractStudioApi.createDraft({
         title,
         author: currentActor,
@@ -86,7 +122,7 @@ export function CreateServicePage() {
       if (selectedMode === 'import' && importContent.trim()) {
         await contractStudioApi.updateContent(createdDraft.draftId, {
           specContent: importContent,
-          format: selectedProtocol === 'Wsdl' ? 'xml' : 'yaml',
+          format: 'yaml',
           editedBy: currentActor,
         });
       }
@@ -342,14 +378,86 @@ export function CreateServicePage() {
                 <div>
                   <label className="block text-xs font-medium text-heading mb-1">
                     {t('contracts.create.importContent', 'Specification Content')}
+                    {isSoapType && (
+                      <span className="ml-1 text-muted font-normal">
+                        {t('contracts.create.wsdlXmlHint', '(WSDL XML)')}
+                      </span>
+                    )}
                   </label>
                   <textarea
                     value={importContent}
                     onChange={(e) => setImportContent(e.target.value)}
                     rows={8}
-                    placeholder={t('contracts.specContentPlaceholder', 'Paste your specification here (JSON/YAML/XML)...')}
+                    placeholder={isSoapType
+                      ? t('contracts.create.wsdlPlaceholder', 'Paste your WSDL XML here (<?xml version="1.0"?><definitions ...>)...')
+                      : t('contracts.specContentPlaceholder', 'Paste your specification here (JSON/YAML/XML)...')}
                     className="w-full text-xs font-mono bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none"
                   />
+                </div>
+              )}
+
+              {/* SOAP-specific metadata fields */}
+              {isSoapType && (
+                <div className="space-y-3 pt-1 border-t border-edge">
+                  <p className="text-[10px] text-muted font-medium uppercase tracking-wider">
+                    {t('contracts.create.soapMetadata', 'SOAP Service Metadata')}
+                  </p>
+
+                  <div>
+                    <label className="block text-xs font-medium text-heading mb-1">
+                      {t('contracts.create.soapServiceName', 'Service Name')}
+                    </label>
+                    <input
+                      type="text"
+                      value={soapServiceName}
+                      onChange={(e) => setSoapServiceName(e.target.value)}
+                      placeholder={t('contracts.create.soapServiceNamePlaceholder', 'e.g., UserService')}
+                      className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-heading mb-1">
+                      {t('contracts.create.soapTargetNamespace', 'Target Namespace')}
+                    </label>
+                    <input
+                      type="text"
+                      value={soapTargetNamespace}
+                      onChange={(e) => setSoapTargetNamespace(e.target.value)}
+                      placeholder="http://example.com/service"
+                      className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.soapVersion', 'SOAP Version')}
+                      </label>
+                      <select
+                        value={soapVersion}
+                        onChange={(e) => setSoapVersion(e.target.value as '1.1' | '1.2')}
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                      >
+                        <option value="1.1">SOAP 1.1</option>
+                        <option value="1.2">SOAP 1.2</option>
+                      </select>
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-heading mb-1">
+                        {t('contracts.create.soapEndpointUrl', 'Endpoint URL')}
+                        <span className="ml-1 text-muted font-normal">{t('common.optional', '(optional)')}</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={soapEndpointUrl}
+                        onChange={(e) => setSoapEndpointUrl(e.target.value)}
+                        placeholder="http://example.com/service"
+                        className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </CardBody>

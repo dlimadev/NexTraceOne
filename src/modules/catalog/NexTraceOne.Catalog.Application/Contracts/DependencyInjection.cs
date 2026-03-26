@@ -10,6 +10,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
 using NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.CreateSoapDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.EvaluateContractRules;
 using NexTraceOne.Catalog.Application.Contracts.Features.ExportContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
@@ -18,7 +19,9 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetSoapContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.ImportContract;
+using NexTraceOne.Catalog.Application.Contracts.Features.ImportWsdlContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews;
 using NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts;
 using NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion;
@@ -77,6 +80,11 @@ public static class DependencyInjection
         services.AddTransient<IValidator<PublishDraft.Command>, PublishDraft.Validator>();
         services.AddTransient<IValidator<GenerateDraftFromAi.Command>, GenerateDraftFromAi.Validator>();
         services.AddTransient<IValidator<AddDraftExample.Command>, AddDraftExample.Validator>();
+
+        // SOAP/WSDL — workflow específico de contratos SOAP
+        services.AddTransient<IValidator<ImportWsdlContract.Command>, ImportWsdlContract.Validator>();
+        services.AddTransient<IValidator<CreateSoapDraft.Command>, CreateSoapDraft.Validator>();
+        services.AddTransient<IValidator<GetSoapContractDetail.Query>, GetSoapContractDetail.Validator>();
 
         return services;
     }
