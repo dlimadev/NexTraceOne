@@ -31,6 +31,13 @@ public static class ContractRuleEngine
         var violations = new List<ContractRuleViolation>();
         var now = DateTimeOffset.UtcNow;
 
+        // Regras específicas para WorkerService (background services)
+        if (protocol == ContractProtocol.WorkerService)
+        {
+            EvaluateWorkerServiceRules(contractVersionId, model, semVer, violations, now);
+            return violations.AsReadOnly();
+        }
+
         // Regra 1: Todas as operações devem ter descrição
         EvaluateDescriptionRule(contractVersionId, model, violations, now);
 
@@ -38,7 +45,9 @@ public static class ContractRuleEngine
         EvaluateNamingConventions(contractVersionId, model, violations, now);
 
         // Regra 3: Segurança — o contrato deve definir esquemas de autenticação
-        EvaluateSecurityRule(contractVersionId, model, violations, now);
+        // (N/A para WSDL e WorkerService — tratados por camadas separadas)
+        if (protocol != ContractProtocol.Wsdl)
+            EvaluateSecurityRule(contractVersionId, model, violations, now);
 
         // Regra 4: Versioning — a versão semântica deve ser válida e consistente
         EvaluateVersioningRule(contractVersionId, semVer, model, violations, now);
@@ -53,6 +62,57 @@ public static class ContractRuleEngine
         EvaluateDeprecationRule(contractVersionId, model, violations, now);
 
         return violations.AsReadOnly();
+    }
+
+    /// <summary>
+    /// Avalia regras específicas para Background Service Contracts (WorkerService).
+    /// Substitui as regras HTTP-centradas (segurança, exemplos de path) por regras
+    /// orientadas a worker/job: trigger type, schedule expression, operação declarada.
+    /// </summary>
+    private static void EvaluateWorkerServiceRules(
+        ContractVersionId contractVersionId,
+        ContractCanonicalModel model,
+        string semVer,
+        List<ContractRuleViolation> violations,
+        DateTimeOffset now)
+    {
+        // Regra W1: Deve existir pelo menos uma operação (o processo em background)
+        if (model.OperationCount == 0)
+        {
+            violations.Add(ContractRuleViolation.Create(
+                contractVersionId, null,
+                "WorkerOperationMissing", "Error",
+                "Background service contract has no declared operations.",
+                "/serviceName", now,
+                "Declare the background service name and category in the contract."));
+        }
+
+        // Regra W2: TriggerType (mapeado em SpecVersion) deve ser válido
+        if (string.IsNullOrWhiteSpace(model.SpecVersion))
+        {
+            violations.Add(ContractRuleViolation.Create(
+                contractVersionId, null,
+                "WorkerTriggerTypeMissing", "Error",
+                "Background service contract does not declare a TriggerType.",
+                "/triggerType", now,
+                "Set TriggerType to one of: Cron, Interval, EventTriggered, OnDemand, Continuous."));
+        }
+
+        // Regra W3: Cron/Interval triggers devem ter ScheduleExpression
+        var isCronOrInterval = string.Equals(model.SpecVersion, "Cron", StringComparison.OrdinalIgnoreCase)
+                               || string.Equals(model.SpecVersion, "Interval", StringComparison.OrdinalIgnoreCase);
+        if (isCronOrInterval && string.IsNullOrWhiteSpace(model.Description))
+        {
+            violations.Add(ContractRuleViolation.Create(
+                contractVersionId, null,
+                "WorkerScheduleMissing", "Warning",
+                $"Background service with TriggerType '{model.SpecVersion}' should declare a ScheduleExpression.",
+                "/scheduleExpression", now,
+                "Provide a cron expression or ISO 8601 interval (e.g. '0 * * * *' or 'PT5M')."));
+        }
+
+        // Regra W4: Versioning semântico deve ser válido
+        EvaluateVersioningRule(contractVersionId, semVer, model, violations, now);
     }
 
     /// <summary>

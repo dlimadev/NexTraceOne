@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { GitCompare, Clock, ArrowRight, AlertTriangle, Plus, Minus, RefreshCw } from 'lucide-react';
+import { GitCompare, Clock, ArrowRight, AlertTriangle, Plus, Minus, RefreshCw, Info } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
 import { LifecycleBadge } from '../../shared/components';
 import { LoadingState, ErrorState } from '../../shared/components/StateIndicators';
 import { contractsApi } from '../../api/contracts';
-import type { ContractVersion, SemanticDiff, ChangeEntry } from '../../../../types';
+import type { ContractVersion, SemanticDiff, ChangeEntry, ContractProtocol } from '../../../../types';
 
 interface VersioningSectionProps {
   apiAssetId: string;
@@ -16,7 +16,22 @@ interface VersioningSectionProps {
 }
 
 /**
+ * Etiqueta e descrição do que é comparado no diff por protocolo.
+ */
+function getDiffProtocolHint(protocol: ContractProtocol | string): string {
+  switch (protocol) {
+    case 'WorkerService': return 'Compares trigger type, schedule, inputs, outputs and side effects';
+    case 'Wsdl': return 'Compares WSDL portTypes, operations and message parts';
+    case 'AsyncApi': return 'Compares channels, operations and message schemas';
+    case 'Swagger':
+    case 'OpenApi': return 'Compares REST paths, methods, parameters and schemas';
+    default: return 'Semantic diff between contract versions';
+  }
+}
+
+/**
  * Secção de versionamento — histórico de versões e diff semântico.
+ * Suporta todos os protocolos: OpenAPI, Swagger, WSDL, AsyncAPI e WorkerService.
  */
 export function VersioningSection({ apiAssetId, currentVersionId, className = '' }: VersioningSectionProps) {
   const { t } = useTranslation();
@@ -34,6 +49,9 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
   });
 
   const versions = historyQuery.data ?? [];
+  // Derive protocol from selected target version for the diff hint
+  const targetVersion = versions.find((v: ContractVersion) => v.id === targetVersionId);
+  const diffProtocolHint = getDiffProtocolHint(targetVersion?.protocol ?? '');
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -90,6 +108,12 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
             <h3 className="text-sm font-semibold text-heading">
               {t('contracts.diff.title', 'Semantic Diff')}
             </h3>
+            {targetVersion && (
+              <span className="text-[10px] text-muted flex items-center gap-1" title={diffProtocolHint}>
+                <Info size={10} />
+                {targetVersion.protocol}
+              </span>
+            )}
           </div>
         </CardHeader>
         <CardBody>

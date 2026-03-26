@@ -466,7 +466,7 @@ export interface SubgraphResult {
 // ─── Contracts ───────────────────────────────────────────────────────────────
 
 /** Protocolo de contrato suportado pelo módulo multi-protocolo. */
-export type ContractProtocol = 'OpenApi' | 'Swagger' | 'Wsdl' | 'AsyncApi' | 'Protobuf' | 'GraphQl';
+export type ContractProtocol = 'OpenApi' | 'Swagger' | 'Wsdl' | 'AsyncApi' | 'Protobuf' | 'GraphQl' | 'WorkerService';
 
 /** Estado do ciclo de vida de uma versão de contrato. */
 export type ContractLifecycleState = 'Draft' | 'InReview' | 'Approved' | 'Locked' | 'Deprecated' | 'Sunset' | 'Retired';

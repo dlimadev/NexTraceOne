@@ -30,6 +30,7 @@ public static class ContractDiffCalculator
             ContractProtocol.Swagger => SwaggerDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             ContractProtocol.AsyncApi => AsyncApiDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             ContractProtocol.Wsdl => WsdlDiffCalculator.ComputeDiff(baseSpec, targetSpec),
+            ContractProtocol.WorkerService => WorkerServiceDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             _ => EmptyResult()
         };
     }

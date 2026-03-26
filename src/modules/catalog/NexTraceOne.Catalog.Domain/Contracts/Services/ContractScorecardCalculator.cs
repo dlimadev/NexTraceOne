@@ -29,10 +29,10 @@ public static class ContractScorecardCalculator
         int ruleViolationCount,
         DateTimeOffset computedAt)
     {
-        var quality = ComputeQualityScore(model);
-        var completeness = ComputeCompletenessScore(model);
-        var compatibility = ComputeCompatibilityScore(model, ruleViolationCount);
-        var risk = ComputeRiskScore(model, ruleViolationCount);
+        var quality = ComputeQualityScore(model, protocol);
+        var completeness = ComputeCompletenessScore(model, protocol);
+        var compatibility = ComputeCompatibilityScore(model, protocol, ruleViolationCount);
+        var risk = ComputeRiskScore(model, protocol, ruleViolationCount);
 
         return ContractScorecard.Create(
             contractVersionId,
@@ -55,8 +55,9 @@ public static class ContractScorecardCalculator
 
     /// <summary>
     /// Avalia a qualidade geral do contrato: naming, documentação, consistência.
+    /// Para WorkerService, segurança não é critério — substitui por trigger/schedule.
     /// </summary>
-    private static (decimal Score, string Justification) ComputeQualityScore(ContractCanonicalModel model)
+    private static (decimal Score, string Justification) ComputeQualityScore(ContractCanonicalModel model, ContractProtocol protocol)
     {
         var score = 0.5m;
         var factors = new List<string>();
@@ -67,8 +68,17 @@ public static class ContractScorecardCalculator
         if (model.HasExamples) { score += 0.15m; factors.Add("examples present"); }
         else { factors.Add("missing examples (-0.15)"); }
 
-        if (model.HasSecurityDefinitions) { score += 0.10m; factors.Add("security defined"); }
-        else { factors.Add("missing security definitions (-0.10)"); }
+        if (protocol == ContractProtocol.WorkerService)
+        {
+            // Para background services, schedule/trigger documentado substitui security como critério
+            if (!string.IsNullOrWhiteSpace(model.SpecVersion)) { score += 0.10m; factors.Add("trigger type declared"); }
+            else { factors.Add("missing trigger type (-0.10)"); }
+        }
+        else
+        {
+            if (model.HasSecurityDefinitions) { score += 0.10m; factors.Add("security defined"); }
+            else { factors.Add("missing security definitions (-0.10)"); }
+        }
 
         if (model.Tags.Count > 0) { score += 0.10m; factors.Add("tags for categorization"); }
         else { factors.Add("no tags defined (-0.10)"); }
@@ -78,8 +88,9 @@ public static class ContractScorecardCalculator
 
     /// <summary>
     /// Avalia a completude do contrato: cobertura de schemas, tipos, metadados.
+    /// Para WorkerService, servers não são critério — substitui por schedule/timeout.
     /// </summary>
-    private static (decimal Score, string Justification) ComputeCompletenessScore(ContractCanonicalModel model)
+    private static (decimal Score, string Justification) ComputeCompletenessScore(ContractCanonicalModel model, ContractProtocol protocol)
     {
         var score = 0.4m;
         var factors = new List<string>();
@@ -90,21 +101,38 @@ public static class ContractScorecardCalculator
         if (model.SchemaCount > 0) { score += 0.15m; factors.Add($"{model.SchemaCount} schemas defined"); }
         else { factors.Add("no schemas defined (-0.15)"); }
 
-        if (model.Servers.Count > 0) { score += 0.10m; factors.Add("servers/endpoints defined"); }
-        else { factors.Add("no servers defined (-0.10)"); }
+        if (protocol == ContractProtocol.WorkerService)
+        {
+            // WorkerService: schedule expression (mapped to Description) replaces servers
+            if (!string.IsNullOrWhiteSpace(model.Description)) { score += 0.10m; factors.Add("schedule expression declared"); }
+            else { factors.Add("no schedule expression (-0.10)"); }
+        }
+        else
+        {
+            if (model.Servers.Count > 0) { score += 0.10m; factors.Add("servers/endpoints defined"); }
+            else { factors.Add("no servers defined (-0.10)"); }
+        }
 
-        if (!string.IsNullOrWhiteSpace(model.Description)) { score += 0.15m; factors.Add("API description present"); }
-        else { factors.Add("missing API description (-0.15)"); }
+        if (!string.IsNullOrWhiteSpace(model.Description) || protocol == ContractProtocol.WorkerService)
+        {
+            if (!string.IsNullOrWhiteSpace(model.Title) && model.Title != "Unknown Worker")
+            { score += 0.15m; factors.Add("service name present"); }
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(model.Description)) { score += 0.15m; factors.Add("API description present"); }
+            else { factors.Add("missing API description (-0.15)"); }
+        }
 
         return (Math.Clamp(score, 0m, 1m), string.Join("; ", factors));
     }
 
     /// <summary>
     /// Avalia a compatibilidade baseada nas violações de regras detectadas.
-    /// Quanto menos violações, maior o score.
+    /// Para WorkerService, security score penalty não é aplicada.
     /// </summary>
     private static (decimal Score, string Justification) ComputeCompatibilityScore(
-        ContractCanonicalModel model, int ruleViolationCount)
+        ContractCanonicalModel model, ContractProtocol protocol, int ruleViolationCount)
     {
         var score = 1.0m;
         var factors = new List<string>();
@@ -119,23 +147,29 @@ public static class ContractScorecardCalculator
             factors.Add("no rule violations");
         }
 
-        if (model.HasSecurityDefinitions) { factors.Add("security compliant"); }
-        else { score -= 0.15m; factors.Add("missing security reduces compatibility score"); }
+        if (protocol != ContractProtocol.WorkerService)
+        {
+            if (model.HasSecurityDefinitions) { factors.Add("security compliant"); }
+            else { score -= 0.15m; factors.Add("missing security reduces compatibility score"); }
+        }
 
         return (Math.Clamp(score, 0m, 1m), string.Join("; ", factors));
     }
 
     /// <summary>
     /// Avalia o risco técnico do contrato. Score alto = alto risco.
-    /// Baseado em violações de regras, ausência de segurança e completude.
+    /// Para WorkerService, ausência de security não é risco (não aplicável).
     /// </summary>
     private static (decimal Score, string Justification) ComputeRiskScore(
-        ContractCanonicalModel model, int ruleViolationCount)
+        ContractCanonicalModel model, ContractProtocol protocol, int ruleViolationCount)
     {
         var score = 0.1m;
         var factors = new List<string>();
 
-        if (!model.HasSecurityDefinitions) { score += 0.25m; factors.Add("no security definitions increases risk"); }
+        if (protocol != ContractProtocol.WorkerService)
+        {
+            if (!model.HasSecurityDefinitions) { score += 0.25m; factors.Add("no security definitions increases risk"); }
+        }
         if (ruleViolationCount > 5) { score += 0.20m; factors.Add($"high violation count ({ruleViolationCount})"); }
         else if (ruleViolationCount > 0) { score += 0.10m; factors.Add($"{ruleViolationCount} rule violations"); }
         if (model.OperationCount == 0) { score += 0.15m; factors.Add("no operations increases risk"); }

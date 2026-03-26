@@ -86,14 +86,14 @@ public static class RegisterBackgroundServiceContract
                 return ContractsErrors.AlreadyExists(request.SemVer, request.ApiAssetId.ToString());
 
             // 2. Cria ContractVersion com ContractType=BackgroundService
-            // Usa protocolo genérico; background services não têm protocolo de wire próprio
+            // Usa ContractProtocol.WorkerService — protocolo explícito para background services
             var importResult = ContractVersion.Import(
                 request.ApiAssetId,
                 request.SemVer,
                 request.SpecContent ?? "{}",
                 "json",
                 "manual-registration",
-                ContractProtocol.OpenApi);  // Protocolo genérico — background services não têm protocolo de wire
+                ContractProtocol.WorkerService);
 
             if (importResult.IsFailure)
                 return importResult.Error;
