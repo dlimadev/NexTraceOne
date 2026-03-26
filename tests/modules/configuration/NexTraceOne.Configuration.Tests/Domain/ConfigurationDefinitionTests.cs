@@ -285,4 +285,61 @@ public sealed class ConfigurationDefinitionTests
         definition.Key.Should().Be("test.trimmed");
         definition.DisplayName.Should().Be("Trimmed Name");
     }
+
+    // ── ModuleId — hierarchy expansion P3.1 ───────────────────────────
+
+    [Fact]
+    public void Create_WithModuleId_ShouldAssignModuleId()
+    {
+        var moduleId = new ConfigurationModuleId(Guid.NewGuid());
+        var definition = ConfigurationDefinition.Create(
+            key: "notifications.enabled",
+            displayName: "Notifications Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System],
+            moduleId: moduleId);
+
+        definition.ModuleId.Should().Be(moduleId);
+    }
+
+    [Fact]
+    public void Create_WithoutModuleId_ShouldHaveNullModuleId()
+    {
+        var definition = ConfigurationDefinition.Create(
+            key: "notifications.enabled",
+            displayName: "Notifications Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System]);
+
+        definition.ModuleId.Should().BeNull();
+    }
+
+    [Fact]
+    public void Update_WithModuleId_ShouldUpdateModuleId()
+    {
+        var definition = ConfigurationDefinition.Create(
+            key: "notifications.enabled",
+            displayName: "Notifications Enabled",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System]);
+
+        var moduleId = new ConfigurationModuleId(Guid.NewGuid());
+        definition.Update(
+            displayName: "Notifications Enabled",
+            description: null,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: null,
+            isSensitive: false,
+            isEditable: true,
+            isInheritable: true,
+            validationRules: null,
+            uiEditorType: null,
+            sortOrder: 0,
+            moduleId: moduleId);
+
+        definition.ModuleId.Should().Be(moduleId);
+    }
 }
