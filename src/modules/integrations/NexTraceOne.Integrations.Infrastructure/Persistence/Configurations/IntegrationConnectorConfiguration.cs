@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using NexTraceOne.Governance.Domain.Entities;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Integrations.Domain.Enums;
 
-namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
+namespace NexTraceOne.Integrations.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade IntegrationConnector.
 /// Define mapeamento de tabela, typed ID, enums e índices.
+/// Extraído de Governance.Infrastructure em P2.1 — owner correto: módulo Integrations.
 /// </summary>
 internal sealed class IntegrationConnectorConfiguration : IEntityTypeConfiguration<IntegrationConnector>
 {

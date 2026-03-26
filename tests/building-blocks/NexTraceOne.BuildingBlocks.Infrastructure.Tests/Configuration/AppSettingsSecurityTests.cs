@@ -97,12 +97,12 @@ public sealed class AppSettingsSecurityTests
     }
 
     [Fact]
-    public void BaseAppSettings_ShouldHave20ConnectionStrings()
+    public void BaseAppSettings_ShouldHave21ConnectionStrings()
     {
         var json = ReadJson(BaseAppSettings);
         var connStrings = json.GetProperty("ConnectionStrings");
 
-        connStrings.EnumerateObject().Count().Should().Be(20, "expected 20 connection strings for all DbContexts (E14+E15 architecture: NexTraceOne + 19 module-specific)");
+        connStrings.EnumerateObject().Count().Should().Be(21, "expected 21 connection strings for all DbContexts (E14+E15 architecture: NexTraceOne + 19 module-specific + IntegrationsDatabase added in P2.1)");
     }
 
     [Fact]

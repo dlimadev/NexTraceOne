@@ -699,126 +699,6 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.IntegrationConnector", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AllowedTeams")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("AuthenticationMode")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasDefaultValue("Not configured");
-
-                    b.Property<string>("ConnectorType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("Endpoint")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("Environment")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("Production");
-
-                    b.Property<long>("FailedExecutions")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("FreshnessLagMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Health")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTimeOffset?>("LastErrorAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastErrorMessage")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTimeOffset?>("LastSuccessAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("PollingMode")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasDefaultValue("Not configured");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<long>("SuccessfulExecutions")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TotalExecutions")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ConnectorType");
-
-                    b.HasIndex("Environment");
-
-                    b.HasIndex("Health");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Provider");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("int_connectors", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_int_connectors_health", "\"Health\" IN ('Unknown','Healthy','Degraded','Unhealthy','Critical')");
-
-                            t.HasCheckConstraint("CK_int_connectors_status", "\"Status\" IN ('Pending','Active','Paused','Disabled','Failed','Configuring')");
-                        });
-                });
-
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -918,11 +798,9 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.IngestionExecution", b =>
                 {
-                    b.HasOne("NexTraceOne.Governance.Domain.Entities.IntegrationConnector", null)
-                        .WithMany()
-                        .HasForeignKey("ConnectorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    // NOTE P2.1: FK navigation to IntegrationConnector removed.
+                    // IntegrationConnector was extracted to IntegrationsDbContext.
+                    // ConnectorId is preserved as a cross-context reference column.
 
                     b.HasOne("NexTraceOne.Governance.Domain.Entities.IngestionSource", null)
                         .WithMany()
@@ -932,11 +810,9 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.IngestionSource", b =>
                 {
-                    b.HasOne("NexTraceOne.Governance.Domain.Entities.IntegrationConnector", null)
-                        .WithMany()
-                        .HasForeignKey("ConnectorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    // NOTE P2.1: FK navigation to IntegrationConnector removed.
+                    // IntegrationConnector was extracted to IntegrationsDbContext.
+                    // ConnectorId is preserved as a cross-context reference column.
                 });
 #pragma warning restore 612, 618
         }

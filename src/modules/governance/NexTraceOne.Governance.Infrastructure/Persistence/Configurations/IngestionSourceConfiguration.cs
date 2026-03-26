@@ -3,12 +3,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade IngestionSource.
 /// Define mapeamento de tabela, typed ID, enums, relacionamentos e índices.
+/// NOTA P2.1: A navegação para IntegrationConnector foi removida desta configuração porque
+/// IntegrationConnector passou a pertencer ao IntegrationsDbContext.
+/// ConnectorId mantém-se como chave estrangeira a nível de base de dados,
+/// mas sem navegação EF Core entre DbContexts.
 /// </summary>
 internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<IngestionSource>
 {
@@ -84,13 +89,9 @@ internal sealed class IngestionSourceConfiguration : IEntityTypeConfiguration<In
         builder.Property(x => x.UpdatedAt)
             .HasColumnType("timestamp with time zone");
 
-        // Relacionamento com IntegrationConnector
-        builder.HasOne<IntegrationConnector>()
-            .WithMany()
-            .HasForeignKey(x => x.ConnectorId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // Índices para consultas frequentes
+        // NOTE P2.1: FK navigation to IntegrationConnector removed because IntegrationConnector
+        // moved to IntegrationsDbContext. The FK column ConnectorId is preserved as a cross-context
+        // reference. EF navigation will be restored when IngestionSource is extracted in P2.2.
         builder.HasIndex(x => x.ConnectorId);
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => x.SourceType);

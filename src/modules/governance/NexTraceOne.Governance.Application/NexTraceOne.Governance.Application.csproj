@@ -9,6 +9,9 @@
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Domain\NexTraceOne.Governance.Domain.csproj" />
     <ProjectReference Include="..\..\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
+    <!-- P2.1: Governance.Application references Integrations.Application for IIntegrationConnectorRepository.
+         Handlers using IIntegrationConnectorRepository alongside Governance repos remain here until P2.2. -->
+    <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Application\NexTraceOne.Integrations.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" />

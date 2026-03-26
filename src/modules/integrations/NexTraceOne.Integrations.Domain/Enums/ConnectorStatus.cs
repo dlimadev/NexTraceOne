@@ -1,4 +1,4 @@
-namespace NexTraceOne.Governance.Domain.Enums;
+namespace NexTraceOne.Integrations.Domain.Enums;
 
 /// <summary>
 /// Estado operacional de um connector de integração.

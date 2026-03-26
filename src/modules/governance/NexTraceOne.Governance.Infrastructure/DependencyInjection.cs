@@ -9,6 +9,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Integrations.Infrastructure;
 
 namespace NexTraceOne.Governance.Infrastructure;
 
@@ -45,11 +46,15 @@ public static class DependencyInjection
         services.AddScoped<IDelegatedAdministrationRepository, DelegatedAdministrationRepository>();
         services.AddScoped<ITeamDomainLinkRepository, TeamDomainLinkRepository>();
         services.AddScoped<IGovernanceRolloutRecordRepository, GovernanceRolloutRecordRepository>();
-        services.AddScoped<IIntegrationConnectorRepository, IntegrationConnectorRepository>();
+        // NOTE: IIntegrationConnectorRepository removed from Governance in P2.1.
+        //       Registered via AddIntegrationsInfrastructure below.
         services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
         services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
         services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
+
+        // Integrations module infrastructure (P2.1: IntegrationConnector extracted here)
+        services.AddIntegrationsInfrastructure(configuration);
 
         return services;
     }

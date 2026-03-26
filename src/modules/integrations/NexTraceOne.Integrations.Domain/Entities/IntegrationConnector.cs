@@ -1,9 +1,9 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Domain.Enums;
 
-namespace NexTraceOne.Governance.Domain.Entities;
+namespace NexTraceOne.Integrations.Domain.Entities;
 
 /// <summary>
 /// Identificador fortemente tipado para IntegrationConnector.
@@ -14,6 +14,8 @@ public sealed record IntegrationConnectorId(Guid Value) : TypedIdBase(Value);
 /// Agregado que representa um conector de integração no Integration Hub.
 /// Conectores são pontos de entrada de dados externos para o NexTraceOne:
 /// CI/CD, Observability, ITSM, Gateways, Event Streams, etc.
+///
+/// Owner: módulo Integrations (extraído de Governance em P2.1).
 /// </summary>
 public sealed class IntegrationConnector : Entity<IntegrationConnectorId>
 {

@@ -7,6 +7,7 @@ using NexTraceOne.Governance.Application.Features.GetTeamDetail;
 using NexTraceOne.Governance.Application.Features.ListGovernancePacks;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 

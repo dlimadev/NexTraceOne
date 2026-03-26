@@ -12,9 +12,10 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 /// REGRA: Outros módulos NUNCA referenciam este DbContext. Comunicação via Integration Events.
 ///
 /// NOTA SOBRE ESCOPO: Este DbContext contém temporariamente DbSets de Integrations
-/// (IntegrationConnectors, IngestionSources, IngestionExecutions) e Product Analytics
-/// (AnalyticsEvents) que serão extraídos para módulos próprios em OI-02 e OI-03.
-/// Após extração, apenas os 8 DbSets de Governance permanecerão.
+/// (IngestionSources, IngestionExecutions) que serão extraídos para IntegrationsDbContext em P2.2.
+/// O DbSet de IntegrationConnectors foi extraído para IntegrationsDbContext em P2.1.
+/// Product Analytics (AnalyticsEvents) será extraído para módulo próprio em OI-03.
+/// Após essas extrações, apenas os 8 DbSets de Governance permanecerão.
 /// </summary>
 public sealed class GovernanceDbContext(
     DbContextOptions<GovernanceDbContext> options,
@@ -47,16 +48,15 @@ public sealed class GovernanceDbContext(
     /// <summary>Registos de rollout de pacotes de governança.</summary>
     public DbSet<GovernanceRolloutRecord> RolloutRecords => Set<GovernanceRolloutRecord>();
 
-    /// <summary>Connectors de integração com sistemas externos.</summary>
-    public DbSet<IntegrationConnector> IntegrationConnectors => Set<IntegrationConnector>();
+    // NOTE: IntegrationConnectors was extracted to IntegrationsDbContext in P2.1.
 
-    /// <summary>Fontes de ingestão de dados.</summary>
+    /// <summary>Fontes de ingestão de dados (a ser extraído para IntegrationsDbContext em P2.2).</summary>
     public DbSet<IngestionSource> IngestionSources => Set<IngestionSource>();
 
-    /// <summary>Execuções de ingestão de dados.</summary>
+    /// <summary>Execuções de ingestão de dados (a ser extraído para IntegrationsDbContext em P2.2).</summary>
     public DbSet<IngestionExecution> IngestionExecutions => Set<IngestionExecution>();
 
-    /// <summary>Eventos de Product Analytics.</summary>
+    /// <summary>Eventos de Product Analytics (a ser extraído para módulo próprio em OI-03).</summary>
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly

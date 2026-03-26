@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence.Configurations;
 
@@ -72,10 +73,9 @@ internal sealed class IngestionExecutionConfiguration : IEntityTypeConfiguration
             .IsRequired();
 
         // Relacionamentos
-        builder.HasOne<IntegrationConnector>()
-            .WithMany()
-            .HasForeignKey(x => x.ConnectorId)
-            .OnDelete(DeleteBehavior.Cascade);
+        // NOTE P2.1: FK navigation to IntegrationConnector removed because IntegrationConnector
+        // moved to IntegrationsDbContext. ConnectorId is preserved as a cross-context reference.
+        // EF navigation will be restored when IngestionExecution is extracted in P2.2.
 
         builder.HasOne<IngestionSource>()
             .WithMany()

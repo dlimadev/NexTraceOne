@@ -5,6 +5,8 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.RetryConnector;
 

@@ -6,5 +6,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
+    <!-- TEMP P2.1: IngestionSource and IngestionExecution still reference IntegrationConnectorId.
+         This dependency will be removed when those entities are extracted in P2.2. -->
+    <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Domain\NexTraceOne.Integrations.Domain.csproj" />
   </ItemGroup>
 </Project>
