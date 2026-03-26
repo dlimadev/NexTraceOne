@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NexTraceOne — Change Governance</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.tabs { display:flex; gap:2px; background:var(--panel); border:1px solid var(--border); border-radius:var(--r-sm); padding:3px; width:fit-content; margin-bottom:20px; }
+.tab { padding:6px 16px; border-radius:6px; font-size:13px; font-weight:500; color:var(--txt-3); cursor:pointer; transition:all .15s; }
+.tab.active { background:var(--elevated); color:var(--txt); }
+.risk-high   { color:var(--danger); }
+.risk-medium { color:var(--warning); }
+.risk-low    { color:var(--success); }
+.approval-chain { display:flex; align-items:center; gap:4px; font-size:11px; }
+.approval-step { padding:2px 8px; border-radius:99px; font-weight:600; }
+.step-done    { background:rgba(30,242,193,.12); color:var(--success); }
+.step-pending { background:rgba(245,192,98,.12); color:var(--warning); }
+.step-wait    { background:rgba(142,160,183,.1);  color:var(--txt-muted); }
+.arrow { color:var(--txt-muted); font-size:10px; }
+.change-row td:first-child { padding-left:20px; }
+.blast-pill { display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--txt-3); }
+.blast-dot { width:6px;height:6px;border-radius:50%;display:inline-block; }
+.sidebar-stat { display:flex;flex-direction:column;gap:12px;margin-bottom:24px; }
+.mini-stat { background:var(--elevated);border-radius:var(--r-sm);padding:14px;display:flex;align-items:center;justify-content:space-between; }
+.mini-stat-val { font-size:22px;font-weight:800; }
+.mini-stat-lbl { font-size:11px;color:var(--txt-muted);text-transform:uppercase;letter-spacing:.05em; }
+.layout-split { display:grid;grid-template-columns:1fr 280px;gap:20px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">N</div>
+      <div class="sidebar-logo-text">
+        <span class="sidebar-logo-name">NexTraceOne</span>
+        <span class="sidebar-logo-tag">Operational Confidence</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <a class="nav-item" href="dashboard.html"><svg class="icon nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+        <div class="nav-label">Plataforma</div>
+        <a class="nav-item" href="services.html"><svg class="icon nav-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Service Catalog</a>
+        <a class="nav-item" href="#"><svg class="icon nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Contratos</a>
+        <a class="nav-item active" href="changes.html"><svg class="icon nav-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Change Governance</a>
+        <a class="nav-item" href="incidents.html"><svg class="icon nav-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>Incidents<span class="nav-badge">3</span></a>
+        <div class="nav-label">Inteligência</div>
+        <a class="nav-item" href="#"><svg class="icon nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>AI Hub</a>
+        <div class="nav-label">Governança</div>
+        <a class="nav-item" href="#"><svg class="icon nav-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Governance</a>
+        <a class="nav-item" href="#"><svg class="icon nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>Admin</a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar">JD</div>
+      <div class="avatar-info"><div class="avatar-name">João Dinis</div><div class="avatar-role">Platform Admin</div></div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <span class="topbar-title">Change Governance</span>
+      <div class="topbar-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Pesquisar mudanças, serviços, aprovadores…">
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" style="font-size:12.5px;padding:7px 14px">+ Nova Mudança</button>
+        <div class="notif-wrap"><button class="icon-btn">🔔<div class="notif-dot"></div></button></div>
+        <div class="avatar" style="width:32px;height:32px;font-size:13px">JD</div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="page-header">
+        <div class="page-title">Change Governance</div>
+        <div class="page-sub">28 mudanças abertas · 6 aguardam a sua aprovação · Janela de freeze: <span style="color:var(--warning)">31 Mar – 2 Apr</span></div>
+      </div>
+
+      <div class="layout-split">
+        <div>
+          <!-- Tabs -->
+          <div class="tabs">
+            <div class="tab active">Abertas (28)</div>
+            <div class="tab">Minhas (6)</div>
+            <div class="tab">Em Review (9)</div>
+            <div class="tab">Concluídas</div>
+          </div>
+
+          <!-- Table -->
+          <div class="card" style="padding:0">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Serviço</th>
+                    <th>Risco</th>
+                    <th>Blast Radius</th>
+                    <th>Aprovação</th>
+                    <th>Prazo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="change-row">
+                    <td><span style="font-family:var(--mono);font-size:12px;color:var(--cyan)">CHG-2041</span></td>
+                    <td><span style="color:var(--txt);font-weight:500">Atualização TLS 1.3 em toda infra</span></td>
+                    <td><span class="tag">payment-service</span></td>
+                    <td><span class="risk-high">● Alto</span><br><div class="risk-bar" style="margin-top:4px"><div class="risk-fill" style="width:82%;background:var(--danger)"></div></div></td>
+                    <td><span class="blast-pill"><span class="blast-dot" style="background:var(--danger)"></span>34 serviços</span></td>
+                    <td>
+                      <div class="approval-chain">
+                        <span class="approval-step step-done">TL ✓</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-pending">CISO ⏳</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-wait">CTO</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--danger);font-size:12px">28 Mar</td>
+                  </tr>
+                  <tr class="change-row">
+                    <td><span style="font-family:var(--mono);font-size:12px;color:var(--cyan)">CHG-2040</span></td>
+                    <td><span style="color:var(--txt);font-weight:500">Migração BD order-api para pg16</span></td>
+                    <td><span class="tag">order-api</span></td>
+                    <td><span class="risk-medium">⚠ Médio</span><br><div class="risk-bar" style="margin-top:4px"><div class="risk-fill" style="width:55%;background:var(--warning)"></div></div></td>
+                    <td><span class="blast-pill"><span class="blast-dot" style="background:var(--warning)"></span>12 serviços</span></td>
+                    <td>
+                      <div class="approval-chain">
+                        <span class="approval-step step-done">TL ✓</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-done">DBA ✓</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-pending">CTO ⏳</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--txt-3);font-size:12px">2 Apr</td>
+                  </tr>
+                  <tr class="change-row">
+                    <td><span style="font-family:var(--mono);font-size:12px;color:var(--cyan)">CHG-2039</span></td>
+                    <td><span style="color:var(--txt);font-weight:500">Deploy auth-service v3.1.0</span></td>
+                    <td><span class="tag">auth-service</span></td>
+                    <td><span class="risk-low">● Baixo</span><br><div class="risk-bar" style="margin-top:4px"><div class="risk-fill" style="width:20%;background:var(--success)"></div></div></td>
+                    <td><span class="blast-pill"><span class="blast-dot" style="background:var(--success)"></span>2 serviços</span></td>
+                    <td>
+                      <div class="approval-chain">
+                        <span class="approval-step step-done">TL ✓</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-done">Auto ✓</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--success);font-size:12px">Concluído</td>
+                  </tr>
+                  <tr class="change-row">
+                    <td><span style="font-family:var(--mono);font-size:12px;color:var(--cyan)">CHG-2038</span></td>
+                    <td><span style="color:var(--txt);font-weight:500">Rollout analytics-engine v4.0.0</span></td>
+                    <td><span class="tag">analytics-engine</span></td>
+                    <td><span class="risk-medium">⚠ Médio</span><br><div class="risk-bar" style="margin-top:4px"><div class="risk-fill" style="width:48%;background:var(--warning)"></div></div></td>
+                    <td><span class="blast-pill"><span class="blast-dot" style="background:var(--warning)"></span>9 serviços</span></td>
+                    <td>
+                      <div class="approval-chain">
+                        <span class="approval-step step-pending">TL ⏳</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-wait">Arch</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--txt-3);font-size:12px">5 Apr</td>
+                  </tr>
+                  <tr class="change-row">
+                    <td><span style="font-family:var(--mono);font-size:12px;color:var(--cyan)">CHG-2037</span></td>
+                    <td><span style="color:var(--txt);font-weight:500">Hotfix CVE-2026-1234 em libs HTTP</span></td>
+                    <td><span class="tag">*</span></td>
+                    <td><span class="risk-high">● Alto</span><br><div class="risk-bar" style="margin-top:4px"><div class="risk-fill" style="width:75%;background:var(--danger)"></div></div></td>
+                    <td><span class="blast-pill"><span class="blast-dot" style="background:var(--danger)"></span>142 serviços</span></td>
+                    <td>
+                      <div class="approval-chain">
+                        <span class="approval-step step-done">Security ✓</span>
+                        <span class="arrow">›</span>
+                        <span class="approval-step step-pending">CTO ⏳</span>
+                      </div>
+                    </td>
+                    <td style="color:var(--danger);font-size:12px">URGENTE</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar panel -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title">Resumo do Período</div>
+            <div class="sidebar-stat">
+              <div class="mini-stat">
+                <div><div class="mini-stat-lbl">Aguardam aprovação</div><div class="mini-stat-val" style="color:var(--warning)">6</div></div>
+                <span style="font-size:24px">⏳</span>
+              </div>
+              <div class="mini-stat">
+                <div><div class="mini-stat-lbl">Em freeze (próx.)</div><div class="mini-stat-val" style="color:var(--info)">2d</div></div>
+                <span style="font-size:24px">🧊</span>
+              </div>
+              <div class="mini-stat">
+                <div><div class="mini-stat-lbl">Taxa aprovação (30d)</div><div class="mini-stat-val" style="color:var(--success)">94%</div></div>
+                <span style="font-size:24px">✅</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Aprovações Pendentes</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+              <div style="padding:10px;background:var(--elevated);border-radius:var(--r-xs);border-left:3px solid var(--danger)">
+                <div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px">CHG-2041 · TLS 1.3</div>
+                <div style="font-size:11px;color:var(--txt-muted)">Aguarda: CISO · Alto risco</div>
+                <div style="margin-top:8px;display:flex;gap:6px">
+                  <button class="btn btn-primary" style="flex:1;padding:5px;font-size:11px;justify-content:center">Aprovar</button>
+                  <button class="btn btn-ghost" style="flex:1;padding:5px;font-size:11px;justify-content:center">Rejeitar</button>
+                </div>
+              </div>
+              <div style="padding:10px;background:var(--elevated);border-radius:var(--r-xs);border-left:3px solid var(--warning)">
+                <div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:2px">CHG-2040 · PG16 Migr.</div>
+                <div style="font-size:11px;color:var(--txt-muted)">Aguarda: CTO · Médio risco</div>
+                <div style="margin-top:8px;display:flex;gap:6px">
+                  <button class="btn btn-primary" style="flex:1;padding:5px;font-size:11px;justify-content:center">Aprovar</button>
+                  <button class="btn btn-ghost" style="flex:1;padding:5px;font-size:11px;justify-content:center">Rejeitar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

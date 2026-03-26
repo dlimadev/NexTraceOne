@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 190" fill="none" role="img" aria-label="NexTraceOne — Operational Confidence">
+  <defs>
+    <linearGradient id="gG" x1="20" y1="140" x2="140" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="55%" stop-color="#18CFF2"/>
+      <stop offset="100%" stop-color="#18E8B8"/>
+    </linearGradient>
+    <linearGradient id="nG" x1="55" y1="110" x2="108" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="50%" stop-color="#18CFF2"/>
+      <stop offset="100%" stop-color="#18E8B8"/>
+    </linearGradient>
+    <radialGradient id="nC" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#79FCE0"/>
+      <stop offset="100%" stop-color="#18CFF2"/>
+    </radialGradient>
+    <radialGradient id="nB" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#6ED7F5"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </radialGradient>
+    <clipPath id="gC">
+      <circle cx="80" cy="80" r="66"/>
+    </clipPath>
+  </defs>
+
+  <!-- Icon -->
+  <g>
+    <g clip-path="url(#gC)" opacity="0.55">
+      <ellipse cx="80" cy="80" rx="66" ry="20" stroke="url(#gG)" stroke-width="1" fill="none"/>
+      <ellipse cx="80" cy="57" rx="52" ry="15" stroke="url(#gG)" stroke-width="0.8" fill="none"/>
+      <ellipse cx="80" cy="103" rx="52" ry="15" stroke="url(#gG)" stroke-width="0.8" fill="none"/>
+      <path d="M 80 14 Q 42 80 80 146" stroke="url(#gG)" stroke-width="1" fill="none"/>
+      <path d="M 80 14 Q 118 80 80 146" stroke="url(#gG)" stroke-width="1" fill="none"/>
+    </g>
+    <circle cx="80" cy="80" r="66" stroke="url(#gG)" stroke-width="1.8" fill="none"/>
+    <path d="M 80 14 Q 114 10 140 36" stroke="url(#gG)" stroke-width="1.6" fill="none"/>
+    <circle cx="80" cy="14" r="3.5" fill="url(#nC)"/>
+    <circle cx="140" cy="36" r="5.5" fill="url(#nC)"/>
+    <circle cx="17" cy="88" r="3.5" fill="url(#nB)"/>
+    <circle cx="17" cy="88" r="6.5" stroke="url(#gG)" stroke-width="0.9" fill="none" opacity="0.5"/>
+    <rect x="54" y="52" width="14" height="56" rx="4" fill="url(#nG)"/>
+    <rect x="92" y="52" width="14" height="56" rx="4" fill="url(#nG)"/>
+    <polygon points="68,52 82,52 92,108 78,108" fill="url(#nG)"/>
+    <path d="M 106 52 C 112 48 118 43 122 38" stroke="url(#nG)" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    <circle cx="123" cy="37" r="4" fill="url(#nC)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="175" y="96"
+        font-family="Inter, ui-sans-serif, -apple-system, sans-serif"
+        font-size="42" font-weight="700" letter-spacing="-0.02em" fill="#2BB7E3">Nex</text>
+  <text x="254" y="96"
+        font-family="Inter, ui-sans-serif, -apple-system, sans-serif"
+        font-size="42" font-weight="700" letter-spacing="-0.02em" fill="#F2F7FF">Trace</text>
+  <text x="396" y="96"
+        font-family="Inter, ui-sans-serif, -apple-system, sans-serif"
+        font-size="42" font-weight="700" letter-spacing="-0.02em" fill="#18E8B8">One</text>
+
+  <!-- Tagline -->
+  <text x="175" y="125"
+        font-family="Inter, ui-sans-serif, -apple-system, sans-serif"
+        font-size="15" font-weight="400" letter-spacing="0.12em"
+        fill="#8EA0B7" text-anchor="start">OPERATIONAL CONFIDENCE</text>
+</svg>

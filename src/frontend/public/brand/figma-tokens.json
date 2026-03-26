@@ -1,0 +1,116 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "description": "NexTraceOne Design Tokens — W3C DTCG format. Import via Figma Tokens plugin or Token Studio.",
+  "color": {
+    "brand": {
+      "blue":      { "$value": "#2BB7E3", "$type": "color", "$description": "CTA principal institucional" },
+      "cyan":      { "$value": "#18CFF2", "$type": "color", "$description": "Foco, estados ativos, links" },
+      "cyan-400":  { "$value": "#47DBFF", "$type": "color", "$description": "Hover / acento luminoso" },
+      "mint":      { "$value": "#1EF2C1", "$type": "color", "$description": "Success, healthy, destaque positivo" },
+      "mint-400":  { "$value": "#79FCE0", "$type": "color", "$description": "Brilho / halo positivo" }
+    },
+    "canvas": {
+      "base":     { "$value": "#081120", "$type": "color", "$description": "Fundo base da aplicação" },
+      "deep":     { "$value": "#0A1730", "$type": "color", "$description": "Áreas de auth, hero, sidebar" },
+      "panel":    { "$value": "#0F1E38", "$type": "color", "$description": "Cards, painéis, containers" },
+      "elevated": { "$value": "#132543", "$type": "color", "$description": "Hover, superfícies elevadas" },
+      "input":    { "$value": "#091729", "$type": "color", "$description": "Campos de formulário" },
+      "overlay":  { "$value": "rgba(3,10,22,0.72)", "$type": "color", "$description": "Modais, drawers, overlays" }
+    },
+    "text": {
+      "primary":    { "$value": "#F2F7FF", "$type": "color", "$description": "Títulos, labels críticos" },
+      "secondary":  { "$value": "#B5C4D8", "$type": "color", "$description": "Corpo principal" },
+      "tertiary":   { "$value": "#8EA0B7", "$type": "color", "$description": "Suporte, hints" },
+      "muted":      { "$value": "#6D7E96", "$type": "color", "$description": "Metadados, desabilitados" },
+      "on-accent":  { "$value": "#04111E", "$type": "color", "$description": "Texto sobre CTA colorido" }
+    },
+    "border": {
+      "soft":   { "$value": "rgba(129,170,214,0.14)", "$type": "color" },
+      "medium": { "$value": "rgba(129,170,214,0.22)", "$type": "color" },
+      "strong": { "$value": "rgba(55,190,233,0.42)",  "$type": "color" },
+      "divider":{ "$value": "rgba(255,255,255,0.06)", "$type": "color" }
+    },
+    "semantic": {
+      "success":  { "$value": "#1EF2C1", "$type": "color" },
+      "info":     { "$value": "#18CFF2", "$type": "color" },
+      "warning":  { "$value": "#F5C062", "$type": "color" },
+      "danger":   { "$value": "#FF7A86", "$type": "color" },
+      "critical": { "$value": "#FF6A78", "$type": "color" },
+      "neutral":  { "$value": "#8EA0B7", "$type": "color" }
+    },
+    "data": {
+      "1": { "$value": "#18CFF2", "$type": "color" },
+      "2": { "$value": "#1EF2C1", "$type": "color" },
+      "3": { "$value": "#8EA0B7", "$type": "color" },
+      "4": { "$value": "#F5C062", "$type": "color" },
+      "5": { "$value": "#FF7A86", "$type": "color" },
+      "6": { "$value": "#5F8DFF", "$type": "color" }
+    }
+  },
+  "spacing": {
+    "1":  { "$value": "4px",  "$type": "dimension" },
+    "2":  { "$value": "8px",  "$type": "dimension" },
+    "3":  { "$value": "12px", "$type": "dimension" },
+    "4":  { "$value": "16px", "$type": "dimension" },
+    "5":  { "$value": "20px", "$type": "dimension" },
+    "6":  { "$value": "24px", "$type": "dimension" },
+    "8":  { "$value": "32px", "$type": "dimension" },
+    "10": { "$value": "40px", "$type": "dimension" },
+    "12": { "$value": "48px", "$type": "dimension" },
+    "16": { "$value": "64px", "$type": "dimension" }
+  },
+  "borderRadius": {
+    "xs":   { "$value": "6px",   "$type": "dimension" },
+    "sm":   { "$value": "10px",  "$type": "dimension" },
+    "md":   { "$value": "14px",  "$type": "dimension" },
+    "lg":   { "$value": "18px",  "$type": "dimension" },
+    "xl":   { "$value": "24px",  "$type": "dimension" },
+    "pill": { "$value": "999px", "$type": "dimension" }
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": { "$value": "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif", "$type": "fontFamily" },
+      "mono": { "$value": "JetBrains Mono, IBM Plex Mono, ui-monospace, monospace",     "$type": "fontFamily" }
+    },
+    "fontSize": {
+      "display-xl": { "$value": "64px", "$type": "dimension" },
+      "display":    { "$value": "48px", "$type": "dimension" },
+      "h1":         { "$value": "32px", "$type": "dimension" },
+      "h2":         { "$value": "24px", "$type": "dimension" },
+      "title-1":    { "$value": "20px", "$type": "dimension" },
+      "title-2":    { "$value": "18px", "$type": "dimension" },
+      "body-lg":    { "$value": "18px", "$type": "dimension" },
+      "body-md":    { "$value": "16px", "$type": "dimension" },
+      "body-sm":    { "$value": "14px", "$type": "dimension" },
+      "label":      { "$value": "14px", "$type": "dimension" },
+      "caption":    { "$value": "12px", "$type": "dimension" },
+      "mono-sm":    { "$value": "12px", "$type": "dimension" },
+      "overline":   { "$value": "11px", "$type": "dimension" }
+    },
+    "fontWeight": {
+      "regular":   { "$value": "400", "$type": "fontWeight" },
+      "medium":    { "$value": "500", "$type": "fontWeight" },
+      "semibold":  { "$value": "600", "$type": "fontWeight" },
+      "bold":      { "$value": "700", "$type": "fontWeight" },
+      "extrabold": { "$value": "800", "$type": "fontWeight" }
+    }
+  },
+  "shadow": {
+    "xs":  { "$value": "0 1px 2px rgba(0,0,0,0.3)",                                                       "$type": "shadow" },
+    "sm":  { "$value": "0 2px 6px rgba(0,0,0,0.35)",                                                      "$type": "shadow" },
+    "md":  { "$value": "0 4px 16px rgba(0,0,0,0.4)",                                                      "$type": "shadow" },
+    "lg":  { "$value": "0 8px 32px rgba(0,0,0,0.45)",                                                     "$type": "shadow" },
+    "xl":  { "$value": "0 16px 48px rgba(0,0,0,0.5)",                                                     "$type": "shadow" },
+    "glow-cyan":   { "$value": "0 0 0 1px rgba(24,207,242,0.22), 0 0 24px rgba(24,207,242,0.16)",         "$type": "shadow" },
+    "glow-mint":   { "$value": "0 0 0 1px rgba(30,242,193,0.20), 0 0 24px rgba(30,242,193,0.14)",         "$type": "shadow" },
+    "glow-danger": { "$value": "0 0 0 1px rgba(255,122,134,0.24), 0 0 20px rgba(255,122,134,0.14)",       "$type": "shadow" }
+  },
+  "motion": {
+    "duration": {
+      "fast":   { "$value": "120ms", "$type": "duration" },
+      "base":   { "$value": "180ms", "$type": "duration" },
+      "medium": { "$value": "240ms", "$type": "duration" },
+      "slow":   { "$value": "320ms", "$type": "duration" }
+    }
+  }
+}
