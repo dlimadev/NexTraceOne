@@ -1,4 +1,5 @@
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -104,7 +105,18 @@ public static class SetFeatureFlagOverride
                 await repository.AddEntryAsync(entry, cancellationToken);
             }
 
-            await unitOfWork.CommitAsync(cancellationToken);
+            try
+            {
+                await unitOfWork.CommitAsync(cancellationToken);
+            }
+            catch (NexTraceOne.BuildingBlocks.Application.Abstractions.ConcurrencyException)
+            {
+                return Error.Conflict(
+                    "FEATURE_FLAG_CONCURRENCY_CONFLICT",
+                    "The feature flag entry '{0}' was modified by another process. Please reload and try again.",
+                    request.Key);
+            }
+
             await cacheService.InvalidateAsync(request.Key, request.Scope, cancellationToken);
 
             return new FeatureFlagEntryDto(
@@ -116,7 +128,8 @@ public static class SetFeatureFlagOverride
                 IsActive: entry.IsActive,
                 ChangeReason: entry.ChangeReason,
                 UpdatedAt: entry.UpdatedAt ?? entry.CreatedAt,
-                UpdatedBy: entry.UpdatedBy ?? entry.CreatedBy);
+                UpdatedBy: entry.UpdatedBy ?? entry.CreatedBy,
+                RowVersion: entry.RowVersion);
         }
     }
 }

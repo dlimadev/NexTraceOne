@@ -16,6 +16,8 @@ public sealed record FeatureFlagDefinitionDto(
 
 /// <summary>
 /// Representa uma substituição de valor de feature flag para um âmbito específico.
+/// O <see cref="RowVersion"/> é o token de concorrência xmin do PostgreSQL — usado para
+/// detetar modificações concorrentes e retornar HTTP 409 quando ocorre um lost-update.
 /// </summary>
 public sealed record FeatureFlagEntryDto(
     Guid Id,
@@ -26,7 +28,8 @@ public sealed record FeatureFlagEntryDto(
     bool IsActive,
     string? ChangeReason,
     DateTimeOffset UpdatedAt,
-    string? UpdatedBy);
+    string? UpdatedBy,
+    uint RowVersion);
 
 /// <summary>
 /// Representa o valor efetivo resolvido de uma feature flag para um âmbito dado,

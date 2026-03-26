@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -155,7 +156,19 @@ public static class SetConfigurationValue
                 isSensitive: definition.IsSensitive);
 
             await auditRepository.AddAsync(auditEntry, cancellationToken);
-            await unitOfWork.CommitAsync(cancellationToken);
+
+            try
+            {
+                await unitOfWork.CommitAsync(cancellationToken);
+            }
+            catch (NexTraceOne.BuildingBlocks.Application.Abstractions.ConcurrencyException)
+            {
+                return Error.Conflict(
+                    "CONFIG_CONCURRENCY_CONFLICT",
+                    "The configuration entry '{0}' was modified by another process. Please reload and try again.",
+                    request.Key);
+            }
+
             await cacheService.InvalidateAsync(request.Key, request.Scope, cancellationToken);
 
             var displayValue = definition.IsSensitive
@@ -172,7 +185,8 @@ public static class SetConfigurationValue
                 Version: entry.Version,
                 ChangeReason: entry.ChangeReason,
                 UpdatedAt: entry.UpdatedAt ?? entry.CreatedAt,
-                UpdatedBy: entry.UpdatedBy ?? entry.CreatedBy);
+                UpdatedBy: entry.UpdatedBy ?? entry.CreatedBy,
+                RowVersion: entry.RowVersion);
 
             return dto;
         }

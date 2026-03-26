@@ -1,3 +1,4 @@
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -59,7 +60,19 @@ public static class RemoveOverride
 
             await auditRepository.AddAsync(auditEntry, cancellationToken);
             await entryRepository.DeleteAsync(entry, cancellationToken);
-            await unitOfWork.CommitAsync(cancellationToken);
+
+            try
+            {
+                await unitOfWork.CommitAsync(cancellationToken);
+            }
+            catch (NexTraceOne.BuildingBlocks.Application.Abstractions.ConcurrencyException)
+            {
+                return Error.Conflict(
+                    "CONFIG_CONCURRENCY_CONFLICT",
+                    "The configuration entry '{0}' was modified by another process. Please reload and try again.",
+                    request.Key);
+            }
+
             await cacheService.InvalidateAsync(request.Key, request.Scope, cancellationToken);
 
             return true;
