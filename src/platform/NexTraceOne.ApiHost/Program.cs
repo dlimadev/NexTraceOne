@@ -97,32 +97,36 @@ builder.Services.AddOpenApi();
 builder.AddCorsConfiguration();
 
 // [8] Rate Limiting — proteção contra abuso nas APIs públicas
+var rateLimitingOptions = builder.Configuration
+    .GetSection(RateLimitingOptions.SectionName)
+    .Get<RateLimitingOptions>() ?? new RateLimitingOptions();
+
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    // Política global: janela fixa de 60s com limite de 100 requisições por IP.
-    // Clientes sem IP resolvido (atrás de proxy sem X-Forwarded-For)
-    // recebem um limite mais restritivo para mitigar bypass de rate limiting.
+    // Política global: janela fixa por IP, com limite mais restritivo para IPs não resolvidos
+    // (clientes atrás de proxy sem X-Forwarded-For), para mitigar bypass de rate limiting.
+    var globalOpts = rateLimitingOptions.Global;
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
     {
         var remoteIp = context.Connection.RemoteIpAddress?.ToString();
-        var permitLimit = remoteIp is not null ? 100 : 20;
+        var permitLimit = remoteIp is not null ? globalOpts.PermitLimit : globalOpts.UnresolvedIpPermitLimit;
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: remoteIp ?? "unresolved-ip",
             factory: _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = permitLimit,
-                Window = TimeSpan.FromMinutes(1),
+                Window = TimeSpan.FromMinutes(globalOpts.WindowMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 5
+                QueueLimit = globalOpts.QueueLimit
             });
     });
 
-    // Política "auth" — limite mais restritivo para endpoints de autenticação.
-    // Protege contra brute force, credential stuffing e abuso de login/register.
-    // 20 tentativas por minuto por IP para login/refresh/federated/oidc.
+    // Política "auth" — endpoints de autenticação (login, refresh, federated, oidc).
+    // Protege contra brute force e credential stuffing.
+    var authOpts = rateLimitingOptions.Auth;
     options.AddPolicy("auth", context =>
     {
         var remoteIp = context.Connection.RemoteIpAddress?.ToString();
@@ -131,16 +135,15 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: $"auth:{remoteIp ?? "unresolved-ip"}",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 20,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = authOpts.PermitLimit,
+                Window = TimeSpan.FromMinutes(authOpts.WindowMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 2
+                QueueLimit = authOpts.QueueLimit
             });
     });
 
-    // Política "auth-sensitive" — limite mais restritivo para operações sensíveis.
-    // Protege contra abuso de registration, OIDC start e cookie session creation.
-    // 10 tentativas por minuto por IP.
+    // Política "auth-sensitive" — operações sensíveis (register, OIDC start, cookie session).
+    var authSensitiveOpts = rateLimitingOptions.AuthSensitive;
     options.AddPolicy("auth-sensitive", context =>
     {
         var remoteIp = context.Connection.RemoteIpAddress?.ToString();
@@ -149,16 +152,15 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: $"auth-sensitive:{remoteIp ?? "unresolved-ip"}",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = authSensitiveOpts.PermitLimit,
+                Window = TimeSpan.FromMinutes(authSensitiveOpts.WindowMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 2
+                QueueLimit = authSensitiveOpts.QueueLimit
             });
     });
 
-    // Política "ai" — protege endpoints de IA (chat, geração, retrieval, análise).
-    // Limita a 30 requisições por minuto por IP para evitar abuso de recursos de IA
-    // que são computacionalmente custosos e podem ter custo financeiro associado.
+    // Política "ai" — endpoints de IA (chat, geração, retrieval, análise).
+    var aiOpts = rateLimitingOptions.Ai;
     options.AddPolicy("ai", context =>
     {
         var remoteIp = context.Connection.RemoteIpAddress?.ToString();
@@ -167,16 +169,15 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: $"ai:{remoteIp ?? "unresolved-ip"}",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 30,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = aiOpts.PermitLimit,
+                Window = TimeSpan.FromMinutes(aiOpts.WindowMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 3
+                QueueLimit = aiOpts.QueueLimit
             });
     });
 
-    // Política "data-intensive" — protege endpoints de dados intensivos
-    // (catálogo, governance analytics, runtime queries, relatórios).
-    // 50 requisições por minuto por IP para prevenir scraping e overload de queries.
+    // Política "data-intensive" — dados intensivos (catálogo, analytics, runtime queries, relatórios).
+    var dataIntensiveOpts = rateLimitingOptions.DataIntensive;
     options.AddPolicy("data-intensive", context =>
     {
         var remoteIp = context.Connection.RemoteIpAddress?.ToString();
@@ -185,16 +186,15 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: $"data-intensive:{remoteIp ?? "unresolved-ip"}",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 50,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = dataIntensiveOpts.PermitLimit,
+                Window = TimeSpan.FromMinutes(dataIntensiveOpts.WindowMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 3
+                QueueLimit = dataIntensiveOpts.QueueLimit
             });
     });
 
-    // Política "operations" — protege endpoints operacionais
-    // (incidentes, automação, observabilidade, health agregada).
-    // 40 requisições por minuto por IP para prevenir abuso de operações administrativas.
+    // Política "operations" — endpoints operacionais (incidentes, automação, observabilidade, health).
+    var operationsOpts = rateLimitingOptions.Operations;
     options.AddPolicy("operations", context =>
     {
         var remoteIp = context.Connection.RemoteIpAddress?.ToString();
@@ -203,10 +203,10 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: $"operations:{remoteIp ?? "unresolved-ip"}",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 40,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = operationsOpts.PermitLimit,
+                Window = TimeSpan.FromMinutes(operationsOpts.WindowMinutes),
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                QueueLimit = 3
+                QueueLimit = operationsOpts.QueueLimit
             });
     });
 });

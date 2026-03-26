@@ -10,17 +10,24 @@ namespace NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 ///
 /// Prioridade de resolução:
 /// 1) JWT claim "tenant_id" — fonte de verdade após autenticação.
-/// 2) Header "X-Tenant-Id" — usado antes do login estar completo (ex: seleção de tenant).
+/// 2) Header "X-Tenant-Id" — aceito apenas quando o utilizador está autenticado
+///    e o JWT não contém o claim tenant_id (caso de fallback controlado).
 /// 3) Subdomínio — resolução por convenção de host.
 ///
 /// Segurança:
-/// - O header X-Tenant-Id é aceito apenas como fallback quando JWT não está presente.
-///   O backend DEVE validar que o tenant resolvido pertence ao usuário autenticado
-///   nos behaviors de pipeline (TenantIsolationBehavior).
+/// - O header X-Tenant-Id NÃO é aceito em pedidos não autenticados.
+///   Pedidos sem identidade válida ignoram completamente o header, prevenindo
+///   injeção de contexto de tenant por entidades externas não autorizadas.
+/// - Pedidos autenticados com JWT contendo tenant_id usam exclusivamente o claim.
+///   O header só é consultado como fallback quando o JWT está presente mas não
+///   contém o claim tenant_id (situação de transição controlada).
 /// - Subdomínios geram IDs determinísticos via SHA-256 — previsíveis, mas validados
 ///   no pipeline antes do acesso a dados.
 /// - Requisições sem tenant → processadas sem contexto de tenant.
 ///   Endpoints que exigem tenant são bloqueados pelo TenantIsolationBehavior.
+///
+/// IMPORTANTE: Este middleware deve ser registado APÓS UseAuthentication para que
+/// context.User.Identity?.IsAuthenticated reflita o estado de autenticação correto.
 /// </summary>
 public sealed class TenantResolutionMiddleware(
     RequestDelegate next,
@@ -38,13 +45,14 @@ public sealed class TenantResolutionMiddleware(
             currentTenant.Set(jwtTenantId, slug: jwtTenantId.ToString("N"), name: "JWT Tenant", isActive: true);
             logger.LogDebug("Tenant resolved from JWT claim: {TenantId}", jwtTenantId);
         }
-        else if (TryResolveFromHeader(context, out var headerTenantId))
+        else if (context.User.Identity?.IsAuthenticated == true && TryResolveFromHeader(context, out var headerTenantId))
         {
-            // Segurança: o header é aceito como fallback, mas sem JWT o request só terá
-            // acesso a endpoints públicos. O TenantIsolationBehavior impede acesso a dados
-            // sem autenticação adequada. Registrar para fins de auditoria e troubleshooting.
+            // Segurança: o header é aceito apenas para utilizadores autenticados e como
+            // fallback controlado quando o JWT não contém o claim tenant_id.
+            // Pedidos não autenticados com X-Tenant-Id são ignorados para prevenir
+            // injeção de contexto de tenant por entidades externas não autorizadas.
             currentTenant.Set(headerTenantId, slug: headerTenantId.ToString("N"), name: "Header Tenant", isActive: true);
-            logger.LogDebug("Tenant resolved from X-Tenant-Id header: {TenantId}", headerTenantId);
+            logger.LogDebug("Tenant resolved from X-Tenant-Id header (authenticated): {TenantId}", headerTenantId);
         }
         else if (TryResolveFromSubdomain(context, out var subdomain, out var deterministicTenantId))
         {

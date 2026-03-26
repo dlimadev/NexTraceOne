@@ -10,11 +10,12 @@ public static class WebApplicationBuilderExtensions
     /// <summary>
     /// Configura a política CORS para o frontend da plataforma, com validação por ambiente.
     ///
-    /// Em Development/CI: aceita origens por defeito (localhost:5173, localhost:3000)
-    /// quando nenhuma configuração explícita é fornecida.
+    /// Em Development/CI: aceita origens configuradas em appsettings.Development.json.
+    /// Se nenhuma origem explícita for encontrada (Cors:AllowedOrigins vazio ou ausente),
+    /// aplica fallback de conveniência para localhost:5173 e localhost:3000.
     ///
     /// Em Staging/Production: exige que Cors:AllowedOrigins esteja explicitamente
-    /// configurado — não permite fallback para origens de desenvolvimento.
+    /// configurado — não permite array vazio nem fallback para origens de desenvolvimento.
     ///
     /// Valida que nenhuma origem contém wildcard (*) quando AllowCredentials está ativo,
     /// pois a especificação CORS proíbe wildcard combinado com credentials
@@ -37,7 +38,9 @@ public static class WebApplicationBuilderExtensions
                 "Falling back to localhost defaults is not allowed in non-development environments.");
         }
 
-        var corsOrigins = configuredOrigins ?? ["http://localhost:5173", "http://localhost:3000"];
+        var corsOrigins = (configuredOrigins is { Length: > 0 })
+            ? configuredOrigins
+            : ["http://localhost:5173", "http://localhost:3000"];
 
         foreach (var origin in corsOrigins)
         {

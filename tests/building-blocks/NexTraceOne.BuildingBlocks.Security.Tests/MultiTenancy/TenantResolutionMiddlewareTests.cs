@@ -25,16 +25,38 @@ public sealed class TenantResolutionMiddlewareTests
     }
 
     [Fact]
-    public async Task InvokeAsync_WithTenantIdHeader_ResolvesFromHeader()
+    public async Task InvokeAsync_WithTenantIdHeader_WithoutAuthentication_DoesNotResolve()
     {
+        // Unauthenticated requests must NOT resolve tenant from the header.
+        // Prevents tenant context injection by external unauthenticated callers.
+        var (middleware, accessor) = CreateMiddleware();
+        var tenantId = Guid.NewGuid();
+        var context = new DefaultHttpContext();
+        context.Request.Headers["X-Tenant-Id"] = tenantId.ToString();
+        // context.User is unauthenticated (default)
+
+        await middleware.InvokeAsync(context, accessor);
+
+        accessor.Id.Should().Be(Guid.Empty, "unauthenticated requests must not resolve tenant from X-Tenant-Id header");
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WithTenantIdHeader_WhenAuthenticated_ResolvesFromHeader()
+    {
+        // When an authenticated user sends X-Tenant-Id but the JWT has no tenant_id claim,
+        // the header is accepted as a controlled fallback.
         var (middleware, accessor) = CreateMiddleware();
         var tenantId = Guid.NewGuid();
         var context = new DefaultHttpContext();
         context.Request.Headers["X-Tenant-Id"] = tenantId.ToString();
 
+        // Authenticated identity without tenant_id claim
+        var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, "user")], "Test");
+        context.User = new ClaimsPrincipal(identity);
+
         await middleware.InvokeAsync(context, accessor);
 
-        accessor.Id.Should().Be(tenantId);
+        accessor.Id.Should().Be(tenantId, "authenticated requests may use X-Tenant-Id as fallback when JWT has no tenant_id claim");
         accessor.IsActive.Should().BeTrue();
     }
 
@@ -103,8 +125,7 @@ public sealed class TenantResolutionMiddlewareTests
 
         await middleware.InvokeAsync(context, accessor);
 
-        // Guid.TryParse succeeds for Guid.Empty — the middleware sets it but
-        // downstream TenantIsolationBehavior rejects Guid.Empty as "no tenant".
+        // Without authentication the header is fully ignored — accessor stays empty.
         accessor.Id.Should().Be(Guid.Empty);
     }
 

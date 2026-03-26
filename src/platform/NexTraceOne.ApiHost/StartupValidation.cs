@@ -75,6 +75,9 @@ public static class StartupValidation
         // Validação de chave de encriptação obrigatória
         ValidateEncryptionKey(app, logger);
 
+        // Validação de política de cookies seguros — proibido desabilitar fora de Development
+        ValidateSecureCookiesPolicy(app, configuration, logger);
+
         // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
         if (connectionStrings.Exists())
@@ -219,7 +222,8 @@ public static class StartupValidation
     /// <summary>
     /// Valida a configuração de chave de encriptação AES obrigatória.
     /// Em todos os ambientes: falha se ausente, nula, whitespace ou inválida.
-    /// O valor deve ser Base64 de 32 bytes ou string UTF-8 com 32 caracteres.
+    /// A variável de ambiente esperada é <c>NEXTRACE_ENCRYPTION_KEY</c>.
+    /// O valor deve ser um Base64-encoded 32-byte key ou uma string UTF-8 com 32 caracteres.
     /// </summary>
     private static void ValidateEncryptionKey(WebApplication app, ILogger logger)
     {
@@ -241,6 +245,46 @@ public static class StartupValidation
                 $"NexTraceOne startup aborted: {ex.Message} " +
                 "Set it via environment variable, .env, dotnet user-secrets, or a secrets manager.",
                 ex);
+        }
+    }
+
+    /// <summary>
+    /// Valida a política de cookies seguros por ambiente.
+    /// Em Development: permite RequireSecureCookies=false e regista um aviso explícito.
+    /// Em qualquer outro ambiente (Staging, Production, etc.): falha o startup se RequireSecureCookies for false,
+    /// porque cookies inseguros em produção expõem tokens de sessão a intercepção via HTTP.
+    /// </summary>
+    private static void ValidateSecureCookiesPolicy(WebApplication app, IConfiguration configuration, ILogger logger)
+    {
+        var rawValue = configuration["Auth:CookieSession:RequireSecureCookies"];
+
+        // Absent or any value other than an explicit "false" is treated as secure (safe default).
+        var isExplicitlyInsecure = string.Equals(rawValue, "false", StringComparison.OrdinalIgnoreCase);
+
+        if (isExplicitlyInsecure && !app.Environment.IsDevelopment())
+        {
+            logger.LogCritical(
+                "Auth:CookieSession:RequireSecureCookies is false in {Environment} environment. " +
+                "Insecure cookies expose session tokens to interception. Aborting startup.",
+                app.Environment.EnvironmentName);
+            throw new InvalidOperationException(
+                $"NexTraceOne startup aborted: Auth:CookieSession:RequireSecureCookies must be true " +
+                $"in non-Development environments (current: {app.Environment.EnvironmentName}). " +
+                "Set 'Auth__CookieSession__RequireSecureCookies=true' via environment variable or configuration. " +
+                "RequireSecureCookies=false is only permitted in local Development.");
+        }
+
+        if (isExplicitlyInsecure)
+        {
+            logger.LogWarning(
+                "Auth:CookieSession:RequireSecureCookies is false in Development environment. " +
+                "This is acceptable for local HTTP development but must NEVER be used in staging or production.");
+        }
+        else
+        {
+            logger.LogInformation(
+                "Auth:CookieSession:RequireSecureCookies validated — secure cookies enforced in {Environment} environment.",
+                app.Environment.EnvironmentName);
         }
     }
 }
