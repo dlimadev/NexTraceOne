@@ -260,6 +260,28 @@ public sealed class ClickHouseAnalyticsWriter : IAnalyticsWriter
         await InsertAsync("nextraceone_analytics.gov_finops_aggregates", [row], cancellationToken);
     }
 
+    /// <inheritdoc />
+    public async Task WriteTraceReleaseMappingAsync(TraceReleaseMappingRecord record, CancellationToken cancellationToken = default)
+    {
+        var row = new
+        {
+            id = record.Id,
+            tenant_id = record.TenantId,
+            release_id = record.ReleaseId,
+            trace_id = record.TraceId,
+            service_name = record.ServiceName,
+            service_id = record.ServiceId,
+            environment = record.Environment,
+            environment_id = record.EnvironmentId,
+            correlation_source = record.CorrelationSource,
+            trace_started_at = record.TraceStartedAt.HasValue ? FormatDateTime(record.TraceStartedAt.Value) : null,
+            trace_ended_at = record.TraceEndedAt.HasValue ? FormatDateTime(record.TraceEndedAt.Value) : null,
+            correlated_at = FormatDateTime(record.CorrelatedAt)
+        };
+
+        await InsertAsync("nextraceone_analytics.chg_trace_release_mapping", [row], cancellationToken);
+    }
+
     /// <summary>
     /// Executa um INSERT em formato JSONEachRow via HTTP interface do ClickHouse.
     /// O timeout é aplicado via HttpClient.Timeout configurado no DI.

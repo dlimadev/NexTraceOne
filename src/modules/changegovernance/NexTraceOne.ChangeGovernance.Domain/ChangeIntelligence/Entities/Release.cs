@@ -94,6 +94,10 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// <summary>
     /// Cria uma nova release a partir de um evento de deployment recebido do CI/CD.
     /// Validações de negócio mais profundas são feitas no command handler.
+    /// <para>
+    /// O campo <paramref name="apiAssetId"/> pode ser <see cref="Guid.Empty"/> quando a release
+    /// é criada a partir de um evento externo de ingestão ainda não correlacionado ao catálogo.
+    /// </para>
     /// </summary>
     public static Release Create(
         Guid apiAssetId,
@@ -104,7 +108,6 @@ public sealed class Release : AggregateRoot<ReleaseId>
         string commitSha,
         DateTimeOffset createdAt)
     {
-        Guard.Against.Default(apiAssetId);
         Guard.Against.NullOrWhiteSpace(serviceName);
         Guard.Against.NullOrWhiteSpace(version);
         Guard.Against.NullOrWhiteSpace(environment);

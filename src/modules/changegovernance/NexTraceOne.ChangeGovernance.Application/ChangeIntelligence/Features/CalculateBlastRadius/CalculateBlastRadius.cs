@@ -38,6 +38,8 @@ public static class CalculateBlastRadius
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IBlastRadiusRepository blastRadiusRepository,
+        IChangeScoreRepository scoreRepository,
+        IChangeScoreCalculator scoreCalculator,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
@@ -57,6 +59,20 @@ public static class CalculateBlastRadius
                 dateTimeProvider.UtcNow);
 
             blastRadiusRepository.Add(report);
+
+            // ── Recalcular ChangeIntelligenceScore com blast radius agora disponível ──────
+            // Remove qualquer score anterior e substitui pelo novo com blast radius real.
+            var factors = scoreCalculator.Compute(release.ChangeLevel, release.Environment, report);
+            var updatedScore = ChangeIntelligenceScore.Compute(
+                release.Id,
+                factors.BreakingChangeWeight,
+                factors.BlastRadiusWeight,
+                factors.EnvironmentWeight,
+                dateTimeProvider.UtcNow,
+                factors.ScoreSource);
+            _ = release.SetChangeScore(updatedScore.Score);
+            scoreRepository.Add(updatedScore);
+
             await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(
@@ -65,16 +81,20 @@ public static class CalculateBlastRadius
                 report.TotalAffectedConsumers,
                 report.DirectConsumers,
                 report.TransitiveConsumers,
-                report.CalculatedAt);
+                report.CalculatedAt,
+                updatedScore.Score,
+                factors.ScoreSource);
         }
     }
 
-    /// <summary>Resposta do cálculo de blast radius da Release.</summary>
+    /// <summary>Resposta do cálculo de blast radius da Release (inclui score recalculado).</summary>
     public sealed record Response(
         Guid ReleaseId,
         Guid BlastRadiusReportId,
         int TotalAffectedConsumers,
         IReadOnlyList<string> DirectConsumers,
         IReadOnlyList<string> TransitiveConsumers,
-        DateTimeOffset CalculatedAt);
+        DateTimeOffset CalculatedAt,
+        decimal UpdatedScore,
+        string ScoreSource);
 }

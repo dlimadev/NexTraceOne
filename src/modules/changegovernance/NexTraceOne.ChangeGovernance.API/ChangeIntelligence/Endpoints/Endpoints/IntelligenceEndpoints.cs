@@ -6,6 +6,8 @@ using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
+using GetPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview.GetPostReleaseReview;
+using RecordObservationMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics.RecordObservationMetrics;
 using RegisterExternalMarkerFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker.RegisterExternalMarker;
 using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
 using RecordReleaseBaselineFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordReleaseBaseline.RecordReleaseBaseline;
@@ -97,5 +99,29 @@ internal static class IntelligenceEndpoints
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:write");
+
+        // ── Post-change verification endpoints (P5.5) ─────────────────────────
+
+        group.MapPost("/{releaseId:guid}/observation-window", async (
+            Guid releaseId,
+            RecordObservationMetricsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ReleaseId = releaseId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:write");
+
+        group.MapGet("/{releaseId:guid}/review", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetPostReleaseReviewFeature.Query(releaseId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
     }
 }

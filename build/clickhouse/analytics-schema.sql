@@ -21,6 +21,7 @@
 --   ops_*   → Operational Intelligence (RECOMMENDED)
 --   int_*   → Integrations (RECOMMENDED)
 --   gov_*   → Governance Analytics (RECOMMENDED)
+--   chg_*   → Change Intelligence (P5.2 — REQUIRED)
 --
 -- MÓDULOS PREPARADOS MAS NÃO ATIVOS (E16 — PREPARE_ONLY):
 --   aik_*   → AI & Knowledge (comentado — ativar quando volume justificar)
@@ -399,3 +400,45 @@ SETTINGS index_granularity = 8192;
 -- ORDER BY (tenant_id, model_id, captured_at)
 -- TTL captured_at + INTERVAL 90 DAY
 -- SETTINGS index_granularity = 8192;
+
+-- ════════════════════════════════════════════════════════════════════════════════
+-- CHANGE INTELLIGENCE ANALYTICS (chg_*)
+-- Nível ClickHouse: REQUIRED (P5.2)
+-- Módulo: Change Governance (10)
+-- Fonte: correlação automática entre traces OTel e releases do módulo Change Governance
+-- ════════════════════════════════════════════════════════════════════════════════
+
+-- ── chg_trace_release_mapping — Mapeamento analítico trace → release ─────────
+-- Registo append-only de correlações entre traces distribuídos e releases.
+-- Permite responder: "quais traces pertencem a esta release?" e inverso.
+--
+-- Alimentado por: NotifyDeployment.Handler (via ITraceCorrelationWriter)
+--                 e por qualquer pipeline que correlacione traces a deploys.
+--
+-- Correlação com PostgreSQL:
+--   release_id      → chg_releases.Id
+--   tenant_id       → iam_tenants.Id
+--   service_id      → cat_service_assets.Id (opcional)
+--   environment_id  → env_environments.Id (opcional)
+--
+-- Correlação com nextraceone_obs:
+--   trace_id        → otel_traces.TraceId (sem FK — ClickHouse não suporta)
+CREATE TABLE IF NOT EXISTS nextraceone_analytics.chg_trace_release_mapping
+(
+    id                  UUID,
+    tenant_id           UUID,
+    release_id          UUID,
+    trace_id            String,
+    service_name        LowCardinality(String),
+    service_id          Nullable(UUID),
+    environment         LowCardinality(String),
+    environment_id      Nullable(UUID),
+    correlation_source  LowCardinality(String)   DEFAULT 'deployment_event',
+    trace_started_at    Nullable(DateTime64(3, 'UTC')),
+    trace_ended_at      Nullable(DateTime64(3, 'UTC')),
+    correlated_at       DateTime64(3, 'UTC')
+) ENGINE = MergeTree()
+PARTITION BY (tenant_id, toYYYYMM(correlated_at))
+ORDER BY (tenant_id, release_id, correlated_at, trace_id)
+TTL correlated_at + INTERVAL 1 YEAR
+SETTINGS index_granularity = 8192;

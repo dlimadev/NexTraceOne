@@ -3,6 +3,7 @@ using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Workflow.Enums;
 
+using AttachCiCdEvidenceFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.AttachCiCdEvidence.AttachCiCdEvidence;
 using CreateWorkflowTemplateFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.CreateWorkflowTemplate.CreateWorkflowTemplate;
 using InitiateWorkflowFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflow.InitiateWorkflow;
 using ApproveStageFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ApproveStage.ApproveStage;
@@ -77,6 +78,7 @@ public sealed class WorkflowApplicationTests
         var templateRepository = Substitute.For<IWorkflowTemplateRepository>();
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
@@ -85,7 +87,7 @@ public sealed class WorkflowApplicationTests
             .Returns(template);
 
         var sut = new InitiateWorkflowFeature.Handler(
-            templateRepository, instanceRepository, stageRepository, unitOfWork, dateTimeProvider);
+            templateRepository, instanceRepository, stageRepository, evidencePackRepository, unitOfWork, dateTimeProvider);
 
         var stages = new List<InitiateWorkflowFeature.StageInput>
         {
@@ -101,8 +103,10 @@ public sealed class WorkflowApplicationTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(WorkflowStatus.Draft.ToString());
         result.Value.StagesCreated.Should().Be(2);
+        result.Value.EvidencePackId.Should().NotBe(Guid.Empty);
         instanceRepository.Received(1).Add(Arg.Any<WorkflowInstance>());
         stageRepository.Received(2).Add(Arg.Any<WorkflowStage>());
+        evidencePackRepository.Received(1).Add(Arg.Any<EvidencePack>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
@@ -112,6 +116,7 @@ public sealed class WorkflowApplicationTests
         var templateRepository = Substitute.For<IWorkflowTemplateRepository>();
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
@@ -119,7 +124,7 @@ public sealed class WorkflowApplicationTests
             .Returns((WorkflowTemplate?)null);
 
         var sut = new InitiateWorkflowFeature.Handler(
-            templateRepository, instanceRepository, stageRepository, unitOfWork, dateTimeProvider);
+            templateRepository, instanceRepository, stageRepository, evidencePackRepository, unitOfWork, dateTimeProvider);
 
         var command = new InitiateWorkflowFeature.Command(
             Guid.NewGuid(), Guid.NewGuid(), "user@company.com",
@@ -596,6 +601,87 @@ public sealed class WorkflowApplicationTests
 
         var result = await sut.Handle(
             new ExportEvidencePackPdfFeature.Query(instance.Id.Value), CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("EvidencePack.NotFound");
+    }
+
+    // ── AttachCiCdEvidence ────────────────────────────────────────────────
+
+    [Fact]
+    public async Task AttachCiCdEvidence_Handle_ShouldUpdatePack_WithPipelineData()
+    {
+        var instance = CreateInstance();
+        var pack = EvidencePack.Create(instance.Id, instance.ReleaseId, FixedNow);
+
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        evidencePackRepository.GetByWorkflowInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(pack);
+
+        var sut = new AttachCiCdEvidenceFeature.Handler(instanceRepository, evidencePackRepository, unitOfWork);
+
+        var command = new AttachCiCdEvidenceFeature.Command(
+            instance.Id.Value,
+            PipelineSource: "github-actions",
+            BuildId: "run-12345",
+            CommitSha: "cafebabe1234",
+            CiChecksResult: "passed");
+
+        var result = await sut.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.PipelineSource.Should().Be("github-actions");
+        result.Value.BuildId.Should().Be("run-12345");
+        result.Value.CommitSha.Should().Be("cafebabe1234");
+        result.Value.CiChecksResult.Should().Be("passed");
+        result.Value.CompletenessPercentage.Should().BeGreaterThan(0m);
+        evidencePackRepository.Received(1).Update(Arg.Any<EvidencePack>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task AttachCiCdEvidence_Handle_WhenInstanceNotFound_ShouldFail()
+    {
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns((WorkflowInstance?)null);
+
+        var sut = new AttachCiCdEvidenceFeature.Handler(instanceRepository, evidencePackRepository, unitOfWork);
+
+        var result = await sut.Handle(
+            new AttachCiCdEvidenceFeature.Command(Guid.NewGuid(), "github-actions", null, null, null),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("Instance.NotFound");
+    }
+
+    [Fact]
+    public async Task AttachCiCdEvidence_Handle_WhenPackNotFound_ShouldFail()
+    {
+        var instance = CreateInstance();
+        var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
+        var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+
+        instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns(instance);
+        evidencePackRepository.GetByWorkflowInstanceIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
+            .Returns((EvidencePack?)null);
+
+        var sut = new AttachCiCdEvidenceFeature.Handler(instanceRepository, evidencePackRepository, unitOfWork);
+
+        var result = await sut.Handle(
+            new AttachCiCdEvidenceFeature.Command(instance.Id.Value, "jenkins", "build-99", "abc123", "failed"),
+            CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("EvidencePack.NotFound");

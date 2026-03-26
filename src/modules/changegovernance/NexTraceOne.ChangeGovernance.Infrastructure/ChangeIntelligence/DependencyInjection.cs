@@ -6,7 +6,9 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 
@@ -45,6 +47,11 @@ public static class DependencyInjection
         services.AddScoped<IPostReleaseReviewRepository, PostReleaseReviewRepository>();
         services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
+
+        // Analytics writer: correlated traces → ClickHouse chg_trace_release_mapping
+        // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false
+        services.AddBuildingBlocksAnalytics(configuration);
+        services.AddScoped<ITraceCorrelationWriter, TraceCorrelationAnalyticsWriter>();
 
         return services;
     }

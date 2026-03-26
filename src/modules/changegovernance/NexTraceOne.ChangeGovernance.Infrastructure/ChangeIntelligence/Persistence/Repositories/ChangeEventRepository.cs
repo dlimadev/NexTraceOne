@@ -17,6 +17,13 @@ internal sealed class ChangeEventRepository(ChangeIntelligenceDbContext context)
             .OrderBy(e => e.OccurredAt)
             .ToListAsync(cancellationToken);
 
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ChangeEvent>> ListByReleaseIdAndEventTypeAsync(ReleaseId releaseId, string eventType, CancellationToken cancellationToken = default)
+        => await context.ChangeEvents
+            .Where(e => e.ReleaseId == releaseId && e.EventType == eventType)
+            .OrderBy(e => e.OccurredAt)
+            .ToListAsync(cancellationToken);
+
     /// <summary>Adiciona um evento de mudança.</summary>
     public void Add(ChangeEvent changeEvent)
         => context.ChangeEvents.Add(changeEvent);

@@ -6,6 +6,7 @@ using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
+using AttachCiCdEvidenceFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.AttachCiCdEvidence.AttachCiCdEvidence;
 using GenerateEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack.GenerateEvidencePack;
 using GetEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetEvidencePack.GetEvidencePack;
 using ExportEvidencePackPdfFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
@@ -58,5 +59,18 @@ internal static class EvidencePackEndpoints
             var result = await sender.Send(new ExportEvidencePackPdfFeature.Query(instanceId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("workflow:instances:read");
+
+        // ── Endpoint CI/CD (P5.4) ─────────────────────────────────────────────
+        group.MapPost("/{instanceId:guid}/evidence-pack/cicd", async (
+            Guid instanceId,
+            AttachCiCdEvidenceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { WorkflowInstanceId = instanceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("workflow:instances:write");
     }
 }

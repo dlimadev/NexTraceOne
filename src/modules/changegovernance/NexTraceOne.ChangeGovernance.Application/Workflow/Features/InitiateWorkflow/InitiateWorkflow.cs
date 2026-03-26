@@ -44,11 +44,12 @@ public static class InitiateWorkflow
         }
     }
 
-    /// <summary>Handler que cria a instância de workflow e seus estágios.</summary>
+    /// <summary>Handler que cria a instância de workflow, seus estágios e o evidence pack inicial.</summary>
     public sealed class Handler(
         IWorkflowTemplateRepository templateRepository,
         IWorkflowInstanceRepository instanceRepository,
         IWorkflowStageRepository stageRepository,
+        IEvidencePackRepository evidencePackRepository,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
@@ -62,11 +63,13 @@ public static class InitiateWorkflow
             if (template is null)
                 return WorkflowErrors.TemplateNotFound(request.WorkflowTemplateId.ToString());
 
+            var now = dateTimeProvider.UtcNow;
+
             var instance = WorkflowInstance.Create(
                 template.Id,
                 request.ReleaseId,
                 request.SubmittedBy,
-                dateTimeProvider.UtcNow);
+                now);
 
             instanceRepository.Add(instance);
 
@@ -85,15 +88,20 @@ public static class InitiateWorkflow
                 stagesCreated++;
             }
 
+            // ── Auto-criar EvidencePack no momento de inicialização do workflow ─────────
+            var pack = EvidencePack.Create(instance.Id, request.ReleaseId, now);
+            evidencePackRepository.Add(pack);
+
             await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(
                 instance.Id.Value,
                 instance.Status.ToString(),
-                stagesCreated);
+                stagesCreated,
+                pack.Id.Value);
         }
     }
 
     /// <summary>Resposta da inicialização da instância de workflow.</summary>
-    public sealed record Response(Guid WorkflowInstanceId, string Status, int StagesCreated);
+    public sealed record Response(Guid WorkflowInstanceId, string Status, int StagesCreated, Guid EvidencePackId);
 }

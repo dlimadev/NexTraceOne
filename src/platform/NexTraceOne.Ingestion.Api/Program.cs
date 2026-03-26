@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -8,12 +9,14 @@ using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
+using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
 using NexTraceOne.Governance.Infrastructure;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 using Serilog;
 using System.Diagnostics;
+using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
 
 /// <summary>
 /// Ponto de entrada do NexTraceOne Ingestion API.
@@ -59,6 +62,9 @@ builder.Services.AddAuthorization(options =>
 
 // Add Governance Infrastructure for persistence
 builder.Services.AddGovernanceInfrastructure(builder.Configuration);
+
+// Add ChangeGovernance module so deploy events are automatically correlated to Releases
+builder.Services.AddChangeIntelligenceModule(builder.Configuration);
 
 var app = builder.Build();
 
@@ -153,8 +159,10 @@ deployments.MapPost("/events", async (
     IIntegrationConnectorRepository connectorRepo,
     IIngestionExecutionRepository executionRepo,
     IIngestionSourceRepository sourceRepo,
+    ISender sender,
     IUnitOfWork unitOfWork,
     IDateTimeProvider clock,
+    ILogger<Program> logger,
     CancellationToken ct) =>
 {
     var correlationId = ResolveCorrelationId(httpContext, request.CorrelationId);
@@ -214,14 +222,63 @@ deployments.MapPost("/events", async (
     await connectorRepo.UpdateAsync(connector, ct);
     await unitOfWork.CommitAsync(ct);
 
+    // ── Correlação automática deploy event → Release (P5.1) ──────────────
+    // Se o evento contém dados suficientes, dispatch para ChangeGovernance.
+    // Falhas não bloqueiam a resposta ao pipeline — são registadas e descartadas.
+    Guid? releaseId = null;
+    bool? isNewRelease = null;
+
+    if (!string.IsNullOrWhiteSpace(request.ServiceName)
+        && !string.IsNullOrWhiteSpace(request.Version)
+        && !string.IsNullOrWhiteSpace(request.Environment)
+        && !string.IsNullOrWhiteSpace(request.CommitSha))
+    {
+        try
+        {
+            var pipelineSource = string.IsNullOrWhiteSpace(request.Source)
+                ? request.Provider
+                : $"{request.Provider}/{request.Source}";
+
+            var notifyCommand = new NotifyDeploymentFeature.Command(
+                ApiAssetId: null,
+                ServiceName: request.ServiceName,
+                Version: request.Version,
+                Environment: request.Environment,
+                PipelineSource: pipelineSource,
+                CommitSha: request.CommitSha,
+                ExternalDeploymentId: correlationId);
+
+            var notifyResult = await sender.Send(notifyCommand, ct);
+
+            if (notifyResult.IsSuccess)
+            {
+                releaseId = notifyResult.Value.ReleaseId;
+                isNewRelease = notifyResult.Value.IsNewRelease;
+            }
+            else
+            {
+                logger.LogWarning(
+                    "Deploy event → Release correlation returned failure for {ServiceName}@{Version} in {Environment}: {Error}",
+                    request.ServiceName, request.Version, request.Environment, notifyResult.Error?.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Unexpected error correlating deploy event to Release for {ServiceName}@{Version} in {Environment}",
+                request.ServiceName, request.Version, request.Environment);
+        }
+    }
+
     return Results.Accepted(null, new
     {
         message = "Deployment event received",
         status = "accepted",
-        processingStatus = "metadata_recorded",
-        note = "Event metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
+        processingStatus = releaseId.HasValue ? "release_correlated" : "metadata_recorded",
         correlationId,
-        executionId = execution.Id.Value
+        executionId = execution.Id.Value,
+        releaseId,
+        isNewRelease
     });
 })
 .WithDescription("Receives deployment event notifications from CI/CD platforms");

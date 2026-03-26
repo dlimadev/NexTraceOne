@@ -31,6 +31,12 @@ public sealed class ChangeIntelligenceScore : AuditableEntity<ChangeIntelligence
     /// <summary>Momento em que o score foi computado.</summary>
     public DateTimeOffset ComputedAt { get; private set; }
 
+    /// <summary>
+    /// Origem do cálculo do score para rastreabilidade.
+    /// Ex: "auto:change_level+blast_radius+environment", "manual", etc.
+    /// </summary>
+    public string ScoreSource { get; private set; } = "unknown";
+
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -45,7 +51,8 @@ public sealed class ChangeIntelligenceScore : AuditableEntity<ChangeIntelligence
         decimal breakingChangeWeight,
         decimal blastRadiusWeight,
         decimal environmentWeight,
-        DateTimeOffset computedAt)
+        DateTimeOffset computedAt,
+        string scoreSource = "unknown")
     {
         Guard.Against.Null(releaseId);
         Guard.Against.OutOfRange(breakingChangeWeight, nameof(breakingChangeWeight), 0m, 1m);
@@ -62,7 +69,8 @@ public sealed class ChangeIntelligenceScore : AuditableEntity<ChangeIntelligence
             BlastRadiusWeight = blastRadiusWeight,
             EnvironmentWeight = environmentWeight,
             Score = score,
-            ComputedAt = computedAt
+            ComputedAt = computedAt,
+            ScoreSource = scoreSource
         };
     }
 }

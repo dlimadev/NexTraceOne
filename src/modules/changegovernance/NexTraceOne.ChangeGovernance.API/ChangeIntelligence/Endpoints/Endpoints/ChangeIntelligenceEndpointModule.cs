@@ -11,6 +11,7 @@ namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoint
 /// - <see cref="ReleaseQueryEndpoints"/> — consulta de releases e histórico.
 /// - <see cref="AnalysisEndpoints"/> — classificação, blast radius, score e work items.
 /// - <see cref="IntelligenceEndpoints"/> — marcadores externos, sumário, baseline, review e rollback assessment.
+/// - <see cref="TraceCorrelationEndpoints"/> — correlação trace → release (P5.2).
 /// - <see cref="FreezeEndpoints"/> — gestão de janelas de freeze.
 /// - <see cref="ChangeConfidenceEndpoints"/> — catálogo de mudanças, resumo e Change Confidence.
 ///
@@ -30,6 +31,7 @@ public sealed class ChangeIntelligenceEndpointModule
         ReleaseQueryEndpoints.Map(group);
         AnalysisEndpoints.Map(group);
         IntelligenceEndpoints.Map(group);
+        TraceCorrelationEndpoints.Map(group);
 
         FreezeEndpoints.Map(app);
         ChangeConfidenceEndpoints.Map(app);

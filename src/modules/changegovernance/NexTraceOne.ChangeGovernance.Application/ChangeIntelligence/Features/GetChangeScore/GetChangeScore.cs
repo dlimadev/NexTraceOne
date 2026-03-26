@@ -47,7 +47,8 @@ public static class GetChangeScore
                 score.BreakingChangeWeight,
                 score.BlastRadiusWeight,
                 score.EnvironmentWeight,
-                score.ComputedAt);
+                score.ComputedAt,
+                score.ScoreSource);
         }
     }
 
@@ -59,5 +60,6 @@ public static class GetChangeScore
         decimal BreakingChangeWeight,
         decimal BlastRadiusWeight,
         decimal EnvironmentWeight,
-        DateTimeOffset ComputedAt);
+        DateTimeOffset ComputedAt,
+        string ScoreSource = "unknown");
 }

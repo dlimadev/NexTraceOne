@@ -25,6 +25,13 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
                 && r.Version == version
                 && r.Environment == environment, cancellationToken);
 
+    /// <inheritdoc />
+    public async Task<Release?> GetByServiceNameVersionEnvironmentAsync(string serviceName, string version, string environment, CancellationToken cancellationToken = default)
+        => await context.Releases
+            .SingleOrDefaultAsync(r => r.ServiceName == serviceName
+                && r.Version == version
+                && r.Environment == environment, cancellationToken);
+
     /// <summary>Lista releases de um ativo de API ordenadas por data de criação descendente.</summary>
     public async Task<IReadOnlyList<Release>> ListByApiAssetAsync(Guid apiAssetId, int page, int pageSize, CancellationToken cancellationToken = default)
         => await context.Releases

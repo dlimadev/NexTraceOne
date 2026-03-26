@@ -71,4 +71,11 @@ public interface IAnalyticsWriter
     /// Usado pelo módulo Governance para registar custos contextualizados por equipa/serviço.
     /// </summary>
     Task WriteFinOpsAggregateAsync(FinOpsAggregateRecord record, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Escreve um registo de correlação trace → release no ClickHouse (tabela chg_trace_release_mapping).
+    /// Usado pelo módulo Change Governance para ligar traces distribuídos a releases.
+    /// Permite análise de "quais traces pertencem a esta release?" e correlação de impacto.
+    /// </summary>
+    Task WriteTraceReleaseMappingAsync(TraceReleaseMappingRecord record, CancellationToken cancellationToken = default);
 }

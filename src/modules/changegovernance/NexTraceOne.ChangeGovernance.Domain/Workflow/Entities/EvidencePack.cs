@@ -14,6 +14,8 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
 {
     private EvidencePack() { }
 
+    private const int TotalCompletenessFields = 6;
+
     /// <summary>Identificador da instância de workflow à qual este evidence pack pertence.</summary>
     public WorkflowInstanceId WorkflowInstanceId { get; private set; } = null!;
 
@@ -37,6 +39,22 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
 
     /// <summary>Hash SHA-256 do contrato para verificação de integridade.</summary>
     public string? ContractHash { get; private set; }
+
+    // ── Campos CI/CD (P5.4) ──────────────────────────────────────────────────
+
+    /// <summary>Sistema de CI/CD de origem (ex: "github-actions", "jenkins", "azure-devops").</summary>
+    public string? PipelineSource { get; private set; }
+
+    /// <summary>Identificador externo do build/run de CI/CD (vindo do ExternalMarker.ExternalId).</summary>
+    public string? BuildId { get; private set; }
+
+    /// <summary>SHA do commit git que originou o pipeline (vindo da Release).</summary>
+    public string? CommitSha { get; private set; }
+
+    /// <summary>Resultado consolidado dos checks de CI: "passed", "failed", "partial", "unknown".</summary>
+    public string? CiChecksResult { get; private set; }
+
+    // ── Fim campos CI/CD ──────────────────────────────────────────────────────
 
     /// <summary>Percentual de completude do evidence pack (0–100).</summary>
     public decimal CompletenessPercentage { get; private set; }
@@ -104,9 +122,28 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
     }
 
     /// <summary>
+    /// Anexa evidências automáticas provenientes do pipeline CI/CD ao evidence pack.
+    /// Chamado automaticamente quando um evento de deploy (ExternalMarker) é recebido.
+    /// </summary>
+    public void AttachCiCdEvidence(
+        string pipelineSource,
+        string? buildId,
+        string? commitSha,
+        string? ciChecksResult)
+    {
+        Guard.Against.NullOrWhiteSpace(pipelineSource);
+
+        PipelineSource = pipelineSource;
+        BuildId = buildId;
+        CommitSha = commitSha;
+        CiChecksResult = ciChecksResult ?? "unknown";
+        RecalculateCompleteness();
+    }
+
+    /// <summary>
     /// Recalcula o percentual de completude com base nos campos preenchidos.
     /// Campos considerados: ContractDiffSummary, BlastRadiusScore, SpectralScore,
-    /// ChangeIntelligenceScore e ApprovalHistory (5 campos no total).
+    /// ChangeIntelligenceScore, ApprovalHistory e PipelineSource (6 campos no total).
     /// Cada campo preenchido contribui igualmente para o percentual total.
     /// </summary>
     public void RecalculateCompleteness()
@@ -118,9 +155,9 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
         if (SpectralScore.HasValue) filledFields++;
         if (ChangeIntelligenceScore.HasValue) filledFields++;
         if (!string.IsNullOrWhiteSpace(ApprovalHistory)) filledFields++;
+        if (!string.IsNullOrWhiteSpace(PipelineSource)) filledFields++;
 
-        const int totalFields = 5;
-        CompletenessPercentage = Math.Round((decimal)filledFields / totalFields * 100m, 2);
+        CompletenessPercentage = Math.Round((decimal)filledFields / TotalCompletenessFields * 100m, 2);
     }
 }
 
