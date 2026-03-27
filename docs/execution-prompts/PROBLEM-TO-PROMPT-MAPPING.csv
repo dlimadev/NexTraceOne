@@ -1,0 +1,51 @@
+problem_id,problem_title,severity,area,module,mapped_prompt_ids,split_reason,dependency_notes,acceptance_notes
+PROB-001,Incident↔change correlation 0% dynamic,CRITICAL,backend+frontend,operationalintelligence,"P01.1,P01.3",Backend engine separated from frontend connection,P01.1 must complete before P01.3 can connect,Dynamic correlation returns results for time-window matches
+PROB-002,Incidents frontend 100% mock (mockIncidents),CRITICAL,frontend,operations,P01.3,Single prompt — clear scope (1 page + API client),Depends on P01.1 and P01.2,IncidentsPage.tsx has zero mockIncidents references
+PROB-003,GetMitigationHistory returns hardcoded data,HIGH,backend,operationalintelligence,P01.2,Part of incidents persistence fix,Independent,GetMitigationHistory reads from MitigationRecord table
+PROB-004,CreateMitigationWorkflow does not persist,HIGH,backend,operationalintelligence,P01.5,Separate from general incidents persistence,Depends on P01.4 (runbooks),MitigationRecord persisted in IncidentDbContext
+PROB-005,3 runbooks hardcoded instead of RunbookRecord,HIGH,backend,operationalintelligence,P01.4,Clean scope — runbook CRUD only,Independent,RunbookRecord CRUD endpoints functional
+PROB-006,RecordMitigationValidation discards data,HIGH,backend,operationalintelligence,P01.2,Part of incidents persistence fix,Independent,Validation data persisted
+PROB-007,AI Assistant returns hardcoded responses,CRITICAL,backend,aiknowledge,P01.6,LLM connection is distinct from persistence and frontend,Independent (providers exist),SendAssistantMessage invokes real LLM
+PROB-008,AiAssistantPage 100% mock conversations,CRITICAL,frontend,ai-hub,P01.8,Frontend separated from backend,Depends on P01.6 + P01.7,AiAssistantPage.tsx has zero mockConversations
+PROB-009,AI conversations not persisted/audited,HIGH,backend,aiknowledge,P01.7,Persistence distinct from LLM integration,Depends on P01.6,Conversations persisted in AiOrchestrationDbContext
+PROB-010,8 ExternalAI TODO stub handlers,HIGH,backend,aiknowledge,P01.9,Essential handlers separated from full module,Depends on P01.6,≥4 handlers implemented with real logic
+PROB-011,AI grounding only searches AIModels,MEDIUM,backend,aiknowledge,P01.10,Quality improvement — no blocker,Depends on P01.6,Grounding retrieves from Catalog and ChangeIntelligence
+PROB-012,Outbox only processed for IdentityDbContext,CRITICAL,backend,platform,"P02.1",Single prompt — focused infrastructure change,Independent,Outbox events consumed for 3+ priority DbContexts
+PROB-013,IContractsModule = PLAN (no implementation),HIGH,backend,catalog,P02.2,Each interface is a separate bounded context,Independent,Interface implemented with unit tests
+PROB-014,IChangeIntelligenceModule = PLAN,HIGH,backend,changegovernance,P02.3,Each interface is a separate bounded context,Independent,Interface implemented with unit tests
+PROB-015,ICostIntelligenceModule = PLAN,HIGH,backend,operationalintelligence,P02.4,Depends on migration P02.8b,Depends on P02.8b,Interface implemented with unit tests
+PROB-016,IRuntimeIntelligenceModule = PLAN,MEDIUM,backend,operationalintelligence,P02.5,Depends on migration P02.8a,Depends on P02.8a,Interface implemented with unit tests
+PROB-017,IAiOrchestrationModule = PLAN,MEDIUM,backend,aiknowledge,P02.6,Depends on migration P02.8c,Depends on P02.8c + P01.7,Interface implemented with unit tests
+PROB-018,IExternalAiModule = PLAN,MEDIUM,backend,aiknowledge,P02.7,Depends on P01.9 + migration P02.8d,Depends on P01.9 + P02.8d,Interface implemented with unit tests
+PROB-019,RuntimeIntelligenceDbContext no migration,HIGH,database,operationalintelligence,P02.8a,Each migration = 1 prompt (different schemas),Independent,Migration applies cleanly
+PROB-020,CostIntelligenceDbContext no migration,HIGH,database,operationalintelligence,P02.8b,Each migration = 1 prompt,Independent,Migration applies cleanly
+PROB-021,AiOrchestrationDbContext no migration,HIGH,database,aiknowledge,P02.8c,Each migration = 1 prompt,Independent,Migration applies cleanly
+PROB-022,ExternalAiDbContext no migration,HIGH,database,aiknowledge,P02.8d,Each migration = 1 prompt,Independent,Migration applies cleanly
+PROB-023,IntegrationsDbContext no migration,HIGH,database,integrations,P02.8e,Each migration = 1 prompt,Independent,Migration applies cleanly
+PROB-024,KnowledgeDbContext no migration,HIGH,database,knowledge,P02.8f,Each migration = 1 prompt,Independent,Migration applies cleanly
+PROB-025,ProductAnalyticsDbContext no migration,MEDIUM,database,productanalytics,P02.8g,Each migration = 1 prompt,Independent,Migration applies cleanly
+PROB-026,Governance Teams/Domains handlers mock,HIGH,backend,governance,P03.1,First step before broader governance fix,Depends on P02.2 + P02.3,Teams/Domains return real data from Identity/Catalog
+PROB-027,74 Governance handlers IsSimulated:true,CRITICAL,backend,governance,"P03.1,P03.2,P03.4",Split into: Teams→broader→cleanup,Sequential chain P03.1→P03.2→P03.4,≥20 handlers return real data
+PROB-028,FinOps 100% mock/IsSimulated,CRITICAL,backend,governance,P03.3,FinOps data source is CostIntelligence,Depends on P02.4,FinOps pages show real CostIntelligence data
+PROB-029,KnowledgeHub no real persistence,HIGH,backend,knowledge,P03.5,Depends on migration P02.8f,Depends on P02.8f,Knowledge docs persist and retrieve from database
+PROB-030,Runbooks not linked to knowledge storage,MEDIUM,backend,knowledge,P03.6,Depends on P01.4 + P03.5,Sequential,KnowledgeRelation links runbooks to services
+PROB-031,OTEL endpoint hardcoded localhost:4317,MEDIUM,config,platform,P04.1,Config-only change — small scope,Independent,OTEL endpoint reads from env var
+PROB-032,OTEL→Collector→ClickHouse not validated,MEDIUM,infra,platform,P04.2,Validation after config fix,Depends on P04.1,Pipeline validated in Docker Compose
+PROB-033,Ingestion API metadata-only processing,HIGH,backend,platform,P04.3,Semantic processing is separate from connectors,Independent,Deploy events parsed and persisted semantically
+PROB-034,No real CI/CD connector,HIGH,backend,integrations,P04.4,Single connector focus (GitHub Actions),Depends on P02.8e,Webhook receiver processes GitHub Actions events
+PROB-035,No canonical deploy event model,HIGH,backend,operationalintelligence,P04.5,Model definition separate from correlation,Depends on P04.3 or P04.4,CanonicalDeployEvent entity with mappers
+PROB-036,Deploy↔release correlation missing,MEDIUM,backend,operationalintelligence,P04.6,Correlation after canonical model exists,Depends on P04.5 + P01.1 + P02.3,Deploys linked to releases
+PROB-037,E2E tests don't block PRs,CRITICAL,ci-cd,platform,P05.1,Pipeline config change,Depends on P01.3 + P01.8,E2E failure blocks PR merge
+PROB-038,Code coverage not tracked,MEDIUM,ci-cd,platform,P05.2,Independent quality improvement,Independent,Coverage threshold enforced in CI
+PROB-039,516 CS8632 nullable warnings,MEDIUM,backend,cross-cutting,P05.3,Progressive annotation — core modules first,Independent,<100 warnings in core modules
+PROB-040,Smoke checks too lenient,MEDIUM,ci-cd,platform,P05.4,Small scope pipeline fix,Independent,Per-module status checks in staging
+PROB-041,Migration validation not in CI,MEDIUM,ci-cd,platform,P05.5,Depends on migrations existing,Depends on P02.8a-g,All migrations validated in CI
+PROB-042,API Keys in appsettings.json,MEDIUM,security,identityaccess,P05.6,Security fix — independent scope,Independent,API Keys in encrypted DB storage
+PROB-043,Historical docs clutter active workspace,LOW,documentation,cross-cutting,P06.1,Archive after CURRENT-STATE exists,Depends on P00.2,Historical docs in docs/archive/
+PROB-044,Duplicate status/roadmap documents,LOW,documentation,cross-cutting,"P06.2,P06.5",Consolidation after contradictions fixed,Depends on P00.1,Single authoritative roadmap
+PROB-045,Commercial Governance residues,LOW,codebase,cross-cutting,P06.3,Independent cleanup,Independent,Zero Commercial Governance references
+PROB-046,InMemoryIncidentStore may still exist,LOW,codebase,operationalintelligence,P06.4,Verify after EfIncidentStore confirmed,Depends on P01.2,Zero InMemoryIncidentStore references
+PROB-047,Mocks exist alongside real implementations,MEDIUM,codebase,governance,P06.6,Only after real replacements confirmed,Depends on P03.4 (Gate 3),All replaced mocks removed
+PROB-048,IMPLEMENTATION-STATUS contradicts audit,LOW,documentation,cross-cutting,P00.1,Foundation fix — do first,Independent,IMPLEMENTATION-STATUS matches audit
+PROB-049,ROADMAP.md outdated vs reality,LOW,documentation,cross-cutting,P00.1,Same doc fix pass,Independent,ROADMAP matches audit
+PROB-050,CORE-FLOW-GAPS misaligned with audit,LOW,documentation,cross-cutting,P00.3,Separate doc — different file,Depends on P00.1,CORE-FLOW-GAPS matches audit evidence
