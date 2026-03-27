@@ -96,6 +96,9 @@ public static class SendAssistantMessage
         IAiModelCatalogService modelCatalogService,
         IAiModelAuthorizationService modelAuthorizationService,
         IExternalAIRoutingPort externalAiRoutingPort,
+        IDocumentRetrievalService documentRetrievalService,
+        IDatabaseRetrievalService databaseRetrievalService,
+        ITelemetryRetrievalService telemetryRetrievalService,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
@@ -246,6 +249,14 @@ public static class SendAssistantMessage
                 groundingSources,
                 contextSummary,
                 contextBundle);
+
+            // ── Augmentar contexto com retrieval services ─────────────────
+            groundingContext = await AugmentWithRetrievalAsync(
+                groundingContext,
+                request.Message,
+                request.ContextScope,
+                useCaseType,
+                cancellationToken);
 
             string grounded;
             string? degradedReason = null;
@@ -470,6 +481,94 @@ public static class SendAssistantMessage
         }
 
         /// <summary>
+        /// Augmenta o contexto de grounding com dados reais dos retrieval services.
+        /// Consulta documentos, dados estruturados e telemetria conforme o ContextScope e UseCase.
+        /// Falhas silenciosas — os retrieval services não devem bloquear o pipeline.
+        /// </summary>
+        private async Task<string> AugmentWithRetrievalAsync(
+            string baseContext,
+            string query,
+            string? contextScope,
+            AIUseCaseType useCaseType,
+            CancellationToken cancellationToken)
+        {
+            var augmentation = new List<string>();
+
+            // Document retrieval — knowledge sources, runbooks, documentation
+            try
+            {
+                var docResult = await documentRetrievalService.SearchAsync(
+                    new DocumentSearchRequest(query, MaxResults: 3), cancellationToken);
+
+                if (docResult.Success && docResult.Hits.Count > 0)
+                {
+                    augmentation.Add("RetrievedDocuments:");
+                    foreach (var hit in docResult.Hits)
+                        augmentation.Add($"  - [{hit.Classification}] {hit.Title}: {hit.Snippet}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Document retrieval augmentation failed — continuing without");
+            }
+
+            // Database retrieval — structured entity data (models, configurations)
+            try
+            {
+                var scope = contextScope?.ToLowerInvariant() ?? string.Empty;
+                var entityFilter = useCaseType switch
+                {
+                    AIUseCaseType.ContractExplanation or AIUseCaseType.ContractGeneration => "Contract",
+                    AIUseCaseType.ServiceLookup or AIUseCaseType.DependencyReasoning => "Service",
+                    _ => (string?)null
+                };
+
+                var dbResult = await databaseRetrievalService.SearchAsync(
+                    new DatabaseSearchRequest(query, EntityType: entityFilter, MaxResults: 3),
+                    cancellationToken);
+
+                if (dbResult.Success && dbResult.Hits.Count > 0)
+                {
+                    augmentation.Add("RetrievedData:");
+                    foreach (var hit in dbResult.Hits)
+                        augmentation.Add($"  - [{hit.EntityType}] {hit.DisplayName}: {hit.Summary}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Database retrieval augmentation failed — continuing without");
+            }
+
+            // Telemetry retrieval — logs, traces (for incident/change analysis)
+            if (useCaseType is AIUseCaseType.IncidentExplanation or AIUseCaseType.MitigationGuidance
+                or AIUseCaseType.ChangeAnalysis or AIUseCaseType.FinOpsExplanation)
+            {
+                try
+                {
+                    var telResult = await telemetryRetrievalService.SearchAsync(
+                        new TelemetrySearchRequest(query, MaxResults: 5), cancellationToken);
+
+                    if (telResult.Success && telResult.Hits.Count > 0)
+                    {
+                        augmentation.Add("RetrievedTelemetry:");
+                        foreach (var hit in telResult.Hits)
+                            augmentation.Add(
+                                $"  - [{hit.Severity}] {hit.ServiceName} @ {hit.Timestamp:u}: {(hit.Message.Length > 120 ? string.Concat(hit.Message.AsSpan(0, 117), "...") : hit.Message)}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogDebug(ex, "Telemetry retrieval augmentation failed — continuing without");
+                }
+            }
+
+            if (augmentation.Count == 0)
+                return baseContext;
+
+            return baseContext + "\n\n--- Retrieved Context ---\n" + string.Join("\n", augmentation);
+        }
+
+        /// <summary>
         /// Classifica o caso de uso baseado na query e contexto.
         /// Heurística baseada em palavras-chave — evolução futura com NLP.
         /// </summary>
@@ -659,51 +758,6 @@ public static class SendAssistantMessage
                 parts.Add($"Strategy: {strategyName}");
 
             return string.Join(". ", parts) + ".";
-        }
-
-        /// <summary>
-        /// Gera resposta stub contextual baseada no prompt, persona e caso de uso.
-        /// Evolução futura: integração com LLM provider via routing pipeline.
-        /// </summary>
-        private static string GenerateStubResponse(
-            string message, string persona, AIUseCaseType useCaseType, List<string> groundingSources)
-        {
-            var personaContext = persona.ToLowerInvariant() switch
-            {
-                "engineer" => "From a technical perspective",
-                "techlead" => "From a team leadership perspective",
-                "architect" => "From an architectural perspective",
-                "product" => "From a product impact perspective",
-                "executive" => "At a strategic level",
-                "platformadmin" => "From a platform governance perspective",
-                "auditor" => "From a compliance and traceability perspective",
-                _ => "Based on available context"
-            };
-
-            var useCaseContext = useCaseType switch
-            {
-                AIUseCaseType.ServiceLookup => "service catalog data",
-                AIUseCaseType.ContractExplanation => "contract registry data",
-                AIUseCaseType.ContractGeneration => "contract patterns and schemas",
-                AIUseCaseType.IncidentExplanation => "incident history and change correlation",
-                AIUseCaseType.MitigationGuidance => "runbooks and incident patterns",
-                AIUseCaseType.ChangeAnalysis => "change intelligence and blast radius analysis",
-                AIUseCaseType.ExecutiveSummary => "operational summaries and scorecards",
-                AIUseCaseType.RiskComplianceExplanation => "risk assessment and compliance data",
-                AIUseCaseType.FinOpsExplanation => "cost analysis and efficiency metrics",
-                AIUseCaseType.DependencyReasoning => "service dependencies and topology",
-                _ => "general operational knowledge"
-            };
-
-            var sourceList = groundingSources.Count > 0
-                ? string.Join(", ", groundingSources.Take(3))
-                : "general knowledge base";
-
-            return $"{personaContext}: I've analyzed your question \"{(message.Length > 60 ? string.Concat(message.AsSpan(0, 57), "...") : message)}\" " +
-                   $"using {useCaseContext} grounded in {sourceList}. " +
-                   "Context-aware routing and enrichment is active — full LLM integration with model selection " +
-                   "and source-weighted responses will be available in upcoming iterations. " +
-                   "This response demonstrates the routing, enrichment and explainability framework.";
         }
 
         /// <summary>

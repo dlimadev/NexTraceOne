@@ -121,8 +121,8 @@ public sealed class AiAgentRuntimeService(
 
         await executionRepository.AddAsync(execution, cancellationToken);
 
-        // 9. Monta prompt e executa inferência (com tool loop)
-        var systemPrompt = BuildSystemPrompt(agent, allowedTools);
+        // 9. Monta prompt com contexto e executa inferência (com tool loop)
+        var systemPrompt = BuildSystemPrompt(agent, allowedTools, contextJson);
         var chatMessages = new List<ChatMessage>();
         if (!string.IsNullOrWhiteSpace(systemPrompt))
             chatMessages.Add(new ChatMessage("system", systemPrompt));
@@ -293,7 +293,7 @@ public sealed class AiAgentRuntimeService(
         return new ToolCallRequest(toolName, argsJson);
     }
 
-    private static string BuildSystemPrompt(AiAgent agent, IReadOnlyList<ToolDefinition> allowedTools)
+    private static string BuildSystemPrompt(AiAgent agent, IReadOnlyList<ToolDefinition> allowedTools, string? contextJson)
     {
         var parts = new List<string>();
 
@@ -305,6 +305,14 @@ public sealed class AiAgentRuntimeService(
 
         if (!string.IsNullOrWhiteSpace(agent.OutputSchema))
             parts.Add($"Expected output format: {agent.OutputSchema}");
+
+        // Inject grounding context when provided by the caller
+        if (!string.IsNullOrWhiteSpace(contextJson))
+        {
+            parts.Add("## Grounding Context\nThe following operational context has been provided for this execution. " +
+                       "Use it to ground your response with real data. If the context is insufficient, state limitations explicitly.\n\n" +
+                       contextJson);
+        }
 
         // Inject tool descriptions into system prompt when tools are available
         if (allowedTools.Count > 0)
