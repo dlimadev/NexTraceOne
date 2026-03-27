@@ -1,17 +1,16 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 using NexTraceOne.Integrations.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.ListIngestionSources;
+namespace NexTraceOne.Integrations.Application.Features.ListIngestionSources;
 
 /// <summary>
 /// Feature: ListIngestionSources — lista fontes de ingestão registadas.
 /// Cada fonte está associada a um conector e tem domínio de dados, nível de confiança e estado de frescura.
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
+/// Handler nativo do módulo Integrations.
+/// Ownership: módulo Integrations.
 /// </summary>
 public static class ListIngestionSources
 {

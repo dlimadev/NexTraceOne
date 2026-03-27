@@ -5,27 +5,24 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using ListIntegrationConnectorsFeature = NexTraceOne.Governance.Application.Features.ListIntegrationConnectors.ListIntegrationConnectors;
-using GetIntegrationConnectorFeature = NexTraceOne.Governance.Application.Features.GetIntegrationConnector.GetIntegrationConnector;
-using ListIngestionSourcesFeature = NexTraceOne.Governance.Application.Features.ListIngestionSources.ListIngestionSources;
-using ListIngestionExecutionsFeature = NexTraceOne.Governance.Application.Features.ListIngestionExecutions.ListIngestionExecutions;
-using GetIngestionHealthFeature = NexTraceOne.Governance.Application.Features.GetIngestionHealth.GetIngestionHealth;
-using GetIngestionFreshnessFeature = NexTraceOne.Governance.Application.Features.GetIngestionFreshness.GetIngestionFreshness;
-using RetryConnectorFeature = NexTraceOne.Governance.Application.Features.RetryConnector.RetryConnector;
-using ReprocessExecutionFeature = NexTraceOne.Governance.Application.Features.ReprocessExecution.ReprocessExecution;
+using ListIntegrationConnectorsFeature = NexTraceOne.Integrations.Application.Features.ListIntegrationConnectors.ListIntegrationConnectors;
+using GetIntegrationConnectorFeature = NexTraceOne.Integrations.Application.Features.GetIntegrationConnector.GetIntegrationConnector;
+using ListIngestionSourcesFeature = NexTraceOne.Integrations.Application.Features.ListIngestionSources.ListIngestionSources;
+using ListIngestionExecutionsFeature = NexTraceOne.Integrations.Application.Features.ListIngestionExecutions.ListIngestionExecutions;
+using GetIngestionHealthFeature = NexTraceOne.Integrations.Application.Features.GetIngestionHealth.GetIngestionHealth;
+using GetIngestionFreshnessFeature = NexTraceOne.Integrations.Application.Features.GetIngestionFreshness.GetIngestionFreshness;
+using RetryConnectorFeature = NexTraceOne.Integrations.Application.Features.RetryConnector.RetryConnector;
+using ReprocessExecutionFeature = NexTraceOne.Integrations.Application.Features.ReprocessExecution.ReprocessExecution;
 
-namespace NexTraceOne.Governance.API.Endpoints;
+namespace NexTraceOne.Integrations.API.Endpoints;
 
 /// <summary>
 /// Endpoints do Integration Hub &amp; Ingestion Maturity — gestão de conectores, fontes de ingestão,
 /// execuções, saúde e frescura do pipeline de dados.
 ///
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4):
-/// Este endpoint module está temporariamente alojado em Governance.API por compatibilidade de rota.
-/// O ownership real pertence ao módulo Integrations.
-/// Os handlers já consomem NexTraceOne.Integrations.Application.Abstractions e NexTraceOne.Integrations.Domain.
-/// A migração definitiva para Integrations.API está prevista para fase futura.
-/// As rotas /api/v1/integrations e /api/v1/ingestion são do módulo Integrations, não de Governance.
+/// Módulo nativo de Integrations. Ownership real do módulo Integrations.
+/// Os handlers consomem NexTraceOne.Integrations.Application.Abstractions e NexTraceOne.Integrations.Domain.
+/// As rotas /api/v1/integrations e /api/v1/ingestion pertencem ao módulo Integrations.
 /// </summary>
 public sealed class IntegrationHubEndpointModule
 {

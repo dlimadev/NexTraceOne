@@ -3,13 +3,13 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.ListIntegrationConnectors;
+namespace NexTraceOne.Integrations.Application.Features.ListIntegrationConnectors;
 
 /// <summary>
 /// Feature: ListIntegrationConnectors — lista conectores de integração registados no Integration Hub.
 /// Permite filtragem por tipo, status, ambiente e pesquisa textual com paginação.
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
+/// Handler nativo do módulo Integrations.
+/// Ownership: módulo Integrations.
 /// </summary>
 public static class ListIntegrationConnectors
 {

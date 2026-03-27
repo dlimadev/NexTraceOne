@@ -1,16 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 
-namespace NexTraceOne.Governance.Application.Features.GetIngestionFreshness;
+namespace NexTraceOne.Integrations.Application.Features.GetIngestionFreshness;
 
 /// <summary>
 /// Feature: GetIngestionFreshness — detalhe de frescura por fonte de ingestão.
 /// Permite visualizar o estado de frescura de cada feed por domínio, conector e tipo de fonte.
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
+/// Handler nativo do módulo Integrations.
+/// Ownership: módulo Integrations.
 /// </summary>
 public static class GetIngestionFreshness
 {

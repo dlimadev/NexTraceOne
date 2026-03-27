@@ -9,7 +9,6 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
-using NexTraceOne.Integrations.Infrastructure;
 using NexTraceOne.ProductAnalytics.Infrastructure;
 
 namespace NexTraceOne.Governance.Infrastructure;
@@ -48,19 +47,12 @@ public static class DependencyInjection
         services.AddScoped<ITeamDomainLinkRepository, TeamDomainLinkRepository>();
         services.AddScoped<IGovernanceRolloutRecordRepository, GovernanceRolloutRecordRepository>();
         // NOTE: IIntegrationConnectorRepository removed from Governance in P2.1.
-        //       Registered via AddIntegrationsInfrastructure below.
+        //       Registered via Integrations.Infrastructure (now wired from Integrations.API module).
         // NOTE: IAnalyticsEventRepository removed from Governance in P2.3.
         //       Registered via AddProductAnalyticsInfrastructure below.
         // NOTE: IGovernanceAnalyticsRepository is a legitimate Governance repository:
         //       it queries Governance entities (Waivers, Packs, RolloutRecords) for executive trends.
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
-
-        // COMPATIBILIDADE TRANSITÓRIA (P2.4):
-        // Integrations module infrastructure is wired from here because integration handlers
-        // (ListIntegrationConnectors, GetIngestionHealth, etc.) remain temporarily in Governance.Application.
-        // These handlers already consume Integrations.Application.Abstractions correctly.
-        // Full separation into Integrations.API and Integrations.Application is pending.
-        services.AddIntegrationsInfrastructure(configuration);
 
         // COMPATIBILIDADE TRANSITÓRIA (P2.4):
         // Product Analytics module infrastructure is wired from here because analytics handlers

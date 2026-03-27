@@ -2,17 +2,16 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 
-namespace NexTraceOne.Governance.Application.Features.RetryConnector;
+namespace NexTraceOne.Integrations.Application.Features.RetryConnector;
 
 /// <summary>
 /// Feature: RetryConnector — solicita nova tentativa de execução de um conector de integração.
 /// Enfileira o pedido de retry e retorna confirmação com ID do pedido.
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Integrations. Migração para Integrations.Application prevista em fase futura.
+/// Handler nativo do módulo Integrations.
+/// Ownership: módulo Integrations.
 /// </summary>
 public static class RetryConnector
 {

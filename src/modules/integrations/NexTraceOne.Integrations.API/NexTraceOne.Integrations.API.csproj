@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.Integrations.API</RootNamespace>
+    <AssemblyName>NexTraceOne.Integrations.API</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.Integrations.Application\NexTraceOne.Integrations.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Integrations.Infrastructure\NexTraceOne.Integrations.Infrastructure.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>
