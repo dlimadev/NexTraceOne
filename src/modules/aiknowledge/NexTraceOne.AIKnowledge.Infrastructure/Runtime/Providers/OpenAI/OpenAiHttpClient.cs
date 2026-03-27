@@ -76,6 +76,73 @@ public sealed class OpenAiHttpClient
         }
     }
 
+    /// <summary>
+    /// Envia uma requisição de chat à API OpenAI com stream=true e retorna chunks SSE progressivamente.
+    /// O OpenAI retorna linhas "data: {json}" e termina com "data: [DONE]".
+    /// </summary>
+    public async IAsyncEnumerable<OpenAiStreamChunk> ChatStreamAsync(
+        OpenAiChatRequest request,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("OpenAI streaming chat request for model {Model}", request.Model);
+
+        var streamRequest = new OpenAiStreamChatRequest
+        {
+            Model = request.Model,
+            Messages = request.Messages,
+            Temperature = request.Temperature,
+            MaxTokens = request.MaxTokens,
+            Stream = true
+        };
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/v1/chat/completions")
+        {
+            Content = JsonContent.Create(streamRequest, options: JsonOptions)
+        };
+
+        httpRequest.Headers.Authorization =
+            new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+
+        using var response = await _httpClient.SendAsync(
+            httpRequest,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var reader = new StreamReader(stream);
+
+        while (!reader.EndOfStream)
+        {
+            var line = await reader.ReadLineAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (!line.StartsWith("data: ", StringComparison.Ordinal))
+                continue;
+
+            var data = line["data: ".Length..];
+
+            if (data == "[DONE]")
+                yield break;
+
+            OpenAiStreamChunk? chunk;
+            try
+            {
+                chunk = JsonSerializer.Deserialize<OpenAiStreamChunk>(data, JsonOptions);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Failed to deserialize OpenAI streaming chunk");
+                continue;
+            }
+
+            if (chunk is not null)
+                yield return chunk;
+        }
+    }
+
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -113,6 +180,25 @@ public sealed class OpenAiChatRequest
 
     [JsonPropertyName("max_tokens")]
     public int? MaxTokens { get; set; }
+}
+
+/// <summary>Request DTO for OpenAI with stream field (used only for streaming calls).</summary>
+public sealed class OpenAiStreamChatRequest
+{
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("messages")]
+    public List<OpenAiChatMessage> Messages { get; set; } = [];
+
+    [JsonPropertyName("temperature")]
+    public double? Temperature { get; set; }
+
+    [JsonPropertyName("max_tokens")]
+    public int? MaxTokens { get; set; }
+
+    [JsonPropertyName("stream")]
+    public bool Stream { get; set; }
 }
 
 public sealed class OpenAiChatMessage
@@ -158,4 +244,42 @@ public sealed class OpenAiUsage
 
     [JsonPropertyName("total_tokens")]
     public int TotalTokens { get; set; }
+}
+
+// ── OpenAI Streaming DTOs ──
+
+/// <summary>Single chunk from the OpenAI streaming response (SSE).</summary>
+public sealed class OpenAiStreamChunk
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("choices")]
+    public List<OpenAiStreamChoice> Choices { get; set; } = [];
+
+    [JsonPropertyName("usage")]
+    public OpenAiUsage? Usage { get; set; }
+}
+
+/// <summary>Choice within a streaming chunk.</summary>
+public sealed class OpenAiStreamChoice
+{
+    [JsonPropertyName("delta")]
+    public OpenAiStreamDelta? Delta { get; set; }
+
+    [JsonPropertyName("finish_reason")]
+    public string? FinishReason { get; set; }
+}
+
+/// <summary>Delta content from a streaming chunk.</summary>
+public sealed class OpenAiStreamDelta
+{
+    [JsonPropertyName("role")]
+    public string? Role { get; set; }
+
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
 }

@@ -86,6 +86,59 @@ public sealed class OllamaHttpClient
         }
     }
 
+    /// <summary>
+    /// Envia uma requisição de chat ao Ollama com stream=true e retorna chunks NDJSON progressivamente.
+    /// O Ollama retorna uma linha JSON por chunk, e a última linha tem done=true.
+    /// </summary>
+    public async IAsyncEnumerable<OllamaChatResponse> ChatStreamAsync(
+        OllamaChatRequest request,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        request.Stream = true;
+
+        _logger.LogInformation("Ollama streaming chat request for model {Model}", request.Model);
+
+        var jsonContent = JsonContent.Create(request, options: JsonOptions);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/chat")
+        {
+            Content = jsonContent
+        };
+
+        using var response = await _httpClient.SendAsync(
+            httpRequest,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var reader = new StreamReader(stream);
+
+        while (!reader.EndOfStream)
+        {
+            var line = await reader.ReadLineAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            OllamaChatResponse? chunk;
+            try
+            {
+                chunk = JsonSerializer.Deserialize<OllamaChatResponse>(line, JsonOptions);
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Failed to deserialize Ollama streaming chunk");
+                continue;
+            }
+
+            if (chunk is not null)
+                yield return chunk;
+
+            if (chunk?.Done == true)
+                yield break;
+        }
+    }
+
     public async Task<OllamaTagsResponse?> ListModelsAsync(
         CancellationToken cancellationToken = default)
     {

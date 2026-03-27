@@ -128,4 +128,66 @@ public sealed class OpenAiProvider : IAiProvider, IChatCompletionProvider
                 0, 0, sw.Elapsed, ex.Message);
         }
     }
+
+    public async IAsyncEnumerable<ChatStreamChunk> CompleteStreamingAsync(
+        ChatCompletionRequest request,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var modelId = string.IsNullOrWhiteSpace(request.ModelId)
+            ? _options.DefaultChatModel
+            : request.ModelId;
+
+        var openAiMessages = request.Messages.Select(m => new OpenAiChatMessage
+        {
+            Role = m.Role,
+            Content = m.Content
+        }).ToList();
+
+        var openAiRequest = new OpenAiChatRequest
+        {
+            Model = modelId,
+            Messages = openAiMessages,
+            Temperature = request.Temperature ?? _options.DefaultTemperature,
+            MaxTokens = request.MaxTokens ?? _options.DefaultMaxTokens,
+        };
+
+        var hasYielded = false;
+        string resolvedModel = modelId;
+
+        await foreach (var chunk in _client.ChatStreamAsync(openAiRequest, cancellationToken))
+        {
+            hasYielded = true;
+            if (!string.IsNullOrWhiteSpace(chunk.Model))
+                resolvedModel = chunk.Model;
+
+            var content = string.Empty;
+            var finishReason = (string?)null;
+
+            if (chunk.Choices is { Count: > 0 })
+            {
+                content = chunk.Choices[0].Delta?.Content ?? string.Empty;
+                finishReason = chunk.Choices[0].FinishReason;
+            }
+
+            var isComplete = finishReason is "stop" or "length";
+
+            yield return new ChatStreamChunk(
+                content,
+                isComplete,
+                resolvedModel,
+                ProviderId,
+                isComplete ? (chunk.Usage?.PromptTokens ?? 0) : 0,
+                isComplete ? (chunk.Usage?.CompletionTokens ?? 0) : 0);
+
+            if (isComplete)
+                yield break;
+        }
+
+        if (!hasYielded)
+        {
+            yield return new ChatStreamChunk(
+                string.Empty, true, modelId, ProviderId,
+                ErrorMessage: "No streaming response from OpenAI");
+        }
+    }
 }
