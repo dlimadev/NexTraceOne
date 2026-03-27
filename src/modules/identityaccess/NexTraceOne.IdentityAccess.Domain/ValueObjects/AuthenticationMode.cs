@@ -18,12 +18,11 @@ namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 ///   </item>
 ///   <item>
 ///     <term>Local</term> — autenticação exclusivamente via credenciais locais (email + senha).
-///     Utilizado em instalações on-premise air-gapped sem acesso a IdP externo.
+///     Utilizado em contextos sem acesso a provedores de identidade externos.
 ///   </item>
 ///   <item>
 ///     <term>Hybrid</term> — autenticação federada preferencial com fallback para login local.
-///     Modo padrão para instalações self-hosted que têm conectividade
-///     mas precisam de contingência caso o IdP externo fique indisponível.
+///     Garante contingência quando o IdP externo fica indisponível.
 ///   </item>
 /// </list>
 /// </para>
@@ -56,7 +55,7 @@ public sealed class AuthenticationMode : ValueObject
 
     /// <summary>
     /// Autenticação exclusivamente via credenciais locais (email + senha).
-    /// Indicado para instalações air-gapped sem acesso a provedores de identidade externos.
+    /// Indicado para contextos sem acesso a provedores de identidade externos.
     /// </summary>
     public static AuthenticationMode Local => new("Local");
 

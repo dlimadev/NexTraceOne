@@ -4,7 +4,7 @@ namespace NexTraceOne.IdentityAccess.Tests.Domain.ValueObjects;
 
 /// <summary>
 /// Testes unitários para o value object <see cref="MfaPolicy"/>.
-/// Valida factory methods por deployment model, criação customizada,
+/// Valida factory methods por perfil de configuração, criação customizada,
 /// validações de domínio e igualdade estrutural.
 /// </summary>
 public sealed class MfaPolicyTests
@@ -26,37 +26,37 @@ public sealed class MfaPolicyTests
     }
 
     [Fact]
-    public void ForSaaS_ShouldRequireMfaForVendorOps()
+    public void ForSaaS_ShouldRequireMfaForSensitiveExternalOps()
     {
         var policy = MfaPolicy.ForSaaS();
 
-        policy.RequiredForVendorOps.Should().BeTrue();
+        policy.RequiredForSensitiveExternalOps.Should().BeTrue();
     }
 
     [Fact]
-    public void ForSelfHosted_ShouldNotRequireMfaOnLogin()
+    public void ForStandardDeployment_ShouldNotRequireMfaOnLogin()
     {
-        var policy = MfaPolicy.ForSelfHosted();
+        var policy = MfaPolicy.ForStandardDeployment();
 
         policy.RequiredOnLogin.Should().BeFalse();
     }
 
     [Fact]
-    public void ForSelfHosted_ShouldRequireMfaForPrivilegedOps()
+    public void ForStandardDeployment_ShouldRequireMfaForPrivilegedOps()
     {
-        var policy = MfaPolicy.ForSelfHosted();
+        var policy = MfaPolicy.ForStandardDeployment();
 
         policy.RequiredForPrivilegedOps.Should().BeTrue();
     }
 
     [Fact]
-    public void ForOnPremise_ShouldNotRequireAnyMfa()
+    public void ForRestrictedConnectivityDeployment_ShouldNotRequireAnyMfa()
     {
-        var policy = MfaPolicy.ForOnPremise();
+        var policy = MfaPolicy.ForRestrictedConnectivityDeployment();
 
         policy.RequiredOnLogin.Should().BeFalse();
         policy.RequiredForPrivilegedOps.Should().BeFalse();
-        policy.RequiredForVendorOps.Should().BeFalse();
+        policy.RequiredForSensitiveExternalOps.Should().BeFalse();
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class MfaPolicyTests
 
         policy.RequiredOnLogin.Should().BeFalse();
         policy.RequiredForPrivilegedOps.Should().BeFalse();
-        policy.RequiredForVendorOps.Should().BeFalse();
+        policy.RequiredForSensitiveExternalOps.Should().BeFalse();
         policy.AllowedMethods.Should().BeEmpty();
         policy.StepUpValidityMinutes.Should().Be(0);
         policy.MaxAttempts.Should().Be(0);
@@ -78,14 +78,14 @@ public sealed class MfaPolicyTests
         var policy = MfaPolicy.Create(
             requiredOnLogin: true,
             requiredForPrivilegedOps: true,
-            requiredForVendorOps: false,
+            requiredForSensitiveExternalOps: false,
             allowedMethods: "TOTP",
             stepUpValidityMinutes: 20,
             maxAttempts: 3);
 
         policy.RequiredOnLogin.Should().BeTrue();
         policy.RequiredForPrivilegedOps.Should().BeTrue();
-        policy.RequiredForVendorOps.Should().BeFalse();
+        policy.RequiredForSensitiveExternalOps.Should().BeFalse();
         policy.AllowedMethods.Should().Be("TOTP");
         policy.StepUpValidityMinutes.Should().Be(20);
         policy.MaxAttempts.Should().Be(3);
@@ -104,7 +104,7 @@ public sealed class MfaPolicyTests
     public void MfaPolicy_Equality_DifferentValues_ShouldNotBeEqual()
     {
         var policy1 = MfaPolicy.ForSaaS();
-        var policy2 = MfaPolicy.ForSelfHosted();
+        var policy2 = MfaPolicy.ForStandardDeployment();
 
         policy1.Should().NotBe(policy2);
     }

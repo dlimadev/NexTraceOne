@@ -2,7 +2,7 @@ namespace NexTraceOne.Governance.Domain.Enums;
 
 /// <summary>
 /// Nível de prontidão de deployment da plataforma NexTraceOne.
-/// Utilizado para avaliação de readiness em self-hosted e on-prem.
+/// Utilizado para avaliação de readiness em ambientes gerenciados.
 /// </summary>
 public enum DeploymentReadinessLevel
 {

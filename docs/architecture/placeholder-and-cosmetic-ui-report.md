@@ -93,14 +93,14 @@ Este relatório inventaria telas, botões, componentes e secções que aparentam
 
 ## 4. Navegação e Menus
 
-### PH-08 — Sidebar Licensing/Vendor Routes
+### PH-08 — ~~Sidebar Licensing/Vendor Routes~~ ✅ RESOLVED (P12.1)
 
 | Campo | Valor |
 |---|---|
-| **Ficheiro** | `src/frontend/src/components/Breadcrumbs.tsx` (line 34), `src/frontend/src/utils/navigation.ts` (line 48) |
-| **Problema** | Breadcrumbs mapeiam `'licensing'` → `'sidebar.licensing'` e `'vendor'` → `'sidebar.vendorLicensing'`, mas essas chaves i18n **não existem** nos ficheiros de locale |
+| **Ficheiro** | `src/frontend/src/components/Breadcrumbs.tsx`, `src/frontend/src/utils/navigation.ts` |
+| **Problema** | ~~Breadcrumbs mapeiam `'licensing'` → `'sidebar.licensing'` e `'vendor'` → `'sidebar.vendorLicensing'`, mas essas chaves i18n **não existem** nos ficheiros de locale~~ |
 | **Módulo** | Identity & Access (Licensing — fora do escopo) |
-| **Classificação** | 🟡 **REMOVE** — referências a Licensing devem ser removidas |
+| **Classificação** | ✅ **RESOLVED** — referências a Licensing foram removidas em P12.1 |
 
 ---
 
@@ -174,5 +174,5 @@ Este relatório inventaria telas, botões, componentes e secções que aparentam
 | PH-03 | Condicionar menu AI Assistant a feature flag real | P2_HIGH | 2h |
 | PH-04 | Condicionar menu AI Analysis a feature flag real | P2_HIGH | 2h |
 | PH-05 | Substituir dados simulados de Automation por dados reais | P2_HIGH | 12h |
-| PH-08 | Remover referências de Licensing em Breadcrumbs e navigation | P2_HIGH | 1h |
+| PH-08 | ~~Remover referências de Licensing em Breadcrumbs e navigation~~ | ✅ CLOSED (P12.1) | — |
 | PH-11 | Adicionar Environments ao sidebar com permissão `env:*` | P3_MEDIUM | 2h |

@@ -36,14 +36,14 @@ public sealed class MfaPolicy : ValueObject
     private MfaPolicy(
         bool requiredOnLogin,
         bool requiredForPrivilegedOps,
-        bool requiredForVendorOps,
+        bool requiredForSensitiveExternalOps,
         string allowedMethods,
         int stepUpValidityMinutes,
         int maxAttempts)
     {
         RequiredOnLogin = requiredOnLogin;
         RequiredForPrivilegedOps = requiredForPrivilegedOps;
-        RequiredForVendorOps = requiredForVendorOps;
+        RequiredForSensitiveExternalOps = requiredForSensitiveExternalOps;
         AllowedMethods = allowedMethods;
         StepUpValidityMinutes = stepUpValidityMinutes;
         MaxAttempts = maxAttempts;
@@ -55,8 +55,8 @@ public sealed class MfaPolicy : ValueObject
     /// <summary>Indica se MFA step-up é exigido para operações privilegiadas.</summary>
     public bool RequiredForPrivilegedOps { get; }
 
-    /// <summary>Indica se MFA step-up é exigido para operações administrativas sensíveis.</summary>
-    public bool RequiredForVendorOps { get; }
+    /// <summary>Indica se MFA step-up é exigido para operações administrativas ou de integração externa sensíveis.</summary>
+    public bool RequiredForSensitiveExternalOps { get; }
 
     /// <summary>Métodos MFA aceitos (TOTP, WebAuthn, SMS).</summary>
     public string AllowedMethods { get; }
@@ -73,7 +73,7 @@ public sealed class MfaPolicy : ValueObject
     /// </summary>
     /// <param name="requiredOnLogin">Se MFA é obrigatório no login inicial.</param>
     /// <param name="requiredForPrivilegedOps">Se step-up é exigido para operações privilegiadas.</param>
-    /// <param name="requiredForVendorOps">Se step-up é exigido para operações de vendor.</param>
+    /// <param name="requiredForSensitiveExternalOps">Se step-up é exigido para operações administrativas externas sensíveis.</param>
     /// <param name="allowedMethods">Métodos MFA aceitos, separados por vírgula.</param>
     /// <param name="stepUpValidityMinutes">Validade do step-up em minutos (0–1440).</param>
     /// <param name="maxAttempts">Máximo de tentativas antes de lockout (0–20).</param>
@@ -88,7 +88,7 @@ public sealed class MfaPolicy : ValueObject
     public static MfaPolicy Create(
         bool requiredOnLogin,
         bool requiredForPrivilegedOps,
-        bool requiredForVendorOps,
+        bool requiredForSensitiveExternalOps,
         string allowedMethods = "TOTP,WebAuthn",
         int stepUpValidityMinutes = 15,
         int maxAttempts = 5)
@@ -121,7 +121,7 @@ public sealed class MfaPolicy : ValueObject
         return new MfaPolicy(
             requiredOnLogin,
             requiredForPrivilegedOps,
-            requiredForVendorOps,
+            requiredForSensitiveExternalOps,
             allowedMethods.Trim(),
             stepUpValidityMinutes,
             maxAttempts);
@@ -135,17 +135,17 @@ public sealed class MfaPolicy : ValueObject
         => new(true, true, true, "TOTP,WebAuthn", 15, 5);
 
     /// <summary>
-    /// Política MFA para self-hosted: MFA apenas para operações privilegiadas e de integração externa.
+    /// Política MFA equilibrada: MFA apenas para operações privilegiadas e externas sensíveis.
     /// Step-up de 30 minutos, máximo 5 tentativas, inclui SMS como método adicional.
     /// </summary>
-    public static MfaPolicy ForSelfHosted()
+    public static MfaPolicy ForStandardDeployment()
         => new(false, true, true, "TOTP,WebAuthn,SMS", 30, 5);
 
     /// <summary>
-    /// Política MFA para on-premise: MFA opcional, configurável pelo cliente.
+    /// Política MFA permissiva: MFA opcional, configurável pelo administrador.
     /// Step-up de 60 minutos, até 10 tentativas, todos os métodos disponíveis.
     /// </summary>
-    public static MfaPolicy ForOnPremise()
+    public static MfaPolicy ForRestrictedConnectivityDeployment()
         => new(false, false, false, "TOTP,WebAuthn,SMS", 60, 10);
 
     /// <summary>
@@ -160,7 +160,7 @@ public sealed class MfaPolicy : ValueObject
     {
         yield return RequiredOnLogin;
         yield return RequiredForPrivilegedOps;
-        yield return RequiredForVendorOps;
+        yield return RequiredForSensitiveExternalOps;
         yield return AllowedMethods;
         yield return StepUpValidityMinutes;
         yield return MaxAttempts;
@@ -168,5 +168,5 @@ public sealed class MfaPolicy : ValueObject
 
     /// <summary>Retorna uma representação textual resumida da política MFA.</summary>
     public override string ToString()
-        => $"MfaPolicy(Login={RequiredOnLogin}, Privileged={RequiredForPrivilegedOps}, Vendor={RequiredForVendorOps}, Methods={AllowedMethods})";
+        => $"MfaPolicy(Login={RequiredOnLogin}, Privileged={RequiredForPrivilegedOps}, SensitiveExternal={RequiredForSensitiveExternalOps}, Methods={AllowedMethods})";
 }

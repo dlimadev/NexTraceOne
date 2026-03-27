@@ -61,16 +61,15 @@
 
 ---
 
-### OI-05 — Licensing residues still present in code
+### OI-05 — ~~Licensing residues still present in code~~ ✅ CLOSED (P12.1)
 
 | Attribute | Value |
 |-----------|-------|
-| **Item** | Licensing module was removed from scope, but code references persist in permissions, configurations, frontend, and seed data |
-| **Why it blocks** | Residual permissions (`licensing:read`, `licensing:write`) pollute the permission catalog. Frontend references create confusion. Seed data includes licensing entries. |
+| **Item** | Licensing module was removed from scope; all active code references cleaned in P12.1 |
+| **Status** | ✅ **RESOLVED** — P12.1 removed all active licensing residues from `RolePermissionCatalog.cs`, `PermissionConfiguration.cs`, `CreateDelegation.cs`, `Breadcrumbs.tsx`, `navigation.ts`, `en.json`, `DeveloperPortalPage.tsx`, and `MfaPolicy.cs`. |
 | **Modules affected** | Identity & Access, Frontend (i18n, Breadcrumbs, DeveloperPortalPage) |
-| **Priority** | **LOW** |
-| **Action** | Remove `licensing:read` and `licensing:write` from `RolePermissionCatalog.cs`. Clean licensing references from `en.json`, `Breadcrumbs.tsx`, `DeveloperPortalPage.tsx`, and `seed-audit.sql`. Do NOT modify migration files (historical records). |
-| **Evidence** | `src/modules/identityaccess/NexTraceOne.IdentityAccess.Domain/Entities/RolePermissionCatalog.cs` (lines 125-127), `src/frontend/src/locales/en.json` (line 3353), `src/frontend/src/components/Breadcrumbs.tsx`, `src/frontend/src/features/catalog/pages/DeveloperPortalPage.tsx`, `src/platform/NexTraceOne.ApiHost/SeedData/seed-audit.sql` |
+| **Priority** | **CLOSED** |
+| **Resolution** | All 7 LIC items from `licensing-residue-final-audit.md` addressed. See `p12-1-licensing-residue-removal-report.md`. |
 
 ---
 
@@ -160,7 +159,7 @@
 | OI-02 | Integrations backend in Governance | HIGH | Integrations, Governance |
 | OI-03 | Product Analytics backend in Governance | HIGH | Product Analytics, Governance |
 | OI-04 | No Environment Management module | MEDIUM | Environment Mgmt, Identity |
-| OI-05 | Licensing residues in code | LOW | Identity, Frontend |
+| OI-05 | Licensing residues in code | ~~LOW~~ ✅ CLOSED (P12.1) | Identity, Frontend |
 | OI-06 | 3 broken Contracts frontend routes | HIGH | Contracts (frontend) |
 | OI-07 | Configuration/Notifications migration gap | MEDIUM | Configuration, Notifications |
 | OI-08 | 4 databases → 1 convergence | MEDIUM | All modules |
@@ -176,7 +175,7 @@
 4. **OI-03** — Extract Product Analytics from Governance
 5. **OI-07** — Resolve Configuration/Notifications migration state
 6. **OI-04** — Create Environment Management module
-7. **OI-05** — Clean Licensing residues
+7. **OI-05** — ~~Clean Licensing residues~~ ✅ CLOSED (P12.1)
 8. **OI-09** — Refine Governance after extractions
 9. **OI-08** — Converge databases (part of baseline reset)
 10. **OI-10** — Address AI backend maturity

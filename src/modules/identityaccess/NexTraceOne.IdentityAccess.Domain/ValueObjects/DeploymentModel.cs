@@ -5,20 +5,18 @@ using NexTraceOne.BuildingBlocks.Core.Primitives;
 namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 /// <summary>
-/// Value Object que representa o modelo de deployment da plataforma NexTraceOne.
-/// Cada tenant opera sob um modelo específico que determina restrições de autenticação,
-/// armazenamento de dados, políticas de segurança e capacidades disponíveis.
+/// Value Object que representa o modo de conectividade e operação de um tenant.
+/// Determina restrições de autenticação, políticas de segurança e capacidades disponíveis
+/// com base no contexto de conectividade do ambiente.
 /// <para>
-/// Modelos suportados:
+/// Modos suportados:
 /// <list type="bullet">
-///   <item><term>SaaS</term> — plataforma gerenciada na nuvem pelo fornecedor;</item>
-///   <item><term>SelfHosted</term> — instalação gerenciada pelo cliente em infraestrutura própria;</item>
-///   <item><term>OnPremise</term> — instalação air-gapped ou altamente restrita, sem conectividade externa.</item>
+///   <item><term>SaaS</term> — ambiente gerenciado com conectividade externa plena;</item>
+///   <item><term>SelfHosted</term> — ambiente com conectividade externa disponível, gerenciado pelo operador;</item>
+///   <item><term>OnPremise</term> — ambiente air-gapped ou altamente restrito, sem conectividade externa.</item>
 /// </list>
 /// </para>
-/// A distinção entre SelfHosted e OnPremise impacta funcionalidades como
-/// verificação de licença online, atualização automática, telemetria e
-/// integração com provedores de identidade externos.
+/// A distinção entre os modos impacta autenticação federada, telemetria e integração com provedores externos.
 /// </summary>
 public sealed class DeploymentModel : ValueObject
 {
@@ -45,14 +43,14 @@ public sealed class DeploymentModel : ValueObject
     public static DeploymentModel SaaS => new("SaaS");
 
     /// <summary>
-    /// Instalação gerenciada pelo cliente em infraestrutura própria.
-    /// Suporta autenticação híbrida e conectividade externa para licenças e atualizações.
+    /// Ambiente gerenciado pelo operador com conectividade externa disponível.
+    /// Suporta autenticação híbrida e integração com provedores de identidade externos.
     /// </summary>
     public static DeploymentModel SelfHosted => new("SelfHosted");
 
     /// <summary>
-    /// Instalação air-gapped ou altamente restrita, sem conectividade externa.
-    /// Licenciamento offline obrigatório, sem telemetria, autenticação local disponível.
+    /// Ambiente air-gapped ou altamente restrito, sem conectividade externa.
+    /// Sem telemetria remota; autenticação local disponível como método primário.
     /// </summary>
     public static DeploymentModel OnPremise => new("OnPremise");
 
@@ -89,8 +87,8 @@ public sealed class DeploymentModel : ValueObject
     public bool IsOnPremise => Value == "OnPremise";
 
     /// <summary>
-    /// Indica se o modelo permite conectividade externa para verificação de licença,
-    /// atualizações automáticas e telemetria.
+    /// Indica se o modo permite conectividade externa para telemetria
+    /// e integração com provedores de identidade externos.
     /// </summary>
     public bool AllowsExternalConnectivity => IsSaaS || IsSelfHosted;
 

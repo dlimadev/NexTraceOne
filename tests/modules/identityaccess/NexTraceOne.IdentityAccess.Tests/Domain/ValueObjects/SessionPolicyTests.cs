@@ -4,7 +4,7 @@ namespace NexTraceOne.IdentityAccess.Tests.Domain.ValueObjects;
 
 /// <summary>
 /// Testes unitários para o value object <see cref="SessionPolicy"/>.
-/// Valida factory methods por deployment model, política padrão
+/// Valida factory methods por perfil de configuração, política padrão
 /// e igualdade estrutural entre instâncias.
 /// </summary>
 public sealed class SessionPolicyTests
@@ -22,9 +22,9 @@ public sealed class SessionPolicyTests
     }
 
     [Fact]
-    public void ForSelfHosted_ShouldHaveRelaxedTimeouts()
+    public void ForStandardDeployment_ShouldHaveBalancedTimeouts()
     {
-        var policy = SessionPolicy.ForSelfHosted();
+        var policy = SessionPolicy.ForStandardDeployment();
 
         policy.MaxConcurrentSessions.Should().Be(5);
         policy.SessionTimeoutMinutes.Should().Be(60);
@@ -35,9 +35,9 @@ public sealed class SessionPolicyTests
     }
 
     [Fact]
-    public void ForOnPremise_ShouldHaveMostRelaxedTimeouts()
+    public void ForRestrictedConnectivityDeployment_ShouldHavePermissiveTimeouts()
     {
-        var policy = SessionPolicy.ForOnPremise();
+        var policy = SessionPolicy.ForRestrictedConnectivityDeployment();
 
         policy.MaxConcurrentSessions.Should().Be(10);
         policy.SessionTimeoutMinutes.Should().Be(120);

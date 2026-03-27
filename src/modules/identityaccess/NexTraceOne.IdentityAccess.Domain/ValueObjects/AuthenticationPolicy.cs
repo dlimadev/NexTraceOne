@@ -172,12 +172,12 @@ public sealed class AuthenticationPolicy : ValueObject
     }
 
     /// <summary>
-    /// Cria a política de autenticação padrão para instalações self-hosted.
+    /// Cria a política de autenticação padrão para deployments com conectividade externa.
     /// Modo híbrido com fallback local habilitado, MFA opcional.
     /// Sessão de 60 minutos e até 5 sessões concorrentes.
     /// </summary>
-    /// <returns>Política configurada para ambiente self-hosted.</returns>
-    public static AuthenticationPolicy ForSelfHosted()
+    /// <returns>Política configurada para ambiente com conectividade disponível.</returns>
+    public static AuthenticationPolicy ForStandardDeployment()
     {
         return Create(
             mode: AuthenticationMode.Hybrid,

@@ -2,15 +2,14 @@
 
 > **Data:** Março 2026
 > **Scope:** Arquitetura de deploy, componentes, configuração e operacionalização.
-> **Princípio:** Self-hosted enterprise. On-premise first. Integrações externas opcionais.
+> **Princípio:** Independência de serviços cloud externos obrigatórios. Integrações externas são opcionais.
 
 ---
 
 ## Visão Geral
 
-O NexTraceOne é uma plataforma **sovereign** — designed para operar inteiramente
-dentro do perímetro controlado do cliente, sem dependências de serviços cloud externos
-obrigatórios. Toda a observabilidade, persistência e inteligência funciona on-premise.
+O NexTraceOne é uma plataforma desenhada para operar sem dependências de serviços cloud externos
+obrigatórios. Toda a observabilidade, persistência e inteligência pode funcionar no ambiente controlado do operador.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -71,7 +70,7 @@ obrigatórios. Toda a observabilidade, persistência e inteligência funciona on
 
 - **Tecnologia:** React 19 + Vite + TypeScript
 - **Porta dev:** 5173
-- **Build prod:** arquivos estáticos em `dist/` — servir via nginx ou CDN on-premise
+- **Build prod:** arquivos estáticos em `dist/` — servir via nginx ou CDN
 - **Fontes:** Inter + JetBrains Mono servidas localmente via `@fontsource` (sem CDN externo)
 
 ### PostgreSQL

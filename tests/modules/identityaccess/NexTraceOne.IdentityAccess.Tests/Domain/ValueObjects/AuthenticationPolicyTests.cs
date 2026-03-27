@@ -4,7 +4,7 @@ namespace NexTraceOne.IdentityAccess.Tests.Domain.ValueObjects;
 
 /// <summary>
 /// Testes unitários para o value object <see cref="AuthenticationPolicy"/>.
-/// Valida os factory methods (ForSaaS, ForSelfHosted, Default), regras de consistência
+/// Valida os factory methods (ForSaaS, ForStandardDeployment, Default), regras de consistência
 /// entre modo de autenticação e parâmetros operacionais, limites de sessão/timeout
 /// e igualdade estrutural entre instâncias.
 /// </summary>
@@ -24,9 +24,9 @@ public sealed class AuthenticationPolicyTests
     }
 
     [Fact]
-    public void ForSelfHosted_CreatesCorrectPolicy()
+    public void ForStandardDeployment_CreatesCorrectPolicy()
     {
-        var policy = AuthenticationPolicy.ForSelfHosted();
+        var policy = AuthenticationPolicy.ForStandardDeployment();
 
         policy.Mode.Should().Be(AuthenticationMode.Hybrid);
         policy.AllowLocalFallback.Should().BeTrue();
@@ -144,8 +144,8 @@ public sealed class AuthenticationPolicyTests
     [Fact]
     public void Equality_SameValues_AreEqual()
     {
-        var policy1 = AuthenticationPolicy.ForSelfHosted();
-        var policy2 = AuthenticationPolicy.ForSelfHosted();
+        var policy1 = AuthenticationPolicy.ForStandardDeployment();
+        var policy2 = AuthenticationPolicy.ForStandardDeployment();
 
         policy1.Should().Be(policy2);
     }
@@ -154,7 +154,7 @@ public sealed class AuthenticationPolicyTests
     public void Equality_DifferentValues_AreNotEqual()
     {
         var policy1 = AuthenticationPolicy.ForSaaS("AzureAD");
-        var policy2 = AuthenticationPolicy.ForSelfHosted();
+        var policy2 = AuthenticationPolicy.ForStandardDeployment();
 
         policy1.Should().NotBe(policy2);
     }
