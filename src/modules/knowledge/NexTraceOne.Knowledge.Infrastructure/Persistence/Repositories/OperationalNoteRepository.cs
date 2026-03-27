@@ -18,4 +18,16 @@ internal sealed class OperationalNoteRepository(KnowledgeDbContext context) : IO
 
     public void Update(OperationalNote note)
         => context.OperationalNotes.Update(note);
+
+    public async Task<IReadOnlyList<OperationalNote>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default)
+    {
+        var pattern = $"%{searchTerm}%";
+        return await context.OperationalNotes
+            .Where(n =>
+                EF.Functions.ILike(n.Title, pattern) ||
+                EF.Functions.ILike(n.Content, pattern))
+            .OrderByDescending(n => n.UpdatedAt ?? n.CreatedAt)
+            .Take(maxResults)
+            .ToListAsync(cancellationToken);
+    }
 }

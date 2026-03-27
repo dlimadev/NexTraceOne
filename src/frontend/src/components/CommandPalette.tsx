@@ -100,6 +100,8 @@ const entityTypeIcons: Record<string, React.ReactNode> = {
   contract: <FileText size={16} />,
   runbook: <FileCode size={16} />,
   doc: <BookOpen size={16} />,
+  knowledge: <BookOpen size={16} />,
+  note: <ClipboardList size={16} />,
 };
 
 /** Chave i18n de label por tipo de entidade. */
@@ -108,6 +110,8 @@ const entityTypeLabelKeys: Record<string, string> = {
   contract: 'commandPalette.entityContract',
   runbook: 'commandPalette.entityRunbook',
   doc: 'commandPalette.entityDoc',
+  knowledge: 'commandPalette.entityKnowledge',
+  note: 'commandPalette.entityNote',
 };
 
 /** Cores de badge por status de entidade. */
@@ -118,6 +122,12 @@ const statusColors: Record<string, string> = {
   degraded: 'bg-amber-500/20 text-amber-400',
   draft: STATUS_COLOR_DEFAULT,
   deprecated: 'bg-red-500/20 text-red-400',
+  published: 'bg-emerald-500/20 text-emerald-400',
+  archived: STATUS_COLOR_DEFAULT,
+  resolved: 'bg-emerald-500/20 text-emerald-400',
+  info: 'bg-blue-500/20 text-blue-400',
+  warning: 'bg-amber-500/20 text-amber-400',
+  critical: 'bg-red-500/20 text-red-400',
 };
 
  /** Hook utilitário para debounce de valor. */

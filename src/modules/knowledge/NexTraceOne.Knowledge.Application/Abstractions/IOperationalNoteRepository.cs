@@ -15,4 +15,7 @@ public interface IOperationalNoteRepository
 
     /// <summary>Atualiza uma nota existente.</summary>
     void Update(OperationalNote note);
+
+    /// <summary>Pesquisa notas operacionais por termo textual (título, conteúdo).</summary>
+    Task<IReadOnlyList<OperationalNote>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default);
 }

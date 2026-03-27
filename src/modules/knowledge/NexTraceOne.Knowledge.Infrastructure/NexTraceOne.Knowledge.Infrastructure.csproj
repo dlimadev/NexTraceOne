@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Knowledge.Application\NexTraceOne.Knowledge.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.Knowledge.Domain\NexTraceOne.Knowledge.Domain.csproj" />
+    <ProjectReference Include="..\NexTraceOne.Knowledge.Contracts\NexTraceOne.Knowledge.Contracts.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>

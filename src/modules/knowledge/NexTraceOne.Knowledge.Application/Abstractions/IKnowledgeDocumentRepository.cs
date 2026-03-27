@@ -15,4 +15,7 @@ public interface IKnowledgeDocumentRepository
 
     /// <summary>Atualiza um documento existente.</summary>
     void Update(KnowledgeDocument document);
+
+    /// <summary>Pesquisa documentos por termo textual (título, conteúdo, summary, tags).</summary>
+    Task<IReadOnlyList<KnowledgeDocument>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default);
 }
