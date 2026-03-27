@@ -7,12 +7,60 @@ using NexTraceOne.AIKnowledge.Domain.Orchestration.Enums;
 namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Repositories;
 
 /// <summary>
+/// Repositório de contextos montados para consultas de IA.
+/// Implementa IAiContextRepository com AiOrchestrationDbContext.
+/// </summary>
+internal sealed class AiContextRepository(AiOrchestrationDbContext context)
+    : IAiContextRepository
+{
+    public async Task<AiContext?> GetByIdAsync(AiContextId id, CancellationToken ct)
+        => await context.Contexts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+
+    public async Task AddAsync(AiContext aiContext, CancellationToken ct)
+    {
+        await context.Contexts.AddAsync(aiContext, ct);
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<AiContext>> GetRecentByServiceAsync(
+        string serviceName,
+        int maxCount,
+        CancellationToken ct)
+    {
+        return await context.Contexts
+            .AsNoTracking()
+            .Where(c => c.ServiceName == serviceName)
+            .OrderByDescending(c => c.AssembledAt)
+            .Take(maxCount)
+            .ToListAsync(ct);
+    }
+}
+
+/// <summary>
 /// Repositório de conversas multi-turno de IA do módulo de orquestração.
 /// Implementa IAiOrchestrationConversationRepository com AiOrchestrationDbContext.
 /// </summary>
 internal sealed class AiOrchestrationConversationRepository(AiOrchestrationDbContext context)
     : IAiOrchestrationConversationRepository
 {
+    public async Task<AiConversation?> GetByIdAsync(AiConversationId id, CancellationToken ct)
+        => await context.Conversations
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+
+    public async Task AddAsync(AiConversation conversation, CancellationToken ct)
+    {
+        await context.Conversations.AddAsync(conversation, ct);
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task UpdateAsync(AiConversation conversation, CancellationToken ct)
+    {
+        context.Conversations.Update(conversation);
+        await context.SaveChangesAsync(ct);
+    }
+
     public async Task<(IReadOnlyList<AiConversation> Items, int Total)> ListHistoryAsync(
         Guid? releaseId,
         string? serviceName,
@@ -78,8 +126,19 @@ internal sealed class KnowledgeCaptureEntryRepository(AiOrchestrationDbContext c
 {
     public async Task<KnowledgeCaptureEntry?> GetByIdAsync(KnowledgeCaptureEntryId id, CancellationToken ct)
         => await context.KnowledgeCaptureEntries
-            .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Id == id, ct);
+
+    public async Task AddAsync(KnowledgeCaptureEntry entry, CancellationToken ct)
+    {
+        await context.KnowledgeCaptureEntries.AddAsync(entry, ct);
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task UpdateAsync(KnowledgeCaptureEntry entry, CancellationToken ct)
+    {
+        context.KnowledgeCaptureEntries.Update(entry);
+        await context.SaveChangesAsync(ct);
+    }
 
     public Task<bool> HasDuplicateTitleInConversationAsync(
         AiConversationId conversationId,
