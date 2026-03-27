@@ -11,12 +11,16 @@ namespace NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 /// <summary>
 /// Serviço central de entrega externa de notificações.
 /// Coordena o roteamento (quais canais), dispatch (enviar) e delivery log (rastrear).
-/// Implementa retry básico com controlo de tentativas.
+/// Implementa retry deferido: em vez de bloquear com Task.Delay, agenda retries via
+/// NotificationDelivery.ScheduleRetry(nextRetryAt), que são processados pelo
+/// NotificationDeliveryRetryJob em background.
+/// P7.3: regista eventos auditáveis após entrega concluída/falhada.
 /// </summary>
 internal sealed class ExternalDeliveryService(
     INotificationRoutingEngine routingEngine,
     IEnumerable<INotificationChannelDispatcher> dispatchers,
     INotificationDeliveryStore deliveryStore,
+    INotificationAuditService notificationAuditService,
     IOptions<DeliveryRetryOptions> retryOptions,
     ILogger<ExternalDeliveryService> logger) : IExternalDeliveryService
 {
@@ -55,6 +59,26 @@ internal sealed class ExternalDeliveryService(
         }
     }
 
+    /// <inheritdoc/>
+    public async Task RetryDeliveryAsync(
+        NotificationDelivery delivery,
+        Notification notification,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_dispatcherMap.TryGetValue(delivery.Channel, out var dispatcher))
+        {
+            logger.LogWarning(
+                "No dispatcher for channel {Channel}. Marking delivery {DeliveryId} as failed.",
+                delivery.Channel, delivery.Id.Value);
+            delivery.MarkFailed("No dispatcher registered for this channel.");
+            await deliveryStore.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
+        await AttemptDispatchAsync(delivery, notification, dispatcher, cancellationToken);
+        await deliveryStore.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task DispatchToChannelAsync(
         Notification notification,
         DeliveryChannel channel,
@@ -72,62 +96,133 @@ internal sealed class ExternalDeliveryService(
         var delivery = NotificationDelivery.Create(
             notification.Id,
             channel,
-            recipientAddress: null);  // Address pode ser resolvido pelo dispatcher
+            recipientAddress: null);  // Address resolvido pelo dispatcher
 
         await deliveryStore.AddAsync(delivery, cancellationToken);
 
-        var maxAttempts = retryOptions.Value.MaxAttempts;
-        var baseDelay = retryOptions.Value.BaseDelaySeconds;
+        await AttemptDispatchAsync(delivery, notification, dispatcher, cancellationToken);
 
-        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        await deliveryStore.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task AttemptDispatchAsync(
+        NotificationDelivery delivery,
+        Notification notification,
+        INotificationChannelDispatcher dispatcher,
+        CancellationToken cancellationToken)
+    {
+        var opts = retryOptions.Value;
+
+        delivery.IncrementRetry();
+
+        try
         {
-            try
+            var success = await dispatcher.DispatchAsync(notification, delivery.RecipientAddress, cancellationToken);
+            if (success)
             {
-                delivery.IncrementRetry();
+                delivery.MarkDelivered();
+                logger.LogInformation(
+                    "External delivery succeeded: channel={Channel}, notification={NotificationId}, attempt={Attempt}",
+                    delivery.Channel, notification.Id.Value, delivery.RetryCount);
 
-                var success = await dispatcher.DispatchAsync(notification, null, cancellationToken);
-                if (success)
-                {
-                    delivery.MarkDelivered();
-                    logger.LogInformation(
-                        "External delivery succeeded: channel={Channel}, notification={NotificationId}, attempt={Attempt}",
-                        channel, notification.Id.Value, attempt);
-                    break;
-                }
-
-                // Dispatcher returned false (e.g., channel disabled, no recipient)
+                // P7.3: Registar entrega concluída na trilha auditável
+                await RecordDeliveryAuditAsync(
+                    notification, delivery,
+                    notification.Severity >= NotificationSeverity.Critical
+                        ? NotificationAuditActions.CriticalNotificationDelivered
+                        : NotificationAuditActions.NotificationDelivered,
+                    $"Notification delivered via {delivery.Channel} on attempt {delivery.RetryCount}",
+                    cancellationToken);
+            }
+            else
+            {
+                // Dispatcher returned false (channel disabled, no recipient, etc.) — not a transient error
                 delivery.MarkSkipped();
                 logger.LogDebug(
                     "External delivery skipped by dispatcher: channel={Channel}, notification={NotificationId}",
-                    channel, notification.Id.Value);
-                break;
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(
-                    ex,
-                    "External delivery attempt {Attempt}/{MaxAttempts} failed: channel={Channel}, notification={NotificationId}",
-                    attempt, maxAttempts, channel, notification.Id.Value);
-
-                if (attempt >= maxAttempts)
-                {
-                    delivery.MarkFailed(ex.Message);
-                    logger.LogError(
-                        "External delivery permanently failed after {MaxAttempts} attempts: channel={Channel}, notification={NotificationId}",
-                        maxAttempts, channel, notification.Id.Value);
-                }
-                else
-                {
-                    // Backoff linear simples: baseDelay * attempt
-                    var delay = TimeSpan.FromSeconds(baseDelay * attempt);
-                    logger.LogDebug(
-                        "Waiting {Delay}s before retry {Next}/{Max} for channel={Channel}, notification={NotificationId}",
-                        delay.TotalSeconds, attempt + 1, maxAttempts, channel, notification.Id.Value);
-                    await Task.Delay(delay, cancellationToken);
-                }
+                    delivery.Channel, notification.Id.Value);
             }
         }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "External delivery attempt {Attempt}/{Max} failed: channel={Channel}, notification={NotificationId}",
+                delivery.RetryCount, opts.MaxAttempts, delivery.Channel, notification.Id.Value);
 
-        await deliveryStore.SaveChangesAsync(cancellationToken);
+            if (delivery.RetryCount >= opts.MaxAttempts)
+            {
+                // All attempts exhausted — mark permanently failed
+                delivery.MarkFailed(ex.Message);
+                logger.LogError(
+                    "External delivery permanently failed after {MaxAttempts} attempts: channel={Channel}, notification={NotificationId}",
+                    opts.MaxAttempts, delivery.Channel, notification.Id.Value);
+
+                // P7.3: Registar falha permanente na trilha auditável
+                await RecordDeliveryAuditAsync(
+                    notification, delivery,
+                    notification.Severity >= NotificationSeverity.Critical
+                        ? NotificationAuditActions.CriticalNotificationFailed
+                        : NotificationAuditActions.NotificationDeliveryFailed,
+                    $"Delivery permanently failed on channel {delivery.Channel} after {opts.MaxAttempts} attempts: {ex.Message}",
+                    cancellationToken);
+            }
+            else
+            {
+                // Schedule next attempt with linear backoff: baseDelay * retryCount seconds
+                var delay = TimeSpan.FromSeconds(opts.BaseDelaySeconds * delivery.RetryCount);
+                var nextRetryAt = DateTimeOffset.UtcNow.Add(delay);
+                delivery.ScheduleRetry(nextRetryAt, ex.Message);
+
+                logger.LogDebug(
+                    "Delivery retry scheduled: channel={Channel}, notification={NotificationId}, nextRetryAt={NextRetryAt}",
+                    delivery.Channel, notification.Id.Value, nextRetryAt);
+
+                // P7.3: Registar retry agendado na trilha auditável
+                await RecordDeliveryAuditAsync(
+                    notification, delivery,
+                    NotificationAuditActions.NotificationDeliveryRetryScheduled,
+                    $"Delivery retry scheduled for channel {delivery.Channel} at {nextRetryAt:u} (attempt {delivery.RetryCount}/{opts.MaxAttempts}): {ex.Message}",
+                    cancellationToken);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Regista evento auditável de entrega de forma best-effort.
+    /// Não bloqueia o fluxo principal em caso de falha de auditoria.
+    /// </summary>
+    private async Task RecordDeliveryAuditAsync(
+        Notification notification,
+        NotificationDelivery delivery,
+        string actionType,
+        string description,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await notificationAuditService.RecordAsync(new NotificationAuditEntry
+            {
+                TenantId = notification.TenantId,
+                ActionType = actionType,
+                ResourceId = delivery.Id.Value.ToString(),
+                ResourceType = "NotificationDelivery",
+                Description = description,
+                PayloadJson = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    NotificationId = notification.Id.Value,
+                    Channel = delivery.Channel.ToString(),
+                    Status = delivery.Status.ToString(),
+                    RetryCount = delivery.RetryCount,
+                    SourceEventId = notification.SourceEventId
+                })
+            }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "Delivery audit record failed for {ActionType}/{DeliveryId}. Non-blocking.",
+                actionType, delivery.Id.Value);
+        }
     }
 }

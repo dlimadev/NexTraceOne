@@ -9,7 +9,8 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configura o mapeamento da entidade NotificationDelivery para a tabela ntf_deliveries.
-/// Regista tentativas de entrega externa com rastreabilidade completa.
+/// Regista tentativas de entrega externa com rastreabilidade completa, incluindo
+/// NextRetryAt (para retry deferido) e LastAttemptAt (para auditoria de tentativas).
 /// </summary>
 internal sealed class NotificationDeliveryConfiguration : IEntityTypeConfiguration<NotificationDelivery>
 {
@@ -19,7 +20,7 @@ internal sealed class NotificationDeliveryConfiguration : IEntityTypeConfigurati
         {
             t.HasCheckConstraint(
                 "CK_ntf_deliveries_status",
-                "\"Status\" IN ('Pending', 'Delivered', 'Failed', 'Skipped')");
+                "\"Status\" IN ('Pending', 'Delivered', 'Failed', 'Skipped', 'RetryScheduled')");
             t.HasCheckConstraint(
                 "CK_ntf_deliveries_channel",
                 "\"Channel\" IN ('InApp', 'Email', 'MicrosoftTeams')");
@@ -49,10 +50,16 @@ internal sealed class NotificationDeliveryConfiguration : IEntityTypeConfigurati
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
+        builder.Property(x => x.LastAttemptAt)
+            .HasColumnType("timestamp with time zone");
+
         builder.Property(x => x.DeliveredAt)
             .HasColumnType("timestamp with time zone");
 
         builder.Property(x => x.FailedAt)
+            .HasColumnType("timestamp with time zone");
+
+        builder.Property(x => x.NextRetryAt)
             .HasColumnType("timestamp with time zone");
 
         builder.Property(x => x.ErrorMessage)
@@ -66,6 +73,9 @@ internal sealed class NotificationDeliveryConfiguration : IEntityTypeConfigurati
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => x.Channel);
         builder.HasIndex(x => new { x.Status, x.RetryCount });
+
+        // Índice específico para o retry job: busca por RetryScheduled + NextRetryAt
+        builder.HasIndex(x => new { x.Status, x.NextRetryAt });
 
         // ── FK → Notification ────────────────────────────────────────────────
         builder.HasOne<Notification>()

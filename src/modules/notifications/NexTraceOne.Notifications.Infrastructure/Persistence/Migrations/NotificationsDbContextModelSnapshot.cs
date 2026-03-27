@@ -70,6 +70,46 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Migrations
                     b.ToTable("ntf_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Notifications.Domain.Entities.DeliveryChannelConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ChannelType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ConfigurationJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "ChannelType")
+                        .IsUnique();
+
+                    b.ToTable("ntf_channel_configurations", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Notifications.Domain.Entities.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -176,6 +216,10 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("SourceEventId")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("SourceModule")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -242,6 +286,12 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("FailedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("LastAttemptAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("NextRetryAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uuid");
 
@@ -271,13 +321,15 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status");
 
+                    b.HasIndex("Status", "NextRetryAt");
+
                     b.HasIndex("Status", "RetryCount");
 
                     b.ToTable("ntf_deliveries", null, t =>
                         {
                             t.HasCheckConstraint("CK_ntf_deliveries_channel", "\"Channel\" IN ('InApp', 'Email', 'MicrosoftTeams')");
 
-                            t.HasCheckConstraint("CK_ntf_deliveries_status", "\"Status\" IN ('Pending', 'Delivered', 'Failed', 'Skipped')");
+                            t.HasCheckConstraint("CK_ntf_deliveries_status", "\"Status\" IN ('Pending', 'Delivered', 'Failed', 'Skipped', 'RetryScheduled')");
                         });
                 });
 
@@ -323,6 +375,128 @@ namespace NexTraceOne.Notifications.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_ntf_preferences_channel", "\"Channel\" IN ('InApp', 'Email', 'MicrosoftTeams')");
                         });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Notifications.Domain.Entities.NotificationTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BodyTemplate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Channel")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsBuiltIn")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PlainTextTemplate")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubjectTemplate")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventType");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "EventType", "Channel", "Locale");
+
+                    b.ToTable("ntf_templates", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Notifications.Domain.Entities.SmtpConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BaseUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EncryptedPassword")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("FromAddress")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("FromName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Host")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("UseSsl")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Username")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .IsUnique();
+
+                    b.ToTable("ntf_smtp_configurations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Notifications.Domain.Entities.NotificationDelivery", b =>

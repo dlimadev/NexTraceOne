@@ -35,7 +35,17 @@ public static class ExportAuditReport
             var events = await auditEventRepository.SearchAsync(null, null, request.From, request.To, 1, 10000, cancellationToken);
 
             var entries = events
-                .Select(e => new ReportEntry(e.Id.Value, e.SourceModule, e.ActionType, e.ResourceType, e.ResourceId, e.PerformedBy, e.OccurredAt))
+                .Select(e => new ReportEntry(
+                    e.Id.Value,
+                    e.SourceModule,
+                    e.ActionType,
+                    e.ResourceType,
+                    e.ResourceId,
+                    e.PerformedBy,
+                    e.OccurredAt,
+                    e.TenantId,
+                    e.Payload,
+                    e.ChainLink?.CurrentHash))
                 .ToArray();
 
             return new Response(request.From, request.To, entries.Length, entries);
@@ -45,6 +55,19 @@ public static class ExportAuditReport
     /// <summary>Resposta do relatório de auditoria.</summary>
     public sealed record Response(DateTimeOffset From, DateTimeOffset To, int TotalEvents, IReadOnlyList<ReportEntry> Entries);
 
-    /// <summary>Entrada do relatório de auditoria.</summary>
-    public sealed record ReportEntry(Guid EventId, string SourceModule, string ActionType, string ResourceType, string ResourceId, string PerformedBy, DateTimeOffset OccurredAt);
+    /// <summary>
+    /// Entrada do relatório de auditoria.
+    /// P7.4 — enriquecida com TenantId, Payload e ChainHash para contexto completo.
+    /// </summary>
+    public sealed record ReportEntry(
+        Guid EventId,
+        string SourceModule,
+        string ActionType,
+        string ResourceType,
+        string ResourceId,
+        string PerformedBy,
+        DateTimeOffset OccurredAt,
+        Guid TenantId,
+        string? Payload,
+        string? ChainHash);
 }

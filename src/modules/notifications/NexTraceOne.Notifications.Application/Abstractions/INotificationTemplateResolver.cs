@@ -12,13 +12,14 @@ public interface INotificationTemplateResolver
     /// Resolve o template para o tipo de evento fornecido.
     /// Retorna título, mensagem e se a notificação requer ação.
     /// </summary>
-    NotificationTemplate Resolve(string eventType, IReadOnlyDictionary<string, string> parameters);
+    ResolvedNotificationTemplate Resolve(string eventType, IReadOnlyDictionary<string, string> parameters);
 }
 
 /// <summary>
-/// Template materializado de uma notificação.
+/// Conteúdo resolvido de um template de notificação em memória.
+/// Distingue-se da entidade persistida NotificationTemplate (domínio).
 /// </summary>
-public sealed record NotificationTemplate(
+public sealed record ResolvedNotificationTemplate(
     string Title,
     string Message,
     NotificationCategory Category,

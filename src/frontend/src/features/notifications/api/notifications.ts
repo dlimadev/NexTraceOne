@@ -6,6 +6,18 @@ import type {
   NotificationPreferencesResponse,
   UnreadCountResponse,
   UpdatePreferenceRequest,
+  NotificationTemplateDto,
+  NotificationTemplatesResponse,
+  UpsertNotificationTemplateRequest,
+  DeliveryChannelDto,
+  DeliveryChannelsResponse,
+  UpsertDeliveryChannelRequest,
+  SmtpConfigurationDto,
+  UpsertSmtpConfigurationRequest,
+  UpsertResponse,
+  DeliveryHistoryResponse,
+  DeliveryStatusResponse,
+  NotificationTrailResponse,
 } from '../types';
 
 export type { NotificationDto };
@@ -37,4 +49,59 @@ export const notificationsApi = {
 
   updatePreference: (data: UpdatePreferenceRequest) =>
     client.put('/notifications/preferences', data).then((r) => r.data),
+
+  // ── P7.1: Templates ───────────────────────────────────────────────────────
+
+  listTemplates: (params?: { eventType?: string; channel?: string; isActive?: boolean }) =>
+    client
+      .get<NotificationTemplatesResponse>('/notifications/configuration/templates', { params })
+      .then((r) => r.data),
+
+  upsertTemplate: (data: UpsertNotificationTemplateRequest) =>
+    client
+      .put<UpsertResponse>('/notifications/configuration/templates', data)
+      .then((r) => r.data),
+
+  // ── P7.1: Channels ────────────────────────────────────────────────────────
+
+  listChannels: () =>
+    client
+      .get<DeliveryChannelsResponse>('/notifications/configuration/channels')
+      .then((r) => r.data),
+
+  upsertChannel: (data: UpsertDeliveryChannelRequest) =>
+    client
+      .put<UpsertResponse>('/notifications/configuration/channels', data)
+      .then((r) => r.data),
+
+  // ── P7.1: SMTP ────────────────────────────────────────────────────────────
+
+  getSmtpConfiguration: () =>
+    client
+      .get<SmtpConfigurationDto | null>('/notifications/configuration/smtp')
+      .then((r) => r.data),
+
+  upsertSmtpConfiguration: (data: UpsertSmtpConfigurationRequest) =>
+    client
+      .put<UpsertResponse>('/notifications/configuration/smtp', data)
+      .then((r) => r.data),
+
+  // ── P7.2: Delivery History & Status ───────────────────────────────────────
+
+  getDeliveryHistory: (notificationId: string) =>
+    client
+      .get<DeliveryHistoryResponse>(`/notifications/${notificationId}/delivery-history`)
+      .then((r) => r.data),
+
+  getDeliveryStatus: (notificationId: string) =>
+    client
+      .get<DeliveryStatusResponse>(`/notifications/${notificationId}/delivery-status`)
+      .then((r) => r.data),
+
+  // ── P7.3: Notification Audit Trail ───────────────────────────────────────
+
+  getNotificationTrail: (notificationId: string) =>
+    client
+      .get<NotificationTrailResponse>(`/notifications/${notificationId}/trail`)
+      .then((r) => r.data),
 };

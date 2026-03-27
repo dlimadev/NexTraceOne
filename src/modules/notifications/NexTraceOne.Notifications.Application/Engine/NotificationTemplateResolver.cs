@@ -11,7 +11,7 @@ namespace NexTraceOne.Notifications.Application.Engine;
 public sealed class NotificationTemplateResolver : Abstractions.INotificationTemplateResolver
 {
     /// <inheritdoc/>
-    public Abstractions.NotificationTemplate Resolve(
+    public Abstractions.ResolvedNotificationTemplate Resolve(
         string eventType,
         IReadOnlyDictionary<string, string> parameters)
     {
@@ -32,7 +32,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
         };
     }
 
-    private static Abstractions.NotificationTemplate BuildIncidentCreated(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildIncidentCreated(IReadOnlyDictionary<string, string> p)
     {
         var service = Get(p, "ServiceName", "Unknown service");
         var severity = Get(p, "IncidentSeverity", "Unknown");
@@ -44,7 +44,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildIncidentEscalated(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildIncidentEscalated(IReadOnlyDictionary<string, string> p)
     {
         var service = Get(p, "ServiceName", "Unknown service");
         return new(
@@ -55,7 +55,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildApprovalPending(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildApprovalPending(IReadOnlyDictionary<string, string> p)
     {
         var entity = Get(p, "EntityName", "workflow");
         var requestedBy = Get(p, "RequestedBy", "a team member");
@@ -67,7 +67,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildApprovalApproved(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildApprovalApproved(IReadOnlyDictionary<string, string> p)
     {
         var entity = Get(p, "EntityName", "workflow");
         var approvedBy = Get(p, "ApprovedBy", "an approver");
@@ -79,7 +79,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: false);
     }
 
-    private static Abstractions.NotificationTemplate BuildApprovalRejected(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildApprovalRejected(IReadOnlyDictionary<string, string> p)
     {
         var entity = Get(p, "EntityName", "workflow");
         var rejectedBy = Get(p, "RejectedBy", "an approver");
@@ -92,7 +92,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: false);
     }
 
-    private static Abstractions.NotificationTemplate BuildBreakGlassActivated(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildBreakGlassActivated(IReadOnlyDictionary<string, string> p)
     {
         var user = Get(p, "ActivatedBy", "Unknown user");
         return new(
@@ -103,7 +103,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildJitAccessPending(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildJitAccessPending(IReadOnlyDictionary<string, string> p)
     {
         var user = Get(p, "RequestedBy", "a user");
         var resource = Get(p, "Resource", "a resource");
@@ -115,7 +115,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildComplianceCheckFailed(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildComplianceCheckFailed(IReadOnlyDictionary<string, string> p)
     {
         var service = Get(p, "ServiceName", "Unknown service");
         var gapCount = Get(p, "GapCount", "1");
@@ -127,7 +127,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildBudgetExceeded(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildBudgetExceeded(IReadOnlyDictionary<string, string> p)
     {
         var service = Get(p, "ServiceName", "Unknown service");
         var expected = Get(p, "ExpectedCost", "N/A");
@@ -140,7 +140,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildIntegrationFailed(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildIntegrationFailed(IReadOnlyDictionary<string, string> p)
     {
         var integration = Get(p, "IntegrationName", "Unknown integration");
         var error = Get(p, "ErrorMessage", "An error occurred.");
@@ -152,7 +152,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: true);
     }
 
-    private static Abstractions.NotificationTemplate BuildAiProviderUnavailable(IReadOnlyDictionary<string, string> p)
+    private static Abstractions.ResolvedNotificationTemplate BuildAiProviderUnavailable(IReadOnlyDictionary<string, string> p)
     {
         var provider = Get(p, "ProviderName", "Unknown provider");
         return new(
@@ -163,7 +163,7 @@ public sealed class NotificationTemplateResolver : Abstractions.INotificationTem
             RequiresAction: false);
     }
 
-    private static Abstractions.NotificationTemplate BuildGeneric(
+    private static Abstractions.ResolvedNotificationTemplate BuildGeneric(
         string eventType,
         IReadOnlyDictionary<string, string> p)
     {

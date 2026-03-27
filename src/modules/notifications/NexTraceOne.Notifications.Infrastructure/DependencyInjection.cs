@@ -19,6 +19,7 @@ using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Notifications.Infrastructure.Preferences;
 using NexTraceOne.Notifications.Infrastructure.Routing;
+// P7.1 – new stores
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -51,6 +52,11 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<NotificationsDbContext>());
         services.AddScoped<INotificationStore, NotificationStoreRepository>();
+
+        // ── P7.1: Templates, Channels e SMTP persistidos ──
+        services.AddScoped<INotificationTemplateStore, NotificationTemplateRepository>();
+        services.AddScoped<IDeliveryChannelConfigurationStore, DeliveryChannelConfigurationRepository>();
+        services.AddScoped<ISmtpConfigurationStore, SmtpConfigurationRepository>();
 
         // ── Fase 4: Preferências, resolução de destinatários, políticas obrigatórias ──
         services.AddScoped<INotificationPreferenceStore, NotificationPreferenceStoreRepository>();
@@ -94,6 +100,8 @@ public static class DependencyInjection
 
         // External delivery service (coordena roteamento + dispatch + logging)
         services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();
+        // P7.2: Background retry job para deliveries agendados
+        services.AddHostedService<NotificationDeliveryRetryJob>();
 
         // Event Handlers — Fase 2: primeiros eventos automáticos de alto valor
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentNotificationHandler>();

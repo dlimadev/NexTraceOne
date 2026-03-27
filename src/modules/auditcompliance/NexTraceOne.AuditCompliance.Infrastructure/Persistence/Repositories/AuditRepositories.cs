@@ -44,6 +44,48 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
             .OrderByDescending(e => e.OccurredAt)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<AuditEvent>> SearchWithResourceAsync(
+        string? sourceModule, string? actionType,
+        string? resourceType, string? resourceId,
+        DateTimeOffset? from, DateTimeOffset? to,
+        int page, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        var query = context.AuditEvents.Include(e => e.ChainLink).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(sourceModule))
+            query = query.Where(e => e.SourceModule == sourceModule);
+
+        if (!string.IsNullOrWhiteSpace(actionType))
+            query = query.Where(e => e.ActionType == actionType);
+
+        if (!string.IsNullOrWhiteSpace(resourceType))
+            query = query.Where(e => e.ResourceType == resourceType);
+
+        if (!string.IsNullOrWhiteSpace(resourceId))
+            query = query.Where(e => e.ResourceId == resourceId);
+
+        if (from.HasValue)
+            query = query.Where(e => e.OccurredAt >= from.Value);
+
+        if (to.HasValue)
+            query = query.Where(e => e.OccurredAt <= to.Value);
+
+        return await query
+            .OrderByDescending(e => e.OccurredAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> DeleteExpiredAsync(DateTimeOffset cutoff, CancellationToken cancellationToken)
+    {
+        // ExecuteDeleteAsync (EF Core 7+) performs a single SQL DELETE without loading entities into memory.
+        return await context.AuditEvents
+            .Where(e => e.OccurredAt < cutoff)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
     public void Add(AuditEvent auditEvent) => context.AuditEvents.Add(auditEvent);
 }
 

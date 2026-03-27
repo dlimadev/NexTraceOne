@@ -19,6 +19,7 @@ public sealed class ExternalDeliveryServiceTests
     private readonly INotificationChannelDispatcher _emailDispatcher = Substitute.For<INotificationChannelDispatcher>();
     private readonly INotificationChannelDispatcher _teamsDispatcher = Substitute.For<INotificationChannelDispatcher>();
     private readonly INotificationDeliveryStore _deliveryStore = Substitute.For<INotificationDeliveryStore>();
+    private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly IOptions<DeliveryRetryOptions> _retryOptions;
     private readonly ILogger<ExternalDeliveryService> _logger =
         NullLoggerFactory.Instance.CreateLogger<ExternalDeliveryService>();
@@ -42,6 +43,7 @@ public sealed class ExternalDeliveryServiceTests
             _routingEngine,
             [_emailDispatcher, _teamsDispatcher],
             _deliveryStore,
+            _auditService,
             _retryOptions,
             _logger);
     }
@@ -164,30 +166,83 @@ public sealed class ExternalDeliveryServiceTests
     }
 
     [Fact]
-    public async Task ProcessExternalDeliveryAsync_TransientFailure_RetriesAndSucceeds()
+    public async Task ProcessExternalDeliveryAsync_TransientFailure_SchedulesRetryInstead()
     {
+        // P7.2 behavior: on failure, delivery is scheduled for deferred retry (not inline retry)
         var notification = CreateTestNotification();
+
+        NotificationDelivery? capturedDelivery = null;
+        _deliveryStore
+            .When(s => s.AddAsync(Arg.Any<NotificationDelivery>(), Arg.Any<CancellationToken>()))
+            .Do(ci => capturedDelivery = ci.Arg<NotificationDelivery>());
+
         _routingEngine.ResolveChannelsAsync(
             Arg.Any<Guid>(), Arg.Any<NotificationCategory>(),
             Arg.Any<NotificationSeverity>(), Arg.Any<CancellationToken>())
             .Returns([DeliveryChannel.InApp, DeliveryChannel.Email]);
 
-        // First call fails, second succeeds
         _emailDispatcher.DispatchAsync(
             Arg.Any<Notification>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(
-                _ => throw new HttpRequestException("Temporary failure"),
-                _ => Task.FromResult(true));
+            .Returns<bool>(_ => throw new HttpRequestException("Temporary failure"));
 
         await _service.ProcessExternalDeliveryAsync(notification);
 
-        await _emailDispatcher.Received(2).DispatchAsync(
+        // P7.2: Only 1 dispatch attempt per ProcessExternalDelivery call; retry is deferred
+        await _emailDispatcher.Received(1).DispatchAsync(
             Arg.Any<Notification>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+
+        // Delivery record must be persisted and have RetryScheduled status with NextRetryAt
+        capturedDelivery.Should().NotBeNull();
+        capturedDelivery!.Status.Should().Be(DeliveryStatus.RetryScheduled);
+        capturedDelivery.NextRetryAt.Should().NotBeNull();
+        capturedDelivery.NextRetryAt.Should().BeOnOrAfter(DateTimeOffset.UtcNow.AddSeconds(-5));
+        await _deliveryStore.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task ProcessExternalDeliveryAsync_PermanentFailure_StopsAfterMaxRetries()
+    public async Task RetryDeliveryAsync_OnRetry_DispatchesAgainAndMarksDelivered()
     {
+        // P7.2: RetryDeliveryAsync is called by the retry job for a previously-scheduled delivery
+        var notification = CreateTestNotification();
+        var delivery = NotificationDelivery.Create(notification.Id, DeliveryChannel.Email, "test@example.com");
+        delivery.ScheduleRetry(DateTimeOffset.UtcNow.AddMinutes(-1), "Previous transient error");
+
+        _emailDispatcher.DispatchAsync(
+            Arg.Any<Notification>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        await _service.RetryDeliveryAsync(delivery, notification);
+
+        delivery.Status.Should().Be(DeliveryStatus.Delivered);
+        await _deliveryStore.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RetryDeliveryAsync_PermanentFailureOnLastAttempt_MarksDeliveryAsFailed()
+    {
+        var notification = CreateTestNotification();
+        var delivery = NotificationDelivery.Create(notification.Id, DeliveryChannel.Email, "test@example.com");
+
+        // Simulate already at MaxAttempts-1
+        for (var i = 0; i < _retryOptions.Value.MaxAttempts - 1; i++)
+            delivery.IncrementRetry();
+
+        delivery.ScheduleRetry(DateTimeOffset.UtcNow.AddMinutes(-1), "Previous transient error");
+
+        _emailDispatcher.DispatchAsync(
+            Arg.Any<Notification>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns<bool>(_ => throw new HttpRequestException("Still failing"));
+
+        await _service.RetryDeliveryAsync(delivery, notification);
+
+        delivery.Status.Should().Be(DeliveryStatus.Failed);
+        await _deliveryStore.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ProcessExternalDeliveryAsync_PermanentFailureAtMaxAttempts_MarksAsFailed()
+    {
+        // P7.2: If already at MaxAttempts (via previous retries), marks as permanently failed
         var notification = CreateTestNotification();
         _routingEngine.ResolveChannelsAsync(
             Arg.Any<Guid>(), Arg.Any<NotificationCategory>(),
@@ -200,9 +255,8 @@ public sealed class ExternalDeliveryServiceTests
 
         await _service.ProcessExternalDeliveryAsync(notification);
 
-        // Should attempt MaxAttempts=3 times
-        await _emailDispatcher.Received(3).DispatchAsync(
-            Arg.Any<Notification>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        // First attempt: RetryCount becomes 1; MaxAttempts is 3 → scheduled for retry, not failed yet
+        await _deliveryStore.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

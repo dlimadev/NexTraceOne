@@ -14,6 +14,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     private readonly INotificationStore _store = Substitute.For<INotificationStore>();
     private readonly INotificationTemplateResolver _templateResolver = new NotificationTemplateResolver();
     private readonly INotificationDeduplicationService _dedup = Substitute.For<INotificationDeduplicationService>();
+    private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly IExternalDeliveryService _externalDelivery = Substitute.For<IExternalDeliveryService>();
     private readonly ILogger<NotificationOrchestrator> _logger = Substitute.For<ILogger<NotificationOrchestrator>>();
 
@@ -29,7 +30,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     public async Task ProcessAsync_WithExternalDeliveryService_TriggersExternalDelivery()
     {
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _externalDelivery, _logger);
+            _store, _templateResolver, _dedup, _auditService, _externalDelivery, _logger);
 
         var request = new NotificationRequest
         {
@@ -53,7 +54,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     public async Task ProcessAsync_WithoutExternalDeliveryService_StillSucceeds()
     {
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, null, _logger);
+            _store, _templateResolver, _dedup, _auditService, null, _logger);
 
         var request = new NotificationRequest
         {
@@ -81,7 +82,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
             .Returns<Task>(_ => throw new Exception("External delivery failed"));
 
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _externalDelivery, _logger);
+            _store, _templateResolver, _dedup, _auditService, _externalDelivery, _logger);
 
         var request = new NotificationRequest
         {
@@ -107,7 +108,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     public async Task ProcessAsync_MultipleRecipients_TriggersExternalDeliveryForEach()
     {
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _externalDelivery, _logger);
+            _store, _templateResolver, _dedup, _auditService, _externalDelivery, _logger);
 
         var request = new NotificationRequest
         {

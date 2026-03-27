@@ -32,7 +32,8 @@ public sealed class Notification : AggregateRoot<NotificationId>
         string? actionUrl,
         bool requiresAction,
         string? payloadJson,
-        DateTimeOffset? expiresAt)
+        DateTimeOffset? expiresAt,
+        string? sourceEventId = null)
     {
         Id = id;
         TenantId = tenantId;
@@ -52,6 +53,7 @@ public sealed class Notification : AggregateRoot<NotificationId>
         Status = NotificationStatus.Unread;
         CreatedAt = DateTimeOffset.UtcNow;
         ExpiresAt = expiresAt;
+        SourceEventId = sourceEventId;
 
         RaiseDomainEvent(new NotificationCreatedEvent(
             id.Value,
@@ -163,6 +165,15 @@ public sealed class Notification : AggregateRoot<NotificationId>
     /// <summary>Razão da supressão (para auditabilidade).</summary>
     public string? SuppressionReason { get; private set; }
 
+    // ── P7.3: Correlação de auditoria ──
+
+    /// <summary>
+    /// Id do evento de origem que gerou esta notificação.
+    /// Permite rastreabilidade completa: evento origem → notificação → entregas → audit trail.
+    /// Pode ser o Id de um incidente, release, aprovação, etc.
+    /// </summary>
+    public string? SourceEventId { get; private set; }
+
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -184,7 +195,8 @@ public sealed class Notification : AggregateRoot<NotificationId>
         string? actionUrl = null,
         bool requiresAction = false,
         string? payloadJson = null,
-        DateTimeOffset? expiresAt = null)
+        DateTimeOffset? expiresAt = null,
+        string? sourceEventId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(eventType);
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
@@ -207,7 +219,8 @@ public sealed class Notification : AggregateRoot<NotificationId>
             actionUrl,
             requiresAction,
             payloadJson,
-            expiresAt);
+            expiresAt,
+            sourceEventId);
     }
 
     /// <summary>Marca a notificação como lida.</summary>

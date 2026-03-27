@@ -4,6 +4,7 @@ using System.Net.Mail;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Domain.Entities;
@@ -15,9 +16,16 @@ namespace NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 /// Dispatcher de notificações por email via SMTP.
 /// Utiliza System.Net.Mail.SmtpClient para envio real.
 /// Gera HTML com template adequado via IExternalChannelTemplateResolver.
+///
+/// P7.2: A configuração SMTP é agora resolvida com prioridade para a entidade
+/// SmtpConfiguration persistida em base de dados (P7.1). Se nenhuma configuração
+/// persistida estiver disponível ou ativa, faz fallback para IOptions&lt;NotificationChannelOptions&gt;
+/// (appsettings), garantindo compatibilidade backward.
 /// </summary>
 internal sealed class EmailNotificationDispatcher(
     IOptions<NotificationChannelOptions> channelOptions,
+    ISmtpConfigurationStore smtpConfigStore,
+    ICurrentTenant currentTenant,
     IExternalChannelTemplateResolver templateResolver,
     ILogger<EmailNotificationDispatcher> logger) : INotificationChannelDispatcher
 {
@@ -33,37 +41,39 @@ internal sealed class EmailNotificationDispatcher(
         string? recipientAddress,
         CancellationToken cancellationToken = default)
     {
-        var emailSettings = channelOptions.Value.Email;
-
-        if (!emailSettings.Enabled)
-        {
-            logger.LogDebug("Email channel is disabled. Skipping dispatch for notification {NotificationId}.", notification.Id.Value);
-            return false;
-        }
-
         if (string.IsNullOrWhiteSpace(recipientAddress))
         {
             logger.LogWarning("No recipient email address provided for notification {NotificationId}. Skipping.", notification.Id.Value);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(emailSettings.SmtpHost))
+        // P7.2: Tentar obter configuração SMTP persistida (prioridade sobre appsettings)
+        var (smtpHost, smtpPort, useSsl, fromAddress, fromName, username, password, baseUrl, isEnabled) =
+            await ResolveSmtpSettingsAsync(cancellationToken);
+
+        if (!isEnabled)
+        {
+            logger.LogDebug("Email channel is disabled. Skipping dispatch for notification {NotificationId}.", notification.Id.Value);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(smtpHost))
         {
             logger.LogWarning("SMTP host not configured. Cannot send email for notification {NotificationId}.", notification.Id.Value);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(emailSettings.FromAddress))
+        if (string.IsNullOrWhiteSpace(fromAddress))
         {
             logger.LogWarning("From address not configured. Cannot send email for notification {NotificationId}.", notification.Id.Value);
             return false;
         }
 
-        var emailTemplate = templateResolver.ResolveEmailTemplate(notification, emailSettings.BaseUrl);
+        var emailTemplate = templateResolver.ResolveEmailTemplate(notification, baseUrl);
 
         using var message = new MailMessage
         {
-            From = new MailAddress(emailSettings.FromAddress, emailSettings.FromName),
+            From = new MailAddress(fromAddress, fromName),
             Subject = emailTemplate.Subject,
             Body = emailTemplate.HtmlBody,
             IsBodyHtml = true
@@ -80,15 +90,15 @@ internal sealed class EmailNotificationDispatcher(
 
         try
         {
-            using var client = new SmtpClient(emailSettings.SmtpHost, emailSettings.SmtpPort)
+            using var client = new SmtpClient(smtpHost, smtpPort)
             {
-                EnableSsl = emailSettings.UseSsl,
+                EnableSsl = useSsl,
                 DeliveryMethod = SmtpDeliveryMethod.Network
             };
 
-            if (!string.IsNullOrWhiteSpace(emailSettings.Username))
+            if (!string.IsNullOrWhiteSpace(username))
             {
-                client.Credentials = new NetworkCredential(emailSettings.Username, emailSettings.Password);
+                client.Credentials = new NetworkCredential(username, password);
             }
 
 #pragma warning disable CA2016 // SmtpClient.SendMailAsync does not accept CancellationToken in all overloads
@@ -108,5 +118,53 @@ internal sealed class EmailNotificationDispatcher(
                 notification.Id.Value, recipientAddress, ex.Message);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Resolve as configurações SMTP com prioridade para configuração persistida.
+    /// Faz fallback para appsettings se nenhuma configuração persistida estiver ativa.
+    /// </summary>
+    private async Task<(string Host, int Port, bool UseSsl, string FromAddress, string FromName,
+        string? Username, string? Password, string? BaseUrl, bool IsEnabled)>
+        ResolveSmtpSettingsAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var persistedConfig = await smtpConfigStore.GetByTenantAsync(currentTenant.Id, cancellationToken);
+            if (persistedConfig is not null && persistedConfig.IsEnabled)
+            {
+                logger.LogDebug("Using persisted SMTP configuration for tenant {TenantId}.", currentTenant.Id);
+                return (
+                    persistedConfig.Host,
+                    persistedConfig.Port,
+                    persistedConfig.UseSsl,
+                    persistedConfig.FromAddress,
+                    persistedConfig.FromName,
+                    persistedConfig.Username,
+                    persistedConfig.EncryptedPassword, // NOTE: P7.3 — decrypt before use
+                    persistedConfig.BaseUrl,
+                    true
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "Failed to load persisted SMTP configuration. Falling back to appsettings.");
+        }
+
+        // Fallback: appsettings via IOptions
+        var emailSettings = channelOptions.Value.Email;
+        return (
+            emailSettings.SmtpHost,
+            emailSettings.SmtpPort,
+            emailSettings.UseSsl,
+            emailSettings.FromAddress,
+            emailSettings.FromName,
+            emailSettings.Username,
+            emailSettings.Password,
+            emailSettings.BaseUrl,
+            emailSettings.Enabled
+        );
     }
 }

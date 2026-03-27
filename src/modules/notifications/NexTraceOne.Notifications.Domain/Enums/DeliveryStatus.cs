@@ -16,5 +16,11 @@ public enum DeliveryStatus
     Failed = 2,
 
     /// <summary>Entrega ignorada (e.g., preferência opt-out, canal desabilitado, deduplicação).</summary>
-    Skipped = 3
+    Skipped = 3,
+
+    /// <summary>
+    /// Entrega falhou nesta tentativa mas está agendada para retry.
+    /// NextRetryAt indica quando deve ser reprocessada pelo NotificationDeliveryRetryJob.
+    /// </summary>
+    RetryScheduled = 4
 }
