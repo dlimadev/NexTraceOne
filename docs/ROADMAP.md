@@ -183,7 +183,7 @@ Garantir que conectores prioritários estão estáveis, freshness/health claros,
 
 ---
 
-## Onda 3 — Hardening e operação enterprise (3-4 semanas)
+## Onda 3 — Hardening e operação (3-4 semanas)
 
 - Performance de endpoints críticos, busca, diff, listagens
 - Revisão de jobs e background processing
@@ -191,7 +191,6 @@ Garantir que conectores prioritários estão estáveis, freshness/health claros,
 - Logs e observabilidade da própria plataforma
 - Secrets/config/environment
 - Packaging/deployment
-- Self-hosted / on-prem readiness
 - Revisão de permissões e escopos
 - Testes E2E dos fluxos centrais
 

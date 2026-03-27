@@ -60,7 +60,6 @@ Tornar a plataforma confiável para uso sério:
 - Testes E2E dos fluxos centrais
 - Health/readiness
 - Packaging/deployment
-- Self-hosted readiness
 - Revisão de permissões e escopos
 
 ---

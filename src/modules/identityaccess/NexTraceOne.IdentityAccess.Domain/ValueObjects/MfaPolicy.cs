@@ -135,17 +135,17 @@ public sealed class MfaPolicy : ValueObject
         => new(true, true, true, "TOTP,WebAuthn", 15, 5);
 
     /// <summary>
-    /// Política MFA para self-hosted: MFA apenas para operações privilegiadas e de integração externa.
+    /// Política MFA equilibrada: MFA apenas para operações privilegiadas e externas sensíveis.
     /// Step-up de 30 minutos, máximo 5 tentativas, inclui SMS como método adicional.
     /// </summary>
-    public static MfaPolicy ForSelfHosted()
+    public static MfaPolicy ForStandardDeployment()
         => new(false, true, true, "TOTP,WebAuthn,SMS", 30, 5);
 
     /// <summary>
-    /// Política MFA para on-premise: MFA opcional, configurável pelo cliente.
+    /// Política MFA permissiva: MFA opcional, configurável pelo administrador.
     /// Step-up de 60 minutos, até 10 tentativas, todos os métodos disponíveis.
     /// </summary>
-    public static MfaPolicy ForOnPremise()
+    public static MfaPolicy ForRestrictedConnectivityDeployment()
         => new(false, false, false, "TOTP,WebAuthn,SMS", 60, 10);
 
     /// <summary>

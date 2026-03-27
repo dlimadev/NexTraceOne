@@ -8,7 +8,7 @@ namespace NexTraceOne.IdentityAccess.Domain.ValueObjects;
 /// <para>
 /// Complementa <see cref="AuthenticationPolicy"/> e <see cref="MfaPolicy"/> ao definir
 /// os parâmetros operacionais de sessão de forma independente, permitindo configurações
-/// diferenciadas por deployment model (SaaS, self-hosted, on-premise).
+/// ajustadas por perfil de segurança do tenant.
 /// </para>
 /// <para>
 /// Regras de negócio aplicadas:
@@ -158,17 +158,17 @@ public sealed class SessionPolicy : ValueObject
         => new(3, 30, 15, true, false, 0);
 
     /// <summary>
-    /// Política de sessão para self-hosted: equilibrada, "Lembrar-me" por 14 dias.
+    /// Política de sessão padrão equilibrada: "Lembrar-me" por 14 dias.
     /// Sessão de 60 minutos, inatividade de 30 minutos, máximo 5 sessões.
     /// </summary>
-    public static SessionPolicy ForSelfHosted()
+    public static SessionPolicy ForStandardDeployment()
         => new(5, 60, 30, true, true, 14);
 
     /// <summary>
-    /// Política de sessão para on-premise: flexível, "Lembrar-me" por 30 dias.
+    /// Política de sessão permissiva: "Lembrar-me" por 30 dias.
     /// Sessão de 120 minutos, inatividade de 60 minutos, máximo 10 sessões.
     /// </summary>
-    public static SessionPolicy ForOnPremise()
+    public static SessionPolicy ForRestrictedConnectivityDeployment()
         => new(10, 120, 60, false, true, 30);
 
     /// <summary>
