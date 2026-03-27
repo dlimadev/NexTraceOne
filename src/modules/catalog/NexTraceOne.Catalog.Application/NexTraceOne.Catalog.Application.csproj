@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\knowledge\NexTraceOne.Knowledge.Contracts\NexTraceOne.Knowledge.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
