@@ -19,6 +19,8 @@ internal sealed class OperationalNoteConfiguration : IEntityTypeConfiguration<Op
         {
             t.HasCheckConstraint("CK_knw_operational_notes_severity",
                 "\"Severity\" IN ('Info','Warning','Critical')");
+            t.HasCheckConstraint("CK_knw_operational_notes_note_type",
+                "\"NoteType\" IN ('Observation','Mitigation','Decision','Hypothesis','FollowUp')");
         });
 
         builder.HasKey(x => x.Id);
@@ -35,6 +37,15 @@ internal sealed class OperationalNoteConfiguration : IEntityTypeConfiguration<Op
         builder.Property(x => x.Severity)
             .HasConversion<string>()
             .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.NoteType)
+            .HasConversion<string>()
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(x => x.Origin)
+            .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(x => x.AuthorId)
@@ -70,6 +81,9 @@ internal sealed class OperationalNoteConfiguration : IEntityTypeConfiguration<Op
         builder.HasIndex(x => x.AuthorId);
         builder.HasIndex(x => x.ContextEntityId);
         builder.HasIndex(x => x.ContextType);
+        builder.HasIndex(x => x.NoteType);
+        builder.HasIndex(x => x.Origin);
+        builder.HasIndex(x => new { x.ContextType, x.ContextEntityId });
         builder.HasIndex(x => x.IsResolved);
         builder.HasIndex(x => x.CreatedAt);
 

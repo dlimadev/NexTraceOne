@@ -34,6 +34,12 @@ public sealed class OperationalNote : Entity<OperationalNoteId>
     /// <summary>Severidade ou importância da nota.</summary>
     public NoteSeverity Severity { get; private set; }
 
+    /// <summary>Tipo funcional da nota operacional.</summary>
+    public OperationalNoteType NoteType { get; private set; }
+
+    /// <summary>Origem da nota (ex: IncidentTimeline, Manual, PostChangeValidation).</summary>
+    public string Origin { get; private set; } = string.Empty;
+
     /// <summary>Identificador do autor (UserId).</summary>
     public Guid AuthorId { get; private init; }
 
@@ -75,6 +81,8 @@ public sealed class OperationalNote : Entity<OperationalNoteId>
         string title,
         string content,
         NoteSeverity severity,
+        OperationalNoteType noteType,
+        string origin,
         Guid authorId,
         Guid? contextEntityId,
         string? contextType,
@@ -84,6 +92,8 @@ public sealed class OperationalNote : Entity<OperationalNoteId>
         Guard.Against.NullOrWhiteSpace(title, nameof(title));
         Guard.Against.StringTooLong(title, 300, nameof(title));
         Guard.Against.NullOrWhiteSpace(content, nameof(content));
+        Guard.Against.NullOrWhiteSpace(origin, nameof(origin));
+        Guard.Against.StringTooLong(origin, 100, nameof(origin));
         Guard.Against.Default(authorId, nameof(authorId));
 
         return new OperationalNote
@@ -92,6 +102,8 @@ public sealed class OperationalNote : Entity<OperationalNoteId>
             Title = title.Trim(),
             Content = content,
             Severity = severity,
+            NoteType = noteType,
+            Origin = origin.Trim(),
             AuthorId = authorId,
             ContextEntityId = contextEntityId,
             ContextType = contextType?.Trim(),
@@ -120,6 +132,13 @@ public sealed class OperationalNote : Entity<OperationalNoteId>
         UpdatedAt = utcNow;
     }
 
+    /// <summary>Atualiza o tipo funcional da nota.</summary>
+    public void UpdateType(OperationalNoteType noteType, DateTimeOffset utcNow)
+    {
+        NoteType = noteType;
+        UpdatedAt = utcNow;
+    }
+
     /// <summary>Marca a nota como resolvida.</summary>
     public void Resolve(DateTimeOffset utcNow)
     {
@@ -140,6 +159,18 @@ public sealed class OperationalNote : Entity<OperationalNoteId>
     public void UpdateTags(IReadOnlyList<string> tags, DateTimeOffset utcNow)
     {
         Tags = tags;
+        UpdatedAt = utcNow;
+    }
+
+    /// <summary>Atualiza o contexto de associação da nota operacional.</summary>
+    public void UpdateContext(Guid? contextEntityId, string? contextType, DateTimeOffset utcNow)
+    {
+        if (contextType is not null)
+        {
+            Guard.Against.StringTooLong(contextType, 100, nameof(contextType));
+        }
+        ContextEntityId = contextEntityId;
+        ContextType = contextType?.Trim();
         UpdatedAt = utcNow;
     }
 }

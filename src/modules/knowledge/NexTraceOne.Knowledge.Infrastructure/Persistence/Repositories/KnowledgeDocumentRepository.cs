@@ -21,13 +21,25 @@ internal sealed class KnowledgeDocumentRepository(KnowledgeDbContext context) : 
 
     public async Task<IReadOnlyList<KnowledgeDocument>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default)
     {
-        var pattern = $"%{searchTerm}%";
+        var term = searchTerm.Trim();
+        if (term.Length == 0)
+            return [];
+
+        var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
+
         return await context.KnowledgeDocuments
-            .Where(d =>
-                EF.Functions.ILike(d.Title, pattern) ||
-                EF.Functions.ILike(d.Content, pattern) ||
-                (d.Summary != null && EF.Functions.ILike(d.Summary, pattern)))
-            .OrderByDescending(d => d.UpdatedAt ?? d.CreatedAt)
+            .Select(d => new
+            {
+                Document = d,
+                SearchVector = EF.Functions.ToTsVector(
+                    "simple",
+                    (d.Title ?? string.Empty) + " " +
+                    (d.Summary ?? string.Empty) + " " +
+                    (d.Content ?? string.Empty))
+            })
+            .Where(x => x.SearchVector.Matches(tsQuery))
+            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Select(x => x.Document)
             .Take(maxResults)
             .ToListAsync(cancellationToken);
     }

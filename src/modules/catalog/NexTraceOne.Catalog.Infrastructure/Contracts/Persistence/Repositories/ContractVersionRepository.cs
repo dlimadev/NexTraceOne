@@ -68,12 +68,33 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var pattern = $"%{searchTerm}%";
-            query = query.Where(v => EF.Functions.Like(v.SemVer, pattern));
+            var term = searchTerm.Trim();
+            var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
+
+            var projected = query
+                .Select(v => new
+                {
+                    Version = v,
+                    SearchVector = EF.Functions.ToTsVector(
+                        "simple",
+                        (v.SemVer ?? string.Empty) + " " +
+                        (v.ImportedFrom ?? string.Empty) + " " +
+                        v.Protocol.ToString())
+                })
+                .Where(x => x.SearchVector.Matches(tsQuery));
+
+            var totalCountFiltered = await projected.CountAsync(cancellationToken);
+            var filteredItems = await projected
+                .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => x.Version)
+                .ToListAsync(cancellationToken);
+
+            return (filteredItems, totalCountFiltered);
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
-
         var items = await query
             .OrderByDescending(v => v.CreatedAt)
             .Skip((page - 1) * pageSize)

@@ -22,6 +22,8 @@ public sealed class OperationalNoteTests
             "Production issue in order-service",
             "Order processing is delayed by 30s after latest deploy.",
             NoteSeverity.Critical,
+            OperationalNoteType.Mitigation,
+            "IncidentTimeline",
             authorId,
             contextEntityId,
             "Service",
@@ -33,6 +35,8 @@ public sealed class OperationalNoteTests
         note.Title.Should().Be("Production issue in order-service");
         note.Content.Should().Contain("Order processing");
         note.Severity.Should().Be(NoteSeverity.Critical);
+        note.NoteType.Should().Be(OperationalNoteType.Mitigation);
+        note.Origin.Should().Be("IncidentTimeline");
         note.AuthorId.Should().Be(authorId);
         note.ContextEntityId.Should().Be(contextEntityId);
         note.ContextType.Should().Be("Service");
@@ -46,7 +50,7 @@ public sealed class OperationalNoteTests
     {
         // Arrange
         var now = DateTimeOffset.UtcNow;
-        var note = OperationalNote.Create("Title", "Content", NoteSeverity.Info, Guid.NewGuid(), null, null, null, now);
+        var note = OperationalNote.Create("Title", "Content", NoteSeverity.Info, OperationalNoteType.Observation, "Manual", Guid.NewGuid(), null, null, null, now);
 
         // Act
         note.Resolve(now.AddHours(2));
@@ -61,7 +65,7 @@ public sealed class OperationalNoteTests
     {
         // Arrange
         var now = DateTimeOffset.UtcNow;
-        var note = OperationalNote.Create("Title", "Content", NoteSeverity.Warning, Guid.NewGuid(), null, null, null, now);
+        var note = OperationalNote.Create("Title", "Content", NoteSeverity.Warning, OperationalNoteType.Observation, "Manual", Guid.NewGuid(), null, null, null, now);
         note.Resolve(now.AddHours(1));
 
         // Act
@@ -77,7 +81,7 @@ public sealed class OperationalNoteTests
     {
         // Arrange
         var now = DateTimeOffset.UtcNow;
-        var note = OperationalNote.Create("Title", "Content", NoteSeverity.Info, Guid.NewGuid(), null, null, null, now);
+        var note = OperationalNote.Create("Title", "Content", NoteSeverity.Info, OperationalNoteType.Observation, "Manual", Guid.NewGuid(), null, null, null, now);
 
         // Act
         note.UpdateSeverity(NoteSeverity.Critical, now.AddMinutes(10));
@@ -91,7 +95,7 @@ public sealed class OperationalNoteTests
     public void Create_WithEmptyTitle_ShouldThrow()
     {
         // Act & Assert
-        var act = () => OperationalNote.Create("", "Content", NoteSeverity.Info, Guid.NewGuid(), null, null, null, DateTimeOffset.UtcNow);
+        var act = () => OperationalNote.Create("", "Content", NoteSeverity.Info, OperationalNoteType.Observation, "Manual", Guid.NewGuid(), null, null, null, DateTimeOffset.UtcNow);
         act.Should().Throw<ArgumentException>();
     }
 }

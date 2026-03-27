@@ -8,12 +8,14 @@ using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceSourceOfTruth;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetContractSourceOfTruth;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceCoverage;
+using NexTraceOne.Catalog.Application.SourceOfTruth.Features.GlobalSearch;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Features.SearchSourceOfTruth;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
+using NexTraceOne.Knowledge.Contracts;
 
 namespace NexTraceOne.Catalog.Tests.SourceOfTruth.Application.Features;
 
@@ -216,5 +218,62 @@ public sealed class SourceOfTruthApplicationTests
             Arg.Any<ContractProtocol?>(), Arg.Any<ContractLifecycleState?>(),
             Arg.Any<Guid?>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(),
             Arg.Any<CancellationToken>());
+    }
+
+    // ── GlobalSearch (P10.2) ─────────────────────────────────────────
+
+    [Fact]
+    public async Task GlobalSearch_Should_IncludeKnowledgeResults_WhenProviderIsAvailable()
+    {
+        var serviceRepo = Substitute.For<IServiceAssetRepository>();
+        var contractRepo = Substitute.For<IContractVersionRepository>();
+        var refRepo = Substitute.For<ILinkedReferenceRepository>();
+        var knowledgeProvider = Substitute.For<IKnowledgeSearchProvider>();
+
+        serviceRepo.SearchAsync("runbook", Arg.Any<CancellationToken>())
+            .Returns(new List<ServiceAsset>());
+        contractRepo.SearchAsync(null, null, null, "runbook", 1, 10, Arg.Any<CancellationToken>())
+            .Returns((new List<ContractVersion>(), 0));
+        refRepo.SearchAsync("runbook", null, Arg.Any<CancellationToken>())
+            .Returns(new List<LinkedReference>());
+        knowledgeProvider.SearchAsync("runbook", "all", 10, Arg.Any<CancellationToken>())
+            .Returns(new List<KnowledgeSearchResultItem>
+            {
+                new(Guid.NewGuid(), "knowledge", "API Runbook", "Payments", "Published", "/knowledge/documents/1", 0.9),
+                new(Guid.NewGuid(), "note", "Night incident note", "Service · Warning", "Warning", "/knowledge/notes/1", 0.7)
+            });
+
+        var sut = new GlobalSearch.Handler(serviceRepo, contractRepo, refRepo, knowledgeProvider);
+
+        var result = await sut.Handle(new GlobalSearch.Query("runbook", "all", null, 10), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().Contain(i => i.EntityType == "knowledge");
+        result.Value.Items.Should().Contain(i => i.EntityType == "note");
+        result.Value.FacetCounts["knowledge"].Should().Be(1);
+        result.Value.FacetCounts["notes"].Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GlobalSearch_Should_ReturnZeroKnowledgeFacets_WhenProviderIsMissing()
+    {
+        var serviceRepo = Substitute.For<IServiceAssetRepository>();
+        var contractRepo = Substitute.For<IContractVersionRepository>();
+        var refRepo = Substitute.For<ILinkedReferenceRepository>();
+
+        serviceRepo.SearchAsync("test", Arg.Any<CancellationToken>())
+            .Returns(new List<ServiceAsset>());
+        contractRepo.SearchAsync(null, null, null, "test", 1, 5, Arg.Any<CancellationToken>())
+            .Returns((new List<ContractVersion>(), 0));
+        refRepo.SearchAsync("test", null, Arg.Any<CancellationToken>())
+            .Returns(new List<LinkedReference>());
+
+        var sut = new GlobalSearch.Handler(serviceRepo, contractRepo, refRepo);
+
+        var result = await sut.Handle(new GlobalSearch.Query("test", "all", null, 5), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.FacetCounts["knowledge"].Should().Be(0);
+        result.Value.FacetCounts["notes"].Should().Be(0);
     }
 }

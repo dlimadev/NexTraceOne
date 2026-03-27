@@ -66,15 +66,27 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
 
     public async Task<IReadOnlyList<ServiceAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken)
     {
-        var pattern = $"%{searchTerm}%";
+        var term = searchTerm.Trim();
+        if (term.Length == 0)
+            return [];
+
+        var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
+
         return await _context.ServiceAssets
-            .Where(s =>
-                EF.Functions.Like(s.Name, pattern) ||
-                EF.Functions.Like(s.DisplayName, pattern) ||
-                EF.Functions.Like(s.Domain, pattern) ||
-                EF.Functions.Like(s.TeamName, pattern) ||
-                EF.Functions.Like(s.Description, pattern))
-            .OrderBy(s => s.Name)
+            .Select(s => new
+            {
+                Service = s,
+                SearchVector = EF.Functions.ToTsVector(
+                    "simple",
+                    (s.Name ?? string.Empty) + " " +
+                    (s.DisplayName ?? string.Empty) + " " +
+                    (s.Domain ?? string.Empty) + " " +
+                    (s.TeamName ?? string.Empty) + " " +
+                    (s.Description ?? string.Empty))
+            })
+            .Where(x => x.SearchVector.Matches(tsQuery))
+            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Select(x => x.Service)
             .ToListAsync(cancellationToken);
     }
 

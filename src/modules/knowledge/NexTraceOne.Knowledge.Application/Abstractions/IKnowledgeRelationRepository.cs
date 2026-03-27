@@ -18,4 +18,10 @@ public interface IKnowledgeRelationRepository
 
     /// <summary>Lista relações por entidade de origem.</summary>
     Task<IReadOnlyList<KnowledgeRelation>> ListBySourceAsync(Guid sourceEntityId, CancellationToken cancellationToken = default);
+
+    /// <summary>Lista relações por entidade de destino e tipo de relação.</summary>
+    Task<IReadOnlyList<KnowledgeRelation>> ListByTargetAsync(
+        NexTraceOne.Knowledge.Domain.Enums.RelationType targetType,
+        Guid targetEntityId,
+        CancellationToken cancellationToken = default);
 }
