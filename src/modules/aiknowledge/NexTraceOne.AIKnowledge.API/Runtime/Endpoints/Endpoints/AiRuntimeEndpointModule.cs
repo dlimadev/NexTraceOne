@@ -93,7 +93,8 @@ public sealed class AiRuntimeEndpointModule
             {
                 httpContext.Response.StatusCode = 404;
                 await httpContext.Response.WriteAsJsonAsync(
-                    new { error = "No AI model available for chat." }, cancellationToken);
+                    new { code = "AI.ModelNotFound", messageKey = "ai.model.not_found" },
+                    cancellationToken);
                 return;
             }
 
@@ -103,7 +104,8 @@ public sealed class AiRuntimeEndpointModule
             {
                 httpContext.Response.StatusCode = 404;
                 await httpContext.Response.WriteAsJsonAsync(
-                    new { error = $"AI provider '{resolvedModel.ProviderId}' is not available." },
+                    new { code = "AI.ProviderNotFound", messageKey = "ai.provider.not_found",
+                          @params = new[] { resolvedModel.ProviderId } },
                     cancellationToken);
                 return;
             }
