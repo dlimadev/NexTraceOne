@@ -14,6 +14,8 @@ using DetectRuntimeDriftFeature = NexTraceOne.OperationalIntelligence.Applicatio
 using GetDriftFindingsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings.GetDriftFindings;
 using GetReleaseHealthTimelineFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline.GetReleaseHealthTimeline;
 using CompareReleaseRuntimeFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime.CompareReleaseRuntime;
+using EstablishRuntimeBaselineFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline.EstablishRuntimeBaseline;
+using CompareEnvironmentsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments.CompareEnvironments;
 
 namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 
@@ -144,5 +146,29 @@ public sealed class RuntimeIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:runtime:read");
+
+        // ── P6.5 — Operational Consistency: baseline + cross-environment comparison ──
+
+        group.MapPost("/baselines", async (
+            EstablishRuntimeBaselineFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runtime:write");
+
+        group.MapPost("/compare-environments", async (
+            CompareEnvironmentsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runtime:write");
     }
 }

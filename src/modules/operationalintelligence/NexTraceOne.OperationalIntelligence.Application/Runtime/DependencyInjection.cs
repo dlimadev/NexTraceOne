@@ -7,9 +7,11 @@ using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.OperationalIntelligence.Application.Automation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents;
 using NexTraceOne.OperationalIntelligence.Application.Reliability;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ComputeObservabilityDebt;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRuntimeDrift;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline;
@@ -22,6 +24,7 @@ namespace NexTraceOne.OperationalIntelligence.Application.Runtime;
 /// Registra serviços da camada Application do módulo RuntimeIntelligence.
 /// Inclui: MediatR handlers, FluentValidation validators.
 /// Compõe também os subdomínios Reliability e Incidents.
+/// P6.5: adicionados EstablishRuntimeBaseline e CompareEnvironments.
 /// </summary>
 public static class DependencyInjection
 {
@@ -42,6 +45,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetDriftFindings.Query>, GetDriftFindings.Validator>();
         services.AddTransient<IValidator<GetReleaseHealthTimeline.Query>, GetReleaseHealthTimeline.Validator>();
         services.AddTransient<IValidator<CompareReleaseRuntime.Query>, CompareReleaseRuntime.Validator>();
+
+        // P6.5 — Operational Consistency: baseline establishment + cross-environment comparison
+        services.AddTransient<IValidator<EstablishRuntimeBaseline.Command>, EstablishRuntimeBaseline.Validator>();
+        services.AddTransient<IValidator<CompareEnvironments.Command>, CompareEnvironments.Validator>();
 
         // ── Reliability (Team-owned Service Reliability) validators ──
         services.AddReliabilityApplication(configuration);
