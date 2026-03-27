@@ -129,4 +129,19 @@ public sealed class KnowledgeDocumentTests
         var act = () => KnowledgeDocument.Create("Title", "Content", null, DocumentCategory.General, null, Guid.Empty, DateTimeOffset.UtcNow);
         act.Should().Throw<ArgumentException>();
     }
+
+    [Theory]
+    [InlineData("Simple Title", "simple-title")]
+    [InlineData("  Extra  Spaces  ", "extra-spaces")]
+    [InlineData("Special! @Characters#", "special-characters")]
+    [InlineData("Under_score.dot", "under-score-dot")]
+    [InlineData("UPPERCASE TITLE", "uppercase-title")]
+    public void Create_ShouldGenerateCorrectSlug(string title, string expectedSlug)
+    {
+        // Act
+        var document = KnowledgeDocument.Create(title, "Content", null, DocumentCategory.General, null, Guid.NewGuid(), DateTimeOffset.UtcNow);
+
+        // Assert
+        document.Slug.Should().Be(expectedSlug);
+    }
 }

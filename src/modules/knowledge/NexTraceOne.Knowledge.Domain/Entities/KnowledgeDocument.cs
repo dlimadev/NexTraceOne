@@ -159,9 +159,32 @@ public sealed class KnowledgeDocument : Entity<KnowledgeDocumentId>
 
     private static string GenerateSlug(string title)
     {
-        return title.Trim()
-            .ToLowerInvariant()
-            .Replace(' ', '-')
-            .Replace("--", "-");
+        var slug = title.Trim().ToLowerInvariant();
+
+        // Replace spaces and common separators with dashes
+        slug = slug.Replace(' ', '-')
+                   .Replace('_', '-')
+                   .Replace('.', '-');
+
+        // Remove characters that are not alphanumeric or dashes
+        var builder = new System.Text.StringBuilder(slug.Length);
+        foreach (var c in slug)
+        {
+            if (char.IsLetterOrDigit(c) || c == '-')
+            {
+                builder.Append(c);
+            }
+        }
+
+        slug = builder.ToString();
+
+        // Collapse consecutive dashes
+        while (slug.Contains("--"))
+        {
+            slug = slug.Replace("--", "-");
+        }
+
+        // Trim leading/trailing dashes
+        return slug.Trim('-');
     }
 }
