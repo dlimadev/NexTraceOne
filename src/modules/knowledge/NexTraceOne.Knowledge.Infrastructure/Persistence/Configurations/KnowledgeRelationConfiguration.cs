@@ -17,6 +17,8 @@ internal sealed class KnowledgeRelationConfiguration : IEntityTypeConfiguration<
     {
         builder.ToTable("knw_relations", t =>
         {
+            t.HasCheckConstraint("CK_knw_relations_source_entity_type",
+                "\"SourceEntityType\" IN ('KnowledgeDocument','OperationalNote')");
             t.HasCheckConstraint("CK_knw_relations_target_type",
                 "\"TargetType\" IN ('Service','Contract','Change','Incident','KnowledgeDocument','Runbook','Other')");
         });
@@ -29,6 +31,7 @@ internal sealed class KnowledgeRelationConfiguration : IEntityTypeConfiguration<
             .IsRequired();
 
         builder.Property(x => x.SourceEntityType)
+            .HasConversion<string>()
             .HasMaxLength(100)
             .IsRequired();
 
@@ -43,6 +46,9 @@ internal sealed class KnowledgeRelationConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.Description)
             .HasMaxLength(1000);
 
+        builder.Property(x => x.Context)
+            .HasMaxLength(100);
+
         builder.Property(x => x.CreatedById)
             .IsRequired();
 
@@ -54,6 +60,7 @@ internal sealed class KnowledgeRelationConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(x => x.SourceEntityId);
         builder.HasIndex(x => x.TargetEntityId);
         builder.HasIndex(x => x.TargetType);
+        builder.HasIndex(x => new { x.TargetType, x.TargetEntityId });
         builder.HasIndex(x => new { x.SourceEntityId, x.TargetEntityId }).IsUnique();
     }
 }

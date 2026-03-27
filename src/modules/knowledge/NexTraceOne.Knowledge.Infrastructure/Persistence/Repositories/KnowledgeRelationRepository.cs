@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Domain.Entities;
+using NexTraceOne.Knowledge.Domain.Enums;
 
 namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 
@@ -22,6 +23,15 @@ internal sealed class KnowledgeRelationRepository(KnowledgeDbContext context) : 
     public async Task<IReadOnlyList<KnowledgeRelation>> ListBySourceAsync(Guid sourceEntityId, CancellationToken cancellationToken = default)
         => await context.KnowledgeRelations
             .Where(r => r.SourceEntityId == sourceEntityId)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<KnowledgeRelation>> ListByTargetAsync(
+        RelationType targetType,
+        Guid targetEntityId,
+        CancellationToken cancellationToken = default)
+        => await context.KnowledgeRelations
+            .Where(r => r.TargetType == targetType && r.TargetEntityId == targetEntityId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
 }

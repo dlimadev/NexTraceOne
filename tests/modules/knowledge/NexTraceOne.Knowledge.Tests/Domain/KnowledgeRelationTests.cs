@@ -20,20 +20,22 @@ public sealed class KnowledgeRelationTests
         // Act
         var relation = KnowledgeRelation.Create(
             sourceId,
-            "KnowledgeDocument",
+            KnowledgeSourceEntityType.KnowledgeDocument,
             targetId,
             RelationType.Service,
             "Document about this service",
+            "Runbook",
             userId,
             now);
 
         // Assert
         relation.Id.Should().NotBeNull();
         relation.SourceEntityId.Should().Be(sourceId);
-        relation.SourceEntityType.Should().Be("KnowledgeDocument");
+        relation.SourceEntityType.Should().Be(KnowledgeSourceEntityType.KnowledgeDocument);
         relation.TargetEntityId.Should().Be(targetId);
         relation.TargetType.Should().Be(RelationType.Service);
         relation.Description.Should().Be("Document about this service");
+        relation.Context.Should().Be("Runbook");
         relation.CreatedById.Should().Be(userId);
         relation.CreatedAt.Should().Be(now);
     }
@@ -43,9 +45,11 @@ public sealed class KnowledgeRelationTests
     {
         // Arrange
         var relation = KnowledgeRelation.Create(
-            Guid.NewGuid(), "KnowledgeDocument",
+            Guid.NewGuid(),
+            KnowledgeSourceEntityType.KnowledgeDocument,
             Guid.NewGuid(), RelationType.Incident,
             "Original description",
+            null,
             Guid.NewGuid(), DateTimeOffset.UtcNow);
 
         // Act
@@ -60,20 +64,9 @@ public sealed class KnowledgeRelationTests
     {
         // Act & Assert
         var act = () => KnowledgeRelation.Create(
-            Guid.Empty, "KnowledgeDocument",
+            Guid.Empty, KnowledgeSourceEntityType.KnowledgeDocument,
             Guid.NewGuid(), RelationType.Service,
-            null, Guid.NewGuid(), DateTimeOffset.UtcNow);
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Fact]
-    public void Create_WithEmptySourceEntityType_ShouldThrow()
-    {
-        // Act & Assert
-        var act = () => KnowledgeRelation.Create(
-            Guid.NewGuid(), "",
-            Guid.NewGuid(), RelationType.Service,
-            null, Guid.NewGuid(), DateTimeOffset.UtcNow);
+            null, null, Guid.NewGuid(), DateTimeOffset.UtcNow);
         act.Should().Throw<ArgumentException>();
     }
 
@@ -82,9 +75,9 @@ public sealed class KnowledgeRelationTests
     {
         // Act & Assert
         var act = () => KnowledgeRelation.Create(
-            Guid.NewGuid(), "KnowledgeDocument",
+            Guid.NewGuid(), KnowledgeSourceEntityType.KnowledgeDocument,
             Guid.Empty, RelationType.Service,
-            null, Guid.NewGuid(), DateTimeOffset.UtcNow);
+            null, null, Guid.NewGuid(), DateTimeOffset.UtcNow);
         act.Should().Throw<ArgumentException>();
     }
 }

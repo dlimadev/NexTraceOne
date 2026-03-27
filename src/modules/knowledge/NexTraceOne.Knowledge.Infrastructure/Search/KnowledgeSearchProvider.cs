@@ -14,7 +14,8 @@ namespace NexTraceOne.Knowledge.Infrastructure.Search;
 /// </summary>
 internal sealed class KnowledgeSearchProvider(
     IKnowledgeDocumentRepository documentRepository,
-    IOperationalNoteRepository noteRepository) : IKnowledgeSearchProvider
+    IOperationalNoteRepository noteRepository,
+    IKnowledgeRelationRepository relationRepository) : IKnowledgeSearchProvider
 {
     public async Task<IReadOnlyList<KnowledgeSearchResultItem>> SearchAsync(
         string searchTerm,
@@ -32,11 +33,14 @@ internal sealed class KnowledgeSearchProvider(
             foreach (var doc in documents)
             {
                 var score = CalculateRelevance(searchTerm, doc.Title, doc.Summary);
+                var relationContext = await BuildRelationContextAsync(doc.Id.Value, cancellationToken);
                 results.Add(new KnowledgeSearchResultItem(
                     doc.Id.Value,
                     "knowledge",
                     doc.Title,
-                    doc.Summary ?? $"{doc.Category} · v{doc.Version}",
+                    relationContext is null
+                        ? doc.Summary ?? $"{doc.Category} · v{doc.Version}"
+                        : $"{doc.Summary ?? $"{doc.Category} · v{doc.Version}"} · {relationContext}",
                     doc.Status.ToString(),
                     $"/knowledge/documents/{doc.Id.Value}",
                     score));
@@ -53,11 +57,12 @@ internal sealed class KnowledgeSearchProvider(
                 var contextInfo = note.ContextType is not null
                     ? $"{note.ContextType} · {note.Severity}"
                     : note.Severity.ToString();
+                var relationContext = await BuildRelationContextAsync(note.Id.Value, cancellationToken);
                 results.Add(new KnowledgeSearchResultItem(
                     note.Id.Value,
                     "note",
                     note.Title,
-                    contextInfo,
+                    relationContext is null ? contextInfo : $"{contextInfo} · {relationContext}",
                     note.IsResolved ? "Resolved" : note.Severity.ToString(),
                     $"/knowledge/notes/{note.Id.Value}",
                     score));
@@ -99,5 +104,21 @@ internal sealed class KnowledgeSearchProvider(
         }
 
         return score;
+    }
+
+    private async Task<string?> BuildRelationContextAsync(Guid sourceEntityId, CancellationToken cancellationToken)
+    {
+        var relations = await relationRepository.ListBySourceAsync(sourceEntityId, cancellationToken);
+        if (relations.Count == 0)
+            return null;
+
+        var labels = relations
+            .Select(r => r.TargetType.ToString())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
+            .Take(3)
+            .ToArray();
+
+        return labels.Length == 0 ? null : $"linked:{string.Join("/", labels)}";
     }
 }

@@ -28,10 +28,8 @@ public sealed class KnowledgeRelation : Entity<KnowledgeRelationId>
     /// </summary>
     public Guid SourceEntityId { get; private init; }
 
-    /// <summary>
-    /// Tipo do objecto de origem (ex: "KnowledgeDocument", "OperationalNote").
-    /// </summary>
-    public string SourceEntityType { get; private init; } = string.Empty;
+    /// <summary>Tipo do objecto de origem (KnowledgeDocument ou OperationalNote).</summary>
+    public KnowledgeSourceEntityType SourceEntityType { get; private init; }
 
     /// <summary>
     /// Identificador da entidade de destino (ServiceId, ContractId, ReleaseId, etc.).
@@ -46,6 +44,12 @@ public sealed class KnowledgeRelation : Entity<KnowledgeRelationId>
     /// <summary>Descrição opcional da relação.</summary>
     public string? Description { get; private set; }
 
+    /// <summary>
+    /// Contexto opcional da relação (ex: "Runbook", "PostMortem", "Mitigation").
+    /// Facilita navegação e filtros sem acoplar o domínio Knowledge aos outros módulos.
+    /// </summary>
+    public string? Context { get; private set; }
+
     /// <summary>Identificador de quem criou a relação (UserId).</summary>
     public Guid CreatedById { get; private init; }
 
@@ -57,27 +61,31 @@ public sealed class KnowledgeRelation : Entity<KnowledgeRelationId>
     /// <summary>Cria uma nova relação de conhecimento.</summary>
     public static KnowledgeRelation Create(
         Guid sourceEntityId,
-        string sourceEntityType,
+        KnowledgeSourceEntityType sourceEntityType,
         Guid targetEntityId,
         RelationType targetType,
         string? description,
+        string? context,
         Guid createdById,
         DateTimeOffset utcNow)
     {
         Guard.Against.Default(sourceEntityId, nameof(sourceEntityId));
-        Guard.Against.NullOrWhiteSpace(sourceEntityType, nameof(sourceEntityType));
-        Guard.Against.StringTooLong(sourceEntityType, 100, nameof(sourceEntityType));
         Guard.Against.Default(targetEntityId, nameof(targetEntityId));
+        if (context is not null)
+        {
+            Guard.Against.StringTooLong(context, 100, nameof(context));
+        }
         Guard.Against.Default(createdById, nameof(createdById));
 
         return new KnowledgeRelation
         {
             Id = new KnowledgeRelationId(Guid.NewGuid()),
             SourceEntityId = sourceEntityId,
-            SourceEntityType = sourceEntityType.Trim(),
+            SourceEntityType = sourceEntityType,
             TargetEntityId = targetEntityId,
             TargetType = targetType,
             Description = description?.Trim(),
+            Context = context?.Trim(),
             CreatedById = createdById,
             CreatedAt = utcNow
         };
@@ -87,5 +95,15 @@ public sealed class KnowledgeRelation : Entity<KnowledgeRelationId>
     public void UpdateDescription(string? description)
     {
         Description = description?.Trim();
+    }
+
+    /// <summary>Atualiza o contexto textual da relação.</summary>
+    public void UpdateContext(string? context)
+    {
+        if (context is not null)
+        {
+            Guard.Against.StringTooLong(context, 100, nameof(context));
+        }
+        Context = context?.Trim();
     }
 }
