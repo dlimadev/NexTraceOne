@@ -68,17 +68,36 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var pattern = $"%{searchTerm}%";
-            query = query.Where(v => EF.Functions.Like(v.SemVer, pattern));
+            var term = searchTerm.Trim();
+            var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
+            query = query.Where(v =>
+                EF.Functions.ToTsVector(
+                    "simple",
+                    (v.SemVer ?? string.Empty) + " " +
+                    (v.ImportedFrom ?? string.Empty) + " " +
+                    v.Protocol.ToString())
+                .Matches(tsQuery));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        var items = await query
-            .OrderByDescending(v => v.CreatedAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+        var items = !string.IsNullOrWhiteSpace(searchTerm)
+            ? await query
+                .OrderByDescending(v =>
+                    EF.Functions.ToTsVector(
+                        "simple",
+                        (v.SemVer ?? string.Empty) + " " +
+                        (v.ImportedFrom ?? string.Empty) + " " +
+                        v.Protocol.ToString())
+                    .Rank(EF.Functions.PlainToTsQuery("simple", searchTerm.Trim())))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken)
+            : await query
+                .OrderByDescending(v => v.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
 
         return (items, totalCount);
     }

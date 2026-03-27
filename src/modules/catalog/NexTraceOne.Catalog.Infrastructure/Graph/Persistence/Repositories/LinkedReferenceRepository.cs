@@ -39,6 +39,11 @@ internal sealed class LinkedReferenceRepository(CatalogGraphDbContext context)
         LinkedReferenceType? referenceType,
         CancellationToken ct = default)
     {
+        var term = searchTerm.Trim();
+        if (term.Length == 0)
+            return [];
+
+        var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
         var query = _context.LinkedReferences.AsQueryable();
 
         if (referenceType.HasValue)
@@ -47,9 +52,21 @@ internal sealed class LinkedReferenceRepository(CatalogGraphDbContext context)
         }
 
         query = query.Where(r =>
-            EF.Functions.ILike(r.Title, $"%{searchTerm}%") ||
-            EF.Functions.ILike(r.Description, $"%{searchTerm}%"));
+            EF.Functions.ToTsVector(
+                "simple",
+                (r.Title ?? string.Empty) + " " +
+                (r.Description ?? string.Empty) + " " +
+                (r.Content ?? string.Empty))
+            .Matches(tsQuery));
 
-        return await query.OrderBy(r => r.Title).ToListAsync(ct);
+        return await query
+            .OrderByDescending(r =>
+                EF.Functions.ToTsVector(
+                    "simple",
+                    (r.Title ?? string.Empty) + " " +
+                    (r.Description ?? string.Empty) + " " +
+                    (r.Content ?? string.Empty))
+                .Rank(tsQuery))
+            .ToListAsync(ct);
     }
 }

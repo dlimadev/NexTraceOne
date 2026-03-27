@@ -21,12 +21,27 @@ internal sealed class OperationalNoteRepository(KnowledgeDbContext context) : IO
 
     public async Task<IReadOnlyList<OperationalNote>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default)
     {
-        var pattern = $"%{searchTerm}%";
+        var term = searchTerm.Trim();
+        if (term.Length == 0)
+            return [];
+
+        var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
+
         return await context.OperationalNotes
             .Where(n =>
-                EF.Functions.ILike(n.Title, pattern) ||
-                EF.Functions.ILike(n.Content, pattern))
-            .OrderByDescending(n => n.UpdatedAt ?? n.CreatedAt)
+                EF.Functions.ToTsVector(
+                    "simple",
+                    (n.Title ?? string.Empty) + " " +
+                    (n.Content ?? string.Empty) + " " +
+                    (n.ContextType ?? string.Empty))
+                .Matches(tsQuery))
+            .OrderByDescending(n =>
+                EF.Functions.ToTsVector(
+                    "simple",
+                    (n.Title ?? string.Empty) + " " +
+                    (n.Content ?? string.Empty) + " " +
+                    (n.ContextType ?? string.Empty))
+                .Rank(tsQuery))
             .Take(maxResults)
             .ToListAsync(cancellationToken);
     }
