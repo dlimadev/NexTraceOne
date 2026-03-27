@@ -73,24 +73,20 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
         var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
 
         return await _context.ServiceAssets
-            .Where(s =>
-                EF.Functions.ToTsVector(
+            .Select(s => new
+            {
+                Service = s,
+                SearchVector = EF.Functions.ToTsVector(
                     "simple",
                     (s.Name ?? string.Empty) + " " +
                     (s.DisplayName ?? string.Empty) + " " +
                     (s.Domain ?? string.Empty) + " " +
                     (s.TeamName ?? string.Empty) + " " +
                     (s.Description ?? string.Empty))
-                .Matches(tsQuery))
-            .OrderByDescending(s =>
-                EF.Functions.ToTsVector(
-                    "simple",
-                    (s.Name ?? string.Empty) + " " +
-                    (s.DisplayName ?? string.Empty) + " " +
-                    (s.Domain ?? string.Empty) + " " +
-                    (s.TeamName ?? string.Empty) + " " +
-                    (s.Description ?? string.Empty))
-                .Rank(tsQuery))
+            })
+            .Where(x => x.SearchVector.Matches(tsQuery))
+            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Select(x => x.Service)
             .ToListAsync(cancellationToken);
     }
 

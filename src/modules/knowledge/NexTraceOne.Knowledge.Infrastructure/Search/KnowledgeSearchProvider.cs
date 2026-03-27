@@ -6,10 +6,11 @@ namespace NexTraceOne.Knowledge.Infrastructure.Search;
 
 /// <summary>
 /// Implementação do IKnowledgeSearchProvider que pesquisa documentos e notas
-/// operacionais usando PostgreSQL ILIKE via os repositórios do módulo Knowledge.
+/// operacionais usando PostgreSQL Full Text Search (FTS) via os repositórios
+/// do módulo Knowledge.
 ///
 /// P10.2: Motor inicial de search cross-module.
-/// Evolução futura: PostgreSQL FTS com tsvector/tsquery, ranking ts_rank, GIN index.
+/// Evolução futura: colunas tsvector materializadas + GIN indexes para otimização.
 /// </summary>
 internal sealed class KnowledgeSearchProvider(
     IKnowledgeDocumentRepository documentRepository,

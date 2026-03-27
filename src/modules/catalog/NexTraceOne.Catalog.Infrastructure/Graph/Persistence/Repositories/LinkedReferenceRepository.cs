@@ -51,22 +51,19 @@ internal sealed class LinkedReferenceRepository(CatalogGraphDbContext context)
             query = query.Where(r => r.ReferenceType == referenceType.Value);
         }
 
-        query = query.Where(r =>
-            EF.Functions.ToTsVector(
-                "simple",
-                (r.Title ?? string.Empty) + " " +
-                (r.Description ?? string.Empty) + " " +
-                (r.Content ?? string.Empty))
-            .Matches(tsQuery));
-
         return await query
-            .OrderByDescending(r =>
-                EF.Functions.ToTsVector(
+            .Select(r => new
+            {
+                Reference = r,
+                SearchVector = EF.Functions.ToTsVector(
                     "simple",
                     (r.Title ?? string.Empty) + " " +
                     (r.Description ?? string.Empty) + " " +
                     (r.Content ?? string.Empty))
-                .Rank(tsQuery))
+            })
+            .Where(x => x.SearchVector.Matches(tsQuery))
+            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Select(x => x.Reference)
             .ToListAsync(ct);
     }
 }

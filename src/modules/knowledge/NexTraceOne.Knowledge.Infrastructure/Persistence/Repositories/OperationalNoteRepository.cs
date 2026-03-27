@@ -28,20 +28,18 @@ internal sealed class OperationalNoteRepository(KnowledgeDbContext context) : IO
         var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
 
         return await context.OperationalNotes
-            .Where(n =>
-                EF.Functions.ToTsVector(
+            .Select(n => new
+            {
+                Note = n,
+                SearchVector = EF.Functions.ToTsVector(
                     "simple",
                     (n.Title ?? string.Empty) + " " +
                     (n.Content ?? string.Empty) + " " +
                     (n.ContextType ?? string.Empty))
-                .Matches(tsQuery))
-            .OrderByDescending(n =>
-                EF.Functions.ToTsVector(
-                    "simple",
-                    (n.Title ?? string.Empty) + " " +
-                    (n.Content ?? string.Empty) + " " +
-                    (n.ContextType ?? string.Empty))
-                .Rank(tsQuery))
+            })
+            .Where(x => x.SearchVector.Matches(tsQuery))
+            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Select(x => x.Note)
             .Take(maxResults)
             .ToListAsync(cancellationToken);
     }

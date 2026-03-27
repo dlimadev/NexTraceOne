@@ -28,20 +28,18 @@ internal sealed class KnowledgeDocumentRepository(KnowledgeDbContext context) : 
         var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
 
         return await context.KnowledgeDocuments
-            .Where(d =>
-                EF.Functions.ToTsVector(
+            .Select(d => new
+            {
+                Document = d,
+                SearchVector = EF.Functions.ToTsVector(
                     "simple",
                     (d.Title ?? string.Empty) + " " +
                     (d.Summary ?? string.Empty) + " " +
                     (d.Content ?? string.Empty))
-                .Matches(tsQuery))
-            .OrderByDescending(d =>
-                EF.Functions.ToTsVector(
-                    "simple",
-                    (d.Title ?? string.Empty) + " " +
-                    (d.Summary ?? string.Empty) + " " +
-                    (d.Content ?? string.Empty))
-                .Rank(tsQuery))
+            })
+            .Where(x => x.SearchVector.Matches(tsQuery))
+            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Select(x => x.Document)
             .Take(maxResults)
             .ToListAsync(cancellationToken);
     }
