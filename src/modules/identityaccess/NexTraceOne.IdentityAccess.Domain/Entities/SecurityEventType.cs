@@ -63,6 +63,21 @@ public static class SecurityEventType
     /// <summary>MFA adicional solicitado (step-up).</summary>
     public const string StepUpMfaRequired = "security.response.stepup_mfa_required";
 
+    /// <summary>Desafio MFA concluído com sucesso durante o login.</summary>
+    public const string MfaChallengeSucceeded = "security.mfa.challenge_succeeded";
+
+    /// <summary>Desafio MFA falhou — código inválido ou expirado.</summary>
+    public const string MfaChallengeFailed = "security.mfa.challenge_failed";
+
+    /// <summary>Step-up MFA concluído com sucesso para operação privilegiada.</summary>
+    public const string MfaStepUpGranted = "security.mfa.stepup_granted";
+
+    /// <summary>Step-up MFA negado — código inválido ou MFA não cumprido.</summary>
+    public const string MfaStepUpDenied = "security.mfa.stepup_denied";
+
+    /// <summary>Contexto de sessão suspeito detectado — IP ou UserAgent alterado durante refresh.</summary>
+    public const string SuspiciousSessionContextDetected = "security.anomaly.suspicious_session_context";
+
     // ── Gestão de Identidade ─────────────────────────────────────────────
 
     /// <summary>

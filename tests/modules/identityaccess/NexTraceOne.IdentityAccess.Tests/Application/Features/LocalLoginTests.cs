@@ -37,7 +37,8 @@ public sealed class LocalLoginTests
             new TestDateTimeProvider(now),
             auditRecorder,
             sessionCreator,
-            responseBuilder);
+            responseBuilder,
+            Substitute.For<IMfaChallengeTokenService>());
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         responseBuilder.ResolveMembershipAsync(user.Id, Arg.Any<CancellationToken>()).Returns(membership);
@@ -77,7 +78,8 @@ public sealed class LocalLoginTests
             new TestDateTimeProvider(now),
             auditRecorder,
             sessionCreator,
-            responseBuilder);
+            responseBuilder,
+            Substitute.For<IMfaChallengeTokenService>());
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         passwordHasher.Verify("wrong-password", user.PasswordHash!.Value).Returns(false);
@@ -115,7 +117,8 @@ public sealed class LocalLoginTests
             new TestDateTimeProvider(now),
             auditRecorder,
             sessionCreator,
-            responseBuilder);
+            responseBuilder,
+            Substitute.For<IMfaChallengeTokenService>());
 
         userRepository.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>()).Returns(user);
         passwordHasher.Verify("wrong-password", user.PasswordHash!.Value).Returns(false);

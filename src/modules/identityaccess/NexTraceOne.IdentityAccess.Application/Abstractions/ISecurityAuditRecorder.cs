@@ -76,6 +76,60 @@ public interface ISecurityAuditRecorder
         string? userAgent);
 
     /// <summary>
+    /// Registra evento de desafio MFA bem-sucedido.
+    /// Emitido quando o utilizador completa o challenge TOTP com sucesso.
+    /// </summary>
+    void RecordMfaChallengeSuccess(
+        TenantId tenantId,
+        UserId userId,
+        string? ipAddress,
+        string? userAgent);
+
+    /// <summary>
+    /// Registra evento de falha no desafio MFA.
+    /// Emitido quando o código TOTP fornecido é inválido.
+    /// </summary>
+    void RecordMfaChallengeFailed(
+        TenantId tenantId,
+        UserId userId,
+        string? ipAddress,
+        string? userAgent);
+
+    /// <summary>
+    /// Registra evento de step-up MFA negado para operação privilegiada.
+    /// Emitido quando o utilizador não fornece código MFA válido para operação de alto risco.
+    /// </summary>
+    void RecordMfaStepUpDenied(
+        TenantId tenantId,
+        UserId userId,
+        string operation,
+        string? ipAddress,
+        string? userAgent);
+
+    /// <summary>
+    /// Registra evento de step-up MFA solicitado (requisito).
+    /// Emitido quando a operação privilegiada exige MFA e o utilizador ainda não o cumpriu.
+    /// </summary>
+    void RecordStepUpMfaRequired(
+        TenantId tenantId,
+        UserId userId,
+        string operation,
+        string? ipAddress,
+        string? userAgent);
+
+    /// <summary>
+    /// Registra evento de contexto de sessão suspeito detectado durante refresh.
+    /// Emitido quando o IP ou UserAgent difere do armazenado na sessão original.
+    /// </summary>
+    void RecordSuspiciousSessionContext(
+        TenantId tenantId,
+        UserId userId,
+        SessionId sessionId,
+        string reason,
+        string? currentIp,
+        string? originalIp);
+
+    /// <summary>
     /// Resolve o TenantId para eventos de segurança quando o tenant pode não estar disponível.
     /// Usado em cenários de falha de autenticação onde o contexto do tenant pode estar vazio.
     /// Retorna TenantId.From(Guid.Empty) como fallback seguro.

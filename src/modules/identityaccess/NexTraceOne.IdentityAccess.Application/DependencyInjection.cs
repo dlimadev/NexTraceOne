@@ -29,6 +29,7 @@ using NexTraceOne.IdentityAccess.Application.Features.RevokeSession;
 using NexTraceOne.IdentityAccess.Application.Features.SelectTenant;
 using NexTraceOne.IdentityAccess.Application.Features.StartAccessReviewCampaign;
 using NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin;
+using NexTraceOne.IdentityAccess.Application.Features.VerifyMfaChallenge;
 
 namespace NexTraceOne.IdentityAccess.Application;
 
@@ -57,6 +58,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RefreshToken.Command>, RefreshToken.Validator>();
         services.AddTransient<IValidator<RevokeSession.Command>, RevokeSession.Validator>();
         services.AddTransient<IValidator<ChangePassword.Command>, ChangePassword.Validator>();
+        services.AddTransient<IValidator<VerifyMfaChallenge.Command>, VerifyMfaChallenge.Validator>();
 
         // OIDC Redirect Flow
         services.AddTransient<IValidator<StartOidcLogin.Command>, StartOidcLogin.Validator>();
