@@ -12,7 +12,7 @@ using NexTraceOne.Integrations.Domain.Entities;
 using NexTraceOne.Integrations.Domain.Enums;
 using NSubstitute;
 
-namespace NexTraceOne.Governance.Tests.Application.Features;
+namespace NexTraceOne.Integrations.Tests.Application.Features;
 
 /// <summary>
 /// Testes de unidade para as features do Integration Hub.

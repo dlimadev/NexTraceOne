@@ -7,12 +7,12 @@ using NexTraceOne.Governance.Application.Features.GetTeamDetail;
 using NexTraceOne.Governance.Application.Features.ListGovernancePacks;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
-using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
 /// <summary>
-/// Testes de unidade Phase 3 — scope counting, IngestionSource behaviours e cross-team enrichment.
+/// Testes de unidade Phase 3 — scope counting e cross-team enrichment.
+/// IngestionSource domain tests foram movidos para NexTraceOne.Integrations.Tests (P8.2).
 /// </summary>
 public sealed class Phase3GovernanceFeatureTests
 {
@@ -121,46 +121,6 @@ public sealed class Phase3GovernanceFeatureTests
         result.Value.Pack.Scopes.Should().HaveCount(1);
         result.Value.Pack.Scopes[0].ScopeValue.Should().Be("team-alpha");
         result.Value.Pack.Scopes[0].ScopeType.Should().Be(GovernanceScopeType.Team);
-    }
-
-    // ── IngestionSource — LastProcessedAt ──
-
-    [Fact]
-    public void IngestionSource_RecordDataReceived_ShouldUpdateLastProcessedAt()
-    {
-        // Arrange
-        var connectorId = new IntegrationConnectorId(Guid.NewGuid());
-        var now = DateTimeOffset.UtcNow;
-        var source = IngestionSource.Create(connectorId, "Webhook", "Webhook", "Changes", "Desc", null, 30, now);
-
-        var processTime = now.AddMinutes(5);
-
-        // Act
-        source.RecordDataReceived(10, processTime);
-
-        // Assert
-        source.LastProcessedAt.Should().Be(processTime);
-        source.LastDataReceivedAt.Should().Be(processTime);
-        source.DataItemsProcessed.Should().Be(10);
-    }
-
-    [Fact]
-    public void IngestionSource_RecordProcessingCompleted_ShouldOnlyUpdateLastProcessedAt()
-    {
-        // Arrange
-        var connectorId = new IntegrationConnectorId(Guid.NewGuid());
-        var now = DateTimeOffset.UtcNow;
-        var source = IngestionSource.Create(connectorId, "Poller", "API Polling", "Runtime", null, null, 60, now);
-
-        var processTime = now.AddMinutes(10);
-
-        // Act
-        source.RecordProcessingCompleted(processTime);
-
-        // Assert
-        source.LastProcessedAt.Should().Be(processTime);
-        source.LastDataReceivedAt.Should().BeNull();
-        source.DataItemsProcessed.Should().Be(0);
     }
 
     // ── GetTeamDetail — Cross-Team Enrichment ──
