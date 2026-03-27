@@ -162,6 +162,17 @@ All PostgreSQL tables **must** use a module-specific prefix in the format `prefi
 
 ---
 
+### `knw_` — Knowledge
+
+| Attribute | Value |
+|-----------|-------|
+| **Module** | Knowledge |
+| **Justification** | Abbreviation for "knowledge" |
+| **Example tables** | `knw_documents`, `knw_operational_notes`, `knw_relations`, `knw_outbox_messages` |
+| **Notes** | Dedicated Knowledge Hub module created in P10.1. Owns KnowledgeDocument, OperationalNote and KnowledgeRelation entities. |
+
+---
+
 ## Summary Table
 
 | Prefix | Module | DbContext (current) | Physical Separation Needed |
@@ -179,3 +190,4 @@ All PostgreSQL tables **must** use a module-specific prefix in the format `prefi
 | `ntf_` | Notifications | NotificationsDbContext | No |
 | `int_` | Integrations | GovernanceDbContext (shared) | **Yes** |
 | `pan_` | Product Analytics | GovernanceDbContext (shared) | **Yes** |
+| `knw_` | Knowledge | KnowledgeDbContext | No |
