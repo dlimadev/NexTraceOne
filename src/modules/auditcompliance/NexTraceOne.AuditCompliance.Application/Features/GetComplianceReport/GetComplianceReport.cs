@@ -23,7 +23,7 @@ public static class GetComplianceReport
         {
             Guard.Against.Null(request);
 
-            var events = await auditEventRepository.SearchAsync(null, null, request.From, request.To, 1, 10000, cancellationToken);
+            var events = await auditEventRepository.SearchAsync(null, null, null, request.From, request.To, 1, 10000, cancellationToken);
             var links = await auditChainRepository.GetAllLinksAsync(cancellationToken);
 
             var moduleBreakdown = events

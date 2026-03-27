@@ -14,9 +14,12 @@ using GetAuditCampaignFeature = NexTraceOne.AuditCompliance.Application.Features
 using GetAuditTrailFeature = NexTraceOne.AuditCompliance.Application.Features.GetAuditTrail.GetAuditTrail;
 using GetCompliancePolicyFeature = NexTraceOne.AuditCompliance.Application.Features.GetCompliancePolicy.GetCompliancePolicy;
 using GetComplianceReportFeature = NexTraceOne.AuditCompliance.Application.Features.GetComplianceReport.GetComplianceReport;
+using GetRetentionPoliciesFeature = NexTraceOne.AuditCompliance.Application.Features.GetRetentionPolicies.GetRetentionPolicies;
 using ListAuditCampaignsFeature = NexTraceOne.AuditCompliance.Application.Features.ListAuditCampaigns.ListAuditCampaigns;
 using ListCompliancePoliciesFeature = NexTraceOne.AuditCompliance.Application.Features.ListCompliancePolicies.ListCompliancePolicies;
 using ListComplianceResultsFeature = NexTraceOne.AuditCompliance.Application.Features.ListComplianceResults.ListComplianceResults;
+using ApplyRetentionFeature = NexTraceOne.AuditCompliance.Application.Features.ApplyRetention.ApplyRetention;
+using ConfigureRetentionFeature = NexTraceOne.AuditCompliance.Application.Features.ConfigureRetention.ConfigureRetention;
 using RecordAuditEventFeature = NexTraceOne.AuditCompliance.Application.Features.RecordAuditEvent.RecordAuditEvent;
 using RecordComplianceResultFeature = NexTraceOne.AuditCompliance.Application.Features.RecordComplianceResult.RecordComplianceResult;
 using SearchAuditLogFeature = NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog.SearchAuditLog;
@@ -60,15 +63,29 @@ public sealed class AuditEndpointModule
         group.MapGet("/search", async (
             string? sourceModule,
             string? actionType,
+            string? correlationId,
             DateTimeOffset? from,
             DateTimeOffset? to,
             int page,
             int pageSize,
+            string? resourceType,
+            string? resourceId,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new SearchAuditLogFeature.Query(sourceModule, actionType, from, to, page, pageSize), cancellationToken);
+            var result = await sender.Send(
+                new SearchAuditLogFeature.Query(
+                    sourceModule,
+                    actionType,
+                    correlationId,
+                    from,
+                    to,
+                    page,
+                    pageSize,
+                    resourceType,
+                    resourceId),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("audit:trail:read");
@@ -106,6 +123,41 @@ public sealed class AuditEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("audit:compliance:read");
+
+        // --- Retention Policies ---
+        var retentionGroup = app.MapGroup("/api/v1/audit/retention");
+
+        retentionGroup.MapPost("/policies", async (
+            ConfigureRetentionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write");
+
+        retentionGroup.MapGet("/policies", async (
+            bool? activeOnly,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetRetentionPoliciesFeature.Query(activeOnly), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:read");
+
+        retentionGroup.MapPost("/apply", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ApplyRetentionFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write");
 
         // --- Compliance Policies ---
         var policiesGroup = app.MapGroup("/api/v1/audit/compliance/policies");

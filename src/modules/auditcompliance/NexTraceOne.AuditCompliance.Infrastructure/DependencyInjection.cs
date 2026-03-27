@@ -3,9 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.AuditCompliance.Application.Retention;
 using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
+using NexTraceOne.AuditCompliance.Infrastructure.Retention;
 using NexTraceOne.AuditCompliance.Infrastructure.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
@@ -33,6 +35,9 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
+        services.Configure<AuditRetentionOptions>(
+            configuration.GetSection(AuditRetentionOptions.SectionName));
+
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AuditDbContext>());
         services.AddScoped<IAuditEventRepository, AuditEventRepository>();
         services.AddScoped<IAuditChainRepository, AuditChainRepository>();
@@ -41,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IComplianceResultRepository, ComplianceResultRepository>();
         services.AddScoped<IRetentionPolicyRepository, RetentionPolicyRepository>();
         services.AddScoped<IAuditModule, AuditModuleService>();
+        services.AddHostedService<AuditRetentionJob>();
 
         return services;
     }

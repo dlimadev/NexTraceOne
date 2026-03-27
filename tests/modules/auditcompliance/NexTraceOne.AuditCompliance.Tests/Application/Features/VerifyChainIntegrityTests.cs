@@ -28,6 +28,7 @@ public sealed class VerifyChainIntegrityTests
         result.Value.IsIntact.Should().BeTrue();
         result.Value.TotalLinks.Should().Be(0);
         result.Value.Violations.Should().BeEmpty();
+        result.Value.IsTruncated.Should().BeFalse();
     }
 
     [Fact]
@@ -55,6 +56,7 @@ public sealed class VerifyChainIntegrityTests
         result.Value.IsIntact.Should().BeTrue();
         result.Value.TotalLinks.Should().Be(3);
         result.Value.Violations.Should().BeEmpty();
+        result.Value.IsTruncated.Should().BeFalse();
     }
 
     [Fact]
@@ -80,6 +82,7 @@ public sealed class VerifyChainIntegrityTests
         result.Value.IsIntact.Should().BeFalse();
         result.Value.Violations.Should().NotBeEmpty();
         result.Value.Violations.Should().Contain(v => v.SequenceNumber == 2);
+        result.Value.IsTruncated.Should().BeFalse();
     }
 
     [Fact]
@@ -98,6 +101,7 @@ public sealed class VerifyChainIntegrityTests
         result.IsSuccess.Should().BeTrue();
         result.Value.IsIntact.Should().BeTrue();
         result.Value.TotalLinks.Should().Be(1);
+        result.Value.IsTruncated.Should().BeFalse();
     }
 
     [Fact]
@@ -121,8 +125,8 @@ public sealed class VerifyChainIntegrityTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.IsIntact.Should().BeFalse();
-        // link1 has PreviousHash "wrong-genesis" but expected "" → violation at seq 1
-        // link2 has PreviousHash "wrong-prev" but expected link1.CurrentHash → violation at seq 2
-        result.Value.Violations.Should().HaveCount(2);
+        result.Value.IsTruncated.Should().BeTrue();
+        // link1 treated as chain truncation, link2 mismatch remains
+        result.Value.Violations.Should().HaveCount(1);
     }
 }

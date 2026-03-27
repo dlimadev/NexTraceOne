@@ -37,6 +37,9 @@ public sealed class AuditEvent : AggregateRoot<AuditEventId>
     /// <summary>Payload serializado com detalhes adicionais do evento.</summary>
     public string? Payload { get; private set; }
 
+    /// <summary>Identificador de correlação distribuída, quando aplicável.</summary>
+    public string? CorrelationId { get; private set; }
+
     /// <summary>Link da cadeia de hash associado a este evento.</summary>
     public AuditChainLink? ChainLink { get; private set; }
 
@@ -49,7 +52,8 @@ public sealed class AuditEvent : AggregateRoot<AuditEventId>
         string performedBy,
         DateTimeOffset occurredAt,
         Guid tenantId,
-        string? payload = null)
+        string? payload = null,
+        string? correlationId = null)
     {
         return new AuditEvent
         {
@@ -61,7 +65,8 @@ public sealed class AuditEvent : AggregateRoot<AuditEventId>
             PerformedBy = Guard.Against.NullOrWhiteSpace(performedBy),
             OccurredAt = occurredAt,
             TenantId = tenantId,
-            Payload = payload
+            Payload = payload,
+            CorrelationId = string.IsNullOrWhiteSpace(correlationId) ? null : correlationId
         };
     }
 

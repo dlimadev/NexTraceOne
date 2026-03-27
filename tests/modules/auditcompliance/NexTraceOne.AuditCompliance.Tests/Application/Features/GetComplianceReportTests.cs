@@ -37,7 +37,7 @@ public sealed class GetComplianceReportTests
             AuditChainLink.Create(chainEvent, 3, "prev2", from.AddDays(3)),
         };
 
-        _eventRepository.SearchAsync(null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
+        _eventRepository.SearchAsync(null, null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
             .Returns(events);
         _chainRepository.GetAllLinksAsync(Arg.Any<CancellationToken>())
             .Returns(links);
@@ -68,7 +68,7 @@ public sealed class GetComplianceReportTests
             AuditEvent.Record("Governance", "D", "r4", "T", "u", from.AddDays(4), tenantId),
         };
 
-        _eventRepository.SearchAsync(null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
+        _eventRepository.SearchAsync(null, null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
             .Returns(events);
         _chainRepository.GetAllLinksAsync(Arg.Any<CancellationToken>())
             .Returns(new List<AuditChainLink>());
@@ -90,7 +90,7 @@ public sealed class GetComplianceReportTests
         var from = DateTimeOffset.UtcNow.AddDays(-1);
         var to = DateTimeOffset.UtcNow;
 
-        _eventRepository.SearchAsync(null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
+        _eventRepository.SearchAsync(null, null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
             .Returns(new List<AuditEvent>());
         _chainRepository.GetAllLinksAsync(Arg.Any<CancellationToken>())
             .Returns(new List<AuditChainLink>());

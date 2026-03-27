@@ -9,6 +9,7 @@ vi.mock('../../features/audit-compliance/api', () => ({
   auditApi: {
     listEvents: vi.fn(),
     verifyIntegrity: vi.fn(),
+    exportReport: vi.fn(),
   },
 }));
 
@@ -22,7 +23,7 @@ const mockEvents = {
       aggregateId: 'rel-001',
       aggregateType: 'Release',
       actorEmail: 'admin@acme.com',
-      payload: { sourceModule: 'ChangeGovernance' },
+      sourceModule: 'ChangeGovernance',
       hash: 'evt-1',
       occurredAt: '2024-01-15T10:00:00Z',
     },
@@ -32,7 +33,7 @@ const mockEvents = {
       aggregateId: 'ses-001',
       aggregateType: 'Session',
       actorEmail: 'dev@acme.com',
-      payload: { sourceModule: 'IdentityAccess' },
+      sourceModule: 'IdentityAccess',
       hash: 'evt-2',
       occurredAt: '2024-01-15T09:00:00Z',
     },

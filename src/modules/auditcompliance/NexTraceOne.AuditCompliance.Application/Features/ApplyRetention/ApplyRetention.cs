@@ -24,8 +24,8 @@ namespace NexTraceOne.AuditCompliance.Application.Features.ApplyRetention;
 ///
 /// Limitações actuais (P7.4):
 ///   - Aplica apenas a política global mais restritiva (não filtra por módulo ou tipo).
-///   - AuditChainLinks dos eventos eliminados ficam órfãos (hash chain fica parcialmente truncada).
-///     Resolução completa fica para P7.5.
+///   - A cadeia pode ficar truncada após a retenção. VerifyChainIntegrity reporta IsTruncated
+///     quando o primeiro elo restante não tem hash anterior vazio. Normalização completa fica para P7.5.
 /// </summary>
 public static class ApplyRetention
 {
@@ -74,6 +74,12 @@ public static class ApplyRetention
             logger.LogInformation(
                 "ApplyRetention: policy={PolicyName} retentionDays={RetentionDays} cutoff={Cutoff} deleted={Count}",
                 policy.Name, policy.RetentionDays, cutoff, deletedCount);
+
+            if (deletedCount > 0)
+            {
+                logger.LogInformation(
+                    "ApplyRetention: chain may be truncated after retention. VerifyChainIntegrity reports truncation status.");
+            }
 
             return new Response(
                 PolicyApplied: true,

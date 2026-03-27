@@ -32,7 +32,7 @@ public static class ExportAuditReport
         {
             Guard.Against.Null(request);
 
-            var events = await auditEventRepository.SearchAsync(null, null, request.From, request.To, 1, 10000, cancellationToken);
+            var events = await auditEventRepository.SearchAsync(null, null, null, request.From, request.To, 1, 10000, cancellationToken);
 
             var entries = events
                 .Select(e => new ReportEntry(
@@ -45,6 +45,7 @@ public static class ExportAuditReport
                     e.OccurredAt,
                     e.TenantId,
                     e.Payload,
+                    e.CorrelationId,
                     e.ChainLink?.CurrentHash))
                 .ToArray();
 
@@ -57,7 +58,7 @@ public static class ExportAuditReport
 
     /// <summary>
     /// Entrada do relatório de auditoria.
-    /// P7.4 — enriquecida com TenantId, Payload e ChainHash para contexto completo.
+    /// P7.4 — enriquecida com TenantId, CorrelationId, Payload e ChainHash para contexto completo.
     /// </summary>
     public sealed record ReportEntry(
         Guid EventId,
@@ -69,5 +70,6 @@ public static class ExportAuditReport
         DateTimeOffset OccurredAt,
         Guid TenantId,
         string? Payload,
+        string? CorrelationId,
         string? ChainHash);
 }

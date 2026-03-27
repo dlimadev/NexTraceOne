@@ -63,7 +63,7 @@ O módulo implementa cadeia de integridade SHA-256:
 - Cada link contém: SequenceNumber, CurrentHash, PreviousHash
 - Verificação de integridade via endpoint `GET /api/v1/audit/verify-chain`
 
-## Endpoints (13)
+## Endpoints (16)
 
 | Método | Rota | Permissão |
 |--------|------|-----------|
@@ -73,6 +73,9 @@ O módulo implementa cadeia de integridade SHA-256:
 | GET | `/api/v1/audit/verify-chain` | `audit:trail:read` |
 | GET | `/api/v1/audit/report` | `audit:reports:read` |
 | GET | `/api/v1/audit/compliance` | `audit:compliance:read` |
+| POST | `/api/v1/audit/retention/policies` | `audit:compliance:write` |
+| GET | `/api/v1/audit/retention/policies` | `audit:compliance:read` |
+| POST | `/api/v1/audit/retention/apply` | `audit:compliance:write` |
 | POST | `/api/v1/audit/compliance/policies` | `audit:compliance:write` |
 | GET | `/api/v1/audit/compliance/policies` | `audit:compliance:read` |
 | GET | `/api/v1/audit/compliance/policies/{id}` | `audit:compliance:read` |

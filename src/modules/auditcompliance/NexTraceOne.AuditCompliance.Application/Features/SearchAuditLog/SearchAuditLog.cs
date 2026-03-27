@@ -10,8 +10,8 @@ namespace NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog;
 
 /// <summary>
 /// Feature: SearchAuditLog — pesquisa eventos de auditoria com filtros.
-/// P7.4 — enriquecido com filtros ResourceType e ResourceId para suporte a correlação lookup
-/// (dado um resourceId, encontrar todos os eventos auditáveis relacionados).
+/// P7.4 — enriquecido com filtros de correlação (CorrelationId) e ResourceType/ResourceId
+/// para suporte a lookup por fluxo e recurso auditável.
 /// </summary>
 public static class SearchAuditLog
 {
@@ -19,6 +19,7 @@ public static class SearchAuditLog
     public sealed record Query(
         string? SourceModule,
         string? ActionType,
+        string? CorrelationId,
         DateTimeOffset? From,
         DateTimeOffset? To,
         int Page,
@@ -33,6 +34,8 @@ public static class SearchAuditLog
         {
             RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
             RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+            RuleFor(x => x.CorrelationId).MaximumLength(100)
+                .When(x => !string.IsNullOrWhiteSpace(x.CorrelationId));
         }
     }
 
@@ -47,11 +50,13 @@ public static class SearchAuditLog
             var events = (request.ResourceType is not null || request.ResourceId is not null)
                 ? await auditEventRepository.SearchWithResourceAsync(
                     request.SourceModule, request.ActionType,
+                    request.CorrelationId,
                     request.ResourceType, request.ResourceId,
                     request.From, request.To,
                     request.Page, request.PageSize, cancellationToken)
                 : await auditEventRepository.SearchAsync(
-                    request.SourceModule, request.ActionType, request.From, request.To,
+                    request.SourceModule, request.ActionType, request.CorrelationId,
+                    request.From, request.To,
                     request.Page, request.PageSize, cancellationToken);
 
             var items = events
@@ -59,7 +64,11 @@ public static class SearchAuditLog
                     e.Id.Value, e.SourceModule, e.ActionType,
                     e.ResourceType, e.ResourceId,
                     e.PerformedBy, e.OccurredAt, e.TenantId,
-                    e.Payload, e.ChainLink?.CurrentHash))
+                    e.Payload,
+                    e.CorrelationId,
+                    e.ChainLink?.CurrentHash,
+                    e.ChainLink?.PreviousHash,
+                    e.ChainLink?.SequenceNumber))
                 .ToArray();
 
             return new Response(items);
@@ -80,5 +89,8 @@ public static class SearchAuditLog
         DateTimeOffset OccurredAt,
         Guid TenantId,
         string? Payload,
-        string? ChainHash);
+        string? CorrelationId,
+        string? ChainHash,
+        string? PreviousHash,
+        long? SequenceNumber);
 }

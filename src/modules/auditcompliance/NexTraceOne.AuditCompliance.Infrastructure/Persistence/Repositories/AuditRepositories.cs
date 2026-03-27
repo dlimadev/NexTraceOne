@@ -13,8 +13,14 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
     public async Task<IReadOnlyList<AuditEvent>> SearchAsync(
-        string? sourceModule, string? actionType, DateTimeOffset? from, DateTimeOffset? to,
-        int page, int pageSize, CancellationToken cancellationToken)
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
     {
         var query = context.AuditEvents.Include(e => e.ChainLink).AsQueryable();
 
@@ -23,6 +29,9 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
 
         if (!string.IsNullOrWhiteSpace(actionType))
             query = query.Where(e => e.ActionType == actionType);
+
+        if (!string.IsNullOrWhiteSpace(correlationId))
+            query = query.Where(e => e.CorrelationId == correlationId);
 
         if (from.HasValue)
             query = query.Where(e => e.OccurredAt >= from.Value);
@@ -45,7 +54,9 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<AuditEvent>> SearchWithResourceAsync(
-        string? sourceModule, string? actionType,
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
         string? resourceType, string? resourceId,
         DateTimeOffset? from, DateTimeOffset? to,
         int page, int pageSize,
@@ -58,6 +69,9 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
 
         if (!string.IsNullOrWhiteSpace(actionType))
             query = query.Where(e => e.ActionType == actionType);
+
+        if (!string.IsNullOrWhiteSpace(correlationId))
+            query = query.Where(e => e.CorrelationId == correlationId);
 
         if (!string.IsNullOrWhiteSpace(resourceType))
             query = query.Where(e => e.ResourceType == resourceType);

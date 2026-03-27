@@ -10,8 +10,16 @@ public interface IAuditEventRepository
     /// <summary>Obtém um evento de auditoria pelo identificador.</summary>
     Task<AuditEvent?> GetByIdAsync(AuditEventId id, CancellationToken cancellationToken);
 
-    /// <summary>Pesquisa eventos de auditoria por módulo, tipo de ação ou período.</summary>
-    Task<IReadOnlyList<AuditEvent>> SearchAsync(string? sourceModule, string? actionType, DateTimeOffset? from, DateTimeOffset? to, int page, int pageSize, CancellationToken cancellationToken);
+    /// <summary>Pesquisa eventos de auditoria por módulo, tipo de ação, correlação ou período.</summary>
+    Task<IReadOnlyList<AuditEvent>> SearchAsync(
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken);
 
     /// <summary>Obtém a trilha de auditoria de um recurso específico.</summary>
     Task<IReadOnlyList<AuditEvent>> GetTrailByResourceAsync(string resourceType, string resourceId, CancellationToken cancellationToken);
@@ -21,7 +29,9 @@ public interface IAuditEventRepository
     /// P7.4 — suporta correlação lookup: dado um resourceId, encontrar todos os eventos relacionados.
     /// </summary>
     Task<IReadOnlyList<AuditEvent>> SearchWithResourceAsync(
-        string? sourceModule, string? actionType,
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
         string? resourceType, string? resourceId,
         DateTimeOffset? from, DateTimeOffset? to,
         int page, int pageSize,

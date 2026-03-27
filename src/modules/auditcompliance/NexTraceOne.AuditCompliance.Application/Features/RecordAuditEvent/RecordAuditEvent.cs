@@ -23,7 +23,8 @@ public static class RecordAuditEvent
         string ResourceType,
         string PerformedBy,
         Guid TenantId,
-        string? Payload = null) : ICommand<Response>;
+        string? Payload = null,
+        string? CorrelationId = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -36,6 +37,8 @@ public static class RecordAuditEvent
             RuleFor(x => x.ResourceType).NotEmpty().MaximumLength(200);
             RuleFor(x => x.PerformedBy).NotEmpty().MaximumLength(200);
             RuleFor(x => x.TenantId).NotEmpty();
+            RuleFor(x => x.CorrelationId).MaximumLength(100)
+                .When(x => !string.IsNullOrWhiteSpace(x.CorrelationId));
         }
     }
 
@@ -51,6 +54,9 @@ public static class RecordAuditEvent
             Guard.Against.Null(request);
 
             var now = dateTimeProvider.UtcNow;
+            var correlationId = string.IsNullOrWhiteSpace(request.CorrelationId)
+                ? System.Diagnostics.Activity.Current?.TraceId.ToString()
+                : request.CorrelationId;
             var auditEvent = AuditEvent.Record(
                 request.SourceModule,
                 request.ActionType,
@@ -59,7 +65,8 @@ public static class RecordAuditEvent
                 request.PerformedBy,
                 now,
                 request.TenantId,
-                request.Payload);
+                request.Payload,
+                correlationId);
 
             var latestLink = await auditChainRepository.GetLatestLinkAsync(cancellationToken);
             var previousHash = latestLink?.CurrentHash ?? string.Empty;
