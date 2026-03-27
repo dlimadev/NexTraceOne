@@ -15,6 +15,9 @@ using AttributeCostToServiceFeature = NexTraceOne.OperationalIntelligence.Applic
 using ComputeCostTrendFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ComputeCostTrend.ComputeCostTrend;
 using AlertCostAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAnomaly.AlertCostAnomaly;
 using ImportCostBatchFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ImportCostBatch.ImportCostBatch;
+using ListCostImportBatchesFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ListCostImportBatches.ListCostImportBatches;
+using GetCostRecordsByServiceFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByService.GetCostRecordsByService;
+using CreateServiceCostProfileFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.CreateServiceCostProfile.CreateServiceCostProfile;
 
 namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
@@ -23,15 +26,19 @@ namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 /// Agrupa endpoints por responsabilidade funcional: ingestão, consulta, análise e alertas.
 ///
 /// Endpoints disponíveis:
-/// - POST   /snapshots          → Ingerir snapshot de custo
-/// - POST   /import             → Importar batch de registos de custo reais
-/// - GET    /report              → Relatório de custo por serviço/ambiente
-/// - GET    /by-release/{id}     → Custo por release
-/// - GET    /by-route            → Custo por rota/serviço
-/// - GET    /delta               → Delta de custo entre períodos
-/// - POST   /attributions        → Atribuir custo a serviço
-/// - POST   /trends              → Computar tendência de custo
-/// - POST   /anomaly-check       → Verificar anomalia de custo/orçamento
+/// - POST   /snapshots            → Ingerir snapshot de custo
+/// - POST   /import               → Importar batch de registos de custo reais
+/// - GET    /import               → Listar histórico de batches de importação (P6.3)
+/// - GET    /report               → Relatório de custo por serviço/ambiente
+/// - GET    /records              → Listar registos de custo por serviço (P6.3)
+/// - GET    /by-release/{id}      → Custo por release
+/// - GET    /by-route             → Custo por rota/serviço
+/// - GET    /delta                → Delta de custo entre períodos
+/// - POST   /attributions         → Atribuir custo a serviço
+/// - POST   /trends               → Computar tendência de custo
+/// - POST   /anomaly-check        → Verificar anomalia de custo/orçamento
+/// - POST   /profiles             → Criar perfil de custo de serviço (P6.3)
+/// - GET    /profiles             → Obter perfil de custo de serviço (P6.3)
 /// </summary>
 public sealed class CostIntelligenceEndpointModule
 {
@@ -155,5 +162,60 @@ public sealed class CostIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:cost:write");
+
+        // ── P6.3 — batch history, cost records by service, service cost profile ──
+
+        group.MapGet("/import", async (
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new ListCostImportBatchesFeature.Query(page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/records", async (
+            string serviceId,
+            string? period,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetCostRecordsByServiceFeature.Query(serviceId, period, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapPost("/profiles", async (
+            CreateServiceCostProfileFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToCreatedResult("/api/v1/cost/profiles/{0}", localizer);
+        })
+        .RequirePermission("operations:cost:write");
+
+        group.MapGet("/profiles", async (
+            string serviceName,
+            string environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            // Returns existing profile (idempotent create with defaults)
+            var command = new CreateServiceCostProfileFeature.Command(serviceName, environment);
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
     }
 }

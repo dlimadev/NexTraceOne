@@ -14,6 +14,9 @@ public interface ICostImportBatchRepository
     /// <summary>Verifica se já existe um batch para a mesma fonte e período.</summary>
     Task<bool> ExistsBySourceAndPeriodAsync(string source, string period, CancellationToken cancellationToken = default);
 
+    /// <summary>Lista batches de importação, ordenados por data de importação descendente, com paginação.</summary>
+    Task<IReadOnlyList<CostImportBatch>> ListAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+
     /// <summary>Adiciona um novo batch de importação ao repositório.</summary>
     void Add(CostImportBatch batch);
 }

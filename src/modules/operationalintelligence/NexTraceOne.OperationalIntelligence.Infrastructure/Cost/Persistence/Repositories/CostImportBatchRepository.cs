@@ -22,4 +22,15 @@ internal sealed class CostImportBatchRepository(CostIntelligenceDbContext contex
     public async Task<bool> ExistsBySourceAndPeriodAsync(string source, string period, CancellationToken cancellationToken = default)
         => await context.CostImportBatches
             .AnyAsync(b => b.Source == source && b.Period == period, cancellationToken);
+
+    /// <summary>Lista batches de importação, ordenados por data de importação descendente.</summary>
+    public async Task<IReadOnlyList<CostImportBatch>> ListAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+        => await context.CostImportBatches
+            .OrderByDescending(b => b.ImportedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
 }
