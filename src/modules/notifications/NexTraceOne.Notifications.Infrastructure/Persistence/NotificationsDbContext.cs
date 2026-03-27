@@ -26,6 +26,15 @@ public sealed class NotificationsDbContext(
     /// <summary>Preferências de notificação dos utilizadores.</summary>
     public DbSet<NotificationPreference> Preferences => Set<NotificationPreference>();
 
+    /// <summary>Templates persistidos de conteúdo de notificação por tipo de evento e canal.</summary>
+    public DbSet<NotificationTemplate> Templates => Set<NotificationTemplate>();
+
+    /// <summary>Configurações persistidas dos canais de entrega (Email, Teams, etc.).</summary>
+    public DbSet<DeliveryChannelConfiguration> ChannelConfigurations => Set<DeliveryChannelConfiguration>();
+
+    /// <summary>Configuração SMTP persistida para entrega por email.</summary>
+    public DbSet<SmtpConfiguration> SmtpConfigurations => Set<SmtpConfiguration>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(NotificationsDbContext).Assembly;
 

@@ -153,7 +153,7 @@ public sealed class NotificationOrchestrator(
     /// Resolve o template — usa o template resolver se há tipo conhecido,
     /// caso contrário usa título/mensagem do próprio request.
     /// </summary>
-    private NotificationTemplate ResolveTemplate(
+    private ResolvedNotificationTemplate ResolveTemplate(
         NotificationRequest request,
         IReadOnlyDictionary<string, string> parameters)
     {
@@ -162,7 +162,7 @@ public sealed class NotificationOrchestrator(
         {
             var category = ParseEnum<NotificationCategory>(request.Category, NotificationCategory.Informational);
             var severity = ParseEnum<NotificationSeverity>(request.Severity, NotificationSeverity.Info);
-            return new NotificationTemplate(
+            return new ResolvedNotificationTemplate(
                 request.Title,
                 request.Message,
                 category,
