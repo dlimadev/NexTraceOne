@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 
 using MediatR;
+using System.Text.Json;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -34,7 +35,10 @@ public static class RevokeDelegation
     /// <summary>Handler que processa a revogação de delegação.</summary>
     public sealed class Handler(
         IDelegationRepository delegationRepository,
+        ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -50,7 +54,34 @@ public static class RevokeDelegation
             if (delegation is null)
                 return IdentityErrors.DelegationNotFound(request.DelegationId);
 
-            delegation.Revoke(UserId.From(Guid.Parse(currentUser.Id)), dateTimeProvider.UtcNow);
+            var revokedBy = UserId.From(Guid.Parse(currentUser.Id));
+            var now = dateTimeProvider.UtcNow;
+            delegation.Revoke(revokedBy, now);
+
+            var tenantId = currentTenant.Id != Guid.Empty
+                ? TenantId.From(currentTenant.Id)
+                : delegation.TenantId;
+
+            var securityEvent = SecurityEvent.Create(
+                tenantId,
+                delegation.DelegateeId,
+                sessionId: null,
+                SecurityEventType.DelegationRevoked,
+                $"Delegation '{delegation.Id.Value}' revoked by '{revokedBy.Value}'.",
+                riskScore: 55,
+                ipAddress: null,
+                userAgent: null,
+                metadataJson: JsonSerializer.Serialize(new
+                {
+                    delegationId = delegation.Id.Value,
+                    grantorId = delegation.GrantorId.Value,
+                    delegateeId = delegation.DelegateeId.Value,
+                    revokedBy = revokedBy.Value
+                }),
+                now);
+
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return Unit.Value;
         }

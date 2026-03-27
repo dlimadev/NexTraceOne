@@ -50,6 +50,12 @@ public static class SecurityEventType
 
     /// <summary>Delegação formal criada.</summary>
     public const string DelegationCreated = "security.privileged.delegation_created";
+    public const string DelegationRevoked = "security.privileged.delegation_revoked";
+    public const string BreakGlassRevoked = "security.privileged.break_glass_revoked";
+    public const string JitAccessApproved = "security.privileged.jit_approved";
+    public const string JitAccessRejected = "security.privileged.jit_rejected";
+    public const string JitSelfApprovalDenied = "security.privileged.jit_self_approval_denied";
+    public const string DelegationToSelfDenied = "security.privileged.delegation_self_denied";
 
     /// <summary>Sessão suspensa por anomalia detectada.</summary>
     public const string SessionSuspended = "security.response.session_suspended";

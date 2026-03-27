@@ -38,6 +38,12 @@ internal sealed class DelegationRepository(IdentityDbContext dbContext) : IDeleg
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<Delegation>> ListByTenantAsync(TenantId tenantId, CancellationToken cancellationToken)
+        => await dbContext.Delegations
+            .Where(x => x.TenantId == tenantId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
     public void Add(Delegation delegation)
         => dbContext.Delegations.Add(delegation);
 }

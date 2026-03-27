@@ -13,7 +13,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features.ListDelegations;
 public static class ListDelegations
 {
     /// <summary>Consulta de delegações ativas.</summary>
-    public sealed record Query() : IQuery<IReadOnlyList<DelegationResponse>>;
+    public sealed record Query(bool IncludeHistory = false) : IQuery<IReadOnlyList<DelegationResponse>>;
 
     /// <summary>Handler que retorna delegações ativas do tenant.</summary>
     public sealed class Handler(
@@ -26,7 +26,9 @@ public static class ListDelegations
             var tenantId = TenantId.From(currentTenant.Id);
             var now = dateTimeProvider.UtcNow;
 
-            var delegations = await delegationRepository.ListActiveByTenantAsync(tenantId, now, cancellationToken);
+            var delegations = request.IncludeHistory
+                ? await delegationRepository.ListByTenantAsync(tenantId, cancellationToken)
+                : await delegationRepository.ListActiveByTenantAsync(tenantId, now, cancellationToken);
 
             var responses = delegations
                 .Select(d => new DelegationResponse(

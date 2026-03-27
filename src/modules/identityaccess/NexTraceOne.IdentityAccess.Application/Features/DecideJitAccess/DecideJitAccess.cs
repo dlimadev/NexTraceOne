@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 
 using MediatR;
+using System.Text.Json;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -45,7 +46,10 @@ public static class DecideJitAccess
     /// <summary>Handler que processa a decisão sobre solicitação JIT.</summary>
     public sealed class Handler(
         IJitAccessRepository jitAccessRepository,
+        ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -65,17 +69,87 @@ public static class DecideJitAccess
                 return IdentityErrors.JitAccessNotPending(request.RequestId);
 
             var decidedBy = UserId.From(Guid.Parse(currentUser.Id));
+            var now = dateTimeProvider.UtcNow;
+            var tenantId = currentTenant.Id != Guid.Empty
+                ? TenantId.From(currentTenant.Id)
+                : jitRequest.TenantId;
 
             if (decidedBy == jitRequest.RequestedBy)
+            {
+                var deniedEvent = SecurityEvent.Create(
+                    tenantId,
+                    decidedBy,
+                    sessionId: null,
+                    SecurityEventType.JitSelfApprovalDenied,
+                    $"Self-approval denied for JIT access request '{jitRequest.Id.Value}'.",
+                    riskScore: 65,
+                    ipAddress: null,
+                    userAgent: null,
+                    metadataJson: JsonSerializer.Serialize(new
+                    {
+                        jitAccessRequestId = jitRequest.Id.Value,
+                        requestedBy = jitRequest.RequestedBy.Value,
+                        attemptedBy = decidedBy.Value
+                    }),
+                    now);
+
+                securityEventRepository.Add(deniedEvent);
+                securityEventTracker.Track(deniedEvent);
                 return IdentityErrors.JitSelfApprovalNotAllowed();
+            }
 
             if (request.Approve)
             {
-                jitRequest.Approve(decidedBy, dateTimeProvider.UtcNow);
+                jitRequest.Approve(decidedBy, now);
+
+                var approvedEvent = SecurityEvent.Create(
+                    tenantId,
+                    jitRequest.RequestedBy,
+                    sessionId: null,
+                    SecurityEventType.JitAccessApproved,
+                    $"JIT access request '{jitRequest.Id.Value}' approved by '{decidedBy.Value}'.",
+                    riskScore: 45,
+                    ipAddress: null,
+                    userAgent: null,
+                    metadataJson: JsonSerializer.Serialize(new
+                    {
+                        jitAccessRequestId = jitRequest.Id.Value,
+                        requestedBy = jitRequest.RequestedBy.Value,
+                        approvedBy = decidedBy.Value,
+                        permissionCode = jitRequest.PermissionCode,
+                        scope = jitRequest.Scope,
+                        grantedFrom = jitRequest.GrantedFrom,
+                        grantedUntil = jitRequest.GrantedUntil
+                    }),
+                    now);
+
+                securityEventRepository.Add(approvedEvent);
+                securityEventTracker.Track(approvedEvent);
             }
             else
             {
-                jitRequest.Reject(decidedBy, request.RejectionReason!, dateTimeProvider.UtcNow);
+                jitRequest.Reject(decidedBy, request.RejectionReason!, now);
+
+                var rejectedEvent = SecurityEvent.Create(
+                    tenantId,
+                    jitRequest.RequestedBy,
+                    sessionId: null,
+                    SecurityEventType.JitAccessRejected,
+                    $"JIT access request '{jitRequest.Id.Value}' rejected by '{decidedBy.Value}'.",
+                    riskScore: 20,
+                    ipAddress: null,
+                    userAgent: null,
+                    metadataJson: JsonSerializer.Serialize(new
+                    {
+                        jitAccessRequestId = jitRequest.Id.Value,
+                        requestedBy = jitRequest.RequestedBy.Value,
+                        rejectedBy = decidedBy.Value,
+                        reason = request.RejectionReason
+                    }),
+                    now);
+
+                securityEventRepository.Add(rejectedEvent);
+                securityEventTracker.Track(rejectedEvent);
             }
 
             return Unit.Value;

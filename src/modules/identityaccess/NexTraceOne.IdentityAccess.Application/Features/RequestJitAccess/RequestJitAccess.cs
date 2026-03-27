@@ -40,6 +40,7 @@ public static class RequestJitAccess
     public sealed class Handler(
         IJitAccessRepository jitAccessRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -74,10 +75,17 @@ public static class RequestJitAccess
                 riskScore: 40,
                 ipAddress: null,
                 userAgent: null,
-                metadataJson: null,
+                metadataJson: System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    jitAccessRequestId = jitRequest.Id.Value,
+                    permissionCode = request.PermissionCode,
+                    scope = request.Scope,
+                    approvalDeadline = jitRequest.ApprovalDeadline
+                }),
                 now);
 
             securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return new Response(
                 jitRequest.Id.Value,

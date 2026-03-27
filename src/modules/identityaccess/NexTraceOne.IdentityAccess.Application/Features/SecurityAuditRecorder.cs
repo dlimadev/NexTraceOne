@@ -22,6 +22,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features;
 /// </summary>
 internal sealed class SecurityAuditRecorder(
     ISecurityEventRepository securityEventRepository,
+    ISecurityEventTracker securityEventTracker,
     IDateTimeProvider dateTimeProvider,
     ICurrentTenant currentTenant) : ISecurityAuditRecorder
 {
@@ -33,7 +34,7 @@ internal sealed class SecurityAuditRecorder(
         string? userAgent,
         string? metadataJson = null)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId: null,
@@ -43,7 +44,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             metadataJson,
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -54,7 +57,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId: null,
@@ -64,7 +67,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             metadataJson: null,
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -74,7 +79,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId: null,
@@ -84,7 +89,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             metadataJson: null,
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -97,7 +104,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId,
@@ -107,7 +114,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             $"{{\"provider\":\"{provider}\",\"externalId\":\"{externalId}\"}}",
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -118,7 +127,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId: null,
             sessionId: null,
@@ -128,7 +137,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             $"{{\"provider\":\"{provider}\"}}",
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />

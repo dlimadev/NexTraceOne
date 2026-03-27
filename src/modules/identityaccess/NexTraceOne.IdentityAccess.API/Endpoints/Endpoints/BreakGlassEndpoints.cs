@@ -50,11 +50,14 @@ internal static class BreakGlassEndpoints
         }).RequirePermission("identity:break-glass:decide");
 
         bgGroup.MapGet("/", async (
+            bool? includeInactive,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new ListBreakGlassFeature.Query(), cancellationToken);
+            var result = await sender.Send(
+                new ListBreakGlassFeature.Query(includeInactive ?? false),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:sessions:read");
     }

@@ -61,6 +61,7 @@ public static class StartAccessReviewCampaign
         IRoleRepository roleRepository,
         IAccessReviewRepository accessReviewRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -110,7 +111,7 @@ public static class StartAccessReviewCampaign
             accessReviewRepository.Add(campaign);
 
             // Registra evento de segurança para trilha de auditoria obrigatória
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 initiatorUserId,
                 sessionId: null,
@@ -120,7 +121,9 @@ public static class StartAccessReviewCampaign
                 ipAddress: null,
                 userAgent: null,
                 $"{{\"campaignId\":\"{campaign.Id.Value}\",\"itemCount\":{activeMemberships.Count},\"windowDays\":{request.ReviewWindowDays}}}",
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return new Response(
                 campaign.Id.Value,

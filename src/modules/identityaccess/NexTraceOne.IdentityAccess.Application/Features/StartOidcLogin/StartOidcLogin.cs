@@ -91,6 +91,7 @@ public static class StartOidcLogin
     public sealed class Handler(
         IOidcProvider oidcProvider,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider dateTimeProvider,
         NexTraceOne.BuildingBlocks.Application.Abstractions.ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
@@ -124,7 +125,7 @@ public static class StartOidcLogin
                 ? TenantId.From(currentTenant.Id)
                 : TenantId.From(Guid.Empty);
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 userId: null,
                 sessionId: null,
@@ -134,7 +135,9 @@ public static class StartOidcLogin
                 ipAddress: null,
                 userAgent: null,
                 $"{{\"provider\":\"{request.Provider}\",\"nonce\":\"{nonce}\"}}",
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return Task.FromResult(Result<Response>.Success(new Response(authorizationUrl, state)));
         }

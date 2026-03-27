@@ -52,11 +52,14 @@ internal static class JitAccessEndpoints
         }).RequirePermission("identity:jit-access:decide");
 
         jitGroup.MapGet("/pending", async (
+            bool? includeHistory,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new ListJitAccessFeature.Query(), cancellationToken);
+            var result = await sender.Send(
+                new ListJitAccessFeature.Query(includeHistory ?? false),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:sessions:read");
     }

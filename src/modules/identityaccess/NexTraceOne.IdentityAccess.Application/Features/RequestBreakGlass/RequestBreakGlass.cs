@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 using NexTraceOne.IdentityAccess.Domain.Errors;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 
 namespace NexTraceOne.IdentityAccess.Application.Features.RequestBreakGlass;
 
@@ -44,6 +45,8 @@ public static class RequestBreakGlass
     public sealed class Handler(
         IBreakGlassRepository breakGlassRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
+        INotificationModule notificationModule,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -89,10 +92,34 @@ public static class RequestBreakGlass
                 riskScore: 90,
                 request.IpAddress,
                 request.UserAgent,
-                metadataJson: null,
+                metadataJson: System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    breakGlassRequestId = breakGlass.Id.Value,
+                    justificationPreview = request.Justification[..Math.Min(100, request.Justification.Length)],
+                    expiresAt = breakGlass.ExpiresAt
+                }),
                 now);
 
             securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
+
+            await notificationModule.SubmitAsync(new NotificationRequest
+            {
+                EventType = "BreakGlassActivated",
+                Category = "Security",
+                Severity = "Critical",
+                Title = "Break-glass access activated",
+                Message = $"Emergency break-glass access was activated by user {userId.Value}. Review immediately.",
+                SourceModule = "Identity",
+                SourceEntityType = nameof(BreakGlassRequest),
+                SourceEntityId = breakGlass.Id.Value.ToString(),
+                ActionUrl = $"/security/break-glass/{breakGlass.Id.Value}",
+                RequiresAction = true,
+                TenantId = tenantId.Value,
+                RecipientUserIds = [userId.Value],
+                PayloadJson = securityEvent.MetadataJson,
+                SourceEventId = securityEvent.Id.Value.ToString()
+            }, cancellationToken);
 
             return new Response(
                 breakGlass.Id.Value,

@@ -13,6 +13,9 @@ public interface IJitAccessRepository
     /// <summary>Lista solicitações pendentes de aprovação no tenant.</summary>
     Task<IReadOnlyList<JitAccessRequest>> ListPendingByTenantAsync(TenantId tenantId, CancellationToken cancellationToken);
 
+    /// <summary>Lista solicitações JIT de um tenant para histórico investigativo.</summary>
+    Task<IReadOnlyList<JitAccessRequest>> ListByTenantAsync(TenantId tenantId, CancellationToken cancellationToken);
+
     /// <summary>Lista solicitações de um usuário específico.</summary>
     Task<IReadOnlyList<JitAccessRequest>> ListByUserAsync(UserId userId, CancellationToken cancellationToken);
 

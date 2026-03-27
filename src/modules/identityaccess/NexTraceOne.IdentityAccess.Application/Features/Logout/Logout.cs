@@ -26,6 +26,7 @@ public static class Logout
         ICurrentTenant currentTenant,
         ISessionRepository sessionRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -50,7 +51,7 @@ public static class Logout
                 ? TenantId.From(currentTenant.Id)
                 : TenantId.From(Guid.Empty);
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 UserId.From(userId),
                 session?.Id,
@@ -60,7 +61,9 @@ public static class Logout
                 ipAddress: null,
                 userAgent: null,
                 metadataJson: null,
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return Unit.Value;
         }

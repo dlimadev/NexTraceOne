@@ -19,6 +19,9 @@ public interface IDelegationRepository
     /// <summary>Lista todas as delegações ativas no tenant.</summary>
     Task<IReadOnlyList<Delegation>> ListActiveByTenantAsync(TenantId tenantId, DateTimeOffset now, CancellationToken cancellationToken);
 
+    /// <summary>Lista todas as delegações do tenant para histórico investigativo.</summary>
+    Task<IReadOnlyList<Delegation>> ListByTenantAsync(TenantId tenantId, CancellationToken cancellationToken);
+
     /// <summary>Adiciona uma nova delegação para persistência.</summary>
     void Add(Delegation delegation);
 }

@@ -36,6 +36,7 @@ public static class DeactivateUser
         IUserRepository userRepository,
         ISessionRepository sessionRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -53,7 +54,7 @@ public static class DeactivateUser
             var session = await sessionRepository.GetActiveByUserIdAsync(user.Id, cancellationToken);
             session?.Revoke(dateTimeProvider.UtcNow);
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 TenantId.From(request.TenantId),
                 user.Id,
                 sessionId: null,
@@ -63,7 +64,9 @@ public static class DeactivateUser
                 ipAddress: null,
                 userAgent: null,
                 metadataJson: null,
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return Unit.Value;
         }

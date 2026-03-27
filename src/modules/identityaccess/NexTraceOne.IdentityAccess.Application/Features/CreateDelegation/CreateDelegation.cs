@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 
 using FluentValidation;
+using System.Text.Json;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -48,6 +49,7 @@ public static class CreateDelegation
         ITenantMembershipRepository membershipRepository,
         IRoleRepository roleRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -77,7 +79,28 @@ public static class CreateDelegation
             var now = dateTimeProvider.UtcNow;
 
             if (grantorId == delegateeId)
+            {
+                var deniedEvent = SecurityEvent.Create(
+                    tenantId,
+                    grantorId,
+                    sessionId: null,
+                    SecurityEventType.DelegationToSelfDenied,
+                    $"Delegation to self denied for user '{grantorId.Value}'.",
+                    riskScore: 55,
+                    ipAddress: null,
+                    userAgent: null,
+                    metadataJson: JsonSerializer.Serialize(new
+                    {
+                        grantorId = grantorId.Value,
+                        delegateeId = delegateeId.Value,
+                        reason = "self-delegation-not-allowed"
+                    }),
+                    now);
+
+                securityEventRepository.Add(deniedEvent);
+                securityEventTracker.Track(deniedEvent);
                 return IdentityErrors.DelegationToSelfNotAllowed();
+            }
 
             // Verifica se alguma permissão é do escopo de administração de sistema
             if (request.Permissions.Any(p => NonDelegablePermissions.Contains(p)))
@@ -121,10 +144,19 @@ public static class CreateDelegation
                 riskScore: 50,
                 ipAddress: null,
                 userAgent: null,
-                metadataJson: null,
+                metadataJson: JsonSerializer.Serialize(new
+                {
+                    delegationId = delegation.Id.Value,
+                    grantorId = grantorId.Value,
+                    delegateeId = delegateeId.Value,
+                    permissionCount = request.Permissions.Count,
+                    validFrom = delegation.ValidFrom,
+                    validUntil = delegation.ValidUntil
+                }),
                 now);
 
             securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return new Response(delegation.Id.Value, delegation.ValidFrom, delegation.ValidUntil);
         }
