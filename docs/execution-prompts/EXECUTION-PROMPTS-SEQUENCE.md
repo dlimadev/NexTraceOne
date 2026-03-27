@@ -868,7 +868,7 @@
 **What to do:**
 1. Add coverage collection to backend tests (e.g., `coverlet` or `dotnet-coverage`)
 2. Add coverage collection to frontend tests (Vitest coverage)
-3. Configure coverage threshold: suggest 60% minimum for backend, 50% for frontend as starting gate
+3. Configure coverage threshold: enforce 60% minimum for backend, 50% for frontend as initial mandatory gate (adjust upward as codebase matures)
 4. Add coverage report upload to CI (e.g., Codecov or GitHub artifact)
 5. Configure CI to fail if coverage drops below threshold
 6. Document coverage policy
@@ -1223,7 +1223,7 @@ Phase 06 (Cleanup) ───── GATE 5
 2. **P01.6 and P01.4** can run in parallel (different modules: AIKnowledge vs OperationalIntelligence)
 3. **P02.8a-g** can ALL run in parallel (independent DbContexts)
 4. **P02.2 and P02.3** can run in parallel (different modules: Catalog vs ChangeGovernance)
-5. **P01.3 and P01.8** should NOT run in parallel (both touch frontend, risk i18n key conflicts)
+5. **P01.3 and P01.8** should NOT run in parallel (both touch frontend feature modules and may add overlapping i18n keys in shared namespaces like `operations` and `ai-hub`, and both modify similar TanStack Query patterns in the same frontend codebase)
 6. **P03.1 and P03.2** should NOT run in parallel (same Governance module handlers)
 7. **P05.1-P05.6** can mostly run in parallel (different files/concerns)
 8. **P06.1-P06.6** can mostly run in parallel (documentation changes don't conflict with code cleanup)
