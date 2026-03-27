@@ -54,7 +54,7 @@ const ADMIN_PERMISSIONS = [
   'governance:evidence:read',
   'governance:controls:read',
   'governance:finops:read',
-  'governance:analytics:read',
+  'analytics:read',
   'governance:domains:read',
   'governance:teams:read',
   'ruleset-governance:read',

@@ -9,6 +9,8 @@ using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Catalog.API.Graph;
 using NexTraceOne.Governance.API;
+using NexTraceOne.Integrations.API.Endpoints;
+using NexTraceOne.ProductAnalytics.API;
 using NexTraceOne.Configuration.API;
 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -74,6 +76,8 @@ builder.Services.AddPromotionModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddGovernanceModule(builder.Configuration);
+builder.Services.AddIntegrationsModule(builder.Configuration);
+builder.Services.AddProductAnalyticsModule(builder.Configuration);
 builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
 builder.Services.AddReliabilityModule(builder.Configuration);
 builder.Services.AddCostIntelligenceModule(builder.Configuration);

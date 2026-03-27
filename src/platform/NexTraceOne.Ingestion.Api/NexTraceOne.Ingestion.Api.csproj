@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
     <ProjectReference Include="..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.API\NexTraceOne.OperationalIntelligence.API.csproj" />
     <ProjectReference Include="..\..\modules\governance\NexTraceOne.Governance.Infrastructure\NexTraceOne.Governance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\integrations\NexTraceOne.Integrations.Infrastructure\NexTraceOne.Integrations.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" />

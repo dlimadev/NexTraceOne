@@ -25,9 +25,6 @@ public interface ITeamRepository
     Task UpdateAsync(Team team, CancellationToken ct);
 }
 
-// NOTE P2.3: IAnalyticsEventRepository and analytics DTOs (ModuleUsageRow, ModuleAdoptionRow,
-// ModuleFeatureCountRow, SessionEventRow) moved to NexTraceOne.ProductAnalytics.Application.Abstractions.
-
 /// <summary>
 /// Interface do repositório de GovernanceDomains para o módulo Governance.
 /// Define operações CRUD e consultas para domínios de governança.
@@ -211,9 +208,6 @@ public interface IGovernanceRolloutRecordRepository
     /// <summary>Atualiza um rollout existente.</summary>
     Task UpdateAsync(GovernanceRolloutRecord record, CancellationToken ct);
 }
-
-// NOTE P2.2: IIngestionSourceRepository moved to NexTraceOne.Integrations.Application.Abstractions.
-// NOTE P2.2: IIngestionExecutionRepository moved to NexTraceOne.Integrations.Application.Abstractions.
 
 /// <summary>
 /// DTO for monthly count aggregation.
