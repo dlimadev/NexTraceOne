@@ -95,3 +95,33 @@ internal sealed class ComplianceResultRepository(AuditDbContext context) : IComp
 
     public void Add(ComplianceResult result) => context.ComplianceResults.Add(result);
 }
+
+/// <summary>
+/// Repositório de políticas de retenção de eventos de auditoria.
+/// P7.4 — implementa IRetentionPolicyRepository para tornar RetentionPolicy funcionalmente real.
+/// </summary>
+internal sealed class RetentionPolicyRepository(AuditDbContext context) : IRetentionPolicyRepository
+{
+    public async Task<IReadOnlyList<RetentionPolicy>> ListActiveAsync(CancellationToken cancellationToken)
+        => await context.RetentionPolicies
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<RetentionPolicy>> ListAllAsync(CancellationToken cancellationToken)
+        => await context.RetentionPolicies
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+
+    public async Task<RetentionPolicy?> GetByIdAsync(RetentionPolicyId id, CancellationToken cancellationToken)
+        => await context.RetentionPolicies
+            .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+
+    public async Task<RetentionPolicy?> GetMostRestrictiveActiveAsync(CancellationToken cancellationToken)
+        => await context.RetentionPolicies
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.RetentionDays)  // lowest days = most restrictive
+            .FirstOrDefaultAsync(cancellationToken);
+
+    public void Add(RetentionPolicy policy) => context.RetentionPolicies.Add(policy);
+}
