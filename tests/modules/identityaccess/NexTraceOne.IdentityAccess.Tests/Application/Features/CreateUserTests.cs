@@ -21,12 +21,14 @@ public sealed class CreateUserTests
         var roleRepository = Substitute.For<IRoleRepository>();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var securityEventTracker = Substitute.For<ISecurityEventTracker>();
         var passwordHasher = Substitute.For<IPasswordHasher>();
         var sut = new CreateUserFeature.Handler(
             userRepository,
             roleRepository,
             membershipRepository,
             securityEventRepository,
+            securityEventTracker,
             new TestDateTimeProvider(now),
             passwordHasher);
 
@@ -53,6 +55,7 @@ public sealed class CreateUserTests
             Substitute.For<IRoleRepository>(),
             Substitute.For<ITenantMembershipRepository>(),
             Substitute.For<ISecurityEventRepository>(),
+            Substitute.For<ISecurityEventTracker>(),
             new TestDateTimeProvider(DateTimeOffset.UtcNow),
             Substitute.For<IPasswordHasher>());
 

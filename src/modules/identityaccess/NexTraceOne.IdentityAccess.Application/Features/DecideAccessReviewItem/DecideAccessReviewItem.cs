@@ -59,6 +59,7 @@ public static class DecideAccessReviewItem
         ICurrentTenant currentTenant,
         IAccessReviewRepository accessReviewRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)

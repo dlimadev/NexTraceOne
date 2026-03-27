@@ -40,6 +40,7 @@ public sealed class LogoutTests
         var currentTenant = new TestCurrentTenant(tenantId);
         var sessionRepository = Substitute.For<ISessionRepository>();
         var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var securityEventTracker = Substitute.For<ISecurityEventTracker>();
         var dateTimeProvider = new TestDateTimeProvider(_now);
 
         sessionRepository.GetActiveByUserIdAsync(UserId.From(userId), Arg.Any<CancellationToken>())
@@ -47,7 +48,7 @@ public sealed class LogoutTests
 
         var sut = new LogoutFeature.Handler(
             currentUser, currentTenant, sessionRepository,
-            securityEventRepository, dateTimeProvider);
+            securityEventRepository, securityEventTracker, dateTimeProvider);
 
         var result = await sut.Handle(new LogoutFeature.Command(), CancellationToken.None);
 
@@ -70,6 +71,7 @@ public sealed class LogoutTests
         var currentTenant = new TestCurrentTenant(tenantId);
         var sessionRepository = Substitute.For<ISessionRepository>();
         var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var securityEventTracker = Substitute.For<ISecurityEventTracker>();
         var dateTimeProvider = new TestDateTimeProvider(_now);
 
         sessionRepository.GetActiveByUserIdAsync(UserId.From(userId), Arg.Any<CancellationToken>())
@@ -77,7 +79,7 @@ public sealed class LogoutTests
 
         var sut = new LogoutFeature.Handler(
             currentUser, currentTenant, sessionRepository,
-            securityEventRepository, dateTimeProvider);
+            securityEventRepository, securityEventTracker, dateTimeProvider);
 
         var result = await sut.Handle(new LogoutFeature.Command(), CancellationToken.None);
 
@@ -95,11 +97,12 @@ public sealed class LogoutTests
         var currentTenant = new TestCurrentTenant(Guid.NewGuid());
         var sessionRepository = Substitute.For<ISessionRepository>();
         var securityEventRepository = Substitute.For<ISecurityEventRepository>();
+        var securityEventTracker = Substitute.For<ISecurityEventTracker>();
         var dateTimeProvider = new TestDateTimeProvider(_now);
 
         var sut = new LogoutFeature.Handler(
             currentUser, currentTenant, sessionRepository,
-            securityEventRepository, dateTimeProvider);
+            securityEventRepository, securityEventTracker, dateTimeProvider);
 
         var result = await sut.Handle(new LogoutFeature.Command(), CancellationToken.None);
 

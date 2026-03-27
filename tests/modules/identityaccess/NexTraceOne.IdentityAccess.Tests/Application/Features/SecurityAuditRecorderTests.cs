@@ -12,11 +12,13 @@ namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 public sealed class SecurityAuditRecorderTests
 {
     private readonly ISecurityEventRepository _securityEventRepository = Substitute.For<ISecurityEventRepository>();
+    private readonly ISecurityEventTracker _securityEventTracker = Substitute.For<ISecurityEventTracker>();
     private readonly TestDateTimeProvider _dateTimeProvider = new(new DateTimeOffset(2025, 03, 12, 10, 0, 0, TimeSpan.Zero));
     private readonly TestCurrentTenant _currentTenant = new(Guid.NewGuid());
 
     private SecurityAuditRecorder CreateSut() => new(
         _securityEventRepository,
+        _securityEventTracker,
         _dateTimeProvider,
         _currentTenant);
 
@@ -103,7 +105,7 @@ public sealed class SecurityAuditRecorderTests
     public void ResolveTenantIdForAudit_Should_ReturnEmptyGuid_When_TenantIsNotAvailable()
     {
         var emptyTenant = new TestCurrentTenant(Guid.Empty);
-        var sut = new SecurityAuditRecorder(_securityEventRepository, _dateTimeProvider, emptyTenant);
+        var sut = new SecurityAuditRecorder(_securityEventRepository, _securityEventTracker, _dateTimeProvider, emptyTenant);
 
         var result = sut.ResolveTenantIdForAudit();
 
