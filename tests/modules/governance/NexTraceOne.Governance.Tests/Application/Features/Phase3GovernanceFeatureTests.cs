@@ -12,7 +12,6 @@ namespace NexTraceOne.Governance.Tests.Application.Features;
 
 /// <summary>
 /// Testes de unidade Phase 3 — scope counting e cross-team enrichment.
-/// IngestionSource domain tests foram movidos para NexTraceOne.Integrations.Tests (P8.2).
 /// </summary>
 public sealed class Phase3GovernanceFeatureTests
 {

@@ -45,10 +45,6 @@ public static class DependencyInjection
         services.AddScoped<IDelegatedAdministrationRepository, DelegatedAdministrationRepository>();
         services.AddScoped<ITeamDomainLinkRepository, TeamDomainLinkRepository>();
         services.AddScoped<IGovernanceRolloutRecordRepository, GovernanceRolloutRecordRepository>();
-        // NOTE: IIntegrationConnectorRepository removed from Governance in P2.1.
-        //       Registered via Integrations.Infrastructure (now wired from Integrations.API module).
-        // NOTE: IAnalyticsEventRepository removed from Governance in P2.3.
-        //       Now registered via ProductAnalytics.Infrastructure (wired from ProductAnalytics.API module — P8.3).
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
 
         return services;
