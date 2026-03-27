@@ -15,6 +15,7 @@ using GetPreferencesFeature = NexTraceOne.Notifications.Application.Features.Get
 using UpdatePreferenceFeature = NexTraceOne.Notifications.Application.Features.UpdatePreference.UpdatePreference;
 using GetDeliveryHistoryFeature = NexTraceOne.Notifications.Application.Features.GetDeliveryHistory.GetDeliveryHistory;
 using GetDeliveryStatusFeature = NexTraceOne.Notifications.Application.Features.GetDeliveryStatus.GetDeliveryStatus;
+using GetNotificationTrailFeature = NexTraceOne.Notifications.Application.Features.GetNotificationTrail.GetNotificationTrail;
 
 namespace NexTraceOne.Notifications.API.Endpoints;
 
@@ -128,6 +129,19 @@ public sealed class NotificationCenterEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new GetDeliveryStatusFeature.Query(id), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:delivery:read");
+
+        // ── P7.3: Notification Audit Trail ────────────────────────────────────
+
+        group.MapGet("/{id:guid}/trail", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetNotificationTrailFeature.Query(id), cancellationToken);
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("notifications:delivery:read");

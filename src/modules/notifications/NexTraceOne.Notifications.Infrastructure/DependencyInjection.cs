@@ -100,7 +100,6 @@ public static class DependencyInjection
 
         // External delivery service (coordena roteamento + dispatch + logging)
         services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();
-
         // P7.2: Background retry job para deliveries agendados
         services.AddHostedService<NotificationDeliveryRetryJob>();
 

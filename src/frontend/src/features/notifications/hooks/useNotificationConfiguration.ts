@@ -108,3 +108,11 @@ export function useDeliveryStatus(notificationId: string, enabled = true) {
     enabled: enabled && !!notificationId,
   });
 }
+
+export function useNotificationTrail(notificationId: string, enabled = true) {
+  return useQuery({
+    queryKey: ['notifications', 'trail', notificationId] as const,
+    queryFn: () => notificationsApi.getNotificationTrail(notificationId),
+    enabled: enabled && !!notificationId,
+  });
+}

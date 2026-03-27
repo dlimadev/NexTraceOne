@@ -18,6 +18,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\aiknowledge\NexTraceOne.AIKnowledge.Contracts\NexTraceOne.AIKnowledge.Contracts.csproj" />
     <!-- P2.5: Integrations.Contracts added — SyncFailed/ConnectorAuthFailed tests updated to use correct ownership -->
     <ProjectReference Include="..\..\..\..\src\modules\integrations\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
+    <!-- P7.3: AuditCompliance.Contracts for NotificationAuditServiceTests (IAuditModule mock) -->
+    <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Contracts\NexTraceOne.AuditCompliance.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

@@ -14,11 +14,13 @@ namespace NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 /// Implementa retry deferido: em vez de bloquear com Task.Delay, agenda retries via
 /// NotificationDelivery.ScheduleRetry(nextRetryAt), que são processados pelo
 /// NotificationDeliveryRetryJob em background.
+/// P7.3: regista eventos auditáveis após entrega concluída/falhada.
 /// </summary>
 internal sealed class ExternalDeliveryService(
     INotificationRoutingEngine routingEngine,
     IEnumerable<INotificationChannelDispatcher> dispatchers,
     INotificationDeliveryStore deliveryStore,
+    INotificationAuditService notificationAuditService,
     IOptions<DeliveryRetryOptions> retryOptions,
     ILogger<ExternalDeliveryService> logger) : IExternalDeliveryService
 {
@@ -122,6 +124,15 @@ internal sealed class ExternalDeliveryService(
                 logger.LogInformation(
                     "External delivery succeeded: channel={Channel}, notification={NotificationId}, attempt={Attempt}",
                     delivery.Channel, notification.Id.Value, delivery.RetryCount);
+
+                // P7.3: Registar entrega concluída na trilha auditável
+                await RecordDeliveryAuditAsync(
+                    notification, delivery,
+                    notification.Severity >= NotificationSeverity.Critical
+                        ? NotificationAuditActions.CriticalNotificationDelivered
+                        : NotificationAuditActions.NotificationDelivered,
+                    $"Notification delivered via {delivery.Channel} on attempt {delivery.RetryCount}",
+                    cancellationToken);
             }
             else
             {
@@ -146,6 +157,15 @@ internal sealed class ExternalDeliveryService(
                 logger.LogError(
                     "External delivery permanently failed after {MaxAttempts} attempts: channel={Channel}, notification={NotificationId}",
                     opts.MaxAttempts, delivery.Channel, notification.Id.Value);
+
+                // P7.3: Registar falha permanente na trilha auditável
+                await RecordDeliveryAuditAsync(
+                    notification, delivery,
+                    notification.Severity >= NotificationSeverity.Critical
+                        ? NotificationAuditActions.CriticalNotificationFailed
+                        : NotificationAuditActions.NotificationDeliveryFailed,
+                    $"Delivery permanently failed on channel {delivery.Channel} after {opts.MaxAttempts} attempts: {ex.Message}",
+                    cancellationToken);
             }
             else
             {
@@ -157,7 +177,52 @@ internal sealed class ExternalDeliveryService(
                 logger.LogDebug(
                     "Delivery retry scheduled: channel={Channel}, notification={NotificationId}, nextRetryAt={NextRetryAt}",
                     delivery.Channel, notification.Id.Value, nextRetryAt);
+
+                // P7.3: Registar retry agendado na trilha auditável
+                await RecordDeliveryAuditAsync(
+                    notification, delivery,
+                    NotificationAuditActions.NotificationDeliveryRetryScheduled,
+                    $"Delivery retry scheduled for channel {delivery.Channel} at {nextRetryAt:u} (attempt {delivery.RetryCount}/{opts.MaxAttempts}): {ex.Message}",
+                    cancellationToken);
             }
+        }
+    }
+
+    /// <summary>
+    /// Regista evento auditável de entrega de forma best-effort.
+    /// Não bloqueia o fluxo principal em caso de falha de auditoria.
+    /// </summary>
+    private async Task RecordDeliveryAuditAsync(
+        Notification notification,
+        NotificationDelivery delivery,
+        string actionType,
+        string description,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await notificationAuditService.RecordAsync(new NotificationAuditEntry
+            {
+                TenantId = notification.TenantId,
+                ActionType = actionType,
+                ResourceId = delivery.Id.Value.ToString(),
+                ResourceType = "NotificationDelivery",
+                Description = description,
+                PayloadJson = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    NotificationId = notification.Id.Value,
+                    Channel = delivery.Channel.ToString(),
+                    Status = delivery.Status.ToString(),
+                    RetryCount = delivery.RetryCount,
+                    SourceEventId = notification.SourceEventId
+                })
+            }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "Delivery audit record failed for {ActionType}/{DeliveryId}. Non-blocking.",
+                actionType, delivery.Id.Value);
         }
     }
 }

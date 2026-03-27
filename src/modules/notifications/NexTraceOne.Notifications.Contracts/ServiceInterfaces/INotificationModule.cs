@@ -78,6 +78,13 @@ public sealed record NotificationRequest
 
     /// <summary>Data de expiração opcional da notificação.</summary>
     public DateTimeOffset? ExpiresAt { get; init; }
+
+    /// <summary>
+    /// Id do evento de origem que gerou este pedido de notificação.
+    /// Utilizado para correlação auditável: origem → notificação → entrega.
+    /// Pode ser um Guid (string) de incidente, release, aprovação, etc.
+    /// </summary>
+    public string? SourceEventId { get; init; }
 }
 
 /// <summary>

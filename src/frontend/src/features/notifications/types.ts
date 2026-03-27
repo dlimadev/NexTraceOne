@@ -183,3 +183,44 @@ export interface DeliveryStatusResponse {
   channelStatuses: ChannelStatusDto[];
 }
 
+// ── P7.3: Notification Audit Trail ──────────────────────────────────────────
+
+export interface NotificationCorrelationDto {
+  notificationId: string;
+  eventType: string;
+  sourceModule: string;
+  sourceEntityType: string | null;
+  sourceEntityId: string | null;
+  sourceEventId: string | null;
+  category: string;
+  severity: string;
+  status: string;
+  recipientUserId: string;
+  createdAt: string;
+  readAt: string | null;
+  requiresAction: boolean;
+}
+
+export interface DeliveryTrailEntryDto {
+  deliveryId: string;
+  channel: string;
+  status: string;
+  retryCount: number;
+  createdAt: string;
+  lastAttemptAt: string | null;
+  deliveredAt: string | null;
+  failedAt: string | null;
+  nextRetryAt: string | null;
+  errorMessage: string | null;
+}
+
+export interface NotificationTrailResponse {
+  notificationId: string;
+  notification: NotificationCorrelationDto;
+  deliveries: DeliveryTrailEntryDto[];
+  totalDeliveryAttempts: number;
+  isDeliveredToAnyChannel: boolean;
+  hasPendingRetry: boolean;
+  hasPermanentFailure: boolean;
+}
+

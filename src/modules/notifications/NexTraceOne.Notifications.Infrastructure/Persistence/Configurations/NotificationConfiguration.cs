@@ -49,6 +49,9 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
         builder.Property(x => x.ArchivedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.ExpiresAt).HasColumnType("timestamp with time zone");
 
+        // ── P7.3: Correlação de auditoria ──────────────────────────────────────
+        builder.Property(x => x.SourceEventId).HasMaxLength(500);
+
         builder.HasIndex(x => x.TenantId);
         builder.HasIndex(x => x.RecipientUserId);
         builder.HasIndex(x => x.Status);

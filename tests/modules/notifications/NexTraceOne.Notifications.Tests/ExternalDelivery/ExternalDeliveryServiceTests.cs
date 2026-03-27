@@ -19,6 +19,7 @@ public sealed class ExternalDeliveryServiceTests
     private readonly INotificationChannelDispatcher _emailDispatcher = Substitute.For<INotificationChannelDispatcher>();
     private readonly INotificationChannelDispatcher _teamsDispatcher = Substitute.For<INotificationChannelDispatcher>();
     private readonly INotificationDeliveryStore _deliveryStore = Substitute.For<INotificationDeliveryStore>();
+    private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly IOptions<DeliveryRetryOptions> _retryOptions;
     private readonly ILogger<ExternalDeliveryService> _logger =
         NullLoggerFactory.Instance.CreateLogger<ExternalDeliveryService>();
@@ -42,6 +43,7 @@ public sealed class ExternalDeliveryServiceTests
             _routingEngine,
             [_emailDispatcher, _teamsDispatcher],
             _deliveryStore,
+            _auditService,
             _retryOptions,
             _logger);
     }

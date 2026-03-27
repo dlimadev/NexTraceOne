@@ -14,11 +14,13 @@ namespace NexTraceOne.Notifications.Application.Engine;
 /// aplica deduplicação básica, persiste na central interna, e agenda entrega externa
 /// para canais elegíveis (email, Teams) via IExternalDeliveryService.
 /// Ponto único de decisão — nenhum módulo deve criar notificações fora desta engine.
+/// P7.3: regista eventos auditáveis após criação de cada notificação.
 /// </summary>
 public sealed class NotificationOrchestrator(
     INotificationStore store,
     INotificationTemplateResolver templateResolver,
     INotificationDeduplicationService deduplicationService,
+    INotificationAuditService notificationAuditService,
     IExternalDeliveryService? externalDeliveryService,
     ILogger<NotificationOrchestrator> logger) : INotificationOrchestrator
 {
@@ -90,12 +92,29 @@ public sealed class NotificationOrchestrator(
                 actionUrl: request.ActionUrl,
                 requiresAction: template.RequiresAction,
                 payloadJson: request.PayloadJson,
-                expiresAt: request.ExpiresAt);
+                expiresAt: request.ExpiresAt,
+                sourceEventId: request.SourceEventId);
 
             await store.AddAsync(notification, cancellationToken);
             createdIds.Add(notification.Id.Value);
 
-            // 4c. Agendar entrega externa (email, Teams) se o serviço estiver disponível
+            // 4c. Registar evento auditável — criação de notificação (P7.3)
+            await RecordAuditAsync(
+                entry: new NotificationAuditEntry
+                {
+                    TenantId = request.TenantId.Value,
+                    ActionType = template.Severity >= NotificationSeverity.Critical
+                        ? NotificationAuditActions.CriticalNotificationGenerated
+                        : NotificationAuditActions.NotificationGenerated,
+                    ResourceId = notification.Id.Value.ToString(),
+                    ResourceType = "Notification",
+                    Description = $"Notification created: {request.EventType} from {request.SourceModule}" +
+                                  $"{(request.SourceEventId is not null ? $" (sourceEventId={request.SourceEventId})" : string.Empty)}",
+                    PayloadJson = request.PayloadJson
+                },
+                cancellationToken);
+
+            // 4d. Agendar entrega externa (email, Teams) se o serviço estiver disponível
             if (externalDeliveryService is not null)
             {
                 try
@@ -215,4 +234,22 @@ public sealed class NotificationOrchestrator(
 
     private static TEnum ParseEnum<TEnum>(string? value, TEnum fallback) where TEnum : struct, Enum =>
         Enum.TryParse<TEnum>(value, ignoreCase: true, out var result) ? result : fallback;
+
+    /// <summary>
+    /// Regista evento auditável de forma best-effort (não bloqueia o fluxo principal em caso de falha).
+    /// P7.3: chamado após criação de notificação para fechar a trilha de auditoria.
+    /// </summary>
+    private async Task RecordAuditAsync(NotificationAuditEntry entry, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await notificationAuditService.RecordAsync(entry, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex,
+                "Audit record failed for notification action {ActionType}/{ResourceId}. Non-blocking.",
+                entry.ActionType, entry.ResourceId);
+        }
+    }
 }

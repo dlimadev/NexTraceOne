@@ -13,6 +13,7 @@ public sealed class NotificationOrchestratorTests
     private readonly INotificationStore _store = Substitute.For<INotificationStore>();
     private readonly INotificationTemplateResolver _templateResolver = new NotificationTemplateResolver();
     private readonly INotificationDeduplicationService _dedup = Substitute.For<INotificationDeduplicationService>();
+    private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly ILogger<NotificationOrchestrator> _logger = Substitute.For<ILogger<NotificationOrchestrator>>();
     private readonly NotificationOrchestrator _orchestrator;
 
@@ -23,7 +24,7 @@ public sealed class NotificationOrchestratorTests
             Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
-        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, null, _logger);
+        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, _auditService, null, _logger);
     }
 
     [Fact]

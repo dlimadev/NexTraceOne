@@ -17,6 +17,7 @@ import type {
   UpsertResponse,
   DeliveryHistoryResponse,
   DeliveryStatusResponse,
+  NotificationTrailResponse,
 } from '../types';
 
 export type { NotificationDto };
@@ -95,5 +96,12 @@ export const notificationsApi = {
   getDeliveryStatus: (notificationId: string) =>
     client
       .get<DeliveryStatusResponse>(`/notifications/${notificationId}/delivery-status`)
+      .then((r) => r.data),
+
+  // ── P7.3: Notification Audit Trail ───────────────────────────────────────
+
+  getNotificationTrail: (notificationId: string) =>
+    client
+      .get<NotificationTrailResponse>(`/notifications/${notificationId}/trail`)
       .then((r) => r.data),
 };

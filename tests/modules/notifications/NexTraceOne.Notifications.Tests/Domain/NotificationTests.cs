@@ -336,4 +336,41 @@ public sealed class NotificationTests
             NotificationSeverity.Info,
             "Test notification", "Test message body.",
             "TestModule");
+
+    // ── P7.3: SourceEventId (audit correlation) ──────────────────────────────
+
+    [Fact]
+    public void Create_WithSourceEventId_SetsAuditCorrelationField()
+    {
+        const string sourceEventId = "incident-evt-abc-123";
+
+        var notification = Notification.Create(
+            _tenantId, _recipientId,
+            "IncidentCreated",
+            NotificationCategory.Incident,
+            NotificationSeverity.Critical,
+            "Critical incident",
+            "A critical incident was created.",
+            "OperationalIntelligence",
+            sourceEntityType: "Incident",
+            sourceEntityId: "inc-999",
+            sourceEventId: sourceEventId);
+
+        notification.SourceEventId.Should().Be(sourceEventId);
+    }
+
+    [Fact]
+    public void Create_WithoutSourceEventId_SourceEventIdIsNull()
+    {
+        var notification = Notification.Create(
+            _tenantId, _recipientId,
+            "ApprovalPending",
+            NotificationCategory.Approval,
+            NotificationSeverity.ActionRequired,
+            "Approval required",
+            "Review and approve.",
+            "ChangeGovernance");
+
+        notification.SourceEventId.Should().BeNull();
+    }
 }

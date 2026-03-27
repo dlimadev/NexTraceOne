@@ -27,6 +27,10 @@
   <ItemGroup Label="Cross-module Contracts for Event Handlers (P2.5 — Integrations)">
     <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
   </ItemGroup>
+  <!-- P7.3: AuditCompliance.Contracts para NotificationAuditService → IAuditModule.RecordEventAsync() real -->
+  <ItemGroup Label="Cross-module Contracts for Audit Bridge (P7.3)">
+    <ProjectReference Include="..\..\auditcompliance\NexTraceOne.AuditCompliance.Contracts\NexTraceOne.AuditCompliance.Contracts.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

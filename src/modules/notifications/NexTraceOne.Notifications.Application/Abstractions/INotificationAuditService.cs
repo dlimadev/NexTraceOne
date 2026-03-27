@@ -51,9 +51,13 @@ public sealed record NotificationAuditEntry
 /// </summary>
 public static class NotificationAuditActions
 {
+    public const string NotificationGenerated = "notification.generated";
     public const string CriticalNotificationGenerated = "notification.critical.generated";
     public const string CriticalNotificationDelivered = "notification.critical.delivered";
     public const string CriticalNotificationFailed = "notification.critical.failed";
+    public const string NotificationDelivered = "notification.delivered";
+    public const string NotificationDeliveryFailed = "notification.delivery.failed";
+    public const string NotificationDeliveryRetryScheduled = "notification.delivery.retry_scheduled";
     public const string NotificationAcknowledged = "notification.acknowledged";
     public const string NotificationSnoozed = "notification.snoozed";
     public const string NotificationEscalated = "notification.escalated";
