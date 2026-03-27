@@ -28,7 +28,8 @@ public sealed record AgentExecutionResult(
     int PromptTokens,
     int CompletionTokens,
     long DurationMs,
-    IReadOnlyList<AgentArtifactResult> Artifacts);
+    IReadOnlyList<AgentArtifactResult> Artifacts,
+    IReadOnlyList<ToolExecutionSummary>? ToolExecutions = null);
 
 /// <summary>Artefacto produzido pela execução.</summary>
 public sealed record AgentArtifactResult(
@@ -36,3 +37,10 @@ public sealed record AgentArtifactResult(
     string ArtifactType,
     string Title,
     string Format);
+
+/// <summary>Resumo de uma execução de tool durante o pipeline do agent.</summary>
+public sealed record ToolExecutionSummary(
+    string ToolName,
+    bool Success,
+    long DurationMs,
+    string? ErrorMessage = null);

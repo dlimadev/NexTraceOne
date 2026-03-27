@@ -201,4 +201,27 @@ public static class AiGovernanceErrors
             "AiGovernance.Artifact.NotFound",
             "Agent artifact '{0}' was not found.",
             artifactId);
+
+    // ── Tool Execution ─────────────────────────────────────────────────
+
+    /// <summary>Tool não está permitida para o agent.</summary>
+    public static Error ToolNotAllowedForAgent(string toolName, string agentName)
+        => Error.Forbidden(
+            "AiGovernance.Agent.ToolNotAllowed",
+            "Tool '{0}' is not allowed for agent '{1}'.",
+            toolName, agentName);
+
+    /// <summary>Tool não encontrada no registry.</summary>
+    public static Error ToolNotFound(string toolName)
+        => Error.NotFound(
+            "AiGovernance.Tool.NotFound",
+            "Tool '{0}' is not registered.",
+            toolName);
+
+    /// <summary>Execução de tool falhou.</summary>
+    public static Error ToolExecutionFailed(string toolName, string reason)
+        => Error.Business(
+            "AiGovernance.Tool.ExecutionFailed",
+            "Tool '{0}' execution failed: {1}.",
+            toolName, reason);
 }
