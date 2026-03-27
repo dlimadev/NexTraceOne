@@ -1,16 +1,13 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.GetValueMilestones;
+namespace NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones;
 
 /// <summary>
 /// Retorna marcos de valor atingidos pelos utilizadores.
 /// Responde: quanto tempo até o primeiro valor? Quais milestones são mais atingidos?
 /// Qual a progressão de valor por persona?
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
-/// NOTA: ValueMilestoneType enum permanece em Governance.Domain.Enums até extração futura para ProductAnalytics.Domain.
 /// </summary>
 public static class GetValueMilestones
 {

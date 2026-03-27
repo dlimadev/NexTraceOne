@@ -1,16 +1,13 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.GetPersonaUsage;
+namespace NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
 
 /// <summary>
 /// Retorna perfil de uso por persona.
 /// Responde: quais personas usam quais capacidades? Qual a profundidade de uso?
 /// Quais são os pontos de fricção e milestones atingidos por persona?
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
 /// </summary>
 public static class GetPersonaUsage
 {

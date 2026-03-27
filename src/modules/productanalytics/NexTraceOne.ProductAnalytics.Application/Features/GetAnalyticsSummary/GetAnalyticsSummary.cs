@@ -1,18 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.GetAnalyticsSummary;
+namespace NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary;
 
 /// <summary>
 /// Retorna resumo consolidado de product analytics.
 /// Fornece visão de adoção, valor, fricção e tendências do produto.
 /// Suporta filtros por persona, módulo, equipa, domínio e período.
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
 /// </summary>
 public static class GetAnalyticsSummary
 {

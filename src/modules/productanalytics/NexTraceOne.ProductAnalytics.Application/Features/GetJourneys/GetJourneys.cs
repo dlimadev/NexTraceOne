@@ -1,16 +1,13 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.GetJourneys;
+namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
 
 /// <summary>
 /// Retorna jornadas e funis do produto com métricas de conclusão.
 /// Responde: quais jornadas chegam até valor real? Onde há abandono?
 /// Qual é o tempo médio por jornada? Onde estão os pontos de drop-off?
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
-/// NOTA: JourneyStatus enum permanece em Governance.Domain.Enums até extração futura para ProductAnalytics.Domain.
 /// </summary>
 public static class GetJourneys
 {

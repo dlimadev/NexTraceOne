@@ -1,11 +1,8 @@
-namespace NexTraceOne.Governance.Domain.Enums;
+namespace NexTraceOne.ProductAnalytics.Domain.Enums;
 
 /// <summary>
 /// Estado de uma jornada de produto.
 /// Usado para medir completion rate e identificar pontos de abandono.
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Enum pertence semanticamente ao módulo Product Analytics.
-/// Permanece em Governance.Domain.Enums enquanto GetJourneys handler residir em Governance.Application.
-/// Extração para ProductAnalytics.Domain.Enums prevista em fase futura.
 /// </summary>
 public enum JourneyStatus
 {

@@ -1,18 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Application.Features.GetModuleAdoption;
+namespace NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
 
 /// <summary>
 /// Retorna métricas de adoção por módulo do produto.
 /// Responde: quais módulos são mais usados? Quais têm baixa adoção?
 /// Quais capabilities têm uso real versus superficial?
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4): Handler temporariamente em Governance.Application.
-/// Ownership real: módulo Product Analytics. Migração para ProductAnalytics.Application prevista em fase futura.
 /// </summary>
 public static class GetModuleAdoption
 {

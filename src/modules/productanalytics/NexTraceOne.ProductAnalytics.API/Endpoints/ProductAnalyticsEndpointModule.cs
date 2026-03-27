@@ -5,28 +5,20 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
-using RecordAnalyticsEventFeature = NexTraceOne.Governance.Application.Features.RecordAnalyticsEvent.RecordAnalyticsEvent;
-using GetAnalyticsSummaryFeature = NexTraceOne.Governance.Application.Features.GetAnalyticsSummary.GetAnalyticsSummary;
-using GetModuleAdoptionFeature = NexTraceOne.Governance.Application.Features.GetModuleAdoption.GetModuleAdoption;
-using GetPersonaUsageFeature = NexTraceOne.Governance.Application.Features.GetPersonaUsage.GetPersonaUsage;
-using GetJourneysFeature = NexTraceOne.Governance.Application.Features.GetJourneys.GetJourneys;
-using GetValueMilestonesFeature = NexTraceOne.Governance.Application.Features.GetValueMilestones.GetValueMilestones;
-using GetFrictionIndicatorsFeature = NexTraceOne.Governance.Application.Features.GetFrictionIndicators.GetFrictionIndicators;
+using RecordAnalyticsEventFeature = NexTraceOne.ProductAnalytics.Application.Features.RecordAnalyticsEvent.RecordAnalyticsEvent;
+using GetAnalyticsSummaryFeature = NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary.GetAnalyticsSummary;
+using GetModuleAdoptionFeature = NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption.GetModuleAdoption;
+using GetPersonaUsageFeature = NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage.GetPersonaUsage;
+using GetJourneysFeature = NexTraceOne.ProductAnalytics.Application.Features.GetJourneys.GetJourneys;
+using GetValueMilestonesFeature = NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones.GetValueMilestones;
+using GetFrictionIndicatorsFeature = NexTraceOne.ProductAnalytics.Application.Features.GetFrictionIndicators.GetFrictionIndicators;
 
-namespace NexTraceOne.Governance.API.Endpoints;
+namespace NexTraceOne.ProductAnalytics.API.Endpoints;
 
 /// <summary>
 /// Endpoints de Product Analytics — disponibiliza métricas de adoção, valor, fricção, jornadas e milestones.
 /// Analytics orientados a decisão de produto, não a vanity metrics.
 /// Privacy-aware: sem coleta excessiva de PII.
-///
-/// COMPATIBILIDADE TRANSITÓRIA (P2.4):
-/// Este endpoint module está temporariamente alojado em Governance.API por compatibilidade de rota.
-/// O ownership real pertence ao módulo Product Analytics.
-/// Os handlers já consomem NexTraceOne.ProductAnalytics.Application.Abstractions e NexTraceOne.ProductAnalytics.Domain.
-/// As permissões "governance:analytics:*" são residuais e serão renomeadas para "analytics:*" em fase futura.
-/// A migração definitiva para ProductAnalytics.API está prevista para fase futura.
-/// A rota /api/v1/product-analytics é do módulo Product Analytics, não de Governance.
 /// </summary>
 public sealed class ProductAnalyticsEndpointModule
 {
@@ -47,7 +39,7 @@ public sealed class ProductAnalyticsEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:write");
+        }).RequirePermission("analytics:write");
 
         // ────────────────────────────────────────
         // Resumo consolidado
@@ -66,7 +58,7 @@ public sealed class ProductAnalyticsEndpointModule
             var query = new GetAnalyticsSummaryFeature.Query(persona, module, teamId, domainId, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:read");
+        }).RequirePermission("analytics:read");
 
         // ────────────────────────────────────────
         // Adoção por módulo
@@ -83,7 +75,7 @@ public sealed class ProductAnalyticsEndpointModule
             var query = new GetModuleAdoptionFeature.Query(persona, teamId, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:read");
+        }).RequirePermission("analytics:read");
 
         // ────────────────────────────────────────
         // Uso por persona
@@ -100,7 +92,7 @@ public sealed class ProductAnalyticsEndpointModule
             var query = new GetPersonaUsageFeature.Query(persona, teamId, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:read");
+        }).RequirePermission("analytics:read");
 
         // ────────────────────────────────────────
         // Jornadas e funis
@@ -117,7 +109,7 @@ public sealed class ProductAnalyticsEndpointModule
             var query = new GetJourneysFeature.Query(journeyId, persona, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:read");
+        }).RequirePermission("analytics:read");
 
         // ────────────────────────────────────────
         // Marcos de valor
@@ -134,7 +126,7 @@ public sealed class ProductAnalyticsEndpointModule
             var query = new GetValueMilestonesFeature.Query(persona, teamId, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:read");
+        }).RequirePermission("analytics:read");
 
         // ────────────────────────────────────────
         // Indicadores de fricção
@@ -151,6 +143,6 @@ public sealed class ProductAnalyticsEndpointModule
             var query = new GetFrictionIndicatorsFeature.Query(persona, module, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("governance:analytics:read");
+        }).RequirePermission("analytics:read");
     }
 }

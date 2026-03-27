@@ -10,8 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Application\NexTraceOne.Governance.Application.csproj" />
-    <!-- P2.3: Governance.Infrastructure wires up ProductAnalytics.Infrastructure for analytics DI. -->
-    <ProjectReference Include="..\..\productanalytics\NexTraceOne.ProductAnalytics.Infrastructure\NexTraceOne.ProductAnalytics.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />

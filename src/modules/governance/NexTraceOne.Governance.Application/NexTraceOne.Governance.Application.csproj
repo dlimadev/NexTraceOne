@@ -9,9 +9,6 @@
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Domain\NexTraceOne.Governance.Domain.csproj" />
     <ProjectReference Include="..\..\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
-    <!-- P2.3: Governance.Application references ProductAnalytics.Application for IAnalyticsEventRepository.
-         Analytics handlers remain here until a future migration to ProductAnalytics.Application. -->
-    <ProjectReference Include="..\..\productanalytics\NexTraceOne.ProductAnalytics.Application\NexTraceOne.ProductAnalytics.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" />

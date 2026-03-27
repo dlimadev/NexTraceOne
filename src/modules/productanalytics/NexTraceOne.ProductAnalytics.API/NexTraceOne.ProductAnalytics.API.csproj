@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>NexTraceOne.ProductAnalytics.API</RootNamespace>
+    <AssemblyName>NexTraceOne.ProductAnalytics.API</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NexTraceOne.ProductAnalytics.Application\NexTraceOne.ProductAnalytics.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.ProductAnalytics.Infrastructure\NexTraceOne.ProductAnalytics.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>

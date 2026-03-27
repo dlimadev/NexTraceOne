@@ -9,7 +9,6 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
-using NexTraceOne.ProductAnalytics.Infrastructure;
 
 namespace NexTraceOne.Governance.Infrastructure;
 
@@ -49,17 +48,8 @@ public static class DependencyInjection
         // NOTE: IIntegrationConnectorRepository removed from Governance in P2.1.
         //       Registered via Integrations.Infrastructure (now wired from Integrations.API module).
         // NOTE: IAnalyticsEventRepository removed from Governance in P2.3.
-        //       Registered via AddProductAnalyticsInfrastructure below.
-        // NOTE: IGovernanceAnalyticsRepository is a legitimate Governance repository:
-        //       it queries Governance entities (Waivers, Packs, RolloutRecords) for executive trends.
+        //       Now registered via ProductAnalytics.Infrastructure (wired from ProductAnalytics.API module — P8.3).
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
-
-        // COMPATIBILIDADE TRANSITÓRIA (P2.4):
-        // Product Analytics module infrastructure is wired from here because analytics handlers
-        // (RecordAnalyticsEvent, GetAnalyticsSummary, etc.) remain temporarily in Governance.Application.
-        // These handlers already consume ProductAnalytics.Application.Abstractions correctly.
-        // Full separation into ProductAnalytics.API and ProductAnalytics.Application is pending.
-        services.AddProductAnalyticsInfrastructure(configuration);
 
         return services;
     }

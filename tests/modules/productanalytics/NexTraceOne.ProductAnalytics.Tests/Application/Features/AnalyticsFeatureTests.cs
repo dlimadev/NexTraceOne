@@ -1,13 +1,13 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.Governance.Application.Features.GetAnalyticsSummary;
-using NexTraceOne.Governance.Application.Features.GetModuleAdoption;
-using NexTraceOne.Governance.Application.Features.GetPersonaUsage;
-using NexTraceOne.Governance.Application.Features.RecordAnalyticsEvent;
+using NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary;
+using NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
+using NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
+using NexTraceOne.ProductAnalytics.Application.Features.RecordAnalyticsEvent;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
-namespace NexTraceOne.Governance.Tests.Application.Features;
+namespace NexTraceOne.ProductAnalytics.Tests.Application.Features;
 
 /// <summary>
 /// Testes de unidade para as features de product analytics.
