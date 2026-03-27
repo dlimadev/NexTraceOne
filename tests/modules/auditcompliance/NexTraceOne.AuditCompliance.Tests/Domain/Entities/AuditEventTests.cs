@@ -39,6 +39,14 @@ public sealed class AuditEventTests
     }
 
     [Fact]
+    public void Record_WithCorrelationId_ShouldStoreCorrelation()
+    {
+        var evt = AuditEvent.Record("Catalog", "ServiceUpdated", "svc-1", "Service", "user@org.com", _now, _tenantId, null, "corr-xyz");
+
+        evt.CorrelationId.Should().Be("corr-xyz");
+    }
+
+    [Fact]
     public void Record_GeneratesUniqueIds()
     {
         var evt1 = AuditEvent.Record("M", "A", "r1", "T", "u", _now, _tenantId);

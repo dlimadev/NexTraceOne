@@ -26,15 +26,25 @@ public static class VerifyChainIntegrity
             var links = await auditChainRepository.GetAllLinksAsync(cancellationToken);
             if (links.Count == 0)
             {
-                return new Response(true, 0, []);
+                return new Response(true, 0, [], false, null, null);
             }
 
             var violations = new List<ChainViolation>();
             var previousHash = string.Empty;
+            var isTruncated = false;
+            long? truncatedAtSequence = null;
+            string? truncatedPreviousHash = null;
 
             foreach (var link in links.OrderBy(l => l.SequenceNumber))
             {
-                if (!string.Equals(link.PreviousHash, previousHash, StringComparison.Ordinal))
+                if (previousHash == string.Empty && !string.IsNullOrEmpty(link.PreviousHash))
+                {
+                    // A cadeia pode ter sido truncada por retenção: aceitar o primeiro elo como novo genesis.
+                    isTruncated = true;
+                    truncatedAtSequence = link.SequenceNumber;
+                    truncatedPreviousHash = link.PreviousHash;
+                }
+                else if (!string.Equals(link.PreviousHash, previousHash, StringComparison.Ordinal))
                 {
                     violations.Add(new ChainViolation(link.SequenceNumber, "Previous hash mismatch"));
                 }
@@ -42,12 +52,24 @@ public static class VerifyChainIntegrity
                 previousHash = link.CurrentHash;
             }
 
-            return new Response(violations.Count == 0, links.Count, violations);
+            return new Response(
+                violations.Count == 0,
+                links.Count,
+                violations,
+                isTruncated,
+                truncatedAtSequence,
+                truncatedPreviousHash);
         }
     }
 
     /// <summary>Resposta da verificação de integridade.</summary>
-    public sealed record Response(bool IsIntact, int TotalLinks, IReadOnlyList<ChainViolation> Violations);
+    public sealed record Response(
+        bool IsIntact,
+        int TotalLinks,
+        IReadOnlyList<ChainViolation> Violations,
+        bool IsTruncated,
+        long? TruncatedAtSequence,
+        string? TruncatedPreviousHash);
 
     /// <summary>Violação detectada na cadeia de hash.</summary>
     public sealed record ChainViolation(long SequenceNumber, string Reason);

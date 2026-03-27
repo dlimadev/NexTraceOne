@@ -13,15 +13,27 @@ import { PageHeader } from '../../../components/PageHeader';
 export function AuditPage() {
   const { t } = useTranslation();
   const [eventTypeFilter, setEventTypeFilter] = useState('');
+  const [sourceModuleFilter, setSourceModuleFilter] = useState('');
+  const [correlationFilter, setCorrelationFilter] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
   const [page, setPage] = useState(1);
 
+  const fromIso = fromDate ? new Date(fromDate).toISOString() : undefined;
+  const toIso = toDate ? new Date(toDate).toISOString() : undefined;
+
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
-    queryKey: ['audit', 'events', page, eventTypeFilter],
+    queryKey: ['audit', 'events', page, eventTypeFilter, sourceModuleFilter, correlationFilter, fromDate, toDate],
     queryFn: () =>
       auditApi.listEvents({
         page,
         pageSize: 20,
         eventType: eventTypeFilter || undefined,
+        sourceModule: sourceModuleFilter || undefined,
+        correlationId: correlationFilter || undefined,
+        from: fromIso,
+        to: toIso,
       }),
     staleTime: 10_000,
   });
@@ -32,20 +44,53 @@ export function AuditPage() {
     enabled: false,
   });
 
+  const handleExport = async () => {
+    const now = new Date();
+    const resolvedFrom = fromDate ? new Date(fromDate) : new Date(now);
+    if (!fromDate) {
+      resolvedFrom.setDate(now.getDate() - 7);
+    }
+    const resolvedTo = toDate ? new Date(toDate) : now;
+
+    setIsExporting(true);
+    try {
+      const blob = await auditApi.exportReport(resolvedFrom.toISOString(), resolvedTo.toISOString());
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `audit-report-${resolvedFrom.toISOString().slice(0, 10)}-${resolvedTo.toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <PageContainer>
       <PageHeader
         title={t('audit.title')}
         subtitle={t('audit.subtitle')}
         actions={
-          <Button
-            variant="secondary"
-            onClick={() => verifyIntegrity()}
-            loading={verifying}
-          >
-            <Shield size={16} />
-            {t('audit.verifyIntegrity')}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => verifyIntegrity()}
+              loading={verifying}
+            >
+              <Shield size={16} />
+              {t('audit.verifyIntegrity')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleExport}
+              loading={isExporting}
+            >
+              {t('audit.exportReport')}
+            </Button>
+          </div>
         }
       />
 
@@ -73,7 +118,7 @@ export function AuditPage() {
       <PageSection>
         <Card className="mb-6">
           <CardBody>
-            <div className="flex gap-3 items-center">
+            <div className="flex flex-wrap gap-3 items-center">
               <Search size={16} className="text-muted shrink-0" />
               <input
                 type="text"
@@ -83,8 +128,57 @@ export function AuditPage() {
                   setPage(1);
                 }}
                 placeholder={t('audit.filterPlaceholder')}
-                className="flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
+                aria-label={t('audit.filterPlaceholder')}
+                className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
               />
+              <input
+                type="text"
+                value={sourceModuleFilter}
+                onChange={(e) => {
+                  setSourceModuleFilter(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={t('audit.sourceModulePlaceholder')}
+                aria-label={t('audit.sourceModulePlaceholder')}
+                className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
+              />
+              <input
+                type="text"
+                value={correlationFilter}
+                onChange={(e) => {
+                  setCorrelationFilter(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={t('audit.correlationIdPlaceholder')}
+                aria-label={t('audit.correlationIdPlaceholder')}
+                className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted">{t('audit.fromDate')}</span>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                    setPage(1);
+                  }}
+                  aria-label={t('audit.fromDate')}
+                  className="text-sm bg-transparent text-heading focus:outline-none"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted">{t('audit.toDate')}</span>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                    setPage(1);
+                  }}
+                  aria-label={t('audit.toDate')}
+                  className="text-sm bg-transparent text-heading focus:outline-none"
+                />
+              </div>
               <Button variant="secondary" onClick={() => refetch()} loading={isFetching}>
                 <RefreshCw size={14} />
                 {t('common.refresh')}
@@ -125,12 +219,13 @@ export function AuditPage() {
                   <th className="px-6 py-3 font-medium text-muted">
                     {t('audit.sourceModule', { defaultValue: 'Source module' })}
                   </th>
+                  <th className="px-6 py-3 font-medium text-muted">
+                    {t('audit.correlationId')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-edge">
                 {data.items.map((e) => {
-                  const sourceModule = (e as { payload?: { sourceModule?: string } }).payload?.sourceModule;
-
                   return (
                     <tr key={e.id} className="hover:bg-hover transition-colors">
                       <td className="px-6 py-3 font-medium text-heading">{e.eventType}</td>
@@ -140,7 +235,10 @@ export function AuditPage() {
                         {new Date(e.occurredAt).toLocaleString()}
                       </td>
                       <td className="px-6 py-3 text-xs text-faded">
-                        {typeof sourceModule === 'string' ? sourceModule : '—'}
+                        {e.sourceModule ?? '—'}
+                      </td>
+                      <td className="px-6 py-3 text-xs text-faded font-mono">
+                        {e.correlationId ?? '—'}
                       </td>
                     </tr>
                   );

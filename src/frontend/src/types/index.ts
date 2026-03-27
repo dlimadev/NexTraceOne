@@ -1798,6 +1798,7 @@ export interface AuditEvent {
   actorEmail?: string;
   action: string;
   eventType?: string;
+  sourceModule?: string;
   entityType?: string;
   aggregateType?: string;
   entityId?: string;

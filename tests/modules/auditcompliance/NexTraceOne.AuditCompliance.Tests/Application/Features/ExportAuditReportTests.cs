@@ -26,7 +26,7 @@ public sealed class ExportAuditReportTests
             AuditEvent.Record("Catalog", "ServiceUpdated", "svc-1", "Service", "user2@org.com", from.AddDays(3), Guid.NewGuid()),
         };
 
-        _eventRepository.SearchAsync(null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
+        _eventRepository.SearchAsync(null, null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
             .Returns(events);
 
         var handler = CreateHandler();
@@ -45,7 +45,7 @@ public sealed class ExportAuditReportTests
         var from = DateTimeOffset.UtcNow.AddDays(-1);
         var to = DateTimeOffset.UtcNow;
 
-        _eventRepository.SearchAsync(null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
+        _eventRepository.SearchAsync(null, null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
             .Returns(new List<AuditEvent>());
 
         var handler = CreateHandler();
@@ -63,7 +63,7 @@ public sealed class ExportAuditReportTests
         var to = DateTimeOffset.UtcNow;
         var evt = AuditEvent.Record("Governance", "PackPublished", "pack-1", "GovernancePack", "admin@org.com", from.AddHours(1), Guid.NewGuid());
 
-        _eventRepository.SearchAsync(null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
+        _eventRepository.SearchAsync(null, null, null, from, to, 1, 10000, Arg.Any<CancellationToken>())
             .Returns(new List<AuditEvent> { evt });
 
         var handler = CreateHandler();

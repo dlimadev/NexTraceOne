@@ -79,6 +79,22 @@ public sealed class RecordAuditEventTests
         _eventRepository.Received(1).Add(Arg.Is<AuditEvent>(e => e.Payload != null));
     }
 
+    [Fact]
+    public async Task Handle_WithCorrelationId_ShouldPersist()
+    {
+        _chainRepository.GetLatestLinkAsync(Arg.Any<CancellationToken>())
+            .Returns((AuditChainLink?)null);
+
+        var command = new RecordAuditEvent.Command(
+            "Catalog", "ServiceUpdated", "svc-2", "Service", "user@org.com", Guid.NewGuid(), null, "corr-001");
+
+        var handler = CreateHandler();
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        _eventRepository.Received(1).Add(Arg.Is<AuditEvent>(e => e.CorrelationId == "corr-001"));
+    }
+
     // ── Validator Tests ──
 
     [Fact]

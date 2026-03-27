@@ -133,6 +133,10 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<DateTimeOffset>("OccurredAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -165,6 +169,8 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ActionType");
+
+                    b.HasIndex("CorrelationId");
 
                     b.HasIndex("OccurredAt");
 

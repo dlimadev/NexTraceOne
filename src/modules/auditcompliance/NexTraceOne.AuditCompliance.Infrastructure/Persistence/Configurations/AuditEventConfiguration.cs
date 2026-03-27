@@ -23,6 +23,7 @@ internal sealed class AuditEventConfiguration : IEntityTypeConfiguration<AuditEv
         builder.Property(x => x.OccurredAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.TenantId).IsRequired();
         builder.Property(x => x.Payload).HasColumnType("text");
+        builder.Property(x => x.CorrelationId).HasMaxLength(100);
 
         builder.HasOne(x => x.ChainLink)
             .WithOne()
@@ -35,5 +36,6 @@ internal sealed class AuditEventConfiguration : IEntityTypeConfiguration<AuditEv
         builder.HasIndex(x => x.SourceModule);
         builder.HasIndex(x => x.ActionType);
         builder.HasIndex(x => x.PerformedBy);
+        builder.HasIndex(x => x.CorrelationId);
     }
 }

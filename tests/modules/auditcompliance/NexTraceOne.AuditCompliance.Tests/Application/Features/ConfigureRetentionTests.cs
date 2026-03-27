@@ -1,4 +1,7 @@
+using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Application.Features.ConfigureRetention;
+using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Tests.Application.Features;
 
@@ -8,37 +11,48 @@ namespace NexTraceOne.AuditCompliance.Tests.Application.Features;
 /// </summary>
 public sealed class ConfigureRetentionTests
 {
+    private readonly IRetentionPolicyRepository _retentionPolicyRepository = Substitute.For<IRetentionPolicyRepository>();
+    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+
+    private ConfigureRetention.Handler CreateHandler() => new(_retentionPolicyRepository, _unitOfWork);
+
     [Fact]
     public async Task Handle_ValidCommand_ShouldReturnSuccess()
     {
-        var handler = new ConfigureRetention.Handler();
+        var handler = CreateHandler();
         var command = new ConfigureRetention.Command("default-90", 90);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
+        _retentionPolicyRepository.Received(1).Add(Arg.Any<RetentionPolicy>());
+        await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Handle_MaxRetention_ShouldReturnSuccess()
     {
-        var handler = new ConfigureRetention.Handler();
+        var handler = CreateHandler();
         var command = new ConfigureRetention.Command("long-term", 3650);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
+        _retentionPolicyRepository.Received(1).Add(Arg.Any<RetentionPolicy>());
+        await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Handle_MinRetention_ShouldReturnSuccess()
     {
-        var handler = new ConfigureRetention.Handler();
+        var handler = CreateHandler();
         var command = new ConfigureRetention.Command("short-term", 1);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
+        _retentionPolicyRepository.Received(1).Add(Arg.Any<RetentionPolicy>());
+        await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     // ── Validator Tests ──
