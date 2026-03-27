@@ -207,4 +207,18 @@ public static class IdentityErrors
     /// <summary>Ambiente inativo não pode ser designado como produção principal.</summary>
     public static Error CannotDesignateInactiveAsPrimaryProduction(Guid environmentId)
         => Error.Validation("Identity.Environment.CannotDesignateInactiveAsPrimaryProduction", "Environment '{0}' is not active and cannot be designated as the primary production environment.", environmentId);
+
+    // ── MFA ──────────────────────────────────────────────────────────────
+
+    /// <summary>Token de desafio MFA inválido ou expirado.</summary>
+    public static Error MfaChallengeExpiredOrInvalid()
+        => Error.Unauthorized("Identity.Mfa.ChallengeExpiredOrInvalid", "The MFA challenge token is invalid or has expired. Please start the login flow again.");
+
+    /// <summary>Código MFA inválido.</summary>
+    public static Error MfaCodeInvalid()
+        => Error.Forbidden("Identity.Mfa.CodeInvalid", "The provided MFA code is invalid. Please check your authenticator and try again.");
+
+    /// <summary>Step-up MFA necessário para operação privilegiada.</summary>
+    public static Error MfaStepUpRequired()
+        => Error.Forbidden("Identity.Mfa.StepUpRequired", "This operation requires MFA step-up verification. Please provide your MFA code.");
 }

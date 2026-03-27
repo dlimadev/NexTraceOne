@@ -61,6 +61,8 @@ public static class DependencyInjection
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<ITotpVerifier, TotpVerifier>();
+        services.AddScoped<IMfaChallengeTokenService, MfaChallengeTokenService>();
 
         // Provider OIDC para fluxo federado (Authorization Code flow)
         services.AddHttpClient("oidc");

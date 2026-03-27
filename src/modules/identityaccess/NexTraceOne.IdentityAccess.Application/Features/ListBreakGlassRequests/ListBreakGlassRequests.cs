@@ -13,7 +13,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features.ListBreakGlassRequests
 public static class ListBreakGlassRequests
 {
     /// <summary>Consulta de solicitações Break Glass.</summary>
-    public sealed record Query() : IQuery<IReadOnlyList<BreakGlassResponse>>;
+    public sealed record Query(bool IncludeInactive = false) : IQuery<IReadOnlyList<BreakGlassResponse>>;
 
     /// <summary>Handler que retorna as solicitações Break Glass do tenant.</summary>
     public sealed class Handler(
@@ -27,7 +27,11 @@ public static class ListBreakGlassRequests
             var active = await breakGlassRepository.ListActiveByTenantAsync(tenantId, cancellationToken);
             var pendingPostMortem = await breakGlassRepository.ListPendingPostMortemAsync(tenantId, cancellationToken);
 
-            var allRequests = active.Concat(pendingPostMortem)
+            var source = request.IncludeInactive
+                ? active.Concat(pendingPostMortem)
+                : active;
+
+            var allRequests = source
                 .DistinctBy(x => x.Id.Value)
                 .Select(x => new BreakGlassResponse(
                     x.Id.Value,

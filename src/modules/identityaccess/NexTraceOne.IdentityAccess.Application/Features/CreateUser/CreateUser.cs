@@ -47,6 +47,7 @@ public static class CreateUser
         IRoleRepository roleRepository,
         ITenantMembershipRepository membershipRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider,
         IPasswordHasher passwordHasher) : ICommandHandler<Command, Guid>
     {
@@ -85,7 +86,7 @@ public static class CreateUser
                 role.Id,
                 dateTimeProvider.UtcNow));
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 TenantId.From(request.TenantId),
                 user.Id,
                 sessionId: null,
@@ -95,7 +96,9 @@ public static class CreateUser
                 ipAddress: null,
                 userAgent: null,
                 $"{{\"roleId\":\"{request.RoleId}\",\"roleName\":\"{role.Name}\"}}",
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return user.Id.Value;
         }

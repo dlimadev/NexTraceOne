@@ -19,8 +19,10 @@ namespace NexTraceOne.IdentityAccess.Application.Features.RefreshToken;
 /// Delegação de responsabilidades:
 /// - Resolução de membership → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
 /// - Construção de resposta → <see cref="ILoginResponseBuilder"/> (DRY/DIP).
+/// - Auditoria de contexto suspeito de sessão → <see cref="ISecurityAuditRecorder"/> (SRP/DIP).
 ///
-/// Refatoração: reduzido de 7 para 5 dependências diretas via serviços injetáveis.
+/// Segurança: detecta mudança de IP/UserAgent entre a criação e o refresh da sessão,
+/// gerando SecurityEvent.SuspiciousSessionContextDetected para auditoria.
 /// </summary>
 public static class RefreshToken
 {
@@ -43,6 +45,7 @@ public static class RefreshToken
     /// Orquestra o fluxo de rotação delegando responsabilidades específicas
     /// para serviços injetados via DI:
     /// - ILoginResponseBuilder para resolução de membership e construção de resposta (DIP).
+    /// - ISecurityAuditRecorder para registo de contexto suspeito de sessão (DIP).
     /// </summary>
     public sealed class Handler(
         ISessionRepository sessionRepository,
@@ -50,7 +53,8 @@ public static class RefreshToken
         IRoleRepository roleRepository,
         IJwtTokenGenerator jwtTokenGenerator,
         IDateTimeProvider dateTimeProvider,
-        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LocalLogin.LocalLogin.LoginResponse>
+        ILoginResponseBuilder responseBuilder,
+        ISecurityAuditRecorder auditRecorder) : ICommandHandler<Command, LocalLogin.LocalLogin.LoginResponse>
     {
         public async Task<Result<LocalLoginFeature.LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -91,6 +95,22 @@ public static class RefreshToken
             if (role is null)
             {
                 return IdentityErrors.RoleNotFound(membership.RoleId.Value);
+            }
+
+            // Detecção de contexto de sessão suspeito: IP alterado entre criação e refresh.
+            // Gera SecurityEvent para auditoria sem revogar a sessão por defeito (comportamento seguro
+            // que não impacta utilizadores legítimos com IPs dinâmicos, mas cria trilha de anomalia).
+            if (!string.IsNullOrWhiteSpace(request.IpAddress) &&
+                !string.Equals(session.CreatedByIp, request.IpAddress, StringComparison.OrdinalIgnoreCase) &&
+                session.CreatedByIp != "unknown")
+            {
+                auditRecorder.RecordSuspiciousSessionContext(
+                    membership.TenantId,
+                    user.Id,
+                    session.Id,
+                    "IP address changed since session creation.",
+                    request.IpAddress,
+                    session.CreatedByIp);
             }
 
             var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();

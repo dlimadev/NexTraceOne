@@ -22,6 +22,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features;
 /// </summary>
 internal sealed class SecurityAuditRecorder(
     ISecurityEventRepository securityEventRepository,
+    ISecurityEventTracker securityEventTracker,
     IDateTimeProvider dateTimeProvider,
     ICurrentTenant currentTenant) : ISecurityAuditRecorder
 {
@@ -33,7 +34,7 @@ internal sealed class SecurityAuditRecorder(
         string? userAgent,
         string? metadataJson = null)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId: null,
@@ -43,7 +44,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             metadataJson,
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -54,7 +57,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId: null,
@@ -64,7 +67,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             metadataJson: null,
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -74,7 +79,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId: null,
@@ -84,7 +89,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             metadataJson: null,
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -97,7 +104,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId,
             sessionId,
@@ -107,7 +114,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             $"{{\"provider\":\"{provider}\",\"externalId\":\"{externalId}\"}}",
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -118,7 +127,7 @@ internal sealed class SecurityAuditRecorder(
         string? ipAddress,
         string? userAgent)
     {
-        securityEventRepository.Add(SecurityEvent.Create(
+        var securityEvent = SecurityEvent.Create(
             tenantId,
             userId: null,
             sessionId: null,
@@ -128,7 +137,9 @@ internal sealed class SecurityAuditRecorder(
             ipAddress,
             userAgent,
             $"{{\"provider\":\"{provider}\"}}",
-            dateTimeProvider.UtcNow));
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 
     /// <inheritdoc />
@@ -137,5 +148,119 @@ internal sealed class SecurityAuditRecorder(
         return currentTenant.Id != Guid.Empty
             ? TenantId.From(currentTenant.Id)
             : TenantId.From(Guid.Empty);
+    }
+
+    /// <inheritdoc />
+    public void RecordMfaChallengeSuccess(
+        TenantId tenantId,
+        UserId userId,
+        string? ipAddress,
+        string? userAgent)
+    {
+        var securityEvent = SecurityEvent.Create(
+            tenantId,
+            userId,
+            sessionId: null,
+            SecurityEventType.MfaChallengeSucceeded,
+            $"MFA challenge completed successfully for user '{userId.Value}'.",
+            riskScore: 0,
+            ipAddress,
+            userAgent,
+            metadataJson: null,
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
+    }
+
+    /// <inheritdoc />
+    public void RecordMfaChallengeFailed(
+        TenantId tenantId,
+        UserId userId,
+        string? ipAddress,
+        string? userAgent)
+    {
+        var securityEvent = SecurityEvent.Create(
+            tenantId,
+            userId,
+            sessionId: null,
+            SecurityEventType.MfaChallengeFailed,
+            $"MFA challenge failed for user '{userId.Value}' — invalid code provided.",
+            riskScore: 50,
+            ipAddress,
+            userAgent,
+            metadataJson: null,
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
+    }
+
+    /// <inheritdoc />
+    public void RecordMfaStepUpDenied(
+        TenantId tenantId,
+        UserId userId,
+        string operation,
+        string? ipAddress,
+        string? userAgent)
+    {
+        var securityEvent = SecurityEvent.Create(
+            tenantId,
+            userId,
+            sessionId: null,
+            SecurityEventType.MfaStepUpDenied,
+            $"Step-up MFA denied for user '{userId.Value}' attempting operation '{operation}' — invalid code.",
+            riskScore: 60,
+            ipAddress,
+            userAgent,
+            $"{{\"operation\":\"{operation}\"}}",
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
+    }
+
+    /// <inheritdoc />
+    public void RecordStepUpMfaRequired(
+        TenantId tenantId,
+        UserId userId,
+        string operation,
+        string? ipAddress,
+        string? userAgent)
+    {
+        var securityEvent = SecurityEvent.Create(
+            tenantId,
+            userId,
+            sessionId: null,
+            SecurityEventType.StepUpMfaRequired,
+            $"Step-up MFA required for user '{userId.Value}' attempting operation '{operation}'.",
+            riskScore: 40,
+            ipAddress,
+            userAgent,
+            $"{{\"operation\":\"{operation}\"}}",
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
+    }
+
+    /// <inheritdoc />
+    public void RecordSuspiciousSessionContext(
+        TenantId tenantId,
+        UserId userId,
+        SessionId sessionId,
+        string reason,
+        string? currentIp,
+        string? originalIp)
+    {
+        var securityEvent = SecurityEvent.Create(
+            tenantId,
+            userId,
+            sessionId,
+            SecurityEventType.SuspiciousSessionContextDetected,
+            $"Suspicious session context detected for user '{userId.Value}': {reason}",
+            riskScore: 55,
+            currentIp,
+            userAgent: null,
+            System.Text.Json.JsonSerializer.Serialize(new { reason, currentIp, originalIp }),
+            dateTimeProvider.UtcNow);
+        securityEventRepository.Add(securityEvent);
+        securityEventTracker.Track(securityEvent);
     }
 }

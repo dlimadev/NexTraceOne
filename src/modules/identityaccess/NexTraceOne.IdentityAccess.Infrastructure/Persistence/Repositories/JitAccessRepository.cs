@@ -20,6 +20,12 @@ internal sealed class JitAccessRepository(IdentityDbContext dbContext) : IJitAcc
             .OrderByDescending(x => x.RequestedAt)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<JitAccessRequest>> ListByTenantAsync(TenantId tenantId, CancellationToken cancellationToken)
+        => await dbContext.JitAccessRequests
+            .Where(x => x.TenantId == tenantId)
+            .OrderByDescending(x => x.RequestedAt)
+            .ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<JitAccessRequest>> ListByUserAsync(UserId userId, CancellationToken cancellationToken)
         => await dbContext.JitAccessRequests
             .Where(x => x.RequestedBy == userId)

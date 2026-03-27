@@ -35,7 +35,8 @@ public sealed class RefreshTokenTests
             roleRepository,
             jwtTokenGenerator,
             new TestDateTimeProvider(now),
-            responseBuilder);
+            responseBuilder,
+            Substitute.For<ISecurityAuditRecorder>());
 
         sessionRepository.GetByRefreshTokenHashAsync(Arg.Any<RefreshTokenHash>(), Arg.Any<CancellationToken>()).Returns(session);
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
@@ -65,7 +66,8 @@ public sealed class RefreshTokenTests
             Substitute.For<IRoleRepository>(),
             Substitute.For<IJwtTokenGenerator>(),
             new TestDateTimeProvider(now),
-            Substitute.For<ILoginResponseBuilder>());
+            Substitute.For<ILoginResponseBuilder>(),
+            Substitute.For<ISecurityAuditRecorder>());
 
         sessionRepository.GetByRefreshTokenHashAsync(Arg.Any<RefreshTokenHash>(), Arg.Any<CancellationToken>()).Returns(session);
 
@@ -89,7 +91,8 @@ public sealed class RefreshTokenTests
             Substitute.For<IRoleRepository>(),
             Substitute.For<IJwtTokenGenerator>(),
             new TestDateTimeProvider(now),
-            Substitute.For<ILoginResponseBuilder>());
+            Substitute.For<ILoginResponseBuilder>(),
+            Substitute.For<ISecurityAuditRecorder>());
 
         sessionRepository.GetByRefreshTokenHashAsync(Arg.Any<RefreshTokenHash>(), Arg.Any<CancellationToken>()).Returns(session);
 

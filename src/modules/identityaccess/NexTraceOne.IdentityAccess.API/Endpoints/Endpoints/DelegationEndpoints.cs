@@ -49,11 +49,14 @@ internal static class DelegationEndpoints
         }).RequirePermission("identity:sessions:revoke");
 
         delGroup.MapGet("/", async (
+            bool? includeHistory,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new ListDelegationsFeature.Query(), cancellationToken);
+            var result = await sender.Send(
+                new ListDelegationsFeature.Query(includeHistory ?? false),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:users:read");
     }

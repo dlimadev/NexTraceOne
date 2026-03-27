@@ -50,12 +50,33 @@ public static class SecurityEventType
 
     /// <summary>Delegação formal criada.</summary>
     public const string DelegationCreated = "security.privileged.delegation_created";
+    public const string DelegationRevoked = "security.privileged.delegation_revoked";
+    public const string BreakGlassRevoked = "security.privileged.break_glass_revoked";
+    public const string JitAccessApproved = "security.privileged.jit_approved";
+    public const string JitAccessRejected = "security.privileged.jit_rejected";
+    public const string JitSelfApprovalDenied = "security.privileged.jit_self_approval_denied";
+    public const string DelegationToSelfDenied = "security.privileged.delegation_self_denied";
 
     /// <summary>Sessão suspensa por anomalia detectada.</summary>
     public const string SessionSuspended = "security.response.session_suspended";
 
     /// <summary>MFA adicional solicitado (step-up).</summary>
     public const string StepUpMfaRequired = "security.response.stepup_mfa_required";
+
+    /// <summary>Desafio MFA concluído com sucesso durante o login.</summary>
+    public const string MfaChallengeSucceeded = "security.mfa.challenge_succeeded";
+
+    /// <summary>Desafio MFA falhou — código inválido ou expirado.</summary>
+    public const string MfaChallengeFailed = "security.mfa.challenge_failed";
+
+    /// <summary>Step-up MFA concluído com sucesso para operação privilegiada.</summary>
+    public const string MfaStepUpGranted = "security.mfa.stepup_granted";
+
+    /// <summary>Step-up MFA negado — código inválido ou MFA não cumprido.</summary>
+    public const string MfaStepUpDenied = "security.mfa.stepup_denied";
+
+    /// <summary>Contexto de sessão suspeito detectado — IP ou UserAgent alterado durante refresh.</summary>
+    public const string SuspiciousSessionContextDetected = "security.anomaly.suspicious_session_context";
 
     // ── Gestão de Identidade ─────────────────────────────────────────────
 

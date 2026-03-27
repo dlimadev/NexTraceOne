@@ -55,9 +55,13 @@ public static class LocalLogin
     /// - ILoginSessionCreator para criação de sessão (DIP).
     /// - ISecurityAuditRecorder para registro de eventos de segurança (DIP).
     /// - ILoginResponseBuilder para resolução de membership e construção de resposta (DIP).
+    /// - IMfaChallengeTokenService para emissão de token de desafio MFA quando necessário.
     ///
-    /// Refatoração: reduzido de 9 para 5 dependências diretas via extração
-    /// de serviços injetáveis, melhorando testabilidade e aderência ao SRP.
+    /// Fluxo com MFA:
+    /// 1. Valida credenciais (igual ao fluxo sem MFA).
+    /// 2. Se user.MfaEnabled = true, emite desafio MFA e retorna resposta parcial (MfaRequired = true).
+    /// 3. Cliente deve chamar POST /auth/mfa/verify com o challenge token + código TOTP.
+    /// 4. VerifyMfaChallenge emite a sessão completa após validação do código.
     /// </summary>
     public sealed class Handler(
         IUserRepository userRepository,
@@ -66,7 +70,8 @@ public static class LocalLogin
         IDateTimeProvider dateTimeProvider,
         ISecurityAuditRecorder auditRecorder,
         ILoginSessionCreator sessionCreator,
-        ILoginResponseBuilder responseBuilder) : ICommandHandler<Command, LoginResponse>
+        ILoginResponseBuilder responseBuilder,
+        IMfaChallengeTokenService mfaChallengeTokenService) : ICommandHandler<Command, LoginResponse>
     {
         public async Task<Result<LoginResponse>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -108,6 +113,30 @@ public static class LocalLogin
                 return IdentityErrors.TenantMembershipNotFound(user.Id.Value, responseBuilder.CurrentTenantId);
             }
 
+            // MFA enforcement: se o utilizador tem MFA habilitado, emitir desafio em vez de tokens completos.
+            // O cliente deve completar o desafio via POST /auth/mfa/verify antes de receber tokens de acesso.
+            if (user.MfaEnabled)
+            {
+                var challengeToken = mfaChallengeTokenService.Issue(
+                    user.Id.Value,
+                    dateTimeProvider.UtcNow.AddMinutes(5));
+
+                auditRecorder.RecordStepUpMfaRequired(
+                    membership.TenantId,
+                    user.Id,
+                    "login",
+                    request.IpAddress,
+                    request.UserAgent);
+
+                return new LoginResponse(
+                    AccessToken: string.Empty,
+                    RefreshToken: string.Empty,
+                    ExpiresIn: 0,
+                    User: new UserResponse(user.Id.Value, user.Email.Value, user.FullName.Value, Guid.Empty, string.Empty, []),
+                    MfaRequired: true,
+                    MfaChallengeToken: challengeToken);
+            }
+
             var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
             if (role is null)
             {
@@ -142,7 +171,9 @@ public static class LocalLogin
         string AccessToken,
         string RefreshToken,
         int ExpiresIn,
-        UserResponse User);
+        UserResponse User,
+        bool MfaRequired = false,
+        string? MfaChallengeToken = null);
 
     /// <summary>Resumo do usuário autenticado incluído na resposta de login.</summary>
     public sealed record UserResponse(

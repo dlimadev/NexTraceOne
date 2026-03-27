@@ -13,7 +13,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features.ListJitAccessRequests;
 public static class ListJitAccessRequests
 {
     /// <summary>Consulta de solicitações JIT pendentes.</summary>
-    public sealed record Query() : IQuery<IReadOnlyList<JitAccessResponse>>;
+    public sealed record Query(bool IncludeHistory = false) : IQuery<IReadOnlyList<JitAccessResponse>>;
 
     /// <summary>Handler que retorna solicitações JIT pendentes do tenant.</summary>
     public sealed class Handler(
@@ -23,9 +23,11 @@ public static class ListJitAccessRequests
         public async Task<Result<IReadOnlyList<JitAccessResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var tenantId = TenantId.From(currentTenant.Id);
-            var pending = await jitAccessRepository.ListPendingByTenantAsync(tenantId, cancellationToken);
+            var items = request.IncludeHistory
+                ? await jitAccessRepository.ListByTenantAsync(tenantId, cancellationToken)
+                : await jitAccessRepository.ListPendingByTenantAsync(tenantId, cancellationToken);
 
-            var responses = pending
+            var responses = items
                 .Select(x => new JitAccessResponse(
                     x.Id.Value,
                     x.RequestedBy.Value,

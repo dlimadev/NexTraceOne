@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 
 using FluentValidation;
+using System.Text.Json;
 
 using MediatR;
 
@@ -58,6 +59,7 @@ public static class DecideAccessReviewItem
         ICurrentTenant currentTenant,
         IAccessReviewRepository accessReviewRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -146,7 +148,7 @@ public static class DecideAccessReviewItem
             string description,
             int riskScore)
         {
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 tenantId,
                 affectedUserId,
                 sessionId: null,
@@ -155,8 +157,10 @@ public static class DecideAccessReviewItem
                 riskScore,
                 ipAddress: null,
                 userAgent: null,
-                $"{{\"itemId\":\"{itemId}\"}}",
-                dateTimeProvider.UtcNow));
+                JsonSerializer.Serialize(new { itemId }),
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
         }
     }
 }

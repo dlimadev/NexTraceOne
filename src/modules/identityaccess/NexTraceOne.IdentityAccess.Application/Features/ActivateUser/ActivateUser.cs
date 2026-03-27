@@ -35,6 +35,7 @@ public static class ActivateUser
     public sealed class Handler(
         IUserRepository userRepository,
         ISecurityEventRepository securityEventRepository,
+        ISecurityEventTracker securityEventTracker,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -49,7 +50,7 @@ public static class ActivateUser
 
             user.Activate();
 
-            securityEventRepository.Add(SecurityEvent.Create(
+            var securityEvent = SecurityEvent.Create(
                 TenantId.From(request.TenantId),
                 user.Id,
                 sessionId: null,
@@ -59,7 +60,9 @@ public static class ActivateUser
                 ipAddress: null,
                 userAgent: null,
                 metadataJson: null,
-                dateTimeProvider.UtcNow));
+                dateTimeProvider.UtcNow);
+            securityEventRepository.Add(securityEvent);
+            securityEventTracker.Track(securityEvent);
 
             return Unit.Value;
         }

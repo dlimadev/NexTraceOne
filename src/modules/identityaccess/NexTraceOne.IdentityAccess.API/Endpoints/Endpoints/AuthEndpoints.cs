@@ -15,6 +15,7 @@ using GetCurrentUserFeature = NexTraceOne.IdentityAccess.Application.Features.Ge
 using ChangePasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ChangePassword.ChangePassword;
 using StartOidcLoginFeature = NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin.StartOidcLogin;
 using OidcCallbackFeature = NexTraceOne.IdentityAccess.Application.Features.OidcCallback.OidcCallback;
+using VerifyMfaChallengeFeature = NexTraceOne.IdentityAccess.Application.Features.VerifyMfaChallenge.VerifyMfaChallenge;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -134,6 +135,23 @@ internal static class AuthEndpoints
             var result = await sender.Send(
                 new OidcCallbackFeature.Command(provider, code, state, ip, userAgent),
                 cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/mfa/verify — segundo passo do fluxo MFA: verifica código TOTP e emite tokens completos.
+        // Requer: ChallengeToken (emitido pelo /auth/login quando MfaRequired = true) + Code TOTP 6 dígitos.
+        authGroup.MapPost("/mfa/verify", async (
+            VerifyMfaChallengeFeature.Command command,
+            HttpContext httpContext,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString();
+            var userAgent = httpContext.Request.Headers.UserAgent.ToString();
+            var enrichedCommand = command with { IpAddress = ip, UserAgent = userAgent };
+            var result = await sender.Send(enrichedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
         }).AllowAnonymous()
           .RequireRateLimiting("auth");
