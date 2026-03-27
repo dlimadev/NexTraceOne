@@ -42,6 +42,8 @@ public static class DependencyInjection
         services.AddScoped<IServiceCostProfileRepository, ServiceCostProfileRepository>();
         services.AddScoped<ICostImportBatchRepository, CostImportBatchRepository>();
         services.AddScoped<ICostRecordRepository, CostRecordRepository>();
+        // P6.3 — repositório de tendências de custo (necessário para ComputeCostTrend persistir)
+        services.AddScoped<ICostTrendRepository, CostTrendRepository>();
         services.AddScoped<ICostIntelligenceModule, CostIntelligenceModuleService>();
 
         return services;

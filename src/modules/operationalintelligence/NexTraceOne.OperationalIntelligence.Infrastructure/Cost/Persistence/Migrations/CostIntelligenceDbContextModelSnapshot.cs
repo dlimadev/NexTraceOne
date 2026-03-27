@@ -230,6 +230,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                     b.Property<DateTimeOffset>("RecordedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("ReleaseId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ServiceId")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -266,6 +269,8 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                     b.HasIndex("Domain");
 
                     b.HasIndex("Period");
+
+                    b.HasIndex("ReleaseId");
 
                     b.HasIndex("Team");
 

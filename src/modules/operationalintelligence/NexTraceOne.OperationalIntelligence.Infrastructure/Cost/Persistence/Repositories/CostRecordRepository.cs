@@ -64,6 +64,13 @@ internal sealed class CostRecordRepository(CostIntelligenceDbContext context)
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>Lista registos de custo correlacionados com uma release específica.</summary>
+    public async Task<IReadOnlyList<CostRecord>> ListByReleaseAsync(Guid releaseId, CancellationToken cancellationToken = default)
+        => await context.CostRecords
+            .Where(r => r.ReleaseId == releaseId)
+            .OrderByDescending(r => r.TotalCost)
+            .ToListAsync(cancellationToken);
+
     /// <summary>Adiciona múltiplos registos de custo ao repositório em batch.</summary>
     public void AddRange(IEnumerable<CostRecord> records)
         => context.CostRecords.AddRange(records);

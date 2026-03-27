@@ -23,6 +23,9 @@ public interface ICostRecordRepository
     /// <summary>Lista registos de custo de um domínio, opcionalmente filtrado por período.</summary>
     Task<IReadOnlyList<CostRecord>> ListByDomainAsync(string domain, string? period = null, CancellationToken cancellationToken = default);
 
+    /// <summary>Lista registos de custo correlacionados com uma release específica.</summary>
+    Task<IReadOnlyList<CostRecord>> ListByReleaseAsync(Guid releaseId, CancellationToken cancellationToken = default);
+
     /// <summary>Adiciona um novo registo de custo ao repositório.</summary>
     void Add(CostRecord record);
 

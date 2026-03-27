@@ -22,4 +22,11 @@ public interface IRuntimeBaselineRepository
 
     /// <summary>Adiciona uma nova baseline de runtime ao repositório.</summary>
     void Add(RuntimeBaseline baseline);
+
+    /// <summary>
+    /// Lista todas as baselines de runtime existentes para paginação administrativa.
+    /// </summary>
+    Task<IReadOnlyList<RuntimeBaseline>> ListByServiceAsync(
+        string serviceName,
+        CancellationToken cancellationToken = default);
 }

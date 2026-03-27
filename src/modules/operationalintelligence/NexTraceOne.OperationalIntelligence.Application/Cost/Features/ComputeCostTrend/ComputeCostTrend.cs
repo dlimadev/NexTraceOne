@@ -42,9 +42,11 @@ public static class ComputeCostTrend
     /// <summary>
     /// Handler que calcula a tendência de custo a partir dos snapshots existentes.
     /// Busca snapshots no período, calcula estatísticas e persiste a entidade CostTrend.
+    /// P6.3: corrigido — CostTrend agora é persistido via ICostTrendRepository.
     /// </summary>
     public sealed class Handler(
         ICostSnapshotRepository snapshotRepository,
+        ICostTrendRepository trendRepository,
         IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -101,6 +103,7 @@ public static class ComputeCostTrend
 
             var trend = trendResult.Value;
 
+            trendRepository.Add(trend);
             await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(

@@ -27,11 +27,13 @@ internal sealed class CostRecordConfiguration : IEntityTypeConfiguration<CostRec
         builder.Property(x => x.Currency).HasMaxLength(10).IsRequired();
         builder.Property(x => x.Source).HasMaxLength(200).IsRequired();
         builder.Property(x => x.RecordedAt).HasColumnType("timestamp with time zone").IsRequired();
+        builder.Property(x => x.ReleaseId);
 
         builder.HasIndex(x => x.BatchId);
         builder.HasIndex(x => new { x.ServiceId, x.Period });
         builder.HasIndex(x => x.Period);
         builder.HasIndex(x => x.Team);
         builder.HasIndex(x => x.Domain);
+        builder.HasIndex(x => x.ReleaseId);
     }
 }

@@ -9,6 +9,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
 /// DbContext do subdomínio Reliability do módulo OperationalIntelligence.
 /// Herda de NexTraceDbContextBase: RLS, auditoria, Outbox, criptografia, soft-delete.
 /// Base de dados isolada — cada sub-domínio pode ter sua própria connection string.
+///
+/// P6.1: expandido com entidades de SLO, SLA, ErrorBudget e BurnRate para suporte
+/// a confiabilidade operacional enterprise.
 /// </summary>
 public sealed class ReliabilityDbContext(
     DbContextOptions<ReliabilityDbContext> options,
@@ -19,6 +22,18 @@ public sealed class ReliabilityDbContext(
 {
     /// <summary>Snapshots computados de confiabilidade por serviço e ambiente.</summary>
     public DbSet<ReliabilitySnapshot> ReliabilitySnapshots => Set<ReliabilitySnapshot>();
+
+    /// <summary>Definições de SLO (Service Level Objective) por serviço e ambiente.</summary>
+    public DbSet<SloDefinition> SloDefinitions => Set<SloDefinition>();
+
+    /// <summary>Definições de SLA (Service Level Agreement) associadas a SLOs.</summary>
+    public DbSet<SlaDefinition> SlaDefinitions => Set<SlaDefinition>();
+
+    /// <summary>Snapshots do estado do error budget por SLO.</summary>
+    public DbSet<ErrorBudgetSnapshot> ErrorBudgetSnapshots => Set<ErrorBudgetSnapshot>();
+
+    /// <summary>Snapshots do burn rate do error budget por SLO e janela de tempo.</summary>
+    public DbSet<BurnRateSnapshot> BurnRateSnapshots => Set<BurnRateSnapshot>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

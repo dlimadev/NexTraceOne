@@ -57,6 +57,13 @@ public sealed class CostRecord : AuditableEntity<CostRecordId>
     public DateTimeOffset RecordedAt { get; private set; }
 
     /// <summary>
+    /// Identificador da release/mudança à qual este custo está correlacionado.
+    /// Null quando o custo ainda não foi associado a uma release específica.
+    /// Permite ligar custo a change intelligence para análise de impacto financeiro de deploys.
+    /// </summary>
+    public Guid? ReleaseId { get; private set; }
+
+    /// <summary>
     /// Factory method para criação de um registo de custo validado.
     /// Garante todas as invariantes da entidade — não existe CostRecord em estado inválido.
     /// </summary>
@@ -98,6 +105,26 @@ public sealed class CostRecord : AuditableEntity<CostRecordId>
             Source = source,
             RecordedAt = recordedAt
         };
+    }
+
+    /// <summary>
+    /// Associa este registo de custo a uma release/mudança específica.
+    /// Permite correlacionar custo operacional com mudanças de produção para análise de impacto financeiro.
+    /// </summary>
+    /// <param name="releaseId">Identificador da release no módulo Change Governance.</param>
+    public void AssignRelease(Guid releaseId)
+    {
+        Guard.Against.Default(releaseId);
+        ReleaseId = releaseId;
+    }
+
+    /// <summary>
+    /// Remove a associação a uma release.
+    /// Deve ser usado quando a correlação estava incorreta.
+    /// </summary>
+    public void ClearRelease()
+    {
+        ReleaseId = null;
     }
 }
 

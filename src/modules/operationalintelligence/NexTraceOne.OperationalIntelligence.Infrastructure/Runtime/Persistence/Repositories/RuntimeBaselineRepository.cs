@@ -25,4 +25,13 @@ internal sealed class RuntimeBaselineRepository(RuntimeIntelligenceDbContext con
         CancellationToken cancellationToken = default)
         => await context.RuntimeBaselines
             .SingleOrDefaultAsync(b => b.ServiceName == serviceName && b.Environment == environment, cancellationToken);
+
+    /// <summary>Lista baselines de runtime de um serviço.</summary>
+    public async Task<IReadOnlyList<RuntimeBaseline>> ListByServiceAsync(
+        string serviceName,
+        CancellationToken cancellationToken = default)
+        => await context.RuntimeBaselines
+            .Where(b => b.ServiceName == serviceName)
+            .OrderByDescending(b => b.EstablishedAt)
+            .ToListAsync(cancellationToken);
 }
