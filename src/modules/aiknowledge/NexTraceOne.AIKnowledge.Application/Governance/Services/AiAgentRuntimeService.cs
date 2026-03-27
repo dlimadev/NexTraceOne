@@ -153,11 +153,7 @@ public sealed class AiAgentRuntimeService(
                     if (toolCall is null)
                         break;
 
-                    // Validate tool is allowed
-                    if (!toolPermissionValidator.IsToolAllowed(agent.AllowedTools, toolCall.ToolName))
-                        break;
-
-                    // Execute tool
+                    // Execute tool (AllowedTools already enforced by DetectToolCall filtering)
                     var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
                     toolResults.Add(toolResult);
 

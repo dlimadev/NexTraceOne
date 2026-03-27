@@ -89,6 +89,8 @@ public sealed class RealToolTests
         var result = await tool.ExecuteAsync("not-json", CancellationToken.None);
 
         result.Success.Should().BeTrue();
+        result.Output.Should().Contain("list_recent_changes");
+        result.Output.Should().Contain("executed");
     }
 
     [Fact]
