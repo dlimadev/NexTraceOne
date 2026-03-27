@@ -70,7 +70,7 @@ A ordem respeita dependências entre módulos:
 | ✅ Obrigatório | Role-Permission mappings | PROD | ✅ Upsert por RoleId+PermissionId |
 | ✅ Obrigatório | 1 default tenant ("NexTraceOne") | PROD | ✅ Upsert por Name |
 | ⚠️ Opcional | Admin user (plataforma) | PROD | ✅ Create if not exists |
-| ❌ Remover | 17 licensing permissions | — | — |
+| ~~❌ Remover~~ ✅ Removido | 17 licensing permissions | — (P12.1 cleanup done) | — |
 
 **Estado actual:** ⚠️ Seeds em `HasData()` dentro de EF Configurations. Precisa ser extraído para seeder programático.
 
@@ -78,7 +78,7 @@ A ordem respeita dependências entre módulos:
 1. Criar `IdentityAccessSeeder.cs` programático
 2. Extrair roles, permissions e tenant default de `HasData()` para o seeder
 3. Remover `HasData()` de `RoleConfiguration.cs`, `PermissionConfiguration.cs`, `TenantConfiguration.cs`
-4. Remover 17 permissões `licensing:*` do catálogo
+4. ~~Remover 17 permissões `licensing:*` do catálogo~~ ✅ Removidas em P12.1
 5. Tornar seeder idempotente (upsert pattern)
 
 ---

@@ -27,7 +27,7 @@ Avaliar quais módulos estão prontos para a nova baseline PostgreSQL e quais ai
 
 | # | Módulo | Domínio Final | Persistência Final | Prefixo Definido | Seeds Definidos | Fronteiras Claras | Backlog Crítico Aberto | Dependências Bloqueantes | Readiness |
 |---|--------|--------------|-------------------|-----------------|----------------|------------------|----------------------|------------------------|-----------|
-| 01 | Identity & Access | ✅ 21 entidades, 7 aggregates | ✅ 17 tabelas `iam_` | ✅ `iam_` | ⚠️ HasData (roles/permissions/tenant) — necessita formalização | ⚠️ Environment entities acopladas (OI-04) | ⚠️ MFA não enforced (P0), API Key ausente (P1), 17 permissões licensing | OI-04: Environment entities embedded | ⚠️ PARCIAL |
+| 01 | Identity & Access | ✅ 21 entidades, 7 aggregates | ✅ 17 tabelas `iam_` | ✅ `iam_` | ⚠️ HasData (roles/permissions/tenant) — necessita formalização | ⚠️ Environment entities acopladas (OI-04) | ⚠️ MFA enforced (P11.3 ✅), API Key ausente (P1), ~~17 permissões licensing~~ ✅ removidas (P12.1) | OI-04: Environment entities embedded | ⚠️ PARCIAL |
 | 02 | Environment Management | ✅ 5 entidades finalizadas | ✅ tabelas `env_` desenhadas | ✅ `env_` | ❌ Sem seeds definidos | ❌ Sem backend dedicado (dentro de Identity) | ⚠️ Extração para módulo próprio pendente (OI-04) | OI-04: Extração bloqueante | ❌ NÃO |
 | 03 | Service Catalog | ✅ 9+5 tabelas cat_/dp_ | ✅ `cat_` + `dp_` | ✅ `cat_`, `dp_` | ❌ Sem seeds definidos | ⚠️ Contracts backend dentro deste módulo (OI-01) | ⚠️ OI-01 pendente | OI-01: Contracts dentro de Catalog | ⚠️ PARCIAL |
 | 04 | Contracts | ✅ 8 tabelas, 5 faltam | ⚠️ Prefixo `ct_` → `ctr_` pendente | ✅ `ctr_` (target) | ❌ Sem seeds definidos | ❌ Backend dentro de Catalog (OI-01) | ⚠️ 5 tabelas ausentes, prefixo errado | OI-01: Extração bloqueante | ❌ NÃO |
@@ -61,7 +61,7 @@ Avaliar quais módulos estão prontos para a nova baseline PostgreSQL e quais ai
 | OI-02 | Integrations backend dentro de Governance | Governance, Integrations | HIGH |
 | OI-03 | Product Analytics backend dentro de Governance | Governance, Product Analytics | HIGH |
 | OI-04 | Environment Management disperso em Identity | Identity & Access, Environment Management | MEDIUM |
-| OI-05 | Resíduos de Licensing em código e seeds | Identity & Access | LOW |
+| OI-05 | ~~Resíduos de Licensing em código e seeds~~ ✅ CLOSED (P12.1) | Identity & Access | ~~LOW~~ |
 | OI-07 | Configuration e Notifications com 0 migrations | Configuration, Notifications | MEDIUM |
 | PREFIX | Prefixos errados em 3+ módulos (`oi_`→`ops_`, `ct_`→`ctr_`, entidades em `gov_`) | OpIntel, Contracts, Integrations, Product Analytics | HIGH |
 

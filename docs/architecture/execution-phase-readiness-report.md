@@ -116,10 +116,10 @@ A trilha N (N1–N16) produziu **~160 documentos** de análise, revisão e estra
 
 ### Limpeza imediata (~8h)
 
-1. Remover 17 licensing permissions de `RolePermissionCatalog.cs` (~1h)
-2. Remover referências licensing de frontend navigation (~1h)
-3. Reescrever strings i18n com "licensing" (~0.5h)
-4. Remover `licensing:write` de CreateDelegation (~0.5h)
+1. ~~Remover 17 licensing permissions de `RolePermissionCatalog.cs` (~1h)~~ ✅ P12.1
+2. ~~Remover referências licensing de frontend navigation (~1h)~~ ✅ P12.1
+3. ~~Reescrever strings i18n com "licensing" (~0.5h)~~ ✅ P12.1
+4. ~~Remover `licensing:write` de CreateDelegation (~0.5h)~~ ✅ P12.1
 5. Documentar InMemoryIncidentStore como temporário com issue tracker (~1h)
 6. Adicionar feature flags para AI pages que dependem de funcionalidade não implementada (~2h)
 7. Remover "fake assistant response" de i18n (~0.5h)

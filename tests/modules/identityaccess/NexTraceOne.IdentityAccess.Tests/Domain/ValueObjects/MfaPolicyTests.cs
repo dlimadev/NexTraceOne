@@ -30,7 +30,7 @@ public sealed class MfaPolicyTests
     {
         var policy = MfaPolicy.ForSaaS();
 
-        policy.RequiredForVendorOps.Should().BeTrue();
+        policy.RequiredForSensitiveExternalOps.Should().BeTrue();
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class MfaPolicyTests
 
         policy.RequiredOnLogin.Should().BeFalse();
         policy.RequiredForPrivilegedOps.Should().BeFalse();
-        policy.RequiredForVendorOps.Should().BeFalse();
+        policy.RequiredForSensitiveExternalOps.Should().BeFalse();
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class MfaPolicyTests
 
         policy.RequiredOnLogin.Should().BeFalse();
         policy.RequiredForPrivilegedOps.Should().BeFalse();
-        policy.RequiredForVendorOps.Should().BeFalse();
+        policy.RequiredForSensitiveExternalOps.Should().BeFalse();
         policy.AllowedMethods.Should().BeEmpty();
         policy.StepUpValidityMinutes.Should().Be(0);
         policy.MaxAttempts.Should().Be(0);
@@ -78,14 +78,14 @@ public sealed class MfaPolicyTests
         var policy = MfaPolicy.Create(
             requiredOnLogin: true,
             requiredForPrivilegedOps: true,
-            requiredForVendorOps: false,
+            requiredForSensitiveExternalOps: false,
             allowedMethods: "TOTP",
             stepUpValidityMinutes: 20,
             maxAttempts: 3);
 
         policy.RequiredOnLogin.Should().BeTrue();
         policy.RequiredForPrivilegedOps.Should().BeTrue();
-        policy.RequiredForVendorOps.Should().BeFalse();
+        policy.RequiredForSensitiveExternalOps.Should().BeFalse();
         policy.AllowedMethods.Should().Be("TOTP");
         policy.StepUpValidityMinutes.Should().Be(20);
         policy.MaxAttempts.Should().Be(3);
