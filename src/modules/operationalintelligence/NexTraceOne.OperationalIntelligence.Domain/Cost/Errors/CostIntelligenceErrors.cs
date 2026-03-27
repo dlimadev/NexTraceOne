@@ -52,4 +52,12 @@ public static class CostIntelligenceErrors
     /// <summary>Já existe um batch de importação para a mesma fonte e período.</summary>
     public static Error DuplicateImportBatch(string source, string period)
         => Error.Conflict("CostIntelligence.CostImportBatch.Duplicate", "An import batch already exists for source '{0}' and period '{1}'.", source, period);
+
+    /// <summary>Nenhum registo de custo foi correlacionado com a release informada.</summary>
+    public static Error NoRecordsForRelease(Guid releaseId)
+        => Error.NotFound("CostIntelligence.CostRecord.NoRecordsForRelease", "No cost records are correlated with release '{0}'.", releaseId);
+
+    /// <summary>Registo de custo não encontrado pelo identificador informado.</summary>
+    public static Error RecordNotFound(string recordId)
+        => Error.NotFound("CostIntelligence.CostRecord.NotFound", "Cost record '{0}' was not found.", recordId);
 }

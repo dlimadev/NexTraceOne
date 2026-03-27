@@ -18,6 +18,10 @@ using ImportCostBatchFeature = NexTraceOne.OperationalIntelligence.Application.C
 using ListCostImportBatchesFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ListCostImportBatches.ListCostImportBatches;
 using GetCostRecordsByServiceFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByService.GetCostRecordsByService;
 using CreateServiceCostProfileFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.CreateServiceCostProfile.CreateServiceCostProfile;
+using GetCostRecordsByTeamFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByTeam.GetCostRecordsByTeam;
+using GetCostRecordsByDomainFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByDomain.GetCostRecordsByDomain;
+using GetCostRecordsByReleaseFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByRelease.GetCostRecordsByRelease;
+using EnrichCostRecordWithReleaseFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.EnrichCostRecordWithRelease.EnrichCostRecordWithRelease;
 
 namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
@@ -217,5 +221,62 @@ public sealed class CostIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:cost:read");
+
+        // ── P6.4 — correlação contextual: team, domain, release ──────────────
+
+        group.MapGet("/records/by-team", async (
+            string team,
+            string? period,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetCostRecordsByTeamFeature.Query(team, period, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/records/by-domain", async (
+            string domain,
+            string? period,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetCostRecordsByDomainFeature.Query(domain, period, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/records/by-release/{releaseId:guid}", async (
+            Guid releaseId,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetCostRecordsByReleaseFeature.Query(releaseId, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapPost("/records/enrich-release", async (
+            EnrichCostRecordWithReleaseFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:write");
     }
 }

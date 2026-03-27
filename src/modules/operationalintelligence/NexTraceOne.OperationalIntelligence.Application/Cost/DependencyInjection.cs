@@ -8,10 +8,14 @@ using NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAno
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.AttributeCostToService;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ComputeCostTrend;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.CreateServiceCostProfile;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.EnrichCostRecordWithRelease;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRelease;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRoute;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostDelta;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByDomain;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByRelease;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByService;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostReport;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ImportCostBatch;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.IngestCostSnapshot;
@@ -24,6 +28,8 @@ namespace NexTraceOne.OperationalIntelligence.Application.Cost;
 /// Inclui: MediatR handlers, FluentValidation validators.
 /// P6.3: adicionados validators para CreateServiceCostProfile, ListCostImportBatches,
 /// GetCostRecordsByService. ComputeCostTrend corrigido para persistir CostTrend.
+/// P6.4: adicionados validators para GetCostRecordsByTeam, GetCostRecordsByDomain,
+/// GetCostRecordsByRelease, EnrichCostRecordWithRelease.
 /// </summary>
 public static class DependencyInjection
 {
@@ -49,6 +55,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<CreateServiceCostProfile.Command>, CreateServiceCostProfile.Validator>();
         services.AddTransient<IValidator<ListCostImportBatches.Query>, ListCostImportBatches.Validator>();
         services.AddTransient<IValidator<GetCostRecordsByService.Query>, GetCostRecordsByService.Validator>();
+
+        // P6.4 — correlação contextual: team, domain, release
+        services.AddTransient<IValidator<GetCostRecordsByTeam.Query>, GetCostRecordsByTeam.Validator>();
+        services.AddTransient<IValidator<GetCostRecordsByDomain.Query>, GetCostRecordsByDomain.Validator>();
+        services.AddTransient<IValidator<GetCostRecordsByRelease.Query>, GetCostRecordsByRelease.Validator>();
+        services.AddTransient<IValidator<EnrichCostRecordWithRelease.Command>, EnrichCostRecordWithRelease.Validator>();
 
         return services;
     }
