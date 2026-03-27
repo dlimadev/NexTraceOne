@@ -42,6 +42,23 @@ internal sealed class NotificationDeliveryStoreRepository(
     }
 
     /// <inheritdoc/>
+    public async Task<IReadOnlyList<NotificationDelivery>> ListScheduledForRetryAsync(
+        DateTimeOffset now,
+        int maxRetryCount,
+        int batchSize = 50,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Deliveries
+            .Where(d => d.Status == DeliveryStatus.RetryScheduled
+                     && d.NextRetryAt != null
+                     && d.NextRetryAt <= now
+                     && d.RetryCount < maxRetryCount)
+            .OrderBy(d => d.NextRetryAt)
+            .Take(batchSize)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc/>
     public async Task<IReadOnlyList<NotificationDelivery>> ListByNotificationIdAsync(
         NotificationId notificationId,
         CancellationToken cancellationToken = default)
@@ -49,6 +66,36 @@ internal sealed class NotificationDeliveryStoreRepository(
         return await context.Deliveries
             .Where(d => d.NotificationId == notificationId)
             .OrderBy(d => d.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<NotificationDelivery>> ListByTenantAsync(
+        Guid tenantId,
+        DeliveryStatus? status = null,
+        DeliveryChannel? channel = null,
+        int skip = 0,
+        int take = 50,
+        CancellationToken cancellationToken = default)
+    {
+        var query = context.Deliveries
+            .Join(context.Notifications,
+                d => d.NotificationId,
+                n => n.Id,
+                (d, n) => new { Delivery = d, Notification = n })
+            .Where(x => x.Notification.TenantId == tenantId)
+            .Select(x => x.Delivery);
+
+        if (status.HasValue)
+            query = query.Where(d => d.Status == status.Value);
+
+        if (channel.HasValue)
+            query = query.Where(d => d.Channel == channel.Value);
+
+        return await query
+            .OrderByDescending(d => d.CreatedAt)
+            .Skip(skip)
+            .Take(take)
             .ToListAsync(cancellationToken);
     }
 

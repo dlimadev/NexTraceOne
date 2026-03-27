@@ -141,3 +141,45 @@ export interface UpsertResponse {
   created: boolean;
 }
 
+// ── P7.2: Delivery History & Status ─────────────────────────────────────────
+
+export interface DeliveryEntryDto {
+  id: string;
+  channel: string;
+  status: string;
+  recipientAddress: string | null;
+  retryCount: number;
+  createdAt: string;
+  lastAttemptAt: string | null;
+  deliveredAt: string | null;
+  failedAt: string | null;
+  nextRetryAt: string | null;
+  errorMessage: string | null;
+}
+
+export interface DeliveryHistoryResponse {
+  notificationId: string;
+  deliveries: DeliveryEntryDto[];
+  totalAttempts: number;
+  hasSuccessfulDelivery: boolean;
+}
+
+export interface ChannelStatusDto {
+  channel: string;
+  status: string;
+  retryCount: number;
+  lastAttemptAt: string | null;
+  deliveredAt: string | null;
+  nextRetryAt: string | null;
+  lastError: string | null;
+}
+
+export interface DeliveryStatusResponse {
+  notificationId: string;
+  isDeliveredToAnyChannel: boolean;
+  hasPendingRetry: boolean;
+  hasPermanentFailure: boolean;
+  totalChannelAttempts: number;
+  channelStatuses: ChannelStatusDto[];
+}
+

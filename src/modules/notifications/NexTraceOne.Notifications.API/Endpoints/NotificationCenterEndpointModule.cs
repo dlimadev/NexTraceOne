@@ -13,6 +13,8 @@ using MarkNotificationUnreadFeature = NexTraceOne.Notifications.Application.Feat
 using MarkAllNotificationsReadFeature = NexTraceOne.Notifications.Application.Features.MarkAllNotificationsRead.MarkAllNotificationsRead;
 using GetPreferencesFeature = NexTraceOne.Notifications.Application.Features.GetPreferences.GetPreferences;
 using UpdatePreferenceFeature = NexTraceOne.Notifications.Application.Features.UpdatePreference.UpdatePreference;
+using GetDeliveryHistoryFeature = NexTraceOne.Notifications.Application.Features.GetDeliveryHistory.GetDeliveryHistory;
+using GetDeliveryStatusFeature = NexTraceOne.Notifications.Application.Features.GetDeliveryStatus.GetDeliveryStatus;
 
 namespace NexTraceOne.Notifications.API.Endpoints;
 
@@ -105,5 +107,29 @@ public sealed class NotificationCenterEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("notifications:preferences:write");
+
+        // ── P7.2: Delivery History & Status ───────────────────────────────────
+
+        group.MapGet("/{id:guid}/delivery-history", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetDeliveryHistoryFeature.Query(id), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:delivery:read");
+
+        group.MapGet("/{id:guid}/delivery-status", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetDeliveryStatusFeature.Query(id), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:delivery:read");
     }
 }

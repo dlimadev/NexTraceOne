@@ -8,6 +8,8 @@ export {
   useUpsertDeliveryChannel,
   useSmtpConfiguration,
   useUpsertSmtpConfiguration,
+  useDeliveryHistory,
+  useDeliveryStatus,
 } from './hooks/useNotificationConfiguration';
 export type {
   NotificationTemplateDto,
@@ -16,4 +18,8 @@ export type {
   UpsertNotificationTemplateRequest,
   UpsertDeliveryChannelRequest,
   UpsertSmtpConfigurationRequest,
+  DeliveryHistoryResponse,
+  DeliveryStatusResponse,
+  DeliveryEntryDto,
+  ChannelStatusDto,
 } from './types';

@@ -15,6 +15,8 @@ import type {
   SmtpConfigurationDto,
   UpsertSmtpConfigurationRequest,
   UpsertResponse,
+  DeliveryHistoryResponse,
+  DeliveryStatusResponse,
 } from '../types';
 
 export type { NotificationDto };
@@ -81,5 +83,17 @@ export const notificationsApi = {
   upsertSmtpConfiguration: (data: UpsertSmtpConfigurationRequest) =>
     client
       .put<UpsertResponse>('/notifications/configuration/smtp', data)
+      .then((r) => r.data),
+
+  // ── P7.2: Delivery History & Status ───────────────────────────────────────
+
+  getDeliveryHistory: (notificationId: string) =>
+    client
+      .get<DeliveryHistoryResponse>(`/notifications/${notificationId}/delivery-history`)
+      .then((r) => r.data),
+
+  getDeliveryStatus: (notificationId: string) =>
+    client
+      .get<DeliveryStatusResponse>(`/notifications/${notificationId}/delivery-status`)
       .then((r) => r.data),
 };

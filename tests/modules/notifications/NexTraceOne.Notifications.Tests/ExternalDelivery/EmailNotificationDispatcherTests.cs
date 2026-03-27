@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Domain.Entities;
@@ -13,6 +14,8 @@ namespace NexTraceOne.Notifications.Tests.ExternalDelivery;
 public sealed class EmailNotificationDispatcherTests
 {
     private readonly IExternalChannelTemplateResolver _templateResolver = Substitute.For<IExternalChannelTemplateResolver>();
+    private readonly ISmtpConfigurationStore _smtpConfigStore = Substitute.For<ISmtpConfigurationStore>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ILogger<EmailNotificationDispatcher> _logger =
         NullLoggerFactory.Instance.CreateLogger<EmailNotificationDispatcher>();
 
@@ -33,10 +36,15 @@ public sealed class EmailNotificationDispatcherTests
             }
         });
 
-        _templateResolver.ResolveEmailTemplate(Arg.Any<Notification>(), Arg.Any<string>())
+        _templateResolver.ResolveEmailTemplate(Arg.Any<Notification>(), Arg.Any<string?>())
             .Returns(new EmailTemplate("Test Subject", "<html>Test Body</html>", "Test Body"));
 
-        return new EmailNotificationDispatcher(options, _templateResolver, _logger);
+        // P7.2: Por padrão, sem configuração persistida → fallback para appsettings
+        _smtpConfigStore.GetByTenantAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns((SmtpConfiguration?)null);
+        _currentTenant.Id.Returns(Guid.NewGuid());
+
+        return new EmailNotificationDispatcher(options, _smtpConfigStore, _currentTenant, _templateResolver, _logger);
     }
 
     private static Notification CreateTestNotification()

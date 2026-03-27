@@ -43,11 +43,20 @@ public sealed class NotificationDelivery : Entity<NotificationDeliveryId>
     /// <summary>Data/hora UTC da criação do registo de entrega.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
+    /// <summary>Data/hora UTC da última tentativa de entrega (sucesso ou falha).</summary>
+    public DateTimeOffset? LastAttemptAt { get; private set; }
+
     /// <summary>Data/hora UTC da entrega com sucesso.</summary>
     public DateTimeOffset? DeliveredAt { get; private set; }
 
     /// <summary>Data/hora UTC da última falha.</summary>
     public DateTimeOffset? FailedAt { get; private set; }
+
+    /// <summary>
+    /// Data/hora UTC agendada para a próxima tentativa de retry.
+    /// Apenas relevante quando Status = RetryScheduled.
+    /// </summary>
+    public DateTimeOffset? NextRetryAt { get; private set; }
 
     /// <summary>Mensagem de erro da última tentativa falhada.</summary>
     public string? ErrorMessage { get; private set; }
@@ -78,26 +87,48 @@ public sealed class NotificationDelivery : Entity<NotificationDeliveryId>
     {
         Status = DeliveryStatus.Delivered;
         DeliveredAt = DateTimeOffset.UtcNow;
+        LastAttemptAt = DeliveredAt;
+        NextRetryAt = null;
     }
 
-    /// <summary>Marca a entrega como falhada.</summary>
+    /// <summary>Marca a entrega como falhada definitivamente (sem mais retries).</summary>
     public void MarkFailed(string? errorMessage)
     {
         Status = DeliveryStatus.Failed;
         FailedAt = DateTimeOffset.UtcNow;
+        LastAttemptAt = FailedAt;
         ErrorMessage = errorMessage;
+        NextRetryAt = null;
     }
 
     /// <summary>Marca a entrega como ignorada (opt-out, canal desabilitado, etc.).</summary>
     public void MarkSkipped()
     {
         Status = DeliveryStatus.Skipped;
+        LastAttemptAt = DateTimeOffset.UtcNow;
+        NextRetryAt = null;
     }
 
-    /// <summary>Incrementa o contador de retry.</summary>
+    /// <summary>
+    /// Agenda um retry: regista o erro da tentativa atual e define quando a próxima
+    /// tentativa deve ocorrer. O NotificationDeliveryRetryJob recolherá este registo
+    /// quando NextRetryAt for atingido.
+    /// Nota: FailedAt só é definido em MarkFailed(); ScheduleRetry indica falha transitória.
+    /// </summary>
+    public void ScheduleRetry(DateTimeOffset nextRetryAt, string? errorMessage = null)
+    {
+        Status = DeliveryStatus.RetryScheduled;
+        NextRetryAt = nextRetryAt;
+        LastAttemptAt = DateTimeOffset.UtcNow;
+        ErrorMessage = errorMessage;
+    }
+
+    /// <summary>Incrementa o contador de retry e limpa o agendamento, tornando pendente.</summary>
     public void IncrementRetry()
     {
         RetryCount++;
         Status = DeliveryStatus.Pending;
+        NextRetryAt = null;
+        LastAttemptAt = DateTimeOffset.UtcNow;
     }
 }

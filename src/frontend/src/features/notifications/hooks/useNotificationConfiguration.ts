@@ -14,6 +14,13 @@ export const notificationConfigKeys = {
   smtp: ['notifications', 'configuration', 'smtp'] as const,
 };
 
+export const notificationDeliveryKeys = {
+  history: (notificationId: string) =>
+    ['notifications', 'delivery', 'history', notificationId] as const,
+  status: (notificationId: string) =>
+    ['notifications', 'delivery', 'status', notificationId] as const,
+};
+
 // ── Templates ─────────────────────────────────────────────────────────────────
 
 export function useNotificationTemplates(params?: {
@@ -81,5 +88,23 @@ export function useUpsertSmtpConfiguration() {
         queryKey: notificationConfigKeys.smtp,
       });
     },
+  });
+}
+
+// ── P7.2: Delivery History & Status ──────────────────────────────────────────
+
+export function useDeliveryHistory(notificationId: string, enabled = true) {
+  return useQuery({
+    queryKey: notificationDeliveryKeys.history(notificationId),
+    queryFn: () => notificationsApi.getDeliveryHistory(notificationId),
+    enabled: enabled && !!notificationId,
+  });
+}
+
+export function useDeliveryStatus(notificationId: string, enabled = true) {
+  return useQuery({
+    queryKey: notificationDeliveryKeys.status(notificationId),
+    queryFn: () => notificationsApi.getDeliveryStatus(notificationId),
+    enabled: enabled && !!notificationId,
   });
 }
