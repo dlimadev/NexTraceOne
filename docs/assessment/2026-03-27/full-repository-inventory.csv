@@ -1,0 +1,84 @@
+path,file_type,area,module,bounded_context,purpose,status,product_alignment,evidence,risk,recommended_action,priority
+src/modules/identityaccess/,backend,identityaccess,Identity,Identity lifecycle (21 entities; 40 handlers),READY,HIGH,185 files,LOW,KEEP,P1
+src/modules/catalog/,backend,catalog,Catalog,Service & Contract governance (310 files),READY,HIGH,3 DbContexts,LOW,KEEP,P1
+src/modules/changegovernance/,backend,changegovernance,Changes,Change intelligence & promotion (4 DbContexts),PARTIAL,HIGH,238 files needs telemetry,MEDIUM,COMPLETE,P2
+src/modules/governance/,backend,governance,Governance,Reports/Risk/FinOps/Compliance (56 handlers),PARTIAL,HIGH,FinOps uses IsSimulated,MEDIUM,COMPLETE,P2
+src/modules/aiknowledge/,backend,aiknowledge,AI,AI runtime/governance/orchestration (3 DbContexts),PARTIAL,HIGH,11 empty handlers,MEDIUM,COMPLETE,P2
+src/modules/auditcompliance/,backend,auditcompliance,Audit,Audit chain/compliance (6 entities),PARTIAL,MEDIUM,17 handlers,LOW,COMPLETE,P3
+src/modules/operationalintelligence/,backend,operationalintelligence,Operations,Runtime/Cost/Incidents/Reliability (5 DbContexts),PARTIAL,HIGH,13 handlers IsSimulated,HIGH,COMPLETE,P2
+src/modules/notifications/,backend,notifications,Notifications,Notification lifecycle,READY,MEDIUM,124 files,LOW,KEEP,P1
+src/modules/configuration/,backend,configuration,Configuration,Config/Feature flags,READY,MEDIUM,57 files,LOW,KEEP,P1
+src/modules/integrations/,backend,integrations,Integrations,Connector/Ingestion structure,INCOMPLETE,MEDIUM,32 files no adapters,MEDIUM,COMPLETE,P3
+src/modules/knowledge/,backend,knowledge,Knowledge,Knowledge hub (3 entities),INCOMPLETE,HIGH,no migration,HIGH,COMPLETE,P2
+src/modules/productanalytics/,backend,productanalytics,Analytics,Usage analytics (1 entity),INCOMPLETE,LOW,23 files minimal,LOW,COMPLETE,P4
+src/building-blocks/NexTraceOne.BuildingBlocks.Core/,building-block,core,Cross-cutting,Domain primitives,READY,HIGH,16 files,LOW,KEEP,P1
+src/building-blocks/NexTraceOne.BuildingBlocks.Application/,building-block,application,Cross-cutting,CQRS/behaviors,READY,HIGH,31 files,LOW,KEEP,P1
+src/building-blocks/NexTraceOne.BuildingBlocks.Infrastructure/,building-block,infrastructure,Cross-cutting,Persistence/outbox,READY,HIGH,12 files,LOW,KEEP,P1
+src/building-blocks/NexTraceOne.BuildingBlocks.Security/,building-block,security,Cross-cutting,Auth/CSRF/encryption,READY,HIGH,17 files,LOW,KEEP,P1
+src/building-blocks/NexTraceOne.BuildingBlocks.Observability/,building-block,observability,Cross-cutting,Telemetry/alerting,READY,HIGH,39 files,LOW,KEEP,P1
+src/platform/NexTraceOne.ApiHost/,platform,apihost,Platform,Composition root,READY,HIGH,rate limiting/health,LOW,KEEP,P1
+src/platform/NexTraceOne.BackgroundWorkers/,platform,workers,Platform,Quartz jobs,READY,HIGH,expiration handlers,LOW,KEEP,P1
+src/platform/NexTraceOne.Ingestion.Api/,platform,ingestion,Platform,External ingestion,PARTIAL,MEDIUM,needs adapters,MEDIUM,COMPLETE,P3
+src/frontend/src/features/identity-access/,frontend,identity-access,Identity,Auth pages (15+ files),READY,HIGH,login/MFA/tenants,LOW,KEEP,P1
+src/frontend/src/features/catalog/,frontend,catalog,Catalog,Service catalog pages,READY,HIGH,real backend,LOW,KEEP,P1
+src/frontend/src/features/contracts/,frontend,contracts,Contracts,Contract studio (30+ files),READY,HIGH,studio/drafts/review,LOW,KEEP,P1
+src/frontend/src/features/change-governance/,frontend,change-governance,Changes,Releases/workflow pages,PARTIAL,HIGH,12 files,MEDIUM,COMPLETE,P2
+src/frontend/src/features/governance/,frontend,governance,Governance,Executive/compliance/risk/finops,PARTIAL,HIGH,20+ files,MEDIUM,COMPLETE,P2
+src/frontend/src/features/ai-hub/,frontend,ai-hub,AI,AI assistant/agents/models,PARTIAL,HIGH,15+ files,MEDIUM,COMPLETE,P2
+src/frontend/src/features/operations/,frontend,operations,Operations,Incidents/runbooks/reliability,PARTIAL,HIGH,12 files,MEDIUM,COMPLETE,P2
+src/frontend/src/features/integrations/,frontend,integrations,Integrations,Hub/connector pages,PARTIAL,MEDIUM,5 files,LOW,COMPLETE,P3
+src/frontend/src/features/product-analytics/,frontend,product-analytics,Analytics,Usage analytics pages,PARTIAL,LOW,6 files mock data,LOW,COMPLETE,P4
+src/frontend/src/features/operational-intelligence/,frontend,op-intel,Operations,FinOps config,PARTIAL,MEDIUM,1 file,LOW,COMPLETE,P3
+src/frontend/src/features/notifications/,frontend,notifications,Notifications,Notification center,READY,MEDIUM,8 files,LOW,KEEP,P1
+src/frontend/src/features/audit-compliance/,frontend,audit,Audit,Audit pages,PARTIAL,MEDIUM,4 files,LOW,COMPLETE,P3
+src/frontend/src/features/configuration/,frontend,configuration,Configuration,Config admin,READY,MEDIUM,4 files,LOW,KEEP,P1
+src/frontend/src/features/knowledge/,frontend,knowledge,Knowledge,Knowledge hub pages,PARTIAL,HIGH,3 files,MEDIUM,COMPLETE,P2
+src/frontend/src/contexts/,frontend,contexts,Cross-cutting,React context providers,READY,MEDIUM,auth/theme/notification contexts,LOW,KEEP,P1
+src/frontend/src/components/,frontend,components,Cross-cutting,Shared UI components,READY,HIGH,design system primitives,LOW,KEEP,P1
+src/frontend/src/hooks/,frontend,hooks,Cross-cutting,Custom React hooks,READY,MEDIUM,useAuth/useApi/useDebounce,LOW,KEEP,P1
+src/frontend/src/i18n/,frontend,i18n,Cross-cutting,Internationalization resources,PARTIAL,HIGH,en/pt translation files,MEDIUM,COMPLETE,P2
+src/frontend/src/lib/,frontend,lib,Cross-cutting,API client and utilities,READY,HIGH,axios config/helpers,LOW,KEEP,P1
+src/frontend/src/layouts/,frontend,layouts,Cross-cutting,Page layout shells,READY,MEDIUM,sidebar/header/main,LOW,KEEP,P1
+src/frontend/src/routes/,frontend,routes,Cross-cutting,Route definitions,READY,HIGH,react-router-dom v7,LOW,KEEP,P1
+docs/,documentation,docs,Documentation,Product and architecture docs,PARTIAL,HIGH,multiple markdown files,MEDIUM,COMPLETE,P2
+docs/architecture/,documentation,docs-architecture,Documentation,Architecture decision records,PARTIAL,HIGH,ADRs and diagrams,MEDIUM,COMPLETE,P2
+docs/product/,documentation,docs-product,Documentation,Product vision and roadmap,PARTIAL,HIGH,vision documents,MEDIUM,COMPLETE,P2
+docs/operations/,documentation,docs-operations,Documentation,Operational runbooks,INCOMPLETE,MEDIUM,minimal content,MEDIUM,COMPLETE,P3
+docs/security/,documentation,docs-security,Documentation,Security architecture,INCOMPLETE,HIGH,minimal content,HIGH,COMPLETE,P2
+tests/,tests,tests,Cross-cutting,Test projects root,PARTIAL,HIGH,unit and integration tests,MEDIUM,COMPLETE,P2
+tests/unit/,tests,tests-unit,Cross-cutting,Unit test projects,PARTIAL,HIGH,per-module test coverage,MEDIUM,COMPLETE,P2
+tests/integration/,tests,tests-integration,Cross-cutting,Integration test projects,PARTIAL,HIGH,API integration tests,MEDIUM,COMPLETE,P2
+tests/e2e/,tests,tests-e2e,Cross-cutting,End-to-end test projects,INCOMPLETE,MEDIUM,Playwright specs,MEDIUM,COMPLETE,P3
+docker-compose.yml,infrastructure,docker,Platform,Container orchestration,READY,MEDIUM,PostgreSQL/services,LOW,KEEP,P1
+docker-compose.override.yml,infrastructure,docker,Platform,Dev overrides,READY,LOW,local dev settings,LOW,KEEP,P1
+Dockerfile.apihost,infrastructure,docker,Platform,API host container,READY,MEDIUM,.NET container build,LOW,KEEP,P1
+Dockerfile.frontend,infrastructure,docker,Platform,Frontend container,READY,MEDIUM,Node/React build,LOW,KEEP,P1
+Dockerfile.ingestion,infrastructure,docker,Platform,Ingestion API container,READY,MEDIUM,.NET container build,LOW,KEEP,P1
+Dockerfile.workers,infrastructure,docker,Platform,Workers container,READY,MEDIUM,Quartz job runner,LOW,KEEP,P1
+scripts/,infrastructure,scripts,Platform,Build and deploy scripts,PARTIAL,MEDIUM,shell scripts,LOW,COMPLETE,P3
+infra/,infrastructure,infra,Platform,Infrastructure as code,PARTIAL,MEDIUM,deployment configs,LOW,COMPLETE,P3
+tools/,infrastructure,tools,Platform,Developer tooling,PARTIAL,LOW,helper utilities,LOW,COMPLETE,P4
+build/,infrastructure,build,Platform,Build configuration,READY,MEDIUM,MSBuild props,LOW,KEEP,P1
+Directory.Build.props,infrastructure,build,Platform,Shared MSBuild properties,READY,HIGH,central package versions,LOW,KEEP,P1
+Directory.Packages.props,infrastructure,build,Platform,Central package management,READY,HIGH,NuGet CPM,LOW,KEEP,P1
+global.json,infrastructure,build,Platform,.NET SDK version pin,READY,MEDIUM,SDK version lock,LOW,KEEP,P1
+NexTraceOne.sln,infrastructure,solution,Platform,Solution file,READY,HIGH,all projects referenced,LOW,KEEP,P1
+src/modules/identityaccess/Domain/,backend,identityaccess-domain,Identity,Domain entities and value objects,READY,HIGH,21 entities,LOW,KEEP,P1
+src/modules/identityaccess/Application/,backend,identityaccess-app,Identity,Command/Query handlers,READY,HIGH,40 handlers,LOW,KEEP,P1
+src/modules/identityaccess/Infrastructure/,backend,identityaccess-infra,Identity,EF Core persistence,READY,HIGH,repositories/configs,LOW,KEEP,P1
+src/modules/identityaccess/Contracts/,backend,identityaccess-contracts,Identity,Public DTOs and interfaces,READY,HIGH,cross-module contracts,LOW,KEEP,P1
+src/modules/catalog/Domain/,backend,catalog-domain,Catalog,Service/Contract/Team domain,READY,HIGH,rich domain model,LOW,KEEP,P1
+src/modules/catalog/Application/,backend,catalog-app,Catalog,Command/Query handlers,READY,HIGH,extensive CQRS,LOW,KEEP,P1
+src/modules/catalog/Infrastructure/,backend,catalog-infra,Catalog,3 DbContexts persistence,READY,HIGH,ServiceDb/ContractDb/TeamDb,LOW,KEEP,P1
+src/modules/catalog/Contracts/,backend,catalog-contracts,Catalog,Public DTOs and interfaces,READY,HIGH,cross-module contracts,LOW,KEEP,P1
+src/modules/changegovernance/Domain/,backend,change-domain,Changes,Change/Release domain entities,PARTIAL,HIGH,promotion/blast radius,MEDIUM,COMPLETE,P2
+src/modules/changegovernance/Application/,backend,change-app,Changes,Change intelligence handlers,PARTIAL,HIGH,promotion workflows,MEDIUM,COMPLETE,P2
+src/modules/changegovernance/Infrastructure/,backend,change-infra,Changes,4 DbContexts persistence,PARTIAL,HIGH,Change/Release/Promotion/Evidence,MEDIUM,COMPLETE,P2
+src/modules/governance/Domain/,backend,governance-domain,Governance,Report/Risk/Compliance domain,PARTIAL,HIGH,FinOps entities,MEDIUM,COMPLETE,P2
+src/modules/governance/Application/,backend,governance-app,Governance,56 handlers (some partial),PARTIAL,HIGH,TODO comments in 8 handlers,MEDIUM,COMPLETE,P2
+src/modules/aiknowledge/Domain/,backend,ai-domain,AI,AI model/agent/policy domain,PARTIAL,HIGH,11 entities,MEDIUM,COMPLETE,P2
+src/modules/aiknowledge/Application/,backend,ai-app,AI,AI handlers (11 empty),PARTIAL,HIGH,stubs need implementation,HIGH,COMPLETE,P2
+src/modules/aiknowledge/Infrastructure/,backend,ai-infra,AI,3 DbContexts persistence,PARTIAL,HIGH,Runtime/Governance/Orchestration,MEDIUM,COMPLETE,P2
+src/modules/operationalintelligence/Domain/,backend,opint-domain,Operations,Reliability/Cost/Incident domain,PARTIAL,HIGH,IsSimulated entities,HIGH,COMPLETE,P2
+src/modules/operationalintelligence/Application/,backend,opint-app,Operations,13 handlers with IsSimulated,PARTIAL,HIGH,simulated data returns,HIGH,COMPLETE,P2
+src/modules/operationalintelligence/Infrastructure/,backend,opint-infra,Operations,5 DbContexts persistence,PARTIAL,HIGH,Reliability/Cost/Incident/Automation/Dashboard,MEDIUM,COMPLETE,P2
