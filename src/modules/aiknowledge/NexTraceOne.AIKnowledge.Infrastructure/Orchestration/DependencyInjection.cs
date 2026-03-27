@@ -53,6 +53,7 @@ public static class DependencyInjection
         services.AddScoped<IPromotionRiskContextBuilder, PromotionRiskContextBuilder>();
 
         // Fase 2 — Repositórios de Orquestração
+        services.AddScoped<IAiContextRepository, AiContextRepository>();
         services.AddScoped<IAiOrchestrationConversationRepository, AiOrchestrationConversationRepository>();
         services.AddScoped<IKnowledgeCaptureEntryRepository, KnowledgeCaptureEntryRepository>();
         services.AddScoped<IGeneratedTestArtifactRepository, GeneratedTestArtifactRepository>();

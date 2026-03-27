@@ -1,7 +1,9 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -65,6 +67,89 @@ public sealed class AiRuntimeEndpointModule
                 body.MaxTokens);
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/chat/stream", async (
+            ExecuteAiChatStreamRequest body,
+            IAiProviderFactory providerFactory,
+            IAiModelCatalogService modelCatalogService,
+            HttpContext httpContext,
+            CancellationToken cancellationToken) =>
+        {
+            // 1. Resolve model
+            ResolvedModel? resolvedModel;
+            if (body.PreferredModelId.HasValue)
+            {
+                resolvedModel = await modelCatalogService.ResolveModelByIdAsync(
+                    body.PreferredModelId.Value, cancellationToken);
+            }
+            else
+            {
+                resolvedModel = await modelCatalogService.ResolveDefaultModelAsync(
+                    "chat", cancellationToken);
+            }
+
+            if (resolvedModel is null)
+            {
+                httpContext.Response.StatusCode = 404;
+                await httpContext.Response.WriteAsJsonAsync(
+                    new { code = "AI.ModelNotFound", messageKey = "ai.model.not_found" },
+                    cancellationToken);
+                return;
+            }
+
+            // 2. Get chat provider
+            var chatProvider = providerFactory.GetChatProvider(resolvedModel.ProviderId);
+            if (chatProvider is null)
+            {
+                httpContext.Response.StatusCode = 404;
+                await httpContext.Response.WriteAsJsonAsync(
+                    new { code = "AI.ProviderNotFound", messageKey = "ai.provider.not_found",
+                          @params = new[] { resolvedModel.ProviderId } },
+                    cancellationToken);
+                return;
+            }
+
+            // 3. Build chat request
+            var messages = new List<ChatMessage>();
+            if (!string.IsNullOrWhiteSpace(body.SystemPrompt))
+                messages.Add(new ChatMessage("system", body.SystemPrompt));
+            messages.Add(new ChatMessage("user", body.Message));
+
+            var chatRequest = new ChatCompletionRequest(
+                resolvedModel.ModelName,
+                messages,
+                body.Temperature,
+                body.MaxTokens,
+                body.SystemPrompt);
+
+            // 4. Write SSE streaming response
+            httpContext.Response.ContentType = "text/event-stream";
+            httpContext.Response.Headers.CacheControl = "no-cache";
+            httpContext.Response.Headers.Connection = "keep-alive";
+
+            await foreach (var chunk in chatProvider.CompleteStreamingAsync(chatRequest, cancellationToken))
+            {
+                var sseData = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    content = chunk.Content,
+                    isComplete = chunk.IsComplete,
+                    modelId = chunk.ModelId,
+                    providerId = chunk.ProviderId,
+                    promptTokens = chunk.PromptTokens,
+                    completionTokens = chunk.CompletionTokens,
+                    error = chunk.ErrorMessage
+                });
+
+                await httpContext.Response.WriteAsync($"data: {sseData}\n\n", cancellationToken);
+                await httpContext.Response.Body.FlushAsync(cancellationToken);
+
+                if (chunk.IsComplete)
+                    break;
+            }
+
+            await httpContext.Response.WriteAsync("data: [DONE]\n\n", cancellationToken);
+            await httpContext.Response.Body.FlushAsync(cancellationToken);
         }).RequirePermission("ai:runtime:write");
     }
 
@@ -266,6 +351,13 @@ public sealed class AiRuntimeEndpointModule
     internal sealed record ExecuteAiChatRequest(
         string Message,
         Guid? ConversationId,
+        Guid? PreferredModelId,
+        string? SystemPrompt,
+        double? Temperature,
+        int? MaxTokens);
+
+    internal sealed record ExecuteAiChatStreamRequest(
+        string Message,
         Guid? PreferredModelId,
         string? SystemPrompt,
         double? Temperature,

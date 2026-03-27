@@ -8,6 +8,15 @@ namespace NexTraceOne.AIKnowledge.Application.Orchestration.Abstractions;
 /// </summary>
 public interface IAiOrchestrationConversationRepository
 {
+    /// <summary>Obtém uma conversa pelo identificador.</summary>
+    Task<AiConversation?> GetByIdAsync(AiConversationId id, CancellationToken ct);
+
+    /// <summary>Adiciona e persiste uma nova conversa.</summary>
+    Task AddAsync(AiConversation conversation, CancellationToken ct);
+
+    /// <summary>Persiste alterações em uma conversa existente.</summary>
+    Task UpdateAsync(AiConversation conversation, CancellationToken ct);
+
     /// <summary>Lista conversas com filtros opcionais e paginação.</summary>
     Task<(IReadOnlyList<AiConversation> Items, int Total)> ListHistoryAsync(
         Guid? releaseId,

@@ -133,6 +133,73 @@ public sealed class OllamaProvider : IAiProvider, IChatCompletionProvider
         }
     }
 
+    public async IAsyncEnumerable<ChatStreamChunk> CompleteStreamingAsync(
+        ChatCompletionRequest request,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        string? selectedModel = null;
+        string? resolveError = null;
+        try
+        {
+            selectedModel = await ResolveModelAsync(request.ModelId, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Ollama model resolution failed for streaming request");
+            resolveError = $"Model resolution failed: {ex.Message}";
+        }
+
+        if (resolveError is not null)
+        {
+            yield return new ChatStreamChunk(
+                string.Empty, true, request.ModelId, ProviderId,
+                ErrorMessage: resolveError);
+            yield break;
+        }
+
+        var ollamaRequest = new OllamaChatRequest
+        {
+            Model = selectedModel!,
+            Stream = true,
+            Messages = request.Messages.Select(m => new OllamaChatMessage
+            {
+                Role = m.Role,
+                Content = m.Content
+            }).ToList(),
+            Options = new OllamaChatOptions
+            {
+                Temperature = request.Temperature,
+                NumPredict = request.MaxTokens
+            }
+        };
+
+        var hasYielded = false;
+
+        await foreach (var chunk in _client.ChatStreamAsync(ollamaRequest, cancellationToken))
+        {
+            hasYielded = true;
+            var content = chunk.Message?.Content ?? string.Empty;
+
+            yield return new ChatStreamChunk(
+                content,
+                chunk.Done,
+                chunk.Model,
+                ProviderId,
+                chunk.Done ? chunk.PromptEvalCount : 0,
+                chunk.Done ? chunk.EvalCount : 0);
+
+            if (chunk.Done)
+                yield break;
+        }
+
+        if (!hasYielded)
+        {
+            yield return new ChatStreamChunk(
+                string.Empty, true, selectedModel!, ProviderId,
+                ErrorMessage: "No streaming response from Ollama");
+        }
+    }
+
     private async Task<string> ResolveModelAsync(string requestedModel, CancellationToken cancellationToken)
     {
         var candidate = string.IsNullOrWhiteSpace(requestedModel)

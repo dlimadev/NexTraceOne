@@ -7,12 +7,14 @@ using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
 
 /// <summary>
 /// Registra serviços de infraestrutura do módulo AI Runtime.
-/// Inclui: Ollama provider, OpenAI provider (quando configurado), factory, catalog, health services.
+/// Inclui: Ollama provider, OpenAI provider (quando configurado), factory, catalog, health services,
+/// tool registry, tool executor, tool permission validator.
 /// </summary>
 public static class DependencyInjection
 {
@@ -83,6 +85,14 @@ public static class DependencyInjection
         services.AddScoped<IDocumentRetrievalService, DocumentRetrievalService>();
         services.AddScoped<IDatabaseRetrievalService, DatabaseRetrievalService>();
         services.AddScoped<ITelemetryRetrievalService, TelemetryRetrievalService>();
+
+        // ── Tool infrastructure ──────────────────────────────────────────
+        services.AddSingleton<IAgentTool, ListServicesInfoTool>();
+        services.AddSingleton<IAgentTool, GetServiceHealthTool>();
+        services.AddSingleton<IAgentTool, ListRecentChangesTool>();
+        services.AddSingleton<IToolRegistry, InMemoryToolRegistry>();
+        services.AddScoped<IToolExecutor, AgentToolExecutor>();
+        services.AddScoped<IToolPermissionValidator, AllowedToolsPermissionValidator>();
 
         return services;
     }

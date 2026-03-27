@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
@@ -12,7 +13,7 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 
 /// <summary>
 /// Implementação do runtime de agents de IA.
-/// Orquestra o pipeline: agent → modelo → provider → inferência → artefactos.
+/// Orquestra o pipeline: agent → modelo → provider → tools → inferência → artefactos.
 ///
 /// Pipeline de execução:
 /// 1. Resolve agent por ID
@@ -21,12 +22,14 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 /// 4. Resolve modelo (override ou preferred do agent)
 /// 5. Valida modelo permitido para o agent
 /// 6. Resolve provider
-/// 7. Monta prompt (system + input)
-/// 8. Executa inferência
-/// 9. Persiste execução
-/// 10. Gera artefactos (se aplicável)
-/// 11. Persiste artefactos
-/// 12. Retorna resultado
+/// 7. Resolve tools permitidas para o agent
+/// 8. Monta prompt (system + tools + input)
+/// 9. Executa inferência
+/// 10. Detecta e executa tool calls (loop)
+/// 11. Persiste execução
+/// 12. Gera artefactos (se aplicável)
+/// 13. Persiste artefactos
+/// 14. Retorna resultado
 /// </summary>
 public sealed class AiAgentRuntimeService(
     IAiAgentRepository agentRepository,
@@ -34,9 +37,15 @@ public sealed class AiAgentRuntimeService(
     IAiAgentArtifactRepository artifactRepository,
     IAiModelCatalogService modelCatalogService,
     IAiProviderFactory providerFactory,
+    IToolRegistry toolRegistry,
+    IToolExecutor toolExecutor,
+    IToolPermissionValidator toolPermissionValidator,
     ICurrentUser currentUser,
     IDateTimeProvider dateTimeProvider) : IAiAgentRuntimeService
 {
+    /// <summary>Número máximo de iterações do loop de tools para prevenir ciclos infinitos.</summary>
+    private const int MaxToolIterations = 5;
+
     public async Task<Result<AgentExecutionResult>> ExecuteAsync(
         AiAgentId agentId,
         string input,
@@ -96,7 +105,10 @@ public sealed class AiAgentRuntimeService(
                 resolvedModel.ProviderId);
         }
 
-        // 7. Inicia execução
+        // 7. Resolve tools permitidas para o agent
+        var allowedTools = toolPermissionValidator.GetAllowedTools(agent.AllowedTools);
+
+        // 8. Inicia execução
         var now = dateTimeProvider.UtcNow;
         var execution = AiAgentExecution.Start(
             agentId,
@@ -109,10 +121,8 @@ public sealed class AiAgentRuntimeService(
 
         await executionRepository.AddAsync(execution, cancellationToken);
 
-        // 8. Monta prompt e executa inferência
-        var systemPrompt = BuildSystemPrompt(agent);
-        var messages = new List<ChatCompletionRequest>(1);
-
+        // 9. Monta prompt com contexto e executa inferência (com tool loop)
+        var systemPrompt = BuildSystemPrompt(agent, allowedTools, contextJson);
         var chatMessages = new List<ChatMessage>();
         if (!string.IsNullOrWhiteSpace(systemPrompt))
             chatMessages.Add(new ChatMessage("system", systemPrompt));
@@ -120,6 +130,7 @@ public sealed class AiAgentRuntimeService(
 
         var sw = Stopwatch.StartNew();
         ChatCompletionResult chatResult;
+        var toolResults = new List<ToolExecutionResult>();
 
         try
         {
@@ -131,6 +142,41 @@ public sealed class AiAgentRuntimeService(
                     MaxTokens: 4096,
                     SystemPrompt: null),
                 cancellationToken);
+
+            // 10. Tool execution loop — detect tool call patterns and execute
+            if (chatResult.Success && allowedTools.Count > 0 && chatResult.Content is not null)
+            {
+                var iteration = 0;
+                while (iteration < MaxToolIterations)
+                {
+                    var toolCall = DetectToolCall(chatResult.Content, allowedTools);
+                    if (toolCall is null)
+                        break;
+
+                    // Execute tool (AllowedTools already enforced by DetectToolCall filtering)
+                    var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
+                    toolResults.Add(toolResult);
+
+                    // Append tool result to conversation and re-infer
+                    chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
+                    chatMessages.Add(new ChatMessage("user",
+                        $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
+
+                    chatResult = await chatProvider.CompleteAsync(
+                        new ChatCompletionRequest(
+                            resolvedModel.ModelName,
+                            chatMessages,
+                            Temperature: 0.3,
+                            MaxTokens: 4096,
+                            SystemPrompt: null),
+                        cancellationToken);
+
+                    if (!chatResult.Success)
+                        break;
+
+                    iteration++;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -157,21 +203,33 @@ public sealed class AiAgentRuntimeService(
                 chatResult.ErrorMessage ?? "Inference failed");
         }
 
-        // 9. Conclui execução
+        // 11. Build execution steps JSON for audit trail
+        var stepsJson = toolResults.Count > 0
+            ? JsonSerializer.Serialize(toolResults.Select(tr => new
+            {
+                tool = tr.ToolName,
+                success = tr.Success,
+                durationMs = tr.DurationMs,
+                error = tr.ErrorMessage,
+            }))
+            : string.Empty;
+
+        // 12. Conclui execução
         execution.Complete(
             chatResult.Content ?? string.Empty,
             chatResult.PromptTokens,
             chatResult.CompletionTokens,
             sw.ElapsedMilliseconds,
-            dateTimeProvider.UtcNow);
+            dateTimeProvider.UtcNow,
+            stepsJson);
 
         await executionRepository.UpdateAsync(execution, cancellationToken);
 
-        // 10. Incrementa contador
+        // 13. Incrementa contador
         agent.IncrementExecutionCount();
         await agentRepository.UpdateAsync(agent, cancellationToken);
 
-        // 11. Gera artefactos baseado no tipo de agent
+        // 14. Gera artefactos baseado no tipo de agent
         var artifacts = await GenerateArtifactsAsync(
             agent, execution, chatResult.Content ?? string.Empty, cancellationToken);
 
@@ -184,10 +242,58 @@ public sealed class AiAgentRuntimeService(
             chatResult.PromptTokens,
             chatResult.CompletionTokens,
             sw.ElapsedMilliseconds,
-            artifacts);
+            artifacts,
+            toolResults.Select(tr => new ToolExecutionSummary(
+                tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList());
     }
 
-    private static string BuildSystemPrompt(AiAgent agent)
+    /// <summary>
+    /// Detects a tool call pattern in the model output.
+    /// Supports a simple convention: [TOOL_CALL: tool_name({"arg":"value"})]
+    /// This is provider-agnostic and works with any LLM that follows instruction.
+    /// </summary>
+    private static ToolCallRequest? DetectToolCall(
+        string content,
+        IReadOnlyList<ToolDefinition> allowedTools)
+    {
+        const string prefix = "[TOOL_CALL:";
+        const string suffix = "]";
+
+        var startIdx = content.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+        if (startIdx < 0)
+            return null;
+
+        var endIdx = content.IndexOf(suffix, startIdx + prefix.Length, StringComparison.Ordinal);
+        if (endIdx < 0)
+            return null;
+
+        var callContent = content[(startIdx + prefix.Length)..endIdx].Trim();
+
+        // Parse: tool_name({"arg":"value"})  or  tool_name({})  or just  tool_name
+        var parenIdx = callContent.IndexOf('(');
+        string toolName;
+        string argsJson;
+
+        if (parenIdx > 0)
+        {
+            toolName = callContent[..parenIdx].Trim();
+            var argsRaw = callContent[(parenIdx + 1)..].TrimEnd(')').Trim();
+            argsJson = string.IsNullOrWhiteSpace(argsRaw) ? "{}" : argsRaw;
+        }
+        else
+        {
+            toolName = callContent.Trim();
+            argsJson = "{}";
+        }
+
+        // Only return if tool is in allowed list
+        if (!allowedTools.Any(t => string.Equals(t.Name, toolName, StringComparison.OrdinalIgnoreCase)))
+            return null;
+
+        return new ToolCallRequest(toolName, argsJson);
+    }
+
+    private static string BuildSystemPrompt(AiAgent agent, IReadOnlyList<ToolDefinition> allowedTools, string? contextJson)
     {
         var parts = new List<string>();
 
@@ -199,6 +305,41 @@ public sealed class AiAgentRuntimeService(
 
         if (!string.IsNullOrWhiteSpace(agent.OutputSchema))
             parts.Add($"Expected output format: {agent.OutputSchema}");
+
+        // Inject grounding context when provided by the caller
+        if (!string.IsNullOrWhiteSpace(contextJson))
+        {
+            parts.Add("## Grounding Context\nThe following operational context has been provided for this execution. " +
+                       "Use it to ground your response with real data. If the context is insufficient, state limitations explicitly.\n\n" +
+                       contextJson);
+        }
+
+        // Inject tool descriptions into system prompt when tools are available
+        if (allowedTools.Count > 0)
+        {
+            var toolsSection = new List<string>
+            {
+                "\n## Available Tools",
+                "You have access to the following tools. To call a tool, use this exact format:",
+                "[TOOL_CALL: tool_name({\"param\": \"value\"})]",
+                "\nAvailable tools:"
+            };
+
+            foreach (var tool in allowedTools)
+            {
+                var paramDesc = tool.Parameters.Count > 0
+                    ? string.Join(", ", tool.Parameters.Select(p =>
+                        $"{p.Name} ({p.Type}{(p.Required ? ", required" : "")})"))
+                    : "none";
+
+                toolsSection.Add($"- **{tool.Name}**: {tool.Description}");
+                toolsSection.Add($"  Parameters: {paramDesc}");
+            }
+
+            toolsSection.Add("\nOnly call tools when you need data to complete the task. Include the tool call in your response.");
+
+            parts.Add(string.Join("\n", toolsSection));
+        }
 
         return string.Join("\n\n", parts);
     }
