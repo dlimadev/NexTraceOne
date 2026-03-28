@@ -19,7 +19,9 @@ internal sealed class AiOrchestrationModule(
                 c.StartedBy,
                 c.ServiceName,
                 c.TurnCount,
+                // TODO(P02.x): Populate from persisted per-conversation token accounting when available in orchestration store.
                 0,
+                // TODO(P02.x): Populate from persisted model attribution when available in orchestration store.
                 null,
                 c.CreatedAt,
                 c.UpdatedAt))
@@ -44,7 +46,9 @@ internal sealed class AiOrchestrationModule(
                 c.StartedBy,
                 c.ServiceName,
                 c.TurnCount,
+                // TODO(P02.x): Populate from persisted per-conversation token accounting when available in orchestration store.
                 0,
+                // TODO(P02.x): Populate from persisted model attribution when available in orchestration store.
                 null,
                 c.CreatedAt,
                 c.UpdatedAt))
@@ -64,6 +68,7 @@ internal sealed class AiOrchestrationModule(
                 a.Status.ToString(),
                 $"Generated test artifact for release {a.ReleaseId}",
                 a.GeneratedAt,
+                // TODO(P02.x): Populate from persisted generation token usage when artifact-level tracking is available.
                 0))
             .FirstOrDefaultAsync(ct);
 
@@ -80,6 +85,7 @@ internal sealed class AiOrchestrationModule(
                 c.Status.ToString(),
                 c.Summary ?? $"Conversation on {c.Topic}",
                 c.StartedAt,
+                // TODO(P02.x): Populate from persisted conversation token usage when available in orchestration store.
                 0))
             .FirstOrDefaultAsync(ct);
 
