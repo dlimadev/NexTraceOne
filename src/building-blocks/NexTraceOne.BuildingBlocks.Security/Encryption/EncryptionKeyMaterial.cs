@@ -6,6 +6,11 @@ public static class EncryptionKeyMaterial
 {
     public const string EnvironmentVariableName = "NEXTRACE_ENCRYPTION_KEY";
 
+    // Chave de fallback exclusiva para ambiente de desenvolvimento local.
+    // Nunca deve ser usada em ambientes não produtivos reais ou em produção.
+    // Para configurar corretamente: definir a variável de ambiente NEXTRACE_ENCRYPTION_KEY.
+    private const string DevFallbackKey = "NexTrace-Dev-Only-Fallback-Key!!"; // 32 UTF-8 bytes
+
     public static byte[] ResolveFromEnvironment()
     {
         var configuredKey = Environment.GetEnvironmentVariable(EnvironmentVariableName);
@@ -25,9 +30,48 @@ public static class EncryptionKeyMaterial
             $"{EnvironmentVariableName} is invalid. Provide a Base64-encoded 32-byte key or a 32-character UTF-8 string.");
     }
 
-    public static void ValidateRequiredEnvironmentVariable()
+    /// <summary>
+    /// Resolve a chave de encriptação, usando fallback inseguro em desenvolvimento quando a
+    /// variável de ambiente não estiver configurada. Em todos os outros ambientes comporta-se
+    /// como <see cref="ResolveFromEnvironment"/>.
+    /// </summary>
+    public static byte[] ResolveWithFallback(bool isDevelopment)
     {
-        _ = ResolveFromEnvironment();
+        var configuredKey = Environment.GetEnvironmentVariable(EnvironmentVariableName);
+        if (!string.IsNullOrWhiteSpace(configuredKey))
+        {
+            return ResolveFromEnvironment();
+        }
+
+        if (isDevelopment)
+        {
+            return Encoding.UTF8.GetBytes(DevFallbackKey);
+        }
+
+        return ResolveFromEnvironment(); // throws with the proper message
+    }
+
+    public static void ValidateRequiredEnvironmentVariable(bool isDevelopment = false)
+    {
+        var configuredKey = Environment.GetEnvironmentVariable(EnvironmentVariableName);
+        if (!string.IsNullOrWhiteSpace(configuredKey))
+        {
+            _ = ResolveFromEnvironment();
+            return;
+        }
+
+        if (isDevelopment)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Error.WriteLine(
+                "[NexTraceOne Security] WARNING: Encryption key not configured. " +
+                "Using insecure development fallback. DO NOT use in non-development environments. " +
+                $"Configure via: set {EnvironmentVariableName}=<base64-32-byte-key>");
+            Console.ResetColor();
+            return;
+        }
+
+        _ = ResolveFromEnvironment(); // throws with the proper message
     }
 
     private static bool TryResolve(string configuredKey, out byte[] keyBytes)

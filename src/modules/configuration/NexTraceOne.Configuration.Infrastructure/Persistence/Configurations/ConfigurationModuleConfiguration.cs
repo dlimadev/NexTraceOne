@@ -52,7 +52,7 @@ internal sealed class ConfigurationModuleConfiguration : IEntityTypeConfiguratio
 
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Key).IsUnique();
-        builder.HasIndex(x => x.IsActive).HasFilter("\"is_active\" = true");
+        builder.HasIndex(x => x.IsActive).HasFilter("\"IsActive\" = true");
         builder.HasIndex(x => x.SortOrder);
     }
 }

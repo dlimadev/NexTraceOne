@@ -65,11 +65,11 @@ public sealed class CostIntelligenceEndpointModule
         group.MapGet("/report", async (
             string serviceName,
             string environment,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetCostReportFeature.Query(serviceName, environment, page, pageSize);
             var result = await sender.Send(query, ct);
@@ -94,11 +94,11 @@ public sealed class CostIntelligenceEndpointModule
         group.MapGet("/by-route", async (
             string serviceName,
             string environment,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetCostByRouteFeature.Query(serviceName, environment, page, pageSize);
             var result = await sender.Send(query, ct);
@@ -170,11 +170,11 @@ public sealed class CostIntelligenceEndpointModule
         // ── P6.3 — batch history, cost records by service, service cost profile ──
 
         group.MapGet("/import", async (
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new ListCostImportBatchesFeature.Query(page, pageSize);
             var result = await sender.Send(query, ct);
@@ -185,11 +185,11 @@ public sealed class CostIntelligenceEndpointModule
         group.MapGet("/records", async (
             string serviceId,
             string? period,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetCostRecordsByServiceFeature.Query(serviceId, period, page, pageSize);
             var result = await sender.Send(query, ct);
@@ -227,11 +227,11 @@ public sealed class CostIntelligenceEndpointModule
         group.MapGet("/records/by-team", async (
             string team,
             string? period,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetCostRecordsByTeamFeature.Query(team, period, page, pageSize);
             var result = await sender.Send(query, ct);
@@ -242,11 +242,11 @@ public sealed class CostIntelligenceEndpointModule
         group.MapGet("/records/by-domain", async (
             string domain,
             string? period,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetCostRecordsByDomainFeature.Query(domain, period, page, pageSize);
             var result = await sender.Send(query, ct);
@@ -256,11 +256,11 @@ public sealed class CostIntelligenceEndpointModule
 
         group.MapGet("/records/by-release/{releaseId:guid}", async (
             Guid releaseId,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetCostRecordsByReleaseFeature.Query(releaseId, page, pageSize);
             var result = await sender.Send(query, ct);

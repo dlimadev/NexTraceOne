@@ -114,11 +114,11 @@ public sealed class PromotionEndpointModule
 
         group.MapGet("/requests", async (
             string? statusFilter,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new ListPromotionRequestsFeature.Query(statusFilter, page, pageSize),

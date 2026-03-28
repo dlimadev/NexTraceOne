@@ -20,10 +20,10 @@ internal sealed class ContractPublicationEntryConfiguration : IEntityTypeConfigu
         {
             t.HasCheckConstraint(
                 "CK_cat_portal_contract_publications_status",
-                "status IN ('PendingPublication', 'Published', 'Withdrawn', 'Deprecated')");
+                "\"Status\" IN ('PendingPublication', 'Published', 'Withdrawn', 'Deprecated')");
             t.HasCheckConstraint(
                 "CK_cat_portal_contract_publications_visibility",
-                "visibility IN ('Internal', 'External', 'RestrictedToTeams')");
+                "\"Visibility\" IN ('Internal', 'External', 'RestrictedToTeams')");
         });
 
         builder.HasKey(x => x.Id);
@@ -54,6 +54,6 @@ internal sealed class ContractPublicationEntryConfiguration : IEntityTypeConfigu
         builder.HasIndex(x => x.ContractVersionId).IsUnique();
         builder.HasIndex(x => x.ApiAssetId);
         builder.HasIndex(x => x.Status);
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
     }
 }

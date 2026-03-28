@@ -18,11 +18,11 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
         {
             t.HasCheckConstraint(
                 "CK_cfg_definitions_category",
-                "category IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
+                "\"Category\" IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
 
             t.HasCheckConstraint(
                 "CK_cfg_definitions_value_type",
-                "value_type IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
+                "\"ValueType\" IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
         });
 
         builder.HasKey(x => x.Id);
@@ -45,11 +45,10 @@ internal sealed class ConfigurationDefinitionConfiguration : IEntityTypeConfigur
             .HasMaxLength(50)
             .IsRequired();
 
-        builder.Property(x => x.AllowedScopes)
+        builder.PrimitiveCollection(x => x.AllowedScopes)
             .HasColumnType("text[]")
-            .HasConversion(
-                scopes => scopes.Select(s => s.ToString()).ToArray(),
-                values => values.Select(v => Enum.Parse<ConfigurationScope>(v)).ToArray());
+            .ElementType()
+            .HasConversion<string>();
 
         builder.Property(x => x.DefaultValue)
             .HasMaxLength(4000);

@@ -9,9 +9,10 @@ namespace NexTraceOne.ApiHost;
 /// <summary>
 /// Validação de configuração crítica durante o arranque da aplicação.
 /// Garante que secções obrigatórias existem antes do host aceitar tráfego.
-/// Em todos os ambientes, valida que Jwt:Secret está preenchido e tem comprimento mínimo
-/// para operação segura com HS256 (32 caracteres = 32 bytes de material de chave),
-/// e que connection strings não estão vazias em ambientes não-Development.
+/// Em Development: regista warnings e continua com fallback inseguro quando Jwt:Secret ou a chave
+/// de encriptação estão ausentes — alinhado com o comportamento do DI registration.
+/// Em todos os outros ambientes: falha se Jwt:Secret ou a chave de encriptação estiverem
+/// ausentes ou inválidos, e se connection strings estiverem vazias.
 /// </summary>
 public static class StartupValidation
 {
@@ -116,7 +117,9 @@ public static class StartupValidation
 
     /// <summary>
     /// Valida a configuração do Jwt:Secret com critérios de segurança obrigatórios.
-    /// Em todos os ambientes: falha se ausente, nulo, whitespace ou curto demais.
+    /// Em desenvolvimento: regista warning e continua com fallback inseguro quando ausente ou curto demais,
+    /// alinhado com o comportamento do DI registration que já aplica o mesmo fallback.
+    /// Em todos os outros ambientes: falha se ausente, nulo, whitespace ou curto demais.
     /// A chave JWT deve ser fornecida externamente via variável de ambiente, dotnet user-secrets
     /// ou gestor de segredos — nunca hardcoded num ficheiro commitado.
     /// </summary>
@@ -126,6 +129,15 @@ public static class StartupValidation
 
         if (string.IsNullOrWhiteSpace(jwtSecret))
         {
+            if (app.Environment.IsDevelopment())
+            {
+                logger.LogWarning(
+                    "Jwt:Secret is absent or empty in Development environment. " +
+                    "An insecure development fallback key is in use. DO NOT use in non-development environments. " +
+                    "Configure via: dotnet user-secrets set \"Jwt:Secret\" \"<key>\"");
+                return;
+            }
+
             logger.LogCritical(
                 "Jwt:Secret is absent or empty in {Environment} environment. Authentication will fail. Aborting startup.",
                 app.Environment.EnvironmentName);
@@ -138,6 +150,16 @@ public static class StartupValidation
 
         if (jwtSecret.Length < MinimumJwtSecretLength)
         {
+            if (app.Environment.IsDevelopment())
+            {
+                logger.LogWarning(
+                    "Jwt:Secret is {Length} characters — below the recommended minimum of {Min} in Development environment. " +
+                    "Acceptable for local development only. Use a strong key in other environments (openssl rand -base64 48).",
+                    jwtSecret.Length,
+                    MinimumJwtSecretLength);
+                return;
+            }
+
             logger.LogCritical(
                 "Jwt:Secret is {Length} characters — below the required minimum of {Min} in {Environment} environment. Aborting startup.",
                 jwtSecret.Length,
@@ -221,7 +243,8 @@ public static class StartupValidation
 
     /// <summary>
     /// Valida a configuração de chave de encriptação AES obrigatória.
-    /// Em todos os ambientes: falha se ausente, nula, whitespace ou inválida.
+    /// Em desenvolvimento: regista warning e continua com fallback inseguro quando ausente.
+    /// Em todos os outros ambientes: falha se ausente, nula, whitespace ou inválida.
     /// A variável de ambiente esperada é <c>NEXTRACE_ENCRYPTION_KEY</c>.
     /// O valor deve ser um Base64-encoded 32-byte key ou uma string UTF-8 com 32 caracteres.
     /// </summary>
@@ -229,7 +252,7 @@ public static class StartupValidation
     {
         try
         {
-            EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable();
+            EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable(app.Environment.IsDevelopment());
             logger.LogInformation(
                 "{VariableName} validated in {Environment} environment.",
                 EncryptionKeyMaterial.EnvironmentVariableName,

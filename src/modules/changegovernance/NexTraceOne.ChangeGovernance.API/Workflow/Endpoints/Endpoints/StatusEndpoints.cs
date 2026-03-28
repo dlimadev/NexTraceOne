@@ -39,11 +39,11 @@ internal static class StatusEndpoints
 
         group.MapGet("/pending-approvals", async (
             string approverUserId,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(new ListPendingApprovalsFeature.Query(approverUserId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);

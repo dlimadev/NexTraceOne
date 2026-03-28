@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -40,7 +40,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ctr_canonical_entities", x => x.Id);
-                    table.CheckConstraint("CK_ctr_canonical_entities_state", "state IN ('Draft', 'Published', 'Deprecated', 'Retired')");
+                    table.CheckConstraint("CK_ctr_canonical_entities_state", "\"State\" IN ('Draft', 'Published', 'Deprecated', 'Retired')");
                 });
 
             migrationBuilder.CreateTable(
@@ -73,7 +73,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ctr_contract_drafts", x => x.Id);
-                    table.CheckConstraint("CK_ctr_contract_drafts_status", "status IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
+                    table.CheckConstraint("CK_ctr_contract_drafts_status", "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
                 });
 
             migrationBuilder.CreateTable(
@@ -131,8 +131,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ctr_contract_versions", x => x.Id);
-                    table.CheckConstraint("CK_ctr_contract_versions_lifecycle_state", "lifecycle_state IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
-                    table.CheckConstraint("CK_ctr_contract_versions_protocol", "protocol IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
+                    table.CheckConstraint("CK_ctr_contract_versions_lifecycle_state", "\"LifecycleState\" IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
+                    table.CheckConstraint("CK_ctr_contract_versions_protocol", "\"Protocol\" IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
                 });
 
             migrationBuilder.CreateTable(
@@ -184,7 +184,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ctr_spectral_rulesets", x => x.Id);
-                    table.CheckConstraint("CK_ctr_spectral_rulesets_origin", "origin IN ('Platform', 'Organization', 'Team', 'Imported')");
+                    table.CheckConstraint("CK_ctr_spectral_rulesets_origin", "\"Origin\" IN ('Platform', 'Organization', 'Team', 'Imported')");
                 });
 
             migrationBuilder.CreateTable(
@@ -371,7 +371,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 name: "IX_ctr_canonical_entities_IsDeleted",
                 table: "ctr_canonical_entities",
                 column: "IsDeleted",
-                filter: "\"is_deleted\" = false");
+                filter: "\"IsDeleted\" = false");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ctr_canonical_entities_Name",
@@ -412,7 +412,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 name: "IX_ctr_contract_drafts_IsDeleted",
                 table: "ctr_contract_drafts",
                 column: "IsDeleted",
-                filter: "\"is_deleted\" = false");
+                filter: "\"IsDeleted\" = false");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ctr_contract_drafts_Protocol",
@@ -489,7 +489,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 name: "IX_ctr_contract_versions_IsDeleted",
                 table: "ctr_contract_versions",
                 column: "IsDeleted",
-                filter: "\"is_deleted\" = false");
+                filter: "\"IsDeleted\" = false");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ctr_contract_versions_LifecycleState",
@@ -521,13 +521,13 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                 name: "IX_ctr_spectral_rulesets_IsActive",
                 table: "ctr_spectral_rulesets",
                 column: "IsActive",
-                filter: "\"is_active\" = true");
+                filter: "\"IsActive\" = true");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ctr_spectral_rulesets_IsDeleted",
                 table: "ctr_spectral_rulesets",
                 column: "IsDeleted",
-                filter: "\"is_deleted\" = false");
+                filter: "\"IsDeleted\" = false");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ctr_spectral_rulesets_Name",

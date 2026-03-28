@@ -20,6 +20,7 @@ using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
+using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using System.Diagnostics;
 
@@ -116,7 +117,10 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<IntegrationsDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ProductAnalyticsDbContext>(migrationScope, pendingContexts);
 
-            // Wave 6 — AI & Knowledge (highest complexity, lowest maturity)
+            // Wave 6 — Notifications & Messaging
+            await MigrateContextAsync<NotificationsDbContext>(migrationScope, pendingContexts);
+
+            // Wave 7 — AI & Knowledge (highest complexity, lowest maturity)
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ExternalAiDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<AiOrchestrationDbContext>(migrationScope, pendingContexts);

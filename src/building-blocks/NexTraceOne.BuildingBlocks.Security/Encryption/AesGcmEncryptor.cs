@@ -65,10 +65,15 @@ public sealed class AesGcmEncryptor
 
     /// <summary>
     /// Resolve a chave de criptografia a partir da variável de ambiente NEXTRACE_ENCRYPTION_KEY.
-    ///
-    /// A chave DEVE ser fornecida externamente em todos os ambientes. Nunca usar fallback hardcoded
-    /// para evitar que dados sensíveis sejam protegidos por uma chave conhecida publicamente.
+    /// Em desenvolvimento, usa fallback inseguro quando a variável não estiver definida.
+    /// Em todos os outros ambientes a variável é obrigatória.
     /// </summary>
     private static byte[] ResolveEncryptionKey()
-        => EncryptionKeyMaterial.ResolveFromEnvironment();
+    {
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? "Production";
+        var isDevelopment = env.Equals("Development", StringComparison.OrdinalIgnoreCase);
+        return EncryptionKeyMaterial.ResolveWithFallback(isDevelopment);
+    }
 }

@@ -18,7 +18,7 @@ internal sealed class SpectralRulesetConfiguration : IEntityTypeConfiguration<Sp
         {
             t.HasCheckConstraint(
                 "CK_ctr_spectral_rulesets_origin",
-                "origin IN ('Platform', 'Organization', 'Team', 'Imported')");
+                "\"Origin\" IN ('Platform', 'Organization', 'Team', 'Imported')");
         });
 
         builder.HasKey(x => x.Id);
@@ -68,8 +68,8 @@ internal sealed class SpectralRulesetConfiguration : IEntityTypeConfiguration<Sp
 
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => x.Origin);
-        builder.HasIndex(x => x.IsActive).HasFilter("\"is_active\" = true");
+        builder.HasIndex(x => x.IsActive).HasFilter("\"IsActive\" = true");
         builder.HasIndex(x => x.OrganizationId);
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
     }
 }

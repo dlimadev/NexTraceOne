@@ -41,6 +41,6 @@ internal sealed class EventContractDetailConfiguration : IEntityTypeConfiguratio
 
         // Um EventContractDetail por ContractVersion (1:0..1)
         builder.HasIndex(x => x.ContractVersionId).IsUnique();
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
     }
 }

@@ -69,11 +69,11 @@ public sealed class ReliabilityEndpointModule
             string? serviceType,
             string? criticality,
             string? search,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new ListServiceReliabilityFeature.Query(
                 teamId, serviceId, domain, environment, status,

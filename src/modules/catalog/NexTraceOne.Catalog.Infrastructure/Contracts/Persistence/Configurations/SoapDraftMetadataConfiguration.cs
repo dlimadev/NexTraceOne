@@ -19,7 +19,7 @@ internal sealed class SoapDraftMetadataConfiguration : IEntityTypeConfiguration<
         {
             t.HasCheckConstraint(
                 "CK_ctr_soap_draft_metadata_soap_version",
-                "soap_version IN ('1.1', '1.2')");
+                "\"SoapVersion\" IN ('1.1', '1.2')");
         });
 
         builder.HasKey(x => x.Id);

@@ -144,7 +144,7 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<string[]>("AllowedScopes")
+                    b.PrimitiveCollection<string[]>("AllowedScopes")
                         .IsRequired()
                         .HasColumnType("text[]");
 
@@ -192,6 +192,9 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<Guid?>("ModuleId")
+                        .HasColumnType("uuid");
+
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
@@ -224,13 +227,15 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                     b.HasIndex("Key")
                         .IsUnique();
 
+                    b.HasIndex("ModuleId");
+
                     b.HasIndex("SortOrder");
 
                     b.ToTable("cfg_definitions", null, t =>
                         {
-                            t.HasCheckConstraint("CK_cfg_definitions_category", "category IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
+                            t.HasCheckConstraint("CK_cfg_definitions_category", "\"Category\" IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
 
-                            t.HasCheckConstraint("CK_cfg_definitions_value_type", "value_type IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
+                            t.HasCheckConstraint("CK_cfg_definitions_value_type", "\"ValueType\" IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
                         });
                 });
 
@@ -312,7 +317,7 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                     b.HasIndex("DefinitionId");
 
                     b.HasIndex("IsActive")
-                        .HasFilter("\"is_active\" = true");
+                        .HasFilter("\"IsActive\" = true");
 
                     b.HasIndex("Key");
 
@@ -323,9 +328,206 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
 
                     b.ToTable("cfg_entries", null, t =>
                         {
-                            t.HasCheckConstraint("CK_cfg_entries_scope", "scope IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
+                            t.HasCheckConstraint("CK_cfg_entries_scope", "\"Scope\" IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
 
-                            t.HasCheckConstraint("CK_cfg_entries_version_positive", "version >= 1");
+                            t.HasCheckConstraint("CK_cfg_entries_version_positive", "\"Version\" >= 1");
+                        });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasFilter("\"IsActive\" = true");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("SortOrder");
+
+                    b.ToTable("cfg_modules", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.PrimitiveCollection<string[]>("AllowedScopes")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("DefaultEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsEditable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid?>("ModuleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasFilter("\"IsActive\" = true");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("ModuleId");
+
+                    b.ToTable("cfg_feature_flag_definitions", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ChangeReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("DefinitionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ScopeReferenceId")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefinitionId");
+
+                    b.HasIndex("IsActive")
+                        .HasFilter("\"IsActive\" = true");
+
+                    b.HasIndex("Key");
+
+                    b.HasIndex("Scope");
+
+                    b.HasIndex("Key", "Scope", "ScopeReferenceId")
+                        .IsUnique();
+
+                    b.ToTable("cfg_feature_flag_entries", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_cfg_feature_flag_entries_scope", "\"Scope\" IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
                         });
                 });
 
@@ -338,9 +540,34 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationDefinition", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", null)
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
             modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationEntry", b =>
                 {
                     b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("DefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", null)
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagEntry", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", null)
                         .WithMany()
                         .HasForeignKey("DefinitionId")
                         .OnDelete(DeleteBehavior.Restrict)

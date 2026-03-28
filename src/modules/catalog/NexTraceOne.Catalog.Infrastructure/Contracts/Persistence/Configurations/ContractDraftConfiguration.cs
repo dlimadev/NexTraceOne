@@ -20,7 +20,7 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         {
             t.HasCheckConstraint(
                 "CK_ctr_contract_drafts_status",
-                "status IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
+                "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
         });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -68,7 +68,7 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         builder.HasIndex(x => x.ServiceId);
         builder.HasIndex(x => x.Author);
         builder.HasIndex(x => x.Protocol);
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
 
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)

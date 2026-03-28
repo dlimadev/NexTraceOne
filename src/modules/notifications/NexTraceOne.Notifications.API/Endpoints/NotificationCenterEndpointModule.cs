@@ -33,11 +33,11 @@ public sealed class NotificationCenterEndpointModule
             string? status,
             string? category,
             string? severity,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new ListNotificationsFeature.Query(status, category, severity, page, pageSize),

@@ -70,6 +70,136 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.ToTable("ctr_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.BackgroundServiceContractDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AllowsConcurrency")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("InputsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("OutputsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScheduleExpression")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("SideEffectsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TimeoutExpression")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TriggerType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractVersionId")
+                        .IsUnique();
+
+                    b.HasIndex("IsDeleted")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ctr_background_service_contract_details", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ctr_bg_service_details_trigger_type", "\"TriggerType\" IN ('Cron', 'Interval', 'EventTriggered', 'OnDemand', 'Continuous')");
+                        });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.BackgroundServiceDraftMetadata", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("ContractDraftId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("InputsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OutputsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScheduleExpression")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("SideEffectsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TriggerType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractDraftId")
+                        .IsUnique();
+
+                    b.ToTable("ctr_background_service_draft_metadata", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.CanonicalEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -174,7 +304,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.HasIndex("Domain");
 
                     b.HasIndex("IsDeleted")
-                        .HasFilter("\"is_deleted\" = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("Name");
 
@@ -184,7 +314,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 
                     b.ToTable("ctr_canonical_entities", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ctr_canonical_entities_state", "state IN ('Draft', 'Published', 'Deprecated', 'Retired')");
+                            t.HasCheckConstraint("CK_ctr_canonical_entities_state", "\"State\" IN ('Draft', 'Published', 'Deprecated', 'Retired')");
                         });
                 });
 
@@ -405,7 +535,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.HasIndex("Author");
 
                     b.HasIndex("IsDeleted")
-                        .HasFilter("\"is_deleted\" = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("Protocol");
 
@@ -415,7 +545,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 
                     b.ToTable("ctr_contract_drafts", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ctr_contract_drafts_status", "status IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
+                            t.HasCheckConstraint("CK_ctr_contract_drafts_status", "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
                         });
                 });
 
@@ -814,7 +944,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IsDeleted")
-                        .HasFilter("\"is_deleted\" = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("LifecycleState");
 
@@ -825,9 +955,243 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 
                     b.ToTable("ctr_contract_versions", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ctr_contract_versions_lifecycle_state", "lifecycle_state IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
+                            t.HasCheckConstraint("CK_ctr_contract_versions_lifecycle_state", "\"LifecycleState\" IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
 
-                            t.HasCheckConstraint("CK_ctr_contract_versions_protocol", "protocol IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
+                            t.HasCheckConstraint("CK_ctr_contract_versions_protocol", "\"Protocol\" IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
+                        });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.EventContractDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AsyncApiVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ChannelsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DefaultContentType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("MessagesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ServersJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractVersionId")
+                        .IsUnique();
+
+                    b.HasIndex("IsDeleted")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ctr_event_contract_details", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.EventDraftMetadata", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AsyncApiVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ChannelsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ContractDraftId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DefaultContentType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("MessagesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractDraftId")
+                        .IsUnique();
+
+                    b.ToTable("ctr_event_draft_metadata", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.SoapContractDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BindingName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("EndpointUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ExtractedOperationsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("PortTypeName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("SoapVersion")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
+                    b.Property<string>("TargetNamespace")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("WsdlSourceUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractVersionId")
+                        .IsUnique();
+
+                    b.HasIndex("IsDeleted")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ctr_soap_contract_details", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ctr_soap_contract_details_soap_version", "\"SoapVersion\" IN ('1.1', '1.2')");
+                        });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.SoapDraftMetadata", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BindingName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ContractDraftId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EndpointUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("OperationsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PortTypeName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("SoapVersion")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
+                    b.Property<string>("TargetNamespace")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractDraftId")
+                        .IsUnique();
+
+                    b.ToTable("ctr_soap_draft_metadata", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ctr_soap_draft_metadata_soap_version", "\"SoapVersion\" IN ('1.1', '1.2')");
                         });
                 });
 
@@ -934,10 +1298,10 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IsActive")
-                        .HasFilter("\"is_active\" = true");
+                        .HasFilter("\"IsActive\" = true");
 
                     b.HasIndex("IsDeleted")
-                        .HasFilter("\"is_deleted\" = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("Name");
 
@@ -947,7 +1311,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 
                     b.ToTable("ctr_spectral_rulesets", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ctr_spectral_rulesets_origin", "origin IN ('Platform', 'Organization', 'Team', 'Imported')");
+                            t.HasCheckConstraint("CK_ctr_spectral_rulesets_origin", "\"Origin\" IN ('Platform', 'Organization', 'Team', 'Imported')");
                         });
                 });
 

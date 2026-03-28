@@ -66,13 +66,13 @@ public sealed class AuditEndpointModule
             string? correlationId,
             DateTimeOffset? from,
             DateTimeOffset? to,
-            int page,
-            int pageSize,
             string? resourceType,
             string? resourceId,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new SearchAuditLogFeature.Query(

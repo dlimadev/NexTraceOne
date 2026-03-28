@@ -38,11 +38,11 @@ internal static class ReleaseQueryEndpoints
 
         group.MapGet("/", async (
             Guid apiAssetId,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(new ListReleasesFeature.Query(apiAssetId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
@@ -50,11 +50,11 @@ internal static class ReleaseQueryEndpoints
 
         group.MapGet("/{apiAssetId:guid}/history", async (
             Guid apiAssetId,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(new GetReleaseHistoryFeature.Query(apiAssetId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);

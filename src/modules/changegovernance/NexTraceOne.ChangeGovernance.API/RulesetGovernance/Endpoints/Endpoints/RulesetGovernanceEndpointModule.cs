@@ -41,11 +41,11 @@ public sealed class RulesetGovernanceEndpointModule
         .RequirePermission("rulesets:write");
 
         group.MapGet("/", async (
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(new ListRulesetsFeature.Query(page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);

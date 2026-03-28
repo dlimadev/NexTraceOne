@@ -72,11 +72,11 @@ public sealed class PublicationCenterEndpointModule
         group.MapGet("/", async (
             string? status,
             Guid? apiAssetId,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new GetPublicationCenterEntriesFeature.Query(status, apiAssetId, page, pageSize),

@@ -124,6 +124,101 @@ namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence.Migrations
                     b.ToTable("cat_code_generation_records", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.ContractPublicationEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ApiAssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContractTitle")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<Guid>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PublishedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ReleaseNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SemVer")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Visibility")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("WithdrawalReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("WithdrawnAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WithdrawnBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApiAssetId");
+
+                    b.HasIndex("ContractVersionId")
+                        .IsUnique();
+
+                    b.HasIndex("IsDeleted")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("cat_portal_contract_publications", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_cat_portal_contract_publications_status", "\"Status\" IN ('PendingPublication', 'Published', 'Withdrawn', 'Deprecated')");
+
+                            t.HasCheckConstraint("CK_cat_portal_contract_publications_visibility", "\"Visibility\" IN ('Internal', 'External', 'RestrictedToTeams')");
+                        });
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Portal.Entities.PlaygroundSession", b =>
                 {
                     b.Property<Guid>("Id")

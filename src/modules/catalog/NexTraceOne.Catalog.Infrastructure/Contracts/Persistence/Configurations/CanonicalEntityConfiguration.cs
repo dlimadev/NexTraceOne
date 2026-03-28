@@ -19,7 +19,7 @@ internal sealed class CanonicalEntityConfiguration : IEntityTypeConfiguration<Ca
         {
             t.HasCheckConstraint(
                 "CK_ctr_canonical_entities_state",
-                "state IN ('Draft', 'Published', 'Deprecated', 'Retired')");
+                "\"State\" IN ('Draft', 'Published', 'Deprecated', 'Retired')");
         });
 
         builder.HasKey(x => x.Id);
@@ -64,6 +64,6 @@ internal sealed class CanonicalEntityConfiguration : IEntityTypeConfiguration<Ca
         builder.HasIndex(x => x.Domain);
         builder.HasIndex(x => x.State);
         builder.HasIndex(x => x.OrganizationId);
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
     }
 }

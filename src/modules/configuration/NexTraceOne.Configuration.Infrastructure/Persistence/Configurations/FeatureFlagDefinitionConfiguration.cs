@@ -36,11 +36,10 @@ internal sealed class FeatureFlagDefinitionConfiguration : IEntityTypeConfigurat
             .HasDefaultValue(false)
             .IsRequired();
 
-        builder.Property(x => x.AllowedScopes)
+        builder.PrimitiveCollection(x => x.AllowedScopes)
             .HasColumnType("text[]")
-            .HasConversion(
-                scopes => scopes.Select(s => s.ToString()).ToArray(),
-                values => values.Select(v => Enum.Parse<ConfigurationScope>(v)).ToArray());
+            .ElementType()
+            .HasConversion<string>();
 
         builder.Property(x => x.ModuleId)
             .HasConversion(
@@ -76,6 +75,6 @@ internal sealed class FeatureFlagDefinitionConfiguration : IEntityTypeConfigurat
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Key).IsUnique();
         builder.HasIndex(x => x.ModuleId);
-        builder.HasIndex(x => x.IsActive).HasFilter("\"is_active\" = true");
+        builder.HasIndex(x => x.IsActive).HasFilter("\"IsActive\" = true");
     }
 }

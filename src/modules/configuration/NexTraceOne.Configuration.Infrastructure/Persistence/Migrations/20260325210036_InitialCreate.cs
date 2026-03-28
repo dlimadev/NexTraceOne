@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -38,8 +38,8 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_cfg_definitions", x => x.Id);
-                    table.CheckConstraint("CK_cfg_definitions_category", "category IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
-                    table.CheckConstraint("CK_cfg_definitions_value_type", "value_type IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
+                    table.CheckConstraint("CK_cfg_definitions_category", "\"Category\" IN ('Bootstrap', 'SensitiveOperational', 'Functional')");
+                    table.CheckConstraint("CK_cfg_definitions_value_type", "\"ValueType\" IN ('String', 'Integer', 'Decimal', 'Boolean', 'Json', 'StringList')");
                 });
 
             migrationBuilder.CreateTable(
@@ -88,8 +88,8 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_cfg_entries", x => x.Id);
-                    table.CheckConstraint("CK_cfg_entries_scope", "scope IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
-                    table.CheckConstraint("CK_cfg_entries_version_positive", "version >= 1");
+                    table.CheckConstraint("CK_cfg_entries_scope", "\"Scope\" IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
+                    table.CheckConstraint("CK_cfg_entries_version_positive", "\"Version\" >= 1");
                     table.ForeignKey(
                         name: "FK_cfg_entries_cfg_definitions_DefinitionId",
                         column: x => x.DefinitionId,
@@ -173,7 +173,7 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                 name: "IX_cfg_entries_IsActive",
                 table: "cfg_entries",
                 column: "IsActive",
-                filter: "\"is_active\" = true");
+                filter: "\"IsActive\" = true");
 
             migrationBuilder.CreateIndex(
                 name: "IX_cfg_entries_Key",

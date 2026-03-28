@@ -19,7 +19,7 @@ internal sealed class BackgroundServiceContractDetailConfiguration : IEntityType
         {
             t.HasCheckConstraint(
                 "CK_ctr_bg_service_details_trigger_type",
-                "trigger_type IN ('Cron', 'Interval', 'EventTriggered', 'OnDemand', 'Continuous')");
+                "\"TriggerType\" IN ('Cron', 'Interval', 'EventTriggered', 'OnDemand', 'Continuous')");
         });
 
         builder.HasKey(x => x.Id);
@@ -49,6 +49,6 @@ internal sealed class BackgroundServiceContractDetailConfiguration : IEntityType
 
         // Um BackgroundServiceContractDetail por ContractVersion (1:0..1)
         builder.HasIndex(x => x.ContractVersionId).IsUnique();
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
     }
 }

@@ -79,11 +79,11 @@ public sealed class ExternalAiEndpointModule
             string? textFilter,
             DateTimeOffset? from,
             DateTimeOffset? to,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new ListKnowledgeCapturesFeature.Query(status, category, tags, textFilter, from, to, page == 0 ? 1 : page, pageSize == 0 ? 20 : pageSize);
             var result = await sender.Send(query, cancellationToken);

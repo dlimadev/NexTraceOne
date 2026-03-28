@@ -53,16 +53,40 @@ public static class DependencyInjection
         var signingKey = configuration["Jwt:Secret"]
             ?? configuration["Security:Jwt:SigningKey"];
 
+        var environmentName = configuration["ASPNETCORE_ENVIRONMENT"]
+            ?? configuration["DOTNET_ENVIRONMENT"]
+            ?? "Production";
+
+        var isDevelopment = environmentName.Equals("Development", StringComparison.OrdinalIgnoreCase);
+
         if (string.IsNullOrWhiteSpace(signingKey))
         {
-            throw new InvalidOperationException(
-                "JWT signing key is not configured. Set 'Jwt:Secret' or 'Security:Jwt:SigningKey' in configuration, " +
-                "or define it via the 'Jwt__Secret' environment variable or dotnet user-secrets. " +
-                "A signing key is mandatory in all environments. " +
-                "Generate a strong key with: openssl rand -base64 48");
+            if (isDevelopment)
+            {
+                // Chave de fallback exclusiva para ambiente de desenvolvimento local.
+                // Nunca deve ser usada em ambientes não produtivos reais ou em produção.
+                // Para configurar corretamente: dotnet user-secrets set "Jwt:Secret" "<sua-chave>"
+                const string devFallbackKey = "NexTraceOne-Dev-Only-FallbackKey-NOT-FOR-NonDev-Or-Production!!";
+                signingKey = devFallbackKey;
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Error.WriteLine(
+                    "[NexTraceOne Security] WARNING: JWT signing key not configured. " +
+                    "Using insecure development fallback. DO NOT use in non-development environments. " +
+                    "Configure via: dotnet user-secrets set \"Jwt:Secret\" \"<key>\"");
+                Console.ResetColor();
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    "JWT signing key is not configured. Set 'Jwt:Secret' or 'Security:Jwt:SigningKey' in configuration, " +
+                    "or define it via the 'Jwt__Secret' environment variable or dotnet user-secrets. " +
+                    "A signing key is mandatory in all non-development environments. " +
+                    "Generate a strong key with: openssl rand -base64 48");
+            }
         }
 
-        EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable();
+        EncryptionKeyMaterial.ValidateRequiredEnvironmentVariable(isDevelopment);
 
         services.Configure<CookieSessionOptions>(configuration.GetSection(CookieSessionOptions.SectionName));
 

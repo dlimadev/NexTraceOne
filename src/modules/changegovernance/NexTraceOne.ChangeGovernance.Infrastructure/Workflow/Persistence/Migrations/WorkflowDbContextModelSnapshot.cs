@@ -140,9 +140,21 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                         .HasPrecision(5, 4)
                         .HasColumnType("numeric(5,4)");
 
+                    b.Property<string>("BuildId")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<decimal?>("ChangeIntelligenceScore")
                         .HasPrecision(5, 4)
                         .HasColumnType("numeric(5,4)");
+
+                    b.Property<string>("CiChecksResult")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("CommitSha")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("CompletenessPercentage")
                         .HasPrecision(5, 2)
@@ -158,6 +170,10 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
 
                     b.Property<DateTimeOffset>("GeneratedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PipelineSource")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");

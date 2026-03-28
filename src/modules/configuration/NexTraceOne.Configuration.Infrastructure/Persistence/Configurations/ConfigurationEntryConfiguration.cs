@@ -18,11 +18,11 @@ internal sealed class ConfigurationEntryConfiguration : IEntityTypeConfiguration
         {
             t.HasCheckConstraint(
                 "CK_cfg_entries_scope",
-                "scope IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
+                "\"Scope\" IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
 
             t.HasCheckConstraint(
                 "CK_cfg_entries_version_positive",
-                "version >= 1");
+                "\"Version\" >= 1");
         });
 
         builder.HasKey(x => x.Id);
@@ -88,7 +88,7 @@ internal sealed class ConfigurationEntryConfiguration : IEntityTypeConfiguration
         builder.HasIndex(x => x.Key);
         builder.HasIndex(x => x.Scope);
         builder.HasIndex(x => x.DefinitionId);
-        builder.HasIndex(x => x.IsActive).HasFilter("\"is_active\" = true");
+        builder.HasIndex(x => x.IsActive).HasFilter("\"IsActive\" = true");
         builder.HasIndex(x => new { x.Key, x.Scope, x.ScopeReferenceId }).IsUnique();
     }
 }

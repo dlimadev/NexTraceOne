@@ -18,7 +18,7 @@ internal sealed class FeatureFlagEntryConfiguration : IEntityTypeConfiguration<F
         {
             t.HasCheckConstraint(
                 "CK_cfg_feature_flag_entries_scope",
-                "scope IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
+                "\"Scope\" IN ('System', 'Tenant', 'Environment', 'Role', 'Team', 'User')");
         });
 
         builder.HasKey(x => x.Id);
@@ -82,7 +82,7 @@ internal sealed class FeatureFlagEntryConfiguration : IEntityTypeConfiguration<F
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Key);
         builder.HasIndex(x => x.DefinitionId);
-        builder.HasIndex(x => x.IsActive).HasFilter("\"is_active\" = true");
+        builder.HasIndex(x => x.IsActive).HasFilter("\"IsActive\" = true");
         builder.HasIndex(x => x.Scope);
     }
 }

@@ -63,14 +63,15 @@ export default function App() {
                     {/* Home */}
                     <Route path="/" element={<DashboardPage />} />
 
-                    {/* Module route groups */}
-                    <CatalogRoutes />
-                    <ContractsRoutes />
-                    <ChangesRoutes />
-                    <OperationsRoutes />
-                    <AiHubRoutes />
-                    <GovernanceRoutes />
-                    <AdminRoutes />
+                    {/* Module route groups — called as functions so React Router
+                        receives <React.Fragment> children directly, not component wrappers */}
+                    {CatalogRoutes()}
+                    {ContractsRoutes()}
+                    {ChangesRoutes()}
+                    {OperationsRoutes()}
+                    {AiHubRoutes()}
+                    {GovernanceRoutes()}
+                    {AdminRoutes()}
                   </Route>
 
                   <Route path="*" element={<Navigate to="/" replace />} />

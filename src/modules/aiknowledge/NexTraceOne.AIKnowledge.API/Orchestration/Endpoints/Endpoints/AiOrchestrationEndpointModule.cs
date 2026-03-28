@@ -132,11 +132,11 @@ public sealed class AiOrchestrationEndpointModule
             ConversationStatus? status,
             DateTimeOffset? from,
             DateTimeOffset? to,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetAiConversationHistoryFeature.Query(
                 releaseId, serviceName, topicFilter, status, from, to,

@@ -19,7 +19,7 @@ internal sealed class SoapContractDetailConfiguration : IEntityTypeConfiguration
         {
             t.HasCheckConstraint(
                 "CK_ctr_soap_contract_details_soap_version",
-                "soap_version IN ('1.1', '1.2')");
+                "\"SoapVersion\" IN ('1.1', '1.2')");
         });
 
         builder.HasKey(x => x.Id);
@@ -48,6 +48,6 @@ internal sealed class SoapContractDetailConfiguration : IEntityTypeConfiguration
 
         // Um SoapContractDetail por ContractVersion (1:0..1)
         builder.HasIndex(x => x.ContractVersionId).IsUnique();
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
     }
 }

@@ -53,11 +53,11 @@ internal static class UserEndpoints
         group.MapGet("/tenants/{tenantId:guid}/users", async (
             Guid tenantId,
             string? search,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new ListTenantUsersFeature.Query(tenantId, search, page == 0 ? 1 : page, pageSize == 0 ? 20 : pageSize),

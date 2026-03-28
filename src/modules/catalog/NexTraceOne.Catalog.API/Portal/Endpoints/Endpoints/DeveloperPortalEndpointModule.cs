@@ -49,11 +49,11 @@ public sealed class DeveloperPortalEndpointModule
             string? typeFilter,
             string? statusFilter,
             string? ownerFilter,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new SearchCatalogFeature.Query(searchTerm ?? string.Empty, typeFilter, statusFilter, ownerFilter, page, pageSize),
@@ -63,12 +63,12 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/catalog/my-apis — APIs que o utilizador é dono
         group.MapGet("/catalog/my-apis", async (
-            int page,
-            int pageSize,
             ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var ownerId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
@@ -79,12 +79,12 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/catalog/consuming — APIs que o utilizador consome
         group.MapGet("/catalog/consuming", async (
-            int page,
-            int pageSize,
             ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var userId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(
@@ -122,11 +122,11 @@ public sealed class DeveloperPortalEndpointModule
         // GET /api/v1/developerportal/catalog/{apiAssetId}/timeline — Timeline de uma API
         group.MapGet("/catalog/{apiAssetId:guid}/timeline", async (
             Guid apiAssetId,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new GetAssetTimelineFeature.Query(apiAssetId, page, pageSize),
@@ -207,12 +207,12 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/playground/history — Histórico de sessões do playground
         group.MapGet("/playground/history", async (
-            int page,
-            int pageSize,
             ICurrentUser currentUser,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var userId = Guid.Parse(currentUser.Id);
             var result = await sender.Send(

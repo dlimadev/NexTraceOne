@@ -51,11 +51,11 @@ internal static class ChangeConfidenceEndpoints
             string? searchTerm,
             DateTimeOffset? from,
             DateTimeOffset? to,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new ListChangesFeature.Query(
@@ -87,11 +87,11 @@ internal static class ChangeConfidenceEndpoints
 
         group.MapGet("/by-service/{serviceName}", async (
             string serviceName,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new ListChangesByServiceFeature.Query(serviceName, page, pageSize),

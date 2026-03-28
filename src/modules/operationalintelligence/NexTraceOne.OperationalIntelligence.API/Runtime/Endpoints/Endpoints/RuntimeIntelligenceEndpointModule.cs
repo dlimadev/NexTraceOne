@@ -103,11 +103,11 @@ public sealed class RuntimeIntelligenceEndpointModule
             string serviceName,
             string environment,
             bool? unacknowledgedOnly,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken ct) =>
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var query = new GetDriftFindingsFeature.Query(serviceName, environment, unacknowledgedOnly ?? false, page, pageSize);
             var result = await sender.Send(query, ct);

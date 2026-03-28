@@ -20,11 +20,11 @@ internal sealed class ContractVersionConfiguration : IEntityTypeConfiguration<Co
         {
             t.HasCheckConstraint(
                 "CK_ctr_contract_versions_protocol",
-                "protocol IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
+                "\"Protocol\" IN ('OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQL')");
 
             t.HasCheckConstraint(
                 "CK_ctr_contract_versions_lifecycle_state",
-                "lifecycle_state IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
+                "\"LifecycleState\" IN ('Draft', 'InReview', 'Approved', 'Locked', 'Deprecated', 'Sunset', 'Retired')");
         });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -87,7 +87,7 @@ internal sealed class ContractVersionConfiguration : IEntityTypeConfiguration<Co
         builder.HasIndex(x => new { x.ApiAssetId, x.SemVer }).IsUnique();
         builder.HasIndex(x => x.Protocol);
         builder.HasIndex(x => x.LifecycleState);
-        builder.HasIndex(x => x.IsDeleted).HasFilter("\"is_deleted\" = false");
+        builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
 
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)
