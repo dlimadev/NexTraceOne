@@ -1,4 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ApplyGovernancePack;
 using NexTraceOne.Governance.Application.Features.GetDomainGovernanceSummary;
@@ -16,40 +17,52 @@ namespace NexTraceOne.Governance.Tests.Application.Features;
 /// </summary>
 public sealed class ExecutiveGovernanceSummaryTests
 {
+    private readonly ITeamRepository _teamRepository = Substitute.For<ITeamRepository>();
+    private readonly IGovernanceDomainRepository _domainRepository = Substitute.For<IGovernanceDomainRepository>();
+    private readonly ICatalogGraphModule _catalogGraph = Substitute.For<ICatalogGraphModule>();
+
     // ── GetDomainGovernanceSummary ──
 
     [Fact]
     public async Task GetDomainGovernanceSummary_ShouldReturnDimensions()
     {
         // Arrange
-        var handler = new GetDomainGovernanceSummary.Handler();
-        var query = new GetDomainGovernanceSummary.Query("domain-commerce");
+        var domain = GovernanceDomain.Create("domain-commerce", "Commerce");
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>()).Returns(domain);
+        _catalogGraph.CountServicesByDomainAsync(domain.Name, Arg.Any<CancellationToken>()).Returns(4);
+
+        var handler = new GetDomainGovernanceSummary.Handler(_domainRepository, _catalogGraph);
+        var query = new GetDomainGovernanceSummary.Query(domain.Id.Value.ToString());
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.DomainId.Should().Be("domain-commerce");
+        result.Value.DomainId.Should().Be(domain.Id.Value.ToString());
         result.Value.Dimensions.Should().NotBeEmpty();
         result.Value.OverallMaturity.Should().NotBeNullOrWhiteSpace();
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     [Fact]
     public async Task GetDomainGovernanceSummary_DimensionsShouldHaveScoresAndTrends()
     {
         // Arrange
-        var handler = new GetDomainGovernanceSummary.Handler();
+        var domain = GovernanceDomain.Create("test-domain", "Test Domain");
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>()).Returns(domain);
+        _catalogGraph.CountServicesByDomainAsync(domain.Name, Arg.Any<CancellationToken>()).Returns(2);
+        var handler = new GetDomainGovernanceSummary.Handler(_domainRepository, _catalogGraph);
 
         // Act
-        var result = await handler.Handle(new GetDomainGovernanceSummary.Query("test"), CancellationToken.None);
+        var result = await handler.Handle(new GetDomainGovernanceSummary.Query(domain.Id.Value.ToString()), CancellationToken.None);
 
         // Assert
         result.Value.Dimensions.Should().AllSatisfy(d =>
         {
             d.Dimension.Should().NotBeNullOrWhiteSpace();
             d.Level.Should().NotBeNullOrWhiteSpace();
-            d.Score.Should().BeGreaterThan(0);
+            d.Score.Should().BeGreaterThanOrEqualTo(0);
             d.Trend.Should().NotBeNullOrWhiteSpace();
         });
     }
@@ -60,27 +73,42 @@ public sealed class ExecutiveGovernanceSummaryTests
     public async Task GetTeamGovernanceSummary_ShouldReturnDimensions()
     {
         // Arrange
-        var handler = new GetTeamGovernanceSummary.Handler();
-        var query = new GetTeamGovernanceSummary.Query("team-commerce");
+        var team = Team.Create("team-commerce", "Commerce Team");
+        _teamRepository.GetByIdAsync(Arg.Any<TeamId>(), Arg.Any<CancellationToken>()).Returns(team);
+        _catalogGraph.CountServicesByTeamAsync(team.Name, Arg.Any<CancellationToken>()).Returns(3);
+        _catalogGraph.ListContractsByTeamAsync(team.Name, Arg.Any<CancellationToken>()).Returns([]);
+        _catalogGraph.ListCrossTeamDependenciesAsync(team.Name, Arg.Any<CancellationToken>()).Returns([]);
+
+        var handler = new GetTeamGovernanceSummary.Handler(_teamRepository, _catalogGraph);
+        var query = new GetTeamGovernanceSummary.Query(team.Id.Value.ToString());
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.TeamId.Should().Be("team-commerce");
+        result.Value.TeamId.Should().Be(team.Id.Value.ToString());
         result.Value.Dimensions.Should().NotBeEmpty();
         result.Value.OverallMaturity.Should().NotBeNullOrWhiteSpace();
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     [Fact]
     public async Task GetTeamGovernanceSummary_ShouldReturnCoverageMetrics()
     {
         // Arrange
-        var handler = new GetTeamGovernanceSummary.Handler();
+        var team = Team.Create("team-test", "Team Test");
+        _teamRepository.GetByIdAsync(Arg.Any<TeamId>(), Arg.Any<CancellationToken>()).Returns(team);
+        _catalogGraph.CountServicesByTeamAsync(team.Name, Arg.Any<CancellationToken>()).Returns(3);
+        _catalogGraph.ListContractsByTeamAsync(team.Name, Arg.Any<CancellationToken>())
+            .Returns([new("ctr-1", "Orders API", "REST", "v1", "Published")]);
+        _catalogGraph.ListCrossTeamDependenciesAsync(team.Name, Arg.Any<CancellationToken>())
+            .Returns([new("dep-1", "orders-api", "identity-api", Guid.NewGuid().ToString(), "Identity", "Synchronous")]);
+
+        var handler = new GetTeamGovernanceSummary.Handler(_teamRepository, _catalogGraph);
 
         // Act
-        var result = await handler.Handle(new GetTeamGovernanceSummary.Query("team-test"), CancellationToken.None);
+        var result = await handler.Handle(new GetTeamGovernanceSummary.Query(team.Id.Value.ToString()), CancellationToken.None);
 
         // Assert
         result.Value.OwnershipCoverage.Should().BeGreaterThan(0);

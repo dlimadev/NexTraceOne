@@ -43,13 +43,13 @@ public static class ListTeams
                 ));
             }
 
-            var response = new Response(Teams: dtos);
+            var response = new Response(Teams: dtos, IsSimulated: false);
             return Result<Response>.Success(response);
         }
     }
 
     /// <summary>Resposta com lista sumária de equipas.</summary>
-    public sealed record Response(IReadOnlyList<TeamSummaryDto> Teams);
+    public sealed record Response(IReadOnlyList<TeamSummaryDto> Teams, bool IsSimulated = false);
 
     /// <summary>DTO sumário de equipa com indicadores de governança.</summary>
     public sealed record TeamSummaryDto(

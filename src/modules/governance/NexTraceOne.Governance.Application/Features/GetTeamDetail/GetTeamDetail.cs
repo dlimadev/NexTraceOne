@@ -63,7 +63,8 @@ public static class GetTeamDetail
                 Services: services,
                 Contracts: contracts,
                 CrossTeamDependencies: crossTeamDeps,
-                CreatedAt: team.CreatedAt);
+                CreatedAt: team.CreatedAt,
+                IsSimulated: false);
 
             return Result<Response>.Success(response);
         }
@@ -86,7 +87,8 @@ public static class GetTeamDetail
         IReadOnlyList<TeamServiceDto> Services,
         IReadOnlyList<TeamContractDto> Contracts,
         IReadOnlyList<CrossTeamDependencyDto> CrossTeamDependencies,
-        DateTimeOffset CreatedAt)
+        DateTimeOffset CreatedAt,
+        bool IsSimulated = false)
     {
         /// <summary>Fields not yet backed by real data.</summary>
         public IReadOnlyList<string> DeferredFields { get; init; } =

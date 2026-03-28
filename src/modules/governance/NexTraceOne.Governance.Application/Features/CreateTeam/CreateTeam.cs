@@ -40,12 +40,12 @@ public static class CreateTeam
             await teamRepository.AddAsync(team, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            var response = new Response(TeamId: team.Id.Value.ToString());
+            var response = new Response(TeamId: team.Id.Value.ToString(), IsSimulated: false);
 
             return Result<Response>.Success(response);
         }
     }
 
     /// <summary>Resposta com o ID da equipa criada.</summary>
-    public sealed record Response(string TeamId);
+    public sealed record Response(string TeamId, bool IsSimulated = false);
 }

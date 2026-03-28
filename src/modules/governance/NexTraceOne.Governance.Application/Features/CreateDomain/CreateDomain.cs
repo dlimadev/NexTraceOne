@@ -47,12 +47,12 @@ public static class CreateDomain
             await domainRepository.AddAsync(domain, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            var response = new Response(DomainId: domain.Id.Value.ToString());
+            var response = new Response(DomainId: domain.Id.Value.ToString(), IsSimulated: false);
 
             return Result<Response>.Success(response);
         }
     }
 
     /// <summary>Resposta com o ID do domínio criado.</summary>
-    public sealed record Response(string DomainId);
+    public sealed record Response(string DomainId, bool IsSimulated = false);
 }
