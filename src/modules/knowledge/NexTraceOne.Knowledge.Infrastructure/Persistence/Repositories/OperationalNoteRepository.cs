@@ -25,8 +25,6 @@ internal sealed class OperationalNoteRepository(KnowledgeDbContext context) : IO
         if (term.Length == 0)
             return [];
 
-        var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
-
         return await context.OperationalNotes
             .Select(n => new
             {
@@ -37,8 +35,8 @@ internal sealed class OperationalNoteRepository(KnowledgeDbContext context) : IO
                     (n.Content ?? string.Empty) + " " +
                     (n.ContextType ?? string.Empty))
             })
-            .Where(x => x.SearchVector.Matches(tsQuery))
-            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Where(x => x.SearchVector.Matches(EF.Functions.PlainToTsQuery("simple", term)))
+            .OrderByDescending(x => x.SearchVector.Rank(EF.Functions.PlainToTsQuery("simple", term)))
             .Select(x => x.Note)
             .Take(maxResults)
             .ToListAsync(cancellationToken);

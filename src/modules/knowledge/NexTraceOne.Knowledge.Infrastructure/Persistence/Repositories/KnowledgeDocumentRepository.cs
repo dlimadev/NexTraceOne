@@ -25,8 +25,6 @@ internal sealed class KnowledgeDocumentRepository(KnowledgeDbContext context) : 
         if (term.Length == 0)
             return [];
 
-        var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
-
         return await context.KnowledgeDocuments
             .Select(d => new
             {
@@ -37,8 +35,8 @@ internal sealed class KnowledgeDocumentRepository(KnowledgeDbContext context) : 
                     (d.Summary ?? string.Empty) + " " +
                     (d.Content ?? string.Empty))
             })
-            .Where(x => x.SearchVector.Matches(tsQuery))
-            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
+            .Where(x => x.SearchVector.Matches(EF.Functions.PlainToTsQuery("simple", term)))
+            .OrderByDescending(x => x.SearchVector.Rank(EF.Functions.PlainToTsQuery("simple", term)))
             .Select(x => x.Document)
             .Take(maxResults)
             .ToListAsync(cancellationToken);
