@@ -88,6 +88,21 @@ public sealed class OutboxEndToEndFlowTests
         protected override System.Reflection.Assembly ConfigurationsAssembly => typeof(TestOutboxDbContext).Assembly;
         protected override string OutboxTableName => "tst_outbox_messages";
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TestOutboxAggregate>(builder =>
+            {
+                builder.ToTable("tst_outbox_aggregates");
+                builder.HasKey(x => x.Id);
+                builder.Property(x => x.Id)
+                    .HasConversion(id => id.Value, value => TestOutboxAggregateId.From(value));
+                builder.Property(x => x.ServiceName).HasMaxLength(200).IsRequired();
+                builder.Property(x => x.Environment).HasMaxLength(100).IsRequired();
+            });
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         public Task<int> CommitAsync(CancellationToken cancellationToken = default) => SaveChangesAsync(cancellationToken);
     }
 
