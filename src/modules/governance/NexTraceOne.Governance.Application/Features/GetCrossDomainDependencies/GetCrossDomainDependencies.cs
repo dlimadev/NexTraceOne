@@ -33,6 +33,7 @@ public static class GetCrossDomainDependencies
 
             var links = await teamDomainLinkRepository.ListByDomainIdAsync(domain.Id, cancellationToken);
             var outbound = new List<OutboundDomainDependencyDto>();
+            var targetTeamIdToDomainCache = new Dictionary<string, (string Id, string Name)>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var link in links)
             {
@@ -46,7 +47,13 @@ public static class GetCrossDomainDependencies
                     var targetDomainId = string.Empty;
                     var targetDomainName = string.Empty;
 
-                    if (Guid.TryParse(dependency.TargetTeamId, out var targetTeamGuid))
+                    if (!string.IsNullOrWhiteSpace(dependency.TargetTeamId)
+                        && targetTeamIdToDomainCache.TryGetValue(dependency.TargetTeamId, out var cachedDomain))
+                    {
+                        targetDomainId = cachedDomain.Id;
+                        targetDomainName = cachedDomain.Name;
+                    }
+                    else if (Guid.TryParse(dependency.TargetTeamId, out var targetTeamGuid))
                     {
                         var targetLinks = await teamDomainLinkRepository.ListByTeamIdAsync(new TeamId(targetTeamGuid), cancellationToken);
                         var targetLink = targetLinks.FirstOrDefault();
@@ -57,6 +64,9 @@ public static class GetCrossDomainDependencies
                             {
                                 targetDomainId = targetDomain.Id.Value.ToString();
                                 targetDomainName = targetDomain.DisplayName;
+
+                                if (!string.IsNullOrWhiteSpace(dependency.TargetTeamId))
+                                    targetTeamIdToDomainCache[dependency.TargetTeamId] = (targetDomainId, targetDomainName);
                             }
                         }
                     }

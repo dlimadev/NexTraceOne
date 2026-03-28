@@ -46,7 +46,7 @@ public sealed class ExecutiveGovernanceSummaryTests
     }
 
     [Fact]
-    public async Task GetDomainGovernanceSummary_DimensionsShouldHaveScoresAndTrends()
+    public async Task GetDomainGovernanceSummary_DimensionsShouldHaveNonNegativeScoresAndTrends()
     {
         // Arrange
         var domain = GovernanceDomain.Create("test-domain", "Test Domain");
@@ -64,6 +64,7 @@ public sealed class ExecutiveGovernanceSummaryTests
             d.Level.Should().NotBeNullOrWhiteSpace();
             d.Score.Should().BeGreaterThanOrEqualTo(0);
             d.Trend.Should().NotBeNullOrWhiteSpace();
+            d.Trend.Should().BeOneOf("Stable", "Improving");
         });
     }
 
