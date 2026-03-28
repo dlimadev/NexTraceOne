@@ -7,8 +7,10 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Services;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance;
 
@@ -37,6 +39,9 @@ public static class DependencyInjection
         services.AddScoped<IRulesetRepository, RulesetRepository>();
         services.AddScoped<IRulesetBindingRepository, RulesetBindingRepository>();
         services.AddScoped<ILintResultRepository, LintResultRepository>();
+
+        // Cross-module public interface — outros módulos consomem IRulesetGovernanceModule
+        services.AddScoped<IRulesetGovernanceModule, RulesetGovernanceModuleService>();
 
         return services;
     }

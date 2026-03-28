@@ -222,7 +222,9 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Interface | Status | Notas |
 |---|---|---|
 | `IContractsModule` | REAL | Implementado por `ContractsModuleService` (Catalog.Infrastructure) |
-| `IChangeIntelligenceModule` | PLAN | Definida, 0 implementações |
+| `IChangeIntelligenceModule` | REAL | Implementado por `ChangeIntelligenceModule` (ChangeGovernance.Infrastructure) |
+| `IPromotionModule` | REAL | Implementado por `PromotionModuleService` (ChangeGovernance.Infrastructure) |
+| `IRulesetGovernanceModule` | REAL | Implementado por `RulesetGovernanceModuleService` (ChangeGovernance.Infrastructure) |
 | `ICatalogGraphModule` | PARTIAL | Usada em Governance para `ServiceCount` (único uso ativo) |
 | `IRuntimeIntelligenceModule` | PLAN | Interface vazia, sem implementação |
 | `ICostIntelligenceModule` | PLAN | Interface vazia, sem implementação |
@@ -230,8 +232,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | `IExternalAiModule` | REAL | Implementado por `ExternalAiModule` (Infrastructure) |
 | `IKnowledgeModule` | PLAN | Definida, 0 implementações |
 
-**Gap:** 8 interfaces cross-module definidas; 5 de 8 com zero implementações.
-**Evidência:** `src/modules/catalog/NexTraceOne.Catalog.Infrastructure/Contracts/Services/ContractsModuleService.cs`
+**Gap:** 10 interfaces cross-module definidas; 3 de 10 com zero implementações (`IRuntimeIntelligenceModule`, `ICostIntelligenceModule`, `IKnowledgeModule`).
+**Evidência:** `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Infrastructure/Promotion/Services/PromotionModuleService.cs`
 
 ---
 

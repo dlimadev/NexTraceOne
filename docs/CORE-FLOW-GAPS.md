@@ -42,8 +42,7 @@ This document is the canonical reference for the real operational state of each 
 - Audit trail and decision timeline: real
 
 ### Gaps
-- **`IChangeIntelligenceModule`** — cross-module interface = PLAN; other modules (Governance, AI) cannot query change data dynamically
-- **`IPromotionModule`** and **`IRulesetGovernanceModule`** — also PLAN; inter-module promotion data unavailable
+- **`IPromotionModule`** and **`IRulesetGovernanceModule`** — now IMPLEMENTED; consumers can query promotion and compliance data cross-module
 - **CI/CD integration** — deploy event ingestion is a stub; no real pipeline events consumed from GitLab, Jenkins, or GitHub Actions
 - **Incident↔change correlation** — the correlation engine reads static seed data, not live change events; see Flow 3
 
@@ -118,7 +117,7 @@ This document is the canonical reference for the real operational state of each 
 
 | Gap | Flows Affected | Status |
 |---|---|---|
-| 8 cross-module interfaces (of which 6 still PLAN: `IContractsModule`, `IChangeIntelligenceModule`, `IPromotionModule`, `IRulesetGovernanceModule`, `ICostIntelligenceModule`, `IRuntimeIntelligenceModule`); `IAiOrchestrationModule` and `IExternalAiModule` now IMPLEMENTED | 1, 2, 3, 4 | PARTIAL |
+| 8 cross-module interfaces (of which 3 still PLAN: `IRuntimeIntelligenceModule`, `ICostIntelligenceModule`, `IKnowledgeModule`); `IContractsModule`, `IChangeIntelligenceModule`, `IPromotionModule`, `IRulesetGovernanceModule`, `IAiOrchestrationModule` and `IExternalAiModule` now IMPLEMENTED | 1, 2, 3, 4 | PARTIAL |
 | Outbox processed only for `IdentityDbContext` — 23 other DbContexts produce unprocessed domain events | All | PARTIAL |
 | E2E tests do not gate PRs — incidents and AI tests use static fixtures | 3, 4 | CI gap |
 
@@ -128,8 +127,8 @@ This document is the canonical reference for the real operational state of each 
 
 | Flow | State | Backend | Frontend | Blocker |
 |---|---|---|---|---|
-| 1 — Source of Truth / Contracts | **75%** | Real (91.7%) | Real (7 stubs) | `IContractsModule` PLAN |
-| 2 — Change Confidence | **95%** | Real (100%) | Real (100%) | `IChangeIntelligenceModule` PLAN |
+| 1 — Source of Truth / Contracts | **80%** | Real (91.7%) | Real (7 stubs) | SearchCatalog stub (cross-module pending) |
+| 2 — Change Confidence | **98%** | Real (100%) | Real (100%) | CI/CD deploy events stub |
 | 3 — Incident Correlation | **0%** | Infra only | Mock inline | Correlation engine absent |
 | 4 — AI Assistant | **LLM real E2E; governance real** | LLM real via Ollama/OpenAI; grounding cross-module incompleto | API real (7 chamadas) | Grounding full cross-module |
 
