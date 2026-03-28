@@ -28,13 +28,13 @@ public static class GetMitigationHistory
     /// <summary>Handler que compõe o histórico de mitigação do incidente.</summary>
     public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = store.GetMitigationHistory(request.IncidentId);
+            var response = await store.GetMitigationHistoryAsync(request.IncidentId, cancellationToken);
             if (response is null)
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

@@ -41,21 +41,22 @@ public static class CreateMitigationWorkflow
     /// <summary>Handler que cria o workflow de mitigação via store.</summary>
     public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             if (!store.IncidentExists(request.IncidentId))
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
 
-            var response = store.CreateMitigationWorkflow(
+            var response = await store.CreateMitigationWorkflowAsync(
                 request.IncidentId,
                 request.Title,
                 request.ActionType,
                 request.RiskLevel,
                 request.RequiresApproval,
                 request.LinkedRunbookId,
-                request.Steps);
+                request.Steps,
+                cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

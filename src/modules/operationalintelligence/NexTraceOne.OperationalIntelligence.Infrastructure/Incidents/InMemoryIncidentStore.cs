@@ -663,6 +663,10 @@ public sealed class InMemoryIncidentStore : IIncidentStore
         return null;
     }
 
+    public Task<GetMitigationHistory.Response?> GetMitigationHistoryAsync(
+        string incidentId, CancellationToken ct = default)
+        => Task.FromResult(GetMitigationHistory(incidentId));
+
     public GetMitigationValidation.Response? GetMitigationValidation(string incidentId, string workflowId)
     {
         // Check recorded validations first
@@ -735,6 +739,22 @@ public sealed class InMemoryIncidentStore : IIncidentStore
 
         return new RecordMitigationValidation.Response(wfGuid, status, validatedAt);
     }
+
+    public Task<RecordMitigationValidation.Response?> RecordMitigationValidationAsync(
+        string incidentId, string workflowId, ValidationStatus status,
+        string? observedOutcome, string? validatedBy,
+        IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks,
+        CancellationToken ct = default)
+        => Task.FromResult(RecordMitigationValidation(incidentId, workflowId, status, observedOutcome, validatedBy, checks));
+
+    // ── CreateMitigationWorkflow async stub ─────────────────────────────
+
+    public Task<CreateMitigationWorkflow.Response> CreateMitigationWorkflowAsync(
+        string incidentId, string title, MitigationActionType actionType,
+        RiskLevel riskLevel, bool requiresApproval, Guid? linkedRunbookId,
+        IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps,
+        CancellationToken ct = default)
+        => Task.FromResult(CreateMitigationWorkflow(incidentId, title, actionType, riskLevel, requiresApproval, linkedRunbookId, steps));
 
     // ── Runbooks ─────────────────────────────────────────────────────────
 

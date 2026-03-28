@@ -39,23 +39,24 @@ public static class RecordMitigationValidation
     /// <summary>Handler que regista a validação do workflow de mitigação via store.</summary>
     public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             if (!store.IncidentExists(request.IncidentId))
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
 
-            var response = store.RecordMitigationValidation(
+            var response = await store.RecordMitigationValidationAsync(
                 request.IncidentId,
                 request.WorkflowId,
                 request.Status,
                 request.ObservedOutcome,
                 request.ValidatedBy,
-                request.Checks);
+                request.Checks,
+                cancellationToken);
 
             if (response is null)
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

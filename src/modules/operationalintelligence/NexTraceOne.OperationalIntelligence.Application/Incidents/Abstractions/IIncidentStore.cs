@@ -70,6 +70,17 @@ public interface IIncidentStore
         Guid? linkedRunbookId,
         IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps);
 
+    /// <summary>Cria um novo workflow de mitigação de forma assíncrona e retorna o ID gerado.</summary>
+    Task<CreateMitigationWorkflow.Response> CreateMitigationWorkflowAsync(
+        string incidentId,
+        string title,
+        MitigationActionType actionType,
+        RiskLevel riskLevel,
+        bool requiresApproval,
+        Guid? linkedRunbookId,
+        IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps,
+        CancellationToken ct = default);
+
     /// <summary>Executa uma ação sobre um workflow de mitigação.</summary>
     UpdateMitigationWorkflowAction.Response? UpdateMitigationWorkflowAction(
         string incidentId,
@@ -83,6 +94,9 @@ public interface IIncidentStore
     /// <summary>Retorna o histórico de mitigação do incidente.</summary>
     GetMitigationHistory.Response? GetMitigationHistory(string incidentId);
 
+    /// <summary>Retorna o histórico de mitigação do incidente de forma assíncrona.</summary>
+    Task<GetMitigationHistory.Response?> GetMitigationHistoryAsync(string incidentId, CancellationToken ct = default);
+
     /// <summary>Retorna o estado de validação pós-mitigação de um workflow.</summary>
     GetMitigationValidation.Response? GetMitigationValidation(string incidentId, string workflowId);
 
@@ -94,6 +108,16 @@ public interface IIncidentStore
         string? observedOutcome,
         string? validatedBy,
         IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks);
+
+    /// <summary>Regista o resultado de uma validação pós-mitigação de forma assíncrona.</summary>
+    Task<RecordMitigationValidation.Response?> RecordMitigationValidationAsync(
+        string incidentId,
+        string workflowId,
+        ValidationStatus status,
+        string? observedOutcome,
+        string? validatedBy,
+        IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks,
+        CancellationToken ct = default);
 
     // ── Runbooks ─────────────────────────────────────────────────────────
 
