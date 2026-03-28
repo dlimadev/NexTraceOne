@@ -5,6 +5,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CorrelateIncidentWithChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetCorrelatedChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
@@ -68,6 +69,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RecordMitigationValidation.Command>, RecordMitigationValidation.Validator>();
 
         // Runbook features
+        services.AddTransient<IValidator<CreateRunbook.Command>, CreateRunbook.Validator>();
         services.AddTransient<IValidator<GetRunbookDetail.Query>, GetRunbookDetail.Validator>();
         services.AddTransient<IValidator<ListRunbooks.Query>, ListRunbooks.Validator>();
 

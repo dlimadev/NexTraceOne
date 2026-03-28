@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 
@@ -57,5 +58,19 @@ public sealed class RunbookEndpointModule
         .RequirePermission("operations:runbooks:read")
         .WithName("GetRunbookDetail")
         .WithSummary("Get runbook detail and mitigation procedures");
+
+        // ── POST /api/v1/runbooks — Criar novo runbook ──
+        group.MapPost("/", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CreateRunbook.Command command,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/runbooks/{r.RunbookId}", localizer);
+        })
+        .RequirePermission("operations:runbooks:write")
+        .WithName("CreateRunbook")
+        .WithSummary("Create a new operational runbook");
     }
 }

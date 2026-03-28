@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
         services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();
         services.AddScoped<IIncidentCorrelationRepository, EfIncidentCorrelationRepository>();
+        services.AddScoped<IRunbookRepository, EfRunbookRepository>();
         services.AddScoped<IChangeIntelligenceReader, EfChangeIntelligenceReader>();
 
         return services;

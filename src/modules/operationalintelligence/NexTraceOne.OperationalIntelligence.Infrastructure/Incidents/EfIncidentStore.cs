@@ -11,9 +11,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMiti
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationRecommendations;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationWorkflow;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
@@ -654,51 +652,7 @@ internal sealed class EfIncidentStore(
         return new RecordMitigationValidation.Response(wfGuid, status, validatedAt);
     }
 
-    // ── Runbooks ─────────────────────────────────────────────────────────
-
-    public IReadOnlyList<ListRunbooks.RunbookSummaryDto> GetRunbooks()
-    {
-        return db.Runbooks
-            .OrderByDescending(r => r.PublishedAt)
-            .AsNoTracking()
-            .ToList()
-            .Select(r =>
-            {
-                var stepCount = Deserialize<List<RunbookStepJson>>(r.StepsJson)?.Count ?? 0;
-                return new ListRunbooks.RunbookSummaryDto(
-                    r.Id.Value, r.Title, r.Description,
-                    r.LinkedService, r.LinkedIncidentType,
-                    stepCount, r.PublishedAt);
-            })
-            .ToList();
-    }
-
-    public GetRunbookDetail.Response? GetRunbookDetail(string runbookId)
-    {
-        if (!Guid.TryParse(runbookId, out var guid))
-            return null;
-
-        var runbook = db.Runbooks
-            .AsNoTracking()
-            .SingleOrDefault(r => r.Id == RunbookRecordId.From(guid));
-
-        if (runbook is null)
-            return null;
-
-        var steps = Deserialize<List<RunbookStepJson>>(runbook.StepsJson)
-            ?.Select(s => new GetRunbookDetail.RunbookStepDto(s.StepOrder, s.Title, s.Description, s.IsOptional))
-            .ToArray()
-            ?? [];
-
-        var prerequisites = Deserialize<List<string>>(runbook.PrerequisitesJson) ?? [];
-
-        return new GetRunbookDetail.Response(
-            runbook.Id.Value, runbook.Title, runbook.Description,
-            runbook.LinkedService, runbook.LinkedIncidentType,
-            steps, prerequisites,
-            runbook.PostNotes,
-            runbook.MaintainedBy, runbook.PublishedAt, runbook.LastReviewedAt);
-    }
+    // ── Runbooks — removed: handled by EfRunbookRepository via IRunbookRepository ─────
 
     // ── JSON helpers ─────────────────────────────────────────────────────
 

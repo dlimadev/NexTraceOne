@@ -7,9 +7,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMiti
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationRecommendations;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationWorkflow;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
@@ -119,13 +117,7 @@ public interface IIncidentStore
         IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks,
         CancellationToken ct = default);
 
-    // ── Runbooks ─────────────────────────────────────────────────────────
-
-    /// <summary>Retorna a lista de runbooks.</summary>
-    IReadOnlyList<ListRunbooks.RunbookSummaryDto> GetRunbooks();
-
-    /// <summary>Retorna o detalhe de um runbook.</summary>
-    GetRunbookDetail.Response? GetRunbookDetail(string runbookId);
+    // ── Runbooks — removed: handled by IRunbookRepository ───────────────
 }
 
 /// <summary>Dados de entrada mínimos para criação de incidente.</summary>
