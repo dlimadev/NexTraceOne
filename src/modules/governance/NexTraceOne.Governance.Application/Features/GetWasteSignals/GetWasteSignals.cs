@@ -24,7 +24,7 @@ public static class GetWasteSignals
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+            var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             if (records.Count == 0)
             {
@@ -40,7 +40,7 @@ public static class GetWasteSignals
 
             var avgCost = records.Average(r => r.TotalCost);
             var sortedCosts = records.Select(r => r.TotalCost).OrderBy(c => c).ToList();
-            var p75Index = (int)(sortedCosts.Count * 0.75);
+            var p75Index = (int)Math.Floor((sortedCosts.Count - 1) * 0.75m);
             var p75Threshold = sortedCosts.Count > 0 ? sortedCosts[Math.Min(p75Index, sortedCosts.Count - 1)] : 0m;
 
             var signals = new List<WasteSignalDetailDto>();

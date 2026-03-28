@@ -27,20 +27,37 @@ public static class GetTeamFinOps
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var records = await _costModule.GetCostsByTeamAsync(request.TeamId, cancellationToken: cancellationToken);
+            var records = await _costModule.GetCostsByTeamAsync(request.TeamId, cancellationToken: cancellationToken) ?? [];
+            var allRecords = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
-            var services = records
+            var latestRecordsByService = records
+                .GroupBy(r => r.ServiceId)
+                .Select(g => g.OrderByDescending(r => r.Period, StringComparer.Ordinal).First())
+                .ToList();
+
+            var previousRecordsByService = records
+                .GroupBy(r => r.ServiceId)
+                .Select(g => g.OrderByDescending(r => r.Period, StringComparer.Ordinal).Skip(1).FirstOrDefault())
+                .Where(r => r is not null)
+                .Cast<CostRecordSummary>()
+                .ToDictionary(r => r.ServiceId, StringComparer.OrdinalIgnoreCase);
+
+            var teamAverageCost = latestRecordsByService.Count == 0 ? 0m : latestRecordsByService.Average(r => r.TotalCost);
+            var tenantAverageCost = allRecords.Count == 0 ? teamAverageCost : allRecords.Average(r => r.TotalCost);
+
+            var services = latestRecordsByService
                 .Select(r => new TeamServiceCostDto(
                     r.ServiceId,
                     r.ServiceName,
                     ComputeEfficiency(r.TotalCost),
                     r.TotalCost,
-                    TrendDirection.Stable,
-                    0m,
+                    GetTrendDirection(previousRecordsByService.GetValueOrDefault(r.ServiceId)?.TotalCost ?? 0m, r.TotalCost),
+                    Math.Round(Math.Max(0m, r.TotalCost - tenantAverageCost), 2),
                     0m))
                 .ToList();
 
             var totalCost = services.Sum(s => s.MonthlyCost);
+            var previousMonthCost = previousRecordsByService.Values.Sum(v => v.TotalCost);
             var overallEfficiency = services.Count == 0
                 ? CostEfficiency.Efficient
                 : ComputeEfficiency(services.Average(s => s.MonthlyCost));
@@ -54,13 +71,13 @@ public static class GetTeamFinOps
                 TeamName: request.TeamId,
                 Domain: records.FirstOrDefault()?.Domain ?? string.Empty,
                 TotalMonthlyCost: totalCost,
-                PreviousMonthCost: 0m,
-                CostTrend: TrendDirection.Stable,
+                PreviousMonthCost: previousMonthCost,
+                CostTrend: GetTrendDirection(previousMonthCost, totalCost),
                 OverallEfficiency: overallEfficiency,
-                TotalWaste: 0m,
+                TotalWaste: services.Sum(s => s.WasteAmount),
                 ServiceCount: services.Count,
                 Services: services,
-                TrendSeries: Array.Empty<TrendPointDto>(),
+                TrendSeries: BuildTeamTrendSeries(records),
                 AvgReliabilityScore: 0m,
                 TotalRecentIncidents: 0,
                 TopOptimizationFocus: topFocus,
@@ -78,6 +95,25 @@ public static class GetTeamFinOps
             > 5000m => CostEfficiency.Acceptable,
             _ => CostEfficiency.Efficient
         };
+
+        private static TrendDirection GetTrendDirection(decimal previous, decimal current)
+        {
+            if (previous <= 0m) return TrendDirection.Stable;
+            var deltaPercent = (current - previous) / previous * 100m;
+            return deltaPercent switch
+            {
+                > 5m => TrendDirection.Declining,
+                < -5m => TrendDirection.Improving,
+                _ => TrendDirection.Stable
+            };
+        }
+
+        private static IReadOnlyList<TrendPointDto> BuildTeamTrendSeries(IReadOnlyList<CostRecordSummary> records) =>
+            records
+                .GroupBy(r => r.Period)
+                .OrderBy(g => g.Key, StringComparer.Ordinal)
+                .Select(g => new TrendPointDto(g.Key, g.Sum(r => r.TotalCost)))
+                .ToList();
     }
 
     /// <summary>Perfil de FinOps agregado por equipa. IsSimulated=true indica dados demonstrativos.</summary>

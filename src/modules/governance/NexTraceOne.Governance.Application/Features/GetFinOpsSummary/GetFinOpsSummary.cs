@@ -31,7 +31,7 @@ public static class GetFinOpsSummary
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var records = await _costModule.GetCostRecordsAsync(request.Range, cancellationToken);
+            var records = await _costModule.GetCostRecordsAsync(request.Range, cancellationToken) ?? [];
 
             var filtered = records.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(request.TeamId))
@@ -52,7 +52,7 @@ public static class GetFinOpsSummary
                     ComputeEfficiency(r.TotalCost),
                     r.TotalCost,
                     TrendDirection.Stable,
-                    Array.Empty<WasteSignalDto>(),
+                    BuildWasteSignals(r.TotalCost, costRecords),
                     null))
                 .ToList();
 
@@ -77,12 +77,16 @@ public static class GetFinOpsSummary
 
             var response = new Response(
                 TotalMonthlyCost: services.Sum(s => s.MonthlyCost),
-                TotalWaste: 0m,
+                TotalWaste: services.Sum(s => s.WasteSignals.Sum(w => w.EstimatedWaste)),
                 OverallEfficiency: overallEfficiency,
                 CostTrend: TrendDirection.Stable,
                 Services: services,
                 TopCostDrivers: topDrivers,
-                TopWasteSignals: Array.Empty<WasteSignalDto>(),
+                TopWasteSignals: services
+                    .SelectMany(s => s.WasteSignals)
+                    .OrderByDescending(s => s.EstimatedWaste)
+                    .Take(5)
+                    .ToList(),
                 OptimizationOpportunities: optimizationOpportunities,
                 GeneratedAt: DateTimeOffset.UtcNow,
                 IsSimulated: false,
@@ -98,6 +102,23 @@ public static class GetFinOpsSummary
             > 5000m => CostEfficiency.Acceptable,
             _ => CostEfficiency.Efficient
         };
+
+        private static IReadOnlyList<WasteSignalDto> BuildWasteSignals(decimal currentCost, IReadOnlyList<CostRecordSummary> allRecords)
+        {
+            if (allRecords.Count == 0) return Array.Empty<WasteSignalDto>();
+            var average = allRecords.Average(r => r.TotalCost);
+            var waste = Math.Max(0m, currentCost - average);
+            if (waste <= 0m) return Array.Empty<WasteSignalDto>();
+
+            return
+            [
+                new WasteSignalDto(
+                    Description: "Cost is above tenant average for the selected scope.",
+                    Pattern: "cost-above-average",
+                    Type: WasteSignalType.DegradedCostAmplification,
+                    EstimatedWaste: Math.Round(waste, 2))
+            ];
+        }
     }
 
     /// <summary>Resposta do resumo de FinOps. IsSimulated=true indica dados demonstrativos.</summary>

@@ -29,7 +29,7 @@ public static class GetBenchmarking
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var records = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+            var records = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             var isDomainDimension = request.Dimension.Equals("domains", StringComparison.OrdinalIgnoreCase);
 
