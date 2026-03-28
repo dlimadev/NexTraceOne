@@ -145,6 +145,8 @@ public sealed class FinOpsFeatureTests
         result.Value.MonthlyCost.Should().BeGreaterThan(0);
         result.Value.IsSimulated.Should().BeFalse();
         result.Value.DataSource.Should().Be("cost-intelligence");
+        result.Value.TotalWaste.Should().BeGreaterThan(0);
+        result.Value.Optimizations.Should().NotBeEmpty();
     }
 
     [Fact]
@@ -183,6 +185,8 @@ public sealed class FinOpsFeatureTests
         result.Value.Services.Should().NotBeEmpty();
         result.Value.TotalMonthlyCost.Should().BeGreaterThan(0);
         result.Value.IsSimulated.Should().BeFalse();
+        result.Value.TrendSeries.Should().NotBeEmpty();
+        result.Value.TotalWaste.Should().BeGreaterThanOrEqualTo(0);
     }
 
     [Fact]
@@ -220,6 +224,24 @@ public sealed class FinOpsFeatureTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.IsSimulated.Should().BeFalse("handler now uses real cost data");
+        result.Value.DataSource.Should().Be("cost-intelligence");
+        result.Value.SignalCount.Should().BeGreaterThan(0);
+        result.Value.TotalWaste.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public async Task GetDomainFinOps_ShouldExposeTrendAndWasteFromRealRecords()
+    {
+        // Arrange
+        var handler = new GetDomainFinOps.Handler(CreateMock());
+
+        // Act
+        var result = await handler.Handle(new GetDomainFinOps.Query("Payments"), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.TrendSeries.Should().NotBeEmpty();
+        result.Value.IsSimulated.Should().BeFalse();
         result.Value.DataSource.Should().Be("cost-intelligence");
     }
 

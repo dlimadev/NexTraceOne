@@ -23,7 +23,7 @@ public static class GetEfficiencyIndicators
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+            var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             if (records.Count == 0)
             {

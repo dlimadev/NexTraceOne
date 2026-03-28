@@ -21,6 +21,8 @@ public static class GetPlatformJobs
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // TODO [P03.5]: Replace static job snapshots with real scheduler/job monitor integration
+            // when a platform job status contract is exposed for Governance.
             var now = DateTimeOffset.UtcNow;
 
             var allJobs = new List<BackgroundJobSummaryDto>

@@ -43,13 +43,13 @@ public static class ListDomains
                 ));
             }
 
-            var response = new Response(Domains: dtos);
+            var response = new Response(Domains: dtos, IsSimulated: false);
             return Result<Response>.Success(response);
         }
     }
 
     /// <summary>Resposta com lista sumária de domínios.</summary>
-    public sealed record Response(IReadOnlyList<DomainSummaryDto> Domains);
+    public sealed record Response(IReadOnlyList<DomainSummaryDto> Domains, bool IsSimulated = false);
 
     /// <summary>DTO sumário de domínio com indicadores de governança.</summary>
     public sealed record DomainSummaryDto(

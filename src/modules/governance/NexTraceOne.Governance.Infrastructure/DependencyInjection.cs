@@ -46,6 +46,8 @@ public static class DependencyInjection
         services.AddScoped<ITeamDomainLinkRepository, TeamDomainLinkRepository>();
         services.AddScoped<IGovernanceRolloutRecordRepository, GovernanceRolloutRecordRepository>();
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
+        services.AddScoped<IEvidencePackageRepository, EvidencePackageRepository>();
+        services.AddScoped<IComplianceGapRepository, ComplianceGapRepository>();
 
         return services;
     }

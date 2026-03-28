@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetPackApplicability;
@@ -7,7 +9,7 @@ namespace NexTraceOne.Governance.Application.Features.GetPackApplicability;
 /// <summary>
 /// Feature: GetPackApplicability — escopos de aplicabilidade de um governance pack.
 /// Retorna os escopos onde o pack está aplicado com modo de enforcement e metadados.
-/// MVP com dados estáticos para validação de fluxo.
+    /// Retorna dados reais de rollout persistidos no módulo Governance.
 /// </summary>
 public static class GetPackApplicability
 {
@@ -15,27 +17,30 @@ public static class GetPackApplicability
     public sealed record Query(string PackId) : IQuery<Response>;
 
     /// <summary>Handler que retorna os escopos de aplicabilidade do governance pack.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernanceRolloutRecordRepository rolloutRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var scopes = new List<ApplicabilityScopeDto>
-            {
-                new(GovernanceScopeType.Global, "*", EnforcementMode.Advisory,
-                    DateTimeOffset.UtcNow.AddDays(-90), "admin@nextraceone.io"),
-                new(GovernanceScopeType.Environment, "Production", EnforcementMode.Blocking,
-                    DateTimeOffset.UtcNow.AddDays(-60), "architect@nextraceone.io"),
-                new(GovernanceScopeType.Domain, "payments", EnforcementMode.Required,
-                    DateTimeOffset.UtcNow.AddDays(-45), "techlead@nextraceone.io"),
-                new(GovernanceScopeType.Team, "platform-core", EnforcementMode.Advisory,
-                    DateTimeOffset.UtcNow.AddDays(-30), "engineer@nextraceone.io")
-            };
+            if (!Guid.TryParse(request.PackId, out var packGuid))
+                return Error.Validation("INVALID_PACK_ID", "Pack ID '{0}' is not a valid GUID.", request.PackId);
+
+            var rollouts = await rolloutRepository.ListByPackIdAsync(new GovernancePackId(packGuid), cancellationToken);
+            var scopes = rollouts
+                .OrderByDescending(r => r.InitiatedAt)
+                .Select(r => new ApplicabilityScopeDto(
+                    ScopeType: r.ScopeType,
+                    ScopeValue: r.Scope,
+                    EnforcementMode: r.EnforcementMode,
+                    AppliedAt: r.InitiatedAt,
+                    AppliedBy: r.InitiatedBy))
+                .ToList();
 
             var response = new Response(
                 PackId: request.PackId,
                 Scopes: scopes);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

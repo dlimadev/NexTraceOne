@@ -18,6 +18,8 @@ public static class GetPackCoverage
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // TODO [P03.5]: Replace static coverage computation with rollout/rule-evaluation engine integration
+            // when per-scope compliance evaluation contract becomes available.
             var items = new List<CoverageItemDto>
             {
                 new("Domain", "payments", 18, 16, 2, 88.9m),

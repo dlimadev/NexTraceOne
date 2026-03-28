@@ -1,7 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Contracts.Graph.DTOs;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.CreateTeam;
+using NexTraceOne.Governance.Application.Features.GetCrossTeamDependencies;
 using NexTraceOne.Governance.Application.Features.GetTeamDetail;
 using NexTraceOne.Governance.Application.Features.ListTeams;
 using NexTraceOne.Governance.Application.Features.UpdateTeam;
@@ -253,6 +255,87 @@ public sealed class TeamFeatureTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.DeferredFields.Should().NotBeEmpty();
+    }
+
+    // ── GetCrossTeamDependencies ──
+
+    [Fact]
+    public async Task GetCrossTeamDependencies_WithCatalogDependencies_ShouldReturnRealDataAndNotSimulated()
+    {
+        // Arrange
+        var team = Team.Create("commerce", "Commerce Team");
+        _teamRepository.GetByIdAsync(Arg.Any<TeamId>(), Arg.Any<CancellationToken>())
+            .Returns(team);
+        _catalogGraph.ListCrossTeamDependenciesAsync(team.Name, Arg.Any<CancellationToken>())
+            .Returns(new List<CrossTeamDependencyInfo>
+            {
+                new("dep-1", "checkout-api", "identity-api", "11111111-1111-1111-1111-111111111111", "Identity Team", "Synchronous")
+            });
+
+        var handler = new GetCrossTeamDependencies.Handler(_teamRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossTeamDependencies.Query(team.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.TeamName.Should().Be("Commerce Team");
+        result.Value.Outbound.Should().HaveCount(1);
+        result.Value.Inbound.Should().BeEmpty();
+        result.Value.IsSimulated.Should().BeFalse();
+        result.Value.Outbound[0].ServiceName.Should().Be("checkout-api");
+    }
+
+    [Fact]
+    public async Task GetCrossTeamDependencies_InvalidGuid_ShouldReturnValidationError()
+    {
+        // Arrange
+        var handler = new GetCrossTeamDependencies.Handler(_teamRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossTeamDependencies.Query("bad-guid"), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("INVALID_TEAM_ID");
+    }
+
+    [Fact]
+    public async Task GetCrossTeamDependencies_TeamNotFound_ShouldReturnNotFoundError()
+    {
+        // Arrange
+        _teamRepository.GetByIdAsync(Arg.Any<TeamId>(), Arg.Any<CancellationToken>())
+            .Returns((Team?)null);
+        var handler = new GetCrossTeamDependencies.Handler(_teamRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossTeamDependencies.Query(Guid.NewGuid().ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("TEAM_NOT_FOUND");
+    }
+
+    [Fact]
+    public async Task GetCrossTeamDependencies_EmptyCatalogDependencies_ShouldReturnEmptyCollections()
+    {
+        // Arrange
+        var team = Team.Create("platform", "Platform Team");
+        _teamRepository.GetByIdAsync(Arg.Any<TeamId>(), Arg.Any<CancellationToken>())
+            .Returns(team);
+        _catalogGraph.ListCrossTeamDependenciesAsync(team.Name, Arg.Any<CancellationToken>())
+            .Returns(new List<CrossTeamDependencyInfo>());
+
+        var handler = new GetCrossTeamDependencies.Handler(_teamRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossTeamDependencies.Query(team.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Outbound.Should().BeEmpty();
+        result.Value.Inbound.Should().BeEmpty();
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     // ── UpdateTeam ──

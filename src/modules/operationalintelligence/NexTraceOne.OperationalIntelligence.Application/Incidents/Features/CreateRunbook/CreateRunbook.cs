@@ -5,6 +5,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 
@@ -56,6 +57,7 @@ public static class CreateRunbook
     /// <summary>Handler que persiste o runbook via repositório.</summary>
     public sealed class Handler(
         IRunbookRepository repository,
+        IRunbookKnowledgeLinkingService runbookKnowledgeLinkingService,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -94,6 +96,13 @@ public static class CreateRunbook
                 now);
 
             await repository.AddAsync(runbook, cancellationToken);
+            await runbookKnowledgeLinkingService.LinkRunbookToServiceAsync(
+                id.Value,
+                request.Title,
+                request.Description,
+                request.LinkedService,
+                request.MaintainedBy,
+                cancellationToken);
 
             return Result<Response>.Success(new Response(id.Value, now));
         }

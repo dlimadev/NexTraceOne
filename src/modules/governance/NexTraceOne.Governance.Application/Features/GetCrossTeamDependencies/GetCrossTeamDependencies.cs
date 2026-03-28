@@ -1,5 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetCrossTeamDependencies;
 
@@ -13,28 +16,39 @@ public static class GetCrossTeamDependencies
     public sealed record Query(string TeamId) : IQuery<Response>;
 
     /// <summary>Handler que retorna dependências outbound e inbound da equipa.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        ITeamRepository teamRepository,
+        ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var outbound = new List<OutboundDependencyDto>
-            {
-                new("Payment Gateway", "Identity Service", "team-identity", "Identity", "Synchronous"),
-                new("Order API", "Notification Worker", "team-platform", "Platform", "Asynchronous")
-            };
+            if (!Guid.TryParse(request.TeamId, out var teamGuid))
+                return Error.Validation("INVALID_TEAM_ID", "Team ID '{0}' is not a valid GUID.", request.TeamId);
 
-            var inbound = new List<InboundDependencyDto>
-            {
-                new("Pricing Engine", "Storefront BFF", "team-platform", "Platform", "Synchronous")
-            };
+            var team = await teamRepository.GetByIdAsync(new TeamId(teamGuid), cancellationToken);
+            if (team is null)
+                return Error.NotFound("TEAM_NOT_FOUND", "Team '{0}' not found.", request.TeamId);
+
+            var dependencies = await catalogGraph.ListCrossTeamDependenciesAsync(team.Name, cancellationToken) ?? [];
+            var outbound = dependencies
+                .Select(d => new OutboundDependencyDto(
+                    ServiceName: d.SourceServiceName,
+                    TargetServiceName: d.TargetServiceName,
+                    TargetTeamId: d.TargetTeamId,
+                    TargetTeamName: d.TargetTeamName,
+                    DependencyType: d.DependencyType))
+                .ToList();
+
+            var inbound = new List<InboundDependencyDto>();
 
             var response = new Response(
                 TeamId: request.TeamId,
-                TeamName: "Commerce",
+                TeamName: team.DisplayName,
                 Outbound: outbound,
-                Inbound: inbound);
+                Inbound: inbound,
+                IsSimulated: false);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 
@@ -43,7 +57,8 @@ public static class GetCrossTeamDependencies
         string TeamId,
         string TeamName,
         IReadOnlyList<OutboundDependencyDto> Outbound,
-        IReadOnlyList<InboundDependencyDto> Inbound);
+        IReadOnlyList<InboundDependencyDto> Inbound,
+        bool IsSimulated = false);
 
     /// <summary>DTO de dependência outbound — serviço da equipa que depende de outra equipa.</summary>
     public sealed record OutboundDependencyDto(

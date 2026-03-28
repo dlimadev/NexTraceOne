@@ -29,7 +29,7 @@ public static class GetFinOpsTrends
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var records = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
+            var records = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             var grouped = request.Dimension switch
             {

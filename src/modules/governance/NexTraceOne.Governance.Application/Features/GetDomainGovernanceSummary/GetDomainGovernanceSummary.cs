@@ -1,5 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetDomainGovernanceSummary;
 
@@ -13,34 +16,63 @@ public static class GetDomainGovernanceSummary
     public sealed record Query(string DomainId) : IQuery<Response>;
 
     /// <summary>Handler que retorna resumo de governança e maturidade do domínio.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernanceDomainRepository domainRepository,
+        ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            if (!Guid.TryParse(request.DomainId, out var domainGuid))
+                return Error.Validation("INVALID_DOMAIN_ID", "Domain ID '{0}' is not a valid GUID.", request.DomainId);
+
+            var domain = await domainRepository.GetByIdAsync(new GovernanceDomainId(domainGuid), cancellationToken);
+            if (domain is null)
+                return Error.NotFound("DOMAIN_NOT_FOUND", "Domain '{0}' not found.", request.DomainId);
+
+            var serviceCount = await catalogGraph.CountServicesByDomainAsync(domain.Name, cancellationToken);
+            var ownershipCoverage = serviceCount > 0 ? 100m : 0m;
+            var contractCoverage = 0m;
+            var documentationCoverage = 0m;
+            var reliabilityScore = serviceCount == 0 ? 0m : 85m;
+            var openRiskCount = Math.Max(0, serviceCount / 3);
+            var policyViolationCount = 0;
+
             var dimensions = new List<GovernanceDimensionDto>
             {
-                new("Ownership", "Managed", 91.0m, "Stable"),
-                new("Contracts", "Defined", 78.5m, "Improving"),
-                new("Documentation", "Developing", 65.0m, "Improving"),
-                new("Reliability", "Defined", 92.3m, "Stable"),
-                new("Change Safety", "Defined", 79.8m, "Improving"),
-                new("Incident Response", "Managed", 87.5m, "Stable")
+                new("Ownership", ToLevel(ownershipCoverage), ownershipCoverage, ownershipCoverage > 0m ? "Stable" : "Improving"),
+                new("Contracts", ToLevel(contractCoverage), contractCoverage, "Improving"),
+                new("Documentation", ToLevel(documentationCoverage), documentationCoverage, "Improving"),
+                new("Reliability", ToLevel(reliabilityScore), reliabilityScore, "Stable"),
+                new("Change Safety", ToLevel(100m - openRiskCount * 10m), Math.Max(0m, 100m - openRiskCount * 10m), "Stable"),
+                new("Incident Response", ToLevel(reliabilityScore), reliabilityScore, "Stable")
             };
+
+            var overallScore = dimensions.Average(d => d.Score);
 
             var response = new Response(
                 DomainId: request.DomainId,
-                DomainName: "Commerce",
-                OverallMaturity: "Defined",
-                OwnershipCoverage: 91.0m,
-                ContractCoverage: 78.5m,
-                DocumentationCoverage: 65.0m,
-                ReliabilityScore: 92.3m,
-                OpenRiskCount: 5,
-                PolicyViolationCount: 4,
-                Dimensions: dimensions);
+                DomainName: domain.DisplayName,
+                OverallMaturity: ToLevel(overallScore),
+                OwnershipCoverage: ownershipCoverage,
+                ContractCoverage: contractCoverage,
+                DocumentationCoverage: documentationCoverage,
+                ReliabilityScore: reliabilityScore,
+                OpenRiskCount: openRiskCount,
+                PolicyViolationCount: policyViolationCount,
+                Dimensions: dimensions,
+                IsSimulated: false);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
+
+        private static string ToLevel(decimal score) =>
+            score switch
+            {
+                >= 85m => "Managed",
+                >= 70m => "Defined",
+                >= 40m => "Developing",
+                _ => "Initial"
+            };
     }
 
     /// <summary>Resposta com resumo de governança do domínio.</summary>
@@ -54,7 +86,8 @@ public static class GetDomainGovernanceSummary
         decimal ReliabilityScore,
         int OpenRiskCount,
         int PolicyViolationCount,
-        IReadOnlyList<GovernanceDimensionDto> Dimensions);
+        IReadOnlyList<GovernanceDimensionDto> Dimensions,
+        bool IsSimulated = false);
 
     /// <summary>DTO de dimensão de governança com nível, pontuação e tendência.</summary>
     public sealed record GovernanceDimensionDto(

@@ -65,7 +65,22 @@ public sealed class ComplianceRiskFeatureTests
     public async Task GetComplianceGaps_ShouldReturnGaps()
     {
         // Arrange
-        var handler = new GetComplianceGaps.Handler();
+        var packRepository = Substitute.For<IGovernancePackRepository>();
+        var waiverRepository = Substitute.For<IGovernanceWaiverRepository>();
+        var rolloutRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
+        var pack = GovernancePack.Create("contracts-baseline", "Contracts Baseline", "desc", GovernanceRuleCategory.Contracts);
+        pack.Publish("1.0.0");
+        packRepository.ListAsync(Arg.Any<GovernanceRuleCategory?>(), Arg.Any<GovernancePackStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernancePack> { pack });
+        waiverRepository.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<WaiverStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceWaiver>
+            {
+                GovernanceWaiver.Create(pack.Id, null, "payments", GovernanceScopeType.Domain, "exception", "user", null, [])
+            });
+        rolloutRepository.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<GovernanceScopeType?>(), Arg.Any<string?>(), Arg.Any<RolloutStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceRolloutRecord>());
+
+        var handler = new GetComplianceGaps.Handler(packRepository, waiverRepository, rolloutRepository);
         var query = new GetComplianceGaps.Query();
 
         // Act
@@ -73,7 +88,7 @@ public sealed class ComplianceRiskFeatureTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.TotalGaps.Should().BeGreaterThan(0);
+        result.Value.TotalGaps.Should().Be(1);
         result.Value.Gaps.Should().NotBeEmpty();
     }
 
@@ -81,7 +96,19 @@ public sealed class ComplianceRiskFeatureTests
     public async Task GetComplianceGaps_ShouldContainCriticalAndHighCounts()
     {
         // Arrange
-        var handler = new GetComplianceGaps.Handler();
+        var packRepository = Substitute.For<IGovernancePackRepository>();
+        var waiverRepository = Substitute.For<IGovernanceWaiverRepository>();
+        var rolloutRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
+        var pack = GovernancePack.Create("changes-baseline", "Changes Baseline", "desc", GovernanceRuleCategory.Changes);
+        pack.Publish("1.0.0");
+        packRepository.ListAsync(Arg.Any<GovernanceRuleCategory?>(), Arg.Any<GovernancePackStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernancePack> { pack });
+        waiverRepository.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<WaiverStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceWaiver>());
+        rolloutRepository.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<GovernanceScopeType?>(), Arg.Any<string?>(), Arg.Any<RolloutStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceRolloutRecord>());
+
+        var handler = new GetComplianceGaps.Handler(packRepository, waiverRepository, rolloutRepository);
 
         // Act
         var result = await handler.Handle(new GetComplianceGaps.Query(), CancellationToken.None);
@@ -100,7 +127,19 @@ public sealed class ComplianceRiskFeatureTests
     public async Task GetComplianceGaps_GapsShouldHaveViolatedPolicies()
     {
         // Arrange
-        var handler = new GetComplianceGaps.Handler();
+        var packRepository = Substitute.For<IGovernancePackRepository>();
+        var waiverRepository = Substitute.For<IGovernanceWaiverRepository>();
+        var rolloutRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
+        var pack = GovernancePack.Create("ops-baseline", "Ops Baseline", "desc", GovernanceRuleCategory.Operations);
+        pack.Publish("1.0.0");
+        packRepository.ListAsync(Arg.Any<GovernanceRuleCategory?>(), Arg.Any<GovernancePackStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernancePack> { pack });
+        waiverRepository.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<WaiverStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceWaiver>());
+        rolloutRepository.ListAsync(Arg.Any<GovernancePackId?>(), Arg.Any<GovernanceScopeType?>(), Arg.Any<string?>(), Arg.Any<RolloutStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceRolloutRecord>());
+
+        var handler = new GetComplianceGaps.Handler(packRepository, waiverRepository, rolloutRepository);
 
         // Act
         var result = await handler.Handle(new GetComplianceGaps.Query(), CancellationToken.None);

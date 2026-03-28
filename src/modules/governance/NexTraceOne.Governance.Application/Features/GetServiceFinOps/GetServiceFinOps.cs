@@ -28,9 +28,46 @@ public static class GetServiceFinOps
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var record = await _costModule.GetServiceCostAsync(request.ServiceId, cancellationToken: cancellationToken);
+            var allRecords = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             if (record is null)
                 return Error.NotFound("FINOPS.SERVICE_NOT_FOUND", "No cost data found for service {0}", request.ServiceId);
+
+            var serviceRecords = allRecords
+                .Where(r => r.ServiceId.Equals(request.ServiceId, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(r => r.Period, StringComparer.Ordinal)
+                .ToList();
+
+            var currentRecord = serviceRecords.FirstOrDefault() ?? record;
+            var previousRecord = serviceRecords.Skip(1).FirstOrDefault();
+            var previousMonthCost = previousRecord?.TotalCost ?? 0m;
+            var costTrend = GetTrendDirection(previousMonthCost, currentRecord.TotalCost);
+
+            var averageServiceCost = allRecords.Count == 0 ? currentRecord.TotalCost : allRecords.Average(r => r.TotalCost);
+            var waste = Math.Max(0m, currentRecord.TotalCost - averageServiceCost);
+            var wasteSignals = waste > 0m
+                ? new[]
+                {
+                    new WasteSignalDto(
+                        Description: "Service cost exceeds tenant average for the selected period.",
+                        Pattern: "cost-above-average",
+                        Type: WasteSignalType.DegradedCostAmplification,
+                        EstimatedWaste: Math.Round(waste, 2),
+                        DetectedAt: DateTimeOffset.UtcNow.ToString("o"))
+                }
+                : Array.Empty<WasteSignalDto>();
+
+            var potentialSavings = Math.Round(waste * 0.35m, 2);
+            var optimizations = potentialSavings > 0m
+                ? new[]
+                {
+                    new OptimizationDto(
+                        Recommendation: "Review scaling and idle capacity for this service in high-cost environments.",
+                        PotentialSavings: potentialSavings,
+                        Priority: waste > averageServiceCost ? "High" : "Medium",
+                        Rationale: $"Current cost {currentRecord.TotalCost:N2} exceeds average {averageServiceCost:N2}.")
+                }
+                : Array.Empty<OptimizationDto>();
 
             var efficiency = ComputeEfficiency(record.TotalCost);
 
@@ -39,19 +76,19 @@ public static class GetServiceFinOps
                 ServiceName: record.ServiceName,
                 Domain: record.Domain ?? string.Empty,
                 Team: record.Team ?? string.Empty,
-                MonthlyCost: record.TotalCost,
-                PreviousMonthCost: 0m,
-                CostTrend: TrendDirection.Stable,
-                Efficiency: efficiency,
-                WasteSignals: Array.Empty<WasteSignalDto>(),
-                TotalWaste: 0m,
+                MonthlyCost: currentRecord.TotalCost,
+                PreviousMonthCost: previousMonthCost,
+                CostTrend: costTrend,
+                Efficiency: ComputeEfficiency(currentRecord.TotalCost),
+                WasteSignals: wasteSignals,
+                TotalWaste: Math.Round(waste, 2),
                 EfficiencyIndicators: Array.Empty<EfficiencyIndicatorDto>(),
                 ReliabilityScore: 0m,
                 RecentIncidents: 0,
                 ReliabilityTrend: TrendDirection.Stable,
                 ChangeImpacts: Array.Empty<ChangeImpactDto>(),
-                Optimizations: Array.Empty<OptimizationDto>(),
-                TotalPotentialSavings: 0m,
+                Optimizations: optimizations,
+                TotalPotentialSavings: optimizations.Sum(o => o.PotentialSavings),
                 GeneratedAt: DateTimeOffset.UtcNow,
                 IsSimulated: false,
                 DataSource: "cost-intelligence");
@@ -66,6 +103,18 @@ public static class GetServiceFinOps
             > 5000m => CostEfficiency.Acceptable,
             _ => CostEfficiency.Efficient
         };
+
+        private static TrendDirection GetTrendDirection(decimal previous, decimal current)
+        {
+            if (previous <= 0m) return TrendDirection.Stable;
+            var deltaPercent = (current - previous) / previous * 100m;
+            return deltaPercent switch
+            {
+                > 5m => TrendDirection.Declining,
+                < -5m => TrendDirection.Improving,
+                _ => TrendDirection.Stable
+            };
+        }
     }
 
     /// <summary>Perfil de FinOps completo de um serviço. IsSimulated=true indica dados demonstrativos.</summary>

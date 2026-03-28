@@ -6,6 +6,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\modules\knowledge\NexTraceOne.Knowledge.Domain\NexTraceOne.Knowledge.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\knowledge\NexTraceOne.Knowledge.Application\NexTraceOne.Knowledge.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\knowledge\NexTraceOne.Knowledge.Infrastructure\NexTraceOne.Knowledge.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\knowledge\NexTraceOne.Knowledge.Contracts\NexTraceOne.Knowledge.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
@@ -13,5 +15,8 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="Bogus" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
   </ItemGroup>
 </Project>

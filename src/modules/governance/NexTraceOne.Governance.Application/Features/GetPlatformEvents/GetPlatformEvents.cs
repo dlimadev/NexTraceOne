@@ -22,6 +22,8 @@ public static class GetPlatformEvents
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // TODO [P03.5]: Replace static platform events with real operational event stream
+            // once platform events contract is available for Governance aggregation.
             var now = DateTimeOffset.UtcNow;
 
             var allEvents = new List<PlatformOperationalEventDto>

@@ -1,8 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Contracts.Graph.DTOs;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.CreateDomain;
+using NexTraceOne.Governance.Application.Features.GetCrossDomainDependencies;
 using NexTraceOne.Governance.Application.Features.GetDomainDetail;
+using NexTraceOne.Governance.Application.Features.GetDomainGovernanceSummary;
 using NexTraceOne.Governance.Application.Features.ListDomains;
 using NexTraceOne.Governance.Application.Features.UpdateDomain;
 using NexTraceOne.Governance.Domain.Entities;
@@ -209,6 +212,197 @@ public sealed class DomainFeatureTests
         // Assert
         result.IsSuccess.Should().BeFalse();
         result.Error.Code.Should().Be("DOMAIN_NOT_FOUND");
+    }
+
+    // ── GetDomainGovernanceSummary ──
+
+    [Fact]
+    public async Task GetDomainGovernanceSummary_WithRealDomain_ShouldReturnNotSimulated()
+    {
+        // Arrange
+        var domain = GovernanceDomain.Create("commerce", "Commerce Domain", criticality: DomainCriticality.High);
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>())
+            .Returns(domain);
+        _catalogGraph.CountServicesByDomainAsync(domain.Name, Arg.Any<CancellationToken>())
+            .Returns(4);
+
+        var handler = new GetDomainGovernanceSummary.Handler(_domainRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetDomainGovernanceSummary.Query(domain.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DomainName.Should().Be("Commerce Domain");
+        result.Value.Dimensions.Should().NotBeEmpty();
+        result.Value.IsSimulated.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetDomainGovernanceSummary_EmptyServices_ShouldReturnZeroCoverage()
+    {
+        // Arrange
+        var domain = GovernanceDomain.Create("empty", "Empty Domain");
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>())
+            .Returns(domain);
+        _catalogGraph.CountServicesByDomainAsync(domain.Name, Arg.Any<CancellationToken>())
+            .Returns(0);
+
+        var handler = new GetDomainGovernanceSummary.Handler(_domainRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetDomainGovernanceSummary.Query(domain.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.OwnershipCoverage.Should().Be(0);
+        result.Value.ContractCoverage.Should().Be(0);
+        result.Value.DocumentationCoverage.Should().Be(0);
+        result.Value.IsSimulated.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetDomainGovernanceSummary_InvalidGuid_ShouldReturnValidationError()
+    {
+        // Arrange
+        var handler = new GetDomainGovernanceSummary.Handler(_domainRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetDomainGovernanceSummary.Query("invalid"), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("INVALID_DOMAIN_ID");
+    }
+
+    [Fact]
+    public async Task GetDomainGovernanceSummary_NotFound_ShouldReturnNotFoundError()
+    {
+        // Arrange
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>())
+            .Returns((GovernanceDomain?)null);
+        var handler = new GetDomainGovernanceSummary.Handler(_domainRepository, _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetDomainGovernanceSummary.Query(Guid.NewGuid().ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("DOMAIN_NOT_FOUND");
+    }
+
+    // ── GetCrossDomainDependencies ──
+
+    [Fact]
+    public async Task GetCrossDomainDependencies_WithLinkedTeamsAndDependencies_ShouldReturnRealDataAndNotSimulated()
+    {
+        // Arrange
+        var sourceDomain = GovernanceDomain.Create("commerce", "Commerce Domain");
+        var targetDomain = GovernanceDomain.Create("identity", "Identity Domain");
+        var sourceTeam = Team.Create("team-commerce", "Team Commerce");
+        var targetTeam = Team.Create("team-identity", "Team Identity");
+
+        _domainRepository.GetByIdAsync(Arg.Is<GovernanceDomainId>(id => id.Value == sourceDomain.Id.Value), Arg.Any<CancellationToken>())
+            .Returns(sourceDomain);
+        _domainRepository.GetByIdAsync(Arg.Is<GovernanceDomainId>(id => id.Value == targetDomain.Id.Value), Arg.Any<CancellationToken>())
+            .Returns(targetDomain);
+
+        var sourceLink = TeamDomainLink.Create(sourceTeam.Id, sourceDomain.Id, OwnershipType.Primary);
+        var targetLink = TeamDomainLink.Create(targetTeam.Id, targetDomain.Id, OwnershipType.Primary);
+
+        _teamDomainLinkRepository.ListByDomainIdAsync(sourceDomain.Id, Arg.Any<CancellationToken>())
+            .Returns(new List<TeamDomainLink> { sourceLink });
+        _teamDomainLinkRepository.ListByTeamIdAsync(targetTeam.Id, Arg.Any<CancellationToken>())
+            .Returns(new List<TeamDomainLink> { targetLink });
+
+        _teamRepository.GetByIdAsync(sourceTeam.Id, Arg.Any<CancellationToken>())
+            .Returns(sourceTeam);
+        _catalogGraph.ListCrossTeamDependenciesAsync(sourceTeam.Name, Arg.Any<CancellationToken>())
+            .Returns(new List<CrossTeamDependencyInfo>
+            {
+                new("dep-1", "checkout-api", "identity-api", targetTeam.Id.Value.ToString(), "Team Identity", "Synchronous")
+            });
+
+        var handler = new GetCrossDomainDependencies.Handler(
+            _domainRepository,
+            _teamDomainLinkRepository,
+            _teamRepository,
+            _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossDomainDependencies.Query(sourceDomain.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DomainName.Should().Be("Commerce Domain");
+        result.Value.Outbound.Should().HaveCount(1);
+        result.Value.Outbound[0].TargetDomainName.Should().Be("Identity Domain");
+        result.Value.Inbound.Should().BeEmpty();
+        result.Value.IsSimulated.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetCrossDomainDependencies_InvalidGuid_ShouldReturnValidationError()
+    {
+        // Arrange
+        var handler = new GetCrossDomainDependencies.Handler(
+            _domainRepository,
+            _teamDomainLinkRepository,
+            _teamRepository,
+            _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossDomainDependencies.Query("invalid"), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("INVALID_DOMAIN_ID");
+    }
+
+    [Fact]
+    public async Task GetCrossDomainDependencies_NotFound_ShouldReturnNotFoundError()
+    {
+        // Arrange
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>())
+            .Returns((GovernanceDomain?)null);
+        var handler = new GetCrossDomainDependencies.Handler(
+            _domainRepository,
+            _teamDomainLinkRepository,
+            _teamRepository,
+            _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossDomainDependencies.Query(Guid.NewGuid().ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("DOMAIN_NOT_FOUND");
+    }
+
+    [Fact]
+    public async Task GetCrossDomainDependencies_EmptyDomainTopology_ShouldReturnEmptyCollections()
+    {
+        // Arrange
+        var domain = GovernanceDomain.Create("empty", "Empty Domain");
+        _domainRepository.GetByIdAsync(Arg.Any<GovernanceDomainId>(), Arg.Any<CancellationToken>())
+            .Returns(domain);
+        _teamDomainLinkRepository.ListByDomainIdAsync(domain.Id, Arg.Any<CancellationToken>())
+            .Returns(new List<TeamDomainLink>());
+
+        var handler = new GetCrossDomainDependencies.Handler(
+            _domainRepository,
+            _teamDomainLinkRepository,
+            _teamRepository,
+            _catalogGraph);
+
+        // Act
+        var result = await handler.Handle(new GetCrossDomainDependencies.Query(domain.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Outbound.Should().BeEmpty();
+        result.Value.Inbound.Should().BeEmpty();
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     // ── UpdateDomain ──

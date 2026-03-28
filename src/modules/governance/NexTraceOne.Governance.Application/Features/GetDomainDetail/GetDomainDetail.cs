@@ -69,7 +69,8 @@ public static class GetDomainDetail
                 Teams: teams,
                 Services: services,
                 CrossDomainDependencies: crossDomainDeps,
-                CreatedAt: domain.CreatedAt);
+                CreatedAt: domain.CreatedAt,
+                IsSimulated: false);
 
             return Result<Response>.Success(response);
         }
@@ -92,7 +93,8 @@ public static class GetDomainDetail
         IReadOnlyList<DomainTeamDto> Teams,
         IReadOnlyList<DomainServiceDto> Services,
         IReadOnlyList<CrossDomainDependencyDto> CrossDomainDependencies,
-        DateTimeOffset CreatedAt)
+        DateTimeOffset CreatedAt,
+        bool IsSimulated = false)
     {
         /// <summary>Fields not yet backed by real data.</summary>
         public IReadOnlyList<string> DeferredFields { get; init; } =
