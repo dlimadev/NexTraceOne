@@ -23,4 +23,7 @@ public interface IAiSourceRepository
 
     /// <summary>Adiciona uma nova fonte para persistência.</summary>
     Task AddAsync(AiSource entity, CancellationToken ct = default);
+
+    /// <summary>Actualiza uma fonte existente (ex: após health check).</summary>
+    Task UpdateAsync(AiSource entity, CancellationToken ct = default);
 }

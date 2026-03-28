@@ -37,6 +37,7 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiAgent> Agents => Set<AiAgent>();
     public DbSet<AiAgentExecution> AgentExecutions => Set<AiAgentExecution>();
     public DbSet<AiAgentArtifact> AgentArtifacts => Set<AiAgentArtifact>();
+    public DbSet<AIKnowledgeSourceWeight> SourceWeights => Set<AIKnowledgeSourceWeight>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;

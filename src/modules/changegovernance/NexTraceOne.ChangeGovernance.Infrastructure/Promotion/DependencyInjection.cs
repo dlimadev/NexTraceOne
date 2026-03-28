@@ -7,8 +7,10 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Services;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion;
 
@@ -38,6 +40,9 @@ public static class DependencyInjection
         services.AddScoped<IPromotionRequestRepository, PromotionRequestRepository>();
         services.AddScoped<IPromotionGateRepository, PromotionGateRepository>();
         services.AddScoped<IGateEvaluationRepository, GateEvaluationRepository>();
+
+        // Cross-module public interface — outros módulos consomem IPromotionModule
+        services.AddScoped<IPromotionModule, PromotionModuleService>();
 
         return services;
     }

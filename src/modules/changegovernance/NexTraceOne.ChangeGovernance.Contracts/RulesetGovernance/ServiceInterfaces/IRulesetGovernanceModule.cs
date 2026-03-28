@@ -1,6 +1,6 @@
 namespace NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — no implementation exists, no consumers.
+// IMPLEMENTATION STATUS: Implemented — RulesetGovernanceModuleService in ChangeGovernance.Infrastructure.
 
 /// <summary>
 /// Interface pública do módulo RulesetGovernance.
