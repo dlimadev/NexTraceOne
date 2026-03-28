@@ -19,7 +19,7 @@ public sealed class QueryExternalAIAdvancedTests
         };
 
         _modelRepository.ListAsync("OpenAI", null, ModelStatus.Active, null, Arg.Any<CancellationToken>())
-            .Returns(models.Where(x => x.Provider == "OpenAI").ToList());
+            .Returns(new List<AIModel> { models[0] });
 
         var handler = new QueryExternalAIAdvanced.Handler(_modelRepository);
         var result = await handler.Handle(new QueryExternalAIAdvanced.Command(Provider: "OpenAI"), CancellationToken.None);

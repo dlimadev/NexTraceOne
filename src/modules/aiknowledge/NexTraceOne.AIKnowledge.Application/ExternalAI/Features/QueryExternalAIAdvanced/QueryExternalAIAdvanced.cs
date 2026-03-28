@@ -38,7 +38,7 @@ public static class QueryExternalAIAdvanced
         {
             Guard.Against.Null(request);
 
-            var statusFilter = request.ActiveOnly ? ModelStatus.Active : null;
+            ModelStatus? statusFilter = request.ActiveOnly ? ModelStatus.Active : null;
             var models = await modelRepository.ListAsync(
                 request.Provider,
                 modelType: null,
