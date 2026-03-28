@@ -17,8 +17,8 @@ public sealed class RuntimeIntelligenceModuleTests
     public async Task GetCurrentHealthStatusAsync_WhenLatestSnapshotExists_ShouldReturnLatestStatus()
     {
         await using var db = CreateDbContext();
-        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "production", 100m, 200m, 0.02m, 120m, 30m, 512m, 2, FixedNow.AddMinutes(-10), "test"));
-        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "production", 110m, 1500m, 0.06m, 130m, 35m, 520m, 2, FixedNow, "test"));
+        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "production", 100m, 200m, 0.02m, 120m, 30m, 512m, 2, FixedNow.AddMinutes(-10), "test-source"));
+        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "production", 110m, 1500m, 0.06m, 130m, 35m, 520m, 2, FixedNow, "test-source"));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -43,8 +43,8 @@ public sealed class RuntimeIntelligenceModuleTests
     public async Task GetCurrentHealthStatusAsync_ShouldFilterByEnvironment()
     {
         await using var db = CreateDbContext();
-        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "staging", 100m, 4000m, 0.12m, 120m, 30m, 512m, 2, FixedNow, "test"));
-        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "production", 100m, 200m, 0.01m, 140m, 30m, 512m, 2, FixedNow, "test"));
+        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "staging", 100m, 4000m, 0.12m, 120m, 30m, 512m, 2, FixedNow, "test-source"));
+        db.RuntimeSnapshots.Add(RuntimeSnapshot.Create("orders", "production", 100m, 200m, 0.01m, 140m, 30m, 512m, 2, FixedNow, "test-source"));
         await db.SaveChangesAsync();
 
         var sut = CreateSut(db);
@@ -113,7 +113,7 @@ public sealed class RuntimeIntelligenceModuleTests
     private static RuntimeIntelligenceDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<RuntimeIntelligenceDbContext>()
-            .UseInMemoryDatabase($"runtime-module-service-tests-{Guid.NewGuid():N}")
+            .UseInMemoryDatabase($"runtime-intelligence-module-tests-{Guid.NewGuid():N}")
             .Options;
 
         return new RuntimeIntelligenceDbContext(
