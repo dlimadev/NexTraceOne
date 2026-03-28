@@ -1,194 +1,199 @@
 # Relatório de Testes, Qualidade e Pipelines — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Inventário de Testes
+## Objetivo da Área no Contexto do Produto
 
-| Tipo | Quantidade | Estado |
+Testes são evidência de conclusão. Um produto enterprise deve ter cobertura dos fluxos críticos, pipelines que bloqueiam regressões, e qualidade verificável sem depender de avaliação subjetiva.
+
+---
+
+## Inventário de Testes
+
+### Backend — Testes .NET
+
+| Área | Ficheiros `.cs` | Projeto |
 |---|---|---|
-| Testes unitários backend (.NET) | ~1.447 | Passando |
-| Testes de integração backend | Presentes (Testcontainers PostgreSQL) | Verificar cobertura |
-| Testes unitários frontend (Vitest) | ~264 | Passando |
-| Testes E2E frontend (Playwright) | 8 specs | Cobertura parcial |
-| Testes E2E real-environment | 5 arquivos (e2e-real/) | Configuração separada |
-| Testes de carga (k6) | 5 cenários | Thresholds não documentados |
-| Testes CLI | Projeto separado (`NexTraceOne.CLI.Tests`) | Presente |
+| Catalog tests | 30+ | `tests/modules/catalog/NexTraceOne.Catalog.Tests/` |
+| ChangeGovernance tests | — | `tests/modules/changegovernance/` |
+| IdentityAccess tests | — | `tests/modules/identityaccess/` |
+| AuditCompliance tests | — | `tests/modules/auditcompliance/` |
+| AIKnowledge tests | — | `tests/modules/aiknowledge/` |
+| Governance tests | — | `tests/modules/governance/` |
+| Configuration tests | — | `tests/modules/configuration/` |
+| Notifications tests | — | `tests/modules/notifications/` |
+| Integrations tests | — | `tests/modules/integrations/` |
+| OperationalIntelligence tests | — | `tests/modules/operationalintelligence/` |
+| Knowledge tests | — | `tests/modules/knowledge/` |
+| ProductAnalytics tests | — | `tests/modules/productanalytics/` |
+| BuildingBlocks tests | 5 projetos | `tests/building-blocks/` |
+| Integration tests | — | `tests/platform/NexTraceOne.IntegrationTests/` |
+| E2E tests (.NET) | — | `tests/platform/NexTraceOne.E2E.Tests/` |
+| CLI tests | — | `tests/platform/NexTraceOne.CLI.Tests/` |
+| **TOTAL ficheiros .cs** | **407** | — |
+
+**Total confirmado de testes unitários backend:** ~1.447 (conforme `docs/ROADMAP.md`)
+
+### Amostra de Testes do Catalog (Confirmados por Inspeção)
+
+Os seguintes testes foram encontrados em `tests/modules/catalog/`:
+- `ContractEvidencePackTests.cs`
+- `ContractVersionLifecycleTests.cs`
+- `ContractScorecardTests.cs`
+- `ContractDraftTests.cs`
+- `SoapDraftMetadataTests.cs`
+- `ContractVersionTests.cs`
+- `EventDraftMetadataTests.cs`
+- `BackgroundServiceContractDetailTests.cs`
+- `SoapContractDetailTests.cs`
+- `ContractSignatureTests.cs`
+- `SemanticVersionTests.cs`
+- `AsyncApiSpecParserTests.cs`
+- `SwaggerDiffCalculatorTests.cs`
+- `OpenApiDiffCalculatorTests.cs`
+- `WsdlDiffCalculatorTests.cs`
+- `ContractRuleEngineTests.cs`
+
+**Avaliação:** Testes de domain e domain services bem cobertos no módulo Catalog.
 
 ---
 
-## 2. Cobertura por Módulo — Backend
+### Frontend — Testes Vitest
 
-| Módulo | Testes Unitários | Integration Tests | Cobertura Real |
-|---|---|---|---|
-| Catalog | 53+ | Ausentes (DB real) | Alta para unitários |
-| Change Governance | 195+ | Ausentes (DB real) | Alta para unitários |
-| Identity Access | 10+ | Presentes (Testcontainers) | Boa |
-| Audit Compliance | 5+ | Presentes | Boa |
-| Operational Intelligence | 266+ | Presentes | Bons; correlação mock |
-| AI Knowledge | 101+ | Parciais | Governance coberto |
-| Governance | Presentes | Ausentes | Testes passam mas feature é mock |
-| Notifications | 4+ | Ausentes | Baixa |
-| Configuration | 5+ | Presentes | Boa |
-
-**Gap crítico:** Testes de Governance passam mas o módulo retorna dados mock — os testes validam contratos de interface, não comportamento real.
-
----
-
-## 3. Testes E2E Frontend (Playwright)
-
-| Spec | O que Testa | Integração Real? |
+| Área | Ficheiros | Observação |
 |---|---|---|
-| app.spec.ts | Auth, navegação, RBAC | Sim (auth mocked) |
-| contracts.spec.ts | Lifecycle de contratos | Sim (fixtures estáveis) |
-| service-catalog.spec.ts | Listagem e detalhe de serviços | Sim (fixtures) |
-| incidents.spec.ts | Incidentes, correlação | Não — usa mock fixtures |
-| change-confidence.spec.ts | Change advisory, blast radius | Sim (fixtures) |
-| modules.spec.ts | Visibilidade de módulos | Sim |
-| refresh-token.spec.ts | Fluxo de refresh token | Sim |
-| governance-finops.spec.ts | Governance e FinOps | Sim (backend mock) |
+| `__tests__/components/` | 10+ | StatCard, Shell, Select, ProtectedRoute, AssistantPanel |
+| `__tests__/hooks/` | 1+ | `usePermissions.test.tsx` |
+| `__tests__/contexts/` | 2 | `AuthContext.test.tsx`, `EnvironmentContext.test.tsx` |
+| `__tests__/pages/` | 2+ | `PromotionPage.test.tsx`, `UnauthorizedPage.test.tsx` |
 
-**Gap:** incidents.spec.ts usa mock fixtures — não valida correlação dinâmica real.
+**Total confirmado:** ~264 testes Vitest passando (conforme `docs/ROADMAP.md`)
 
-**Evidência:** `src/frontend/e2e/*.spec.ts`
+### Frontend — E2E Playwright
+
+**Specs mock (`src/frontend/e2e/`):**
+- 8 specs confirmados
+- `incidents.spec.ts` — usa mock fixtures, não correlação dinâmica real
+
+**Specs real-environment (`src/frontend/e2e-real/`):**
+- 5 ficheiros — configuração separada (`playwright.real.config.ts`)
+- Não integrados no CI padrão
 
 ---
 
-## 4. Qualidade dos Testes
+### Load Tests (k6)
+
+**Localização:** `tests/load/`
+**Ficheiros:** `package.json`, `config/`, `helpers/`, `scenarios/`
+**Cenários:** 5 confirmados
+**Thresholds:** não documentados nos ficheiros auditados
+
+---
+
+## CI/CD Pipelines — Análise Detalhada
+
+### `.github/workflows/ci.yml` — CI Principal
+
+**Jobs:**
+1. `validate` — Quality Gate: `bash scripts/quality/check-no-demo-artifacts.sh`
+2. `build-backend` — `dotnet restore + dotnet build`
+3. `test-backend` — `dotnet test` (unit + integration)
+4. `build-frontend` — `npm ci + tsc + vite build`
+5. `test-frontend` — `vitest run`
+
+**Triggers:** push para `main`, `develop`, `release/**`; PRs para `main`, `develop`
+
+**Gap crítico:** E2E Playwright **não faz parte do CI principal**. `test-frontend` apenas corre Vitest — sem Playwright.
+
+### `.github/workflows/e2e.yml` — E2E Separado
+
+E2E pipeline existe mas não é obrigatório para merge em `main`.
+
+### `.github/workflows/security.yml` — Security Scanning
+
+Scanning de segurança automatizado — confirma foco em segurança do produto.
+
+### `.github/workflows/production.yml` e `staging.yml`
+
+- Aprovação manual para produção confirmada
+- Deploy estruturado por ambiente
+
+---
+
+## Análise de Qualidade dos Testes
 
 ### Pontos Fortes
-- Testcontainers para PostgreSQL real em integration tests
-- Fixtures estáveis para E2E (não dependem de dados variáveis)
-- `mockAuthSession()` helper para RBAC testing
-- k6 com múltiplos cenários de carga
 
-### Problemas
-- Governance module: testes passam mas feature é 100% mock — falsa confiança
-- IncidentsPage: E2E usa mock data, não valida API real
-- AiAssistantPage: sem teste real (100% mock)
-- Correlação incident↔change: sem teste de engine real (inexistente)
-- Cobertura de código: não rastreada no CI
+1. **Testes de domain bem cobertos** no módulo Catalog (30+ testes de entidades, value objects, services)
+2. **Testes de auth** — `AuthContext.test.tsx`, `usePermissions.test.tsx`, `ProtectedRoute.test.tsx`
+3. **Anti-demo guardrail** — `check-no-demo-artifacts.sh` bloqueia artifacts de demo no CI
+4. **Coverage configurado** — `@vitest/coverage-v8` presente
+5. **MSW presente** — `msw` para mocking de API em testes unitários
 
----
+### Gaps Críticos
 
-## 5. CI/CD Pipeline — Estado
-
-### ci.yml (Pull Requests e main)
-**Status: BOM**
-
-```
-validate → check-no-demo-artifacts.sh
-build-backend → .NET 10 build
-test-backend-unit → 1.447 testes (filtrado: !IntegrationTests & !E2E)
-test-backend-integration → PostgreSQL service real
-build-frontend → TypeScript strict + ESLint + Vite build
-test-frontend → 264 testes
-```
-
-**Gaps:**
-- Sem gate de cobertura de código
-- 516 warnings CS8632 não bloqueiam o build
-- Sem E2E gate por PR (apenas nightly)
-
----
-
-### staging.yml (Merge para main)
-**Status: BOM**
-
-```
-Build 4 imagens Docker
-Tag com SHA + "staging"
-Push para GitHub Container Registry
-Apply migrations (script bash)
-Smoke checks (/live, /ready, frontend HTTP 200)
-```
-
-**Gap:** Smoke checks são opcionais (skip se URLs não configuradas). Sem validação que todos os 15+ DbContexts migraram.
-
----
-
-### production.yml (Deploy manual)
-**Status: EXCELENTE**
-
-```
-Approval gate manual (GitHub Environment)
-Validação de image tag antes de deploy
-Apply migrations
-Re-tag e push de imagens staging → produção
-Smoke checks pós-deploy
-Rollback automático disponível
-```
-
-**Avaliação:** Controlo rigoroso correto para produção.
-
----
-
-### e2e.yml (Nightly)
-**Status: PARCIAL**
-
-```
-Schedule: 03:00 UTC diário
-Build backend + docker-compose up (postgres, clickhouse, otel)
-Playwright test suite
-Upload HTML report (14 dias)
-```
-
-**Gap crítico:** E2E não bloqueia PRs — falhas chegam a main sem ser detectadas.
-
----
-
-### security.yml
-**Status: BOM**
-
-```
-NuGet dependency scanning (dotnet list --vulnerable)
-npm audit (frontend)
-CodeQL (C# e JavaScript/TypeScript)
-Trivy (Docker scanning — apenas main branch)
-SARIF upload para GitHub Security tab
-```
-
-**Gap:** Trivy só em main — PRs com imagens vulneráveis não são bloqueados.
-
----
-
-## 6. Quality Gates — Resumo
-
-| Gate | Estado | Cobertura |
+| Gap | Impacto | Evidência |
 |---|---|---|
-| Anti-demo artifacts | ✅ Ativo por PR | `check-no-demo-artifacts.sh` |
-| Build success | ✅ Obrigatório | Bloqueia merge |
-| Unit tests pass | ✅ Obrigatório | 1.447 tests |
-| Integration tests pass | ✅ Obrigatório | Com DB real |
-| TypeScript strict | ✅ Obrigatório | tsconfig |
-| ESLint | ✅ Obrigatório | Não bloqueador se apenas warnings |
-| E2E tests | ❌ Apenas nightly | **Não bloqueia PRs** |
-| Code coverage | ❌ Não rastreado | Sem threshold |
-| Docker scanning (PRs) | ❌ Apenas main | Trivy limitado |
-| Compilation warnings | ❌ Não bloqueador | 516 warnings CS8632 |
+| E2E não bloqueia PRs | Regressões podem entrar em main | `ci.yml` sem Playwright |
+| `incidents.spec.ts` valida mock data | Testa aparência, não comportamento real | `e2e/incidents.spec.ts` |
+| Testes de integração não auditados | Coverage real desconhecida | `tests/platform/NexTraceOne.IntegrationTests/` |
+| Testes para Governance mock | Testam handlers que retornam dados fabricados | `tests/modules/governance/` |
+| 516 warnings CS8632 nullable | Risco de NullReferenceException em runtime | Build log |
 
 ---
 
-## 7. Scripts de Qualidade
+## Anti-Demo Guardrail
 
-| Script | Estado | Propósito |
-|---|---|---|
-| `check-no-demo-artifacts.sh` | READY (20K) | Previne artefatos demo em produção |
-| `smoke-check.sh` | READY | Validação pós-deploy |
-| `rollback.sh` | READY | Rollback de deployment |
-| `smoke-performance.sh` | Verificar | Baseline de performance |
-| `verify-pipeline.sh` | Verificar | Health de telemetria |
+**Script:** `scripts/quality/check-no-demo-artifacts.sh`
+
+Este script verifica que artifacts de demonstração (mocks explícitos, IsSimulated, etc.) não entram em produção. É executado como **primeiro job** do CI — qualquer violação bloqueia o pipeline.
+
+**Avaliação:** Positivo — mas pode estar a permitir os mocks actuais porque eles não violam os critérios de check. O script deve ser revisto para detectar `IsSimulated: true` em handlers não-governance.
 
 ---
 
-## 8. Recomendações
+## Scripts de Qualidade e Operação
 
-| Ação | Prioridade | Impacto |
+| Script | Propósito | Estado |
 |---|---|---|
-| E2E tests como gate obrigatório no merge para main | Alta | Fluxos quebrados não chegam a produção |
-| Adicionar Testcontainers para Catalog integration tests | Alta | 53 unit tests sem DB real |
-| Adicionar coverage report com threshold mínimo (70%) | Média | Rastrear cobertura real |
-| Corrigir/resolver 516 warnings CS8632 nullable | Média | Qualidade de código |
-| E2E de incidents com API real (após engine de correlação) | Alta | Valida fluxo 3 |
-| Trivy scanning em PRs (não só main) | Média | Segurança pré-merge |
-| Documentar SLOs de performance por endpoint | Média | k6 com thresholds definidos |
+| `scripts/quality/check-no-demo-artifacts.sh` | Anti-demo | ✅ Ativo |
+| `scripts/db/apply-migrations.sh` | Migrações | ✅ Existe |
+| `scripts/db/backup.sh` | Backup | ✅ Existe |
+| `scripts/db/restore.sh` | Restore | ✅ Existe |
+| `scripts/deploy/smoke-check.sh` | Health após deploy | ✅ Existe |
+| `scripts/deploy/rollback.sh` | Rollback | ✅ Existe |
+| `scripts/observability/verify-pipeline.sh` | Verificação telemetria | ✅ Existe |
+| `scripts/performance/smoke-performance.sh` | Performance | ✅ Existe |
+
+---
+
+## Definição de "Pronto" por Módulo (Evidência de Testes)
+
+| Módulo | Testes Unitários | E2E Cobertura | Status |
+|---|---|---|---|
+| Catalog | ✅ 30+ domain tests | ⚠️ Parcial | READY |
+| ChangeGovernance | ✅ Existe | ⚠️ Parcial | READY |
+| IdentityAccess | ✅ Existe | ✅ Auth flow testado | READY |
+| AuditCompliance | ✅ Existe | ⚠️ | READY |
+| Configuration | ✅ Existe | ⚠️ | READY |
+| Notifications | ✅ Existe | ⚠️ | READY |
+| OperationalIntelligence | ✅ Existe | ❌ incidents.spec usa mock | PARTIAL |
+| AIKnowledge | ✅ Existe | ❌ sem E2E real | PARTIAL |
+| Governance | ✅ Existe (testa mock) | ❌ | MOCK |
+
+---
+
+## Recomendações
+
+1. **Crítico:** Adicionar Playwright E2E como gate obrigatório de merge para `main` no `ci.yml`
+2. **Alta:** Reescrever `incidents.spec.ts` para testar correlação dinâmica real (após implementação)
+3. **Alta:** Criar E2E real para AI Assistant após conectar LLM real
+4. **Alta:** Revisar `check-no-demo-artifacts.sh` para detectar `IsSimulated: true` em handlers não-governance
+5. **Média:** Auditar cobertura de `IntegrationTests` projeto — definir mínimo aceitável
+6. **Média:** Documentar thresholds de load tests (`tests/load/`)
+7. **Baixa:** Resolver 516 warnings CS8632 nullable
+
+---
+
+*Data: 28 de Março de 2026*

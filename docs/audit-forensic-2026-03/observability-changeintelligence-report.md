@@ -1,189 +1,170 @@
 # Relatório de Observabilidade e Change Intelligence — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Objetivo no Contexto do Produto
+## Objetivo da Área no Contexto do Produto
 
-Observabilidade no NexTraceOne não é um fim em si — é o meio que alimenta contexto, correlação e decisão operacional. O objetivo declarado é: correlacionar telemetria com serviços, contratos, mudanças, incidentes e responsáveis, criando confiança nas mudanças de produção e reduzindo tempo de diagnóstico.
-
----
-
-## 2. Arquitetura de Observabilidade — Estado
-
-### OpenTelemetry
-**Status: CONFIGURADO, NÃO VALIDADO END-TO-END**
-
-- `NexTraceOne.BuildingBlocks.Observability` — 39 arquivos .cs
-- Configuração OTLP: `http://localhost:4317` (requer endpoint real em produção)
-- `build/otel-collector/otel-collector.yaml` — configuração do coletor
-- `build/otel-collector/docker-compose.telemetry.yaml` — stack de telemetria
-- Collector inclui ClickHouse como destino de analytics
-
-**Gap:** Endpoint localhost em produção → requer configuração por ambiente. Não há evidência de validação do pipeline completo Aplicação → OTEL Collector → ClickHouse em ambiente real.
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Observability/`, `build/otel-collector/`
+Observabilidade no NexTraceOne é meio, não fim. Telemetria deve estar contextualizada por serviço, contrato, mudança, ambiente e incidente. Change Intelligence é o pilar diferenciador — conectar mudanças a contexto operacional completo.
 
 ---
 
-### Ingestion API
-**Status: PARTIAL — METADATA ONLY**
+## Observabilidade — Estado Atual
 
-- `NexTraceOne.Ingestion.Api` — 5 endpoints de ingestão definidos
-- Status real: `processingStatus: "metadata_recorded"` — payload **não processado**
-- Dados chegam mas não são tratados, correlacionados ou persistidos com semântica
+### Stack de Observabilidade Configurada
 
-**Impacto:** A ingestão de dados externos (deploys, eventos de pipeline, traces de aplicação) não funciona além de registar que chegou.
-
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Ingestion
-
----
-
-### Serilog
-**Status: READY**
-
-- Logging estruturado configurado
-- Debug em desenvolvimento, Information em produção
-- Correlação de requests via CorrelationId header e context
-
----
-
-### ClickHouse para Analíticos
-**Status: SCHEMA DEFINIDO, INTEGRAÇÃO INCOMPLETA**
-
-- Schema SQL em `build/clickhouse/analytics-schema.sql` e `init-schema.sql`
-- Docker Compose inclui ClickHouse
-- Pipeline Aplicação → OTEL Collector → ClickHouse: estrutura existe, não validada
-- Sem evidence de queries ClickHouse sendo usadas em handlers de produção
-
-**Recomendação estratégica:** ClickHouse é a direção certa para dados analíticos de observabilidade, FinOps e change history. Deve ser ativado gradualmente após o pipeline de ingestão estar funcional.
-
-**Evidência:** `build/clickhouse/`, `docs/architecture/clickhouse-baseline-strategy.md`, `docs/architecture/e16-clickhouse-structure-implementation-report.md`
-
----
-
-## 3. Change Intelligence — Estado Detalhado
-
-### Estado: ALTA maturidade — MÓDULO MAIS COMPLETO ✅
-
-O Change Governance é o módulo mais maduro do produto. Cobre adequadamente a visão de "mudança como entidade de negócio".
-
-| Capacidade | Estado | Evidência |
+| Componente | Estado | Ficheiro |
 |---|---|---|
-| Release tracking | REAL | ChangeIntelligenceDbContext — releases, eventos, state machine |
-| Blast Radius | REAL | BlastRadiusReport feature — análise de impacto em consumidores |
-| Change Score | REAL | ChangeScore com advisory |
-| Freeze Windows | REAL | FreezeWindow entity + FreezeEndpoints |
-| Rollback Assessment | REAL | RollbackAssessment feature |
-| Evidence Pack | REAL | EvidencePack com WorkflowDbContext |
-| Approval Workflow | REAL | ApprovalDecision, stages, SLA policies |
-| Promotion Governance | REAL | PromotionDbContext — gates, evaluations, environments |
-| Ruleset Governance (Spectral) | REAL | RulesetGovernanceDbContext — lint + scoring |
-| TraceCorrelation | REAL | TraceCorrelationEndpoints existem |
+| OpenTelemetry SDK (.NET) | ✅ Configurado | `BuildingBlocks.Observability` |
+| OTLP Exporter | ✅ Configurado | `appsettings.json` → `localhost:4317` |
+| OTel Collector | ✅ Config existe | `build/otel-collector/otel-collector.yaml` |
+| ClickHouse (analytics) | ✅ Config existe | `build/clickhouse/` |
+| Serilog | ✅ Configurado | `SerilogConfiguration` em BuildingBlocks |
+| Prometheus / Grafana | ⚠️ Não confirmado | Não encontrado em configuração ativa |
+| Loki / Tempo | ⚠️ Não confirmado | Direção arquitetural aponta para ClickHouse |
+| Docker Compose Telemetry | ✅ Existe | `build/otel-collector/docker-compose.telemetry.yaml` |
 
-**O que falta para fechar Change Intelligence:**
-1. `IChangeIntelligenceModule` cross-module interface está como PLAN — outros módulos não conseguem consultar mudanças
-2. Correlação dinâmica com incidentes (incident↔change) está como seed data estático
-3. Integração com pipeline de deploy CI/CD (GitLab/Jenkins/GitHub Actions) é stub
+### Telemetria Instrumentada
 
----
-
-## 4. Incident Correlation — Estado Crítico
-
-### Estado: 0% FUNCIONAL para correlação dinâmica
-
-| Capacidade | Estado | Evidência |
+| Fonte | Estado | Evidência |
 |---|---|---|
-| IncidentDbContext com 5 DbSets | REAL | `IncidentDbContext.cs` — IncidentRecord, IncidentNote, RunbookRecord, MitigationRecord |
-| EfIncidentStore (678 linhas) | REAL | Persistência real de incidents |
-| Seed data SQL | REAL | `IncidentSeedData.cs` — dados iniciais |
-| Correlação incidente↔change | MOCK | Baseada em seed data JSON estático, não dinâmica |
-| Mitigação guiada | MOCK | CreateMitigationWorkflow não persiste dados |
-| GetMitigationHistory | MOCK | Retorna dados fixos hardcoded |
-| 3 runbooks | MOCK | Hardcoded no código, não via RunbookRecord |
-| Post-change verification | MOCK | RecordMitigationValidation descarta dados |
-| Frontend | MOCK | IncidentsPage usa `mockIncidents` inline |
+| Traces HTTP (ASP.NET) | ✅ | `NexTraceActivitySources` configurado |
+| Métricas customizadas | ✅ | `NexTraceMeters` configurado |
+| Logs estruturados | ✅ | Serilog com enrichment |
+| ClickHouse analytics writer | ✅ | Implementação real + Null fallback |
+| Health checks | ✅ | `NexTraceHealthChecks` framework |
+| Traces de domínio (change events) | ⚠️ | Sem validação E2E de pipeline completo |
 
-**Gap crítico**: Existe infraestrutura de persistência real para incidents. Falta a engine de correlação dinâmica que liga incidentes a mudanças via timestamps e serviços.
+### O que NÃO foi validado E2E
 
-**Evidência:** `docs/REBASELINE.md` §Fluxo 3, `docs/CORE-FLOW-GAPS.md` §Fluxo 3
+- Ingestão de traces/metrics de ponta a ponta (API → Collector → ClickHouse)
+- Correlação de traces com mudanças e incidentes
+- Retenção e consulta de telemetria histórica
+- Alertas baseados em telemetria
 
----
-
-## 5. Runtime Intelligence — Estado
-
-**Status: PARTIAL — DbContext real, interface PLAN**
-
-- `RuntimeIntelligenceDbContext` existe com ModelSnapshot
-- Repositórios EF Core presentes
-- `IRuntimeIntelligenceModule` = PLAN (interface vazia, sem consumidor)
-- Drift detection, observability scoring, baseline comparison — handlers existem mas integração real não validada
-- Módulo registado em DI (`AddRuntimeIntelligenceModule` em Program.cs)
-
-**Evidência:** `src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Infrastructure/Runtime/`
+**Evidência de gap:** `appsettings.json` aponta `OtlpEndpoint: "http://localhost:4317"` — sem override confirmado por ambiente de produção.
 
 ---
 
-## 6. Cost Intelligence — Estado
+## Ingestão de Telemetria Externa
 
-**Status: PARTIAL — DbContext real, interface PLAN**
+### NexTraceOne.Ingestion.Api
 
-- `CostIntelligenceDbContext` existe com ModelSnapshot
-- CostSnapshot, reports, trends — handlers existem
-- `ICostIntelligenceModule` = PLAN (interface vazia, sem consumidor)
-- Módulo registado em DI (`AddCostIntelligenceModule` em Program.cs)
-- Frontend FinOps conectado ao backend Governance que retorna `IsSimulated: true` — os dados reais do CostIntelligenceDbContext não chegam ao frontend
+Serviço dedicado à ingestão de dados externos. Tem `appsettings.json` próprio.
 
-**Gap**: FinOps frontend consome Governance module que é mock. Deveria consumir CostIntelligenceModule diretamente via ICostIntelligenceModule.
+**Fontes suportadas (documentadas):**
+- Traces OpenTelemetry
+- Logs estruturados
+- Eventos de deploy/change (CI/CD)
+- Eventos Kafka
+- Logs IIS
+- Logs de aplicações .NET
 
-**Evidência:** `src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Infrastructure/Cost/`
-
----
-
-## 7. Reliability — Estado
-
-**Status: MOCK**
-
-- 7 features de reliability (service reliability, team reliability, domain reliability)
-- 8 serviços hardcoded no código
-- `IsSimulated: true` em todos os handlers
-- `ReliabilityDbContext` existe mas handlers não consultam dados reais
-
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Operations "Service reliability list: SIM"
+**Estado real:** A estrutura existe mas a validação de ingestão E2E não foi confirmada. `Integrations` module com conectores stub bloqueia ingestão via CI/CD externo (GitLab, Jenkins, etc.).
 
 ---
 
-## 8. Post-Change Verification
+## Change Intelligence — Estado Detalhado
 
-**Status: PARTIAL**
+Este é o pilar **mais maduro e funcional** do produto.
 
-- Gate evaluations pós-promoção existem no PromotionDbContext
-- Comparação entre ambientes não produtivos e produção: estrutura existe via gates
-- `RecordMitigationValidation` não persiste — impede post-incident verification
+### Capacidades Confirmadas como REAIS
 
-**Evidência:** `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Infrastructure/Promotion/`
-
----
-
-## 9. Release Calendar
-
-**Status: PARTIAL**
-
-- FreezeWindow entity com FreezeEndpoints — real
-- Release tracking com ChangeIntelligenceDbContext — real
-- Calendar UI no frontend: não auditada em detalhe
-- Deploy windows — FreezeWindow cobre este caso
-
----
-
-## 10. Recomendações
-
-| Ação | Prioridade | Impacto |
+| Capacidade | Handler/Feature | Persistência |
 |---|---|---|
-| Implementar engine de correlação dinâmica incident↔change | Crítica | Ativa Fluxo 3 |
-| Configurar endpoint OTEL real por ambiente (não localhost) | Alta | Telemetria em produção |
-| Ativar processamento real na Ingestion API (não só metadata) | Alta | Pipeline de ingestão funcional |
-| Implementar ICostIntelligenceModule e conectar ao frontend FinOps | Alta | FinOps com dados reais |
-| Ativar pipeline ClickHouse para dados analíticos | Média | Analytics históricos |
-| Completar Reliability com dados reais do ReliabilityDbContext | Média | Confiabilidade operacional real |
-| Validar pipeline OpenTelemetry end-to-end em ambiente real | Alta | Observabilidade confiável |
+| Releases com identidade própria | `CreateRelease`, `GetRelease` | `ChangeIntelligenceDbContext` |
+| Blast Radius computation | `ComputeBlastRadius` | `ChangeIntelligenceDbContext` |
+| Change scores / risk scoring | `GetChangeScores` | `ChangeIntelligenceDbContext` |
+| Freeze windows | `CreateFreezeWindow`, `IsFrozen` | `ChangeIntelligenceDbContext` |
+| Rollback assessments | `GetRollbackAssessment` | `ChangeIntelligenceDbContext` |
+| Approval workflows | `RequestApproval`, `ApproveChange`, `RejectChange` | `WorkflowDbContext` |
+| Evidence packs | `GenerateEvidencePack`, `AttachEvidence` | `WorkflowDbContext` |
+| SLA policies de workflow | `GetWorkflowSlaPolicy` | `WorkflowDbContext` |
+| Promotion requests | `CreatePromotionRequest`, `EvaluateGate` | `PromotionDbContext` |
+| Gate evaluations | `GetGateEvaluation` | `PromotionDbContext` |
+| Spectral lint (Contract Policies) | `LintContract`, `GetLintResults` | `RulesetGovernanceDbContext` |
+| Decision trail | `GetDecisionTrail` | Auditado em `AuditDbContext` |
+| Change timeline | `GetChangeTimeline` | `ChangeIntelligenceDbContext` |
+
+### Correlação Pós-Change
+
+| Capacidade | Estado | Gap |
+|---|---|---|
+| Post-change gate evaluations | ✅ REAL | — |
+| `RecordMitigationValidation` | ⚠️ PARCIAL | Validação incompleta |
+| Correlação automática incident↔change | ❌ AUSENTE | Engine dinâmica não existe |
+
+### Change Intelligence vs. Environments
+
+A análise de comportamento em ambientes não produtivos (requisito crítico do CLAUDE.md §9.3):
+- Promotion governance distingue ambientes explicitamente ✅
+- Gate evaluations por ambiente ✅
+- Comparação não-produção vs. produção: ⚠️ estrutura existe, relatório comparativo não confirmado
+
+---
+
+## Correlação Incident↔Change — Gap Crítico
+
+**Requirement (CLAUDE.md §9.4):** Correlação com incidentes é capacidade obrigatória.
+
+**Estado actual:**
+- `CorrelationEvent` existe como DbSet no `IncidentDbContext`
+- Seed data JSON inclui correlações estáticas
+- Nenhuma engine dinâmica que correlacione automaticamente por timestamp + serviço + environment
+- Frontend `IncidentsPage.tsx` não consome correlações do backend
+
+**O que precisa existir:**
+1. Engine que, ao criar incidente, busca mudanças recentes no mesmo serviço/ambiente
+2. Score de correlação por proximidade temporal e serviço afetado
+3. API `POST /incidents/{id}/correlation` para registar correlações detectadas
+4. Frontend consumindo correlações reais
+
+---
+
+## Análise Comparativa Não-Produção vs. Produção
+
+**Requirement:** Análise de comportamento em ambientes não produtivos é mandatória para prevenir falhas em produção.
+
+**Estado:**
+- Promotion governance com gate evaluations por ambiente: ✅ real
+- Comparação de scores entre staging e production: ⚠️ estrutura existe
+- Relatório comparativo de telemetria entre ambientes: ❌ não confirmado
+- Pre-production telemetry analysis como input para Change Confidence: ❌ não confirmado
+
+---
+
+## Avaliação da Direção Arquitetural
+
+### ClickHouse como Destino
+
+`build/clickhouse/` confirma que ClickHouse está no plano. `BuildingBlocks.Observability` tem `ClickHouseAnalyticsWriter`. Direção alinhada ao CLAUDE.md §10.3.
+
+### Avoidance de Stacks Externas como Centro
+
+O produto não acoplou a Loki/Tempo/Prometheus como centro. OpenTelemetry como abstração de exportação é a escolha correta para self-hosted flexibility.
+
+---
+
+## Gaps Identificados
+
+| Gap | Impacto | Prioridade |
+|---|---|---|
+| Pipeline telemetria E2E não validado | Observabilidade pode não estar a funcionar em produção | Alta |
+| Engine correlação incident↔change ausente | Fluxo 3 inoperante | **Crítica** |
+| Correlação não-produção vs. produção não confirmada | Change confidence incompleto | Alta |
+| OtlpEndpoint hardcoded para localhost | Produção sem telemetria sem override | Alta |
+| Conectores CI/CD stubs | Sem ingestão de eventos de deploy real | Alta |
+
+---
+
+## Recomendações
+
+1. **Crítico:** Implementar engine de correlação dinâmica incident↔change
+2. **Alta:** Validar pipeline E2E de telemetria (API → Collector → ClickHouse) em ambiente de staging
+3. **Alta:** Override obrigatório de `OtlpEndpoint` documentado para self-hosted
+4. **Alta:** Implementar conectores de ingestão CI/CD (GitLab, Jenkins) no módulo Integrations
+5. **Média:** Implementar relatório comparativo de telemetria entre ambientes para Change Confidence
+
+---
+
+*Data: 28 de Março de 2026*

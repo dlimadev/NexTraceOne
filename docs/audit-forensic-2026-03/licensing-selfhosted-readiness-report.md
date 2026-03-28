@@ -1,111 +1,122 @@
 # Relatório de Licensing e Self-Hosted Readiness — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Licensing — Estado
+## Objetivo da Área no Contexto do Produto
 
-### Commercial Governance (Removido no PR-17)
-**Status: REMOVIDO**
-
-O módulo de Commercial Governance que incluía licensing foi removido no PR-17 por não estar alinhado ao núcleo do produto. Não há seção de licensing no appsettings.json atual e não há DbContext de licensing ativo.
-
-**Impacto:** Se licensing/entitlements for requisito para self-hosted enterprise:
-- Não há mecanismo de activation
-- Não há heartbeat/revocation
-- Não há fingerprinting de instalação
-- Não há enforcement de entitlements
-
-**Evidência:** `docs/REBASELINE.md` — "~~Commercial Governance~~ — REMOVIDO (PR-17)"
-
-### Assembly Integrity
-**Status: READY**
-
-- `AssemblyIntegrityChecker.VerifyOrThrow()` no startup
-- Controlado por `NEXTRACE_SKIP_INTEGRITY` env var
-- Anti-tampering básico implementado
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Integrity/AssemblyIntegrityChecker.cs`
-
-### Avaliação de Risco de Licensing
-
-Se o produto for distribuído como self-hosted enterprise com cobrança por utilização:
-- **Risco Alto**: Não há mecanismo de controlo de entitlements
-- **Ação necessária**: Reimplementar licensing com abordagem diferente da removida
-- **Não bloqueia**: Se o modelo de negócio for SaaS ou licença única sem enforcement
+Licensing e proteção de código são requisitos estratégicos do NexTraceOne enterprise. Self-hosted readiness determina se o produto pode ser instalado e operado pelo cliente sem dependência de cloud proprietária.
 
 ---
 
-## 2. Self-Hosted Readiness — Avaliação
+## Licensing — Estado Atual
 
-### Critérios Verificados
+### Módulo de Licensing
 
-| Critério | Estado | Evidência |
+**Estado: AUSENTE**
+
+O módulo de licensing foi removido no PR-17. Não existe nenhum DbContext de licensing ativo, nenhum enforcement de licença em runtime, nenhum mecanismo de ativação ou heartbeat.
+
+**Evidência:**
+- `docs/ROADMAP.md`: "Módulo Commercial Governance — REMOVIDO (Removed in PR-17, module no longer exists) | PR-17 — módulo não alinhado ao núcleo do produto; sem DbContext de licensing ativo"
+- Nenhum módulo `licensing` em `src/modules/`
+- Nenhum `LicensingDbContext` nos 24 DbContexts inventariados
+
+### O que Existe (Base para Futuro)
+
+| Componente | Localização | Estado |
 |---|---|---|
-| Sem segredos hardcoded | ✅ Sim | .env.example com placeholders obrigatórios |
-| Configuração via env vars | ✅ Sim | JWT_SECRET, NEXTRACE_ENCRYPTION_KEY, POSTGRES_PASSWORD |
-| Docker Compose funcional | ✅ Sim | docker-compose.yml com todos os serviços |
-| IIS support declarado | Verificar | Documentado; não verificado em detalhe no código |
-| Windows + Linux | ✅ .NET 10 multiplataforma | global.json, Directory.Build.props |
-| Scripts de migração manual | ✅ Sim | `scripts/db/apply-migrations.sh` + `.ps1` |
-| NEXTRACE_AUTO_MIGRATE=false por padrão | ✅ Sim | .env.example |
-| Backup/restore scripts | ✅ Sim | `scripts/db/backup.sh`, `restore.sh`, `verify-restore.sh` |
-| Sem Redis obrigatório | ✅ Sim | Não detectado no stack |
-| Sem Temporal obrigatório | ✅ Sim | Quartz.NET no lugar |
-| Sem OpenSearch obrigatório | ✅ Sim | PostgreSQL FTS implícito |
-| Dependências open-source | ✅ Sim | PostgreSQL, Ollama, OpenTelemetry |
-| SMTP support | Verificar | NotificationsDbContext existe; canal SMTP não auditado em detalhe |
+| `AssemblyIntegrityChecker` | `BuildingBlocks.Security` | ✅ Presente |
+| `NexTraceOne.IntegrityCheck: true` config | `appsettings.json` | ✅ Ativo |
+| AES-256-GCM encryption | `BuildingBlocks.Security` | ✅ Presente |
+| Multi-tenancy com RLS | `BuildingBlocks.Infrastructure` | ✅ Presente |
+| Entitlements concept (documentado) | `docs/` | ⚠️ Documentado, não implementado |
+
+### Capacidades de Licensing Ausentes (CLAUDE.md §17.2)
+
+| Capacidade | Estado |
+|---|---|
+| Self-hosted license validation | ❌ AUSENTE |
+| Online license validation | ❌ AUSENTE |
+| Offline license validation | ❌ AUSENTE |
+| Entitlements por capacidade | ❌ AUSENTE |
+| Trial/freemium enforcement | ❌ AUSENTE |
+| Backend enforcement | ❌ AUSENTE |
+| Activation workflow | ❌ AUSENTE |
+| Heartbeat | ❌ AUSENTE |
+| Remote revocation | ❌ AUSENTE |
+| Machine fingerprinting | ❌ AUSENTE |
+| Assembly integrity verification | ✅ Parcialmente (hash sem assinatura) |
+| Anti-tampering | ⚠️ Base presente (`AssemblyIntegrityChecker`) |
+| Anti-debugging | ❌ AUSENTE |
 
 ---
 
-## 3. Docker Compose — Estado
+## Self-Hosted Readiness — Estado Atual
 
-**Status: CONFIGURADO**
+### Infraestrutura de Deployment
 
-Serviços no docker-compose.yml:
-- PostgreSQL 16
-- Redis (verificar necessidade — pode ser desnecessário)
-- ClickHouse
-- OTEL Collector
-- NexTraceOne.ApiHost
-- NexTraceOne.Ingestion.Api
-- NexTraceOne.BackgroundWorkers
-- Frontend
-
-**4 Dockerfiles:**
-- `Dockerfile.apihost`
-- `Dockerfile.frontend`
-- `Dockerfile.ingestion`
-- `Dockerfile.workers`
-
-**Gap:** Redis no docker-compose — verificar se é realmente necessário ou se pode ser eliminado conforme direção arquitetural.
-
----
-
-## 4. Infra Scripts — Estado
-
-| Script | Estado | Propósito |
+| Componente | Estado | Evidência |
 |---|---|---|
-| `scripts/db/apply-migrations.sh` | READY | Aplicar migrações por DbContext |
-| `scripts/db/apply-migrations.ps1` | READY | Windows — aplicar migrações |
-| `scripts/db/backup.sh` | READY | Backup automático |
-| `scripts/db/restore.sh` | READY | Restore de backup |
-| `scripts/db/restore-all.sh` | READY | Full restore |
-| `scripts/db/verify-restore.sh` | READY | Validação de integridade do restore |
-| `scripts/deploy/rollback.sh` | READY | Rollback de deployment |
-| `scripts/deploy/smoke-check.sh` | READY | Validação pós-deploy |
-| `scripts/quality/check-no-demo-artifacts.sh` | READY | Anti-demo guardrail |
-| `scripts/observability/verify-pipeline.sh` | Verificar | Health check do pipeline de telemetria |
-| `scripts/performance/smoke-performance.sh` | Verificar | Baseline de performance |
+| Docker Compose (POC/avaliação) | ✅ Presente | `docker-compose.yml`, `docker-compose.override.yml` |
+| Dockerfiles | ✅ 4 Dockerfiles | ApiHost, Frontend, Ingestion, Workers |
+| IIS suporte (Windows) | ✅ Documentado | `DEPLOYMENT-ARCHITECTURE.md` |
+| PostgreSQL 16 (base central) | ✅ Presente | 22 connection strings configuradas |
+| SMTP | ✅ Config presente | `appsettings.json` |
+| Scripts de DB | ✅ Presentes | `scripts/db/` — apply-migrations, backup, restore |
+| Scripts de deploy | ✅ Presentes | `scripts/deploy/` — smoke-check, rollback |
+| Nginx config (frontend) | ✅ Presente | `infra/nginx/nginx.frontend.conf` |
+| Kubernetes | ❌ Não presente (evolução futura) | Conforme CLAUDE.md |
+
+### Configuração Self-Hosted
+
+| Item | Estado |
+|---|---|
+| Sem segredos hardcoded | ✅ `REPLACE_VIA_ENV` em todas as passwords |
+| Database initialization script | ✅ `infra/postgres/init-databases.sql` |
+| Environment variable documentation | ⚠️ Parcial — `ENVIRONMENT-VARIABLES.md` existe mas completude não verificada |
+| Override por ambiente (prod vs. dev) | ✅ `appsettings.json` + `appsettings.Development.json` |
+| Health checks para load balancer | ✅ `NexTraceHealthChecks` no BuildingBlocks |
+| Smoke checks pós-deploy | ✅ `scripts/deploy/smoke-check.sh` |
+
+### Gaps de Self-Hosted Readiness
+
+| Gap | Impacto | Prioridade |
+|---|---|---|
+| Sem variáveis de ambiente documentadas completamente | Operador não sabe o que configurar | Alta |
+| OpenTelemetry hardcoded para localhost | Telemetria não funciona sem override | Alta |
+| Sem runbook de instalação completo (IIS + Windows) | Dificulta self-hosted em Windows | Média |
+| Sem script de setup pós-instalação | Operador precisa de orientação | Média |
+| Licensing ausente | Produto pode ser instalado sem licença | Estratégica |
 
 ---
 
-## 5. Recomendações
+## Avaliação de Risco — Licensing Ausente
 
-| Ação | Prioridade | Justificativa |
-|---|---|---|
-| Definir estratégia de licensing para self-hosted | Alta | Módulo removido, sem substituto |
-| Verificar necessidade de Redis no docker-compose | Média | Potencial dependência desnecessária |
-| Documentar suporte IIS com exemplos de configuração | Média | Self-hosted Windows enterprise |
-| Verificar suporte SMTP no módulo Notifications | Média | Canal obrigatório para notificações on-prem |
-| Criar guia de configuração mínima para self-hosted | Alta | Facilita adoção enterprise |
+| Risco | Severidade |
+|---|---|
+| Produto pode ser instalado e usado sem validação comercial | Alta (comercial) |
+| Sem capability de entitlements — sem controlo de feature tiers | Alta |
+| Sem heartbeat — produto pode rodar após expiração sem saber | Alta |
+| Sem revogação remota | Alta |
+| `AssemblyIntegrityChecker` presente mas sem assinatura criptográfica de código | Média (técnica) |
+
+---
+
+## Recomendações
+
+### Licensing (Estratégico)
+1. Definir estratégia de licensing pós-PR-17: novo módulo? biblioteca externa? SaaS licensing service?
+2. Implementar enforcement mínimo: activation + heartbeat + entitlements
+3. Construir sobre `AssemblyIntegrityChecker` existente para adicionar assinatura de código
+
+### Self-Hosted (Operacional)
+1. **Alta:** Criar documento completo de variáveis de ambiente obrigatórias
+2. **Alta:** Garantir override de `OtlpEndpoint` documentado e com exemplo
+3. **Média:** Criar runbook de instalação IIS + Windows
+4. **Média:** Criar script de setup pós-instalação (apply-migrations + seed + smoke-check)
+5. **Baixa:** Documentar Kubernetes como evolução futura com guia de migração do Docker Compose
+
+---
+
+*Data: 28 de Março de 2026*

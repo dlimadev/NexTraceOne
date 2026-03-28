@@ -1,231 +1,187 @@
 # Relatório de Segurança, Identidade e Acesso — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Postura Geral de Segurança
+## Objetivo da Área no Contexto do Produto
 
-**Classificação: FORTE**
-
-O NexTraceOne demonstra arquitetura de segurança enterprise com defesa em profundidade. Nenhuma vulnerabilidade crítica encontrada no código auditado.
+Segurança é requisito não negociável para um produto enterprise self-hosted. O NexTraceOne deve garantir: autenticação robusta, autorização multi-dimensional, isolamento de tenant, auditabilidade de ações sensíveis e proteção de dados.
 
 ---
 
-## 2. Autenticação
+## Estado Atual Encontrado
 
-### JWT Bearer
-**Status: READY**
+### Resumo Executivo de Segurança
 
-- Chave obrigatória validada no startup: falha com `InvalidOperationException` se `Jwt:Secret` ausente
-- Parâmetros: `ValidateIssuer=true`, `ValidateAudience=true`, `ValidateIssuerSigningKey=true`, `ValidateLifetime=true`
-- `ClockSkew`: 1 minuto (tolerância razoável)
-- Algoritmo: HmacSha256
-- Expiração: 60 minutos (access token), 7 dias (refresh token)
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/DependencyInjection.cs`
-
-### API Key Authentication
-**Status: READY (MVP1 — precisa migrar para banco)**
-
-- Dual-scheme: JWT para utilizadores, API Key para sistemas
-- Roteamento por header `X-Api-Key`
-- API Keys com: `ClientId`, `ClientName`, `TenantId`, `Permissions`
-- **Gap**: Atualmente em appsettings.json — código documenta migração para banco criptografado como próxima etapa
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Authentication/ApiKeyAuthenticationOptions.cs`
-
-### Cookie Session
-**Status: READY**
-
-- Cookie `nxt_at` para access token
-- `HttpOnly=true`, `Secure=true` em produção
-- CSRF protection via `nxt_csrf` cookie
-- Fallback gracioso para header Authorization quando cookie ausente
-
----
-
-## 3. Isolamento de Tenant
-
-**Status: READY — 3 camadas**
-
-### Camada 1: JWT Claim (fonte de verdade)
-- `tenant_id` claim no JWT
-- Prioridade máxima na resolução
-
-### Camada 2: Aplicação (TenantIsolationBehavior)
-- Bloqueia requests sem tenant válido
-- Bloqueia tenants inativos
-- `IPublicRequest` para rotas que dispensam tenant (ex: login)
-
-### Camada 3: Banco de Dados (RLS)
-- `SELECT set_config('app.current_tenant_id', @__tenantId, false)` — parametrizado
-- PostgreSQL Row-Level Security por sessão
-- Soft-delete preserva dados por tenant
-
-**Segurança adicional:** Header `X-Tenant-Id` aceito apenas para utilizadores autenticados — pedidos não autenticados com este header são ignorados.
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/MultiTenancy/TenantResolutionMiddleware.cs`, `src/building-blocks/NexTraceOne.BuildingBlocks.Infrastructure/Persistence/TenantRlsInterceptor.cs`
-
----
-
-## 4. Autorização
-
-**Status: READY**
-
-- Permission-based (não apenas role-based)
-- `RequirePermission("resource.action")` por endpoint
-- Dynamic policy provider — runtime evaluation
-- Permissões no JWT claim `permissions`
-- Sem regras de autorização hardcoded
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Authorization/`
-
----
-
-## 5. CORS
-
-**Status: READY — Muito Bem Configurado**
-
-- Produção: requer origens explícitas (falha se vazio)
-- Wildcard com credentials: proibido (validação no startup)
-- Development: `localhost:5173` e `localhost:3000`
-- Headers permitidos: `Content-Type`, `Authorization`, `X-Tenant-Id`, `X-Environment-Id`, `X-Correlation-Id`, `X-Csrf-Token`
-
-**Evidência:** `src/platform/NexTraceOne.ApiHost/WebApplicationBuilderExtensions.cs`
-
----
-
-## 6. Rate Limiting
-
-**Status: READY**
-
-6 políticas diferenciadas por risco de endpoint:
-
-| Policy | Limite | Janela | Proteção contra |
-|---|---|---|---|
-| Global | 100/IP (20 não-resolvidos) | 1 min | DoS genérico, bypass de proxy |
-| Auth | 20/IP | 1 min | Brute force de login |
-| AuthSensitive | 10/IP | 1 min | Abuso de registro/OIDC |
-| AI | 30/IP | 1 min | Abuso de operações caras |
-| DataIntensive | 50/IP | 1 min | Scraping, exportação excessiva |
-| Operations | 40/IP | 1 min | Abuso de operações admin |
-
-**Evidência:** `src/platform/NexTraceOne.ApiHost/RateLimitingOptions.cs`
-
----
-
-## 7. Criptografia
-
-### AES-256-GCM (dados em repouso)
-**Status: READY**
-
-- Algoritmo: AES-256-GCM (authenticated encryption)
-- Nonce: 12 bytes aleatórios (fresh por operação)
-- Tag: 16 bytes (autenticação)
-- Formato payload: `[nonce(12) | tag(16) | ciphertext]`
-- Chave: variável de ambiente `NEXTRACE_ENCRYPTION_KEY` — obrigatória (falha no startup se ausente)
-- Integração EF Core: campos marcados com `[EncryptedField]` são transparentemente criptografados
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Encryption/AesGcmEncryptor.cs`
-
----
-
-## 8. Integrity Checking
-
-**Status: READY**
-
-- `AssemblyIntegrityChecker.VerifyOrThrow()` no startup
-- Controlado por `NEXTRACE_SKIP_INTEGRITY` (false por padrão)
-- Previne execução de assemblies modificados/injetados
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/Integrity/AssemblyIntegrityChecker.cs`
-
----
-
-## 9. Identity Access (Módulo Funcional)
-
-**Status: READY — 100% real**
-
-| Capacidade | Estado |
-|---|---|
-| JWT Auth + RBAC | Real |
-| JIT (Just-in-Time) Access | Real |
-| Break Glass | Real |
-| Access Reviews | Real |
-| Delegated Access | Real |
-| Security Events | Real (SecurityEventsEndpoints) |
-| Environments | Real |
-| Multi-tenancy | Real com RLS |
-| Session management | Real |
-
-**Evidência:** `src/modules/identityaccess/NexTraceOne.IdentityAccess.API/Endpoints/`
-
----
-
-## 10. Middleware Pipeline — Ordem Correta
-
-```
-UseCors()
-UseRateLimiter()
-UseSecurityHeaders()
-UseGlobalExceptionHandler()
-UseCookieSessionCsrfProtection()
-UseAuthentication()
-UseMiddleware<TenantResolutionMiddleware>()   ← DEPOIS de UseAuthentication ✅
-UseMiddleware<EnvironmentResolutionMiddleware>()
-UseAuthorization()
-```
-
-**Avaliação:** Ordem correta — TenantResolution após Authentication garante que tenant só é extraído de contexto autenticado.
-
----
-
-## 11. Segredos — Verificação
-
-**Resultado: NENHUM SEGREDO HARDCODED ENCONTRADO**
-
-| Verificação | Estado |
-|---|---|
-| Passwords no código | Não encontrado |
-| API keys hardcoded | Não encontrado |
-| JWT secrets hardcoded | Não encontrado |
-| Encryption keys hardcoded | Não encontrado |
-| Passwords em docker-compose | Variáveis de ambiente (POSTGRES_PASSWORD) |
-| Passwords em appsettings | Apenas placeholders |
-
----
-
-## 12. Vulnerabilidades Frontend
-
-| Verificação | Estado |
-|---|---|
-| `dangerouslySetInnerHTML` sem sanitização | Não detectado |
-| Autorização apenas no frontend | Não — backend tem RBAC real |
-| Tokens em localStorage | Não detectado — cookies HttpOnly usados |
-| Redirects inseguros | Não detectado |
-| XSS óbvio | Não detectado |
-
----
-
-## 13. Observações e Recomendações
-
-| Item | Severidade | Recomendação |
+| Dimensão | Estado | Evidência |
 |---|---|---|
-| API Keys em appsettings.json (MVP1) | Média | Migrar para armazenamento criptografado em banco |
-| ClickHouse sem password em desenvolvimento | Baixa | Configurar credencial para produção |
-| OTEL endpoint localhost em produção | Média | Configurar endpoint real por env var |
-| `OIDC/SAML` — estado não auditado em detalhe | A verificar | Confirmar suporte para SSO enterprise |
+| Autenticação JWT | ✅ Forte | Validação obrigatória no startup |
+| Autenticação por cookie | ✅ Real | `nxt_at`, `nxt_csrf`, CSRF header |
+| OIDC / Login federado | ✅ Configurável | Azure pre-configurado; outros via config |
+| SAML | ⚠️ Não confirmado | Não encontrado em código atual |
+| MFA / TOTP | ✅ Real | `TotpVerifier`, `MfaChallengeTokenService` |
+| Break Glass | ✅ Real | Acesso emergencial com expiração e auditoria |
+| JIT (Just-In-Time) access | ✅ Real | Expiração automática |
+| Delegações | ✅ Real | Expiração e revogação |
+| Access Reviews | ✅ Real | Workflows periódicos |
+| Multi-tenancy | ✅ Real (3 camadas) | RLS + aplicação + soft-delete |
+| Autorização por módulo/ação | ✅ Real | Permission strings tipadas |
+| Environment-aware authorization | ✅ Real | `EnvironmentAccessRequirement` |
+| Segredos hardcoded | ✅ Limpo | `REPLACE_VIA_ENV` em todas as passwords |
+| AES-256-GCM encryption | ✅ Presente | `BuildingBlocks.Security` |
+| `AssemblyIntegrityChecker` | ✅ Presente | Base para anti-tampering |
+| Eventos de segurança auditados | ✅ Real | Trilha de auditoria em `AuditDbContext` |
+| Frontend autorização apenas no client | ✅ Ausente | Backend é autoridade final |
 
 ---
 
-## 14. Auditabilidade de Segurança
+## Identity Access Module — Análise Detalhada
 
-**Status: READY**
+`src/modules/identityaccess/` | 185 ficheiros | 1 DbContext | 3 migrações
 
-- AuditDbContext com hash chain SHA-256 para imutabilidade
-- SecurityEventsEndpoints para eventos de segurança
-- CorrelationId em todos os requests para rastreabilidade
-- CreatedBy/UpdatedBy em todas as entidades auditáveis
-- AuditChainLink para sequência imutável de eventos
+### Domain Layer
 
-**Evidência:** `src/modules/auditcompliance/`, `docs/IMPLEMENTATION-STATUS.md` §Audit Compliance
+**Entidades:** `User`, `Role`, `Environment`, `EnvironmentAccess`, `Delegation`, `AccessReview`
+
+**Value Objects com validação real:**
+- `Email` — validação via `MailAddress`, imutabilidade, equality
+- `HashedPassword` — hashing, nunca exposta em plain text
+- `FullName` — validação de comprimento
+- `AuthenticationMode` — Local, OIDC, SAML
+- `MfaPolicy` — políticas de MFA por grupo/role
+- `SessionPolicy` — duração, refresh, invalidação
+- `DeploymentModel` — Cloud, OnPrem, Hybrid
+
+### Application Layer
+
+| Feature | Estado |
+|---|---|
+| Login (local + OIDC) | ✅ Real |
+| Refresh token | ✅ Real |
+| MFA challenge e verify | ✅ Real — `TotpVerifier` |
+| JIT privileged access (request + grant + revoke) | ✅ Real — expiração automática |
+| Break Glass (request + activate + close) | ✅ Real — auditado |
+| Access Reviews (create + review + approve/reject) | ✅ Real |
+| Delegations (create + revoke + expire) | ✅ Real |
+| Environment management (CRUD) | ✅ Real |
+| User management (CRUD) | ✅ Real |
+| Role and permission management | ✅ Real |
+| Environment-aware access control | ✅ Real |
+
+### Infrastructure Layer
+
+- `JwtTokenGenerator` — geração real com claims
+- `TotpVerifier` — validação TOTP real
+- `OidcProviderService` — integração OIDC real
+- `MfaChallengeTokenService` — challenge real
+
+---
+
+## BuildingBlocks.Security — Análise Detalhada
+
+`src/building-blocks/NexTraceOne.BuildingBlocks.Security/`
+
+### Authentication
+- JWT token validation com `RequireJwtAuthentication()` no startup
+- API Key authentication como alternativa
+- Cookie session com CSRF protection
+
+### Authorization
+- Permission-based: strings como `"ai:governance:read"`, `"ai:assistant:*"`, `"contracts:write"`
+- Environment access requirements: `EnvironmentAccessRequirement`
+- Policies CORS: 5+ políticas configuradas
+- Rate limiting: 6 políticas configuradas
+
+### Encryption
+- `AES-256-GCM` para dados sensíveis em repouso
+- Chaves via variáveis de ambiente (não hardcoded)
+
+### Integrity
+- `AssemblyIntegrityChecker` — hash de assemblies para detecção de tampering
+- Verificação no startup (controlada por `NexTraceOne.IntegrityCheck: true`)
+
+---
+
+## Multi-tenancy — 3 Camadas
+
+### Camada 1: Row Level Security (PostgreSQL)
+- `TenantRlsInterceptor` ativado globalmente via `NexTraceDbContextBase`
+- Todas as queries filtram automaticamente por `tenant_id`
+- Sem possibilidade de acesso cross-tenant via EF Core sem bypass explícito
+
+### Camada 2: Application Layer
+- `ICurrentTenant` injeta tenant em todos os handlers
+- Guards de tenant em handlers críticos
+
+### Camada 3: Soft-delete
+- Entidades deletadas ficam retidas por tenant — sem risco de leak cross-tenant
+
+---
+
+## Autorização — Dimensões Verificadas
+
+| Dimensão | Implementada | Evidência |
+|---|---|---|
+| Módulo | ✅ | Permission strings por módulo |
+| Ação (read/write/admin) | ✅ | Permission strings granulares |
+| Ambiente | ✅ | `EnvironmentAccessRequirement` |
+| Tenant | ✅ | RLS + ICurrentTenant |
+| Role/Policy | ✅ | RBAC no IdentityAccess |
+| AI capability | ✅ | `"ai:governance:*"` policies |
+| Frontend nunca é fonte de verdade | ✅ | `ProtectedRoute.tsx` validado mas backend verifica |
+
+---
+
+## Auditoria de Segurança
+
+- `AuditDbContext` com hash chain SHA-256 — imputabilidade
+- Eventos de segurança: login, logout, JIT activation, break glass, access review
+- `AuditInterceptor` no `NexTraceDbContextBase` — automático para mudanças em entidades
+- Correlação auditável via `correlationId` em todos os requests
+
+---
+
+## Riscos e Gaps Identificados
+
+| Risco | Severidade | Observação |
+|---|---|---|
+| SAML não encontrado em código | Média | CLAUDE.md especifica SAML como requisito; não confirmado em `identityaccess` |
+| `OtlpEndpoint: localhost` em config base | Baixa | Não é segurança mas exposição de config incorreta |
+| `RequireSecureCookies` precisa verificar override em development | Baixa | Confirmar que `false` só em dev |
+| AssemblyIntegrityChecker sem validação de chave de assinatura | Média | Verifica hash mas sem assinatura criptográfica de código |
+| Licensing removido (PR-17) | Alta | Sem enforcement de licença — produto pode correr sem autorização comercial válida |
+| Deep-link preservation após OIDC | Baixa | Verificar fluxo completo em integração real |
+
+---
+
+## Frontend — Segurança Verificada
+
+| Check | Estado |
+|---|---|
+| Sem `dangerouslySetInnerHTML` com conteúdo não sanitizado | ✅ Não encontrado |
+| Sem credenciais no browser storage | ✅ Cookies HttpOnly confirmados |
+| Autorização via `ProtectedRoute` | ✅ Confirmado (`src/components/ProtectedRoute.tsx`) |
+| `usePermissions` hook para UI condicional | ✅ Confirmado (`__tests__/hooks/usePermissions.test.tsx`) |
+| URLs e redirects validados | ⚠️ Verificar após OIDC integration completa |
+
+---
+
+## Avaliação Global de Segurança
+
+**Ponto forte:** O NexTraceOne tem um dos aspectos de segurança mais maduros do repositório. A implementação de JIT, Break Glass, RLS multi-tenant, AES-256-GCM e JWT validado no startup é enterprise-grade e vai além do mínimo esperado para MVP.
+
+**Gap principal:** SAML não confirmado; Licensing ausente (impacto na segurança comercial, não técnica).
+
+---
+
+## Recomendações
+
+1. **Alta:** Confirmar/implementar suporte SAML se for requisito imediato
+2. **Alta:** Definir estratégia de Licensing (módulo removido — enterprise sem enforcement de licença)
+3. **Média:** Verificar deep-link preservation completo em OIDC flow
+4. **Média:** Documentar explicitamente quais variáveis de ambiente são obrigatórias para startup seguro
+5. **Baixa:** Validar que `RequireSecureCookies` está `false` apenas em `appsettings.Development.json`
+
+---
+
+*Data: 28 de Março de 2026*

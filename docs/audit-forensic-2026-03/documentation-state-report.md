@@ -1,248 +1,181 @@
 # Relatório de Estado da Documentação — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Inventário de Documentação
+## Objetivo da Área no Contexto do Produto
 
-| Métrica | Valor |
+Documentação deve refletir o produto real — não a intenção ou o aspiracional. Deve ser fonte de verdade para arquitetura, operação, gaps e decisões técnicas, alinhada ao código real.
+
+---
+
+## Inventário de Documentação
+
+### Root `docs/` — Documentos Estratégicos
+
+| Documento | Status | Avaliação |
+|---|---|---|
+| `PRODUCT-VISION.md` | ✅ Correto | Visão alinhada ao CLAUDE.md |
+| `PRODUCT-SCOPE.md` | ✅ Correto | Escopo bem definido |
+| `ARCHITECTURE-OVERVIEW.md` | ✅ Correto | Clean Architecture, DDD, CQRS |
+| `DATA-ARCHITECTURE.md` | ✅ Correto | PostgreSQL, ClickHouse direction |
+| `FRONTEND-ARCHITECTURE.md` | ⚠️ DESATUALIZADO | Pode referenciar TanStack Router que não está implementado |
+| `SECURITY-ARCHITECTURE.md` | ✅ Correto | AES-256, JWT, RLS, multi-tenancy |
+| `INTEGRATIONS-ARCHITECTURE.md` | ⚠️ PARCIAL | Conectores descritos não implementados |
+| `IMPLEMENTATION-STATUS.md` | ✅ Correto | Atualizado com estado real — referencia auditoria |
+| `ROADMAP.md` | ✅ Correto | Atualizado com gaps reais, 4 fluxos, prioridades |
+| `CORE-FLOW-GAPS.md` | ✅ Correto | Gaps dos fluxos 1-4 documentados honestamente |
+| `OBSERVABILITY-STRATEGY.md` | ⚠️ PARCIAL | Estratégia definida; validação E2E não confirmada |
+| `AI-GOVERNANCE.md` | ⚠️ PARCIAL | Governess real; assistant mock não refletido |
+| `AI-ARCHITECTURE.md` | ⚠️ PARCIAL | Arquitetura real para governance; External AI é PLAN |
+| `AI-ASSISTED-OPERATIONS.md` | ⚠️ ASPIRACIONAL | Descreve capacidades não ainda funcionais |
+| `AI-DEVELOPER-EXPERIENCE.md` | ⚠️ ASPIRACIONAL | IDE extensions não validadas E2E |
+| `PERSONA-MATRIX.md` | ✅ Correto | Personas definidas |
+| `PERSONA-UX-MAPPING.md` | ⚠️ PARCIAL | Mapping ideal; UI actual não corresponde para Executive/Product |
+| `DESIGN-SYSTEM.md` | ⚠️ DESATUALIZADO | Referencia Radix UI que não está no package.json |
+| `CHANGE-CONFIDENCE.md` | ✅ Correto | Reflexo do módulo mais maduro |
+| `SOURCE-OF-TRUTH-STRATEGY.md` | ✅ Correto | Catalog + ChangeGovernance suportam |
+| `SERVICE-CONTRACT-GOVERNANCE.md` | ✅ Correto | — |
+| `CONTRACT-STUDIO-VISION.md` | ⚠️ PARCIAL | Backend real; UX incompleto |
+| `SECURITY.md` | ✅ Correto | — |
+| `ENVIRONMENT-VARIABLES.md` | ⚠️ PARCIAL | Verificar completude das vars obrigatórias |
+| `LOCAL-SETUP.md` | ✅ Correto | Setup local documentado |
+| `DEPLOYMENT-ARCHITECTURE.md` | ✅ Correto | Docker, IIS, PostgreSQL |
+| `BRAND-IDENTITY.md` | ✅ Informacional | — |
+| `DESIGN.md` | ✅ Informacional | — |
+| `UX-PRINCIPLES.md` | ✅ Correto | — |
+| `I18N-STRATEGY.md` | ✅ Correto | 4 locales, 41 namespaces |
+| `BACKEND-MODULE-GUIDELINES.md` | ✅ Correto | — |
+| `MODULES-AND-PAGES.md` | ⚠️ VERIFICAR | Pode estar desatualizado com estado atual |
+| `PLATFORM-CAPABILITIES.md` | ⚠️ ASPIRACIONAL | Lista capacidades aspiracionais |
+| `DOMAIN-BOUNDARIES.md` | ✅ Correto | — |
+| `DOCUMENTATION-INDEX.md` | ✅ Correto | Índice de navegação |
+| `GUIDELINE.md` | ✅ Correto | — |
+
+---
+
+### `docs/audit-forensic-2026-03/` — Auditoria Forense
+
+**17 relatórios** da auditoria forense atual. **Fonte de verdade do estado real do produto.**
+
+| Relatório | Status |
 |---|---|
-| Total de arquivos de documentação | ~928 |
-| Arquivos Markdown (.md) | ~903 |
-| Diretórios de documentação | 30+ |
-| Documentos de arquitetura | 20+ |
-| ADRs (Architecture Decision Records) | 6 confirmados |
-| Revisões modulares (11-review-modular/) | 100+ docs por módulo |
+| `final-project-state-assessment.md` | ✅ Atualizado (28/03/2026) |
+| `capability-gap-matrix.md` | ✅ Atualizado (28/03/2026) |
+| `backend-state-report.md` | ✅ Atualizado (28/03/2026) |
+| `frontend-state-report.md` | ✅ Atualizado (28/03/2026) |
+| `database-state-report.md` | ✅ Atualizado (28/03/2026) |
+| `configuration-and-parameterization-report.md` | ✅ Atualizado (28/03/2026) |
+| `security-identity-access-report.md` | ✅ Atualizado (28/03/2026) |
+| `ai-agents-governance-report.md` | ✅ Atualizado (28/03/2026) |
+| `observability-changeintelligence-report.md` | ✅ Atualizado (28/03/2026) |
+| `tests-quality-pipelines-report.md` | ✅ Atualizado (28/03/2026) |
+| `product-alignment-report.md` | ✅ Atualizado (28/03/2026) |
+| `documentation-state-report.md` | ✅ Este documento |
+| `licensing-selfhosted-readiness-report.md` | ✅ Em geração |
+| `integrations-state-report.md` | ✅ Em geração |
+| `remove-archive-consolidate-report.md` | ✅ Em geração |
+| `prioritized-remediation-roadmap.md` | ✅ Em geração |
+| `full-repository-inventory.csv` | ✅ Em geração |
 
 ---
 
-## 2. Estrutura de Documentação
+### `docs/audits/` — Auditorias Anteriores
 
-```
-docs/
-├── 11-review-modular/          (Revisões modulares detalhadas — 100+ docs)
-│   ├── 00-governance/
-│   ├── 01-identity-access/
-│   ├── 02-environment-management/
-│   ├── 03-catalog/
-│   ├── 04-contracts/
-│   ├── 05-change-governance/
-│   ├── 06-operational-intelligence/
-│   ├── 07-ai-knowledge/
-│   ├── 08-governance/
-│   ├── 09-configuration/
-│   ├── 10-audit-compliance/
-│   ├── 11-notifications/
-│   ├── 12-integrations/
-│   └── 13-product-analytics/
-├── architecture/               (ADRs, decisões, análises)
-├── acceptance/                 (Checklists e planos de aceite)
-├── aiknowledge/                (Docs específicos de IA)
-├── assessment/                 (Avaliações)
-├── audits/                     (Relatórios de auditoria)
-├── checklists/                 (Checklists operacionais)
-├── deployment/                 (Guias de deploy)
-├── engineering/                (Guias técnicos)
-├── execution/                  (Rastreamento de execução)
-├── frontend/                   (Documentação frontend)
-├── frontend-audit/             (Auditoria frontend)
-├── governance/                 (Documentação de governança)
-├── observability/              (Estratégia de observabilidade)
-├── planos/                     (Planos de produto)
-├── prototype/                  (Documentos de prototipagem)
-├── quality/                    (Qualidade e testes)
-├── rebaseline/                 (Documentos de rebaseline)
-├── release/                    (Release notes)
-├── reliability/                (Confiabilidade)
-├── reviews/                    (Revisões)
-├── roadmap/                    (Roadmap)
-├── runbooks/                   (Runbooks)
-├── security/                   (Segurança)
-├── telemetry/                  (Telemetria)
-├── testing/                    (Testes)
-└── user-guide/                 (Guias de utilizador)
-```
+Contém 30+ relatórios de fases e waves anteriores (Phase-0 a Phase-9, Wave-0 a Wave-Final).
+
+**Classificação:** ARCHIVE_CANDIDATE — valor histórico mas potencial de confusão com estado atual.
+
+Ficheiros notáveis:
+- `NEXTRACEONE-CURRENT-STATE-AND-100-PERCENT-GAP-REPORT.md` — análise de gaps anterior
+- `NEXTRACEONE-FINAL-GO-LIVE-AUDIT.md` — auditoria go-live anterior
+- `PHASE-0-DEMO-DEBT-INVENTORY.md` — inventário de dívida de demo (relevante historicamente)
+- `WAVE-FINAL-NO-DEMO-NO-STUB-REPORT.md` — relatório de limpeza de demos
 
 ---
 
-## 3. Documentos Estratégicos — Avaliação Individual
+### `docs/architecture/` — ADRs e Decisões Técnicas
 
-### PRODUCT-VISION.md
-**Status: CORRETO E ATUAL**
+**Architecture Decision Records confirmados:**
+- `ADR-001-database-strategy.md` — PostgreSQL strategy
+- `ADR-002-migration-policy.md` — Política de migrações
+- `ADR-003-event-bus-limitations.md` — Limitações do event bus
+- `ADR-004-simulated-data-policy.md` — **Política de dados simulados** — confirma que `IsSimulated: true` é intencional e deve ser substituído
+- `ADR-005-ai-runtime-foundation.md` — Fundação do runtime de IA
+- `ADR-006-agent-runtime-foundation.md` — Fundação de agentes
 
-- Visão consistente com a implementação real
-- 8 pilares enumerados corretamente
-- Posicionamento como "governance-first" correto
-- Alinhado com a arquitetura modular real
+**Avaliação:** ADRs são valiosos e honestos. `ADR-004` é particularmente importante — documenta a política que governa o `IsSimulated` pattern.
 
-**Recomendação:** Manter. Não requer atualização.
-
----
-
-### REBASELINE.md
-**Status: CORRETO, HONESTO E ATUAL**
-
-O documento mais preciso e útil do repositório. Contém:
-- Inventário real por módulo com percentagem de features reais vs. mock
-- Estado dos fluxos centrais de valor
-- Dívidas de arquitetura numeradas
-- Diferenciação clara entre o que está pronto, parcial e mock
-
-**Recomendação:** Manter como fonte de verdade do estado do produto. Atualizar após cada sprint.
+**Outros documentos valiosos:**
+- `docs/architecture/module-boundary-matrix.md` — Boundaries confirmadas
+- `docs/architecture/module-data-placement-matrix.md` — Dados por módulo
+- `docs/architecture/clickhouse-baseline-strategy.md` — Estratégia ClickHouse
+- `docs/architecture/database-table-prefixes.md` — Prefixos de tabelas
 
 ---
 
-### CORE-FLOW-GAPS.md
-**Status: CORRETO E ÚTIL**
+### `docs/current-state/` — Estado Atual por Módulo
 
-- Lista explicitamente os gaps por fluxo central
-- Prioridades corretas
-- Identifica correlação incident↔change como gap crítico
-- Confirma AiAssistantPage como 100% mock
-- Alinha com REBASELINE.md sem contradições
+10 ficheiros de estado atual por módulo. **Atualizados com base na auditoria forense.**
 
-**Recomendação:** Manter. Fechar gaps e marcar como resolvidos.
-
----
-
-### IMPLEMENTATION-STATUS.md
-**Status: PARCIALMENTE DESATUALIZADO**
-
-Contradição detectada:
-- O documento lista Incidents como `SIM` (simulado) mas o REBASELINE.md indica que EfIncidentStore foi adicionado (17 features reais com DbContext e migração)
-- Cross-module interfaces corretamente marcadas como `PLAN`
-- Integration Events corretamente marcadas como `PLAN — no consumers`
-
-**Evidência de contradição:**
-- `IMPLEMENTATION-STATUS.md`: "Incidents: SIM — InMemoryIncidentStore"
-- `REBASELINE.md`: "Incidents (17 features): ✅ Real — EfIncidentStore (678 lines), IncidentDbContext"
-
-**Recomendação:** Atualizar Incidents de `SIM` para `PARTIAL` refletindo EfIncidentStore. Manter estrutura e padrão.
-
----
-
-### ROADMAP.md
-**Status: PARCIALMENTE DESATUALIZADO**
-
-Contradições com REBASELINE.md:
-- Fluxo 3 (Incidents) marcado como em progresso com frontend conectado — REBASELINE confirma que é 100% mock no frontend
-- "Frontend conectado à API" — verdadeiro para 89% das páginas, falso para incidents
-- Contagem de testes E2E: claims 13 novos; apenas 8 specs existem
-
-**Recomendação:** Atualizar Fluxo 3 para refletir estado real. Sincronizar contagens.
-
----
-
-### ARCHITECTURE-OVERVIEW.md
-**Status: CORRETO MAS MÍNIMO**
-
-- Modular Monolith confirmado
-- 7 bounded contexts (confirmado na estrutura real)
-- 4-layer architecture confirmada
-- DDD, SOLID, CQRS confirmados
-
-**Gap:** 19 linhas apenas. Falta:
-- Diagramas de dependências entre módulos
-- Fluxo de dados entre bounded contexts
-- Visão do middleware pipeline
-- Overview do schema de banco
-
-**Recomendação:** Expandir com diagramas e fluxos reais.
-
----
-
-### ADRs (Architecture Decision Records)
-**Status: 6 ADRs confirmados — ÚTEIS**
-
-| ADR | Título | Estado |
-|---|---|---|
-| ADR-001 | Database Strategy | Correto — PostgreSQL como base |
-| ADR-002 | Migration Policy | Correto — por DbContext |
-| ADR-003 | Event Bus Limitations | Correto — documenta limitações do outbox |
-| ADR-004 | Simulated Data Policy | Correto — documenta o padrão IsSimulated |
-| ADR-005 | AI Runtime Foundation | Correto — Ollama como padrão |
-| ADR-006 | Agent Runtime Foundation | Correto — arquitetura de agentes |
-
-**Recomendação:** Manter e adicionar ADRs para:
-- Remoção do Commercial Governance (PR-17)
-- Estratégia de cross-module interfaces
-- Decisão sobre ClickHouse
-
----
-
-## 4. Documentação Técnica — Estado por Área
-
-| Documento | Estado | Recomendação |
-|---|---|---|
-| BACKEND-MODULE-GUIDELINES.md | Útil | Manter |
-| DESIGN-SYSTEM.md | Útil | Manter |
-| ENVIRONMENT-VARIABLES.md | Verificar atualidade | Sincronizar com .env.example |
-| SECURITY-ARCHITECTURE.md / SECURITY.md | Útil | Manter |
-| DATA-ARCHITECTURE.md | Verificar | Sincronizar com DbContexts reais |
-| OBSERVABILITY-STRATEGY.md | Verificar | Alinhar com estado real da telemetria |
-| INTEGRATIONS-ARCHITECTURE.md | Verificar | Alinhar com stubs de integração reais |
-| AI-GOVERNANCE.md | Útil | Manter |
-| AI-ARCHITECTURE.md | Útil | Manter |
-| CONTRACT-STUDIO-VISION.md | Útil | Manter |
-| CHANGE-CONFIDENCE.md | Útil | Manter |
-| SOURCE-OF-TRUTH-STRATEGY.md | Útil | Manter |
-| PERSONA-MATRIX.md | Útil | Manter |
-| PERSONA-UX-MAPPING.md | Útil | Manter |
-
----
-
-## 5. Documentos de Revisão Modular (11-review-modular/)
-
-**Status: EXTENSOS — VERIFICAR ATUALIDADE**
-
-Cada módulo tem 40+ documentos de revisão cobrindo:
-- Análise de gaps
-- Relatórios de implementação
-- Decisões arquiteturais
-- Validação de estado
-
-**Risco:** Com 100+ documentos por módulo, há risco de redundância e contradição interna. Estes documentos representam o histórico de evolução, não o estado atual.
-
-**Recomendação:** Manter como histórico arquivado. Criar `CURRENT-STATE.md` por módulo como fonte única de verdade do estado atual, apontando para REBASELINE.md como consolidador.
-
----
-
-## 6. Documentação Ausente (Gaps)
-
-| Documento Faltante | Impacto |
+| Ficheiro | Estado |
 |---|---|
-| Diagrama de dependências entre módulos | Sem visão de impacto de mudanças |
-| Inventário canônico de feature flags | Sem rastreabilidade das flags ativas |
-| Guia de migração de banco de dados por ambiente | Risco operacional em deploys |
-| SLOs documentados por endpoint | Load tests sem thresholds |
-| Guia de onboarding do developer | Barreira de entrada para novos devs |
-| Documentação de cross-module interfaces | 8 interfaces PLAN sem spec formal |
+| `catalog-current-state.md` | ✅ READY (91.7%) |
+| `change-governance-current-state.md` | ✅ READY (100%) |
+| `identity-access-current-state.md` | ✅ READY |
+| `audit-compliance-current-state.md` | ✅ READY |
+| `ai-knowledge-current-state.md` | ⚠️ PARTIAL |
+| `operational-intelligence-current-state.md` | ❌ PARTIAL/MOCK |
+| `governance-current-state.md` | ❌ MOCK |
+| `knowledge-current-state.md` | ⚠️ INCOMPLETE |
+| `integrations-current-state.md` | ⚠️ STUB |
+| `finops-current-state.md` | ❌ MOCK |
 
 ---
 
-## 7. Documentação Contraditória — Lista
+### Documentação com Contradições vs. Código
 
-| Contradição | Documento A | Documento B | Resolução |
-|---|---|---|---|
-| Estado dos Incidents | IMPLEMENTATION-STATUS.md: "SIM (InMemoryIncidentStore)" | REBASELINE.md: "✅ Real — EfIncidentStore" | REBASELINE.md está correto |
-| Estado do Fluxo 3 | ROADMAP.md: "em progresso / conectado" | CORE-FLOW-GAPS.md: "0% funcional" | CORE-FLOW-GAPS.md está correto |
-| Contagem de testes E2E | ROADMAP.md: "13 novos" | Estrutura real: "8 specs" | Estrutura real é correta |
-| Commercial Governance | Docs antigos referenciam | REBASELINE.md: "REMOVIDO PR-17" | PR-17 é correto |
-
----
-
-## 8. Classificação de Documentos por Ação
-
-| Documento | Classificação | Ação |
+| Documento | Contradição | Impacto |
 |---|---|---|
-| REBASELINE.md | CORRETO E ATUAL | Manter como referência |
-| CORE-FLOW-GAPS.md | CORRETO E ATUAL | Manter e atualizar gaps |
-| PRODUCT-VISION.md | CORRETO | Manter |
-| ARCHITECTURE-OVERVIEW.md | ÚTIL MAS MÍNIMO | Expandir |
-| ADRs 001-006 | CORRETOS | Manter + adicionar novos |
-| IMPLEMENTATION-STATUS.md | PARCIALMENTE DESATUALIZADO | Atualizar Incidents section |
-| ROADMAP.md | PARCIALMENTE DESATUALIZADO | Atualizar Fluxo 3 e contagem de testes |
-| docs/11-review-modular/ | HISTÓRICO VÁLIDO | Arquivar como histórico; criar CURRENT-STATE por módulo |
-| docs/architecture/e14-* a e18-* | HISTÓRICO DE EXECUÇÃO | Arquivar |
-| docs/architecture/p0-* a p1-* | HISTÓRICO DE SEGURANÇA | Arquivar |
-| Docs de tecnologia removida | OBSOLETO | Remover ou marcar como ARCHIVE |
+| `FRONTEND-ARCHITECTURE.md` | Pode referenciar TanStack Router | Médio — confunde onboarding |
+| `DESIGN-SYSTEM.md` | Referencia Radix UI | Médio — não implementado |
+| `AI-ASSISTED-OPERATIONS.md` | Descreve capabilities não funcionais | Alto — expectativas falsas |
+| `PLATFORM-CAPABILITIES.md` | Lista capacidades aspiracionais | Médio — sem distinção de estado |
+
+---
+
+### Documentação Positiva e Honesta
+
+| Documento | Avaliação |
+|---|---|
+| `IMPLEMENTATION-STATUS.md` | Excelente — tabelas claras de status por módulo |
+| `ROADMAP.md` | Excelente — inclui gaps reais, prioridades, correções de auditoria |
+| `CORE-FLOW-GAPS.md` | Excelente — documenta 0% de correlação dinâmica |
+| `ADR-004-simulated-data-policy.md` | Excelente — honesto sobre dados simulados |
+| `docs/audit-forensic-2026-03/` | Excelente — 17 relatórios com evidência do código |
+
+---
+
+### Documentação Ausente (Gaps)
+
+| Documento Necessário | Impacto |
+|---|---|
+| Guia completo de variáveis de ambiente obrigatórias para self-hosted | Operacional |
+| Runbook de deploy manual (IIS + Windows) | Operacional |
+| Documentação de Licensing pós-remoção do módulo PR-17 | Estratégico |
+| Plano de integração de stack frontend (TanStack Router, etc.) | Técnico |
+
+---
+
+## Recomendações
+
+1. **Alta:** Atualizar `FRONTEND-ARCHITECTURE.md` para refletir stack real (react-router-dom, sem Radix UI, sem ECharts)
+2. **Alta:** Atualizar `DESIGN-SYSTEM.md` para refletir componentes customizados em vez de Radix UI
+3. **Alta:** Marcar explicitamente `AI-ASSISTED-OPERATIONS.md` como "visão/roadmap" e não "estado atual"
+4. **Alta:** Criar documento de variáveis de ambiente obrigatórias para self-hosted deployment
+5. **Média:** Mover `docs/audits/` para `docs/archive/audits/` com índice de leitura histórica
+6. **Média:** Atualizar `PLATFORM-CAPABILITIES.md` com distinção clara PRONTO/PARCIAL/PLAN
+
+---
+
+*Data: 28 de Março de 2026*

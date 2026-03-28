@@ -1,272 +1,328 @@
 # Relatório de Estado do Frontend — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Visão Geral
+## Objetivo da Área no Contexto do Produto
 
-| Métrica | Valor |
-|---|---|
-| Total de páginas | 82 |
-| Páginas conectadas ao backend real | 73 (89%) |
-| Páginas com mock inline | 9 (11%) |
-| Arquivos .tsx | ~335 |
-| Arquivos .ts (não-test) | ~110 |
-| Testes unitários frontend | ~264 (passando) |
-| Testes E2E (Playwright) | 8 specs + 5 real-env |
-| Locales i18n | 4 (en, es, pt-BR, pt-PT) |
-| Namespaces i18n | 41 |
-| Feature modules | 12 |
+O frontend é a superfície operacional e de governança do NexTraceOne — deve traduzir a visão de produto para Engineer, Tech Lead, Architect, Executive, Platform Admin e Auditor com contexto de ambiente, ownership, contratos e mudanças.
 
 ---
 
-## 2. Arquitetura Frontend
+## Stack Real vs. Stack Alvo (CLAUDE.md)
 
-### Stack
-- React 18 + TypeScript + Vite
-- TanStack Router (roteamento type-safe)
-- TanStack Query (`useQuery`, `useMutation`) para estado de servidor
-- Axios via `src/api/client.ts` com JWT auth e tenant headers
-- i18n via `i18next` com 4 locales e 41 namespaces
-- Tailwind CSS + Radix UI
-- Playwright para E2E
-
-### API Client
-`src/api/client.ts` — centralizado com:
-- JWT Authentication (Bearer token)
-- Headers: `X-Tenant-Id`, `X-Environment-Id`, `X-Correlation-Id`
-- Refresh token automático
-- Axios interceptors
-
-### Autenticação e Guards
-- `AuthContext` com estado de autenticação global
-- Guardas de rota presentes
-- Deep-link preservation após login
-- `TenantSelectionPage` para fluxo multi-tenant
-
----
-
-## 3. Estado por Feature Module
-
-### Catalog (11 páginas) — PARTIAL/READY
-**Status: CONNECTED — 89% real**
-
-| Página | Integração | Status |
-|---|---|---|
-| ServiceCatalogListPage | API real | READY |
-| ServiceCatalogPage | API real | READY |
-| ServiceDetailPage | API real | READY |
-| ContractsPage | API real | READY |
-| ContractListPage | API real | READY |
-| ContractDetailPage | API real | READY |
-| SourceOfTruthExplorerPage | API real | READY |
-| ServiceSourceOfTruthPage | API real | READY |
-| ContractSourceOfTruthPage | API real | READY |
-| DeveloperPortalPage | API parcial (7 stubs backend) | PARTIAL |
-| CatalogContractsConfigurationPage | API real | READY |
-| GlobalSearchPage | API real (SearchCatalog é stub backend) | PARTIAL |
-
-**Evidência:** `src/frontend/src/features/catalog/pages/`
-
----
-
-### Change Governance (5 páginas) — READY
-**Status: FULLY CONNECTED**
-
-| Página | Integração | Status |
-|---|---|---|
-| ChangeCatalogPage | API real | READY |
-| ChangeDetailPage | API real | READY |
-| WorkflowPage | API real | READY |
-| WorkflowConfigurationPage | API real | READY |
-| ReleasesPage | API real | READY |
-| PromotionPage | API real | READY |
-
-**Evidência:** `src/frontend/src/features/change-governance/pages/`
-
----
-
-### Operations / Incidents (9 páginas) — MOCK
-**Status: MOCK INLINE — gap crítico**
-
-- `IncidentsPage.tsx` usa `mockIncidents` hardcoded inline com comentário: *"Dados simulados — em produção, virão da API /api/v1/incidents"*
-- `IncidentDetailPage.tsx` — dados estáticos
-- Mitigação, runbooks, validação pós-ação: stubs visuais sem API real
-
-**Risco:** O fluxo central de incidents não funciona no frontend. A correlação incident↔change é estática.
-
-**Evidência:** `src/frontend/src/features/operations/`
-
----
-
-### Governance (25 páginas) — CONNECTED (backend mock)
-**Status: CONNECTED to mock backend**
-
-25 páginas conectadas ao backend via API real. O backend retorna `IsSimulated: true` com dados fabricados. O frontend exibe `DemoBanner` quando recebe `IsSimulated: true`.
-
-| Área | Páginas | Status Backend |
-|---|---|---|
-| Teams & Domains | TeamsOverviewPage, DomainsOverviewPage, TeamDetailPage, DomainDetailPage | MOCK |
-| FinOps | FinOpsPage, TeamFinOpsPage, DomainFinOpsPage, ServiceFinOpsPage, ExecutiveFinOpsPage | MOCK |
-| Executive | ExecutiveOverviewPage, ExecutiveDrillDownPage | MOCK |
-| Compliance | CompliancePage, EnterpriseControlsPage, RiskHeatmapPage | MOCK |
-| Governance Packs | GovernancePacksOverviewPage, GovernancePackDetailPage | MOCK |
-| Policies | PolicyCatalogPage | MOCK |
-| Reports | ReportsPage, MaturityScorecardsPage, BenchmarkingPage | MOCK |
-| Waivers | WaiversPage | MOCK |
-| Evidence | EvidencePackagesPage | Parcial (backend real) |
-
-**Evidência:** `src/frontend/src/features/governance/pages/`, `docs/IMPLEMENTATION-STATUS.md` §Governance
-
----
-
-### AI Hub (10 páginas) — PARTIAL
-**Status: CONNECTED (parcial)**
-
-| Página | Integração | Status |
-|---|---|---|
-| AiAssistantPage | `mockConversations` hardcoded | MOCK |
-| AssistantPanel | API com fallback mock | PARTIAL |
-| AiAnalysisPage | API real | PARTIAL |
-| ModelRegistryPage | API parcial (dados mock no backend) | PARTIAL |
-| AiPoliciesPage | API real | PARTIAL |
-| TokenBudgetPage | API real (dados mock no backend) | PARTIAL |
-| AiAuditPage | API real | PARTIAL |
-| AiAgentsPage | API real | PARTIAL |
-| AgentDetailPage | API real | PARTIAL |
-| AiRoutingPage | API real | PARTIAL |
-| AiIntegrationsConfigurationPage | API real | PARTIAL |
-| IdeIntegrationsPage | API real | PARTIAL |
-
-**Gap crítico:** AiAssistantPage usa `mockConversations` — o fluxo de assistente não funciona.
-
-**Evidência:** `src/frontend/src/features/ai-hub/pages/`, `docs/CORE-FLOW-GAPS.md` §Fluxo 4
-
----
-
-### Identity Access (9 páginas) — READY
-**Status: FULLY CONNECTED**
-
-- LoginPage, UserManagement, RolePermissions, TenantSelection, AccessReview, BreakGlass, JitAccess, DelegatedAdmin, DelegationPage
-- Todos conectados ao backend real
-
-**Evidência:** `src/frontend/src/features/identity-access/`
-
----
-
-### Audit Compliance (1 página) — READY
-**Status: FULLY CONNECTED**
-
-- AuditPage conectada ao backend real
-
-**Evidência:** `src/frontend/src/features/audit-compliance/`
-
----
-
-### Integrations (4 páginas) — PARTIAL
-**Status: CONNECTED (backend stubs)**
-
-- ConnectorDetailPage, IngestionExecutionsPage e páginas relacionadas
-- Conectados ao backend; backend retorna stubs/metadata-only
-
-**Evidência:** `src/frontend/src/features/integrations/`
-
----
-
-### Product Analytics (5 páginas) — MOCK
-**Status: CONNECTED (backend 100% mock)**
-
-- ValueTrackingPage e demais conectados ao backend que retorna dados simulados
-
-**Evidência:** `src/frontend/src/features/product-analytics/`
-
----
-
-### Dashboard (shared) — PARTIAL
-**Status: PARTIAL**
-
-- `DashboardPage.tsx` em `src/frontend/src/features/shared/pages/`
-- Dashboard sem semântica clara de persona — parece genérico
-- Não reflete ownership, ambiente, serviços do utilizador autenticado de forma clara
-
----
-
-## 4. Avaliação de i18n
-
-**Status: COMPLETO nas áreas core**
-
-| Verificação | Estado |
-|---|---|
-| Títulos de página | Sim — via `t()` |
-| Labels e placeholders | Sim — via `t()` |
-| Botões e tooltips | Sim — via `t()` |
-| Empty states | Parcial — padrão não uniforme |
-| Loading states | Parcial — só ServiceCatalogPage tem loading real padronizado |
-| Error states | Parcial — 96% das páginas sem error boundary por secção |
-| Mensagens de backend | Sim — contrato `code`/`messageKey`/`correlationId` presente |
-
-**4 locales ativos:** `en`, `es`, `pt-BR`, `pt-PT`
-**41 namespaces** cobrindo todos os módulos core
-
-**Evidência:** `src/frontend/src/i18n.ts`, `docs/REBASELINE.md` §i18n
-
----
-
-## 5. Problemas de UX a Endereçar
-
-| Problema | Localização | Impacto |
-|---|---|---|
-| Dashboard genérico sem semântica de persona | DashboardPage.tsx | UX não reflete papel do utilizador |
-| IncidentsPage 100% mock | operations/ | Fluxo central indisponível |
-| AiAssistantPage 100% mock conversations | ai-hub/AiAssistantPage.tsx | Fluxo AI quebrado |
-| 83% das páginas sem EmptyState padronizado | Geral | UX inconsistente |
-| 96% das páginas sem error states por secção | Geral | Erros silenciosos |
-| Loading states não padronizados | Geral (ServiceCatalogPage é exceção) | UX inconsistente |
-| Governance/FinOps 25 páginas com DemoBanner | governance/ | Experiência de demo explícita |
-
----
-
-## 6. Integração Real vs. Mock — Resumo
-
-| Feature Module | API Real? | Backend Real? | Estado Final |
+| Componente | Alvo (CLAUDE.md) | Real (package.json) | Status |
 |---|---|---|---|
-| Catalog | Sim | Sim (91.7%) | READY com gaps pontuais |
-| Change Governance | Sim | Sim (100%) | READY |
-| Identity Access | Sim | Sim (100%) | READY |
-| Audit Compliance | Sim | Sim (100%) | READY |
-| Operations/Incidents | Não (mock inline) | Parcial (seed estático) | MOCK/BROKEN |
-| Governance | Sim | Não (IsSimulated) | CONNECTED/MOCK |
-| AI Hub | Parcial (Assistant mock) | Parcial (ExternalAI stubs) | PARTIAL |
-| Integrations | Sim | Parcial (stubs) | PARTIAL |
-| Product Analytics | Sim | Não (mock) | CONNECTED/MOCK |
-| Configuration | Sim | Sim | READY |
-| Notifications | Sim | Parcial | PARTIAL |
+| React | 18 | **19.2.0** | ⚠️ DIVERGE |
+| Router | TanStack Router | **react-router-dom v7.13.1** | ❌ DIVERGE |
+| State management | Zustand | **Não presente** | ❌ AUSENTE |
+| UI Components | Radix UI | **Não presente** | ❌ AUSENTE |
+| Charts | Apache ECharts | **Não presente** | ❌ AUSENTE |
+| Data fetching | TanStack Query | ✅ @tanstack/react-query v5.90 | ✅ OK |
+| Forms | — | react-hook-form v7 + zod v4 | OK |
+| Styling | Tailwind CSS | ✅ tailwindcss v4 (via @tailwindcss/vite) | ✅ OK |
+| HTTP client | — | axios v1.13 | OK |
+| i18n | i18n | ✅ i18next v25 + react-i18next v16 | ✅ OK |
+| Bundler | Vite | ✅ @vitejs/plugin-react | ✅ OK |
+| TypeScript | TypeScript | ✅ | ✅ OK |
+| E2E testing | Playwright | ✅ @playwright/test | ✅ OK |
+| Unit testing | Vitest | ✅ (via @vitest/coverage-v8) | ✅ OK |
+| MSW (mock service worker) | — | ✅ msw | Presente para testes |
+
+**Impacto do desvio:** A ausência de Radix UI significa que o design system usa componentes próprios (confirmado: `src/components/` com 50+ componentes customizados). A ausência de Apache ECharts implica que gráficos usam outra biblioteca ou são placeholders. A ausência de Zustand implica que estado global é gerido apenas com React Context ou TanStack Query.
 
 ---
 
-## 7. Avaliação de Maturidade por Persona
+## Estrutura de Ficheiros
 
-| Persona | Áreas Funcionais no Frontend | Lacunas |
-|---|---|---|
-| Engineer | Catalog, Change, Contract Studio, AI Hub (parcial) | AI Assistant não funciona |
-| Tech Lead | Change Intelligence, Blast Radius, Workflow | Incidents mock |
-| Platform Admin | Identity, Config, Audit, Environments | Funcional |
-| Auditor | Audit Trail, Security Events | Funcional |
-| Architect | Service Topology, Source of Truth | Developer Portal parcial |
-| Product | Governance, Maturity, Benchmarking | Todos mock |
-| Executive | Executive Overview, FinOps, Reports | Todos mock |
+| Área | Ficheiros |
+|---|---|
+| `src/features/` (total) | 235+ TypeScript/TSX |
+| `src/components/` (shared) | 50+ componentes |
+| `src/routes/` | 7 ficheiros de rotas |
+| `src/api/` | `client.ts` + `index.ts` |
+| `src/locales/` | i18n translations |
+| `src/auth/` | auth flow |
+| `src/contexts/` | React contexts |
+| `src/hooks/` | custom hooks |
+| `src/__tests__/` | testes unitários |
+| `src/shared/design-system/` | foundations.ts |
+| `e2e/` | specs Playwright mock |
+| `e2e-real/` | specs real-environment |
 
 ---
 
-## 8. Testes Frontend
+## Features e Páginas — Estado Detalhado
 
-| Tipo | Quantidade | Estado |
+### Catalog (`src/features/catalog/`)
+**Rotas:** `catalogRoutes.tsx`
+
+| Página | Status | Evidência |
 |---|---|---|
-| Testes unitários (Vitest) | ~264 | Passando |
-| Testes E2E Playwright | 8 specs | Cobrem catalog, changes, incidents (mock), AI |
-| Testes real-env | 5 (e2e-real/) | Ambiente real; configuração separada |
-| Testes de componentes | ~15 | Presentes |
+| ServiceCatalogListPage | ✅ REAL | Conectada à API real de serviços |
+| ServiceCatalogPage | ✅ REAL | — |
+| ServiceDetailPage | ✅ REAL | — |
+| ContractsPage | ✅ REAL | — |
+| ContractListPage | ✅ REAL | — |
+| ContractDetailPage | ✅ REAL | — |
+| SourceOfTruthExplorerPage | ✅ REAL | — |
+| ServiceSourceOfTruthPage | ✅ REAL | — |
+| ContractSourceOfTruthPage | ✅ REAL | — |
+| CatalogContractsConfigurationPage | ✅ REAL | — |
+| DeveloperPortalPage | ⚠️ PARCIAL | 7 endpoints backend stub |
+| GlobalSearchPage | ⚠️ PARCIAL | GlobalSearch real; SearchCatalog stub |
 
-**Gap:** E2E de incidents e AI não validam fluxo real (usam fixtures estáticas).
+**Status geral:** READY para 10/12 páginas; 2 parciais por stubs do backend
 
-**Evidência:** `src/frontend/e2e/`, `src/frontend/src/__tests__/`
+---
+
+### Change Governance (`src/features/change-governance/`)
+**Rotas:** `changesRoutes.tsx`
+
+| Página | Status | Evidência |
+|---|---|---|
+| ChangeCatalogPage | ✅ REAL | — |
+| ChangeDetailPage | ✅ REAL | — |
+| ReleasesPage | ✅ REAL | — |
+| WorkflowPage | ✅ REAL | — |
+| WorkflowConfigurationPage | ✅ REAL | — |
+| PromotionPage | ✅ REAL | Testado em `__tests__/pages/PromotionPage.test.tsx` |
+
+**Status geral:** READY — módulo mais completo no frontend
+
+---
+
+### Operations (`src/features/operations/`)
+**Rotas:** `operationsRoutes.tsx`
+
+| Página | Status | Evidência |
+|---|---|---|
+| IncidentsPage | ❌ MOCK | `mockIncidents` hardcoded inline — confirmado |
+| RunbooksPage | ❌ MOCK | 3 runbooks hardcoded |
+| MitigationPage | ❌ MOCK | Sem conexão à API real |
+
+**Status geral:** BROKEN — 100% mock, sem conexão ao backend real
+
+---
+
+### AI Hub (`src/features/ai-hub/`)
+**Rotas:** `aiHubRoutes.tsx`
+
+| Componente/Página | Status | Evidência |
+|---|---|---|
+| AssistantPanel.tsx | ❌ MOCK | `mockConversations` hardcoded — confirmado |
+| AI Governance pages | ✅ REAL | Model registry, policies, budgets conectados |
+| AI Agents pages | ⚠️ PARCIAL | Dados parcialmente reais |
+
+**Status geral:** PARTIAL — governance real; assistant 100% mock
+
+---
+
+### Governance (`src/features/governance/`)
+**Rotas:** `governanceRoutes.tsx`
+
+| Página | Status | Evidência |
+|---|---|---|
+| GovernancePacksOverviewPage | 🟡 MOCK | Dados simulados do backend |
+| GovernancePackDetailPage | 🟡 MOCK | — |
+| DomainsOverviewPage | 🟡 MOCK | — |
+| DomainDetailPage | 🟡 MOCK | — |
+| TeamsOverviewPage | 🟡 MOCK | — |
+| ReportsPage | 🟡 MOCK | — |
+| RiskCenterPage | 🟡 MOCK | — |
+| RiskHeatmapPage | 🟡 MOCK | — |
+| CompliancePage | 🟡 MOCK | — |
+| WaiversPage | 🟡 MOCK | — |
+| EvidencePackagesPage | 🟡 MOCK | — |
+| PolicyCatalogPage | 🟡 MOCK | — |
+| ExecutiveOverviewPage | 🟡 MOCK | — |
+| ExecutiveDrillDownPage | 🟡 MOCK | — |
+| ExecutiveFinOpsPage | 🟡 MOCK | — |
+| ServiceFinOpsPage | 🟡 MOCK | — |
+| DomainFinOpsPage | 🟡 MOCK | — |
+| BenchmarkingPage | 🟡 MOCK | — |
+| DelegatedAdminPage | 🟡 MOCK | — |
+| GovernanceConfigurationPage | ⚠️ PARCIAL | — |
+| EnterpriseControlsPage | 🟡 MOCK | — |
+
+**Status geral:** MOCK — 20+ páginas que consomem dados simulados do backend
+
+---
+
+### Identity Access (`src/features/identity-access/`)
+
+| Componente/Página | Status |
+|---|---|
+| Users, Roles, Delegations, Environments | ✅ REAL |
+| Login, OIDC flow | ✅ REAL |
+| MFA, JIT, Break Glass | ✅ REAL |
+
+**Status geral:** READY
+
+---
+
+### Contracts (`src/features/contracts/`)
+**Rotas:** `contractsRoutes.tsx`
+
+| Área | Status |
+|---|---|
+| Contract catalog, list, detail | ✅ REAL |
+| Contract Studio workspace | ⚠️ PARCIAL |
+| Contract governance | ✅ REAL |
+| Publication workflow | ✅ REAL |
+
+**Status geral:** READY para 80%; Contract Studio precisa polish
+
+---
+
+### Configuration (`src/features/configuration/`)
+
+| Área | Status |
+|---|---|
+| Feature flags, settings | ✅ REAL |
+| Tenant configuration | ✅ REAL |
+
+**Status geral:** READY
+
+---
+
+### Audit Compliance (`src/features/audit-compliance/`)
+
+| Área | Status |
+|---|---|
+| Audit trail, campaigns | ✅ REAL |
+
+**Status geral:** READY
+
+---
+
+### Integrations (`src/features/integrations/`)
+
+| Área | Status |
+|---|---|
+| Integration list, configuration | ⚠️ PARCIAL |
+
+**Status geral:** PARCIAL — conectores backend são stubs
+
+---
+
+### Notifications (`src/features/notifications/`)
+
+| Área | Status |
+|---|---|
+| Notification preferences, templates | ✅ REAL |
+
+**Status geral:** READY (cobertura E2E não validada)
+
+---
+
+### Operations → Product Analytics (`src/features/product-analytics/`)
+
+**Status:** MOCK — dados simulados
+
+---
+
+### Dashboard (`src/features/shared/pages/DashboardPage.tsx`)
+
+Dashboard principal. Conecta a múltiplos módulos. Estado: PARCIAL — dados de módulos mock aparecem simulados.
+
+---
+
+## API Integration (`src/api/`)
+
+- `client.ts`: cliente axios configurado com base URL e interceptors de auth
+- `index.ts`: ponto de exportação
+- Cada feature tem sua própria pasta `api/` com hooks TanStack Query
+
+**Avaliação:** Integração real confirmada para Catalog, ChangeGovernance, IdentityAccess, AuditCompliance. Mock/placeholder para Operations (incidents), AI Hub (assistant), e módulos governance.
+
+---
+
+## i18n — Estado
+
+- Framework: i18next + react-i18next (confirmado)
+- 4 locales documentados
+- 41 namespaces documentados
+- `src/locales/en.json` — ficheiro principal confirmado
+- Avaliação: i18n presente e aplicado nas áreas core; áreas mock podem ter cobertura parcial
+
+**Sem textos hardcoded identificados nas áreas core.** Áreas mock (Governance, Operations) devem ser verificadas no momento de substituição.
+
+---
+
+## Auth Flow (`src/auth/`)
+
+- `AuthContext.tsx` testado em `__tests__/contexts/AuthContext.test.tsx`
+- `ProtectedRoute.tsx` testado em `__tests__/components/ProtectedRoute.test.tsx`
+- `usePermissions.test.tsx` confirma lógica de permissões
+- Deep-link preservation: verificar no momento de integração OIDC completa
+
+---
+
+## Componentes Shared (`src/components/`)
+
+50+ componentes customizados confirmados com `wc -l`:
+- `PageStateDisplay.tsx` (77 linhas) — estados de página
+- `PasswordInput.tsx` (84 linhas)
+- `PersonaQuickstart.tsx` (150 linhas) — onboarding por persona
+- `QuickActions.tsx` (102 linhas) — ações contextuais
+- `StatCard.tsx` (78 linhas) — cards de métricas
+- `Tabs.tsx` (106 linhas)
+- `TimelinePanel.tsx` (92 linhas)
+- `Typography.tsx` (147 linhas)
+- `DemoBanner.tsx` — **banner explícito para áreas de demonstração/simulação**
+- `CommandPalette.tsx` — busca global
+- `SearchInput.tsx`
+- `ReleaseScopeGate.tsx` — gate de acesso por release scope
+
+**Nota:** Sem Radix UI — todos os componentes são implementações customizadas. Risco de inconsistência com o alvo de design system definido.
+
+---
+
+## Anti-padrões Identificados
+
+| Anti-padrão | Localização | Impacto |
+|---|---|---|
+| `mockIncidents` hardcoded inline | `src/features/operations/` | Fluxo 3 inoperante |
+| `mockConversations` hardcoded | `src/features/ai-hub/components/AssistantPanel.tsx` | AI Assistant inoperante |
+| Governance exibe dados simulados sem warning adequado | `src/features/governance/` | Expectativas falsas |
+| React 19 em vez de React 18 (alvo CLAUDE.md) | `package.json` | Desvio de stack |
+| react-router-dom em vez de TanStack Router | `package.json` | Desvio de stack |
+| Ausência de Radix UI | `package.json` | Componentes customizados sem base validada |
+| Ausência de Apache ECharts | `package.json` | Gráficos sem biblioteca definida pelo alvo |
+
+---
+
+## Resumo por Módulo
+
+| Feature | Estado | Mock? |
+|---|---|---|
+| Catalog (serviços, contratos, source of truth) | ✅ READY | Não |
+| Change Governance | ✅ READY | Não |
+| Identity Access | ✅ READY | Não |
+| Audit Compliance | ✅ READY | Não |
+| Configuration | ✅ READY | Não |
+| Notifications | ✅ READY | Não |
+| Contracts workspace | ⚠️ PARCIAL | Parcialmente |
+| AI Hub (governance) | ⚠️ PARCIAL | Sim (assistant) |
+| Operations (incidents, runbooks) | ❌ BROKEN | Sim (100%) |
+| Governance (reports, FinOps, risk) | 🟡 MOCK | Sim (100%) |
+| Integrations | ⚠️ PARCIAL | Parcialmente |
+| Product Analytics | 🟡 MOCK | Sim |
+
+**Global:** ~89% de páginas conectadas a backend real; ~11% em mock inline
+
+---
+
+## Recomendações
+
+1. **Crítico:** Conectar `IncidentsPage.tsx` à API real — remover `mockIncidents`
+2. **Crítico:** Conectar `AssistantPanel.tsx` à API real de conversações
+3. **Alta:** Substituir Governance pages para consumir dados reais quando backend for implementado
+4. **Média:** Avaliar alinhamento da stack (TanStack Router, Zustand, Radix UI, ECharts)
+5. **Média:** Padronizar loading, error e empty states em todas as páginas
+6. **Baixa:** Garantir i18n completo nas áreas que serão substituídas (Governance, Operations)
+
+---
+
+*Data: 28 de Março de 2026*

@@ -1,153 +1,193 @@
 # Relatório de IA, Agentes e Governança de IA — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Objetivo no Contexto do Produto
+## Objetivo da Área no Contexto do Produto
 
-A IA no NexTraceOne deve ser uma capacidade governada, auditável, contextualizada ao produto e útil para as personas. Não pode ser um chat genérico. Deve: operar dentro de políticas, respeitar limites por utilizador/grupo/tenant, usar fontes de conhecimento do produto (contratos, mudanças, incidentes) e ser auditável.
-
----
-
-## 2. Estado Geral do Módulo AI Knowledge
-
-### Resumo por Área
-
-| Área | DbContext | Migrações | Features | Estado Real |
-|---|---|---|---|---|
-| AI Governance | AiGovernanceDbContext | Sim | 28 | PARTIAL — repositórios EF Core funcionais |
-| AI Orchestration | AiOrchestrationDbContext | Snapshot (sem confirmação) | Parcial | PARTIAL |
-| External AI | ExternalAiDbContext | Snapshot (sem confirmação) | 8 TODO stubs | STUB |
-
-**Total features módulo:** ~36 features, 78% real, 22% stub/plan
+IA no NexTraceOne é capacidade governada, não chat genérico. Deve incluir: modelo governado, auditoria de uso, controlo de acesso por persona/tenant/ambiente, e assistência real a decisões operacionais (contratos, mudanças, incidentes, runbooks).
 
 ---
 
-## 3. AI Governance — Estado
+## Estado Atual Encontrado
 
-**Status: PARTIAL/READY**
+### Sumário de Estado
 
-### O que funciona:
-- **Model Registry**: CRUD de modelos, tracking de budget, metadata
-- **AI Access Policies**: Políticas por utilizador e por grupo
-- **Token & Budget Governance**: Controlo de gastos de tokens por tenant/utilizador
-- **AI Audit**: Registo de uso de IA
-
-### O que falta:
-- `IAiOrchestrationModule` = PLAN (interface vazia, sem métodos implementados)
-- A governança existe mas o assistant não a consulta de facto (porque o assistant é mock)
-
-**Evidência:** `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/Governance/`, `docs/IMPLEMENTATION-STATUS.md` §AI
-
----
-
-## 4. AI Assistant — Estado Crítico
-
-**Status: MOCK**
-
-### Problema central:
-`SendAssistantMessage` retorna respostas hardcoded — sem integração com LLM real.
-
-### Frontend:
-`AiAssistantPage.tsx` usa `mockConversations` hardcoded com comentário: *"AssistantPanel tem fallback mock quando backend falha"*
-
-### Integração LLM:
-- Ollama: configurado (`localhost:11434`, `qwen3.5:9b`), enabled=true
-- OpenAI: configurado mas `enabled=false` por padrão
-- `IExternalAIRoutingPort` existe como abstração
-- `ExternalAI` module: 8 features marcadas como TODO stub
-
-**Gap:** A infraestrutura de configuração de providers está correta. O routing de provider existe como abstração. Mas o handler `SendAssistantMessage` não invoca nenhum provider real — retorna hardcoded.
-
-**Evidência:** `docs/CORE-FLOW-GAPS.md` §Fluxo 4, `docs/REBASELINE.md` §AI Knowledge
-
----
-
-## 5. Grounding e Knowledge Retrieval
-
-**Status: PARTIAL**
-
-### Infraestrutura presente:
-- Context builders e knowledge surfaces existem
-- `POST /ai/context/enrich` existe mas sem retrieval real de dados
-- Incidents e Runbooks têm persistência real via EfIncidentStore (usáveis como fontes)
-- Contratos e mudanças têm dados reais (Catalog e ChangeGovernance)
-
-### O que falta:
-- Enriquecimento de contexto via queries reais dos módulos (IContractsModule, IChangeIntelligenceModule) — ambas são PLAN
-- Model selection retorna modelos fictícios (`NexTrace-Internal-v1`) — sem conexão ao Model Registry real
-- Grounding validado end-to-end: não existe
-
-**Evidência:** `docs/CORE-FLOW-GAPS.md` §Fluxo 4
-
----
-
-## 6. AI Agents
-
-**Status: PARTIAL (UI presente, backend parcial)**
-
-- `AiAgentsPage.tsx` e `AgentDetailPage.tsx` existem no frontend
-- Conectados ao backend via API real
-- `ADR-006-agent-runtime-foundation.md` documenta a arquitetura de agentes
-- `IAiOrchestrationModule` = PLAN (sem implementação)
-
----
-
-## 7. IDE Extensions Management
-
-**Status: PLACEHOLDER**
-
-- `IdeIntegrationsPage.tsx` existe no frontend
-- Conectada ao backend
-- Sem evidence de integração real com IDEs (VS Code, JetBrains)
-
----
-
-## 8. Regras de Governança de IA — Verificação
-
-| Regra | Estado | Evidência |
+| Componente | Estado | Evidência |
 |---|---|---|
-| IA com contexto do produto | Parcial — estrutura existe, não funcional | `context/enrich` sem retrieval real |
-| IA com política por utilizador | Sim — AiGovernanceDbContext | Access policies implementadas |
-| IA com autorização | Sim — RequirePermission nos endpoints | Endpoints protegidos |
-| IA com auditabilidade | Parcial — AI Audit existe; assistant não persiste conversas reais | AiAuditPage conectada |
-| IA com tenant awareness | Sim — tenant isolation no DbContext | RLS aplicado |
-| IA com environment awareness | Parcial — estrutura existe | Não validado |
-| IA com persona awareness | Parcial — prompts por persona documentados | Eficácia não validada |
-| Controle de dados para modelos externos | Sim — OpenAI disabled por padrão | appsettings.json |
-| Token budget governance | Sim — AiGovernanceDbContext | Implementado |
-| Sem chat genérico sem contexto | VIOLADO — assistant retorna hardcoded | `SendAssistantMessage` |
+| AI Governance (modelos, políticas, budgets) | ✅ REAL | `AiGovernanceDbContext`, model registry funcional |
+| AI Access Policies | ✅ REAL | Políticas por tenant/role — real |
+| AI Token & Budget Governance | ✅ REAL | `AiTokenUsageLedger` persistido |
+| Model Registry | ⚠️ PARCIAL | Real mas não conectado ao routing real |
+| AI Audit & Usage | ⚠️ PARCIAL | Real mas audita mock (assistant retorna hardcoded) |
+| AI Tools (list_services, etc.) | ✅ REAL | 3 ferramentas reais confirmadas |
+| AI Knowledge Sources / Context builders | ⚠️ PARCIAL | Estrutura real, sem retrieval/RAG real |
+| AI Assistant (SendAssistantMessage) | ❌ BROKEN | Retorna respostas hardcoded — sem LLM real E2E |
+| AiAssistantPage | ❌ MOCK | `mockConversations` hardcoded |
+| AI Agents (orchestration) | ⚠️ PARCIAL | State machines reais; orchestration parcialmente implementada |
+| External AI Integrations | ❌ PLAN | 8 handlers TODO stub; `ExternalAiModule` é stub |
+| IDE Extensions Management | ⚠️ PARCIAL | `AiIdeEndpointModule` existe; sem validação E2E de extensão IDE |
 
 ---
 
-## 9. Cross-Module AI Interfaces — Estado
+## AIKnowledge Module — Análise por SubContexto
 
-| Interface | Estado | Impacto para IA |
+`src/modules/aiknowledge/` | 287 ficheiros | 3 DbContexts | 11 migrações
+
+### 1. AI Governance (`AiGovernanceDbContext`) — READY
+**Migrações:** 3
+
+**O que está real e funcional:**
+- `AiProvider`: registo de providers (Ollama, OpenAI, etc.) com configuração por tenant
+- `AiModel`: registry de modelos com capabilities, contexto máximo, pricing
+- `AiAccessPolicy`: políticas de acesso por role/tenant/ambiente
+- `AiAgentDefinition`: definição de agentes com estado (Draft → Active → Published → Archived)
+- `AiTokenUsageLedger`: contabilização real de tokens por utilizador/agente/tenant
+- `AiAuditEntry`: auditoria de uso de IA
+- `AiKnowledgeSource`: fontes de conhecimento configuradas
+
+**Verificação:** Todas as entidades têm DbSets, migrations, e handlers reais que consultam o DbContext.
+
+### 2. AI Orchestration (`AiOrchestrationDbContext`) — PARCIAL
+**Migrações:** 5
+
+**O que existe:**
+- `AiAssistantConversation`: conversações de assistente com mensagens
+- `AiMessage`: mensagens de conversa com role e conteúdo
+- `AiAgentExecution`: execuções de agentes com estado
+- State machine real para `AgentPublicationStatus`
+
+**O que está quebrado:**
+- `SendAssistantMessage` handler (256 linhas) tem lógica de routing, grounding e contexto real, **mas retorna resposta hardcoded** em vez de chamar o LLM
+- `IExternalAIRoutingPort` existe como abstração — implementação real para Ollama não está conectada
+- Outbox sem processador registado para `AiOrchestrationDbContext`
+
+### 3. External AI (`ExternalAiDbContext`) — PLAN
+**Migrações:** 3
+
+**Estado:** `ExternalAiModule.cs` implementa `IExternalAiModule` mas todos os 8 métodos têm `TODO: Phase 03.x`. Sem lógica real de chamada a LLM externo.
+
+**Ficheiro chave:** `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/ExternalAI/Services/ExternalAiModule.cs`
+
+---
+
+## SendAssistantMessage — Análise Detalhada
+
+**Ficheiro:** `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Features/SendAssistantMessage/`
+
+O handler tem 256 linhas com lógica real de:
+- routing intelligence (provider selection)
+- context building (grounding com contratos, mudanças, serviços)
+- `AiTokenUsageLedger` update
+- `AiAuditEntry` creation
+- `AiMessage` persistence
+
+**Mas:** a chamada real ao LLM não acontece. A resposta é hardcoded como texto de fallback. `Ollama` está configurado em `appsettings.json` (`http://localhost:11434`) mas a chamada HTTP não chega ao provider.
+
+**Gap:** Conectar `IExternalAIRoutingPort` ao provider Ollama implementado é a ação que fecha este fluxo.
+
+**TODOs confirmados (aiknowledge):**
+- 3 em Orchestration (Phase 02.6 — metadata de atribuição de token/modelo)
+- 6 em ExternalAI (Phase 03.x — knowledge capture, external routing, retrieval)
+
+---
+
+## AI Tools — 3 Ferramentas Reais
+
+Confirmadas como reais no domain:
+1. `list_services` — lista serviços do catalog
+2. `get_service_health` — saúde de serviço via OperationalIntelligence
+3. `list_recent_changes` — mudanças recentes via ChangeGovernance
+
+**Gap:** Ferramentas existem no domain mas `SendAssistantMessage` não chega a invocá-las por causa do hardcoded response.
+
+---
+
+## AiAssistantPage — Frontend MOCK
+
+**Ficheiro:** `src/frontend/src/features/ai-hub/components/AssistantPanel.tsx`
+
+Confirmado por inspeção: contém `mockConversations` hardcoded. Não consume a API real de `AiOrchestrationDbContext`.
+
+---
+
+## Governance de IA — Verificação de Requisitos CLAUDE.md
+
+| Requisito | Estado | Evidência |
 |---|---|---|
-| `IAiOrchestrationModule` | PLAN (empty) | Sem orquestração real de AI flows |
-| `IExternalAiModule` | PLAN (empty) | Sem integração com providers externos |
-| `IContractsModule` | PLAN | IA não pode consultar contratos dinamicamente |
-| `IChangeIntelligenceModule` | PLAN | IA não pode consultar mudanças dinamicamente |
+| Contexto do produto | ✅ | Context builders com contratos, mudanças, serviços |
+| Política de acesso | ✅ | `AiAccessPolicy` real |
+| Auditabilidade | ⚠️ PARCIAL | `AiAuditEntry` real mas audita resposta hardcoded |
+| Observabilidade de uso | ✅ | `AiTokenUsageLedger` |
+| Governança de modelo | ✅ | Model registry real |
+| i18n na UI | ✅ | i18n aplicado |
+| Tenant awareness | ✅ | Tenant filtrado em todas as queries |
+| Environment awareness | ⚠️ | Presente na estrutura; verificar em fluxo real |
+| Persona awareness | ⚠️ | Estrutura existe; sem validação E2E |
+| Controlo de dados para modelos externos | ✅ | OpenAI disabled por default; política de acesso |
 
 ---
 
-## 10. Risco Principal
+## Avaliação por Caso de Uso de IA (CLAUDE.md §11.3)
 
-**A governança existe mas o assistant que ela governa não funciona.**
+### IA Operacional
+| Caso | Estado |
+|---|---|
+| Investigar problema em produção | ❌ — assistant não funciona E2E |
+| Correlacionar incidente com mudança | ❌ — engine de correlação ausente |
+| Sugerir causa provável | ❌ — sem LLM real |
+| Recomendar mitigação | ❌ — sem LLM real |
+| Consultar telemetry, changes, topology, contracts | ⚠️ — context builders existem; não testados E2E |
 
-Existe infrastructure completa de AI governance (políticas, budgets, model registry, audit). Mas o único componente que usa esta infraestrutura — o AI Assistant — retorna respostas hardcoded. Resultado: governança governa nada em produção.
+### IA de Engenharia
+| Caso | Estado |
+|---|---|
+| Gerar contratos REST/SOAP/AsyncAPI | ❌ — sem LLM real |
+| Sugerir schemas e exemplos | ❌ — sem LLM real |
+| Validar compatibilidade | ⚠️ — sem LLM real (lógica de domain existe sem AI) |
+| Acelerar desenvolvimento com contexto governado | ⚠️ — context builders existem |
+
+### IA Governada
+| Caso | Estado |
+|---|---|
+| Controlar quem pode usar qual modelo | ✅ REAL |
+| Controlar dados que saem para modelos externos | ✅ OpenAI disabled; policy real |
+| Budget de tokens | ✅ REAL |
+| Auditar uso completo | ⚠️ PARCIAL — audita mock |
 
 ---
 
-## 11. Recomendações
+## Agentes Especializados — Estado
 
-| Ação | Prioridade | Impacto |
-|---|---|---|
-| Conectar `SendAssistantMessage` ao provider Ollama via `IExternalAIRoutingPort` | Crítica | Fluxo AI end-to-end |
-| Implementar enriquecimento de contexto com dados reais dos módulos | Alta | Grounding útil |
-| Conectar `AiAssistantPage` à API de conversas real | Alta | Frontend funcional |
-| Implementar `IAiOrchestrationModule` com métodos reais | Alta | Orquestração |
-| Gerar migrações para AiOrchestrationDbContext e ExternalAiDbContext | Média | Persistência deployável |
-| Implementar os 8 ExternalAI handlers TODO | Média | Integração IA externa |
-| Conectar Model Registry ao routing de providers | Média | Modelo selecionado por política |
-| Validar que AI Audit persiste conversas reais | Alta | Auditabilidade real |
+| Agente | Estado |
+|---|---|
+| Agente de criação de contrato REST | ❌ PLAN — sem LLM real |
+| Agente de análise de change impact | ❌ PLAN |
+| Agente de investigação operacional | ❌ PLAN |
+| Agente de geração de cenários de teste | ❌ PLAN |
+| Criação de agentes por utilizador | ⚠️ PARCIAL — `AiAgentDefinition` existe |
+
+---
+
+## Gaps Críticos
+
+1. **AI Assistant sem LLM real** — `SendAssistantMessage` retorna hardcoded; `AiAssistantPage` usa mock
+2. **ExternalAI 8 handlers TODO** — Phase 03.x não iniciado
+3. **Outbox sem processador** para `AiOrchestrationDbContext`
+4. **RAG/Knowledge retrieval** ausente — context builders sem retrieval semântico real
+5. **IDE Extensions** — `AiIdeEndpointModule` existe mas extensão IDE não validada
+
+---
+
+## Recomendações
+
+1. **Crítico:** Conectar `SendAssistantMessage` → `IExternalAIRoutingPort` → Ollama provider
+2. **Crítico:** Remover `mockConversations` de `AssistantPanel.tsx` e conectar à API real
+3. **Alta:** Implementar os 8 handlers ExternalAI (Phase 03.x)
+4. **Alta:** Ativar outbox para `AiOrchestrationDbContext`
+5. **Média:** Implementar RAG básico para knowledge retrieval do `KnowledgeDbContext`
+6. **Média:** Conectar `AiAuditEntry` ao fluxo real (vai ficar automático após passo 1)
+
+---
+
+*Data: 28 de Março de 2026*
