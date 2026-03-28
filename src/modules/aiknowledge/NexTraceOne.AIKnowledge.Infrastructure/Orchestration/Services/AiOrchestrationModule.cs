@@ -8,7 +8,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Services;
 internal sealed class AiOrchestrationModule(
     AiOrchestrationDbContext context) : IAiOrchestrationModule
 {
-    // TODO(P02.x): replace placeholders when orchestration persists token/model attribution metadata.
+    // TODO(P02.6-followup): replace placeholders when orchestration persists token/model attribution metadata.
     private const int UnknownTokensUsed = 0;
     private const string? UnknownModelUsed = null;
 
