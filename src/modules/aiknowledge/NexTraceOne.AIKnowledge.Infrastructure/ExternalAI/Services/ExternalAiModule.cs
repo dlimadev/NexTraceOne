@@ -23,7 +23,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
             .ToListAsync(ct);
 
         var policyCapabilities = ExtractCapabilities(activePolicies);
-        var providerCapabilities = policyCapabilities.Count > 0 ? policyCapabilities : DefaultCapabilities;
+        var resolvedCapabilities = policyCapabilities.Count > 0 ? policyCapabilities : DefaultCapabilities;
 
         return await context.Providers
             .AsNoTracking()
@@ -34,7 +34,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
                 p.Name,
                 p.ModelName,
                 p.IsActive ? "Healthy" : "Unhealthy",
-                providerCapabilities,
+                resolvedCapabilities,
                 p.UpdatedAt))
             .ToListAsync(ct);
     }
