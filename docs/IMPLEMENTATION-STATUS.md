@@ -221,7 +221,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Interface | Status | Notas |
 |---|---|---|
-| `IContractsModule` | PLAN | Definida, 0 implementações |
+| `IContractsModule` | REAL | Implementado por `ContractsModuleService` (Catalog.Infrastructure) |
 | `IChangeIntelligenceModule` | PLAN | Definida, 0 implementações |
 | `ICatalogGraphModule` | PARTIAL | Usada em Governance para `ServiceCount` (único uso ativo) |
 | `IRuntimeIntelligenceModule` | PLAN | Interface vazia, sem implementação |
@@ -230,8 +230,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | `IExternalAiModule` | REAL | Implementado por `ExternalAiModule` (Infrastructure) |
 | `IKnowledgeModule` | PLAN | Definida, 0 implementações |
 
-**Gap crítico:** 8 interfaces cross-module definidas; 7 de 8 com zero implementações. Integração entre módulos não funciona.
-**Evidência:** `docs/audit-forensic-2026-03/backend-state-report.md`
+**Gap:** 8 interfaces cross-module definidas; 5 de 8 com zero implementações.
+**Evidência:** `src/modules/catalog/NexTraceOne.Catalog.Infrastructure/Contracts/Services/ContractsModuleService.cs`
 
 ---
 
