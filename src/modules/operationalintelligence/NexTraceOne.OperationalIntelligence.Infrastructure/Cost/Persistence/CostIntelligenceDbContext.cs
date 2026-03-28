@@ -46,7 +46,7 @@ public sealed class CostIntelligenceDbContext(
         => "NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Configurations";
 
     /// <inheritdoc />
-    protected override string OutboxTableName => "ops_cost_outbox_messages";
+    protected override string OutboxTableName => "ops_outbox_messages";
 
     /// <inheritdoc />
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
