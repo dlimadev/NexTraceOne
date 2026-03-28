@@ -1,0 +1,108 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
+
+namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
+
+/// <summary>
+/// Implementação do contrato público do módulo RuntimeIntelligence.
+/// Usa RuntimeIntelligenceDbContext para consultas de leitura cross-module.
+/// </summary>
+internal sealed class RuntimeIntelligenceModule(
+    RuntimeIntelligenceDbContext context,
+    ILogger<RuntimeIntelligenceModule> logger) : IRuntimeIntelligenceModule
+{
+    private const decimal MissingBaselinePenalty = 0.90m;
+    private const decimal HighDriftPenalty = 0.85m;
+    private const decimal CriticalDriftPenalty = 0.70m;
+    private const decimal BaselineMinWeight = 0.85m;
+    private const decimal BaselineVariableWeight = 0.15m;
+
+    /// <inheritdoc />
+    public async Task<string?> GetCurrentHealthStatusAsync(
+        string serviceName,
+        string environment,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug(
+            "Fetching latest runtime health status for service '{ServiceName}' in environment '{Environment}'",
+            serviceName,
+            environment);
+
+        var latestStatus = await context.RuntimeSnapshots
+            .AsNoTracking()
+            .Where(s => s.ServiceName == serviceName && s.Environment == environment)
+            .OrderByDescending(s => s.CapturedAt)
+            .Select(s => (HealthStatus?)s.HealthStatus)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return latestStatus?.ToString();
+    }
+
+    /// <inheritdoc />
+    public async Task<decimal?> GetObservabilityScoreAsync(
+        string serviceName,
+        string environment,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug(
+            "Fetching runtime observability score for service '{ServiceName}' in environment '{Environment}'",
+            serviceName,
+            environment);
+
+        var profileScore = await context.ObservabilityProfiles
+            .AsNoTracking()
+            .Where(p => p.ServiceName == serviceName && p.Environment == environment)
+            .OrderByDescending(p => p.LastAssessedAt)
+            .Select(p => (decimal?)p.ObservabilityScore)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (!profileScore.HasValue)
+            return null;
+
+        var baselineConfidence = await context.RuntimeBaselines
+            .AsNoTracking()
+            .Where(b => b.ServiceName == serviceName && b.Environment == environment)
+            .OrderByDescending(b => b.EstablishedAt)
+            .Select(b => (decimal?)b.ConfidenceScore)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var hasOpenHighDrift = await context.DriftFindings
+            .AsNoTracking()
+            .AnyAsync(
+                d => d.ServiceName == serviceName
+                     && d.Environment == environment
+                     && !d.IsResolved
+                     && d.Severity == DriftSeverity.High,
+                cancellationToken);
+
+        var hasOpenCriticalDrift = await context.DriftFindings
+            .AsNoTracking()
+            .AnyAsync(
+                d => d.ServiceName == serviceName
+                     && d.Environment == environment
+                     && !d.IsResolved
+                     && d.Severity == DriftSeverity.Critical,
+                cancellationToken);
+
+        var score = profileScore.Value;
+
+        score *= baselineConfidence.HasValue
+            ? BaselineMinWeight + (Math.Clamp(baselineConfidence.Value, 0m, 1m) * BaselineVariableWeight)
+            : MissingBaselinePenalty;
+
+        if (hasOpenCriticalDrift)
+        {
+            score *= CriticalDriftPenalty;
+        }
+        else if (hasOpenHighDrift)
+        {
+            score *= HighDriftPenalty;
+        }
+
+        return Math.Round(Math.Clamp(score, 0m, 1m), 2);
+    }
+}
