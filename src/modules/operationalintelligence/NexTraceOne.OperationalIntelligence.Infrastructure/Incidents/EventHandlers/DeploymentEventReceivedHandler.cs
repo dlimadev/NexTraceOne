@@ -36,7 +36,7 @@ internal sealed class DeploymentEventReceivedHandler(
             Description: $"Deployment {@event.DeploymentId} version {@event.Version} received from {@event.SourceSystem}.",
             IncidentType: IncidentType.OperationalRegression,
             Severity: IncidentSeverity.Warning,
-            ServiceId: @event.DeploymentId.ToString(),
+            ServiceId: @event.SourceSystem,
             ServiceDisplayName: @event.SourceSystem,
             OwnerTeam: "change-governance",
             ImpactedDomain: "change-intelligence",
