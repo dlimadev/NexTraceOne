@@ -2,25 +2,32 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
-using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 
 /// <summary>
 /// Implementação real do serviço de retrieval de documentos para grounding de IA.
-/// Pesquisa fontes de conhecimento registadas no módulo AIKnowledge (KnowledgeSources).
-/// Filtra por query, classificação e fonte. Retorna resultados relevantes ou vazio honesto.
+/// Combina duas fontes de conhecimento:
+///   1. KnowledgeDocuments do Knowledge Hub (runbooks, docs operacionais, post-mortems)
+///      via IKnowledgeDocumentGroundingReader (somente-leitura cross-módulo)
+///   2. AIKnowledgeSources registadas no módulo AIKnowledge (configurações, endpoints)
+/// Retorna resultados relevantes. Falha silenciosamente por fonte — nunca bloqueia o pipeline.
 /// </summary>
 public sealed class DocumentRetrievalService : IDocumentRetrievalService
 {
+    private const int MaxSnippetLength = 250;
+
     private readonly IAiKnowledgeSourceRepository _sourceRepo;
+    private readonly IKnowledgeDocumentGroundingReader _knowledgeDocReader;
     private readonly ILogger<DocumentRetrievalService> _logger;
 
     public DocumentRetrievalService(
         IAiKnowledgeSourceRepository sourceRepo,
+        IKnowledgeDocumentGroundingReader knowledgeDocReader,
         ILogger<DocumentRetrievalService> logger)
     {
         _sourceRepo = sourceRepo;
+        _knowledgeDocReader = knowledgeDocReader;
         _logger = logger;
     }
 
@@ -32,6 +39,37 @@ public sealed class DocumentRetrievalService : IDocumentRetrievalService
             "Document retrieval requested for query '{Query}' with max {MaxResults} results",
             request.Query, request.MaxResults);
 
+        var hits = new List<DocumentSearchHit>();
+
+        // ── 1. Knowledge Hub documents (runbooks, operational docs, post-mortems) ──
+        try
+        {
+            var docs = await _knowledgeDocReader.SearchDocumentsAsync(
+                request.Query, request.MaxResults, ct);
+
+            foreach (var doc in docs)
+            {
+                hits.Add(new DocumentSearchHit(
+                    SourceId: "KnowledgeHub",
+                    DocumentId: doc.DocumentId,
+                    Title: doc.Title,
+                    Snippet: doc.Summary ?? string.Empty,
+                    RelevanceScore: 0.90,
+                    Classification: doc.Category));
+            }
+
+            _logger.LogDebug(
+                "Knowledge Hub grounding: {Count} documents retrieved for query='{Query}'",
+                docs.Count, request.Query);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "Knowledge document retrieval failed for query='{Query}' — continuing without",
+                request.Query);
+        }
+
+        // ── 2. AI Knowledge Sources (registered source endpoints) ──
         try
         {
             var sources = await _sourceRepo.ListAsync(
@@ -39,14 +77,8 @@ public sealed class DocumentRetrievalService : IDocumentRetrievalService
                 isActive: true,
                 ct: ct);
 
-            if (sources.Count == 0)
-            {
-                _logger.LogDebug("No active knowledge sources found — returning empty result");
-                return new DocumentSearchResult(Success: true, Hits: Array.Empty<DocumentSearchHit>());
-            }
-
             var query = request.Query;
-            var hits = sources
+            var sourceHits = sources
                 .Where(s =>
                     s.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     s.Description.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -58,21 +90,34 @@ public sealed class DocumentRetrievalService : IDocumentRetrievalService
                     SourceId: s.SourceType.ToString(),
                     DocumentId: s.Id.Value.ToString(),
                     Title: s.Name,
-                    Snippet: s.Description,
-                    RelevanceScore: Math.Max(0.0, 1.0 - (index * 0.1)),
+                    Snippet: Truncate(s.Description, MaxSnippetLength),
+                    RelevanceScore: Math.Max(0.0, 0.75 - (index * 0.1)),
                     Classification: s.SourceType.ToString()))
                 .ToList();
 
-            _logger.LogDebug(
-                "Document retrieval found {HitCount} results for query '{Query}'",
-                hits.Count, request.Query);
+            hits.AddRange(sourceHits);
 
-            return new DocumentSearchResult(Success: true, Hits: hits);
+            _logger.LogDebug(
+                "AI knowledge source grounding: {Count} sources matched query='{Query}'",
+                sourceHits.Count, query);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Document retrieval failed for query '{Query}'", request.Query);
-            return new DocumentSearchResult(Success: false, Hits: Array.Empty<DocumentSearchHit>(), ErrorMessage: ex.Message);
+            _logger.LogWarning(ex,
+                "AI knowledge source retrieval failed for query='{Query}' — continuing without",
+                request.Query);
         }
+
+        _logger.LogDebug(
+            "Document retrieval found {HitCount} results for query '{Query}'",
+            hits.Count, request.Query);
+
+        return new DocumentSearchResult(Success: true, Hits: hits.Take(request.MaxResults).ToList());
+    }
+
+    private static string Truncate(string? text, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+        return text.Length <= maxLength ? text : string.Concat(text.AsSpan(0, maxLength - 3), "...");
     }
 }

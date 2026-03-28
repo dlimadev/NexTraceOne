@@ -18,7 +18,13 @@ public sealed record DatabaseSearchRequest(
     string Query,
     string? EntityType = null,
     string? TenantId = null,
-    int MaxResults = 10);
+    int MaxResults = 10,
+    string? ServiceId = null,
+    string? Environment = null,
+    int ChangesWindowDays = 7,
+    int IncidentsWindowDays = 30,
+    int MaxChanges = 10,
+    int MaxIncidents = 5);
 
 /// <summary>Resultado de pesquisa de dados estruturados.</summary>
 public sealed record DatabaseSearchResult(
