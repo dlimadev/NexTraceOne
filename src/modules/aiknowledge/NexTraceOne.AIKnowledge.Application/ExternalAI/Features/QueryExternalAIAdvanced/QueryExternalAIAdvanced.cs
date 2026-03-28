@@ -47,25 +47,30 @@ public static class QueryExternalAIAdvanced
                 cancellationToken);
 
             var filtered = models
-                .Where(model => HasCapability(model.Capabilities, request.Capability))
-                .Select(model => new ModelItem(
-                    model.Id.Value,
-                    model.Name,
-                    model.Provider,
-                    ParseCapabilities(model.Capabilities),
-                    model.Status == ModelStatus.Active ? "active" : "inactive",
-                    model.ContextWindow))
+                .Select(model => new
+                {
+                    Model = model,
+                    ParsedCapabilities = ParseCapabilities(model.Capabilities)
+                })
+                .Where(x => HasCapability(x.ParsedCapabilities, request.Capability))
+                .Select(x => new ModelItem(
+                    x.Model.Id.Value,
+                    x.Model.Name,
+                    x.Model.Provider,
+                    x.ParsedCapabilities,
+                    x.Model.Status == ModelStatus.Active ? "active" : "inactive",
+                    x.Model.ContextWindow))
                 .ToList();
 
             return new Response(filtered, filtered.Count);
         }
 
-        private static bool HasCapability(string capabilities, string? requestedCapability)
+        private static bool HasCapability(IReadOnlyList<string> parsedCapabilities, string? requestedCapability)
         {
             if (string.IsNullOrWhiteSpace(requestedCapability))
                 return true;
 
-            return ParseCapabilities(capabilities).Any(capability =>
+            return parsedCapabilities.Any(capability =>
                 string.Equals(capability, requestedCapability, StringComparison.OrdinalIgnoreCase));
         }
 

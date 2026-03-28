@@ -54,6 +54,7 @@ public static class ConfigureExternalAIPolicy
                     connectivity = connectivity with
                     {
                         Checked = true,
+                        IsHealthy = false,
                         ErrorMessage = $"Provider '{request.ProviderId}' is not registered."
                     };
                     errors.Add(new FieldValidationError("providerId", "Provider is not registered in runtime factory."));
