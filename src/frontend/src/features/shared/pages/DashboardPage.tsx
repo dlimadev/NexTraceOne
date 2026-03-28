@@ -183,14 +183,14 @@ export function DashboardPage() {
   return (
     <PageContainer>
       {/* ── Context bar ──────────────────────────────────────────────────────── */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-heading">{t('dashboard.title')}</h1>
-          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-accent/10 text-accent">
+      <div className="mb-7">
+        <div className="flex items-center gap-3 mb-1.5">
+          <h1 className="text-2xl font-bold text-heading tracking-tight">{t('dashboard.title')}</h1>
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue/10 text-cyan border border-cyan/15">
             {t(`persona.${persona}.label`)}
           </span>
         </div>
-        <p className="text-sm text-muted mt-1">{t(config.homeSubtitleKey)}</p>
+        <p className="text-sm text-muted">{t(config.homeSubtitleKey)}</p>
       </div>
 
       {/* Quick Actions — adaptadas à persona */}
@@ -211,13 +211,13 @@ export function DashboardPage() {
       )}
 
       {/* ── KPI Stats ────────────────────────────────────────────────────────── */}
-      <PageSection>
+      <div className="mb-6">
         <ContentGrid columns={5}>
           {stats.map((s) => (
             <StatCard key={s.title} {...s} />
           ))}
         </ContentGrid>
-      </PageSection>
+      </div>
 
       {/* ── Attention Alerts ─────────────────────────────────────────────────── */}
       {attentionAlerts.length > 0 && (

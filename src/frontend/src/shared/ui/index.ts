@@ -10,6 +10,9 @@
  * @see docs/DESIGN-SYSTEM.md
  */
 
+// ── Brand ────────────────────────────────────────────────────────────────────
+export { NexTraceLogo, NexTraceIcon, NexTraceWordmark } from '../../components/NexTraceLogo';
+
 // ── Interactive ─────────────────────────────────────────────────────────────
 export { Button } from '../../components/Button';
 export { IconButton } from '../../components/IconButton';

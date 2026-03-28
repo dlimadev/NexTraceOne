@@ -54,6 +54,15 @@
   --color-mint: #18E8B8;
   --color-mint-hover: #6CF5D8;
 
+  /* ─── Blue Institucional (CTA primário, SSO, ações destaque) ──────────────
+     Azul rico e profundo alinhado com a identidade visual do logo.
+     Separado do cyan para criar hierarquia de CTA clara.
+     ──────────────────────────────────────────────────────────────────────── */
+  --color-blue: #1B7FE8;
+  --color-blue-hover: #3D96F2;
+  --color-blue-muted: rgba(27, 127, 232, 0.14);
+  --color-blue-glow: rgba(27, 127, 232, 0.30);
+
   /* ─── Semantic Status ────────────────────────────────────────────────────── */
   --color-success: #18E8B8;
   --color-success-muted: rgba(24, 232, 184, 0.12);
@@ -99,6 +108,7 @@
   --shadow-glow-cyan: 0 0 0 1px rgba(18, 196, 232, 0.22), 0 0 24px rgba(18, 196, 232, 0.16);
   --shadow-glow-mint: 0 0 0 1px rgba(24, 232, 184, 0.20), 0 0 24px rgba(24, 232, 184, 0.14);
   --shadow-glow-danger: 0 0 0 1px rgba(255, 122, 134, 0.24), 0 0 20px rgba(255, 122, 134, 0.14);
+  --shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.30), 0 0 24px rgba(27, 127, 232, 0.20);
   --shadow-glow: 0 0 24px rgba(18, 196, 232, 0.16);
   --shadow-glow-sm: 0 0 12px rgba(18, 196, 232, 0.10);
 
@@ -140,6 +150,12 @@
   --nto-gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
   --nto-gradient-accent: linear-gradient(135deg, rgba(24,207,242,0.18) 0%, rgba(30,242,193,0.08) 100%);
   --nto-gradient-cta: linear-gradient(135deg, #29C0E5 0%, #2BB7E3 100%);
+  /* Gradiente azul institucional para SSO e ações de destaque primário */
+  --nto-gradient-blue: linear-gradient(135deg, #1B7FE8 0%, #1468CC 100%);
+  /* Gradiente do logo da marca: azul → cyan → mint */
+  --nto-gradient-logo: linear-gradient(135deg, #1B7FE8 0%, #12C4E8 50%, #18E8B8 100%);
+  /* Gradiente hero para painéis de apresentação */
+  --nto-gradient-hero: radial-gradient(ellipse at 30% 40%, rgba(27,127,232,0.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 70%, rgba(18,196,232,0.08) 0%, transparent 55%);
 
   /* Z-index layers */
   --z-base: 0;
@@ -228,14 +244,20 @@ body {
 /* ─── Brand Gradient Utilities ───────────────────────────────────────────────── */
 
 .brand-gradient {
-  background: linear-gradient(90deg, #18CFF2 0%, #2BB7E3 50%, #1EF2C1 100%);
+  background: linear-gradient(90deg, #1B7FE8 0%, #12C4E8 50%, #18E8B8 100%);
 }
 
 .brand-gradient-text {
-  background: linear-gradient(90deg, #18CFF2 0%, #2BB7E3 50%, #1EF2C1 100%);
+  background: linear-gradient(90deg, #1B7FE8 0%, #12C4E8 50%, #18E8B8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ─── Blue Gradient (SSO / ações institucionais primárias) ───────────────────── */
+
+.blue-gradient {
+  background: var(--nto-gradient-blue);
 }
 
 /* ─── CTA Gradient ───────────────────────────────────────────────────────────── */
@@ -248,6 +270,19 @@ body {
 
 .accent-gradient {
   background: var(--nto-gradient-accent);
+}
+
+/* ─── Logo Gradient ──────────────────────────────────────────────────────────── */
+
+.logo-gradient {
+  background: var(--nto-gradient-logo);
+}
+
+.logo-gradient-text {
+  background: var(--nto-gradient-logo);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════

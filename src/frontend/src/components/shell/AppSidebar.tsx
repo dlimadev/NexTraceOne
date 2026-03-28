@@ -170,21 +170,25 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
   return (
     <div
       className={cn(
-        'bg-deep flex flex-col h-full border-r border-edge',
+        'flex flex-col h-full border-r border-edge',
         !mobile && 'fixed inset-y-0 left-0 z-[var(--z-header)]',
         !mobile && 'transition-[width] duration-[var(--nto-motion-medium)] ease-[var(--ease-standard)]',
         mobile && 'w-[272px]',
         className,
       )}
-      style={!mobile ? { width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED } : undefined}
+      style={{
+        ...(!mobile ? { width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED } : {}),
+        background: 'linear-gradient(180deg, #0A1730 0%, #081120 100%)',
+      }}
       role="navigation"
       aria-label={t('shell.sidebarNav')}
     >
+      {/* Brand gradient stripe no topo */}
       <div className="h-0.5 brand-gradient shrink-0" />
 
       <AppSidebarHeader collapsed={collapsed} />
 
-      <nav className={cn('flex-1 py-3 overflow-y-auto', collapsed ? 'px-1.5' : 'px-3')} aria-label={t('shell.mainNavigation')}>
+      <nav className={cn('flex-1 py-2 overflow-y-auto', collapsed ? 'px-1.5' : 'px-2.5')} aria-label={t('shell.mainNavigation')}>
         {config.sectionOrder.map(sectionKey => {
           const sectionItems = visibleItems.filter(i => i.section === sectionKey);
           if (sectionItems.length === 0) return null;

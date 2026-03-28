@@ -15,6 +15,12 @@ interface AppSidebarGroupProps {
   children: ReactNode;
 }
 
+/**
+ * AppSidebarGroup — grupo de navegação com label de seção colapsável.
+ *
+ * Highlighted: acento lateral cyan para seções prioritárias da persona.
+ * Labels em overline style (uppercase, tracking-wide, 10px).
+ */
 export function AppSidebarGroup({
   sectionKey,
   labelKey,
@@ -37,7 +43,7 @@ export function AppSidebarGroup({
 
   return (
     <div
-      className={cn('mb-1.5', highlighted && 'pl-0.5 border-l-2 border-cyan/30')}
+      className={cn('mb-1', highlighted && 'pl-1 border-l-2 border-cyan/40')}
       role="group"
       aria-label={labelKey ? t(labelKey) : sectionKey}
     >
@@ -45,8 +51,9 @@ export function AppSidebarGroup({
         <button
           onClick={onToggle}
           className={cn(
-            'w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider',
-            highlighted ? 'text-cyan' : 'text-faded',
+            'w-full flex items-center justify-between px-2.5 pt-3 pb-1',
+            'text-[10px] font-semibold uppercase tracking-[0.06em]',
+            highlighted ? 'text-cyan/80' : 'text-faded',
             hasMultipleItems ? 'hover:text-muted cursor-pointer' : 'cursor-default',
           )}
           aria-expanded={expanded}
@@ -54,14 +61,14 @@ export function AppSidebarGroup({
         >
           <span>{t(labelKey)}</span>
           {hasMultipleItems && (
-            <span className="text-faded" aria-hidden="true">
-              {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+            <span className="text-faded/60" aria-hidden="true">
+              {expanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
             </span>
           )}
         </button>
       )}
       {(expanded || !hasMultipleItems) && (
-        <ul className="space-y-0.5" role="list">
+        <ul className="space-y-px" role="list">
           {children}
         </ul>
       )}
