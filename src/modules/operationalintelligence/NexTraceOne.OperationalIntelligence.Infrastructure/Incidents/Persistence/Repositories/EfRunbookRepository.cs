@@ -26,17 +26,17 @@ internal sealed class EfRunbookRepository(IncidentDbContext context) : IRunbookR
         if (!string.IsNullOrWhiteSpace(linkedService))
             query = query.Where(r =>
                 r.LinkedService != null &&
-                r.LinkedService.Contains(linkedService));
+                EF.Functions.ILike(r.LinkedService, $"%{linkedService}%"));
 
         if (!string.IsNullOrWhiteSpace(linkedIncidentType))
             query = query.Where(r =>
                 r.LinkedIncidentType != null &&
-                r.LinkedIncidentType == linkedIncidentType);
+                EF.Functions.ILike(r.LinkedIncidentType, linkedIncidentType));
 
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(r =>
-                r.Title.Contains(search) ||
-                r.Description.Contains(search));
+                EF.Functions.ILike(r.Title, $"%{search}%") ||
+                EF.Functions.ILike(r.Description, $"%{search}%"));
 
         return await query
             .OrderByDescending(r => r.PublishedAt)
