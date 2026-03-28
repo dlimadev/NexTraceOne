@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
+using NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.Repositories;
+using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -49,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IExternalAiConsultationRepository, ExternalAiConsultationRepository>();
         services.AddScoped<IExternalAiPolicyRepository, ExternalAiPolicyRepository>();
         services.AddScoped<IExternalAiProviderRepository, ExternalAiProviderRepository>();
+        services.AddScoped<IExternalAiModule, ExternalAiModule>();
 
         return services;
     }

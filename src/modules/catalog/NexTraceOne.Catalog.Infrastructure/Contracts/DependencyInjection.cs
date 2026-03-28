@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
+using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Services;
@@ -49,6 +50,7 @@ public static class DependencyInjection
 
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();
+        services.AddScoped<IContractsModule, ContractsModuleService>();
 
         return services;
     }

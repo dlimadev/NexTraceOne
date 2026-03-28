@@ -9,4 +9,23 @@ namespace NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 /// </summary>
 public interface IAiOrchestrationModule
 {
+    /// <summary>
+    /// Obtém metadados de uma conversa por ID.
+    /// Retorna null quando a conversa não existe.
+    /// </summary>
+    Task<ConversationSummaryDto?> GetConversationAsync(Guid conversationId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Obtém conversas recentes por serviço.
+    /// </summary>
+    Task<IReadOnlyList<ConversationSummaryDto>> GetConversationsByServiceAsync(
+        string serviceName,
+        int limit = 10,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// Obtém resumo de execução de agente por ID.
+    /// Retorna null quando não há resultado correspondente.
+    /// </summary>
+    Task<AgentExecutionResultDto?> GetAgentExecutionResultAsync(Guid executionId, CancellationToken ct = default);
 }

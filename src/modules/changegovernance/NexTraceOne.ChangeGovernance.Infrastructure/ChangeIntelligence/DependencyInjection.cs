@@ -5,12 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
@@ -47,6 +50,7 @@ public static class DependencyInjection
         services.AddScoped<IPostReleaseReviewRepository, PostReleaseReviewRepository>();
         services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
+        services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
 
         // Analytics writer: correlated traces → ClickHouse chg_trace_release_mapping
         // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false

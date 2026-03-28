@@ -2,9 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.EventHandlers;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
@@ -38,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IMitigationWorkflowRepository, EfMitigationWorkflowRepository>();
         services.AddScoped<IMitigationValidationRepository, EfMitigationValidationRepository>();
         services.AddScoped<IChangeIntelligenceReader, EfChangeIntelligenceReader>();
+        services.AddScoped<IIntegrationEventHandler<DeploymentEventReceivedEvent>, DeploymentEventReceivedHandler>();
 
         return services;
     }

@@ -5,9 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Abstractions;
+using NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Repositories;
+using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -57,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<IAiOrchestrationConversationRepository, AiOrchestrationConversationRepository>();
         services.AddScoped<IKnowledgeCaptureEntryRepository, KnowledgeCaptureEntryRepository>();
         services.AddScoped<IGeneratedTestArtifactRepository, GeneratedTestArtifactRepository>();
+        services.AddScoped<IAiOrchestrationModule, AiOrchestrationModule>();
 
         return services;
     }

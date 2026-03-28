@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.Migrations
 {
     [DbContext(typeof(AiOrchestrationDbContext))]
-    partial class AiOrchestrationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260328153500_P02_8c_AiOrchestrationOutboxTablePrefixAlignment")]
+    partial class P02_8c_AiOrchestrationOutboxTablePrefixAlignment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

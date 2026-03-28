@@ -4,10 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Catalog.Infrastructure.Graph.EventHandlers;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Graph.Services;
@@ -49,6 +54,8 @@ public static class DependencyInjection
 
         // ── Repositório de Source of Truth ───────────────────────────────
         services.AddScoped<ILinkedReferenceRepository, LinkedReferenceRepository>();
+        services.AddScoped<IIntegrationEventHandler<ReleasePublishedEvent>, ReleasePublishedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<DeploymentEventReceivedEvent>, DeploymentEventReceivedCatalogHandler>();
 
         // ── Integração cross-module via Contracts ────────────────────────
         services.AddScoped<ICatalogGraphModule, CatalogGraphModuleService>();
