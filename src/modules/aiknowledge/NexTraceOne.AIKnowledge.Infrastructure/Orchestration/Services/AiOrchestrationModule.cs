@@ -8,6 +8,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Services;
 internal sealed class AiOrchestrationModule(
     AiOrchestrationDbContext context) : IAiOrchestrationModule
 {
+    // TODO(P02.x): replace placeholders when orchestration persists token/model attribution metadata.
+    private const int UnknownTokensUsed = 0;
+    private const string? UnknownModelUsed = null;
+
     public async Task<ConversationSummaryDto?> GetConversationAsync(Guid conversationId, CancellationToken ct = default)
     {
         return await context.Conversations
@@ -19,10 +23,8 @@ internal sealed class AiOrchestrationModule(
                 c.StartedBy,
                 c.ServiceName,
                 c.TurnCount,
-                // TODO(P02.x): Populate from persisted per-conversation token accounting when available in orchestration store.
-                0,
-                // TODO(P02.x): Populate from persisted model attribution when available in orchestration store.
-                null,
+                UnknownTokensUsed,
+                UnknownModelUsed,
                 c.CreatedAt,
                 c.UpdatedAt))
             .FirstOrDefaultAsync(ct);
@@ -46,10 +48,8 @@ internal sealed class AiOrchestrationModule(
                 c.StartedBy,
                 c.ServiceName,
                 c.TurnCount,
-                // TODO(P02.x): Populate from persisted per-conversation token accounting when available in orchestration store.
-                0,
-                // TODO(P02.x): Populate from persisted model attribution when available in orchestration store.
-                null,
+                UnknownTokensUsed,
+                UnknownModelUsed,
                 c.CreatedAt,
                 c.UpdatedAt))
             .ToListAsync(ct);
@@ -67,8 +67,7 @@ internal sealed class AiOrchestrationModule(
                 a.Status.ToString(),
                 $"Generated test artifact for release {a.ReleaseId}",
                 a.GeneratedAt,
-                // TODO(P02.x): Populate from persisted generation token usage when artifact-level tracking is available.
-                0))
+                UnknownTokensUsed))
             .FirstOrDefaultAsync(ct);
 
         if (artifact is not null)
@@ -84,8 +83,7 @@ internal sealed class AiOrchestrationModule(
                 c.Status.ToString(),
                 c.Summary ?? $"Conversation on {c.Topic}",
                 c.StartedAt,
-                // TODO(P02.x): Populate from persisted conversation token usage when available in orchestration store.
-                0))
+                UnknownTokensUsed))
             .FirstOrDefaultAsync(ct);
 
         if (conversation is not null)
