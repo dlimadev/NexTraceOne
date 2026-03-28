@@ -44,3 +44,22 @@ public interface IKnowledgeSearchProvider
         int maxResults,
         CancellationToken cancellationToken = default);
 }
+
+/// <summary>
+/// Contrato cross-module para ligar runbooks operacionais ao Knowledge Hub.
+/// A implementação cria relações e notas operacionais para grounding contextual.
+/// </summary>
+public interface IRunbookKnowledgeLinkingService
+{
+    /// <summary>
+    /// Garante ligação idempotente de um runbook com o serviço associado no Knowledge Hub.
+    /// Quando aplicável, cria nota operacional de resumo para pesquisa/grounding.
+    /// </summary>
+    Task LinkRunbookToServiceAsync(
+        Guid runbookId,
+        string runbookTitle,
+        string runbookDescription,
+        string? linkedServiceId,
+        string maintainedBy,
+        CancellationToken cancellationToken = default);
+}

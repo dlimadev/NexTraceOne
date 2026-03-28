@@ -41,6 +41,7 @@ public static class DependencyInjection
 
         // Cross-module search provider
         services.AddScoped<IKnowledgeSearchProvider, KnowledgeSearchProvider>();
+        services.AddScoped<IRunbookKnowledgeLinkingService, RunbookKnowledgeLinkingService>();
 
         return services;
     }

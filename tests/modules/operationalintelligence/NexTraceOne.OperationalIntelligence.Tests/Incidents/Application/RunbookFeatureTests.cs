@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text.Json;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
@@ -231,11 +232,12 @@ public sealed class RunbookFeatureTests
     public async Task CreateRunbook_ValidCommand_ShouldPersistAndReturnId()
     {
         var repo = Substitute.For<IRunbookRepository>();
+        var linkingService = Substitute.For<IRunbookKnowledgeLinkingService>();
         var clock = Substitute.For<IDateTimeProvider>();
         var now = DateTimeOffset.UtcNow;
         clock.UtcNow.Returns(now);
 
-        var handler = new CreateRunbook.Handler(repo, clock);
+        var handler = new CreateRunbook.Handler(repo, linkingService, clock);
         var command = new CreateRunbook.Command(
             "Deploy Rollback Procedure",
             "Guide for rolling back a failed deployment.",
@@ -251,6 +253,13 @@ public sealed class RunbookFeatureTests
         result.Value.RunbookId.Should().NotBeEmpty();
         result.Value.CreatedAt.Should().Be(now);
         await repo.Received(1).AddAsync(Arg.Any<RunbookRecord>(), Arg.Any<CancellationToken>());
+        await linkingService.Received(1).LinkRunbookToServiceAsync(
+            result.Value.RunbookId,
+            command.Title,
+            command.Description,
+            command.LinkedService,
+            command.MaintainedBy,
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
