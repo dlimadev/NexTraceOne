@@ -1,145 +1,124 @@
 # Relatório de Alinhamento de Produto — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
 ## Objetivo
 
-Verificar se o repositório atual reflete o NexTraceOne como: source of truth operacional, plataforma de contract governance, change intelligence, operational consistency, AI governance, knowledge hub e FinOps contextual.
+Verificar se o repositório reflete o NexTraceOne como definido na visão oficial: source of truth para serviços, contratos, mudanças, operação e conhecimento operacional — e não como ferramenta genérica de observabilidade ou catálogo de APIs isolado.
 
 ---
 
-## 1. Alinhamento Global com a Visão Oficial
+## Alinhamento por Pilar Oficial
 
-### Visão declarada
-> "NexTraceOne é uma plataforma enterprise unificada para governança de serviços e contratos, change intelligence, confiança em mudanças de produção, confiabilidade operacional orientada por equipas, inteligência operacional assistida por IA, conhecimento operacional governado e otimização contextual de operação e custo."
-
-### Veredicto de alinhamento: **PARCIALMENTE ALINHADO**
-
-O repositório reflete corretamente a visão nos pilares 1 (Service Governance), 2 (Contract Governance) e 3 (Change Intelligence). Nos pilares 4 a 10, a implementação é fragmentada, mock ou inexistente.
-
----
-
-## 2. Alinhamento por Pilar Oficial
-
-| Pilar | Módulo Principal | Implementação Real? | Alinhamento | Evidência |
-|---|---|---|---|---|
-| 1. Service Governance | Catalog (Graph) | Sim — RegisterServiceAsset, dependencies, topology | **ALIGNED** | `src/modules/catalog/NexTraceOne.Catalog.Infrastructure/Graph/` |
-| 2. Contract Governance | Catalog (Contracts) | Sim — REST, SOAP, Event, Background | **ALIGNED** | `src/modules/catalog/NexTraceOne.Catalog.Infrastructure/Contracts/` |
-| 3. Change Intelligence | Change Governance | Sim — blast radius, advisory, approval, rollback | **ALIGNED** | `src/modules/changegovernance/` |
-| 4. Operational Reliability | Operational Intelligence | Parcial — Incidents real mas correlação mock | **PARTIAL** | `src/modules/operationalintelligence/` |
-| 5. Operational Consistency | Governance | 100% mock com `IsSimulated: true` | **MOCK** | `src/modules/governance/` |
-| 6. AI-assisted Operations | AI Knowledge | Parcial — Gov real, ExternalAI TODO, assistant mock | **PARTIAL** | `src/modules/aiknowledge/` |
-| 7. Source of Truth & Knowledge | Catalog + Knowledge | Catalog real; Knowledge DbContext sem migrações | **PARTIAL** | `src/modules/knowledge/`, `src/modules/catalog/` |
-| 8. AI Governance | AI Knowledge (Governance) | AI Governance funcional — modelos, políticas, budgets | **ALIGNED** | `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/Governance/` |
-| 9. Operational Intelligence | Operational Intelligence | Runtime+Cost têm DbContexts; handlers parcialmente mock | **PARTIAL** | `src/modules/operationalintelligence/` |
-| 10. FinOps contextual | Governance (FinOps handlers) | 100% hardcoded — `IsSimulated: true` | **MOCK** | `src/modules/governance/` FinOps handlers |
+| Pilar | Estado de Implementação | Evidência | Alinhado? |
+|---|---|---|---|
+| 1. Service Governance | 75% — Catalog real, cross-module parcial | `src/modules/catalog/` | ⚠️ PARCIAL |
+| 2. Contract Governance | 85% — REST/SOAP/AsyncAPI/Background reais | `src/modules/catalog/NexTraceOne.Catalog.Application/Features/Contracts/` | ✅ BOM |
+| 3. Change Intelligence & Production Confidence | 90% — Fluxo mais maduro | `src/modules/changegovernance/` | ✅ FORTE |
+| 4. Operational Reliability | 20% — Backend parcial; frontend 100% mock | `src/modules/operationalintelligence/` | ❌ FRACO |
+| 5. Operational Consistency | 30% — Governance inteiro mock | `src/modules/governance/` | ❌ FRACO |
+| 6. AI-assisted Operations & Engineering | 40% — AI Governance real; Assistant mock | `src/modules/aiknowledge/` | ⚠️ PARCIAL |
+| 7. Source of Truth & Operational Knowledge | 60% — Catalog sólido; Knowledge parcial | `src/modules/catalog/`, `src/modules/knowledge/` | ⚠️ PARCIAL |
+| 8. AI Governance & Developer Acceleration | 65% — Policies reais; assistant não funciona | `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/Governance/` | ⚠️ PARCIAL |
+| 9. Operational Intelligence & Optimization | 25% — Automação/Reliability mock | `src/modules/operationalintelligence/` | ❌ FRACO |
+| 10. FinOps Contextual | 5% — 100% mock | `src/modules/governance/NexTraceOne.Governance.Application/Features/GetDomainFinOps/` | ❌ AUSENTE |
 
 ---
 
-## 3. O Produto Está Virando Algo que Não Deve?
+## Verificação da Definição Curta
 
-### Anti-padrão: dashboard genérico de observabilidade
-**Status: RISCO MÉDIO**
+**"NexTraceOne é a fonte de verdade para serviços, contratos, mudanças, operação e conhecimento operacional."**
 
-A estrutura de Runtime Intelligence e Cost Intelligence existe, mas a telemetria ingerida via `/api/ingestion/*` não está correlacionada dinamicamente com serviços, contratos e mudanças. Os dashboards de observabilidade existem como widgets sem narrativa operacional completa.
-
-Evidência: `docs/IMPLEMENTATION-STATUS.md` — "IRuntimeIntelligenceModule: PLAN — no implementation"; "ICostIntelligenceModule: PLAN — no implementation"
-
-### Anti-padrão: chat IA sem governança
-**Status: RISCO ALTO**
-
-O AI Assistant (`AiAssistantPage.tsx`) usa `mockConversations` hardcoded. Quando funcionar, a governança existe (AI Governance DbContext, políticas, budgets), mas o assistant em si retorna respostas hardcoded sem LLM real.
-
-Evidência: `docs/CORE-FLOW-GAPS.md` — "SendAssistantMessage retorna respostas hardcoded — sem integração com LLM real"
-
-### Anti-padrão: telas bonitas mas vazias
-**Status: CONFIRMADO para Governance e FinOps**
-
-25 páginas de Governance no frontend conectadas ao backend retornam dados com `IsSimulated: true`. A experiência visual existe mas não entrega valor real.
-
-Evidência: `docs/IMPLEMENTATION-STATUS.md` Governance section — "Benchmarking: SIM"; "FinOps (domain/team/service): SIM"; "Executive drill-down: SIM"
-
-### Anti-padrão: pedido de GUID ao utilizador
-**Status: NÃO DETECTADO nas áreas core**
-
-A navegação usa slugs e IDs de forma interna, não exposta ao utilizador final.
-
----
-
-## 4. Personas — Reflexo no Produto
-
-| Persona | Áreas de Produto Disponíveis | Lacunas para Esta Persona |
+| Área | Fonte de Verdade Real? | Evidência |
 |---|---|---|
-| Engineer | Contract Studio, Service Catalog, Change Confidence, AI Assistant | AI Assistant não funcional; Developer Portal parcial |
-| Tech Lead | Change Intelligence, Blast Radius, Approval workflows | Correlação incident↔change mock |
-| Architect | Service Topology, Contract Governance, Source of Truth | Topology real mas cross-module interfaces ausentes |
-| Product | Governance Overview, Maturity Scorecards | Governance 100% mock |
-| Executive | Executive Overview, FinOps, Compliance | FinOps e Compliance 100% mock |
-| Platform Admin | Identity, Environments, Configuration, Audit | Sólido — Identity 100% real |
-| Auditor | Audit Trail, Chain Integrity, Security Events | Sólido — Audit Compliance 100% real |
-
-**Conclusão**: O produto atende bem às personas de Engineer (parcial), Tech Lead e Platform Admin/Auditor. As personas de Executive, Product e Architect recebem predominantemente dados simulados.
+| Serviços | ✅ SIM | Service Catalog funcional, ownership via Graph |
+| Contratos | ✅ SIM | REST/SOAP/AsyncAPI/Background reais, versioning, diff semântico |
+| Mudanças | ✅ SIM | ChangeGovernance completo, blast radius, evidence pack |
+| Operação | ❌ NÃO | Incidents mock, runbooks hardcoded, mitigações não persistidas |
+| Conhecimento Operacional | ⚠️ PARCIAL | Knowledge Hub existe mas incompleto; runbooks hardcoded |
 
 ---
 
-## 5. Regra de Source of Truth — Verificação
+## O que o Produto Não Deve Ser — Verificação
 
-| Entidade | Consultável com Confiança? | Evidência |
+| Anti-padrão | Presente? | Evidência |
 |---|---|---|
-| Serviços | Sim | CatalogGraphDbContext, RegisterServiceAsset |
-| Ownership | Sim | Graph service assets com ownership |
-| Equipas | Parcial | Governance retorna dados mock |
-| Ambientes | Sim | IdentityAccess EnvironmentEndpoints |
-| Contratos | Sim | ContractsDbContext, ContractVersion |
-| Dependências | Parcial | Graph existe; cross-module IContractsModule PLAN |
-| Mudanças | Sim | ChangeIntelligenceDbContext completo |
-| Incidentes | Não | Dados hardcoded/seed; correlação não dinâmica |
-| Evidências | Sim | EvidencePack com WorkflowDbContext |
-| Documentação operacional | Parcial | Knowledge DbContext sem migrações geradas |
-| Políticas | Sim | AI Governance policies; RulesetGovernanceDbContext |
-| Conhecimento governado | Parcial | Runbooks hardcoded; Knowledge module sem migrações |
+| Dashboard genérico de observabilidade | ⚠️ Parcialmente | Governance pages genéricas sem contexto de serviço/contrato |
+| Catálogo de APIs isolado | ❌ NÃO | Contratos ligados a serviços, ownership, mudanças |
+| Repositório documental sem semântica | ⚠️ Risco | Knowledge Hub incompleto |
+| Ferramenta genérica de incidentes | ❌ NÃO (por omissão) | Incidents não funciona mas a visão está alinhada |
+| Chat com LLM sem governança | ❌ NÃO | AI Governance real e com policies |
+| Coleção de widgets sem narrativa operacional | ⚠️ Risco | Governance pages com dados mock sem contexto real |
 
 ---
 
-## 6. Decisões Antigas que Ainda Carrega
+## Regras Mestras — Verificação (CLAUDE.md §6)
 
-| Resíduo | Localização | Recomendação |
+| Regra | Estado | Evidência |
 |---|---|---|
-| Módulo Commercial Governance removido (PR-17) | Referências em docs antigos | Confirmar remoção completa de docs e referencias residuais |
-| `IsSimulated: true` como pattern de mock | Handlers de Governance, Reliability, FinOps | Manter padrão para rastreabilidade; priorizar substituição |
-| InMemoryIncidentStore (citado em docs antigos) | Substituído por EfIncidentStore | Verificar se resíduo de código `InMemoryIncidentStore` ainda existe |
-| 7 stubs intencionais no Developer Portal | `docs/REBASELINE.md` §Portal | Documentar como roadmap, não remover silenciosamente |
+| Aproxima o NexTraceOne da visão oficial? | ✅ SIM para pilares 1-3 | Módulos core funcionais |
+| Reforça como Source of Truth? | ⚠️ PARCIAL | Operação e Conhecimento incompletos |
+| Melhora governança de contratos/serviços/mudanças? | ✅ SIM | Catalog + ChangeGovernance sólidos |
+| Aumenta confiança para mudanças em produção? | ✅ SIM | Blast radius, evidence pack, promotion gates |
+| Melhora confiabilidade orientada por equipa? | ❌ NÃO | Reliability 100% mock |
+| Respeita arquitetura modular, segurança, auditoria, i18n, personas? | ✅ SIM | Clean Architecture, AES-256, hash chain, i18n |
+| Evita transformar em observabilidade genérica? | ✅ SIM | Observabilidade como meio, não fim |
+| Mantém viável para enterprise self-hosted? | ✅ SIM | PostgreSQL, Docker Compose, IIS suportado |
 
 ---
 
-## 7. Alinhamento à Base Técnica Alvo
+## Persona Awareness — Verificação
 
-| Tecnologia Alvo | Presente? | Estado |
+| Persona | UI Adapta-se? | Evidência |
 |---|---|---|
-| .NET 10 / ASP.NET Core 10 | Sim | `global.json`, `Directory.Build.props` |
-| EF Core + Npgsql + PostgreSQL 16 | Sim | 24 DbContexts, docker-compose.yml |
-| MediatR (CQRS) | Sim | Building blocks Application |
-| FluentValidation | Sim | Behaviors no BuildingBlocks.Application |
-| Quartz.NET | Verificar | BackgroundWorkers project existe |
-| OpenTelemetry | Sim | BuildingBlocks.Observability, otel-collector config |
-| Serilog | Sim | appsettings.json Serilog section |
-| React 18 + TypeScript + Vite | Sim | `src/frontend/package.json` |
-| TanStack Router + Query | Sim | `src/frontend/` dependencies |
-| Zustand | Verificar | Pattern usado em contexts |
-| Tailwind CSS + Radix UI | Sim | Frontend config |
-| Apache ECharts | Verificar | Dashboards de analytics |
-| Playwright (E2E) | Sim | `src/frontend/e2e/`, `playwright.config.ts` |
-| ClickHouse (analíticos) | Parcial | Schema SQL em `build/clickhouse/`; integração não completa |
-| Redis | Ausente | Correto — evitado conforme direção |
+| Engineer | ⚠️ | `PersonaQuickstart.tsx` existe; dashboard genérico |
+| Tech Lead | ⚠️ | Algumas ações específicas mas limitado |
+| Architect | ⚠️ | Source of Truth views ajudam; sem view dedicada |
+| Product | ❌ | Governance mock não entrega dados reais |
+| Executive | ❌ | `ExecutiveOverviewPage` com dados mock |
+| Platform Admin | ✅ | Configuration, Identity, Audit funcionam |
+| Auditor | ✅ | AuditCompliance funcional, hash chain |
+
+**Diagnóstico:** Personas técnicas (Engineer, Platform Admin, Auditor) têm suporte real. Personas de gestão (Executive, Product) dependem de Governance que está 100% mock.
 
 ---
 
-## 8. Recomendações de Alinhamento
+## Stack Frontend — Desvio do Alvo
 
-1. **Fechar Fluxo 3 (Incidents)** — é o gap mais crítico de alinhamento de produto
-2. **Conectar FinOps ao CostIntelligenceDbContext** — dados reais existem, handlers retornam mock
-3. **Implementar cross-module interfaces prioritárias** — IContractsModule e IChangeIntelligenceModule primeiro
-4. **Ativar processamento de outbox em todos os DbContexts** — propagação de eventos é fundação do produto
-5. **Governance persistence layer** — sem isso, o pilar de Operational Consistency é falso
-6. **Garantir que AI governance envolve o assistant** — AI sem governança ativa contradiz a visão
+O CLAUDE.md especifica uma stack específica. O desvio confirmado representa risco de product debt:
+
+| Item | Alvo | Real | Impacto |
+|---|---|---|---|
+| React version | 18 | 19 | Baixo — React 19 é superior; mas documentar a divergência |
+| Router | TanStack Router | react-router-dom v7 | Médio — TanStack Router tem tipagem mais forte para enterprise |
+| State global | Zustand | Context API implícito | Médio — Zustand mais escalável para estado global complexo |
+| UI Components | Radix UI | Componentes customizados | Médio — Radix garante acessibilidade e consistência |
+| Charts | Apache ECharts | Não identificado | Alto — FinOps e Executive Views precisam de gráficos |
+
+---
+
+## Alinhamento Arquitetural — Verificação
+
+| Princípio | Aplicado? | Evidência |
+|---|---|---|
+| Modular monolith com DDD | ✅ | 12 módulos com bounded contexts |
+| Clean Architecture | ✅ | Domain/Application/Infrastructure/API separados |
+| CQRS | ✅ | MediatR com handlers separados |
+| SOLID | ✅ | Result<T>, interfaces, dependency injection |
+| Crescimento evolutivo | ✅ | Migrações evolutivas, phase deferrals documentados |
+| Sem microserviços prematuros | ✅ | Monólito modular |
+| Sem Redis desnecessário | ✅ | Não presente |
+| Sem OpenSearch desnecessário | ✅ | PostgreSQL FTS usado |
+
+---
+
+## Conclusão de Alinhamento
+
+O NexTraceOne está **estruturalmente alinhado** à visão oficial nos pilares core (Catalog, Change, Identity, Audit). O **desvio crítico** está nos pilares operacionais (Incidents, Reliability, FinOps, Governance) que estão 0-30% implementados. A visão de produto é coerente mas a implementação é incompleta nos pilares que diferencia o NexTraceOne de concorrentes.
+
+**Veredicto de alinhamento:** `ALIGNED_BUT_INCOMPLETE`
+
+---
+
+*Data: 28 de Março de 2026*

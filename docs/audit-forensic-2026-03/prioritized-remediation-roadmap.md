@@ -1,5 +1,5 @@
 # Roadmap de Remediação Priorizado — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
@@ -10,242 +10,250 @@
 ---
 
 ## BLOCO 1 — Correções Críticas
-*Segurança, quebras funcionais severas, fluxos centrais inoperantes*
+*Fluxos centrais inoperantes, quebras funcionais severas*
 
 ### 1.1 Engine de Correlação Dinâmica incident↔change
-**Prioridade: CRÍTICA | Esforço estimado: Alto**
+**Prioridade: CRÍTICA | Pilar: Operational Reliability | Fluxo: 3**
 
-O fluxo 3 (Incident Correlation & Mitigation) está 0% funcional. EfIncidentStore existe, IncidentDbContext tem 5 DbSets e migração. Falta a engine que correlaciona incidentes com mudanças via timestamps e serviços.
+Estado atual: `EfIncidentStore` (678 linhas) existe com `IncidentDbContext` e `CorrelationEvent` DbSet. Falta a engine que correlaciona dinamicamente por timestamp + serviço + ambiente.
 
 **Ações:**
-1. Implementar engine de correlação em `OperationalIntelligence.Application`
-2. Adicionar `POST /incidents` e `PATCH /incidents/{id}/correlation`
-3. Substituir dados hardcoded no `GetMitigationHistory` por queries EF reais
-4. Conectar `IncidentsPage.tsx` à API real (remover `mockIncidents` inline)
-5. Usar `RunbookRecord` persistido em vez dos 3 hardcoded
+1. Implementar `CorrelationEngine` em `OperationalIntelligence.Application`
+2. Ao criar/atualizar incidente, buscar mudanças recentes no mesmo serviço/ambiente via `ChangeIntelligenceDbContext`
+3. Calcular score de correlação por proximidade temporal
+4. Persistir em `CorrelationEvent` DbSet
+5. Conectar `IncidentsPage.tsx` à API real — remover `mockIncidents` inline
+6. Conectar `RunbookPage.tsx` ao `RunbookRecord` DB em vez de 3 hardcoded
+7. Conectar `CreateMitigationWorkflow` à persistência real em `MitigationRecord`
 
-**Evidência:** `docs/CORE-FLOW-GAPS.md` §Fluxo 3
+**Evidência de estado:** `src/frontend/src/features/operations/` | `src/modules/operationalintelligence/`
 
 ---
 
 ### 1.2 Conectar AI Assistant a LLM Real
-**Prioridade: CRÍTICA | Esforço estimado: Alto**
+**Prioridade: CRÍTICA | Pilar: AI-assisted Operations | Fluxo: 4**
 
-`SendAssistantMessage` retorna respostas hardcoded. Ollama está configurado (`localhost:11434`). `IExternalAIRoutingPort` existe como abstração.
+Estado atual: `SendAssistantMessage` handler (256 linhas) tem lógica de routing e context building mas retorna resposta hardcoded. Ollama configurado em `localhost:11434`. `IExternalAIRoutingPort` existe como abstração.
 
 **Ações:**
-1. Conectar `SendAssistantMessage` handler ao `IExternalAIRoutingPort` → Ollama provider
-2. Implementar os 8 handlers ExternalAI (TODO stubs)
-3. Conectar `AiAssistantPage.tsx` à API de conversas real
-4. Garantir que conversas são persistidas e auditadas via AiGovernanceDbContext
+1. Implementar `OllamaExternalAIRoutingPort` que chama `localhost:11434` via HTTP
+2. Conectar `SendAssistantMessage` handler ao `IExternalAIRoutingPort` → Ollama
+3. Conectar `AiAssistantPage.tsx` à API real de conversações — remover `mockConversations`
+4. Garantir que `AiTokenUsageLedger` e `AiAuditEntry` são populados com dados reais
+5. Implementar os 8 handlers ExternalAI (Phase 03.x stubs)
 
-**Evidência:** `docs/CORE-FLOW-GAPS.md` §Fluxo 4
+**Evidência de estado:** `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Features/SendAssistantMessage/` | `AssistantPanel.tsx`
 
 ---
 
-### 1.3 Ativar Processamento de Outbox em Todos os DbContexts
-**Prioridade: CRÍTICA | Esforço estimado: Médio**
+### 1.3 Ativar Processamento de Outbox em DbContexts Prioritários
+**Prioridade: CRÍTICA | Pilar: Operational Consistency**
 
-Apenas IdentityDbContext tem outbox processado. 23 DbContexts têm tabelas de outbox sem processamento. Eventos de domínio não propagam entre módulos.
+Estado atual: Apenas `IdentityDbContext` tem outbox processado. 23 outros DbContexts têm tabelas `OutboxMessages` sem processador. Eventos de domínio não propagam.
 
 **Ações:**
-1. Identificar DbContexts prioritários para outbox (Catalog, ChangeGovernance, OperationalIntelligence)
-2. Ativar outbox processor para cada DbContext prioritário no BackgroundWorkers
-3. Definir consumidores dos eventos para cada contexto
+1. Ativar outbox processor para `CatalogGraphDbContext` no BackgroundWorkers
+2. Ativar outbox processor para `ChangeIntelligenceDbContext`
+3. Ativar outbox processor para `IncidentDbContext`
+4. Ativar outbox processor para `AiOrchestrationDbContext`
+5. Definir consumidores dos eventos para cada contexto
 
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Infrastructure
+**Evidência:** `src/platform/NexTraceOne.BackgroundWorkers/`
 
 ---
 
 ## BLOCO 2 — Correções Estruturais
-*Bounded contexts, schema/modelagem, contratos, cross-module interfaces*
+*Bounded contexts, cross-module interfaces, schema e contratos*
 
 ### 2.1 Implementar Cross-Module Interfaces Prioritárias
-**Prioridade: ALTA | Esforço estimado: Alto**
-
-8 interfaces cross-module estão definidas como PLAN sem consumidores. Governance, FinOps e Developer Portal dependem destas interfaces.
+**Prioridade: ALTA | Impacto: Developer Portal, Governance, FinOps**
 
 **Ordem de implementação:**
-1. `IContractsModule` — desbloqueia Developer Portal (7 stubs)
-2. `IChangeIntelligenceModule` — desbloqueia Governance real
-3. `ICostIntelligenceModule` — desbloqueia FinOps real
-4. `IRuntimeIntelligenceModule` — desbloqueia Reliability real
+1. `IContractsModule` → desbloqueia Developer Portal (7 stubs) e SearchCatalog
+2. `IChangeIntelligenceModule` → desbloqueia Governance com dados reais de mudanças
+3. `ICostIntelligenceModule` → desbloqueia FinOps real em Governance
+4. `IRuntimeIntelligenceModule` → desbloqueia Reliability real
 5. `IPromotionModule`, `IRulesetGovernanceModule` (fase seguinte)
 6. `IAiOrchestrationModule`, `IExternalAiModule` (junto com Bloco 1.2)
 
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Cross-Module Contract Health
+**Evidência:** `src/modules/catalog/NexTraceOne.Catalog.Contracts/Contracts/ServiceInterfaces/IContractsModule.cs`
 
 ---
 
-### 2.2 Gerar Migrações para DbContexts sem Schema Deployável
-**Prioridade: ALTA | Esforço estimado: Médio**
+### 2.2 Governance Module — Substituir Handlers Mock por Persistência Real
+**Prioridade: ALTA | Pilar: Operational Consistency, FinOps**
 
-DbContexts com ModelSnapshot mas sem migrações confirmadas não podem ser deployados.
+Estado atual: 22+ ficheiros, ~74 handlers com `IsSimulated: true`. `GovernanceDbContext` existe com 3 migrações mas não é consultado.
 
-**Ações por DbContext:**
-1. `RuntimeIntelligenceDbContext` — `dotnet ef migrations add InitialCreate`
-2. `CostIntelligenceDbContext` — idem
-3. `AiOrchestrationDbContext` — idem
-4. `ExternalAiDbContext` — idem
-5. `IntegrationsDbContext` — idem
-6. `KnowledgeDbContext` — idem
-7. `ProductAnalyticsDbContext` — idem (apenas se product analytics for prioridade)
-
-**Evidência:** `docs/REBASELINE.md` §Dívidas A1, A2
+**Ações:**
+1. Implementar `ListTeams` consultando `IdentityDbContext` (teams via ownership)
+2. Implementar `ListDomains` e `GetDomainDetail` com persistência real
+3. Implementar `GetDomainFinOps`, `GetServiceFinOps`, `GetFinOpsTrends` consumindo `CostIntelligenceDbContext` via `ICostIntelligenceModule` (depende de 2.1)
+4. Substituir restantes handlers mock progressivamente
 
 ---
 
-### 2.3 Governance Module — Persistence Layer
-**Prioridade: ALTA | Esforço estimado: Alto**
+### 2.3 Resolver Warnings CS8632 Nullable
+**Prioridade: ALTA | Pilar: Operational Reliability**
 
-74 handlers retornam `IsSimulated: true`. Para que Governance seja real, precisa de persistence própria ou consumo real via cross-module interfaces.
+516 warnings de nullable no projeto. Risco de `NullReferenceException` em runtime.
 
-**Abordagem recomendada:**
-1. Implementar cross-module interfaces primeiro (2.1)
-2. Substituir handlers mock de Teams/Domains por queries a IdentityAccess e Catalog
-3. Substituir handlers de FinOps por queries a CostIntelligenceModule
-4. Adicionar persistence própria apenas para dados que não existem noutros módulos (ex: Governance Packs, Waivers)
-
----
-
-### 2.4 Configurar OTEL Endpoint por Ambiente
-**Prioridade: ALTA | Esforço estimado: Baixo**
-
-`appsettings.json` aponta OTEL para `localhost:4317`. Em produção, precisa de endpoint real.
-
-**Ação:** Adicionar `OTEL_EXPORTER_OTLP_ENDPOINT` como env var obrigatória em produção e documentar no .env.example.
+**Ações:**
+1. Activar `<Nullable>enable</Nullable>` em `Directory.Build.props`
+2. Resolver warnings módulo a módulo começando pelos módulos core (Catalog, ChangeGovernance)
+3. Usar `!` (null-forgiving) apenas quando garantido; preferir null-checks reais
 
 ---
 
 ## BLOCO 3 — Fechamento de Lacunas Estratégicas
-*Source of truth, contract governance, AI governance, knowledge hub, FinOps*
+*Source of truth, knowledge hub, FinOps, AI governance*
 
-### 3.1 FinOps com Dados Reais
-**Prioridade: ALTA | Esforço estimado: Médio**
+### 3.1 Knowledge Hub — Completar
+**Prioridade: ALTA | Pilar: Source of Truth & Operational Knowledge**
 
-CostIntelligenceDbContext existe com dados reais (CostSnapshot, trends, reports). Frontend FinOps consome Governance module que retorna mock.
+Estado atual: `KnowledgeDbContext` com 3 migrações; 34 ficheiros; features básicas implementadas. Sem conectividade com AI context.
 
 **Ações:**
-1. Implementar ICostIntelligenceModule (ver 2.1)
-2. Redirecionar handlers de FinOps no Governance para consumir ICostIntelligenceModule
-3. Remover `IsSimulated: true` dos handlers de FinOps
+1. Verificar deployabilidade das 3 migrações existentes
+2. Implementar endpoints de criação e consulta de notas operacionais
+3. Conectar `KnowledgeDbContext` como fonte para context builders de AI
+4. Conectar `KnowledgePage` frontend à API real
 
 ---
 
-### 3.2 Knowledge Hub com Migrações
-**Prioridade: ALTA | Esforço estimado: Médio**
+### 3.2 FinOps — Conectar a Dados Reais
+**Prioridade: ALTA | Pilar: FinOps Contextual**
 
-KnowledgeDbContext existe sem migrações. Runbooks usam seed data. Conhecimento operacional é central para a visão do produto.
+Estado atual: `CostIntelligenceDbContext` com 7 migrações existe. Handlers de Governance retornam `IsSimulated: true`.
+
+**Dependência:** Requer `ICostIntelligenceModule` (Bloco 2.1, item 3)
 
 **Ações:**
-1. Gerar migração para KnowledgeDbContext
-2. Conectar handlers de runbooks ao KnowledgeDbContext real
-3. Completar UX de Knowledge Hub no frontend
+1. Implementar `ICostIntelligenceModule` em `OperationalIntelligence.Infrastructure`
+2. Registar como serviço no ApiHost
+3. Atualizar handlers de FinOps em Governance para consumir via interface
 
 ---
 
-### 3.3 Conectar Enriquecimento de Contexto IA a Dados Reais
-**Prioridade: ALTA | Esforço estimado: Médio**
+### 3.3 Definir Estratégia de Licensing
+**Prioridade: ESTRATÉGICA | Pilar: Licensing & Entitlements**
 
-`POST /ai/context/enrich` existe mas sem retrieval real. Contratos e mudanças têm dados reais acessíveis.
+Estado atual: Módulo removido em PR-17. Sem enforcement de licença.
 
 **Ações:**
-1. Implementar retrieval de contratos via IContractsModule
-2. Implementar retrieval de mudanças via IChangeIntelligenceModule
-3. Implementar retrieval de incidents via IncidentDbContext
-4. Validar grounding com LLM real (após Bloco 1.2)
+1. Decidir abordagem: novo módulo interno vs. biblioteca de licensing externa
+2. Implementar: activation + heartbeat + entitlements mínimos
+3. Construir sobre `AssemblyIntegrityChecker` existente
+4. Documentar estratégia em ADR
 
 ---
 
-### 3.4 Integração CI/CD — 1 Conector Real
-**Prioridade: MÉDIA | Esforço estimado: Alto**
+### 3.4 Conectores CI/CD para Ingestão de Eventos
+**Prioridade: ALTA | Pilar: Change Intelligence**
 
-Change Intelligence depende de eventos de deploy. Ingestion API recebe payloads mas não processa.
+Estado atual: `Integrations` module com `IntegrationsDbContext` mas conectores são stubs.
 
 **Ações:**
-1. Processar payload real na Ingestion API para pelo menos GitHub Actions
-2. Mapear evento de deploy para CreateRelease no ChangeGovernance
-3. Documentar modelo canônico de evento de deploy
+1. Implementar conector GitLab (webhook de deploy/pipeline events)
+2. Implementar conector GitHub Actions (workflow run events)
+3. Mapear eventos para entidades de `ChangeGovernance` via ingestão
+4. Documentar esquema de webhook para cada conector
 
 ---
 
 ## BLOCO 4 — Limpeza e Consolidação
+*Resíduos, duplicação, documentação obsoleta*
 
-### 4.1 Eliminar 516 Warnings CS8632 Nullable
-**Prioridade: MÉDIA | Esforço estimado: Médio**
+### 4.1 Arquivar Relatórios de Fases Anteriores
+**Prioridade: BAIXA**
 
-**Ações:**
-1. Habilitar `<Nullable>enable</Nullable>` no Directory.Build.props
-2. Corrigir warnings módulo a módulo começando pelos core (Catalog, ChangeGovernance)
-3. Adicionar gate de zero warnings no CI
+Mover `docs/audits/` para `docs/archive/audits/` com README explicativo.
 
----
+### 4.2 Atualizar FRONTEND-ARCHITECTURE.md e DESIGN-SYSTEM.md
+**Prioridade: MÉDIA**
 
-### 4.2 Arquivar Documentação Histórica
-**Prioridade: BAIXA | Esforço estimado: Baixo**
+Remover referências a TanStack Router e Radix UI que não estão implementados. Documentar stack real.
 
-**Ações:**
-1. Mover `docs/architecture/e14-* a e18-*` para `docs/archive/historical-execution/`
-2. Mover `docs/architecture/p0-* a p1-*` para `docs/archive/security-hardening/`
-3. Mover `docs/11-review-modular/` para `docs/archive/module-reviews/`
-4. Criar `CURRENT-STATE.md` por módulo como fonte atual
+### 4.3 Marcar AI Docs como Aspiracionais
+**Prioridade: MÉDIA**
 
----
+`AI-ASSISTED-OPERATIONS.md` e `AI-DEVELOPER-EXPERIENCE.md` devem indicar claramente "visão futura" vs. "estado actual".
 
-### 4.3 Consolidar Documentação de Estado
-**Prioridade: MÉDIA | Esforço estimado: Baixo**
+### 4.4 Verificar `fix-pagination-defaults.ps1`
+**Prioridade: BAIXA**
 
-**Ações:**
-1. Atualizar `IMPLEMENTATION-STATUS.md` Incidents section para refletir EfIncidentStore
-2. Atualizar `ROADMAP.md` Fluxo 3 para estado real
-3. Criar protocolo de atualização semanal do REBASELINE.md
+Script pontual — remover se objetivo já alcançado.
 
 ---
 
 ## BLOCO 5 — Experiência e Produto
+*UI por persona, dashboards coerentes, i18n, responsividade*
 
-### 5.1 Padronizar Loading States, Empty States e Error States
-**Prioridade: MÉDIA | Esforço estimado: Médio**
+### 5.1 E2E como Gate Obrigatório de Merge
+**Prioridade: ALTA | Impacto: Qualidade garantida no merge**
 
-83% das páginas sem EmptyState padronizado. 96% sem error states por secção.
+Adicionar Playwright E2E ao `ci.yml` como job obrigatório. Sem E2E, regressões críticas podem entrar em `main`.
 
-**Ações:**
-1. Criar componente `StateDisplay` (loading, empty, error) padronizado
-2. Aplicar em todas as páginas core (Catalog, Change, Identity)
-3. Aplicar em páginas restantes progressivamente
+### 5.2 Reescrever incidents.spec.ts
+**Prioridade: ALTA** (após completar Bloco 1.1)
 
----
+Quando `IncidentsPage.tsx` estiver conectada à API real, reescrever o E2E para validar correlação dinâmica real.
 
-### 5.2 E2E Tests como Gate Obrigatório
-**Prioridade: ALTA | Esforço estimado: Baixo**
+### 5.3 Padronizar Loading, Error e Empty States
+**Prioridade: MÉDIA | Impacto: UX consistente**
 
-E2E tests correm nightly mas não bloqueiam PRs.
+Garantir que todas as páginas têm estados de loading, erro e vazio consistentes. `PageStateDisplay.tsx` já existe — usar em todas as páginas.
 
-**Ações:**
-1. Adicionar E2E tests ao ci.yml como job obrigatório (subset dos specs mais críticos)
-2. Ou: adicionar regra de branch protection que bloqueia merge se nightly E2E falhou
+### 5.4 Avaliar Alinhamento de Stack Frontend
+**Prioridade: MÉDIA | Impacto: Dívida técnica vs. roadmap**
 
----
+Decisão: manter react-router-dom v7 (que é excelente) ou migrar para TanStack Router conforme CLAUDE.md. Documentar decisão como ADR.
 
-### 5.3 Dashboard com Semântica de Persona
-**Prioridade: MÉDIA | Esforço estimado: Alto**
+### 5.5 Persona Awareness no Dashboard
+**Prioridade: MÉDIA | Impacto: Produto diferenciado**
 
-DashboardPage.tsx parece genérico — não reflete papel do utilizador autenticado.
-
-**Ações:**
-1. Conectar dashboard ao perfil de utilizador (roles, teams, owned services)
-2. Mostrar mudanças recentes relevantes para a persona
-3. Mostrar alertas de confiança em produção para Tech Lead / Architect
-4. Mostrar KPIs de FinOps para Executive
+`DashboardPage.tsx` deve adaptar-se por persona. `PersonaQuickstart.tsx` existe (150 linhas). Implementar lógica de personalização por persona baseada em `ICurrentUser`.
 
 ---
 
-## Resumo de Prioridades
+## Tabela Resumo de Prioridades
 
-| Bloco | Ações | Impacto | Quando |
-|---|---|---|---|
-| 1 — Correções Críticas | 3 ações | Ativa 2 fluxos centrais quebrados | Sprint imediato |
-| 2 — Correções Estruturais | 4 ações | Fundação para Governance e FinOps reais | Sprint seguinte |
-| 3 — Lacunas Estratégicas | 4 ações | Fecha pilares de produto | 2-3 sprints |
-| 4 — Limpeza | 3 ações | Qualidade e clareza | Paralelo |
-| 5 — Experiência | 3 ações | UX e confiança no produto | 3-4 sprints |
+| Item | Bloco | Prioridade | Pilar | Esforço |
+|---|---|---|---|---|
+| Engine correlação incident↔change | 1.1 | **CRÍTICA** | Operational Reliability | Alto |
+| AI Assistant → LLM real | 1.2 | **CRÍTICA** | AI-assisted Operations | Alto |
+| Outbox processing (4 DbContexts) | 1.3 | **CRÍTICA** | Operational Consistency | Médio |
+| `IContractsModule` cross-module | 2.1 | **ALTA** | Service Governance | Médio |
+| `IChangeIntelligenceModule` | 2.1 | **ALTA** | Operational Intelligence | Médio |
+| `ICostIntelligenceModule` | 2.1 | **ALTA** | FinOps | Médio |
+| Governance handlers reais | 2.2 | **ALTA** | Operational Consistency | Alto |
+| CS8632 nullable warnings | 2.3 | **ALTA** | Reliability | Médio |
+| Knowledge Hub completar | 3.1 | **ALTA** | Source of Truth | Médio |
+| FinOps dados reais | 3.2 | **ALTA** | FinOps | Médio (depende 2.1) |
+| Estratégia Licensing | 3.3 | **ESTRATÉGICA** | Licensing | Alto |
+| Conectores CI/CD | 3.4 | **ALTA** | Change Intelligence | Alto |
+| E2E como gate CI | 5.1 | **ALTA** | Qualidade | Baixo |
+| Reescrever incidents.spec.ts | 5.2 | **ALTA** (pós 1.1) | Qualidade | Médio |
+| Arquivar docs de fases | 4.1 | Baixa | — | Baixo |
+| Atualizar FRONTEND-ARCHITECTURE | 4.2 | Média | Documentação | Baixo |
+| Padronizar loading/error/empty | 5.3 | Média | UX | Médio |
+| Avaliar stack frontend | 5.4 | Média | Technical Debt | Alto |
+| Persona awareness dashboard | 5.5 | Média | UX | Médio |
+
+---
+
+## Sequência de Execução Recomendada
+
+```
+Sprint 1: 1.1 (Incident correlation) + 1.3 (Outbox activation)
+Sprint 2: 1.2 (AI Assistant LLM) + 2.1 IContractsModule
+Sprint 3: 2.1 IChangeIntelligenceModule + 2.2 Governance partial
+Sprint 4: 2.1 ICostIntelligenceModule + 3.2 FinOps
+Sprint 5: 3.1 Knowledge Hub + 3.4 CI/CD connectors
+Sprint 6: 2.3 Nullable + 5.1 E2E gate + 4.2 Docs
+Parallel: 3.3 Licensing strategy (depende de decisão de produto)
+```
+
+---
+
+*Data: 28 de Março de 2026*

@@ -1,107 +1,157 @@
 # Relatório de Remoção, Arquivamento e Consolidação — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Critérios Aplicados
+## Objetivo
 
-- **REMOVE_CANDIDATE**: Sem uso real, tecnologia abandonada, duplicação desnecessária, documento contraditório sem valor, artefato fora da visão
-- **ARCHIVE_CANDIDATE**: Valor histórico/técnico mas não deve permanecer ativo
-- **CONSOLIDATE_CANDIDATE**: Dois ou mais artefatos com o mesmo papel
-- **KEEP_AND_COMPLETE**: Estratégico, incompleto, deve ser preservado e concluído
+Identificar artefatos do repositório que devem ser removidos, arquivados ou consolidados para reduzir confusão, eliminar resíduos técnicos e manter o repositório limpo e alinhado com a visão do produto.
 
 ---
 
-## 2. REMOVE_CANDIDATE
+## Princípio de Avaliação
 
-### Código
+> Não remover funcionalidade relevante apenas porque está incompleta.
+> Remover apenas quando: ausência total de uso real, duplicação desnecessária, tecnologia abandonada, ou contradição com a visão oficial sem valor histórico.
 
-| Artefato | Motivo | Evidência |
+---
+
+## REMOVE_CANDIDATE — Remoção Segura Recomendada
+
+### 1. Scripts Mortos ou Substituídos
+
+| Ficheiro | Motivo | Evidência |
 |---|---|---|
-| `InMemoryIncidentStore` (se ainda existir) | Substituído por `EfIncidentStore`; REBASELINE confirma EF como atual | `docs/REBASELINE.md` §Operational Intelligence |
-| Handlers de mock em Governance com `IsSimulated: true` | Substituir por implementação real quando persistence layer for adicionado; não remover antes | Remover apenas após substituição — ver §4 |
-| Referências a Commercial Governance em docs | Módulo removido no PR-17 | `docs/REBASELINE.md` §Removido |
+| `scripts/root-level/fix-pagination-defaults.ps1` | Script pontual — objetivo já alcançado | Não referenciado em pipelines |
 
-### Documentação
+**Ação:** Verificar se ainda é necessário; remover se o fix já foi aplicado.
 
-| Documento | Motivo | Evidência |
+---
+
+## ARCHIVE_CANDIDATE — Arquivar para Referência Histórica
+
+### 1. Relatórios de Fases e Waves Anteriores
+
+**Localização:** `docs/audits/`
+
+**Ficheiros (30+):**
+- `PHASE-0-*`, `PHASE-1-*` a `PHASE-9-*` (10 reports)
+- `WAVE-1-*` a `WAVE-FINAL-*` (5 reports)
+- `NOTIFICATIONS-PHASE-*` (6 reports)
+- `CONFIGURATION-PHASE-*` (8 reports)
+- `NEXTRACEONE-*` (6 reports)
+
+**Motivo:** Estes relatórios têm valor histórico de auditoria mas não refletem o estado atual. Mantê-los em `docs/audits/` pode confundir quem consulta estado atual. A referência definitiva é `docs/audit-forensic-2026-03/`.
+
+**Ação recomendada:** Mover para `docs/archive/audits/` com um `README.md` que explica que estes são relatórios históricos de fases passadas.
+
+**Não apagar:** Mantêm rastreabilidade de decisões e evolução do produto.
+
+### 2. Execution Prompts Gerados
+
+**Localização:** `docs/execution-prompts/generated/`
+
+**Motivo:** Prompts gerados para execução de tarefas específicas. Valor operacional baixo após a tarefa concluída.
+
+**Ação recomendada:** Mover para `docs/archive/execution-prompts/` ou remover se sem valor documental.
+
+### 3. Protótipos
+
+**Localização:** `docs/prototype/pdfs/`
+
+**Motivo:** PDFs de protótipo visual não são código e têm baixo valor em repositório de código.
+
+**Ação recomendada:** Avaliar se devem ficar em repositório de design separado ou `docs/archive/prototype/`.
+
+---
+
+## CONSOLIDATE_CANDIDATE — Consolidar Fontes Duplicadas
+
+### 1. Múltiplas Fontes de "Estado Atual"
+
+**Fontes existentes:**
+- `docs/audit-forensic-2026-03/final-project-state-assessment.md` (principal)
+- `docs/IMPLEMENTATION-STATUS.md` (atualizado)
+- `docs/current-state/*.md` (10 ficheiros por módulo)
+- `docs/ROADMAP.md` (atualizado)
+- `docs/audits/NEXTRACEONE-CURRENT-STATE-AND-100-PERCENT-GAP-REPORT.md` (desatualizado)
+
+**Ação:** Manter `audit-forensic-2026-03/` como fonte definitiva. `IMPLEMENTATION-STATUS.md` e `ROADMAP.md` mantêm-se como documentos de referência rápida. `docs/audits/` → `docs/archive/audits/`. `docs/current-state/` mantém-se para detalhe por módulo.
+
+### 2. AI Architecture Documents
+
+**Documentos relacionados:**
+- `docs/AI-GOVERNANCE.md`
+- `docs/AI-ARCHITECTURE.md`
+- `docs/AI-ASSISTED-OPERATIONS.md`
+- `docs/AI-DEVELOPER-EXPERIENCE.md`
+- `docs/aiknowledge/` (subdiretório)
+
+**Ação:** Consolidar em estrutura hierárquica clara com distinção explícita entre "estado atual" e "visão/roadmap".
+
+---
+
+## KEEP_AND_COMPLETE — Manter e Concluir
+
+### 1. Módulo Operations (`src/modules/operationalintelligence/`)
+
+**Motivo:** EfIncidentStore (678 linhas), schema real, 21 migrações. Não remover — completar conectando frontend e engine de correlação.
+
+### 2. Módulo Governance (`src/modules/governance/`)
+
+**Motivo:** GovernanceDbContext existe, 3 migrações. Não remover — substituir handlers mock por implementação real. Valor estratégico alto.
+
+### 3. Knowledge Hub (`src/modules/knowledge/`)
+
+**Motivo:** Pequeno mas alinhado à visão. Completar migrações e conectar ao AI context.
+
+### 4. Módulo Integrations (`src/modules/integrations/`)
+
+**Motivo:** Estrutura correta. Completar com implementação real de conectores CI/CD.
+
+### 5. `docs/audits/` (fase 0-9 e waves)
+
+**Motivo:** Valor histórico. Arquivar em vez de remover.
+
+### 6. `e2e-real/` (frontend)
+
+**Motivo:** 5 specs de ambiente real são valiosos — configuração separada intencional. Manter e integrar no CI quando ambientes de teste estiverem prontos.
+
+### 7. `DemoBanner.tsx` (`src/components/`)
+
+**Motivo:** Componente explícito de marcação de áreas de demonstração. Manter para uso enquanto existirem áreas mock; remover quando todo o produto for real.
+
+---
+
+## Resíduos a Eliminar (sem criação de novas features)
+
+### 1. `IsSimulated: true` nos handlers de Governance
+**Não é remoção de ficheiro** — é substituição de comportamento. Os ficheiros mantêm-se; o conteúdo muda.
+
+### 2. `mockIncidents` em IncidentsPage.tsx
+**Não é remoção de ficheiro** — é substituição da fonte de dados.
+
+### 3. `mockConversations` em AssistantPanel.tsx
+**Não é remoção de ficheiro** — é substituição pela API real.
+
+---
+
+## Sumário de Ações
+
+| Ação | Artefatos | Prioridade |
 |---|---|---|
-| Docs que referenciam Commercial Governance como ativo | Módulo removido | PR-17 |
-| Docs que descrevem stack tecnológico abandonado (ex: se houver refs a Redis/Temporal) | Tecnologia não adotada | Verificar cada caso |
-| Relatórios de execução histórica (e14, e15, e16, e17, e18) redundantes com REBASELINE | Histórico de processo, não estado atual | `docs/architecture/e14-* a e18-*` |
-| Relatórios p0-*, p1-* de segurança historicos | Histórico de hardening | `docs/architecture/p0-* a p1-*` |
+| ARCHIVE | `docs/audits/` (30+ relatórios de fases) | Baixa |
+| ARCHIVE | `docs/execution-prompts/generated/` | Baixa |
+| ARCHIVE | `docs/prototype/pdfs/` | Baixa |
+| REMOVE (verificar) | `scripts/root-level/fix-pagination-defaults.ps1` | Baixa |
+| CONSOLIDATE | Documentação AI (4 docs) | Média |
+| KEEP_AND_COMPLETE | `src/modules/operationalintelligence/` | Crítica |
+| KEEP_AND_COMPLETE | `src/modules/governance/` | Alta |
+| KEEP_AND_COMPLETE | `src/modules/knowledge/` | Alta |
+| KEEP_AND_COMPLETE | `src/modules/integrations/` | Alta |
+| KEEP_AND_COMPLETE | `DemoBanner.tsx` (temporariamente) | Baixa |
+| KEEP_AND_COMPLETE | `src/frontend/e2e-real/` | Média |
 
 ---
 
-## 3. ARCHIVE_CANDIDATE
-
-### Documentação Histórica de Evolução
-
-| Grupo de Documentos | Motivo para Arquivar |
-|---|---|
-| `docs/architecture/e14-legacy-migrations-removal-report.md` até `e18-final-technical-closure-report.md` | Histórico de execução de fases; não é estado atual |
-| `docs/architecture/p0-1-*` até `p1-5-*` (relatórios de hardening de segurança) | Histórico de hardening implementado; já consolidado no estado atual |
-| `docs/architecture/n-trail-*` (execução de auditoria anterior) | Histórico de processo |
-| `docs/archive/` (conteúdo já em subdiretório de arquivo) | Já identificado como arquivo |
-| `docs/11-review-modular/` como conjunto completo | Histórico de revisão modular; substituído por REBASELINE.md como fonte atual |
-
-**Ação recomendada:** Mover para `docs/archive/historical-execution/` mantendo estrutura interna.
-
----
-
-## 4. KEEP_AND_COMPLETE
-
-### Código — Estratégico, incompleto, preservar e concluir
-
-| Artefato | Justificativa | Ação |
-|---|---|---|
-| `EfIncidentStore` + `IncidentDbContext` | Real, 5 DbSets, migração; falta engine de correlação dinâmica | Completar com correlação |
-| `RuntimeIntelligenceDbContext` | DbContext real; migração não confirmada; IRuntimeIntelligenceModule PLAN | Gerar migração; implementar interface |
-| `CostIntelligenceDbContext` | DbContext real; ICostIntelligenceModule PLAN | Gerar migração; implementar interface |
-| `AiOrchestrationDbContext` + `ExternalAiDbContext` | DbContexts existem; migrações não confirmadas | Gerar migrações; implementar handlers ExternalAI |
-| `IExternalAIRoutingPort` | Abstração correta para routing de providers | Conectar ao handler SendAssistantMessage |
-| `GovernanceDbContext` | Existe; módulo 100% mock por design; persistence layer necessária | Adicionar persistence layer completo |
-| `KnowledgeDbContext` | DbContext existe; sem migrações | Gerar migração; completar Knowledge Hub |
-| `IntegrationsDbContext` | DbContext existe; conectores são stubs | Gerar migração; implementar ao menos 1 conector |
-| 7 stubs no Developer Portal | Intencionais; aguardam cross-module | Implementar via IContractsModule quando disponível |
-| `IAiOrchestrationModule` | Interface vazia mas arquiteturalmente correta | Adicionar métodos e implementação |
-| `IContractsModule` | PLAN; crítico para cross-module | Implementar |
-| `IChangeIntelligenceModule` | PLAN; crítico para Governance e IA | Implementar |
-
----
-
-## 5. CONSOLIDATE_CANDIDATE
-
-### Documentação com Papel Duplicado
-
-| Conjunto | Consolidação Proposta |
-|---|---|
-| `IMPLEMENTATION-STATUS.md` + `REBASELINE.md` | REBASELINE.md é mais atual e honesto; consolidar em `CURRENT-STATE.md` |
-| `ROADMAP.md` + `POST-PR16-EVOLUTION-ROADMAP.md` + `PRODUCT-REFOUNDATION-PLAN.md` | Consolidar em único `ROADMAP.md` atual |
-| `docs/11-review-modular/` (100+ docs por módulo) | Criar `CURRENT-STATE.md` por módulo como sumário; 11-review-modular como histórico |
-| ADRs duplicados em `docs/architecture/adr/` e `docs/architecture/ADR-*.md` | Verificar sobreposição e consolidar em estrutura única |
-| Múltiplos relatórios de validação (WAVE-1-*, EXECUTION-BASELINE-*) | Consolidar em REBASELINE.md |
-
----
-
-## 6. Resumo de Ações por Categoria
-
-| Categoria | Quantidade Estimada | Impacto |
-|---|---|---|
-| REMOVE_CANDIDATE | ~10-15 artefatos | Baixo risco; reduz ruído |
-| ARCHIVE_CANDIDATE | ~100+ documentos históricos | Reduz confusão sobre estado atual |
-| CONSOLIDATE_CANDIDATE | ~5 grupos de docs | Cria fonte única de verdade |
-| KEEP_AND_COMPLETE | ~12 artefatos estratégicos | Alta prioridade para produto |
-
----
-
-## 7. O que NÃO Remover
-
-| Artefato | Justificativa para Preservar |
-|---|---|
-| Módulos com `IsSimulated: true` | São o estado atual intencional; remover sem substituição quebra o produto |
-| 7 stubs do Developer Portal | Intencionais; referenciam capacidades reais futuras |
-| DbContexts sem migrações | Estratégicos; precisam de migrações geradas, não de remoção |
-| REBASELINE.md, CORE-FLOW-GAPS.md | Fontes de verdade do estado atual |
-| Building Blocks completos | Fundação do produto; não remover |
-| ADRs | Decisões arquiteturais registadas |
+*Data: 28 de Março de 2026*

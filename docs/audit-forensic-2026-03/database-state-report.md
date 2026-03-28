@@ -1,177 +1,172 @@
 # Relatório de Estado do Banco de Dados — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Estratégia de Persistência
+## Objetivo da Área no Contexto do Produto
 
-### Arquitetura
-- **PostgreSQL 16** como único banco de dados central
-- **1 banco físico:** `nextraceone` (UTF8, en_US.utf8)
-- **Isolamento por prefixo de tabela** por módulo
-- **EF Core** como ORM com migrações por DbContext
-- **Multi-tenancy** via RLS (Row-Level Security) + isolamento na camada de aplicação
-
-### Prefixos por Módulo
-| Prefixo | Módulo |
-|---|---|
-| `iam_` | Identity & Access |
-| `cat_` | Catalog (Graph, Contracts, Portal) |
-| `ctr_` | Contracts |
-| `aud_` | Audit & Compliance |
-| `gov_` | Governance |
-| `chg_` | Change Governance |
-| `ops_` | Operational Intelligence |
-| `aik_` | AI Knowledge |
-| `ntf_` | Notifications |
-| `cfg_` | Configuration |
-| `int_` | Integrations |
-| `knw_` | Knowledge |
+A persistência é o alicerce do NexTraceOne como source of truth. Cada módulo deve ter schema deployável, auditável e alinhado ao domínio. Dados de auditoria, mudanças, contratos e serviços devem ser rastreáveis e consultáveis.
 
 ---
 
-## 2. Inventário de DbContexts
+## Estado Atual Encontrado
 
-### Total: 24 DbContexts
+### Inventário de DbContexts e Migrações
 
-| DbContext | Módulo | Migrações | Estado |
+| DbContext | Módulo | Migrações | Schema Deployável | Observação |
+|---|---|---|---|---|
+| `IdentityDbContext` | identityaccess | 3 | ✅ SIM | Outbox processado ativamente |
+| `ContractsDbContext` | catalog | 5 | ✅ SIM | — |
+| `CatalogGraphDbContext` | catalog | 3 | ✅ SIM | Topologia de serviços |
+| `DeveloperPortalDbContext` | catalog | 5 | ✅ SIM | — |
+| `ChangeIntelligenceDbContext` | changegovernance | 7 | ✅ SIM | — |
+| `WorkflowDbContext` | changegovernance | 5 | ✅ SIM | — |
+| `PromotionDbContext` | changegovernance | 3 | ✅ SIM | — |
+| `RulesetGovernanceDbContext` | changegovernance | 3 | ✅ SIM | — |
+| `IncidentDbContext` | operationalintelligence | 3 | ✅ SIM | Frontend não conectado |
+| `AutomationDbContext` | operationalintelligence | 3 | ✅ SIM | Handlers retornam PreviewOnly |
+| `ReliabilityDbContext` | operationalintelligence | 5 | ✅ SIM | Handlers não consultam DB |
+| `RuntimeIntelligenceDbContext` | operationalintelligence | 3 | ✅ SIM | — |
+| `CostIntelligenceDbContext` | operationalintelligence | 7 | ✅ SIM | Não consumido pelos handlers |
+| `AuditDbContext` | auditcompliance | 4 | ✅ SIM | Hash chain SHA-256 |
+| `GovernanceDbContext` | governance | 3 | ✅ SIM | Handlers não consultam DB (mock) |
+| `ConfigurationDbContext` | configuration | 13 | ✅ SIM | Feature flags DB-driven |
+| `NotificationsDbContext` | notifications | 9 | ✅ SIM | — |
+| `IntegrationsDbContext` | integrations | 3 | ✅ SIM | Conectores são stubs |
+| `AiGovernanceDbContext` | aiknowledge | 3 | ✅ SIM | — |
+| `AiOrchestrationDbContext` | aiknowledge | 5 | ✅ SIM | Outbox não processado |
+| `ExternalAiDbContext` | aiknowledge | 3 | ✅ SIM | 8 handlers TODO |
+| `KnowledgeDbContext` | knowledge | 3 | ✅ SIM | Features mínimas implementadas |
+| `ProductAnalyticsDbContext` | productanalytics | 3 | ✅ SIM | 100% mock |
+| `NexTraceOne` (base) | platform | — | ✅ SIM | Connection string principal |
+
+**Total: 24 DbContexts, ~100+ ficheiros de migração**
+
+---
+
+## Análise de Migrações por Módulo
+
+| Módulo | DbContexts | Total Migrações | Qualidade dos Nomes |
 |---|---|---|---|
-| IdentityDbContext | identityaccess | Sim (1+) | READY |
-| ContractsDbContext | catalog | Sim (com snapshot) | READY |
-| CatalogGraphDbContext | catalog | Sim (com snapshot) | READY |
-| DeveloperPortalDbContext | catalog | Sim (com snapshot) | READY |
-| AuditDbContext | auditcompliance | Sim (2: InitialCreate + P7_4_AuditCorrelationId) | READY |
-| GovernanceDbContext | governance | Sim (com snapshot) | READY* |
-| ChangeIntelligenceDbContext | changegovernance | Sim (com snapshot) | READY |
-| WorkflowDbContext | changegovernance | Sim (com snapshot) | READY |
-| PromotionDbContext | changegovernance | Sim (com snapshot) | READY |
-| RulesetGovernanceDbContext | changegovernance | Sim (com snapshot) | READY |
-| IncidentDbContext | operationalintelligence | Sim (com snapshot) | READY |
-| AutomationDbContext | operationalintelligence | Sim (com snapshot) | READY |
-| ReliabilityDbContext | operationalintelligence | Sim (com snapshot) | READY |
-| RuntimeIntelligenceDbContext | operationalintelligence | Snapshot existe; migração confirmada? | PARTIAL |
-| CostIntelligenceDbContext | operationalintelligence | Snapshot existe; migração confirmada? | PARTIAL |
-| AiGovernanceDbContext | aiknowledge | Sim (com snapshot) | READY |
-| AiOrchestrationDbContext | aiknowledge | Snapshot existe; migração confirmada? | PARTIAL |
-| ExternalAiDbContext | aiknowledge | Snapshot existe; migração confirmada? | PARTIAL |
-| ConfigurationDbContext | configuration | Sim (com snapshot) | READY |
-| NotificationsDbContext | notifications | Sim (2+ migrações: 20260327082159, 20260327092812) | READY |
-| IntegrationsDbContext | integrations | Snapshot existe; migração não confirmada | PARTIAL |
-| ProductAnalyticsDbContext | productanalytics | Sem migrações confirmadas | INCOMPLETE |
-| KnowledgeDbContext | knowledge | Sem migrações confirmadas | INCOMPLETE |
-| NexTraceDbContextBase | building-blocks | N/A (base class) | BASE |
-
-*GovernanceDbContext existe mas módulo Governance tem 74 handlers que retornam dados mock; persistência própria é design intencional vazio.
+| catalog | 3 | 13 | ✅ Descritivos (InitialCreate, AddServiceDependencies, etc.) |
+| changegovernance | 4 | 18 | ✅ Descritivos (AddBlastRadius, AddFreezeWindows, etc.) |
+| operationalintelligence | 5 | 21 | ✅ Mais migrações — evolução clara |
+| configuration | 1 | 13 | ✅ Feature flags evolutivos |
+| notifications | 1 | 9 | ✅ Canais de entrega adicionados progressivamente |
+| auditcompliance | 1 | 4 | ✅ — |
+| aiknowledge | 3 | 11 | ✅ — |
+| identityaccess | 1 | 3 | ✅ — |
+| governance | 1 | 3 | ✅ — |
+| knowledge | 1 | 3 | ✅ — |
+| integrations | 1 | 3 | ✅ — |
+| productanalytics | 1 | 3 | ✅ — |
 
 ---
 
-## 3. Qualidade do Schema
+## Estratégia de Base de Dados
 
-### Pontos Fortes
+### Configuração Atual (appsettings.json)
 
-**Isolamento de tenant:**
-- Todos os DbContexts herdam de `NexTraceDbContextBase`
-- `ICurrentTenant` injetado em todos os contextos
-- `TenantRlsInterceptor`: `SELECT set_config('app.current_tenant_id', @__tenantId, false)` — parametrizado (sem SQL injection)
-- `TenantIsolationBehavior` na camada de aplicação como segunda linha de defesa
+Todos os 22 connection strings apontam para o **mesmo servidor PostgreSQL**, mesma base de dados `nextraceone`:
 
-**Audit fields:**
-- `CreatedAt`, `CreatedBy`, `UpdatedAt`, `UpdatedBy` em todas as entidades auditáveis
-- Soft-delete (`IsDeleted`) via `AuditableEntity<T>` base class
-- `AuditInterceptor` para gestão automática de timestamps
-- Row version com coluna `xmin` (PostgreSQL nativo) para concorrência otimista
+```
+Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=REPLACE_VIA_ENV
+```
 
-**Qualidade estrutural:**
-- UUID (Guid) como PKs — nativo PostgreSQL
-- Check constraints em enums: e.g., `"Status" IN ('Planned','InProgress','Completed','Cancelled')`
-- Índices adequados em colunas de alta consulta: `TenantId`, `ActionType`, `OccurredAt`, `PerformedBy`
-- Outbox pattern com `idempotency_key` (índice único) em todos os módulos
+**Implicação:** O produto usa uma única base de dados PostgreSQL com múltiplos DbContexts (multi-schema strategy). Cada DbContext tem prefixo de tabela por módulo (ex.: `cat_`, `chg_`, `id_`, `aud_`).
 
-**Evidência:** `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Infrastructure/Persistence/AuditDbContext.cs`, `src/building-blocks/NexTraceOne.BuildingBlocks.Infrastructure/Persistence/NexTraceDbContextBase.cs`
+**Alinhamento com CLAUDE.md:** ✅ PostgreSQL 16 como base central no MVP — conforme definido.
+
+### Inicialização
+`infra/postgres/init-databases.sql` — script de inicialização confirmado.
+
+### Seeds
+- `db/seed/seed_development.sql` — dados de desenvolvimento
+- `db/seed/seed_production.sql` — baseline de produção
+- `src/platform/NexTraceOne.ApiHost/SeedData/` — seeds via EF Core
 
 ---
 
-## 4. Problemas Identificados
+## Avaliação do Schema por Área de Produto
 
-### Gap Crítico 1: Outbox não processado em 23 DbContexts
+### Source of Truth (Catalog)
+✅ Schema suporta adequadamente:
+- Serviços com metadata, ownership, topologia
+- Contratos com versões semânticas, assinaturas, evidências
+- Developer Portal com subscriptions e analytics
 
-O outbox pattern está implementado em todos os DbContexts (tabela `*_outbox_messages`). Porém, apenas o IdentityDbContext tem processamento ativo de outbox. Os outros 23 DbContexts produzem eventos de domínio que ficam na tabela de outbox sem serem consumidos.
+### Change Intelligence
+✅ Schema suporta:
+- Releases, blast radius, change scores, freeze windows
+- Workflows com aprovações, evidence packs
+- Promotion requests e gate evaluations
+- Rollback assessments
 
-**Impacto:** Eventos de integração entre módulos não propagam. A arquitetura event-driven é estruturalmente presente mas funcionalmente inoperante para a maioria dos módulos.
+### Incidents & Operations
+⚠️ Schema existe mas não é consumido:
+- `IncidentDbContext` tem 5 DbSets (Incidents, RunbookRecords, MitigationRecords, ResolutionRecords, CorrelationEvents)
+- `EfIncidentStore` real com 678 linhas mas frontend não conectado
+- `RunbookRecord` existe mas handlers usam 3 runbooks hardcoded
+- `MitigationRecord` existe mas `CreateMitigationWorkflow` não persiste
 
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Infrastructure — "Outbox pattern: PARTIAL — Only IdentityDbContext processed; 15 other contexts unprocessed"
+### FinOps
+⚠️ Schema existe mas não consumido por governance:
+- `CostIntelligenceDbContext` com 7 migrações
+- Handlers de FinOps em `governance` módulo retornam `IsSimulated: true` sem consultar `CostIntelligenceDbContext`
+- `ICostIntelligenceModule` interface não implementada
 
-### Gap Crítico 2: DbContexts sem migrações confirmadas
+### Identity & Security
+✅ Schema robusto:
+- Multi-tenancy com RLS a nível de base de dados
+- Auditoria de entidades via `AuditInterceptor`
+- Delegações com expiração e revogação
 
-Os seguintes DbContexts têm `ModelSnapshot` mas não têm migrações confirmadas como executáveis:
-- RuntimeIntelligenceDbContext
-- CostIntelligenceDbContext
-- AiOrchestrationDbContext
-- ExternalAiDbContext
-- IntegrationsDbContext
-- ProductAnalyticsDbContext
-- KnowledgeDbContext
-
-**Impacto:** Estes schemas não são deployáveis sem geração explícita de migrações (`dotnet ef migrations add`).
-
-**Evidência:** `docs/REBASELINE.md` §Dívidas de Arquitetura — A1, A2
-
-### Gap 3: Cross-module interfaces como PLAN
-
-8 interfaces cross-module estão definidas mas sem implementação:
-- `IContractsModule`
-- `IChangeIntelligenceModule`
-- `IPromotionModule`
-- `IRulesetGovernanceModule`
-- `ICostIntelligenceModule`
-- `IRuntimeIntelligenceModule`
-- `IAiOrchestrationModule`
-- `IExternalAiModule`
-
-**Impacto:** Módulos como Governance não conseguem consultar dados reais de outros módulos. FinOps não pode correlacionar custos com serviços reais.
-
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Cross-Module Contract Health
+### AI Governance
+✅ Schema funcional:
+- `AiGovernanceDbContext`: modelos, políticas, budgets, token usage ledger
+- `AiOrchestrationDbContext`: conversações, agentes, execuções (sem outbox processado)
 
 ---
 
-## 5. Seed Data
+## Problemas Identificados
 
-| Módulo | Seed | Ambiente |
-|---|---|---|
-| Configuration | ConfigurationDefinitionSeeder | Development/Staging |
-| OperationalIntelligence | IncidentSeedData (SQL) | Development/Staging |
-| ApiHost | DevelopmentSeedDataExtensions | Development only |
+### 1. Outbox sem processadores (CRÍTICO)
+**Impacto:** Eventos de domínio não propagam entre módulos.
+- 23 DbContexts têm tabelas `OutboxMessages` criadas pelo `NexTraceDbContextBase`
+- Apenas `IdentityDbContext` tem processador registado em `BackgroundWorkers`
+- Sem processamento de outbox, eventos de Catalog, ChangeGovernance e OperationalIntelligence não chegam a consumidores
 
-**Regra de segurança respeitada:** Seeds restritos a ambientes não-produção via verificação de ambiente.
+### 2. Schema existe mas handlers não consultam (ALTA)
+- `ReliabilityDbContext`: handlers em reliability retornam 8 serviços hardcoded
+- `CostIntelligenceDbContext`: não consultado pelos handlers de FinOps
+- `GovernanceDbContext`: ~74 handlers retornam dados mock sem consultar o schema
+- `RunbookRecord` e `MitigationRecord`: existem no schema mas não são usados
 
-**Evidência:** `src/platform/NexTraceOne.ApiHost/DevelopmentSeedDataExtensions.cs`
-
----
-
-## 6. ClickHouse — Estado
-
-**Status: ESQUEMA DEFINIDO, INTEGRAÇÃO INCOMPLETA**
-
-Schema SQL para analytics em `build/clickhouse/`:
-- `analytics-schema.sql` — tabelas analíticas
-- `init-schema.sql` — inicialização
-
-O docker-compose inclui ClickHouse. Porém, não há evidência de pipeline completo de ingestão de dados do PostgreSQL para ClickHouse em funcionamento.
-
-**Recomendação:** ClickHouse é candidato estratégico para dados analíticos (observabilidade, FinOps, change history). Deve ser ativado quando o pipeline de ingestão de telemetria estiver pronto.
-
-**Evidência:** `build/clickhouse/`, `docs/architecture/clickhouse-baseline-strategy.md`
+### 3. Prefixos de tabela
+Prefixo de tabelas por módulo (`cat_`, `chg_`, `id_`, `aud_`) confirma estratégia de isolamento lógico dentro de um único DB PostgreSQL. Documentado em `docs/architecture/database-table-prefixes.md`.
 
 ---
 
-## 7. Recomendações de Banco de Dados
+## Restrições Técnicas Respeitadas
 
-| Ação | Prioridade | Impacto |
-|---|---|---|
-| Ativar processamento de outbox para todos os DbContexts críticos | Alta | Habilita event-driven entre módulos |
-| Gerar migrações para RuntimeIntelligence e CostIntelligence | Alta | Schemas deployáveis |
-| Gerar migrações para AiOrchestration, ExternalAI, Integrations | Média | Schemas deployáveis |
-| Gerar migrações para ProductAnalytics e Knowledge | Média | Schemas deployáveis |
-| Implementar cross-module interfaces | Alta | Desbloqueia Governance e FinOps real |
-| Ativar pipeline ClickHouse para dados analíticos | Média | FinOps e observabilidade analítica |
-| Senha ClickHouse vazia em appsettings.Development | Baixa | Configurar para produção |
+✅ PostgreSQL 16 como base central (alinhado ao MVP)
+✅ EF Core 10 com Npgsql confirmado
+✅ Migrations coerentes e auditáveis
+✅ Sem Redis no MVP (confirmado — não está em nenhum appsettings)
+✅ Sem OpenSearch no MVP (PostgreSQL FTS usado)
+✅ Sem Temporal — Quartz.NET via BackgroundWorkers
+
+---
+
+## Recomendações
+
+1. **Crítico:** Ativar outbox processors para Catalog e ChangeGovernance no BackgroundWorkers
+2. **Alta:** Conectar handlers de Reliability ao `ReliabilityDbContext` (substituir hardcoded)
+3. **Alta:** Conectar handlers de FinOps ao `CostIntelligenceDbContext` via `ICostIntelligenceModule`
+4. **Alta:** Conectar handlers de Governance ao `GovernanceDbContext` (substituir `IsSimulated`)
+5. **Média:** Usar `RunbookRecord` e `MitigationRecord` nos handlers de OperationalIntelligence
+6. **Baixa:** Documentar estratégia de sharding/particionamento para volumes enterprise futuros
+
+---
+
+*Data: 28 de Março de 2026*

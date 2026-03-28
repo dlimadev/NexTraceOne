@@ -1,186 +1,229 @@
 # Relatório de Configuração e Parametrização — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Inventário de Configuração
+## Objetivo da Área no Contexto do Produto
 
-| Arquivo | Localização | Propósito |
-|---|---|---|
-| appsettings.json | `src/platform/NexTraceOne.ApiHost/` | Defaults de produção |
-| appsettings.Development.json | `src/platform/NexTraceOne.ApiHost/` | Overrides de desenvolvimento |
-| appsettings.json | `src/platform/NexTraceOne.Ingestion.Api/` | Ingestão — defaults |
-| appsettings.Development.json | `src/platform/NexTraceOne.Ingestion.Api/` | Ingestão — desenvolvimento |
-| .env.example | Raiz do repositório | Template de variáveis de ambiente |
-| docker-compose.yml | Raiz | Configuração Docker principal |
-| docker-compose.override.yml | Raiz | Overrides locais |
-| Directory.Build.props | Raiz | Propriedades centrais .NET |
-| Directory.Packages.props | Raiz | Versões de pacotes NuGet |
-| global.json | Raiz | Versão do SDK .NET |
+Configuração deve suportar deployment enterprise self-hosted e on-prem, sem segredos hardcoded, com parâmetros funcionais persistidos na base de dados e parâmetros técnicos em variáveis de ambiente.
 
 ---
 
-## 2. Análise de appsettings.json (Produção)
+## O que Existe
 
-### Segurança — Estado: CORRETO
+### Ficheiros de Configuração Identificados
 
-| Configuração | Valor | Avaliação |
+| Ficheiro | Localização | Propósito |
 |---|---|---|
-| `Jwt:ExpirationMinutes` | 60 | Razoável |
-| `Security:Cookie:Secure` | `true` | Correto — requer HTTPS |
-| `Security:CsrfProtection:Enabled` | `true` | Correto |
-| `Security:IntegrityCheck:Enabled` | `true` | Correto para produção |
-| `Security:ApiKeys` | Array vazio | Correto — preenchido por admin |
-| `Cors:AllowedOrigins` | Array vazio | **Correto** — requer config explícita em produção |
+| `appsettings.json` | `src/platform/NexTraceOne.ApiHost/` | Config base do API Host |
+| `appsettings.Development.json` | `src/platform/NexTraceOne.ApiHost/` | Override desenvolvimento |
+| `appsettings.json` | `src/platform/NexTraceOne.Ingestion.Api/` | Config do Ingestion service |
+| `.env.example` | raiz | Template de variáveis de ambiente |
+| `global.json` | raiz | Versão .NET |
+| `Directory.Build.props` | raiz | MSBuild global |
+| `Directory.Packages.props` | raiz | NuGet centralizado |
+| `otel-collector.yaml` | `build/otel-collector/` | OpenTelemetry collector |
+| `docker-compose.yml` | raiz | Compose de produção |
+| `docker-compose.override.yml` | raiz | Override desenvolvimento |
 
-### Rate Limiting — Estado: BEM CONFIGURADO
+---
 
-| Policy | Limite | Janela |
-|---|---|---|
-| Global | 100/IP (20 não-resolvidos) | 1 min |
-| Auth | 20/IP | 1 min |
-| AuthSensitive | 10/IP | 1 min |
-| AI | 30/IP | 1 min |
-| DataIntensive | 50/IP | 1 min |
-| Operations | 40/IP | 1 min |
+## Análise do appsettings.json (ApiHost)
 
-### AI Providers — Estado: DEFAULTS SEGUROS
-
+### Connection Strings
 ```json
-"AiRuntime": {
-  "Ollama": { "BaseUrl": "http://localhost:11434", "Enabled": true },
-  "OpenAI": { "ApiKey": "", "Enabled": false },
-  "Routing": { "PreferredProvider": "ollama" }
+"NexTraceOne": "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=REPLACE_VIA_ENV"
+```
+
+22 connection strings confirmadas. Todas usam `Password=REPLACE_VIA_ENV`.
+
+**Avaliação:**
+- ✅ Sem senhas hardcoded — padrão `REPLACE_VIA_ENV` correto
+- ✅ Todas apontam para mesmo PostgreSQL (estratégia de single-DB multi-schema)
+- ⚠️ Maximum Pool Size fixo em 10 para todos — pode precisar de tuning por ambiente
+
+### JWT Configuration
+```json
+"Jwt": {
+  "Issuer": "NexTraceOne",
+  "Audience": "nextraceone-api",
+  "AccessTokenExpirationMinutes": 60,
+  "RefreshTokenExpirationDays": 7
 }
 ```
 
-**Avaliação:** Ollama como padrão local; OpenAI desabilitado por padrão. Correto.
+**Avaliação:**
+- ✅ Sem JwtSecret hardcoded — deve vir de variável de ambiente
+- ⚠️ Expiração de 60 minutos e 7 dias — valores aceitáveis, mas auditáveis
+- ⚠️ Confirmar que `JwtSecret` vem de variável de ambiente e não de appsettings.Development.json
 
-### Observabilidade — Estado: REQUIRES CONFIGURATION
+### AI Runtime Configuration
+```json
+"AiRuntime": {
+  "Ollama": {
+    "BaseUrl": "http://localhost:11434",
+    "TimeoutSeconds": 120,
+    "DefaultChatModel": "qwen3.5:9b",
+    "Enabled": true
+  },
+  "OpenAI": {
+    "ApiKey": "",
+    "DefaultChatModel": "gpt-4o-mini",
+    "Enabled": false
+  },
+  "Routing": {
+    "PreferredProvider": "ollama",
+    "PreferredChatModel": "qwen3.5:9b"
+  }
+}
+```
 
-- `"Endpoint": "http://localhost:4317"` para OpenTelemetry
-- Em produção, requer substituição por endpoint real do coletor
-- ClickHouse password vazia em desenvolvimento — requer configuração em produção
+**Avaliação:**
+- ✅ OpenAI desativado por default — correto para on-prem
+- ✅ `ApiKey: ""` vazio — sem chave hardcoded
+- ✅ Ollama como provider preferencial — alinhado com IA local
+- ⚠️ `BaseUrl: "http://localhost:11434"` — hardcoded para localhost; em deployment self-hosted precisa ser override
+- ⚠️ Model `qwen3.5:9b` hardcoded — deveria vir de parametrização persistida (ConfigurationDbContext)
+
+### Auth / Cookie Session
+```json
+"Auth": {
+  "CookieSession": {
+    "AccessTokenCookieName": "nxt_at",
+    "CsrfCookieName": "nxt_csrf",
+    "RequireSecureCookies": true
+  }
+}
+```
+
+**Avaliação:**
+- ✅ `RequireSecureCookies: true` — correto para produção
+- ✅ Nomes de cookies configuráveis
+- ⚠️ Confirmar que `RequireSecureCookies` é `false` apenas em `appsettings.Development.json`
+
+### OIDC Providers
+```json
+"OidcProviders": {
+  "azure": {
+    "Authority": "https://login.microsoftonline.com/{tenant-id}/v2.0",
+    "ClientId": "",
+    "ClientSecret": ""
+  }
+}
+```
+
+**Avaliação:**
+- ✅ `ClientId` e `ClientSecret` vazios — sem segredos hardcoded
+- ✅ `{tenant-id}` como placeholder — correto
+- ⚠️ Apenas Azure pré-configurado; Keycloak e outros IDPs requerem configuração manual
+
+### OpenTelemetry
+```json
+"Telemetry": {
+  "OtlpEndpoint": "http://localhost:4317"
+}
+```
+
+**Avaliação:**
+- ⚠️ `localhost:4317` hardcoded em config base — requer override obrigatório em produção
+- ⚠️ Sem configuração por ambiente visível no appsettings base
 
 ---
 
-## 3. Análise de appsettings.Development.json
+## O que Está Hardcoded e Não Deveria Estar
 
-| Diferença | Valor Dev | Avaliação |
+| Item | Localização | Problema |
 |---|---|---|
-| `IntegrityCheck:Enabled` | `false` | Correto para dev |
-| `Cors:AllowedOrigins` | `["localhost:5173", "localhost:3000"]` | Correto para dev |
-| `Cookie:Secure` | `false` | Correto para HTTP local |
-| Serilog MinimumLevel | `Debug` | Correto para dev |
-
-**Avaliação:** Separação correta entre dev e produção.
-
----
-
-## 4. Análise de .env.example
-
-### Sem segredos hardcoded — CONFIRMADO
-
-| Variável | Valor no Template | Avaliação |
-|---|---|---|
-| `POSTGRES_PASSWORD` | `change-me-in-production` | Correto — placeholder explícito |
-| `JWT_SECRET` | `REPLACE-WITH-AT-LEAST-32-CHAR-SECRET-KEY` | Correto — obrigatório substituir |
-| `NEXTRACE_ENCRYPTION_KEY` | `REPLACE-WITH-BASE64-32-BYTE-KEY` | Correto — obrigatório substituir |
-| `NEXTRACE_SKIP_INTEGRITY` | `false` | Correto — default seguro |
-| `NEXTRACE_AUTO_MIGRATE` | `false` | Correto — previne auto-migração em produção |
-| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Correto — local por padrão |
-| `OPENAI_API_KEY` | vazio | Correto — opcional |
+| `DefaultChatModel: "qwen3.5:9b"` | `appsettings.json` | Deveria vir de `ConfigurationDbContext` (model registry) |
+| `OtlpEndpoint: "http://localhost:4317"` | `appsettings.json` | Deveria ser override por ambiente |
+| `MaxPoolSize: 10` | Todas connection strings | Deveria ser parametrizável |
+| Runbooks hardcoded | `src/modules/operationalintelligence/` handlers | Deveria vir de `RunbookRecord` no DB |
+| 8 serviços hardcoded em Reliability | handlers de reliability | Deveria vir de `ReliabilityDbContext` |
+| `IsSimulated: true` em 22+ handlers | `src/modules/governance/` | Dados fabricados — sem parametrização de dados reais |
 
 ---
 
-## 5. O que Está Hardcoded e Não Deveria
+## O que Deve Permanecer em Configuração Técnica
 
-| Item | Localização | Recomendação |
-|---|---|---|
-| API Keys armazenadas em appsettings | `appsettings.json "ApiKeys"` | Migrar para armazenamento criptografado em banco para produção (anotado no código como MVP1) |
-| ClickHouse password vazia | docker-compose/appsettings dev | Configurar credencial em produção |
-| OpenTelemetry endpoint = localhost | appsettings.json | Configurar endpoint real por ambiente via env var |
-| Modelos de IA hardcoded no config | `DefaultChatModel: "qwen3.5:9b"` | Migrar para Model Registry (que já existe) |
-| Thresholds de blast radius | Verificar handlers de ChangeGovernance | Candidatos a parametrização persistida |
-| Approval rules | Verificar WorkflowDbContext | Já persistidos via rulesets — OK |
-
----
-
-## 6. O que Deve Virar Parametrização Persistida
-
-Aplicando a regra: *"Se a configuração precisa ser alterada por admin funcional sem redeploy, é forte candidata a parametrização persistida."*
-
-| Configuração | Estado Atual | Recomendação |
-|---|---|---|
-| Feature flags | Database-driven (ConfigurationDbContext) | Já correto |
-| Thresholds de change score | Verificar handlers | Candidato a configuração persistida |
-| Deploy windows / freeze windows | WorkflowDbContext (FreezeWindow entity) | Já persistido — correto |
-| Retention policies | AuditDbContext | Verificar se é configurável por tenant |
-| Rate limit overrides por tenant | appsettings.json | Candidato a override por tenant via ConfigurationDbContext |
-| AI token budgets | AiGovernanceDbContext | Já persistido — correto |
-| AI access policies | AiGovernanceDbContext | Já persistido — correto |
+✅ Correto permanecer em `appsettings.json`:
+- Connection strings (com senha via ENV)
+- JWT issuer/audience
+- OidcProviders (com segredos via ENV)
+- Cookie names e flags de segurança
+- AI provider base URLs e timeouts
+- SMTP/notification endpoints
+- OpenTelemetry endpoint (com override por ambiente)
 
 ---
 
-## 7. O que Deve Permanecer Configuração Técnica
+## O que Deve Ser Parametrização Persistida (ConfigurationDbContext)
 
-| Item | Justificativa |
+| Parâmetro | Motivo |
 |---|---|
-| Strings de conexão | Infraestrutura — não funcional |
-| JWT secret | Segredo de segurança — env var |
-| Encryption key | Segredo de segurança — env var |
-| CORS origins | Infraestrutura — env var/appsettings por ambiente |
-| Rate limiting global | Infraestrutura — appsettings |
-| OpenTelemetry endpoint | Infraestrutura — env var |
-| SDK e versão .NET | global.json |
+| Modelo de IA padrão por tenant/role | Admin funcional precisa mudar sem redeploy |
+| Janelas de deploy por ambiente | Operação muda conforme calendário |
+| Critérios de aprovação de mudanças | Risco e governance evoluem |
+| Thresholds de blast radius | Produto-específico, não técnico |
+| Severidades e classificações de incidente | Operação configura |
+| Políticas de retenção de auditoria | Admin funcional |
+| Quotas de tokens AI por grupo/persona | Governance de IA |
+| Configuração de conectores de integração | Admin de integrações |
+
+O módulo `Configuration` com `ConfigurationDbContext` e 13 migrações já existe — é o lugar correto para estes parâmetros.
 
 ---
 
-## 8. O que Está Obsoleto ou Inconsistente
+## Segredos e Exposição
 
-| Item | Estado | Recomendação |
-|---|---|---|
-| Seção de Commercial Governance no config (se existir) | Módulo removido no PR-17 | Verificar e remover |
-| Configurações de tecnologias removidas | — | Confirmar limpeza |
-| Feature flags para módulos mock | Config pode referenciar módulos mock | Sinalizar como PREVIEW explicitamente |
+| Item | Estado |
+|---|---|
+| Passwords em appsettings.json | ✅ `REPLACE_VIA_ENV` — sem exposição |
+| JWT Secret | ✅ Não encontrado hardcoded |
+| OpenAI ApiKey | ✅ `""` vazio em config base |
+| OIDC Client secrets | ✅ `""` vazios |
+| Encryption keys | ✅ Não hardcoded (AES-256-GCM key via ENV) |
+| `.env.example` | ✅ Template sem valores reais |
 
----
-
-## 9. Feature Flags — Estado
-
-**Status: IMPLEMENTADO via ConfigurationDbContext**
-
-- Feature flags database-driven com override por tenant
-- `SetFeatureFlagOverride` — override por tenant
-- `GetEffectiveFeatureFlag` — resolução de valor efetivo
-- `ConfigurationDefinitionSeeder` — valores padrão em desenvolvimento
-
-**Gap:** Não há inventário documentado de todas as feature flags ativas no sistema. Recomendado criar lista canônica de flags por módulo.
+**Avaliação de segurança de configuração:** Boa — sem segredos hardcoded identificados.
 
 ---
 
-## 10. Configuração de Licenciamento
+## Feature Flags
 
-**Status: AUSENTE**
+O módulo `Configuration` tem feature flags database-driven com:
+- Override por tenant
+- `ConfigurationDefinitionSeeder` para valores padrão
+- API de gestão via `ConfigurationDbContext`
 
-O módulo de Commercial Governance (licenciamento) foi removido no PR-17. Não há seção de licensing no appsettings.json atual.
-
-**Risco:** Se licenciamento for requisito para self-hosted enterprise, precisa ser reimplementado com abordagem diferente da original removida.
-
-**Evidência:** `docs/REBASELINE.md` — "~~Commercial Governance~~ — REMOVIDO (PR-17)"
+**Avaliação:** ✅ Feature flags funcionais e DB-driven.
 
 ---
 
-## 11. Avaliação Self-Hosted Readiness
+## Consistência entre Ambientes
 
-| Critério | Estado | Evidência |
-|---|---|---|
-| Sem segredos hardcoded | Sim | .env.example com placeholders |
-| Configuração por env vars | Sim | Todas as configs sensíveis via env |
-| Docker Compose funcional | Sim | docker-compose.yml com todos os serviços |
-| IIS support | Verificar | Documentado mas não verificado em detalhe |
-| Auto-migrate desabilitado por padrão | Sim | `NEXTRACE_AUTO_MIGRATE=false` |
-| Script de migração manual | Sim | `scripts/db/apply-migrations.sh` e `.ps1` |
-| Sem dependências proprietárias | Sim (verificado) | PostgreSQL, Ollama, OpenTelemetry — open-source |
-| Sem Redis obrigatório | Sim | Não detectado no stack |
-| Sem Temporal obrigatório | Sim | Quartz.NET no lugar |
+| Config | Desenvolvimento | Produção | Alinhamento |
+|---|---|---|---|
+| `RequireSecureCookies` | Presumivelmente `false` | `true` | ✅ Correto |
+| `OtlpEndpoint` | `localhost:4317` | Precisa de override | ⚠️ Requer atenção |
+| AI provider URL | `localhost:11434` | Precisa de override | ⚠️ Requer atenção |
+| Log level | Provavelmente Debug/Verbose | Information/Warning | ⚠️ Confirmar |
+
+---
+
+## Obsoletos / Remover
+
+Nenhum ficheiro de configuração identificado como obsoleto. `appsettings.Development.json` deve ser inspecionado para confirmar que não contém segredos em desenvolvimento.
+
+---
+
+## Recomendações
+
+1. **Alta:** Override obrigatório de `OtlpEndpoint` por ambiente em deployment docs
+2. **Alta:** Migrar `DefaultChatModel` para `ConfigurationDbContext` (model registry já existe)
+3. **Média:** Documentar todos os overrides obrigatórios para self-hosted deployment
+4. **Média:** Adicionar validação de startup para variáveis de ambiente obrigatórias ausentes
+5. **Baixa:** Tornar `MaxPoolSize` parametrizável por ambiente
+
+---
+
+*Data: 28 de Março de 2026*

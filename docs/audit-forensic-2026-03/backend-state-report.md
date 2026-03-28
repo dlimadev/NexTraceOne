@@ -1,316 +1,277 @@
 # Relatório de Estado do Backend — NexTraceOne
-**Auditoria Forense | Março 2026**
+**Auditoria Forense | 28 de Março de 2026**
 
 ---
 
-## 1. Visão Geral
+## Objetivo da Área no Contexto do Produto
 
-| Métrica | Valor |
+O backend é a autoridade final de todas as operações — governança de contratos, change intelligence, identidade, auditoria, IA governada e conhecimento operacional. Toda lógica de negócio, autorização e persistência deve residir aqui.
+
+---
+
+## Estado Atual Encontrado
+
+### Estrutura Geral
+
+| Componente | Valor |
 |---|---|
-| Total de projetos .csproj | 59 |
-| Total de arquivos .cs | ~1.866 |
+| Total de ficheiros `.cs` | 1.866+ |
 | Módulos de domínio | 12 |
-| Projetos por módulo (camadas) | 5 (API, Application, Domain, Infrastructure, Contracts) |
-| Building Blocks | 5 projetos compartilhados |
-| Platform hosts | 3 (ApiHost, Ingestion.Api, BackgroundWorkers) |
-| DbContexts | 24 |
-| Migrações geradas | 46 |
-| DbContexts com migrações | ~15 confirmados |
-| DbContexts sem migrações | ~9 (Knowledge, ProductAnalytics, Integrations, e parcialmente OperationalIntelligence) |
+| Camadas por módulo | 5 (Domain, Application, Infrastructure, API, Contracts) |
+| Building blocks | 5 (Core, Application, Infrastructure, Security, Observability) |
+| DbContexts totais | 24 |
+| Migrações totais | ~100+ (confirmadas em 24 conjuntos) |
+| Serviços de plataforma | 3 (ApiHost, Ingestion.Api, BackgroundWorkers) |
+| TODOs/FIXMEs em módulos | ~14 (aiknowledge: 9, governance: 5) |
+
+### Padrões Aplicados (confirmados por inspeção)
+
+- Clean Architecture: Domain → Application → Infrastructure, sem inversão de dependência
+- CQRS via MediatR: handlers separados para Commands e Queries
+- `Result<T>`: erros controlados sem exceções para controlo de fluxo
+- `StronglyTypedIds`: todos os IDs com `TypedIdBase<Guid>`
+- `CancellationToken`: presente em handlers async
+- `NexTraceGuards` estendendo Ardalis.GuardClauses
+- Serilog: logging estruturado com contexto
+- Minimal API pattern nos controllers
 
 ---
 
-## 2. Building Blocks — Estado
+## Building Blocks — Estado Detalhado
 
-### `NexTraceOne.BuildingBlocks.Core`
+### BuildingBlocks.Core — READY
+`src/building-blocks/NexTraceOne.BuildingBlocks.Core/`
+
+- `Result<T>` e `Error` com códigos estruturados
+- `TypedIdBase<T>` para strongly typed IDs
+- Primitivos DDD: `Entity`, `AggregateRoot`, `AuditableEntity`, `ValueObject`
+- Domain events e integration events
+- `NexTraceGuards` estendendo Ardalis
+- Enums: `ChangeLevel`, `DiscoveryConfidence`
+
+**Qualidade:** Zero TODOs, zero stubs.
+
+### BuildingBlocks.Application — READY
+`src/building-blocks/NexTraceOne.BuildingBlocks.Application/`
+
+- `ICommand<T>`, `IQuery<T>`, handlers abstratos
+- `ICurrentUser`, `ICurrentTenant` para contexto de segurança
+- `IDateTimeProvider` para tempo testável (sem `DateTime.Now` direto)
+- `IErrorLocalizer` para i18n de erros
+- Extension methods para Result → HTTP response
+- Paginação, correlação, CQRS behaviors (logging, validation)
+
+### BuildingBlocks.Infrastructure — READY (com gap crítico de outbox)
+`src/building-blocks/NexTraceOne.BuildingBlocks.Infrastructure/`
+
+- `NexTraceDbContextBase` com outbox, audit interceptor, RLS interceptor
+- `TenantRlsInterceptor` — Row Level Security por tenant
+- `AuditInterceptor` — auditoria automática de entidades
+- `RepositoryBase<TEntity, TId>` genérico
+- Outbox pattern implementado
+
+**GAP CRÍTICO:** Apenas `IdentityDbContext` tem processamento ativo de outbox no `BackgroundWorkers`. Os outros 23 DbContexts têm tabelas de outbox sem processador. Eventos de domínio não propagam entre módulos.
+
+### BuildingBlocks.Security — READY
+`src/building-blocks/NexTraceOne.BuildingBlocks.Security/`
+
+- JWT + API Key authentication
+- AES-256-GCM encryption
+- `AssemblyIntegrityChecker` (base para anti-tampering)
+- CORS (5+ políticas), rate limiting (6 políticas)
+- Permission-based authorization
+- Environment access requirements
+
+### BuildingBlocks.Observability — READY (config gap)
+`src/building-blocks/NexTraceOne.BuildingBlocks.Observability/`
+
+- OpenTelemetry (traces, metrics, logs)
+- ClickHouse analytics writer + Null implementation
+- `NexTraceHealthChecks`, `NexTraceMeters`, `NexTraceActivitySources`
+- Serilog configuration
+
+**Gap:** OpenTelemetry aponta para `localhost:4317` em config base — requer override por ambiente em produção.
+
+---
+
+## Módulos — Estado Detalhado
+
+### Catalog — READY (91.7%)
+`src/modules/catalog/` | 317 ficheiros | 3 DbContexts | 13 migrações
+
+**Domain:** ApiAsset, ServiceAsset, contratos multi-protocolo (REST/SOAP/gRPC/AsyncAPI/Background), ContractVersion com SemVer, NodeHealthRecord, graph de dependências.
+
+**Application (84 features):**
+- 77 reais (100% business logic real)
+- 7 stubs intencionais aguardando `IContractsModule`: `SearchCatalog`, `RenderOpenApiContract`, `GetApiHealth`, `GetMyApis`, `GetApisIConsume`, `GetApiDetail`, `GetAssetTimeline`
+- Features notáveis: `ImportContract` (145 linhas), `ImportWsdlContract` (166), `ImportAsyncApiContract` (151), `ComputeSemanticDiff` (113), `EvaluateCompatibility` (138), `GenerateEvidencePack` (171)
+
+**Gap:** `IContractsModule` definida em `NexTraceOne.Catalog.Contracts/Contracts/ServiceInterfaces/IContractsModule.cs`; `ContractsModuleService.cs` implementa a interface mas sem consumidores cross-module registados.
+
+**Status: READY** — 91.7% real
+
+---
+
+### Change Governance — READY (100%)
+`src/modules/changegovernance/` | 245 ficheiros | 4 DbContexts | 18 migrações
+
+**Features confirmadas como reais:**
+- BlastRadius, ChangeScores, FreezeWindows, RollbackAssessments
+- Workflow: Templates, instâncias, stages, approval decisions, evidence packs, SLA policies
+- Promotion: Environments, requests, gates, gate evaluations
+- Ruleset Governance (Spectral lint)
+- Audit trail: Decision trail, change timeline, correlation events
+
+**Gap menor:** `RecordMitigationValidation` — validação pós-change incompleta.
+
+**Status: READY** — módulo mais maduro
+
+---
+
+### Identity Access — READY (100%)
+`src/modules/identityaccess/` | 185 ficheiros | 1 DbContext | 3 migrações
+
+**Features:** Auth JWT/RBAC, multi-tenancy RLS, Sessions/Cookies, JIT privileged access, Break Glass (com expiração e auditoria), Access Reviews, Delegações, OIDC (Azure, Keycloak), TOTP/MFA.
+
+**Value Objects validados:** `Email` (MailAddress validation), `HashedPassword`, `FullName`, `AuthenticationMode`, `MfaPolicy`, `SessionPolicy`, `DeploymentModel`.
+
 **Status: READY**
 
-- Primitivos de domínio: `AggregateRoot`, `Entity`, `ValueObject`, `DomainEvent`
-- `Result<T>` pattern implementado
-- Guards (guard clauses)
-- Strongly typed IDs
-- Enums e atributos de domínio
+---
 
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Core/`
+### Audit Compliance — READY (100%)
+`src/modules/auditcompliance/` | 56 ficheiros | 1 DbContext | 4 migrações
 
-### `NexTraceOne.BuildingBlocks.Application`
+**Features:** Audit entry creation com hash chain SHA-256, campaign management, retention policies, compliance reporting.
+
 **Status: READY**
 
-- Abstrações CQRS: `ICommand`, `IQuery`, `ICommandHandler`, `IQueryHandler`
-- Behaviors MediatR: validação (FluentValidation), logging, correlação, paginação
-- Context: `ICurrentUser`, `ICurrentTenant` — injeção presente em todos os handlers
-- i18n/localização: `ILocalizationService`
-- Integração: contratos de eventos de integração
+---
 
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Application/`
+### Configuration — READY (functional)
+`src/modules/configuration/` | 67 ficheiros | 1 DbContext | 13 migrações
 
-### `NexTraceOne.BuildingBlocks.Infrastructure`
+**Features:** Feature flags database-driven, override por tenant, parametrização persistida, quotas.
+
 **Status: READY**
 
-- `NexTraceDbContextBase` — base para todos os DbContexts com tenant isolation
-- `TenantRlsInterceptor` — PostgreSQL Row-Level Security por SET config
-- `AuditInterceptor` — campos CreatedAt/UpdatedAt automáticos
-- Outbox pattern — parcialmente processado (apenas IdentityDbContext ativo)
-- Health checks: `DbContextConnectivityHealthCheck`
+---
 
-**Gap crítico:** O outbox só processa eventos do IdentityDbContext. Os outros 23 DbContexts têm tabelas de outbox mas sem processamento ativo.
+### Notifications — READY (coverage E2E não validada)
+`src/modules/notifications/` | 124 ficheiros | 1 DbContext | 9 migrações
 
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Infrastructure/Persistence/NexTraceDbContextBase.cs`
+**Features:** Templates, delivery multi-canal (Email, Teams, Slack, SMS, Push), `MandatoryNotificationPolicy`, `TeamsNotificationDispatcher`.
 
-### `NexTraceOne.BuildingBlocks.Security`
-**Status: READY**
-
-- JWT com validação obrigatória no startup (falha se chave ausente)
-- API Key authentication dual-scheme
-- CORS com validação de wildcard e configuração obrigatória em produção
-- Rate limiting em 6 policies por risco de endpoint
-- TenantResolutionMiddleware após UseAuthentication (ordem correta)
-- AES-256-GCM encryption com chave obrigatória por env var
-- AssemblyIntegrityChecker no startup
-- Permission-based authorization (dynamic policy provider)
-
-**Evidência:** `src/building-blocks/NexTraceOne.BuildingBlocks.Security/`
-
-### `NexTraceOne.BuildingBlocks.Observability`
-**Status: PARTIAL**
-
-- OpenTelemetry configurado para `localhost:4317`
-- Serilog com structured logging
-- Health checks
-- Métricas e alertas
-
-**Gap:** Configuração aponta para localhost em produção — requer configuração por ambiente.
+**Status: READY** estruturalmente; PARTIAL em cobertura E2E validada.
 
 ---
 
-## 3. Módulos de Domínio — Análise Individual
+### Operational Intelligence — PARTIAL
+`src/modules/operationalintelligence/` | 275 ficheiros | 5 DbContexts | 21 migrações
 
-### Catalog — ALTA maturidade ✅
-**Status: READY**
+**O que existe e é real:**
+- `EfIncidentStore` (678 linhas) — persistência real com `IncidentDbContext`
+- SLO/SLA modeling no domain com `ReliabilityDbContext`
+- Lifecycle de incidentes
+- `CostIntelligenceDbContext` com 7 migrações
 
-**DbContexts:** ContractsDbContext, CatalogGraphDbContext, DeveloperPortalDbContext (3 DbContexts, 4 migrações)
+**O que está mock/quebrado:**
+- Frontend: `IncidentsPage.tsx` usa `mockIncidents` hardcoded inline — confirmado
+- Runbooks: 3 hardcoded no handler; `RunbookRecord` no schema não é consultado
+- `CreateMitigationWorkflow`: descarta dados sem persistir `MitigationRecord`
+- Automation: handlers retornam `PreviewOnly` — sem automação real
+- Reliability: 8 serviços hardcoded; `ReliabilityDbContext` não consultado
+- Correlação incident↔change: seed data JSON estático, engine dinâmica ausente
 
-**Features implementadas (84 total, 91.7% real):**
-- Graph: RegisterServiceAsset, ImportFromBackstage, ListServices, GetAssetGraph, CreateGraphSnapshot (27 features, 100% real)
-- Contracts: CreateContractVersion, CreateDraft, PublishDraft, SignContractVersion, GenerateScorecard, EvaluateContractRules, ComputeSemanticDiff, EvaluateCompatibility (35 features, 100% real)
-- Portal: RecordAnalyticsEvent, CreateSubscription, ExecutePlayground, GenerateCode, GlobalSearch (22 features, 68% real)
-
-**Stubs intencionais (7):** SearchCatalog, RenderOpenApiContract, GetApiHealth, GetMyApis, GetAssetTimeline, GetApisIConsume, GetApiDetail — aguardam integração cross-module
-
-**Evidência:** `src/modules/catalog/`
-
----
-
-### Change Governance — ALTA maturidade ✅
-**Status: READY**
-
-**DbContexts:** ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext, RulesetGovernanceDbContext (4 DbContexts, 4 migrações)
-
-**Features implementadas (50+, 100% real):**
-- ChangeIntelligence: releases, blast radius, change scores, freeze windows, rollback assessments
-- Workflow: templates, instâncias, stages, approval decisions, evidence packs, SLA policies
-- Promotion: environments, promotion requests, gates, gate evaluations
-- RulesetGovernance: rulesets, bindings, lint results (Spectral)
-
-**Endpoints:** FreezeEndpoints, TraceCorrelationEndpoints, ChangeConfidenceEndpoints, AnalysisEndpoints, ReleaseQueryEndpoints, DeploymentEndpoints, IntelligenceEndpoints, ApprovalEndpoints, EvidencePackEndpoints, StatusEndpoints, TemplateEndpoints
-
-**Evidência:** `src/modules/changegovernance/`
+**Status: PARTIAL** — backend tem estrutura; correlação, runbooks, mitigação e reliability são mock
 
 ---
 
-### Identity Access — ALTA maturidade ✅
-**Status: READY**
+### AI Knowledge — PARTIAL
+`src/modules/aiknowledge/` | 287 ficheiros | 3 DbContexts | 11 migrações
 
-**DbContexts:** IdentityDbContext (1 DbContext, 1 migração)
+**O que é real:**
+- AI Governance: modelos, políticas, budgets, access policies (`AiGovernanceDbContext`)
+- Model registry, `AiTokenUsageLedger`
+- 3 AI tools: `list_services`, `get_service_health`, `list_recent_changes`
+- State machines de agentes (Draft → Active → Published)
+- Grounding context builders (estrutura real)
 
-**Features implementadas (35, 100% real):**
-- Auth JWT, RBAC, sessões, multi-tenancy com RLS
-- JIT access, break glass, access reviews, delegações
-- Environments, tenants, users, roles, permissions
+**O que está mock/quebrado:**
+- `SendAssistantMessage`: retorna respostas hardcoded sem chamada real a LLM
+- ExternalAI: 8 handlers com `TODO: Phase 03.x` — `IExternalAIRoutingPort` é abstração sem implementação real
+- `AiAssistantPage`: `mockConversations` hardcoded no frontend
 
-**Endpoints:** AuthEndpoints, UserEndpoints, TenantEndpoints, RolePermissionEndpoints, JitAccessEndpoints, AccessReviewEndpoints, BreakGlassEndpoints, DelegationEndpoints, EnvironmentEndpoints, SecurityEventsEndpoints, CookieSessionEndpoints, RuntimeContextEndpoints
+**TODOs confirmados:** 9 (6 em ExternalAI Phase 03.x, 3 em Orchestration metadata Phase 02.6)
 
-**Evidência:** `src/modules/identityaccess/`
-
----
-
-### Audit Compliance — ALTA maturidade ✅
-**Status: READY**
-
-**DbContexts:** AuditDbContext (1 DbContext, 2 migrações — inclui `20260327103000_P7_4_AuditCorrelationId`)
-
-**Features implementadas (7, 100% real):**
-- RecordAuditEvent, GetAuditTrail, VerifyChainIntegrity, SearchAuditLog
-- Hash chain SHA-256 para imutabilidade auditável
-- AuditChainLink com cascade delete controlado
-
-**Evidência:** `src/modules/auditcompliance/NexTraceOne.AuditCompliance.Infrastructure/Persistence/`
+**Status: PARTIAL** — AI Governance sólido; AI Assistant e ExternalAI quebrados ponta a ponta
 
 ---
 
-### Operational Intelligence — BAIXA maturidade ⚠️
-**Status: PARTIAL/MOCK**
+### Governance — MOCK (intencional)
+`src/modules/governance/` | 143 ficheiros | 1 DbContext | 3 migrações
 
-**DbContexts:** IncidentDbContext, AutomationDbContext, ReliabilityDbContext, RuntimeIntelligenceDbContext, CostIntelligenceDbContext (5 DbContexts)
+**Estado confirmado por inspeção:** 22+ ficheiros `.cs` no módulo contêm `IsSimulated: true`. Aproximadamente 74 handlers retornam dados fabricados. `GovernanceDbContext` existe com 3 migrações mas não é consultado pelos handlers para dados reais.
 
-**Migrações:** IncidentDbContext tem migração; AutomationDbContext tem migração; ReliabilityDbContext tem migração; RuntimeIntelligenceDbContext e CostIntelligenceDbContext têm ModelSnapshot mas sem confirmação de migração executável
+**Áreas afetadas:** Teams, Domains, FinOps (GetDomainFinOps, GetServiceFinOps, GetFinOpsTrends), Benchmarking, Waivers, Evidence Packages, Risk, Compliance, Policy Catalog, Executive Views, DelegatedAdmin.
 
-**Features por área:**
-- Incidents (17): **PARTIAL/SIM** — EfIncidentStore (678 linhas) com 5 DbSets, seed data SQL; correlação incident↔change é seed data estático
-- Automation (10): **MOCK** — catálogo estático, workflows não persistidos
-- Reliability (7): **MOCK** — 8 serviços hardcoded, sem integração cross-module
-- Runtime Intelligence (8+): **PARTIAL** — RuntimeIntelligenceDbContext existe, repositórios EF Core presentes; IRuntimeIntelligenceModule = PLAN
-- Cost Intelligence (8+): **PARTIAL** — CostIntelligenceDbContext existe; ICostIntelligenceModule = PLAN
+**TODOs:** 5 (P03.5 — platform readiness probes, queue stats, job tracking, event stats, pack coverage)
 
-**Gap crítico:** Correlação dinâmica incident↔change é ZERO. `CreateMitigationWorkflow` existe mas não persiste. `GetMitigationHistory` retorna dados fixos.
-
-**Evidência:** `src/modules/operationalintelligence/`, `docs/REBASELINE.md` §Operational Intelligence, `docs/CORE-FLOW-GAPS.md` §Fluxo 3
-
----
-
-### AI Knowledge — MÉDIA maturidade ⚠️
-**Status: PARTIAL**
-
-**DbContexts:** AiGovernanceDbContext (com migrações), AiOrchestrationDbContext (com ModelSnapshot), ExternalAiDbContext (com ModelSnapshot)
-
-**Migrações confirmadas:** AiGovernanceDbContext — outras têm snapshot mas migrações não confirmadas
-
-**Features por área:**
-- AI Governance (28): **PARTIAL** — funcional com repositórios EF Core (modelos, políticas, budgets, model registry)
-- ExternalAI (8): **STUB** — TODO em todos os handlers; `IExternalAiModule = PLAN` (empty interface)
-- AI Orchestration: **PARTIAL** — DbContext existe; `IAiOrchestrationModule = PLAN` (empty interface)
-
-**AI Chat (local):**
-- Ollama integrado (`localhost:11434`, `qwen3.5:9b`)
-- OpenAI configurado mas desabilitado por padrão
-- SendAssistantMessage retorna respostas hardcoded — **sem LLM real no fluxo end-to-end**
-
-**Evidência:** `src/modules/aiknowledge/`, `docs/CORE-FLOW-GAPS.md` §Fluxo 4, `docs/IMPLEMENTATION-STATUS.md` §AI
-
----
-
-### Governance — BAIXA maturidade ⚠️
-**Status: MOCK (intencional por design)**
-
-**DbContexts:** GovernanceDbContext existe mas sem persistência própria por design
-
-**Features:** 74 handlers retornam `IsSimulated: true` e `DataSource = "demo"`:
-- Teams, Domains, Governance Packs, Evidence, Policies, FinOps, Reports, Compliance, Executive views — todos mock
-- Única exceção: ICatalogGraphModule é chamado para ServiceCount real em Teams/Domains
-
-**Justificativa do design:** "Fase atual: sem persistência própria — agrega dados de outros módulos"
-
-**Risco:** Toda a camada de Governance como entregável de produto é vazia. Qualquer demo desta área é falsa.
-
-**Evidência:** `src/modules/governance/`, `docs/IMPLEMENTATION-STATUS.md` §Governance
-
----
-
-### Notifications — PARTIAL
-**Status: PARTIAL**
-
-**DbContexts:** NotificationsDbContext (com 2+ migrações — `20260327082159`, `20260327092812`)
-
-**Features:** Delivery channels, preferences, templates — existência confirmada; cobertura funcional end-to-end não auditada
-
-**Evidência:** `src/modules/notifications/`
-
----
-
-### Configuration — PARTIAL
-**Status: PARTIAL**
-
-**DbContexts:** ConfigurationDbContext (com migração)
-
-**Features:** Feature flags (database-driven com override por tenant), ConfigurationDefinitionSeeder, settings por tenant/ambiente
-
-**Evidência:** `src/modules/configuration/`, `docs/IMPLEMENTATION-STATUS.md` §Foundation
-
----
-
-### Integrations — INCOMPLETE
-**Status: INCOMPLETE**
-
-**DbContexts:** IntegrationsDbContext (sem migração confirmada)
-
-**Features:** Conectores como stubs; sem processamento real de dados externos. 5 endpoints de ingestão com `processingStatus: "metadata_recorded"` — payload não processado.
-
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Ingestion
+**Status: MOCK** — módulo inteiro retorna dados simulados
 
 ---
 
 ### Knowledge — INCOMPLETE
+`src/modules/knowledge/` | 34 ficheiros | 1 DbContext | 3 migrações
+
+**Features básicas:** `CreateKnowledgeDocument`, `GetKnowledgeByRelationTarget`, CRUD básico.
+
+**Gap:** Módulo pequeno. Knowledge Hub sem conectividade cross-module para servir contexto ao AI Assistant. Source of Truth incompleto.
+
 **Status: INCOMPLETE**
 
-**DbContexts:** KnowledgeDbContext (sem migrações geradas)
+---
 
-**Features:** Operational notes e changelog existem via eventos de domínio; Knowledge Hub sem migração deployável
+### Integrations — STUB
+`src/modules/integrations/` | 35 ficheiros | 1 DbContext | 3 migrações
 
-**Evidência:** `src/modules/knowledge/`
+**Gap:** Conectores externos (GitLab, Jenkins, GitHub, Azure DevOps) são stubs sem lógica real de ingestão de eventos CI/CD.
+
+**Status: STUB**
 
 ---
 
 ### Product Analytics — MOCK
+`src/modules/productanalytics/` | 26 ficheiros | 1 DbContext | 3 migrações
+
+**Gap:** 100% mock. Sem event tracking pipeline real.
+
 **Status: MOCK**
 
-**DbContexts:** ProductAnalyticsDbContext (sem migrações confirmadas)
-
-**Features:** 100% mock — depende de event tracking real que não existe
-
-**Evidência:** `docs/IMPLEMENTATION-STATUS.md` §Product Analytics
-
 ---
 
-## 4. Platform Hosts
+## Gaps Transversais Críticos
 
-### `NexTraceOne.ApiHost`
-**Status: READY**
-
-- Orquestra todos os módulos via DI
-- Middleware pipeline em ordem correta (CORS → RateLimit → SecurityHeaders → CSRF → Auth → TenantResolution → EnvironmentResolution → Authorization)
-- Seed data restrito a Development/Staging
-- appsettings.json com defaults seguros
-- IntegrityChecker no startup
-
-### `NexTraceOne.Ingestion.Api`
-**Status: PARTIAL**
-
-- 5 endpoints de ingestão existem
-- Dados ingeridos são registados como metadata, não processados
-
-### `NexTraceOne.BackgroundWorkers`
-**Status: PARTIAL**
-
-- Projeto existe; cobertura de jobs Quartz não auditada em detalhe
-
----
-
-## 5. Problemas de Código a Corrigir
-
-| Problema | Localização | Severidade |
+| Gap | Impacto | Ficheiro |
 |---|---|---|
-| Outbox não processado em 23 DbContexts | BuildingBlocks.Infrastructure | Alta |
-| 8 cross-module interfaces sem implementação | IMPLEMENTATION-STATUS.md §Cross-Module | Alta |
-| 516 warnings CS8632 nullable | CI/CD logs | Média |
-| InMemoryIncidentStore (resíduo?) | Verificar se ainda existe após EfIncidentStore | Média |
-| IRuntimeIntelligenceModule/ICostIntelligenceModule: PLAN | Operational Intelligence | Alta |
-| IAiOrchestrationModule/IExternalAiModule: PLAN (empty) | AIKnowledge | Alta |
-| SendAssistantMessage retorna hardcoded | AIKnowledge ExternalAI | Alta |
+| Outbox processado só em IdentityDbContext | Eventos não propagam em 23 outros DbContexts | `src/platform/NexTraceOne.BackgroundWorkers/` |
+| `IContractsModule` sem consumidores cross-module | Developer Portal e Search bloqueados | `NexTraceOne.Catalog.Contracts/Contracts/ServiceInterfaces/IContractsModule.cs` |
+| `SendAssistantMessage` hardcoded | AI Assistant inoperante ponta a ponta | `NexTraceOne.AIKnowledge.Application/Features/SendAssistantMessage/` |
+| Engine correlação incident↔change ausente | Fluxo 3 inoperante | `src/modules/operationalintelligence/` |
+| Governance `IsSimulated: true` em 22+ ficheiros | Pilar Governance vazio | `src/modules/governance/NexTraceOne.Governance.Application/Features/` |
+| 516 warnings CS8632 nullable | Risco NullReferenceException em runtime | Transversal |
 
 ---
 
-## 6. Qualidade de Código — Verificação de Padrões
+## Recomendações Prioritárias
 
-| Padrão | Estado | Observação |
-|---|---|---|
-| `sealed` para classes finais | Parcial | Não auditado sistematicamente |
-| `CancellationToken` em async | Parcial — presente em Building Blocks | Não verificado em todos os handlers |
-| `Result<T>` para falhas | Sim — presente no Core | Usado em responses |
-| Guard clauses | Sim — BuildingBlocks.Core/Guards/ | Presente |
-| Strongly typed IDs | Sim — BuildingBlocks.Core/StronglyTypedIds/ | Presente |
-| `DateTime.Now` proibido | Não verificado sistematicamente | Usar `DateTime.UtcNow` |
-| Logging estruturado | Sim — Serilog com propriedades | Presente |
-| DbContext isolado por módulo | Sim | Sem cross-context references detectadas |
-| Bounded contexts preservados | Sim | 12 módulos isolados |
-| Controllers com lógica leve | Sim — Minimal API Endpoints | Pattern correto |
-| Domain separado de infra | Sim | 5 camadas por módulo |
+1. **Crítico:** Implementar engine correlação dinâmica incident↔change
+2. **Crítico:** Conectar `SendAssistantMessage` ao `IExternalAIRoutingPort` → Ollama
+3. **Alta:** Ativar outbox processing para Catalog e ChangeGovernance no BackgroundWorkers
+4. **Alta:** Substituir Governance handlers mock por queries reais
+5. **Alta:** Completar 8 stubs ExternalAI
+6. **Média:** Resolver 516 warnings CS8632 nullable
+
+---
+
+*Data: 28 de Março de 2026*
