@@ -3,9 +3,11 @@ using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ApplyGovernancePack;
 using NexTraceOne.Governance.Application.Features.GetDomainGovernanceSummary;
+using NexTraceOne.Governance.Application.Features.GetEvidencePackage;
 using NexTraceOne.Governance.Application.Features.GetPackApplicability;
 using NexTraceOne.Governance.Application.Features.GetPackCoverage;
 using NexTraceOne.Governance.Application.Features.GetTeamGovernanceSummary;
+using NexTraceOne.Governance.Application.Features.ListEvidencePackages;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
@@ -19,6 +21,8 @@ public sealed class ExecutiveGovernanceSummaryTests
 {
     private readonly ITeamRepository _teamRepository = Substitute.For<ITeamRepository>();
     private readonly IGovernanceDomainRepository _domainRepository = Substitute.For<IGovernanceDomainRepository>();
+    private readonly IGovernanceRolloutRecordRepository _rolloutRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
+    private readonly IEvidencePackageRepository _evidencePackageRepository = Substitute.For<IEvidencePackageRepository>();
     private readonly ICatalogGraphModule _catalogGraph = Substitute.For<ICatalogGraphModule>();
 
     // ── GetDomainGovernanceSummary ──
@@ -161,8 +165,16 @@ public sealed class ExecutiveGovernanceSummaryTests
     public async Task GetPackApplicability_ShouldReturnScopes()
     {
         // Arrange
-        var handler = new GetPackApplicability.Handler();
-        var query = new GetPackApplicability.Query(Guid.NewGuid().ToString());
+        var packId = new GovernancePackId(Guid.NewGuid());
+        var versionId = new GovernancePackVersionId(Guid.NewGuid());
+        _rolloutRepository.ListByPackIdAsync(packId, Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceRolloutRecord>
+            {
+                GovernanceRolloutRecord.Create(packId, versionId, "payments", GovernanceScopeType.Domain, EnforcementMode.Required, "admin@company.com")
+            });
+
+        var handler = new GetPackApplicability.Handler(_rolloutRepository);
+        var query = new GetPackApplicability.Query(packId.Value.ToString());
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
@@ -175,6 +187,67 @@ public sealed class ExecutiveGovernanceSummaryTests
             s.AppliedBy.Should().NotBeNullOrWhiteSpace();
             s.ScopeValue.Should().NotBeNullOrWhiteSpace();
         });
+    }
+
+    [Fact]
+    public async Task GetPackApplicability_InvalidPackId_ShouldReturnValidationError()
+    {
+        // Arrange
+        var handler = new GetPackApplicability.Handler(_rolloutRepository);
+
+        // Act
+        var result = await handler.Handle(new GetPackApplicability.Query("invalid"), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("INVALID_PACK_ID");
+    }
+
+    [Fact]
+    public async Task ListEvidencePackages_ShouldReturnRepositoryDataAndNotSimulated()
+    {
+        // Arrange
+        var package = EvidencePackage.Create("Q1 Evidence", "Quarterly evidence", "quarterly-review", "auditor@company.com");
+        var item = EvidenceItem.Create(package.Id, EvidenceType.Approval, "Approval", "Approved", "governance", "REF-1", "auditor@company.com", DateTimeOffset.UtcNow);
+        package.AddItem(item);
+        package.Seal();
+
+        _evidencePackageRepository.ListAsync(Arg.Any<string?>(), Arg.Any<EvidencePackageStatus?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<EvidencePackage> { package });
+
+        var handler = new ListEvidencePackages.Handler(_evidencePackageRepository);
+
+        // Act
+        var result = await handler.Handle(new ListEvidencePackages.Query(), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.TotalPackages.Should().Be(1);
+        result.Value.Packages[0].ItemCount.Should().Be(1);
+        result.Value.IsSimulated.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetEvidencePackage_ExistingPackage_ShouldReturnDetailAndNotSimulated()
+    {
+        // Arrange
+        var package = EvidencePackage.Create("Q1 Evidence", "Quarterly evidence", "quarterly-review", "auditor@company.com");
+        package.AddItem(EvidenceItem.Create(package.Id, EvidenceType.AuditReference, "Audit", "Audit trail", "audit", "AUD-1", "auditor@company.com", DateTimeOffset.UtcNow));
+        package.Seal();
+
+        _evidencePackageRepository.GetByIdAsync(package.Id, Arg.Any<CancellationToken>())
+            .Returns(package);
+
+        var handler = new GetEvidencePackage.Handler(_evidencePackageRepository);
+
+        // Act
+        var result = await handler.Handle(new GetEvidencePackage.Query(package.Id.Value.ToString()), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Package.Name.Should().Be("Q1 Evidence");
+        result.Value.Package.Items.Should().HaveCount(1);
+        result.Value.IsSimulated.Should().BeFalse();
     }
 
     // ── GetPackCoverage ──

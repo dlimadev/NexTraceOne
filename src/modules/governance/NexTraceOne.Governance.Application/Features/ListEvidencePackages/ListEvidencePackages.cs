@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.ListEvidencePackages;
@@ -16,42 +17,46 @@ public static class ListEvidencePackages
         string? Status = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna pacotes de evidência.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IEvidencePackageRepository evidencePackageRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var packages = new List<EvidencePackageDto>
+            EvidencePackageStatus? statusFilter = null;
+            if (!string.IsNullOrWhiteSpace(request.Status)
+                && Enum.TryParse<EvidencePackageStatus>(request.Status, ignoreCase: true, out var parsedStatus))
             {
-                new("evp-001", "Q1 2026 Compliance Evidence", "Quarterly compliance evidence package for production services",
-                    "quarterly-review", EvidencePackageStatus.Sealed, 24,
-                    new[] { "Approvals", "Change History", "Contract Publications", "Compliance Results" },
-                    "auditor@nextraceone.com", DateTimeOffset.UtcNow.AddDays(-15), DateTimeOffset.UtcNow.AddDays(-14)),
-                new("evp-002", "Payment Gateway Security Review", "Security compliance evidence for PCI-DSS audit",
-                    "security-audit", EvidencePackageStatus.Exported, 18,
-                    new[] { "Security Reviews", "Change Validations", "AI Usage Records", "Mitigation Records" },
-                    "security@nextraceone.com", DateTimeOffset.UtcNow.AddDays(-30), DateTimeOffset.UtcNow.AddDays(-28)),
-                new("evp-003", "AI Governance Audit Pack", "Evidence package for AI model usage and policy compliance",
-                    "ai-governance", EvidencePackageStatus.Sealed, 35,
-                    new[] { "AI Usage Records", "Policy Decisions", "Model Registry Snapshots", "Token Usage" },
-                    "ai-governance@nextraceone.com", DateTimeOffset.UtcNow.AddDays(-7), DateTimeOffset.UtcNow.AddDays(-6)),
-                new("evp-004", "Change Governance March 2026", "Change validation and blast radius evidence for March releases",
-                    "change-governance", EvidencePackageStatus.Draft, 12,
-                    new[] { "Change History", "Blast Radius", "Approval History", "Rollback Records" },
-                    "release-mgr@nextraceone.com", DateTimeOffset.UtcNow.AddDays(-2), null),
-                new("evp-005", "Incident Mitigation Evidence", "Post-incident mitigation and resolution evidence pack",
-                    "incident-review", EvidencePackageStatus.Sealed, 8,
-                    new[] { "Mitigation Records", "Approval History", "Post-mortem References", "Audit Trails" },
-                    "ops-lead@nextraceone.com", DateTimeOffset.UtcNow.AddDays(-20), DateTimeOffset.UtcNow.AddDays(-19))
-            };
+                statusFilter = parsedStatus;
+            }
+
+            var packages = await evidencePackageRepository.ListAsync(
+                scope: request.Scope,
+                status: statusFilter,
+                ct: cancellationToken);
+
+            var dtos = packages
+                .Select(p => new EvidencePackageDto(
+                    PackageId: p.Id.Value.ToString(),
+                    Name: p.Name,
+                    Description: p.Description,
+                    Scope: p.Scope,
+                    Status: p.Status,
+                    ItemCount: p.Items.Count,
+                    IncludedTypes: p.Items.Select(i => i.Type.ToString()).Distinct(StringComparer.OrdinalIgnoreCase).ToArray(),
+                    CreatedBy: p.CreatedBy,
+                    CreatedAt: p.CreatedAt,
+                    SealedAt: p.SealedAt))
+                .ToList();
 
             var response = new Response(
-                TotalPackages: packages.Count,
-                SealedCount: packages.Count(p => p.Status == EvidencePackageStatus.Sealed),
-                ExportedCount: packages.Count(p => p.Status == EvidencePackageStatus.Exported),
-                DraftCount: packages.Count(p => p.Status == EvidencePackageStatus.Draft),
-                Packages: packages);
+                TotalPackages: dtos.Count,
+                SealedCount: dtos.Count(p => p.Status == EvidencePackageStatus.Sealed),
+                ExportedCount: dtos.Count(p => p.Status == EvidencePackageStatus.Exported),
+                DraftCount: dtos.Count(p => p.Status == EvidencePackageStatus.Draft),
+                Packages: dtos,
+                IsSimulated: false);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 
@@ -61,7 +66,8 @@ public static class ListEvidencePackages
         int SealedCount,
         int ExportedCount,
         int DraftCount,
-        IReadOnlyList<EvidencePackageDto> Packages);
+        IReadOnlyList<EvidencePackageDto> Packages,
+        bool IsSimulated = false);
 
     /// <summary>DTO de pacote de evidência.</summary>
     public sealed record EvidencePackageDto(

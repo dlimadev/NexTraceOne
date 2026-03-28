@@ -1,5 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetScopedContext;
 
@@ -13,35 +16,128 @@ public static class GetScopedContext
     public sealed record Query() : IQuery<Response>;
 
     /// <summary>Handler que retorna o contexto de governança do utilizador com equipas e domínios permitidos.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        ICurrentUser currentUser,
+        IDelegatedAdministrationRepository delegationRepository,
+        ITeamRepository teamRepository,
+        ITeamDomainLinkRepository teamDomainLinkRepository,
+        IGovernanceDomainRepository domainRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var allowedTeams = new List<AllowedScopeDto>
-            {
-                new("team-commerce", "commerce-squad", "Commerce", "Admin"),
-                new("team-platform", "platform-squad", "Platform", "Member")
-            };
+            if (!currentUser.IsAuthenticated)
+                return Error.Unauthorized("UNAUTHENTICATED", "Current user is not authenticated.");
 
-            var allowedDomains = new List<AllowedScopeDto>
+            var delegations = await delegationRepository.ListByGranteeAsync(currentUser.Id, cancellationToken);
+            var activeDelegations = delegations.Where(d => d.IsActive && !d.IsExpired()).ToList();
+
+            var adminScopes = new List<string>(activeDelegations.Count);
+            var teamScopes = new List<(Team Team, DelegatedAdministration Delegation)>(activeDelegations.Count);
+            var allowedDomainsMap = new Dictionary<string, AllowedScopeDto>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var delegation in activeDelegations)
             {
-                new("domain-commerce", "commerce", "Commerce", "Owner"),
-                new("domain-platform", "platform", "Platform", "Viewer")
-            };
+                var role = delegation.Scope switch
+                {
+                    Governance.Domain.Enums.DelegationScope.FullAdmin or Governance.Domain.Enums.DelegationScope.TeamAdmin or Governance.Domain.Enums.DelegationScope.DomainAdmin => "Admin",
+                    Governance.Domain.Enums.DelegationScope.ReadOnly => "Viewer",
+                    _ => "Member"
+                };
+
+                if (!string.IsNullOrWhiteSpace(delegation.TeamId)
+                    && Guid.TryParse(delegation.TeamId, out var teamGuid))
+                {
+                    var team = await teamRepository.GetByIdAsync(new TeamId(teamGuid), cancellationToken);
+                    if (team is not null)
+                    {
+                        teamScopes.Add((team, delegation));
+                        if (role is "Admin")
+                            adminScopes.Add(team.Id.Value.ToString());
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(delegation.DomainId)
+                    && Guid.TryParse(delegation.DomainId, out var domainGuid))
+                {
+                    var domain = await domainRepository.GetByIdAsync(new GovernanceDomainId(domainGuid), cancellationToken);
+                    if (domain is not null)
+                    {
+                        allowedDomainsMap[domain.Id.Value.ToString()] = new AllowedScopeDto(
+                            Id: domain.Id.Value.ToString(),
+                            Name: domain.Name,
+                            DisplayName: domain.DisplayName,
+                            Role: role);
+
+                        if (role is "Admin")
+                            adminScopes.Add(domain.Id.Value.ToString());
+                    }
+                }
+            }
+
+            var allowedTeams = teamScopes
+                .Select(ts =>
+                {
+                    var role = ts.Delegation.Scope switch
+                    {
+                        Governance.Domain.Enums.DelegationScope.FullAdmin or Governance.Domain.Enums.DelegationScope.TeamAdmin => "Admin",
+                        Governance.Domain.Enums.DelegationScope.ReadOnly => "Viewer",
+                        _ => "Member"
+                    };
+
+                    return new AllowedScopeDto(
+                        Id: ts.Team.Id.Value.ToString(),
+                        Name: ts.Team.Name,
+                        DisplayName: ts.Team.DisplayName,
+                        Role: role);
+                })
+                .DistinctBy(t => t.Id)
+                .ToList();
+
+            foreach (var team in teamScopes.Select(ts => ts.Team).DistinctBy(t => t.Id))
+            {
+                var links = await teamDomainLinkRepository.ListByTeamIdAsync(team.Id, cancellationToken);
+                foreach (var link in links)
+                {
+                    var domain = await domainRepository.GetByIdAsync(link.DomainId, cancellationToken);
+                    if (domain is null)
+                        continue;
+
+                    if (!allowedDomainsMap.ContainsKey(domain.Id.Value.ToString()))
+                    {
+                        allowedDomainsMap[domain.Id.Value.ToString()] = new AllowedScopeDto(
+                            Id: domain.Id.Value.ToString(),
+                            Name: domain.Name,
+                            DisplayName: domain.DisplayName,
+                            Role: "Member");
+                    }
+                }
+            }
+
+            var allowedDomains = allowedDomainsMap.Values.ToList();
+
+            var defaultTeam = allowedTeams.FirstOrDefault();
+            var defaultDomain = allowedDomains.FirstOrDefault();
+
+            var personaHint = activeDelegations.Any(d =>
+                    d.Scope is Governance.Domain.Enums.DelegationScope.FullAdmin
+                    or Governance.Domain.Enums.DelegationScope.TeamAdmin
+                    or Governance.Domain.Enums.DelegationScope.DomainAdmin)
+                ? "PlatformAdmin"
+                : "Engineer";
 
             var response = new Response(
-                UserId: "user-001",
-                DefaultTeamId: "team-commerce",
-                DefaultTeamName: "Commerce",
-                DefaultDomainId: "domain-commerce",
-                DefaultDomainName: "Commerce",
+                UserId: currentUser.Id,
+                DefaultTeamId: defaultTeam?.Id ?? string.Empty,
+                DefaultTeamName: defaultTeam?.DisplayName ?? string.Empty,
+                DefaultDomainId: defaultDomain?.Id,
+                DefaultDomainName: defaultDomain?.DisplayName,
                 AllowedTeams: allowedTeams,
                 AllowedDomains: allowedDomains,
-                AdminScopes: new List<string> { "team-commerce", "domain-commerce" },
-                IsCentralAdmin: false,
-                PersonaHint: "TechLead");
+                AdminScopes: adminScopes.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+                IsCentralAdmin: activeDelegations.Any(d => d.Scope == Governance.Domain.Enums.DelegationScope.FullAdmin),
+                PersonaHint: personaHint);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 

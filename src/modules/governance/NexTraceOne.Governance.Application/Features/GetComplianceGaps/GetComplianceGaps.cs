@@ -1,5 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetComplianceGaps;
@@ -17,31 +19,60 @@ public static class GetComplianceGaps
         string? ServiceId = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna gaps de compliance agrupados.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IGovernancePackRepository packRepository,
+        IGovernanceWaiverRepository waiverRepository,
+        IGovernanceRolloutRecordRepository rolloutRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var gaps = new List<ComplianceGapDto>
+            GovernanceScopeType? scopeType = null;
+            string? scopeValue = null;
+
+            if (!string.IsNullOrWhiteSpace(request.TeamId))
             {
-                new("gap-001", "svc-legacy-adapter", "Legacy Adapter", "integration-squad", "Integration",
-                    "No owner, no contract, no runbook", PolicySeverity.Critical,
-                    new[] { "pol-001", "pol-002", "pol-003" }, 3, DateTimeOffset.UtcNow.AddDays(-30)),
-                new("gap-002", "svc-batch-processor", "Batch Processor", "operations-squad", "Operations",
-                    "Owner unassigned, missing runbook", PolicySeverity.High,
-                    new[] { "pol-001", "pol-003" }, 2, DateTimeOffset.UtcNow.AddDays(-15)),
-                new("gap-003", "svc-catalog-sync", "Catalog Sync", "platform-squad", "Platform",
-                    "No semantic versioning, outdated publication", PolicySeverity.Medium,
-                    new[] { "pol-009", "pol-006" }, 2, DateTimeOffset.UtcNow.AddDays(-10)),
-                new("gap-004", "svc-notification-worker", "Notification Worker", "platform-squad", "Platform",
-                    "Dependencies not mapped, documentation incomplete", PolicySeverity.Medium,
-                    new[] { "pol-007", "pol-006" }, 2, DateTimeOffset.UtcNow.AddDays(-8)),
-                new("gap-005", "svc-payment-gateway", "Payment Gateway", "payment-squad", "Payments",
-                    "Missing contract and runbook for critical service", PolicySeverity.Critical,
-                    new[] { "pol-002", "pol-003" }, 2, DateTimeOffset.UtcNow.AddDays(-5)),
-                new("gap-006", "svc-chat-service", "Chat Service", "platform-squad", "Platform",
-                    "External AI integration without complete audit trail", PolicySeverity.High,
-                    new[] { "pol-005" }, 1, DateTimeOffset.UtcNow.AddDays(-3))
-            };
+                scopeType = GovernanceScopeType.Team;
+                scopeValue = request.TeamId;
+            }
+            else if (!string.IsNullOrWhiteSpace(request.DomainId))
+            {
+                scopeType = GovernanceScopeType.Domain;
+                scopeValue = request.DomainId;
+            }
+            else if (!string.IsNullOrWhiteSpace(request.ServiceId))
+            {
+                scopeType = null;
+                scopeValue = request.ServiceId;
+            }
+
+            var packs = await packRepository.ListAsync(category: null, status: GovernancePackStatus.Published, cancellationToken);
+            var waivers = await waiverRepository.ListAsync(packId: null, status: WaiverStatus.Pending, cancellationToken);
+
+            var rollouts = await rolloutRepository.ListAsync(
+                packId: null,
+                scopeType: scopeType,
+                scopeValue: scopeValue,
+                status: null,
+                ct: cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(request.ServiceId))
+            {
+                rollouts = rollouts
+                    .Where(r => string.Equals(r.Scope, request.ServiceId, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            var rolloutByPack = rollouts
+                .GroupBy(r => r.PackId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(r => r.InitiatedAt).First());
+
+            var gaps = packs
+                .Select(pack => BuildGap(pack, rolloutByPack, waivers))
+                .Where(g => g is not null)
+                .Select(g => g!)
+                .OrderByDescending(g => g.Severity)
+                .ThenByDescending(g => g.DetectedAt)
+                .ToList();
 
             var response = new Response(
                 TotalGaps: gaps.Count,
@@ -52,7 +83,62 @@ public static class GetComplianceGaps
                 Gaps: gaps,
                 GeneratedAt: DateTimeOffset.UtcNow);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
+        }
+
+        private static ComplianceGapDto? BuildGap(
+            GovernancePack pack,
+            IReadOnlyDictionary<GovernancePackId, GovernanceRolloutRecord> rolloutByPack,
+            IReadOnlyList<GovernanceWaiver> waivers)
+        {
+            var hasPendingWaiver = waivers.Any(w => w.PackId == pack.Id && w.Status == WaiverStatus.Pending);
+            var latestRollout = rolloutByPack.GetValueOrDefault(pack.Id);
+            var missingRollout = latestRollout is null;
+            var rolloutFailed = latestRollout?.Status == RolloutStatus.Failed;
+
+            if (!hasPendingWaiver && !missingRollout && !rolloutFailed)
+                return null;
+
+            var violatedPolicies = new List<string>();
+            if (hasPendingWaiver)
+                violatedPolicies.Add("POL-WAIVER-PENDING");
+            if (missingRollout)
+                violatedPolicies.Add("POL-ROLLOUT-MISSING");
+            if (rolloutFailed)
+                violatedPolicies.Add("POL-ROLLOUT-FAILED");
+
+            var severity = (rolloutFailed, missingRollout, hasPendingWaiver) switch
+            {
+                (true, _, _) => PolicySeverity.Critical,
+                (_, true, true) => PolicySeverity.High,
+                (_, true, false) => PolicySeverity.Medium,
+                _ => PolicySeverity.Low
+            };
+
+            var scope = latestRollout?.Scope ?? "unassigned";
+            var scopeType = latestRollout?.ScopeType.ToString() ?? "Global";
+            var detectedAt = latestRollout?.InitiatedAt ?? pack.UpdatedAt;
+
+            return new ComplianceGapDto(
+                GapId: $"gap-{pack.Id.Value:N}",
+                ServiceId: $"pack-{pack.Id.Value:N}",
+                ServiceName: pack.DisplayName,
+                Team: scope,
+                Domain: scopeType,
+                Description: BuildDescription(hasPendingWaiver, missingRollout, rolloutFailed),
+                Severity: severity,
+                ViolatedPolicyIds: violatedPolicies.ToArray(),
+                ViolationCount: violatedPolicies.Count,
+                DetectedAt: detectedAt);
+        }
+
+        private static string BuildDescription(bool hasPendingWaiver, bool missingRollout, bool rolloutFailed)
+        {
+            var parts = new List<string>(3);
+            if (hasPendingWaiver) parts.Add("Pending waiver");
+            if (missingRollout) parts.Add("No rollout evidence");
+            if (rolloutFailed) parts.Add("Latest rollout failed");
+            return string.Join(", ", parts);
         }
     }
 

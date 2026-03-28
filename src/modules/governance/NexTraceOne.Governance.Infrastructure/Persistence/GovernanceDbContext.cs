@@ -42,6 +42,15 @@ public sealed class GovernanceDbContext(
     /// <summary>Registos de rollout de pacotes de governança.</summary>
     public DbSet<GovernanceRolloutRecord> RolloutRecords => Set<GovernanceRolloutRecord>();
 
+    /// <summary>Pacotes de evidência de governança.</summary>
+    public DbSet<EvidencePackage> EvidencePackages => Set<EvidencePackage>();
+
+    /// <summary>Itens de evidência de um pacote de governança.</summary>
+    public DbSet<EvidenceItem> EvidenceItems => Set<EvidenceItem>();
+
+    /// <summary>Gaps de compliance persistidos.</summary>
+    public DbSet<ComplianceGap> ComplianceGaps => Set<ComplianceGap>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

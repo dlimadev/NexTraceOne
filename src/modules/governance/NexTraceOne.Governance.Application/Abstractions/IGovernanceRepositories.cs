@@ -235,3 +235,40 @@ public interface IGovernanceAnalyticsRepository
     /// <summary>Retorna contagem total de packs publicados ativos.</summary>
     Task<int> GetPublishedPackCountAsync(CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de EvidencePackages para o módulo Governance.
+/// </summary>
+public interface IEvidencePackageRepository
+{
+    /// <summary>Lista pacotes de evidência, opcionalmente filtrados por escopo e status.</summary>
+    Task<IReadOnlyList<EvidencePackage>> ListAsync(
+        string? scope,
+        EvidencePackageStatus? status,
+        CancellationToken ct);
+
+    /// <summary>Obtém pacote de evidência por identificador.</summary>
+    Task<EvidencePackage?> GetByIdAsync(EvidencePackageId id, CancellationToken ct);
+
+    /// <summary>Adiciona novo pacote de evidência.</summary>
+    Task AddAsync(EvidencePackage package, CancellationToken ct);
+
+    /// <summary>Atualiza pacote de evidência existente.</summary>
+    Task UpdateAsync(EvidencePackage package, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de ComplianceGap para o módulo Governance.
+/// </summary>
+public interface IComplianceGapRepository
+{
+    /// <summary>Lista gaps de compliance, opcionalmente filtrados por escopo.</summary>
+    Task<IReadOnlyList<ComplianceGap>> ListAsync(
+        string? teamId,
+        string? domainId,
+        string? serviceId,
+        CancellationToken ct);
+
+    /// <summary>Adiciona novo gap de compliance.</summary>
+    Task AddAsync(ComplianceGap gap, CancellationToken ct);
+}
