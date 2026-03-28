@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeNonProdEnvironment;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -39,7 +39,7 @@ public sealed class AnalyzeNonProdEnvironmentTests
     public async Task Handle_ShouldReturnAnalysis_WhenProviderResponds()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("FINDING: HIGH | contract-drift | PaymentService contract has breaking changes not in production\nOVERALL_RISK: HIGH\nRECOMMENDATION: Review contract changes before promoting.");
 
         var result = await CreateHandler().Handle(DefaultCommand(), CancellationToken.None);
@@ -61,7 +61,7 @@ public sealed class AnalyzeNonProdEnvironmentTests
     public async Task Handle_ShouldReturnNoFindings_WhenEnvironmentIsClean()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: LOW\nRECOMMENDATION: Environment looks healthy. No significant risks detected.");
 
         var result = await CreateHandler().Handle(DefaultCommand(), CancellationToken.None);
@@ -75,7 +75,7 @@ public sealed class AnalyzeNonProdEnvironmentTests
     public async Task Handle_ShouldDetectFallback_WhenResponseContainsFallbackPrefix()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("[FALLBACK_PROVIDER_UNAVAILABLE] No AI provider available.");
 
         var result = await CreateHandler().Handle(DefaultCommand(), CancellationToken.None);
@@ -88,7 +88,7 @@ public sealed class AnalyzeNonProdEnvironmentTests
     public async Task Handle_ShouldReturnError_WhenProviderThrows()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<string>(new InvalidOperationException("Connection refused")));
 
         var result = await CreateHandler().Handle(DefaultCommand(), CancellationToken.None);
@@ -104,7 +104,7 @@ public sealed class AnalyzeNonProdEnvironmentTests
         string? capturedGrounding = null;
         _routingPort.RouteQueryAsync(
             Arg.Do<string>(g => capturedGrounding = g),
-            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: LOW\nRECOMMENDATION: All good.");
 
         await CreateHandler().Handle(DefaultCommand(tenantId: "tenant-xyz-999"), CancellationToken.None);
@@ -116,7 +116,7 @@ public sealed class AnalyzeNonProdEnvironmentTests
     public async Task Handle_ShouldParseMultipleFindings()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "FINDING: HIGH | contract-drift | PaymentService has breaking changes\n" +
                 "FINDING: MEDIUM | telemetry | Error rate 15% above baseline\n" +

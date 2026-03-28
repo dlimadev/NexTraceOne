@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Integrations.Domain.Enums;
 
 namespace NexTraceOne.Integrations.Infrastructure.Persistence.Configurations;
 
@@ -88,5 +89,33 @@ internal sealed class IngestionExecutionConfiguration : IEntityTypeConfiguration
         builder.HasIndex(x => x.Result);
         builder.HasIndex(x => x.RetryAttempt);
         builder.HasIndex(x => new { x.ConnectorId, x.StartedAt });
+
+        // P04.3 — Parsed payload fields (persisted via migration AddParsedPayloadFieldsToIngestionExecution)
+        builder.Property(x => x.ParsedServiceName)
+            .HasMaxLength(500);
+
+        builder.Property(x => x.ParsedEnvironment)
+            .HasMaxLength(200);
+
+        builder.Property(x => x.ParsedVersion)
+            .HasMaxLength(100);
+
+        builder.Property(x => x.ParsedCommitSha)
+            .HasMaxLength(200);
+
+        builder.Property(x => x.ParsedChangeType)
+            .HasMaxLength(100);
+
+        builder.Property(x => x.ParsedAt)
+            .HasColumnType("timestamp with time zone");
+
+        builder.Property(x => x.ProcessingStatus)
+            .HasConversion<string>()
+            .HasMaxLength(50)
+            .IsRequired()
+            .HasDefaultValue(ProcessingStatus.MetadataRecorded);
+
+        builder.HasIndex(x => x.ProcessingStatus);
+        builder.HasIndex(x => x.ParsedServiceName);
     }
 }

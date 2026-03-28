@@ -14,6 +14,9 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
         "test-generation"
     ];
 
+    private static readonly HashSet<string> ProductionEnvironments =
+        new(StringComparer.OrdinalIgnoreCase) { "production", "prod", "prd" };
+
     public async Task<IReadOnlyList<ProviderSummaryDto>> GetAvailableProvidersAsync(CancellationToken ct = default)
     {
         var activePolicies = await context.Policies
@@ -56,6 +59,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
     public async Task<RoutingDecisionDto?> RouteRequestAsync(
         string capability,
         string? preferredProvider = null,
+        string? environment = null,
         CancellationToken ct = default)
     {
         var activePolicies = await context.Policies
@@ -63,11 +67,21 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
             .Where(p => p.IsActive)
             .ToListAsync(ct);
 
-        var requiresApproval = activePolicies.Any(p => p.RequiresApproval && p.IsContextAllowed(capability));
+        var isProduction = !string.IsNullOrWhiteSpace(environment)
+            && ProductionEnvironments.Contains(environment);
 
+        // Block when any active policy requires approval for this capability.
+        var requiresApproval = activePolicies.Any(p => p.RequiresApproval && p.IsContextAllowed(capability));
         if (requiresApproval)
-        {
             return null;
+
+        // In production environments, block external routing for any capability covered by an active policy
+        // to enforce data-leakage containment regardless of approval requirement.
+        if (isProduction)
+        {
+            var productionBlocked = activePolicies.Any(p => p.IsContextAllowed(capability));
+            if (productionBlocked)
+                return null;
         }
 
         if (!string.IsNullOrWhiteSpace(preferredProvider))
@@ -102,9 +116,7 @@ internal sealed class ExternalAiModule(ExternalAiDbContext context) : IExternalA
             .FirstOrDefaultAsync(ct);
 
         if (selected is null)
-        {
             return null;
-        }
 
         var selectedFallback = await context.Providers
             .AsNoTracking()

@@ -1,14 +1,17 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# NexTraceOne — E2E Tests (Playwright) — Nightly / Manual
+# NexTraceOne — E2E Tests (Playwright)
 #
-# Trigger: schedule (nightly) + manual dispatch
-# Estes testes são pesados e requerem stack completa rodando.
-# Não devem ser executados em cada PR para não bloquear velocidade de entrega.
+# Trigger: schedule (nightly), manual dispatch e pull_request para main
+# PRs para main executam apenas testes marcados com @smoke para não bloquear
+# velocidade de entrega. Nightly executa a suíte completa.
 # ═══════════════════════════════════════════════════════════════════════════════
 
-name: E2E Tests (Nightly)
+name: E2E Tests
 
 on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
   schedule:
     # Executa às 03:00 UTC todos os dias
     - cron: "0 3 * * *"
@@ -18,6 +21,10 @@ on:
         description: "Base URL to run E2E against (default: local stack)"
         required: false
         default: "http://localhost:4173"
+      grep:
+        description: "Playwright --grep filter (empty = all tests)"
+        required: false
+        default: ""
 
 env:
   NODE_VERSION: "22"
@@ -79,7 +86,14 @@ jobs:
 
       - name: Run E2E tests
         working-directory: src/frontend
-        run: npx playwright test --reporter=html
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx playwright test --grep "@smoke" --reporter=html
+          elif [ -n "${{ inputs.grep }}" ]; then
+            npx playwright test --grep "${{ inputs.grep }}" --reporter=html
+          else
+            npx playwright test --reporter=html
+          fi
         env:
           PLAYWRIGHT_BASE_URL: ${{ inputs.base_url || 'http://localhost:4173' }}
           CI: "true"

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeNonProdEnvironment;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotionReadiness;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments;
@@ -36,7 +36,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
         string? captured = null;
-        _routingPort.RouteQueryAsync(Arg.Do<string>(g => captured = g), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Do<string>(g => captured = g), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: LOW\nRECOMMENDATION: Clean.");
 
         var handler = new AnalyzeNonProdEnvironment.Handler(_routingPort, _dateTimeProvider, _analyzeLogger);
@@ -54,7 +54,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task AnalyzeNonProd_TwoExecutions_ShouldProduceDifferentCorrelationIds()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: LOW\nRECOMMENDATION: Clean.");
 
         var handler = new AnalyzeNonProdEnvironment.Handler(_routingPort, _dateTimeProvider, _analyzeLogger);
@@ -73,7 +73,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task AnalyzeNonProd_ShouldIncludeEnvironmentIdInResponse_ForTraceability()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: MEDIUM\nRECOMMENDATION: Review.");
 
         var handler = new AnalyzeNonProdEnvironment.Handler(_routingPort, _dateTimeProvider, _analyzeLogger);
@@ -97,7 +97,7 @@ public sealed class AiAnalysisContextIsolationTests
         string? capturedGrounding = null;
         _routingPort.RouteQueryAsync(
             Arg.Do<string>(g => capturedGrounding = g),
-            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("PROMOTION_RECOMMENDATION: SAFE_TO_PROMOTE\nSUMMARY: Aligned.");
 
         var handler = new CompareEnvironments.Handler(_routingPort, _dateTimeProvider, _compareLogger);
@@ -150,7 +150,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task CompareEnvironments_ResponseMustContainBothEnvironmentIds_ForAudit()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("DIVERGENCE: HIGH | contracts | Breaking change detected\nPROMOTION_RECOMMENDATION: BLOCK_PROMOTION\nSUMMARY: Block this.");
 
         var handler = new CompareEnvironments.Handler(_routingPort, _dateTimeProvider, _compareLogger);
@@ -232,7 +232,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task AssessPromotionReadiness_ShouldCarryTenantInResponse_ForAudit()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("READINESS_SCORE: 88\nREADINESS_LEVEL: READY\nSHOULD_BLOCK: NO\nSUMMARY: Ready.");
 
         var handler = new AssessPromotionReadiness.Handler(_routingPort, _dateTimeProvider, _readinessLogger);
@@ -261,7 +261,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
         string? captured = null;
-        _routingPort.RouteQueryAsync(Arg.Do<string>(g => captured = g), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Do<string>(g => captured = g), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: LOW\nRECOMMENDATION: OK.");
 
         var handler = new AnalyzeNonProdEnvironment.Handler(_routingPort, _dateTimeProvider, _analyzeLogger);
@@ -277,7 +277,7 @@ public sealed class AiAnalysisContextIsolationTests
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
         string? captured = null;
-        _routingPort.RouteQueryAsync(Arg.Do<string>(g => captured = g), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Do<string>(g => captured = g), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("OVERALL_RISK: LOW\nRECOMMENDATION: OK.");
 
         var handler = new AnalyzeNonProdEnvironment.Handler(_routingPort, _dateTimeProvider, _analyzeLogger);
@@ -301,7 +301,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task AnalyzeNonProd_ShouldParseAllRiskLevels(string aiResponse, string expectedRisk)
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(aiResponse);
 
         var handler = new AnalyzeNonProdEnvironment.Handler(_routingPort, _dateTimeProvider, _analyzeLogger);
@@ -320,7 +320,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task CompareEnvironments_ShouldParseAllPromotionRecommendations(string aiResponse, string expectedRec)
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(aiResponse);
 
         var handler = new CompareEnvironments.Handler(_routingPort, _dateTimeProvider, _compareLogger);
@@ -338,7 +338,7 @@ public sealed class AiAnalysisContextIsolationTests
     public async Task AllFeatures_ShouldReturnError_WhenProviderThrows()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<string>(new TimeoutException("Provider timeout")));
 
         // AnalyzeNonProd

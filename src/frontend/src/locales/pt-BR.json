@@ -239,6 +239,8 @@
     "sourceOfTruth": "Fonte de Verdade",
     "sectionKnowledge": "Conhecimento",
     "changeConfidence": "Confiança em Mudanças",
+    "changes": "Mudanças",
+    "releases": "Releases",
     "ideIntegrations": "Integrações IDE",
     "executiveOverview": "Visão Executiva",
     "riskHeatmap": "Heatmap de Risco",
@@ -269,6 +271,14 @@
     "evidence": "Pacotes de Evidência",
     "aiAnalysis": "Análise de IA",
     "environmentComparison": "Comparação de Ambientes",
+    "runtimeIntelligence": "Inteligência de Runtime",
+    "publicationCenter": "Central de Publicação",
+    "productAnalytics": "Analytics do Produto",
+    "sectionOrganization": "Organização",
+    "sectionOwnershipTeams": "Ownership e Equipes",
+    "teams": "Equipes",
+    "domains": "Domínios",
+    "delegatedAdmin": "Admin Delegado",
     "platformConfiguration": "Configuração da Plataforma"
   },
   "platformOps": {
@@ -997,8 +1007,9 @@
     "subtitle": "Controle a promoção de ambientes com quality gates",
     "newRequest": "Nova Solicitação de Promoção",
     "createRequest": "Criar Solicitação de Promoção",
-    "releaseId": "ID da Release",
+    "releaseId": "Release",
     "releaseIdPlaceholder": "UUID da release",
+    "selectRelease": "Selecione uma release…",
     "sourceEnvironment": "Ambiente de Origem",
     "targetEnvironment": "Ambiente de Destino",
     "createButton": "Criar Solicitação",
@@ -3094,5 +3105,805 @@
       "mandatoryDefinitions": "Mandatórias (System-only)",
       "domainBreakdown": "Distribuição por Domínio"
     }
+  },
+  "persona": {
+    "quickActions": "Ações Rápidas",
+    "widgetComingSoon": "Dados estarão disponíveis quando ligados aos serviços do backend",
+    "Engineer": {
+      "label": "Engenheiro",
+      "homeSubtitle": "Visão operacional dos seus serviços, incidentes e contratos",
+      "widgets": {
+        "myServices": "Os Meus Serviços",
+        "recentChanges": "Alterações Recentes",
+        "openIncidents": "Incidentes Abertos",
+        "contracts": "Os Meus Contratos"
+      },
+      "actions": {
+        "investigateService": "Investigar Serviço",
+        "openRunbook": "Abrir Runbook",
+        "viewContract": "Ver Contrato",
+        "analyzeIncident": "Analisar Incidente"
+      },
+      "ai": {
+        "prompt1": "Que problemas estão a afetar os meus serviços neste momento?",
+        "prompt2": "Mostre as últimas alterações de contrato dos meus serviços",
+        "prompt3": "Ajude-me a investigar o último incidente"
+      }
+    },
+    "TechLead": {
+      "label": "Tech Lead",
+      "homeSubtitle": "Visão da equipa: serviços, risco, fiabilidade e impacto de alterações",
+      "widgets": {
+        "teamServices": "Serviços da Equipa",
+        "changeRisk": "Risco de Alterações",
+        "teamReliability": "Fiabilidade da Equipa",
+        "teamIncidents": "Incidentes da Equipa",
+        "ownershipGaps": "Lacunas de Ownership"
+      },
+      "actions": {
+        "reviewTeamRisk": "Rever Risco da Equipa",
+        "inspectChanges": "Inspecionar Alterações Recentes",
+        "assignOwner": "Atribuir Responsável",
+        "openTeamServices": "Abrir Serviços da Equipa"
+      },
+      "ai": {
+        "prompt1": "Qual o nível de risco atual dos serviços da minha equipa?",
+        "prompt2": "Mostre alterações recentes que possam afetar a fiabilidade da equipa",
+        "prompt3": "Quais serviços da minha equipa não têm ownership adequado?"
+      }
+    },
+    "Architect": {
+      "label": "Arquiteto",
+      "homeSubtitle": "Visão estrutural: dependências, contratos e impacto transversal",
+      "widgets": {
+        "dependencies": "Dependências Cross-Service",
+        "contractConsistency": "Consistência de Contratos",
+        "architecturalRisk": "Risco Arquitetural",
+        "crossTeamChanges": "Alterações Cross-Team"
+      },
+      "actions": {
+        "inspectDependencyMap": "Inspecionar Mapa de Dependências",
+        "reviewCrossImpact": "Rever Impacto Cross-Domain",
+        "analyzeContractCompatibility": "Analisar Compatibilidade de Contratos",
+        "sourceOfTruth": "Fonte de Verdade"
+      },
+      "ai": {
+        "prompt1": "Existem riscos de fragilidade de dependências entre serviços?",
+        "prompt2": "Mostre incompatibilidades de contrato entre domínios",
+        "prompt3": "Quais as alterações cross-team mais impactantes esta semana?"
+      }
+    },
+    "Product": {
+      "label": "Produto",
+      "homeSubtitle": "Impacto funcional: confiança da release, risco e saúde dos serviços",
+      "widgets": {
+        "releaseConfidence": "Confiança da Release",
+        "criticalServices": "Serviços Críticos do Produto",
+        "operationalRisk": "Risco Operacional",
+        "recentIncidents": "Incidentes Recentes com Impacto"
+      },
+      "actions": {
+        "reviewReleaseConfidence": "Rever Confiança da Release",
+        "viewCriticalServiceStatus": "Ver Estado dos Serviços Críticos",
+        "inspectProductIncidents": "Inspecionar Incidentes do Produto",
+        "viewReports": "Ver Relatórios"
+      },
+      "ai": {
+        "prompt1": "Qual o nível de confiança da próxima release?",
+        "prompt2": "Existem incidentes a impactar fluxos críticos do produto?",
+        "prompt3": "Mostre um resumo do risco operacional dos serviços principais"
+      }
+    },
+    "Executive": {
+      "label": "Executivo",
+      "homeSubtitle": "Visão estratégica: tendências, maturidade, risco e indicadores de confiança",
+      "widgets": {
+        "operationalTrend": "Tendência Operacional",
+        "criticalDomains": "Domínios Críticos",
+        "riskOverview": "Visão de Risco",
+        "confidenceIndicators": "Indicadores de Confiança"
+      },
+      "actions": {
+        "openExecutiveOverview": "Visão Executiva",
+        "reviewOperationalTrend": "Rever Tendência Operacional",
+        "inspectCriticalDomains": "Inspecionar Domínios Críticos",
+        "viewCompliance": "Ver Conformidade"
+      },
+      "ai": {
+        "prompt1": "Dê-me um resumo executivo da saúde operacional",
+        "prompt2": "Quais as principais tendências de risco este mês?",
+        "prompt3": "Mostre os indicadores de maturidade geral entre domínios"
+      }
+    },
+    "PlatformAdmin": {
+      "label": "Admin Plataforma",
+      "homeSubtitle": "Governança da plataforma: políticas, modelos IA, integrações e cobertura",
+      "widgets": {
+        "policyHealth": "Saúde das Políticas",
+        "platformCoverage": "Cobertura da Plataforma",
+        "aiGovernance": "Governança IA",
+        "integrations": "Integrações"
+      },
+      "actions": {
+        "managePolicies": "Gerir Políticas",
+        "manageAiModels": "Gerir Modelos IA",
+        "configureIntegrations": "Configurar Integrações",
+        "reviewPlatformCoverage": "Rever Cobertura da Plataforma"
+      },
+      "ai": {
+        "prompt1": "Qual o estado atual das políticas de governança de IA?",
+        "prompt2": "Existem problemas de saúde nas integrações?",
+        "prompt3": "Mostre lacunas de cobertura da plataforma entre serviços"
+      }
+    },
+    "Auditor": {
+      "label": "Auditor",
+      "homeSubtitle": "Rastreabilidade e evidências: trilhas de auditoria, aprovações e conformidade",
+      "widgets": {
+        "auditActivity": "Atividade de Auditoria",
+        "approvalTraceability": "Rastreabilidade de Aprovações",
+        "evidenceExports": "Exportações de Evidências",
+        "aiUsageAudit": "Auditoria de Uso de IA"
+      },
+      "actions": {
+        "inspectAuditTrail": "Inspecionar Trilha de Auditoria",
+        "exportEvidence": "Exportar Evidências",
+        "reviewApprovalHistory": "Rever Histórico de Aprovações",
+        "auditAiUsage": "Auditar Uso de IA"
+      },
+      "ai": {
+        "prompt1": "Mostre trilhas de auditoria de aprovações recentes",
+        "prompt2": "Que modelos de IA foram usados e por quem esta semana?",
+        "prompt3": "Existem lacunas de conformidade nas alterações recentes?"
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "Início"
+  },
+  "onboarding": {
+    "hintsTitle": "O que pode fazer aqui",
+    "dismiss": "Dispensar",
+    "services": {
+      "hint1Title": "Explorar Catálogo de Serviços",
+      "hint1Desc": "Veja todos os serviços registados, os seus proprietários e dependências",
+      "hint2Title": "Ver Grafo de Dependências",
+      "hint2Desc": "Visualize as dependências e topologia dos serviços",
+      "hint3Title": "Verificar Saúde do Serviço",
+      "hint3Desc": "Monitorize o estado de fiabilidade dos seus serviços"
+    },
+    "contracts": {
+      "hint1Title": "Navegar Contratos de API",
+      "hint1Desc": "Veja todos os contratos de API com histórico de versões e estado do ciclo de vida",
+      "hint2Title": "Criar no Contract Studio",
+      "hint2Desc": "Utilize o estúdio assistido por IA para criar e validar contratos",
+      "hint3Title": "Comparar Versões",
+      "hint3Desc": "Compare versões de contratos para compreender as alterações"
+    },
+    "changes": {
+      "hint1Title": "Rastrear Alterações em Produção",
+      "hint1Desc": "Monitorize implementações e alterações com pontuação de confiança",
+      "hint2Title": "Monitorizar Raio de Impacto",
+      "hint2Desc": "Compreenda o âmbito de impacto das alterações em produção",
+      "hint3Title": "Rever Confiança na Alteração",
+      "hint3Desc": "Avalie a prontidão da alteração antes de implementar em produção"
+    },
+    "operations": {
+      "hint1Title": "Gerir Incidentes",
+      "hint1Desc": "Rastreie e resolva incidentes com contexto completo de correlação",
+      "hint2Title": "Aceder a Runbooks",
+      "hint2Desc": "Encontre e execute procedimentos operacionais para cenários comuns",
+      "hint3Title": "Monitorizar Fiabilidade",
+      "hint3Desc": "Acompanhe métricas de fiabilidade e SLOs dos serviços da equipa"
+    },
+    "aiHub": {
+      "hint1Title": "Assistente IA",
+      "hint1Desc": "Obtenha insights potenciados por IA sobre os seus serviços, contratos e incidentes",
+      "hint2Title": "Registo de Modelos",
+      "hint2Desc": "Consulte e faça a gestão dos modelos IA registados e das suas configurações",
+      "hint3Title": "Integrações IDE",
+      "hint3Desc": "Ligue o seu IDE ao NexTraceOne para assistência IA governada no desenvolvimento"
+    },
+    "governance": {
+      "hint1Title": "Relatórios Executivos",
+      "hint1Desc": "Aceda a dashboards executivos com dados de risco, maturidade e benchmarking",
+      "hint2Title": "Centro de Risco",
+      "hint2Desc": "Monitorize o risco operacional em serviços, equipas e domínios",
+      "hint3Title": "Acompanhamento de Conformidade",
+      "hint3Desc": "Acompanhe o estado de conformidade e faça a gestão da aplicação de políticas"
+    },
+    "knowledge": {
+      "hint1Title": "Source of Truth",
+      "hint1Desc": "A sua referência central para todos os serviços, contratos e conhecimento operacional",
+      "hint2Title": "Trilho de Auditoria",
+      "hint2Desc": "Rastreie todas as alterações, aprovações e decisões operacionais"
+    }
+  },
+  "productPolish": {
+    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "welcomeSubtitle": "A fonte de verdade para serviços, contratos, alterações e conhecimento operacional",
+    "quickstartTitle": "Primeiros passos",
+    "quickstartSubtitle": "Próximos passos recomendados com base no seu perfil",
+    "emptyStateDefault": "Nada aqui ainda",
+    "emptyStateAction": "Comece por explorar as opções abaixo",
+    "moduleGuidanceTitle": "Sobre este módulo",
+    "notConfiguredTitle": "Ainda não configurado",
+    "notConfiguredDesc": "Esta funcionalidade requer configuração antes de poder ser utilizada",
+    "notConfiguredAction": "Configurar agora",
+    "blockedTitle": "Acesso restrito",
+    "blockedDesc": "Não tem permissão para aceder a este recurso. Contacte o administrador.",
+    "quotaExceededTitle": "Quota excedida",
+    "quotaExceededDesc": "A sua quota de utilização desta funcionalidade foi excedida. Contacte o administrador.",
+    "noResultsTitle": "Sem resultados",
+    "noResultsDesc": "Tente ajustar os critérios de pesquisa ou filtros",
+    "errorTitle": "Algo correu mal",
+    "errorDesc": "Ocorreu um erro inesperado. Tente novamente.",
+    "errorAction": "Tentar novamente",
+    "successTitle": "Sucesso",
+    "loadingTitle": "A carregar...",
+    "loadingDesc": "A obter os seus dados",
+    "guidanceServices": "O Catálogo de Serviços é a fonte de verdade para todos os serviços registados, os seus proprietários, dependências e estado operacional.",
+    "guidanceContracts": "A Governança de Contratos permite consultar, criar, versionar e validar contratos de API com gestão completa do ciclo de vida.",
+    "guidanceChanges": "Change Intelligence rastreia alterações em produção, pontuação de confiança, raio de impacto e correlação alteração-incidente.",
+    "guidanceOperations": "Operações centraliza gestão de incidentes, runbooks e métricas de fiabilidade de serviços por equipa.",
+    "guidanceAiHub": "AI Hub disponibiliza assistência IA governada, gestão de modelos, políticas e integrações IDE para a sua equipa.",
+    "guidanceGovernance": "Governança disponibiliza relatórios executivos, análise de risco, acompanhamento de conformidade e controlos empresariais.",
+    "guidanceAdmin": "Administração abrange gestão de utilizadores, controlos de acesso, ambientes e trilhos de auditoria.",
+    "guidanceKnowledge": "Source of Truth é a referência central para todos os serviços, contratos e conhecimento operacional.",
+    "quickstart": {
+      "Engineer": {
+        "step1": "Explore os seus serviços no Catálogo de Serviços",
+        "step2": "Reveja as alterações recentes em produção",
+        "step3": "Verifique incidentes abertos que afetam os seus serviços",
+        "step4": "Consulte os contratos de API dos seus serviços"
+      },
+      "TechLead": {
+        "step1": "Reveja a ownership dos serviços da sua equipa",
+        "step2": "Verifique o risco de alterações da equipa",
+        "step3": "Monitorize a fiabilidade dos serviços da equipa",
+        "step4": "Reveja incidentes abertos da equipa"
+      },
+      "Architect": {
+        "step1": "Explore o grafo de dependências de serviços",
+        "step2": "Reveja a consistência de contratos entre serviços",
+        "step3": "Analise o impacto de alterações entre equipas",
+        "step4": "Verifique indicadores de risco arquitetural"
+      },
+      "Product": {
+        "step1": "Reveja as pontuações de confiança de releases",
+        "step2": "Verifique o estado dos serviços críticos",
+        "step3": "Monitorize tendências de risco operacional",
+        "step4": "Veja o impacto de incidentes recentes"
+      },
+      "Executive": {
+        "step1": "Abra o painel executivo",
+        "step2": "Reveja tendências de risco operacional",
+        "step3": "Inspecione domínios de negócio críticos",
+        "step4": "Verifique o estado de conformidade"
+      },
+      "PlatformAdmin": {
+        "step1": "Reveja as políticas e controlos da plataforma",
+        "step2": "Faça a gestão do registo de modelos IA",
+        "step3": "Configure integrações",
+        "step4": "Verifique métricas de cobertura da plataforma"
+      },
+      "Auditor": {
+        "step1": "Inspecione o trilho de auditoria",
+        "step2": "Reveja pacotes de evidências",
+        "step3": "Verifique o histórico de aprovações",
+        "step4": "Audite padrões de utilização de IA"
+      }
+    },
+    "emptyServices": "Nenhum serviço registado ainda. Comece por adicionar o primeiro serviço ao catálogo.",
+    "emptyServicesAction": "Adicionar serviço",
+    "emptyContracts": "Nenhum contrato encontrado. Crie o seu primeiro contrato de API utilizando o Contract Studio.",
+    "emptyContractsAction": "Abrir Contract Studio",
+    "emptyChanges": "Nenhuma alteração rastreada ainda. As alterações aparecerão aqui quando forem detetados deploys.",
+    "emptyIncidents": "Nenhum incidente reportado. Os incidentes aparecerão aqui quando forem detetados.",
+    "emptyRunbooks": "Nenhum runbook disponível. Crie runbooks para documentar procedimentos operacionais.",
+    "emptyRunbooksAction": "Criar runbook",
+    "emptyReliability": "Sem dados de fiabilidade ainda. Dados de SLO aparecerão quando os serviços reportarem métricas.",
+    "emptyAiConversations": "Nenhuma conversa ainda. Inicie uma conversa com o Assistente IA.",
+    "emptyAiConversationsAction": "Iniciar conversa",
+    "emptyModels": "Nenhum modelo IA registado. Configure o registo de modelos para ativar funcionalidades de IA.",
+    "emptyPolicies": "Nenhuma política configurada. Crie políticas para governar a utilização e acesso de IA.",
+    "emptyReports": "Sem dados de relatórios ainda. Os relatórios serão gerados com base nos dados operacionais.",
+    "emptyEvidence": "Nenhum pacote de evidência encontrado. As evidências serão recolhidas conforme as verificações de conformidade executem.",
+    "emptyFinOps": "Sem dados de FinOps ainda. Os dados de custo aparecerão quando os serviços reportarem utilização de recursos.",
+    "aiAssistantHint": "Faça perguntas sobre os seus serviços, contratos, incidentes ou alterações",
+    "aiAssistantPersonaHint": "Os prompts sugeridos são personalizados para o seu perfil"
+  },
+  "automation": {
+    "title": "Automação de Workflows",
+    "subtitle": "Automação operacional com controlos de segurança, aprovações e auditoria",
+    "emptyTitle": "Nenhum workflow de automação",
+    "emptyDescription": "Os workflows de automação operacional aparecerão aqui quando criados.",
+    "catalog": {
+      "title": "Catálogo de Ações",
+      "subtitle": "Ações de automação disponíveis com controlos de segurança",
+      "actionType": "Tipo de Ação",
+      "riskLevel": "Nível de Risco",
+      "requiresApproval": "Requer Aprovação",
+      "allowedPersonas": "Personas Permitidas",
+      "allowedEnvironments": "Ambientes Permitidos",
+      "preconditions": "Pré-condições",
+      "postValidation": "Validação Pós-Execução",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "workflows": {
+      "title": "Workflows de Automação",
+      "subtitle": "Workflows de automação ativos e recentes",
+      "create": "Novo Workflow",
+      "noWorkflows": "Nenhum workflow encontrado",
+      "status": "Estado",
+      "action": "Ação",
+      "service": "Serviço",
+      "requestedBy": "Solicitado Por",
+      "createdAt": "Criado Em",
+      "riskLevel": "Nível de Risco"
+    },
+    "detail": {
+      "title": "Detalhe do Workflow",
+      "rationale": "Justificação",
+      "scope": "Âmbito",
+      "environment": "Ambiente",
+      "linkedIncident": "Incidente Associado",
+      "linkedChange": "Alteração Associada",
+      "linkedService": "Serviço Associado",
+      "requestedBy": "Solicitado Por",
+      "approvedBy": "Aprovado Por",
+      "createdAt": "Criado",
+      "updatedAt": "Última Atualização"
+    },
+    "preconditions": {
+      "title": "Pré-condições",
+      "subtitle": "Condições que devem ser cumpridas antes da execução",
+      "evaluate": "Avaliar Pré-condições",
+      "allPassed": "Todas as pré-condições cumpridas",
+      "someFailedOrPending": "Algumas pré-condições pendentes ou falharam",
+      "status": {
+        "Pending": "Pendente",
+        "Passed": "Aprovada",
+        "Failed": "Falhou"
+      }
+    },
+    "approval": {
+      "title": "Aprovação",
+      "subtitle": "Aprovação necessária antes da execução",
+      "requestApproval": "Solicitar Aprovação",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "approved": "Aprovado",
+      "rejected": "Rejeitado",
+      "pending": "Aprovação Pendente",
+      "notRequired": "Aprovação não necessária",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Indique o motivo da sua decisão"
+    },
+    "execution": {
+      "title": "Execução",
+      "subtitle": "Passos de execução e progresso",
+      "execute": "Executar",
+      "cancel": "Cancelar Execução",
+      "completeStep": "Concluir Passo",
+      "steps": "Passos de Execução",
+      "noSteps": "Nenhum passo de execução registado"
+    },
+    "validation": {
+      "title": "Validação Pós-Execução",
+      "subtitle": "Verifique o resultado da automação",
+      "recordValidation": "Registar Validação",
+      "observedOutcome": "Resultado Observado",
+      "validatedBy": "Validado Por",
+      "checks": "Verificações de Validação",
+      "noValidation": "Nenhuma validação registada ainda",
+      "status": {
+        "Pending": "Pendente",
+        "InProgress": "Em Progresso",
+        "Passed": "Aprovada",
+        "Failed": "Falhou",
+        "Skipped": "Ignorada"
+      }
+    },
+    "audit": {
+      "title": "Trilha de Auditoria",
+      "subtitle": "Histórico completo de ações do workflow",
+      "performedBy": "Realizado Por",
+      "performedAt": "Realizado Em",
+      "details": "Detalhes",
+      "action": {
+        "WorkflowCreated": "Workflow Criado",
+        "PreconditionsEvaluated": "Pré-condições Avaliadas",
+        "ApprovalRequested": "Aprovação Solicitada",
+        "ApprovalGranted": "Aprovação Concedida",
+        "ApprovalRejected": "Aprovação Rejeitada",
+        "ExecutionStarted": "Execução Iniciada",
+        "StepCompleted": "Passo Concluído",
+        "ExecutionCompleted": "Execução Concluída",
+        "ExecutionFailed": "Execução Falhou",
+        "ValidationRecorded": "Validação Registada",
+        "WorkflowCancelled": "Workflow Cancelado",
+        "EscalationTriggered": "Escalação Acionada"
+      }
+    },
+    "admin": {
+      "title": "Controlos de Automação",
+      "subtitle": "Gerir ações de automação, políticas e controlos de segurança",
+      "actionCatalog": "Catálogo de Ações",
+      "safetyPolicies": "Políticas de Segurança",
+      "approvalRules": "Regras de Aprovação",
+      "usageOverview": "Visão de Utilização",
+      "totalActions": "Total de Ações",
+      "activeWorkflows": "Workflows Ativos",
+      "pendingApprovals": "Aprovações Pendentes",
+      "completedToday": "Concluídos Hoje"
+    },
+    "risk": {
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "workflowStatus": {
+      "Draft": "Rascunho",
+      "PendingPreconditions": "Pré-condições Pendentes",
+      "AwaitingApproval": "A Aguardar Aprovação",
+      "Approved": "Aprovado",
+      "ReadyToExecute": "Pronto para Executar",
+      "Executing": "A Executar",
+      "AwaitingValidation": "A Aguardar Validação",
+      "Completed": "Concluído",
+      "Failed": "Falhou",
+      "Cancelled": "Cancelado",
+      "Rejected": "Rejeitado"
+    },
+    "actionType": {
+      "RestartControlled": "Reinício (Controlado)",
+      "ReprocessControlled": "Reprocessamento (Controlado)",
+      "ExecuteRunbookStep": "Executar Passo do Runbook",
+      "RollbackReadinessReview": "Revisão de Prontidão de Rollback",
+      "ObserveAndValidate": "Observar e Validar",
+      "EscalateWithContext": "Escalar com Contexto",
+      "VerifyDependencyState": "Verificar Estado de Dependência",
+      "ValidatePostChangeState": "Validar Estado Pós-Alteração"
+    }
+  },
+  "integrations": {
+    "hubTitle": "Hub de Integrações",
+    "hubSubtitle": "Gerir conectores, fontes de ingestão e pipelines de dados",
+    "totalConnectors": "Total de Conectores",
+    "healthyConnectors": "Saudáveis",
+    "degradedFailed": "Degradados / Falhados",
+    "staleFeeds": "Feeds Obsoletos",
+    "search": "Pesquisar conectores...",
+    "filterType": "Todos os Tipos",
+    "filterStatus": "Todos os Estados",
+    "columnName": "Conector",
+    "columnType": "Tipo",
+    "columnProvider": "Fornecedor",
+    "columnStatus": "Estado",
+    "columnHealth": "Saúde",
+    "columnLastSuccess": "Último Sucesso",
+    "columnFreshness": "Frescura",
+    "columnItemsSynced": "Itens Sincronizados",
+    "noConnectors": "Nenhum conector encontrado com os filtros aplicados.",
+    "connectorDetail": "Detalhe do Conector",
+    "tabOverview": "Visão Geral",
+    "tabConfiguration": "Configuração",
+    "tabExecutions": "Execuções",
+    "tabHealth": "Saúde",
+    "description": "Descrição",
+    "environment": "Ambiente",
+    "lastSuccess": "Último Sucesso",
+    "lastFailure": "Última Falha",
+    "freshnessLag": "Atraso de Frescura",
+    "itemsSynced": "Itens Sincronizados",
+    "endpoint": "Endpoint",
+    "authMode": "Autenticação",
+    "pollingMode": "Modo de Polling",
+    "retryPolicy": "Política de Retentativas",
+    "enabled": "Habilitado",
+    "allowedDomains": "Domínios de Dados Permitidos",
+    "sourceScope": "Âmbito da Fonte",
+    "allowedTeams": "Equipas Permitidas",
+    "recentExecutions": "Execuções Recentes",
+    "executionId": "ID da Execução",
+    "startedAt": "Iniciado Em",
+    "finishedAt": "Finalizado Em",
+    "result": "Resultado",
+    "recordsProcessed": "Registos",
+    "warnings": "Avisos",
+    "errors": "Erros",
+    "retryConnector": "Retentar",
+    "retryQueued": "Pedido de retentativa colocado em fila com sucesso",
+    "reprocess": "Reprocessar",
+    "reprocessQueued": "Pedido de reprocessamento colocado em fila com sucesso",
+    "executionsTitle": "Execuções de Ingestão",
+    "executionsSubtitle": "Acompanhar histórico e resultados de execução do pipeline de ingestão",
+    "connector": "Conector",
+    "duration": "Duração",
+    "recordsReceived": "Recebidos",
+    "recordsNormalized": "Normalizados",
+    "correlationId": "ID de Correlação",
+    "noExecutions": "Nenhuma execução encontrada com os filtros aplicados.",
+    "freshnessTitle": "Frescura e Saúde",
+    "freshnessSubtitle": "Monitorizar a frescura dos dados e saúde do pipeline de ingestão",
+    "overallHealth": "Saúde Geral",
+    "healthy": "Saudável",
+    "degraded": "Degradado",
+    "failed": "Falhado",
+    "critical": "Crítico",
+    "stale": "Obsoleto",
+    "fresh": "Fresco",
+    "acceptable": "Aceitável",
+    "unknown": "Desconhecido",
+    "domainFreshness": "Frescura por Domínio",
+    "domain": "Domínio",
+    "lastReceived": "Último Recebido",
+    "lagMinutes": "Atraso (minutos)",
+    "trustLevel": "Nível de Confiança",
+    "sourceCount": "Fontes",
+    "criticalIssues": "Problemas Críticos",
+    "noCriticalIssues": "Nenhum problema crítico detetado",
+    "verified": "Verificado",
+    "trusted": "Fiável",
+    "provisional": "Provisório",
+    "untrusted": "Não Fiável",
+    "active": "Ativo",
+    "disabled": "Desativado",
+    "paused": "Pausado",
+    "success": "Sucesso",
+    "partialSuccess": "Sucesso Parcial",
+    "backToHub": "Voltar ao Hub de Integrações",
+    "connectorNotFound": "Conector não encontrado"
+  },
+  "analytics": {
+    "title": "Analytics de Produto",
+    "subtitle": "Adoção, valor, fricção e análise de jornadas em toda a plataforma",
+    "adoptionScore": "Score de Adoção",
+    "valueScore": "Score de Valor",
+    "frictionScore": "Score de Fricção",
+    "uniqueUsers": "Utilizadores Únicos",
+    "timeToFirstValue": "Tempo até Primeiro Valor",
+    "timeToFirstValueDesc": "Tempo médio desde o primeiro login até à primeira ação significativa",
+    "timeToCoreValue": "Tempo até Valor Principal",
+    "timeToCoreValueDesc": "Tempo médio desde o primeiro login até ao primeiro fluxo completo",
+    "topModules": "Módulos Mais Utilizados",
+    "actions": "ações",
+    "users": "utilizadores",
+    "minutes": "min",
+    "trendImproving": "A Melhorar",
+    "trendStable": "Estável",
+    "trendDeclining": "A Declinar",
+    "viewModuleAdoption": "Adoção por Módulo",
+    "viewPersonaUsage": "Uso por Persona",
+    "viewJourneys": "Jornadas e Funis",
+    "viewValueTracking": "Acompanhamento de Valor",
+    "trend": {
+      "Improving": "A Melhorar",
+      "Stable": "Estável",
+      "Declining": "A Declinar"
+    },
+    "adoption": {
+      "title": "Adoção por Módulo",
+      "subtitle": "Profundidade de adoção e padrões de uso por módulo",
+      "searchPlaceholder": "Pesquisar módulos ou funcionalidades...",
+      "depthScore": "Profundidade",
+      "noResults": "Nenhum módulo encontrado para a pesquisa."
+    },
+    "persona": {
+      "title": "Uso por Persona",
+      "subtitle": "Perfis de uso, profundidade de adoção e fricção por persona",
+      "all": "Todas as Personas",
+      "depth": "profundidade",
+      "topModules": "Módulos Principais",
+      "milestonesReached": "Marcos Alcançados",
+      "frictionPoints": "Pontos de Fricção",
+      "role": {
+        "Engineer": "Engenheiro",
+        "TechLead": "Líder Técnico",
+        "Architect": "Arquitecto",
+        "Product": "Produto",
+        "Executive": "Executivo",
+        "PlatformAdmin": "Admin. Plataforma",
+        "Auditor": "Auditor"
+      }
+    },
+    "journey": {
+      "title": "Jornadas e Funis",
+      "subtitle": "Jornadas-chave do produto com taxas de conclusão e análise de abandono",
+      "all": "Todas as Jornadas",
+      "completion": "conclusão",
+      "biggestDropOff": "Maior abandono"
+    },
+    "value": {
+      "title": "Acompanhamento de Valor",
+      "subtitle": "Tempo até marcos de valor e progressão dos utilizadores nos momentos-chave do produto",
+      "avgCompletion": "Conclusão Média",
+      "totalMilestones": "Total de Marcos",
+      "milestoneProgress": "Progresso dos Marcos"
+    },
+    "milestone": {
+      "FirstSearchSuccess": "Primeira Pesquisa com Sucesso",
+      "FirstServiceLookup": "Primeira Consulta de Serviço",
+      "FirstContractView": "Primeira Visualização de Contrato",
+      "FirstContractDraftCreated": "Primeiro Rascunho de Contrato",
+      "FirstContractPublished": "Primeiro Contrato Publicado",
+      "FirstAiUsefulInteraction": "Primeira Interação Útil com IA",
+      "FirstIncidentInvestigation": "Primeira Investigação de Incidente",
+      "FirstMitigationCompleted": "Primeira Mitigação Concluída",
+      "FirstExecutiveOverviewConsumed": "Primeira Vista Executiva",
+      "FirstRunbookConsulted": "Primeiro Runbook Consultado",
+      "FirstSourceOfTruthUsed": "Primeiro Uso do Source of Truth",
+      "FirstEvidenceExported": "Primeira Evidência Exportada",
+      "FirstReportGenerated": "Primeiro Relatório Gerado",
+      "FirstReliabilityViewed": "Primeira Vista de Fiabilidade",
+      "FirstAutomationCreated": "Primeira Automatização Criada"
+    }
+  },
+  "governancePacks": {
+    "title": "Packs de Governança",
+    "subtitle": "Packs reutilizáveis e versionados de regras de governança para padronização corporativa",
+    "totalPacks": "Total de Packs",
+    "published": "Publicados",
+    "draft": "Rascunho",
+    "deprecated": "Descontinuados",
+    "searchPlaceholder": "Pesquisar packs...",
+    "filterAll": "Todos",
+    "scopes": "Escopos",
+    "rules": "Regras",
+    "status": {
+      "Draft": "Rascunho",
+      "Published": "Publicado",
+      "Deprecated": "Descontinuado",
+      "Archived": "Arquivado"
+    },
+    "category": {
+      "Contracts": "Contratos",
+      "SourceOfTruth": "Source of Truth",
+      "Changes": "Mudanças",
+      "Incidents": "Incidentes",
+      "AIGovernance": "Governança de IA",
+      "Reliability": "Confiabilidade",
+      "Operations": "Operações"
+    },
+    "detail": {
+      "backToPacks": "Voltar aos Packs",
+      "version": "Versão",
+      "waiverCount": "Isenções Ativas",
+      "tabOverview": "Visão Geral",
+      "tabRules": "Regras",
+      "tabScopes": "Escopos",
+      "tabVersions": "Versões",
+      "tabCoverage": "Cobertura",
+      "tabWaivers": "Isenções",
+      "tabSimulation": "Simulação",
+      "overviewTitle": "Visão Geral do Pack",
+      "packName": "Nome do Pack",
+      "category": "Categoria",
+      "status": "Status",
+      "createdAt": "Criado em",
+      "updatedAt": "Atualizado em",
+      "rulesTitle": "Regras Incluídas",
+      "rulesDescription": "Regras aplicadas por este pack de governança",
+      "enforcement": {
+        "Advisory": "Consultivo",
+        "SoftEnforce": "Obrigatório",
+        "HardEnforce": "Bloqueante"
+      },
+      "scopesTitle": "Escopos Aplicados",
+      "scopesDescription": "Escopos onde este pack está aplicado",
+      "scopeType": {
+        "Team": "Equipa",
+        "Domain": "Domínio",
+        "Service": "Serviço",
+        "Environment": "Ambiente",
+        "Global": "Global"
+      },
+      "versionsTitle": "Histórico de Versões",
+      "coverageTitle": "Resumo de Cobertura",
+      "coverageDescription": "Cobertura de conformidade por escopo",
+      "waiversTitle": "Isenções Ativas",
+      "simulationTitle": "Simulação",
+      "simulationDescription": "Execute uma simulação para visualizar o impacto deste pack antes do rollout",
+      "runSimulation": "Executar Simulação",
+      "expiresAt": "Expira em"
+    },
+    "simulation": {
+      "backToPack": "Voltar ao Pack",
+      "title": "Simulação do Pack",
+      "subtitle": "Visualize o impacto de aplicar este pack de governança",
+      "totalAffected": "Total Afetado",
+      "compliant": "Conforme",
+      "nonCompliant": "Não Conforme",
+      "blockingImpacts": "Impactos Bloqueantes",
+      "impactByTeam": "Impacto por Equipa",
+      "affected": "Afetados",
+      "blocking": "Bloqueantes",
+      "impactByDomain": "Impacto por Domínio",
+      "impactedEntities": "Entidades Impactadas",
+      "impactedEntitiesDescription": "Lista detalhada de entidades impactadas por esta simulação",
+      "entityName": "Nome da Entidade",
+      "entityType": "Tipo da Entidade",
+      "currentStatus": "Status Atual",
+      "projectedStatus": "Status Projetado",
+      "blockingLabel": "Bloqueante",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "waivers": {
+      "title": "Exceções e Isenções",
+      "subtitle": "Gerir isenções de governança, exceções e sobrescritas temporárias com trilha de auditoria completa",
+      "totalWaivers": "Total de Isenções",
+      "pendingApproval": "Aprovação Pendente",
+      "approved": "Aprovadas",
+      "expired": "Expiradas",
+      "searchPlaceholder": "Pesquisar isenções...",
+      "filterAll": "Todos",
+      "status": {
+        "Pending": "Pendente",
+        "Approved": "Aprovada",
+        "Rejected": "Rejeitada",
+        "Expired": "Expirada",
+        "Revoked": "Revogada"
+      },
+      "listTitle": "Lista de Isenções",
+      "listDescription": "Todas as isenções de governança e seus status atuais",
+      "scope": "Escopo",
+      "requestedBy": "Solicitado por",
+      "expiresAt": "Expira em",
+      "approve": "Aprovar",
+      "reject": "Rejeitar"
+    }
+  },
+  "domainBadges": {
+    "confidence": {
+      "high": "Confiança Alta",
+      "medium": "Confiança Média",
+      "low": "Confiança Baixa",
+      "unknown": "Desconhecido"
+    },
+    "compatibility": {
+      "compatible": "Compatível",
+      "breaking": "Quebra de Contrato",
+      "additive": "Aditivo",
+      "unknown": "Desconhecido"
+    },
+    "risk": {
+      "critical": "Risco Crítico",
+      "high": "Risco Alto",
+      "medium": "Risco Médio",
+      "low": "Risco Baixo",
+      "none": "Sem Risco"
+    },
+    "freshness": {
+      "fresh": "Atualizado",
+      "stale": "Desatualizado",
+      "outdated": "Obsoleto",
+      "unknown": "Desconhecido"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "major": "Maior",
+      "minor": "Menor",
+      "informational": "Informativo"
+    }
+  },
+  "shell": {
+    "sidebarNav": "Navegação lateral",
+    "mainNavigation": "Navegação principal",
+    "openMenu": "Abrir menu",
+    "mobileMenu": "Menu de navegação móvel",
+    "userMenu": "Menu do utilizador",
+    "myProfile": "O Meu Perfil",
+    "myAccess": "O Meu Acesso",
+    "workspace": "Workspace",
+    "workspaceSwitcher": "Trocar workspace",
+    "defaultWorkspace": "Workspace Predefinido",
+    "environment": "Ambiente",
+    "moduleUnavailable": "Módulo Indisponível",
+    "moduleUnavailableDescription": "Este módulo está temporariamente indisponível. Tente novamente mais tarde.",
+    "moduleUnavailableDescriptionNamed": "O módulo {{module}} está temporariamente indisponível. Tente novamente mais tarde."
   }
 }

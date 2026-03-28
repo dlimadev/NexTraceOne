@@ -92,7 +92,12 @@ operações transacionais do produto e permite escalar cada workload de forma in
                                              │                      │
                                              │  ┌── otel_logs ────┐ │
                                              │  ┌── otel_traces ──┐ │
-                                             │  ┌── otel_metrics ─┐ │
+                                             │  ┌── otel_metrics  ┐ │
+                                             │  │  _gauge         │ │
+                                             │  │  _sum           │ │
+                                             │  │  _histogram     │ │
+                                             │  │  _exp_histogram │ │
+                                             │  │  _summary       │ │
                                              └──────────────────────┘
                                                         │
                                                         ▼
@@ -106,7 +111,7 @@ operações transacionais do produto e permite escalar cada workload de forma in
 
 1. Os serviços do NexTraceOne exportam telemetria via OTLP para o Collector.
 2. O OTel Collector processa, transforma e envia os dados para o ClickHouse.
-3. O ClickHouse armazena na base `nextraceone_obs` em três tabelas dedicadas.
+3. O ClickHouse armazena na base `nextraceone_obs` em sete tabelas dedicadas.
 4. Os dados ficam disponíveis para consulta analítica pelo produto.
 
 **Tabelas:**
@@ -115,7 +120,14 @@ operações transacionais do produto e permite escalar cada workload de forma in
 |---|---|---|
 | `otel_logs` | Logs | 30 dias |
 | `otel_traces` | Traces/Spans | 30 dias |
-| `otel_metrics` | Métricas | 90 dias |
+| `otel_metrics_gauge` | Métricas tipo Gauge | 90 dias |
+| `otel_metrics_sum` | Métricas tipo Sum (counters) | 90 dias |
+| `otel_metrics_histogram` | Histogramas explícitos | 90 dias |
+| `otel_metrics_exponential_histogram` | Histogramas exponenciais | 90 dias |
+| `otel_metrics_summary` | Summaries | 90 dias |
+
+> **Nota:** O `otel-collector-contrib` >= v0.100 usa tabelas separadas por tipo de métrica.
+> O prefixo (`otel_metrics`) é definido por `metrics_table_name` no `otel-collector.yaml`.
 
 ---
 
@@ -131,9 +143,10 @@ docker compose up -d clickhouse
 
 O container irá:
 1. Iniciar o ClickHouse Server 24.8 (Alpine).
-2. Executar automaticamente o script `build/clickhouse/init-schema.sql` via
-   `/docker-entrypoint-initdb.d/`.
-3. Criar a base `nextraceone_obs` e as três tabelas.
+2. Executar automaticamente os scripts `build/clickhouse/init-schema.sql` e
+   `build/clickhouse/analytics-schema.sql` via `/docker-entrypoint-initdb.d/`.
+3. Criar a base `nextraceone_obs` com as tabelas OTEL e a base `nextraceone_analytics`
+   com as tabelas de analytics de domínio.
 
 ### Instalação standalone
 

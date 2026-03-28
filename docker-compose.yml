@@ -111,10 +111,16 @@ services:
       NEXTRACE_AUTO_MIGRATE: ${NEXTRACE_AUTO_MIGRATE:-false}
 
       # Observability
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OpenTelemetry__Endpoint: http://otel-collector:4317
       Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
       Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=${CLICKHOUSE_PASSWORD:-}"
       Telemetry__CollectionMode__ActiveMode: ${COLLECTION_MODE:-OpenTelemetryCollector}
+      Telemetry__CollectionMode__OpenTelemetryCollector__OtlpGrpcEndpoint: http://otel-collector:4317
+      Telemetry__CollectionMode__OpenTelemetryCollector__OtlpHttpEndpoint: http://otel-collector:4318
+      Telemetry__CollectionMode__ClrProfiler__OtlpEndpoint: http://otel-collector:4317
+      Telemetry__Collector__OtlpGrpcEndpoint: http://otel-collector:4317
+      Telemetry__Collector__OtlpHttpEndpoint: http://otel-collector:4318
 
       # Integrity check (desabilitar apenas em CI)
       NEXTRACE_SKIP_INTEGRITY: ${NEXTRACE_SKIP_INTEGRITY:-false}
@@ -150,6 +156,7 @@ services:
 
       ConnectionStrings__NexTraceOne: ${CONNECTION_STRING_NEXTRACEONE:?CONNECTION_STRING_NEXTRACEONE is required}
 
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OpenTelemetry__Endpoint: http://otel-collector:4317
       Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
       Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=${CLICKHOUSE_PASSWORD:-}"
@@ -188,6 +195,7 @@ services:
       Jwt__Issuer: ${JWT_ISSUER:-NexTraceOne}
       Jwt__Audience: ${JWT_AUDIENCE:-NexTraceOne}
 
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OpenTelemetry__Endpoint: http://otel-collector:4317
       Telemetry__ObservabilityProvider__Provider: ${OBSERVABILITY_PROVIDER:-ClickHouse}
       Telemetry__ObservabilityProvider__ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=nextraceone_obs;Username=default;Password=${CLICKHOUSE_PASSWORD:-}"

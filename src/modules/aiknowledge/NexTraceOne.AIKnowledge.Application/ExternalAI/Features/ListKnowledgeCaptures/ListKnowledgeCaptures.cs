@@ -1,5 +1,8 @@
+using Ardalis.GuardClauses;
+
 using FluentValidation;
-using NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
+
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -7,8 +10,8 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.ListKnowledgeCaptures;
 
 /// <summary>
-/// TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-/// This handler will list persisted knowledge captures when knowledge capture is prioritized.
+/// Feature: ListKnowledgeCaptures — lista captures de conhecimento persistidos com filtros
+/// opcionais de status, categoria, tags, texto livre e janela temporal. Suporta paginação.
 /// </summary>
 public static class ListKnowledgeCaptures
 {
@@ -35,13 +38,40 @@ public static class ListKnowledgeCaptures
         }
     }
 
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IKnowledgeCaptureRepository captureRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-            return await Task.FromResult<Result<Response>>(
-                ExternalAiErrors.NotImplemented("Feature pending Phase 03"));
+            Guard.Against.Null(request);
+
+            var (items, total) = await captureRepository.ListAsync(
+                request.Status,
+                request.Category,
+                request.Tags,
+                request.TextFilter,
+                request.From,
+                request.To,
+                request.Page,
+                request.PageSize,
+                cancellationToken);
+
+            var totalPages = (int)Math.Ceiling(total / (double)request.PageSize);
+
+            var mapped = items.Select(c => new CaptureItem(
+                c.Id.Value,
+                c.ConsultationId.Value,
+                c.Title,
+                c.Category,
+                c.Tags,
+                c.Status.ToString(),
+                c.ReuseCount,
+                c.CapturedAt,
+                c.ReviewedBy,
+                c.ReviewedAt,
+                c.RejectionReason)).ToList();
+
+            return new Response(mapped, total, request.Page, request.PageSize, totalPages);
         }
     }
 

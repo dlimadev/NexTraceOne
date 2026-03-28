@@ -27,6 +27,13 @@ services:
         Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
         Maximum Pool Size=20
       Jwt__Secret: NexTraceOne-Development-SecretKey-AtLeast32BytesLong-2024!
+      # OTEL collector is reachable via Docker network name, not localhost
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      Telemetry__CollectionMode__OpenTelemetryCollector__OtlpGrpcEndpoint: http://otel-collector:4317
+      Telemetry__CollectionMode__OpenTelemetryCollector__OtlpHttpEndpoint: http://otel-collector:4318
+      Telemetry__CollectionMode__ClrProfiler__OtlpEndpoint: http://otel-collector:4317
+      Telemetry__Collector__OtlpGrpcEndpoint: http://otel-collector:4317
+      Telemetry__Collector__OtlpHttpEndpoint: http://otel-collector:4318
 
   workers:
     environment:
@@ -36,6 +43,7 @@ services:
         Host=postgres;Port=5432;Database=nextraceone;
         Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
         Maximum Pool Size=20
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
 
   ingestion:
     environment:
@@ -46,6 +54,7 @@ services:
         Username=${POSTGRES_USER:-nextraceone};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required};
         Maximum Pool Size=20
       Jwt__Secret: NexTraceOne-Development-SecretKey-AtLeast32BytesLong-2024!
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
 
   postgres:
     environment:

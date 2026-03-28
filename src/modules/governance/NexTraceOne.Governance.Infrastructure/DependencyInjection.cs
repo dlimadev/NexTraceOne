@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Infrastructure.Persistence;
+using NexTraceOne.Governance.Infrastructure.Persistence.Providers;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 namespace NexTraceOne.Governance.Infrastructure;
@@ -48,6 +49,11 @@ public static class DependencyInjection
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
         services.AddScoped<IEvidencePackageRepository, EvidencePackageRepository>();
         services.AddScoped<IComplianceGapRepository, ComplianceGapRepository>();
+
+        // Platform runtime providers — real data for P03.5 platform status handlers
+        services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
+        services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();
+        services.AddScoped<IPlatformEventProvider, GovernanceEventProvider>();
 
         return services;
     }

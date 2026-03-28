@@ -108,6 +108,36 @@ namespace NexTraceOne.Integrations.Infrastructure.Persistence.Migrations
                     b.Property<int>("ItemsSucceeded")
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("ParsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ParsedChangeType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ParsedCommitSha")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ParsedEnvironment")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ParsedServiceName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ParsedVersion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ProcessingStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("MetadataRecorded");
+
                     b.Property<string>("Result")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -129,6 +159,10 @@ namespace NexTraceOne.Integrations.Infrastructure.Persistence.Migrations
                     b.HasIndex("ConnectorId");
 
                     b.HasIndex("CorrelationId");
+
+                    b.HasIndex("ParsedServiceName");
+
+                    b.HasIndex("ProcessingStatus");
 
                     b.HasIndex("Result");
 

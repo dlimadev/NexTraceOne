@@ -80,7 +80,7 @@ public static class SummarizeReleaseForApproval
                     context,
                     prompt,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
 
                 isFallback = aiSummary.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
             }

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
@@ -10,22 +11,31 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 /// <summary>
 /// Implementacao concreta da porta de roteamento de IA externa.
 /// Encaminha consultas para provider real e aplica fallback explicito e controlado.
+/// Antes de encaminhar, valida a capability contra políticas ativas de ExternalAI —
+/// se uma política activa bloquear o contexto ou requerer aprovação, o pedido é rejeitado.
+/// Em ambiente de produção, aplica regras adicionais de contenção de dados.
 /// </summary>
 public sealed class ExternalAiRoutingPortAdapter : IExternalAIRoutingPort
 {
+    private static readonly HashSet<string> ProductionEnvironmentNames =
+        new(StringComparer.OrdinalIgnoreCase) { "production", "prod", "prd" };
+
     private readonly IAiProviderFactory _providerFactory;
     private readonly IAiModelCatalogService _modelCatalogService;
+    private readonly IExternalAiPolicyRepository _policyRepository;
     private readonly AiRoutingOptions _options;
     private readonly ILogger<ExternalAiRoutingPortAdapter> _logger;
 
     public ExternalAiRoutingPortAdapter(
         IAiProviderFactory providerFactory,
         IAiModelCatalogService modelCatalogService,
+        IExternalAiPolicyRepository policyRepository,
         IOptions<AiRoutingOptions> options,
         ILogger<ExternalAiRoutingPortAdapter> logger)
     {
         _providerFactory = providerFactory;
         _modelCatalogService = modelCatalogService;
+        _policyRepository = policyRepository;
         _options = options.Value;
         _logger = logger;
     }
@@ -34,10 +44,32 @@ public sealed class ExternalAiRoutingPortAdapter : IExternalAIRoutingPort
         string context,
         string query,
         string? preferredProvider = null,
+        string? capability = null,
+        string? environment = null,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query))
             throw new InvalidOperationException("AI query must not be empty.");
+
+        // ── Data protection: validate capability against active ExternalAI policies ──
+        if (!string.IsNullOrWhiteSpace(capability))
+        {
+            var policyViolation = await CheckDataProtectionPoliciesAsync(
+                capability, environment, cancellationToken);
+
+            if (policyViolation is not null)
+            {
+                _logger.LogWarning(
+                    "ExternalAI routing blocked by policy for capability '{Capability}' in environment '{Environment}': {Reason}",
+                    capability, environment ?? "unspecified", policyViolation);
+
+                if (_options.EnableDeterministicFallback)
+                    return BuildPolicyBlockedResponse(capability, policyViolation);
+
+                throw new InvalidOperationException(
+                    $"ExternalAI routing blocked by active policy: {policyViolation}");
+            }
+        }
 
         // Try resolving model from registry; fall back to routing options when registry is empty.
         var resolvedModel = await _modelCatalogService.ResolveDefaultModelAsync("chat", cancellationToken);
@@ -157,4 +189,46 @@ public sealed class ExternalAiRoutingPortAdapter : IExternalAIRoutingPort
                $"Question: {querySnippet}\n" +
                $"Grounding snapshot: {contextSnippet}";
     }
+
+    /// <summary>
+    /// Verifica políticas activas de ExternalAI contra a capability e o ambiente.
+    /// Retorna a razão de bloqueio quando alguma política impede o envio, ou null quando permitido.
+    /// Em produção, qualquer política activa que cubra a capability e requeira aprovação bloqueia.
+    /// </summary>
+    private async Task<string?> CheckDataProtectionPoliciesAsync(
+        string capability,
+        string? environment,
+        CancellationToken ct)
+    {
+        var activePolicies = await _policyRepository.ListActiveAsync(ct);
+
+        if (activePolicies.Count == 0)
+            return null;
+
+        var isProduction = !string.IsNullOrWhiteSpace(environment)
+            && ProductionEnvironmentNames.Contains(environment);
+
+        foreach (var policy in activePolicies)
+        {
+            // A policy that explicitly covers the capability and requires approval always blocks.
+            if (policy.IsContextAllowed(capability) && policy.RequiresApproval)
+            {
+                return $"Policy '{policy.Name}' requires approval for capability '{capability}'.";
+            }
+
+            // In production environments, any active policy that covers the capability blocks
+            // external routing to enforce data-leakage containment.
+            if (isProduction && policy.IsContextAllowed(capability))
+            {
+                return $"Policy '{policy.Name}' blocks external AI routing for capability '{capability}' in production environment.";
+            }
+        }
+
+        return null;
+    }
+
+    private string BuildPolicyBlockedResponse(string capability, string reason)
+        => $"{_options.FallbackPrefix} ExternalAI routing blocked by governance policy for capability '{capability}'. " +
+           $"Reason: {reason} " +
+           "This response is a deterministic fallback. Review ExternalAI policies with your platform administrator.";
 }

@@ -79,7 +79,7 @@ public static class GenerateRobotFrameworkDraft
                     context,
                     prompt,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
 
                 isFallback = generatedContent.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
             }

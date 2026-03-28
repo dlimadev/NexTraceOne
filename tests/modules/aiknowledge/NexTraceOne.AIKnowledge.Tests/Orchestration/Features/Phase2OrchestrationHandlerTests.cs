@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateTestScenarios;
@@ -171,7 +171,7 @@ public sealed class Phase2OrchestrationHandlerTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<GenerateTestScenarios.Handler>>();
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Scenario 1: Happy path\nScenario 2: Error path");
         dateTimeProvider.UtcNow.Returns(FixedNow);
         currentUser.Email.Returns("engineer@nextraceone.io");
@@ -199,7 +199,7 @@ public sealed class Phase2OrchestrationHandlerTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<GenerateTestScenarios.Handler>>();
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Generated scenarios content here");
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -223,7 +223,7 @@ public sealed class Phase2OrchestrationHandlerTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<GenerateTestScenarios.Handler>>();
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<string>(new InvalidOperationException("Provider unreachable")));
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -247,7 +247,7 @@ public sealed class Phase2OrchestrationHandlerTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<GenerateRobotFrameworkDraft.Handler>>();
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("*** Settings ***\nLibrary  RequestsLibrary\n\n*** Test Cases ***\nCreate Payment\n    [Documentation]  Happy path");
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -272,7 +272,7 @@ public sealed class Phase2OrchestrationHandlerTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var logger = Substitute.For<ILogger<GenerateRobotFrameworkDraft.Handler>>();
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("*** Test Cases ***\nBasic test");
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -311,7 +311,7 @@ public sealed class Phase2OrchestrationHandlerTests
                 new("PaymentService", "xunit", "Accepted", 0.9m)
             });
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Executive summary: This release adds payment processing capabilities with low risk.");
         dateTimeProvider.UtcNow.Returns(FixedNow);
         currentUser.Email.Returns("pm@nextraceone.io");
@@ -351,7 +351,7 @@ public sealed class Phase2OrchestrationHandlerTests
         artifactRepo.GetRecentByReleaseAsync(Arg.Any<Guid>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ArtifactSummaryData>());
 
-        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Generic summary without context.");
         dateTimeProvider.UtcNow.Returns(FixedNow);
 

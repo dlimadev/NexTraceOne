@@ -55,7 +55,7 @@ internal sealed class EvidencePackageConfiguration : IEntityTypeConfiguration<Ev
         builder.Property(x => x.RowVersion)
             .IsRowVersion();
 
-        builder.HasMany<EvidenceItem>("_items")
+        builder.HasMany(x => x.Items)
             .WithOne()
             .HasForeignKey(i => i.PackageId)
             .OnDelete(DeleteBehavior.Cascade);

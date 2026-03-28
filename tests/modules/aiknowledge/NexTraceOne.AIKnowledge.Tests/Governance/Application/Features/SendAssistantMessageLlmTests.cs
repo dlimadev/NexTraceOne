@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessage;
@@ -34,6 +34,7 @@ public sealed class SendAssistantMessageLlmTests
     private readonly IDatabaseRetrievalService _dbRetrieval = Substitute.For<IDatabaseRetrievalService>();
     private readonly ITelemetryRetrievalService _telRetrieval = Substitute.For<ITelemetryRetrievalService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
+    private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public SendAssistantMessageLlmTests()
@@ -67,7 +68,7 @@ public sealed class SendAssistantMessageLlmTests
         _modelCatalog, _modelAuth,
         _routingPort, _providerFactory,
         _docRetrieval, _dbRetrieval, _telRetrieval,
-        _currentUser, _clock,
+        _currentUser, _currentEnvironment, _clock,
         NullLogger<SendAssistantMessage.Handler>.Instance);
 
     private IChatCompletionProvider MockProvider(string content, int promptTokens = 50, int completionTokens = 120)
@@ -174,7 +175,7 @@ public sealed class SendAssistantMessageLlmTests
     {
         const string routedResponse = "Routed response from external gateway.";
         _providerFactory.GetChatProvider(Arg.Any<string>()).Returns((IChatCompletionProvider?)null);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(routedResponse);
 
         var result = await CreateHandler().Handle(
@@ -192,7 +193,7 @@ public sealed class SendAssistantMessageLlmTests
         result.IsSuccess.Should().BeTrue();
         result.Value!.AssistantResponse.Should().Be(routedResponse);
         await _routingPort.Received(1).RouteQueryAsync(
-            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     // ── Test 5: model ID and provider ID from result are reflected in response

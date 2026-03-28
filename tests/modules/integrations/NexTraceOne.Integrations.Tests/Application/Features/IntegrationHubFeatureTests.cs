@@ -10,7 +10,10 @@ using NexTraceOne.Integrations.Application.Features.RetryConnector;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
 using NexTraceOne.Integrations.Domain.Enums;
+using MediatR;
 using NSubstitute;
+using NexTraceOne.BuildingBlocks.Core.Results;
+using ProcessIngestionPayloadFeature = NexTraceOne.Integrations.Application.Features.ProcessIngestionPayload.ProcessIngestionPayload;
 
 namespace NexTraceOne.Integrations.Tests.Application.Features;
 
@@ -25,6 +28,7 @@ public sealed class IntegrationHubFeatureTests
     private readonly IIngestionExecutionRepository _executionRepository = Substitute.For<IIngestionExecutionRepository>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly ISender _sender = Substitute.For<ISender>();
 
     public IntegrationHubFeatureTests()
     {
@@ -369,8 +373,11 @@ public sealed class IntegrationHubFeatureTests
             .Returns(originalExecution);
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(1));
+        _sender.Send(Arg.Any<ProcessIngestionPayloadFeature.Command>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(Result<ProcessIngestionPayloadFeature.Response>.Success(
+                new ProcessIngestionPayloadFeature.Response(Guid.NewGuid(), "metadata_recorded"))));
 
-        var handler = new ReprocessExecution.Handler(_executionRepository, _unitOfWork, _clock);
+        var handler = new ReprocessExecution.Handler(_executionRepository, _unitOfWork, _clock, _sender);
         var command = new ReprocessExecution.Command(originalExecution.Id.Value.ToString());
 
         // Act
@@ -386,7 +393,7 @@ public sealed class IntegrationHubFeatureTests
     public async Task ReprocessExecution_InvalidGuidFormat_ShouldReturnValidationError()
     {
         // Arrange
-        var handler = new ReprocessExecution.Handler(_executionRepository, _unitOfWork, _clock);
+        var handler = new ReprocessExecution.Handler(_executionRepository, _unitOfWork, _clock, _sender);
         var command = new ReprocessExecution.Command("not-a-guid");
 
         // Act

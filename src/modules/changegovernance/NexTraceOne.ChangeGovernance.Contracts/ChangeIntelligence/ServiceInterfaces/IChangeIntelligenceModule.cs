@@ -1,7 +1,5 @@
 namespace NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — no implementation exists, no consumers.
-
 /// <summary>
 /// Interface pública do módulo ChangeIntelligence.
 /// Outros módulos que precisarem de dados deste módulo devem usar

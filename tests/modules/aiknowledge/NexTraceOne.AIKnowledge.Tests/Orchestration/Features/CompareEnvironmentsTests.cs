@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -33,7 +33,7 @@ public sealed class CompareEnvironmentsTests
     public async Task Handle_ShouldReturnComparison_WithDivergencesAndRecommendation()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("DIVERGENCE: HIGH | contracts | OrderService v2.1 in QA has breaking changes vs v2.0 in Production\n" +
                      "DIVERGENCE: MEDIUM | telemetry | P99 latency 40% higher in QA\n" +
                      "PROMOTION_RECOMMENDATION: BLOCK_PROMOTION\n" +
@@ -55,7 +55,7 @@ public sealed class CompareEnvironmentsTests
         string? capturedGrounding = null;
         _routingPort.RouteQueryAsync(
             Arg.Do<string>(g => capturedGrounding = g),
-            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("PROMOTION_RECOMMENDATION: SAFE_TO_PROMOTE\nSUMMARY: Environments look aligned.");
 
         await CreateHandler().Handle(DefaultCommand(tenantId: "tenant-acme-001"), CancellationToken.None);
@@ -87,7 +87,7 @@ public sealed class CompareEnvironmentsTests
     public async Task Handle_ShouldReturnSafeToPromote_WhenNoDivergences()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("PROMOTION_RECOMMENDATION: SAFE_TO_PROMOTE\nSUMMARY: Environments are well-aligned.");
 
         var result = await CreateHandler().Handle(DefaultCommand(), CancellationToken.None);

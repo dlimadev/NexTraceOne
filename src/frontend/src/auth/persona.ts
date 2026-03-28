@@ -38,8 +38,8 @@ export function derivePersona(roleName: string): Persona {
     Developer: 'Engineer',
     Viewer: 'Product',
     Auditor: 'Auditor',
-    SecurityReview: 'Architect',
-    ApprovalOnly: 'Executive',
+    SecurityReview: 'Auditor',
+    ApprovalOnly: 'TechLead',
   };
   return mapping[roleName as AppRole] ?? 'Engineer';
 }
@@ -212,7 +212,7 @@ const executiveConfig: PersonaConfig = {
     { id: 'confidence-indicators', titleKey: 'persona.Executive.widgets.confidenceIndicators', type: 'releaseConfidence' },
   ],
   quickActions: [
-    { id: 'executive-overview', labelKey: 'persona.Executive.actions.openExecutiveOverview', icon: 'BarChart3', to: '/governance/reports' },
+    { id: 'executive-overview', labelKey: 'persona.Executive.actions.openExecutiveOverview', icon: 'BarChart3', to: '/governance/executive' },
     { id: 'operational-trend', labelKey: 'persona.Executive.actions.reviewOperationalTrend', icon: 'Activity', to: '/governance/risk' },
     { id: 'inspect-domains', labelKey: 'persona.Executive.actions.inspectCriticalDomains', icon: 'Server', to: '/services' },
     { id: 'view-compliance', labelKey: 'persona.Executive.actions.viewCompliance', icon: 'Scale', to: '/governance/compliance' },
@@ -239,7 +239,7 @@ const platformAdminConfig: PersonaConfig = {
   quickActions: [
     { id: 'manage-policies', labelKey: 'persona.PlatformAdmin.actions.managePolicies', icon: 'ShieldCheck', to: '/ai/policies' },
     { id: 'manage-models', labelKey: 'persona.PlatformAdmin.actions.manageAiModels', icon: 'Database', to: '/ai/models' },
-    { id: 'configure-integrations', labelKey: 'persona.PlatformAdmin.actions.configureIntegrations', icon: 'Settings', to: '/users' },
+    { id: 'configure-integrations', labelKey: 'persona.PlatformAdmin.actions.configureIntegrations', icon: 'Settings', to: '/integrations' },
     { id: 'review-coverage', labelKey: 'persona.PlatformAdmin.actions.reviewPlatformCoverage', icon: 'BarChart3', to: '/governance/reports' },
   ],
   aiContextScopes: ['governance', 'policies', 'models'],

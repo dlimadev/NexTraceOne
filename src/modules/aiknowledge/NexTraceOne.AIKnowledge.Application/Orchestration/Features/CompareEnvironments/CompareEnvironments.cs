@@ -68,7 +68,7 @@ public static class CompareEnvironments
             bool isFallback;
             try
             {
-                aiContent = await externalAiRoutingPort.RouteQueryAsync(groundingContext, query, request.PreferredProvider, cancellationToken);
+                aiContent = await externalAiRoutingPort.RouteQueryAsync(groundingContext, query, request.PreferredProvider, cancellationToken: cancellationToken);
                 isFallback = aiContent.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception ex)

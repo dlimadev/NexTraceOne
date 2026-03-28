@@ -36,6 +36,13 @@ const ALLOWED_INTERNAL_PATHS = [
   '/access-reviews',
   '/my-sessions',
   '/unauthorized',
+  '/changes',
+  '/analytics',
+  '/integrations',
+  '/environments',
+  '/search',
+  '/platform',
+  '/source-of-truth',
 ] as const;
 
 /**

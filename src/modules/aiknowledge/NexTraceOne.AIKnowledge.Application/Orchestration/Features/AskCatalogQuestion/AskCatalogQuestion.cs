@@ -59,7 +59,7 @@ public static class AskCatalogQuestion
                     groundingPrompt,
                     request.Question,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
             }
             catch (Exception ex)
             {

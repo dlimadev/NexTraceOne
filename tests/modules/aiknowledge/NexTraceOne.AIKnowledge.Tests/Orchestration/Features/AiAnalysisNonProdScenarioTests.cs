@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeNonProdEnvironment;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotionReadiness;
@@ -36,7 +36,7 @@ public sealed class AiAnalysisNonProdScenarioTests
         // SCENARIO: A QA environment has a service with a breaking contract change.
         // The AI should detect this and flag it as HIGH risk to prevent it reaching production.
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "FINDING: HIGH | contract-drift | payment-service v2.1 has a breaking change in /payments response schema\n" +
                 "FINDING: MEDIUM | error-rate | order-service error rate is 12% above baseline\n" +
@@ -76,7 +76,7 @@ public sealed class AiAnalysisNonProdScenarioTests
         // SCENARIO: UAT has topology changes compared to production.
         // The AI compares UAT (subject) vs PROD (reference) and detects divergences.
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "DIVERGENCE: HIGH | topology | catalog-service is missing in UAT but present in PROD\n" +
                 "DIVERGENCE: HIGH | contracts | notifications-service has schema mismatch (UAT v3 vs PROD v2)\n" +
@@ -116,7 +116,7 @@ public sealed class AiAnalysisNonProdScenarioTests
         // SCENARIO: payment-service v2.1.0 is in STAGING and being assessed for promotion to PROD.
         // The AI finds a blocking contract issue and recommends blocking.
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "READINESS_SCORE: 42\n" +
                 "READINESS_LEVEL: NOT_READY\n" +
@@ -159,7 +159,7 @@ public sealed class AiAnalysisNonProdScenarioTests
     {
         // SCENARIO: api-gateway v1.5.0 is in STAGING and ready for promotion.
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "READINESS_SCORE: 94\n" +
                 "READINESS_LEVEL: READY\n" +
@@ -186,7 +186,7 @@ public sealed class AiAnalysisNonProdScenarioTests
     public async Task Scenario_HMLAnalysis_MediumRisk_ShouldRequireReview()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "FINDING: MEDIUM | telemetry | checkout-service error rate elevated (8% vs 2% baseline)\n" +
                 "FINDING: LOW | topology | recommendation-service has 1 degraded instance\n" +
@@ -212,7 +212,7 @@ public sealed class AiAnalysisNonProdScenarioTests
     public async Task Scenario_DevEnvironmentAnalysis_LowRisk_ShouldBeIdentifiedAsNonCritical()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "OVERALL_RISK: LOW\n" +
                 "RECOMMENDATION: No critical signals. Environment is in expected development state.");
@@ -239,7 +239,7 @@ public sealed class AiAnalysisNonProdScenarioTests
         string? capturedGrounding = null;
         _routingPort.RouteQueryAsync(
             Arg.Do<string>(g => capturedGrounding = g),
-            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("READINESS_SCORE: 80\nREADINESS_LEVEL: NEEDS_REVIEW\nSHOULD_BLOCK: NO\nSUMMARY: Minor concerns only.");
 
         var handler = new AssessPromotionReadiness.Handler(_routingPort, _dateTimeProvider, _readinessLogger);
@@ -264,7 +264,7 @@ public sealed class AiAnalysisNonProdScenarioTests
         string? capturedGrounding = null;
         _routingPort.RouteQueryAsync(
             Arg.Do<string>(g => capturedGrounding = g),
-            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("PROMOTION_RECOMMENDATION: REVIEW_REQUIRED\nSUMMARY: Some contract drift found.");
 
         var handler = new CompareEnvironments.Handler(_routingPort, _dateTimeProvider, _compareLogger);

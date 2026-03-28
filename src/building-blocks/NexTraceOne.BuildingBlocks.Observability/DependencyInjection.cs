@@ -52,7 +52,12 @@ public static class DependencyInjection
             configuration.GetSection(TelemetryStoreOptions.SectionName));
 
         var serviceName = configuration["OpenTelemetry:ServiceName"] ?? "NexTraceOne";
-        var otlpEndpoint = configuration["OpenTelemetry:Endpoint"];
+        // Canonical OTLP endpoint: Telemetry:Collector:OtlpGrpcEndpoint (canonical path).
+        // OpenTelemetry:Endpoint is kept as backwards-compatible fallback.
+        // OTEL_EXPORTER_OTLP_ENDPOINT env var takes precedence (standard SDK convention).
+        var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+            ?? configuration["Telemetry:Collector:OtlpGrpcEndpoint"]
+            ?? configuration["OpenTelemetry:Endpoint"];
 
         services.AddOpenTelemetry()
             .ConfigureResource(resource => resource

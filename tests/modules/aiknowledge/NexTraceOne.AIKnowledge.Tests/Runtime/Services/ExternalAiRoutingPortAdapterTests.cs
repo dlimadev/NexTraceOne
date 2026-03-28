@@ -3,7 +3,9 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 
@@ -65,6 +67,14 @@ public sealed class ExternalAiRoutingPortAdapterTests
     private static ILogger<ExternalAiRoutingPortAdapter> CreateLogger()
         => Substitute.For<ILogger<ExternalAiRoutingPortAdapter>>();
 
+    private static IExternalAiPolicyRepository CreatePolicyRepository(params ExternalAiPolicy[] policies)
+    {
+        var repo = Substitute.For<IExternalAiPolicyRepository>();
+        var list = (IReadOnlyList<ExternalAiPolicy>)policies.ToList();
+        repo.ListActiveAsync(Arg.Any<CancellationToken>()).Returns(list);
+        return repo;
+    }
+
     // ── Tests ────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -76,10 +86,11 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var adapter = new ExternalAiRoutingPortAdapter(
             CreateFactory(ollamaProvider),
             CreateCatalog(resolvedModel),
+            CreatePolicyRepository(),
             CreateOptions(),
             CreateLogger());
 
-        var result = await adapter.RouteQueryAsync("context", "what is this?");
+        var result = await adapter.RouteQueryAsync("context", "test query");
 
         result.Should().Be("Hello from Ollama");
     }
@@ -92,6 +103,7 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var adapter = new ExternalAiRoutingPortAdapter(
             CreateFactory(ollamaProvider),
             CreateCatalog(null),             // empty registry
+            CreatePolicyRepository(),
             CreateOptions("ollama", "deepseek-r1:1.5b"),
             CreateLogger());
 
@@ -108,6 +120,7 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var adapter = new ExternalAiRoutingPortAdapter(
             CreateFactory(failingProvider),
             CreateCatalog(null),
+            CreatePolicyRepository(),
             CreateOptions("ollama", "deepseek-r1:1.5b", fallbackEnabled: true),
             CreateLogger());
 
@@ -127,6 +140,7 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var adapter = new ExternalAiRoutingPortAdapter(
             emptyFactory,
             CreateCatalog(null),
+            CreatePolicyRepository(),
             CreateOptions("ollama", "deepseek-r1:1.5b", fallbackEnabled: true),
             CreateLogger());
 
@@ -141,6 +155,7 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var adapter = new ExternalAiRoutingPortAdapter(
             Substitute.For<IAiProviderFactory>(),
             CreateCatalog(null),
+            CreatePolicyRepository(),
             CreateOptions(),
             CreateLogger());
 
@@ -165,6 +180,7 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var adapter = new ExternalAiRoutingPortAdapter(
             factory,
             CreateCatalog(resolvedModel),
+            CreatePolicyRepository(),
             CreateOptions(preferredProvider: "openai", preferredModel: "gpt-4o-mini"),
             CreateLogger());
 
@@ -172,5 +188,79 @@ public sealed class ExternalAiRoutingPortAdapterTests
         var result = await adapter.RouteQueryAsync("ctx", "question");
 
         result.Should().Be("OpenAI response");
+    }
+
+    [Fact]
+    public async Task RouteQueryAsync_ShouldReturnPolicyFallback_WhenCapabilityRequiresApproval()
+    {
+        var ollamaProvider = CreateChatProvider("ollama", "Should not reach this");
+        var policy = ExternalAiPolicy.Create(
+            "approval-policy", "desc", 100, 1000, requiresApproval: true,
+            "ChangeAnalysis,ErrorDiagnosis", DateTimeOffset.UtcNow);
+
+        var adapter = new ExternalAiRoutingPortAdapter(
+            CreateFactory(ollamaProvider),
+            CreateCatalog(null),
+            CreatePolicyRepository(policy),
+            CreateOptions("ollama", "deepseek-r1:1.5b", fallbackEnabled: true),
+            CreateLogger());
+
+        var result = await adapter.RouteQueryAsync(
+            "ctx", "analyse this change",
+            capability: "ChangeAnalysis",
+            environment: null);
+
+        result.Should().StartWith("[FALLBACK_PROVIDER_UNAVAILABLE]");
+        result.Should().Contain("ChangeAnalysis");
+        result.Should().Contain("approval");
+    }
+
+    [Fact]
+    public async Task RouteQueryAsync_ShouldReturnPolicyFallback_WhenCapabilityInProductionAndPolicyCoverIt()
+    {
+        var ollamaProvider = CreateChatProvider("ollama", "Should not reach this");
+        // Policy does NOT require approval but covers the capability
+        var policy = ExternalAiPolicy.Create(
+            "production-data-guard", "desc", 100, 1000, requiresApproval: false,
+            "IncidentAnalysis", DateTimeOffset.UtcNow);
+
+        var adapter = new ExternalAiRoutingPortAdapter(
+            CreateFactory(ollamaProvider),
+            CreateCatalog(null),
+            CreatePolicyRepository(policy),
+            CreateOptions("ollama", "deepseek-r1:1.5b", fallbackEnabled: true),
+            CreateLogger());
+
+        var result = await adapter.RouteQueryAsync(
+            "ctx", "diagnose incident",
+            capability: "IncidentAnalysis",
+            environment: "production");
+
+        result.Should().StartWith("[FALLBACK_PROVIDER_UNAVAILABLE]");
+        result.Should().Contain("production environment");
+    }
+
+    [Fact]
+    public async Task RouteQueryAsync_ShouldProceedNormally_WhenCapabilityNotCoveredByAnyPolicy()
+    {
+        var ollamaProvider = CreateChatProvider("ollama", "Normal response");
+        // Policy covers a different capability
+        var policy = ExternalAiPolicy.Create(
+            "limited-policy", "desc", 100, 1000, requiresApproval: true,
+            "ChangeAnalysis", DateTimeOffset.UtcNow);
+
+        var adapter = new ExternalAiRoutingPortAdapter(
+            CreateFactory(ollamaProvider),
+            CreateCatalog(null),
+            CreatePolicyRepository(policy),
+            CreateOptions("ollama", "deepseek-r1:1.5b"),
+            CreateLogger());
+
+        var result = await adapter.RouteQueryAsync(
+            "ctx", "query about contracts",
+            capability: "ContractLookup",
+            environment: "production");
+
+        result.Should().Be("Normal response");
     }
 }

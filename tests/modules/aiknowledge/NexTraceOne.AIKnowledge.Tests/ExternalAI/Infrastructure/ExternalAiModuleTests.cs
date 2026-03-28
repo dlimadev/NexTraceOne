@@ -84,7 +84,7 @@ public sealed class ExternalAiModuleTests
 
         var sut = CreateSut(db);
 
-        var result = await sut.RouteRequestAsync("change-analysis", "preferred", CancellationToken.None);
+        var result = await sut.RouteRequestAsync("change-analysis", "preferred", ct: CancellationToken.None);
 
         result.Should().NotBeNull();
         result!.ProviderName.Should().Be("preferred");
@@ -102,7 +102,7 @@ public sealed class ExternalAiModuleTests
 
         var sut = CreateSut(db);
 
-        var result = await sut.RouteRequestAsync("change-analysis", "missing-provider", CancellationToken.None);
+        var result = await sut.RouteRequestAsync("change-analysis", "missing-provider", ct: CancellationToken.None);
 
         result.Should().NotBeNull();
         result!.ProviderName.Should().Be("primary");
@@ -119,9 +119,42 @@ public sealed class ExternalAiModuleTests
 
         var sut = CreateSut(db);
 
-        var result = await sut.RouteRequestAsync("change-analysis", null, CancellationToken.None);
+        var result = await sut.RouteRequestAsync("change-analysis", null, ct: CancellationToken.None);
 
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task RouteRequestAsync_WhenEnvironmentIsProduction_ShouldReturnNull_WhenActivePolicyCoverCapability()
+    {
+        await using var db = CreateDbContext();
+        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        // Policy does NOT require approval but covers the capability — production block applies
+        db.Policies.Add(ExternalAiPolicy.Create("prod-guard", "desc", 100, 1000, false, "change-analysis", FixedNow));
+        await db.SaveChangesAsync();
+
+        var sut = CreateSut(db);
+
+        var result = await sut.RouteRequestAsync("change-analysis", null, "production", CancellationToken.None);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task RouteRequestAsync_WhenEnvironmentIsNotProduction_ShouldProceed_EvenWhenPolicyCoverCapability()
+    {
+        await using var db = CreateDbContext();
+        db.Providers.Add(ExternalAiProvider.Register("primary", "http://primary", "gpt-4o", 4096, 0.001m, 1, FixedNow));
+        // Policy covers capability but does not require approval; environment is non-production
+        db.Policies.Add(ExternalAiPolicy.Create("dev-policy", "desc", 100, 1000, false, "change-analysis", FixedNow));
+        await db.SaveChangesAsync();
+
+        var sut = CreateSut(db);
+
+        var result = await sut.RouteRequestAsync("change-analysis", null, "development", CancellationToken.None);
+
+        result.Should().NotBeNull();
+        result!.ProviderName.Should().Be("primary");
     }
 
     private static ExternalAiDbContext CreateDbContext()

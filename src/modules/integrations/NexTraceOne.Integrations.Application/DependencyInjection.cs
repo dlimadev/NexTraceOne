@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Application.Parsing;
 
 namespace NexTraceOne.Integrations.Application;
 
@@ -17,6 +19,7 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksApplication(configuration);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+        services.AddSingleton<IIngestionPayloadParser, GenericIngestionPayloadParser>();
         return services;
     }
 }

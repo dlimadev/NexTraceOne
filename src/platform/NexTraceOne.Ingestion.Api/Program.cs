@@ -17,6 +17,7 @@ using NexTraceOne.Integrations.Domain.Entities;
 using Serilog;
 using System.Diagnostics;
 using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
+using ProcessIngestionPayloadFeature = NexTraceOne.Integrations.Application.Features.ProcessIngestionPayload.ProcessIngestionPayload;
 
 /// <summary>
 /// Ponto de entrada do NexTraceOne Ingestion API.
@@ -270,11 +271,38 @@ deployments.MapPost("/events", async (
         }
     }
 
+    // ── Semantic payload processing ───────────────────────────────────────────
+    // Only triggered when release was NOT already correlated via NotifyDeployment.
+    // "release_correlated" supersedes "processed" — no need to parse again when
+    // the full correlation pipeline already ran successfully.
+    string processingStatus;
+    if (releaseId.HasValue)
+    {
+        processingStatus = "release_correlated";
+    }
+    else
+    {
+        try
+        {
+            var rawPayload = System.Text.Json.JsonSerializer.Serialize(request);
+            var processCmd = new ProcessIngestionPayloadFeature.Command(execution.Id.Value, rawPayload);
+            var processResult = await sender.Send(processCmd, ct);
+            processingStatus = processResult.IsSuccess ? processResult.Value.Status : "metadata_recorded";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Failed to dispatch ProcessIngestionPayload for execution {ExecutionId} — falling back to metadata_recorded",
+                execution.Id.Value);
+            processingStatus = "metadata_recorded";
+        }
+    }
+
     return Results.Accepted(null, new
     {
         message = "Deployment event received",
         status = "accepted",
-        processingStatus = releaseId.HasValue ? "release_correlated" : "metadata_recorded",
+        processingStatus,
         correlationId,
         executionId = execution.Id.Value,
         releaseId,
@@ -297,6 +325,8 @@ promotions.MapPost("/events", async (
     IIngestionExecutionRepository executionRepo,
     IUnitOfWork unitOfWork,
     IDateTimeProvider clock,
+    ISender sender,
+    ILogger<Program> logger,
     CancellationToken ct) =>
 {
     var correlationId = ResolveCorrelationId(httpContext, request.CorrelationId);
@@ -331,12 +361,28 @@ promotions.MapPost("/events", async (
     await connectorRepo.UpdateAsync(connector, ct);
     await unitOfWork.CommitAsync(ct);
 
+    // ── Semantic payload processing ───────────────────────────────────────────
+    string processingStatus;
+    try
+    {
+        var rawPayload = System.Text.Json.JsonSerializer.Serialize(request);
+        var processCmd = new ProcessIngestionPayloadFeature.Command(execution.Id.Value, rawPayload);
+        var processResult = await sender.Send(processCmd, ct);
+        processingStatus = processResult.IsSuccess ? processResult.Value.Status : "metadata_recorded";
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex,
+            "Failed to dispatch ProcessIngestionPayload for promotion execution {ExecutionId}",
+            execution.Id.Value);
+        processingStatus = "metadata_recorded";
+    }
+
     return Results.Accepted(null, new
     {
         message = "Promotion event received",
         status = "accepted",
-        processingStatus = "metadata_recorded",
-        note = "Event metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
+        processingStatus,
         correlationId,
         executionId = execution.Id.Value
     });

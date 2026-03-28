@@ -101,6 +101,7 @@ public static class SendAssistantMessage
         IDatabaseRetrievalService databaseRetrievalService,
         ITelemetryRetrievalService telemetryRetrievalService,
         ICurrentUser currentUser,
+        ICurrentEnvironment currentEnvironment,
         IDateTimeProvider dateTimeProvider,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
@@ -312,11 +313,17 @@ public static class SendAssistantMessage
                         "No local provider registered for {ProviderId}; routing via IExternalAIRoutingPort",
                         selectedProvider);
 
+                    var routingEnvironment = currentEnvironment.IsResolved && currentEnvironment.IsProductionLike
+                        ? "production"
+                        : null;
+
                     grounded = await externalAiRoutingPort.RouteQueryAsync(
                         groundingContext,
                         request.Message,
-                        selectedProvider,
-                        cancellationToken);
+                        preferredProvider: selectedProvider,
+                        capability: useCaseType.ToString(),
+                        environment: routingEnvironment,
+                        cancellationToken: cancellationToken);
 
                     promptTokens = Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
                     completionTokens = Math.Max(1, grounded.Length / 4);

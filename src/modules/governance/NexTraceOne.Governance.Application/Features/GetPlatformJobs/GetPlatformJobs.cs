@@ -1,12 +1,15 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetPlatformJobs;
 
 /// <summary>
-/// Feature: GetPlatformJobs — listagem e monitorização de background jobs da plataforma.
-/// Permite filtro por estado e paginação para operadores e administradores da plataforma.
+/// Feature: GetPlatformJobs — listagem dos background jobs conhecidos da plataforma.
+/// Os jobs executam no processo BackgroundWorkers (separado do ApiHost).
+/// O estado de execução em runtime é honestamente reportado como desconhecido;
+/// os nomes e descrições são derivados do catálogo real de jobs da plataforma.
 /// </summary>
 public static class GetPlatformJobs
 {
@@ -16,56 +19,25 @@ public static class GetPlatformJobs
         int? Page = null,
         int? PageSize = null) : IQuery<Response>;
 
-    /// <summary>Handler que retorna lista paginada de background jobs com métricas de execução.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que retorna o catálogo real de background jobs via IPlatformJobStatusProvider.</summary>
+    public sealed class Handler(IPlatformJobStatusProvider jobProvider) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // TODO [P03.5]: Replace static job snapshots with real scheduler/job monitor integration
-            // when a platform job status contract is exposed for Governance.
-            var now = DateTimeOffset.UtcNow;
+            var snapshots = await jobProvider.GetJobSnapshotsAsync(cancellationToken);
 
-            var allJobs = new List<BackgroundJobSummaryDto>
-            {
-                new(
-                    JobId: "job-outbox-processor",
-                    Name: "Outbox Processor",
-                    Status: BackgroundJobStatus.Running,
-                    LastRunAt: now.AddMinutes(-2),
-                    NextRunAt: now.AddSeconds(30),
-                    ExecutionCount: 14832,
-                    FailureCount: 3,
-                    LastError: null),
-                new(
-                    JobId: "job-identity-expiration",
-                    Name: "Identity Expiration",
-                    Status: BackgroundJobStatus.Completed,
-                    LastRunAt: now.AddMinutes(-15),
-                    NextRunAt: now.AddMinutes(45),
-                    ExecutionCount: 720,
+            var allJobs = snapshots
+                .Select(s => new BackgroundJobSummaryDto(
+                    JobId: s.JobId,
+                    Name: s.Name,
+                    Status: BackgroundJobStatus.Stale,
+                    LastRunAt: null,
+                    NextRunAt: null,
+                    ExecutionCount: 0,
                     FailureCount: 0,
-                    LastError: null),
-                new(
-                    JobId: "job-analytics-aggregation",
-                    Name: "Analytics Aggregation",
-                    Status: BackgroundJobStatus.Completed,
-                    LastRunAt: now.AddMinutes(-5),
-                    NextRunAt: now.AddMinutes(55),
-                    ExecutionCount: 2160,
-                    FailureCount: 7,
-                    LastError: null),
-                new(
-                    JobId: "job-ingestion-pipeline",
-                    Name: "Ingestion Pipeline",
-                    Status: BackgroundJobStatus.Running,
-                    LastRunAt: now.AddMinutes(-1),
-                    NextRunAt: now.AddSeconds(15),
-                    ExecutionCount: 43210,
-                    FailureCount: 12,
-                    LastError: null)
-            };
+                    LastError: s.Description))
+                .ToList();
 
-            // Aplicar filtro de estado se especificado
             var filtered = allJobs.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(request.StatusFilter)
                 && Enum.TryParse<BackgroundJobStatus>(request.StatusFilter, ignoreCase: true, out var statusFilter))
@@ -78,13 +50,11 @@ public static class GetPlatformJobs
             var items = filtered.ToList();
             var paged = items.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            var response = new Response(
+            return Result<Response>.Success(new Response(
                 Jobs: paged,
                 TotalCount: items.Count,
                 Page: page,
-                PageSize: pageSize);
-
-            return Task.FromResult(Result<Response>.Success(response));
+                PageSize: pageSize));
         }
     }
 
@@ -95,12 +65,16 @@ public static class GetPlatformJobs
         int Page,
         int PageSize);
 
-    /// <summary>Resumo de execução de um background job.</summary>
+    /// <summary>
+    /// Resumo de um background job.
+    /// LastRunAt é null quando o estado de execução não está disponível
+    /// (BackgroundWorkers é processo separado do ApiHost).
+    /// </summary>
     public sealed record BackgroundJobSummaryDto(
         string JobId,
         string Name,
         BackgroundJobStatus Status,
-        DateTimeOffset LastRunAt,
+        DateTimeOffset? LastRunAt,
         DateTimeOffset? NextRunAt,
         long ExecutionCount,
         long FailureCount,

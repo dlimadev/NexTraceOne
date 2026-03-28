@@ -240,13 +240,15 @@ public sealed class OpenTelemetryCollectorModeOptions
 
     /// <summary>
     /// Endpoint gRPC do Collector OTLP (ex: "http://otel-collector:4317").
+    /// Obrigatório — configurar via appsettings.{Environment}.json ou variável de ambiente.
     /// </summary>
-    public string OtlpGrpcEndpoint { get; set; } = "http://localhost:4317";
+    public string OtlpGrpcEndpoint { get; set; } = string.Empty;
 
     /// <summary>
     /// Endpoint HTTP do Collector OTLP (ex: "http://otel-collector:4318").
+    /// Obrigatório — configurar via appsettings.{Environment}.json ou variável de ambiente.
     /// </summary>
-    public string OtlpHttpEndpoint { get; set; } = "http://localhost:4318";
+    public string OtlpHttpEndpoint { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -278,8 +280,9 @@ public sealed class ClrProfilerModeOptions
     /// <summary>
     /// Endpoint OTLP do destino de exportação.
     /// Quando ExportTarget = "Collector", aponta para o OTel Collector.
+    /// Obrigatório — configurar via appsettings.{Environment}.json ou variável de ambiente.
     /// </summary>
-    public string OtlpEndpoint { get; set; } = "http://localhost:4317";
+    public string OtlpEndpoint { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -290,16 +293,17 @@ public sealed class ClrProfilerModeOptions
 public sealed class CollectorOptions
 {
     /// <summary>
-    /// Endpoint gRPC do Collector OTLP (ex: "http://localhost:4317").
-    /// Usado por receivers OTLP para ingestão de traces, metrics e logs.
+    /// Endpoint gRPC do Collector OTLP (ex: "http://otel-collector:4317").
+    /// Obrigatório — configurar via appsettings.{Environment}.json ou variável de ambiente.
     /// </summary>
-    public string OtlpGrpcEndpoint { get; set; } = "http://localhost:4317";
+    public string OtlpGrpcEndpoint { get; set; } = string.Empty;
 
     /// <summary>
-    /// Endpoint HTTP do Collector OTLP (ex: "http://localhost:4318").
+    /// Endpoint HTTP do Collector OTLP (ex: "http://otel-collector:4318").
     /// Alternativa HTTP para ambientes que não suportam gRPC.
+    /// Obrigatório — configurar via appsettings.{Environment}.json ou variável de ambiente.
     /// </summary>
-    public string OtlpHttpEndpoint { get; set; } = "http://localhost:4318";
+    public string OtlpHttpEndpoint { get; set; } = string.Empty;
 
     /// <summary>
     /// Habilita o receiver Prometheus no Collector para scraping de métricas.

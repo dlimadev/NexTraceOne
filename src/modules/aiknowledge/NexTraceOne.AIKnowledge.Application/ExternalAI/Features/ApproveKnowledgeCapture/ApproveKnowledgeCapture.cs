@@ -1,13 +1,19 @@
+using Ardalis.GuardClauses;
+
 using FluentValidation;
+
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.ApproveKnowledgeCapture;
 
 /// <summary>
-/// TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-/// This handler will implement capture approval workflow when knowledge capture is prioritized.
+/// Feature: ApproveKnowledgeCapture — aprova uma captura de conhecimento pendente,
+/// tornando-a disponível para reutilização. Rejeita se já tiver sido revisada.
 /// </summary>
 public static class ApproveKnowledgeCapture
 {
@@ -25,13 +31,32 @@ public static class ApproveKnowledgeCapture
         }
     }
 
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        IKnowledgeCaptureRepository captureRepository,
+        ICurrentUser currentUser,
+        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-            return await Task.FromResult<Result<Response>>(
-                ExternalAiErrors.NotImplemented("Feature pending Phase 03"));
+            Guard.Against.Null(request);
+
+            var captureId = KnowledgeCaptureId.From(request.CaptureId);
+            var capture = await captureRepository.GetByIdAsync(captureId, cancellationToken);
+            if (capture is null)
+                return ExternalAiErrors.KnowledgeCaptureNotFound(request.CaptureId.ToString());
+
+            var approveResult = capture.Approve(currentUser.Id, dateTimeProvider.UtcNow);
+            if (approveResult.IsFailure)
+                return approveResult.Error;
+
+            await captureRepository.UpdateAsync(capture, cancellationToken);
+
+            return new Response(
+                capture.Id.Value,
+                capture.Status.ToString(),
+                capture.ReviewedBy!,
+                capture.ReviewedAt!.Value,
+                request.ReviewNotes);
         }
     }
 

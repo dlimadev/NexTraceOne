@@ -272,3 +272,57 @@ public interface IComplianceGapRepository
     /// <summary>Adiciona novo gap de compliance.</summary>
     Task AddAsync(ComplianceGap gap, CancellationToken ct);
 }
+
+/// <summary>
+/// Fornece métricas reais de filas de outbox acessíveis ao módulo Governance.
+/// Implementada na camada de infraestrutura com acesso direto ao GovernanceDbContext.
+/// </summary>
+public interface IPlatformQueueMetricsProvider
+{
+    /// <summary>Retorna snapshots das filas de outbox com contagens reais.</summary>
+    Task<IReadOnlyList<QueueSnapshot>> GetQueueSnapshotsAsync(CancellationToken ct);
+}
+
+/// <summary>Métricas de uma fila de outbox derivadas da tabela de outbox messages.</summary>
+public sealed record QueueSnapshot(
+    string QueueName,
+    string Subsystem,
+    long PendingCount,
+    long FailedCount,
+    DateTimeOffset? LastActivityAt);
+
+/// <summary>
+/// Fornece o catálogo de background jobs conhecidos da plataforma.
+/// Implementada na camada de infraestrutura; o estado de execução em runtime
+/// não está disponível a partir do ApiHost (BackgroundWorkers é processo separado).
+/// </summary>
+public interface IPlatformJobStatusProvider
+{
+    /// <summary>Retorna os jobs conhecidos com o melhor estado disponível.</summary>
+    Task<IReadOnlyList<KnownJobSnapshot>> GetJobSnapshotsAsync(CancellationToken ct);
+}
+
+/// <summary>Snapshot de um background job conhecido da plataforma.</summary>
+public sealed record KnownJobSnapshot(
+    string JobId,
+    string Name,
+    string Description);
+
+/// <summary>
+/// Fornece eventos operacionais reais derivados de dados de governança persistidos.
+/// Implementada na camada de infraestrutura usando rollouts e waivers como fonte de eventos.
+/// </summary>
+public interface IPlatformEventProvider
+{
+    /// <summary>Retorna eventos operacionais recentes com base em atividade de governança.</summary>
+    Task<IReadOnlyList<GovernanceOperationalEvent>> GetRecentEventsAsync(int limit, CancellationToken ct);
+}
+
+/// <summary>Evento operacional derivado de atividade real de governança.</summary>
+public sealed record GovernanceOperationalEvent(
+    string EventId,
+    DateTimeOffset Timestamp,
+    string Severity,
+    string Subsystem,
+    string Message,
+    bool Resolved);

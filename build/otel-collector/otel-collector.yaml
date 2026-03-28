@@ -194,6 +194,7 @@ exporters:
     endpoint: "${CLICKHOUSE_ENDPOINT:-tcp://clickhouse:9000?database=nextraceone_obs}"
     database: nextraceone_obs
     ttl: 720h
+    create_schema: true
     logs_table_name: otel_logs
     traces_table_name: otel_traces
     metrics_table_name: otel_metrics
@@ -207,10 +208,13 @@ exporters:
       num_consumers: 10
       queue_size: 1000
 
-  # OTLP/gRPC — exporter genérico para backends compatíveis com OTLP.
-  # Usado para enviar métricas derivadas (spanmetrics) para Product Store aggregator.
+  # OTLP/gRPC — exporter genérico para backends OTLP-compatíveis.
+  # NOTA: Não está em nenhum pipeline activo — reservado para uso futuro.
+  # Para activar o reencaminhamento de spanmetrics para um aggregator externo,
+  # definir SPANMETRICS_FORWARD_ENDPOINT e adicionar "otlp" ao pipeline de métricas.
+  # AVISO: Não usar "localhost:4317" — apontaria para o próprio Collector (loop circular).
   otlp:
-    endpoint: "localhost:4317"
+    endpoint: "${SPANMETRICS_FORWARD_ENDPOINT:-localhost:4317}"
     tls:
       insecure: true
 
@@ -274,7 +278,9 @@ service:
     # Pipeline de METRICS:
     # Receivers (OTLP + HostMetrics + SpanMetrics) →
     # Memory Limiter → Resource Detection → Normalize → Batch →
-    # ClickHouse (crus) + OTLP (para Product Store aggregator)
+    # ClickHouse (crus)
+    # Nota: O exporter "otlp" está declarado mas fora deste pipeline intencionalmente.
+    # Ver comentário do exporter "otlp" acima para reactivar reencaminhamento externo.
     metrics:
       receivers: [otlp, hostmetrics, spanmetrics]
       processors:
@@ -282,7 +288,7 @@ service:
         - resourcedetection
         - attributes/normalize
         - batch
-      exporters: [clickhouse, otlp]
+      exporters: [clickhouse]
 
     # Pipeline de LOGS:
     # Receivers → Memory Limiter → Resource Detection → Normalize →

@@ -60,8 +60,8 @@ const paletteItems: PaletteItem[] = [
   { id: 'contracts', labelKey: 'sidebar.apiContracts', to: '/contracts', icon: <FileText size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
   { id: 'contract-studio', labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={16} />, group: 'commandPalette.contracts', permission: 'contracts:read' },
   // ── Changes ──
-  { id: 'change-confidence', labelKey: 'sidebar.changeConfidence', to: '/changes', icon: <ShieldCheck size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:read' },
-  { id: 'releases', labelKey: 'sidebar.changeIntelligence', to: '/releases', icon: <Zap size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:releases:read' },
+  { id: 'change-confidence', labelKey: 'sidebar.changes', to: '/changes', icon: <ShieldCheck size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:read' },
+  { id: 'releases', labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:releases:read' },
   { id: 'workflow', labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={16} />, group: 'commandPalette.changes', permission: 'workflow:read' },
   { id: 'promotion', labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={16} />, group: 'commandPalette.changes', permission: 'promotion:read' },
   // ── Operations ──

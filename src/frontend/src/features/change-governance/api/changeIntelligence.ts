@@ -127,6 +127,11 @@ export const changeIntelligenceApi = {
       .get<PagedList<Release>>('/releases', { params: { apiAssetId, page, pageSize } })
       .then((r) => r.data),
 
+  listRecentReleases: (page = 1, pageSize = 50) =>
+    client
+      .get<PagedList<Release>>('/releases', { params: { page, pageSize } })
+      .then((r) => r.data),
+
   getReleaseHistory: (apiAssetId: string, page = 1, pageSize = 20) =>
     client
       .get<PagedList<Release>>(`/releases/${apiAssetId}/history`, {

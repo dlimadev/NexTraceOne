@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -24,7 +24,7 @@ public sealed class ClassifyChangeWithAITests
     public async Task Handle_ShouldClassifyAsBreaking_WhenResponseContainsBreaking()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("This is a Breaking change that removes the /users endpoint.\n- Update all consumers\n- Add deprecation notice");
 
         var command = new ClassifyChangeWithAI.Command(
@@ -49,7 +49,7 @@ public sealed class ClassifyChangeWithAITests
     public async Task Handle_ShouldClassifyAsSecurity_WhenResponseContainsSecurity()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("This is a Security fix for CVE-2025-0001.\n- Apply patch immediately\n* Rotate API keys");
 
         var command = new ClassifyChangeWithAI.Command(
@@ -71,7 +71,7 @@ public sealed class ClassifyChangeWithAITests
     public async Task Handle_ShouldClassifyAsPatch_WhenResponseContainsFix()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("This is a bug fix for null reference exception.\n- Deploy during off-peak hours");
 
         var command = new ClassifyChangeWithAI.Command(
@@ -92,7 +92,7 @@ public sealed class ClassifyChangeWithAITests
     public async Task Handle_ShouldDetectFallback_WhenResponseStartsWithFallbackPrefix()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("[FALLBACK_PROVIDER_UNAVAILABLE] Provider is down. Query: Classify this change");
 
         var command = new ClassifyChangeWithAI.Command(
@@ -113,7 +113,7 @@ public sealed class ClassifyChangeWithAITests
     public async Task Handle_ShouldReturnError_WhenProviderThrows()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<string>(new InvalidOperationException("Timeout")));
 
         var command = new ClassifyChangeWithAI.Command(
@@ -134,7 +134,7 @@ public sealed class ClassifyChangeWithAITests
     public async Task Handle_ShouldParseMitigationSteps_WithNumberedList()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Feature change.\n1. Update documentation\n2. Notify consumers\n3. Deploy gradually");
 
         var command = new ClassifyChangeWithAI.Command(

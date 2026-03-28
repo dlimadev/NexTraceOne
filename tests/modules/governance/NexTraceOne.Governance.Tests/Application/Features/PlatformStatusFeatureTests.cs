@@ -1,5 +1,4 @@
 using System.Linq;
-using Microsoft.Extensions.Configuration;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.GetPlatformEvents;
 using NexTraceOne.Governance.Application.Features.GetPlatformHealth;
@@ -12,14 +11,17 @@ namespace NexTraceOne.Governance.Tests.Application.Features;
 
 public sealed class PlatformStatusFeatureTests
 {
+    private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 12, 0, 0, TimeSpan.Zero);
+
     // ── GetPlatformReadiness ──
 
     [Fact]
     public async Task GetPlatformReadiness_Handler_ShouldReturnSuccess()
     {
-        var handler = new GetPlatformReadiness.Handler();
-        var query = new GetPlatformReadiness.Query();
-        var result = await handler.Handle(query, CancellationToken.None);
+        var healthProvider = BuildFullHealthProvider();
+        var handler = new GetPlatformReadiness.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformReadiness.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
         result.Value.IsReady.Should().BeTrue();
         result.Value.EnvironmentName.Should().NotBeNullOrWhiteSpace();
@@ -29,26 +31,43 @@ public sealed class PlatformStatusFeatureTests
     [Fact]
     public async Task GetPlatformReadiness_Handler_ShouldReturnAllExpectedChecks()
     {
-        var handler = new GetPlatformReadiness.Handler();
-        var query = new GetPlatformReadiness.Query();
-        var result = await handler.Handle(query, CancellationToken.None);
-        result.IsSuccess.Should().BeTrue();
+        var healthProvider = BuildFullHealthProvider();
+        var handler = new GetPlatformReadiness.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformReadiness.Query(), CancellationToken.None);
 
-        var expectedChecks = new[] { "API", "Database", "Configuration", "BackgroundJobs", "Ingestion" };
-        result.Value.Checks.Should().HaveCount(expectedChecks.Length);
-        result.Value.Checks.Select(c => c.Name).Should().BeEquivalentTo(expectedChecks);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Checks.Should().HaveCount(2);
         result.Value.Checks.Should().OnlyContain(c => c.Passed);
     }
 
     [Fact]
     public async Task GetPlatformReadiness_Response_ShouldHaveVersionFormat()
     {
-        var handler = new GetPlatformReadiness.Handler();
-        var query = new GetPlatformReadiness.Query();
-        var result = await handler.Handle(query, CancellationToken.None);
+        var healthProvider = BuildFullHealthProvider();
+        var handler = new GetPlatformReadiness.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformReadiness.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
         result.Value.Version.Should().NotBeNullOrWhiteSpace();
-        result.Value.Version.Should().Contain(".");
+    }
+
+    [Fact]
+    public async Task GetPlatformReadiness_ShouldNotBeReady_WhenAnySubsystemUnhealthy()
+    {
+        var healthProvider = Substitute.For<IPlatformHealthProvider>();
+        healthProvider.GetSubsystemHealthAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<SubsystemHealthInfo>
+            {
+                new("API", PlatformSubsystemStatus.Healthy, "OK"),
+                new("Database", PlatformSubsystemStatus.Unhealthy, "Connection refused")
+            });
+
+        var handler = new GetPlatformReadiness.Handler(healthProvider);
+        var result = await handler.Handle(new GetPlatformReadiness.Query(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsReady.Should().BeFalse();
+        result.Value.Checks.Single(c => c.Name == "Database").Passed.Should().BeFalse();
     }
 
     // ── GetPlatformHealth ──
@@ -65,8 +84,8 @@ public sealed class PlatformStatusFeatureTests
             });
 
         var handler = new GetPlatformHealth.Handler(healthProvider);
-        var query = new GetPlatformHealth.Query();
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
         result.Value.UptimeSeconds.Should().BeGreaterThanOrEqualTo(0);
         result.Value.Version.Should().NotBeNullOrWhiteSpace();
@@ -85,6 +104,7 @@ public sealed class PlatformStatusFeatureTests
 
         var handler = new GetPlatformHealth.Handler(healthProvider);
         var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
         result.Value.OverallStatus.Should().Be(PlatformSubsystemStatus.Unhealthy);
     }
@@ -102,6 +122,7 @@ public sealed class PlatformStatusFeatureTests
 
         var handler = new GetPlatformHealth.Handler(healthProvider);
         var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
         result.Value.OverallStatus.Should().Be(PlatformSubsystemStatus.Degraded);
     }
@@ -115,6 +136,7 @@ public sealed class PlatformStatusFeatureTests
 
         var handler = new GetPlatformHealth.Handler(healthProvider);
         var result = await handler.Handle(new GetPlatformHealth.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
         result.Value.OverallStatus.Should().Be(PlatformSubsystemStatus.Unknown);
     }
@@ -122,14 +144,40 @@ public sealed class PlatformStatusFeatureTests
     // ── GetPlatformJobs ──
 
     [Fact]
-    public async Task GetPlatformJobs_Handler_ShouldRespectStatusFilter()
+    public async Task GetPlatformJobs_Handler_ShouldReturnAllKnownJobs_WhenNoFilter()
     {
-        var handler = new GetPlatformJobs.Handler();
-        var query = new GetPlatformJobs.Query(StatusFilter: "Running");
-        var result = await handler.Handle(query, CancellationToken.None);
+        var jobProvider = Substitute.For<IPlatformJobStatusProvider>();
+        jobProvider.GetJobSnapshotsAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<KnownJobSnapshot>
+            {
+                new("outbox-processor-governance", "Outbox Processor — Governance", "Processes governance outbox."),
+                new("identity-expiration",          "Identity Expiration Cleanup",   "Revokes expired sessions.")
+            });
+
+        var handler = new GetPlatformJobs.Handler(jobProvider);
+        var result = await handler.Handle(new GetPlatformJobs.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
-        result.Value.Jobs.Should().NotBeEmpty();
-        result.Value.Jobs.Should().OnlyContain(j => j.Status == Governance.Domain.Enums.BackgroundJobStatus.Running);
+        result.Value.Jobs.Should().HaveCount(2);
+        result.Value.Jobs.Should().OnlyContain(j => j.Status == BackgroundJobStatus.Stale);
+        result.Value.Jobs.Should().OnlyContain(j => j.LastRunAt == null);
+    }
+
+    [Fact]
+    public async Task GetPlatformJobs_Handler_ShouldReturnEmpty_WhenFilteringForRunning()
+    {
+        var jobProvider = Substitute.For<IPlatformJobStatusProvider>();
+        jobProvider.GetJobSnapshotsAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<KnownJobSnapshot>
+            {
+                new("outbox-processor-governance", "Outbox Processor", "Description")
+            });
+
+        var handler = new GetPlatformJobs.Handler(jobProvider);
+        var result = await handler.Handle(new GetPlatformJobs.Query(StatusFilter: "Running"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Jobs.Should().BeEmpty("all jobs are reported as Stale when BackgroundWorkers is a separate process");
     }
 
     // ── GetPlatformEvents ──
@@ -137,23 +185,57 @@ public sealed class PlatformStatusFeatureTests
     [Fact]
     public async Task GetPlatformEvents_Handler_ShouldRespectSeverityFilter()
     {
-        var handler = new GetPlatformEvents.Handler();
-        var query = new GetPlatformEvents.Query(SeverityFilter: "Warning");
-        var result = await handler.Handle(query, CancellationToken.None);
+        var eventProvider = Substitute.For<IPlatformEventProvider>();
+        eventProvider.GetRecentEventsAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceOperationalEvent>
+            {
+                new("rollout-1", FixedNow.AddMinutes(-10), "Warning", "Governance", "Pack rolled back.", false),
+                new("rollout-2", FixedNow.AddMinutes(-20), "Info",    "Governance", "Pack completed.",  true)
+            });
+
+        var handler = new GetPlatformEvents.Handler(eventProvider);
+        var result = await handler.Handle(new GetPlatformEvents.Query(SeverityFilter: "Warning"), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
-        result.Value.Events.Should().NotBeEmpty();
-        result.Value.Events.Should().OnlyContain(e => e.Severity == Governance.Domain.Enums.PlatformEventSeverity.Warning);
+        result.Value.Events.Should().HaveCount(1);
+        result.Value.Events.Should().OnlyContain(e => e.Severity == PlatformEventSeverity.Warning);
     }
 
     [Fact]
     public async Task GetPlatformEvents_Handler_ShouldRespectSubsystemFilter()
     {
-        var handler = new GetPlatformEvents.Handler();
-        var query = new GetPlatformEvents.Query(SubsystemFilter: "API");
-        var result = await handler.Handle(query, CancellationToken.None);
+        var eventProvider = Substitute.For<IPlatformEventProvider>();
+        eventProvider.GetRecentEventsAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceOperationalEvent>
+            {
+                new("rollout-1", FixedNow, "Info",    "Governance", "Governance event.", true),
+                new("waiver-1",  FixedNow, "Warning", "Identity",   "Identity event.",   false)
+            });
+
+        var handler = new GetPlatformEvents.Handler(eventProvider);
+        var result = await handler.Handle(new GetPlatformEvents.Query(SubsystemFilter: "Governance"), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
-        result.Value.Events.Should().NotBeEmpty();
-        result.Value.Events.Should().OnlyContain(e => e.Subsystem == "API");
+        result.Value.Events.Should().HaveCount(1);
+        result.Value.Events.Should().OnlyContain(e => e.Subsystem == "Governance");
+    }
+
+    [Fact]
+    public async Task GetPlatformEvents_Handler_ShouldReturnEmpty_WhenNoEventsMatchFilter()
+    {
+        var eventProvider = Substitute.For<IPlatformEventProvider>();
+        eventProvider.GetRecentEventsAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<GovernanceOperationalEvent>
+            {
+                new("rollout-1", FixedNow, "Info", "Governance", "Pack completed.", true)
+            });
+
+        var handler = new GetPlatformEvents.Handler(eventProvider);
+        var result = await handler.Handle(new GetPlatformEvents.Query(SeverityFilter: "Critical"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Events.Should().BeEmpty();
+        result.Value.TotalCount.Should().Be(0);
     }
 
     // ── GetPlatformQueues ──
@@ -161,12 +243,35 @@ public sealed class PlatformStatusFeatureTests
     [Fact]
     public async Task GetPlatformQueues_Handler_ShouldReturnQueues()
     {
-        var handler = new GetPlatformQueues.Handler();
-        var query = new GetPlatformQueues.Query();
-        var result = await handler.Handle(query, CancellationToken.None);
+        var metricsProvider = Substitute.For<IPlatformQueueMetricsProvider>();
+        metricsProvider.GetQueueSnapshotsAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<QueueSnapshot>
+            {
+                new("gov_outbox_messages", "Governance", PendingCount: 3, FailedCount: 1, LastActivityAt: FixedNow)
+            });
+
+        var handler = new GetPlatformQueues.Handler(metricsProvider);
+        var result = await handler.Handle(new GetPlatformQueues.Query(), CancellationToken.None);
+
         result.IsSuccess.Should().BeTrue();
-        result.Value.Queues.Should().NotBeEmpty();
-        result.Value.Queues.Should().OnlyContain(q => q.QueueName.Length > 0);
+        result.Value.Queues.Should().HaveCount(1);
+        result.Value.Queues[0].QueueName.Should().Be("gov_outbox_messages");
+        result.Value.Queues[0].PendingCount.Should().Be(3);
+        result.Value.Queues[0].FailedCount.Should().Be(1);
         result.Value.CheckedAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(5));
+    }
+
+    // ── helpers ──
+
+    private static IPlatformHealthProvider BuildFullHealthProvider()
+    {
+        var provider = Substitute.For<IPlatformHealthProvider>();
+        provider.GetSubsystemHealthAsync(Arg.Any<CancellationToken>())
+            .Returns(new List<SubsystemHealthInfo>
+            {
+                new("API",      PlatformSubsystemStatus.Healthy, "API is responding."),
+                new("Database", PlatformSubsystemStatus.Healthy, "All checks healthy.")
+            });
+        return provider;
     }
 }

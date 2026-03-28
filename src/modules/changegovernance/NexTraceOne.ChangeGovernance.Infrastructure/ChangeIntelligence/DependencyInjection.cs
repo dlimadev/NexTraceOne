@@ -9,10 +9,12 @@ using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
@@ -56,6 +58,9 @@ public static class DependencyInjection
         // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false
         services.AddBuildingBlocksAnalytics(configuration);
         services.AddScoped<ITraceCorrelationWriter, TraceCorrelationAnalyticsWriter>();
+
+        // Cross-module public interface — outros módulos consomem IChangeIntelligenceModule
+        services.AddScoped<IChangeIntelligenceModule, ChangeIntelligenceModule>();
 
         return services;
     }

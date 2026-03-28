@@ -122,4 +122,57 @@ public sealed class IngestionExecution : Entity<IngestionExecutionId>
         ErrorMessage = errorMessage;
         ErrorCode = errorCode;
     }
+
+    // ── Parsed payload fields ─────────────────────────────────────────────────
+
+    /// <summary>Nome do serviço extraído do payload.</summary>
+    public string? ParsedServiceName { get; private set; }
+
+    /// <summary>Ambiente extraído do payload.</summary>
+    public string? ParsedEnvironment { get; private set; }
+
+    /// <summary>Versão extraída do payload.</summary>
+    public string? ParsedVersion { get; private set; }
+
+    /// <summary>Commit SHA extraído do payload.</summary>
+    public string? ParsedCommitSha { get; private set; }
+
+    /// <summary>Tipo de mudança extraído do payload.</summary>
+    public string? ParsedChangeType { get; private set; }
+
+    /// <summary>Data/hora em que o parsing ocorreu.</summary>
+    public DateTimeOffset? ParsedAt { get; private set; }
+
+    /// <summary>Estado de processamento semântico do payload.</summary>
+    public ProcessingStatus ProcessingStatus { get; private set; } = ProcessingStatus.MetadataRecorded;
+
+    /// <summary>
+    /// Marca o payload como processado com sucesso, armazenando os campos extraídos.
+    /// </summary>
+    public void MarkAsProcessed(
+        string? serviceName,
+        string? environment,
+        string? version,
+        string? commitSha,
+        string? changeType,
+        DateTimeOffset parsedAt)
+    {
+        ParsedServiceName = serviceName;
+        ParsedEnvironment = environment;
+        ParsedVersion = version;
+        ParsedCommitSha = commitSha;
+        ParsedChangeType = changeType;
+        ParsedAt = parsedAt;
+        ProcessingStatus = ProcessingStatus.Processed;
+    }
+
+    /// <summary>
+    /// Marca o processamento semântico como falhado, preservando o estado <see cref="ProcessingStatus.MetadataRecorded"/>
+    /// para degradação graciosa — os metadados da execução são mantidos mesmo sem parsing completo.
+    /// </summary>
+    public void MarkAsFailed(string errorMessage)
+    {
+        Guard.Against.NullOrWhiteSpace(errorMessage, nameof(errorMessage));
+        ProcessingStatus = ProcessingStatus.Failed;
+    }
 }

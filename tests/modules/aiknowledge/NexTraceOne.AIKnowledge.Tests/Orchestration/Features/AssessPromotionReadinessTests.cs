@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotionReadiness;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -35,7 +35,7 @@ public sealed class AssessPromotionReadinessTests
     public async Task Handle_ShouldReturnReadinessAssessment_WhenProviderResponds()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "READINESS_SCORE: 78\n" +
                 "READINESS_LEVEL: NEEDS_REVIEW\n" +
@@ -61,7 +61,7 @@ public sealed class AssessPromotionReadinessTests
     public async Task Handle_ShouldReturnReady_WhenServiceIsPromotable()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(
                 "READINESS_SCORE: 95\n" +
                 "READINESS_LEVEL: READY\n" +
@@ -80,7 +80,7 @@ public sealed class AssessPromotionReadinessTests
     public async Task Handle_ShouldClampScore_WhenScoreOutOfRange()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("READINESS_SCORE: 150\nREADINESS_LEVEL: READY\nSHOULD_BLOCK: NO\nSUMMARY: Good.");
 
         var result = await CreateHandler().Handle(DefaultCommand(), CancellationToken.None);

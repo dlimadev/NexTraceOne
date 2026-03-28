@@ -7,7 +7,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { promotionApi } from '../api';
+import { promotionApi, changeIntelligenceApi } from '../api';
 import type { PromotionRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -51,6 +51,14 @@ export function PromotionPage() {
     queryFn: () => promotionApi.listRequests(1, 20),
     staleTime: 15_000,
   });
+
+  const releasesQuery = useQuery({
+    queryKey: ['releases', 'recent'],
+    queryFn: () => changeIntelligenceApi.listRecentReleases(1, 50),
+    staleTime: 30_000,
+  });
+
+  const availableReleases = releasesQuery.data?.items ?? [];
 
   const createMutation = useMutation({
     mutationFn: promotionApi.createRequest,
@@ -103,14 +111,19 @@ export function PromotionPage() {
             >
               <div>
                 <label className="block text-sm font-medium text-body mb-1">{t('promotion.releaseId')}</label>
-                <input
-                  type="text"
+                <select
                   value={form.releaseId}
                   onChange={(e) => setForm((f) => ({ ...f, releaseId: e.target.value }))}
                   required
-                  placeholder={t('promotion.releaseIdPlaceholder')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                />
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                >
+                  <option value="">{t('promotion.selectRelease')}</option>
+                  {availableReleases.map((rel) => (
+                    <option key={rel.id} value={rel.id}>
+                      {rel.serviceName} — v{rel.version} ({rel.environment})
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">{t('promotion.sourceEnvironment')}</label>

@@ -139,6 +139,13 @@ internal sealed class ExternalAiPolicyRepository(ExternalAiDbContext context) : 
     public async Task<ExternalAiPolicy?> GetByNameAsync(string name, CancellationToken ct)
         => await context.Policies.FirstOrDefaultAsync(p => p.Name == name, ct);
 
+    public async Task<IReadOnlyList<ExternalAiPolicy>> ListActiveAsync(CancellationToken ct)
+        => await context.Policies
+            .AsNoTracking()
+            .Where(p => p.IsActive)
+            .OrderBy(p => p.Name)
+            .ToListAsync(ct);
+
     public async Task AddAsync(ExternalAiPolicy policy, CancellationToken ct)
     {
         await context.Policies.AddAsync(policy, ct);

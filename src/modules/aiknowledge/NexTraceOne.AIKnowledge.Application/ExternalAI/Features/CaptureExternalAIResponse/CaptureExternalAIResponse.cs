@@ -1,13 +1,20 @@
+using Ardalis.GuardClauses;
+
 using FluentValidation;
+
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.CaptureExternalAIResponse;
 
 /// <summary>
-/// TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-/// This handler will implement capture persistence from external AI responses in Phase 03.
+/// Feature: CaptureExternalAIResponse — persiste uma consulta de IA externa e o conhecimento
+/// organizacional capturado a partir da resposta. Cria ExternalAiConsultation no estado
+/// Completed e KnowledgeCapture no estado Pending aguardando revisão.
 /// </summary>
 public static class CaptureExternalAIResponse
 {
@@ -39,13 +46,59 @@ public static class CaptureExternalAIResponse
         }
     }
 
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        IExternalAiProviderRepository providerRepository,
+        IExternalAiConsultationRepository consultationRepository,
+        IKnowledgeCaptureRepository captureRepository,
+        ICurrentUser currentUser,
+        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-            return await Task.FromResult<Result<Response>>(
-                ExternalAiErrors.NotImplemented("Feature pending Phase 03"));
+            Guard.Against.Null(request);
+
+            var providerId = ExternalAiProviderId.From(request.ProviderId);
+            var providerExists = await providerRepository.ExistsAsync(providerId, cancellationToken);
+            if (!providerExists)
+                return ExternalAiErrors.ProviderNotFound(request.ProviderId.ToString());
+
+            var now = dateTimeProvider.UtcNow;
+
+            var consultation = ExternalAiConsultation.Create(
+                providerId,
+                request.Context,
+                request.Query,
+                currentUser.Id,
+                now);
+
+            var recordResult = consultation.RecordResponse(
+                request.AiResponse,
+                request.TokensUsed,
+                request.Confidence,
+                now);
+
+            if (recordResult.IsFailure)
+                return recordResult.Error;
+
+            await consultationRepository.AddAsync(consultation, cancellationToken);
+
+            var capture = KnowledgeCapture.Capture(
+                consultation.Id,
+                request.Title,
+                request.AiResponse,
+                request.Category,
+                request.Tags,
+                now);
+
+            await captureRepository.AddAsync(capture, cancellationToken);
+
+            return new Response(
+                capture.Id.Value,
+                consultation.Id.Value,
+                capture.Title,
+                capture.Category,
+                capture.Status.ToString(),
+                capture.CapturedAt);
         }
     }
 

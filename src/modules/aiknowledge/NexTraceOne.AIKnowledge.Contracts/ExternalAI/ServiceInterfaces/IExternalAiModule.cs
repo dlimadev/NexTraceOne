@@ -1,6 +1,6 @@
 namespace NexTraceOne.AIKnowledge.Contracts.ExternalAI.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — no methods defined, no implementation, no consumers.
+// IMPLEMENTATION STATUS: Complete — implemented by ExternalAiModule, registered in DI, covered by ExternalAiModuleTests.
 
 /// <summary>
 /// Interface pública do módulo ExternalAi.
@@ -22,10 +22,13 @@ public interface IExternalAiModule
 
     /// <summary>
     /// Selects the best provider for a capability using active policy and provider availability.
-    /// Returns null when no eligible provider is found.
+    /// When <paramref name="environment"/> is "production", stricter approval rules are applied —
+    /// any active policy matching the capability that requires approval will block routing.
+    /// Returns null when no eligible provider is found or when policy blocks the request.
     /// </summary>
     Task<RoutingDecisionDto?> RouteRequestAsync(
         string capability,
         string? preferredProvider = null,
+        string? environment = null,
         CancellationToken ct = default);
 }

@@ -35,6 +35,7 @@ public sealed class ConversationPersistenceTests
     private readonly IDatabaseRetrievalService _dbRetrieval = Substitute.For<IDatabaseRetrievalService>();
     private readonly ITelemetryRetrievalService _telRetrieval = Substitute.For<ITelemetryRetrievalService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
+    private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public ConversationPersistenceTests()
@@ -68,7 +69,7 @@ public sealed class ConversationPersistenceTests
         _modelCatalog, _modelAuth,
         _routingPort, _providerFactory,
         _docRetrieval, _dbRetrieval, _telRetrieval,
-        _currentUser, _clock,
+        _currentUser, _currentEnvironment, _clock,
         NullLogger<SendAssistantMessage.Handler>.Instance);
 
     private void MockProvider(string content, int promptTokens = 40, int completionTokens = 80)

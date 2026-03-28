@@ -61,7 +61,7 @@ public static class ClassifyChangeWithAI
                     groundingContext,
                     query,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
             }
             catch (Exception ex)
             {

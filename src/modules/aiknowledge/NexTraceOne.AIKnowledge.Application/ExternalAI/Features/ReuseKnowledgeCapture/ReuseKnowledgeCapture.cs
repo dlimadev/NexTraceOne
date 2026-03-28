@@ -1,13 +1,19 @@
+using Ardalis.GuardClauses;
+
 using FluentValidation;
+
+using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.ReuseKnowledgeCapture;
 
 /// <summary>
-/// TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-/// This handler will implement capture reuse workflow when knowledge capture is prioritized.
+/// Feature: ReuseKnowledgeCapture — regista a reutilização de um capture aprovado num
+/// novo contexto, incrementando o contador de reuso e rastreando a intenção de uso.
 /// </summary>
 public static class ReuseKnowledgeCapture
 {
@@ -27,13 +33,36 @@ public static class ReuseKnowledgeCapture
         }
     }
 
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        IKnowledgeCaptureRepository captureRepository,
+        ICurrentUser currentUser,
+        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
-            return await Task.FromResult<Result<Response>>(
-                ExternalAiErrors.NotImplemented("Feature pending Phase 03"));
+            Guard.Against.Null(request);
+
+            var captureId = KnowledgeCaptureId.From(request.CaptureId);
+            var capture = await captureRepository.GetByIdAsync(captureId, cancellationToken);
+            if (capture is null)
+                return ExternalAiErrors.KnowledgeCaptureNotFound(request.CaptureId.ToString());
+
+            var reuseResult = capture.IncrementReuse();
+            if (reuseResult.IsFailure)
+                return reuseResult.Error;
+
+            await captureRepository.UpdateAsync(capture, cancellationToken);
+
+            return new Response(
+                capture.Id.Value,
+                capture.Title,
+                capture.Content,
+                capture.Category,
+                capture.ReuseCount,
+                request.NewContext,
+                request.Purpose,
+                currentUser.Id,
+                dateTimeProvider.UtcNow);
         }
     }
 

@@ -10,6 +10,9 @@ public interface IExternalAiPolicyRepository
     /// <summary>Obtém uma política pelo nome (case-sensitive).</summary>
     Task<ExternalAiPolicy?> GetByNameAsync(string name, CancellationToken ct);
 
+    /// <summary>Retorna todas as políticas ativas. Usado pelo pipeline de proteção de dados.</summary>
+    Task<IReadOnlyList<ExternalAiPolicy>> ListActiveAsync(CancellationToken ct);
+
     /// <summary>Adiciona e persiste uma nova política.</summary>
     Task AddAsync(ExternalAiPolicy policy, CancellationToken ct);
 

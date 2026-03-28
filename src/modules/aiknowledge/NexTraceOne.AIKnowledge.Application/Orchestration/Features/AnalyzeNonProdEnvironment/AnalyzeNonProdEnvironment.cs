@@ -100,7 +100,7 @@ public static class AnalyzeNonProdEnvironment
                     groundingContext,
                     query,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
                 isFallback = aiContent.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception ex)

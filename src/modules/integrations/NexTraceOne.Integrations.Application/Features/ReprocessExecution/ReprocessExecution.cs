@@ -1,9 +1,11 @@
 using FluentValidation;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
+using ProcessIngestionPayloadFeature = NexTraceOne.Integrations.Application.Features.ProcessIngestionPayload.ProcessIngestionPayload;
 
 namespace NexTraceOne.Integrations.Application.Features.ReprocessExecution;
 
@@ -31,7 +33,8 @@ public static class ReprocessExecution
     public sealed class Handler(
         IIngestionExecutionRepository executionRepository,
         IUnitOfWork unitOfWork,
-        IDateTimeProvider clock) : ICommandHandler<Command, Response>
+        IDateTimeProvider clock,
+        ISender sender) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -58,10 +61,20 @@ public static class ReprocessExecution
             await executionRepository.AddAsync(newExecution, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
 
+            // Attempt semantic processing of the new execution.
+            // RawPayload is not available on the original execution yet (pending migration),
+            // so processing falls back to metadata_recorded gracefully.
+            var processResult = await sender.Send(
+                new ProcessIngestionPayloadFeature.Command(newExecution.Id.Value, RawPayload: null),
+                cancellationToken);
+
+            var processingStatus = processResult.IsSuccess ? processResult.Value.Status : "metadata_recorded";
+
             var response = new Response(
                 ReprocessRequestId: newExecution.Id.Value,
                 ExecutionId: request.ExecutionId,
                 Status: "Queued",
+                ProcessingStatus: processingStatus,
                 RequestedAt: clock.UtcNow);
 
             return Result<Response>.Success(response);
@@ -73,5 +86,6 @@ public static class ReprocessExecution
         Guid ReprocessRequestId,
         string ExecutionId,
         string Status,
+        string ProcessingStatus,
         DateTimeOffset RequestedAt);
 }

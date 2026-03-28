@@ -1,6 +1,6 @@
 namespace NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — no methods defined, no implementation, no consumers.
+// IMPLEMENTATION STATUS: Complete — implemented by AiOrchestrationModule, registered in DI, covered by AiOrchestrationModuleTests.
 
 /// <summary>
 /// Interface pública do módulo AiOrchestration.

@@ -60,7 +60,7 @@ public static class SuggestSemanticVersionWithAI
                     groundingContext,
                     query,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
             }
             catch (Exception ex)
             {

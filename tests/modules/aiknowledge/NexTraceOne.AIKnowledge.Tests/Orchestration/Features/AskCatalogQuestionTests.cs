@@ -24,7 +24,7 @@ public sealed class AskCatalogQuestionTests
     public async Task Handle_ShouldReturnAiResponse_WhenProviderResponds()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("The PaymentService handles payment processing for the platform.");
 
         var command = new AskCatalogQuestion.Command(
@@ -52,7 +52,7 @@ public sealed class AskCatalogQuestionTests
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
         const string fallbackResponse = "[FALLBACK_PROVIDER_UNAVAILABLE] AI provider is unavailable. Query: What does this service do?";
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(fallbackResponse);
 
         var command = new AskCatalogQuestion.Command(
@@ -74,7 +74,7 @@ public sealed class AskCatalogQuestionTests
     public async Task Handle_ShouldReturnError_WhenProviderThrows()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<string>(new InvalidOperationException("Connection refused")));
 
         var command = new AskCatalogQuestion.Command(
@@ -95,7 +95,7 @@ public sealed class AskCatalogQuestionTests
     public async Task Handle_ShouldIncludeProperties_InGroundingPrompt()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Response with properties context");
 
         var command = new AskCatalogQuestion.Command(
@@ -118,6 +118,8 @@ public sealed class AskCatalogQuestionTests
         await _routingPort.Received(1).RouteQueryAsync(
             Arg.Is<string>(ctx => ctx.Contains("sla") && ctx.Contains("99.9%")),
             Arg.Any<string>(),
+            Arg.Any<string?>(),
+            Arg.Any<string?>(),
             Arg.Any<string?>(),
             Arg.Any<CancellationToken>());
     }

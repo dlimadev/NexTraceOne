@@ -13,9 +13,12 @@ vi.mock('../../features/change-governance/api', () => ({
     promote: vi.fn(),
     reject: vi.fn(),
   },
+  changeIntelligenceApi: {
+    listRecentReleases: vi.fn(),
+  },
 }));
 
-import { promotionApi } from '../../features/change-governance/api';
+import { promotionApi, changeIntelligenceApi } from '../../features/change-governance/api';
 
 const mockRequests: PagedList<PromotionRequest> = {
   items: [
@@ -64,6 +67,16 @@ function renderPromotion() {
 describe('PromotionPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(changeIntelligenceApi.listRecentReleases).mockResolvedValue({
+      items: [
+        { id: 'rel-abc-123', apiAssetId: 'asset-1', serviceName: 'order-service', version: '1.2.0', environment: 'staging', status: 'Deployed', changeLevel: 'Minor', changeScore: 75, workItemReference: null, deployedAt: '2024-01-15T10:00:00Z', createdAt: '2024-01-15T10:00:00Z' },
+        { id: 'rel-def-456', apiAssetId: 'asset-2', serviceName: 'payment-service', version: '2.0.0', environment: 'production', status: 'Deployed', changeLevel: 'Major', changeScore: 50, workItemReference: null, deployedAt: '2024-01-14T08:00:00Z', createdAt: '2024-01-14T08:00:00Z' },
+      ],
+      totalCount: 2,
+      page: 1,
+      pageSize: 50,
+      totalPages: 1,
+    });
   });
 
   it('exibe o título da página', () => {
@@ -98,7 +111,9 @@ describe('PromotionPage', () => {
     });
     renderPromotion();
     await userEvent.click(screen.getByRole('button', { name: /new promotion request/i }));
-    expect(screen.getByPlaceholderText(/uuid of the release/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/select a release/i)).toBeInTheDocument();
+    });
   });
 
   it('exibe as requisições carregadas da API', async () => {
@@ -144,8 +159,11 @@ describe('PromotionPage', () => {
     vi.mocked(promotionApi.createRequest).mockResolvedValue({ id: 'pr-new' });
     renderPromotion();
     await userEvent.click(screen.getByRole('button', { name: /new promotion request/i }));
-    const releaseInput = screen.getByPlaceholderText(/uuid of the release/i);
-    await userEvent.type(releaseInput, 'rel-abc-123');
+    await waitFor(() => {
+      expect(screen.getByText(/select a release/i)).toBeInTheDocument();
+    });
+    const releaseSelect = screen.getByText(/select a release/i).closest('select')!;
+    await userEvent.selectOptions(releaseSelect, 'rel-abc-123');
     await userEvent.click(screen.getByRole('button', { name: /create request/i }));
     await waitFor(() => {
       expect(promotionApi.createRequest).toHaveBeenCalled();

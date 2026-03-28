@@ -78,7 +78,7 @@ public static class GenerateTestScenarios
                     context,
                     prompt,
                     request.PreferredProvider,
-                    cancellationToken);
+                    cancellationToken: cancellationToken);
 
                 isFallback = generatedContent.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
             }
