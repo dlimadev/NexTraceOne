@@ -1,102 +1,58 @@
-using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.ExternalAI.Features.QueryExternalAISimple;
-using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Tests.ExternalAI.Features;
 
-/// <summary>
-/// Testes unitários do handler QueryExternalAISimple.
-/// Valida: roteamento de query, detecção de fallback, falha do provider.
-/// </summary>
 public sealed class QueryExternalAISimpleTests
 {
-    private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
+    private readonly IAiProviderHealthService _healthService = Substitute.For<IAiProviderHealthService>();
 
-    private readonly IExternalAIRoutingPort _routingPort = Substitute.For<IExternalAIRoutingPort>();
-    private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
-    private readonly ILogger<QueryExternalAISimple.Handler> _logger = Substitute.For<ILogger<QueryExternalAISimple.Handler>>();
-
-    private QueryExternalAISimple.Handler CreateHandler() =>
-        new(_routingPort, _dateTimeProvider, _logger);
+    private QueryExternalAISimple.Handler CreateHandler() => new(_healthService);
 
     [Fact]
-    public async Task Handle_ShouldReturnAiResponse_WhenProviderResponds()
+    public async Task Handle_ShouldReturnHealthy_WhenProviderReachable()
     {
-        _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync("general", "What is NexTraceOne?", null, Arg.Any<CancellationToken>())
-            .Returns("NexTraceOne is a unified service governance platform.");
+        _healthService.CheckProviderAsync("ollama", Arg.Any<CancellationToken>())
+            .Returns(new AiProviderHealthResult(true, "ollama", "OK", TimeSpan.FromMilliseconds(12)));
 
-        var command = new QueryExternalAISimple.Command(
-            Query: "What is NexTraceOne?",
-            ContextScope: null,
-            SystemContext: null,
-            PreferredProvider: null);
-
-        var result = await CreateHandler().Handle(command, CancellationToken.None);
+        var result = await CreateHandler().Handle(new QueryExternalAISimple.Command("ollama"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value!.Content.Should().Be("NexTraceOne is a unified service governance platform.");
-        result.Value.IsFallback.Should().BeFalse();
-        result.Value.CorrelationId.Should().NotBeNullOrWhiteSpace();
+        result.Value!.TotalProviders.Should().Be(1);
+        result.Value.Providers[0].ProviderId.Should().Be("ollama");
+        result.Value.Providers[0].Status.Should().Be("Healthy");
+        result.Value.Providers[0].ErrorMessage.Should().BeNull();
     }
 
     [Fact]
-    public async Task Handle_ShouldDetectFallback_WhenResponseStartsWithFallbackPrefix()
+    public async Task Handle_ShouldReturnUnhealthy_WhenProviderUnreachable()
     {
-        _dateTimeProvider.UtcNow.Returns(FixedNow);
-        const string fallbackResponse = "[FALLBACK_PROVIDER_UNAVAILABLE] Provider is down. Query: What is NexTraceOne?";
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(fallbackResponse);
+        _healthService.CheckProviderAsync("openai", Arg.Any<CancellationToken>())
+            .Returns(new AiProviderHealthResult(false, "openai", "timeout", TimeSpan.FromMilliseconds(5020)));
 
-        var command = new QueryExternalAISimple.Command(
-            Query: "What is NexTraceOne?",
-            ContextScope: null,
-            SystemContext: null,
-            PreferredProvider: null);
-
-        var result = await CreateHandler().Handle(command, CancellationToken.None);
+        var result = await CreateHandler().Handle(new QueryExternalAISimple.Command("openai"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value!.IsFallback.Should().BeTrue();
-        result.Value.Content.Should().StartWith("[FALLBACK_PROVIDER_UNAVAILABLE]");
+        result.Value!.Providers.Should().ContainSingle();
+        result.Value.Providers[0].Status.Should().Be("Unhealthy");
+        result.Value.Providers[0].ErrorMessage.Should().Be("timeout");
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnError_WhenProviderThrows()
+    public async Task Handle_ShouldCheckAllProviders_WhenProviderIdNotProvided()
     {
-        _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<string>(new InvalidOperationException("Connection refused")));
+        _healthService.CheckAllProvidersAsync(Arg.Any<CancellationToken>())
+            .Returns(
+            [
+                new AiProviderHealthResult(true, "ollama", "OK", TimeSpan.FromMilliseconds(10)),
+                new AiProviderHealthResult(false, "openai", "down", TimeSpan.FromMilliseconds(50))
+            ]);
 
-        var command = new QueryExternalAISimple.Command(
-            Query: "What is NexTraceOne?",
-            ContextScope: null,
-            SystemContext: null,
-            PreferredProvider: null);
-
-        var result = await CreateHandler().Handle(command, CancellationToken.None);
-
-        result.IsSuccess.Should().BeFalse();
-        result.Error!.Code.Should().Be("AIKnowledge.Provider.Unavailable");
-    }
-
-    [Fact]
-    public async Task Handle_ShouldUseSystemContext_AsGroundingContext_WhenProvided()
-    {
-        _dateTimeProvider.UtcNow.Returns(FixedNow);
-        _routingPort.RouteQueryAsync("service context", Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns("Response with context");
-
-        var command = new QueryExternalAISimple.Command(
-            Query: "Explain this service",
-            ContextScope: null,
-            SystemContext: "service context",
-            PreferredProvider: null);
-
-        var result = await CreateHandler().Handle(command, CancellationToken.None);
+        var result = await CreateHandler().Handle(new QueryExternalAISimple.Command(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        await _routingPort.Received(1).RouteQueryAsync("service context", "Explain this service", null, Arg.Any<CancellationToken>());
+        result.Value!.TotalProviders.Should().Be(2);
+        result.Value.Providers.Should().Contain(x => x.ProviderId == "ollama" && x.Status == "Healthy");
+        result.Value.Providers.Should().Contain(x => x.ProviderId == "openai" && x.Status == "Unhealthy");
     }
 }

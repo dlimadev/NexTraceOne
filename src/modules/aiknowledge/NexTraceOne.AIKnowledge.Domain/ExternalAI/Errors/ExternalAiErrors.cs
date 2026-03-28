@@ -9,6 +9,13 @@ namespace NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
 /// </summary>
 public static class ExternalAiErrors
 {
+    /// <summary>Feature ainda não implementada para a fase atual do roadmap.</summary>
+    public static Error NotImplemented(string reason)
+        => Error.Business(
+            "ExternalAi.Feature.NotImplemented",
+            "{0}",
+            reason);
+
     /// <summary>Consulta de IA não encontrada pelo identificador informado.</summary>
     public static Error ConsultationNotFound(string consultationId)
         => Error.NotFound(

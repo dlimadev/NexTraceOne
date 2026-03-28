@@ -1,126 +1,146 @@
 using Ardalis.GuardClauses;
-
 using FluentValidation;
-
-using Microsoft.Extensions.Logging;
-
-using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
-using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.ConfigureExternalAIPolicy;
 
 /// <summary>
-/// Feature: ConfigureExternalAIPolicy — persiste e atualiza política de uso/captura de IA externa.
-/// Cria nova política ou atualiza existente (por nome). A política fica persistida e consultável,
-/// com efeito real nos fluxos de capture/aprovação/reuso.
-/// Estrutura VSA: Command + Validator + Handler + Response num único ficheiro.
+/// Feature: ConfigureExternalAIPolicy — validação de configuração de provider.
 /// </summary>
 public static class ConfigureExternalAIPolicy
 {
-    // ── COMMAND ───────────────────────────────────────────────────────────
-
-    /// <summary>Comando para criar ou atualizar uma política de IA externa.</summary>
     public sealed record Command(
-        string Name,
-        string Description,
-        int MaxDailyQueries,
-        long MaxTokensPerDay,
-        bool RequiresApproval,
-        string AllowedContexts) : ICommand<Response>;
-
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
+        string ProviderId,
+        string ProviderType,
+        string EndpointUrl,
+        string? ApiKey,
+        string ModelName,
+        bool TestConnectivity = false) : ICommand<Response>;
 
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
         {
-            RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
-            RuleFor(x => x.Description).NotEmpty().MaximumLength(1_000);
-            RuleFor(x => x.MaxDailyQueries).GreaterThan(0);
-            RuleFor(x => x.MaxTokensPerDay).GreaterThan(0L);
-            RuleFor(x => x.AllowedContexts).NotEmpty().MaximumLength(1_000);
+            RuleFor(x => x.ProviderId).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.ProviderType).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.EndpointUrl).NotEmpty().MaximumLength(1_000);
+            RuleFor(x => x.ModelName).NotEmpty().MaximumLength(500);
+            RuleFor(x => x.ApiKey).MaximumLength(1_000).When(x => x.ApiKey is not null);
         }
     }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-
     public sealed class Handler(
-        IExternalAiPolicyRepository policyRepository,
-        IDateTimeProvider dateTimeProvider,
-        ILogger<Handler> logger) : ICommandHandler<Command, Response>
+        IAiProviderFactory providerFactory) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            var now = dateTimeProvider.UtcNow;
-            var existing = await policyRepository.GetByNameAsync(request.Name, cancellationToken);
+            var errors = new List<FieldValidationError>();
 
-            bool isNew;
-            ExternalAiPolicy policy;
+            ValidateEndpoint(request.EndpointUrl, errors);
+            ValidateApiKey(request.ProviderType, request.ApiKey, errors);
+            ValidateModelName(request.ModelName, errors);
 
-            if (existing is null)
+            var connectivity = new ConnectivityValidationResult(false, false, null, null);
+            if (request.TestConnectivity && errors.Count == 0)
             {
-                policy = ExternalAiPolicy.Create(
-                    request.Name,
-                    request.Description,
-                    request.MaxDailyQueries,
-                    request.MaxTokensPerDay,
-                    request.RequiresApproval,
-                    request.AllowedContexts,
-                    now);
+                var provider = providerFactory.GetProvider(request.ProviderId);
+                if (provider is null)
+                {
+                    connectivity = connectivity with
+                    {
+                        Checked = true,
+                        IsHealthy = false,
+                        ErrorMessage = $"Provider '{request.ProviderId}' is not registered."
+                    };
+                    errors.Add(new FieldValidationError("providerId", "Provider is not registered in runtime factory."));
+                }
+                else
+                {
+                    var health = await provider.CheckHealthAsync(cancellationToken);
+                    connectivity = new ConnectivityValidationResult(
+                        true,
+                        health.IsHealthy,
+                        health.ResponseTime.HasValue
+                            ? Math.Round(health.ResponseTime.Value.TotalMilliseconds, 2)
+                            : null,
+                        health.IsHealthy ? null : health.Message);
 
-                await policyRepository.AddAsync(policy, cancellationToken);
-                isNew = true;
+                    if (!health.IsHealthy)
+                    {
+                        errors.Add(new FieldValidationError(
+                            "connectivity",
+                            health.Message ?? "Provider connectivity check failed."));
+                    }
+                }
             }
-            else
-            {
-                var updateResult = existing.Update(
-                    request.Description,
-                    request.MaxDailyQueries,
-                    request.MaxTokensPerDay,
-                    request.RequiresApproval,
-                    request.AllowedContexts);
-
-                if (!updateResult.IsSuccess)
-                    return updateResult.Error!;
-
-                await policyRepository.UpdateAsync(existing, cancellationToken);
-                policy = existing;
-                isNew = false;
-            }
-
-            logger.LogInformation(
-                "External AI policy '{PolicyName}' {Action}. MaxDailyQueries={MaxDailyQueries}, RequiresApproval={RequiresApproval}",
-                request.Name, isNew ? "created" : "updated", request.MaxDailyQueries, request.RequiresApproval);
 
             return new Response(
-                policy.Id.Value,
-                policy.Name,
-                policy.Description,
-                policy.MaxDailyQueries,
-                policy.MaxTokensPerDay,
-                policy.RequiresApproval,
-                policy.AllowedContexts,
-                policy.IsActive,
-                isNew ? "Created" : "Updated");
+                errors.Count == 0,
+                errors,
+                connectivity);
+        }
+
+        private static void ValidateEndpoint(string endpointUrl, ICollection<FieldValidationError> errors)
+        {
+            if (!Uri.TryCreate(endpointUrl, UriKind.Absolute, out var endpoint) ||
+                (endpoint.Scheme != Uri.UriSchemeHttp && endpoint.Scheme != Uri.UriSchemeHttps))
+            {
+                errors.Add(new FieldValidationError("endpointUrl", "Endpoint URL must be a valid absolute HTTP/HTTPS URL."));
+            }
+        }
+
+        private static void ValidateApiKey(string providerType, string? apiKey, ICollection<FieldValidationError> errors)
+        {
+            var requiresApiKey = string.Equals(providerType, "openai", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(providerType, "azureopenai", StringComparison.OrdinalIgnoreCase);
+
+            if (!requiresApiKey)
+                return;
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                errors.Add(new FieldValidationError("apiKey", "API key is required for this provider type."));
+                return;
+            }
+
+            if (apiKey.Length < 16)
+            {
+                errors.Add(new FieldValidationError("apiKey", "API key format appears invalid."));
+            }
+        }
+
+        private static void ValidateModelName(string modelName, ICollection<FieldValidationError> errors)
+        {
+            if (string.IsNullOrWhiteSpace(modelName))
+            {
+                errors.Add(new FieldValidationError("modelName", "Model name is required."));
+                return;
+            }
+
+            if (modelName.Any(char.IsWhiteSpace))
+            {
+                errors.Add(new FieldValidationError("modelName", "Model name must not contain whitespace."));
+            }
         }
     }
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-
-    /// <summary>Resultado da configuração da política de IA externa.</summary>
     public sealed record Response(
-        Guid PolicyId,
-        string Name,
-        string Description,
-        int MaxDailyQueries,
-        long MaxTokensPerDay,
-        bool RequiresApproval,
-        string AllowedContexts,
-        bool IsActive,
-        string Action);
+        bool IsValid,
+        IReadOnlyList<FieldValidationError> Errors,
+        ConnectivityValidationResult Connectivity);
+
+    public sealed record FieldValidationError(
+        string Field,
+        string Message);
+
+    public sealed record ConnectivityValidationResult(
+        bool Checked,
+        bool IsHealthy,
+        double? LatencyMs,
+        string? ErrorMessage);
 }

@@ -115,13 +115,27 @@ public sealed class ExternalAiEndpointModule
         }).RequirePermission("ai:runtime:write");
 
         group.MapGet("/usage", async (
+            Guid? conversationId,
+            string? userId,
             DateTimeOffset? from,
             DateTimeOffset? to,
+            string? provider,
+            string? model,
+            Guid? tenantId,
+            Guid? environmentId,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetExternalAIUsageFeature.Query(from, to);
+            var query = new GetExternalAIUsageFeature.Query(
+                conversationId,
+                userId,
+                from,
+                to,
+                provider,
+                model,
+                tenantId,
+                environmentId);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:read");

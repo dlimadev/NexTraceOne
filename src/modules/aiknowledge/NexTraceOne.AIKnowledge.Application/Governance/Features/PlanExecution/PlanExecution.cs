@@ -162,7 +162,7 @@ public static class PlanExecution
                 return ("NexTrace-Summary-v1", "Internal", true);
             }
 
-            return ("NexTrace-Internal-v1", "Internal", true);
+            return ("gpt-4o-mini", "OpenAI", false);
         }
 
         /// <summary>
