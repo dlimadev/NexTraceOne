@@ -18,6 +18,8 @@ internal sealed class RunbookKnowledgeLinkingService(
     KnowledgeDbContext unitOfWork,
     IDateTimeProvider clock) : IRunbookKnowledgeLinkingService
 {
+    private static readonly Guid SystemAuthorId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
     public async Task LinkRunbookToServiceAsync(
         Guid runbookId,
         string runbookTitle,
@@ -69,7 +71,7 @@ internal sealed class RunbookKnowledgeLinkingService(
         if (Guid.TryParse(maintainedBy, out var authorId) && authorId != Guid.Empty)
             return authorId;
 
-        return Guid.Parse("00000000-0000-0000-0000-000000000001");
+        return SystemAuthorId;
     }
 
     private async Task<bool> HasExistingRunbookServiceLinkAsync(
