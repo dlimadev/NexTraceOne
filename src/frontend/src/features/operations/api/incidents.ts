@@ -207,6 +207,48 @@ export interface IncidentCorrelationResponse {
   possibleImpactedContracts: ImpactedContract[];
 }
 
+// ── Dynamic Correlation Engine (P01.1) ───────────────────────────────
+
+export interface DynamicCorrelatedChange {
+  changeId: string;
+  serviceId: string;
+  serviceName: string;
+  description: string;
+  environment: string;
+  occurredAt: string;
+  confidenceLevel: string;
+  matchType: string;
+  timeWindowHours: number;
+  correlatedAt: string;
+}
+
+export interface DynamicCorrelationResponse {
+  incidentId: string;
+  totalCorrelations: number;
+  correlations: DynamicCorrelatedChange[];
+}
+
+export interface TriggerCorrelationRequest {
+  timeWindowHours?: number;
+}
+
+export interface TriggerCorrelationResponse {
+  incidentId: string;
+  timeWindowHours: number;
+  totalCandidates: number;
+  newCorrelations: number;
+  correlations: {
+    changeId: string;
+    serviceName: string;
+    description: string;
+    environment: string;
+    occurredAt: string;
+    confidenceLevel: string;
+    matchType: string;
+    isDuplicate: boolean;
+  }[];
+}
+
 export interface CreateIncidentRequest {
   title: string;
   description: string;
@@ -433,6 +475,13 @@ export const incidentsApi = {
 
   refreshIncidentCorrelation: (incidentId: string) =>
     client.post<IncidentCorrelationResponse>(`/incidents/${incidentId}/correlation/refresh`).then(r => r.data),
+
+  // Dynamic Correlation Engine (P01.1)
+  getCorrelatedChanges: (incidentId: string) =>
+    client.get<DynamicCorrelationResponse>(`/incidents/${incidentId}/correlated-changes`).then(r => r.data),
+
+  triggerCorrelation: (incidentId: string, data?: TriggerCorrelationRequest) =>
+    client.post<TriggerCorrelationResponse>(`/incidents/${incidentId}/correlate`, data ?? {}).then(r => r.data),
 
   getIncidentEvidence: (incidentId: string) =>
     client.get<IncidentEvidenceResponse>(`/incidents/${incidentId}/evidence`).then(r => r.data),

@@ -1299,7 +1299,10 @@
         "Medium": "Média",
         "High": "Alta",
         "Confirmed": "Confirmada"
-      }
+      },
+      "triggeredMessage": "Motor de correlação executado. {{count}} nova(s) correlação(ões) encontrada(s).",
+      "runEngineAction": "Executar motor de correlação",
+      "dynamicCorrelations": "Correlações dinâmicas ({{count}})"
     },
     "evidence": {
       "title": "Evidências",
@@ -1347,14 +1350,6 @@
       "title": "Lista de Incidentes",
       "correlationIndicator": "Correlacionado",
       "mitigationIndicator": "Mitigação"
-    },
-    "mock": {
-      "paymentIncidentTitle": "Payment Gateway — taxa de erros elevada",
-      "catalogIncidentTitle": "Catalog Sync — parceiro de integração inacessível",
-      "inventoryIncidentTitle": "Inventory Consumer — pico no lag do consumidor",
-      "orderIncidentTitle": "Order API — regressão de latência após deploy",
-      "notificationIncidentTitle": "Notification Worker — falhas em jobs background",
-      "authIncidentTitle": "Auth Gateway — incompatibilidade de schema de contrato"
     }
   },
   "runbooks": {

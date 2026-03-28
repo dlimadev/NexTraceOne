@@ -13,7 +13,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { incidentsApi, type IncidentDetailResponse } from '../api/incidents';
+import { incidentsApi, type IncidentDetailResponse, type DynamicCorrelatedChange } from '../api/incidents';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
@@ -82,6 +82,29 @@ export function IncidentDetailPage() {
     queryKey: ['incident-detail', incidentId],
     queryFn: () => incidentsApi.getIncidentDetail(incidentId!),
     enabled: !!incidentId,
+  });
+
+  const correlatedChangesQuery = useQuery({
+    queryKey: ['incident-correlated-changes', incidentId],
+    queryFn: () => incidentsApi.getCorrelatedChanges(incidentId!),
+    enabled: !!incidentId,
+  });
+
+  const triggerCorrelationMutation = useMutation({
+    mutationFn: async () => incidentsApi.triggerCorrelation(incidentId!),
+    onSuccess: (data) => {
+      setRefreshFeedback(
+        t('incidents.correlation.triggeredMessage', { count: data.newCorrelations }),
+      );
+      queryClient.invalidateQueries({ queryKey: ['incident-correlated-changes', incidentId] });
+      queryClient.invalidateQueries({ queryKey: ['incident-detail', incidentId] });
+      queryClient.invalidateQueries({ queryKey: ['incidents'] });
+      queryClient.invalidateQueries({ queryKey: ['incidents-summary'] });
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : t('common.errorLoading');
+      setRefreshFeedback(message);
+    },
   });
 
   const refreshCorrelationMutation = useMutation({
@@ -234,19 +257,34 @@ export function IncidentDetailPage() {
                 <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
                   <GitBranch size={16} className="text-accent" aria-hidden="true" /> {t('incidents.correlation.title')}
                 </h2>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRefreshFeedback(null);
-                    refreshCorrelationMutation.mutate();
-                  }}
-                  disabled={refreshCorrelationMutation.isPending}
-                  className="px-2.5 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body disabled:opacity-60"
-                >
-                  {refreshCorrelationMutation.isPending
-                    ? t('common.loading', 'Loading...')
-                    : t('incidents.correlation.refreshAction', 'Refresh correlation')}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRefreshFeedback(null);
+                      triggerCorrelationMutation.mutate();
+                    }}
+                    disabled={triggerCorrelationMutation.isPending || refreshCorrelationMutation.isPending}
+                    className="px-2.5 py-1.5 text-xs rounded-md border border-accent/30 text-accent hover:bg-accent/10 disabled:opacity-60"
+                  >
+                    {triggerCorrelationMutation.isPending
+                      ? t('common.loading', 'Loading...')
+                      : t('incidents.correlation.runEngineAction', 'Run correlation engine')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRefreshFeedback(null);
+                      refreshCorrelationMutation.mutate();
+                    }}
+                    disabled={refreshCorrelationMutation.isPending || triggerCorrelationMutation.isPending}
+                    className="px-2.5 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body disabled:opacity-60"
+                  >
+                    {refreshCorrelationMutation.isPending
+                      ? t('common.loading', 'Loading...')
+                      : t('incidents.correlation.refreshAction', 'Refresh correlation')}
+                  </button>
+                </div>
               </div>
             </CardHeader>
             <CardBody>
@@ -278,6 +316,26 @@ export function IncidentDetailPage() {
                     <p className="text-sm text-muted">{t('incidents.correlation.noRelatedChanges', 'No correlated changes were confirmed for this incident yet.')}</p>
                   )}
                 </div>
+                {/* Dynamic correlation results from P01.1 engine */}
+                {correlatedChangesQuery.data && correlatedChangesQuery.data.totalCorrelations > 0 && (
+                  <div>
+                    <p className="text-xs text-muted mb-2">
+                      {t('incidents.correlation.dynamicCorrelations', 'Dynamic correlations ({{count}})', { count: correlatedChangesQuery.data.totalCorrelations })}
+                    </p>
+                    {correlatedChangesQuery.data.correlations.map((c: DynamicCorrelatedChange) => (
+                      <div key={c.changeId} className="flex items-center gap-2 p-2 rounded bg-elevated text-sm mb-1">
+                        <GitBranch size={14} className="text-accent shrink-0" aria-hidden="true" />
+                        <span className="text-body truncate">{c.description || c.serviceName}</span>
+                        <Badge
+                          variant={c.confidenceLevel === 'High' ? 'danger' : c.confidenceLevel === 'Medium' ? 'warning' : 'default'}
+                          className="text-[10px] ml-auto shrink-0"
+                        >
+                          {c.confidenceLevel}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div>
                   <p className="text-xs text-muted mb-2">{t('incidents.correlation.relatedServices')}</p>
                   {correlation.relatedServices.length > 0 ? (
