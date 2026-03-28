@@ -33,6 +33,9 @@ public sealed class IncidentDbContext(
     /// <summary>Runbooks operacionais.</summary>
     public DbSet<RunbookRecord> Runbooks => Set<RunbookRecord>();
 
+    /// <summary>Correlações dinâmicas incidente↔mudança geradas pelo motor de correlação.</summary>
+    public DbSet<IncidentChangeCorrelation> ChangeCorrelations => Set<IncidentChangeCorrelation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IncidentDbContext).Assembly;
