@@ -1,28 +1,25 @@
 using Ardalis.GuardClauses;
-
 using FluentValidation;
-
-using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.GetExternalAIUsage;
 
 /// <summary>
-/// Feature: GetExternalAIUsage — consolida métricas reais de uso de IA externa para
-/// governança, visibilidade e controle operacional. Agrega dados de consultas e captures.
-/// Estrutura VSA: Query + Validator + Handler + Response num único ficheiro.
+/// Feature: GetExternalAIUsage — consolida métricas de token usage por conversa.
 /// </summary>
 public static class GetExternalAIUsage
 {
-    // ── QUERY ─────────────────────────────────────────────────────────────
-
-    /// <summary>Query para obter métricas agregadas de uso de IA externa.</summary>
     public sealed record Query(
+        Guid? ConversationId,
+        string? UserId,
         DateTimeOffset? From,
-        DateTimeOffset? To) : IQuery<Response>;
-
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
+        DateTimeOffset? To,
+        string? Provider,
+        string? Model,
+        Guid? TenantId,
+        Guid? EnvironmentId) : IQuery<Response>;
 
     public sealed class Validator : AbstractValidator<Query>
     {
@@ -31,72 +28,108 @@ public static class GetExternalAIUsage
             RuleFor(x => x.From).LessThan(x => x.To)
                 .When(x => x.From.HasValue && x.To.HasValue)
                 .WithMessage("'From' must be earlier than 'To'.");
+
+            RuleFor(x => x.UserId)
+                .MaximumLength(500)
+                .When(x => !string.IsNullOrWhiteSpace(x.UserId));
+
+            RuleFor(x => x.Provider)
+                .MaximumLength(200)
+                .When(x => !string.IsNullOrWhiteSpace(x.Provider));
+
+            RuleFor(x => x.Model)
+                .MaximumLength(200)
+                .When(x => !string.IsNullOrWhiteSpace(x.Model));
         }
     }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-
     public sealed class Handler(
-        IKnowledgeCaptureRepository captureRepository) : IQueryHandler<Query, Response>
+        IAiUsageEntryRepository usageEntryRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            var metrics = await captureRepository.GetUsageMetricsAsync(
-                request.From, request.To, cancellationToken);
+            var entries = await usageEntryRepository.ListAsync(
+                request.UserId,
+                modelId: null,
+                request.From,
+                request.To,
+                result: null,
+                clientType: null,
+                pageSize: 1_000,
+                cancellationToken);
 
-            var approvalRate = metrics.TotalCaptures > 0
-                ? Math.Round((double)metrics.ApprovedCaptures / metrics.TotalCaptures * 100, 2)
+            var filtered = entries
+                .Where(entry => !request.ConversationId.HasValue || entry.ConversationId == request.ConversationId)
+                .Where(entry => string.IsNullOrWhiteSpace(request.Provider) ||
+                                string.Equals(entry.Provider, request.Provider, StringComparison.OrdinalIgnoreCase))
+                .Where(entry => string.IsNullOrWhiteSpace(request.Model) ||
+                                string.Equals(entry.ModelName, request.Model, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var totalTokens = filtered.Sum(entry => (long)entry.TotalTokens);
+            var inputTokens = filtered.Sum(entry => (long)entry.PromptTokens);
+            var outputTokens = filtered.Sum(entry => (long)entry.CompletionTokens);
+            var conversationCount = filtered
+                .Where(entry => entry.ConversationId.HasValue)
+                .Select(entry => entry.ConversationId!.Value)
+                .Distinct()
+                .Count();
+
+            var averageTokensPerConversation = conversationCount > 0
+                ? Math.Round(totalTokens / (double)conversationCount, 2)
                 : 0d;
 
-            var reuseRate = metrics.ApprovedCaptures > 0
-                ? Math.Round((double)metrics.TotalReuses / metrics.ApprovedCaptures * 100, 2)
-                : 0d;
-
-            var byProvider = metrics.ByProvider.Select(p => new ProviderUsage(
-                p.ProviderId, p.ConsultationCount, p.TokensUsed)).ToList();
+            var byProvider = filtered
+                .GroupBy(entry => entry.Provider)
+                .Select(group => new ProviderUsage(
+                    group.Key,
+                    group.Sum(entry => (long)entry.TotalTokens),
+                    group.Sum(entry => (long)entry.PromptTokens),
+                    group.Sum(entry => (long)entry.CompletionTokens),
+                    group.Count()))
+                .OrderByDescending(item => item.TotalTokens)
+                .ToList();
 
             return new Response(
-                metrics.TotalConsultations,
-                metrics.CompletedConsultations,
-                metrics.FailedConsultations,
-                metrics.TotalTokensUsed,
+                totalTokens,
+                inputTokens,
+                outputTokens,
+                conversationCount,
+                averageTokensPerConversation,
                 byProvider,
-                metrics.TotalCaptures,
-                metrics.ApprovedCaptures,
-                metrics.RejectedCaptures,
-                metrics.PendingCaptures,
-                metrics.TotalReuses,
-                approvalRate,
-                reuseRate,
+                request.ConversationId,
+                request.UserId,
                 request.From,
-                request.To);
+                request.To,
+                request.Provider,
+                request.Model,
+                request.TenantId,
+                request.EnvironmentId);
         }
     }
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-
-    /// <summary>Métricas agregadas de uso de IA externa.</summary>
     public sealed record Response(
-        int TotalConsultations,
-        int CompletedConsultations,
-        int FailedConsultations,
-        long TotalTokensUsed,
+        long TotalTokens,
+        long InputTokens,
+        long OutputTokens,
+        int ConversationCount,
+        double AverageTokensPerConversation,
         IReadOnlyList<ProviderUsage> ByProvider,
-        int TotalCaptures,
-        int ApprovedCaptures,
-        int RejectedCaptures,
-        int PendingCaptures,
-        long TotalReuses,
-        double ApprovalRatePct,
-        double ReuseRatePct,
+        Guid? ConversationId,
+        string? UserId,
         DateTimeOffset? PeriodFrom,
-        DateTimeOffset? PeriodTo);
+        DateTimeOffset? PeriodTo,
+        string? Provider,
+        string? Model,
+        Guid? TenantId,
+        Guid? EnvironmentId);
 
-    /// <summary>Uso agregado por provedor de IA.</summary>
     public sealed record ProviderUsage(
         string ProviderId,
-        int ConsultationCount,
-        long TokensUsed);
+        long TotalTokens,
+        long InputTokens,
+        long OutputTokens,
+        int EntryCount);
 }

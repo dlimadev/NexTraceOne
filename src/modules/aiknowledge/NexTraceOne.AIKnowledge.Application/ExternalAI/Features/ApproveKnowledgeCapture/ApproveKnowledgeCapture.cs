@@ -1,33 +1,20 @@
-using Ardalis.GuardClauses;
-
 using FluentValidation;
-
-using Microsoft.Extensions.Logging;
-
-using NexTraceOne.AIKnowledge.Application.ExternalAI.Abstractions;
-using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Errors;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.ApproveKnowledgeCapture;
 
 /// <summary>
-/// Feature: ApproveKnowledgeCapture — aprova formalmente um capture de conhecimento
-/// para reutilização confiável. Valida pré-condições e registra quem aprovou e quando.
-/// Estrutura VSA: Command + Validator + Handler + Response num único ficheiro.
+/// TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
+/// This handler will implement capture approval workflow when knowledge capture is prioritized.
 /// </summary>
 public static class ApproveKnowledgeCapture
 {
-    // ── COMMAND ───────────────────────────────────────────────────────────
-
     /// <summary>Comando para aprovar um capture de conhecimento de IA externa.</summary>
     public sealed record Command(
         Guid CaptureId,
         string? ReviewNotes) : ICommand<Response>;
-
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
 
     public sealed class Validator : AbstractValidator<Command>
     {
@@ -38,47 +25,15 @@ public static class ApproveKnowledgeCapture
         }
     }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-
-    public sealed class Handler(
-        IKnowledgeCaptureRepository captureRepository,
-        ICurrentUser currentUser,
-        IDateTimeProvider dateTimeProvider,
-        ILogger<Handler> logger) : ICommandHandler<Command, Response>
+    public sealed class Handler : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(request);
-
-            var capture = await captureRepository.GetByIdAsync(
-                KnowledgeCaptureId.From(request.CaptureId), cancellationToken);
-
-            if (capture is null)
-                return ExternalAiErrors.KnowledgeCaptureNotFound(request.CaptureId.ToString());
-
-            var now = dateTimeProvider.UtcNow;
-            var reviewer = currentUser.Email;
-
-            var approvalResult = capture.Approve(reviewer, now);
-            if (!approvalResult.IsSuccess)
-                return approvalResult.Error!;
-
-            await captureRepository.UpdateAsync(capture, cancellationToken);
-
-            logger.LogInformation(
-                "Knowledge capture {CaptureId} approved by {Reviewer} at {ApprovedAt}",
-                capture.Id.Value, reviewer, now);
-
-            return new Response(
-                capture.Id.Value,
-                capture.Status.ToString(),
-                reviewer,
-                now,
-                request.ReviewNotes);
+            // TODO: P03.x — Knowledge capture workflow not in scope for Phase 01.
+            return await Task.FromResult<Result<Response>>(
+                ExternalAiErrors.NotImplemented("Feature pending Phase 03"));
         }
     }
-
-    // ── RESPONSE ──────────────────────────────────────────────────────────
 
     /// <summary>Resultado da aprovação do capture de conhecimento.</summary>
     public sealed record Response(

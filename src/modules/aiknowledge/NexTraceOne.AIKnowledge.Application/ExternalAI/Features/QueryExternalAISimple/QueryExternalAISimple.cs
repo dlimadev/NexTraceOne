@@ -1,80 +1,83 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
-using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.AIKnowledge.Application.ExternalAI.Features.QueryExternalAISimple;
 
 /// <summary>
-/// Feature: QueryExternalAISimple — consulta direta e simples a um provider de IA externa.
-/// Roteia a query via IExternalAIRoutingPort sem grounding estruturado adicional.
+/// Feature: QueryExternalAISimple — health check essencial dos providers externos configurados.
 /// </summary>
 public static class QueryExternalAISimple
 {
-    // ── COMMAND ───────────────────────────────────────────────────────────
-
     public sealed record Command(
-        string Query,
-        string? ContextScope,
-        string? SystemContext,
-        string? PreferredProvider) : ICommand<Response>;
-
-    // ── VALIDATOR ─────────────────────────────────────────────────────────
+        string? ProviderId = null) : ICommand<Response>;
 
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
         {
-            RuleFor(x => x.Query)
-                .NotEmpty()
-                .MaximumLength(10_000);
+            RuleFor(x => x.ProviderId)
+                .MaximumLength(200)
+                .When(x => !string.IsNullOrWhiteSpace(x.ProviderId));
         }
     }
 
-    // ── HANDLER ───────────────────────────────────────────────────────────
-
     public sealed class Handler(
-        IExternalAIRoutingPort externalAiRoutingPort,
-        IDateTimeProvider dateTimeProvider,
-        ILogger<Handler> logger) : ICommandHandler<Command, Response>
+        IAiProviderHealthService healthService) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
-            Guard.Against.NullOrWhiteSpace(request.Query);
 
-            var correlationId = Guid.NewGuid().ToString();
-            var context = request.SystemContext ?? request.ContextScope ?? "general";
-
-            string content;
-            try
+            var checkedAt = DateTimeOffset.UtcNow;
+            if (!string.IsNullOrWhiteSpace(request.ProviderId))
             {
-                content = await externalAiRoutingPort.RouteQueryAsync(
-                    context,
-                    request.Query,
-                    request.PreferredProvider,
-                    cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "AI provider unavailable for simple query. CorrelationId={CorrelationId}", correlationId);
-                return Error.Business("AIKnowledge.Provider.Unavailable", "AI provider unavailable: {0}", ex.Message);
+                var providerResult = await healthService.CheckProviderAsync(request.ProviderId, cancellationToken);
+                return new Response(
+                    [MapProviderStatus(providerResult, checkedAt)],
+                    1);
             }
 
-            var isFallback = content.StartsWith("[FALLBACK_PROVIDER_UNAVAILABLE]", StringComparison.OrdinalIgnoreCase);
+            var results = await healthService.CheckAllProvidersAsync(cancellationToken);
+            var providers = results
+                .Select(result => MapProviderStatus(result, checkedAt))
+                .ToList();
 
-            return Result<Response>.Success(new Response(content, request.PreferredProvider ?? "default", isFallback, correlationId));
+            return new Response(providers, providers.Count);
+        }
+
+        private static ProviderHealthStatusItem MapProviderStatus(
+            AiProviderHealthResult result,
+            DateTimeOffset checkedAt)
+        {
+            var latencyMs = result.ResponseTime.HasValue
+                ? Math.Round(result.ResponseTime.Value.TotalMilliseconds, 2)
+                : (double?)null;
+
+            var status = result.IsHealthy
+                ? ProviderHealthStatus.Healthy.ToString()
+                : ProviderHealthStatus.Unhealthy.ToString();
+
+            return new ProviderHealthStatusItem(
+                result.ProviderId,
+                status,
+                latencyMs,
+                checkedAt,
+                result.IsHealthy ? null : result.Message);
         }
     }
 
-    // ── RESPONSE ──────────────────────────────────────────────────────────
-
     public sealed record Response(
-        string Content,
+        IReadOnlyList<ProviderHealthStatusItem> Providers,
+        int TotalProviders);
+
+    public sealed record ProviderHealthStatusItem(
         string ProviderId,
-        bool IsFallback,
-        string CorrelationId);
+        string Status,
+        double? LatencyMs,
+        DateTimeOffset LastCheckedAt,
+        string? ErrorMessage);
 }
