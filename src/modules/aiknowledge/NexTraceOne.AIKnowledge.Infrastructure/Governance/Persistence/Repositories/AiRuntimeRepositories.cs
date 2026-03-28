@@ -46,6 +46,12 @@ internal sealed class AiSourceRepository(AiGovernanceDbContext context) : IAiSou
 
     public async Task AddAsync(AiSource entity, CancellationToken ct)
         => await context.Sources.AddAsync(entity, ct);
+
+    public Task UpdateAsync(AiSource entity, CancellationToken ct)
+    {
+        context.Sources.Update(entity);
+        return Task.CompletedTask;
+    }
 }
 
 internal sealed class AiTokenQuotaPolicyRepository(AiGovernanceDbContext context) : IAiTokenQuotaPolicyRepository

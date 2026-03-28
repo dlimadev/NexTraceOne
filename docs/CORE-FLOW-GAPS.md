@@ -83,7 +83,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 4 — AI-Assisted Operations & Engineering
 
-**State: governance infrastructure exists; assistant returns hardcoded responses; 8 ExternalAI stubs**
+**State: LLM real integrado E2E; governance real; grounding cross-module incompleto**
 
 ### What works
 - Model Registry: CRUD, budget tracking, metadata (`AiGovernanceDbContext`)
@@ -92,22 +92,25 @@ This document is the canonical reference for the real operational state of each 
 - AI Audit log: entries recorded (`AiGovernanceDbContext`)
 - Tool execution: 3 real tools wired — `list_services`, `get_service_health`, `list_recent_changes`
 - Streaming endpoint: `POST /api/v1/ai/chat/stream` (SSE) — infrastructure present
-- Grounding assembly: `DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService` wired; DB retrieval searches only `AIModels` table (not cross-module entities)
+- Grounding assembly: `DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService` wired
+- **`SendAssistantMessage`** — invoca `IChatCompletionProvider.CompleteAsync()` via `IAiProviderFactory`; LLM real via Ollama/OpenAI; fallback degradado quando nenhum provider disponível
+- **`AiAssistantPage.tsx`** — usa `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas API reais)
+- **`IAiOrchestrationModule`** — implementado por `AiOrchestrationModule`; DbContext com migrações confirmadas
+- **`IExternalAiModule`** — implementado por `ExternalAiModule`; DbContext com migrações confirmadas
+- **Knowledge Source Weights** — persistidos em `aik_source_weights`; `ListKnowledgeSourceWeights` consulta DB com fallback a defaults
+- **PlanExecution model selection** — usa `IAiModelCatalogService` para resolver modelo real via Model Registry
+- **AI Source health check** — verifica conectividade HTTP para fontes Document com URL; actualiza estado persistido
 
-### Gaps (critical)
-- **`SendAssistantMessage` returns hardcoded responses** — no real LLM invoked end-to-end; `IExternalAIRoutingPort` abstraction exists but is not called by the handler
-- **`AiAssistantPage.tsx`** — uses `mockConversations` hardcoded; frontend flow is entirely simulated
-- **ExternalAI: 8 features all TODO stubs** — `IExternalAiModule` = PLAN (empty interface); OpenAI disabled by default; Ollama configured at `localhost:11434` (`qwen3.5:9b`) but not wired through
-- **Governance governs nothing real** — the governance infrastructure (policies, budgets, audit) exists but the assistant it governs returns hardcoded responses; governance is formally present and functionally hollow
-- **`IAiOrchestrationModule`** — PLAN (empty interface); orchestration flows not callable cross-module
-- **`AiOrchestrationDbContext` and `ExternalAiDbContext`** — snapshot exists; no confirmed deployable EF migration
-- **Cross-module grounding** — `IContractsModule` and `IChangeIntelligenceModule` are PLAN; AI cannot query real contracts or changes dynamically
-- **Model selection** — `NexTrace-Internal-v1` (fictional ID) returned; not connected to real Model Registry
+### Gaps (medium/low)
+- **Cross-module grounding** — `DatabaseRetrievalService` consulta apenas tabelas do módulo AI; entidades de outros módulos (contratos, mudanças, incidentes) acessíveis via grounding readers mas sem full cross-module query support
+- **AI Source health check** — conectores para fontes Database e ExternalMemory ainda retornam estado persistido (sem teste de conectividade real para esses tipos)
+- **Model selection routing** — classificação de caso de uso usa heurística de palavras-chave; NLP real não implementado
 
 ### Evidence
-- `src/modules/aiknowledge/` — `AiGovernanceDbContext` (confirmed migration), `AiOrchestrationDbContext` (snapshot only), `ExternalAiDbContext` (snapshot only)
-- `docs/audit-forensic-2026-03/ai-agents-governance-report.md §4, §9, §10`
-- `docs/audit-forensic-2026-03/final-project-state-assessment.md §3 (Fluxo 4)`
+- `src/modules/aiknowledge/` — `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` (todos com migrações confirmadas)
+- `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Application/Governance/Features/SendAssistantMessage/SendAssistantMessage.cs`
+- `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/Orchestration/Services/AiOrchestrationModule.cs`
+- `src/modules/aiknowledge/NexTraceOne.AIKnowledge.Infrastructure/ExternalAI/Services/ExternalAiModule.cs`
 
 ---
 
@@ -115,7 +118,7 @@ This document is the canonical reference for the real operational state of each 
 
 | Gap | Flows Affected | Status |
 |---|---|---|
-| 8 cross-module interfaces unimplemented (`IContractsModule`, `IChangeIntelligenceModule`, `IPromotionModule`, `IRulesetGovernanceModule`, `ICostIntelligenceModule`, `IRuntimeIntelligenceModule`, `IAiOrchestrationModule`, `IExternalAiModule`) | 1, 2, 3, 4 | PLAN |
+| 8 cross-module interfaces (of which 6 still PLAN: `IContractsModule`, `IChangeIntelligenceModule`, `IPromotionModule`, `IRulesetGovernanceModule`, `ICostIntelligenceModule`, `IRuntimeIntelligenceModule`); `IAiOrchestrationModule` and `IExternalAiModule` now IMPLEMENTED | 1, 2, 3, 4 | PARTIAL |
 | Outbox processed only for `IdentityDbContext` — 23 other DbContexts produce unprocessed domain events | All | PARTIAL |
 | E2E tests do not gate PRs — incidents and AI tests use static fixtures | 3, 4 | CI gap |
 
@@ -128,7 +131,7 @@ This document is the canonical reference for the real operational state of each 
 | 1 — Source of Truth / Contracts | **75%** | Real (91.7%) | Real (7 stubs) | `IContractsModule` PLAN |
 | 2 — Change Confidence | **95%** | Real (100%) | Real (100%) | `IChangeIntelligenceModule` PLAN |
 | 3 — Incident Correlation | **0%** | Infra only | Mock inline | Correlation engine absent |
-| 4 — AI Assistant | **infra real; E2E broken** | Governance real; assistant hardcoded | `mockConversations` | LLM not wired; `IExternalAiModule` PLAN |
+| 4 — AI Assistant | **LLM real E2E; governance real** | LLM real via Ollama/OpenAI; grounding cross-module incompleto | API real (7 chamadas) | Grounding full cross-module |
 
 ---
 

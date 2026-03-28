@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -8,10 +9,9 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Features.ListKnowledgeS
 
 /// <summary>
 /// Feature: ListKnowledgeSourceWeights — lista pesos configurados de fontes
-/// de conhecimento por caso de uso. Fornece visibilidade sobre priorização
-/// de fontes na composição de contexto de IA.
+/// de conhecimento por caso de uso. Consulta configurações persistidas no banco,
+/// com fallback aos pesos padrão quando nenhuma configuração estiver presente.
 /// Estrutura VSA: Query + Handler + Response num único ficheiro.
-/// Stub: retorna configurações in-memory — persistência em evolução futura.
 /// </summary>
 public static class ListKnowledgeSourceWeights
 {
@@ -19,9 +19,10 @@ public static class ListKnowledgeSourceWeights
     public sealed record Query(string? UseCaseType) : IQuery<Response>;
 
     /// <summary>Handler que lista pesos de fontes por caso de uso.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IAiKnowledgeSourceWeightRepository weightRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
@@ -31,20 +32,29 @@ public static class ListKnowledgeSourceWeights
                     : (AIUseCaseType?)null
                 : null;
 
-            var allWeights = BuildDefaultWeights();
+            // Consultar configurações persistidas
+            var persisted = await weightRepository.ListAsync(
+                useCaseFilter, isActive: true, cancellationToken);
 
-            var filtered = useCaseFilter.HasValue
-                ? allWeights.Where(w => w.UseCaseType == useCaseFilter.Value.ToString()).ToList()
-                : allWeights;
+            // Se não existem configurações persistidas, retornar os pesos padrão
+            // (comportamento de bootstrap: novos ambientes têm pesos razoáveis sem configuração manual)
+            var items = persisted.Count > 0
+                ? persisted.Select(w => new SourceWeightItem(
+                    w.SourceType.ToString(),
+                    w.UseCaseType.ToString(),
+                    w.Relevance.ToString(),
+                    w.Weight,
+                    w.TrustLevel)).ToList()
+                : BuildDefaultWeights(useCaseFilter);
 
-            return Task.FromResult<Result<Response>>(new Response(filtered, filtered.Count));
+            return new Response(items, items.Count);
         }
 
         /// <summary>
         /// Constrói pesos padrão de fontes por caso de uso.
-        /// Stub: configuração in-memory — persistência em evolução futura.
+        /// Usado como fallback quando nenhuma configuração persistida existe.
         /// </summary>
-        private static List<SourceWeightItem> BuildDefaultWeights()
+        private static List<SourceWeightItem> BuildDefaultWeights(AIUseCaseType? useCaseFilter)
         {
             var weights = new List<SourceWeightItem>();
 
@@ -108,7 +118,9 @@ public static class ListKnowledgeSourceWeights
                 (KnowledgeSourceType.SourceOfTruth, 20, "Secondary"),
                 (KnowledgeSourceType.Documentation, 20, "Supplementary"));
 
-            return weights;
+            return useCaseFilter.HasValue
+                ? weights.Where(w => w.UseCaseType == useCaseFilter.Value.ToString()).ToList()
+                : weights;
         }
 
         private static void AddWeights(
@@ -141,3 +153,4 @@ public static class ListKnowledgeSourceWeights
         int Weight,
         int TrustLevel);
 }
+

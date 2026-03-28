@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -43,6 +44,7 @@ public static class PlanExecution
     public sealed class Handler(
         IAiRoutingStrategyRepository strategyRepository,
         IAiKnowledgeSourceRepository knowledgeSourceRepository,
+        IAiModelCatalogService modelCatalogService,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -64,11 +66,10 @@ public static class PlanExecution
                 .FirstOrDefault();
 
             var routingPath = applicableStrategy?.PreferredPath ?? AIRoutingPath.InternalOnly;
-            var allowExternal = applicableStrategy?.AllowExternalEscalation ?? false;
 
-            // ── Selecionar modelo ────────────────────────────────────────
-            var (selectedModel, selectedProvider, isInternal) = SelectModel(
-                useCaseType, persona, routingPath);
+            // ── Selecionar modelo via Model Registry ─────────────────────
+            var (selectedModel, selectedProvider, isInternal) = await ResolveModelAsync(
+                useCaseType, persona, routingPath, request.PreferredModelId, modelCatalogService, cancellationToken);
 
             // ── Resolver fontes e pesos ──────────────────────────────────
             var sources = await knowledgeSourceRepository.ListAsync(
@@ -142,27 +143,64 @@ public static class PlanExecution
         }
 
         /// <summary>
-        /// Seleciona modelo baseado em caso de uso, persona e caminho de roteamento.
-        /// Stub: retorna modelo interno por padrão — evolução com Model Registry lookup.
+        /// Seleciona modelo via Model Registry. Ordem de preferência:
+        /// 1. Modelo preferido explicitamente pelo caller (PreferredModelId)
+        /// 2. Modelo resolvido por finalidade adequada ao caso de uso
+        /// 3. Fallback: modelo padrão "chat" do registry
+        /// 4. Último recurso: assume roteamento interno sem modelo registado
         /// </summary>
-        private static (string Model, string Provider, bool IsInternal) SelectModel(
-            AIUseCaseType useCaseType, string persona, AIRoutingPath routingPath)
+        private static async Task<(string Model, string Provider, bool IsInternal)> ResolveModelAsync(
+            AIUseCaseType useCaseType,
+            string persona,
+            AIRoutingPath routingPath,
+            Guid? preferredModelId,
+            IAiModelCatalogService catalog,
+            CancellationToken ct)
         {
-            // Casos que podem beneficiar de modelo mais capaz
-            if (routingPath == AIRoutingPath.ExternalEscalation &&
-                useCaseType is AIUseCaseType.ContractGeneration or AIUseCaseType.ChangeAnalysis)
+            // 1. Modelo explicitamente preferido pelo caller
+            if (preferredModelId.HasValue)
             {
-                return ("NexTrace-Advanced-v1", "Internal-Advanced", true);
+                var preferred = await catalog.ResolveModelByIdAsync(preferredModelId.Value, ct);
+                if (preferred is not null)
+                    return (preferred.ModelName, preferred.ProviderDisplayName, preferred.IsInternal);
             }
 
-            // Executivos usam modelo otimizado para síntese
-            if (persona.Equals("Executive", StringComparison.OrdinalIgnoreCase) ||
-                persona.Equals("Product", StringComparison.OrdinalIgnoreCase))
-            {
-                return ("NexTrace-Summary-v1", "Internal", true);
-            }
+            // 2. Finalidade derivada do caso de uso e persona
+            var purpose = DeriveModelPurpose(useCaseType, persona);
+            var resolved = await catalog.ResolveDefaultModelAsync(purpose, ct);
+            if (resolved is not null)
+                return (resolved.ModelName, resolved.ProviderDisplayName, resolved.IsInternal);
 
-            return ("gpt-4o-mini", "OpenAI", false);
+            // 3. Fallback genérico para chat
+            var fallback = await catalog.ResolveDefaultModelAsync("chat", ct);
+            if (fallback is not null)
+                return (fallback.ModelName, fallback.ProviderDisplayName, fallback.IsInternal);
+
+            // 4. Último recurso: assume roteamento interno sem modelo registado
+            return ("internal-default", "Internal", true);
+        }
+
+        /// <summary>
+        /// Deriva a finalidade de modelo adequada ao caso de uso e persona.
+        /// </summary>
+        private static string DeriveModelPurpose(AIUseCaseType useCaseType, string persona)
+        {
+            // Casos que requerem capacidade de geração de código/análise avançada
+            if (useCaseType is AIUseCaseType.ContractGeneration)
+                return "code";
+
+            // Análise e correlação
+            if (useCaseType is AIUseCaseType.ChangeAnalysis
+                or AIUseCaseType.IncidentExplanation
+                or AIUseCaseType.RiskComplianceExplanation)
+                return "analysis";
+
+            // Executivos e produto — optimizado para síntese
+            if (persona.Equals("Executive", StringComparison.OrdinalIgnoreCase)
+                || persona.Equals("Product", StringComparison.OrdinalIgnoreCase))
+                return "completion";
+
+            return "chat";
         }
 
         /// <summary>
@@ -174,7 +212,6 @@ public static class PlanExecution
             var sourceNames = new List<string>();
             var weights = new List<string>();
 
-            // Definir fontes prioritárias por caso de uso
             var priorities = GetSourcePriorities(useCaseType);
 
             foreach (var (sourceType, weight) in priorities)

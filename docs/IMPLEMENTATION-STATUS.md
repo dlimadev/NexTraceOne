@@ -132,17 +132,18 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| AI Governance (modelos, políticas, budgets) | PARTIAL | Repositórios EF Core reais; `SendAssistantMessage` retorna respostas hardcoded — sem LLM real integrado no fluxo E2E |
+| AI Governance (modelos, políticas, budgets) | REAL | Repositórios EF Core reais; `SendAssistantMessage` invoca `IChatCompletionProvider.CompleteAsync()` com LLM real, routing, governance, audit trail e fallback degradado |
 | Model Registry | PARTIAL | Funcional com DbContext real |
-| AI Streaming | PARTIAL | `IChatCompletionProvider` com streaming; endpoint SSE existe; sem LLM real integrado |
+| AI Streaming | PARTIAL | `IChatCompletionProvider` com streaming; endpoint SSE existe; LLM real integrado via Ollama/OpenAI |
 | AI Tool Execution | PARTIAL | `IToolRegistry`, `IToolExecutor`, `IToolPermissionValidator` implementados; 3 ferramentas reais (`list_services`, `get_service_health`, `list_recent_changes`); `MaxToolIterations=5` |
 | AI Grounding / Context | PARTIAL | Assemblagem de contexto configurada (`DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService`); sem pesquisa cross-module de entidades reais |
-| AI Orchestration | PARTIAL | `AiOrchestrationDbContext` existe (ModelSnapshot); `IAiOrchestrationModule` = PLAN (interface vazia) |
-| External AI | STUB | 8 handlers com `TODO` stubs; `IExternalAiModule` = PLAN (interface vazia) |
-| AiAssistantPage (frontend) | SIM | 100% mock — `mockConversations` hardcoded, não conectado à API real |
+| AI Orchestration | REAL | `AiOrchestrationDbContext` com migrações; `IAiOrchestrationModule` implementado por `AiOrchestrationModule` |
+| External AI | REAL | `IExternalAiModule` implementado por `ExternalAiModule`; `ExternalAiDbContext` com migrações |
+| Knowledge Source Weights | REAL | Pesos persistidos em `aik_source_weights`; `ListKnowledgeSourceWeights` consulta DB com fallback a defaults |
+| AiAssistantPage (frontend) | REAL | Usa API real: `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas API reais) |
 
-**DbContexts:** `AiGovernanceDbContext` (migrações confirmadas), `AiOrchestrationDbContext` (ModelSnapshot), `ExternalAiDbContext` (ModelSnapshot)
-**Evidência:** `src/modules/aiknowledge/`, `docs/audit-forensic-2026-03/backend-state-report.md §AI`
+**DbContexts:** `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` — todos com migrações confirmadas.
+**Evidência:** `src/modules/aiknowledge/`
 
 ---
 
@@ -225,8 +226,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | `ICatalogGraphModule` | PARTIAL | Usada em Governance para `ServiceCount` (único uso ativo) |
 | `IRuntimeIntelligenceModule` | PLAN | Interface vazia, sem implementação |
 | `ICostIntelligenceModule` | PLAN | Interface vazia, sem implementação |
-| `IAiOrchestrationModule` | PLAN | Interface vazia, sem implementação |
-| `IExternalAiModule` | PLAN | Interface vazia, sem implementação |
+| `IAiOrchestrationModule` | REAL | Implementado por `AiOrchestrationModule` (Infrastructure) |
+| `IExternalAiModule` | REAL | Implementado por `ExternalAiModule` (Infrastructure) |
 | `IKnowledgeModule` | PLAN | Definida, 0 implementações |
 
 **Gap crítico:** 8 interfaces cross-module definidas; 7 de 8 com zero implementações. Integração entre módulos não funciona.
@@ -254,7 +255,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Change Governance | READY | Sim (100% real, módulo flagship) |
 | Audit Compliance | READY | Sim (hash chain SHA-256) |
 | Operational Intelligence | PARTIAL | Não — correlação quebrada, frontend mock |
-| AI Knowledge | PARTIAL | Não — sem LLM real E2E |
+| AI Knowledge | PARTIAL | Não — grounding cross-module incompleto; health checks de AI sources parcialmente implementados |
 | Governance | SIM (por design) | Não |
 | Knowledge | INCOMPLETE | Não |
 | Notifications | PARTIAL | Pendente validação E2E |
