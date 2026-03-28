@@ -12,9 +12,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMiti
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationRecommendations;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationWorkflow;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
@@ -663,6 +661,10 @@ public sealed class InMemoryIncidentStore : IIncidentStore
         return null;
     }
 
+    public Task<GetMitigationHistory.Response?> GetMitigationHistoryAsync(
+        string incidentId, CancellationToken ct = default)
+        => Task.FromResult(GetMitigationHistory(incidentId));
+
     public GetMitigationValidation.Response? GetMitigationValidation(string incidentId, string workflowId)
     {
         // Check recorded validations first
@@ -736,84 +738,23 @@ public sealed class InMemoryIncidentStore : IIncidentStore
         return new RecordMitigationValidation.Response(wfGuid, status, validatedAt);
     }
 
-    // ── Runbooks ─────────────────────────────────────────────────────────
+    public Task<RecordMitigationValidation.Response?> RecordMitigationValidationAsync(
+        string incidentId, string workflowId, ValidationStatus status,
+        string? observedOutcome, string? validatedBy,
+        IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks,
+        CancellationToken ct = default)
+        => Task.FromResult(RecordMitigationValidation(incidentId, workflowId, status, observedOutcome, validatedBy, checks));
 
-    public IReadOnlyList<ListRunbooks.RunbookSummaryDto> GetRunbooks()
-    {
-        return new List<ListRunbooks.RunbookSummaryDto>
-        {
-            new(Guid.Parse(Rb1), "Payment Gateway Rollback Procedure",
-                "Step-by-step guide for rolling back the payment-service deployment.",
-                "payment-service", "ServiceDegradation", 6, DateTimeOffset.Parse("2024-01-15T09:00:00Z")),
-            new(Guid.Parse(Rb2), "Catalog Sync Manual Recovery",
-                "Steps for manually recovering catalog synchronization.",
-                "catalog-service", "DependencyFailure", 4, DateTimeOffset.Parse("2024-02-10T11:00:00Z")),
-            new(Guid.Parse(Rb3), "Generic Service Restart Procedure",
-                "Standard procedure for performing a controlled restart of a service.",
-                null, null, 4, DateTimeOffset.Parse("2024-03-01T08:00:00Z")),
-        };
-    }
+    // ── CreateMitigationWorkflow async stub ─────────────────────────────
 
-    public GetRunbookDetail.Response? GetRunbookDetail(string runbookId)
-    {
-        if (runbookId.Equals(Rb1, StringComparison.OrdinalIgnoreCase))
-        {
-            return new GetRunbookDetail.Response(
-                Guid.Parse(Rb1), "Payment Gateway Rollback Procedure",
-                "Step-by-step guide for rolling back the payment-service deployment to a known stable version.",
-                "payment-service", "ServiceDegradation",
-                new[]
-                {
-                    new GetRunbookDetail.RunbookStepDto(1, "Confirm rollback target version", "Identify the last known stable version from deployment history.", false),
-                    new GetRunbookDetail.RunbookStepDto(2, "Notify affected teams", "Send notification to downstream consumers before rollback.", false),
-                    new GetRunbookDetail.RunbookStepDto(3, "Trigger rollback pipeline", "Use the CI/CD one-click rollback to deploy the target version.", false),
-                    new GetRunbookDetail.RunbookStepDto(4, "Validate deployment health", "Check health endpoints and error rates post-deployment.", false),
-                    new GetRunbookDetail.RunbookStepDto(5, "Monitor for 30 minutes", "Observe error rate and payment success metrics for stability.", false),
-                    new GetRunbookDetail.RunbookStepDto(6, "Update incident status", "Mark the incident as mitigated and document the outcome.", true),
-                },
-                new[] { "CI/CD pipeline access for payment-service", "Previous stable version identified", "Downstream teams notified" },
-                "After rollback, monitor error rate and payment success rate for at least 30 minutes. If metrics do not return to baseline, escalate to payments-lead.",
-                "platform-team@nextraceone.io", DateTimeOffset.Parse("2024-01-15T09:00:00Z"), DateTimeOffset.Parse("2024-05-20T14:30:00Z"));
-        }
+    public Task<CreateMitigationWorkflow.Response> CreateMitigationWorkflowAsync(
+        string incidentId, string title, MitigationActionType actionType,
+        RiskLevel riskLevel, bool requiresApproval, Guid? linkedRunbookId,
+        IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps,
+        CancellationToken ct = default)
+        => Task.FromResult(CreateMitigationWorkflow(incidentId, title, actionType, riskLevel, requiresApproval, linkedRunbookId, steps));
 
-        if (runbookId.Equals(Rb2, StringComparison.OrdinalIgnoreCase))
-        {
-            return new GetRunbookDetail.Response(
-                Guid.Parse(Rb2), "Catalog Sync Manual Recovery",
-                "Steps for manually recovering catalog synchronization when the external provider is unavailable.",
-                "catalog-service", "DependencyFailure",
-                new[]
-                {
-                    new GetRunbookDetail.RunbookStepDto(1, "Check vendor status page", "Verify the current status of the external catalog provider.", false),
-                    new GetRunbookDetail.RunbookStepDto(2, "Attempt manual sync request", "Send a manual sync request to test connectivity.", false),
-                    new GetRunbookDetail.RunbookStepDto(3, "Enable fallback mode", "Activate the manual sync fallback configuration.", false),
-                    new GetRunbookDetail.RunbookStepDto(4, "Verify catalog data freshness", "Confirm catalog data is within acceptable freshness threshold.", false),
-                },
-                new[] { "Access to catalog-service configuration", "Manual sync endpoint credentials" },
-                "Monitor catalog data freshness and sync error rate. Disable fallback mode once vendor connectivity is restored.",
-                "platform-team@nextraceone.io", DateTimeOffset.Parse("2024-02-10T11:00:00Z"), null);
-        }
-
-        if (runbookId.Equals(Rb3, StringComparison.OrdinalIgnoreCase))
-        {
-            return new GetRunbookDetail.Response(
-                Guid.Parse(Rb3), "Generic Service Restart Procedure",
-                "Standard procedure for performing a controlled restart of a service with minimal impact.",
-                null, null,
-                new[]
-                {
-                    new GetRunbookDetail.RunbookStepDto(1, "Notify dependent teams", "Alert teams that depend on this service about the planned restart.", true),
-                    new GetRunbookDetail.RunbookStepDto(2, "Drain active connections", "Gracefully drain active connections before restart.", false),
-                    new GetRunbookDetail.RunbookStepDto(3, "Trigger controlled restart", "Initiate the restart via orchestrator or deployment tool.", false),
-                    new GetRunbookDetail.RunbookStepDto(4, "Verify service health", "Confirm the service is healthy post-restart.", false),
-                },
-                new[] { "Orchestrator or deployment tool access", "Service health endpoint available" },
-                "Monitor service health and downstream error rates for 15 minutes post-restart.",
-                "sre-team@nextraceone.io", DateTimeOffset.Parse("2024-03-01T08:00:00Z"), DateTimeOffset.Parse("2024-04-10T16:00:00Z"));
-        }
-
-        return null;
-    }
+    // ── Runbooks — removed: handled by EfRunbookRepository via IRunbookRepository ─────
 
     // ── Internal state records ───────────────────────────────────────────
 

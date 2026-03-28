@@ -11,9 +11,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMiti
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationRecommendations;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationWorkflow;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
@@ -459,6 +457,14 @@ internal sealed class EfIncidentStore(
         string incidentId, string title, MitigationActionType actionType,
         RiskLevel riskLevel, bool requiresApproval, Guid? linkedRunbookId,
         IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps)
+        => CreateMitigationWorkflowAsync(incidentId, title, actionType, riskLevel, requiresApproval, linkedRunbookId, steps)
+            .GetAwaiter().GetResult();
+
+    public async Task<CreateMitigationWorkflow.Response> CreateMitigationWorkflowAsync(
+        string incidentId, string title, MitigationActionType actionType,
+        RiskLevel riskLevel, bool requiresApproval, Guid? linkedRunbookId,
+        IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps,
+        CancellationToken ct = default)
     {
         var wfId = MitigationWorkflowRecordId.New();
 
@@ -478,11 +484,11 @@ internal sealed class EfIncidentStore(
         var workflow = MitigationWorkflowRecord.Create(
             wfId, incidentId, title,
             MitigationWorkflowStatus.Draft, actionType, riskLevel,
-            requiresApproval, "user",
+            requiresApproval, currentUser.Id,
             linkedRunbookId, stepsJson);
 
         db.MitigationWorkflows.Add(workflow);
-        db.SaveChanges();
+        await db.SaveChangesAsync(ct);
 
         return new CreateMitigationWorkflow.Response(wfId.Value, MitigationWorkflowStatus.Draft, workflow.CreatedAt);
     }
@@ -540,6 +546,36 @@ internal sealed class EfIncidentStore(
         return new GetMitigationHistory.Response(guid, entries);
     }
 
+    public async Task<GetMitigationHistory.Response?> GetMitigationHistoryAsync(
+        string incidentId, CancellationToken ct = default)
+    {
+        if (!Guid.TryParse(incidentId, out var guid))
+            return null;
+
+        if (!await db.Incidents.AnyAsync(i => i.Id == IncidentRecordId.From(guid), ct))
+            return null;
+
+        var actions = await db.MitigationWorkflowActions
+            .Where(a => a.IncidentId == incidentId)
+            .OrderBy(a => a.PerformedAt)
+            .AsNoTracking()
+            .ToListAsync(ct);
+
+        var entries = actions.Select(a => new GetMitigationHistory.MitigationAuditEntryDto(
+            a.Id.Value,
+            a.WorkflowId,
+            a.Action,
+            a.PerformedBy ?? "system",
+            a.PerformedAt,
+            a.Notes,
+            null,
+            a.Reason,
+            Array.Empty<string>()
+        )).ToArray();
+
+        return new GetMitigationHistory.Response(guid, entries);
+    }
+
     public GetMitigationValidation.Response? GetMitigationValidation(string incidentId, string workflowId)
     {
         if (!Guid.TryParse(workflowId, out var wfGuid))
@@ -581,9 +617,17 @@ internal sealed class EfIncidentStore(
         string incidentId, string workflowId, ValidationStatus status,
         string? observedOutcome, string? validatedBy,
         IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks)
+        => RecordMitigationValidationAsync(incidentId, workflowId, status, observedOutcome, validatedBy, checks)
+            .GetAwaiter().GetResult();
+
+    public async Task<RecordMitigationValidation.Response?> RecordMitigationValidationAsync(
+        string incidentId, string workflowId, ValidationStatus status,
+        string? observedOutcome, string? validatedBy,
+        IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks,
+        CancellationToken ct = default)
     {
         var wfGuid = Guid.TryParse(workflowId, out var parsed) ? parsed : Guid.NewGuid();
-        var validatedAt = DateTimeOffset.UtcNow;
+        var validatedAt = clock.UtcNow;
 
         string? checksJson = null;
         if (checks is { Count: > 0 })
@@ -603,56 +647,12 @@ internal sealed class EfIncidentStore(
             observedOutcome, validatedBy, validatedAt, checksJson);
 
         db.MitigationValidations.Add(validation);
-        db.SaveChanges();
+        await db.SaveChangesAsync(ct);
 
         return new RecordMitigationValidation.Response(wfGuid, status, validatedAt);
     }
 
-    // ── Runbooks ─────────────────────────────────────────────────────────
-
-    public IReadOnlyList<ListRunbooks.RunbookSummaryDto> GetRunbooks()
-    {
-        return db.Runbooks
-            .OrderByDescending(r => r.PublishedAt)
-            .AsNoTracking()
-            .ToList()
-            .Select(r =>
-            {
-                var stepCount = Deserialize<List<RunbookStepJson>>(r.StepsJson)?.Count ?? 0;
-                return new ListRunbooks.RunbookSummaryDto(
-                    r.Id.Value, r.Title, r.Description,
-                    r.LinkedService, r.LinkedIncidentType,
-                    stepCount, r.PublishedAt);
-            })
-            .ToList();
-    }
-
-    public GetRunbookDetail.Response? GetRunbookDetail(string runbookId)
-    {
-        if (!Guid.TryParse(runbookId, out var guid))
-            return null;
-
-        var runbook = db.Runbooks
-            .AsNoTracking()
-            .SingleOrDefault(r => r.Id == RunbookRecordId.From(guid));
-
-        if (runbook is null)
-            return null;
-
-        var steps = Deserialize<List<RunbookStepJson>>(runbook.StepsJson)
-            ?.Select(s => new GetRunbookDetail.RunbookStepDto(s.StepOrder, s.Title, s.Description, s.IsOptional))
-            .ToArray()
-            ?? [];
-
-        var prerequisites = Deserialize<List<string>>(runbook.PrerequisitesJson) ?? [];
-
-        return new GetRunbookDetail.Response(
-            runbook.Id.Value, runbook.Title, runbook.Description,
-            runbook.LinkedService, runbook.LinkedIncidentType,
-            steps, prerequisites,
-            runbook.PostNotes,
-            runbook.MaintainedBy, runbook.PublishedAt, runbook.LastReviewedAt);
-    }
+    // ── Runbooks — removed: handled by EfRunbookRepository via IRunbookRepository ─────
 
     // ── JSON helpers ─────────────────────────────────────────────────────
 

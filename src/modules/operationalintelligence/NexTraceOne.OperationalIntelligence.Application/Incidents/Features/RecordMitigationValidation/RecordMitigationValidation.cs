@@ -1,18 +1,29 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Ardalis.GuardClauses;
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 
 /// <summary>
-/// Feature: RecordMitigationValidation — regista o resultado de uma validação pós-mitigação,
+/// Feature: RecordMitigationValidation — persiste o resultado de uma validação pós-mitigação,
 /// incluindo o estado, resultado observado e verificações individuais.
 /// </summary>
 public static class RecordMitigationValidation
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+    };
+
     /// <summary>Comando para registar a validação de um workflow de mitigação.</summary>
     public sealed record Command(
         string IncidentId,
@@ -36,26 +47,51 @@ public static class RecordMitigationValidation
         }
     }
 
-    /// <summary>Handler que regista a validação do workflow de mitigação via store.</summary>
-    public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
+    /// <summary>
+    /// Handler que persiste a validação do workflow de mitigação via repositório dedicado.
+    /// Usa IIncidentStore apenas para verificar a existência do incidente.
+    /// </summary>
+    public sealed class Handler(
+        IIncidentStore store,
+        IMitigationValidationRepository validationRepository,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!store.IncidentExists(request.IncidentId))
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+            Guard.Against.Null(request);
 
-            var response = store.RecordMitigationValidation(
+            if (!store.IncidentExists(request.IncidentId))
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
+
+            if (!Guid.TryParse(request.WorkflowId, out var wfGuid))
+                return IncidentErrors.IncidentNotFound(request.WorkflowId);
+
+            var validatedAt = clock.UtcNow;
+
+            var checksJson = request.Checks is { Count: > 0 }
+                ? JsonSerializer.Serialize(
+                    request.Checks.Select(c => new ValidationCheckJson
+                    {
+                        CheckName = c.CheckName,
+                        IsPassed = c.IsPassed,
+                        ObservedValue = c.ObservedValue,
+                    }).ToList(),
+                    JsonOptions)
+                : null;
+
+            var log = MitigationValidationLog.Create(
+                MitigationValidationLogId.New(),
                 request.IncidentId,
-                request.WorkflowId,
+                wfGuid,
                 request.Status,
                 request.ObservedOutcome,
                 request.ValidatedBy,
-                request.Checks);
+                validatedAt,
+                checksJson);
 
-            if (response is null)
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+            await validationRepository.AddAsync(log, cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(new Response(wfGuid, request.Status, validatedAt));
         }
     }
 
@@ -64,4 +100,11 @@ public static class RecordMitigationValidation
         Guid WorkflowId,
         ValidationStatus Status,
         DateTimeOffset ValidatedAt);
+
+    private sealed class ValidationCheckJson
+    {
+        [JsonPropertyName("checkName")] public string CheckName { get; set; } = string.Empty;
+        [JsonPropertyName("isPassed")] public bool IsPassed { get; set; }
+        [JsonPropertyName("observedValue")] public string? ObservedValue { get; set; }
+    }
 }

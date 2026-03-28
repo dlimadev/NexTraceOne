@@ -96,6 +96,7 @@ public static class SendAssistantMessage
         IAiModelCatalogService modelCatalogService,
         IAiModelAuthorizationService modelAuthorizationService,
         IExternalAIRoutingPort externalAiRoutingPort,
+        IAiProviderFactory providerFactory,
         IDocumentRetrievalService documentRetrievalService,
         IDatabaseRetrievalService databaseRetrievalService,
         ITelemetryRetrievalService telemetryRetrievalService,
@@ -260,13 +261,72 @@ public static class SendAssistantMessage
 
             string grounded;
             string? degradedReason = null;
+            int promptTokens;
+            int completionTokens;
             try
             {
-                grounded = await externalAiRoutingPort.RouteQueryAsync(
-                    groundingContext,
-                    request.Message,
-                    selectedProvider,
-                    cancellationToken);
+                // Prefer direct IChatCompletionProvider call to capture real token counts,
+                // model name and provider ID from ChatCompletionResult.
+                var chatProvider = providerFactory.GetChatProvider(selectedProvider);
+                if (chatProvider is not null)
+                {
+                    var systemPrompt = BuildAssistantSystemPrompt(persona, request.ContextScope, groundingContext);
+                    var messages = new List<ChatMessage> { new("user", request.Message) };
+                    var chatRequest = new ChatCompletionRequest(selectedModel, messages, SystemPrompt: systemPrompt);
+
+                    logger.LogDebug(
+                        "Calling IChatCompletionProvider {ProviderId} model {ModelId} for conversation {ConversationId}",
+                        chatProvider.ProviderId, selectedModel, conversationId);
+
+                    var result = await chatProvider.CompleteAsync(chatRequest, cancellationToken);
+
+                    if (result.Success && !string.IsNullOrWhiteSpace(result.Content))
+                    {
+                        grounded = result.Content;
+                        promptTokens = result.PromptTokens > 0
+                            ? result.PromptTokens
+                            : Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
+                        completionTokens = result.CompletionTokens > 0
+                            ? result.CompletionTokens
+                            : Math.Max(1, grounded.Length / 4);
+                        // Only override if provider returns a non-empty value; keep the
+                        // pre-resolved values otherwise to avoid breaking AiMessage guards.
+                        if (!string.IsNullOrWhiteSpace(result.ModelId))
+                            selectedModel = result.ModelId;
+                        if (!string.IsNullOrWhiteSpace(result.ProviderId))
+                            selectedProvider = result.ProviderId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            string.IsNullOrWhiteSpace(result.ErrorMessage)
+                                ? "Provider returned empty response."
+                                : result.ErrorMessage);
+                    }
+                }
+                else
+                {
+                    // Fallback: no local provider registered for this ID — use routing port
+                    // (handles external/gateway providers not registered in IAiProviderFactory)
+                    logger.LogDebug(
+                        "No local provider registered for {ProviderId}; routing via IExternalAIRoutingPort",
+                        selectedProvider);
+
+                    grounded = await externalAiRoutingPort.RouteQueryAsync(
+                        groundingContext,
+                        request.Message,
+                        selectedProvider,
+                        cancellationToken);
+
+                    promptTokens = Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
+                    completionTokens = Math.Max(1, grounded.Length / 4);
+
+                    // Normalize empty strings so AiMessage creation guards are satisfied
+                    if (string.IsNullOrWhiteSpace(selectedModel))
+                        selectedModel = "external-routed";
+                    if (string.IsNullOrWhiteSpace(selectedProvider))
+                        selectedProvider = "external-routing-port";
+                }
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
@@ -279,10 +339,9 @@ public static class SendAssistantMessage
                 selectedModel = DegradedModelName;
                 selectedProvider = DegradedProviderId;
                 isInternal = true;
+                promptTokens = Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
+                completionTokens = Math.Max(1, grounded.Length / 4);
             }
-
-            var promptTokens = Math.Max(1, (request.Message.Length + groundingContext.Length) / 4);
-            var completionTokens = Math.Max(1, grounded.Length / 4);
             var usedDeterministicFallback = grounded.StartsWith(AiMessage.DeterministicFallbackPrefix, StringComparison.OrdinalIgnoreCase);
 
             if (usedDeterministicFallback)
@@ -334,8 +393,8 @@ public static class SendAssistantMessage
                 : AiMessage.AssistantMessage(
                     conversationId,
                     grounded,
-                    selectedModel,
-                    selectedProvider,
+                    string.IsNullOrWhiteSpace(selectedModel) ? DegradedModelName : selectedModel,
+                    string.IsNullOrWhiteSpace(selectedProvider) ? DegradedProviderId : selectedProvider,
                     isInternal: isInternal,
                     promptTokens,
                     completionTokens,
@@ -418,6 +477,29 @@ public static class SendAssistantMessage
                 : query;
 
             return $"{AiMessage.DeterministicFallbackPrefix} Provider unavailable. This response is degraded and should be treated as limited guidance. Operational detail: {errorMessage}.\n\nQuestion: {querySnippet}\nGrounding snapshot: {contextSnippet}";
+        }
+
+        /// <summary>
+        /// Constrói o system prompt para o assistente de IA, incorporando persona,
+        /// escopo de contexto e dados de grounding para orientar o modelo.
+        /// </summary>
+        private static string BuildAssistantSystemPrompt(string persona, string? contextScope, string groundingContext)
+        {
+            var scope = string.IsNullOrWhiteSpace(contextScope) ? "general" : contextScope;
+
+            var prompt = $"""
+                You are NexTraceOne AI Assistant — a governed operational intelligence assistant.
+                Your role is to help {persona}s with service governance, contract intelligence, change confidence, and operational insights.
+                Answer based on the grounding context below. If grounding is incomplete, state limitations explicitly.
+                Prioritize operational safety, contract accuracy, and change confidence.
+                Do NOT reveal internal system details or grounding metadata in your response.
+                Context scope: {scope}
+
+                ## Grounding Context
+                {(string.IsNullOrWhiteSpace(groundingContext) ? "No grounding context available." : groundingContext)}
+                """;
+
+            return prompt;
         }
 
         /// <summary>

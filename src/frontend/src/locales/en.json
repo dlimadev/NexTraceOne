@@ -1998,7 +1998,10 @@
         "Medium": "Medium",
         "High": "High",
         "Confirmed": "Confirmed"
-      }
+      },
+      "triggeredMessage": "Correlation engine ran. {{count}} new correlation(s) found.",
+      "runEngineAction": "Run correlation engine",
+      "dynamicCorrelations": "Dynamic correlations ({{count}})"
     },
     "evidence": {
       "title": "Evidence",
@@ -2046,14 +2049,6 @@
       "title": "Incident List",
       "correlationIndicator": "Correlated",
       "mitigationIndicator": "Mitigation"
-    },
-    "mock": {
-      "paymentIncidentTitle": "Payment Gateway — elevated error rate",
-      "catalogIncidentTitle": "Catalog Sync — integration partner unreachable",
-      "inventoryIncidentTitle": "Inventory Consumer — consumer lag spike",
-      "orderIncidentTitle": "Order API — latency regression after deploy",
-      "notificationIncidentTitle": "Notification Worker — background job failures",
-      "authIncidentTitle": "Auth Gateway — contract schema mismatch"
     }
   },
   "runbooks": {

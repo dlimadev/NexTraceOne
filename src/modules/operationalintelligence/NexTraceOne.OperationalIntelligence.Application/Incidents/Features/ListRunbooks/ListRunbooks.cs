@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -11,6 +14,12 @@ namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.Lis
 /// </summary>
 public static class ListRunbooks
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+    };
+
     /// <summary>Query para listar runbooks com filtros opcionais.</summary>
     public sealed record Query(string? ServiceId, string? IncidentType, string? Search) : IQuery<Response>;
 
@@ -25,30 +34,45 @@ public static class ListRunbooks
         }
     }
 
-    /// <summary>Handler que retorna a lista de runbooks via store.</summary>
-    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
+    /// <summary>Handler que retorna a lista de runbooks via repositório.</summary>
+    public sealed class Handler(IRunbookRepository repository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var filtered = store.GetRunbooks().AsEnumerable();
+            Guard.Against.Null(request);
 
-            if (!string.IsNullOrWhiteSpace(request.ServiceId))
-                filtered = filtered.Where(r =>
-                    r.LinkedServiceId is not null
-                    && r.LinkedServiceId.Contains(request.ServiceId, StringComparison.OrdinalIgnoreCase));
+            var runbooks = await repository.ListAsync(
+                request.ServiceId,
+                request.IncidentType,
+                request.Search,
+                cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(request.IncidentType))
-                filtered = filtered.Where(r =>
-                    r.LinkedIncidentType is not null
-                    && r.LinkedIncidentType.Equals(request.IncidentType, StringComparison.OrdinalIgnoreCase));
+            var dtos = runbooks
+                .Select(r =>
+                {
+                    var stepCount = 0;
+                    if (!string.IsNullOrWhiteSpace(r.StepsJson))
+                    {
+                        try
+                        {
+                            var steps = JsonSerializer.Deserialize<List<RunbookStepJson>>(r.StepsJson, JsonOptions);
+                            stepCount = steps?.Count ?? 0;
+                        }
+                        catch (JsonException) { /* ignore malformed JSON */ }
+                    }
 
-            if (!string.IsNullOrWhiteSpace(request.Search))
-                filtered = filtered.Where(r =>
-                    r.Title.Contains(request.Search, StringComparison.OrdinalIgnoreCase)
-                    || r.Summary.Contains(request.Search, StringComparison.OrdinalIgnoreCase));
+                    return new RunbookSummaryDto(
+                        r.Id.Value,
+                        r.Title,
+                        r.Description,
+                        r.LinkedService,
+                        r.LinkedIncidentType,
+                        stepCount,
+                        r.PublishedAt);
+                })
+                .ToList();
 
-            var response = new Response(Runbooks: filtered.ToList().AsReadOnly());
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(new Response(dtos.AsReadOnly()));
         }
     }
 
@@ -64,4 +88,10 @@ public static class ListRunbooks
         string? LinkedIncidentType,
         int StepCount,
         DateTimeOffset CreatedAt);
+
+    private sealed class RunbookStepJson
+    {
+        [JsonPropertyName("stepOrder")] public int StepOrder { get; set; }
+        [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
+    }
 }

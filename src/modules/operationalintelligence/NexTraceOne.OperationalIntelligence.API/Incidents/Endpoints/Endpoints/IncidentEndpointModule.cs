@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CorrelateIncidentWithChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetCorrelatedChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
@@ -169,6 +171,37 @@ public sealed class IncidentEndpointModule
 
         // ── Scoped views: by service and by team ──
 
+        // ── POST /api/v1/incidents/{id}/correlate — Motor de correlação dinâmica ──
+        group.MapPost("/{incidentId:guid}/correlate", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            Guid incidentId,
+            CorrelateRequest? request,
+            CancellationToken cancellationToken = default) =>
+        {
+            var command = new CorrelateIncidentWithChanges.Command(incidentId, request?.TimeWindowHours);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:write")
+        .WithName("CorrelateIncidentWithChanges")
+        .WithSummary("Trigger dynamic correlation engine to link incident with changes");
+
+        // ── GET /api/v1/incidents/{id}/correlated-changes — Leitura de correlações persistidas ──
+        group.MapGet("/{incidentId:guid}/correlated-changes", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            Guid incidentId,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new GetCorrelatedChanges.Query(incidentId);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("GetCorrelatedChanges")
+        .WithSummary("Retrieve persisted dynamic correlations for an incident");
+
         var servicesGroup = app.MapGroup("/api/v1/services");
 
         // ── GET /api/v1/services/{serviceId}/incidents — Incidentes por serviço ──
@@ -210,3 +243,6 @@ public sealed class IncidentEndpointModule
         .WithSummary("List incidents by team");
     }
 }
+
+/// <summary>Corpo opcional do pedido de correlação dinâmica.</summary>
+internal sealed record CorrelateRequest(int? TimeWindowHours);

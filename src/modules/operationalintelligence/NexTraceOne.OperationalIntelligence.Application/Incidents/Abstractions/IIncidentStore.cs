@@ -1,16 +1,11 @@
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentMitigation;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationHistory;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationRecommendations;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationWorkflow;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
-using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
@@ -60,16 +55,6 @@ public interface IIncidentStore
     /// <summary>Retorna o detalhe de um workflow de mitigação.</summary>
     GetMitigationWorkflow.Response? GetMitigationWorkflow(string incidentId, string workflowId);
 
-    /// <summary>Cria um novo workflow de mitigação e retorna o ID gerado.</summary>
-    CreateMitigationWorkflow.Response CreateMitigationWorkflow(
-        string incidentId,
-        string title,
-        MitigationActionType actionType,
-        RiskLevel riskLevel,
-        bool requiresApproval,
-        Guid? linkedRunbookId,
-        IReadOnlyList<CreateMitigationWorkflow.CreateStepDto>? steps);
-
     /// <summary>Executa uma ação sobre um workflow de mitigação.</summary>
     UpdateMitigationWorkflowAction.Response? UpdateMitigationWorkflowAction(
         string incidentId,
@@ -80,28 +65,10 @@ public interface IIncidentStore
         string? reason,
         string? notes);
 
-    /// <summary>Retorna o histórico de mitigação do incidente.</summary>
-    GetMitigationHistory.Response? GetMitigationHistory(string incidentId);
-
     /// <summary>Retorna o estado de validação pós-mitigação de um workflow.</summary>
     GetMitigationValidation.Response? GetMitigationValidation(string incidentId, string workflowId);
 
-    /// <summary>Regista o resultado de uma validação pós-mitigação.</summary>
-    RecordMitigationValidation.Response? RecordMitigationValidation(
-        string incidentId,
-        string workflowId,
-        ValidationStatus status,
-        string? observedOutcome,
-        string? validatedBy,
-        IReadOnlyList<RecordMitigationValidation.ValidationCheckInput>? checks);
-
-    // ── Runbooks ─────────────────────────────────────────────────────────
-
-    /// <summary>Retorna a lista de runbooks.</summary>
-    IReadOnlyList<ListRunbooks.RunbookSummaryDto> GetRunbooks();
-
-    /// <summary>Retorna o detalhe de um runbook.</summary>
-    GetRunbookDetail.Response? GetRunbookDetail(string runbookId);
+    // ── Runbooks e Mitigation Write/History — removidos: tratados por repositórios dedicados ─
 }
 
 /// <summary>Dados de entrada mínimos para criação de incidente.</summary>

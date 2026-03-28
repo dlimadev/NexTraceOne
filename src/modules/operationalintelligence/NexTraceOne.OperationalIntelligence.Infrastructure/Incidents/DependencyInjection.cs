@@ -6,12 +6,14 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
 /// <summary>
 /// Registra serviços de infraestrutura do subdomínio Incidents.
 /// Utiliza IncidentDbContext com Npgsql e EfIncidentStore como implementação de IIncidentStore.
+/// Inclui o motor de correlação dinâmica: IIncidentCorrelationRepository e IChangeIntelligenceReader.
 /// </summary>
 public static class DependencyInjection
 {
@@ -31,6 +33,11 @@ public static class DependencyInjection
         services.AddScoped<IIncidentStore, EfIncidentStore>();
         services.AddScoped<IIncidentContextSurface, IncidentContextSurface>();
         services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();
+        services.AddScoped<IIncidentCorrelationRepository, EfIncidentCorrelationRepository>();
+        services.AddScoped<IRunbookRepository, EfRunbookRepository>();
+        services.AddScoped<IMitigationWorkflowRepository, EfMitigationWorkflowRepository>();
+        services.AddScoped<IMitigationValidationRepository, EfMitigationValidationRepository>();
+        services.AddScoped<IChangeIntelligenceReader, EfChangeIntelligenceReader>();
 
         return services;
     }

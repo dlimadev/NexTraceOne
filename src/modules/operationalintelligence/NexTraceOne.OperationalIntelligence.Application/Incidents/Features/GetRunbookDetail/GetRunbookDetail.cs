@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -12,6 +15,12 @@ namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.Get
 /// </summary>
 public static class GetRunbookDetail
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+    };
+
     /// <summary>Query para obter o detalhe de um runbook.</summary>
     public sealed record Query(string RunbookId) : IQuery<Response>;
 
@@ -24,16 +33,68 @@ public static class GetRunbookDetail
         }
     }
 
-    /// <summary>Handler que compõe o detalhe do runbook.</summary>
-    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
+    /// <summary>Handler que compõe o detalhe do runbook via repositório.</summary>
+    public sealed class Handler(IRunbookRepository repository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = store.GetRunbookDetail(request.RunbookId);
-            if (response is null)
-                return Task.FromResult<Result<Response>>(IncidentErrors.RunbookNotFound(request.RunbookId));
+            Guard.Against.Null(request);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            if (!Guid.TryParse(request.RunbookId, out var guid))
+                return IncidentErrors.RunbookNotFound(request.RunbookId);
+
+            var runbook = await repository.GetByIdAsync(guid, cancellationToken);
+            if (runbook is null)
+                return IncidentErrors.RunbookNotFound(request.RunbookId);
+
+            var steps = DeserializeSteps(runbook.StepsJson);
+            var prerequisites = DeserializePrerequisites(runbook.PrerequisitesJson);
+
+            return Result<Response>.Success(new Response(
+                runbook.Id.Value,
+                runbook.Title,
+                runbook.Description,
+                runbook.LinkedService,
+                runbook.LinkedIncidentType,
+                steps,
+                prerequisites,
+                runbook.PostNotes,
+                runbook.MaintainedBy,
+                runbook.PublishedAt,
+                runbook.LastReviewedAt));
+        }
+
+        private static IReadOnlyList<RunbookStepDto> DeserializeSteps(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return [];
+
+            try
+            {
+                var steps = JsonSerializer.Deserialize<List<RunbookStepJson>>(json, JsonOptions);
+                return steps?
+                    .Select(s => new RunbookStepDto(s.StepOrder, s.Title, s.Description, s.IsOptional))
+                    .ToArray() ?? [];
+            }
+            catch (JsonException)
+            {
+                return [];
+            }
+        }
+
+        private static IReadOnlyList<string> DeserializePrerequisites(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                return [];
+
+            try
+            {
+                return JsonSerializer.Deserialize<List<string>>(json, JsonOptions) ?? [];
+            }
+            catch (JsonException)
+            {
+                return [];
+            }
         }
     }
 
@@ -57,4 +118,12 @@ public static class GetRunbookDetail
         string Title,
         string? Description,
         bool IsOptional);
+
+    private sealed class RunbookStepJson
+    {
+        [JsonPropertyName("stepOrder")] public int StepOrder { get; set; }
+        [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
+        [JsonPropertyName("description")] public string? Description { get; set; }
+        [JsonPropertyName("isOptional")] public bool IsOptional { get; set; }
+    }
 }

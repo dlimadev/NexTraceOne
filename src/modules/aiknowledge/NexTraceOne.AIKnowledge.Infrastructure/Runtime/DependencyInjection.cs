@@ -1,13 +1,19 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
+using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
+using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.Knowledge.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
 
@@ -15,6 +21,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime;
 /// Registra serviços de infraestrutura do módulo AI Runtime.
 /// Inclui: Ollama provider, OpenAI provider (quando configurado), factory, catalog, health services,
 /// tool registry, tool executor, tool permission validator.
+/// Registra também DbContexts de leitura para grounding cross-módulo (P01.10).
 /// </summary>
 public static class DependencyInjection
 {
@@ -81,6 +88,25 @@ public static class DependencyInjection
         // Source registry — scoped (depends on scoped repository)
         services.AddScoped<IAiSourceRegistryService, AiSourceRegistryService>();
 
+        // ── Cross-module DbContexts for AI grounding (read-only) ────────
+        // These DbContexts are already registered by their owning modules.
+        // We register them conditionally here only if not already registered,
+        // using the same connection string as the owning module.
+        RegisterCrossModuleContextIfNeeded<CatalogGraphDbContext>(
+            services, configuration, "CatalogDatabase");
+        RegisterCrossModuleContextIfNeeded<ChangeIntelligenceDbContext>(
+            services, configuration, "ChangeIntelligenceDatabase");
+        RegisterCrossModuleContextIfNeeded<IncidentDbContext>(
+            services, configuration, "IncidentDatabase");
+        RegisterCrossModuleContextIfNeeded<KnowledgeDbContext>(
+            services, configuration, "KnowledgeDatabase");
+
+        // Cross-module grounding readers — thin abstractions over read-only DbContext access
+        services.AddScoped<ICatalogGroundingReader, CatalogGroundingReader>();
+        services.AddScoped<IChangeGroundingReader, ChangeGroundingReader>();
+        services.AddScoped<IIncidentGroundingReader, IncidentGroundingReader>();
+        services.AddScoped<IKnowledgeDocumentGroundingReader, KnowledgeDocumentGroundingReader>();
+
         // Retrieval services — scoped (foundation for RAG, database grounding and telemetry)
         services.AddScoped<IDocumentRetrievalService, DocumentRetrievalService>();
         services.AddScoped<IDatabaseRetrievalService, DatabaseRetrievalService>();
@@ -95,5 +121,29 @@ public static class DependencyInjection
         services.AddScoped<IToolPermissionValidator, AllowedToolsPermissionValidator>();
 
         return services;
+    }
+
+    /// <summary>
+    /// Regista um DbContext cross-módulo se ainda não estiver registado pelo módulo dono.
+    /// Usa a connection string do módulo dono; se não existir, ignora silenciosamente.
+    /// </summary>
+    private static void RegisterCrossModuleContextIfNeeded<TContext>(
+        IServiceCollection services,
+        IConfiguration configuration,
+        string connectionStringKey)
+        where TContext : DbContext
+    {
+        // Skip if already registered by the owning module
+        if (services.Any(d => d.ServiceType == typeof(TContext)))
+            return;
+
+        var connectionString = configuration.GetConnectionString(connectionStringKey)
+            ?? configuration[$"ConnectionStrings:{connectionStringKey}"];
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            return;
+
+        services.AddDbContext<TContext>((_, options) =>
+            options.UseNpgsql(connectionString));
     }
 }

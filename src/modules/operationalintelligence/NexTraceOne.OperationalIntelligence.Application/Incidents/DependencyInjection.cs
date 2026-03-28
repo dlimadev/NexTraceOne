@@ -2,8 +2,11 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CorrelateIncidentWithChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetCorrelatedChanges;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
@@ -40,6 +43,10 @@ public static class DependencyInjection
     {
         services.AddScoped<IIncidentCorrelationService, IncidentCorrelationService>();
 
+        // Dynamic correlation engine features
+        services.AddTransient<IValidator<CorrelateIncidentWithChanges.Command>, CorrelateIncidentWithChanges.Validator>();
+        services.AddTransient<IValidator<GetCorrelatedChanges.Query>, GetCorrelatedChanges.Validator>();
+
         // Incident features
         services.AddTransient<IValidator<CreateIncident.Command>, CreateIncident.Validator>();
         services.AddTransient<IValidator<ListIncidents.Query>, ListIncidents.Validator>();
@@ -62,6 +69,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RecordMitigationValidation.Command>, RecordMitigationValidation.Validator>();
 
         // Runbook features
+        services.AddTransient<IValidator<CreateRunbook.Command>, CreateRunbook.Validator>();
         services.AddTransient<IValidator<GetRunbookDetail.Query>, GetRunbookDetail.Validator>();
         services.AddTransient<IValidator<ListRunbooks.Query>, ListRunbooks.Validator>();
 

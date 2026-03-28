@@ -1,3 +1,5 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationHistory;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationRecommendations;
@@ -5,6 +7,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMiti
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationWorkflow;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
@@ -115,7 +118,13 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task CreateMitigationWorkflow_ValidInputs_ShouldReturnDraftWorkflow()
     {
-        var handler = new CreateMitigationWorkflow.Handler(_store);
+        var workflowRepo = Substitute.For<IMitigationWorkflowRepository>();
+        var currentUser = Substitute.For<ICurrentUser>();
+        currentUser.Id.Returns("test-user@nextraceone.io");
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+
+        var handler = new CreateMitigationWorkflow.Handler(_store, workflowRepo, currentUser, clock);
         var command = new CreateMitigationWorkflow.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
             Title: "Test workflow",
@@ -130,12 +139,19 @@ public sealed class MitigationFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(MitigationWorkflowStatus.Draft);
         result.Value.WorkflowId.Should().NotBeEmpty();
+        await workflowRepo.Received(1).AddAsync(Arg.Any<MitigationWorkflowRecord>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task CreateMitigationWorkflow_UnknownIncident_ShouldReturnError()
     {
-        var handler = new CreateMitigationWorkflow.Handler(_store);
+        var workflowRepo = Substitute.For<IMitigationWorkflowRepository>();
+        var currentUser = Substitute.For<ICurrentUser>();
+        currentUser.Id.Returns("test-user@nextraceone.io");
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+
+        var handler = new CreateMitigationWorkflow.Handler(_store, workflowRepo, currentUser, clock);
         var command = new CreateMitigationWorkflow.Command(
             IncidentId: "nonexistent-incident-id",
             Title: "Test workflow",
@@ -149,6 +165,7 @@ public sealed class MitigationFeatureTests
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("NotFound");
+        await workflowRepo.DidNotReceive().AddAsync(Arg.Any<MitigationWorkflowRecord>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -230,31 +247,43 @@ public sealed class MitigationFeatureTests
     // ── GetMitigationHistory ─────────────────────────────────────────
 
     [Fact]
-    public async Task GetMitigationHistory_KnownIncident_ShouldReturnHistoryEntries()
+    public async Task GetMitigationHistory_KnownIncident_ShouldReturnWorkflowEntries()
     {
-        var handler = new GetMitigationHistory.Handler(_store);
-        var query = new GetMitigationHistory.Query("a1b2c3d4-0001-0000-0000-000000000001");
+        var workflowRepo = Substitute.For<IMitigationWorkflowRepository>();
+        var knownIncidentId = "a1b2c3d4-0001-0000-0000-000000000001";
+        var now = DateTimeOffset.UtcNow;
+        var workflow = MitigationWorkflowRecord.Create(
+            MitigationWorkflowRecordId.New(), knownIncidentId, "Rollback",
+            MitigationWorkflowStatus.Draft, MitigationActionType.RollbackCandidate,
+            RiskLevel.Medium, false, "test-user@nextraceone.io");
+        workflowRepo.GetByIncidentIdAsync(knownIncidentId, Arg.Any<CancellationToken>())
+            .Returns([workflow]);
+
+        var handler = new GetMitigationHistory.Handler(_store, workflowRepo);
+        var query = new GetMitigationHistory.Query(knownIncidentId);
 
         var result = await handler.Handle(query, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Entries.Should().HaveCount(4);
-        result.Value.Entries[0].Action.Should().Be("workflow-created");
-        result.Value.Entries[0].PerformedBy.Should().Be("ai-assistant");
-        result.Value.Entries[0].LinkedEvidence.Should().NotBeEmpty();
-        result.Value.Entries[2].Outcome.Should().Be(MitigationOutcome.Successful);
+        result.Value.IncidentId.Should().Be(Guid.Parse(knownIncidentId));
+        result.Value.Entries.Should().HaveCount(1);
+        result.Value.Entries[0].Action.Should().Be(MitigationActionType.RollbackCandidate.ToString());
+        result.Value.Entries[0].PerformedBy.Should().Be("test-user@nextraceone.io");
     }
 
     [Fact]
     public async Task GetMitigationHistory_UnknownIncident_ShouldReturnError()
     {
-        var handler = new GetMitigationHistory.Handler(_store);
+        var workflowRepo = Substitute.For<IMitigationWorkflowRepository>();
+        var handler = new GetMitigationHistory.Handler(_store, workflowRepo);
         var query = new GetMitigationHistory.Query("nonexistent");
 
         var result = await handler.Handle(query, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("NotFound");
+        await workflowRepo.DidNotReceive()
+            .GetByIncidentIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -304,10 +333,14 @@ public sealed class MitigationFeatureTests
     [Fact]
     public async Task RecordMitigationValidation_ValidInputs_ShouldRecordSuccessfully()
     {
-        var handler = new RecordMitigationValidation.Handler(_store);
+        var validationRepo = Substitute.For<IMitigationValidationRepository>();
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+
+        var handler = new RecordMitigationValidation.Handler(_store, validationRepo, clock);
         var command = new RecordMitigationValidation.Command(
             IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
-            WorkflowId: "wf-0001-0000-0000-000000000001",
+            WorkflowId: "00000001-0001-0000-0000-000000000001",
             Status: ValidationStatus.Passed,
             ObservedOutcome: "All checks passed",
             ValidatedBy: "ops-engineer@nextraceone.io",
@@ -320,12 +353,17 @@ public sealed class MitigationFeatureTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(ValidationStatus.Passed);
+        await validationRepo.Received(1).AddAsync(Arg.Any<MitigationValidationLog>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task RecordMitigationValidation_UnknownIncident_ShouldReturnError()
     {
-        var handler = new RecordMitigationValidation.Handler(_store);
+        var validationRepo = Substitute.For<IMitigationValidationRepository>();
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+
+        var handler = new RecordMitigationValidation.Handler(_store, validationRepo, clock);
         var command = new RecordMitigationValidation.Command(
             IncidentId: "nonexistent",
             WorkflowId: "wf-001",
@@ -338,6 +376,7 @@ public sealed class MitigationFeatureTests
 
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("NotFound");
+        await validationRepo.DidNotReceive().AddAsync(Arg.Any<MitigationValidationLog>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

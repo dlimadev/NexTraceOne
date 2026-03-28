@@ -1,18 +1,29 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Ardalis.GuardClauses;
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateMitigationWorkflow;
 
 /// <summary>
-/// Feature: CreateMitigationWorkflow — cria um novo workflow de mitigação para um incidente,
+/// Feature: CreateMitigationWorkflow — cria e persiste um novo workflow de mitigação para um incidente,
 /// definindo tipo de ação, nível de risco, passos e associação a runbooks.
 /// </summary>
 public static class CreateMitigationWorkflow
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+    };
+
     /// <summary>Comando para criar um workflow de mitigação.</summary>
     public sealed record Command(
         string IncidentId,
@@ -38,24 +49,51 @@ public static class CreateMitigationWorkflow
         }
     }
 
-    /// <summary>Handler que cria o workflow de mitigação via store.</summary>
-    public sealed class Handler(IIncidentStore store) : ICommandHandler<Command, Response>
+    /// <summary>
+    /// Handler que persiste o workflow de mitigação via repositório dedicado.
+    /// Usa IIncidentStore apenas para verificar a existência do incidente.
+    /// </summary>
+    public sealed class Handler(
+        IIncidentStore store,
+        IMitigationWorkflowRepository workflowRepository,
+        ICurrentUser currentUser,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!store.IncidentExists(request.IncidentId))
-                return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
+            Guard.Against.Null(request);
 
-            var response = store.CreateMitigationWorkflow(
+            if (!store.IncidentExists(request.IncidentId))
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
+
+            var id = MitigationWorkflowRecordId.New();
+
+            var stepsJson = request.Steps is { Count: > 0 }
+                ? JsonSerializer.Serialize(
+                    request.Steps.Select(s => new WorkflowStepJson
+                    {
+                        StepOrder = s.StepOrder,
+                        Title = s.Title,
+                        Description = s.Description,
+                    }).ToList(),
+                    JsonOptions)
+                : null;
+
+            var workflow = MitigationWorkflowRecord.Create(
+                id,
                 request.IncidentId,
                 request.Title,
+                MitigationWorkflowStatus.Draft,
                 request.ActionType,
                 request.RiskLevel,
                 request.RequiresApproval,
+                currentUser.Id,
                 request.LinkedRunbookId,
-                request.Steps);
+                stepsJson);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            await workflowRepository.AddAsync(workflow, cancellationToken);
+
+            return Result<Response>.Success(new Response(id.Value, MitigationWorkflowStatus.Draft, workflow.CreatedAt));
         }
     }
 
@@ -64,4 +102,12 @@ public static class CreateMitigationWorkflow
         Guid WorkflowId,
         MitigationWorkflowStatus Status,
         DateTimeOffset CreatedAt);
+
+    private sealed class WorkflowStepJson
+    {
+        [JsonPropertyName("stepOrder")] public int StepOrder { get; set; }
+        [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
+        [JsonPropertyName("description")] public string? Description { get; set; }
+        [JsonPropertyName("isCompleted")] public bool IsCompleted { get; set; }
+    }
 }
