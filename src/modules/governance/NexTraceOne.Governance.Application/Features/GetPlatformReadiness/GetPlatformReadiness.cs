@@ -19,6 +19,8 @@ public static class GetPlatformReadiness
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // TODO [P03.5]: Replace static readiness checks with real subsystem probe contract
+            // once health/readiness providers are exposed for Governance module consumption.
             var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "1.0.0-preview";
             var environmentName =
                 Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")

@@ -18,6 +18,8 @@ public static class GetPlatformQueues
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // TODO [P03.5]: Replace static queue snapshots with real queue telemetry provider
+            // once platform queue metrics contract is available for Governance cross-module consumption.
             var now = DateTimeOffset.UtcNow;
 
             var queues = new List<QueueSummaryDto>

@@ -53,7 +53,7 @@ internal sealed class ComplianceGapConfiguration : IEntityTypeConfiguration<Comp
         builder.Property(x => x.ViolatedPolicyIds)
             .HasColumnType("jsonb")
             .HasConversion(
-                links => JsonSerializer.Serialize(links, JsonOptions),
+                policyIds => JsonSerializer.Serialize(policyIds, JsonOptions),
                 json => JsonSerializer.Deserialize<List<string>>(json, JsonOptions)
                     ?? new List<string>())
             .IsRequired();

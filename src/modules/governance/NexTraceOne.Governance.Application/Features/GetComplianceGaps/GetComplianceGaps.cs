@@ -67,7 +67,7 @@ public static class GetComplianceGaps
                 .ToDictionary(g => g.Key, g => g.OrderByDescending(r => r.InitiatedAt).First());
 
             var gaps = packs
-                .Select(pack => BuildGap(pack, rolloutByPack, waivers))
+                .Select(pack => BuildComplianceGapFromPack(pack, rolloutByPack, waivers))
                 .Where(g => g is not null)
                 .Select(g => g!)
                 .OrderByDescending(g => g.Severity)
@@ -86,7 +86,7 @@ public static class GetComplianceGaps
             return Result<Response>.Success(response);
         }
 
-        private static ComplianceGapDto? BuildGap(
+        private static ComplianceGapDto? BuildComplianceGapFromPack(
             GovernancePack pack,
             IReadOnlyDictionary<GovernancePackId, GovernanceRolloutRecord> rolloutByPack,
             IReadOnlyList<GovernanceWaiver> waivers)

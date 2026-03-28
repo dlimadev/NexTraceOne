@@ -37,12 +37,7 @@ public static class GetScopedContext
 
             foreach (var delegation in activeDelegations)
             {
-                var role = delegation.Scope switch
-                {
-                    Governance.Domain.Enums.DelegationScope.FullAdmin or Governance.Domain.Enums.DelegationScope.TeamAdmin or Governance.Domain.Enums.DelegationScope.DomainAdmin => "Admin",
-                    Governance.Domain.Enums.DelegationScope.ReadOnly => "Viewer",
-                    _ => "Member"
-                };
+                var role = ResolveRole(delegation.Scope);
 
                 if (!string.IsNullOrWhiteSpace(delegation.TeamId)
                     && Guid.TryParse(delegation.TeamId, out var teamGuid))
@@ -77,12 +72,7 @@ public static class GetScopedContext
             var allowedTeams = teamScopes
                 .Select(ts =>
                 {
-                    var role = ts.Delegation.Scope switch
-                    {
-                        Governance.Domain.Enums.DelegationScope.FullAdmin or Governance.Domain.Enums.DelegationScope.TeamAdmin => "Admin",
-                        Governance.Domain.Enums.DelegationScope.ReadOnly => "Viewer",
-                        _ => "Member"
-                    };
+                    var role = ResolveRole(ts.Delegation.Scope);
 
                     return new AllowedScopeDto(
                         Id: ts.Team.Id.Value.ToString(),
@@ -139,6 +129,16 @@ public static class GetScopedContext
 
             return Result<Response>.Success(response);
         }
+
+        private static string ResolveRole(Governance.Domain.Enums.DelegationScope scope) =>
+            scope switch
+            {
+                Governance.Domain.Enums.DelegationScope.FullAdmin
+                or Governance.Domain.Enums.DelegationScope.TeamAdmin
+                or Governance.Domain.Enums.DelegationScope.DomainAdmin => "Admin",
+                Governance.Domain.Enums.DelegationScope.ReadOnly => "Viewer",
+                _ => "Member"
+            };
     }
 
     /// <summary>Resposta com o contexto de governança do utilizador.</summary>
