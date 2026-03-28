@@ -8,8 +8,8 @@ using NexTraceOne.OperationalIntelligence.Domain.Incidents.Errors;
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationHistory;
 
 /// <summary>
-/// Feature: GetMitigationHistory — retorna o histórico de auditoria de mitigação de um incidente,
-/// incluindo ações executadas, resultados, evidências e validações.
+/// Feature: GetMitigationHistory — retorna o histórico de workflows de mitigação de um incidente,
+/// lendo diretamente da base de dados via repositório dedicado.
 /// </summary>
 public static class GetMitigationHistory
 {
@@ -25,16 +25,38 @@ public static class GetMitigationHistory
         }
     }
 
-    /// <summary>Handler que compõe o histórico de mitigação do incidente.</summary>
-    public sealed class Handler(IIncidentStore store) : IQueryHandler<Query, Response>
+    /// <summary>
+    /// Handler que lê os workflows de mitigação do incidente via repositório,
+    /// mapeando cada registo para uma entrada de auditoria.
+    /// </summary>
+    public sealed class Handler(
+        IIncidentStore store,
+        IMitigationWorkflowRepository workflowRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = await store.GetMitigationHistoryAsync(request.IncidentId, cancellationToken);
-            if (response is null)
+            if (!Guid.TryParse(request.IncidentId, out var incidentGuid))
                 return IncidentErrors.IncidentNotFound(request.IncidentId);
 
-            return Result<Response>.Success(response);
+            if (!store.IncidentExists(request.IncidentId))
+                return IncidentErrors.IncidentNotFound(request.IncidentId);
+
+            var workflows = await workflowRepository.GetByIncidentIdAsync(request.IncidentId, cancellationToken);
+
+            var entries = workflows
+                .Select(w => new MitigationAuditEntryDto(
+                    EntryId: w.Id.Value,
+                    WorkflowId: w.Id.Value,
+                    Action: w.ActionType.ToString(),
+                    PerformedBy: w.CreatedByUser,
+                    PerformedAt: w.CreatedAt,
+                    Notes: w.CompletedNotes,
+                    Outcome: w.CompletedOutcome,
+                    ValidationResult: w.Status.ToString(),
+                    LinkedEvidence: []))
+                .ToArray();
+
+            return Result<Response>.Success(new Response(incidentGuid, entries));
         }
     }
 
