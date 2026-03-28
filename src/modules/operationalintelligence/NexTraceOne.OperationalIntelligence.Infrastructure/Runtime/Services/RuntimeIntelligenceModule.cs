@@ -90,6 +90,7 @@ internal sealed class RuntimeIntelligenceModule(
 
         var score = profileScore.Value;
 
+        // Weighted score with baseline: 85% guaranteed + up to 15% based on confidence (0.85 to 1.00 range).
         score *= baselineConfidence.HasValue
             ? BaselineMinWeight + (Math.Clamp(baselineConfidence.Value, 0m, 1m) * BaselineVariableWeight)
             : MissingBaselinePenalty;
