@@ -60,7 +60,6 @@ internal sealed class AiOrchestrationModule(
         var artifact = await context.TestArtifacts
             .AsNoTracking()
             .Where(a => a.Id == Domain.Orchestration.Entities.GeneratedTestArtifactId.From(executionId))
-            .OrderByDescending(a => a.GeneratedAt)
             .Select(a => new AgentExecutionResultDto(
                 a.Id.Value,
                 $"test-generation:{a.TestFramework}",
