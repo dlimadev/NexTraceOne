@@ -28,6 +28,9 @@ using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Governance.API;
 using NexTraceOne.OperationalIntelligence.API.Reliability.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
+using NexTraceOne.Integrations.Infrastructure;
+using NexTraceOne.Knowledge.Infrastructure;
+using NexTraceOne.ProductAnalytics.Infrastructure;
 
 // DbContext types for outbox processor registration
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
@@ -47,6 +50,9 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.Integrations.Infrastructure.Persistence;
+using NexTraceOne.Knowledge.Infrastructure.Persistence;
+using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NEXTRACEONE — Background Workers
@@ -81,6 +87,9 @@ builder.Services.AddGovernanceModule(builder.Configuration);
 builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
 builder.Services.AddReliabilityModule(builder.Configuration);
 builder.Services.AddCostIntelligenceModule(builder.Configuration);
+builder.Services.AddIntegrationsInfrastructure(builder.Configuration);
+builder.Services.AddKnowledgeInfrastructure(builder.Configuration);
+builder.Services.AddProductAnalyticsInfrastructure(builder.Configuration);
 
 builder.Services.Configure<DriftDetectionOptions>(
     builder.Configuration.GetSection(DriftDetectionOptions.SectionName));
@@ -95,6 +104,21 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<IdentityDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-integrations",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<IntegrationsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-knowledge",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<KnowledgeDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-product-analytics",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<ProductAnalyticsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "identity-expiration-job",
         failureStatus: HealthStatus.Unhealthy,
@@ -150,6 +174,11 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<ReliabilityDbContext>
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<CostIntelligenceDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<AutomationDbContext>>();
+
+// Integrations / Knowledge / ProductAnalytics
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<IntegrationsDbContext>>();
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<KnowledgeDbContext>>();
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<ProductAnalyticsDbContext>>();
 
 builder.Services.AddHostedService<IdentityExpirationJob>();
 builder.Services.AddHostedService<DriftDetectionJob>();
