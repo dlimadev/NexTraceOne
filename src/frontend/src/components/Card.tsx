@@ -8,11 +8,12 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
 /**
  * Card base — superfície elevada sobre canvas profundo navy.
- * DESIGN-SYSTEM.md §4.7: padding 24px, radius-lg (18px), borda soft translúcida.
+ * DESIGN-SYSTEM.md §4.7: radius-xl (14px), borda soft translúcida, shadow-surface.
+ * Hover disponível via className extra quando necessário.
  */
 export function Card({ children, className, ...rest }: CardProps) {
   return (
-    <div className={cn('bg-card rounded-lg border border-edge shadow-surface', className)} {...rest}>
+    <div className={cn('bg-card rounded-xl border border-edge shadow-surface overflow-hidden', className)} {...rest}>
       {children}
     </div>
   );
@@ -20,12 +21,12 @@ export function Card({ children, className, ...rest }: CardProps) {
 
 export function CardHeader({ children, className, ...rest }: CardProps) {
   return (
-    <div className={cn('px-6 py-5 border-b border-divider', className)} {...rest}>
+    <div className={cn('px-5 py-4 border-b border-divider', className)} {...rest}>
       {children}
     </div>
   );
 }
 
 export function CardBody({ children, className, ...rest }: CardProps) {
-  return <div className={cn('px-6 py-5', className)} {...rest}>{children}</div>;
+  return <div className={cn('px-5 py-4', className)} {...rest}>{children}</div>;
 }

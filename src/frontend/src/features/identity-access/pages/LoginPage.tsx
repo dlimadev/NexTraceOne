@@ -80,11 +80,11 @@ export function LoginPage() {
 
         {serverError && <AuthFeedback variant="error" message={serverError} className="mb-6" />}
 
-        {/* SSO — primary authentication method */}
+        {/* SSO — primary authentication method (institutional blue) */}
         <div className="mb-6">
           <Button
             type="button"
-            variant="primary"
+            variant="institutional"
             size="lg"
             className="w-full"
             loading={ssoLoading}

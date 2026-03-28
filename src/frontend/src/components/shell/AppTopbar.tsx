@@ -14,6 +14,13 @@ interface AppTopbarProps {
   sidebarCollapsed?: boolean;
 }
 
+/**
+ * AppTopbar — barra de topo da aplicação.
+ *
+ * Layout: [menu mobile] [search flex-1] — [workspace] [actions] [divider] [user]
+ * Height 56px, bg deep translúcido com backdrop-blur.
+ * Breadcrumbs strip abaixo, ocultados na rota home.
+ */
 export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarProps) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
@@ -22,8 +29,9 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
     <div className="shrink-0">
       <header
         className={cn(
-          'h-14 bg-deep/80 backdrop-blur-sm border-b border-edge',
+          'h-14 border-b border-edge',
           'flex items-center justify-between px-4 lg:px-5 gap-3',
+          'bg-deep/90 backdrop-blur-md',
         )}
         role="banner"
       >
@@ -36,19 +44,21 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
           <Menu size={20} />
         </button>
 
-        {/* Search */}
-        <AppTopbarSearch onOpenCommandPalette={onOpenCommandPalette} />
+        {/* Search — flex-1 to consume available horizontal space */}
+        <div className="flex-1 min-w-0 max-w-lg">
+          <AppTopbarSearch onOpenCommandPalette={onOpenCommandPalette} />
+        </div>
 
         {/* Right section */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <WorkspaceSwitcher />
           <AppTopbarActions />
-          <div className="w-px h-7 bg-edge mx-1.5" aria-hidden="true" />
+          <div className="w-px h-6 bg-edge mx-1" aria-hidden="true" />
           <AppUserMenu />
         </div>
       </header>
 
-      {/* Breadcrumbs strip */}
+      {/* Breadcrumbs strip — hidden on home */}
       {pathname !== '/' && <Breadcrumbs />}
     </div>
   );
