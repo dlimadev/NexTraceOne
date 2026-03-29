@@ -17,11 +17,11 @@ Preparar o projeto para a evolução legacy sem quebrar funcionalidade existente
 
 - [ ] Documentação de visão legacy integrada no `PRODUCT-VISION.md`
 - [ ] Documentação de modos de maturidade (`docs/legacy/MATURITY-MODES.md`)
-- [ ] Extensão de enums existentes para tipos legacy
-- [ ] Extensão do DB check constraint para novos `ServiceType` values
-- [ ] Feature flags para capabilities legacy (Configuration module)
-- [ ] Chaves i18n base para termos legacy (~100 keys iniciais)
-- [ ] Alinhamento do `ServiceType` enum C# com DB check constraint
+- [x] Extensão de enums existentes para tipos legacy
+- [x] Extensão do DB check constraint para novos `ServiceType` values
+- [x] Feature flags para capabilities legacy (Configuration module)
+- [x] Chaves i18n base para termos legacy (~115 keys em 4 locales)
+- [x] Alinhamento do `ServiceType` enum C# com DB check constraint
 
 ---
 
@@ -167,8 +167,9 @@ Sem alterações visuais nesta onda.
 
 ## Testes
 
-- [ ] Testes de regressão em todos os catálogos existentes (652+ catalog tests devem continuar a passar)
-- [ ] Testes de regressão em change governance (195+ tests devem continuar a passar)
+- [x] Testes de regressão em todos os catálogos existentes (652 catalog tests passam ✅)
+- [x] Testes de regressão em change governance (248 tests passam ✅)
+- [x] Testes de regressão em configuration (326 tests passam ✅)
 - [ ] Novos testes para enum serialization/deserialization com novos valores
 - [ ] Teste de migração em base de dados limpa e com dados existentes
 
@@ -195,15 +196,15 @@ Sem alterações visuais nesta onda.
 
 ## Stories
 
-| ID | Story | Prioridade |
-|---|---|---|
-| W0-S01 | Alinhar `ServiceType` enum C# com DB check constraint | P0 |
-| W0-S02 | Adicionar novos `ServiceType` values para mainframe | P0 |
-| W0-S03 | Adicionar novos `ContractType` + `ContractProtocol` values | P0 |
-| W0-S04 | Adicionar novos `NodeType` + `EdgeType` values | P0 |
-| W0-S05 | Adicionar novos `ChangeType` values | P0 |
-| W0-S06 | Criar migração EF para check constraint update | P0 |
-| W0-S07 | Registar feature flags para legacy capabilities | P1 |
-| W0-S08 | Criar chaves i18n base (~100 keys) | P1 |
-| W0-S09 | Atualizar `PRODUCT-VISION.md` com visão híbrida | P1 |
-| W0-S10 | Criar `MATURITY-MODES.md` | P2 |
+| ID | Story | Prioridade | Estado |
+|---|---|---|---|
+| W0-S01 | Alinhar `ServiceType` enum C# com DB check constraint | P0 | ✅ Implementado |
+| W0-S02 | Adicionar novos `ServiceType` values para mainframe | P0 | ✅ Implementado |
+| W0-S03 | Adicionar novos `ContractType` + `ContractProtocol` values | P0 | ✅ Implementado |
+| W0-S04 | Adicionar novos `NodeType` + `EdgeType` values | P0 | ✅ Implementado |
+| W0-S05 | Adicionar novos `ChangeType` values | P0 | ✅ Implementado |
+| W0-S06 | Criar migração EF para check constraint update | P0 | ✅ Implementado |
+| W0-S07 | Registar feature flags para legacy capabilities | P1 | ✅ Implementado |
+| W0-S08 | Criar chaves i18n base (~100 keys) | P1 | ✅ Implementado (115 keys, 4 locales) |
+| W0-S09 | Atualizar `PRODUCT-VISION.md` com visão híbrida | P1 | ⏳ Pendente (documentação) |
+| W0-S10 | Criar `MATURITY-MODES.md` | P2 | ⏳ Pendente (documentação) |
