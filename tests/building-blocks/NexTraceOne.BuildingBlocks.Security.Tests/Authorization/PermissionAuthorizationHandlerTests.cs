@@ -13,7 +13,9 @@ public sealed class PermissionAuthorizationHandlerTests
     private static (PermissionAuthorizationHandler Handler, ICurrentUser CurrentUser) CreateHandler(
         bool isAuthenticated = true,
         string userId = "user-1",
-        IEnumerable<string>? grantedPermissions = null)
+        IEnumerable<string>? grantedPermissions = null,
+        IDatabasePermissionProvider? dbProvider = null,
+        IJitPermissionProvider? jitProvider = null)
     {
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.IsAuthenticated.Returns(isAuthenticated);
@@ -24,7 +26,7 @@ public sealed class PermissionAuthorizationHandlerTests
             .Returns(callInfo => permissions.Contains(callInfo.Arg<string>(), StringComparer.OrdinalIgnoreCase));
 
         var logger = Substitute.For<ILogger<PermissionAuthorizationHandler>>();
-        var handler = new PermissionAuthorizationHandler(currentUser, logger);
+        var handler = new PermissionAuthorizationHandler(currentUser, logger, dbProvider, jitProvider);
 
         return (handler, currentUser);
     }
@@ -110,5 +112,99 @@ public sealed class PermissionAuthorizationHandlerTests
 
         context.HasSucceeded.Should().BeFalse();
         logger.ReceivedCalls().Should().NotBeEmpty();
+    }
+
+    // ── Testes da cascata: JWT → Database → JIT ──────────────────────────
+
+    [Fact]
+    public async Task HandleRequirement_WithDbPermission_Succeeds_When_JwtDoesNotHaveIt()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        dbProvider.HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            "governance:admin:write", Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: [],
+            dbProvider: dbProvider);
+
+        var context = CreateContext("governance:admin:write");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task HandleRequirement_WithJitGrant_Succeeds_When_JwtAndDbDoNotHaveIt()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        dbProvider.HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        var jitProvider = Substitute.For<IJitPermissionProvider>();
+        jitProvider.HasActiveJitGrantAsync("user-1", "platform:admin:read", Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: [],
+            dbProvider: dbProvider,
+            jitProvider: jitProvider);
+
+        var context = CreateContext("platform:admin:read");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task HandleRequirement_JwtTakesPrecedence_When_JwtHasPermission()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        var jitProvider = Substitute.For<IJitPermissionProvider>();
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: ["services:read"],
+            dbProvider: dbProvider,
+            jitProvider: jitProvider);
+
+        var context = CreateContext("services:read");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+
+        // DB and JIT should NOT have been called since JWT had the permission
+        await dbProvider.DidNotReceive().HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await jitProvider.DidNotReceive().HasActiveJitGrantAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleRequirement_DeniesAccess_When_AllProvidersReturnFalse()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        dbProvider.HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        var jitProvider = Substitute.For<IJitPermissionProvider>();
+        jitProvider.HasActiveJitGrantAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: [],
+            dbProvider: dbProvider,
+            jitProvider: jitProvider);
+
+        var context = CreateContext("nonexistent:permission");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeFalse();
     }
 }
