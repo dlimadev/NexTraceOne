@@ -37,6 +37,12 @@ public interface IModuleAccessPolicyRepository
         string module,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Verifica se existem políticas de acesso persistidas para um papel específico.
+    /// Utilizado para determinar se deve usar seed do <see cref="ModuleAccessPolicyCatalog"/>.
+    /// </summary>
+    Task<bool> HasPoliciesForRoleAsync(RoleId roleId, TenantId? tenantId, CancellationToken cancellationToken);
+
     /// <summary>Adiciona uma nova política de acesso.</summary>
     Task AddAsync(ModuleAccessPolicy policy, CancellationToken cancellationToken);
 

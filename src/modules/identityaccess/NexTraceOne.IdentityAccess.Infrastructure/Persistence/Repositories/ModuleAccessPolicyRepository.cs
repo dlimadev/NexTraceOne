@@ -65,6 +65,18 @@ internal sealed class ModuleAccessPolicyRepository(IdentityDbContext context) : 
     }
 
     /// <inheritdoc />
+    public async Task<bool> HasPoliciesForRoleAsync(
+        RoleId roleId,
+        TenantId? tenantId,
+        CancellationToken cancellationToken)
+    {
+        return await context.ModuleAccessPolicies
+            .AnyAsync(p => p.RoleId == roleId
+                           && p.TenantId == tenantId
+                           && p.IsActive, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task AddAsync(ModuleAccessPolicy policy, CancellationToken cancellationToken)
     {
         await context.ModuleAccessPolicies.AddAsync(policy, cancellationToken);
