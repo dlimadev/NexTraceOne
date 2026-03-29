@@ -437,14 +437,13 @@ public static class CopybookParser
         // Expand PIC shorthand: X(10) → XXXXXXXXXX for counting
         var expanded = ExpandPic(picClause);
 
-        var intDigits = CountChar(expanded, '9');
+        // totalDigitCount includes all 9s in the PIC clause (both before and after V)
+        var totalDigitCount = CountChar(expanded, '9');
         var alphaCount = CountChar(expanded, 'X');
         var alphabeticCount = CountChar(expanded, 'A');
         var hasSigned = expanded.Contains('S', StringComparison.OrdinalIgnoreCase);
         var hasDecimal = expanded.Contains('V', StringComparison.OrdinalIgnoreCase);
         var decimalDigits = hasDecimal ? CountDigitsAfterV(expanded) : 0;
-        // intDigits already includes ALL 9s (before and after V), so totalDigits = intDigits
-        var totalDigits = intDigits;
 
         // COMP-1 / COMP-2: fixed sizes regardless of PIC
         if (string.Equals(usage, "COMP-1", StringComparison.OrdinalIgnoreCase))
@@ -458,7 +457,7 @@ public static class CopybookParser
             (usage.Equals("COMP-3", StringComparison.OrdinalIgnoreCase) ||
              usage.Equals("PACKED-DECIMAL", StringComparison.OrdinalIgnoreCase)))
         {
-            var packedLen = (totalDigits + 1 + 1) / 2; // +1 for sign nibble, then rounded up
+            var packedLen = CalculatePackedDecimalLength(totalDigitCount);
             var type = hasDecimal ? "signed-decimal" : hasSigned ? "signed-numeric" : "packed-decimal";
             return (type, packedLen, hasDecimal ? decimalDigits : null);
         }
@@ -470,7 +469,7 @@ public static class CopybookParser
              usage.Equals("COMP-5", StringComparison.OrdinalIgnoreCase) ||
              usage.Equals("BINARY", StringComparison.OrdinalIgnoreCase)))
         {
-            var binaryLen = totalDigits switch
+            var binaryLen = totalDigitCount switch
             {
                 <= 4 => 2,
                 <= 9 => 4,
@@ -481,15 +480,15 @@ public static class CopybookParser
         }
 
         // Alphanumeric: PIC X
-        if (alphaCount > 0 && intDigits == 0)
+        if (alphaCount > 0 && totalDigitCount == 0)
             return ("alphanumeric", alphaCount, null);
 
         // Alphabetic: PIC A
-        if (alphabeticCount > 0 && intDigits == 0)
+        if (alphabeticCount > 0 && totalDigitCount == 0)
             return ("alphabetic", alphabeticCount, null);
 
-        // Display numeric — intDigits already includes decimal digits
-        var displayLen = intDigits + (hasSigned ? 1 : 0);
+        // Display numeric — totalDigitCount includes decimal digits
+        var displayLen = totalDigitCount + (hasSigned ? 1 : 0);
 
         if (hasDecimal && hasSigned)
             return ("signed-decimal", displayLen, decimalDigits);
@@ -500,6 +499,14 @@ public static class CopybookParser
 
         return ("numeric", displayLen, null);
     }
+
+    /// <summary>
+    /// Calcula o comprimento em bytes de um campo COMP-3 (packed decimal).
+    /// Cada dígito ocupa um nibble (4 bits), mais um nibble para o sinal.
+    /// Resultado é arredondado para o byte completo.
+    /// </summary>
+    private static int CalculatePackedDecimalLength(int totalDigits)
+        => (totalDigits + 1 + 1) / 2; // +1 sign nibble, +1 for ceiling division by 2
 
     /// <summary>
     /// Expande notação PIC abreviada: 9(5) → 99999, X(10) → XXXXXXXXXX.

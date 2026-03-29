@@ -112,13 +112,13 @@ public static class CopybookDiffCalculator
         // Compare 88-level condition values (non-breaking)
         Compare88Levels(baseLayout.Fields, targetLayout.Fields, nonBreaking);
 
-        var changeLevel = breaking.Count > 0
-            ? ChangeLevel.Breaking
-            : additive.Count > 0
-                ? ChangeLevel.Additive
-                : nonBreaking.Count > 0
-                    ? ChangeLevel.NonBreaking
-                    : ChangeLevel.NonBreaking;
+        ChangeLevel changeLevel;
+        if (breaking.Count > 0)
+            changeLevel = ChangeLevel.Breaking;
+        else if (additive.Count > 0)
+            changeLevel = ChangeLevel.Additive;
+        else
+            changeLevel = ChangeLevel.NonBreaking;
 
         return new CopybookDiffResult(
             breaking.AsReadOnly(),

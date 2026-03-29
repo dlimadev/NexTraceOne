@@ -236,22 +236,22 @@ Se `Copybook` e `CopybookField` já foram criados na Onda 1, esta onda adiciona:
 
 ## Stories
 
-| ID | Story | Prioridade |
-|---|---|---|
-| W4-S01 | Implementar `CopybookParser` (Fase 1 — PIC, OCCURS, REDEFINES, 88) | P0 |
-| W4-S02 | Criar modelo `CopybookField` e `CopybookLayout` | P0 |
-| W4-S03 | Implementar `ImportCopybookLayout` command + handler | P1 |
-| W4-S04 | Implementar versionamento de copybooks | P1 |
-| W4-S05 | Implementar `DiffCopybookVersions` query | P1 |
-| W4-S06 | Implementar `ClassifyCopybookChange` (breaking detection) | P1 |
-| W4-S07 | Implementar `MqMessageDescriptorParser` | P2 |
-| W4-S08 | Implementar `RegisterMqContract` command | P2 |
-| W4-S09 | Implementar `MapCopybookToContract` (cross-reference) | P2 |
-| W4-S10 | Criar `CopybookViewer` page frontend | P1 |
-| W4-S11 | Criar `CopybookDiffViewer` page frontend | P1 |
-| W4-S12 | Criar `CopybookFieldsTable` component | P1 |
-| W4-S13 | Extensão do Contract Catalog com tipos legacy | P1 |
-| W4-S14 | Criar migrações para novas tabelas | P1 |
-| W4-S15 | Criar testes para CopybookParser (~40 testes) | P0 |
-| W4-S16 | Criar testes para diff e classification (~20 testes) | P1 |
-| W4-S17 | Criar testes de integração (~10) | P2 |
+| ID | Story | Prioridade | Estado |
+|---|---|---|---|
+| W4-S01 | Implementar `CopybookParser` (Fase 1 — PIC, OCCURS, REDEFINES, 88) | P0 | ✅ Implementado |
+| W4-S02 | Criar modelo `CopybookParsedField` e `CopybookParsedLayout` | P0 | ✅ Implementado |
+| W4-S03 | Implementar `ImportCopybookLayout` command + handler | P1 | ✅ Implementado |
+| W4-S04 | Implementar versionamento de copybooks | P1 | ✅ Implementado (CopybookVersion entity + repository) |
+| W4-S05 | Implementar `DiffCopybookVersions` query | P1 | ✅ Implementado |
+| W4-S06 | Implementar `ClassifyCopybookChange` (breaking detection) | P1 | ✅ Implementado (CopybookDiffCalculator + CopybookDiffRecord) |
+| W4-S07 | Implementar `MqMessageDescriptorParser` | P2 | ⏳ Pendente |
+| W4-S08 | Implementar `RegisterMqContract` command | P2 | ⏳ Pendente |
+| W4-S09 | Implementar `MapCopybookToContract` (cross-reference) | P2 | ⏳ Pendente |
+| W4-S10 | Criar `CopybookViewer` page frontend | P2 | ⏳ Pendente |
+| W4-S11 | Criar `CopybookDiffViewer` page frontend | P2 | ⏳ Pendente |
+| W4-S12 | Criar `CopybookFieldsTable` component | P2 | ⏳ Pendente |
+| W4-S13 | Extensão do Contract Catalog com tipos legacy | P2 | ⏳ Pendente |
+| W4-S14 | Criar migrações para novas tabelas | P1 | ✅ Implementado (4 tabelas: cat_copybook_versions, cat_copybook_diffs, cat_mq_contracts, cat_copybook_contract_mappings) |
+| W4-S15 | Criar testes para CopybookParser (~40 testes) | P0 | ✅ Implementado (32 testes parser + 10 diff) |
+| W4-S16 | Criar testes para diff e classification (~20 testes) | P1 | ✅ Implementado (10 diff + 8 feature tests) |
+| W4-S17 | Criar testes de integração (~10) | P2 | ⏳ Pendente |
