@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Save,
   Send,
+  Download,
   FileText,
   Code,
   Settings,
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { contractStudioApi } from '../api/contractStudio';
+import { useDraftExport } from '../hooks/useDraftExport';
 import { PROTOCOL_COLORS, LIFECYCLE_COLORS } from '../shared/constants';
 import { cn } from '../../../lib/cn';
 import { PageContainer } from '../../../components/shell';
@@ -38,6 +40,7 @@ export function DraftStudioPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const currentActor = user?.email || user?.fullName || user?.id || 'system';
+  const { exportDraft, isExporting, exportError } = useDraftExport();
 
   const [activeTab, setActiveTab] = useState<DraftTab>('spec');
   const [draftSpecContent, setDraftSpecContent] = useState<string | null>(null);
@@ -177,6 +180,16 @@ export function DraftStudioPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {draftId && specContent.trim() && (
+            <button
+              onClick={() => exportDraft(draftId)}
+              disabled={isExporting}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-elevated text-muted hover:text-heading disabled:opacity-40 transition-colors border border-edge"
+            >
+              {isExporting ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              {t('contracts.studio.exportDraft', 'Export')}
+            </button>
+          )}
           {isEditable && (
             <>
               <button
@@ -240,6 +253,11 @@ export function DraftStudioPage() {
         {submitMutation.isSuccess && (
           <div className="mb-4 text-xs text-emerald-400 bg-emerald-900/10 border border-emerald-700/20 rounded-md px-3 py-2">
             {t('contracts.studio.submitSuccess', 'Draft submitted for review successfully.')}
+          </div>
+        )}
+        {exportError && (
+          <div className="mb-4 text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded-md px-3 py-2">
+            {t('contracts.studio.exportDraftFailed', 'Failed to export draft.')}
           </div>
         )}
 

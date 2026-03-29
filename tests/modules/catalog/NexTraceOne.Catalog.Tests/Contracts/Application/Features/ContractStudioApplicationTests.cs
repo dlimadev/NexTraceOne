@@ -6,6 +6,7 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
+using ExportDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ExportDraft.ExportDraft;
 using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
 using UpdateDraftContentFeature = NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent.UpdateDraftContent;
 using ListDraftsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts.ListDrafts;
@@ -510,5 +511,75 @@ public sealed class ContractStudioApplicationTests
         result.Value.ExampleId.Should().NotBeEmpty();
         result.Value.DraftId.Should().Be(draft.Id.Value);
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    // ── ExportDraft ─────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ExportDraft_Should_ReturnSpecContent_When_DraftExists()
+    {
+        var draft = ContractDraft.Create(
+            "Export Test API", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+
+        draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new ExportDraftFeature.Handler(draftRepo);
+
+        var result = await sut.Handle(
+            new ExportDraftFeature.Query(draft.Id.Value),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DraftId.Should().Be(draft.Id.Value);
+        result.Value.Title.Should().Be("Export Test API");
+        result.Value.SpecContent.Should().Be(ValidSpec);
+        result.Value.Format.Should().Be("json");
+        result.Value.ProposedVersion.Should().Be("1.0.0");
+        result.Value.Protocol.Should().Be("OpenApi");
+        result.Value.ContractType.Should().Be("RestApi");
+    }
+
+    [Fact]
+    public async Task ExportDraft_Should_ReturnError_When_DraftNotFound()
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns((ContractDraft?)null);
+
+        var sut = new ExportDraftFeature.Handler(draftRepo);
+
+        var result = await sut.Handle(
+            new ExportDraftFeature.Query(Guid.NewGuid()),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Contracts.Draft.NotFound");
+    }
+
+    [Fact]
+    public async Task ExportDraft_Should_ReturnEmptySpecContent_When_DraftHasNoContent()
+    {
+        var draft = ContractDraft.Create(
+            "Empty Draft", "author@test.com", ContractType.Soap, ContractProtocol.Wsdl).Value;
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new ExportDraftFeature.Handler(draftRepo);
+
+        var result = await sut.Handle(
+            new ExportDraftFeature.Query(draft.Id.Value),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.SpecContent.Should().BeEmpty();
+        result.Value.Format.Should().Be("yaml");
+        result.Value.Protocol.Should().Be("Wsdl");
+        result.Value.ContractType.Should().Be("Soap");
     }
 }
