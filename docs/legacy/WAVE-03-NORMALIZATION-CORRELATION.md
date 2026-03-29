@@ -159,17 +159,17 @@ Sem novas tabelas. Extensões:
 
 ## Stories
 
-| ID | Story | Prioridade |
-|---|---|---|
-| W3-S01 | Implementar `ILegacyEventCorrelator` service | P0 |
-| W3-S02 | Implementar `CorrelateBatchEventHandler` | P1 |
-| W3-S03 | Implementar `CorrelateMqEventHandler` | P1 |
-| W3-S04 | Implementar `CorrelateMainframeEventHandler` | P1 |
-| W3-S05 | Implementar auto-creation de incidente para batch failure | P1 |
-| W3-S06 | Implementar auto-creation de incidente para MQ anomaly | P1 |
-| W3-S07 | Estender `IncidentChangeCorrelation` com campos legacy | P1 |
-| W3-S08 | Implementar unified timeline query | P1 |
-| W3-S09 | Criar tabela de aliases para matching | P2 |
-| W3-S10 | Extensão do frontend com timeline e indicadores | P2 |
-| W3-S11 | Extensão da lista de incidentes com fonte legacy | P2 |
-| W3-S12 | Criar testes unitários e integração (~45) | P1 |
+| ID | Story | Prioridade | Estado |
+|---|---|---|---|
+| W3-S01 | Implementar `ILegacyEventCorrelator` service | P0 | ✅ Implementado |
+| W3-S02 | Implementar `CorrelateBatchEventHandler` | P1 | ✅ Implementado |
+| W3-S03 | Implementar `CorrelateMqEventHandler` | P1 | ✅ Implementado |
+| W3-S04 | Implementar `CorrelateMainframeEventHandler` | P1 | ✅ Implementado |
+| W3-S05 | Implementar auto-creation de incidente para batch failure | P1 | ✅ Implementado |
+| W3-S06 | Implementar auto-creation de incidente para MQ anomaly | P1 | ✅ Implementado |
+| W3-S07 | Estender `IncidentChangeCorrelation` com campos legacy | P1 | ✅ Implementado (3 novos campos + migração) |
+| W3-S08 | Implementar unified timeline query | P1 | ✅ Implementado (GET /api/v1/incidents/timeline) |
+| W3-S09 | Criar tabela de aliases para matching | P2 | ⏳ Pendente |
+| W3-S10 | Extensão do frontend com timeline e indicadores | P2 | ⏳ Pendente |
+| W3-S11 | Extensão da lista de incidentes com fonte legacy | P2 | ⏳ Pendente |
+| W3-S12 | Criar testes unitários e integração (~45) | P1 | ✅ Implementado (24 testes, 582 total) |
