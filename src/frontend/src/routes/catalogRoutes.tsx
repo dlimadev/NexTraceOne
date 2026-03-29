@@ -14,6 +14,8 @@ const ServiceSourceOfTruthPage = lazy(() => import('../features/catalog/pages/Se
 const ContractSourceOfTruthPage = lazy(() => import('../features/catalog/pages/ContractSourceOfTruthPage').then(m => ({ default: m.ContractSourceOfTruthPage })));
 const GlobalSearchPage = lazy(() => import('../features/catalog/pages/GlobalSearchPage').then(m => ({ default: m.GlobalSearchPage })));
 const DeveloperPortalPage = lazy(() => import('../features/catalog/pages/DeveloperPortalPage').then(m => ({ default: m.DeveloperPortalPage })));
+const LegacyAssetCatalogPage = lazy(() => import('../features/legacy-assets/pages/LegacyAssetCatalogPage'));
+const MainframeSystemDetailPage = lazy(() => import('../features/legacy-assets/pages/MainframeSystemDetailPage'));
 
 export function CatalogRoutes() {
   return (
@@ -75,6 +77,22 @@ export function CatalogRoutes() {
         }
       />
       <Route path="/graph" element={<Navigate to="/services/graph" replace />} />
+      <Route
+        path="/services/legacy"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <LegacyAssetCatalogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/legacy/:assetType/:assetId"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <MainframeSystemDetailPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/portal/*"
         element={

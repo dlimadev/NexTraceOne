@@ -11,6 +11,7 @@ using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterDb2Artifact;
 using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterImsTransaction;
 using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterMainframeSystem;
 using NexTraceOne.Catalog.Application.LegacyAssets.Features.RegisterZosConnectBinding;
+using NexTraceOne.Catalog.Application.LegacyAssets.Features.SyncLegacyAssets;
 using NexTraceOne.Catalog.Infrastructure.LegacyAssets;
 
 namespace NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
@@ -40,6 +41,9 @@ public static class DependencyInjection
         // ── Validators de consulta ───────────────────────────────────────
         services.AddTransient<IValidator<ListLegacyAssets.Query>, ListLegacyAssets.Validator>();
         services.AddTransient<IValidator<GetLegacyAssetDetail.Query>, GetLegacyAssetDetail.Validator>();
+
+        // ── Validator de ingestão bulk ───────────────────────────────────
+        services.AddTransient<IValidator<SyncLegacyAssets.Command>, SyncLegacyAssets.Validator>();
 
         return services;
     }

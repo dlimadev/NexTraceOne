@@ -33,5 +33,8 @@ public sealed class LegacyAssetsEndpointModule
         // ── Consulta de ativos legacy ────────────────────────────────────
         ListLegacyAssetsEndpoint.Map(group);
         GetLegacyAssetDetailEndpoint.Map(group);
+
+        // ── Ingestão bulk de ativos legacy ───────────────────────────────
+        SyncLegacyAssetsEndpoint.Map(group);
     }
 }
