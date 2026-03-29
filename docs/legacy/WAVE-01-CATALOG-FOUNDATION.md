@@ -250,13 +250,13 @@ Services
 | W1-S09 | Implementar `RegisterCicsTransaction` command + handler | P1 | ✅ Implementado |
 | W1-S10 | Implementar commands para IMS, DB2, z/OS Connect | P2 | ✅ Implementado |
 | W1-S11 | Implementar `ListLegacyAssets` e `GetLegacyAssetDetail` queries | P1 | ✅ Implementado |
-| W1-S12 | Implementar `SyncLegacyAssets` para Ingestion API | P1 | ⏳ Pendente |
+| W1-S12 | Implementar `SyncLegacyAssets` para Ingestion API | P1 | ✅ Implementado (POST /api/catalog/legacy/assets/sync) |
 | W1-S13 | Criar FluentValidation validators | P1 | ✅ Implementado |
-| W1-S14 | Criar endpoint modules na Catalog API | P1 | ✅ Implementado (9 endpoints) |
-| W1-S15 | Criar `LegacyAssetCatalogPage` frontend | P1 | ⏳ Pendente (frontend) |
-| W1-S16 | Criar `MainframeSystemDetailPage` frontend | P1 | ⏳ Pendente (frontend) |
-| W1-S17 | Atualizar sidebar com "Legacy Assets" | P1 | ⏳ Pendente (frontend) |
+| W1-S14 | Criar endpoint modules na Catalog API | P1 | ✅ Implementado (10 endpoints) |
+| W1-S15 | Criar `LegacyAssetCatalogPage` frontend | P1 | ✅ Implementado |
+| W1-S16 | Criar `MainframeSystemDetailPage` frontend | P1 | ✅ Implementado |
+| W1-S17 | Atualizar sidebar com "Legacy Assets" | P1 | ✅ Implementado |
 | W1-S18 | Adicionar i18n keys (~150) | P1 | ✅ Implementado (132 keys × 4 locales) |
 | W1-S19 | Criar testes unitários (~100) | P1 | ✅ Implementado (~88 testes, 741 total) |
 | W1-S20 | Criar testes de integração (~20) | P2 | ⏳ Pendente |
-| W1-S21 | Configurar outbox processing para `LegacyAssetsDbContext` | P1 | ⏳ Pendente |
+| W1-S21 | Configurar outbox processing para `LegacyAssetsDbContext` | P1 | ✅ Implementado |
