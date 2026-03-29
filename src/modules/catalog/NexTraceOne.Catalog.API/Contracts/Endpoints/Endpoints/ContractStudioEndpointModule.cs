@@ -10,6 +10,8 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample.AddDraftExample;
 using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft.ApproveDraft;
 using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
+using ExportDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ExportDraft.ExportDraft;
+using GenerateDraftFromAiFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi.GenerateDraftFromAi;
 using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
 using ListDraftReviewsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews.ListDraftReviews;
 using ListDraftsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts.ListDrafts;
@@ -187,5 +189,30 @@ public sealed class ContractStudioEndpointModule
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToCreatedResult("/api/v1/contracts/drafts/{0}/examples", localizer);
         }).RequirePermission("contracts:write");
+
+        // ── AI Generation ───────────────────────────────────────
+
+        group.MapPost("/ai/generate", async (
+            GenerateDraftFromAiFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToCreatedResult(
+                response => $"/api/v1/contracts/drafts/{response.DraftId}", localizer);
+        }).RequirePermission("contracts:write");
+
+        // ── Export ──────────────────────────────────────────────
+
+        group.MapGet("/{draftId:guid}/export", async (
+            Guid draftId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ExportDraftFeature.Query(draftId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
     }
 }
