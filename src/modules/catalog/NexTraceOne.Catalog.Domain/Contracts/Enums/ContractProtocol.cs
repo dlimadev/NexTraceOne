@@ -29,5 +29,22 @@ public enum ContractProtocol
     GraphQl = 5,
 
     /// <summary>Worker/Background Service — processo em background declarado por metadados estruturados (trigger, inputs, outputs, side effects).</summary>
-    WorkerService = 6
+    WorkerService = 6,
+
+    // ── Novos protocolos para contratos legacy / mainframe ──
+
+    /// <summary>Copybook COBOL — definição de layout de dados com PIC clauses.</summary>
+    Copybook = 7,
+
+    /// <summary>MQ Message Descriptor — formato de mensagem IBM MQ.</summary>
+    MqMessageDescriptor = 8,
+
+    /// <summary>Fixed Record Layout — ficheiro com posições fixas (flat file).</summary>
+    FixedRecordLayout = 9,
+
+    /// <summary>CICS COMMAREA — área de comunicação para transações CICS.</summary>
+    CicsCommarea = 10,
+
+    /// <summary>IMS Segment — segmento de dados IMS/DB.</summary>
+    ImsSegment = 11
 }

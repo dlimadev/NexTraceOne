@@ -25,5 +25,25 @@ public enum ChangeType
     PolicyChange = 5,
 
     /// <summary>Alteração operacional (runbook, infra, etc.).</summary>
-    OperationalChange = 6
+    OperationalChange = 6,
+
+    // ── Novos tipos de mudança para core systems / mainframe ──
+
+    /// <summary>Alteração de batch job (JCL, scheduling, parâmetros).</summary>
+    BatchJobChange = 7,
+
+    /// <summary>Alteração de copybook COBOL (layout de dados).</summary>
+    CopybookChange = 8,
+
+    /// <summary>Alteração de transação CICS (programa, configuração).</summary>
+    CicsTransactionChange = 9,
+
+    /// <summary>Alteração de configuração MQ (filas, canais, queue manager).</summary>
+    MqConfigurationChange = 10,
+
+    /// <summary>Alteração de infraestrutura mainframe (LPAR, sysplex).</summary>
+    MainframeInfraChange = 11,
+
+    /// <summary>Alteração de binding z/OS Connect (mapeamento API↔transação).</summary>
+    ZosConnectBindingChange = 12
 }

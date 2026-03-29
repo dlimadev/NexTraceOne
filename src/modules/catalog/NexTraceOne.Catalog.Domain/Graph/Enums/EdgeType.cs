@@ -29,5 +29,25 @@ public enum EdgeType
     Impacts = 6,
 
     /// <summary>A → B: A pertence ao domínio B (Service→Domain).</summary>
-    BelongsTo = 7
+    BelongsTo = 7,
+
+    // ── Novos tipos de arestas para core systems / mainframe ──
+
+    /// <summary>A → B: A produz mensagens para B (Service → MQ Queue).</summary>
+    Produces = 8,
+
+    /// <summary>A → B: A consome mensagens de B (Service → MQ Queue).</summary>
+    Consumes = 9,
+
+    /// <summary>A → B: A desencadeia a execução de B (Batch Job → Batch Job).</summary>
+    Triggers = 10,
+
+    /// <summary>A → B: A agenda a execução de B (Scheduler → Batch Job).</summary>
+    Schedules = 11,
+
+    /// <summary>A → B: A utiliza B (COBOL Program → Copybook).</summary>
+    Uses = 12,
+
+    /// <summary>A → B: A está vinculado a B (z/OS Connect → CICS Transaction).</summary>
+    BoundTo = 13
 }

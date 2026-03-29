@@ -26,5 +26,22 @@ public enum NodeType
     Endpoint = 5,
 
     /// <summary>Ambiente de execução (Production, Staging, Development).</summary>
-    Environment = 6
+    Environment = 6,
+
+    // ── Novos tipos de nós para core systems / mainframe ──
+
+    /// <summary>Sistema mainframe — LPAR, sysplex ou região como nó de infraestrutura.</summary>
+    MainframeSystem = 7,
+
+    /// <summary>Batch Job — job de execução batch no grafo de dependências.</summary>
+    BatchJob = 8,
+
+    /// <summary>Transação CICS — transação online mainframe como nó do grafo.</summary>
+    CicsTransaction = 9,
+
+    /// <summary>Fila MQ — queue IBM MQ como nó do grafo de mensageria.</summary>
+    MqQueue = 10,
+
+    /// <summary>Copybook — definição de layout de dados como nó do grafo.</summary>
+    Copybook = 11
 }
