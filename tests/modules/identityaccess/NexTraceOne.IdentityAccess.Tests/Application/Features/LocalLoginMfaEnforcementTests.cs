@@ -78,7 +78,7 @@ public sealed class LocalLoginMfaEnforcementTests
         roleRepository.GetByIdAsync(membership.RoleId, Arg.Any<CancellationToken>()).Returns(role);
         sessionCreator.CreateSession(user.Id, Arg.Any<string?>(), Arg.Any<string?>())
             .Returns((Session.Create(user.Id, RefreshTokenHash.Create("rt"), Now.AddDays(30), "unknown", "unknown"), "rt"));
-        responseBuilder.CreateLoginResponse(user, membership, role, "rt")
+        responseBuilder.CreateLoginResponseAsync(user, membership, role, "rt", Arg.Any<CancellationToken>())
             .Returns(new LocalLoginFeature.LoginResponse("access", "rt", 3600,
                 new LocalLoginFeature.UserResponse(user.Id.Value, user.Email.Value, user.FullName.Value, membership.TenantId.Value, Role.PlatformAdmin, [])));
 

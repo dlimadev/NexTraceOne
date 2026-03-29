@@ -130,7 +130,7 @@ public static class FederatedLogin
             var (_, refreshToken) = sessionCreator.CreateSession(
                 user.Id, request.IpAddress, request.UserAgent);
 
-            return responseBuilder.CreateLoginResponse(user, membership, role, refreshToken);
+            return await responseBuilder.CreateLoginResponseAsync(user, membership, role, refreshToken, cancellationToken);
         }
 
         /// <summary>

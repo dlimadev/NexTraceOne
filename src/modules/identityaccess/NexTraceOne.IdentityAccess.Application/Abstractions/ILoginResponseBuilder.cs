@@ -39,10 +39,12 @@ public interface ILoginResponseBuilder
     /// <summary>
     /// Cria a resposta padronizada de autenticação incluindo access token, refresh token,
     /// dados do usuário, tenant, role e permissões.
+    /// Operação assíncrona para suportar resolução de permissões via base de dados.
     /// </summary>
-    LocalLoginFeature.LoginResponse CreateLoginResponse(
+    Task<LocalLoginFeature.LoginResponse> CreateLoginResponseAsync(
         User user,
         TenantMembership membership,
         Role role,
-        string refreshToken);
+        string refreshToken,
+        CancellationToken cancellationToken);
 }

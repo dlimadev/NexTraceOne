@@ -176,8 +176,8 @@ public static class OidcCallback
                 request.Provider, userInfo.ExternalId,
                 request.IpAddress, request.UserAgent);
 
-            var loginResponse = responseBuilder.CreateLoginResponse(
-                user, membership, role, refreshToken);
+            var loginResponse = await responseBuilder.CreateLoginResponseAsync(
+                user, membership, role, refreshToken, cancellationToken);
 
             return new Response(
                 loginResponse.AccessToken,

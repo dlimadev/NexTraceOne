@@ -59,6 +59,13 @@ public static class DependencyInjection
         // Repositórios — v1.2 Autorização por Ambiente
         services.AddScoped<IEnvironmentRepository, EnvironmentRepository>();
 
+        // Repositórios — v1.3 Autorização Granular Enterprise
+        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+        services.AddScoped<IModuleAccessPolicyRepository, ModuleAccessPolicyRepository>();
+
+        // Repositórios — v1.4 Multi-Role por Tenant
+        services.AddScoped<IUserRoleAssignmentRepository, UserRoleAssignmentRepository>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -67,6 +74,10 @@ public static class DependencyInjection
 
         // JIT permission provider — permite ao PermissionAuthorizationHandler verificar grants JIT activos.
         services.AddScoped<IJitPermissionProvider, JitPermissionProvider>();
+
+        // Database permission provider — permite ao PermissionAuthorizationHandler verificar
+        // permissões persistidas em base de dados com suporte a personalização por tenant.
+        services.AddScoped<IDatabasePermissionProvider, DatabasePermissionProvider>();
 
         // Provider OIDC para fluxo federado (Authorization Code flow)
         services.AddHttpClient("oidc");
@@ -79,6 +90,9 @@ public static class DependencyInjection
         // Rastreador de eventos de segurança para propagação automática ao Audit central.
         // Escopo por requisição — acumula eventos durante a execução do handler.
         services.AddScoped<ISecurityEventTracker, SecurityEventTracker>();
+
+        // Resolução de permissões DB-first com fallback estático
+        services.AddScoped<IPermissionResolver, PermissionResolver>();
 
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();

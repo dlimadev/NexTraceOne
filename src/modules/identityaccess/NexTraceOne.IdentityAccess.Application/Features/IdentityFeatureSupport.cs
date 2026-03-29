@@ -20,11 +20,13 @@ namespace NexTraceOne.IdentityAccess.Application.Features;
 ///
 /// Refatoração: migrado da classe estática IdentityFeatureSupport para serviço injetável,
 /// aderindo ao Dependency Inversion Principle e facilitando testes unitários.
+/// Utiliza IPermissionResolver para resolução DB-first com fallback estático.
 /// </summary>
 internal sealed class LoginResponseBuilder(
     ICurrentTenant currentTenant,
     ITenantMembershipRepository membershipRepository,
-    IJwtTokenGenerator jwtTokenGenerator) : ILoginResponseBuilder
+    IJwtTokenGenerator jwtTokenGenerator,
+    IPermissionResolver permissionResolver) : ILoginResponseBuilder
 {
     /// <inheritdoc />
     public Guid CurrentTenantId => currentTenant.Id;
@@ -52,13 +54,20 @@ internal sealed class LoginResponseBuilder(
     }
 
     /// <inheritdoc />
-    public LocalLoginFeature.LoginResponse CreateLoginResponse(
+    public async Task<LocalLoginFeature.LoginResponse> CreateLoginResponseAsync(
         User user,
         TenantMembership membership,
         Role role,
-        string refreshToken)
+        string refreshToken,
+        CancellationToken cancellationToken)
     {
-        var permissions = Role.GetPermissionsForRole(role.Name);
+        var tenantId = currentTenant.Id != Guid.Empty
+            ? TenantId.From(currentTenant.Id)
+            : membership.TenantId;
+
+        var permissions = await permissionResolver.ResolvePermissionsAsync(
+            role.Id, role.Name, tenantId, cancellationToken);
+
         var accessToken = jwtTokenGenerator.GenerateAccessToken(user, membership, permissions);
 
         return new LocalLoginFeature.LoginResponse(

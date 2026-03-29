@@ -18,6 +18,8 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 /// - v1.1: ExternalIdentity, SsoGroupMapping, BreakGlassRequest, JitAccessRequest,
 ///          Delegation, AccessReviewCampaign, AccessReviewItem, SecurityEvent
 /// - v1.2: Environment, EnvironmentAccess
+/// - v1.3: RolePermission, ModuleAccessPolicy
+/// - v1.4: UserRoleAssignment, Tenant hierarquia (ParentTenantId, TenantType)
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -85,6 +87,19 @@ public sealed class IdentityDbContext(
 
     /// <summary>Acessos granulares de usuários a ambientes específicos dentro de um tenant.</summary>
     public DbSet<EnvironmentAccess> EnvironmentAccesses { get; init; } = null!;
+
+    // ── v1.3 — Autorização Granular Enterprise ────────────────────────────
+
+    /// <summary>Mapeamentos papel→permissão persistidos, com suporte a personalização por tenant.</summary>
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
+    /// <summary>Políticas de acesso granular por módulo/página/ação por papel e tenant.</summary>
+    public DbSet<ModuleAccessPolicy> ModuleAccessPolicies => Set<ModuleAccessPolicy>();
+
+    // ── v1.4 — Multi-Role por Tenant e Hierarquia Organizacional ──────────
+
+    /// <summary>Atribuições de papéis a usuários em tenants (suporte a N papéis por user/tenant).</summary>
+    public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;

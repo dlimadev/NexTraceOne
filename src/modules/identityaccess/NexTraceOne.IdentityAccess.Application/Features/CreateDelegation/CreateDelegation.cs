@@ -52,7 +52,8 @@ public static class CreateDelegation
         ISecurityEventTracker securityEventTracker,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IPermissionResolver permissionResolver) : ICommandHandler<Command, Response>
     {
         /// <summary>
         /// Permissões exclusivas de PlatformAdmin que não podem ser delegadas.
@@ -117,7 +118,8 @@ public static class CreateDelegation
             if (role is null)
                 return IdentityErrors.RoleNotFound(membership.RoleId.Value);
 
-            var grantorPermissions = Role.GetPermissionsForRole(role.Name);
+            var grantorPermissions = await permissionResolver.ResolvePermissionsAsync(
+                role.Id, role.Name, tenantId, cancellationToken);
             var grantorPermissionSet = new HashSet<string>(grantorPermissions);
 
             if (!request.Permissions.All(p => grantorPermissionSet.Contains(p)))

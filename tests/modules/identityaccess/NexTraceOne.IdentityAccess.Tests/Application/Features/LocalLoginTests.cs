@@ -46,7 +46,7 @@ public sealed class LocalLoginTests
         passwordHasher.Verify("P@ssw0rd123", user.PasswordHash!.Value).Returns(true);
         sessionCreator.CreateSession(user.Id, Arg.Any<string?>(), Arg.Any<string?>())
             .Returns((Session.Create(user.Id, RefreshTokenHash.Create("refresh-token"), now.AddDays(30), "unknown", "unknown"), "refresh-token"));
-        responseBuilder.CreateLoginResponse(user, membership, role, "refresh-token")
+        responseBuilder.CreateLoginResponseAsync(user, membership, role, "refresh-token", Arg.Any<CancellationToken>())
             .Returns(new LocalLoginFeature.LoginResponse("access-token", "refresh-token", 3600,
                 new LocalLoginFeature.UserResponse(user.Id.Value, "alice@example.com", "Alice Doe", membership.TenantId.Value, Role.PlatformAdmin, [])));
 
