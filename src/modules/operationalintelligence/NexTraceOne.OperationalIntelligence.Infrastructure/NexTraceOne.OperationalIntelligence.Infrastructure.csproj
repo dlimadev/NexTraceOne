@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.OperationalIntelligence.Application\NexTraceOne.OperationalIntelligence.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.OperationalIntelligence.Domain\NexTraceOne.OperationalIntelligence.Domain.csproj" />
+    <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Domain\NexTraceOne.Integrations.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
