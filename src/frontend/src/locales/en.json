@@ -5031,6 +5031,44 @@
       "messageTooLong": "Message exceeds maximum length of 10000 characters"
     }
   },
+  "legacyCorrelation": {
+    "title": "Legacy Event Correlation",
+    "description": "Correlate legacy mainframe events with service catalog assets",
+    "timeline": {
+      "title": "Unified Timeline",
+      "description": "Combined view of incidents and legacy events",
+      "source": "Source",
+      "sourceIncident": "Incident",
+      "sourceBatch": "Batch Job",
+      "sourceMq": "MQ Event",
+      "sourceMainframe": "Mainframe",
+      "noEvents": "No events found for the selected filters",
+      "filterByService": "Filter by service",
+      "filterBySystem": "Filter by system",
+      "filterByEnvironment": "Filter by environment",
+      "dateRange": "Date range"
+    },
+    "incident": {
+      "autoCreated": "Auto-created",
+      "autoCreatedBatch": "Auto-created from batch failure",
+      "autoCreatedMq": "Auto-created from MQ anomaly",
+      "legacySource": "Legacy Source",
+      "batchFailure": "Batch Job Failure",
+      "mqAnomaly": "MQ Anomaly",
+      "correlatedAsset": "Correlated Asset",
+      "assetType": "Asset Type",
+      "assetName": "Asset Name",
+      "matchMethod": "Match Method",
+      "exactMatch": "Exact Match",
+      "noMatch": "No Match Found"
+    },
+    "correlation": {
+      "status": "Correlation Status",
+      "correlated": "Correlated",
+      "uncorrelated": "Uncorrelated",
+      "pending": "Pending Correlation"
+    }
+  },
   "legacyCatalog": {
     "title": "Legacy Asset Catalog",
     "subtitle": "Register and manage mainframe core system assets",

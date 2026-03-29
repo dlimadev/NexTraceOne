@@ -4238,6 +4238,44 @@
       "messageTooLong": "A mensagem excede o comprimento máximo de 10000 caracteres"
     }
   },
+  "legacyCorrelation": {
+    "title": "Correlação de Eventos Legacy",
+    "description": "Correlacionar eventos mainframe legacy com ativos do catálogo de serviços",
+    "timeline": {
+      "title": "Timeline Unificada",
+      "description": "Visão combinada de incidentes e eventos legacy",
+      "source": "Fonte",
+      "sourceIncident": "Incidente",
+      "sourceBatch": "Job Batch",
+      "sourceMq": "Evento MQ",
+      "sourceMainframe": "Mainframe",
+      "noEvents": "Nenhum evento encontrado para os filtros selecionados",
+      "filterByService": "Filtrar por serviço",
+      "filterBySystem": "Filtrar por sistema",
+      "filterByEnvironment": "Filtrar por ambiente",
+      "dateRange": "Intervalo de datas"
+    },
+    "incident": {
+      "autoCreated": "Criado automaticamente",
+      "autoCreatedBatch": "Criado automaticamente a partir de falha batch",
+      "autoCreatedMq": "Criado automaticamente a partir de anomalia MQ",
+      "legacySource": "Fonte Legacy",
+      "batchFailure": "Falha de Job Batch",
+      "mqAnomaly": "Anomalia MQ",
+      "correlatedAsset": "Ativo Correlacionado",
+      "assetType": "Tipo de Ativo",
+      "assetName": "Nome do Ativo",
+      "matchMethod": "Método de Correspondência",
+      "exactMatch": "Correspondência Exata",
+      "noMatch": "Sem Correspondência"
+    },
+    "correlation": {
+      "status": "Estado da Correlação",
+      "correlated": "Correlacionado",
+      "uncorrelated": "Não Correlacionado",
+      "pending": "Correlação Pendente"
+    }
+  },
   "legacyCatalog": {
     "title": "Catálogo de Ativos Legacy",
     "subtitle": "Registar e gerir ativos de sistemas core mainframe",
