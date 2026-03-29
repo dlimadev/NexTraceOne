@@ -39,6 +39,8 @@ using UpdateAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Featur
 using ExecuteAgentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteAgent.ExecuteAgent;
 using GetAgentExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentExecution.GetAgentExecution;
 using ReviewArtifactFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ReviewArtifact.ReviewArtifact;
+using SeedDefaultModelsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultModels.SeedDefaultModels;
+using SeedDefaultAgentsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultAgents.SeedDefaultAgents;
 
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
@@ -71,6 +73,7 @@ public sealed class AiGovernanceEndpointModule
         MapAgentEndpoints(app);
         MapAgentExecutionEndpoints(app);
         MapAgentArtifactEndpoints(app);
+        MapSeedEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -602,6 +605,33 @@ public sealed class AiGovernanceEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:write");
+    }
+
+    // ── Seed Defaults ──────────────────────────────────────────────────
+
+    private static void MapSeedEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/seed");
+
+        group.MapPost("/models", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SeedDefaultModelsFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/agents", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SeedDefaultAgentsFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
     }
 }
 
