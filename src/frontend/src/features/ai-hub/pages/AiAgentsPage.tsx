@@ -503,6 +503,11 @@ export function AiAgentsPage() {
     void loadAgents();
   }, [loadAgents]);
 
+  const handleAgentCreated = useCallback(() => {
+    void loadAgents();
+    toastSuccess(t('agents.createSuccess'));
+  }, [loadAgents, toastSuccess, t]);
+
   const filteredAgents = agents.filter(a => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
@@ -642,7 +647,7 @@ export function AiAgentsPage() {
       <CreateAgentDialog
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onCreated={() => { loadAgents(); toastSuccess(t('agents.createSuccess')); }}
+        onCreated={handleAgentCreated}
       />
       <ExecuteAgentDialog
         isOpen={!!executeAgent}

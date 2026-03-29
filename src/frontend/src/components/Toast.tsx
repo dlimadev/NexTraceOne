@@ -84,7 +84,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       const id = `toast-${++toastCounter}`;
       const newToast: Toast = { id, message, variant, duration };
 
-      setToasts((prev) => [...prev.slice(-4), newToast]); // Max 5 visible
+      setToasts((prev) => [...prev.slice(-4), newToast]); // Keep last 4 + new = max 5 visible
 
       if (duration > 0) {
         setTimeout(() => removeToast(id), duration);
