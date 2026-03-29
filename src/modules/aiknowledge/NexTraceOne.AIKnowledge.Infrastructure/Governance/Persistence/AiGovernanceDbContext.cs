@@ -39,6 +39,10 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiAgentArtifact> AgentArtifacts => Set<AiAgentArtifact>();
     public DbSet<AIKnowledgeSourceWeight> SourceWeights => Set<AIKnowledgeSourceWeight>();
 
+    // ── Phase 4: Prompt Templates & Tool Definitions ────────────
+    public DbSet<PromptTemplate> PromptTemplates => Set<PromptTemplate>();
+    public DbSet<AiToolDefinition> ToolDefinitions => Set<AiToolDefinition>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

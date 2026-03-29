@@ -26,6 +26,12 @@ internal sealed class AiTokenUsageLedgerConfiguration : IEntityTypeConfiguration
         builder.Property(x => x.Timestamp).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.Status).HasMaxLength(100).IsRequired();
 
+        // Phase 4: FinOps cost attribution
+        builder.Property(x => x.CostPerInputToken).HasColumnType("numeric(18,12)");
+        builder.Property(x => x.CostPerOutputToken).HasColumnType("numeric(18,12)");
+        builder.Property(x => x.EstimatedCostUsd).HasColumnType("numeric(18,8)");
+        builder.Property(x => x.CostCurrency).HasMaxLength(10);
+
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.TenantId);
         builder.HasIndex(x => x.Timestamp);
