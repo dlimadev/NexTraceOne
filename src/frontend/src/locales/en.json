@@ -4968,5 +4968,169 @@
       "telemetryIngestion": "Legacy Telemetry Ingestion",
       "telemetryIngestionDescription": "Enable mainframe telemetry ingestion (SMF, SYSLOG, job logs)"
     }
+  },
+  "legacyCatalog": {
+    "title": "Legacy Asset Catalog",
+    "subtitle": "Register and manage mainframe core system assets",
+    "description": "Browse, register, and manage legacy assets including mainframe systems, COBOL programs, copybooks, transactions, and DB2 artifacts.",
+    "sidebar": {
+      "legacyAssets": "Legacy Assets"
+    },
+    "filters": {
+      "title": "Filters",
+      "assetType": "Asset Type",
+      "allTypes": "All Types",
+      "teamName": "Team",
+      "domain": "Domain",
+      "criticality": "Criticality",
+      "lifecycleStatus": "Lifecycle Status",
+      "search": "Search assets...",
+      "clearFilters": "Clear Filters",
+      "showingResults": "Showing {{count}} assets"
+    },
+    "assetTypes": {
+      "mainframeSystem": "Mainframe System",
+      "cobolProgram": "COBOL Program",
+      "copybook": "Copybook",
+      "cicsTransaction": "CICS Transaction",
+      "imsTransaction": "IMS Transaction",
+      "db2Artifact": "DB2 Artifact",
+      "zosConnectBinding": "z/OS Connect Binding"
+    },
+    "register": {
+      "title": "Register Legacy Asset",
+      "selectType": "Select asset type to register",
+      "mainframeSystem": {
+        "title": "Register Mainframe System",
+        "name": "System Name",
+        "namePlaceholder": "Enter mainframe system name",
+        "domain": "Domain",
+        "domainPlaceholder": "Enter business domain",
+        "teamName": "Owner Team",
+        "teamNamePlaceholder": "Enter responsible team name",
+        "sysplexName": "Sysplex Name",
+        "sysplexNamePlaceholder": "Enter sysplex name",
+        "lparName": "LPAR Name",
+        "lparNamePlaceholder": "Enter LPAR name",
+        "regionName": "Region Name (optional)",
+        "regionNamePlaceholder": "Enter region name"
+      },
+      "cobolProgram": {
+        "title": "Register COBOL Program",
+        "name": "Program Name",
+        "namePlaceholder": "Enter COBOL program name",
+        "systemId": "Parent System",
+        "systemIdPlaceholder": "Select mainframe system",
+        "compilerVersion": "Compiler Version",
+        "sourceLibrary": "Source Library",
+        "loadModule": "Load Module"
+      },
+      "copybook": {
+        "title": "Register Copybook",
+        "name": "Copybook Name",
+        "namePlaceholder": "Enter copybook name",
+        "systemId": "Parent System",
+        "fieldCount": "Number of Fields",
+        "totalLength": "Record Length (bytes)",
+        "recordFormat": "Record Format",
+        "recordFormatPlaceholder": "e.g. FB, VB, FBA",
+        "version": "Version"
+      },
+      "cicsTransaction": {
+        "title": "Register CICS Transaction",
+        "transactionId": "Transaction ID (4 chars)",
+        "transactionIdPlaceholder": "e.g. INQR",
+        "systemId": "Parent System",
+        "programName": "COBOL Program",
+        "programNamePlaceholder": "Enter associated program name",
+        "regionName": "CICS Region",
+        "regionNamePlaceholder": "Enter CICS region name",
+        "cicsVersion": "CICS Version",
+        "port": "Port"
+      },
+      "imsTransaction": {
+        "title": "Register IMS Transaction",
+        "transactionCode": "Transaction Code",
+        "transactionCodePlaceholder": "Enter IMS transaction code",
+        "systemId": "Parent System",
+        "psbName": "PSB Name",
+        "psbNamePlaceholder": "Enter PSB name",
+        "dbdName": "DBD Name",
+        "dbdNamePlaceholder": "Enter DBD name"
+      },
+      "db2Artifact": {
+        "title": "Register DB2 Artifact",
+        "name": "Artifact Name",
+        "namePlaceholder": "Enter DB2 object name",
+        "systemId": "Parent System",
+        "artifactType": "Artifact Type",
+        "schemaName": "Schema",
+        "schemaNamePlaceholder": "Enter DB2 schema name",
+        "databaseName": "Database",
+        "databaseNamePlaceholder": "Enter DB2 database name"
+      },
+      "zosConnectBinding": {
+        "title": "Register z/OS Connect Binding",
+        "name": "Binding Name",
+        "namePlaceholder": "Enter binding name",
+        "systemId": "Parent System",
+        "serviceName": "Service Name",
+        "serviceNamePlaceholder": "Enter z/OS Connect service name",
+        "operationName": "Operation Name",
+        "operationNamePlaceholder": "Enter operation name",
+        "httpMethod": "HTTP Method",
+        "basePath": "Base Path"
+      },
+      "success": "Asset registered successfully",
+      "error": "Failed to register asset"
+    },
+    "detail": {
+      "title": "Asset Detail",
+      "generalInfo": "General Information",
+      "ownership": "Ownership",
+      "classification": "Classification",
+      "technicalDetails": "Technical Details",
+      "relatedAssets": "Related Assets",
+      "cobolPrograms": "COBOL Programs",
+      "cicsTransactions": "CICS Transactions",
+      "imsTransactions": "IMS Transactions",
+      "copybooks": "Copybooks",
+      "db2Artifacts": "DB2 Artifacts",
+      "zosConnectBindings": "z/OS Connect Bindings",
+      "changeTimeline": "Change Timeline",
+      "noRelatedAssets": "No related assets found",
+      "back": "Back to catalog"
+    },
+    "card": {
+      "team": "Team",
+      "domain": "Domain",
+      "criticality": "Criticality",
+      "lifecycle": "Lifecycle",
+      "system": "System",
+      "created": "Created",
+      "updated": "Updated"
+    },
+    "empty": {
+      "title": "No legacy assets found",
+      "description": "Register your first mainframe system to start building your legacy asset catalog.",
+      "action": "Register System"
+    },
+    "errors": {
+      "systemNotFound": "Mainframe system not found",
+      "systemAlreadyExists": "A mainframe system with this name already exists",
+      "programNotFound": "COBOL program not found",
+      "programAlreadyExists": "A COBOL program with this name already exists in this system",
+      "copybookNotFound": "Copybook not found",
+      "copybookAlreadyExists": "A copybook with this name already exists in this system",
+      "cicsTransactionNotFound": "CICS transaction not found",
+      "cicsTransactionAlreadyExists": "A CICS transaction with this ID already exists in this system",
+      "imsTransactionNotFound": "IMS transaction not found",
+      "imsTransactionAlreadyExists": "An IMS transaction with this code already exists in this system",
+      "db2ArtifactNotFound": "DB2 artifact not found",
+      "db2ArtifactAlreadyExists": "A DB2 artifact with this name already exists in this system",
+      "zosBindingNotFound": "z/OS Connect binding not found",
+      "zosBindingAlreadyExists": "A z/OS Connect binding with this name already exists in this system",
+      "invalidAssetType": "Invalid asset type"
+    }
   }
 }

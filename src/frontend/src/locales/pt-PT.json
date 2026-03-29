@@ -4175,5 +4175,169 @@
       "telemetryIngestion": "Ingestão de Telemetria Legacy",
       "telemetryIngestionDescription": "Ativar ingestão de telemetria mainframe (SMF, SYSLOG, job logs)"
     }
+  },
+  "legacyCatalog": {
+    "title": "Catálogo de Ativos Legacy",
+    "subtitle": "Registar e gerir ativos de sistemas core mainframe",
+    "description": "Consultar, registar e gerir ativos legacy incluindo sistemas mainframe, programas COBOL, copybooks, transações e artefactos DB2.",
+    "sidebar": {
+      "legacyAssets": "Ativos Legacy"
+    },
+    "filters": {
+      "title": "Filtros",
+      "assetType": "Tipo de Ativo",
+      "allTypes": "Todos os Tipos",
+      "teamName": "Equipa",
+      "domain": "Domínio",
+      "criticality": "Criticidade",
+      "lifecycleStatus": "Estado do Ciclo de Vida",
+      "search": "Pesquisar ativos...",
+      "clearFilters": "Limpar Filtros",
+      "showingResults": "A mostrar {{count}} ativos"
+    },
+    "assetTypes": {
+      "mainframeSystem": "Sistema Mainframe",
+      "cobolProgram": "Programa COBOL",
+      "copybook": "Copybook",
+      "cicsTransaction": "Transação CICS",
+      "imsTransaction": "Transação IMS",
+      "db2Artifact": "Artefacto DB2",
+      "zosConnectBinding": "Binding z/OS Connect"
+    },
+    "register": {
+      "title": "Registar Ativo Legacy",
+      "selectType": "Selecionar tipo de ativo a registar",
+      "mainframeSystem": {
+        "title": "Registar Sistema Mainframe",
+        "name": "Nome do Sistema",
+        "namePlaceholder": "Introduzir nome do sistema mainframe",
+        "domain": "Domínio",
+        "domainPlaceholder": "Introduzir domínio de negócio",
+        "teamName": "Equipa Responsável",
+        "teamNamePlaceholder": "Introduzir nome da equipa responsável",
+        "sysplexName": "Nome do Sysplex",
+        "sysplexNamePlaceholder": "Introduzir nome do sysplex",
+        "lparName": "Nome do LPAR",
+        "lparNamePlaceholder": "Introduzir nome do LPAR",
+        "regionName": "Nome da Região (opcional)",
+        "regionNamePlaceholder": "Introduzir nome da região"
+      },
+      "cobolProgram": {
+        "title": "Registar Programa COBOL",
+        "name": "Nome do Programa",
+        "namePlaceholder": "Introduzir nome do programa COBOL",
+        "systemId": "Sistema Pai",
+        "systemIdPlaceholder": "Selecionar sistema mainframe",
+        "compilerVersion": "Versão do Compilador",
+        "sourceLibrary": "Biblioteca de Código-Fonte",
+        "loadModule": "Módulo de Carga"
+      },
+      "copybook": {
+        "title": "Registar Copybook",
+        "name": "Nome do Copybook",
+        "namePlaceholder": "Introduzir nome do copybook",
+        "systemId": "Sistema Pai",
+        "fieldCount": "Número de Campos",
+        "totalLength": "Comprimento do Registo (bytes)",
+        "recordFormat": "Formato do Registo",
+        "recordFormatPlaceholder": "ex. FB, VB, FBA",
+        "version": "Versão"
+      },
+      "cicsTransaction": {
+        "title": "Registar Transação CICS",
+        "transactionId": "ID da Transação (4 caracteres)",
+        "transactionIdPlaceholder": "ex. INQR",
+        "systemId": "Sistema Pai",
+        "programName": "Programa COBOL",
+        "programNamePlaceholder": "Introduzir nome do programa associado",
+        "regionName": "Região CICS",
+        "regionNamePlaceholder": "Introduzir nome da região CICS",
+        "cicsVersion": "Versão CICS",
+        "port": "Porta"
+      },
+      "imsTransaction": {
+        "title": "Registar Transação IMS",
+        "transactionCode": "Código da Transação",
+        "transactionCodePlaceholder": "Introduzir código da transação IMS",
+        "systemId": "Sistema Pai",
+        "psbName": "Nome do PSB",
+        "psbNamePlaceholder": "Introduzir nome do PSB",
+        "dbdName": "Nome do DBD",
+        "dbdNamePlaceholder": "Introduzir nome do DBD"
+      },
+      "db2Artifact": {
+        "title": "Registar Artefacto DB2",
+        "name": "Nome do Artefacto",
+        "namePlaceholder": "Introduzir nome do objeto DB2",
+        "systemId": "Sistema Pai",
+        "artifactType": "Tipo de Artefacto",
+        "schemaName": "Schema",
+        "schemaNamePlaceholder": "Introduzir nome do schema DB2",
+        "databaseName": "Base de Dados",
+        "databaseNamePlaceholder": "Introduzir nome da base de dados DB2"
+      },
+      "zosConnectBinding": {
+        "title": "Registar Binding z/OS Connect",
+        "name": "Nome do Binding",
+        "namePlaceholder": "Introduzir nome do binding",
+        "systemId": "Sistema Pai",
+        "serviceName": "Nome do Serviço",
+        "serviceNamePlaceholder": "Introduzir nome do serviço z/OS Connect",
+        "operationName": "Nome da Operação",
+        "operationNamePlaceholder": "Introduzir nome da operação",
+        "httpMethod": "Método HTTP",
+        "basePath": "Caminho Base"
+      },
+      "success": "Ativo registado com sucesso",
+      "error": "Falha ao registar ativo"
+    },
+    "detail": {
+      "title": "Detalhe do Ativo",
+      "generalInfo": "Informação Geral",
+      "ownership": "Ownership",
+      "classification": "Classificação",
+      "technicalDetails": "Detalhes Técnicos",
+      "relatedAssets": "Ativos Relacionados",
+      "cobolPrograms": "Programas COBOL",
+      "cicsTransactions": "Transações CICS",
+      "imsTransactions": "Transações IMS",
+      "copybooks": "Copybooks",
+      "db2Artifacts": "Artefactos DB2",
+      "zosConnectBindings": "Bindings z/OS Connect",
+      "changeTimeline": "Linha Temporal de Mudanças",
+      "noRelatedAssets": "Nenhum ativo relacionado encontrado",
+      "back": "Voltar ao catálogo"
+    },
+    "card": {
+      "team": "Equipa",
+      "domain": "Domínio",
+      "criticality": "Criticidade",
+      "lifecycle": "Ciclo de Vida",
+      "system": "Sistema",
+      "created": "Criado",
+      "updated": "Atualizado"
+    },
+    "empty": {
+      "title": "Nenhum ativo legacy encontrado",
+      "description": "Registe o seu primeiro sistema mainframe para começar a construir o catálogo de ativos legacy.",
+      "action": "Registar Sistema"
+    },
+    "errors": {
+      "systemNotFound": "Sistema mainframe não encontrado",
+      "systemAlreadyExists": "Já existe um sistema mainframe com este nome",
+      "programNotFound": "Programa COBOL não encontrado",
+      "programAlreadyExists": "Já existe um programa COBOL com este nome neste sistema",
+      "copybookNotFound": "Copybook não encontrado",
+      "copybookAlreadyExists": "Já existe um copybook com este nome neste sistema",
+      "cicsTransactionNotFound": "Transação CICS não encontrada",
+      "cicsTransactionAlreadyExists": "Já existe uma transação CICS com este ID neste sistema",
+      "imsTransactionNotFound": "Transação IMS não encontrada",
+      "imsTransactionAlreadyExists": "Já existe uma transação IMS com este código neste sistema",
+      "db2ArtifactNotFound": "Artefacto DB2 não encontrado",
+      "db2ArtifactAlreadyExists": "Já existe um artefacto DB2 com este nome neste sistema",
+      "zosBindingNotFound": "Binding z/OS Connect não encontrado",
+      "zosBindingAlreadyExists": "Já existe um binding z/OS Connect com este nome neste sistema",
+      "invalidAssetType": "Tipo de ativo inválido"
+    }
   }
 }
