@@ -17,7 +17,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 /// Produz tokens HMAC-SHA256 assinados com chave simétrica configurável
 /// usando <see cref="JwtSecurityTokenHandler"/> standard da Microsoft.
 /// A configuração é lida do appsettings na seção "Jwt" (raiz) ou "Security:Jwt" (building blocks).
-/// Claims incluídos: sub, email, name, tenant_id, role_id, permissions, nbf, exp, iss, aud.
+/// Claims incluídos: sub, email, name, tenant_id, role_ids (multi-valued), permissions, nbf, exp, iss, aud.
 /// </summary>
 internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeProvider dateTimeProvider) : IJwtTokenGenerator
 {
@@ -49,6 +49,17 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
     /// <inheritdoc />
     public string GenerateAccessToken(User user, TenantMembership membership, IReadOnlyCollection<string> permissions)
     {
+        // Backward-compatible: delega para o novo overload com um único role.
+        return GenerateAccessToken(
+            user,
+            membership.TenantId,
+            new[] { membership.RoleId },
+            permissions);
+    }
+
+    /// <inheritdoc />
+    public string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> permissions)
+    {
         var now = dateTimeProvider.UtcNow;
 
         var claims = new List<Claim>
@@ -56,9 +67,20 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
             new(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email.Value),
             new(JwtRegisteredClaimNames.Name, user.FullName.Value),
-            new("tenant_id", membership.TenantId.Value.ToString()),
-            new("role_id", membership.RoleId.Value.ToString()),
+            new("tenant_id", tenantId.Value.ToString()),
         };
+
+        // Multi-valued claim: role_ids (um claim por papel atribuído).
+        foreach (var roleId in roleIds)
+        {
+            claims.Add(new Claim("role_ids", roleId.Value.ToString()));
+        }
+
+        // Backward-compatible: role_id com o primeiro papel (para consumers antigos).
+        if (roleIds.Count > 0)
+        {
+            claims.Add(new Claim("role_id", roleIds.First().Value.ToString()));
+        }
 
         foreach (var permission in permissions)
         {

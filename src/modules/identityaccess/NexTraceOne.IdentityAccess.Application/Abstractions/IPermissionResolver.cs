@@ -27,4 +27,17 @@ public interface IPermissionResolver
         string roleName,
         TenantId? tenantId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resolve as permissões efetivas para múltiplos papéis, retornando a UNIÃO.
+    /// Usado quando um usuário tem N papéis atribuídos no mesmo tenant.
+    /// </summary>
+    /// <param name="roleAssignments">Pares de (RoleId, RoleName) a resolver.</param>
+    /// <param name="tenantId">Tenant para resolução contextual.</param>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    /// <returns>Lista imutável de códigos de permissão únicos (union de todos os papéis).</returns>
+    Task<IReadOnlyList<string>> ResolvePermissionsForMultipleRolesAsync(
+        IReadOnlyList<(RoleId RoleId, string RoleName)> roleAssignments,
+        TenantId? tenantId,
+        CancellationToken cancellationToken);
 }

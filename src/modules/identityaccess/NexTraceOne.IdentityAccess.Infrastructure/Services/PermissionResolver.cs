@@ -11,6 +11,8 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 /// 2. Se existirem, retorna as permissões da base de dados (suportando personalização por tenant).
 /// 3. Se não existirem, recorre ao <see cref="RolePermissionCatalog"/> como fallback
 ///    (compatibilidade retroativa para instalações sem seed executado).
+///
+/// Suporta multi-role: resolve permissões para múltiplos papéis e retorna a UNIÃO.
 /// </summary>
 internal sealed class PermissionResolver(
     IRolePermissionRepository rolePermissionRepository) : IPermissionResolver
@@ -33,5 +35,41 @@ internal sealed class PermissionResolver(
 
         // Fallback: catálogo estático para compatibilidade retroativa.
         return RolePermissionCatalog.GetPermissionsForRole(roleName);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<string>> ResolvePermissionsForMultipleRolesAsync(
+        IReadOnlyList<(RoleId RoleId, string RoleName)> roleAssignments,
+        TenantId? tenantId,
+        CancellationToken cancellationToken)
+    {
+        if (roleAssignments.Count == 0)
+            return Array.Empty<string>();
+
+        // Caso com um único papel — evita overhead de HashSet.
+        if (roleAssignments.Count == 1)
+        {
+            return await ResolvePermissionsAsync(
+                roleAssignments[0].RoleId,
+                roleAssignments[0].RoleName,
+                tenantId,
+                cancellationToken);
+        }
+
+        // Múltiplos papéis — UNIÃO de permissões sem duplicatas.
+        var allPermissions = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var (roleId, roleName) in roleAssignments)
+        {
+            var permissions = await ResolvePermissionsAsync(
+                roleId, roleName, tenantId, cancellationToken);
+
+            foreach (var permission in permissions)
+            {
+                allPermissions.Add(permission);
+            }
+        }
+
+        return allPermissions.Order().ToList().AsReadOnly();
     }
 }

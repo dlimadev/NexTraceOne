@@ -63,6 +63,9 @@ public static class DependencyInjection
         services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
         services.AddScoped<IModuleAccessPolicyRepository, ModuleAccessPolicyRepository>();
 
+        // Repositórios — v1.4 Multi-Role por Tenant
+        services.AddScoped<IUserRoleAssignmentRepository, UserRoleAssignmentRepository>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

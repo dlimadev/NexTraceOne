@@ -19,6 +19,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 ///          Delegation, AccessReviewCampaign, AccessReviewItem, SecurityEvent
 /// - v1.2: Environment, EnvironmentAccess
 /// - v1.3: RolePermission, ModuleAccessPolicy
+/// - v1.4: UserRoleAssignment, Tenant hierarquia (ParentTenantId, TenantType)
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -94,6 +95,11 @@ public sealed class IdentityDbContext(
 
     /// <summary>Políticas de acesso granular por módulo/página/ação por papel e tenant.</summary>
     public DbSet<ModuleAccessPolicy> ModuleAccessPolicies => Set<ModuleAccessPolicy>();
+
+    // ── v1.4 — Multi-Role por Tenant e Hierarquia Organizacional ──────────
+
+    /// <summary>Atribuições de papéis a usuários em tenants (suporte a N papéis por user/tenant).</summary>
+    public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;
