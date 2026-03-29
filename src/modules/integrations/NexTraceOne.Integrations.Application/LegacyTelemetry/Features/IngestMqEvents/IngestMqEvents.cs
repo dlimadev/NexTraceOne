@@ -1,10 +1,12 @@
 using FluentValidation;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Parsers;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Requests;
 using NexTraceOne.Integrations.Domain.LegacyTelemetry;
+using NexTraceOne.Integrations.Domain.LegacyTelemetry.Events;
 
 namespace NexTraceOne.Integrations.Application.LegacyTelemetry.Features.IngestMqEvents;
 
@@ -33,7 +35,8 @@ public static class IngestMqEvents
     }
 
     public sealed class Handler(
-        ILegacyEventWriter writer) : ICommandHandler<Command, Response>
+        ILegacyEventWriter writer,
+        IPublisher publisher) : ICommandHandler<Command, Response>
     {
         private readonly MqEventParser _parser = new();
 
@@ -56,6 +59,31 @@ public static class IngestMqEvents
 
             if (normalized.Count > 0)
                 await writer.WriteLegacyEventsAsync(normalized, cancellationToken);
+
+            foreach (var (evt, norm) in request.Events.Zip(normalized))
+            {
+                var isDlq = string.Equals(evt.EventType, "dlq_message", StringComparison.OrdinalIgnoreCase);
+                var isDepthCritical = evt.QueueDepth.HasValue && evt.MaxDepth.HasValue &&
+                                     evt.MaxDepth.Value > 0 &&
+                                     (double)evt.QueueDepth.Value / evt.MaxDepth.Value >= 0.9;
+                var isCriticalSeverity = string.Equals(norm.Severity, LegacySeverity.Error, StringComparison.Ordinal) ||
+                                         string.Equals(norm.Severity, LegacySeverity.Critical, StringComparison.Ordinal);
+
+                if (!isDlq && !isDepthCritical && !isCriticalSeverity) continue;
+
+                await publisher.Publish(new LegacyMqEventIngestedEvent(
+                    IngestionEventId: norm.EventId,
+                    QueueManagerName: evt.QueueManagerName,
+                    QueueName: evt.QueueName,
+                    ChannelName: evt.ChannelName,
+                    EventType: evt.EventType,
+                    QueueDepth: evt.QueueDepth,
+                    MaxDepth: evt.MaxDepth,
+                    ChannelStatus: evt.ChannelStatus,
+                    Severity: norm.Severity,
+                    Message: norm.Message,
+                    Timestamp: norm.Timestamp), cancellationToken);
+            }
 
             return new Response(normalized.Count, errors.Count, errors);
         }

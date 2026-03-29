@@ -1,10 +1,12 @@
 using FluentValidation;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Parsers;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Requests;
 using NexTraceOne.Integrations.Domain.LegacyTelemetry;
+using NexTraceOne.Integrations.Domain.LegacyTelemetry.Events;
 
 namespace NexTraceOne.Integrations.Application.LegacyTelemetry.Features.IngestMainframeEvents;
 
@@ -35,7 +37,8 @@ public static class IngestMainframeEvents
     }
 
     public sealed class Handler(
-        ILegacyEventWriter writer) : ICommandHandler<Command, Response>
+        ILegacyEventWriter writer,
+        IPublisher publisher) : ICommandHandler<Command, Response>
     {
         private readonly MainframeEventParser _parser = new();
 
@@ -58,6 +61,24 @@ public static class IngestMainframeEvents
 
             if (normalized.Count > 0)
                 await writer.WriteLegacyEventsAsync(normalized, cancellationToken);
+
+            foreach (var (evt, norm) in request.Events.Zip(normalized))
+            {
+                var isCriticalSeverity = string.Equals(norm.Severity, LegacySeverity.Error, StringComparison.Ordinal) ||
+                                         string.Equals(norm.Severity, LegacySeverity.Critical, StringComparison.Ordinal);
+
+                if (!isCriticalSeverity) continue;
+
+                await publisher.Publish(new LegacyMainframeEventIngestedEvent(
+                    IngestionEventId: norm.EventId,
+                    SourceType: evt.SourceType,
+                    SystemName: evt.SystemName,
+                    LparName: evt.LparName,
+                    EventType: evt.EventType,
+                    Severity: norm.Severity,
+                    Message: norm.Message,
+                    Timestamp: norm.Timestamp), cancellationToken);
+            }
 
             return new Response(normalized.Count, errors.Count, errors);
         }

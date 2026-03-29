@@ -1,10 +1,12 @@
 using FluentValidation;
+using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Parsers;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Requests;
 using NexTraceOne.Integrations.Domain.LegacyTelemetry;
+using NexTraceOne.Integrations.Domain.LegacyTelemetry.Events;
 
 namespace NexTraceOne.Integrations.Application.LegacyTelemetry.Features.IngestBatchEvents;
 
@@ -35,7 +37,8 @@ public static class IngestBatchEvents
     }
 
     public sealed class Handler(
-        ILegacyEventWriter writer) : ICommandHandler<Command, Response>
+        ILegacyEventWriter writer,
+        IPublisher publisher) : ICommandHandler<Command, Response>
     {
         private readonly BatchEventParser _parser = new();
 
@@ -58,6 +61,30 @@ public static class IngestBatchEvents
 
             if (normalized.Count > 0)
                 await writer.WriteLegacyEventsAsync(normalized, cancellationToken);
+
+            foreach (var (evt, norm) in request.Events.Zip(normalized))
+            {
+                var isFailed = string.Equals(evt.Status, "failed", StringComparison.OrdinalIgnoreCase) ||
+                               string.Equals(evt.Status, "abended", StringComparison.OrdinalIgnoreCase) ||
+                               (evt.ReturnCode?.StartsWith("ABEND", StringComparison.OrdinalIgnoreCase) ?? false);
+                var isCriticalSeverity = string.Equals(norm.Severity, LegacySeverity.Error, StringComparison.Ordinal) ||
+                                         string.Equals(norm.Severity, LegacySeverity.Critical, StringComparison.Ordinal);
+
+                if (!isFailed && !isCriticalSeverity) continue;
+
+                await publisher.Publish(new LegacyBatchEventIngestedEvent(
+                    IngestionEventId: norm.EventId,
+                    JobName: evt.JobName,
+                    JobId: evt.JobId,
+                    ProgramName: evt.ProgramName,
+                    ReturnCode: evt.ReturnCode,
+                    Status: evt.Status,
+                    SystemName: evt.SystemName,
+                    LparName: evt.LparName,
+                    Severity: norm.Severity,
+                    Message: norm.Message,
+                    Timestamp: norm.Timestamp), cancellationToken);
+            }
 
             return new Response(normalized.Count, errors.Count, errors);
         }
