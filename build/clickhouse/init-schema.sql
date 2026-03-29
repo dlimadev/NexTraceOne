@@ -255,3 +255,61 @@ PARTITION BY toDate(TimeUnix)
 ORDER BY (ServiceName, MetricName, Attributes, toUnixTimestamp64Nano(TimeUnix))
 TTL toDateTime(TimeUnix) + INTERVAL 90 DAY
 SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1;
+
+-- ══════════════════════════════════════════════════════════════════════════════
+-- WAVE-02: Mainframe / Legacy Telemetry Events
+-- ══════════════════════════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS nextraceone_obs.mf_operational_events (
+    Timestamp DateTime64(9) CODEC(Delta, ZSTD(1)),
+    TimestampDate Date DEFAULT toDate(Timestamp),
+    EventId String CODEC(ZSTD(1)),
+    EventType LowCardinality(String),
+    SourceType LowCardinality(String),
+    SystemName LowCardinality(String),
+    LparName LowCardinality(String),
+    ServiceName String CODEC(ZSTD(1)),
+    AssetName String CODEC(ZSTD(1)),
+    Severity LowCardinality(String),
+    Message String CODEC(ZSTD(1)),
+    TenantId String CODEC(ZSTD(1)),
+    Attributes Map(LowCardinality(String), String) CODEC(ZSTD(1))
+) ENGINE = MergeTree()
+PARTITION BY (TenantId, toYYYYMM(TimestampDate))
+ORDER BY (TenantId, SystemName, EventType, Timestamp)
+TTL TimestampDate + INTERVAL 30 DAY;
+
+CREATE TABLE IF NOT EXISTS nextraceone_obs.mf_cics_statistics (
+    Timestamp DateTime64(9) CODEC(Delta, ZSTD(1)),
+    TimestampDate Date DEFAULT toDate(Timestamp),
+    RegionName LowCardinality(String),
+    TransactionId String CODEC(ZSTD(1)),
+    ProgramName String CODEC(ZSTD(1)),
+    ResponseTimeMs Float64 CODEC(ZSTD(1)),
+    CpuTimeMs Float64 CODEC(ZSTD(1)),
+    TransactionCount UInt64 CODEC(ZSTD(1)),
+    AbendCount UInt64 CODEC(ZSTD(1)),
+    TenantId String CODEC(ZSTD(1)),
+    Attributes Map(LowCardinality(String), String) CODEC(ZSTD(1))
+) ENGINE = MergeTree()
+PARTITION BY (TenantId, toYYYYMM(TimestampDate))
+ORDER BY (TenantId, RegionName, TransactionId, Timestamp)
+TTL TimestampDate + INTERVAL 30 DAY;
+
+CREATE TABLE IF NOT EXISTS nextraceone_obs.mf_ims_statistics (
+    Timestamp DateTime64(9) CODEC(Delta, ZSTD(1)),
+    TimestampDate Date DEFAULT toDate(Timestamp),
+    RegionName LowCardinality(String),
+    TransactionName String CODEC(ZSTD(1)),
+    ProgramName String CODEC(ZSTD(1)),
+    ResponseTimeMs Float64 CODEC(ZSTD(1)),
+    CpuTimeMs Float64 CODEC(ZSTD(1)),
+    TransactionCount UInt64 CODEC(ZSTD(1)),
+    AbendCount UInt64 CODEC(ZSTD(1)),
+    QueueDepth UInt64 CODEC(ZSTD(1)),
+    TenantId String CODEC(ZSTD(1)),
+    Attributes Map(LowCardinality(String), String) CODEC(ZSTD(1))
+) ENGINE = MergeTree()
+PARTITION BY (TenantId, toYYYYMM(TimestampDate))
+ORDER BY (TenantId, RegionName, TransactionName, Timestamp)
+TTL TimestampDate + INTERVAL 30 DAY;

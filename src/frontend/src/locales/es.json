@@ -3959,6 +3959,68 @@
       "telemetryIngestionDescription": "Activar ingestión de telemetría mainframe (SMF, SYSLOG, job logs)"
     }
   },
+  "legacyTelemetry": {
+    "title": "Ingestión de Telemetría Legacy",
+    "subtitle": "Ingerir y normalizar datos de telemetría mainframe",
+    "description": "Recibir eventos operacionales de jobs batch, sistemas MQ, CICS, IMS y fuentes mainframe vía API o OpenTelemetry Collector.",
+    "sourceTypes": {
+      "batch": "Batch",
+      "mq": "MQ",
+      "cics": "CICS",
+      "ims": "IMS",
+      "mainframe": "Mainframe"
+    },
+    "ingestion": {
+      "title": "Estado de Ingestión",
+      "eventsReceived": "Eventos Recibidos",
+      "eventsNormalized": "Eventos Normalizados",
+      "lastReceived": "Última Recepción",
+      "errorRate": "Tasa de Error",
+      "noEvents": "No se han recibido eventos de telemetría legacy",
+      "noEventsDescription": "Configure el OpenTelemetry Collector o utilice la API de ingestión para comenzar a enviar eventos mainframe."
+    },
+    "endpoints": {
+      "batchEvents": "Eventos Batch",
+      "batchEventsDescription": "Ingerir eventos de ejecución de jobs batch (JES2, CA7, TWS, Control-M)",
+      "mqEvents": "Eventos MQ",
+      "mqEventsDescription": "Ingerir eventos operacionales MQ (IBM MQ, OMEGAMON)",
+      "mainframeEvents": "Eventos Mainframe",
+      "mainframeEventsDescription": "Ingerir eventos mainframe genéricos (SMF, SYSLOG, CICS, IMS)"
+    },
+    "severity": {
+      "info": "Información",
+      "warning": "Advertencia",
+      "error": "Error",
+      "critical": "Crítico"
+    },
+    "fields": {
+      "eventId": "ID del Evento",
+      "eventType": "Tipo de Evento",
+      "sourceType": "Tipo de Fuente",
+      "systemName": "Nombre del Sistema",
+      "lparName": "Nombre del LPAR",
+      "serviceName": "Nombre del Servicio",
+      "assetName": "Nombre del Activo",
+      "severity": "Severidad",
+      "message": "Mensaje",
+      "timestamp": "Fecha/Hora",
+      "provider": "Proveedor",
+      "jobName": "Nombre del Job",
+      "jobId": "ID del Job",
+      "returnCode": "Código de Retorno",
+      "status": "Estado",
+      "queueManager": "Gestor de Colas",
+      "queueName": "Nombre de la Cola",
+      "channelName": "Nombre del Canal",
+      "queueDepth": "Profundidad de la Cola",
+      "channelStatus": "Estado del Canal"
+    },
+    "validation": {
+      "maxEventsExceeded": "Máximo de 1000 eventos por solicitud excedido",
+      "jobNameRequired": "El nombre del job es obligatorio para eventos batch",
+      "messageTooLong": "El mensaje excede la longitud máxima de 10000 caracteres"
+    }
+  },
   "legacyCatalog": {
     "title": "Catálogo de Activos Legacy",
     "subtitle": "Registrar y gestionar activos de sistemas core mainframe",

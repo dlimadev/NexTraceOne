@@ -4969,6 +4969,68 @@
       "telemetryIngestionDescription": "Enable mainframe telemetry ingestion (SMF, SYSLOG, job logs)"
     }
   },
+  "legacyTelemetry": {
+    "title": "Legacy Telemetry Ingestion",
+    "subtitle": "Ingest and normalize mainframe telemetry data",
+    "description": "Receive operational events from batch jobs, MQ systems, CICS, IMS and mainframe sources via API or OpenTelemetry Collector.",
+    "sourceTypes": {
+      "batch": "Batch",
+      "mq": "MQ",
+      "cics": "CICS",
+      "ims": "IMS",
+      "mainframe": "Mainframe"
+    },
+    "ingestion": {
+      "title": "Ingestion Status",
+      "eventsReceived": "Events Received",
+      "eventsNormalized": "Events Normalized",
+      "lastReceived": "Last Received",
+      "errorRate": "Error Rate",
+      "noEvents": "No legacy telemetry events received yet",
+      "noEventsDescription": "Configure your OpenTelemetry Collector or use the ingestion API to start sending mainframe events."
+    },
+    "endpoints": {
+      "batchEvents": "Batch Events",
+      "batchEventsDescription": "Ingest batch job execution events (JES2, CA7, TWS, Control-M)",
+      "mqEvents": "MQ Events",
+      "mqEventsDescription": "Ingest MQ operational events (IBM MQ, OMEGAMON)",
+      "mainframeEvents": "Mainframe Events",
+      "mainframeEventsDescription": "Ingest generic mainframe events (SMF, SYSLOG, CICS, IMS)"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Warning",
+      "error": "Error",
+      "critical": "Critical"
+    },
+    "fields": {
+      "eventId": "Event ID",
+      "eventType": "Event Type",
+      "sourceType": "Source Type",
+      "systemName": "System Name",
+      "lparName": "LPAR Name",
+      "serviceName": "Service Name",
+      "assetName": "Asset Name",
+      "severity": "Severity",
+      "message": "Message",
+      "timestamp": "Timestamp",
+      "provider": "Provider",
+      "jobName": "Job Name",
+      "jobId": "Job ID",
+      "returnCode": "Return Code",
+      "status": "Status",
+      "queueManager": "Queue Manager",
+      "queueName": "Queue Name",
+      "channelName": "Channel Name",
+      "queueDepth": "Queue Depth",
+      "channelStatus": "Channel Status"
+    },
+    "validation": {
+      "maxEventsExceeded": "Maximum of 1000 events per request exceeded",
+      "jobNameRequired": "Job name is required for batch events",
+      "messageTooLong": "Message exceeds maximum length of 10000 characters"
+    }
+  },
   "legacyCatalog": {
     "title": "Legacy Asset Catalog",
     "subtitle": "Register and manage mainframe core system assets",
