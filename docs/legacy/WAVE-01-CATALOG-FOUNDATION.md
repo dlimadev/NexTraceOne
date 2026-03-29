@@ -237,26 +237,26 @@ Services
 
 ## Stories
 
-| ID | Story | Prioridade |
-|---|---|---|
-| W1-S01 | Criar entidades de domínio para ativos legacy | P0 |
-| W1-S02 | Criar value objects (LparReference, CicsRegion, etc.) | P0 |
-| W1-S03 | Criar enums legacy (MainframeAssetType, etc.) | P0 |
-| W1-S04 | Criar `LegacyAssetsDbContext` com configurações | P0 |
-| W1-S05 | Criar migrações EF para novas tabelas | P0 |
-| W1-S06 | Implementar `RegisterMainframeSystem` command + handler | P1 |
-| W1-S07 | Implementar `RegisterCobolProgram` command + handler | P1 |
-| W1-S08 | Implementar `RegisterCopybook` command + handler | P1 |
-| W1-S09 | Implementar `RegisterCicsTransaction` command + handler | P1 |
-| W1-S10 | Implementar commands para IMS, DB2, z/OS Connect | P2 |
-| W1-S11 | Implementar `ListLegacyAssets` e `GetLegacyAssetDetail` queries | P1 |
-| W1-S12 | Implementar `SyncLegacyAssets` para Ingestion API | P1 |
-| W1-S13 | Criar FluentValidation validators | P1 |
-| W1-S14 | Criar endpoint modules na Catalog API | P1 |
-| W1-S15 | Criar `LegacyAssetCatalogPage` frontend | P1 |
-| W1-S16 | Criar `MainframeSystemDetailPage` frontend | P1 |
-| W1-S17 | Atualizar sidebar com "Legacy Assets" | P1 |
-| W1-S18 | Adicionar i18n keys (~150) | P1 |
-| W1-S19 | Criar testes unitários (~100) | P1 |
-| W1-S20 | Criar testes de integração (~20) | P2 |
-| W1-S21 | Configurar outbox processing para `LegacyAssetsDbContext` | P1 |
+| ID | Story | Prioridade | Estado |
+|---|---|---|---|
+| W1-S01 | Criar entidades de domínio para ativos legacy | P0 | ✅ Implementado (10 entidades) |
+| W1-S02 | Criar value objects (LparReference, CicsRegion, etc.) | P0 | ✅ Implementado (4 VOs) |
+| W1-S03 | Criar enums legacy (MainframeAssetType, etc.) | P0 | ✅ Implementado (4 enums) |
+| W1-S04 | Criar `LegacyAssetsDbContext` com configurações | P0 | ✅ Implementado (DbContext + 10 configs + 7 repos + DI) |
+| W1-S05 | Criar migrações EF para novas tabelas | P0 | ✅ Implementado (11 tabelas) |
+| W1-S06 | Implementar `RegisterMainframeSystem` command + handler | P1 | ✅ Implementado |
+| W1-S07 | Implementar `RegisterCobolProgram` command + handler | P1 | ✅ Implementado |
+| W1-S08 | Implementar `RegisterCopybook` command + handler | P1 | ✅ Implementado |
+| W1-S09 | Implementar `RegisterCicsTransaction` command + handler | P1 | ✅ Implementado |
+| W1-S10 | Implementar commands para IMS, DB2, z/OS Connect | P2 | ✅ Implementado |
+| W1-S11 | Implementar `ListLegacyAssets` e `GetLegacyAssetDetail` queries | P1 | ✅ Implementado |
+| W1-S12 | Implementar `SyncLegacyAssets` para Ingestion API | P1 | ⏳ Pendente |
+| W1-S13 | Criar FluentValidation validators | P1 | ✅ Implementado |
+| W1-S14 | Criar endpoint modules na Catalog API | P1 | ✅ Implementado (9 endpoints) |
+| W1-S15 | Criar `LegacyAssetCatalogPage` frontend | P1 | ⏳ Pendente (frontend) |
+| W1-S16 | Criar `MainframeSystemDetailPage` frontend | P1 | ⏳ Pendente (frontend) |
+| W1-S17 | Atualizar sidebar com "Legacy Assets" | P1 | ⏳ Pendente (frontend) |
+| W1-S18 | Adicionar i18n keys (~150) | P1 | ✅ Implementado (132 keys × 4 locales) |
+| W1-S19 | Criar testes unitários (~100) | P1 | ✅ Implementado (~88 testes, 741 total) |
+| W1-S20 | Criar testes de integração (~20) | P2 | ⏳ Pendente |
+| W1-S21 | Configurar outbox processing para `LegacyAssetsDbContext` | P1 | ⏳ Pendente |
