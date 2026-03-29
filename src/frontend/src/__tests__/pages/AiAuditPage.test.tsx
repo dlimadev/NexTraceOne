@@ -119,8 +119,8 @@ describe('AiAuditPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Alice Engineer')).toBeInTheDocument();
     });
-    expect(screen.getByText('Allowed')).toBeInTheDocument();
-    expect(screen.getByText('Blocked')).toBeInTheDocument();
+    expect(screen.getAllByText('Allowed').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Blocked').length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays token counts', async () => {

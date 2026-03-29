@@ -1584,7 +1584,59 @@
     "routingWeightPrimary": "Primário",
     "routingWeightSecondary": "Secundário",
     "routingWeightSupplementary": "Suplementar",
-    "routingGovernanceNotice": "As estratégias de roteamento e pesos das fontes governam como a IA seleciona modelos, prioriza fontes de conhecimento e enriquece o contexto para cada consulta."
+    "routingGovernanceNotice": "As estratégias de roteamento e pesos das fontes governam como a IA seleciona modelos, prioriza fontes de conhecimento e enriquece o contexto para cada consulta.",
+    "activeModels": "Modelos Ativos",
+    "auditBlockedStat": "Bloqueados por Política",
+    "auditColClient": "Cliente",
+    "auditColModel": "Modelo",
+    "auditColPolicy": "Política Aplicada",
+    "auditColResult": "Resultado",
+    "auditColTime": "Hora",
+    "auditColTokens": "Tokens",
+    "auditColType": "Tipo",
+    "auditColUser": "Usuário",
+    "auditExternalStat": "IA Externa",
+    "auditInternalStat": "IA Interna",
+    "auditSubtitle": "Rastreie e audite todo o uso de modelos de IA na plataforma",
+    "auditTitle": "Auditoria de Uso de IA",
+    "auditTotalStat": "Total de Solicitações",
+    "budgetActiveStat": "Orçamentos Ativos",
+    "budgetExceededStat": "Orçamentos Excedidos",
+    "budgetSubtitle": "Gerencie e monitore o consumo de tokens de IA e orçamentos",
+    "budgetTitle": "Orçamentos de Tokens",
+    "budgetTokensUsedStat": "Tokens Utilizados",
+    "budgetTotalStat": "Total de Orçamentos",
+    "external": "Externo",
+    "externalAllowed": "IA Externa Permitida",
+    "filterActive": "Ativo",
+    "filterAll": "Todos",
+    "filterInactive": "Inativo",
+    "internal": "Interno",
+    "internalOnly": "Apenas Interno",
+    "maxTokens": "Tokens Máximos",
+    "noAuditFound": "Nenhum registro de auditoria encontrado",
+    "noBudgetsFound": "Nenhum orçamento encontrado",
+    "noPoliciesFound": "Nenhuma política encontrada",
+    "policiesActiveStat": "Políticas Ativas",
+    "policiesExternalAllowedStat": "Externo Permitido",
+    "policiesInternalOnlyStat": "Apenas Interno",
+    "policiesTotalStat": "Total de Políticas",
+    "quotaExceeded": "Cota Excedida",
+    "registerModel": "Registrar Modelo",
+    "requests": "Solicitações",
+    "resultAllowed": "Permitido",
+    "resultBlocked": "Bloqueado",
+    "resultQuotaExceeded": "Cota Excedida",
+    "searchAudit": "Pesquisar registro de auditoria...",
+    "searchBudgets": "Pesquisar orçamentos...",
+    "searchModels": "Pesquisar modelos...",
+    "searchPolicies": "Pesquisar políticas...",
+    "sensitivityHigh": "Alta",
+    "sensitivityLow": "Baixa",
+    "sensitivityMedium": "Média",
+    "statusInactive": "Inativo",
+    "tokens": "Tokens",
+    "totalModels": "Total de Modelos"
   },
   "governance": {
     "policies": {
@@ -2345,7 +2397,111 @@
     }
   },
   "assistantPanel": {
-    "analyzingNonProd": "Analisando {{environment}} (não produtivo)"
+    "title": "Assistente de IA",
+    "tryAsking": "Tente perguntar",
+    "quickQuestions": "Perguntas Rápidas",
+    "suggestedActions": "Ações Sugeridas",
+    "suggestedSteps": "Próximos Passos Sugeridos",
+    "groundedIn": "Fundamentado em",
+    "noContextWarning": "Nenhum contexto disponível para fundamentação",
+    "contextSummaryLabel": "Resumo do Contexto",
+    "caveatsLabel": "Ressalvas",
+    "fallbackCaveat": "Resposta pode não refletir o estado atual do sistema",
+    "analyzingNonProd": "Analisando ambiente não produtivo",
+    "meta": {
+      "contextualRouting": "Roteamento Contextual"
+    },
+    "contextLabel": {
+      "service": "Serviço",
+      "contract": "Contrato",
+      "incident": "Incidente",
+      "change": "Mudança"
+    },
+    "contextHint": {
+      "service": "Pergunte sobre este serviço, suas dependências e contratos",
+      "contract": "Pergunte sobre este contrato, compatibilidade e consumidores",
+      "incident": "Pergunte sobre este incidente, causa raiz e mitigação",
+      "change": "Pergunte sobre esta mudança, impacto e raio de explosão"
+    },
+    "contextStrength": {
+      "strong": "Forte",
+      "good": "Bom",
+      "partial": "Parcial",
+      "weak": "Fraco",
+      "none": "Nenhum"
+    },
+    "contextCaveats": {
+      "noContractsLoaded": "Contratos não carregados",
+      "noLinkedServices": "Nenhum serviço vinculado",
+      "noRunbooks": "Nenhum runbook disponível",
+      "noVersionHistory": "Sem histórico de versões",
+      "noCorrelatedChanges": "Sem mudanças correlacionadas",
+      "noDecisionHistory": "Sem histórico de decisões",
+      "noAdvisoryData": "Sem dados de consultoria"
+    },
+    "placeholder": {
+      "service": "Pergunte sobre este serviço...",
+      "contract": "Pergunte sobre este contrato...",
+      "incident": "Pergunte sobre este incidente...",
+      "change": "Pergunte sobre esta mudança..."
+    },
+    "welcome": {
+      "service": "Olá! Estou aqui para ajudar com este serviço. Posso analisar dependências, contratos, mudanças recentes e mais.",
+      "contract": "Olá! Estou aqui para ajudar com este contrato. Posso verificar compatibilidade, consumidores e histórico de versões.",
+      "incident": "Olá! Estou aqui para ajudar com este incidente. Posso investigar causa raiz, sugerir mitigação e correlacionar com mudanças.",
+      "change": "Olá! Estou aqui para ajudar com esta mudança. Posso analisar impacto, raio de explosão e prontidão para promoção."
+    },
+    "actions": {
+      "viewDependencies": "Ver Dependências",
+      "viewContracts": "Ver Contratos",
+      "viewRecentChanges": "Ver Mudanças Recentes",
+      "viewOwnerService": "Ver Serviço Proprietário",
+      "checkCompatibility": "Verificar Compatibilidade",
+      "viewVersionHistory": "Ver Histórico de Versões",
+      "correlateChanges": "Correlacionar Mudanças",
+      "correlateIncidents": "Correlacionar Incidentes",
+      "suggestMitigation": "Sugerir Mitigação",
+      "findRunbook": "Encontrar Runbook",
+      "viewBlastRadius": "Ver Raio de Explosão",
+      "checkRollbackReadiness": "Verificar Prontidão de Rollback"
+    },
+    "prompts": {
+      "service": {
+        "overview": "Dê-me uma visão geral deste serviço",
+        "dependencies": "Quais são as dependências deste serviço?",
+        "contracts": "Quais contratos este serviço expõe?",
+        "recentChanges": "Quais foram as mudanças recentes neste serviço?"
+      },
+      "contract": {
+        "explain": "Explique este contrato",
+        "compatibility": "Verifique a compatibilidade deste contrato",
+        "consumers": "Quem consome este contrato?",
+        "versionDiff": "Quais são as diferenças entre versões?"
+      },
+      "incident": {
+        "rootCause": "Qual pode ser a causa raiz?",
+        "mitigation": "Sugira passos de mitigação",
+        "relatedChanges": "Há mudanças relacionadas a este incidente?",
+        "runbook": "Há um runbook para este tipo de incidente?"
+      },
+      "change": {
+        "riskAnalysis": "Analise o risco desta mudança",
+        "blastRadius": "Qual é o raio de explosão potencial?",
+        "correlatedIncidents": "Há incidentes correlacionados?",
+        "rollback": "Qual é o plano de rollback?"
+      }
+    },
+    "response": {
+      "serviceAnalysis": "Análise do Serviço",
+      "serviceGroundingNote": "Fundamentado nos dados do catálogo de serviços",
+      "contractAnalysis": "Análise do Contrato",
+      "contractGroundingNote": "Fundamentado no registro de contratos",
+      "incidentAnalysis": "Análise do Incidente",
+      "incidentGroundingNote": "Fundamentado nos dados de inteligência operacional",
+      "changeAnalysis": "Análise da Mudança",
+      "changeGroundingNote": "Fundamentado nos dados de governança de mudanças",
+      "additionalContext": "Contexto Adicional"
+    }
   },
   "aiAnalysis": {
     "title": "Análise de IA",
@@ -4342,6 +4498,110 @@
       "messageFormat": "Formato de Mensagem",
       "payloadSchema": "Schema do Payload",
       "copybookReference": "Referência ao Copybook"
+    }
+  },
+  "agents": {
+    "title": "Agentes de IA",
+    "subtitle": "Gerencie, execute e revise agentes de IA especializados",
+    "searchPlaceholder": "Pesquisar agentes...",
+    "createAgent": "Criar Agente",
+    "createTitle": "Criar Novo Agente",
+    "createButton": "Criar",
+    "createError": "Erro ao criar o agente",
+    "emptyTitle": "Nenhum agente encontrado",
+    "emptyDescription": "Crie seu primeiro agente de IA para começar",
+    "loadError": "Erro ao carregar agentes",
+    "officialSection": "Agentes Oficiais",
+    "customSection": "Agentes Personalizados",
+    "governanceNotice": "Os agentes operam sob as políticas de governança de IA da organização",
+    "filter": {
+      "all": "Todos",
+      "official": "Oficiais",
+      "custom": "Personalizados"
+    },
+    "fieldName": "Nome",
+    "fieldDisplayName": "Nome de Exibição",
+    "fieldDescription": "Descrição",
+    "fieldObjective": "Objetivo",
+    "fieldSystemPrompt": "Prompt do Sistema",
+    "fieldVisibility": "Visibilidade",
+    "fieldCategory": "Categoria",
+    "displayNamePlaceholder": "Insira o nome de exibição do agente",
+    "descriptionLabel": "Descrição",
+    "descriptionPlaceholder": "Descreva o propósito do agente",
+    "objectiveLabel": "Objetivo",
+    "objectivePlaceholder": "Defina o objetivo principal do agente",
+    "systemPromptLabel": "Prompt do Sistema",
+    "systemPromptPlaceholder": "Insira o prompt do sistema para o agente",
+    "capabilitiesLabel": "Capacidades",
+    "allowedModelsLabel": "Modelos Permitidos",
+    "allowedToolsLabel": "Ferramentas Permitidas",
+    "allowModelOverrideLabel": "Permitir Substituição de Modelo",
+    "inputSchemaLabel": "Esquema de Entrada",
+    "outputSchemaLabel": "Esquema de Saída",
+    "targetPersonaLabel": "Persona Alvo",
+    "metadataLabel": "Metadados",
+    "versionLabel": "Versão",
+    "ownerId": "ID do Proprietário",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "edit": "Editar",
+    "saveChanges": "Salvar Alterações",
+    "updateError": "Erro ao atualizar o agente",
+    "execute": "Executar",
+    "executeTitle": "Executar Agente",
+    "executeButton": "Executar",
+    "executeError": "Erro ao executar o agente",
+    "inputLabel": "Entrada",
+    "inputPlaceholder": "Insira os dados de entrada para o agente...",
+    "modelOverride": "Modelo Alternativo",
+    "outputLabel": "Resultado",
+    "executions": "Execuções",
+    "totalExecutions": "Total de Execuções",
+    "statsLabel": "Estatísticas",
+    "tokens": "Tokens",
+    "artifacts": "Artefatos",
+    "approve": "Aprovar",
+    "reject": "Rejeitar",
+    "view": "Ver",
+    "backToList": "Voltar à Lista",
+    "detailNotFound": "Agente não encontrado",
+    "detailLoadError": "Erro ao carregar detalhes do agente",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "tab": {
+      "overview": "Visão Geral",
+      "definition": "Definição",
+      "edit": "Editar"
+    },
+    "visibility": {
+      "Private": "Privado",
+      "Team": "Equipe",
+      "Tenant": "Organização"
+    },
+    "ownership": {
+      "System": "Sistema",
+      "Tenant": "Organização",
+      "User": "Usuário"
+    },
+    "status": {
+      "Draft": "Rascunho",
+      "PendingReview": "Revisão Pendente",
+      "Active": "Ativo",
+      "Published": "Publicado",
+      "Archived": "Arquivado",
+      "Blocked": "Bloqueado"
+    },
+    "category": {
+      "General": "Geral",
+      "ApiDesign": "Design de API",
+      "TestGeneration": "Geração de Testes",
+      "EventDesign": "Design de Eventos",
+      "Documentation": "Documentação",
+      "Analysis": "Análise",
+      "CodeReview": "Revisão de Código",
+      "Security": "Segurança",
+      "Operations": "Operações"
     }
   }
 }
