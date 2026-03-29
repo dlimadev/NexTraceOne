@@ -154,6 +154,18 @@ public sealed class UserRoleAssignmentTests
         assignment.IsEffectivelyActive(Now).Should().BeTrue();
     }
 
+    [Fact]
+    public void IsEffectivelyActive_Should_ReturnFalse_WhenExactlyAtValidUntil()
+    {
+        // Exclusive end semantics: at exactly ValidUntil, assignment is NOT active.
+        var until = Now;
+        var assignment = UserRoleAssignment.Create(
+            TestUserId, TestTenantId, TestRoleId, Now.AddDays(-10), "admin",
+            validUntil: until);
+
+        assignment.IsEffectivelyActive(Now).Should().BeFalse();
+    }
+
     // ── Deactivate / Activate ────────────────────────────────────────────
 
     [Fact]

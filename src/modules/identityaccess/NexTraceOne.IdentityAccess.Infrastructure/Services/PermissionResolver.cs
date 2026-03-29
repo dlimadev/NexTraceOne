@@ -70,6 +70,6 @@ internal sealed class PermissionResolver(
             }
         }
 
-        return allPermissions.Order().ToList().AsReadOnly();
+        return allPermissions.OrderBy(x => x, StringComparer.Ordinal).ToList().AsReadOnly();
     }
 }

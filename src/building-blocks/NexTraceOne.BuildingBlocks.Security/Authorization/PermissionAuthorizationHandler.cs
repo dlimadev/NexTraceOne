@@ -47,26 +47,42 @@ public sealed class PermissionAuthorizationHandler(
 
         // 2. Verificação secundária: mapeamentos papel→permissão persistidos no banco de dados.
         // Permite customização por tenant sem necessidade de re-emitir JWT.
+        // Suporta multi-role: verifica todos os role_ids do JWT (v1.4).
         if (databasePermissionProvider is not null)
         {
-            var roleId = httpContext?.User?.FindFirst("role_id")?.Value ?? string.Empty;
             var tenantId = httpContext?.User?.FindFirst("tenant_id")?.Value ?? string.Empty;
 
-            var hasDbPermission = await databasePermissionProvider.HasPermissionAsync(
-                currentUser.Id,
-                roleId,
-                tenantId,
-                requirement.Permission,
-                cancellationToken);
+            // Multi-role: iterar sobre todos os role_ids emitidos no JWT.
+            var roleIdClaims = httpContext?.User?.FindAll("role_ids")
+                .Select(c => c.Value)
+                .ToList() ?? [];
 
-            if (hasDbPermission)
+            // Backward-compatible: se não houver role_ids, usar role_id (legado).
+            if (roleIdClaims.Count == 0)
             {
-                logger.LogInformation(
-                    "Authorization granted via database permission for user {UserId}: permission '{Permission}'",
+                var legacyRoleId = httpContext?.User?.FindFirst("role_id")?.Value ?? string.Empty;
+                roleIdClaims = [legacyRoleId];
+            }
+
+            foreach (var roleId in roleIdClaims)
+            {
+                var hasDbPermission = await databasePermissionProvider.HasPermissionAsync(
                     currentUser.Id,
-                    requirement.Permission);
-                context.Succeed(requirement);
-                return;
+                    roleId,
+                    tenantId,
+                    requirement.Permission,
+                    cancellationToken);
+
+                if (hasDbPermission)
+                {
+                    logger.LogInformation(
+                        "Authorization granted via database permission for user {UserId} role {RoleId}: permission '{Permission}'",
+                        currentUser.Id,
+                        roleId,
+                        requirement.Permission);
+                    context.Succeed(requirement);
+                    return;
+                }
             }
         }
 

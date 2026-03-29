@@ -111,7 +111,7 @@ public sealed class UserRoleAssignment : Entity<UserRoleAssignmentId>
     {
         if (!IsActive) return false;
         if (ValidFrom.HasValue && now < ValidFrom.Value) return false;
-        if (ValidUntil.HasValue && now > ValidUntil.Value) return false;
+        if (ValidUntil.HasValue && now >= ValidUntil.Value) return false;
         return true;
     }
 
