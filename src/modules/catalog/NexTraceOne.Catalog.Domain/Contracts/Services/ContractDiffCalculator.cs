@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
+using NexTraceOne.Catalog.Domain.LegacyAssets.Services;
 
 namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 
@@ -31,6 +32,7 @@ public static class ContractDiffCalculator
             ContractProtocol.AsyncApi => AsyncApiDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             ContractProtocol.Wsdl => WsdlDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             ContractProtocol.WorkerService => WorkerServiceDiffCalculator.ComputeDiff(baseSpec, targetSpec),
+            ContractProtocol.Copybook => CopybookDiffAdapter.ComputeDiff(baseSpec, targetSpec),
             _ => EmptyResult()
         };
     }
