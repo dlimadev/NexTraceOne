@@ -207,10 +207,11 @@ export function CreateServicePage() {
 
   const canProceedToMode = !!selectedType;
   const canProceedToDetails = !!selectedMode;
-  const canCreate = !!title && !!selectedProtocol && (
-    selectedMode === 'ai' ? !!aiPrompt.trim() :
-    selectedMode !== 'import' || !!importContent.trim() || !!title
-  );
+  const canCreate = !!title && !!selectedProtocol && (() => {
+    if (selectedMode === 'ai') return !!aiPrompt.trim();
+    if (selectedMode === 'import') return !!importContent.trim();
+    return true;
+  })();
 
   return (
     <PageContainer className="max-w-4xl">
