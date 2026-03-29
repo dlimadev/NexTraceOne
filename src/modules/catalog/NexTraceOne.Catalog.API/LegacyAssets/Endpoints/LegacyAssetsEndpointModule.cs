@@ -36,5 +36,9 @@ public sealed class LegacyAssetsEndpointModule
 
         // ── Ingestão bulk de ativos legacy ───────────────────────────────
         SyncLegacyAssetsEndpoint.Map(group);
+
+        // ── Legacy contract governance ───────────────────────────────────
+        ImportCopybookLayoutEndpoint.Map(group);
+        DiffCopybookVersionsEndpoint.Map(group);
     }
 }

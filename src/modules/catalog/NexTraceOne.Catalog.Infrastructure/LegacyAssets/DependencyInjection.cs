@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IImsTransactionRepository, ImsTransactionRepository>();
         services.AddScoped<IDb2ArtifactRepository, Db2ArtifactRepository>();
         services.AddScoped<IZosConnectBindingRepository, ZosConnectBindingRepository>();
+        services.AddScoped<ICopybookVersionRepository, CopybookVersionRepository>();
 
         return services;
     }

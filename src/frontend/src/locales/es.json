@@ -4222,5 +4222,42 @@
       "zosBindingAlreadyExists": "Ya existe un binding z/OS Connect con este nombre en este sistema",
       "invalidAssetType": "Tipo de activo inválido"
     }
+  },
+  "legacyContracts": {
+    "title": "Gobernanza de Contratos Legacy",
+    "description": "Gestionar contratos de copybooks COBOL, versionado y diffs semánticos",
+    "importCopybook": "Importar Copybook",
+    "importCopybookDesc": "Analizar e importar un layout de copybook COBOL",
+    "importSuccess": "Layout de copybook importado con éxito",
+    "importFailed": "Error al importar layout del copybook",
+    "copybookVersion": "Versión del Copybook",
+    "copybookVersions": "Versiones del Copybook",
+    "versionLabel": "Etiqueta de Versión",
+    "rawContent": "Contenido Original",
+    "diff": {
+      "title": "Diff de Copybook",
+      "description": "Diff semántico entre dos versiones de copybook",
+      "baseVersion": "Versión Base",
+      "targetVersion": "Versión Objetivo",
+      "changeLevel": "Nivel de Cambio",
+      "breaking": "Breaking",
+      "additive": "Aditivo",
+      "nonBreaking": "No Breaking",
+      "hasBreakingChanges": "Contiene Breaking Changes",
+      "noChanges": "No se detectaron cambios",
+      "fieldAdded": "Campo Añadido",
+      "fieldRemoved": "Campo Eliminado",
+      "fieldTypeChanged": "Tipo de Campo Cambiado",
+      "fieldLengthChanged": "Longitud de Campo Cambiada",
+      "fieldRenamed": "Campo Renombrado",
+      "occursChanged": "Conteo OCCURS Cambiado"
+    },
+    "mqContract": {
+      "title": "Contrato de Mensaje MQ",
+      "queueName": "Nombre de Cola",
+      "messageFormat": "Formato de Mensaje",
+      "payloadSchema": "Schema del Payload",
+      "copybookReference": "Referencia al Copybook"
+    }
   }
 }

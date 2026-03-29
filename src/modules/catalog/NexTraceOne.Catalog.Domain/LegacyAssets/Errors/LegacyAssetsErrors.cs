@@ -82,4 +82,14 @@ public static class LegacyAssetsErrors
     /// <summary>Tipo de ativo legacy inválido.</summary>
     public static Error InvalidAssetType(string assetType)
         => Error.Validation("LegacyAssets.InvalidAssetType", "Asset type '{0}' is not a valid legacy asset type.", assetType);
+
+    // ── Copybook Versioning ──────────────────────────────────────────────
+
+    /// <summary>Versão de copybook não encontrada.</summary>
+    public static Error CopybookVersionNotFound(Guid versionId)
+        => Error.NotFound("LegacyAssets.CopybookVersion.NotFound", "Copybook version '{0}' was not found.", versionId);
+
+    /// <summary>Falha ao fazer parse do texto de copybook.</summary>
+    public static Error CopybookParseFailed(string message)
+        => Error.Validation("LegacyAssets.Copybook.ParseFailed", "Failed to parse copybook: {0}", message);
 }

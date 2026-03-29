@@ -48,6 +48,18 @@ public sealed class LegacyAssetsDbContext(
     /// <summary>Dependências entre ativos legacy persistidas do sub-domínio Legacy Assets.</summary>
     public DbSet<LegacyDependency> LegacyDependencies => Set<LegacyDependency>();
 
+    /// <summary>Versões de copybooks COBOL persistidas do sub-domínio Legacy Assets.</summary>
+    public DbSet<CopybookVersion> CopybookVersions => Set<CopybookVersion>();
+
+    /// <summary>Registos de diff entre versões de copybook persistidos.</summary>
+    public DbSet<CopybookDiffRecord> CopybookDiffs => Set<CopybookDiffRecord>();
+
+    /// <summary>Contratos de mensagem MQ persistidos do sub-domínio Legacy Assets.</summary>
+    public DbSet<MqMessageContract> MqMessageContracts => Set<MqMessageContract>();
+
+    /// <summary>Mapeamentos copybook–contrato persistidos do sub-domínio Legacy Assets.</summary>
+    public DbSet<CopybookContractMapping> CopybookContractMappings => Set<CopybookContractMapping>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(LegacyAssetsDbContext).Assembly;
 
