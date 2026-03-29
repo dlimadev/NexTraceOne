@@ -33,7 +33,7 @@ public static class DefaultToolDefinitionCatalog
             DisplayName: "Get Service Health",
             Description: "Retrieves current health status, SLIs, and recent incidents for a specific service.",
             Category: "service_catalog",
-            ParametersSchema: """{"type":"object","properties":{"serviceId":{"type":"string","description":"Service identifier"},"includeDepencies":{"type":"boolean","description":"Include dependency health"}},"required":["serviceId"]}""",
+            ParametersSchema: """{"type":"object","properties":{"serviceId":{"type":"string","description":"Service identifier"},"includeDependencies":{"type":"boolean","description":"Include dependency health"}},"required":["serviceId"]}""",
             RiskLevel: 0,
             RequiresApproval: false,
             TimeoutMs: 15000),

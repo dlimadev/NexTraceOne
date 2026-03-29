@@ -39,7 +39,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "analysis",
             Content: "Analyze the incident for service {{serviceName}} in environment {{environment}}. Consider recent changes in the last {{timeRange}}. Focus on: 1) Service dependencies and topology impact, 2) Recent deployments and configuration changes, 3) Telemetry anomalies and error patterns. Provide a structured root cause analysis with confidence levels.",
             Variables: "serviceName,environment,timeRange",
-            TargetPersonas: "Engineer,TechLead",
+            TargetPersonas: "Engineer,Tech Lead",
             ScopeHint: "incidentId",
             Relevance: "high"),
 
@@ -50,7 +50,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "operations",
             Content: "Provide a comprehensive health summary for service {{serviceName}} in {{environment}}. Include: 1) Current SLI/SLO status, 2) Dependency health and latency, 3) Recent incidents and their resolution, 4) Change frequency and deployment stability, 5) Recommendations for improvement.",
             Variables: "serviceName,environment",
-            TargetPersonas: "Engineer,TechLead,Architect",
+            TargetPersonas: "Engineer,Tech Lead,Architect",
             ScopeHint: "serviceId",
             Relevance: "high"),
 
@@ -61,7 +61,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "governance",
             Content: "Assess the impact of the proposed change to {{serviceName}} in {{environment}}. Evaluate: 1) Blast radius — which services and contracts are affected, 2) Risk level based on change type and service criticality, 3) Required validations before promotion, 4) Recommended rollback strategy, 5) Historical comparison with similar changes.",
             Variables: "serviceName,environment",
-            TargetPersonas: "TechLead,Architect",
+            TargetPersonas: "Tech Lead,Architect",
             ScopeHint: "changeId",
             Relevance: "high"),
 
@@ -96,7 +96,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "management",
             Content: "Generate a service reliability report for team {{teamName}} covering the period {{period}}. Include: 1) SLO adherence per service, 2) Incident frequency and mean time to resolution, 3) Change success rate, 4) Top recurring issues, 5) Recommendations for reliability improvement. Format for {{targetAudience}} audience.",
             Variables: "teamName,period,targetAudience",
-            TargetPersonas: "TechLead,Product,Executive",
+            TargetPersonas: "Tech Lead,Product,Executive",
             ScopeHint: "teamId",
             Relevance: "medium"),
 
@@ -119,7 +119,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "troubleshooting",
             Content: "Diagnose the recurring error pattern for service {{serviceName}} with error code/message '{{errorPattern}}'. Analyze: 1) Error frequency and trend, 2) Correlation with recent changes or incidents, 3) Affected endpoints and consumers, 4) Similar patterns in other services, 5) Recommended investigation steps and potential fixes.",
             Variables: "serviceName,errorPattern",
-            TargetPersonas: "Engineer,TechLead",
+            TargetPersonas: "Engineer,Tech Lead",
             ScopeHint: "serviceId",
             Relevance: "high"),
 
@@ -131,7 +131,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "governance",
             Content: "Generate a compliance audit checklist for service {{serviceName}} owned by team {{teamName}}. Evaluate: 1) Contract governance (versioning, documentation, approval workflow), 2) Change management compliance (evidence pack, approval gates), 3) Security posture (authentication, authorization, data sensitivity), 4) Operational readiness (runbooks, monitoring, SLOs defined), 5) Ownership and documentation completeness.",
             Variables: "serviceName,teamName",
-            TargetPersonas: "Auditor,PlatformAdmin,Architect",
+            TargetPersonas: "Auditor,Platform Admin,Architect",
             ScopeHint: "serviceId",
             Relevance: "high"),
 
@@ -142,7 +142,7 @@ public static class DefaultPromptTemplateCatalog
             Category: "governance",
             Content: "Analyze AI token usage for {{scope}} '{{scopeValue}}' over {{period}}. Identify: 1) Usage patterns and peak times, 2) Model selection efficiency (internal vs. external), 3) Token waste (repeated queries, excessive context), 4) Budget adherence and forecast, 5) Recommendations to optimize cost while maintaining quality.",
             Variables: "scope,scopeValue,period",
-            TargetPersonas: "PlatformAdmin,Executive",
+            TargetPersonas: "Platform Admin,Executive",
             ScopeHint: null,
             Relevance: "medium"),
     };

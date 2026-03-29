@@ -49,7 +49,7 @@ public sealed class PromptTemplate : AuditableEntity<PromptTemplateId>
     /// <summary>Identificador do agente associado (null para templates genéricos).</summary>
     public Guid? AgentId { get; private set; }
 
-    /// <summary>Personas alvo (CSV, ex: "Engineer,TechLead,Architect").</summary>
+    /// <summary>Personas alvo (CSV, ex: "Engineer,Tech Lead,Architect").</summary>
     public string TargetPersonas { get; private set; } = string.Empty;
 
     /// <summary>Dica de escopo contextual (ex: "serviceId", "incidentId").</summary>
