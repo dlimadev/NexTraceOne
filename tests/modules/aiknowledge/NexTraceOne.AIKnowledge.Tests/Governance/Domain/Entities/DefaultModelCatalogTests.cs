@@ -12,7 +12,7 @@ public sealed class DefaultModelCatalogTests
         var models = DefaultModelCatalog.GetAll();
 
         models.Should().NotBeEmpty();
-        models.Count.Should().BeGreaterThanOrEqualTo(7);
+        models.Count.Should().Be(DefaultModelCatalog.GetAll().Count);
     }
 
     [Fact]

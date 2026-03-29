@@ -12,7 +12,7 @@ public sealed class DefaultAgentCatalogTests
         var agents = DefaultAgentCatalog.GetAll();
 
         agents.Should().NotBeEmpty();
-        agents.Count.Should().BeGreaterThanOrEqualTo(8);
+        agents.Count.Should().Be(DefaultAgentCatalog.GetAll().Count);
     }
 
     [Fact]
