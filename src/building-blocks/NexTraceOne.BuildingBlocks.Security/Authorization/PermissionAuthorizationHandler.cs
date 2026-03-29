@@ -53,9 +53,9 @@ public sealed class PermissionAuthorizationHandler(
             var tenantId = httpContext?.User?.FindFirst("tenant_id")?.Value ?? string.Empty;
 
             // Multi-role: iterar sobre todos os role_ids emitidos no JWT.
-            var roleIdClaims = httpContext?.User?.FindAll("role_ids")
-                .Select(c => c.Value)
-                .ToList() ?? [];
+            var roleIdClaims = (httpContext?.User?.FindAll("role_ids")
+                ?.Select(c => c.Value)
+                .ToList()) ?? [];
 
             // Backward-compatible: se não houver role_ids, usar role_id (legado).
             if (roleIdClaims.Count == 0)
