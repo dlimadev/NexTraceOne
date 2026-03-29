@@ -24,7 +24,8 @@ export type AppRole =
   | 'SecurityReview'
   | 'ApprovalOnly';
 
-// Permissões granulares por módulo (códigos idênticos ao catálogo do backend)
+// Permissões granulares por módulo — códigos idênticos ao RolePermissionCatalog do backend.
+// Manter sincronizado com: IdentityAccess.Domain/Entities/RolePermissionCatalog.cs
 export type Permission =
   // ── Identity & Access ──
   | 'identity:users:read'
@@ -34,6 +35,9 @@ export type Permission =
   | 'identity:sessions:read'
   | 'identity:sessions:revoke'
   | 'identity:permissions:read'
+  | 'identity:jit-access:decide'
+  | 'identity:break-glass:decide'
+  | 'identity:delegations:manage'
   // ── Engineering Graph / Service Catalog ──
   | 'catalog:assets:read'
   | 'catalog:assets:write'
@@ -46,117 +50,94 @@ export type Permission =
   | 'developer-portal:write'
   // ── Change Intelligence ──
   | 'change-intelligence:read'
-  | 'change-intelligence:releases:read'
-  | 'change-intelligence:releases:write'
-  | 'change-intelligence:blast-radius:read'
+  | 'change-intelligence:write'
   // ── Workflow ──
-  | 'workflow:read'
-  | 'workflow:write'
-  | 'workflow:approve'
+  | 'workflow:instances:read'
+  | 'workflow:instances:write'
+  | 'workflow:templates:write'
   // ── Promotion ──
-  | 'promotion:read'
-  | 'promotion:write'
-  | 'promotion:promote'
+  | 'promotion:requests:read'
+  | 'promotion:requests:write'
+  | 'promotion:environments:write'
+  | 'promotion:gates:override'
   // ── Ruleset Governance ──
-  | 'ruleset-governance:read'
-  | 'ruleset-governance:write'
+  | 'rulesets:read'
+  | 'rulesets:write'
+  | 'rulesets:execute'
   // ── Operations ──
   | 'operations:incidents:read'
   | 'operations:incidents:write'
+  | 'operations:mitigation:read'
+  | 'operations:mitigation:write'
   | 'operations:runbooks:read'
   | 'operations:runbooks:write'
   | 'operations:reliability:read'
+  | 'operations:reliability:write'
+  | 'operations:runtime:read'
+  | 'operations:runtime:write'
+  | 'operations:cost:read'
+  | 'operations:cost:write'
   | 'operations:automation:read'
   | 'operations:automation:write'
-  | 'operations:automation:admin'
-  | 'operations:runtime:read'
+  | 'operations:automation:execute'
+  | 'operations:automation:approve'
   // ── AI Hub ──
   | 'ai:assistant:read'
   | 'ai:assistant:write'
-  | 'ai:models:read'
-  | 'ai:models:write'
-  | 'ai:policies:read'
-  | 'ai:policies:write'
+  | 'ai:governance:read'
+  | 'ai:governance:write'
   | 'ai:ide:read'
   | 'ai:ide:write'
   | 'ai:runtime:read'
   | 'ai:runtime:write'
-  | 'ai:governance:read'
-  | 'ai:governance:write'
   // ── Governance ──
-  | 'governance:read'
-  | 'governance:reports:read'
-  | 'governance:risk:read'
-  | 'governance:compliance:read'
-  | 'governance:finops:read'
+  | 'governance:domains:read'
+  | 'governance:domains:write'
+  | 'governance:teams:read'
+  | 'governance:teams:write'
   | 'governance:policies:read'
-  | 'governance:evidence:read'
   | 'governance:controls:read'
+  | 'governance:compliance:read'
+  | 'governance:risk:read'
+  | 'governance:evidence:read'
+  | 'governance:waivers:read'
+  | 'governance:waivers:write'
+  | 'governance:packs:read'
+  | 'governance:packs:write'
+  | 'governance:reports:read'
+  | 'governance:finops:read'
+  | 'governance:admin:read'
+  | 'governance:admin:write'
   // ── Product Analytics ──
   | 'analytics:read'
   | 'analytics:write'
-  // ── Organization Governance ──
-  | 'governance:teams:read'
-  | 'governance:teams:write'
-  | 'governance:domains:read'
-  | 'governance:domains:write'
-  // ── Governance Packs ──
-  | 'governance:packs:read'
-  | 'governance:packs:write'
-  | 'governance:waivers:read'
-  | 'governance:waivers:write'
   // ── Audit ──
-  | 'audit:read'
-  | 'audit:export'
+  | 'audit:trail:read'
+  | 'audit:reports:read'
+  | 'audit:compliance:read'
+  | 'audit:compliance:write'
+  | 'audit:events:write'
   // ── Integrations ──
   | 'integrations:read'
   | 'integrations:write'
+  // ── Configuration ──
+  | 'configuration:read'
+  | 'configuration:write'
   // ── Platform ──
+  | 'platform:admin:read'
   | 'platform:settings:read'
   | 'platform:settings:write'
-  | 'platform:admin:read';
-
-// ── Helpers para UI gating e testes ──────────────────────────────────────────
-// Mapeamento client-side simplificado de role→permissões para controle visual.
-// O backend continua sendo a fonte de verdade para enforcement real.
-//
-// NOTA: Em produção, as permissões efetivas do usuário vêm do servidor via
-// CurrentUserProfile.permissions (endpoint /auth/me). Este mapeamento é usado
-// apenas para fallback visual quando o perfil ainda não foi carregado, e para
-// testes unitários dos componentes de UI que dependem de roles.
-// Sincronização: manter alinhado com IdentityAccess.Application/Roles/.
-
-const rolePermissions: Record<string, string[]> = {
-  Admin: [
-    'users:read', 'users:write', 'releases:read', 'releases:write',
-    'contracts:read', 'contracts:write', 'audit:read', 'audit:export',
-    'workflow:approve',
-  ],
-  Developer: [
-    'releases:read', 'releases:write', 'contracts:read', 'contracts:write',
-  ],
-  Viewer: [
-    'releases:read', 'contracts:read',
-  ],
-  Auditor: [
-    'audit:read', 'audit:export', 'releases:read', 'contracts:read',
-  ],
-  Manager: [
-    'users:read', 'releases:read', 'contracts:read', 'workflow:approve',
-  ],
-};
-
-export function getPermissionsForRoles(roles: string[]): Set<string> {
-  const perms = new Set<string>();
-  for (const role of roles) {
-    const rolePerms = rolePermissions[role];
-    if (rolePerms) {
-      for (const p of rolePerms) perms.add(p);
-    }
-  }
-  return perms;
-}
-
-export function hasPermission(roles: string[], permission: string): boolean {
-  return getPermissionsForRoles(roles).has(permission);
-}
+  // ── Notifications ──
+  | 'notifications:inbox:read'
+  | 'notifications:inbox:write'
+  | 'notifications:preferences:read'
+  | 'notifications:preferences:write'
+  | 'notifications:configuration:read'
+  | 'notifications:configuration:write'
+  | 'notifications:delivery:read'
+  // ── Environment Management ──
+  | 'env:environments:read'
+  | 'env:environments:write'
+  | 'env:environments:admin'
+  | 'env:access:read'
+  | 'env:access:admin';

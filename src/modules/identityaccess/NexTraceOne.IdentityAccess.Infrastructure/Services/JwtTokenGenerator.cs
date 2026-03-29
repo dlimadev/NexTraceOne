@@ -1,8 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
@@ -12,9 +14,10 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 
 /// <summary>
 /// Gerador de JWT (access token) e refresh token para o módulo Identity.
-/// Produz tokens HMAC-SHA256 assinados com chave simétrica configurável.
+/// Produz tokens HMAC-SHA256 assinados com chave simétrica configurável
+/// usando <see cref="JwtSecurityTokenHandler"/> standard da Microsoft.
 /// A configuração é lida do appsettings na seção "Jwt" (raiz) ou "Security:Jwt" (building blocks).
-/// Claims incluídos: sub, email, name, tenant_id, role, role_id, permissions, nbf, exp, iss, aud.
+/// Claims incluídos: sub, email, name, tenant_id, role_id, permissions, nbf, exp, iss, aud.
 /// </summary>
 internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeProvider dateTimeProvider) : IJwtTokenGenerator
 {
@@ -46,51 +49,38 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
     /// <inheritdoc />
     public string GenerateAccessToken(User user, TenantMembership membership, IReadOnlyCollection<string> permissions)
     {
-        var header = new Dictionary<string, object>
-        {
-            ["alg"] = "HS256",
-            ["typ"] = "JWT"
-        };
-
         var now = dateTimeProvider.UtcNow;
-        var payload = new Dictionary<string, object>
+
+        var claims = new List<Claim>
         {
-            ["iss"] = _issuer,
-            ["aud"] = _audience,
-            ["sub"] = user.Id.Value.ToString(),
-            ["email"] = user.Email.Value,
-            ["name"] = user.FullName.Value,
-            ["tenant_id"] = membership.TenantId.Value.ToString(),
-            ["role_id"] = membership.RoleId.Value.ToString(),
-            ["permissions"] = permissions,
-            ["nbf"] = now.ToUnixTimeSeconds(),
-            ["exp"] = now.AddMinutes(_accessTokenLifetimeMinutes).ToUnixTimeSeconds()
+            new(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email.Value),
+            new(JwtRegisteredClaimNames.Name, user.FullName.Value),
+            new("tenant_id", membership.TenantId.Value.ToString()),
+            new("role_id", membership.RoleId.Value.ToString()),
         };
 
-        var encodedHeader = Base64UrlEncode(JsonSerializer.SerializeToUtf8Bytes(header));
-        var encodedPayload = Base64UrlEncode(JsonSerializer.SerializeToUtf8Bytes(payload));
-        var unsignedToken = $"{encodedHeader}.{encodedPayload}";
-        var signature = ComputeSignature(unsignedToken, _signingKey);
+        foreach (var permission in permissions)
+        {
+            claims.Add(new Claim("permissions", permission));
+        }
 
-        return $"{unsignedToken}.{signature}";
+        var credentials = new SigningCredentials(
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_signingKey)),
+            SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _issuer,
+            audience: _audience,
+            claims: claims,
+            notBefore: now.UtcDateTime,
+            expires: now.AddMinutes(_accessTokenLifetimeMinutes).UtcDateTime,
+            signingCredentials: credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     /// <inheritdoc />
     public string GenerateRefreshToken()
-    {
-        var bytes = RandomNumberGenerator.GetBytes(64);
-        return Convert.ToBase64String(bytes);
-    }
-
-    private static string ComputeSignature(string value, string signingKey)
-    {
-        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(signingKey));
-        return Base64UrlEncode(hmac.ComputeHash(Encoding.UTF8.GetBytes(value)));
-    }
-
-    private static string Base64UrlEncode(byte[] value)
-        => Convert.ToBase64String(value)
-            .TrimEnd('=')
-            .Replace('+', '-')
-            .Replace('/', '_');
+        => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 }

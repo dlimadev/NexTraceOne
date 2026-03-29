@@ -56,13 +56,20 @@ public static class RolePermissionCatalog
                 "change-intelligence:read",
                 "change-intelligence:write",
 
+                // Workflow
+                "workflow:instances:read",
+                "workflow:instances:write",
+                "workflow:templates:write",
+
                 // Operations
                 "operations:incidents:read",
                 "operations:incidents:write",
                 "operations:mitigation:read",
                 "operations:mitigation:write",
                 "operations:runbooks:read",
+                "operations:runbooks:write",
                 "operations:reliability:read",
+                "operations:reliability:write",
                 "operations:runtime:read",
                 "operations:runtime:write",
                 "operations:cost:read",
@@ -118,6 +125,8 @@ public static class RolePermissionCatalog
                 "ai:governance:write",
                 "ai:ide:read",
                 "ai:ide:write",
+                "ai:runtime:read",
+                "ai:runtime:write",
 
                 // Integrations
                 "integrations:read",
@@ -128,11 +137,18 @@ public static class RolePermissionCatalog
                 "platform:settings:read",
                 "platform:settings:write",
 
+                // Configuration
+                "configuration:read",
+                "configuration:write",
+
                 // Notifications
                 "notifications:inbox:read",
                 "notifications:inbox:write",
                 "notifications:preferences:read",
                 "notifications:preferences:write",
+                "notifications:configuration:read",
+                "notifications:configuration:write",
+                "notifications:delivery:read",
 
                 // Environment Management
                 "env:environments:read",
@@ -156,11 +172,15 @@ public static class RolePermissionCatalog
                 "developer-portal:write",
                 "change-intelligence:read",
                 "change-intelligence:write",
+                "workflow:instances:read",
+                "workflow:instances:write",
+                "workflow:templates:write",
                 "operations:incidents:read",
                 "operations:incidents:write",
                 "operations:mitigation:read",
                 "operations:reliability:read",
                 "operations:runbooks:read",
+                "operations:runbooks:write",
                 "operations:runtime:read",
                 "operations:automation:read",
                 "governance:domains:read",
@@ -185,6 +205,7 @@ public static class RolePermissionCatalog
                 "notifications:inbox:write",
                 "notifications:preferences:read",
                 "notifications:preferences:write",
+                "notifications:configuration:read",
                 "env:environments:read",
                 "env:environments:write",
                 "env:access:read"],
@@ -197,6 +218,7 @@ public static class RolePermissionCatalog
                 "developer-portal:read",
                 "developer-portal:write",
                 "change-intelligence:read",
+                "workflow:instances:read",
                 "operations:incidents:read",
                 "operations:incidents:write",
                 "operations:reliability:read",
@@ -222,6 +244,7 @@ public static class RolePermissionCatalog
                 "contracts:read",
                 "developer-portal:read",
                 "change-intelligence:read",
+                "workflow:instances:read",
                 "operations:incidents:read",
                 "operations:reliability:read",
                 "governance:domains:read",
@@ -241,6 +264,7 @@ public static class RolePermissionCatalog
                 "contracts:read",
                 "developer-portal:read",
                 "change-intelligence:read",
+                "workflow:instances:read",
                 "operations:incidents:read",
                 "operations:reliability:read",
                 "operations:runbooks:read",
@@ -268,6 +292,7 @@ public static class RolePermissionCatalog
                 "contracts:read",
                 "developer-portal:read",
                 "change-intelligence:read",
+                "workflow:instances:read",
                 "operations:incidents:read",
                 "operations:reliability:read",
                 "governance:compliance:read",
@@ -286,6 +311,8 @@ public static class RolePermissionCatalog
                 "env:access:read"],
             Role.ApprovalOnly => [
                 "change-intelligence:read",
+                "workflow:instances:read",
+                "workflow:instances:write",
                 "promotion:requests:read",
                 "promotion:requests:write",
                 "promotion:gates:override",

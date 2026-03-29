@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
 import type { CurrentUserProfile } from '../../types';
-import { getPermissionsForRoles } from '../../auth/permissions';
 
 // Mock dos hooks necessários
 vi.mock('../../contexts/AuthContext', () => ({
@@ -12,8 +11,7 @@ vi.mock('../../contexts/AuthContext', () => ({
 
 import { useAuth } from '../../contexts/AuthContext';
 
-function mockUser(roles: string[]): CurrentUserProfile {
-  const permissions = [...getPermissionsForRoles(roles)];
+function mockUser(permissions: string[], roleName = 'Developer'): CurrentUserProfile {
   return {
     id: 'user-1',
     email: 'test@acme.com',
@@ -23,16 +21,16 @@ function mockUser(roles: string[]): CurrentUserProfile {
     isActive: true,
     lastLoginAt: null,
     tenantId: 'tenant-1',
-    roleName: roles[0] || '',
+    roleName,
     permissions,
   };
 }
 
-function mockAuthValue(roles: string[]) {
+function mockAuthValue(permissions: string[], roleName = 'Developer') {
   return {
     isAuthenticated: true,
     accessToken: 'token',
-    user: mockUser(roles),
+    user: mockUser(permissions, roleName),
     tenantId: 'tenant-1',
     requiresTenantSelection: false,
     availableTenants: [],
@@ -42,8 +40,8 @@ function mockAuthValue(roles: string[]) {
   };
 }
 
-function renderProtectedRoute(permission: Parameters<typeof ProtectedRoute>[0]['permission'], roles: string[]) {
-  vi.mocked(useAuth).mockReturnValue(mockAuthValue(roles));
+function renderProtectedRoute(permission: Parameters<typeof ProtectedRoute>[0]['permission'], permissions: string[], roleName = 'Developer') {
+  vi.mocked(useAuth).mockReturnValue(mockAuthValue(permissions, roleName));
 
   return render(
     <MemoryRouter initialEntries={['/protected']}>
@@ -65,18 +63,18 @@ function renderProtectedRoute(permission: Parameters<typeof ProtectedRoute>[0]['
 
 describe('ProtectedRoute', () => {
   it('renderiza o conteúdo filho quando o usuário tem a permissão', () => {
-    renderProtectedRoute('users:read', ['Admin']);
+    renderProtectedRoute('identity:users:read', ['identity:users:read', 'identity:users:write'], 'PlatformAdmin');
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 
   it('redireciona para / quando o usuário não tem a permissão', () => {
-    renderProtectedRoute('users:read', ['Developer']);
+    renderProtectedRoute('identity:users:read', ['contracts:read', 'contracts:write']);
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
   it('redireciona para rota customizada quando especificada', () => {
-    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['Developer']));
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue(['contracts:read']));
 
     render(
       <MemoryRouter initialEntries={['/protected']}>
@@ -84,7 +82,7 @@ describe('ProtectedRoute', () => {
           <Route
             path="/protected"
             element={
-              <ProtectedRoute permission="users:read" redirectTo="/unauthorized">
+              <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
                 <div>Protected Content</div>
               </ProtectedRoute>
             }
@@ -98,23 +96,18 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Unauthorized')).toBeInTheDocument();
   });
 
-  it('Admin tem acesso à rota de users', () => {
-    renderProtectedRoute('users:read', ['Admin']);
-    expect(screen.getByText('Protected Content')).toBeInTheDocument();
-  });
-
-  it('Manager tem acesso à rota de users', () => {
-    renderProtectedRoute('users:read', ['Manager']);
+  it('PlatformAdmin tem acesso à rota de users', () => {
+    renderProtectedRoute('identity:users:read', ['identity:users:read', 'identity:users:write'], 'PlatformAdmin');
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 
   it('Auditor tem acesso à rota de audit', () => {
-    renderProtectedRoute('audit:read', ['Auditor']);
+    renderProtectedRoute('audit:trail:read', ['audit:trail:read', 'audit:reports:read'], 'Auditor');
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 
-  it('Developer não tem acesso à rota de audit:export', () => {
-    renderProtectedRoute('audit:export', ['Developer']);
+  it('Developer não tem acesso à rota de audit:reports:read', () => {
+    renderProtectedRoute('audit:reports:read', ['contracts:read', 'change-intelligence:read']);
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
   });
 
@@ -137,7 +130,7 @@ describe('ProtectedRoute', () => {
           <Route
             path="/protected"
             element={
-              <ProtectedRoute permission="users:read">
+              <ProtectedRoute permission="identity:users:read">
                 <div>Protected Content</div>
               </ProtectedRoute>
             }

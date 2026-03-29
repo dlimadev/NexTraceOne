@@ -54,6 +54,7 @@ public static class DependencyInjection
         services.AddScoped<IDelegationRepository, DelegationRepository>();
         services.AddScoped<IAccessReviewRepository, AccessReviewRepository>();
         services.AddScoped<ISecurityEventRepository, SecurityEventRepository>();
+        services.AddScoped<ISsoGroupMappingRepository, SsoGroupMappingRepository>();
 
         // Repositórios — v1.2 Autorização por Ambiente
         services.AddScoped<IEnvironmentRepository, EnvironmentRepository>();
@@ -63,6 +64,9 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ITotpVerifier, TotpVerifier>();
         services.AddScoped<IMfaChallengeTokenService, MfaChallengeTokenService>();
+
+        // JIT permission provider — permite ao PermissionAuthorizationHandler verificar grants JIT activos.
+        services.AddScoped<IJitPermissionProvider, JitPermissionProvider>();
 
         // Provider OIDC para fluxo federado (Authorization Code flow)
         services.AddHttpClient("oidc");

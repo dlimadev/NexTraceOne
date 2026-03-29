@@ -35,7 +35,8 @@ public static class FederatedLogin
         string Email,
         string Name,
         string? IpAddress = null,
-        string? UserAgent = null) : ICommand<LocalLogin.LocalLogin.LoginResponse>, IPublicRequest;
+        string? UserAgent = null,
+        IReadOnlyList<string>? Groups = null) : ICommand<LocalLogin.LocalLogin.LoginResponse>, IPublicRequest;
 
     /// <summary>Valida a entrada do login federado.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -61,6 +62,7 @@ public static class FederatedLogin
         IUserRepository userRepository,
         ITenantMembershipRepository membershipRepository,
         IRoleRepository roleRepository,
+        ISsoGroupMappingRepository ssoGroupMappingRepository,
         IDateTimeProvider dateTimeProvider,
         ICurrentTenant currentTenant,
         ILoginSessionCreator sessionCreator,
@@ -95,8 +97,8 @@ public static class FederatedLogin
 
             if (membership is null && currentTenant.Id != Guid.Empty)
             {
-                var viewerRole = await roleRepository.GetByNameAsync(Role.Viewer, cancellationToken);
-                if (viewerRole is null)
+                var resolvedRole = await ResolveSsoRoleAsync(request, cancellationToken);
+                if (resolvedRole is null)
                 {
                     return IdentityErrors.RoleNotFound(Guid.Empty);
                 }
@@ -104,7 +106,7 @@ public static class FederatedLogin
                 membership = TenantMembership.Create(
                     user.Id,
                     TenantId.From(currentTenant.Id),
-                    viewerRole.Id,
+                    resolvedRole.Id,
                     dateTimeProvider.UtcNow);
 
                 membershipRepository.Add(membership);
@@ -129,6 +131,31 @@ public static class FederatedLogin
                 user.Id, request.IpAddress, request.UserAgent);
 
             return responseBuilder.CreateLoginResponse(user, membership, role, refreshToken);
+        }
+
+        /// <summary>
+        /// Resolve o role para um novo utilizador federado.
+        /// Tenta mapear os grupos SSO via <see cref="ISsoGroupMappingRepository"/>.
+        /// Se nenhum mapeamento existir ou nenhum grupo for fornecido, usa Viewer como fallback.
+        /// </summary>
+        private async Task<Role?> ResolveSsoRoleAsync(Command request, CancellationToken cancellationToken)
+        {
+            if (request.Groups is { Count: > 0 })
+            {
+                var mapping = await ssoGroupMappingRepository.FindActiveByGroupsAsync(
+                    TenantId.From(currentTenant.Id),
+                    request.Provider,
+                    request.Groups,
+                    cancellationToken);
+
+                if (mapping is not null)
+                {
+                    return await roleRepository.GetByIdAsync(mapping.RoleId, cancellationToken);
+                }
+            }
+
+            // Fallback: nenhum mapeamento SSO encontrado — atribuir Viewer por defeito.
+            return await roleRepository.GetByNameAsync(Role.Viewer, cancellationToken);
         }
     }
 }

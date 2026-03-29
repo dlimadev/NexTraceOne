@@ -6,4 +6,7 @@
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
     <PublishAssetsDirectory>$(MSBuildProjectDirectory)\dist</PublishAssetsDirectory>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="src\__tests__\auth\" />
+  </ItemGroup>
 </Project>

@@ -34,7 +34,7 @@ export function ChangesRoutes() {
       <Route
         path="/releases"
         element={
-          <ProtectedRoute permission="change-intelligence:releases:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <ReleasesPage />
           </ProtectedRoute>
         }
@@ -42,7 +42,7 @@ export function ChangesRoutes() {
       <Route
         path="/workflow"
         element={
-          <ProtectedRoute permission="workflow:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="workflow:instances:read" redirectTo="/unauthorized">
             <WorkflowPage />
           </ProtectedRoute>
         }
@@ -50,7 +50,7 @@ export function ChangesRoutes() {
       <Route
         path="/promotion"
         element={
-          <ProtectedRoute permission="promotion:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="promotion:requests:read" redirectTo="/unauthorized">
             <PromotionPage />
           </ProtectedRoute>
         }
