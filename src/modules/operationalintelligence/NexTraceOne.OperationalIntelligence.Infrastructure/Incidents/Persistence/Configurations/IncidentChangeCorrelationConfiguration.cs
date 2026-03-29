@@ -27,6 +27,10 @@ internal sealed class IncidentChangeCorrelationConfiguration : IEntityTypeConfig
         builder.Property(x => x.ChangeEnvironment).HasMaxLength(100).IsRequired();
         builder.Property(x => x.ChangeOccurredAt).HasColumnType("timestamp with time zone").IsRequired();
 
+        builder.Property(x => x.LegacyAssetType).HasColumnName("legacy_asset_type").HasMaxLength(100);
+        builder.Property(x => x.LegacyAssetName).HasColumnName("legacy_asset_name").HasMaxLength(500);
+        builder.Property(x => x.LegacyAssetId).HasColumnName("legacy_asset_id");
+
         builder.HasIndex(x => x.IncidentId).HasDatabaseName("ix_ops_icc_incident_id");
         builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_ops_icc_tenant_id");
         builder.HasIndex(x => new { x.IncidentId, x.ChangeId })

@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
     <ProjectReference Include="..\..\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Application\NexTraceOne.Catalog.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

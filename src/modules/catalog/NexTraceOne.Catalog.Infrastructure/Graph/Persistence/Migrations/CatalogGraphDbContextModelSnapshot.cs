@@ -463,7 +463,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_cat_service_assets_lifecycle_status", "\"LifecycleStatus\" IN ('Planning', 'Development', 'Staging', 'Active', 'Deprecating', 'Deprecated', 'Retired')");
 
-                            t.HasCheckConstraint("CK_cat_service_assets_service_type", "\"ServiceType\" IN ('RestApi', 'GraphqlApi', 'GrpcService', 'KafkaProducer', 'KafkaConsumer', 'BackgroundService', 'LegacySystem', 'Gateway', 'ThirdParty')");
+                            t.HasCheckConstraint("CK_cat_service_assets_service_type", "\"ServiceType\" IN ('RestApi', 'SoapService', 'KafkaProducer', 'KafkaConsumer', 'BackgroundService', 'ScheduledProcess', 'IntegrationComponent', 'SharedPlatformService', 'GraphqlApi', 'GrpcService', 'LegacySystem', 'Gateway', 'ThirdParty', 'CobolProgram', 'CicsTransaction', 'ImsTransaction', 'BatchJob', 'MainframeSystem', 'MqQueueManager', 'ZosConnectApi')");
                         });
                 });
 

@@ -103,7 +103,30 @@ Relatórios de execução das fases P1–P12. Ver `docs/architecture/p*.md` e `d
 
 ---
 
-## 5. Observabilidade (docs/observability/)
+## 5. Legacy / Mainframe — Ondas de Desenvolvimento (docs/legacy/)
+
+Plano de desenvolvimento para suporte completo a core systems legacy/mainframe.
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`LEGACY-MAINFRAME-WAVES.md`](LEGACY-MAINFRAME-WAVES.md) | **Documento mestre** — visão geral das 13 ondas |
+| [`legacy/WAVE-00-STRATEGY.md`](legacy/WAVE-00-STRATEGY.md) | Onda 0 — Estratégia e baseline (enums, feature flags) |
+| [`legacy/WAVE-01-CATALOG-FOUNDATION.md`](legacy/WAVE-01-CATALOG-FOUNDATION.md) | Onda 1 — Foundation de domínio e catálogo legacy |
+| [`legacy/WAVE-02-TELEMETRY-INGESTION.md`](legacy/WAVE-02-TELEMETRY-INGESTION.md) | Onda 2 — Ingestão de telemetria legacy |
+| [`legacy/WAVE-03-NORMALIZATION-CORRELATION.md`](legacy/WAVE-03-NORMALIZATION-CORRELATION.md) | Onda 3 — Normalização e correlação |
+| [`legacy/WAVE-04-CONTRACT-GOVERNANCE.md`](legacy/WAVE-04-CONTRACT-GOVERNANCE.md) | Onda 4 — Legacy contract governance |
+| [`legacy/WAVE-05-HYBRID-GRAPH.md`](legacy/WAVE-05-HYBRID-GRAPH.md) | Onda 5 — Hybrid dependency graph |
+| [`legacy/WAVE-06-CHANGE-INTELLIGENCE.md`](legacy/WAVE-06-CHANGE-INTELLIGENCE.md) | Onda 6 — Core change intelligence legacy |
+| [`legacy/WAVE-07-BATCH-INTELLIGENCE.md`](legacy/WAVE-07-BATCH-INTELLIGENCE.md) | Onda 7 — Batch intelligence |
+| [`legacy/WAVE-08-MESSAGING-INTELLIGENCE.md`](legacy/WAVE-08-MESSAGING-INTELLIGENCE.md) | Onda 8 — Messaging intelligence (IBM MQ) |
+| [`legacy/WAVE-09-AI-ASSISTIVE.md`](legacy/WAVE-09-AI-ASSISTIVE.md) | Onda 9 — IA assistiva para legacy |
+| [`legacy/WAVE-10-WORKFLOW-POLICIES.md`](legacy/WAVE-10-WORKFLOW-POLICIES.md) | Onda 10 — Workflow, aprovação e políticas |
+| [`legacy/WAVE-11-FRONTEND-ENTERPRISE.md`](legacy/WAVE-11-FRONTEND-ENTERPRISE.md) | Onda 11 — Frontend enterprise (polish) |
+| [`legacy/WAVE-12-SECURITY-READINESS.md`](legacy/WAVE-12-SECURITY-READINESS.md) | Onda 12 — Segurança, readiness e operação |
+
+---
+
+## 6. Observabilidade (docs/observability/)
 
 Documentação da stack de observabilidade activa do NexTraceOne.
 Ver [`observability/`](observability/) para providers, collectors e configuração.
@@ -115,7 +138,7 @@ Ver [`observability/`](observability/) para providers, collectors e configuraç�
 
 ---
 
-## 6. Documentação Arquivada (docs/archive/)
+## 7. Documentação Arquivada (docs/archive/)
 
 | Directório | Conteúdo | Motivo |
 |-----------|---------|--------|
@@ -128,7 +151,7 @@ Ver [`observability/`](observability/) para providers, collectors e configuraç�
 
 ---
 
-## 7. Tecnologias Removidas / Não Usadas
+## 8. Tecnologias Removidas / Não Usadas
 
 As seguintes tecnologias foram consideradas e explicitamente **não adoptadas**:
 

@@ -70,6 +70,100 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.ToTable("ops_inc_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.IncidentChangeCorrelation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ChangeDescription")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ChangeEnvironment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("ChangeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ChangeOccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ConfidenceLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CorrelatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("IncidentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("LegacyAssetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("legacy_asset_id");
+
+                    b.Property<string>("LegacyAssetName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("legacy_asset_name");
+
+                    b.Property<string>("LegacyAssetType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("legacy_asset_type");
+
+                    b.Property<int>("MatchType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<int>("TimeWindowHours")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IncidentId")
+                        .HasDatabaseName("ix_ops_icc_incident_id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_ops_icc_tenant_id");
+
+                    b.HasIndex("IncidentId", "ChangeId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_ops_icc_incident_change_unique");
+
+                    b.ToTable("ops_incident_change_correlations", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.IncidentRecord", b =>
                 {
                     b.Property<Guid>("Id")

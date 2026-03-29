@@ -22,5 +22,19 @@ public enum ContractType
     BackgroundService = 3,
 
     /// <summary>Schema canónico partilhado entre serviços.</summary>
-    SharedSchema = 4
+    SharedSchema = 4,
+
+    // ── Novos tipos para contratos legacy / mainframe ──
+
+    /// <summary>Contrato de copybook COBOL — layout de dados estruturado.</summary>
+    Copybook = 5,
+
+    /// <summary>Contrato de mensagem MQ — descriptor e payload format.</summary>
+    MqMessage = 6,
+
+    /// <summary>Layout de registo fixo — ficheiro ou mensagem com posições fixas.</summary>
+    FixedLayout = 7,
+
+    /// <summary>CICS COMMAREA — área de comunicação para transações CICS.</summary>
+    CicsCommarea = 8
 }

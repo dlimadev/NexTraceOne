@@ -10,6 +10,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.EventHandlers;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 
@@ -42,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<IMitigationValidationRepository, EfMitigationValidationRepository>();
         services.AddScoped<IChangeIntelligenceReader, EfChangeIntelligenceReader>();
         services.AddScoped<IIntegrationEventHandler<DeploymentEventReceivedEvent>, DeploymentEventReceivedHandler>();
+        services.AddScoped<ILegacyEventCorrelator, LegacyEventCorrelator>();
 
         return services;
     }

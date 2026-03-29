@@ -7,6 +7,8 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
+using NexTraceOne.Integrations.Infrastructure.LegacyTelemetry;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
 
@@ -40,6 +42,11 @@ public static class DependencyInjection
         // Repositories — P2.2
         services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
         services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
+
+        // Legacy Telemetry — ClickHouse writer
+        services.Configure<ClickHouseLegacyWriterOptions>(
+            configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
+        services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>();
 
         return services;
     }

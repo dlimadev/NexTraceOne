@@ -28,5 +28,45 @@ public enum ServiceType
     IntegrationComponent = 6,
 
     /// <summary>Serviço de plataforma partilhado (shared infra, auth, config).</summary>
-    SharedPlatformService = 7
+    SharedPlatformService = 7,
+
+    // ── Valores já no DB constraint mas anteriormente ausentes no enum ──
+
+    /// <summary>API GraphQL.</summary>
+    GraphqlApi = 8,
+
+    /// <summary>Serviço gRPC.</summary>
+    GrpcService = 9,
+
+    /// <summary>Sistema legado genérico (não mainframe).</summary>
+    LegacySystem = 10,
+
+    /// <summary>API Gateway (Kong, Apigee, etc.).</summary>
+    Gateway = 11,
+
+    /// <summary>Serviço de terceiros (externo à organização).</summary>
+    ThirdParty = 12,
+
+    // ── Novos valores para core systems / mainframe ──
+
+    /// <summary>Programa COBOL — unidade de execução mainframe.</summary>
+    CobolProgram = 13,
+
+    /// <summary>Transação CICS — processamento online mainframe.</summary>
+    CicsTransaction = 14,
+
+    /// <summary>Transação IMS — processamento IMS/DB mainframe.</summary>
+    ImsTransaction = 15,
+
+    /// <summary>Batch Job — execução batch (JCL, scheduling).</summary>
+    BatchJob = 16,
+
+    /// <summary>Sistema mainframe (LPAR, sysplex, região).</summary>
+    MainframeSystem = 17,
+
+    /// <summary>Queue Manager IBM MQ — gestor de filas de mensagens.</summary>
+    MqQueueManager = 18,
+
+    /// <summary>API z/OS Connect — exposição de transações mainframe via REST.</summary>
+    ZosConnectApi = 19
 }

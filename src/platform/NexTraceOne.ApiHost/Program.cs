@@ -25,6 +25,7 @@ using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
 using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Catalog.API.Contracts.Endpoints;
 using NexTraceOne.Catalog.API.Graph.Endpoints;
+using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
 using NexTraceOne.Catalog.API.Portal.Endpoints;
 using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
 using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
@@ -69,6 +70,7 @@ builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IP
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddCatalogGraphModule(builder.Configuration);
+builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
 builder.Services.AddContractsModule(builder.Configuration);
 builder.Services.AddChangeIntelligenceModule(builder.Configuration);
 builder.Services.AddRulesetGovernanceModule(builder.Configuration);
