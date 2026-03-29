@@ -43,7 +43,7 @@ public sealed class RefreshTokenTests
         responseBuilder.ResolveMembershipAsync(user.Id, Arg.Any<CancellationToken>()).Returns(membership);
         roleRepository.GetByIdAsync(membership.RoleId, Arg.Any<CancellationToken>()).Returns(role);
         jwtTokenGenerator.GenerateRefreshToken().Returns("new-refresh-token");
-        responseBuilder.CreateLoginResponse(user, membership, role, "new-refresh-token")
+        responseBuilder.CreateLoginResponseAsync(user, membership, role, "new-refresh-token", Arg.Any<CancellationToken>())
             .Returns(new LocalLoginFeature.LoginResponse("new-access-token", "new-refresh-token", 3600,
                 new LocalLoginFeature.UserResponse(user.Id.Value, "alice@example.com", "Alice Doe", membership.TenantId.Value, Role.PlatformAdmin, [])));
 

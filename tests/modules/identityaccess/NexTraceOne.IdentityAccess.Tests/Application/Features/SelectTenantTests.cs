@@ -42,7 +42,9 @@ public sealed class SelectTenantTests
         jwtGenerator.GenerateAccessToken(user, membership, Arg.Any<IReadOnlyCollection<string>>()).Returns("new-access-token");
         jwtGenerator.AccessTokenLifetimeSeconds.Returns(3600);
 
-        var handler = new SelectTenant.Handler(currentUser, userRepo, membershipRepo, tenantRepo, roleRepo, jwtGenerator);
+        var permissionResolver = Substitute.For<IPermissionResolver>();
+
+        var handler = new SelectTenant.Handler(currentUser, userRepo, membershipRepo, tenantRepo, roleRepo, jwtGenerator, permissionResolver);
         var result = await handler.Handle(new SelectTenant.Command(tenant.Id.Value), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -71,7 +73,8 @@ public sealed class SelectTenantTests
             Substitute.For<ITenantMembershipRepository>(),
             tenantRepo,
             Substitute.For<IRoleRepository>(),
-            Substitute.For<IJwtTokenGenerator>());
+            Substitute.For<IJwtTokenGenerator>(),
+            Substitute.For<IPermissionResolver>());
 
         var result = await handler.Handle(new SelectTenant.Command(Guid.NewGuid()), CancellationToken.None);
 
@@ -91,7 +94,8 @@ public sealed class SelectTenantTests
             Substitute.For<ITenantMembershipRepository>(),
             Substitute.For<ITenantRepository>(),
             Substitute.For<IRoleRepository>(),
-            Substitute.For<IJwtTokenGenerator>());
+            Substitute.For<IJwtTokenGenerator>(),
+            Substitute.For<IPermissionResolver>());
 
         var result = await handler.Handle(new SelectTenant.Command(Guid.NewGuid()), CancellationToken.None);
 
@@ -122,7 +126,8 @@ public sealed class SelectTenantTests
         var handler = new SelectTenant.Handler(
             currentUser, userRepo, membershipRepo, tenantRepo,
             Substitute.For<IRoleRepository>(),
-            Substitute.For<IJwtTokenGenerator>());
+            Substitute.For<IJwtTokenGenerator>(),
+            Substitute.For<IPermissionResolver>());
 
         var result = await handler.Handle(new SelectTenant.Command(tenant.Id.Value), CancellationToken.None);
 

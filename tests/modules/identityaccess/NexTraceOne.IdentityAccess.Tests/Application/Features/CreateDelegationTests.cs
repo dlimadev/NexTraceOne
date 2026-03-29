@@ -39,7 +39,8 @@ public sealed class CreateDelegationTests
             securityEventTracker,
             currentUser,
             new TestCurrentTenant(tenantId),
-            new TestDateTimeProvider(Now));
+            new TestDateTimeProvider(Now),
+            Substitute.For<IPermissionResolver>());
 
         var result = await sut.Handle(
             new CreateDelegationFeature.Command(
@@ -76,7 +77,8 @@ public sealed class CreateDelegationTests
             Substitute.For<ISecurityEventTracker>(),
             currentUser,
             new TestCurrentTenant(tenantId),
-            new TestDateTimeProvider(Now));
+            new TestDateTimeProvider(Now),
+            Substitute.For<IPermissionResolver>());
 
         var result = await sut.Handle(
             new CreateDelegationFeature.Command(
@@ -127,7 +129,8 @@ public sealed class CreateDelegationTests
             securityEventTracker,
             currentUser,
             new TestCurrentTenant(tenantId),
-            new TestDateTimeProvider(Now));
+            new TestDateTimeProvider(Now),
+            Substitute.For<IPermissionResolver>());
 
         var techLeadPermissions = Role.GetPermissionsForRole(Role.TechLead);
         var allowedPermission = techLeadPermissions.First(p =>
