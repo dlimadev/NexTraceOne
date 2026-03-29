@@ -53,6 +53,27 @@ public sealed class IncidentChangeCorrelation : AuditableEntity<IncidentChangeCo
     /// <summary>Data/hora UTC em que a mudança ocorreu.</summary>
     public DateTimeOffset ChangeOccurredAt { get; private set; }
 
+    // ── Legacy asset metadata (para correlações com ativos mainframe/legacy) ──
+
+    /// <summary>Tipo do ativo legacy correlacionado (e.g. BatchJob, MqQueue).</summary>
+    public string? LegacyAssetType { get; private set; }
+
+    /// <summary>Nome do ativo legacy correlacionado.</summary>
+    public string? LegacyAssetName { get; private set; }
+
+    /// <summary>Identificador do ativo legacy no catálogo, quando disponível.</summary>
+    public Guid? LegacyAssetId { get; private set; }
+
+    /// <summary>
+    /// Define informações do ativo legacy correlacionado.
+    /// </summary>
+    public void SetLegacyAsset(string assetType, string assetName, Guid? assetId)
+    {
+        LegacyAssetType = assetType;
+        LegacyAssetName = assetName;
+        LegacyAssetId = assetId;
+    }
+
     /// <summary>
     /// Cria uma nova correlação entre incidente e mudança.
     /// </summary>

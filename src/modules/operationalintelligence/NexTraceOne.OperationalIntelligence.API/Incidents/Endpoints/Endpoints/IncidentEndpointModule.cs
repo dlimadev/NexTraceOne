@@ -15,6 +15,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetInci
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentMitigation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentSummary;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetUnifiedTimeline;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
@@ -93,6 +94,28 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:read")
         .WithName("GetIncidentSummary")
         .WithSummary("Get aggregated incident summary");
+
+        // ── GET /api/v1/incidents/timeline — Timeline unificada ──
+        group.MapGet("/timeline", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string? serviceName,
+            string? systemName,
+            string? environment,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            int page = 1,
+            int pageSize = 50,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new GetUnifiedTimeline.Query(
+                serviceName, systemName, environment, from, to, pageSize, page);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("GetUnifiedTimeline")
+        .WithSummary("Get unified timeline of incidents and legacy events");
 
         // ── GET /api/v1/incidents/{incidentId} — Detalhe do incidente ──
         group.MapGet("/{incidentId}", async (
