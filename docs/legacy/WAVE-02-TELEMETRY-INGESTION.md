@@ -340,21 +340,21 @@ service:
 
 ## Stories
 
-| ID | Story | Prioridade |
-|---|---|---|
-| W2-S01 | Criar endpoint `POST /api/v1/batch/events` | P1 |
-| W2-S02 | Criar endpoint `POST /api/v1/mq/events` | P1 |
-| W2-S03 | Criar endpoint `POST /api/v1/mainframe/events` | P1 |
-| W2-S04 | Implementar `BatchEventParser` com normalização | P1 |
-| W2-S05 | Implementar `MqEventParser` com normalização | P1 |
-| W2-S06 | Implementar `MainframeEventParser` com normalização | P1 |
-| W2-S07 | Criar modelo canónico `NormalizedLegacyEvent` | P0 |
-| W2-S08 | Criar tabelas ClickHouse (`mf_operational_events`, `mf_cics_statistics`) | P1 |
-| W2-S09 | Implementar ClickHouse writer para eventos legacy | P1 |
-| W2-S10 | Criar `SmfRecordParser` básico (JSON input) | P2 |
-| W2-S11 | Criar `SyslogParser` básico | P2 |
-| W2-S12 | Criar templates OTel Collector (Z CDP, filelog) | P2 |
-| W2-S13 | Documentar formatos esperados de input | P1 |
-| W2-S14 | Extensão da Integration Hub com status legacy | P2 |
-| W2-S15 | Criar testes unitários (~60) | P1 |
-| W2-S16 | Criar testes de integração (~15) | P2 |
+| ID | Story | Prioridade | Estado |
+|---|---|---|---|
+| W2-S01 | Criar endpoint `POST /api/v1/ingestion/legacy/batch/events` | P1 | ✅ Implementado |
+| W2-S02 | Criar endpoint `POST /api/v1/ingestion/legacy/mq/events` | P1 | ✅ Implementado |
+| W2-S03 | Criar endpoint `POST /api/v1/ingestion/legacy/mainframe/events` | P1 | ✅ Implementado |
+| W2-S04 | Implementar `BatchEventParser` com normalização | P1 | ✅ Implementado |
+| W2-S05 | Implementar `MqEventParser` com normalização | P1 | ✅ Implementado |
+| W2-S06 | Implementar `MainframeEventParser` com normalização | P1 | ✅ Implementado |
+| W2-S07 | Criar modelo canónico `NormalizedLegacyEvent` | P0 | ✅ Implementado |
+| W2-S08 | Criar tabelas ClickHouse (`mf_operational_events`, `mf_cics_statistics`, `mf_ims_statistics`) | P1 | ✅ Implementado |
+| W2-S09 | Implementar ClickHouse writer para eventos legacy | P1 | ✅ Implementado |
+| W2-S10 | Criar `SmfRecordParser` básico (JSON input) | P2 | ✅ Implementado |
+| W2-S11 | Criar `SyslogParser` básico | P2 | ✅ Implementado |
+| W2-S12 | Criar templates OTel Collector (Z CDP, filelog) | P2 | ⏳ Pendente |
+| W2-S13 | Documentar formatos esperados de input | P1 | ✅ Implementado (WAVE-02-INPUT-FORMATS.md) |
+| W2-S14 | Extensão da Integration Hub com status legacy | P2 | ⏳ Pendente (frontend) |
+| W2-S15 | Criar testes unitários (~60) | P1 | ✅ Implementado (91 testes) |
+| W2-S16 | Criar testes de integração (~15) | P2 | ⏳ Pendente |
