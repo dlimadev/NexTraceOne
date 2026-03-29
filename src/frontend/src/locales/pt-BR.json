@@ -48,7 +48,13 @@
     "demoBanner": {
       "title": "Dados de Demonstração",
       "description": "Os dados exibidos nesta página são simulados para fins de demonstração. Dados reais estarão disponíveis quando a integração subjacente estiver completa."
-    }
+    },
+    "confirmAction": "Confirmar ação",
+    "confirmDelete": "Confirmar exclusão",
+    "confirmDeleteDescription": "Esta ação não pode ser desfeita. Tem certeza de que deseja continuar?",
+    "successSaved": "Alterações salvas com sucesso",
+    "successCreated": "Criado com sucesso",
+    "successDeleted": "Excluído com sucesso"
   },
   "auth": {
     "signIn": "Entrar na sua conta",
@@ -1636,7 +1642,8 @@
     "sensitivityMedium": "Média",
     "statusInactive": "Inativo",
     "tokens": "Tokens",
-    "totalModels": "Total de Modelos"
+    "totalModels": "Total de Modelos",
+    "filterByStatus": "Filtrar por status"
   },
   "governance": {
     "policies": {
@@ -4602,6 +4609,7 @@
       "CodeReview": "Revisão de Código",
       "Security": "Segurança",
       "Operations": "Operações"
-    }
+    },
+    "createSuccess": "Agente criado com sucesso"
   }
 }

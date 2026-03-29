@@ -18,7 +18,7 @@ import { Button } from '../../../components/Button';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { Loader } from '../../../components/Loader';
+import { CardListSkeleton } from '../../../components/CardListSkeleton';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { aiGovernanceApi } from '../api';
@@ -149,14 +149,16 @@ export function ModelRegistryPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t('aiHub.searchModels')}
+            aria-label={t('aiHub.searchModels')}
             className="w-full bg-elevated border border-edge rounded-lg pl-9 pr-4 py-2 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" role="group" aria-label={t('aiHub.filterByStatus')}>
           {statusFilters.map(f => (
             <button
               key={f}
               onClick={() => setStatusFilter(f)}
+              aria-pressed={statusFilter === f}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 statusFilter === f
                   ? 'bg-accent text-heading'
@@ -171,11 +173,7 @@ export function ModelRegistryPage() {
 
       {/* Model list */}
       {isLoading && (
-        <Card>
-          <CardBody className="flex justify-center py-16">
-            <Loader size="lg" />
-          </CardBody>
-        </Card>
+        <CardListSkeleton count={4} showStats statsCount={4} />
       )}
 
       {isError && (

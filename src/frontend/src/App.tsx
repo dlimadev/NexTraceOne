@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { PersonaProvider } from './contexts/PersonaContext';
+import { ToastProvider } from './components/Toast';
 import { AppShell } from './components/shell/AppShell';
 
 // Eager imports — critical for fast first paint
@@ -46,6 +47,7 @@ export default function App() {
       <AuthProvider>
         <EnvironmentProvider>
           <PersonaProvider>
+            <ToastProvider>
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
@@ -78,6 +80,7 @@ export default function App() {
                 </Routes>
               </Suspense>
             </BrowserRouter>
+            </ToastProvider>
           </PersonaProvider>
         </EnvironmentProvider>
       </AuthProvider>

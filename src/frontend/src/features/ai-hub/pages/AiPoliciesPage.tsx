@@ -9,7 +9,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { Loader } from '../../../components/Loader';
+import { CardListSkeleton } from '../../../components/CardListSkeleton';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { Button } from '../../../components/Button';
 import { aiGovernanceApi } from '../api';
@@ -115,14 +115,16 @@ export function AiPoliciesPage() {
             placeholder={t('aiHub.searchPolicies')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label={t('aiHub.searchPolicies')}
             className="w-full pl-9 pr-3 py-2 rounded-md bg-surface border border-edge text-body text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5" role="group" aria-label={t('aiHub.filterByStatus')}>
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
+              aria-pressed={filter === f.key}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filter === f.key ? 'bg-accent text-heading' : 'bg-elevated text-muted hover:text-body'}`}
             >
               {f.label}
@@ -134,11 +136,7 @@ export function AiPoliciesPage() {
       {/* Policy list */}
       <div className="space-y-3">
         {isLoading && (
-          <Card>
-            <CardBody className="flex justify-center py-16">
-              <Loader size="lg" />
-            </CardBody>
-          </Card>
+          <CardListSkeleton count={3} showStats statsCount={4} />
         )}
 
         {isError && (

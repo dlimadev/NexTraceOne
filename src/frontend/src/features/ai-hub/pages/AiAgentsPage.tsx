@@ -23,6 +23,8 @@ import {
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageContainer } from '../../../components/shell';
+import { CardListSkeleton } from '../../../components/CardListSkeleton';
+import { useToast } from '../../../components/Toast';
 import { aiGovernanceApi } from '../api/aiGovernance';
 
 // ── Types ───────────────────────────────────────────────────────────────
@@ -473,6 +475,7 @@ function statusVariant(status: string): 'success' | 'warning' | 'default' | 'inf
 export function AiAgentsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { toastSuccess } = useToast();
 
   const [agents, setAgents] = useState<AgentListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -541,14 +544,16 @@ export function AiAgentsPage() {
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder={t('agents.searchPlaceholder')}
+              aria-label={t('agents.searchPlaceholder')}
               className="w-full pl-9 pr-3 py-2 rounded-md border border-edge bg-elevated text-sm text-body placeholder-muted focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
-          <div className="flex items-center gap-1 rounded-md border border-edge bg-elevated p-0.5">
+          <div className="flex items-center gap-1 rounded-md border border-edge bg-elevated p-0.5" role="group" aria-label={t('aiHub.filterByStatus')}>
             {(['all', 'official', 'custom'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
+                aria-pressed={filter === f}
                 className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
                   filter === f ? 'bg-accent text-white' : 'text-muted hover:text-body'
                 }`}
@@ -561,9 +566,7 @@ export function AiAgentsPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 size={24} className="animate-spin text-muted" />
-          </div>
+          <CardListSkeleton count={4} showStats={false} />
         )}
 
         {/* Error */}
@@ -639,7 +642,7 @@ export function AiAgentsPage() {
       <CreateAgentDialog
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onCreated={loadAgents}
+        onCreated={() => { loadAgents(); toastSuccess(t('agents.createSuccess')); }}
       />
       <ExecuteAgentDialog
         isOpen={!!executeAgent}

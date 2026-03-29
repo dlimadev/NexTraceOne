@@ -9,7 +9,7 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
-import { Loader } from '../../../components/Loader';
+import { CardListSkeleton } from '../../../components/CardListSkeleton';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { Button } from '../../../components/Button';
@@ -157,10 +157,11 @@ export function AiAuditPage() {
             placeholder={t('aiHub.searchAudit')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label={t('aiHub.searchAudit')}
             className="w-full pl-9 pr-3 py-2 rounded-md bg-surface border border-edge text-body text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5" role="group" aria-label={t('aiHub.filterByStatus')}>
           {resultFilters.map((f) => (
             <button
               key={f.key}
@@ -175,11 +176,7 @@ export function AiAuditPage() {
 
       {/* Audit table */}
       {isLoading && (
-        <Card>
-          <CardBody className="flex justify-center py-16">
-            <Loader size="lg" />
-          </CardBody>
-        </Card>
+        <CardListSkeleton count={5} showStats={false} />
       )}
 
       {isError && (

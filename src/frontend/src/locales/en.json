@@ -48,7 +48,13 @@
     "demoBanner": {
       "title": "Demo Data",
       "description": "The data shown on this page is simulated for demonstration purposes. Real data will be available when the underlying integration is complete."
-    }
+    },
+    "confirmAction": "Confirm action",
+    "confirmDelete": "Confirm deletion",
+    "confirmDeleteDescription": "This action cannot be undone. Are you sure you want to proceed?",
+    "successSaved": "Changes saved successfully",
+    "successCreated": "Created successfully",
+    "successDeleted": "Deleted successfully"
   },
   "auth": {
     "signIn": "Sign in to your account",
@@ -2257,7 +2263,8 @@
       "CodeReview": "Code Review",
       "Security": "Security",
       "Operations": "Operations"
-    }
+    },
+    "createSuccess": "Agent created successfully"
   },
   "aiHub": {
     "conversations": "Conversations",
@@ -2458,7 +2465,8 @@
     "sensitivityMedium": "Medium",
     "statusInactive": "Inactive",
     "tokens": "Tokens",
-    "totalModels": "Total Models"
+    "totalModels": "Total Models",
+    "filterByStatus": "Filter by status"
   },
   "governance": {
     "policies": {
