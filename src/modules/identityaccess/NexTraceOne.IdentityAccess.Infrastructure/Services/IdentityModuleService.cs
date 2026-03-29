@@ -9,11 +9,13 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Services;
 /// Implementação do contrato público IIdentityModule.
 /// Serve como ponto de acesso para outros módulos consultarem dados de identidade
 /// sem acoplar diretamente ao DbContext ou repositórios internos.
+/// Utiliza IPermissionResolver para resolução DB-first com fallback estático.
 /// </summary>
 internal sealed class IdentityModuleService(
     IUserRepository userRepository,
     ITenantMembershipRepository membershipRepository,
-    IRoleRepository roleRepository) : IIdentityModule
+    IRoleRepository roleRepository,
+    IPermissionResolver permissionResolver) : IIdentityModule
 {
     /// <inheritdoc />
     public async Task<UserSummaryDto?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
@@ -38,7 +40,13 @@ internal sealed class IdentityModuleService(
         }
 
         var role = await roleRepository.GetByIdAsync(membership.RoleId, cancellationToken);
-        return role is null ? [] : Role.GetPermissionsForRole(role.Name);
+        if (role is null)
+        {
+            return [];
+        }
+
+        return await permissionResolver.ResolvePermissionsAsync(
+            role.Id, role.Name, tenantId: null, cancellationToken);
     }
 
     /// <inheritdoc />

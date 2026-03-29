@@ -121,6 +121,10 @@ public sealed class CreateDelegationTests
         var currentUser = Substitute.For<ICurrentUser>();
         currentUser.Id.Returns(grantorId.ToString());
 
+        var permissionResolver = Substitute.For<IPermissionResolver>();
+        permissionResolver.ResolvePermissionsAsync(roleId, role.Name, TenantId.From(tenantId), Arg.Any<CancellationToken>())
+            .Returns(RolePermissionCatalog.GetPermissionsForRole(role.Name));
+
         var sut = new CreateDelegationFeature.Handler(
             delegationRepo,
             membershipRepo,
@@ -130,7 +134,7 @@ public sealed class CreateDelegationTests
             currentUser,
             new TestCurrentTenant(tenantId),
             new TestDateTimeProvider(Now),
-            Substitute.For<IPermissionResolver>());
+            permissionResolver);
 
         var techLeadPermissions = Role.GetPermissionsForRole(Role.TechLead);
         var allowedPermission = techLeadPermissions.First(p =>

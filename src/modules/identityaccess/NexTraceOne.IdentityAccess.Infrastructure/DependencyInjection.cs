@@ -88,6 +88,9 @@ public static class DependencyInjection
         // Escopo por requisição — acumula eventos durante a execução do handler.
         services.AddScoped<ISecurityEventTracker, SecurityEventTracker>();
 
+        // Resolução de permissões DB-first com fallback estático
+        services.AddScoped<IPermissionResolver, PermissionResolver>();
+
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
 

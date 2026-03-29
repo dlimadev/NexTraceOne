@@ -51,7 +51,8 @@ public static class SelectTenant
         ITenantMembershipRepository membershipRepository,
         ITenantRepository tenantRepository,
         IRoleRepository roleRepository,
-        IJwtTokenGenerator jwtTokenGenerator) : ICommandHandler<Command, Response>
+        IJwtTokenGenerator jwtTokenGenerator,
+        IPermissionResolver permissionResolver) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -81,7 +82,8 @@ public static class SelectTenant
             if (role is null)
                 return IdentityErrors.RoleNotFound(membership.RoleId.Value);
 
-            var permissions = Role.GetPermissionsForRole(role.Name);
+            var permissions = await permissionResolver.ResolvePermissionsAsync(
+                role.Id, role.Name, tenantId, cancellationToken);
             var accessToken = jwtTokenGenerator.GenerateAccessToken(user, membership, permissions);
 
             return new Response(

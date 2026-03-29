@@ -36,12 +36,15 @@ public sealed class GetCurrentUserTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var responseBuilder = Substitute.For<ILoginResponseBuilder>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
 
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         responseBuilder.ResolveMembershipAsync(user.Id, Arg.Any<CancellationToken>()).Returns(membership);
         roleRepository.GetByIdAsync(roleId, Arg.Any<CancellationToken>()).Returns(role);
+        permissionResolver.ResolvePermissionsAsync(roleId, role.Name, tenantId, Arg.Any<CancellationToken>())
+            .Returns(RolePermissionCatalog.GetPermissionsForRole(role.Name));
 
-        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder);
+        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder, permissionResolver);
 
         var result = await sut.Handle(new GetCurrentUserFeature.Query(), CancellationToken.None);
 
@@ -66,11 +69,12 @@ public sealed class GetCurrentUserTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var responseBuilder = Substitute.For<ILoginResponseBuilder>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
 
         userRepository.GetByIdAsync(UserId.From(userId), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
-        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder);
+        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder, permissionResolver);
 
         var result = await sut.Handle(new GetCurrentUserFeature.Query(), CancellationToken.None);
 
@@ -87,8 +91,9 @@ public sealed class GetCurrentUserTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var responseBuilder = Substitute.For<ILoginResponseBuilder>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
 
-        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder);
+        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder, permissionResolver);
 
         var result = await sut.Handle(new GetCurrentUserFeature.Query(), CancellationToken.None);
 
@@ -111,12 +116,13 @@ public sealed class GetCurrentUserTests
         var userRepository = Substitute.For<IUserRepository>();
         var roleRepository = Substitute.For<IRoleRepository>();
         var responseBuilder = Substitute.For<ILoginResponseBuilder>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
 
         userRepository.GetByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         responseBuilder.ResolveMembershipAsync(user.Id, Arg.Any<CancellationToken>())
             .Returns((TenantMembership?)null);
 
-        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder);
+        var sut = new GetCurrentUserFeature.Handler(currentUser, userRepository, roleRepository, responseBuilder, permissionResolver);
 
         var result = await sut.Handle(new GetCurrentUserFeature.Query(), CancellationToken.None);
 

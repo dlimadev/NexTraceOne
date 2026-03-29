@@ -21,8 +21,9 @@ public sealed class LoginResponseBuilderTests
         var membership = TenantMembership.Create(userId, tenantId, RoleId.New(), now);
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
         var currentTenant = new TestCurrentTenant(tenantId.Value);
-        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator);
+        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator, permissionResolver);
 
         membershipRepository.GetByUserAndTenantAsync(userId, tenantId, Arg.Any<CancellationToken>()).Returns(membership);
 
@@ -39,8 +40,9 @@ public sealed class LoginResponseBuilderTests
         var membership = TenantMembership.Create(userId, TenantId.From(Guid.NewGuid()), RoleId.New(), now);
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
         var currentTenant = new TestCurrentTenant(Guid.Empty);
-        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator);
+        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator, permissionResolver);
 
         membershipRepository.ListByUserAsync(userId, Arg.Any<CancellationToken>()).Returns([membership]);
 
@@ -55,8 +57,9 @@ public sealed class LoginResponseBuilderTests
         var userId = UserId.New();
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
         var currentTenant = new TestCurrentTenant(Guid.Empty);
-        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator);
+        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator, permissionResolver);
 
         membershipRepository.ListByUserAsync(userId, Arg.Any<CancellationToken>()).Returns([]);
 
@@ -66,7 +69,7 @@ public sealed class LoginResponseBuilderTests
     }
 
     [Fact]
-    public void CreateLoginResponse_Should_ReturnCompleteResponse()
+    public async Task CreateLoginResponseAsync_Should_ReturnCompleteResponse()
     {
         var now = new DateTimeOffset(2025, 03, 12, 10, 0, 0, TimeSpan.Zero);
         var user = User.CreateLocal(Email.Create("alice@example.com"), FullName.Create("Alice", "Doe"), HashedPassword.FromPlainText("P@ssw0rd123"));
@@ -74,13 +77,17 @@ public sealed class LoginResponseBuilderTests
         var role = Role.CreateSystem(membership.RoleId, Role.PlatformAdmin, "Admin");
         var membershipRepository = Substitute.For<ITenantMembershipRepository>();
         var jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
+        var permissionResolver = Substitute.For<IPermissionResolver>();
         var currentTenant = new TestCurrentTenant(membership.TenantId.Value);
-        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator);
+        var sut = new LoginResponseBuilder(currentTenant, membershipRepository, jwtTokenGenerator, permissionResolver);
 
+        var expectedPermissions = RolePermissionCatalog.GetPermissionsForRole(role.Name);
+        permissionResolver.ResolvePermissionsAsync(role.Id, role.Name, membership.TenantId, Arg.Any<CancellationToken>())
+            .Returns(expectedPermissions);
         jwtTokenGenerator.GenerateAccessToken(user, membership, Arg.Any<IReadOnlyCollection<string>>()).Returns("access-token");
         jwtTokenGenerator.AccessTokenLifetimeSeconds.Returns(3600);
 
-        var result = sut.CreateLoginResponse(user, membership, role, "refresh-token");
+        var result = await sut.CreateLoginResponseAsync(user, membership, role, "refresh-token", CancellationToken.None);
 
         result.AccessToken.Should().Be("access-token");
         result.RefreshToken.Should().Be("refresh-token");

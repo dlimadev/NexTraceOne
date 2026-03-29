@@ -98,7 +98,7 @@ public static class VerifyMfaChallenge
 
             auditRecorder.RecordMfaChallengeSuccess(membership.TenantId, user.Id, request.IpAddress, request.UserAgent);
 
-            return responseBuilder.CreateLoginResponse(user, membership, role, refreshToken);
+            return await responseBuilder.CreateLoginResponseAsync(user, membership, role, refreshToken, cancellationToken);
         }
     }
 }

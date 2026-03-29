@@ -117,7 +117,7 @@ public static class RefreshToken
             session.Rotate(RefreshTokenHash.Create(newRefreshToken), dateTimeProvider.UtcNow.AddDays(30));
             user.RegisterSuccessfulLogin(dateTimeProvider.UtcNow);
 
-            return responseBuilder.CreateLoginResponse(user, membership, role, newRefreshToken);
+            return await responseBuilder.CreateLoginResponseAsync(user, membership, role, newRefreshToken, cancellationToken);
         }
     }
 }

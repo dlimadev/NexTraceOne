@@ -22,7 +22,8 @@ public static class GetCurrentUser
         ICurrentUser currentUser,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        ILoginResponseBuilder responseBuilder) : IQueryHandler<Query, Response>
+        ILoginResponseBuilder responseBuilder,
+        IPermissionResolver permissionResolver) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -50,7 +51,8 @@ public static class GetCurrentUser
                 if (role is not null)
                 {
                     roleName = role.Name;
-                    permissions = Role.GetPermissionsForRole(role.Name);
+                    permissions = await permissionResolver.ResolvePermissionsAsync(
+                        role.Id, role.Name, membership.TenantId, cancellationToken);
                 }
             }
 

@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using ListRolesFeature = NexTraceOne.IdentityAccess.Application.Features.ListRoles.ListRoles;
 using ListPermissionsFeature = NexTraceOne.IdentityAccess.Application.Features.ListPermissions.ListPermissions;
+using SeedDefaultsFeature = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions.SeedDefaultRolePermissions;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -15,6 +16,7 @@ namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 /// Endpoints de consulta de papéis (roles) e permissões do sistema.
 /// Permitem listar os roles disponíveis e as permissões definidas,
 /// útil para interfaces de administração e atribuição de acessos.
+/// Inclui endpoint de seed para inicialização dos mapeamentos padrão.
 /// </summary>
 internal static class RolePermissionEndpoints
 {
@@ -40,5 +42,14 @@ internal static class RolePermissionEndpoints
             var result = await sender.Send(new ListPermissionsFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:permissions:read");
+
+        group.MapPost("/role-permissions/seed-defaults", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new SeedDefaultsFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
     }
 }

@@ -154,7 +154,7 @@ public static class LocalLogin
                 membership.TenantId, user.Id,
                 request.IpAddress, request.UserAgent);
 
-            return responseBuilder.CreateLoginResponse(user, membership, role, refreshToken);
+            return await responseBuilder.CreateLoginResponseAsync(user, membership, role, refreshToken, cancellationToken);
         }
 
         /// <summary>Registra evento de falha de autenticação delegando para ISecurityAuditRecorder.</summary>

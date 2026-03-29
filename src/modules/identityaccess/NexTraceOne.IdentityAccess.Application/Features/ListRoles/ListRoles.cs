@@ -16,7 +16,9 @@ public static class ListRoles
     public sealed record Query : IQuery<IReadOnlyList<RoleResponse>>;
 
     /// <summary>Handler que retorna todos os papéis pré-definidos.</summary>
-    public sealed class Handler(IRoleRepository roleRepository) : IQueryHandler<Query, IReadOnlyList<RoleResponse>>
+    public sealed class Handler(
+        IRoleRepository roleRepository,
+        IPermissionResolver permissionResolver) : IQueryHandler<Query, IReadOnlyList<RoleResponse>>
     {
         public async Task<Result<IReadOnlyList<RoleResponse>>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -24,12 +26,19 @@ public static class ListRoles
 
             var roles = await roleRepository.GetSystemRolesAsync(cancellationToken);
 
-            var result = roles.Select(r => new RoleResponse(
-                r.Id.Value,
-                r.Name,
-                r.Description,
-                r.IsSystem,
-                Role.GetPermissionsForRole(r.Name))).ToList();
+            var result = new List<RoleResponse>(roles.Count);
+            foreach (var r in roles)
+            {
+                var permissions = await permissionResolver.ResolvePermissionsAsync(
+                    r.Id, r.Name, tenantId: null, cancellationToken);
+
+                result.Add(new RoleResponse(
+                    r.Id.Value,
+                    r.Name,
+                    r.Description,
+                    r.IsSystem,
+                    permissions));
+            }
 
             return result;
         }
