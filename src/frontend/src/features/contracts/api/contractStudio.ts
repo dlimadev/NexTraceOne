@@ -236,4 +236,37 @@ export const contractStudioApi = {
       outputsJson: data.outputsJson,
       sideEffectsJson: data.sideEffectsJson,
     }).then((r) => r.data),
+
+  // ── AI Generation ─────────────────────────────────────────────────────────
+
+  /**
+   * Gera um draft de contrato assistido por IA.
+   * O backend delega ao IAiDraftGenerator e cria um ContractDraft persistido.
+   */
+  generateFromAi: (data: {
+    title: string;
+    author: string;
+    contractType: ContractType;
+    protocol: ContractProtocol;
+    prompt: string;
+    serviceId?: string;
+  }) =>
+    client.post('/contracts/drafts/ai/generate', data).then((r) => mapDraftCreationResult(r.data)),
+
+  // ── Draft Export ──────────────────────────────────────────────────────────
+
+  /**
+   * Exporta o conteúdo bruto da especificação de um draft para utilização
+   * com ferramentas externas (dotnet-openapi, NSwag, Kiota) antes da publicação.
+   */
+  exportDraft: (draftId: string) =>
+    client.get<{
+      draftId: string;
+      title: string;
+      specContent: string;
+      format: string;
+      proposedVersion: string;
+      protocol: string;
+      contractType: string;
+    }>(`/contracts/drafts/${draftId}/export`).then((r) => r.data),
 };

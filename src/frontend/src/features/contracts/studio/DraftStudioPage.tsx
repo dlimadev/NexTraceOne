@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Save,
   Send,
+  Download,
   FileText,
   Code,
   Settings,
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { contractStudioApi } from '../api/contractStudio';
+import { useDraftExport } from '../hooks/useDraftExport';
 import { PROTOCOL_COLORS, LIFECYCLE_COLORS } from '../shared/constants';
 import { cn } from '../../../lib/cn';
 import { PageContainer } from '../../../components/shell';
@@ -38,6 +40,7 @@ export function DraftStudioPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const currentActor = user?.email || user?.fullName || user?.id || 'system';
+  const { exportDraft } = useDraftExport();
 
   const [activeTab, setActiveTab] = useState<DraftTab>('spec');
   const [draftSpecContent, setDraftSpecContent] = useState<string | null>(null);
@@ -177,6 +180,15 @@ export function DraftStudioPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {draftId && specContent.trim() && (
+            <button
+              onClick={() => exportDraft(draftId)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-elevated text-muted hover:text-heading transition-colors border border-edge"
+            >
+              <Download size={12} />
+              {t('contracts.studio.exportDraft', 'Export')}
+            </button>
+          )}
           {isEditable && (
             <>
               <button

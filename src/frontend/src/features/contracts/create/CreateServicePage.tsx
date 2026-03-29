@@ -10,6 +10,7 @@ import {
   Database,
   Columns,
   Upload,
+  Sparkles,
   ArrowLeft,
   ArrowRight,
 } from 'lucide-react';
@@ -29,7 +30,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?
   SharedSchema: Database,
 };
 
-type CreationMode = 'visual' | 'import';
+type CreationMode = 'visual' | 'import' | 'ai';
 
 interface CreationModeOption {
   id: CreationMode;
@@ -41,6 +42,7 @@ interface CreationModeOption {
 const CREATION_MODES: CreationModeOption[] = [
   { id: 'visual', labelKey: 'contracts.create.modeVisual', descriptionKey: 'contracts.create.modeVisualDesc', Icon: Columns },
   { id: 'import', labelKey: 'contracts.create.modeImport', descriptionKey: 'contracts.create.modeImportDesc', Icon: Upload },
+  { id: 'ai', labelKey: 'contracts.create.modeAi', descriptionKey: 'contracts.create.modeAiDesc', Icon: Sparkles },
 ];
 
 type Step = 'type' | 'mode' | 'details';
@@ -66,6 +68,7 @@ export function CreateServicePage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [importContent, setImportContent] = useState('');
+  const [aiPrompt, setAiPrompt] = useState('');
 
   // SOAP-specific fields for import/create flows
   const [soapServiceName, setSoapServiceName] = useState('');
@@ -95,6 +98,20 @@ export function CreateServicePage() {
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!selectedType || !selectedProtocol) throw new Error('Missing required fields');
+
+      // AI Generation mode uses dedicated generateFromAi endpoint
+      if (selectedMode === 'ai') {
+        const aiDraft = await contractStudioApi.generateFromAi({
+          title,
+          author: currentActor,
+          contractType: selectedType as ContractType,
+          protocol: selectedProtocol as ContractProtocol,
+          prompt: aiPrompt,
+          serviceId: linkedServiceId || undefined,
+        });
+
+        return { draftId: aiDraft.draftId };
+      }
 
       // SOAP type uses dedicated createSoapDraft to populate SoapDraftMetadata
       if (isSoapType) {
@@ -190,7 +207,10 @@ export function CreateServicePage() {
 
   const canProceedToMode = !!selectedType;
   const canProceedToDetails = !!selectedMode;
-  const canCreate = !!title && !!selectedProtocol && (selectedMode !== 'import' || !!importContent.trim() || !!title);
+  const canCreate = !!title && !!selectedProtocol && (
+    selectedMode === 'ai' ? !!aiPrompt.trim() :
+    selectedMode !== 'import' || !!importContent.trim() || !!title
+  );
 
   return (
     <PageContainer className="max-w-4xl">
@@ -451,6 +471,25 @@ export function CreateServicePage() {
                         : t('contracts.specContentPlaceholder', 'Paste your specification here (JSON/YAML/XML)...')}
                     className="w-full text-xs font-mono bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none"
                   />
+                </div>
+              )}
+
+              {/* AI prompt (when mode is 'ai') */}
+              {selectedMode === 'ai' && (
+                <div>
+                  <label className="block text-xs font-medium text-heading mb-1">
+                    {t('contracts.create.aiPrompt', 'AI Prompt')} *
+                  </label>
+                  <textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    rows={6}
+                    placeholder={t('contracts.create.aiPromptPlaceholder', 'Describe the API you want to generate. Include endpoints, operations, data models...')}
+                    className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-none"
+                  />
+                  <p className="mt-1 text-[10px] text-muted">
+                    {t('contracts.create.aiPromptHint', 'The AI will generate a specification draft based on your description. You can refine it in the studio after creation.')}
+                  </p>
                 </div>
               )}
 

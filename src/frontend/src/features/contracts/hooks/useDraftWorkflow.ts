@@ -61,5 +61,27 @@ export function usePublishDraft() {
   });
 }
 
+/**
+ * Hook para gerar um draft de contrato assistido por IA.
+ * Chama o endpoint POST /contracts/drafts/ai/generate.
+ */
+export function useGenerateFromAi() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      title: string;
+      author: string;
+      contractType: ContractType;
+      protocol: ContractProtocol;
+      prompt: string;
+      serviceId?: string;
+    }) => contractStudioApi.generateFromAi(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: draftKeys.lists() });
+    },
+  });
+}
+
 export { draftKeys };
 export type { DraftStatus };
