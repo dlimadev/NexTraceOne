@@ -741,4 +741,4 @@ As sugestões de inovação focam em **três eixos estratégicos**:
 2. **Fechar o ciclo completo de governance** (Contract Testing, Policy as Code, Auto-docs) — ir além de documentar para validar e enforçar
 3. **IA como diferenciador contextual** (RCA, Predictive Failure, Knowledge Graph) — usar o contexto único do NexTraceOne (contracts + changes + ownership + topology) para criar IA que nenhum concorrente pode replicar
 
-A maior vantagem competitiva do NexTraceOne é a **densidade de contexto operacional**: ele sabe quem é dono de quê, quais contratos existem, quais mudanças foram feitas, e como os serviços se relacionam. Nenhum outro produto combina tudo isto. As funcionalidades sugeridas exploram exactamente esta vantagem.
+A maior vantagem competitiva do NexTraceOne é a **densidade de contexto operacional**: ele sabe quem é dono de quê, quais contratos existem, quais mudanças foram feitas, e como os serviços se relacionam. Nenhum outro produto combina tudo isto. As funcionalidades sugeridas exploram exatamente esta vantagem.
