@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Contracts.Orchestration.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Domain.Orchestration.Entities;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
@@ -150,7 +151,10 @@ public sealed class AiOrchestrationModuleTests
     }
 
     private static IAiOrchestrationModule CreateSut(AiOrchestrationDbContext db)
-        => new AiOrchestrationModule(db);
+    {
+        var governanceModule = Substitute.For<IAiGovernanceModule>();
+        return new AiOrchestrationModule(db, governanceModule);
+    }
 
     private sealed class TestCurrentTenant : ICurrentTenant
     {

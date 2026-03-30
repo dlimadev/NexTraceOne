@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.Integrations.Domain.Enums;
+using NexTraceOne.Integrations.Domain.Events;
 
 namespace NexTraceOne.Integrations.Domain.Entities;
 
@@ -13,8 +14,10 @@ public sealed record IngestionExecutionId(Guid Value) : TypedIdBase(Value);
 /// <summary>
 /// Representa uma execução de ingestão de dados.
 /// Cada vez que um conector/fonte processa dados, uma execução é criada.
+/// Aggregate Root do bounded context de Ingestão — emite domain events
+/// capturados automaticamente pelo outbox durante SaveChanges.
 /// </summary>
-public sealed class IngestionExecution : Entity<IngestionExecutionId>
+public sealed class IngestionExecution : AggregateRoot<IngestionExecutionId>
 {
     /// <summary>Conector que executou a ingestão.</summary>
     public IntegrationConnectorId ConnectorId { get; private init; } = null!;
@@ -148,6 +151,7 @@ public sealed class IngestionExecution : Entity<IngestionExecutionId>
 
     /// <summary>
     /// Marca o payload como processado com sucesso, armazenando os campos extraídos.
+    /// Emite <see cref="IngestionPayloadProcessedDomainEvent"/> para downstream modules.
     /// </summary>
     public void MarkAsProcessed(
         string? serviceName,
@@ -164,6 +168,15 @@ public sealed class IngestionExecution : Entity<IngestionExecutionId>
         ParsedChangeType = changeType;
         ParsedAt = parsedAt;
         ProcessingStatus = ProcessingStatus.Processed;
+
+        RaiseDomainEvent(new IngestionPayloadProcessedDomainEvent(
+            ExecutionId: Id.Value,
+            ServiceName: serviceName,
+            Environment: environment,
+            Version: version,
+            CommitSha: commitSha,
+            ChangeType: changeType,
+            ProcessedAt: parsedAt));
     }
 
     /// <summary>

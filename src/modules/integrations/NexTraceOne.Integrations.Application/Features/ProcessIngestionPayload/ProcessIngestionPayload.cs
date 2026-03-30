@@ -1,11 +1,9 @@
-using MediatR;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
-using NexTraceOne.Integrations.Domain.Events;
 
 namespace NexTraceOne.Integrations.Application.Features.ProcessIngestionPayload;
 
@@ -21,7 +19,9 @@ public static class ProcessIngestionPayload
 
     /// <summary>
     /// Handler que carrega a execução, invoca o parser, persiste os campos extraídos
-    /// e publica <see cref="IngestionPayloadProcessedDomainEvent"/> em caso de sucesso.
+    /// e emite <see cref="IngestionPayloadProcessedDomainEvent"/> via outbox em caso de sucesso.
+    /// O domain event é emitido automaticamente pelo aggregate root durante SaveChanges,
+    /// persistido na tabela outbox e processado assincronamente pelo ModuleOutboxProcessorJob.
     /// Degradação graciosa: qualquer falha de parsing mantém o status metadata_recorded
     /// e nunca propaga excepção para o caller.
     /// </summary>
@@ -29,7 +29,6 @@ public static class ProcessIngestionPayload
         IIngestionExecutionRepository executionRepository,
         IIngestionPayloadParser payloadParser,
         IUnitOfWork unitOfWork,
-        IPublisher publisher,
         IDateTimeProvider clock,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
@@ -82,18 +81,8 @@ public static class ProcessIngestionPayload
 
                 await executionRepository.UpdateAsync(execution, cancellationToken);
                 await unitOfWork.CommitAsync(cancellationToken);
-
-                // TODO (P02.1): migrar para outbox pattern quando disponível
-                await publisher.Publish(
-                    new IngestionPayloadProcessedDomainEvent(
-                        ExecutionId: request.ExecutionId,
-                        ServiceName: parsed.ServiceName,
-                        Environment: parsed.Environment,
-                        Version: parsed.Version,
-                        CommitSha: parsed.CommitSha,
-                        ChangeType: parsed.ChangeType,
-                        ProcessedAt: parsedAt),
-                    cancellationToken);
+                // Domain event IngestionPayloadProcessedDomainEvent is raised by the aggregate root
+                // in MarkAsProcessed() and captured by the outbox during SaveChanges/CommitAsync.
 
                 return Result<Response>.Success(new Response(request.ExecutionId, "processed"));
             }

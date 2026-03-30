@@ -5,8 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
+using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -68,6 +70,9 @@ public static class DependencyInjection
         services.AddScoped<IAiKnowledgeSourceWeightRepository, AiKnowledgeSourceWeightRepository>();
         services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
+
+        // Cross-module contract — consumed by AiOrchestration for token/model attribution
+        services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
 
         return services;
     }

@@ -2,6 +2,8 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Models;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetUnifiedTimeline;
@@ -37,9 +39,10 @@ public static class GetUnifiedTimeline
 
     public sealed class Handler(
         IIncidentStore incidentStore,
+        IObservabilityProvider observabilityProvider,
         ILogger<Handler> logger) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             logger.LogInformation("Building unified timeline for service={Service}, system={System}",
                 request.ServiceName, request.SystemName);
@@ -85,9 +88,45 @@ public static class GetUnifiedTimeline
                 logger.LogWarning(ex, "Failed to fetch incidents for unified timeline");
             }
 
-            // Phase 2: Legacy events from Elasticsearch would be added here
-            // TODO (P02.3): integrate with Elasticsearch via IAnalyticsWriter/ElasticObservabilityProvider
-            // to fetch legacy batch, MQ and mainframe events for the unified timeline.
+            // Phase 2: Legacy/observability events from Elasticsearch via IObservabilityProvider
+            try
+            {
+                var environment = request.Environment ?? "production";
+                var from = request.From ?? DateTimeOffset.UtcNow.AddDays(-7);
+                var to = request.To ?? DateTimeOffset.UtcNow;
+
+                var logFilter = new LogQueryFilter
+                {
+                    Environment = environment,
+                    From = from,
+                    Until = to,
+                    ServiceName = request.ServiceName,
+                    Limit = request.PageSize * 2
+                };
+
+                var logs = await observabilityProvider.QueryLogsAsync(logFilter, cancellationToken);
+
+                foreach (var log in logs)
+                {
+                    entries.Add(new TimelineEntry(
+                        Id: log.TraceId ?? Guid.NewGuid().ToString("N"),
+                        Source: "observability",
+                        EventType: log.Level,
+                        Title: log.Message,
+                        Severity: log.Level,
+                        ServiceName: log.ServiceName,
+                        SystemName: request.SystemName,
+                        Timestamp: log.Timestamp,
+                        Details: log.Attributes?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) ?? new()));
+                }
+
+                logger.LogDebug("Unified timeline: {IncidentCount} incidents + {LogCount} observability events",
+                    entries.Count(e => e.Source == "incident"), logs.Count);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch observability logs for unified timeline — continuing with incidents only");
+            }
 
             var totalCount = entries.Count;
             var ordered = entries
@@ -96,7 +135,7 @@ public static class GetUnifiedTimeline
                 .Take(request.PageSize)
                 .ToList();
 
-            return Task.FromResult(Result<Response>.Success(new Response(ordered, totalCount)));
+            return Result<Response>.Success(new Response(ordered, totalCount));
         }
     }
 
