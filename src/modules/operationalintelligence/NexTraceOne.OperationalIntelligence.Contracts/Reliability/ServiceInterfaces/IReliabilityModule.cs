@@ -1,6 +1,6 @@
 namespace NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — TODO(P03.1): implement IReliabilityModule in Infrastructure layer.
+// IMPLEMENTATION STATUS: Implemented — ReliabilityModuleService registered in Reliability/DependencyInjection.cs.
 
 /// <summary>
 /// Interface pública do módulo Reliability.

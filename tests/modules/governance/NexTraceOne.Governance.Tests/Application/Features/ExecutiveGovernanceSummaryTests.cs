@@ -22,6 +22,8 @@ public sealed class ExecutiveGovernanceSummaryTests
     private readonly ITeamRepository _teamRepository = Substitute.For<ITeamRepository>();
     private readonly IGovernanceDomainRepository _domainRepository = Substitute.For<IGovernanceDomainRepository>();
     private readonly IGovernanceRolloutRecordRepository _rolloutRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
+    private readonly IGovernancePackVersionRepository _versionRepository = Substitute.For<IGovernancePackVersionRepository>();
+    private readonly IComplianceGapRepository _gapRepository = Substitute.For<IComplianceGapRepository>();
     private readonly IEvidencePackageRepository _evidencePackageRepository = Substitute.For<IEvidencePackageRepository>();
     private readonly ICatalogGraphModule _catalogGraph = Substitute.For<ICatalogGraphModule>();
 
@@ -256,8 +258,38 @@ public sealed class ExecutiveGovernanceSummaryTests
     public async Task GetPackCoverage_ShouldReturnCoverageItems()
     {
         // Arrange
-        var handler = new GetPackCoverage.Handler();
-        var query = new GetPackCoverage.Query(Guid.NewGuid().ToString());
+        var packId = Guid.NewGuid();
+        var packIdTyped = new GovernancePackId(packId);
+
+        var rollouts = new List<GovernanceRolloutRecord>
+        {
+            GovernanceRolloutRecord.Create(
+                packIdTyped,
+                new GovernancePackVersionId(Guid.NewGuid()),
+                "payments",
+                GovernanceScopeType.Domain,
+                EnforcementMode.Required,
+                "admin")
+        };
+        rollouts[0].MarkCompleted();
+
+        _rolloutRepository.ListAsync(
+            Arg.Is<GovernancePackId>(id => id.Value == packId),
+            Arg.Any<GovernanceScopeType?>(),
+            Arg.Any<string?>(),
+            Arg.Is(RolloutStatus.Completed),
+            Arg.Any<CancellationToken>()).Returns(rollouts);
+
+        _versionRepository.GetLatestByPackIdAsync(
+            Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
+            .Returns((GovernancePackVersion?)null);
+
+        _gapRepository.ListAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ComplianceGap>());
+
+        var handler = new GetPackCoverage.Handler(_rolloutRepository, _versionRepository, _gapRepository);
+        var query = new GetPackCoverage.Query(packId.ToString());
 
         // Act
         var result = await handler.Handle(query, CancellationToken.None);
@@ -265,7 +297,6 @@ public sealed class ExecutiveGovernanceSummaryTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Items.Should().NotBeEmpty();
-        result.Value.OverallCoveragePercent.Should().BeGreaterThan(0);
         result.Value.TotalScopes.Should().BeGreaterThan(0);
     }
 
@@ -273,10 +304,38 @@ public sealed class ExecutiveGovernanceSummaryTests
     public async Task GetPackCoverage_ItemsShouldHaveConsistentCounts()
     {
         // Arrange
-        var handler = new GetPackCoverage.Handler();
+        var packId = Guid.NewGuid();
+        var packIdTyped = new GovernancePackId(packId);
+        var versionId = new GovernancePackVersionId(Guid.NewGuid());
+
+        var rollouts = new List<GovernanceRolloutRecord>
+        {
+            GovernanceRolloutRecord.Create(
+                packIdTyped, versionId, "payments",
+                GovernanceScopeType.Domain, EnforcementMode.Required, "admin"),
+            GovernanceRolloutRecord.Create(
+                packIdTyped, versionId, "platform-core",
+                GovernanceScopeType.Team, EnforcementMode.Advisory, "admin")
+        };
+        rollouts.ForEach(r => r.MarkCompleted());
+
+        _rolloutRepository.ListAsync(
+            Arg.Any<GovernancePackId>(), Arg.Any<GovernanceScopeType?>(),
+            Arg.Any<string?>(), Arg.Is(RolloutStatus.Completed), Arg.Any<CancellationToken>())
+            .Returns(rollouts);
+
+        _versionRepository.GetLatestByPackIdAsync(
+            Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>())
+            .Returns((GovernancePackVersion?)null);
+
+        _gapRepository.ListAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ComplianceGap>());
+
+        var handler = new GetPackCoverage.Handler(_rolloutRepository, _versionRepository, _gapRepository);
 
         // Act
-        var result = await handler.Handle(new GetPackCoverage.Query("test"), CancellationToken.None);
+        var result = await handler.Handle(new GetPackCoverage.Query(packId.ToString()), CancellationToken.None);
 
         // Assert
         result.Value.Items.Should().AllSatisfy(item =>

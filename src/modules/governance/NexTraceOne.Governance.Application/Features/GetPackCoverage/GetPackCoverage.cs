@@ -1,47 +1,118 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Application.Features.GetPackCoverage;
 
 /// <summary>
 /// Feature: GetPackCoverage — cobertura de conformidade de um governance pack.
 /// Retorna métricas de cobertura por escopo com percentagem de conformidade.
-/// MVP com dados estáticos para validação de fluxo.
+/// P03.5: Dados reais baseados em rollout records e compliance gaps.
 /// </summary>
 public static class GetPackCoverage
 {
     /// <summary>Query para obter a cobertura de conformidade de um governance pack.</summary>
     public sealed record Query(string PackId) : IQuery<Response>;
 
-    /// <summary>Handler que retorna as métricas de cobertura do governance pack.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>
+    /// Handler que calcula as métricas de cobertura do governance pack
+    /// com base nos rollout records e compliance gaps persistidos.
+    /// </summary>
+    public sealed class Handler(
+        IGovernanceRolloutRecordRepository rolloutRepository,
+        IGovernancePackVersionRepository versionRepository,
+        IComplianceGapRepository gapRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // TODO [P03.5]: Replace static coverage computation with rollout/rule-evaluation engine integration
-            // when per-scope compliance evaluation contract becomes available.
-            var items = new List<CoverageItemDto>
-            {
-                new("Domain", "payments", 18, 16, 2, 88.9m),
-                new("Domain", "operations", 18, 14, 4, 77.8m),
-                new("Team", "platform-core", 18, 17, 1, 94.4m),
-                new("Team", "growth", 18, 12, 6, 66.7m),
-                new("Environment", "Production", 18, 15, 3, 83.3m)
-            };
+            if (!Guid.TryParse(request.PackId, out var packGuid))
+                return Error.Validation("INVALID_PACK_ID", "Pack ID '{0}' is not a valid GUID.", request.PackId);
 
-            var totalRules = items.Sum(i => i.TotalRules);
+            var packId = new GovernancePackId(packGuid);
+
+            // Fetch completed rollouts for this pack
+            var rollouts = await rolloutRepository.ListAsync(
+                packId, scopeType: null, scopeValue: null, status: RolloutStatus.Completed, cancellationToken);
+
+            if (rollouts.Count == 0)
+            {
+                return Result<Response>.Success(new Response(
+                    PackId: request.PackId,
+                    OverallCoveragePercent: 0m,
+                    TotalScopes: 0,
+                    Items: []));
+            }
+
+            // Find the latest version to determine total rule count
+            var latestVersion = await versionRepository.GetLatestByPackIdAsync(packId, cancellationToken);
+            var totalRules = latestVersion?.Rules.Count ?? 0;
+
+            // Fetch all compliance gaps to cross-reference violations per scope
+            var allGaps = await gapRepository.ListAsync(teamId: null, domainId: null, serviceId: null, cancellationToken);
+
+            // Build coverage items grouped by (ScopeType, ScopeValue)
+            var distinctScopes = rollouts
+                .GroupBy(r => (r.ScopeType, Scope: r.Scope))
+                .Select(g => g.OrderByDescending(r => r.InitiatedAt).First())
+                .ToList();
+
+            var items = new List<CoverageItemDto>();
+
+            foreach (var rollout in distinctScopes)
+            {
+                // Count violations matching this scope
+                var violations = CountViolationsForScope(allGaps, rollout.ScopeType, rollout.Scope);
+                var compliant = Math.Max(0, totalRules - violations);
+                var coveragePercent = totalRules > 0
+                    ? Math.Round((decimal)compliant / totalRules * 100, 1)
+                    : 0m;
+
+                items.Add(new CoverageItemDto(
+                    ScopeType: rollout.ScopeType.ToString(),
+                    ScopeValue: rollout.Scope,
+                    TotalRules: totalRules,
+                    CompliantCount: compliant,
+                    NonCompliantCount: violations,
+                    CoveragePercent: coveragePercent));
+            }
+
+            var totalRulesAll = items.Sum(i => i.TotalRules);
             var totalCompliant = items.Sum(i => i.CompliantCount);
-            var overallPercent = totalRules > 0
-                ? Math.Round((decimal)totalCompliant / totalRules * 100, 1)
+            var overallPercent = totalRulesAll > 0
+                ? Math.Round((decimal)totalCompliant / totalRulesAll * 100, 1)
                 : 0m;
 
-            var response = new Response(
+            return Result<Response>.Success(new Response(
                 PackId: request.PackId,
                 OverallCoveragePercent: overallPercent,
                 TotalScopes: items.Count,
-                Items: items);
+                Items: items));
+        }
 
-            return Task.FromResult(Result<Response>.Success(response));
+        /// <summary>
+        /// Counts the number of distinct violated policy IDs that match a scope.
+        /// Matches by Domain or Team field on the ComplianceGap entity.
+        /// </summary>
+        private static int CountViolationsForScope(
+            IReadOnlyList<ComplianceGap> gaps,
+            GovernanceScopeType scopeType,
+            string scopeValue)
+        {
+            var matching = scopeType switch
+            {
+                GovernanceScopeType.Domain => gaps.Where(g =>
+                    string.Equals(g.Domain, scopeValue, StringComparison.OrdinalIgnoreCase)),
+                GovernanceScopeType.Team => gaps.Where(g =>
+                    string.Equals(g.Team, scopeValue, StringComparison.OrdinalIgnoreCase)),
+                GovernanceScopeType.Environment => gaps.Where(g =>
+                    // ComplianceGap doesn't carry environment — count 0 for environment scopes
+                    false),
+                _ => Enumerable.Empty<ComplianceGap>()
+            };
+
+            return matching.SelectMany(g => g.ViolatedPolicyIds).Distinct(StringComparer.OrdinalIgnoreCase).Count();
         }
     }
 

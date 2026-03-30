@@ -1,6 +1,6 @@
 namespace NexTraceOne.OperationalIntelligence.Contracts.Automation.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — TODO(P03.2): implement IAutomationModule in Infrastructure layer.
+// IMPLEMENTATION STATUS: Implemented — AutomationModuleService registered in Automation/DependencyInjection.cs.
 
 /// <summary>
 /// Interface pública do módulo Automation.

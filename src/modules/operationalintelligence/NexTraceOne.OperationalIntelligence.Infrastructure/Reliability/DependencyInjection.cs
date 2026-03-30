@@ -5,8 +5,10 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Services;
+using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability;
 
@@ -41,6 +43,9 @@ public static class DependencyInjection
 
         // P6.2 — cálculo real de error budget e burn rate
         services.AddSingleton<IErrorBudgetCalculator, ErrorBudgetCalculator>();
+
+        // P03.1 — contrato cross-module de Reliability
+        services.AddScoped<IReliabilityModule, ReliabilityModuleService>();
 
         return services;
     }
