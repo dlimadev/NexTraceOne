@@ -363,7 +363,7 @@ internal static class IncidentSeedData
         {
             // INC-1 / WF-1 validation (in progress)
             MitigationValidationLog.Create(
-                MitigationValidationLogId.From(Guid.Parse("val00001-0001-0000-0000-000000000001")),
+                MitigationValidationLogId.From(Guid.Parse("aa100001-0001-0000-0000-000000000001")),
                 Inc1.ToString(), Wf1, ValidationStatus.InProgress,
                 "Error rate recovered to baseline. Payment success rate at 99.7%. Awaiting confirmation from one downstream consumer.",
                 null,
@@ -377,7 +377,7 @@ internal static class IncidentSeedData
                 })),
             // INC-2 / WF-2 validation (pending)
             MitigationValidationLog.Create(
-                MitigationValidationLogId.From(Guid.Parse("val00002-0001-0000-0000-000000000001")),
+                MitigationValidationLogId.From(Guid.Parse("aa100002-0001-0000-0000-000000000001")),
                 Inc2.ToString(), Wf2, ValidationStatus.Pending,
                 null, null,
                 DateTimeOffset.Parse("2024-06-15T15:00:00Z"),

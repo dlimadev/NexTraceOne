@@ -1,5 +1,6 @@
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetUnifiedTimeline;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
@@ -68,8 +69,9 @@ public sealed class GetUnifiedTimelineTests
     public async Task Handle_ReturnsTimelineFromIncidents()
     {
         var store = Substitute.For<IIncidentStore>();
+        var obsProvider = Substitute.For<IObservabilityProvider>();
         var logger = Substitute.For<ILogger<GetUnifiedTimeline.Handler>>();
-        var handler = new GetUnifiedTimeline.Handler(store, logger);
+        var handler = new GetUnifiedTimeline.Handler(store, obsProvider, logger);
 
         var incidents = new List<ListIncidents.IncidentListItem>
         {
@@ -98,8 +100,9 @@ public sealed class GetUnifiedTimelineTests
     public async Task Handle_FiltersIncidentsByServiceName()
     {
         var store = Substitute.For<IIncidentStore>();
+        var obsProvider = Substitute.For<IObservabilityProvider>();
         var logger = Substitute.For<ILogger<GetUnifiedTimeline.Handler>>();
-        var handler = new GetUnifiedTimeline.Handler(store, logger);
+        var handler = new GetUnifiedTimeline.Handler(store, obsProvider, logger);
 
         var incidents = new List<ListIncidents.IncidentListItem>
         {

@@ -9,7 +9,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Services;
 /// 
 /// Esta implementação usa o IObservabilityProvider já existente e extrai
 /// os serviços distintos dos traces. Numa fase futura pode ser substituída
-/// por queries diretas a ClickHouse para melhor performance.
+/// por queries diretas ao Elasticsearch para melhor performance.
 /// </summary>
 internal sealed class OtelServiceDiscoveryProvider(IObservabilityProvider observabilityProvider) : IServiceDiscoveryProvider
 {

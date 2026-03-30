@@ -5,8 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Contracts;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
+using NexTraceOne.ProductAnalytics.Infrastructure.Services;
 
 namespace NexTraceOne.ProductAnalytics.Infrastructure;
 
@@ -33,6 +35,9 @@ public static class DependencyInjection
 
         // Repositories — P2.3
         services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
+
+        // Cross-module contract — consumed by Governance for adoption metrics
+        services.AddScoped<IProductAnalyticsModule, ProductAnalyticsModuleService>();
 
         return services;
     }

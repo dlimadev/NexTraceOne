@@ -5,7 +5,11 @@
     <AssemblyName>NexTraceOne.ProductAnalytics.Infrastructure</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.ProductAnalytics.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.ProductAnalytics.Application\NexTraceOne.ProductAnalytics.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.ProductAnalytics.Contracts\NexTraceOne.ProductAnalytics.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.ProductAnalytics.Domain\NexTraceOne.ProductAnalytics.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
   </ItemGroup>

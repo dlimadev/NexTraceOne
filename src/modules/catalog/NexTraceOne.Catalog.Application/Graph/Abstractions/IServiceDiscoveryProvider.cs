@@ -2,7 +2,7 @@ namespace NexTraceOne.Catalog.Application.Graph.Abstractions;
 
 /// <summary>
 /// Provider para descoberta de serviços a partir de fontes de telemetria.
-/// Abstrai a consulta a ClickHouse, Elastic ou outra fonte.
+/// Abstrai a consulta a Elastic, ClickHouse ou outra fonte.
 /// A implementação concreta reside na camada de Infrastructure.
 /// </summary>
 public interface IServiceDiscoveryProvider

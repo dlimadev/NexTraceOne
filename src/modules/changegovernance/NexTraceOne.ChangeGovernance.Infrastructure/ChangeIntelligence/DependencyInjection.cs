@@ -54,7 +54,7 @@ public static class DependencyInjection
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
 
-        // Analytics writer: correlated traces → ClickHouse chg_trace_release_mapping
+        // Analytics writer: correlated traces → Elasticsearch chg_trace_release_mapping
         // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false
         services.AddBuildingBlocksAnalytics(configuration);
         services.AddScoped<ITraceCorrelationWriter, TraceCorrelationAnalyticsWriter>();

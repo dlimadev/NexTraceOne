@@ -6,9 +6,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Domain\NexTraceOne.ProductAnalytics.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Application\NexTraceOne.ProductAnalytics.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Contracts\NexTraceOne.ProductAnalytics.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Infrastructure\NexTraceOne.ProductAnalytics.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="NSubstitute" />

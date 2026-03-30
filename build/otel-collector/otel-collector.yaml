@@ -16,11 +16,11 @@
 # PIPELINE:
 # Fontes → Receivers → Processors → Exporters
 #                                    ├── Product Store (PostgreSQL via OTLP connector/custom)
-#                                    └── ClickHouse (traces, logs e métricas crus)
+#                                    └── Elasticsearch (traces, logs e métricas crus)
 #
 # PROVIDER DE OBSERVABILIDADE:
-# Esta configuração exporta para ClickHouse por padrão.
-# Para Elastic, substituir os exporters de ClickHouse pelos exporters do Elastic.
+# Esta configuração exporta para Elasticsearch por padrão.
+# Para ClickHouse, substituir os exporters de Elasticsearch pelos exporters do ClickHouse.
 #
 # MODOS DE COLETA:
 # - OpenTelemetry Collector (Kubernetes): esta configuração
@@ -186,27 +186,21 @@ processors:
 
 # ── Exporters ────────────────────────────────────────────────────────────────
 # Destinos finais para cada tipo de sinal.
-# Provider padrão: ClickHouse. Para Elastic, substituir os exporters abaixo.
+# Provider padrão: Elasticsearch. Para ClickHouse, substituir os exporters abaixo.
 exporters:
-  # ClickHouse — provider de observabilidade para traces, logs e métricas crus.
-  # O ClickHouse recebe todos os sinais crus. PostgreSQL NÃO é usado para isto.
-  clickhouse:
-    endpoint: "${CLICKHOUSE_ENDPOINT:-tcp://clickhouse:9000?database=nextraceone_obs}"
-    database: nextraceone_obs
-    ttl: 720h
-    create_schema: true
-    logs_table_name: otel_logs
-    traces_table_name: otel_traces
-    metrics_table_name: otel_metrics
-    timeout: 10s
-    retry_on_failure:
+  # Elasticsearch — provider de observabilidade para traces, logs e métricas crus.
+  # O Elasticsearch recebe todos os sinais crus. PostgreSQL NÃO é usado para isto.
+  elasticsearch:
+    endpoints: ["${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}"]
+    logs_index: nextraceone-obs-logs
+    traces_index: nextraceone-obs-traces
+    mapping:
+      mode: ecs
+    flush:
+      bytes: 5242880
+    retry:
       enabled: true
-      initial_interval: 5s
-      max_interval: 30s
-      max_elapsed_time: 120s
-    sending_queue:
-      num_consumers: 10
-      queue_size: 1000
+      max_requests: 3
 
   # OTLP/gRPC — exporter genérico para backends OTLP-compatíveis.
   # NOTA: Não está em nenhum pipeline activo — reservado para uso futuro.
@@ -261,7 +255,7 @@ service:
     # Pipeline de TRACES:
     # Receivers → Memory Limiter → Resource Detection → Normalize →
     # Filter → Correlation → Redaction → Tail Sampling → Batch →
-    # ClickHouse (crus) + SpanMetrics (derivar métricas)
+    # Elasticsearch (crus) + SpanMetrics (derivar métricas)
     traces:
       receivers: [otlp]
       processors:
@@ -273,12 +267,12 @@ service:
         - redaction
         - tail_sampling
         - batch
-      exporters: [clickhouse, spanmetrics]
+      exporters: [elasticsearch, spanmetrics]
 
     # Pipeline de METRICS:
     # Receivers (OTLP + HostMetrics + SpanMetrics) →
     # Memory Limiter → Resource Detection → Normalize → Batch →
-    # ClickHouse (crus)
+    # Elasticsearch (crus)
     # Nota: O exporter "otlp" está declarado mas fora deste pipeline intencionalmente.
     # Ver comentário do exporter "otlp" acima para reactivar reencaminhamento externo.
     metrics:
@@ -288,11 +282,11 @@ service:
         - resourcedetection
         - attributes/normalize
         - batch
-      exporters: [clickhouse]
+      exporters: [elasticsearch]
 
     # Pipeline de LOGS:
     # Receivers → Memory Limiter → Resource Detection → Normalize →
-    # Filter → Correlation → Redaction → Batch → ClickHouse (crus)
+    # Filter → Correlation → Redaction → Batch → Elasticsearch (crus)
     logs:
       receivers: [otlp]
       processors:
@@ -303,7 +297,7 @@ service:
         - transform/correlation
         - redaction
         - batch
-      exporters: [clickhouse]
+      exporters: [elasticsearch]
 
   # Extensions para health check e z-pages do próprio Collector.
   extensions: [health_check, zpages]

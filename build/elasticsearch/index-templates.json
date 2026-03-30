@@ -1,0 +1,350 @@
+{
+  "_comment": "NexTraceOne — Elasticsearch Index Templates for observability and analytics data.",
+
+  "observability_logs": {
+    "index_patterns": ["nextraceone-obs-logs*"],
+    "template": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.lifecycle.name": "nextraceone-obs-policy",
+        "index.lifecycle.rollover_alias": "nextraceone-obs-logs"
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp":           { "type": "date" },
+          "trace_id":             { "type": "keyword" },
+          "span_id":              { "type": "keyword" },
+          "severity_text":        { "type": "keyword" },
+          "severity_number":      { "type": "integer" },
+          "body":                 { "type": "text" },
+          "service.name":         { "type": "keyword" },
+          "service.namespace":    { "type": "keyword" },
+          "deployment.environment": { "type": "keyword" },
+          "resource.attributes":  { "type": "object", "enabled": false },
+          "attributes":           { "type": "object", "enabled": false }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "observability_traces": {
+    "index_patterns": ["nextraceone-obs-traces*"],
+    "template": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.lifecycle.name": "nextraceone-obs-policy",
+        "index.lifecycle.rollover_alias": "nextraceone-obs-traces"
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp":           { "type": "date" },
+          "trace_id":             { "type": "keyword" },
+          "span_id":              { "type": "keyword" },
+          "parent_span_id":       { "type": "keyword" },
+          "name":                 { "type": "keyword" },
+          "kind":                 { "type": "keyword" },
+          "status.code":          { "type": "keyword" },
+          "status.message":       { "type": "text" },
+          "duration":             { "type": "long" },
+          "service.name":         { "type": "keyword" },
+          "service.namespace":    { "type": "keyword" },
+          "deployment.environment": { "type": "keyword" },
+          "resource.attributes":  { "type": "object", "enabled": false },
+          "attributes":           { "type": "object", "enabled": false }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "observability_metrics": {
+    "index_patterns": ["nextraceone-obs-metrics*"],
+    "template": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.lifecycle.name": "nextraceone-obs-policy",
+        "index.lifecycle.rollover_alias": "nextraceone-obs-metrics"
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp":           { "type": "date" },
+          "metric.name":          { "type": "keyword" },
+          "metric.type":          { "type": "keyword" },
+          "metric.value":         { "type": "double" },
+          "service.name":         { "type": "keyword" },
+          "service.namespace":    { "type": "keyword" },
+          "deployment.environment": { "type": "keyword" },
+          "resource.attributes":  { "type": "object", "enabled": false },
+          "attributes":           { "type": "object", "enabled": false }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_pan_events": {
+    "index_patterns": ["nextraceone-analytics-pan-events*"],
+    "template": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0
+      },
+      "mappings": {
+        "properties": {
+          "id":               { "type": "keyword" },
+          "tenant_id":        { "type": "keyword" },
+          "user_id":          { "type": "keyword" },
+          "persona":          { "type": "keyword" },
+          "module":           { "type": "keyword" },
+          "event_type":       { "type": "byte" },
+          "feature":          { "type": "keyword" },
+          "entity_type":      { "type": "keyword" },
+          "outcome":          { "type": "keyword" },
+          "route":            { "type": "keyword" },
+          "team_id":          { "type": "keyword" },
+          "domain_id":        { "type": "keyword" },
+          "session_id":       { "type": "keyword" },
+          "client_type":      { "type": "keyword" },
+          "metadata_json":    { "type": "text", "index": false },
+          "occurred_at":      { "type": "date" },
+          "environment_id":   { "type": "keyword" },
+          "duration_ms":      { "type": "long" },
+          "parent_event_id":  { "type": "keyword" },
+          "source":           { "type": "keyword" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_ops_runtime_metrics": {
+    "index_patterns": ["nextraceone-analytics-ops-runtime-metrics*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "id":                   { "type": "keyword" },
+          "tenant_id":            { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "service_id":           { "type": "keyword" },
+          "environment":          { "type": "keyword" },
+          "environment_id":       { "type": "keyword" },
+          "source":               { "type": "keyword" },
+          "avg_latency_ms":       { "type": "double" },
+          "p99_latency_ms":       { "type": "double" },
+          "error_rate":           { "type": "double" },
+          "requests_per_second":  { "type": "double" },
+          "cpu_usage_percent":    { "type": "double" },
+          "memory_usage_mb":      { "type": "double" },
+          "active_instances":     { "type": "long" },
+          "health_status":        { "type": "keyword" },
+          "captured_at":          { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_ops_cost_entries": {
+    "index_patterns": ["nextraceone-analytics-ops-cost-entries*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "id":                   { "type": "keyword" },
+          "tenant_id":            { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "service_id":           { "type": "keyword" },
+          "environment":          { "type": "keyword" },
+          "environment_id":       { "type": "keyword" },
+          "currency":             { "type": "keyword" },
+          "period":               { "type": "keyword" },
+          "source":               { "type": "keyword" },
+          "total_cost":           { "type": "double" },
+          "cpu_cost_share":       { "type": "double" },
+          "memory_cost_share":    { "type": "double" },
+          "network_cost_share":   { "type": "double" },
+          "storage_cost_share":   { "type": "double" },
+          "captured_at":          { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_ops_incident_trends": {
+    "index_patterns": ["nextraceone-analytics-ops-incident-trends*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "event_id":             { "type": "keyword" },
+          "incident_id":          { "type": "keyword" },
+          "tenant_id":            { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "service_id":           { "type": "keyword" },
+          "environment":          { "type": "keyword" },
+          "environment_id":       { "type": "keyword" },
+          "severity":             { "type": "keyword" },
+          "incident_type":        { "type": "keyword" },
+          "lifecycle_event":      { "type": "keyword" },
+          "change_correlated":    { "type": "boolean" },
+          "mttr_minutes":         { "type": "long" },
+          "occurred_at":          { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_int_execution_logs": {
+    "index_patterns": ["nextraceone-analytics-int-execution-logs*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "id":                   { "type": "keyword" },
+          "tenant_id":            { "type": "keyword" },
+          "connector_id":         { "type": "keyword" },
+          "connector_name":       { "type": "keyword" },
+          "connector_type":       { "type": "keyword" },
+          "provider":             { "type": "keyword" },
+          "source_id":            { "type": "keyword" },
+          "data_domain":          { "type": "keyword" },
+          "correlation_id":       { "type": "keyword" },
+          "started_at":           { "type": "date" },
+          "completed_at":         { "type": "date" },
+          "duration_ms":          { "type": "long" },
+          "result":               { "type": "keyword" },
+          "items_processed":      { "type": "integer" },
+          "items_succeeded":      { "type": "integer" },
+          "items_failed":         { "type": "integer" },
+          "error_code":           { "type": "keyword" },
+          "retry_attempt":        { "type": "integer" },
+          "created_at":           { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_int_health_history": {
+    "index_patterns": ["nextraceone-analytics-int-health-history*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "tenant_id":               { "type": "keyword" },
+          "connector_id":            { "type": "keyword" },
+          "connector_name":          { "type": "keyword" },
+          "health":                  { "type": "keyword" },
+          "previous_health":         { "type": "keyword" },
+          "freshness_lag_minutes":   { "type": "integer" },
+          "changed_at":              { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_gov_compliance_trends": {
+    "index_patterns": ["nextraceone-analytics-gov-compliance-trends*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "tenant_id":            { "type": "keyword" },
+          "service_id":           { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "policy_id":            { "type": "keyword" },
+          "policy_name":          { "type": "keyword" },
+          "environment":          { "type": "keyword" },
+          "compliance_score":     { "type": "double" },
+          "status":               { "type": "keyword" },
+          "violations_count":     { "type": "long" },
+          "captured_at":          { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_gov_finops_aggregates": {
+    "index_patterns": ["nextraceone-analytics-gov-finops-aggregates*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "tenant_id":            { "type": "keyword" },
+          "team_id":              { "type": "keyword" },
+          "team_name":            { "type": "keyword" },
+          "domain_name":          { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "service_id":           { "type": "keyword" },
+          "environment":          { "type": "keyword" },
+          "currency":             { "type": "keyword" },
+          "period_label":         { "type": "keyword" },
+          "total_cost":           { "type": "double" },
+          "compute_cost":         { "type": "double" },
+          "storage_cost":         { "type": "double" },
+          "network_cost":         { "type": "double" },
+          "anomaly_detected":     { "type": "boolean" },
+          "captured_at":          { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "analytics_chg_trace_release_mapping": {
+    "index_patterns": ["nextraceone-analytics-chg-trace-release-mapping*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "id":                   { "type": "keyword" },
+          "tenant_id":            { "type": "keyword" },
+          "release_id":           { "type": "keyword" },
+          "trace_id":             { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "service_id":           { "type": "keyword" },
+          "environment":          { "type": "keyword" },
+          "environment_id":       { "type": "keyword" },
+          "correlation_source":   { "type": "keyword" },
+          "trace_started_at":     { "type": "date" },
+          "trace_ended_at":       { "type": "date" },
+          "correlated_at":        { "type": "date" }
+        }
+      }
+    },
+    "priority": 100
+  },
+
+  "operational_events": {
+    "index_patterns": ["nextraceone-obs-mf-operational-events*"],
+    "template": {
+      "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+      "mappings": {
+        "properties": {
+          "timestamp":            { "type": "date" },
+          "event_id":             { "type": "keyword" },
+          "event_type":           { "type": "keyword" },
+          "source_type":          { "type": "keyword" },
+          "system_name":          { "type": "keyword" },
+          "lpar_name":            { "type": "keyword" },
+          "service_name":         { "type": "keyword" },
+          "asset_name":           { "type": "keyword" },
+          "severity":             { "type": "keyword" },
+          "message":              { "type": "text" },
+          "tenant_id":            { "type": "keyword" },
+          "attributes":           { "type": "object", "enabled": false }
+        }
+      }
+    },
+    "priority": 100
+  }
+}

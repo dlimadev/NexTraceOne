@@ -3,16 +3,16 @@ using NexTraceOne.BuildingBlocks.Observability.Analytics.Events;
 namespace NexTraceOne.BuildingBlocks.Observability.Analytics.Abstractions;
 
 /// <summary>
-/// Interface de escrita para a camada analítica ClickHouse do NexTraceOne.
+/// Interface de escrita para a camada analítica do NexTraceOne.
 ///
-/// Responsabilidade: receber eventos de domínio analítico e persistir no ClickHouse
-/// (nextraceone_analytics). Esta interface é a fronteira entre os módulos de domínio
-/// e o storage analítico.
+/// Responsabilidade: receber eventos de domínio analítico e persistir no storage analítico
+/// (Elasticsearch por padrão, ClickHouse como alternativa). Esta interface é a fronteira
+/// entre os módulos de domínio e o storage analítico.
 ///
 /// Princípios:
-/// - Append-only: nunca atualiza ou remove registos no ClickHouse
+/// - Append-only: nunca atualiza ou remove registos
 /// - Fire-and-forget em contextos de alta frequência (falha não bloqueia o domínio)
-/// - Graceful degradation: NullAnalyticsWriter activo quando ClickHouse indisponível
+/// - Graceful degradation: NullAnalyticsWriter activo quando storage analítico indisponível
 /// - Tenant isolation: tenant_id obrigatório em todos os eventos
 /// - CancellationToken em todas as operações async
 /// </summary>

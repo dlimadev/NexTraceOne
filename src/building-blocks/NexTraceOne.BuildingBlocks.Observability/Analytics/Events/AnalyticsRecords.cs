@@ -9,7 +9,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Analytics.Events;
 /// <summary>
 /// Registo analítico de evento de uso de produto.
 /// Representa um evento gerado pela plataforma (page view, action, search, etc.)
-/// para armazenamento no ClickHouse (pan_events).
+/// para armazenamento no storage analítico (Elasticsearch por padrão — pan_events).
 ///
 /// Chaves de correlação com PostgreSQL:
 ///   - TenantId → iam_tenants.Id
@@ -251,7 +251,7 @@ public sealed record FinOpsAggregateRecord(
 /// <summary>
 /// Registo analítico de correlação trace → release.
 /// Representa o mapeamento entre um trace distribuído (OTel) e uma Release do
-/// módulo Change Governance, para armazenamento no ClickHouse (chg_trace_release_mapping).
+/// módulo Change Governance, para armazenamento no storage analítico (Elasticsearch por padrão — chg_trace_release_mapping).
 ///
 /// Chaves de correlação com PostgreSQL:
 ///   - TenantId     → iam_tenants.Id
@@ -260,7 +260,7 @@ public sealed record FinOpsAggregateRecord(
 ///   - EnvironmentId → env_environments.Id (opcional)
 ///
 /// Correlação com nextraceone_obs:
-///   - TraceId      → otel_traces.TraceId (sem FK — ClickHouse não suporta)
+///   - TraceId      → traces no storage analítico (Elasticsearch ou ClickHouse — sem FK)
 /// </summary>
 public sealed record TraceReleaseMappingRecord(
     Guid Id,

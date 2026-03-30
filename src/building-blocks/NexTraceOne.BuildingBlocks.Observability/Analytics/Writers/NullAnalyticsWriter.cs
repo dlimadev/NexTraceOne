@@ -5,7 +5,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Analytics.Writers;
 
 /// <summary>
 /// Implementação nula do IAnalyticsWriter.
-/// Usada quando Analytics:Enabled = false ou quando ClickHouse não está disponível.
+/// Usada quando Analytics:Enabled = false ou quando o storage analítico (Elasticsearch) não está disponível.
 /// Todas as operações retornam imediatamente sem I/O — graceful degradation.
 /// O domínio transacional funciona normalmente sem dependência da camada analítica.
 /// </summary>
