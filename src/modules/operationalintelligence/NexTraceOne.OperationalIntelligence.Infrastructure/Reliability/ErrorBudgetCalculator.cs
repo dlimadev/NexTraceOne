@@ -25,7 +25,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability;
 /// Nota: nesta fase (P6.2) o observed_error_rate é obtido do snapshot mais recente
 /// do RuntimeSnapshot — representa uma proxy do estado actual do serviço.
 /// Em fases futuras pode ser substituído por uma média ponderada da janela completa
-/// via ClickHouse ou repositório analítico.
+/// via Elasticsearch ou repositório analítico.
 /// </summary>
 internal sealed class ErrorBudgetCalculator : IErrorBudgetCalculator
 {

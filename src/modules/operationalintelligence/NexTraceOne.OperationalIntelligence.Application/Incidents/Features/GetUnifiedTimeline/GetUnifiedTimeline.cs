@@ -10,7 +10,7 @@ namespace NexTraceOne.OperationalIntelligence.Application.Incidents.Features.Get
 /// Query para timeline unificada de eventos legacy e modernos.
 /// Combina incidentes, eventos de batch, MQ e mainframe.
 /// Fase 1: utiliza dados de incidentes já persistidos em PostgreSQL.
-/// Fase 2 (futura): integrará eventos analíticos do ClickHouse.
+/// Fase 2 (futura): integrará eventos analíticos do Elasticsearch.
 /// </summary>
 public static class GetUnifiedTimeline
 {
@@ -85,8 +85,8 @@ public static class GetUnifiedTimeline
                 logger.LogWarning(ex, "Failed to fetch incidents for unified timeline");
             }
 
-            // Phase 2: Legacy events from ClickHouse would be added here
-            // This is a placeholder for future ClickHouse integration
+            // Phase 2: Legacy events from Elasticsearch would be added here
+            // This is a placeholder for future Elasticsearch integration
 
             var totalCount = entries.Count;
             var ordered = entries

@@ -25,12 +25,12 @@ namespace NexTraceOne.BuildingBlocks.Observability;
 /// <summary>
 /// Registra toda a infraestrutura de observabilidade da plataforma:
 /// OpenTelemetry (tracing + metrics via OTLP), provider de observabilidade
-/// configurável (ClickHouse ou Elastic), estratégia de coleta por ambiente
+/// configurável (Elastic ou ClickHouse), estratégia de coleta por ambiente
 /// (OpenTelemetry Collector ou CLR Profiler) e health checks.
 ///
 /// A plataforma é OpenTelemetry-native na ingestão, correlation-first no produto
 /// e storage-aware na persistência. O PostgreSQL serve como Product Store
-/// (agregados, correlações, topologia) e o provider configurável (ClickHouse ou Elastic)
+/// (agregados, correlações, topologia) e o provider configurável (Elastic ou ClickHouse)
 /// como storage analítico para traces, logs e métricas crus.
 ///
 /// Coleta, transporte, storage e análise são preocupações separadas.
@@ -40,7 +40,7 @@ public static class DependencyInjection
     /// <summary>
     /// Registra observabilidade base compartilhada da plataforma.
     /// Configura: OpenTelemetry (tracing + metrics), provider de observabilidade
-    /// (ClickHouse ou Elastic), modo de coleta (Collector ou CLR Profiler),
+    /// (Elastic ou ClickHouse), modo de coleta (Collector ou CLR Profiler),
     /// opções de telemetria (Product Store, retenção, collector) e health checks.
     /// </summary>
     public static IServiceCollection AddBuildingBlocksObservability(
@@ -122,27 +122,28 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Registra o provider de observabilidade configurado (ClickHouse ou Elastic).
+    /// Registra o provider de observabilidade configurado (Elastic ou ClickHouse).
     /// A escolha é feita por configuração em Telemetry:ObservabilityProvider:Provider.
+    /// Padrão: Elastic.
     /// </summary>
     private static void RegisterObservabilityProvider(
         IServiceCollection services,
         IConfiguration configuration)
     {
-        var providerName = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "ClickHouse";
+        var providerName = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
 
-        if (string.Equals(providerName, "Elastic", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(providerName, "ClickHouse", StringComparison.OrdinalIgnoreCase))
         {
-            services.AddSingleton<ElasticObservabilityProvider>();
-            services.AddSingleton<IObservabilityProvider>(sp =>
-                sp.GetRequiredService<ElasticObservabilityProvider>());
-        }
-        else
-        {
-            // Default: ClickHouse
             services.AddSingleton<ClickHouseObservabilityProvider>();
             services.AddSingleton<IObservabilityProvider>(sp =>
                 sp.GetRequiredService<ClickHouseObservabilityProvider>());
+        }
+        else
+        {
+            // Default: Elastic
+            services.AddSingleton<ElasticObservabilityProvider>();
+            services.AddSingleton<IObservabilityProvider>(sp =>
+                sp.GetRequiredService<ElasticObservabilityProvider>());
         }
     }
 
@@ -168,8 +169,8 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Registra a camada de escrita analítica ClickHouse do NexTraceOne.
-    /// Quando Analytics:Enabled = true, registra ClickHouseAnalyticsWriter.
+    /// Registra a camada de escrita analítica do NexTraceOne.
+    /// Quando Analytics:Enabled = true, registra ElasticAnalyticsWriter (padrão).
     /// Quando false, registra NullAnalyticsWriter (graceful degradation).
     ///
     /// Módulos suportados: Product Analytics, Operational Intelligence,
@@ -186,11 +187,11 @@ public static class DependencyInjection
         {
             services.Configure<AnalyticsOptions>(
                 configuration.GetSection(AnalyticsOptions.SectionName));
-            services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
+            services.AddHttpClient<ElasticAnalyticsWriter>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
             });
-            services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
+            services.AddSingleton<IAnalyticsWriter, ElasticAnalyticsWriter>();
         }
         else
         {

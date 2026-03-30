@@ -13,14 +13,14 @@ namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.R
 
 /// <summary>
 /// Feature: RecordTraceCorrelation — correlaciona automaticamente um trace OTel a uma Release.
-/// Pipeline: trace identificado → Release lookup → ChangeEvent(trace_correlated) + mapping analítico ClickHouse.
+/// Pipeline: trace identificado → Release lookup → ChangeEvent(trace_correlated) + mapping analítico Elasticsearch.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class RecordTraceCorrelation
 {
     /// <summary>
     /// Comando para registar a correlação entre um trace OTel e uma Release existente.
-    /// Produz um registo de auditoria (ChangeEvent) e escreve no mapping analítico (ClickHouse).
+    /// Produz um registo de auditoria (ChangeEvent) e escreve no mapping analítico (Elasticsearch).
     /// </summary>
     public sealed record Command(
         Guid ReleaseId,
@@ -50,7 +50,7 @@ public static class RecordTraceCorrelation
     /// Handler que persiste a correlação trace → release no domínio e no mapping analítico.
     /// 1. Verifica que a Release existe.
     /// 2. Cria ChangeEvent(trace_correlated) no PostgreSQL para rastreabilidade.
-    /// 3. Escreve TraceReleaseMappingRecord no ClickHouse via ITraceCorrelationWriter (fire-and-forget).
+    /// 3. Escreve TraceReleaseMappingRecord no Elasticsearch via ITraceCorrelationWriter (fire-and-forget).
     /// </summary>
     public sealed class Handler(
         IReleaseRepository releaseRepository,
@@ -83,8 +83,8 @@ public static class RecordTraceCorrelation
             changeEventRepository.Add(changeEvent);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            // Registo analítico no ClickHouse — fire-and-forget
-            // SuppressWriteErrors = true garante que falhas no ClickHouse não propagam
+            // Registo analítico no Elasticsearch — fire-and-forget
+            // SuppressWriteErrors = true garante que falhas no Elasticsearch não propagam
             await traceCorrelationWriter.WriteAsync(
                 mappingId: mappingId,
                 tenantId: release.TenantId ?? Guid.Empty,

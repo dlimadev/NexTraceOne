@@ -9,7 +9,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Tests.Telemetry;
 ///
 /// Valida: defaults seguros, separação Product Store vs provider de observabilidade,
 /// política de retenção hot/warm/cold, limites do Collector,
-/// provider configurável (ClickHouse/Elastic), modo de coleta (Collector/CLR Profiler).
+/// provider configurável (Elastic/ClickHouse), modo de coleta (Collector/CLR Profiler).
 /// </summary>
 public sealed class TelemetryStoreOptionsTests
 {
@@ -41,24 +41,24 @@ public sealed class TelemetryStoreOptionsTests
     }
 
     [Fact]
-    public void DefaultObservabilityProvider_ShouldUseClickHouse()
+    public void DefaultObservabilityProvider_ShouldUseElastic()
     {
         var options = new TelemetryStoreOptions();
-        options.ObservabilityProvider.Provider.Should().Be("ClickHouse");
+        options.ObservabilityProvider.Provider.Should().Be("Elastic");
     }
 
     [Fact]
-    public void DefaultObservabilityProvider_ClickHouse_ShouldBeEnabled()
+    public void DefaultObservabilityProvider_ClickHouse_ShouldBeDisabled()
     {
         var options = new TelemetryStoreOptions();
-        options.ObservabilityProvider.ClickHouse.Enabled.Should().BeTrue();
+        options.ObservabilityProvider.ClickHouse.Enabled.Should().BeFalse();
     }
 
     [Fact]
-    public void DefaultObservabilityProvider_Elastic_ShouldBeDisabled()
+    public void DefaultObservabilityProvider_Elastic_ShouldBeEnabled()
     {
         var options = new TelemetryStoreOptions();
-        options.ObservabilityProvider.Elastic.Enabled.Should().BeFalse();
+        options.ObservabilityProvider.Elastic.Enabled.Should().BeTrue();
     }
 
     [Fact]

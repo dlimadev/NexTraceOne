@@ -9,7 +9,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 /// <summary>
 /// Abstração principal do provider de observabilidade do NexTraceOne.
 /// Permite consulta unificada de logs, traces e métricas crus armazenados
-/// em ClickHouse ou Elastic, sem acoplar o domínio ao storage.
+/// em Elastic ou ClickHouse, sem acoplar o domínio ao storage.
 ///
 /// O provider é selecionado por configuração (Telemetry:ObservabilityProvider:Provider).
 /// O NexTraceOne consome dados via esta interface para análise, correlação, IA interna
@@ -17,7 +17,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 /// </summary>
 public interface IObservabilityProvider
 {
-    /// <summary>Nome do provider ativo ("ClickHouse" ou "Elastic").</summary>
+    /// <summary>Nome do provider ativo ("Elastic" ou "ClickHouse").</summary>
     string ProviderName { get; }
 
     /// <summary>Verifica se o provider está acessível e operacional.</summary>

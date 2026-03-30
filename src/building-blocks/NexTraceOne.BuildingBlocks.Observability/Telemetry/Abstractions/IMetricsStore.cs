@@ -12,7 +12,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 /// Implementação reside na Infrastructure do módulo OperationalIntelligence.
 ///
 /// O Product Store (PostgreSQL) armazena apenas dados agregados por minuto e hora.
-/// Dados crus ficam no provider de observabilidade (ClickHouse ou Elastic)
+/// Dados crus ficam no provider de observabilidade (Elastic ou ClickHouse)
 /// e são referenciados via TelemetryReference.
 /// </summary>
 public interface IServiceMetricsWriter

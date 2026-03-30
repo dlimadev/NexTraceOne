@@ -43,10 +43,10 @@ public static class DependencyInjection
         services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
         services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
 
-        // Legacy Telemetry — ClickHouse writer
-        services.Configure<ClickHouseLegacyWriterOptions>(
-            configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
-        services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>();
+        // Legacy Telemetry — Elastic writer (padrão)
+        services.Configure<ElasticLegacyWriterOptions>(
+            configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
+        services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>();
 
         return services;
     }

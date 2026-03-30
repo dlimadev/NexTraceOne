@@ -100,10 +100,10 @@ PostgreSQL xmin via `RowVersion` nos 5 aggregate roots.
 | `operations:automation:execute` | Executar automações |
 | `operations:automation:approve` | Aprovar automações |
 
-## PostgreSQL vs ClickHouse
+## PostgreSQL vs Elasticsearch
 
 - **PostgreSQL**: Estado operacional atual, incidentes, automações, runbooks, baselines
-- **ClickHouse** (futuro): Telemetria de alto volume, snapshots históricos, séries temporais, métricas agregadas
+- **Elasticsearch** (futuro): Telemetria de alto volume, snapshots históricos, séries temporais, métricas agregadas
 
 ## Testes
 

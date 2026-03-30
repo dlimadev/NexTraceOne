@@ -21,7 +21,7 @@ namespace NexTraceOne.OperationalIntelligence.Application.Reliability.Features.C
 /// 5. Persiste um BurnRateSnapshot por janela de tempo solicitada
 ///
 /// Nota: nesta fase o cálculo é baseado no snapshot mais recente — em P6.3+
-/// o cálculo por janela pode usar médias ou agregados históricos do ClickHouse.
+/// o cálculo por janela pode usar médias ou agregados históricos do Elasticsearch.
 /// </summary>
 public static class ComputeBurnRate
 {

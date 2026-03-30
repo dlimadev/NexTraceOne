@@ -93,22 +93,23 @@ public sealed class ProductStoreOptions
 
 /// <summary>
 /// Configuração do provider de observabilidade — storage analítico configurável.
-/// O NexTraceOne suporta dois providers: ClickHouse e Elastic.
+/// O NexTraceOne suporta dois providers: Elastic (padrão) e ClickHouse (alternativa).
 /// A empresa escolhe o provider por configuração, sem acoplar o domínio.
 ///
 /// Combinações suportadas:
-/// - CLR Profiler + ClickHouse
 /// - CLR Profiler + Elastic
-/// - OpenTelemetry Collector + ClickHouse
+/// - CLR Profiler + ClickHouse
 /// - OpenTelemetry Collector + Elastic
+/// - OpenTelemetry Collector + ClickHouse
 /// </summary>
 public sealed class ObservabilityProviderOptions
 {
     /// <summary>
-    /// Provider ativo de observabilidade: "ClickHouse" ou "Elastic".
+    /// Provider ativo de observabilidade: "Elastic" ou "ClickHouse".
     /// Determina onde traces, logs e métricas crus são armazenados e consultados.
+    /// Padrão: Elastic. ClickHouse mantém-se como opção alternativa.
     /// </summary>
-    public string Provider { get; set; } = "ClickHouse";
+    public string Provider { get; set; } = "Elastic";
 
     /// <summary>
     /// Configuração do provider ClickHouse.
@@ -134,8 +135,8 @@ public sealed class ObservabilityProviderOptions
 /// </summary>
 public sealed class ClickHouseProviderOptions
 {
-    /// <summary>Habilita o provider ClickHouse.</summary>
-    public bool Enabled { get; set; } = true;
+    /// <summary>Habilita o provider ClickHouse (alternativa ao Elastic).</summary>
+    public bool Enabled { get; set; } = false;
 
     /// <summary>
     /// Connection string do ClickHouse.
@@ -170,11 +171,11 @@ public sealed class ClickHouseProviderOptions
 /// </summary>
 public sealed class ElasticProviderOptions
 {
-    /// <summary>Habilita o provider Elastic.</summary>
-    public bool Enabled { get; set; }
+    /// <summary>Habilita o provider Elastic (padrão).</summary>
+    public bool Enabled { get; set; } = true;
 
     /// <summary>Endpoint do cluster Elastic (ex: "https://elastic.example.com:9200").</summary>
-    public string Endpoint { get; set; } = string.Empty;
+    public string Endpoint { get; set; } = "http://elasticsearch:9200";
 
     /// <summary>API Key para autenticação no Elastic (recomendado sobre user/password).</summary>
     public string ApiKey { get; set; } = string.Empty;
@@ -288,7 +289,7 @@ public sealed class ClrProfilerModeOptions
 /// <summary>
 /// Configuração do OpenTelemetry Collector — pipeline central de ingestão.
 /// O Collector normaliza, enriquece, filtra e roteia sinais de telemetria
-/// para o provider de observabilidade configurado (ClickHouse ou Elastic).
+/// para o provider de observabilidade configurado (Elastic ou ClickHouse).
 /// </summary>
 public sealed class CollectorOptions
 {

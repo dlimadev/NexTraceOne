@@ -3,7 +3,7 @@ namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 /// <summary>
 /// Referência do Product Store para dados crus no provider de observabilidade.
 /// Serve como ponteiro/link entre os dados agregados (PostgreSQL) e
-/// os traces/logs crus armazenados no provider configurado (ClickHouse, Elastic).
+/// os traces/logs crus armazenados no provider configurado (Elastic, ClickHouse).
 ///
 /// Tabela-alvo: telemetry_references (Product Store — PostgreSQL).
 ///
@@ -27,14 +27,14 @@ public sealed record TelemetryReference
     public required string ExternalId { get; init; }
 
     /// <summary>
-    /// Backend onde o dado cru reside ("clickhouse", "elastic", etc.).
+    /// Backend onde o dado cru reside ("elastic", "clickhouse", etc.).
     /// Permite que a UI saiba qual API chamar para buscar o dado original.
     /// </summary>
     public required string BackendType { get; init; }
 
     /// <summary>
     /// URI ou query para acesso direto ao dado no provider de observabilidade.
-    /// Ex: query SQL para ClickHouse ou query DSL para Elastic.
+    /// Ex: query DSL para Elastic ou query SQL para ClickHouse.
     /// </summary>
     public string? AccessUri { get; init; }
 
