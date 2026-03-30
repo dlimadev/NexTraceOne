@@ -62,9 +62,11 @@ public static class GetPackCoverage
 
             foreach (var rollout in distinctScopes)
             {
-                // Count violations matching this scope
+                // Count violations matching this scope.
+                // If violations exceed totalRules (e.g. stale gaps), clamp compliant to 0.
                 var violations = CountViolationsForScope(allGaps, rollout.ScopeType, rollout.Scope);
-                var compliant = Math.Max(0, totalRules - violations);
+                var clampedViolations = Math.Min(violations, totalRules);
+                var compliant = totalRules - clampedViolations;
                 var coveragePercent = totalRules > 0
                     ? Math.Round((decimal)compliant / totalRules * 100, 1)
                     : 0m;
@@ -74,7 +76,7 @@ public static class GetPackCoverage
                     ScopeValue: rollout.Scope,
                     TotalRules: totalRules,
                     CompliantCount: compliant,
-                    NonCompliantCount: violations,
+                    NonCompliantCount: clampedViolations,
                     CoveragePercent: coveragePercent));
             }
 
@@ -106,9 +108,9 @@ public static class GetPackCoverage
                     string.Equals(g.Domain, scopeValue, StringComparison.OrdinalIgnoreCase)),
                 GovernanceScopeType.Team => gaps.Where(g =>
                     string.Equals(g.Team, scopeValue, StringComparison.OrdinalIgnoreCase)),
-                GovernanceScopeType.Environment => gaps.Where(g =>
-                    // ComplianceGap doesn't carry environment — count 0 for environment scopes
-                    false),
+                // NOTE: ComplianceGap entity doesn't carry an environment field.
+                // Environment-scoped rollouts report 0 violations until the entity is extended.
+                GovernanceScopeType.Environment => Enumerable.Empty<ComplianceGap>(),
                 _ => Enumerable.Empty<ComplianceGap>()
             };
 

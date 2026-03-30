@@ -47,7 +47,7 @@ internal sealed class ReliabilityModuleService(ReliabilityDbContext context) : I
         if (budget is null || budget.TotalBudgetMinutes <= 0)
             return null;
 
-        // Return remaining as fraction 0.0 – 1.0
+        // Division is safe: TotalBudgetMinutes is > 0 after the guard above.
         var remaining = budget.RemainingBudgetMinutes / budget.TotalBudgetMinutes;
         return Math.Clamp(Math.Round(remaining, 4), 0m, 1m);
     }

@@ -298,6 +298,7 @@ public sealed class ExecutiveGovernanceSummaryTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Items.Should().NotBeEmpty();
         result.Value.TotalScopes.Should().BeGreaterThan(0);
+        result.Value.Items.Should().ContainSingle(i => i.ScopeType == "Domain" && i.ScopeValue == "payments");
     }
 
     [Fact]
