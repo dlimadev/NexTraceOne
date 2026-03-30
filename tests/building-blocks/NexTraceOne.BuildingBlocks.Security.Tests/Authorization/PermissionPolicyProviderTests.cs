@@ -82,4 +82,48 @@ public sealed class PermissionPolicyProviderTests
         policy!.Requirements.Should().ContainSingle()
             .Which.Should().BeOfType<PermissionRequirement>();
     }
+
+    // ── Testes do novo prefixo ModuleAccess ──────────────────────────────
+
+    [Fact]
+    public async Task GetPolicyAsync_WithModuleAccessPrefix_ReturnsModuleAccessPolicy()
+    {
+        var provider = CreateProvider();
+
+        var policy = await provider.GetPolicyAsync("ModuleAccess:AI:Runtime:Write");
+
+        policy.Should().NotBeNull();
+        policy!.Requirements.Should().ContainSingle()
+            .Which.Should().BeOfType<ModuleAccessRequirement>();
+
+        var requirement = (ModuleAccessRequirement)policy.Requirements.Single();
+        requirement.Module.Should().Be("AI");
+        requirement.Page.Should().Be("Runtime");
+        requirement.Action.Should().Be("Write");
+    }
+
+    [Fact]
+    public async Task GetPolicyAsync_WithModuleAccessWildcard_ReturnsCorrectRequirement()
+    {
+        var provider = CreateProvider();
+
+        var policy = await provider.GetPolicyAsync("ModuleAccess:Catalog:*:Read");
+
+        policy.Should().NotBeNull();
+        var requirement = (ModuleAccessRequirement)policy!.Requirements.Single();
+        requirement.Module.Should().Be("Catalog");
+        requirement.Page.Should().Be("*");
+        requirement.Action.Should().Be("Read");
+    }
+
+    [Fact]
+    public async Task GetPolicyAsync_WithInvalidModuleAccessFormat_DelegatesToFallback()
+    {
+        var provider = CreateProvider();
+
+        // Only 2 parts instead of 3
+        var policy = await provider.GetPolicyAsync("ModuleAccess:AI:Runtime");
+
+        policy.Should().BeNull();
+    }
 }

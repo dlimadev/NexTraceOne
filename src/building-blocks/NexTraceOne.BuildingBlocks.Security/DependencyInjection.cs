@@ -164,9 +164,13 @@ public static class DependencyInjection
                     options.ConfiguredKeys = apiKeysSection.Get<List<ApiKeyConfiguration>>() ?? [];
                 });
 
-        // Autorização baseada em permissões granulares — policies dinâmicas via PermissionPolicyProvider
+        // Autorização baseada em permissões granulares — policies dinâmicas via PermissionPolicyProvider.
+        // Suporta dois modelos:
+        // - Permission (plano): "Permission:ai:runtime:write" → PermissionAuthorizationHandler
+        // - ModuleAccess (granular): "ModuleAccess:AI:Runtime:Write" → ModuleAccessAuthorizationHandler
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, ModuleAccessAuthorizationHandler>();
         services.AddAuthorization();
 
         return services;

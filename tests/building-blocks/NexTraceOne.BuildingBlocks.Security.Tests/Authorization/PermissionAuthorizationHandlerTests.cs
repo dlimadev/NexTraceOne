@@ -15,6 +15,7 @@ public sealed class PermissionAuthorizationHandlerTests
         string userId = "user-1",
         IEnumerable<string>? grantedPermissions = null,
         IDatabasePermissionProvider? dbProvider = null,
+        IModuleAccessPermissionProvider? moduleAccessProvider = null,
         IJitPermissionProvider? jitProvider = null)
     {
         var currentUser = Substitute.For<ICurrentUser>();
@@ -26,7 +27,7 @@ public sealed class PermissionAuthorizationHandlerTests
             .Returns(callInfo => permissions.Contains(callInfo.Arg<string>(), StringComparer.OrdinalIgnoreCase));
 
         var logger = Substitute.For<ILogger<PermissionAuthorizationHandler>>();
-        var handler = new PermissionAuthorizationHandler(currentUser, logger, dbProvider, jitProvider);
+        var handler = new PermissionAuthorizationHandler(currentUser, logger, dbProvider, moduleAccessProvider, jitProvider);
 
         return (handler, currentUser);
     }
@@ -114,7 +115,97 @@ public sealed class PermissionAuthorizationHandlerTests
         logger.ReceivedCalls().Should().NotBeEmpty();
     }
 
-    // ── Testes da cascata: JWT → Database → JIT ──────────────────────────
+    // ── Testes da cascata: JWT → Database → ModuleAccess → JIT ───────────
+
+    [Fact]
+    public async Task HandleRequirement_WithModuleAccessPolicy_Succeeds_When_JwtAndDbDoNotHaveIt()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        dbProvider.HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        var moduleAccessProvider = Substitute.For<IModuleAccessPermissionProvider>();
+        moduleAccessProvider.HasModuleAccessAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            "ai:runtime:write", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<bool?>(true));
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: [],
+            dbProvider: dbProvider,
+            moduleAccessProvider: moduleAccessProvider);
+
+        var context = CreateContext("ai:runtime:write");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task HandleRequirement_WithModuleAccessDeny_DeniesAccess_Even_When_JitWouldAllow()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        dbProvider.HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        var moduleAccessProvider = Substitute.For<IModuleAccessPermissionProvider>();
+        moduleAccessProvider.HasModuleAccessAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            "governance:admin:write", Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<bool?>(false));
+
+        var jitProvider = Substitute.For<IJitPermissionProvider>();
+        jitProvider.HasActiveJitGrantAsync("user-1", "governance:admin:write", Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: [],
+            dbProvider: dbProvider,
+            moduleAccessProvider: moduleAccessProvider,
+            jitProvider: jitProvider);
+
+        var context = CreateContext("governance:admin:write");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeFalse();
+        await jitProvider.DidNotReceive().HasActiveJitGrantAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleRequirement_ModuleAccessNull_FallsThrough_ToJit()
+    {
+        var dbProvider = Substitute.For<IDatabasePermissionProvider>();
+        dbProvider.HasPermissionAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        var moduleAccessProvider = Substitute.For<IModuleAccessPermissionProvider>();
+        moduleAccessProvider.HasModuleAccessAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<bool?>(null));
+
+        var jitProvider = Substitute.For<IJitPermissionProvider>();
+        jitProvider.HasActiveJitGrantAsync("user-1", "platform:admin:read", Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        var (handler, _) = CreateHandler(
+            grantedPermissions: [],
+            dbProvider: dbProvider,
+            moduleAccessProvider: moduleAccessProvider,
+            jitProvider: jitProvider);
+
+        var context = CreateContext("platform:admin:read");
+        await ((IAuthorizationHandler)handler).HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
 
     [Fact]
     public async Task HandleRequirement_WithDbPermission_Succeeds_When_JwtDoesNotHaveIt()

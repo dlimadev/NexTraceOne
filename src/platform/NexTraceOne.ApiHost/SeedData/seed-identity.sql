@@ -271,3 +271,15 @@ VALUES
         'b0000000-0000-0000-0000-000000000001'
     )
 ON CONFLICT DO NOTHING;
+
+-- ═══ NOTA: ROLE PERMISSIONS & MODULE ACCESS POLICIES ═════════════════════════
+-- Os dados de iam_role_permissions e iam_module_access_policies NÃO estão
+-- incluídos neste ficheiro. São semeados automaticamente pelo pipeline
+-- programático SeedAuthorizationDataAsync() que executa ANTES deste script,
+-- lendo diretamente dos catálogos C# (RolePermissionCatalog e
+-- ModuleAccessPolicyCatalog). Isto garante alinhamento automático com o código.
+--
+-- Para seed manual via psql, consultar:
+--   db/seed/seed_production.sql  (PlatformAdmin)
+--   db/seed/seed_development.sql (restantes 6 papéis)
+-- ═════════════════════════════════════════════════════════════════════════════

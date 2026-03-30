@@ -105,3 +105,67 @@ EF Core com IDs fixos:
 | Auditor | `1e91a557-fade-46df-b248-0f5f5899c005` |
 | SecurityReview | `1e91a557-fade-46df-b248-0f5f5899c006` |
 | ApprovalOnly | `1e91a557-fade-46df-b248-0f5f5899c007` |
+
+## Role Permissions e Module Access Policies
+
+### Abordagem programática (preferencial)
+
+O NexTraceOne executa automaticamente o seed de autorização no arranque da aplicação
+em **todos os ambientes** (produção, staging, desenvolvimento) através de
+`SeedAuthorizationDataExtensions.SeedAuthorizationDataAsync()`.
+
+Este seed programático:
+
+- Lê diretamente dos catálogos C# (`RolePermissionCatalog` e `ModuleAccessPolicyCatalog`)
+- É idempotente (verifica se já existem dados antes de inserir)
+- Cobre todos os 7 papéis do sistema
+- Não requer intervenção manual
+- Garante alinhamento automático com o código
+
+**Sequência de arranque:**
+```
+Migrations → SeedConfigurationDefinitions → SeedAuthorizationData → SeedDevelopmentData
+```
+
+### Abordagem SQL (fallback manual)
+
+Os scripts SQL também incluem dados de autorização para cenários de provisionamento
+manual via `psql`:
+
+| Script | Dados de autorização |
+|---|---|
+| `seed_production.sql` | PlatformAdmin: 93 role permissions + 16 module access policies (wildcard) |
+| `seed_development.sql` | 6 papéis restantes: ~190 role permissions + ~100 module access policies granulares |
+
+### Tabelas de autorização
+
+| Tabela | Descrição |
+|---|---|
+| `iam_role_permissions` | Permissões planas por papel (RoleId + PermissionCode + TenantId) |
+| `iam_module_access_policies` | Políticas de acesso granular módulo/página/ação por papel |
+
+### Contagens por papel (role permissions)
+
+| Papel | Nº de permissões | Script |
+|---|---|---|
+| PlatformAdmin | 93 | `seed_production.sql` |
+| TechLead | 52 | `seed_development.sql` |
+| Developer | 28 | `seed_development.sql` |
+| Viewer | 18 | `seed_development.sql` |
+| Auditor | 24 | `seed_development.sql` |
+| SecurityReview | 25 | `seed_development.sql` |
+| ApprovalOnly | 10 | `seed_development.sql` |
+
+### Pipeline de autorização (4 passos)
+
+A cascata de autorização usa estes dados na seguinte ordem:
+
+```
+1. JWT claims (permissões no token)
+2. DB RolePermission (iam_role_permissions)
+3. DB ModuleAccessPolicy (iam_module_access_policies)
+4. JIT grants (acesso temporário just-in-time)
+```
+
+Se nenhum passo conceder acesso, o pedido é negado.
+Se o DB não tiver dados, o sistema usa o catálogo estático como fallback.

@@ -79,6 +79,11 @@ public static class DependencyInjection
         // permissões persistidas em base de dados com suporte a personalização por tenant.
         services.AddScoped<IDatabasePermissionProvider, DatabasePermissionProvider>();
 
+        // Module access permission provider — permite ao PermissionAuthorizationHandler e ao
+        // ModuleAccessAuthorizationHandler verificar políticas de acesso ao nível de módulo/página/ação,
+        // completando a ligação entre o modelo granular (ModuleAccessPolicy) e o pipeline de autorização.
+        services.AddScoped<IModuleAccessPermissionProvider, ModuleAccessPermissionProvider>();
+
         // Provider OIDC para fluxo federado (Authorization Code flow)
         services.AddHttpClient("oidc");
         services.AddScoped<IOidcProvider, OidcProviderService>();

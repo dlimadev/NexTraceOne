@@ -1098,12 +1098,333 @@ VALUES
     )
 ON CONFLICT DO NOTHING;
 
+-- ---------------------------------------------------------------------------
+-- 17. Permissões dos papéis de teste (iam_role_permissions)
+--     Mapeamentos padrão para os 6 papéis de desenvolvimento (TechLead..ApprovalOnly).
+--     PlatformAdmin é inserido pelo seed_production.sql.
+--
+--     Role GUIDs (seeded by EF HasData):
+--       TechLead       : 1e91a557-fade-46df-b248-0f5f5899c002
+--       Developer      : 1e91a557-fade-46df-b248-0f5f5899c003
+--       Viewer         : 1e91a557-fade-46df-b248-0f5f5899c004
+--       Auditor        : 1e91a557-fade-46df-b248-0f5f5899c005
+--       SecurityReview : 1e91a557-fade-46df-b248-0f5f5899c006
+--       ApprovalOnly   : 1e91a557-fade-46df-b248-0f5f5899c007
+--
+--     NOTA: A abordagem preferencial é o seed programático via
+--     SeedAuthorizationDataAsync (Program.cs). Este SQL serve como
+--     fallback para provisioning manual via psql.
+-- ---------------------------------------------------------------------------
+INSERT INTO iam_role_permissions (
+    "Id", "RoleId", "PermissionCode", "TenantId", "GrantedAt", "GrantedBy", "IsActive"
+)
+VALUES
+    -- ══ TechLead (c002) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'identity:users:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'identity:roles:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'identity:sessions:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'identity:jit-access:decide',    NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'identity:break-glass:decide',   NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'identity:delegations:manage',   NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'catalog:assets:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'catalog:assets:write',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'contracts:read',                NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'contracts:write',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'contracts:import',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'developer-portal:read',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'developer-portal:write',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'change-intelligence:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'change-intelligence:write',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'workflow:instances:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'workflow:instances:write',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'workflow:templates:write',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:incidents:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:incidents:write',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:mitigation:read',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:reliability:read',    NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:runbooks:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:runbooks:write',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:runtime:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'operations:automation:read',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:domains:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:teams:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:policies:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:compliance:read',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'analytics:read',                 NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'promotion:requests:write',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'promotion:environments:write',   NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'rulesets:read',                  NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'rulesets:write',                 NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'audit:trail:read',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'audit:reports:read',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'ai:assistant:read',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'ai:assistant:write',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'ai:governance:read',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'integrations:read',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'integrations:write',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'notifications:inbox:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'notifications:inbox:write',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'notifications:preferences:read', NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'notifications:preferences:write',NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'notifications:configuration:read',NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'env:environments:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'env:environments:write',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', 'env:access:read',                NULL, NOW(), 'seed', true),
+    -- ══ Developer (c003) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'identity:users:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'catalog:assets:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'contracts:read',                NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'contracts:write',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'contracts:import',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'developer-portal:read',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'developer-portal:write',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'change-intelligence:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'workflow:instances:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'operations:incidents:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'operations:incidents:write',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'operations:reliability:read',    NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'operations:runbooks:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'operations:runtime:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'governance:domains:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'governance:teams:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'rulesets:read',                  NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'audit:trail:read',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'ai:assistant:read',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'ai:assistant:write',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'integrations:read',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'notifications:inbox:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'notifications:inbox:write',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'notifications:preferences:read', NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'notifications:preferences:write',NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'env:environments:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', 'env:access:read',                NULL, NOW(), 'seed', true),
+    -- ══ Viewer (c004) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'identity:users:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'catalog:assets:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'contracts:read',                NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'developer-portal:read',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'change-intelligence:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'workflow:instances:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'operations:incidents:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'operations:reliability:read',    NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'governance:domains:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'analytics:read',                 NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'rulesets:read',                  NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'audit:trail:read',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'ai:assistant:read',              NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'notifications:inbox:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'notifications:preferences:read', NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', 'env:environments:read',          NULL, NOW(), 'seed', true),
+    -- ══ Auditor (c005) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'identity:users:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'identity:sessions:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'catalog:assets:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'contracts:read',                NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'developer-portal:read',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'change-intelligence:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'workflow:instances:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'operations:incidents:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'operations:reliability:read',    NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'operations:runbooks:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:domains:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:compliance:read',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:evidence:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'governance:reports:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'rulesets:read',                  NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'audit:trail:read',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'audit:reports:read',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'audit:compliance:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'audit:compliance:write',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'env:environments:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'env:access:read',                NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'notifications:inbox:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', 'notifications:preferences:read', NULL, NOW(), 'seed', true),
+    -- ══ SecurityReview (c006) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'identity:users:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'identity:roles:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'identity:sessions:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'identity:sessions:revoke',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'identity:break-glass:decide',   NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'catalog:assets:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'contracts:read',                NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'developer-portal:read',         NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'change-intelligence:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'workflow:instances:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'operations:incidents:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'operations:reliability:read',    NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'governance:compliance:read',     NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'governance:risk:read',           NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'governance:evidence:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'governance:policies:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'rulesets:read',                  NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'rulesets:write',                 NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'audit:trail:read',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'audit:reports:read',             NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'audit:compliance:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'notifications:inbox:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'notifications:preferences:read', NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'env:environments:read',          NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', 'env:access:read',                NULL, NOW(), 'seed', true),
+    -- ══ ApprovalOnly (c007) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'change-intelligence:read',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'workflow:instances:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'workflow:instances:write',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'promotion:requests:read',        NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'promotion:requests:write',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'promotion:gates:override',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'audit:trail:read',               NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'notifications:inbox:read',       NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'notifications:inbox:write',      NULL, NOW(), 'seed', true),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', 'notifications:preferences:read', NULL, NOW(), 'seed', true)
+ON CONFLICT DO NOTHING;
+
+-- ---------------------------------------------------------------------------
+-- 18. Políticas de acesso módulo/página/ação — todos os papéis de teste
+--     (iam_module_access_policies)
+--     PlatformAdmin é inserido pelo seed_production.sql.
+--     Aqui inserem-se TechLead, Developer, Viewer, Auditor, SecurityReview, ApprovalOnly.
+-- ---------------------------------------------------------------------------
+INSERT INTO iam_module_access_policies (
+    "Id", "RoleId", "TenantId", "Module", "Page", "Action",
+    "IsAllowed", "IsActive", "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy"
+)
+VALUES
+    -- ══ TechLead (c002) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Identity',           'Users',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Identity',           'Roles',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Identity',           'Sessions',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Identity',           'JitAccess',   'Decide',  true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Identity',           'BreakGlass',  'Decide',  true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Identity',           'Delegations', '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Catalog',            '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Contracts',          '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'DeveloperPortal',    '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'ChangeIntelligence', '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Workflow',           '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Operations',         'Incidents',   '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Operations',         'Runbooks',    '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Operations',         'Reliability', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Operations',         'Runtime',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Operations',         'Automation',  'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Governance',         'Domains',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Governance',         'Teams',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Governance',         'Policies',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Governance',         'Compliance',  'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Governance',         'Reports',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Promotion',          '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Audit',              'Trail',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Audit',              'Reports',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'AI',                 'Assistant',   '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'AI',                 'Governance',  'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Integrations',       '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Notifications',      '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Environments',       '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c002', NULL, 'Environments',       '*',           'Write',   true, true, NOW(), 'seed', NULL, NULL),
+    -- ══ Developer (c003) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Identity',           'Users',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Catalog',            '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Contracts',          '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'DeveloperPortal',    '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'ChangeIntelligence', '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Workflow',           'Instances',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Operations',         'Incidents',   '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Operations',         'Reliability', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Operations',         'Runbooks',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Operations',         'Runtime',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Governance',         'Domains',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Governance',         'Teams',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Promotion',          'Requests',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Audit',              'Trail',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'AI',                 'Assistant',   '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Integrations',       '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Notifications',      'Inbox',       '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Notifications',      'Preferences', '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c003', NULL, 'Environments',       '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    -- ══ Viewer (c004) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Identity',           'Users',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Catalog',            '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Contracts',          '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'DeveloperPortal',    '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'ChangeIntelligence', '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Workflow',           'Instances',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Operations',         'Incidents',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Operations',         'Reliability', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Governance',         'Domains',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Governance',         'Reports',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Promotion',          'Requests',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Audit',              'Trail',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'AI',                 'Assistant',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Notifications',      'Inbox',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Notifications',      'Preferences', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c004', NULL, 'Environments',       '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    -- ══ Auditor (c005) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Identity',           'Users',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Identity',           'Sessions',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Catalog',            '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Contracts',          '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'DeveloperPortal',    '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'ChangeIntelligence', '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Workflow',           'Instances',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Operations',         'Incidents',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Operations',         'Reliability', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Operations',         'Runbooks',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Governance',         'Domains',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Governance',         'Compliance',  '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Governance',         'Evidence',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Governance',         'Reports',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Promotion',          'Requests',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Audit',              '*',           '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Environments',       '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Notifications',      'Inbox',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c005', NULL, 'Notifications',      'Preferences', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    -- ══ SecurityReview (c006) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Identity',           'Users',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Identity',           'Roles',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Identity',           'Sessions',    '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Identity',           'BreakGlass',  'Decide',  true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Catalog',            '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Contracts',          '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'DeveloperPortal',    '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'ChangeIntelligence', '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Workflow',           'Instances',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Operations',         'Incidents',   'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Operations',         'Reliability', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Governance',         'Compliance',  'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Governance',         'Risk',        'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Governance',         'Evidence',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Governance',         'Policies',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Promotion',          'Requests',    'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Audit',              'Trail',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Audit',              'Reports',     'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Audit',              'Compliance',  'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Environments',       '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Notifications',      'Inbox',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c006', NULL, 'Notifications',      'Preferences', 'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    -- ══ ApprovalOnly (c007) ══
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'ChangeIntelligence', '*',           'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'Workflow',           'Instances',   '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'Promotion',          'Requests',    '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'Promotion',          'Gates',       'Override',true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'Audit',              'Trail',       'Read',    true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'Notifications',      'Inbox',       '*',       true, true, NOW(), 'seed', NULL, NULL),
+    (gen_random_uuid(), '1e91a557-fade-46df-b248-0f5f5899c007', NULL, 'Notifications',      'Preferences', 'Read',    true, true, NOW(), 'seed', NULL, NULL)
+ON CONFLICT DO NOTHING;
+
 COMMIT;
 
 -- =============================================================================
 -- Resumo do que foi inserido:
 --   iam_users                   : 6   (techlead, dev, viewer, auditor, secreview, approval)
 --   iam_tenant_memberships      : 6   (um por utilizador de teste)
+--   iam_role_permissions        : ~190 (6 papéis × permissões do catálogo)
+--   iam_module_access_policies  : ~100 (6 papéis × políticas módulo/página/ação do catálogo)
 --   gov_teams                   : 3   (platform-engineering, payments-checkout, identity-security)
 --   gov_domains                 : 3   (platform, payments, security)
 --   gov_team_domain_links       : 3   (um por equipa)
@@ -1123,7 +1444,12 @@ COMMIT;
 --   aik_ide_capability_policies : 4   (VS+VSCode × Developer+TechLead)
 --
 -- Nota: cfg_modules, chg_deployment_environments, chg_workflow_templates,
---       chg_sla_policies, chg_promotion_gates, ntf_channel_configurations
---       e ntf_templates são inseridos por seed_production.sql (dados de referência
+--       chg_sla_policies, chg_promotion_gates, ntf_channel_configurations,
+--       ntf_templates, e iam_role_permissions/iam_module_access_policies do
+--       PlatformAdmin são inseridos por seed_production.sql (dados de referência
 --       comuns a todos os ambientes).
+--
+-- Nota: A abordagem preferencial para permissões e políticas de acesso é o seed
+--       programático via SeedAuthorizationDataAsync (Program.cs), que lê
+--       directamente os catálogos C# e é idempotente.
 -- =============================================================================
