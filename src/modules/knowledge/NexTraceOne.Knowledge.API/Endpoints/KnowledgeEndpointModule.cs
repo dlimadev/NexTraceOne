@@ -13,6 +13,8 @@ using GetKnowledgeRelationsBySourceFeature = NexTraceOne.Knowledge.Application.F
 using ListKnowledgeDocumentsFeature = NexTraceOne.Knowledge.Application.Features.ListKnowledgeDocuments.ListKnowledgeDocuments;
 using GetKnowledgeDocumentByIdFeature = NexTraceOne.Knowledge.Application.Features.GetKnowledgeDocumentById.GetKnowledgeDocumentById;
 using ListOperationalNotesFeature = NexTraceOne.Knowledge.Application.Features.ListOperationalNotes.ListOperationalNotes;
+using UpdateKnowledgeDocumentFeature = NexTraceOne.Knowledge.Application.Features.UpdateKnowledgeDocument.UpdateKnowledgeDocument;
+using UpdateOperationalNoteFeature = NexTraceOne.Knowledge.Application.Features.UpdateOperationalNote.UpdateOperationalNote;
 
 using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.Knowledge.Domain.Enums;
@@ -212,5 +214,35 @@ public sealed class KnowledgeEndpointModule
         })
         .WithTags("Knowledge")
         .WithSummary("List operational notes with pagination");
+
+        // P10.5: Atualização de documento de conhecimento.
+        knowledge.MapPut("/documents/{documentId:guid}", async (
+            Guid documentId,
+            UpdateKnowledgeDocumentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var enriched = command with { DocumentId = documentId };
+            var result = await sender.Send(enriched, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("Update knowledge document");
+
+        // P10.5: Atualização de nota operacional (inclui resolve/reopen).
+        knowledge.MapPut("/operational-notes/{noteId:guid}", async (
+            Guid noteId,
+            UpdateOperationalNoteFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var enriched = command with { NoteId = noteId };
+            var result = await sender.Send(enriched, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("Update operational note");
     }
 }
