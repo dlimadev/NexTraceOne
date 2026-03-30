@@ -344,7 +344,6 @@ export function AiAssistantPage() {
         setSelectedConversationState(null);
       }
     } catch (err) {
-      console.error('Failed to load conversations:', err);
       setConversationsError(t('aiHub.errorLoadingConversations'));
     } finally {
       if (requestId === conversationLoadRequestRef.current) {
@@ -385,7 +384,6 @@ export function AiAssistantPage() {
           : conv
       )));
     } catch (err) {
-      console.error('Failed to load messages:', err);
       setMessages([]);
       setMessagesError(getProblemStatus(err) === 404 ? t('aiHub.conversationNotFound') : t('aiHub.errorLoadingMessages'));
     } finally {
@@ -485,7 +483,6 @@ export function AiAssistantPage() {
       setSelectedConversationState(response.conversationId);
       await loadConversations(response.conversationId);
     } catch (err) {
-      console.error('Failed to create conversation:', err);
       setConversationsError(t('common.errorLoading'));
     }
   };

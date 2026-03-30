@@ -71,6 +71,20 @@ public sealed class AiTokenUsageLedger : AuditableEntity<AiTokenUsageLedgerId>
     /// <summary>Duração da inferência em milissegundos.</summary>
     public double DurationMs { get; private set; }
 
+    // ── FinOps: Atribuição de custo (Phase 4) ──────────────────────────
+
+    /// <summary>Custo por token de entrada (USD), conforme pricing do provedor.</summary>
+    public decimal? CostPerInputToken { get; private set; }
+
+    /// <summary>Custo por token de saída (USD), conforme pricing do provedor.</summary>
+    public decimal? CostPerOutputToken { get; private set; }
+
+    /// <summary>Custo estimado total em USD para esta inferência.</summary>
+    public decimal? EstimatedCostUsd { get; private set; }
+
+    /// <summary>Moeda do custo (padrão "USD").</summary>
+    public string? CostCurrency { get; private set; }
+
     /// <summary>
     /// Regista uma nova entrada no ledger de consumo de tokens.
     /// A entrada é imutável após criação — não existem métodos de alteração.
@@ -92,7 +106,11 @@ public sealed class AiTokenUsageLedger : AuditableEntity<AiTokenUsageLedgerId>
         string executionId,
         DateTimeOffset timestamp,
         string status,
-        double durationMs)
+        double durationMs,
+        decimal? costPerInputToken = null,
+        decimal? costPerOutputToken = null,
+        decimal? estimatedCostUsd = null,
+        string? costCurrency = null)
     {
         Guard.Against.NullOrWhiteSpace(userId);
         Guard.Against.Default(tenantId);
@@ -126,7 +144,11 @@ public sealed class AiTokenUsageLedger : AuditableEntity<AiTokenUsageLedgerId>
             ExecutionId = executionId,
             Timestamp = timestamp,
             Status = status,
-            DurationMs = durationMs
+            DurationMs = durationMs,
+            CostPerInputToken = costPerInputToken,
+            CostPerOutputToken = costPerOutputToken,
+            EstimatedCostUsd = estimatedCostUsd,
+            CostCurrency = costCurrency
         };
     }
 }
