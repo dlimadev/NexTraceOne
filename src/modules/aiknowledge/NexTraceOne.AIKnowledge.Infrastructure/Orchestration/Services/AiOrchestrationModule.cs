@@ -69,6 +69,9 @@ internal sealed class AiOrchestrationModule(
             })
             .ToListAsync(ct);
 
+        // Note: Token usage is queried per conversation because IAiGovernanceModule
+        // operates across bounded contexts. Batch optimisation (P02.6-followup) can be
+        // added to IAiGovernanceModule when volume justifies it.
         var results = new List<ConversationSummaryDto>(conversations.Count);
 
         foreach (var c in conversations)
