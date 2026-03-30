@@ -70,7 +70,7 @@ public sealed class MitigationFeatureTests
     public async Task GetMitigationWorkflow_KnownIncidentAndWorkflow_ShouldReturnWorkflowDetail()
     {
         var handler = new GetMitigationWorkflow.Handler(_store);
-        var query = new GetMitigationWorkflow.Query("a1b2c3d4-0001-0000-0000-000000000001", "wf-0001-0000-0000-000000000001");
+        var query = new GetMitigationWorkflow.Query("a1b2c3d4-0001-0000-0000-000000000001", "00000001-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
 
@@ -303,7 +303,7 @@ public sealed class MitigationFeatureTests
     public async Task GetMitigationValidation_KnownWorkflow_ShouldReturnValidationData()
     {
         var handler = new GetMitigationValidation.Handler(_store);
-        var query = new GetMitigationValidation.Query("a1b2c3d4-0001-0000-0000-000000000001", "wf-0001-0000-0000-000000000001");
+        var query = new GetMitigationValidation.Query("a1b2c3d4-0001-0000-0000-000000000001", "00000001-0001-0000-0000-000000000001");
 
         var result = await handler.Handle(query, CancellationToken.None);
 
