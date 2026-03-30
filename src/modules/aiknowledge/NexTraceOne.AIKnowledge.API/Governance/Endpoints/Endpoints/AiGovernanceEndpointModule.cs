@@ -41,6 +41,24 @@ using GetAgentExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.
 using ReviewArtifactFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ReviewArtifact.ReviewArtifact;
 using SeedDefaultModelsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultModels.SeedDefaultModels;
 using SeedDefaultAgentsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultAgents.SeedDefaultAgents;
+using SeedDefaultGuardrailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultGuardrails.SeedDefaultGuardrails;
+using SeedDefaultPromptTemplatesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultPromptTemplates.SeedDefaultPromptTemplates;
+using SeedDefaultToolDefinitionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultToolDefinitions.SeedDefaultToolDefinitions;
+using ListGuardrailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListGuardrails.ListGuardrails;
+using GetGuardrailFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetGuardrail.GetGuardrail;
+using CreateGuardrailFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateGuardrail.CreateGuardrail;
+using UpdateGuardrailFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateGuardrail.UpdateGuardrail;
+using ListPromptTemplatesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListPromptTemplates.ListPromptTemplates;
+using GetPromptTemplateFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetPromptTemplate.GetPromptTemplate;
+using CreatePromptTemplateFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreatePromptTemplate.CreatePromptTemplate;
+using UpdatePromptTemplateFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePromptTemplate.UpdatePromptTemplate;
+using ListToolDefinitionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListToolDefinitions.ListToolDefinitions;
+using GetToolDefinitionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetToolDefinition.GetToolDefinition;
+using CreateToolDefinitionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateToolDefinition.CreateToolDefinition;
+using UpdateToolDefinitionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateToolDefinition.UpdateToolDefinition;
+using ListEvaluationsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListEvaluations.ListEvaluations;
+using GetEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluation.GetEvaluation;
+using SubmitEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitEvaluation.SubmitEvaluation;
 
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
@@ -73,6 +91,10 @@ public sealed class AiGovernanceEndpointModule
         MapAgentEndpoints(app);
         MapAgentExecutionEndpoints(app);
         MapAgentArtifactEndpoints(app);
+        MapGuardrailEndpoints(app);
+        MapPromptTemplateEndpoints(app);
+        MapToolDefinitionEndpoints(app);
+        MapEvaluationEndpoints(app);
         MapSeedEndpoints(app);
     }
 
@@ -632,6 +654,239 @@ public sealed class AiGovernanceEndpointModule
                 new SeedDefaultAgentsFeature.Command(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/guardrails", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SeedDefaultGuardrailsFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/prompt-templates", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SeedDefaultPromptTemplatesFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/tool-definitions", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SeedDefaultToolDefinitionsFeature.Command(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Guardrails ──────────────────────────────────────────────────────
+
+    private static void MapGuardrailEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/guardrails");
+
+        group.MapGet("/", async (
+            string? category,
+            string? guardType,
+            bool? isActive,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListGuardrailsFeature.Query(category, guardType, isActive),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{guardrailId:guid}", async (
+            Guid guardrailId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetGuardrailFeature.Query(guardrailId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/", async (
+            CreateGuardrailFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPatch("/{guardrailId:guid}", async (
+            Guid guardrailId,
+            UpdateGuardrailRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateGuardrailFeature.Command(guardrailId, body.IsActive);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Prompt Templates ────────────────────────────────────────────────
+
+    private static void MapPromptTemplateEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/prompt-templates");
+
+        group.MapGet("/", async (
+            string? category,
+            string? persona,
+            bool? isActive,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListPromptTemplatesFeature.Query(category, persona, isActive),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{templateId:guid}", async (
+            Guid templateId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetPromptTemplateFeature.Query(templateId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/", async (
+            CreatePromptTemplateFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPatch("/{templateId:guid}", async (
+            Guid templateId,
+            UpdatePromptTemplateRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdatePromptTemplateFeature.Command(templateId, body.IsActive);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Tool Definitions ────────────────────────────────────────────────
+
+    private static void MapToolDefinitionEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/tool-definitions");
+
+        group.MapGet("/", async (
+            string? category,
+            bool? isActive,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListToolDefinitionsFeature.Query(category, isActive),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{toolId:guid}", async (
+            Guid toolId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetToolDefinitionFeature.Query(toolId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/", async (
+            CreateToolDefinitionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPatch("/{toolId:guid}", async (
+            Guid toolId,
+            UpdateToolDefinitionRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateToolDefinitionFeature.Command(toolId, body.IsActive);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Evaluations ─────────────────────────────────────────────────────
+
+    private static void MapEvaluationEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/evaluations");
+
+        group.MapGet("/", async (
+            Guid? conversationId,
+            Guid? agentExecutionId,
+            string? userId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListEvaluationsFeature.Query(conversationId, agentExecutionId, userId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{evaluationId:guid}", async (
+            Guid evaluationId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetEvaluationFeature.Query(evaluationId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/", async (
+            SubmitEvaluationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
     }
 }
 
@@ -693,3 +948,12 @@ public sealed record ExecuteAgentRequest(
 public sealed record ReviewArtifactRequest(
     string Decision,
     string? Notes);
+
+/// <summary>Corpo de pedido para atualização de um guardrail de IA.</summary>
+public sealed record UpdateGuardrailRequest(bool? IsActive);
+
+/// <summary>Corpo de pedido para atualização de um template de prompt.</summary>
+public sealed record UpdatePromptTemplateRequest(bool? IsActive);
+
+/// <summary>Corpo de pedido para atualização de uma definição de ferramenta.</summary>
+public sealed record UpdateToolDefinitionRequest(bool? IsActive);

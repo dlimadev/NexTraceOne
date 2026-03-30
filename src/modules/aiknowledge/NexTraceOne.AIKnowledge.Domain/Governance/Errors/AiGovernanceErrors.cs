@@ -224,4 +224,61 @@ public static class AiGovernanceErrors
             "AiGovernance.Tool.ExecutionFailed",
             "Tool '{0}' execution failed: {1}.",
             toolName, reason);
+
+    // ── Guardrails ──────────────────────────────────────────────────────
+
+    /// <summary>Guardrail de IA não encontrado pelo identificador informado.</summary>
+    public static Error GuardrailNotFound(string guardrailId)
+        => Error.NotFound(
+            "AiGovernance.Guardrail.NotFound",
+            "AI guardrail '{0}' was not found.",
+            guardrailId);
+
+    /// <summary>Já existe um guardrail com o nome especificado.</summary>
+    public static Error GuardrailDuplicateName(string name)
+        => Error.Conflict(
+            "AiGovernance.Guardrail.DuplicateName",
+            "An AI guardrail with name '{0}' already exists.",
+            name);
+
+    // ── Prompt Templates ────────────────────────────────────────────────
+
+    /// <summary>Template de prompt não encontrado pelo identificador informado.</summary>
+    public static Error PromptTemplateNotFound(string templateId)
+        => Error.NotFound(
+            "AiGovernance.PromptTemplate.NotFound",
+            "Prompt template '{0}' was not found.",
+            templateId);
+
+    /// <summary>Já existe um template de prompt com o nome especificado.</summary>
+    public static Error PromptTemplateDuplicateName(string name)
+        => Error.Conflict(
+            "AiGovernance.PromptTemplate.DuplicateName",
+            "A prompt template with name '{0}' already exists.",
+            name);
+
+    // ── Tool Definitions ────────────────────────────────────────────────
+
+    /// <summary>Definição de ferramenta de IA não encontrada pelo identificador informado.</summary>
+    public static Error ToolDefinitionNotFound(string toolId)
+        => Error.NotFound(
+            "AiGovernance.ToolDefinition.NotFound",
+            "AI tool definition '{0}' was not found.",
+            toolId);
+
+    /// <summary>Já existe uma ferramenta com o nome especificado.</summary>
+    public static Error ToolDefinitionDuplicateName(string name)
+        => Error.Conflict(
+            "AiGovernance.ToolDefinition.DuplicateName",
+            "An AI tool definition with name '{0}' already exists.",
+            name);
+
+    // ── Evaluations ─────────────────────────────────────────────────────
+
+    /// <summary>Avaliação de qualidade de IA não encontrada pelo identificador informado.</summary>
+    public static Error EvaluationNotFound(string evaluationId)
+        => Error.NotFound(
+            "AiGovernance.Evaluation.NotFound",
+            "AI evaluation '{0}' was not found.",
+            evaluationId);
 }
