@@ -21,6 +21,10 @@ public sealed class AnalyticsOptions
     /// Endpoint do storage analítico.
     /// Para Elasticsearch: http://elasticsearch:9200
     /// Para ClickHouse (alternativa): http://clickhouse:8123/?database=nextraceone_analytics
+    ///
+    /// NOTA: O nome "ConnectionString" é mantido por backward-compatibility com
+    /// configurações existentes (Analytics:ConnectionString). Para Elasticsearch,
+    /// o valor esperado é o URL base do cluster (ex: http://elasticsearch:9200).
     /// </summary>
     public string ConnectionString { get; set; } = "http://elasticsearch:9200";
 

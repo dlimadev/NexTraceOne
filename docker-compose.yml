@@ -47,12 +47,14 @@ services:
       - nextraceone-net
 
   # ── Elasticsearch (observabilidade — provider padrão) ────────────────────────
+  # AVISO: xpack.security.enabled=false é apenas para desenvolvimento local.
+  # Em produção, ativar segurança (TLS, autenticação, API keys).
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
     restart: unless-stopped
     environment:
       discovery.type: single-node
-      xpack.security.enabled: "false"
+      xpack.security.enabled: "false"   # APENAS para dev local — ativar em produção
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
