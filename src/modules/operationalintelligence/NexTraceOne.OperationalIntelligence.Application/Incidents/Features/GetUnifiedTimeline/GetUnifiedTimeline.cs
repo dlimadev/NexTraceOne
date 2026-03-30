@@ -86,7 +86,8 @@ public static class GetUnifiedTimeline
             }
 
             // Phase 2: Legacy events from Elasticsearch would be added here
-            // This is a placeholder for future Elasticsearch integration
+            // TODO (P02.3): integrate with Elasticsearch via IAnalyticsWriter/ElasticObservabilityProvider
+            // to fetch legacy batch, MQ and mainframe events for the unified timeline.
 
             var totalCount = entries.Count;
             var ordered = entries

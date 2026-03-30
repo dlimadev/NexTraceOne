@@ -80,7 +80,7 @@ jobs:
           sed -i 's/JWT_SECRET=REPLACE-WITH-AT-LEAST-32-CHAR-SECRET-KEY/JWT_SECRET=E2E-Test-SecretKey-AtLeast32BytesLong-2024!/' .env
           sed -i 's/NEXTRACE_AUTO_MIGRATE=false/NEXTRACE_AUTO_MIGRATE=true/' .env
           sed -i 's/ASPNETCORE_ENVIRONMENT=Staging/ASPNETCORE_ENVIRONMENT=Development/' .env
-          docker compose up -d postgres clickhouse otel-collector 2>&1 | tail -20
+          docker compose up -d postgres elasticsearch otel-collector 2>&1 | tail -20
           echo "Waiting for infrastructure..."
           sleep 30
 

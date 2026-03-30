@@ -456,7 +456,7 @@ O produto deve considerar como fontes válidas:
 
 ## 10.3 Armazenamento e direção arquitetural
 
-Nas conversas do projeto, a direção evoluiu para privilegiar **ClickHouse** como base importante para workloads analíticos e de observabilidade, em vez de dependência da stack Loki/Tempo/Prometheus como centro do produto.
+Nas conversas do projeto, a direção evoluiu para privilegiar **Elasticsearch** como base principal para workloads analíticos e de observabilidade, em vez de dependência da stack Loki/Tempo/Prometheus como centro do produto. ClickHouse permanece como opção alternativa para cenários específicos.
 
 Isto significa:
 
@@ -658,7 +658,7 @@ O produto deve nascer consistente como monólito modular bem desenhado, preparad
 - Windows e Linux
 - SMTP
 - evolução posterior para Kubernetes
-- stack analítica/observabilidade com forte inclinação a ClickHouse
+- stack analítica/observabilidade com Elasticsearch como provider padrão (ClickHouse como alternativa)
 
 ## 14.5 Restrições conhecidas
 

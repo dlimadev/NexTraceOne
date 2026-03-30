@@ -4,14 +4,14 @@
 #
 # Stack para desenvolvimento e POC:
 # - OpenTelemetry Collector (pipeline central de ingestão)
-# - ClickHouse (provider de observabilidade — traces, logs e métricas crus)
+# - Elasticsearch (provider de observabilidade — traces, logs e métricas crus)
 #
 # O PostgreSQL do produto (Product Store) é externo a este compose.
 # Métricas agregadas são escritas no PostgreSQL pelo application layer,
 # não diretamente pelo Collector.
 #
-# Provider: ClickHouse é o provider padrão para desenvolvimento local.
-# Para Elastic: substituir ClickHouse por integração com stack Elastic existente.
+# Provider: Elasticsearch é o provider padrão para desenvolvimento local.
+# Para ClickHouse: substituir Elasticsearch pelo ClickHouse como alternativa.
 #
 # Coleta: OpenTelemetry Collector é o modo padrão (Kubernetes).
 # Para IIS: CLR Profiler envia dados via OTLP HTTP para este Collector.
@@ -21,28 +21,26 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 
 services:
-  # ── ClickHouse (Observability Provider) ──────────────────────────────
-  clickhouse:
-    image: clickhouse/clickhouse-server:24.8-alpine
-    container_name: nextraceone-clickhouse
+  # ── Elasticsearch (Observability Provider) ───────────────────────────
+  # AVISO: xpack.security.enabled=false é apenas para desenvolvimento local.
+  # Em produção, ativar segurança (TLS, autenticação, API keys).
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    container_name: nextraceone-elasticsearch
     environment:
-      CLICKHOUSE_DB: nextraceone_obs
-      CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: ""
-      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      discovery.type: single-node
+      xpack.security.enabled: "false"   # APENAS para dev local — ativar em produção
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     volumes:
-      - clickhouse-data:/var/lib/clickhouse
-      - ../clickhouse/init-schema.sql:/docker-entrypoint-initdb.d/01-init-schema.sql:ro
-      - ../clickhouse/analytics-schema.sql:/docker-entrypoint-initdb.d/02-analytics-schema.sql:ro
+      - elasticsearch-data:/usr/share/elasticsearch/data
     ports:
-      - "8123:8123"   # HTTP interface
-      - "9000:9000"   # Native protocol
+      - "9200:9200"   # REST API
     healthcheck:
-      test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     restart: unless-stopped
     networks:
       - nextraceone-telemetry
@@ -60,9 +58,9 @@ services:
       - "8888:8888"   # Prometheus metrics (Collector self-monitoring)
       - "13133:13133" # Health check
     environment:
-      - CLICKHOUSE_ENDPOINT=tcp://clickhouse:9000?database=nextraceone_obs
+      - ELASTICSEARCH_ENDPOINT=http://elasticsearch:9200
     depends_on:
-      clickhouse:
+      elasticsearch:
         condition: service_healthy
     restart: unless-stopped
     deploy:
@@ -73,7 +71,7 @@ services:
       - nextraceone-telemetry
 
 volumes:
-  clickhouse-data:
+  elasticsearch-data:
 
 networks:
   nextraceone-telemetry:
