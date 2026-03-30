@@ -46,6 +46,15 @@ public static class DependencyInjection
         // ── Repositórios de ativos (existentes) ──────────────────────────
         services.AddScoped<IApiAssetRepository, ApiAssetRepository>();
         services.AddScoped<IServiceAssetRepository, ServiceAssetRepository>();
+        services.AddScoped<IServiceLinkRepository, ServiceLinkRepository>();
+
+        // ── Repositórios de discovery automático ─────────────────────────
+        services.AddScoped<IDiscoveredServiceRepository, DiscoveredServiceRepository>();
+        services.AddScoped<IDiscoveryRunRepository, DiscoveryRunRepository>();
+        services.AddScoped<IDiscoveryMatchRuleRepository, DiscoveryMatchRuleRepository>();
+
+        // ── Provider de discovery via telemetria ─────────────────────────
+        services.AddScoped<IServiceDiscoveryProvider, OtelServiceDiscoveryProvider>();
 
         // ── Repositórios de temporalidade, overlays e saved views ────────
         services.AddScoped<IGraphSnapshotRepository, GraphSnapshotRepository>();

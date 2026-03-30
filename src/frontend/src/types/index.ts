@@ -1229,10 +1229,44 @@ export interface ContractListItem {
   exposureType?: string;
   serviceType?: string;
   ruleViolationCount?: number;
+  overallScore?: number;
 }
 
 export interface ContractListResponse {
   items: ContractListItem[];
+  totalCount: number;
+}
+
+export interface ContractDeploymentItem {
+  deploymentId: string;
+  contractVersionId: string;
+  apiAssetId: string;
+  environment: string;
+  semVer: string;
+  status: 'Pending' | 'Success' | 'Failed' | 'Rollback';
+  deployedAt: string;
+  deployedBy: string;
+  sourceSystem: string;
+  notes?: string;
+}
+
+export interface ContractDeploymentsResponse {
+  deployments: ContractDeploymentItem[];
+}
+
+export interface ContractSubscriber {
+  subscriberId: string;
+  subscriberEmail: string;
+  consumerServiceName: string;
+  consumerServiceVersion: string;
+  subscriptionLevel: string;
+  notificationChannel: string;
+  isActive: boolean;
+  subscribedAt: string;
+}
+
+export interface ContractSubscribersResponse {
+  consumers: ContractSubscriber[];
   totalCount: number;
 }
 
@@ -2571,4 +2605,147 @@ export interface FrictionIndicatorDto {
 export interface FrictionIndicatorsResponse {
   indicators: FrictionIndicatorDto[];
   generatedAt: string;
+}
+
+// ── Knowledge Hub ───────────────────────────────────────────────
+
+export type DocumentCategory =
+  | 'General'
+  | 'Runbook'
+  | 'Troubleshooting'
+  | 'Architecture'
+  | 'Procedure'
+  | 'PostMortem'
+  | 'Reference';
+
+export type DocumentStatus = 'Draft' | 'Published' | 'Archived' | 'Deprecated';
+
+export type NoteSeverity = 'Info' | 'Warning' | 'Critical';
+
+export type OperationalNoteType =
+  | 'Observation'
+  | 'Mitigation'
+  | 'Decision'
+  | 'Hypothesis'
+  | 'FollowUp';
+
+export type KnowledgeRelationType =
+  | 'Service'
+  | 'Contract'
+  | 'Change'
+  | 'Incident'
+  | 'KnowledgeDocument'
+  | 'Runbook'
+  | 'Other';
+
+export interface KnowledgeDocumentSummary {
+  documentId: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  category: DocumentCategory;
+  status: DocumentStatus;
+  tags: string[];
+  authorId: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string | null;
+  publishedAt: string | null;
+}
+
+export interface KnowledgeDocumentDetail {
+  documentId: string;
+  title: string;
+  slug: string;
+  content: string;
+  summary: string | null;
+  category: DocumentCategory;
+  status: DocumentStatus;
+  tags: string[];
+  authorId: string;
+  lastEditorId: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string | null;
+  publishedAt: string | null;
+}
+
+export interface OperationalNoteDto {
+  noteId: string;
+  title: string;
+  content: string;
+  severity: NoteSeverity;
+  noteType: OperationalNoteType;
+  origin: string;
+  authorId: string;
+  contextEntityId: string | null;
+  contextType: string | null;
+  tags: string[];
+  isResolved: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  resolvedAt: string | null;
+}
+
+export interface KnowledgeRelationDto {
+  relationId: string;
+  sourceEntityId: string;
+  targetEntityId: string;
+  targetEntityType: KnowledgeRelationType;
+  relationType: string;
+  createdAt: string;
+}
+
+export interface KnowledgeSearchItem {
+  entityId: string;
+  entityType: string;
+  title: string;
+  subtitle: string | null;
+  status: string | null;
+  route: string;
+  relevanceScore: number;
+}
+
+export interface KnowledgeSearchResponse {
+  items: KnowledgeSearchItem[];
+  totalResults: number;
+}
+
+export interface KnowledgeDocumentsListResponse {
+  items: KnowledgeDocumentSummary[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface OperationalNotesListResponse {
+  items: OperationalNoteDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface CreateKnowledgeDocumentRequest {
+  title: string;
+  content: string;
+  summary?: string;
+  category: DocumentCategory;
+  tags?: string[];
+}
+
+export interface CreateOperationalNoteRequest {
+  title: string;
+  content: string;
+  severity: NoteSeverity;
+  noteType: OperationalNoteType;
+  contextEntityId?: string;
+  contextType?: string;
+  tags?: string[];
+}
+
+export interface CreateKnowledgeRelationRequest {
+  sourceEntityId: string;
+  targetEntityId: string;
+  targetEntityType: KnowledgeRelationType;
+  relationType: string;
 }

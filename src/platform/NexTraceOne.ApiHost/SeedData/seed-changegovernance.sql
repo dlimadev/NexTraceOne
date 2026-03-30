@@ -26,7 +26,7 @@ INSERT INTO chg_releases (
   "CreatedAt"
 ) VALUES
 (
-  'cg000001-0001-0000-0000-000000000001',
+  'c9000001-0001-0000-0000-000000000001',
   'ca010001-0001-0000-0000-000000000001',
   'payment-service', '1.2.0',
   'production', 'gitlab/payments-team/payment-service', 'abc123def456',
@@ -37,7 +37,7 @@ INSERT INTO chg_releases (
   NOW() - INTERVAL '7 days'
 ),
 (
-  'cg000002-0001-0000-0000-000000000001',
+  'c9000002-0001-0000-0000-000000000001',
   'ca010002-0001-0000-0000-000000000001',
   'catalog-service', '2.0.0',
   'production', 'gitlab/platform-team/catalog-service', 'def789abc012',
@@ -48,7 +48,7 @@ INSERT INTO chg_releases (
   NOW() - INTERVAL '14 days'
 ),
 (
-  'cg000003-0001-0000-0000-000000000001',
+  'c9000003-0001-0000-0000-000000000001',
   'ca010003-0001-0000-0000-000000000001',
   'identity-service', '1.0.5',
   'staging', 'gitlab/platform-team/identity-service', 'fed321cba654',
@@ -68,19 +68,19 @@ INSERT INTO chg_deployment_environments (
   "CreatedAt"
 ) VALUES
 (
-  'cg010001-0001-0000-0000-000000000001',
+  'c9010001-0001-0000-0000-000000000001',
   'development', 'Development environment for feature work and integration testing.',
   1, false, false, true,
   NOW() - INTERVAL '90 days'
 ),
 (
-  'cg010002-0001-0000-0000-000000000001',
+  'c9010002-0001-0000-0000-000000000001',
   'staging', 'Pre-production staging environment. Mirrors production configuration.',
   2, false, false, true,
   NOW() - INTERVAL '90 days'
 ),
 (
-  'cg010003-0001-0000-0000-000000000001',
+  'c9010003-0001-0000-0000-000000000001',
   'production', 'Production environment. Requires approval and evidence pack for all breaking changes.',
   3, true, true, true,
   NOW() - INTERVAL '90 days'
@@ -95,7 +95,7 @@ INSERT INTO chg_rulesets (
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'cg020001-0001-0000-0000-000000000001',
+  'c9020001-0001-0000-0000-000000000001',
   'nextraceone-change-standards',
   'Default NexTraceOne change governance ruleset. Validates release metadata, change level classification and evidence completeness.',
   '{"rules":{"require-work-item-reference":{"severity":"warn","description":"Releases should reference a work item"},"breaking-change-requires-approval":{"severity":"error","description":"Breaking changes require explicit promotion approval"},"evidence-pack-for-production":{"severity":"error","description":"Production deployments require evidence pack"}}}',
@@ -103,7 +103,7 @@ INSERT INTO chg_rulesets (
   NOW() - INTERVAL '90 days', 'system', NOW(), 'system', false
 ),
 (
-  'cg020002-0001-0000-0000-000000000001',
+  'c9020002-0001-0000-0000-000000000001',
   'nextraceone-security-baseline',
   'Security baseline ruleset. Validates that releases include security approval markers for critical services.',
   '{"rules":{"critical-service-security-approval":{"severity":"error","description":"Critical services require SecurityApproval marker before production"},"commit-sha-required":{"severity":"error","description":"All releases must have a commit SHA for traceability"}}}',
@@ -116,18 +116,21 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO chg_ruleset_bindings (
   "Id", "RulesetId", "AssetType",
+  "BindingCreatedAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'cg030001-0001-0000-0000-000000000001',
-  'cg020001-0001-0000-0000-000000000001',
+  'c9030001-0001-0000-0000-000000000001',
+  'c9020001-0001-0000-0000-000000000001',
   'RestApi',
+  NOW() - INTERVAL '90 days',
   NOW() - INTERVAL '90 days', 'system', NOW(), 'system', false
 ),
 (
-  'cg030002-0001-0000-0000-000000000001',
-  'cg020002-0001-0000-0000-000000000001',
+  'c9030002-0001-0000-0000-000000000001',
+  'c9020002-0001-0000-0000-000000000001',
   'RestApi',
+  NOW() - INTERVAL '60 days',
   NOW() - INTERVAL '60 days', 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
@@ -136,24 +139,24 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO chg_lint_results (
   "Id", "RulesetId", "ReleaseId", "ApiAssetId",
-  "Score", "TotalFindings", "ExecutedAt",
+  "Score", "TotalFindings", "Findings", "ExecutedAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'cg040001-0001-0000-0000-000000000001',
-  'cg020001-0001-0000-0000-000000000001',
-  'cg000001-0001-0000-0000-000000000001',
+  'c9040001-0001-0000-0000-000000000001',
+  'c9020001-0001-0000-0000-000000000001',
+  'c9000001-0001-0000-0000-000000000001',
   'ca010001-0001-0000-0000-000000000001',
-  92.50, 1,
+  92.50, 1, '[]',
   NOW() - INTERVAL '7 days',
   NOW() - INTERVAL '7 days', 'system', NOW(), 'system', false
 ),
 (
-  'cg040002-0001-0000-0000-000000000001',
-  'cg020001-0001-0000-0000-000000000001',
-  'cg000002-0001-0000-0000-000000000001',
+  'c9040002-0001-0000-0000-000000000001',
+  'c9020001-0001-0000-0000-000000000001',
+  'c9000002-0001-0000-0000-000000000001',
   'ca010002-0001-0000-0000-000000000001',
-  68.00, 4,
+  68.00, 4, '[]',
   NOW() - INTERVAL '14 days',
   NOW() - INTERVAL '14 days', 'system', NOW(), 'system', false
 )

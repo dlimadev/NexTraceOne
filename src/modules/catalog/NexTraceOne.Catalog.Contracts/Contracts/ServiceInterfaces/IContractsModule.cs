@@ -2,10 +2,6 @@ using NexTraceOne.BuildingBlocks.Core.Enums;
 
 namespace NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Planned — no implementation exists.
-// Referenced in governance module as deferred dependency for ContractCount.
-// Implement in Catalog.Infrastructure when contract counting is needed.
-
 /// <summary>
 /// Interface pública do módulo Contracts.
 /// Outros módulos que precisarem de dados deste módulo devem usar

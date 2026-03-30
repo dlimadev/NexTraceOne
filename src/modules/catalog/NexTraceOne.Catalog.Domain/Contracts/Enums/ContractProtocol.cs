@@ -22,10 +22,16 @@ public enum ContractProtocol
     /// <summary>AsyncAPI 2.6 / 3.x — contratos event-driven (mensageria, streaming).</summary>
     AsyncApi = 3,
 
-    /// <summary>Protocol Buffers (.proto) — capacidade evolutiva para gRPC.</summary>
+    /// <summary>
+    /// Protocol Buffers (.proto) — capacidade evolutiva para gRPC.
+    /// RESERVADO: sem parser, diff semântico ou UI implementados nesta versão.
+    /// </summary>
     Protobuf = 4,
 
-    /// <summary>GraphQL SDL — capacidade evolutiva para APIs GraphQL.</summary>
+    /// <summary>
+    /// GraphQL SDL — capacidade evolutiva para APIs GraphQL.
+    /// RESERVADO: sem parser, diff semântico ou UI implementados nesta versão.
+    /// </summary>
     GraphQl = 5,
 
     /// <summary>Worker/Background Service — processo em background declarado por metadados estruturados (trigger, inputs, outputs, side effects).</summary>

@@ -85,7 +85,8 @@ public static class ListContracts
                     TechnicalOwner: service?.TechnicalOwner ?? string.Empty,
                     Criticality: service?.Criticality.ToString() ?? "Medium",
                     Exposure: service?.ExposureType.ToString() ?? "Internal",
-                    ServiceType: service?.ServiceType.ToString() ?? "RestApi");
+                    ServiceType: service?.ServiceType.ToString() ?? "RestApi",
+                    OverallScore: v.LastOverallScore);
             }).ToList();
 
             return new Response(contracts, totalCount, request.Page, request.PageSize);
@@ -116,7 +117,8 @@ public static class ListContracts
         string TechnicalOwner,
         string Criticality,
         string Exposure,
-        string ServiceType);
+        string ServiceType,
+        decimal? OverallScore);
 
     /// <summary>Resposta paginada da listagem de contratos.</summary>
     public sealed record Response(

@@ -12,6 +12,7 @@ using NexTraceOne.OperationalIntelligence.Application.Automation.Features.ListAu
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.ListAutomationWorkflows;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.RecordAutomationValidation;
 using NexTraceOne.OperationalIntelligence.Application.Automation.Features.UpdateAutomationWorkflowAction;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
@@ -481,7 +482,20 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task GetAutomationAuditTrail_KnownWorkflowId_ShouldReturnAuditEntries()
     {
-        var handler = new GetAutomationAuditTrail.Handler();
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var workflowId = new AutomationWorkflowRecordId(Guid.Parse("b0a10001-0001-0000-0000-000000000001"));
+        var records = new List<AutomationAuditRecord>
+        {
+            AutomationAuditRecord.Create(
+                workflowId,
+                AutomationAuditAction.WorkflowCreated,
+                "ops-engineer@nextraceone.io",
+                "Workflow created for controlled restart.",
+                DateTimeOffset.UtcNow)
+        };
+        auditRepo.GetByWorkflowIdAsync(workflowId, Arg.Any<CancellationToken>())
+            .Returns(records);
+        var handler = new GetAutomationAuditTrail.Handler(auditRepo);
         var query = new GetAutomationAuditTrail.Query(
             WorkflowId: "b0a10001-0001-0000-0000-000000000001",
             ServiceId: null,

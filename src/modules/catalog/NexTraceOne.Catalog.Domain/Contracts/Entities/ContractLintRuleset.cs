@@ -7,13 +7,14 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 /// <summary>
-/// Entidade que representa um ruleset Spectral cadastrado na plataforma.
-/// Permite que organizações definam, versão e apliquem regras de linting
+/// Entidade que representa um ruleset de linting de contratos cadastrado na plataforma.
+/// Permite que organizações definam, versionem e apliquem regras de linting
 /// customizadas aos seus contratos, com controlo de escopo e enforcement.
+/// Independente de vendor — suporta rulesets Spectral, OAS Lint ou regras internas.
 /// </summary>
-public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
+public sealed class ContractLintRuleset : AuditableEntity<ContractLintRulesetId>
 {
-    private SpectralRuleset() { }
+    private ContractLintRuleset() { }
 
     /// <summary>Nome legível do ruleset.</summary>
     public string Name { get; private set; } = string.Empty;
@@ -24,17 +25,17 @@ public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
     /// <summary>Versão do ruleset (semver-like ou incremental).</summary>
     public string Version { get; private set; } = "1.0.0";
 
-    /// <summary>Conteúdo do ruleset (JSON/YAML Spectral).</summary>
+    /// <summary>Conteúdo do ruleset (JSON/YAML — Spectral, OAS Lint ou formato interno).</summary>
     public string Content { get; private set; } = string.Empty;
 
     /// <summary>Origem do ruleset: plataforma, organização, equipa, importado.</summary>
-    public SpectralRulesetOrigin Origin { get; private set; }
+    public ContractLintRulesetOrigin Origin { get; private set; }
 
     /// <summary>Modo de execução padrão: realtime, on save, before publish, etc.</summary>
-    public SpectralExecutionMode DefaultExecutionMode { get; private set; }
+    public ContractLintExecutionMode DefaultExecutionMode { get; private set; }
 
     /// <summary>Comportamento face a violações: advisory, blocking, etc.</summary>
-    public SpectralEnforcementBehavior EnforcementBehavior { get; private set; }
+    public ContractLintEnforcementBehavior EnforcementBehavior { get; private set; }
 
     /// <summary>Organização/tenant owner do ruleset. Null para rulesets da plataforma.</summary>
     public string? OrganizationId { get; private set; }
@@ -66,14 +67,14 @@ public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
     /// </summary>
     public uint RowVersion { get; set; }
 
-    /// <summary>Cria novo ruleset Spectral.</summary>
-    public static SpectralRuleset Create(
+    /// <summary>Cria novo ruleset de linting de contrato.</summary>
+    public static ContractLintRuleset Create(
         string name,
         string description,
         string content,
-        SpectralRulesetOrigin origin,
-        SpectralExecutionMode defaultExecutionMode,
-        SpectralEnforcementBehavior enforcementBehavior,
+        ContractLintRulesetOrigin origin,
+        ContractLintExecutionMode defaultExecutionMode,
+        ContractLintEnforcementBehavior enforcementBehavior,
         string? organizationId = null,
         string? owner = null,
         string? domain = null,
@@ -85,9 +86,9 @@ public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
         Guard.Against.NullOrWhiteSpace(name);
         Guard.Against.NullOrWhiteSpace(content);
 
-        return new SpectralRuleset
+        return new ContractLintRuleset
         {
-            Id = SpectralRulesetId.New(),
+            Id = ContractLintRulesetId.New(),
             Name = name,
             Description = description ?? string.Empty,
             Version = "1.0.0",
@@ -135,8 +136,8 @@ public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
 
     /// <summary>Atualiza a configuração de execução e enforcement.</summary>
     public void UpdateConfiguration(
-        SpectralExecutionMode executionMode,
-        SpectralEnforcementBehavior enforcementBehavior)
+        ContractLintExecutionMode executionMode,
+        ContractLintEnforcementBehavior enforcementBehavior)
     {
         DefaultExecutionMode = executionMode;
         EnforcementBehavior = enforcementBehavior;
@@ -155,9 +156,9 @@ public sealed class SpectralRuleset : AuditableEntity<SpectralRulesetId>
     public void UnsetDefault() => IsDefault = false;
 }
 
-/// <summary>Identificador fortemente tipado de SpectralRuleset.</summary>
-public sealed record SpectralRulesetId(Guid Value) : TypedIdBase(Value)
+/// <summary>Identificador fortemente tipado de ContractLintRuleset.</summary>
+public sealed record ContractLintRulesetId(Guid Value) : TypedIdBase(Value)
 {
-    public static SpectralRulesetId New() => new(Guid.NewGuid());
-    public static SpectralRulesetId From(Guid value) => new(value);
+    public static ContractLintRulesetId New() => new(Guid.NewGuid());
+    public static ContractLintRulesetId From(Guid value) => new(value);
 }

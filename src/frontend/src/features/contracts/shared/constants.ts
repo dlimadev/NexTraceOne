@@ -22,8 +22,11 @@ export type ServiceTypeValue = (typeof SERVICE_TYPES)[number]['value'];
 // ── Protocols ─────────────────────────────────────────────────────────────
 
 export const PROTOCOLS: readonly ContractProtocol[] = [
-  'OpenApi', 'Swagger', 'Wsdl', 'AsyncApi', 'Protobuf', 'GraphQl',
+  'OpenApi', 'Swagger', 'Wsdl', 'AsyncApi',
 ];
+
+/** Protocolos reservados — declarados no domínio mas sem implementação completa nesta versão. */
+export const RESERVED_PROTOCOLS: readonly ContractProtocol[] = ['Protobuf', 'GraphQl'];
 
 export const PROTOCOL_BY_TYPE: Record<ServiceTypeValue, ContractProtocol[]> = {
   RestApi: ['OpenApi', 'Swagger'],
@@ -129,9 +132,11 @@ export const WORKSPACE_SECTIONS = [
   { id: 'changelog', labelKey: 'contracts.workspace.changelog', icon: 'History', group: 'governance' },
   { id: 'approvals', labelKey: 'contracts.workspace.approvals', icon: 'CheckCircle', group: 'governance' },
   { id: 'compliance', labelKey: 'contracts.workspace.compliance', icon: 'ShieldCheck', group: 'governance' },
+  { id: 'scorecard', labelKey: 'contracts.workspace.scorecard', icon: 'BarChart2', group: 'governance' },
 
   { id: 'consumers', labelKey: 'contracts.workspace.consumers', icon: 'Users', group: 'relationships' },
   { id: 'dependencies', labelKey: 'contracts.workspace.dependencies', icon: 'Network', group: 'relationships' },
+  { id: 'deployments', labelKey: 'contracts.workspace.deployments', icon: 'Rocket', group: 'relationships' },
   { id: 'ai-agents', labelKey: 'contracts.workspace.aiAgents', icon: 'Bot', group: 'ai' },
 ] as const;
 

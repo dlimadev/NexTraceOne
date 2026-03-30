@@ -9,6 +9,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 using ClassifyBreakingChangeFeature = NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange.ClassifyBreakingChange;
+using ParseSpecPreviewFeature = NexTraceOne.Catalog.Application.Contracts.Features.ParseSpecPreview.ParseSpecPreview;
 using ComputeSemanticDiffFeature = NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff.ComputeSemanticDiff;
 using CreateContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion.CreateContractVersion;
 using DeprecateContractVersionFeature = NexTraceOne.Catalog.Application.Contracts.Features.DeprecateContractVersion.DeprecateContractVersion;
@@ -32,6 +33,8 @@ using GenerateScorecardFeature = NexTraceOne.Catalog.Application.Contracts.Featu
 using GenerateEvidencePackFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateEvidencePack.GenerateEvidencePack;
 using EvaluateContractRulesFeature = NexTraceOne.Catalog.Application.Contracts.Features.EvaluateContractRules.EvaluateContractRules;
 using GetCompatibilityAssessmentFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment.GetCompatibilityAssessment;
+using RegisterContractDeploymentFeature = NexTraceOne.Catalog.Application.Contracts.Features.RegisterContractDeployment.RegisterContractDeployment;
+using GetContractDeploymentsFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractDeployments.GetContractDeployments;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -320,6 +323,42 @@ public sealed class ContractsEndpointModule
 
         group.MapPost("/compatibility", async (
             GetCompatibilityAssessmentFeature.Query query,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Deployments ──────────────────────────────────────────────
+
+        group.MapPost("/{contractVersionId:guid}/deployments", async (
+            Guid contractVersionId,
+            RegisterContractDeploymentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updated = command with { ContractVersionId = contractVersionId };
+            var result = await sender.Send(updated, cancellationToken);
+            return result.ToCreatedResult("/api/v1/contracts/{0}/deployments", localizer);
+        }).RequirePermission("contracts:write");
+
+        group.MapGet("/{contractVersionId:guid}/deployments", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetContractDeploymentsFeature.Query(contractVersionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Preview (Contract Studio Editor) ─────────────────────────
+
+        group.MapPost("/parse-preview", async (
+            ParseSpecPreviewFeature.Query query,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

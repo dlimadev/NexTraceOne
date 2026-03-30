@@ -1,4 +1,5 @@
 export { ConfigurationAdminPage } from './pages/ConfigurationAdminPage';
+export { AdvancedConfigurationConsolePage } from './pages/AdvancedConfigurationConsolePage';
 export { configurationApi } from './api/configurationApi';
 export {
   useConfigurationDefinitions,

@@ -25,6 +25,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { serviceCatalogApi } from '../api';
 import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
+import { ServiceLinksSection } from '../components/ServiceLinksSection';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 import { PageContainer, PageSection, TableWrapper } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
@@ -488,60 +489,8 @@ export function ServiceDetailPage() {
             </CardBody>
           </Card>
 
-          {/* Links */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Layers size={16} className="text-accent" aria-hidden="true" />
-                <h2 className="text-base font-semibold text-heading">
-                  {t('catalog.detail.links')}
-                </h2>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <div className="flex flex-col gap-3 text-sm">
-                {service.documentationUrl ? (
-                  <a
-                    href={service.documentationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-accent hover:underline"
-                  >
-                    <FileText size={14} />
-                    {t('catalog.detail.documentationUrl')}
-                    <ExternalLink size={12} />
-                  </a>
-                ) : (
-                  <span className="text-muted text-xs">
-                    {t('catalog.detail.documentationUrl')}: {t('common.noData')}
-                  </span>
-                )}
-                {service.repositoryUrl ? (
-                  <a
-                    href={service.repositoryUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-accent hover:underline"
-                  >
-                    <GitBranch size={14} />
-                    {t('catalog.detail.repositoryUrl')}
-                    <ExternalLink size={12} />
-                  </a>
-                ) : (
-                  <span className="text-muted text-xs">
-                    {t('catalog.detail.repositoryUrl')}: {t('common.noData')}
-                  </span>
-                )}
-                <Link
-                  to={`/source-of-truth/services/${serviceId}`}
-                  className="inline-flex items-center gap-2 text-accent hover:underline"
-                >
-                  <Eye size={14} />
-                  {t('catalog.detail.viewSourceOfTruth', 'Source of Truth')}
-                </Link>
-              </div>
-            </CardBody>
-          </Card>
+          {/* Links (enriched) */}
+          <ServiceLinksSection serviceId={serviceId!} />
         </div>
       </div>
 

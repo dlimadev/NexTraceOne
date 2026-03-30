@@ -11,6 +11,51 @@ import type {
   ServicesSummary,
 } from '../../../types';
 
+/** Categorias de link disponíveis para serviços. */
+export type LinkCategory =
+  | 'Repository'
+  | 'Documentation'
+  | 'CiCd'
+  | 'Monitoring'
+  | 'Wiki'
+  | 'SwaggerUi'
+  | 'ApiPortal'
+  | 'Backstage'
+  | 'Adr'
+  | 'Runbook'
+  | 'Changelog'
+  | 'Dashboard'
+  | 'Other';
+
+/** Item de link de serviço retornado pela API. */
+export interface ServiceLinkItem {
+  linkId: string;
+  serviceAssetId: string;
+  category: LinkCategory;
+  title: string;
+  url: string;
+  description: string;
+  iconHint: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+/** Resposta da listagem de links de um serviço. */
+export interface ServiceLinksResponse {
+  items: ServiceLinkItem[];
+  totalCount: number;
+}
+
+/** Payload para criar/atualizar um link de serviço. */
+export interface ServiceLinkPayload {
+  category: string;
+  title: string;
+  url: string;
+  description?: string;
+  iconHint?: string;
+  sortOrder?: number;
+}
+
 /** Cliente de API para o módulo Service Catalog (Engineering Graph backend). */
 export const serviceCatalogApi = {
   /** Obtém o grafo completo de ativos e relacionamentos. */
@@ -164,4 +209,252 @@ export const serviceCatalogApi = {
     client
       .get('/catalog/services/search', { params: { q } })
       .then((r) => r.data),
+
+  // ── Service Links ──────────────────────────────────────────────────
+
+  /** Lista todos os links de um serviço. */
+  listServiceLinks: (serviceId: string) =>
+    client
+      .get<ServiceLinksResponse>(`/catalog/services/${serviceId}/links`)
+      .then((r) => r.data),
+
+  /** Adiciona um link a um serviço. */
+  addServiceLink: (serviceId: string, data: ServiceLinkPayload) =>
+    client
+      .post<ServiceLinkItem>(`/catalog/services/${serviceId}/links`, data)
+      .then((r) => r.data),
+
+  /** Atualiza um link de um serviço. */
+  updateServiceLink: (serviceId: string, linkId: string, data: ServiceLinkPayload) =>
+    client
+      .put<ServiceLinkItem>(`/catalog/services/${serviceId}/links/${linkId}`, data)
+      .then((r) => r.data),
+
+  /** Remove um link de um serviço. */
+  removeServiceLink: (serviceId: string, linkId: string) =>
+    client
+      .delete(`/catalog/services/${serviceId}/links/${linkId}`)
+      .then((r) => r.data),
+
+  // ── Service Discovery ──────────────────────────────────────────────
+
+  /** Executa uma discovery run num ambiente e janela temporal. */
+  runServiceDiscovery: (data: { environment: string; from: string; until: string }) =>
+    client
+      .post<DiscoveryRunResponse>('/catalog/discovery/run', data)
+      .then((r) => r.data),
+
+  /** Lista serviços descobertos com filtros. */
+  listDiscoveredServices: (params?: { status?: string; environment?: string; search?: string }) =>
+    client
+      .get<DiscoveredServicesResponse>('/catalog/discovery/services', { params })
+      .then((r) => r.data),
+
+  /** Obtém dashboard de discovery com estatísticas. */
+  getDiscoveryDashboard: () =>
+    client
+      .get<DiscoveryDashboardResponse>('/catalog/discovery/dashboard')
+      .then((r) => r.data),
+
+  /** Faz match de um serviço descoberto com um ServiceAsset. */
+  matchDiscoveredService: (discoveredServiceId: string, data: { serviceAssetId: string }) =>
+    client
+      .post(`/catalog/discovery/services/${discoveredServiceId}/match`, data)
+      .then((r) => r.data),
+
+  /** Regista um novo serviço no catálogo a partir de discovery. */
+  registerFromDiscovery: (discoveredServiceId: string, data: { domain: string; teamName: string }) =>
+    client
+      .post(`/catalog/discovery/services/${discoveredServiceId}/register`, data)
+      .then((r) => r.data),
+
+  /** Ignora um serviço descoberto. */
+  ignoreDiscoveredService: (discoveredServiceId: string, data: { reason: string }) =>
+    client
+      .post(`/catalog/discovery/services/${discoveredServiceId}/ignore`, data)
+      .then((r) => r.data),
+
+  // ── Service Maturity & Ownership Audit ────────────────────────────
+
+  /** Obtém scorecard de maturidade de um serviço. */
+  getServiceMaturity: (serviceId: string) =>
+    client
+      .get<ServiceMaturityResponse>(`/catalog/services/${serviceId}/maturity`)
+      .then((r) => r.data),
+
+  /** Obtém dashboard de maturidade de todos os serviços. */
+  getMaturityDashboard: (params?: { teamName?: string; domain?: string }) =>
+    client
+      .get<MaturityDashboardResponse>('/catalog/maturity/dashboard', { params })
+      .then((r) => r.data),
+
+  /** Obtém auditoria de ownership dos serviços. */
+  getOwnershipAudit: (params?: { teamName?: string; domain?: string }) =>
+    client
+      .get<OwnershipAuditResponse>('/catalog/ownership/audit', { params })
+      .then((r) => r.data),
 };
+
+// ── Discovery Types ────────────────────────────────────────────────
+
+/** Status de um serviço descoberto. */
+export type DiscoveryStatus = 'Pending' | 'Matched' | 'Ignored' | 'Registered';
+
+/** Item de serviço descoberto. */
+export interface DiscoveredServiceItem {
+  id: string;
+  serviceName: string;
+  serviceNamespace: string;
+  environment: string;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  traceCount: number;
+  endpointCount: number;
+  status: DiscoveryStatus;
+  matchedServiceAssetId: string | null;
+  ignoreReason: string | null;
+}
+
+/** Resposta da listagem de serviços descobertos. */
+export interface DiscoveredServicesResponse {
+  items: DiscoveredServiceItem[];
+  totalCount: number;
+}
+
+/** Resposta do dashboard de discovery. */
+export interface DiscoveryDashboardResponse {
+  totalDiscovered: number;
+  pending: number;
+  matched: number;
+  registered: number;
+  ignored: number;
+  newThisWeek: number;
+  recentRuns: DiscoveryRunSummary[];
+}
+
+/** Resumo de uma execução de discovery. */
+export interface DiscoveryRunSummary {
+  runId: string;
+  startedAt: string;
+  completedAt: string | null;
+  source: string;
+  environment: string;
+  servicesFound: number;
+  newServicesFound: number;
+  status: string;
+}
+
+/** Resposta de uma execução de discovery. */
+export interface DiscoveryRunResponse {
+  runId: string;
+  totalServicesFound: number;
+  newServicesFound: number;
+  errorCount: number;
+  status: string;
+}
+
+// ── Maturity Types ─────────────────────────────────────────────────
+
+/** Dimensão de maturidade de um serviço. */
+export interface MaturityDimensionDto {
+  dimension: string;
+  score: number;
+  maxScore: number;
+  explanation: string;
+}
+
+/** Resposta do scorecard de maturidade de um serviço individual. */
+export interface ServiceMaturityResponse {
+  serviceId: string;
+  serviceName: string;
+  displayName: string;
+  teamName: string;
+  domain: string;
+  level: string;
+  overallScore: number;
+  dimensions: MaturityDimensionDto[];
+  computedAt: string;
+}
+
+/** Item de maturidade de um serviço no dashboard. */
+export interface ServiceMaturityItemDto {
+  serviceId: string;
+  serviceName: string;
+  displayName: string;
+  teamName: string;
+  domain: string;
+  criticality: string;
+  lifecycleStatus: string;
+  level: string;
+  overallScore: number;
+  hasOwnership: boolean;
+  hasContracts: boolean;
+  hasDocumentation: boolean;
+  hasRunbook: boolean;
+  hasMonitoring: boolean;
+  hasRepository: boolean;
+  apiCount: number;
+  contractCount: number;
+  linkCount: number;
+}
+
+/** Resumo do dashboard de maturidade. */
+export interface MaturityDashboardSummary {
+  totalServices: number;
+  averageScore: number;
+  optimizing: number;
+  managed: number;
+  defined: number;
+  developing: number;
+  initial: number;
+  withoutOwnership: number;
+  withoutContracts: number;
+  withoutDocumentation: number;
+  withoutRunbooks: number;
+  withoutMonitoring: number;
+}
+
+/** Resposta do dashboard de maturidade. */
+export interface MaturityDashboardResponse {
+  summary: MaturityDashboardSummary;
+  services: ServiceMaturityItemDto[];
+  computedAt: string;
+}
+
+// ── Ownership Audit Types ──────────────────────────────────────────
+
+/** Resumo da auditoria de ownership. */
+export interface AuditSummaryDto {
+  totalServicesAudited: number;
+  servicesWithIssues: number;
+  healthyServices: number;
+  criticalFindings: number;
+  highFindings: number;
+  mediumFindings: number;
+  withoutTeam: number;
+  withoutTechnicalOwner: number;
+  withoutDocumentation: number;
+  withoutRunbook: number;
+  apisWithoutContracts: number;
+}
+
+/** Finding de auditoria para um serviço. */
+export interface AuditFindingDto {
+  serviceId: string;
+  serviceName: string;
+  displayName: string;
+  teamName: string;
+  domain: string;
+  criticality: string;
+  lifecycleStatus: string;
+  severity: string;
+  findings: string[];
+  findingCount: number;
+}
+
+/** Resposta da auditoria de ownership. */
+export interface OwnershipAuditResponse {
+  summary: AuditSummaryDto;
+  findings: AuditFindingDto[];
+  auditedAt: string;
+}

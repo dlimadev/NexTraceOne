@@ -21,7 +21,8 @@ import {
   Globe, Activity, Plus, Settings,
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
-  Network, Workflow,
+  Network, Workflow, StickyNote, BookMarked, Radar,
+  CalendarDays, Award,
 } from 'lucide-react';
 
 interface NavItem {
@@ -39,8 +40,12 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.serviceCatalog', to: '/services', icon: <Server size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.dependencyGraph', to: '/services/graph', icon: <Share2 size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'legacyCatalog.sidebar.legacyAssets', to: '/services/legacy', icon: <Database size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.serviceMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
-  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookOpen size={18} />, permission: 'developer-portal:read', section: 'knowledge' },
+  { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
+  { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
+  { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookMarked size={18} />, permission: 'developer-portal:read', section: 'knowledge' },
   { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
   { labelKey: 'sidebar.createContract', to: '/contracts/new', icon: <Plus size={18} />, permission: 'contracts:write', section: 'contracts' },
   { labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={18} />, permission: 'contracts:read', section: 'contracts' },
@@ -50,6 +55,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <ArrowUpCircle size={18} />, permission: 'contracts:write', section: 'contracts' },
   { labelKey: 'sidebar.changes', to: '/changes', icon: <ShieldCheck size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:read', section: 'changes' },
+  { labelKey: 'sidebar.releaseCalendar', to: '/release-calendar', icon: <CalendarDays size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:instances:read', section: 'changes' },
   { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:requests:read', section: 'changes' },
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },

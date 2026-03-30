@@ -72,21 +72,21 @@ INSERT INTO cat_api_assets (
   'ca010001-0001-0000-0000-000000000001',
   'payment-service-v1', '/api/v1/payments', 'v1',
   'Internal',
-  'ca000001-0001-0000-0000-000000000001',
+  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'payment-service'),
   false
 ),
 (
   'ca010002-0001-0000-0000-000000000001',
   'catalog-service-v1', '/api/v1', 'v1',
   'Internal',
-  'ca000002-0001-0000-0000-000000000001',
+  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'catalog-service'),
   false
 ),
 (
   'ca010003-0001-0000-0000-000000000001',
   'identity-service-v1', '/api/v1/identity', 'v1',
   'Internal',
-  'ca000004-0001-0000-0000-000000000001',
+  (SELECT "Id" FROM cat_service_assets WHERE "Name" = 'identity-service'),
   false
 )
 ON CONFLICT DO NOTHING;
@@ -97,15 +97,15 @@ INSERT INTO ctr_spectral_rulesets (
   "Id", "Name", "Description", "Version",
   "Content", "Origin", "DefaultExecutionMode", "EnforcementBehavior",
   "OrganizationId", "Owner", "Domain", "ApplicableServiceType", "ApplicableProtocols",
-  "IsEnabled", "IsDefault",
+  "IsActive", "IsDefault",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'ctr00001-0001-0000-0000-000000000001',
+  'c7000001-0001-0000-0000-000000000001',
   'nextraceone-api-standards', 'NexTraceOne default API linting ruleset. Enforces naming, versioning, security and response standards.',
   '1.0.0',
   '{"rules":{"oas3-api-servers":true,"oas3-valid-schema-example":true,"operation-operationId":true,"operation-description":"warn","operation-tags":true,"no-eval-in-markdown":true,"no-script-tags-in-markdown":true,"openapi-tags":true,"tag-description":"warn","path-params":true}}',
-  'NexTraceOne', 'Full', 'WarnAndFlag',
+  'Platform', 'Full', 'WarnAndFlag',
   NULL, 'platform-team', NULL, NULL, 'OpenApi',
   true, true,
   NOW(), 'system', NOW(), 'system', false
@@ -118,29 +118,29 @@ INSERT INTO ctr_canonical_entities (
   "Id", "Name", "Description",
   "Domain", "Category", "Owner", "Version",
   "State", "SchemaContent", "SchemaFormat",
-  "Aliases", "Tags", "Criticality",
+  "Aliases", "Tags", "Criticality", "ReusePolicy",
   "OrganizationId",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'ctr10001-0001-0000-0000-000000000001',
+  'c7100001-0001-0000-0000-000000000001',
   'PaymentRequest', 'Canonical DTO for payment authorisation requests across all payment instruments.',
   'payments', 'Request', 'payments-team', '1.0.0',
-  'Active',
+  'Published',
   '{"type":"object","required":["amount","currency","paymentMethod"],"properties":{"amount":{"type":"number","minimum":0},"currency":{"type":"string","maxLength":3},"paymentMethod":{"type":"string","enum":["card","bank_transfer","wallet"]},"reference":{"type":"string","maxLength":100}}}',
   'JsonSchema',
-  '{}', '{"payments","canonical"}', 'High',
+  '{}', '{"payments","canonical"}', 'High', 'recommended',
   NULL,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
-  'ctr10002-0001-0000-0000-000000000001',
+  'c7100002-0001-0000-0000-000000000001',
   'ServiceAsset', 'Canonical representation of a registered service in the NexTraceOne catalogue.',
   'platform', 'Entity', 'platform-team', '1.0.0',
-  'Active',
+  'Published',
   '{"type":"object","required":["name","domain","teamName"],"properties":{"name":{"type":"string","maxLength":200},"domain":{"type":"string","maxLength":200},"teamName":{"type":"string","maxLength":200},"serviceType":{"type":"string","enum":["RestApi","GraphqlApi","GrpcService","KafkaProducer","KafkaConsumer","BackgroundService","LegacySystem","Gateway","ThirdParty"]},"criticality":{"type":"string","enum":["Critical","High","Medium","Low"]}}}',
   'JsonSchema',
-  '{}', '{"platform","catalog","canonical"}', 'Medium',
+  '{}', '{"platform","catalog","canonical"}', 'Medium', 'recommended',
   NULL,
   NOW(), 'system', NOW(), 'system', false
 )
@@ -158,7 +158,7 @@ INSERT INTO ctr_contract_drafts (
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'ctr20001-0001-0000-0000-000000000001',
+  'c7200001-0001-0000-0000-000000000001',
   'Payment Service API v1',
   'OpenAPI 3.0 contract for the Payment Service REST API covering authorisation, capture and refund operations.',
   'ca000001-0001-0000-0000-000000000001',

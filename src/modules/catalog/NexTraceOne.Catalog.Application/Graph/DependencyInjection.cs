@@ -18,6 +18,16 @@ using NexTraceOne.Catalog.Application.Graph.Features.SearchAssets;
 using NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers;
 using NexTraceOne.Catalog.Application.Graph.Features.UpdateAssetMetadata;
 using NexTraceOne.Catalog.Application.Graph.Features.ValidateDiscoveredDependency;
+using NexTraceOne.Catalog.Application.Graph.Features.AddServiceLink;
+using NexTraceOne.Catalog.Application.Graph.Features.ListServiceLinks;
+using NexTraceOne.Catalog.Application.Graph.Features.RemoveServiceLink;
+using NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceLink;
+using NexTraceOne.Catalog.Application.Graph.Features.RunServiceDiscovery;
+using NexTraceOne.Catalog.Application.Graph.Features.ListDiscoveredServices;
+using NexTraceOne.Catalog.Application.Graph.Features.MatchDiscoveredService;
+using NexTraceOne.Catalog.Application.Graph.Features.RegisterFromDiscovery;
+using NexTraceOne.Catalog.Application.Graph.Features.IgnoreDiscoveredService;
+using NexTraceOne.Catalog.Application.Graph.Features.GetDiscoveryDashboard;
 
 namespace NexTraceOne.Catalog.Application.Graph;
 
@@ -62,6 +72,20 @@ public static class DependencyInjection
 
         // ── Integração Inbound Externa ───────────────────────────────────
         services.AddTransient<IValidator<SyncConsumers.Command>, SyncConsumers.Validator>();
+
+        // ── Service Links ────────────────────────────────────────────────
+        services.AddTransient<IValidator<AddServiceLink.Command>, AddServiceLink.Validator>();
+        services.AddTransient<IValidator<RemoveServiceLink.Command>, RemoveServiceLink.Validator>();
+        services.AddTransient<IValidator<ListServiceLinks.Query>, ListServiceLinks.Validator>();
+        services.AddTransient<IValidator<UpdateServiceLink.Command>, UpdateServiceLink.Validator>();
+
+        // ── Service Discovery ────────────────────────────────────────────
+        services.AddTransient<IValidator<RunServiceDiscovery.Command>, RunServiceDiscovery.Validator>();
+        services.AddTransient<IValidator<ListDiscoveredServices.Query>, ListDiscoveredServices.Validator>();
+        services.AddTransient<IValidator<MatchDiscoveredService.Command>, MatchDiscoveredService.Validator>();
+        services.AddTransient<IValidator<RegisterFromDiscovery.Command>, RegisterFromDiscovery.Validator>();
+        services.AddTransient<IValidator<IgnoreDiscoveredService.Command>, IgnoreDiscoveredService.Validator>();
+        services.AddTransient<IValidator<GetDiscoveryDashboard.Query>, GetDiscoveryDashboard.Validator>();
 
         return services;
     }

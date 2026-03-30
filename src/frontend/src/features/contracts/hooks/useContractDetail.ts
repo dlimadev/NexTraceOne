@@ -18,6 +18,7 @@ export const contractQueryKeys = {
   canonicalEntities: (filters?: Record<string, unknown>) => [...contractQueryKeys.all, 'canonical-entities', filters] as const,
   canonicalEntity: (id: string) => [...contractQueryKeys.all, 'canonical-entity', id] as const,
   canonicalUsages: (id: string) => [...contractQueryKeys.all, 'canonical-usages', id] as const,
+  subscribers: (apiAssetId: string) => [...contractQueryKeys.all, 'subscribers', apiAssetId] as const,
 };
 
 /**

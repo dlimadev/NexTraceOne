@@ -264,6 +264,8 @@
     "spectralRulesets": "Spectral Rulesets",
     "canonicalEntities": "Canonical Entities",
     "sourceOfTruth": "Source of Truth",
+    "knowledgeHub": "Knowledge Hub",
+    "operationalNotes": "Operational Notes",
     "sectionKnowledge": "Knowledge",
     "changeConfidence": "Change Confidence",
     "changes": "Changes",
@@ -306,7 +308,10 @@
     "aiAnalysis": "AI Analysis",
     "environmentComparison": "Environment Comparison",
     "runtimeIntelligence": "Runtime Intelligence",
-    "platformConfiguration": "Platform Configuration"
+    "platformConfiguration": "Platform Configuration",
+    "serviceDiscovery": "Service Discovery",
+    "serviceMaturity": "Service Maturity",
+    "releaseCalendar": "Release Calendar"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -677,6 +682,37 @@
     },
     "freezeEnvironmentPlaceholder": "production"
   },
+  "releaseCalendar": {
+    "title": "Release Calendar",
+    "subtitle": "Unified view of releases, freeze windows and change risk across time.",
+    "tabs": {
+      "calendar": "Calendar",
+      "freezeWindows": "Freeze Windows"
+    },
+    "filters": "Filters",
+    "from": "From",
+    "to": "To",
+    "environment": "Environment",
+    "totalReleases": "Total Releases",
+    "highRiskReleases": "High Risk",
+    "activeFreezes": "Active Freezes",
+    "avgScore": "Avg Score",
+    "activeFreezeWindows": "Active Freeze Windows",
+    "dailySummary": "Daily Summary",
+    "date": "Date",
+    "releaseTimeline": "Release Timeline",
+    "noReleases": "No releases found in this period",
+    "releasesLabel": "releases",
+    "score": "Score",
+    "freezeWindowsList": "Freeze Windows",
+    "editFreezeWindow": "Edit Freeze Window",
+    "deactivate": "Deactivate",
+    "scopeGlobal": "Global",
+    "scopeTenant": "Tenant",
+    "scopeDomain": "Domain",
+    "scopeEnvironment": "Environment",
+    "scopeService": "Service"
+  },
   "contracts": {
     "active": "Active",
     "aiGenerated": "AI Generated",
@@ -916,6 +952,27 @@
         "valid": "✓ Valid",
         "invalid": "Invalid format",
         "unclosedTag": "Unclosed XML tag detected"
+      },
+      "splitEditor": {
+        "title": "Split",
+        "livePreview": "Live Preview",
+        "parsing": "Parsing specification...",
+        "parseError": "Parse error",
+        "emptyPreview": "Start typing to see the live preview",
+        "updating": "Updating...",
+        "valid": "Valid",
+        "invalid": "Invalid",
+        "operations": "operations",
+        "schemas": "schemas",
+        "noSpec": "No specification loaded",
+        "securityDefined": "Security defined",
+        "servers": "Servers",
+        "security": "Security",
+        "endpoints": "Endpoints",
+        "channels": "Channels",
+        "soapOperations": "SOAP Operations",
+        "models": "Models",
+        "tags": "Tags"
       },
       "validation": "Validation",
       "aiAgents": "AI Agents",
@@ -2844,6 +2901,35 @@
       "noRelatedIncidents": "No active incidents",
       "viewIncident": "View incident"
     },
+    "serviceLinks": {
+      "addLink": "Add Link",
+      "editLink": "Edit Link",
+      "addFirstLink": "Add the first link to this service",
+      "noLinks": "No links added yet.",
+      "form": {
+        "category": "Category",
+        "title": "Title",
+        "titlePlaceholder": "e.g. Main Repository",
+        "url": "URL",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional description"
+      },
+      "categories": {
+        "Repository": "Repository",
+        "Documentation": "Documentation",
+        "CiCd": "CI/CD",
+        "Monitoring": "Monitoring",
+        "Wiki": "Wiki",
+        "SwaggerUi": "Swagger UI",
+        "ApiPortal": "API Portal",
+        "Backstage": "Backstage",
+        "Adr": "ADR",
+        "Runbook": "Runbook",
+        "Changelog": "Changelog",
+        "Dashboard": "Dashboard",
+        "Other": "Other"
+      }
+    },
     "actions": {
       "viewDetail": "View Detail",
       "viewGraph": "View Graph",
@@ -2851,6 +2937,66 @@
       "updateOwnership": "Update Ownership"
     },
     "totalCount": "({{count}} total)"
+  },
+  "discovery": {
+    "title": "Service Discovery",
+    "subtitle": "Automatically discover services from telemetry and manage catalog registration.",
+    "runDiscovery": "Run Discovery",
+    "noServices": "No discovered services found.",
+    "searchPlaceholder": "Search service name...",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "matched": "Matched",
+      "registered": "Registered",
+      "ignored": "Ignored",
+      "newThisWeek": "New this week"
+    },
+    "filters": {
+      "allStatuses": "All statuses",
+      "pending": "Pending",
+      "matched": "Matched",
+      "registered": "Registered",
+      "ignored": "Ignored",
+      "environment": "Environment"
+    },
+    "table": {
+      "service": "Service",
+      "environment": "Environment",
+      "traces": "Traces",
+      "endpoints": "Endpoints",
+      "lastSeen": "Last Seen",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "statuses": {
+      "Pending": "Pending",
+      "Matched": "Matched",
+      "Registered": "Registered",
+      "Ignored": "Ignored"
+    },
+    "actions": {
+      "match": "Match",
+      "register": "Register",
+      "ignore": "Ignore"
+    },
+    "recentRuns": "Recent Discovery Runs",
+    "found": "found",
+    "new": "new",
+    "modal": {
+      "matchTitle": "Match to Existing Service",
+      "registerTitle": "Register as New Service",
+      "ignoreTitle": "Ignore Discovered Service",
+      "service": "Service",
+      "serviceAssetId": "Service Asset ID",
+      "serviceAssetIdPlaceholder": "Select or enter service ID...",
+      "domain": "Domain",
+      "domainPlaceholder": "e.g. Payments",
+      "teamName": "Team",
+      "teamNamePlaceholder": "e.g. Platform Engineering",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g. Internal tooling, not a business service"
+    }
   },
   "contractGov": {
     "title": "Contract Governance",
@@ -2951,6 +3097,64 @@
       "moreViolations": "more",
       "ownerService": "Owner Service",
       "viewServiceDetail": "View service"
+    }
+  },
+  "knowledgeHub": {
+    "title": "Knowledge Hub",
+    "subtitle": "Centralized operational knowledge, runbooks, architecture docs and post-mortems",
+    "newDocument": "New Document",
+    "statsDocuments": "Published Documents",
+    "statsOpenNotes": "Open Operational Notes",
+    "searchPlaceholder": "Search documents...",
+    "filterAll": "All",
+    "noDocuments": "No documents found. Try adjusting your filters.",
+    "recentNotesTitle": "Recent Open Notes",
+    "viewAllNotes": "View all operational notes →",
+    "backToHub": "Back to Knowledge Hub",
+    "documentMeta": "Document Info",
+    "metaVersion": "Version",
+    "metaAuthor": "Author",
+    "metaCreated": "Created",
+    "metaUpdated": "Updated",
+    "metaPublished": "Published",
+    "tags": "Tags",
+    "viewRelatedNotes": "View Related Notes",
+    "category": {
+      "General": "General",
+      "Runbook": "Runbook",
+      "Troubleshooting": "Troubleshooting",
+      "Architecture": "Architecture",
+      "Procedure": "Procedure",
+      "PostMortem": "Post-Mortem",
+      "Reference": "Reference"
+    },
+    "status": {
+      "Draft": "Draft",
+      "Published": "Published",
+      "Archived": "Archived",
+      "Deprecated": "Deprecated"
+    },
+    "severity": {
+      "Info": "Info",
+      "Warning": "Warning",
+      "Critical": "Critical"
+    }
+  },
+  "operationalNotes": {
+    "title": "Operational Notes",
+    "subtitle": "Contextual observations, mitigations, decisions and follow-ups linked to services and incidents",
+    "filterSeverity": "Severity",
+    "filterAll": "All",
+    "filterStatusAll": "All status",
+    "filterOpen": "Open",
+    "filterResolved": "Resolved",
+    "noNotes": "No operational notes found. Try adjusting your filters.",
+    "noteType": {
+      "Observation": "Observation",
+      "Mitigation": "Mitigation",
+      "Decision": "Decision",
+      "Hypothesis": "Hypothesis",
+      "FollowUp": "Follow-Up"
     }
   },
   "sourceOfTruth": {
@@ -5328,6 +5532,60 @@
       "messageFormat": "Message Format",
       "payloadSchema": "Payload Schema",
       "copybookReference": "Copybook Reference"
+    }
+  },
+  "serviceMaturity": {
+    "title": "Service Maturity & Ownership Audit",
+    "subtitle": "Evaluate service maturity, completeness and ownership across your catalog",
+    "tabs": {
+      "maturity": "Maturity Scorecard",
+      "audit": "Ownership Audit"
+    },
+    "filterTeam": "Filter by team...",
+    "filterDomain": "Filter by domain...",
+    "totalServices": "Total Services",
+    "avgScore": "Avg. Score",
+    "withoutOwnership": "No Ownership",
+    "withoutContracts": "No Contracts",
+    "withoutDocs": "No Docs",
+    "withoutRunbooks": "No Runbooks",
+    "levelDistribution": "Level Distribution",
+    "serviceList": "Service Maturity Details",
+    "noServices": "No services found for the selected filters.",
+    "level": {
+      "Optimizing": "Optimizing",
+      "Managed": "Managed",
+      "Defined": "Defined",
+      "Developing": "Developing",
+      "Initial": "Initial"
+    },
+    "dim": {
+      "ownership": "Ownership",
+      "contracts": "Contracts",
+      "documentation": "Docs",
+      "repository": "Repo",
+      "monitoring": "Monitoring",
+      "runbook": "Runbook"
+    },
+    "audit": {
+      "totalAudited": "Services Audited",
+      "healthy": "Healthy",
+      "withIssues": "With Issues",
+      "critical": "Critical",
+      "noTeam": "No Team",
+      "noContracts": "APIs No Contract",
+      "findings": "Audit Findings",
+      "noFindings": "All services passed the ownership audit. Great job!",
+      "finding": {
+        "NoTeam": "No team assigned",
+        "NoTechnicalOwner": "No technical owner",
+        "NoBusinessOwner": "No business owner",
+        "NoDescription": "Missing description",
+        "ApisWithoutContracts": "{{count}} API(s) without contracts",
+        "NoDocumentation": "No documentation",
+        "NoRunbook": "No runbook",
+        "NoMonitoring": "No monitoring"
+      }
     }
   }
 }

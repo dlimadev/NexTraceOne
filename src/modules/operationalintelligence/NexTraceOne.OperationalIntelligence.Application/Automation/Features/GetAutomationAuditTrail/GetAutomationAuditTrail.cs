@@ -1,6 +1,8 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.GetAutomationAuditTrail;
@@ -9,10 +11,6 @@ namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.Ge
 /// Feature: GetAutomationAuditTrail — retorna a trilha de auditoria de automação operacional
 /// filtrável por workflow, serviço ou equipa para rastreabilidade completa.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
-///
-/// LIMITATION: dados são simulados com entradas hardcoded.
-/// Substituir pela leitura real dos eventos de auditoria persistidos no AutomationDbContext
-/// quando a integração entre módulos estiver completa.
 /// </summary>
 public static class GetAutomationAuditTrail
 {
@@ -39,107 +37,50 @@ public static class GetAutomationAuditTrail
         }
     }
 
-    /// <summary>Handler que compõe a trilha de auditoria com dados simulados hardcoded.
-    /// LIMITATION: substituir por leitura real do AutomationDbContext.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que lê a trilha de auditoria de automação a partir do IAutomationAuditRepository.</summary>
+    public sealed class Handler(IAutomationAuditRepository auditRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var entries = GenerateSimulatedEntries(request);
-            return Task.FromResult(Result<Response>.Success(new Response(entries)));
-        }
+            IReadOnlyList<AutomationAuditRecord> records;
 
-        private static IReadOnlyList<AuditEntry> GenerateSimulatedEntries(Query request)
-        {
-            var allEntries = new List<AuditEntry>
-            {
-                new(Guid.Parse("ee000001-0001-0000-0000-000000000001"),
-                    Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.WorkflowCreated,
-                    "ops-engineer@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-15T10:15:00Z"),
-                    "Workflow created for controlled restart of payment-gateway.",
-                    "svc-payment-gateway",
-                    "payment-squad"),
-
-                new(Guid.Parse("ee000001-0002-0000-0000-000000000001"),
-                    Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.PreconditionsEvaluated,
-                    "system",
-                    DateTimeOffset.Parse("2024-06-15T10:26:00Z"),
-                    "All 3 preconditions evaluated — all passed.",
-                    "svc-payment-gateway",
-                    "payment-squad"),
-
-                new(Guid.Parse("ee000001-0003-0000-0000-000000000001"),
-                    Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.ApprovalGranted,
-                    "tech-lead@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-15T10:30:00Z"),
-                    "Approved — low blast radius, controlled restart is safe.",
-                    "svc-payment-gateway",
-                    "payment-squad"),
-
-                new(Guid.Parse("ee000001-0004-0000-0000-000000000001"),
-                    Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.ExecutionStarted,
-                    "ops-engineer@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-15T10:35:00Z"),
-                    "Execution started for controlled restart workflow.",
-                    "svc-payment-gateway",
-                    "payment-squad"),
-
-                new(Guid.Parse("ee000001-0005-0000-0000-000000000001"),
-                    Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.StepCompleted,
-                    "ops-engineer@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-15T10:40:00Z"),
-                    "Step 2 completed: restart executed successfully.",
-                    "svc-payment-gateway",
-                    "payment-squad"),
-
-                new(Guid.Parse("ee000002-0001-0000-0000-000000000001"),
-                    Guid.Parse("b0a10002-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.WorkflowCreated,
-                    "platform-engineer@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-16T08:00:00Z"),
-                    "Workflow created for post-deployment observation of catalog-sync.",
-                    "svc-catalog-sync",
-                    "platform-squad"),
-
-                new(Guid.Parse("ee000003-0001-0000-0000-000000000001"),
-                    Guid.Parse("b0a10003-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.WorkflowCreated,
-                    "senior-engineer@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-16T09:00:00Z"),
-                    "Workflow created for dependency state verification of order-api.",
-                    "svc-order-api",
-                    "order-squad"),
-
-                new(Guid.Parse("ee000003-0002-0000-0000-000000000001"),
-                    Guid.Parse("b0a10003-0001-0000-0000-000000000001"),
-                    AutomationAuditAction.WorkflowCancelled,
-                    "senior-engineer@nextraceone.io",
-                    DateTimeOffset.Parse("2024-06-16T09:15:00Z"),
-                    "Workflow cancelled — issue resolved before execution.",
-                    "svc-order-api",
-                    "order-squad"),
-            };
-
-            var filtered = allEntries.AsEnumerable();
-
+            // WorkflowId is the most specific filter; ServiceId and TeamId are broader.
             if (!string.IsNullOrWhiteSpace(request.WorkflowId) && Guid.TryParse(request.WorkflowId, out var wfId))
-                filtered = filtered.Where(e => e.WorkflowId == wfId);
+            {
+                records = await auditRepository.GetByWorkflowIdAsync(
+                    new AutomationWorkflowRecordId(wfId), cancellationToken);
 
-            if (!string.IsNullOrWhiteSpace(request.ServiceId))
-                filtered = filtered.Where(e =>
-                    e.ServiceId != null && e.ServiceId.Equals(request.ServiceId, StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrWhiteSpace(request.ServiceId))
+                    records = records.Where(r => string.Equals(r.ServiceId, request.ServiceId, StringComparison.OrdinalIgnoreCase)).ToList();
 
-            if (!string.IsNullOrWhiteSpace(request.TeamId))
-                filtered = filtered.Where(e =>
-                    e.TeamId != null && e.TeamId.Equals(request.TeamId, StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrWhiteSpace(request.TeamId))
+                    records = records.Where(r => string.Equals(r.TeamId, request.TeamId, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            else if (!string.IsNullOrWhiteSpace(request.ServiceId))
+            {
+                records = await auditRepository.GetByServiceIdAsync(request.ServiceId, cancellationToken);
 
-            return filtered.ToList();
+                if (!string.IsNullOrWhiteSpace(request.TeamId))
+                    records = records.Where(r => string.Equals(r.TeamId, request.TeamId, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            else
+            {
+                records = await auditRepository.GetByTeamIdAsync(request.TeamId!, cancellationToken);
+            }
+
+            var entries = records
+                .Select(r => new AuditEntry(
+                    r.Id.Value,
+                    r.WorkflowId.Value,
+                    r.Action,
+                    r.Actor,
+                    r.OccurredAt,
+                    r.Details,
+                    r.ServiceId,
+                    r.TeamId))
+                .ToList();
+
+            return Result<Response>.Success(new Response(entries));
         }
     }
 

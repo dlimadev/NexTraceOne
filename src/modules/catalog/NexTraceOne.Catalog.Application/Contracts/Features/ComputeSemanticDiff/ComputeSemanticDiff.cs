@@ -7,10 +7,13 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Errors;
 using NexTraceOne.Catalog.Domain.Contracts.Services;
 using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff;
 
@@ -41,11 +44,17 @@ public static class ComputeSemanticDiff
     /// Carrega as versões do repositório, delega o cálculo ao <see cref="ContractDiffCalculator"/>
     /// que seleciona o calculador específico do protocolo da versão alvo,
     /// e persiste o resultado na versão alvo.
+    /// Quando o nível de mudança é Breaking, publica <see cref="BreakingChangeDetectedIntegrationEvent"/>
+    /// para notificar o owner e consumidores relevantes.
     /// </summary>
     public sealed class Handler(
         IContractVersionRepository repository,
+        IApiAssetRepository apiAssetRepository,
         IUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : IQueryHandler<Query, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEventBus eventBus,
+        ICurrentUser currentUser,
+        ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -87,6 +96,9 @@ public static class ComputeSemanticDiff
             targetVersion.AddDiff(diff);
             await unitOfWork.CommitAsync(cancellationToken);
 
+            if (diffResult.ChangeLevel == ChangeLevel.Breaking)
+                await PublishBreakingChangeEventAsync(targetVersion, diffResult.BreakingChanges, cancellationToken);
+
             return new Response(
                 diff.Id.Value,
                 request.BaseVersionId,
@@ -96,6 +108,29 @@ public static class ComputeSemanticDiff
                 diffResult.BreakingChanges,
                 diffResult.NonBreakingChanges,
                 diffResult.AdditiveChanges);
+        }
+
+        private async Task PublishBreakingChangeEventAsync(
+            ContractVersion targetVersion,
+            IReadOnlyList<ChangeEntry> breakingChanges,
+            CancellationToken cancellationToken)
+        {
+            var apiAsset = await apiAssetRepository.GetByIdAsync(
+                ApiAssetId.From(targetVersion.ApiAssetId), cancellationToken);
+
+            var description = breakingChanges.Count > 0
+                ? string.Join("; ", breakingChanges.Take(3).Select(c => c.Description))
+                : "Breaking changes detected.";
+
+            _ = Guid.TryParse(currentUser.Id, out var ownerUserId);
+
+            await eventBus.PublishAsync(new BreakingChangeDetectedIntegrationEvent(
+                ContractId: targetVersion.ApiAssetId,
+                ContractName: apiAsset?.Name ?? "Unknown",
+                ServiceName: apiAsset?.OwnerService?.Name ?? "Unknown",
+                Description: description,
+                OwnerUserId: ownerUserId == Guid.Empty ? null : ownerUserId,
+                TenantId: currentTenant.Id), cancellationToken);
         }
     }
 

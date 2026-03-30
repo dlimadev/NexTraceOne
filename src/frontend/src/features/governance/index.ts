@@ -1,7 +1,11 @@
-/** Barrel export — bounded context Governance (relatórios, risco, compliance, finops, executive). */
+/** Barrel export — bounded context Governance (relatórios, risco, compliance, finops, executive, equipas, domínios, packs). */
 export { organizationGovernanceApi } from './api/organizationGovernance';
+export { evidenceApi } from './api/evidence';
+export { executiveApi } from './api/executive';
+export { finOpsApi } from './api/finOps';
 export { ReportsPage } from './pages/ReportsPage';
 export { RiskCenterPage } from './pages/RiskCenterPage';
+export { RiskHeatmapPage } from './pages/RiskHeatmapPage';
 export { CompliancePage } from './pages/CompliancePage';
 export { FinOpsPage } from './pages/FinOpsPage';
 export { ServiceFinOpsPage } from './pages/ServiceFinOpsPage';
@@ -9,7 +13,18 @@ export { TeamFinOpsPage } from './pages/TeamFinOpsPage';
 export { DomainFinOpsPage } from './pages/DomainFinOpsPage';
 export { ExecutiveFinOpsPage } from './pages/ExecutiveFinOpsPage';
 export { ExecutiveOverviewPage } from './pages/ExecutiveOverviewPage';
-export { RiskHeatmapPage } from './pages/RiskHeatmapPage';
+export { ExecutiveDrillDownPage } from './pages/ExecutiveDrillDownPage';
 export { MaturityScorecardsPage } from './pages/MaturityScorecardsPage';
 export { BenchmarkingPage } from './pages/BenchmarkingPage';
-export { ExecutiveDrillDownPage } from './pages/ExecutiveDrillDownPage';
+export { PolicyCatalogPage } from './pages/PolicyCatalogPage';
+export { EnterpriseControlsPage } from './pages/EnterpriseControlsPage';
+export { EvidencePackagesPage } from './pages/EvidencePackagesPage';
+export { TeamsOverviewPage } from './pages/TeamsOverviewPage';
+export { TeamDetailPage } from './pages/TeamDetailPage';
+export { DomainsOverviewPage } from './pages/DomainsOverviewPage';
+export { DomainDetailPage } from './pages/DomainDetailPage';
+export { GovernancePacksOverviewPage } from './pages/GovernancePacksOverviewPage';
+export { GovernancePackDetailPage } from './pages/GovernancePackDetailPage';
+export { WaiversPage } from './pages/WaiversPage';
+export { DelegatedAdminPage } from './pages/DelegatedAdminPage';
+export { GovernanceConfigurationPage } from './pages/GovernanceConfigurationPage';

@@ -72,6 +72,19 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     public string? DeprecationNotice { get; private set; }
 
     /// <summary>
+    /// Acordo de nível de serviço (SLA/SLO) associado a este contrato.
+    /// Permite correlação com observabilidade e change intelligence.
+    /// </summary>
+    public ContractSla? Sla { get; private set; }
+
+    /// <summary>
+    /// Último score geral calculado para esta versão de contrato (0.0 a 1.0).
+    /// Materializado na última chamada ao endpoint de scorecard para permitir
+    /// exibição de badge de qualidade na listagem do catálogo sem recálculo.
+    /// </summary>
+    public decimal? LastOverallScore { get; private set; }
+
+    /// <summary>
     /// Token de concorrência otimista (PostgreSQL xmin).
     /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
     /// </summary>
@@ -221,6 +234,29 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     {
         Guard.Against.Null(artifact);
         _artifacts.Add(artifact);
+    }
+
+    /// <summary>
+    /// Define ou actualiza o SLA/SLO associado a esta versão do contrato.
+    /// Permite registar expectativas de disponibilidade, latência e throughput.
+    /// </summary>
+    public void SetSla(ContractSla sla)
+    {
+        Guard.Against.Null(sla);
+        Sla = sla;
+    }
+
+    /// <summary>Remove o SLA associado a esta versão do contrato.</summary>
+    public void ClearSla() => Sla = null;
+
+    /// <summary>
+    /// Actualiza o último score geral calculado para esta versão de contrato.
+    /// Chamado após geração de scorecard para materializar o valor no catálogo.
+    /// </summary>
+    public void UpdateLastOverallScore(decimal score)
+    {
+        Guard.Against.OutOfRange(score, nameof(score), 0m, 1m);
+        LastOverallScore = score;
     }
 
     /// <summary>

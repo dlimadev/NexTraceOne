@@ -95,6 +95,39 @@ public sealed class FreezeWindow : AggregateRoot<FreezeWindowId>
         IsActive && at >= StartsAt && at <= EndsAt;
 
     /// <summary>
+    /// Atualiza os dados editáveis da janela de freeze.
+    /// </summary>
+    public Result<Unit> Update(
+        string name,
+        string reason,
+        FreezeScope scope,
+        string? scopeValue,
+        DateTimeOffset startsAt,
+        DateTimeOffset endsAt)
+    {
+        Guard.Against.NullOrWhiteSpace(name, nameof(name));
+        Guard.Against.NullOrWhiteSpace(reason, nameof(reason));
+
+        if (endsAt <= startsAt)
+            return Error.Validation(
+                "change_intelligence.freeze.invalid_dates",
+                "Freeze window end must be after start.");
+
+        if (scope != FreezeScope.Global && string.IsNullOrWhiteSpace(scopeValue))
+            return Error.Validation(
+                "change_intelligence.freeze.scope_value_required",
+                "Scope value is required for non-global freeze windows.");
+
+        Name = name;
+        Reason = reason;
+        Scope = scope;
+        ScopeValue = scopeValue;
+        StartsAt = startsAt;
+        EndsAt = endsAt;
+        return Result<Unit>.Success(Unit.Value);
+    }
+
+    /// <summary>
     /// Desativa a janela de freeze antes do término previsto.
     /// </summary>
     public Result<Unit> Deactivate()

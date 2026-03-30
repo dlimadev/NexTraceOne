@@ -28,6 +28,19 @@ using SearchServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.Sea
 using SyncConsumersFeature = NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers.SyncConsumers;
 using UpdateServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceAsset.UpdateServiceAsset;
 using UpdateServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceOwnership.UpdateServiceOwnership;
+using AddServiceLinkFeature = NexTraceOne.Catalog.Application.Graph.Features.AddServiceLink.AddServiceLink;
+using ListServiceLinksFeature = NexTraceOne.Catalog.Application.Graph.Features.ListServiceLinks.ListServiceLinks;
+using RemoveServiceLinkFeature = NexTraceOne.Catalog.Application.Graph.Features.RemoveServiceLink.RemoveServiceLink;
+using UpdateServiceLinkFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceLink.UpdateServiceLink;
+using RunServiceDiscoveryFeature = NexTraceOne.Catalog.Application.Graph.Features.RunServiceDiscovery.RunServiceDiscovery;
+using ListDiscoveredServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.ListDiscoveredServices.ListDiscoveredServices;
+using MatchDiscoveredServiceFeature = NexTraceOne.Catalog.Application.Graph.Features.MatchDiscoveredService.MatchDiscoveredService;
+using RegisterFromDiscoveryFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterFromDiscovery.RegisterFromDiscovery;
+using IgnoreDiscoveredServiceFeature = NexTraceOne.Catalog.Application.Graph.Features.IgnoreDiscoveredService.IgnoreDiscoveredService;
+using GetDiscoveryDashboardFeature = NexTraceOne.Catalog.Application.Graph.Features.GetDiscoveryDashboard.GetDiscoveryDashboard;
+using ComputeServiceMaturityFeature = NexTraceOne.Catalog.Application.Graph.Features.ComputeServiceMaturity.ComputeServiceMaturity;
+using GetServiceMaturityDashboardFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceMaturityDashboard.GetServiceMaturityDashboard;
+using GetOwnershipAuditFeature = NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipAudit.GetOwnershipAudit;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -200,6 +213,54 @@ public sealed class ServiceCatalogEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
 
+        // ── Service Links ────────────────────────────────────────────────
+
+        group.MapGet("/services/{serviceId:guid}/links", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListServiceLinksFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapPost("/services/{serviceId:guid}/links", async (
+            Guid serviceId,
+            AddServiceLinkFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceAssetId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToCreatedResult("/api/v1/catalog/services/{0}/links", localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapPut("/services/{serviceId:guid}/links/{linkId:guid}", async (
+            Guid serviceId,
+            Guid linkId,
+            UpdateServiceLinkFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceAssetId = serviceId, LinkId = linkId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapDelete("/services/{serviceId:guid}/links/{linkId:guid}", async (
+            Guid serviceId,
+            Guid linkId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new RemoveServiceLinkFeature.Command(serviceId, linkId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
         // ── Subgrafo Contextual (mini-grafos) ────────────────────────────
 
         group.MapGet("/subgraph/{rootNodeId:guid}", async (
@@ -312,5 +373,111 @@ public sealed class ServiceCatalogEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:write");
+
+        // ── Service Discovery ────────────────────────────────────────────
+
+        group.MapPost("/discovery/run", async (
+            RunServiceDiscoveryFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapGet("/discovery/services", async (
+            string? status,
+            string? environment,
+            string? search,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ListDiscoveredServicesFeature.Query(status, environment, search);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/discovery/dashboard", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetDiscoveryDashboardFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapPost("/discovery/services/{discoveredServiceId:guid}/match", async (
+            Guid discoveredServiceId,
+            MatchDiscoveredServiceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { DiscoveredServiceId = discoveredServiceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapPost("/discovery/services/{discoveredServiceId:guid}/register", async (
+            Guid discoveredServiceId,
+            RegisterFromDiscoveryFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { DiscoveredServiceId = discoveredServiceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToCreatedResult("/api/v1/catalog/services/{0}", localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapPost("/discovery/services/{discoveredServiceId:guid}/ignore", async (
+            Guid discoveredServiceId,
+            IgnoreDiscoveredServiceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { DiscoveredServiceId = discoveredServiceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        // ── Maturity & Ownership Audit ────────────────────────────────────
+
+        group.MapGet("/services/{serviceId:guid}/maturity", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ComputeServiceMaturityFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/maturity/dashboard", async (
+            string? teamName,
+            string? domain,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetServiceMaturityDashboardFeature.Query(teamName, domain);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/ownership/audit", async (
+            string? teamName,
+            string? domain,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetOwnershipAuditFeature.Query(teamName, domain);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
     }
 }

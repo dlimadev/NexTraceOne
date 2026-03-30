@@ -2,6 +2,11 @@
 export { ContractCatalogPage } from './catalog/ContractCatalogPage';
 export { CreateServicePage } from './create/CreateServicePage';
 export { ContractWorkspacePage } from './workspace/ContractWorkspacePage';
+export { ContractGovernancePage } from './governance/ContractGovernancePage';
+export { ContractPortalPage } from './portal/ContractPortalPage';
+export { SpectralRulesetManagerPage } from './spectral/SpectralRulesetManagerPage';
+export { CanonicalEntityCatalogPage } from './canonical/CanonicalEntityCatalogPage';
+export { DraftStudioPage } from './studio/DraftStudioPage';
 
 // ── API ───────────────────────────────────────────────────────────────────────
 export { contractsApi } from './api/contracts';

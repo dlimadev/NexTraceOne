@@ -11,6 +11,7 @@ const WorkflowPage = lazy(() => import('../features/change-governance/pages/Work
 const PromotionPage = lazy(() => import('../features/change-governance/pages/PromotionPage').then(m => ({ default: m.PromotionPage })));
 const ChangeCatalogPage = lazy(() => import('../features/change-governance/pages/ChangeCatalogPage').then(m => ({ default: m.ChangeCatalogPage })));
 const ChangeDetailPage = lazy(() => import('../features/change-governance/pages/ChangeDetailPage').then(m => ({ default: m.ChangeDetailPage })));
+const ReleaseCalendarPage = lazy(() => import('../features/change-governance/pages/ReleaseCalendarPage').then(m => ({ default: m.ReleaseCalendarPage })));
 
 export function ChangesRoutes() {
   return (
@@ -52,6 +53,14 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="promotion:requests:read" redirectTo="/unauthorized">
             <PromotionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/release-calendar"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseCalendarPage />
           </ProtectedRoute>
         }
       />

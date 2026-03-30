@@ -74,6 +74,9 @@ function buildConsumers(detail: ContractVersionDetail): StudioRelationship[] {
     name: consumer.name,
     type: consumer.kind || 'Consumer',
     registeredAt: consumer.lastObservedAt,
+    confidenceScore: consumer.confidenceScore,
+    environment: consumer.environment || undefined,
+    sourceType: consumer.kind || undefined,
   }));
 }
 

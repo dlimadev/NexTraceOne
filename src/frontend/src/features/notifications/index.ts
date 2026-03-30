@@ -1,6 +1,8 @@
 export { NotificationCenterPage } from './pages/NotificationCenterPage';
 export { NotificationPreferencesPage } from './pages/NotificationPreferencesPage';
+export { NotificationConfigurationPage } from './pages/NotificationConfigurationPage';
 export { NotificationBell } from './components/NotificationBell';
+export { notificationsApi } from './api/notifications';
 export {
   useNotificationTemplates,
   useUpsertNotificationTemplate,

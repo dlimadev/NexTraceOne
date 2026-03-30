@@ -1,4 +1,5 @@
 using NexTraceOne.Knowledge.Domain.Entities;
+using NexTraceOne.Knowledge.Domain.Enums;
 
 namespace NexTraceOne.Knowledge.Application.Abstractions;
 
@@ -18,4 +19,14 @@ public interface IOperationalNoteRepository
 
     /// <summary>Pesquisa notas operacionais por termo textual (título, conteúdo).</summary>
     Task<IReadOnlyList<OperationalNote>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default);
+
+    /// <summary>Lista notas com paginação e filtros opcionais (severidade, contextType, contextEntityId).</summary>
+    Task<(IReadOnlyList<OperationalNote> Items, int TotalCount)> ListAsync(
+        NoteSeverity? severity,
+        string? contextType,
+        Guid? contextEntityId,
+        bool? isResolved,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
 }

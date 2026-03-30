@@ -19,6 +19,8 @@ import type {
   AsyncApiImportResponse,
   BackgroundServiceContractDetail,
   BackgroundServiceRegisterResponse,
+  ContractDeploymentsResponse,
+  ContractSubscribersResponse,
 } from '../types';
 import type {
   ValidationIssue,
@@ -29,6 +31,7 @@ import type {
   SpectralRulesetOrigin,
   CanonicalEntity,
   CanonicalUsageReference,
+  ContractScorecard,
 } from '../types/domain';
 
 /**
@@ -185,6 +188,9 @@ export const contractsApi = {
   validateSpecContent: (data: { specContent: string; protocol: ContractProtocol; rulesetIds?: string[] }) =>
     client.post<{ issues: ValidationIssue[]; summary: ValidationSummary }>('/contracts/validate-spec', data).then((r) => r.data),
 
+  parseSpecPreview: (data: { specContent: string; protocol: string }) =>
+    client.post('/contracts/parse-preview', data).then((r) => r.data),
+
   // ── Spectral Rulesets ───────────────────────────────────────────────────────
 
   listSpectralRulesets: (params?: { origin?: SpectralRulesetOrigin; isActive?: boolean; domain?: string }) =>
@@ -337,4 +343,27 @@ export const contractsApi = {
   getBackgroundServiceContractDetail: (contractVersionId: string) =>
     client.get<BackgroundServiceContractDetail>(`/contracts/${contractVersionId}/background-service-detail`)
       .then((r) => r.data),
+
+  // ── Scorecard ─────────────────────────────────────────────────────
+
+  /**
+   * Gera o scorecard técnico de uma versão de contrato.
+   * Retorna scores de qualidade, completude, compatibilidade e risco.
+   */
+  getScorecard: (contractVersionId: string) =>
+    client.get<ContractScorecard>(`/contracts/${contractVersionId}/scorecard`).then((r) => r.data),
+
+  /**
+   * Lista deployments registados de uma versão de contrato por ambiente.
+   * Alimenta o Change Intelligence — rastreabilidade de mudanças por ambiente.
+   */
+  getDeployments: (contractVersionId: string) =>
+    client.get<ContractDeploymentsResponse>(`/contracts/${contractVersionId}/deployments`).then((r) => r.data),
+
+  /**
+   * Lista subscrições formais de uma API via Developer Portal.
+   * Permite ao produtor ver quem subscreveu para receber notificações de mudanças.
+   */
+  getSubscribers: (apiAssetId: string) =>
+    client.get<ContractSubscribersResponse>(`/developerportal/catalog/${apiAssetId}/consumers`).then((r) => r.data),
 };

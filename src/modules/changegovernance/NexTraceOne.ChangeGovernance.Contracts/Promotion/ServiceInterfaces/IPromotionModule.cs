@@ -1,7 +1,5 @@
 namespace NexTraceOne.ChangeGovernance.Contracts.Promotion.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Implemented — PromotionModuleService in ChangeGovernance.Infrastructure.
-
 /// <summary>
 /// Interface pública do módulo Promotion.
 /// Outros módulos que precisarem de dados deste módulo devem usar

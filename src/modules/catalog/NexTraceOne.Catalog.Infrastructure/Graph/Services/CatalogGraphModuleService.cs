@@ -1,3 +1,4 @@
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Contracts.Graph.DTOs;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
@@ -11,7 +12,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Services;
 /// </summary>
 internal sealed class CatalogGraphModuleService(
     IApiAssetRepository apiAssetRepository,
-    IServiceAssetRepository serviceAssetRepository) : ICatalogGraphModule
+    IServiceAssetRepository serviceAssetRepository,
+    IContractVersionRepository contractVersionRepository) : ICatalogGraphModule
 {
     /// <inheritdoc />
     public async Task<bool> ApiAssetExistsAsync(Guid apiAssetId, CancellationToken cancellationToken)
@@ -36,14 +38,87 @@ internal sealed class CatalogGraphModuleService(
         => await serviceAssetRepository.CountByDomainAsync(domain, cancellationToken);
 
     /// <inheritdoc />
-    public Task<IReadOnlyList<TeamServiceInfo>> ListServicesByTeamAsync(string teamName, CancellationToken cancellationToken)
-        => Task.FromResult<IReadOnlyList<TeamServiceInfo>>(Array.Empty<TeamServiceInfo>());
+    public async Task<IReadOnlyList<TeamServiceInfo>> ListServicesByTeamAsync(string teamName, CancellationToken cancellationToken)
+    {
+        var services = await serviceAssetRepository.ListByTeamAsync(teamName, cancellationToken);
+
+        return services
+            .Select(svc => new TeamServiceInfo(
+                svc.Id.Value.ToString(),
+                svc.Name,
+                svc.Domain,
+                svc.Criticality.ToString(),
+                svc.ExposureType.ToString()))
+            .ToList();
+    }
 
     /// <inheritdoc />
-    public Task<IReadOnlyList<TeamContractInfo>> ListContractsByTeamAsync(string teamName, CancellationToken cancellationToken)
-        => Task.FromResult<IReadOnlyList<TeamContractInfo>>(Array.Empty<TeamContractInfo>());
+    public async Task<IReadOnlyList<TeamContractInfo>> ListContractsByTeamAsync(string teamName, CancellationToken cancellationToken)
+    {
+        var services = await serviceAssetRepository.ListByTeamAsync(teamName, cancellationToken);
+        if (services.Count == 0)
+            return [];
+
+        var allApiAssetIds = new List<Guid>();
+        foreach (var service in services)
+        {
+            var apis = await apiAssetRepository.ListByServiceIdAsync(service.Id, cancellationToken);
+            allApiAssetIds.AddRange(apis.Select(a => a.Id.Value));
+        }
+
+        if (allApiAssetIds.Count == 0)
+            return [];
+
+        var contractVersions = await contractVersionRepository.ListByApiAssetIdsAsync(
+            allApiAssetIds, cancellationToken);
+
+        return contractVersions
+            .Select(cv => new TeamContractInfo(
+                cv.Id.Value.ToString(),
+                cv.SemVer,
+                cv.Protocol.ToString(),
+                cv.SemVer,
+                cv.LifecycleState.ToString()))
+            .ToList();
+    }
 
     /// <inheritdoc />
-    public Task<IReadOnlyList<CrossTeamDependencyInfo>> ListCrossTeamDependenciesAsync(string teamName, CancellationToken cancellationToken)
-        => Task.FromResult<IReadOnlyList<CrossTeamDependencyInfo>>(Array.Empty<CrossTeamDependencyInfo>());
+    public async Task<IReadOnlyList<CrossTeamDependencyInfo>> ListCrossTeamDependenciesAsync(string teamName, CancellationToken cancellationToken)
+    {
+        var services = await serviceAssetRepository.ListByTeamAsync(teamName, cancellationToken);
+        if (services.Count == 0)
+            return [];
+
+        var dependencies = new List<CrossTeamDependencyInfo>();
+
+        foreach (var service in services)
+        {
+            var apis = await apiAssetRepository.ListByServiceIdAsync(service.Id, cancellationToken);
+
+            foreach (var api in apis)
+            {
+                foreach (var consumer in api.ConsumerRelationships)
+                {
+                    var consumerService = await serviceAssetRepository.GetByNameAsync(
+                        consumer.ConsumerName, cancellationToken);
+
+                    if (consumerService is null)
+                        continue;
+
+                    if (string.Equals(consumerService.TeamName, teamName, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    dependencies.Add(new CrossTeamDependencyInfo(
+                        consumer.Id.Value.ToString(),
+                        consumerService.Name,
+                        service.Name,
+                        consumerService.TeamName,
+                        consumerService.TeamName,
+                        consumer.SourceType));
+                }
+            }
+        }
+
+        return dependencies;
+    }
 }

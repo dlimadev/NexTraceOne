@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Knowledge.Application.Abstractions;
 using NexTraceOne.Knowledge.Domain.Entities;
+using NexTraceOne.Knowledge.Domain.Enums;
 
 namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Repositories;
 
@@ -40,5 +41,38 @@ internal sealed class OperationalNoteRepository(KnowledgeDbContext context) : IO
             .Select(x => x.Note)
             .Take(maxResults)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<(IReadOnlyList<OperationalNote> Items, int TotalCount)> ListAsync(
+        NoteSeverity? severity,
+        string? contextType,
+        Guid? contextEntityId,
+        bool? isResolved,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = context.OperationalNotes.AsQueryable();
+
+        if (severity.HasValue)
+            query = query.Where(n => n.Severity == severity.Value);
+
+        if (!string.IsNullOrWhiteSpace(contextType))
+            query = query.Where(n => n.ContextType == contextType);
+
+        if (contextEntityId.HasValue)
+            query = query.Where(n => n.ContextEntityId == contextEntityId.Value);
+
+        if (isResolved.HasValue)
+            query = query.Where(n => n.IsResolved == isResolved.Value);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .OrderByDescending(n => n.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 }

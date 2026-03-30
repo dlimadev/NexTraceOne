@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
-/// Comportamento do Spectral face a violações detectadas.
-/// Controla se as violações são apenas informativas ou bloqueantes.
+/// Comportamento do linting face a violações detectadas num contrato.
+/// Controla se as violações são apenas informativas ou bloqueantes no workflow de governança.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum SpectralEnforcementBehavior
+public enum ContractLintEnforcementBehavior
 {
     /// <summary>Apenas informativo — mostra resultados sem bloquear.</summary>
     AdvisoryOnly = 0,

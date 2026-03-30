@@ -10,8 +10,12 @@ using CreateOperationalNoteFeature = NexTraceOne.Knowledge.Application.Features.
 using CreateKnowledgeRelationFeature = NexTraceOne.Knowledge.Application.Features.CreateKnowledgeRelation.CreateKnowledgeRelation;
 using GetKnowledgeByRelationTargetFeature = NexTraceOne.Knowledge.Application.Features.GetKnowledgeByRelationTarget.GetKnowledgeByRelationTarget;
 using GetKnowledgeRelationsBySourceFeature = NexTraceOne.Knowledge.Application.Features.GetKnowledgeRelationsBySource.GetKnowledgeRelationsBySource;
+using ListKnowledgeDocumentsFeature = NexTraceOne.Knowledge.Application.Features.ListKnowledgeDocuments.ListKnowledgeDocuments;
+using GetKnowledgeDocumentByIdFeature = NexTraceOne.Knowledge.Application.Features.GetKnowledgeDocumentById.GetKnowledgeDocumentById;
+using ListOperationalNotesFeature = NexTraceOne.Knowledge.Application.Features.ListOperationalNotes.ListOperationalNotes;
 
 using NexTraceOne.Knowledge.Contracts;
+using NexTraceOne.Knowledge.Domain.Enums;
 
 namespace NexTraceOne.Knowledge.API.Endpoints;
 
@@ -137,5 +141,76 @@ public sealed class KnowledgeEndpointModule
         })
         .WithTags("Knowledge")
         .WithSummary("Get target relations for a knowledge source entity");
+
+        // P10.4: Listagem paginada de documentos de conhecimento.
+        knowledge.MapGet("/documents", async (
+            string? category,
+            string? status,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            DocumentCategory? parsedCategory = null;
+            if (!string.IsNullOrWhiteSpace(category) && Enum.TryParse<DocumentCategory>(category, true, out var cat))
+                parsedCategory = cat;
+
+            DocumentStatus? parsedStatus = null;
+            if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<DocumentStatus>(status, true, out var st))
+                parsedStatus = st;
+
+            var result = await sender.Send(
+                new ListKnowledgeDocumentsFeature.Query(parsedCategory, parsedStatus, page < 1 ? 1 : page, pageSize < 1 ? 25 : pageSize),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("List knowledge documents with pagination");
+
+        // P10.4: Detalhe completo de um documento de conhecimento.
+        knowledge.MapGet("/documents/{documentId:guid}", async (
+            Guid documentId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetKnowledgeDocumentByIdFeature.Query(documentId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("Get knowledge document detail");
+
+        // P10.4: Listagem paginada de notas operacionais.
+        knowledge.MapGet("/operational-notes", async (
+            string? severity,
+            string? contextType,
+            Guid? contextEntityId,
+            bool? isResolved,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            NoteSeverity? parsedSeverity = null;
+            if (!string.IsNullOrWhiteSpace(severity) && Enum.TryParse<NoteSeverity>(severity, true, out var sev))
+                parsedSeverity = sev;
+
+            var result = await sender.Send(
+                new ListOperationalNotesFeature.Query(
+                    parsedSeverity,
+                    string.IsNullOrWhiteSpace(contextType) ? null : contextType,
+                    contextEntityId,
+                    isResolved,
+                    page < 1 ? 1 : page,
+                    pageSize < 1 ? 25 : pageSize),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("List operational notes with pagination");
     }
 }

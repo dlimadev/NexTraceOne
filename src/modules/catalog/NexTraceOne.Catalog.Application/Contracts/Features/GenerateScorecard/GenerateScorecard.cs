@@ -36,9 +36,11 @@ public static class GenerateScorecard
     /// Handler que orquestra a geração do scorecard técnico.
     /// Carrega a versão do contrato, constrói o modelo canônico, avalia regras
     /// e calcula os scores em cada dimensão.
+    /// Materializa o LastOverallScore na ContractVersion para exibição no catálogo.
     /// </summary>
     public sealed class Handler(
         IContractVersionRepository repository,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
@@ -54,6 +56,9 @@ public static class GenerateScorecard
             var violations = ContractRuleEngine.Evaluate(version.Id, canonicalModel, version.SemVer, version.Protocol);
             var scorecard = ContractScorecardCalculator.Compute(
                 version.Id, canonicalModel, version.Protocol, violations.Count, dateTimeProvider.UtcNow);
+
+            version.UpdateLastOverallScore(scorecard.OverallScore);
+            await unitOfWork.CommitAsync(cancellationToken);
 
             return new Response(
                 scorecard.Id.Value,

@@ -1,7 +1,5 @@
 namespace NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 
-// IMPLEMENTATION STATUS: Implemented — RulesetGovernanceModuleService in ChangeGovernance.Infrastructure.
-
 /// <summary>
 /// Interface pública do módulo RulesetGovernance.
 /// Outros módulos que precisarem de dados deste módulo devem usar

@@ -7,11 +7,11 @@ import {
   Save,
   Send,
   Download,
-  FileText,
   Code,
   Settings,
   Loader2,
 } from 'lucide-react';
+import { ContractSection } from '../workspace/sections/ContractSection';
 import { Card, CardBody } from '../../../components/Card';
 import { contractStudioApi } from '../api/contractStudio';
 import { useDraftExport } from '../hooks/useDraftExport';
@@ -26,7 +26,7 @@ const draftKeys = {
   detail: (id: string) => ['contract-drafts', 'detail', id] as const,
 };
 
-type DraftTab = 'spec' | 'metadata' | 'preview';
+type DraftTab = 'spec' | 'metadata';
 
 /**
  * Página do studio de edição de draft de contrato.
@@ -43,6 +43,7 @@ export function DraftStudioPage() {
   const { exportDraft, isExporting, exportError } = useDraftExport();
 
   const [activeTab, setActiveTab] = useState<DraftTab>('spec');
+  const [saveKey, setSaveKey] = useState(0);
   const [draftSpecContent, setDraftSpecContent] = useState<string | null>(null);
   const [draftFormat, setDraftFormat] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState<string | null>(null);
@@ -88,6 +89,7 @@ export function DraftStudioPage() {
       }),
     onSuccess: async () => {
       resetOverrides();
+      setSaveKey((k) => k + 1);
       await queryClient.invalidateQueries({ queryKey: draftKeys.detail(draftId!) });
     },
   });
@@ -149,7 +151,6 @@ export function DraftStudioPage() {
   const TABS: { id: DraftTab; labelKey: string; Icon: React.ComponentType<{ size?: number }> }[] = [
     { id: 'spec', labelKey: 'contracts.studio.tabSpec', Icon: Code },
     { id: 'metadata', labelKey: 'contracts.studio.tabMetadata', Icon: Settings },
-    { id: 'preview', labelKey: 'contracts.studio.tabPreview', Icon: FileText },
   ];
 
   return (
@@ -263,33 +264,33 @@ export function DraftStudioPage() {
 
         {/* Tab: Spec Content */}
         {activeTab === 'spec' && (
-          <Card>
-            <CardBody className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-heading">
-                  {t('contracts.studio.specContent', 'Specification Content')}
-                </label>
-                <select
-                  value={format}
-                  onChange={(e) => setDraftFormat(e.target.value)}
-                  disabled={!isEditable}
-                  className="text-xs bg-elevated border border-edge rounded px-2 py-1 text-body"
-                >
-                  <option value="yaml">YAML</option>
-                  <option value="json">JSON</option>
-                  <option value="xml">XML</option>
-                </select>
-              </div>
-              <textarea
-                value={specContent}
-                onChange={(e) => setDraftSpecContent(e.target.value)}
-                readOnly={!isEditable}
-                rows={24}
-                placeholder={t('contracts.studio.specPlaceholder', 'Paste or write your specification content here...')}
-                className="w-full text-xs font-mono bg-elevated border border-edge rounded-md px-4 py-3 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent resize-y leading-relaxed"
-              />
-            </CardBody>
-          </Card>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-heading">
+                {t('contracts.studio.specContent', 'Specification Content')}
+              </label>
+              <select
+                value={format}
+                onChange={(e) => setDraftFormat(e.target.value)}
+                disabled={!isEditable}
+                className="text-xs bg-elevated border border-edge rounded px-2 py-1 text-body"
+              >
+                <option value="yaml">YAML</option>
+                <option value="json">JSON</option>
+                <option value="xml">XML</option>
+              </select>
+            </div>
+            <ContractSection
+              key={saveKey}
+              specContent={specContent}
+              format={format}
+              protocol={draft.protocol}
+              contractType={draft.contractType}
+              isReadOnly={!isEditable}
+              onContentChange={setDraftSpecContent}
+              className="border border-edge rounded-lg overflow-hidden min-h-[560px]"
+            />
+          </div>
         )}
 
         {/* Tab: Metadata */}
@@ -364,23 +365,6 @@ export function DraftStudioPage() {
                   <p>{t('contracts.studio.lastEdited', 'Last edited')}: <span className="text-heading font-medium">{new Date(draft.lastEditedAt).toLocaleString()}{draft.lastEditedBy ? ` · ${draft.lastEditedBy}` : ''}</span></p>
                 )}
               </div>
-            </CardBody>
-          </Card>
-        )}
-
-        {/* Tab: Preview */}
-        {activeTab === 'preview' && (
-          <Card>
-            <CardBody className="space-y-4">
-              <div>
-                <h3 className="text-xs font-medium text-heading mb-1">{t('contracts.studio.preview.title', 'Preview')}</h3>
-                <p className="text-xs text-muted">
-                  {t('contracts.studio.preview.description', 'This preview reflects the persisted draft content and metadata without artificial enrichment.')}
-                </p>
-              </div>
-              <pre className="text-[11px] font-mono bg-elevated border border-edge rounded-md px-4 py-3 text-body overflow-x-auto whitespace-pre-wrap">
-                {specContent || t('contracts.studio.preview.empty', 'No specification content has been saved yet.')}
-              </pre>
             </CardBody>
           </Card>
         )}

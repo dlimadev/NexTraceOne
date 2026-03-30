@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 using ComputeSemanticDiffFeature = NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff.ComputeSemanticDiff;
@@ -194,7 +195,11 @@ public sealed class ContractsApplicationTests
         var repository = Substitute.For<IContractVersionRepository>();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new ComputeSemanticDiffFeature.Handler(repository, unitOfWork, dateTimeProvider);
+        var apiAssetRepository = Substitute.For<IApiAssetRepository>();
+        var eventBus = Substitute.For<IEventBus>();
+        var currentUser = Substitute.For<ICurrentUser>();
+        var currentTenant = Substitute.For<ICurrentTenant>();
+        var sut = new ComputeSemanticDiffFeature.Handler(repository, apiAssetRepository, unitOfWork, dateTimeProvider, eventBus, currentUser, currentTenant);
 
         repository.GetByIdAsync(Arg.Is<ContractVersionId>(id => id.Value == baseVersion.Id.Value), Arg.Any<CancellationToken>())
             .Returns(baseVersion);
@@ -221,7 +226,11 @@ public sealed class ContractsApplicationTests
         var repository = Substitute.For<IContractVersionRepository>();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new ComputeSemanticDiffFeature.Handler(repository, unitOfWork, dateTimeProvider);
+        var apiAssetRepository2 = Substitute.For<IApiAssetRepository>();
+        var eventBus2 = Substitute.For<IEventBus>();
+        var currentUser2 = Substitute.For<ICurrentUser>();
+        var currentTenant2 = Substitute.For<ICurrentTenant>();
+        var sut = new ComputeSemanticDiffFeature.Handler(repository, apiAssetRepository2, unitOfWork, dateTimeProvider, eventBus2, currentUser2, currentTenant2);
 
         repository.GetByIdAsync(Arg.Is<ContractVersionId>(id => id.Value == baseVersion.Id.Value), Arg.Any<CancellationToken>())
             .Returns(baseVersion);

@@ -94,4 +94,32 @@ public static class CatalogGraphErrors
             assetName,
             currentStatus,
             targetStatus);
+
+    // ── Service Links ─────────────────────────────────────────────────────
+
+    /// <summary>Link de serviço não encontrado pelo identificador.</summary>
+    public static Error ServiceLinkNotFound(Guid linkId)
+        => Error.NotFound("CatalogGraph.ServiceLink.NotFound", "Service link '{0}' was not found.", linkId);
+
+    // ── Service Discovery ──────────────────────────────────────────────────
+
+    /// <summary>Serviço descoberto não encontrado pelo identificador.</summary>
+    public static Error DiscoveredServiceNotFound(Guid discoveredServiceId)
+        => Error.NotFound("CatalogGraph.DiscoveredService.NotFound", "Discovered service '{0}' was not found.", discoveredServiceId);
+
+    /// <summary>Serviço descoberto já foi processado (não está Pending).</summary>
+    public static Error DiscoveredServiceAlreadyProcessed(Guid discoveredServiceId, string currentStatus)
+        => Error.Conflict(
+            "CatalogGraph.DiscoveredService.AlreadyProcessed",
+            "Discovered service '{0}' has already been processed (status: {1}).",
+            discoveredServiceId,
+            currentStatus);
+
+    /// <summary>Regra de matching não encontrada.</summary>
+    public static Error DiscoveryMatchRuleNotFound(Guid ruleId)
+        => Error.NotFound("CatalogGraph.DiscoveryMatchRule.NotFound", "Discovery match rule '{0}' was not found.", ruleId);
+
+    /// <summary>Discovery run não encontrado.</summary>
+    public static Error DiscoveryRunNotFound(Guid runId)
+        => Error.NotFound("CatalogGraph.DiscoveryRun.NotFound", "Discovery run '{0}' was not found.", runId);
 }

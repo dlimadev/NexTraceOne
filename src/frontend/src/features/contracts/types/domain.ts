@@ -271,25 +271,31 @@ export interface ValidationSummary {
   validatedAt: string;
 }
 
-/** Modo de execução do Spectral. */
-export type SpectralExecutionMode = 'Realtime' | 'OnSave' | 'OnDemand' | 'BeforeReview' | 'BeforePublish';
+/** Modo de execução do linting de contratos. */
+export type ContractLintExecutionMode = 'Realtime' | 'OnSave' | 'OnDemand' | 'BeforeReview' | 'BeforePublish';
+/** @deprecated Use ContractLintExecutionMode */
+export type SpectralExecutionMode = ContractLintExecutionMode;
 
-/** Comportamento de enforcement do Spectral. */
-export type SpectralEnforcementBehavior = 'AdvisoryOnly' | 'WarningOnly' | 'BlockingOnPublish' | 'BlockingOnReview' | 'Silent';
+/** Comportamento de enforcement do linting de contratos. */
+export type ContractLintEnforcementBehavior = 'AdvisoryOnly' | 'WarningOnly' | 'BlockingOnPublish' | 'BlockingOnReview' | 'Silent';
+/** @deprecated Use ContractLintEnforcementBehavior */
+export type SpectralEnforcementBehavior = ContractLintEnforcementBehavior;
 
-/** Origem de um ruleset Spectral. */
-export type SpectralRulesetOrigin = 'Platform' | 'Organization' | 'Team' | 'Imported' | 'ExternalRepository';
+/** Origem de um ruleset de linting de contratos. */
+export type ContractLintRulesetOrigin = 'Platform' | 'Organization' | 'Team' | 'Imported' | 'ExternalRepository';
+/** @deprecated Use ContractLintRulesetOrigin */
+export type SpectralRulesetOrigin = ContractLintRulesetOrigin;
 
-/** Ruleset Spectral cadastrado no sistema. */
-export interface SpectralRuleset {
+/** Ruleset de linting de contratos cadastrado no sistema. */
+export interface ContractLintRuleset {
   id: string;
   name: string;
   description: string;
   version: string;
   content: string;
-  origin: SpectralRulesetOrigin;
-  defaultExecutionMode: SpectralExecutionMode;
-  enforcementBehavior: SpectralEnforcementBehavior;
+  origin: ContractLintRulesetOrigin;
+  defaultExecutionMode: ContractLintExecutionMode;
+  enforcementBehavior: ContractLintEnforcementBehavior;
   organizationId?: string;
   owner?: string;
   domain?: string;
@@ -301,6 +307,8 @@ export interface SpectralRuleset {
   createdAt: string;
   updatedAt: string;
 }
+/** @deprecated Use ContractLintRuleset */
+export type SpectralRuleset = ContractLintRuleset;
 
 // ── Canonical Entities ────────────────────────────────────────────────────────
 
@@ -339,6 +347,28 @@ export interface CanonicalUsageReference {
   usageType: string;
   isConformant: boolean;
   conformanceMessage?: string;
+}
+
+// ── Scorecard ─────────────────────────────────────────────────────────────────
+
+/** Scorecard técnico de uma versão de contrato. Gerado pelo backend. */
+export interface ContractScorecard {
+  scorecardId: string;
+  contractVersionId: string;
+  qualityScore: number;
+  completenessScore: number;
+  compatibilityScore: number;
+  riskScore: number;
+  overallScore: number;
+  operationCount: number;
+  schemaCount: number;
+  hasSecurityDefinitions: boolean;
+  hasExamples: boolean;
+  hasDescriptions: boolean;
+  qualityJustification: string;
+  completenessJustification: string;
+  compatibilityJustification: string;
+  riskJustification: string;
 }
 
 // ── Authoring ─────────────────────────────────────────────────────────────────

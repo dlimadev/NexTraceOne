@@ -177,6 +177,159 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.ToTable("cat_consumer_relationships", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoveredService", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DiscoveryRunId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("EndpointCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("FirstSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IgnoreReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("MatchedServiceAssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ServiceNamespace")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("TraceCount")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Environment");
+
+                    b.HasIndex("LastSeenAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("ServiceName", "Environment")
+                        .IsUnique();
+
+                    b.ToTable("cat_discovered_services", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_cat_discovered_services_Status", "\"Status\" IN ('Pending', 'Matched', 'Ignored', 'Registered')");
+                        });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoveryMatchRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Pattern")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TargetServiceAssetId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("IsActive", "Priority");
+
+                    b.ToTable("cat_discovery_match_rules", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoveryRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("ErrorCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("NewServicesFound")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ServicesFound")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Environment");
+
+                    b.HasIndex("StartedAt")
+                        .IsDescending();
+
+                    b.ToTable("cat_discovery_runs", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoverySource", b =>
                 {
                     b.Property<Guid>("Id")
@@ -467,6 +620,63 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("IconHint")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<Guid>("ServiceAssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceAssetId");
+
+                    b.HasIndex("ServiceAssetId", "Category");
+
+                    b.ToTable("cat_service_links", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_cat_service_links_category", "\"Category\" IN ('Repository', 'Documentation', 'CiCd', 'Monitoring', 'Wiki', 'SwaggerUi', 'ApiPortal', 'Backstage', 'Adr', 'Runbook', 'Changelog', 'Dashboard', 'Other')");
+                        });
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.SourceOfTruth.Entities.LinkedReference", b =>
                 {
                     b.Property<Guid>("Id")
@@ -559,6 +769,17 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasForeignKey("ApiAssetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceLink", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceAsset", "ServiceAsset")
+                        .WithMany()
+                        .HasForeignKey("ServiceAssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceAsset");
                 });
 
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", b =>

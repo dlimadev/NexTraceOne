@@ -7,3 +7,11 @@ export { ServiceReliabilityDetailPage } from './pages/ServiceReliabilityDetailPa
 export { AutomationWorkflowsPage } from './pages/AutomationWorkflowsPage';
 export { AutomationWorkflowDetailPage } from './pages/AutomationWorkflowDetailPage';
 export { AutomationAdminPage } from './pages/AutomationAdminPage';
+export { EnvironmentComparisonPage } from './pages/EnvironmentComparisonPage';
+export { PlatformOperationsPage } from './pages/PlatformOperationsPage';
+
+export { automationApi } from './api/automation';
+export { incidentsApi } from './api/incidents';
+export { platformOpsApi } from './api/platformOps';
+export { reliabilityApi } from './api/reliability';
+export { runtimeIntelligenceApi } from './api/runtimeIntelligence';

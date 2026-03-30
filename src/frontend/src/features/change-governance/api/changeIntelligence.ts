@@ -107,6 +107,75 @@ export interface FreezeWindowDto {
   endsAt: string;
 }
 
+export interface FreezeWindowListDto {
+  id: string;
+  name: string;
+  reason: string;
+  scope: string;
+  scopeValue: string | null;
+  startsAt: string;
+  endsAt: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface CalendarReleaseDto {
+  releaseId: string;
+  serviceName: string;
+  version: string;
+  environment: string;
+  status: string;
+  changeType: string;
+  confidenceStatus: string;
+  changeScore: number;
+  changeLevel: number;
+  teamName: string | null;
+  createdAt: string;
+}
+
+export interface CalendarFreezeDto {
+  freezeWindowId: string;
+  name: string;
+  reason: string;
+  scope: string;
+  scopeValue: string | null;
+  startsAt: string;
+  endsAt: string;
+  isActive: boolean;
+}
+
+export interface DailySummaryDto {
+  date: string;
+  totalReleases: number;
+  highRiskReleases: number;
+  averageScore: number;
+}
+
+export interface ReleaseCalendarResponse {
+  releases: CalendarReleaseDto[];
+  freezeWindows: CalendarFreezeDto[];
+  dailySummary: DailySummaryDto[];
+}
+
+export interface CreateFreezeWindowRequest {
+  name: string;
+  reason: string;
+  scope: number;
+  scopeValue?: string | null;
+  startsAt: string;
+  endsAt: string;
+}
+
+export interface UpdateFreezeWindowRequest {
+  name: string;
+  reason: string;
+  scope: number;
+  scopeValue?: string | null;
+  startsAt: string;
+  endsAt: string;
+}
+
 // ─── API Client ──────────────────────────────────────────────────────────────
 
 export const changeIntelligenceApi = {
@@ -220,6 +289,32 @@ export const changeIntelligenceApi = {
       .get<{ hasConflict: boolean; activeFreezes: FreezeWindowDto[] }>(
         `/freeze-windows/check?${params.toString()}`,
       )
+      .then((r) => r.data);
+  },
+
+  listFreezeWindows: (from: string, to: string, environment?: string, isActive?: boolean) => {
+    const params: Record<string, string> = { from, to };
+    if (environment) params.environment = environment;
+    if (isActive !== undefined) params.isActive = String(isActive);
+    return client
+      .get<{ items: FreezeWindowListDto[] }>('/freeze-windows', { params })
+      .then((r) => r.data);
+  },
+
+  createFreezeWindow: (data: CreateFreezeWindowRequest) =>
+    client.post<{ id: string }>('/freeze-windows', data).then((r) => r.data),
+
+  updateFreezeWindow: (id: string, data: UpdateFreezeWindowRequest) =>
+    client.put(`/freeze-windows/${id}`, data).then((r) => r.data),
+
+  deactivateFreezeWindow: (id: string) =>
+    client.post(`/freeze-windows/${id}/deactivate`).then((r) => r.data),
+
+  getReleaseCalendar: (from: string, to: string, environment?: string) => {
+    const params: Record<string, string> = { from, to };
+    if (environment) params.environment = environment;
+    return client
+      .get<ReleaseCalendarResponse>('/release-calendar', { params })
       .then((r) => r.data);
   },
 };

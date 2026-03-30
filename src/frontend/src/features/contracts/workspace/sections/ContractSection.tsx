@@ -1,13 +1,14 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Code, Columns, Eye, AlertTriangle, Check, List } from 'lucide-react';
+import { Code, Columns, Eye, AlertTriangle, Check, List, PanelLeftClose } from 'lucide-react';
 import { VisualRestBuilder } from '../builders/VisualRestBuilder';
 import { VisualSoapBuilder } from '../builders/VisualSoapBuilder';
 import { VisualEventBuilder } from '../builders/VisualEventBuilder';
 import { VisualWorkserviceBuilder } from '../builders/VisualWorkserviceBuilder';
+import { ContractEditorSplitPane } from '../editor/ContractEditorSplitPane';
 import type { SyncResult } from '../builders/shared/builderTypes';
 
-type EditorMode = 'visual' | 'source' | 'preview';
+type EditorMode = 'visual' | 'source' | 'split' | 'preview';
 
 interface ContractSectionProps {
   specContent: string;
@@ -20,9 +21,10 @@ interface ContractSectionProps {
 }
 
 /**
- * Secção de contrato com abas Visual / Source / Preview.
+ * Secção de contrato com abas Visual / Source / Split / Preview.
  * Round-trip entre modos de autoria para perfis técnicos e não técnicos.
  * Sync: visual builder gera source; source é carregado no preview.
+ * O modo Split apresenta o editor Monaco à esquerda e o live preview à direita.
  */
 export function ContractSection({
   specContent,
@@ -34,7 +36,7 @@ export function ContractSection({
   className = '',
 }: ContractSectionProps) {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<EditorMode>('source');
+  const [mode, setMode] = useState<EditorMode>('split');
   const [content, setContent] = useState(specContent);
   const [syncWarnings, setSyncWarnings] = useState<string[]>([]);
   const [syncSuccess, setSyncSuccess] = useState(false);
@@ -65,6 +67,7 @@ export function ContractSection({
   const modes: { id: EditorMode; labelKey: string; Icon: React.ComponentType<{ size?: number }> }[] = [
     { id: 'visual', labelKey: 'contracts.workspace.visualBuilder', Icon: Columns },
     { id: 'source', labelKey: 'contracts.workspace.sourceEditor', Icon: Code },
+    { id: 'split', labelKey: 'contracts.workspace.splitEditor.title', Icon: PanelLeftClose },
     { id: 'preview', labelKey: 'contracts.workspace.preview', Icon: Eye },
   ];
 
@@ -114,6 +117,16 @@ export function ContractSection({
           <SourceEditor
             content={content}
             format={format}
+            isReadOnly={isReadOnly}
+            onChange={handleContentChange}
+          />
+        )}
+
+        {mode === 'split' && (
+          <ContractEditorSplitPane
+            content={content}
+            format={format}
+            protocol={protocol}
             isReadOnly={isReadOnly}
             onChange={handleContentChange}
           />

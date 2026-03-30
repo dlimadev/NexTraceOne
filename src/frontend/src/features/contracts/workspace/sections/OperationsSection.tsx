@@ -22,6 +22,8 @@ interface OperationsSectionProps {
   specContent: string;
   protocol: string;
   isReadOnly?: boolean;
+  /** Called when the user requests to add an operation (navigates to spec editor). */
+  onAddOperation?: () => void;
   className?: string;
 }
 
@@ -39,7 +41,7 @@ const METHOD_COLORS: Record<string, string> = {
  * Apresenta as operações extraídas do spec content de forma visual,
  * com pesquisa, filtros e agrupamento por tags.
  */
-export function OperationsSection({ specContent, protocol, isReadOnly = false, className = '' }: OperationsSectionProps) {
+export function OperationsSection({ specContent, protocol, isReadOnly = false, onAddOperation, className = '' }: OperationsSectionProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -106,7 +108,10 @@ export function OperationsSection({ specContent, protocol, isReadOnly = false, c
           </div>
 
           {!isReadOnly && (
-            <button className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium rounded bg-accent text-white hover:bg-accent/90 transition-colors">
+            <button
+              onClick={onAddOperation}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium rounded bg-accent text-white hover:bg-accent/90 transition-colors"
+            >
               <Plus size={11} />
               {t('contracts.operations.add', 'Add Operation')}
             </button>

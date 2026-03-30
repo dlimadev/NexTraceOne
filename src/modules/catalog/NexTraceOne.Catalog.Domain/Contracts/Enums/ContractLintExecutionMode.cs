@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
-/// Modo de execução do linting Spectral no módulo de contratos.
+/// Modo de execução do linting de contratos no módulo de governança.
 /// Define quando as regras são executadas durante o ciclo de vida do contrato.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum SpectralExecutionMode
+public enum ContractLintExecutionMode
 {
     /// <summary>Validação em tempo real durante edição.</summary>
     Realtime = 0,

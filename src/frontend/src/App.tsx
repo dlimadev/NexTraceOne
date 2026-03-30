@@ -13,6 +13,7 @@ import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, 
 // ── Route groups (lazy-loaded by module) ──────────────────────────────────────
 import { CatalogRoutes } from './routes/catalogRoutes';
 import { ContractsRoutes } from './routes/contractsRoutes';
+import { KnowledgeRoutes } from './routes/knowledgeRoutes';
 import { ChangesRoutes } from './routes/changesRoutes';
 import { OperationsRoutes } from './routes/operationsRoutes';
 import { AiHubRoutes } from './routes/aiHubRoutes';
@@ -69,6 +70,7 @@ export default function App() {
                         receives <React.Fragment> children directly, not component wrappers */}
                     {CatalogRoutes()}
                     {ContractsRoutes()}
+                    {KnowledgeRoutes()}
                     {ChangesRoutes()}
                     {OperationsRoutes()}
                     {AiHubRoutes()}

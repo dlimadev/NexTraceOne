@@ -7,12 +7,14 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Configurations;
 
 /// <summary>
-/// Configura o mapeamento EF Core da entidade SpectralRuleset.
+/// Configura o mapeamento EF Core da entidade ContractLintRuleset.
 /// Rulesets representam regras de linting customizadas para governança de contratos.
+/// A tabela mantém o nome original "ctr_spectral_rulesets" para preservar compatibilidade
+/// com dados e migrações existentes.
 /// </summary>
-internal sealed class SpectralRulesetConfiguration : IEntityTypeConfiguration<SpectralRuleset>
+internal sealed class ContractLintRulesetConfiguration : IEntityTypeConfiguration<ContractLintRuleset>
 {
-    public void Configure(EntityTypeBuilder<SpectralRuleset> builder)
+    public void Configure(EntityTypeBuilder<ContractLintRuleset> builder)
     {
         builder.ToTable("ctr_spectral_rulesets", t =>
         {
@@ -23,7 +25,7 @@ internal sealed class SpectralRulesetConfiguration : IEntityTypeConfiguration<Sp
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
-            .HasConversion(id => id.Value, value => SpectralRulesetId.From(value));
+            .HasConversion(id => id.Value, value => ContractLintRulesetId.From(value));
 
         builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(2000);

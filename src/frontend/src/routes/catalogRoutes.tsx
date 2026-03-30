@@ -16,6 +16,8 @@ const GlobalSearchPage = lazy(() => import('../features/catalog/pages/GlobalSear
 const DeveloperPortalPage = lazy(() => import('../features/catalog/pages/DeveloperPortalPage').then(m => ({ default: m.DeveloperPortalPage })));
 const LegacyAssetCatalogPage = lazy(() => import('../features/legacy-assets/pages/LegacyAssetCatalogPage'));
 const MainframeSystemDetailPage = lazy(() => import('../features/legacy-assets/pages/MainframeSystemDetailPage'));
+const ServiceDiscoveryPage = lazy(() => import('../features/catalog/pages/ServiceDiscoveryPage'));
+const ServiceMaturityPage = lazy(() => import('../features/catalog/pages/ServiceMaturityPage'));
 
 export function CatalogRoutes() {
   return (
@@ -90,6 +92,22 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <MainframeSystemDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/discovery"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <ServiceDiscoveryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/maturity"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <ServiceMaturityPage />
           </ProtectedRoute>
         }
       />

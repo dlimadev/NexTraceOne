@@ -12,3 +12,5 @@ export { ApprovalsSection } from './ApprovalsSection';
 export { ConsumersSection } from './ConsumersSection';
 export { DependenciesSection } from './DependenciesSection';
 export { AiAgentsSection } from './AiAgentsSection';
+export { ScorecardSection } from './ScorecardSection';
+export { DeploymentsSection } from './DeploymentsSection';

@@ -98,6 +98,9 @@ export interface StudioRelationship {
   name: string;
   type: string;
   registeredAt: string;
+  confidenceScore?: number;
+  environment?: string;
+  sourceType?: string;
 }
 
 /** Dependência entre contratos/serviços. */

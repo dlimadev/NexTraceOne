@@ -19,6 +19,8 @@ import {
   ConsumersSection,
   DependenciesSection,
   AiAgentsSection,
+  ScorecardSection,
+  DeploymentsSection,
 } from './sections';
 import { StudioRail } from './components/StudioRail';
 import {
@@ -108,6 +110,7 @@ export function ContractWorkspacePage() {
             specContent={detail.specContent}
             protocol={detail.protocol}
             isReadOnly={detail.isLocked}
+            onAddOperation={onNavigate ? () => onNavigate('contract') : undefined}
           />
         );
 
@@ -163,11 +166,19 @@ export function ContractWorkspacePage() {
           <ValidationSection contractVersionId={contractVersionId!} />
         );
 
+      case 'scorecard':
+        return (
+          <ScorecardSection contractVersionId={contractVersionId!} />
+        );
+
       case 'consumers':
         return <ConsumersSection contract={studioContract} />;
 
       case 'dependencies':
         return <DependenciesSection contract={studioContract} />;
+
+      case 'deployments':
+        return <DeploymentsSection contractVersionId={contractVersionId!} />;
 
       case 'ai-agents':
         return <AiAgentsSection contract={studioContract} />;

@@ -41,8 +41,8 @@ public sealed class ContractsDbContext(
     /// <summary>Exemplos associados a drafts ou versões publicadas de contrato.</summary>
     public DbSet<ContractExample> Examples => Set<ContractExample>();
 
-    /// <summary>Rulesets Spectral para governança de linting de contratos.</summary>
-    public DbSet<SpectralRuleset> SpectralRulesets => Set<SpectralRuleset>();
+    /// <summary>Rulesets de linting para governança de contratos (independente de vendor).</summary>
+    public DbSet<ContractLintRuleset> ContractLintRulesets => Set<ContractLintRuleset>();
 
     /// <summary>Entidades canónicas reutilizáveis (schemas/modelos padrão).</summary>
     public DbSet<CanonicalEntity> CanonicalEntities => Set<CanonicalEntity>();
@@ -70,6 +70,9 @@ public sealed class ContractsDbContext(
 
     /// <summary>Metadados de Background Service para drafts de contrato em edição (ContractType = BackgroundService).</summary>
     public DbSet<BackgroundServiceDraftMetadata> BackgroundServiceDraftMetadata => Set<BackgroundServiceDraftMetadata>();
+
+    /// <summary>Deployments de versões de contrato por ambiente para rastreabilidade de mudanças.</summary>
+    public DbSet<ContractDeployment> ContractDeployments => Set<ContractDeployment>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

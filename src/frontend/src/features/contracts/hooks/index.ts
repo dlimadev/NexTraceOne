@@ -6,6 +6,7 @@ export { useContractDetail } from './useContractDetail';
 export { useContractList, useContractsSummary } from './useContractList';
 export { useContractViolations } from './useContractViolations';
 export { useContractHistory } from './useContractHistory';
+export { useContractSubscribers } from './useContractSubscribers';
 
 // ── Mutation hooks ────────────────────────────────────────────────────────────
 export { useContractTransition } from './useContractTransition';
@@ -18,6 +19,9 @@ export { useDraftExport } from './useDraftExport';
 
 // ── Validation hooks ──────────────────────────────────────────────────────────
 export { useValidationSummary, useExecuteValidation, useValidateSpec } from './useValidation';
+
+// ── Preview hooks ─────────────────────────────────────────────────────────────
+export { useSpecPreview } from './useSpecPreview';
 
 // ── Spectral ruleset hooks ────────────────────────────────────────────────────
 export {

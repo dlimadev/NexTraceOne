@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 namespace NexTraceOne.Catalog.Domain.Contracts.Enums;
 
 /// <summary>
-/// Origem/fonte de um ruleset Spectral cadastrado no sistema.
-/// Permite rastrear a proveniência e prioridade de aplicação das regras.
+/// Origem/fonte de um ruleset de linting de contratos cadastrado no sistema.
+/// Permite rastrear a proveniência e prioridade de aplicação das regras de governança.
 /// </summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum SpectralRulesetOrigin
+public enum ContractLintRulesetOrigin
 {
     /// <summary>Ruleset padrão fornecido pela plataforma NexTraceOne.</summary>
     Platform = 0,

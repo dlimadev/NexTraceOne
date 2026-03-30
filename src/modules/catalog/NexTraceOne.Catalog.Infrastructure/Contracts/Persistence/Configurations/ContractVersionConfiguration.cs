@@ -77,12 +77,28 @@ internal sealed class ContractVersionConfiguration : IEntityTypeConfiguration<Co
             prov.Property(p => p.AiModelVersion).HasMaxLength(200).HasColumnName("ProvenanceAiModelVersion");
         });
 
+        // SLA/SLO (owned entity mapeada na mesma tabela — colunas prefixadas com "Sla")
+        builder.OwnsOne(x => x.Sla, sla =>
+        {
+            sla.Property(s => s.AvailabilityTarget).HasColumnName("SlaAvailabilityTarget").HasColumnType("numeric(5,2)");
+            sla.Property(s => s.LatencyP99Ms).HasColumnName("SlaLatencyP99Ms");
+            sla.Property(s => s.LatencyP95Ms).HasColumnName("SlaLatencyP95Ms");
+            sla.Property(s => s.MaxErrorRatePercent).HasColumnName("SlaMaxErrorRatePercent").HasColumnType("numeric(5,2)");
+            sla.Property(s => s.MinThroughputRps).HasColumnName("SlaMinThroughputRps");
+            sla.Property(s => s.MaintenanceWindowMinutes).HasColumnName("SlaMaintenanceWindowMinutes");
+            sla.Property(s => s.Tier).HasMaxLength(50).HasColumnName("SlaTier");
+            sla.Property(s => s.DocumentReference).HasMaxLength(500).HasColumnName("SlaDocumentReference");
+        });
+
         // Auditoria
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.CreatedBy).HasMaxLength(500).IsRequired();
         builder.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.UpdatedBy).HasMaxLength(500).IsRequired();
         builder.Property(x => x.IsDeleted).IsRequired().HasDefaultValue(false);
+
+        // Score de qualidade materializado — actualizado na geração do scorecard
+        builder.Property(x => x.LastOverallScore).HasColumnType("numeric(5,4)");
 
         builder.HasIndex(x => new { x.ApiAssetId, x.SemVer }).IsUnique();
         builder.HasIndex(x => x.Protocol);

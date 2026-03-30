@@ -47,6 +47,18 @@ public sealed class CatalogGraphDbContext(
     /// <summary>Referências vinculadas a ativos no Source of Truth.</summary>
     public DbSet<LinkedReference> LinkedReferences => Set<LinkedReference>();
 
+    /// <summary>Links categorizados associados a serviços do catálogo.</summary>
+    public DbSet<ServiceLink> ServiceLinks => Set<ServiceLink>();
+
+    /// <summary>Serviços descobertos automaticamente via telemetria.</summary>
+    public DbSet<DiscoveredService> DiscoveredServices => Set<DiscoveredService>();
+
+    /// <summary>Execuções do job de discovery automático.</summary>
+    public DbSet<DiscoveryRun> DiscoveryRuns => Set<DiscoveryRun>();
+
+    /// <summary>Regras de matching automático para discovery.</summary>
+    public DbSet<DiscoveryMatchRule> DiscoveryMatchRules => Set<DiscoveryMatchRule>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CatalogGraphDbContext).Assembly;
 

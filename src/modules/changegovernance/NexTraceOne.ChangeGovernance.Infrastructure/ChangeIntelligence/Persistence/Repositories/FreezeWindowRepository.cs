@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 
@@ -30,7 +31,58 @@ internal sealed class FreezeWindowRepository(ChangeIntelligenceDbContext context
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
+    /// <summary>Lista janelas de freeze que intersectam uma janela temporal, com filtros opcionais.</summary>
+    public async Task<IReadOnlyList<FreezeWindow>> ListInRangeAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        string? environment,
+        bool? isActive,
+        CancellationToken cancellationToken = default)
+    {
+        var query = context.FreezeWindows
+            .Where(w => w.StartsAt <= to && w.EndsAt >= from);
+
+        if (isActive.HasValue)
+            query = query.Where(w => w.IsActive == isActive.Value);
+
+        if (!string.IsNullOrWhiteSpace(environment))
+            query = query.Where(w =>
+                w.Scope == FreezeScope.Global ||
+                (w.Scope == FreezeScope.Environment &&
+                 w.ScopeValue != null &&
+                 w.ScopeValue.ToLower() == environment.ToLower()));
+
+        return await query
+            .OrderBy(w => w.StartsAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>Conta o total de janelas de freeze com filtros opcionais.</summary>
+    public async Task<int> CountAsync(
+        string? environment,
+        bool? isActive,
+        CancellationToken cancellationToken = default)
+    {
+        var query = context.FreezeWindows.AsQueryable();
+
+        if (isActive.HasValue)
+            query = query.Where(w => w.IsActive == isActive.Value);
+
+        if (!string.IsNullOrWhiteSpace(environment))
+            query = query.Where(w =>
+                w.Scope == FreezeScope.Global ||
+                (w.Scope == FreezeScope.Environment &&
+                 w.ScopeValue != null &&
+                 w.ScopeValue.ToLower() == environment.ToLower()));
+
+        return await query.CountAsync(cancellationToken);
+    }
+
     /// <summary>Adiciona uma janela de freeze.</summary>
     public void Add(FreezeWindow window)
         => context.FreezeWindows.Add(window);
+
+    /// <summary>Remove uma janela de freeze.</summary>
+    public void Remove(FreezeWindow window)
+        => context.FreezeWindows.Remove(window);
 }

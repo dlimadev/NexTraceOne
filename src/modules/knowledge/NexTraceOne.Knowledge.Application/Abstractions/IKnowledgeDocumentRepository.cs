@@ -1,4 +1,5 @@
 using NexTraceOne.Knowledge.Domain.Entities;
+using NexTraceOne.Knowledge.Domain.Enums;
 
 namespace NexTraceOne.Knowledge.Application.Abstractions;
 
@@ -18,4 +19,15 @@ public interface IKnowledgeDocumentRepository
 
     /// <summary>Pesquisa documentos por termo textual (título, conteúdo, summary, tags).</summary>
     Task<IReadOnlyList<KnowledgeDocument>> SearchAsync(string searchTerm, int maxResults, CancellationToken cancellationToken = default);
+
+    /// <summary>Lista documentos com paginação e filtro opcional por categoria/status.</summary>
+    Task<(IReadOnlyList<KnowledgeDocument> Items, int TotalCount)> ListAsync(
+        DocumentCategory? category,
+        DocumentStatus? status,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Obtém um documento pelo slug.</summary>
+    Task<KnowledgeDocument?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
 }

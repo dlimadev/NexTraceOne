@@ -31,6 +31,40 @@ import { ApprovalStateBadge, CriticalityBadge } from './CatalogBadges';
 import type { CatalogItem } from '../types';
 import type { SortConfig, SortField } from '../types';
 
+// ── Score Badge ───────────────────────────────────────────────────────────────
+
+/**
+ * Badge de qualidade do contrato (0–100) calculado pelo scorecard.
+ * Mostra "–" quando o score ainda não foi gerado (lazy computation).
+ */
+function ScoreBadge({ score }: { score?: number | null }) {
+  const { t } = useTranslation();
+
+  if (score == null) {
+    return (
+      <span className="text-[10px] text-muted/50">
+        {t('contracts.catalog.score.notScored', '–')}
+      </span>
+    );
+  }
+
+  const pct = Math.round(score * 100);
+  const color =
+    pct >= 80 ? 'text-mint border-mint/40 bg-mint/5' :
+    pct >= 60 ? 'text-cyan border-cyan/40 bg-cyan/5' :
+    pct >= 40 ? 'text-amber border-amber/40 bg-amber/5' :
+               'text-error border-error/40 bg-error/5';
+
+  return (
+    <span
+      className={`inline-block text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded border ${color}`}
+      title={t('contracts.catalog.score.tooltip', 'Contract quality score (last computed)')}
+    >
+      {pct}
+    </span>
+  );
+}
+
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 interface CatalogTableProps {
@@ -99,6 +133,9 @@ export function CatalogTable({ items, sort, onSort }: CatalogTableProps) {
               sort={sort}
               onToggle={toggleSort}
             />
+            <th className="px-3 py-3 text-left font-medium text-muted whitespace-nowrap">
+              {t('contracts.catalog.columns.score', 'Score')}
+            </th>
             <SortableHeader
               label={t('contracts.catalog.columns.updatedAt', 'Updated')}
               field="updatedAt"
@@ -217,6 +254,11 @@ function CatalogRow({ item }: { item: CatalogItem }) {
         <CriticalityBadge
           level={toCriticalityLevel(item.criticality)}
         />
+      </td>
+
+      {/* Score */}
+      <td className="px-3 py-3">
+        <ScoreBadge score={item.overallScore} />
       </td>
 
       {/* Updated */}

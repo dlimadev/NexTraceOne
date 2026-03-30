@@ -15,6 +15,8 @@ import {
   Network,
   ScanSearch,
   Bot,
+  BarChart2,
+  Rocket,
 } from 'lucide-react';
 import { cn } from '../../../lib/cn';
 import { WORKSPACE_SECTIONS, WORKSPACE_SECTION_GROUPS } from '../shared/constants';
@@ -32,8 +34,10 @@ const SECTION_ICONS: Record<WorkspaceSectionId, React.ComponentType<{ size?: num
   changelog: History,
   approvals: CheckCircle,
   compliance: ShieldCheck,
+  scorecard: BarChart2,
   consumers: Users,
   dependencies: Network,
+  deployments: Rocket,
   'ai-agents': Bot,
 };
 

@@ -124,6 +124,24 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
         return (total, validated, needsAttention, suspectedRegressions, correlatedWithIncidents);
     }
 
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Release>> ListInRangeAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        string? environment,
+        CancellationToken cancellationToken = default)
+    {
+        var query = context.Releases
+            .Where(r => r.CreatedAt >= from && r.CreatedAt <= to);
+
+        if (!string.IsNullOrWhiteSpace(environment))
+            query = query.Where(r => r.Environment == environment);
+
+        return await query
+            .OrderBy(r => r.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
     private IQueryable<Release> ApplyFilters(
         string? serviceName, string? teamName, string? environment,
         ChangeType? changeType, ConfidenceStatus? confidenceStatus,

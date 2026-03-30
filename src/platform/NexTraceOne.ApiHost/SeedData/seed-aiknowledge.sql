@@ -8,74 +8,143 @@
 -- ═══ PROVIDERS ═══════════════════════════════════════════════════════════════
 
 INSERT INTO aik_providers (
-  "Id", "Name", "DisplayName", "Description",
-  "BaseUrl", "ApiVersion", "IsEnabled", "Priority",
-  "HealthStatus", "HealthCheckedAt",
+  "Id", "Name", "Slug", "DisplayName", "Description",
+  "ProviderType", "BaseUrl", "IsLocal", "IsExternal", "IsEnabled",
+  "AuthenticationMode", "SupportedCapabilities",
+  "SupportsChat", "SupportsEmbeddings", "SupportsTools", "SupportsVision", "SupportsStructuredOutput",
+  "HealthStatus", "Priority", "TimeoutSeconds", "RegisteredAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'cc000001-0001-0000-0000-000000000001',
-  'ollama-local', 'Ollama (Local)', 'Local AI provider via Ollama runtime.',
-  'http://localhost:11434', 'v1', true, 1,
-  'Unknown', NULL,
+  'ollama-local', 'ollama', 'Ollama (Local)', 'Local AI provider via Ollama runtime.',
+  'Ollama', 'http://localhost:11434', true, false, true,
+  'None', 'chat,reasoning,code,embeddings',
+  true, true, true, false, true,
+  'Unknown', 1, 30, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'cc000002-0001-0000-0000-000000000001',
-  'openai', 'OpenAI', 'OpenAI external AI provider (requires API key).',
-  'https://api.openai.com', 'v1', false, 10,
-  'Unknown', NULL,
+  'openai', 'openai', 'OpenAI', 'OpenAI external AI provider (requires API key).',
+  'OpenAI', 'https://api.openai.com', false, true, false,
+  'ApiKey', 'chat,reasoning,code,vision,embeddings,tools,structured-output',
+  true, true, true, true, true,
+  'Unknown', 10, 30, NOW(),
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
 
 -- ═══ MODELS ══════════════════════════════════════════════════════════════════
 
+-- Fix existing model rows to match the actual Ollama models installed locally
+UPDATE aik_models SET "Name" = 'qwen3.5:9b', "Slug" = 'qwen3.5-9b', "DisplayName" = 'Qwen 3.5 9B (Chat)', "ExternalModelId" = 'qwen3.5:9b'
+WHERE "Id" = 'aa000001-0001-0000-0000-000000000001';
+
+UPDATE aik_models SET "Name" = 'deepseek-r1:14b', "Slug" = 'deepseek-r1-14b', "DisplayName" = 'DeepSeek R1 14B (Analysis)',
+  "ExternalModelId" = 'deepseek-r1:14b', "ModelType" = 'Analysis', "Category" = 'Reasoning',
+  "Capabilities" = 'reasoning,analysis,code,chain-of-thought', "DefaultUseCases" = 'contract-generation,code-analysis,change-analysis',
+  "SensitivityLevel" = 2, "ContextWindow" = 131072, "RequiresGpu" = true, "RecommendedRamGb" = 16.0
+WHERE "Id" = 'aa000002-0001-0000-0000-000000000001';
+
+UPDATE aik_models SET "Name" = 'deepseek-r1:671b', "Slug" = 'deepseek-r1-671b', "DisplayName" = 'DeepSeek R1 671B (Heavy Reasoning)',
+  "ExternalModelId" = 'deepseek-r1:671b', "Capabilities" = 'reasoning,analysis,chain-of-thought,deep-analysis',
+  "DefaultUseCases" = 'change-analysis,incident-explanation,blast-radius',
+  "SensitivityLevel" = 3, "ContextWindow" = 131072, "RequiresGpu" = true, "RecommendedRamGb" = 128.0
+WHERE "Id" = 'aa000003-0001-0000-0000-000000000001';
+
+UPDATE aik_models SET "Name" = 'llama3.1:8b', "Slug" = 'llama3.1-8b', "DisplayName" = 'Llama 3.1 8B (Completion)',
+  "ExternalModelId" = 'llama3.1:8b', "Capabilities" = 'completion,summarisation,concise,multilingual',
+  "ContextWindow" = 131072, "RecommendedRamGb" = 8.0
+WHERE "Id" = 'aa000004-0001-0000-0000-000000000001';
+
 INSERT INTO aik_models (
-  "Id", "Name", "DisplayName", "Description",
-  "Provider", "ModelType", "Status",
-  "IsInternal", "MaxTokens", "ContextWindow",
-  "Capabilities", "Metadata",
+  "Id", "Name", "Slug", "DisplayName",
+  "Provider", "ProviderId", "ExternalModelId",
+  "ModelType", "Category",
+  "IsInternal", "IsExternal", "IsInstalled",
+  "Status", "Capabilities", "DefaultUseCases",
+  "SensitivityLevel",
+  "IsDefaultForChat", "IsDefaultForReasoning", "IsDefaultForEmbeddings",
+  "SupportsStreaming", "SupportsToolCalling", "SupportsEmbeddings", "SupportsVision", "SupportsStructuredOutput",
+  "ContextWindow", "RequiresGpu", "RecommendedRamGb",
+  "LicenseName", "LicenseUrl", "ComplianceStatus",
+  "RegisteredAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'aa000001-0001-0000-0000-000000000001',
-  'qwen2.5:7b', 'Qwen 2.5 7B (Chat)', 'General-purpose chat model via Ollama. Balanced performance for most operational queries.',
-  'ollama-local', 'Chat', 'Active',
-  true, 8192, 32768,
-  'chat,reasoning,multilingual', '{}',
+  'qwen3.5:9b', 'qwen3.5-9b', 'Qwen 3.5 9B (Chat)',
+  'ollama-local', 'cc000001-0001-0000-0000-000000000001', 'qwen3.5:9b',
+  'Chat', 'General',
+  true, false, true,
+  'Active', 'chat,reasoning,multilingual', 'service-lookup,incident-explanation,executive-summary',
+  1,
+  true, false, false,
+  true, false, false, false, true,
+  32768, false, 8.0,
+  'Apache 2.0', 'https://www.apache.org/licenses/LICENSE-2.0', 'Approved',
+  NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'aa000002-0001-0000-0000-000000000001',
-  'qwen2.5-coder:7b', 'Qwen 2.5 Coder 7B (Code)', 'Code-optimised model via Ollama. Used for contract generation and code analysis.',
-  'ollama-local', 'CodeGeneration', 'Active',
-  true, 8192, 32768,
-  'code,generation,analysis', '{}',
+  'deepseek-r1:14b', 'deepseek-r1-14b', 'DeepSeek R1 14B (Analysis)',
+  'ollama-local', 'cc000001-0001-0000-0000-000000000001', 'deepseek-r1:14b',
+  'Analysis', 'Reasoning',
+  true, false, true,
+  'Active', 'reasoning,analysis,code,chain-of-thought', 'contract-generation,code-analysis,change-analysis',
+  2,
+  false, true, false,
+  true, true, false, false, true,
+  131072, true, 16.0,
+  'Apache 2.0', 'https://www.apache.org/licenses/LICENSE-2.0', 'Approved',
+  NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'aa000003-0001-0000-0000-000000000001',
-  'deepseek-r1:8b', 'DeepSeek R1 8B (Analysis)', 'Reasoning-optimised model via Ollama. Used for change analysis and incident explanation.',
-  'ollama-local', 'Analysis', 'Active',
-  true, 8192, 65536,
-  'reasoning,analysis,chain-of-thought', '{}',
+  'deepseek-r1:671b', 'deepseek-r1-671b', 'DeepSeek R1 671B (Heavy Reasoning)',
+  'ollama-local', 'cc000001-0001-0000-0000-000000000001', 'deepseek-r1:671b',
+  'Analysis', 'Reasoning',
+  true, false, true,
+  'Active', 'reasoning,analysis,chain-of-thought,deep-analysis', 'change-analysis,incident-explanation,blast-radius',
+  3,
+  false, true, false,
+  true, true, false, false, true,
+  131072, true, 128.0,
+  'Apache 2.0', 'https://www.apache.org/licenses/LICENSE-2.0', 'Approved',
+  NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'aa000004-0001-0000-0000-000000000001',
-  'llama3.2:3b', 'Llama 3.2 3B (Completion)', 'Lightweight completion model via Ollama. Used for executive summaries and concise responses.',
-  'ollama-local', 'Completion', 'Active',
-  true, 4096, 8192,
-  'completion,summarisation,concise', '{}',
+  'llama3.1:8b', 'llama3.1-8b', 'Llama 3.1 8B (Completion)',
+  'ollama-local', 'cc000001-0001-0000-0000-000000000001', 'llama3.1:8b',
+  'Completion', 'Summarization',
+  true, false, true,
+  'Active', 'completion,summarisation,concise,multilingual', 'executive-summary,post-change-summary',
+  1,
+  false, false, false,
+  true, false, false, false, false,
+  131072, false, 8.0,
+  'Meta Llama Community License', 'https://llama.meta.com/llama3/license/', 'Approved',
+  NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'aa000005-0001-0000-0000-000000000001',
-  'gpt-4o-mini', 'GPT-4o Mini (External)', 'OpenAI external model — requires API key and explicit policy enablement.',
-  'openai', 'Chat', 'Inactive',
-  false, 16384, 128000,
-  'chat,reasoning,multilingual,code', '{}',
+  'gpt-4o-mini', 'gpt-4o-mini', 'GPT-4o Mini (External)',
+  'openai', 'cc000002-0001-0000-0000-000000000001', 'gpt-4o-mini',
+  'Chat', 'General',
+  false, true, false,
+  'Inactive', 'chat,reasoning,multilingual,code', 'executive-summary,contract-explanation',
+  2,
+  false, false, false,
+  true, true, false, true, true,
+  128000, true, 32.0,
+  'Proprietary', 'https://openai.com/policies/terms-of-use', 'PendingReview',
+  NOW(),
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
@@ -83,27 +152,31 @@ ON CONFLICT DO NOTHING;
 -- ═══ ACCESS POLICIES ═════════════════════════════════════════════════════════
 
 INSERT INTO aik_access_policies (
-  "Id", "Name", "Description", "Scope",
-  "AllowedPersonas", "AllowedClientTypes", "MaxTokensPerRequest",
+  "Id", "Name", "Description", "Scope", "ScopeValue",
+  "AllowedModelIds", "BlockedModelIds",
+  "AllowExternalAI", "InternalOnly", "MaxTokensPerRequest",
+  "EnvironmentRestrictions",
   "IsActive",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'dd000001-0001-0000-0000-000000000001',
   'default-internal-policy', 'Default policy: internal models only for all personas.',
-  'global',
-  'Engineer,TechLead,Architect,Product,Executive,PlatformAdmin,Auditor',
-  'WebApp,IDEExtension,API',
-  8192, true,
+  'persona', 'all',
+  '', '',
+  false, true, 8192,
+  '',
+  true,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'dd000002-0001-0000-0000-000000000001',
   'platform-admin-extended', 'Extended policy for platform admins: all models, higher token limit.',
-  'role:platform-admin',
-  'PlatformAdmin',
-  'WebApp,IDEExtension,API',
-  32768, true,
+  'role', 'platform-admin',
+  '', '',
+  true, false, 32768,
+  '',
+  true,
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
@@ -111,17 +184,18 @@ ON CONFLICT DO NOTHING;
 -- ═══ BUDGETS ═════════════════════════════════════════════════════════════════
 
 INSERT INTO aik_budgets (
-  "Id", "Name", "Description", "Scope",
-  "TotalTokenLimit", "UsedTokens",
-  "Period", "IsActive",
+  "Id", "Name", "Scope", "ScopeValue",
+  "Period", "MaxTokens", "MaxRequests",
+  "CurrentTokensUsed", "CurrentRequestCount",
+  "PeriodStartDate", "IsActive",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'ee000001-0001-0000-0000-000000000001',
-  'default-monthly-budget', 'Default monthly token budget — all users.',
-  'global',
-  5000000, 0,
-  'Monthly', true,
+  'default-monthly-budget', 'global', '',
+  'Monthly', 5000000, 10000,
+  0, 0,
+  NOW(), true,
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
@@ -130,29 +204,25 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO aik_routing_strategies (
   "Id", "Name", "Description",
-  "ApplicablePersonas", "ApplicableUseCases", "ApplicableClientTypes",
-  "PreferredPath", "AllowExternalEscalation",
-  "Priority", "IsActive",
+  "TargetPersona", "TargetUseCase", "TargetClientType",
+  "PreferredPath", "MaxSensitivityLevel", "AllowExternalEscalation",
+  "Priority", "IsActive", "RegisteredAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'ff000001-0001-0000-0000-000000000001',
   'internal-only-default', 'Default strategy: route all requests through internal models only.',
-  'Engineer,TechLead,Architect,Product,Executive,PlatformAdmin,Auditor',
-  'General,ServiceLookup,ContractExplanation,IncidentExplanation,MitigationGuidance,ChangeAnalysis,ExecutiveSummary,RiskComplianceExplanation,FinOpsExplanation,DependencyReasoning',
-  'WebApp,IDEExtension,API',
-  'InternalOnly', false,
-  100, true,
+  '*', '*', '*',
+  'InternalOnly', 5, false,
+  100, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'ff000002-0001-0000-0000-000000000001',
   'code-generation-advanced', 'Route contract and code generation to code-optimised models.',
-  'Engineer,TechLead,Architect',
-  'ContractGeneration',
-  'WebApp,IDEExtension',
-  'InternalOnly', false,
-  10, true,
+  '*', 'ContractGeneration', '*',
+  'InternalOnly', 3, false,
+  10, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
@@ -162,63 +232,63 @@ ON CONFLICT DO NOTHING;
 INSERT INTO aik_knowledge_sources (
   "Id", "Name", "Description",
   "SourceType", "EndpointOrPath",
-  "Priority", "IsActive",
+  "Priority", "IsActive", "RegisteredAt",
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
   'bb000001-0002-0000-0000-000000000001',
   'service-catalog', 'Service Catalog — services, ownership, teams, dependencies.',
   'Service', 'internal://catalog',
-  1, true,
+  1, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000002-0002-0000-0000-000000000001',
   'contract-registry', 'Contract Registry — REST, SOAP, Event and background service contracts.',
   'Contract', 'internal://contracts',
-  2, true,
+  2, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000003-0002-0000-0000-000000000001',
   'change-intelligence', 'Change Intelligence — deploy events, blast radius, confidence scores.',
   'Change', 'internal://changes',
-  3, true,
+  3, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000004-0002-0000-0000-000000000001',
   'incident-store', 'Incident Store — active incidents, timeline, mitigation history.',
   'Incident', 'internal://incidents',
-  4, true,
+  4, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000005-0002-0000-0000-000000000001',
   'runbook-library', 'Runbook Library — operational runbooks, step-by-step guides.',
   'Runbook', 'internal://runbooks',
-  5, true,
+  5, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000006-0002-0000-0000-000000000001',
   'source-of-truth', 'Source of Truth — authoritative data across services, contracts, environments.',
   'SourceOfTruth', 'internal://source-of-truth',
-  6, true,
+  6, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000007-0002-0000-0000-000000000001',
   'telemetry-summary', 'Telemetry Summary — aggregated metrics, error rates, latency data.',
   'TelemetrySummary', 'internal://telemetry',
-  7, true,
+  7, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 ),
 (
   'bb000008-0002-0000-0000-000000000001',
   'knowledge-docs', 'Knowledge Documentation — internal docs, wiki, technical notes.',
   'Documentation', 'internal://knowledge',
-  8, true,
+  8, true, NOW(),
   NOW(), 'system', NOW(), 'system', false
 )
 ON CONFLICT DO NOTHING;
@@ -285,6 +355,15 @@ ON CONFLICT DO NOTHING;
 
 -- ═══ AGENTS ══════════════════════════════════════════════════════════════════
 
+-- Fix existing rows that were seeded with invalid enum values
+UPDATE aik_agents
+SET "OwnershipType" = 'System'
+WHERE "OwnershipType" = 'Platform';
+
+UPDATE aik_agents
+SET "Visibility" = 'Tenant'
+WHERE "Visibility" = 'Public';
+
 INSERT INTO aik_agents (
   "Id", "Name", "DisplayName", "Slug", "Description",
   "Category", "SystemPrompt", "Capabilities", "TargetPersona",
@@ -298,7 +377,7 @@ INSERT INTO aik_agents (
   "CreatedAt", "CreatedBy", "UpdatedAt", "UpdatedBy", "IsDeleted"
 ) VALUES
 (
-  'ag000001-0001-0000-0000-000000000001',
+  'a9000001-0001-0000-0000-000000000001',
   'contract-assistant', 'Contract Assistant', 'contract-assistant',
   'Assists with understanding, generating, and validating API, SOAP, and event contracts.',
   'ContractGovernance',
@@ -307,15 +386,15 @@ INSERT INTO aik_agents (
   'Engineer,TechLead,Architect',
   'FileText', NULL,
   true, true,
-  'Platform', 'Public', 'Published',
+  'System', 'Tenant', 'Published',
   'system', 'platform-team',
-  '', 'list_services', 'Help engineers manage and govern service contracts.',
+  '', 'list_services', 'Help engineers manage and govern service contracts',
   '{}', '{}',
   false, 1, 0, 1,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
-  'ag000002-0001-0000-0000-000000000001',
+  'a9000002-0001-0000-0000-000000000001',
   'incident-investigator', 'Incident Investigator', 'incident-investigator',
   'Correlates incidents with recent changes, blast radius, and suggests mitigation paths.',
   'IncidentResponse',
@@ -324,15 +403,15 @@ INSERT INTO aik_agents (
   'Engineer,TechLead',
   'AlertTriangle', NULL,
   true, true,
-  'Platform', 'Public', 'Published',
+  'System', 'Tenant', 'Published',
   'system', 'platform-team',
-  '', 'list_services,list_recent_changes,get_service_health', 'Accelerate incident resolution through change correlation and mitigation guidance.',
+  '', 'list_services,list_recent_changes,get_service_health', 'Accelerate incident resolution through change correlation and mitigation guidance',
   '{}', '{}',
   false, 1, 0, 2,
   NOW(), 'system', NOW(), 'system', false
 ),
 (
-  'ag000003-0001-0000-0000-000000000001',
+  'a9000003-0001-0000-0000-000000000001',
   'change-risk-analyst', 'Change Risk Analyst', 'change-risk-analyst',
   'Evaluates change risk, blast radius, and promotion readiness across environments.',
   'ChangeIntelligence',
@@ -341,9 +420,9 @@ INSERT INTO aik_agents (
   'TechLead,Architect,Product',
   'GitBranch', NULL,
   true, true,
-  'Platform', 'Public', 'Published',
+  'System', 'Tenant', 'Published',
   'system', 'platform-team',
-  '', 'list_services,list_recent_changes', 'Improve confidence in production changes by quantifying risk and promotion readiness.',
+  '', 'list_services,list_recent_changes', 'Improve confidence in production changes by quantifying risk and promotion readiness',
   '{}', '{}',
   false, 1, 0, 3,
   NOW(), 'system', NOW(), 'system', false

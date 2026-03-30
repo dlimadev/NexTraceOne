@@ -300,7 +300,10 @@
     "runtimeIntelligence": "Inteligência de Runtime",
     "publicationCenter": "Central de Publicação",
     "productAnalytics": "Analytics do Produto",
-    "platformConfiguration": "Configuração da Plataforma"
+    "platformConfiguration": "Configuração da Plataforma",
+    "serviceDiscovery": "Service Discovery",
+    "serviceMaturity": "Maturidade de Serviços",
+    "releaseCalendar": "Calendário de Releases"
   },
   "platformOps": {
     "title": "Operações da Plataforma",
@@ -671,6 +674,37 @@
     },
     "freezeEnvironmentPlaceholder": "produção"
   },
+  "releaseCalendar": {
+    "title": "Calendário de Releases",
+    "subtitle": "Visão unificada de releases, janelas de freeze e risco de mudanças ao longo do tempo.",
+    "tabs": {
+      "calendar": "Calendário",
+      "freezeWindows": "Janelas de Freeze"
+    },
+    "filters": "Filtros",
+    "from": "De",
+    "to": "Até",
+    "environment": "Ambiente",
+    "totalReleases": "Total de Releases",
+    "highRiskReleases": "Alto Risco",
+    "activeFreezes": "Freezes Ativos",
+    "avgScore": "Score Médio",
+    "activeFreezeWindows": "Janelas de Freeze Ativas",
+    "dailySummary": "Resumo Diário",
+    "date": "Data",
+    "releaseTimeline": "Timeline de Releases",
+    "noReleases": "Nenhuma release encontrada neste período",
+    "releasesLabel": "releases",
+    "score": "Score",
+    "freezeWindowsList": "Janelas de Freeze",
+    "editFreezeWindow": "Editar Janela de Freeze",
+    "deactivate": "Desativar",
+    "scopeGlobal": "Global",
+    "scopeTenant": "Tenant",
+    "scopeDomain": "Domínio",
+    "scopeEnvironment": "Ambiente",
+    "scopeService": "Serviço"
+  },
   "contracts": {
     "active": "Ativo",
     "aiGenerated": "Gerado por IA",
@@ -997,6 +1031,27 @@
       "aiAgentsOpenAssistant": "Abrir Assistente de IA",
       "groups": {
         "ai": "IA"
+      },
+      "splitEditor": {
+        "title": "Editor Split",
+        "livePreview": "Preview ao Vivo",
+        "parsing": "A analisar especificação...",
+        "parseError": "Erro ao analisar",
+        "emptyPreview": "Comece a escrever para ver o preview ao vivo",
+        "updating": "A atualizar...",
+        "valid": "Válido",
+        "invalid": "Inválido",
+        "operations": "operações",
+        "schemas": "schemas",
+        "noSpec": "Nenhuma especificação carregada",
+        "securityDefined": "Segurança definida",
+        "servers": "Servidores",
+        "security": "Segurança",
+        "endpoints": "Endpoints",
+        "channels": "Canais",
+        "soapOperations": "Operações SOAP",
+        "models": "Modelos",
+        "tags": "Tags"
       }
     }
   },
@@ -2050,6 +2105,35 @@
       "noRelatedIncidents": "Nenhum incidente ativo",
       "viewIncident": "Ver incidente"
     },
+    "serviceLinks": {
+      "addLink": "Adicionar Link",
+      "editLink": "Editar Link",
+      "addFirstLink": "Adicione o primeiro link a este serviço",
+      "noLinks": "Nenhum link adicionado ainda.",
+      "form": {
+        "category": "Categoria",
+        "title": "Título",
+        "titlePlaceholder": "ex. Repositório Principal",
+        "url": "URL",
+        "description": "Descrição",
+        "descriptionPlaceholder": "Descrição opcional"
+      },
+      "categories": {
+        "Repository": "Repositório",
+        "Documentation": "Documentação",
+        "CiCd": "CI/CD",
+        "Monitoring": "Monitorização",
+        "Wiki": "Wiki",
+        "SwaggerUi": "Swagger UI",
+        "ApiPortal": "Portal de APIs",
+        "Backstage": "Backstage",
+        "Adr": "ADR",
+        "Runbook": "Runbook",
+        "Changelog": "Changelog",
+        "Dashboard": "Dashboard",
+        "Other": "Outro"
+      }
+    },
     "actions": {
       "viewDetail": "Ver Detalhe",
       "viewGraph": "Ver Grafo",
@@ -2057,6 +2141,66 @@
       "updateOwnership": "Atualizar Ownership"
     },
     "totalCount": "({{count}} total)"
+  },
+  "discovery": {
+    "title": "Service Discovery",
+    "subtitle": "Descubra automaticamente serviços a partir da telemetria e faça a gestão do registo no catálogo.",
+    "runDiscovery": "Executar Discovery",
+    "noServices": "Nenhum serviço descoberto encontrado.",
+    "searchPlaceholder": "Pesquisar nome do serviço...",
+    "stats": {
+      "total": "Total",
+      "pending": "Pendentes",
+      "matched": "Associados",
+      "registered": "Registados",
+      "ignored": "Ignorados",
+      "newThisWeek": "Novos esta semana"
+    },
+    "filters": {
+      "allStatuses": "Todos os estados",
+      "pending": "Pendente",
+      "matched": "Associado",
+      "registered": "Registado",
+      "ignored": "Ignorado",
+      "environment": "Ambiente"
+    },
+    "table": {
+      "service": "Serviço",
+      "environment": "Ambiente",
+      "traces": "Traces",
+      "endpoints": "Endpoints",
+      "lastSeen": "Última Observação",
+      "status": "Estado",
+      "actions": "Ações"
+    },
+    "statuses": {
+      "Pending": "Pendente",
+      "Matched": "Associado",
+      "Registered": "Registado",
+      "Ignored": "Ignorado"
+    },
+    "actions": {
+      "match": "Associar",
+      "register": "Registar",
+      "ignore": "Ignorar"
+    },
+    "recentRuns": "Execuções Recentes de Discovery",
+    "found": "encontrados",
+    "new": "novos",
+    "modal": {
+      "matchTitle": "Associar a Serviço Existente",
+      "registerTitle": "Registar como Novo Serviço",
+      "ignoreTitle": "Ignorar Serviço Descoberto",
+      "service": "Serviço",
+      "serviceAssetId": "ID do Serviço",
+      "serviceAssetIdPlaceholder": "Selecione ou introduza o ID do serviço...",
+      "domain": "Domínio",
+      "domainPlaceholder": "ex. Pagamentos",
+      "teamName": "Equipa",
+      "teamNamePlaceholder": "ex. Engenharia de Plataforma",
+      "reason": "Motivo",
+      "reasonPlaceholder": "ex. Ferramenta interna, não é um serviço de negócio"
+    }
   },
   "contractGov": {
     "title": "Governança de Contratos",
@@ -4640,5 +4784,59 @@
       "Operations": "Operações"
     },
     "createSuccess": "Agent criado com sucesso"
+  },
+  "serviceMaturity": {
+    "title": "Maturidade e Auditoria de Ownership",
+    "subtitle": "Avalie a maturidade, completude e ownership dos serviços no catálogo",
+    "tabs": {
+      "maturity": "Scorecard de Maturidade",
+      "audit": "Auditoria de Ownership"
+    },
+    "filterTeam": "Filtrar por equipa...",
+    "filterDomain": "Filtrar por domínio...",
+    "totalServices": "Total de Serviços",
+    "avgScore": "Score Médio",
+    "withoutOwnership": "Sem Ownership",
+    "withoutContracts": "Sem Contratos",
+    "withoutDocs": "Sem Docs",
+    "withoutRunbooks": "Sem Runbooks",
+    "levelDistribution": "Distribuição por Nível",
+    "serviceList": "Detalhe de Maturidade por Serviço",
+    "noServices": "Nenhum serviço encontrado para os filtros selecionados.",
+    "level": {
+      "Optimizing": "Otimizando",
+      "Managed": "Gerido",
+      "Defined": "Definido",
+      "Developing": "Em Desenvolvimento",
+      "Initial": "Inicial"
+    },
+    "dim": {
+      "ownership": "Ownership",
+      "contracts": "Contratos",
+      "documentation": "Docs",
+      "repository": "Repo",
+      "monitoring": "Monitorização",
+      "runbook": "Runbook"
+    },
+    "audit": {
+      "totalAudited": "Serviços Auditados",
+      "healthy": "Saudáveis",
+      "withIssues": "Com Problemas",
+      "critical": "Críticos",
+      "noTeam": "Sem Equipa",
+      "noContracts": "APIs Sem Contrato",
+      "findings": "Resultados da Auditoria",
+      "noFindings": "Todos os serviços passaram na auditoria de ownership. Excelente!",
+      "finding": {
+        "NoTeam": "Sem equipa atribuída",
+        "NoTechnicalOwner": "Sem owner técnico",
+        "NoBusinessOwner": "Sem owner de negócio",
+        "NoDescription": "Descrição em falta",
+        "ApisWithoutContracts": "{{count}} API(s) sem contratos",
+        "NoDocumentation": "Sem documentação",
+        "NoRunbook": "Sem runbook",
+        "NoMonitoring": "Sem monitorização"
+      }
+    }
   }
 }

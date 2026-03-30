@@ -67,6 +67,13 @@ public interface IReleaseRepository
         string serviceName,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Lista releases numa janela temporal, com filtro opcional de ambiente.</summary>
+    Task<IReadOnlyList<Release>> ListInRangeAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        string? environment,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Obtém contadores agregados de mudanças.</summary>
     Task<(int total, int validated, int needsAttention, int suspectedRegressions, int correlatedWithIncidents)>
         GetSummaryCountsAsync(

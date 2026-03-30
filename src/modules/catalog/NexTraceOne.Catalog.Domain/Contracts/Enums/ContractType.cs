@@ -36,5 +36,8 @@ public enum ContractType
     FixedLayout = 7,
 
     /// <summary>CICS COMMAREA — área de comunicação para transações CICS.</summary>
-    CicsCommarea = 8
+    CicsCommarea = 8,
+
+    /// <summary>Contrato de Webhook — notificações HTTP push para subscribers externos.</summary>
+    Webhook = 9
 }

@@ -3,20 +3,20 @@ using NexTraceOne.Catalog.Domain.Contracts.Enums;
 namespace NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 /// <summary>
-/// Define o escopo de aplicação de um ruleset Spectral.
-/// Permite configurar onde e como o Spectral é utilizado —
+/// Define o escopo de aplicação de um ruleset de linting de contratos.
+/// Permite configurar onde e como o linting é utilizado —
 /// globalmente, por organização, domínio, equipa, produto,
 /// tipo de serviço, template ou por workflow state.
 /// </summary>
-public sealed record SpectralBindingScope(
+public sealed record ContractLintBindingScope(
     /// <summary>Identificador do ruleset a aplicar.</summary>
     Guid RulesetId,
-    /// <summary>Spectral habilitado neste escopo.</summary>
+    /// <summary>Linting habilitado neste escopo.</summary>
     bool Enabled,
     /// <summary>Modo de execução para este binding.</summary>
-    SpectralExecutionMode ExecutionMode,
+    ContractLintExecutionMode ExecutionMode,
     /// <summary>Comportamento face a violações.</summary>
-    SpectralEnforcementBehavior EnforcementBehavior,
+    ContractLintEnforcementBehavior EnforcementBehavior,
     /// <summary>Escopo: "global", "organization", "domain", "team", "product", "serviceType", "template", "workflowState".</summary>
     string ScopeType,
     /// <summary>Valor do escopo (ex: id da org, nome do domínio, id da equipa).</summary>
