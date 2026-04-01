@@ -22,7 +22,7 @@ export function MobileDrawer({ open, onClose, children }: MobileDrawerProps) {
         aria-hidden="true"
       />
       {/* Drawer panel */}
-      <div className="relative h-full w-[250px] animate-slide-right">
+      <div className="relative h-full w-[320px] animate-slide-right">
         <button
           onClick={onClose}
           className="absolute top-4 right-[-44px] p-2 rounded-lg text-muted hover:text-heading bg-elevated/80"

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ShieldCheck, Mail } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Button, TextField, PasswordInput } from '../../../shared/ui';
+import { Button, TextField, PasswordInput, Checkbox } from '../../../shared/ui';
 import { identityApi } from '../api';
 import { resolveApiError } from '../../../utils/apiErrors';
 import { AuthShell } from '../components/AuthShell';
@@ -15,11 +15,12 @@ import { AuthFeedback } from '../components/AuthFeedback';
 import { loginSchema, type LoginFormData } from '../schemas/auth';
 
 /**
- * Página de login — Auth Shell enterprise (DESIGN-SYSTEM.md §4.2, DESIGN.md §9.1)
+ * Página de login — Auth Shell enterprise inspirada no NexLink template.
  *
- * Usa AuthShell (split-layout: hero 55% + card 45%).
- * react-hook-form + zod para validação tipada.
- * Design system components: TextField, PasswordInput, Button.
+ * Layout: split 50/50 com ilustração à esquerda e card à direita.
+ * Logo centrado no card, heading "Welcome to NexTraceOne", campos de
+ * email/password, remember me, forgot password, botão de login, SSO abaixo.
+ * Pill theme toggle no canto superior direito (via AuthShell).
  */
 export function LoginPage() {
   const { t } = useTranslation();
@@ -75,30 +76,20 @@ export function LoginPage() {
   return (
     <AuthShell>
       <AuthCard>
-        <h2 className="text-xl font-semibold text-heading mb-1">{t('auth.signIn')}</h2>
-        <p className="text-sm text-muted mb-8">{t('auth.signInSubtitle')}</p>
+        {/* Logo centrado — globe icon */}
+        <div className="flex justify-center mb-6">
+          <img src="/brand/logo-icon.svg" alt="NexTraceOne" className="h-12 w-auto" />
+        </div>
+
+        {/* Heading — "Welcome to NexTraceOne" */}
+        <div className="text-center mb-8">
+          <h2 className="text-xl font-semibold text-heading mb-1">{t('auth.welcomeTitle')}</h2>
+          <p className="text-sm text-muted">{t('auth.signInSubtitle')}</p>
+        </div>
 
         {serverError && <AuthFeedback variant="error" message={serverError} className="mb-6" />}
 
-        {/* SSO — primary authentication method (institutional blue) */}
-        <div className="mb-6">
-          <Button
-            type="button"
-            variant="institutional"
-            size="lg"
-            className="w-full"
-            loading={ssoLoading}
-            onClick={handleSsoLogin}
-          >
-            <ShieldCheck size={18} />
-            {ssoLoading ? t('auth.ssoRedirecting') : t('auth.ssoSignIn')}
-          </Button>
-          <p className="text-xs text-muted text-center mt-2.5">{t('auth.ssoDescription')}</p>
-        </div>
-
-        <AuthDivider />
-
-        {/* Credentials form — react-hook-form + zod */}
+        {/* Credentials form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <TextField
             label={t('auth.email')}
@@ -121,20 +112,39 @@ export function LoginPage() {
               error={errors.password?.message ? t(errors.password.message) : undefined}
               {...register('password')}
             />
-            <div className="flex justify-end mt-2">
-              <Link
-                to="/forgot-password"
-                className="text-xs text-cyan hover:text-cyan-hover transition-colors"
-              >
-                {t('auth.forgotPasswordLink')}
-              </Link>
-            </div>
+          </div>
+
+          {/* Remember me + Forgot password row */}
+          <div className="flex items-center justify-between">
+            <Checkbox label={t('auth.rememberMe')} />
+            <Link
+              to="/forgot-password"
+              className="text-xs text-cyan hover:text-cyan-hover transition-colors"
+            >
+              {t('auth.forgotPasswordLink')}
+            </Link>
           </div>
 
           <Button type="submit" loading={isSubmitting} className="w-full" size="lg">
             {t('auth.signInButton')}
           </Button>
         </form>
+
+        {/* SSO section */}
+        <AuthDivider labelKey="auth.orContinueWith" />
+
+        <Button
+          type="button"
+          variant="institutional"
+          size="lg"
+          className="w-full"
+          loading={ssoLoading}
+          onClick={handleSsoLogin}
+        >
+          <ShieldCheck size={18} />
+          {ssoLoading ? t('auth.ssoRedirecting') : t('auth.ssoSignIn')}
+        </Button>
+        <p className="text-xs text-muted text-center mt-2.5">{t('auth.ssoDescription')}</p>
 
         {/* Help link */}
         <p className="text-center text-xs text-faded mt-6">

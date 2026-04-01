@@ -44,6 +44,9 @@ export { Loader } from '../../components/Loader';
 export { Tooltip } from '../../components/Tooltip';
 export { DemoBanner } from '../../components/DemoBanner';
 
+// ── Theme ───────────────────────────────────────────────────────────────────
+export { ThemeToggle } from './ThemeToggle';
+
 // ── Overlay ─────────────────────────────────────────────────────────────────
 export { Modal } from '../../components/Modal';
 export { Drawer } from '../../components/Drawer';

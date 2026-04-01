@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../../lib/cn';
 import { NexTraceLogo } from '../../../components/NexTraceLogo';
+import { ThemeToggle } from '../../../shared/ui';
 
 interface AuthShellProps {
   children: ReactNode;
@@ -15,13 +16,10 @@ interface AuthShellProps {
 /**
  * Auth Shell — layout reutilizável para todas as telas de autenticação.
  *
- * DESIGN-SYSTEM.md §4.2: split-layout 55/45, hero esquerdo, card direito.
- * Hero: headline, subtítulo, chips de capacidade, trust signals.
- * Auth card area: responsivo, centralizado.
- *
- * Breakpoints:
- * - lg+: split-layout com hero + card
- * - <lg: card centralizado com logo mobile
+ * Inspirado no NexLink template login-cover: split-layout 50/50.
+ * Esquerda: ilustração + headline + capacidades + trust signals.
+ * Direita: card de autenticação centrado.
+ * Pill theme toggle no canto superior direito.
  */
 export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShellProps) {
   const { t } = useTranslation();
@@ -62,7 +60,7 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
 
   return (
     <div className="min-h-screen bg-canvas flex relative overflow-hidden">
-      {/* Background: hero radial halos */}
+      {/* Background radial halos */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
           className="absolute top-[-15%] left-[-5%] w-[55%] h-[55%] rounded-full blur-[140px]"
@@ -72,15 +70,16 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
           className="absolute bottom-[-20%] right-[-10%] w-[45%] h-[50%] rounded-full blur-[120px]"
           style={{ background: 'radial-gradient(circle, rgba(18,196,232,0.07) 0%, transparent 70%)' }}
         />
-        <div
-          className="absolute top-[40%] left-[25%] w-[30%] h-[30%] rounded-full blur-[100px]"
-          style={{ background: 'radial-gradient(circle, rgba(24,232,184,0.04) 0%, transparent 70%)' }}
-        />
       </div>
 
-      {/* Left panel: Hero & Branding — hidden below lg */}
+      {/* Theme toggle — top-right corner */}
+      <div className="fixed top-5 right-5 z-50">
+        <ThemeToggle />
+      </div>
+
+      {/* Left panel: Illustration + Branding — hidden below lg */}
       <div
-        className="hidden lg:flex lg:w-[55%] xl:w-[55%] flex-col justify-between p-12 xl:p-16 relative border-r border-edge"
+        className="hidden lg:flex lg:w-1/2 flex-col justify-center p-12 xl:p-16 relative"
         style={{ background: 'var(--t-sidebar-gradient)' }}
       >
         {/* Subtle grid overlay */}
@@ -93,37 +92,39 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
           aria-hidden="true"
         />
 
-        <div className="relative z-10">
-          {/* Logo */}
-          <div className="mb-16">
-            <NexTraceLogo size={44} variant="full" />
+        {/* Brand logo + content, top-left aligned */}
+        <div className="relative z-10 flex-1 flex flex-col items-start justify-start text-left pt-4">
+          {/* Full NexTraceOne logo (globe + wordmark) */}
+          <div className="mb-10">
+            <img
+              src="/brand/logo.svg"
+              alt="NexTraceOne"
+              className="h-16 xl:h-20 w-auto"
+            />
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl xl:text-[2.75rem] font-bold text-heading leading-[1.1] mb-5 max-w-lg">
+          <h1 className="text-2xl xl:text-3xl font-bold text-heading leading-tight mb-4 max-w-lg">
             {t('auth.loginHeadline')}
           </h1>
-          <p className="text-base text-body leading-relaxed max-w-md mb-12 opacity-80">
+          <p className="text-sm text-body leading-relaxed max-w-md mb-10 opacity-80">
             {t('auth.loginSubheadline')}
           </p>
 
           {/* Platform capabilities list */}
-          <div className="space-y-3">
+          <div className="space-y-2.5 mb-10">
             {platformCapabilities.map((cap) => (
-              <div key={cap.labelKey} className="flex items-center gap-3.5">
-                <div className={cn('w-8 h-8 rounded-md border flex items-center justify-center shrink-0', cap.bg, cap.color)}>
+              <div key={cap.labelKey} className="flex items-center gap-3">
+                <div className={cn('w-7 h-7 rounded-md border flex items-center justify-center shrink-0', cap.bg, cap.color)}>
                   {cap.icon}
                 </div>
                 <span className="text-sm text-body">{t(cap.labelKey)}</span>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Footer: trust + encryption signals */}
-        <div className="relative z-10">
-          {/* Trust badges row */}
-          <div className="flex items-center gap-2 flex-wrap mb-4">
+          {/* Trust + security footer */}
+          <div className="flex items-center gap-2 flex-wrap mb-3">
             {trustSignals.map((signal, i) => (
               <span key={signal} className="text-xs font-medium text-faded">
                 {signal}
@@ -133,7 +134,6 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
               </span>
             ))}
           </div>
-          {/* Security signals */}
           <div className="flex items-center gap-5 text-xs text-faded/70">
             <span className="flex items-center gap-1.5">
               <Lock size={11} />

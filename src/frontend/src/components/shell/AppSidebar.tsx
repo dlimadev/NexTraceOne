@@ -1,17 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { usePersona } from '../../contexts/PersonaContext';
-import { AppSidebarHeader } from './AppSidebarHeader';
-import { AppSidebarGroup } from './AppSidebarGroup';
-import { AppSidebarItem } from './AppSidebarItem';
 import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
-import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
+import { SIDEBAR_RAIL_WIDTH, SIDEBAR_CONTENT_WIDTH, SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
 import { useNavCounters } from '../../hooks/useNavCounters';
 import {
   LayoutDashboard, FileText, Zap, Users, CheckSquare, ArrowUpCircle,
@@ -116,6 +113,29 @@ const sectionLabels: Record<NavSection, string> = {
   admin: 'sidebar.sectionAdmin',
 };
 
+/** Ícone representativo de cada secção — exibido no icon rail. */
+const sectionIcons: Partial<Record<NavSection, React.ReactNode>> = {
+  home: <LayoutDashboard size={22} />,
+  services: <Server size={22} />,
+  knowledge: <BookOpen size={22} />,
+  contracts: <FileText size={22} />,
+  changes: <Zap size={22} />,
+  operations: <AlertTriangle size={22} />,
+  aiHub: <Bot size={22} />,
+  governance: <Briefcase size={22} />,
+  organization: <Users size={22} />,
+  integrations: <Cable size={22} />,
+  admin: <Settings size={22} />,
+};
+
+/** Agrupamento visual para separadores no icon rail. */
+const sectionGroups: NavSection[][] = [
+  ['home', 'services', 'knowledge', 'contracts', 'changes', 'operations'],
+  ['aiHub'],
+  ['governance', 'organization', 'integrations'],
+  ['admin'],
+];
+
 interface AppSidebarProps {
   collapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -127,22 +147,14 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { can, roleName } = usePermissions();
   const { persona, config } = usePersona();
-  const [expandedSections, setExpandedSections] = useState<Set<NavSection>>(new Set(['home']));
+  const [activeSection, setActiveSection] = useState<NavSection>('home');
 
   const handleLogout = () => {
     logout();
     navigate('/login');
-  };
-
-  const toggleSection = (section: NavSection) => {
-    setExpandedSections(prev => {
-      const next = new Set(prev);
-      if (next.has(section)) next.delete(section);
-      else next.add(section);
-      return next;
-    });
   };
 
   const { openIncidents } = useNavCounters();
@@ -155,11 +167,9 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
     const max = config.maxSidebarItems;
     if (!max) return permittedItems;
 
-    // Always include the home item regardless of limit
     const homeItems = permittedItems.filter(i => i.section === 'home');
     const remaining = permittedItems.filter(i => i.section !== 'home');
 
-    // Reorder remaining by sectionOrder priority
     const ordered: typeof permittedItems = [];
     for (const section of config.sectionOrder) {
       if (section === 'home') continue;
@@ -170,94 +180,217 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
     return [...homeItems, ...ordered.slice(0, limit)];
   })();
 
-  const isHighlighted = (section: NavSection): boolean => config.highlightedSections.includes(section);
+  // Sections that actually have visible items
+  const visibleSections = useMemo(() => {
+    const sections = new Set<NavSection>();
+    for (const item of visibleItems) sections.add(item.section);
+    return sections;
+  }, [visibleItems]);
 
-  /** Returns the counter value for a given nav item route. */
+  // Auto-select active section based on current route
+  useEffect(() => {
+    const match = visibleItems.find(item => {
+      if (item.to === '/') return location.pathname === '/';
+      return location.pathname.startsWith(item.to);
+    });
+    if (match && match.section !== activeSection) {
+      setActiveSection(match.section);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  const activeItems = visibleItems.filter(i => i.section === activeSection);
+
   const getCounter = (to: string): number => {
     if (to === '/operations/incidents') return openIncidents;
     return 0;
   };
 
+  const getSectionCounter = (section: NavSection): number =>
+    visibleItems
+      .filter(i => i.section === section)
+      .reduce((sum, item) => sum + getCounter(item.to), 0);
+
   return (
     <div
       className={cn(
-        'flex flex-col h-full border-r border-edge',
+        'flex h-full',
         !mobile && 'fixed inset-y-0 left-0 z-[var(--z-header)]',
         !mobile && 'transition-[width] duration-[var(--nto-motion-medium)] ease-[var(--ease-standard)]',
-        mobile && 'w-[250px]',
+        mobile && 'w-[320px]',
         className,
       )}
       style={{
         ...(!mobile ? { width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED } : {}),
-        background: 'var(--t-sidebar-gradient)',
       }}
       role="navigation"
       aria-label={t('shell.sidebarNav')}
     >
-      {/* Brand gradient stripe no topo */}
-      <div className="h-0.5 brand-gradient shrink-0" />
-
-      <AppSidebarHeader collapsed={collapsed} />
-
-      <nav className={cn('flex-1 py-3 overflow-y-auto', collapsed ? 'px-2' : 'px-3')} aria-label={t('shell.mainNavigation')}>
-        {config.sectionOrder.map(sectionKey => {
-          const sectionItems = visibleItems.filter(i => i.section === sectionKey);
-          if (sectionItems.length === 0) return null;
-
-          const labelKey = sectionLabels[sectionKey];
-          const highlighted = isHighlighted(sectionKey);
-          const isHome = sectionKey === 'home';
-          const isExpanded = expandedSections.has(sectionKey) || isHome;
-          const hasMultipleItems = sectionItems.length > 1;
-
-          return (
-            <AppSidebarGroup
-              key={sectionKey}
-              sectionKey={sectionKey}
-              labelKey={labelKey}
-              highlighted={highlighted}
-              collapsed={collapsed}
-              expanded={isExpanded}
-              hasMultipleItems={hasMultipleItems}
-              onToggle={() => { if (hasMultipleItems) toggleSection(sectionKey); }}
-            >
-              {sectionItems.map(item => (
-                <AppSidebarItem
-                  key={item.to}
-                  to={item.to}
-                  icon={item.icon}
-                  labelKey={item.labelKey}
-                  collapsed={collapsed}
-                  preview={item.preview}
-                  counter={getCounter(item.to)}
-                />
-              ))}
-            </AppSidebarGroup>
-          );
-        })}
-      </nav>
-
-      {onToggleCollapse && !mobile && (
-        <div className={cn('px-3 py-2.5 border-t border-edge', collapsed && 'flex justify-center')}>
-          <button
-            onClick={onToggleCollapse}
-            className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-faded hover:text-body hover:bg-hover transition-all duration-[var(--nto-motion-base)] w-full text-sm"
-            title={collapsed ? t('common.expand') : t('common.collapse')}
-            aria-label={collapsed ? t('common.expand') : t('common.collapse')}
-          >
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-            {!collapsed && <span>{t('common.collapse')}</span>}
-          </button>
+      {/* ─── Icon Rail ─────────────────────────────────────────────────────── */}
+      <div
+        className="flex flex-col h-full shrink-0 border-r border-edge"
+        style={{ width: SIDEBAR_RAIL_WIDTH, background: 'var(--t-sidebar-gradient)' }}
+      >
+        {/* Logo */}
+        <div className="flex items-center justify-center h-[70px] shrink-0 border-b border-edge">
+          <img
+            src="/logo.svg"
+            alt="NexTraceOne"
+            className="w-10 h-10 object-contain"
+          />
         </div>
-      )}
 
-      <AppSidebarFooter
-        collapsed={collapsed}
-        email={user?.email}
-        persona={persona}
-        roleName={roleName}
-        onLogout={handleLogout}
-      />
+        {/* Section tab icons */}
+        <div className="flex-1 flex flex-col py-3 px-3 overflow-y-auto">
+          {sectionGroups.map((group, gi) => (
+            <div key={gi}>
+              {gi > 0 && (
+                <div className="w-6 h-px bg-edge mx-auto my-3" />
+              )}
+              {group.map(section => {
+                if (!visibleSections.has(section)) return null;
+                const icon = sectionIcons[section];
+                if (!icon) return null;
+                const isActive = activeSection === section;
+                const counter = getSectionCounter(section);
+                const isHighlighted = config.highlightedSections.includes(section);
+
+                return (
+                  <button
+                    key={section}
+                    onClick={() => {
+                      setActiveSection(section);
+                      if (collapsed && onToggleCollapse) onToggleCollapse();
+                    }}
+                    title={sectionLabels[section] ? t(sectionLabels[section]) : section}
+                    className={cn(
+                      'relative flex items-center justify-center w-[48px] h-[44px] mx-auto rounded-xl mb-1',
+                      'transition-all duration-200',
+                      isActive
+                        ? 'bg-blue/15 text-blue shadow-[inset_0_0_0_1px_rgba(59,130,246,0.2)]'
+                        : isHighlighted
+                          ? 'text-cyan hover:bg-hover hover:text-cyan'
+                          : 'text-muted hover:bg-hover hover:text-body',
+                    )}
+                    aria-current={isActive ? 'true' : undefined}
+                  >
+                    {icon}
+                    {counter > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 rounded-full bg-critical text-[9px] font-bold text-white flex items-center justify-center leading-none">
+                        {counter > 99 ? '99+' : counter}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Expand toggle (only in collapsed rail) */}
+        {collapsed && onToggleCollapse && !mobile && (
+          <div className="px-3 py-2 border-t border-edge flex justify-center">
+            <button
+              onClick={onToggleCollapse}
+              className="flex items-center justify-center w-[48px] h-[40px] rounded-xl text-faded hover:text-body hover:bg-hover transition-all duration-200"
+              title={t('common.expand')}
+              aria-label={t('common.expand')}
+            >
+              <PanelLeftOpen size={18} />
+            </button>
+          </div>
+        )}
+
+        {/* User avatar — rail mode */}
+        <AppSidebarFooter
+          collapsed
+          email={user?.email}
+          persona={persona}
+          roleName={roleName}
+          onLogout={handleLogout}
+        />
+      </div>
+
+      {/* ─── Content Panel ─────────────────────────────────────────────────── */}
+      <div
+        className={cn(
+          'flex flex-col h-full overflow-hidden border-r border-edge',
+          'transition-[width,opacity] duration-[var(--nto-motion-medium)] ease-[var(--ease-standard)]',
+          collapsed && !mobile ? 'w-0 opacity-0' : 'opacity-100',
+        )}
+        style={{
+          ...(!collapsed || mobile ? { width: SIDEBAR_CONTENT_WIDTH } : {}),
+          background: 'var(--t-sidebar-gradient)',
+        }}
+      >
+        {/* Brand header + collapse toggle */}
+        <div className="flex items-center justify-between h-[70px] px-5 shrink-0 border-b border-edge">
+          <span className="text-base font-semibold text-heading truncate">NexTraceOne</span>
+          {onToggleCollapse && !mobile && (
+            <button
+              onClick={onToggleCollapse}
+              className="p-1.5 rounded-lg text-faded hover:text-body hover:bg-hover transition-all duration-150 shrink-0"
+              title={t('common.collapse')}
+              aria-label={t('common.collapse')}
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* Section heading + nav items */}
+        <nav className="flex-1 px-5 py-4 overflow-y-auto" aria-label={t('shell.mainNavigation')}>
+          {sectionLabels[activeSection] && (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent mb-3 px-1">
+              {t(sectionLabels[activeSection])}
+            </p>
+          )}
+
+          <ul className="space-y-0.5" role="list">
+            {activeItems.map(item => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm',
+                      'transition-all duration-150',
+                      isActive
+                        ? 'bg-blue text-white font-medium shadow-sm'
+                        : item.preview
+                          ? 'text-muted/50 hover:bg-hover hover:text-muted'
+                          : 'text-body hover:bg-hover hover:text-heading font-normal',
+                    )
+                  }
+                >
+                  <span className="shrink-0">{item.icon}</span>
+                  <span className="truncate flex-1">{t(item.labelKey)}</span>
+                  {item.preview && (
+                    <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none bg-warning/15 text-warning border border-warning/25">
+                      {t('preview.badge', 'Preview')}
+                    </span>
+                  )}
+                  {!item.preview && getCounter(item.to) > 0 && (
+                    <span className="ml-auto shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-critical text-[9px] font-bold text-white flex items-center justify-center leading-none">
+                      {getCounter(item.to) > 99 ? '99+' : getCounter(item.to)}
+                    </span>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* User card — expanded mode */}
+        <AppSidebarFooter
+          collapsed={false}
+          email={user?.email}
+          persona={persona}
+          roleName={roleName}
+          onLogout={handleLogout}
+        />
+      </div>
     </div>
   );
 }
