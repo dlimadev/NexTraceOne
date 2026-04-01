@@ -47,7 +47,7 @@ const METHOD_COLORS: Record<string, string> = {
 
 /** Gera IDs únicos por instância do builder usando crypto.randomUUID(). */
 function genId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID().slice(0, 8)}`;
+  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 function createEndpoint(): RestEndpoint {

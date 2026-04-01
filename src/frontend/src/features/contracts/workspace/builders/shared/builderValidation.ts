@@ -224,9 +224,17 @@ export function validateEventBuilder(state: EventBuilderState): BuilderValidatio
       errors.push({ field: `channel.${ch.id}.actors`, messageKey: 'contracts.builder.validation.actorRequired', fallback: 'At least one producer or consumer is required' });
     }
 
-    // Validar nome de tópico Kafka (alfanumérico + '-' e '_')
-    if (ch.topicName.trim() && !/^[a-zA-Z0-9._-]+$/.test(ch.topicName)) {
-      errors.push({ field: `channel.${ch.id}.topicName`, messageKey: 'contracts.builder.validation.topicNameInvalid', fallback: `Topic name '${ch.topicName}' must contain only alphanumeric characters, dots, hyphens, and underscores` });
+    // Validar nome de tópico Kafka (alfanumérico + '.', '-', '_'; max 249 chars; cannot be '.' or '..')
+    if (ch.topicName.trim()) {
+      if (!/^[a-zA-Z0-9._-]+$/.test(ch.topicName)) {
+        errors.push({ field: `channel.${ch.id}.topicName`, messageKey: 'contracts.builder.validation.topicNameInvalid', fallback: `Topic name '${ch.topicName}' must contain only alphanumeric characters, dots, hyphens, and underscores` });
+      }
+      if (ch.topicName === '.' || ch.topicName === '..') {
+        errors.push({ field: `channel.${ch.id}.topicName`, messageKey: 'contracts.builder.validation.topicNameReserved', fallback: `Topic name cannot be '.' or '..'` });
+      }
+      if (ch.topicName.length > 249) {
+        errors.push({ field: `channel.${ch.id}.topicName`, messageKey: 'contracts.builder.validation.topicNameTooLong', fallback: 'Topic name cannot exceed 249 characters' });
+      }
     }
 
     // Detectar tópicos duplicados
@@ -258,11 +266,11 @@ export function validateWorkserviceBuilder(state: WorkserviceBuilderState): Buil
     errors.push({ field: 'schedule', messageKey: 'contracts.builder.validation.scheduleRequired', fallback: 'Schedule is required for Cron trigger' });
   }
 
-  // Validar cron expression (formato básico: 5 ou 6 campos separados por espaço)
+  // Validar cron expression (5 campos Unix, 6 campos Quartz com seconds, 7 campos Quartz com seconds+year)
   if (state.trigger === 'Cron' && state.schedule.trim()) {
     const fields = state.schedule.trim().split(/\s+/);
     if (fields.length < 5 || fields.length > 7) {
-      errors.push({ field: 'schedule', messageKey: 'contracts.builder.validation.cronInvalid', fallback: 'Cron expression must have 5-7 fields (e.g., "0 * * * *")' });
+      errors.push({ field: 'schedule', messageKey: 'contracts.builder.validation.cronInvalid', fallback: 'Cron expression must have 5 fields (Unix) or 6-7 fields (Quartz)' });
     }
   }
 

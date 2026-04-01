@@ -1044,9 +1044,11 @@
         "actorRequired": "At least one producer or consumer is required",
         "nameRequired": "Service name is required",
         "scheduleRequired": "Schedule is required for Cron trigger",
-        "cronInvalid": "Cron expression must have 5-7 fields",
+        "cronInvalid": "Cron expression must have 5 fields (Unix) or 6-7 fields (Quartz)",
         "timeoutInvalid": "Timeout must be a duration (e.g., 30s, 5m, 1h)",
-        "retriesMustBeNumber": "Retries must be a positive number"
+        "retriesMustBeNumber": "Retries must be a positive number",
+        "topicNameReserved": "Topic name cannot be '.' or '..'",
+        "topicNameTooLong": "Topic name cannot exceed 249 characters"
       },
       "rest": {
         "apiInfo": "API Information",
