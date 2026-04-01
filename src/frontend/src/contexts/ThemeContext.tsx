@@ -14,7 +14,7 @@ const STORAGE_KEY = 'nto-theme';
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getSystemPreference(): ThemeMode {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'dark';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 

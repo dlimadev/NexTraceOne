@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { AppShell } from '../../../components/shell/AppShell';
+import { ThemeProvider } from '../../../contexts/ThemeContext';
 
 // Mock incidents API used by useNavCounters
 vi.mock('../../../features/operations/api/incidents', () => ({
@@ -88,6 +89,7 @@ function renderShell(route = '/') {
   const queryClient = createWrapper();
   return render(
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <MemoryRouter initialEntries={[route]}>
         <Routes>
           <Route element={<AppShell />}>
@@ -97,6 +99,7 @@ function renderShell(route = '/') {
           </Route>
         </Routes>
       </MemoryRouter>
+      </ThemeProvider>
     </QueryClientProvider>,
   );
 }
