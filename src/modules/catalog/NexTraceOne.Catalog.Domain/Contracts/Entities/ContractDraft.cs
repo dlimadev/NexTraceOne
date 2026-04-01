@@ -257,20 +257,39 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
         return MediatR.Unit.Value;
     }
 
-    /// <summary>Adiciona um exemplo ao draft.</summary>
-    public void AddExample(ContractExample example)
+    /// <summary>
+    /// Adiciona um exemplo ao draft.
+    /// Apenas drafts nos estados Editing ou InReview permitem adição de exemplos.
+    /// </summary>
+    public Result<MediatR.Unit> AddExample(ContractExample example)
     {
         Guard.Against.Null(example);
+
+        if (Status is DraftStatus.Published or DraftStatus.Discarded)
+            return ContractsErrors.DraftNotEditable(Id.Value.ToString());
+
         _examples.Add(example);
+        return MediatR.Unit.Value;
     }
 
-    /// <summary>Remove um exemplo do draft.</summary>
-    public void RemoveExample(ContractExampleId exampleId)
+    /// <summary>
+    /// Remove um exemplo do draft.
+    /// Apenas drafts nos estados Editing ou InReview permitem remoção de exemplos.
+    /// Retorna erro se o exemplo não for encontrado.
+    /// </summary>
+    public Result<MediatR.Unit> RemoveExample(ContractExampleId exampleId)
     {
         Guard.Against.Null(exampleId);
+
+        if (Status is DraftStatus.Published or DraftStatus.Discarded)
+            return ContractsErrors.DraftNotEditable(Id.Value.ToString());
+
         var example = _examples.Find(e => e.Id == exampleId);
-        if (example is not null)
-            _examples.Remove(example);
+        if (example is null)
+            return ContractsErrors.ExampleNotFound(exampleId.Value.ToString());
+
+        _examples.Remove(example);
+        return MediatR.Unit.Value;
     }
 }
 

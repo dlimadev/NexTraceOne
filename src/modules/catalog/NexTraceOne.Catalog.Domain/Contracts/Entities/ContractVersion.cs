@@ -147,9 +147,7 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
         if (IsLocked)
             return ContractsErrors.AlreadyLocked(SemVer);
 
-        IsLocked = true;
-        LockedAt = lockedAt;
-        LockedBy = lockedBy;
+        ApplyLock(lockedBy, lockedAt);
         LifecycleState = ContractLifecycleState.Locked;
         return Unit.Value;
     }
@@ -167,8 +165,7 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
 
         if (newState == ContractLifecycleState.Locked && !IsLocked)
         {
-            IsLocked = true;
-            LockedAt = at;
+            ApplyLock(lockedBy: null, at);
         }
 
         return Unit.Value;
@@ -177,6 +174,7 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     /// <summary>
     /// Aplica assinatura digital ao contrato após canonicalização.
     /// Requer que o contrato esteja no estado Locked ou Approved.
+    /// Valida que a assinatura corresponde ao conteúdo atual do contrato.
     /// </summary>
     public Result<Unit> Sign(ContractSignature signature)
     {
@@ -185,12 +183,16 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
         if (LifecycleState is not (ContractLifecycleState.Locked or ContractLifecycleState.Approved))
             return ContractsErrors.CannotSignInCurrentState(LifecycleState.ToString());
 
+        if (!signature.Verify(SpecContent))
+            return ContractsErrors.SignatureVerificationFailed(Id.Value.ToString());
+
         Signature = signature;
         return Unit.Value;
     }
 
     /// <summary>
     /// Deprecia o contrato com aviso para consumers e data de sunset opcional.
+    /// Quando fornecida, a data de sunset deve ser posterior à data de depreciação.
     /// </summary>
     public Result<Unit> Deprecate(string notice, DateTimeOffset deprecatedAt, DateTimeOffset? sunsetDate)
     {
@@ -198,6 +200,9 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
 
         if (LifecycleState is ContractLifecycleState.Retired or ContractLifecycleState.Draft)
             return ContractsErrors.InvalidLifecycleTransition(LifecycleState.ToString(), ContractLifecycleState.Deprecated.ToString());
+
+        if (sunsetDate.HasValue && sunsetDate.Value <= deprecatedAt)
+            return ContractsErrors.SunsetDateMustBeAfterDeprecation(deprecatedAt.ToString("O"), sunsetDate.Value.ToString("O"));
 
         LifecycleState = ContractLifecycleState.Deprecated;
         DeprecationDate = deprecatedAt;
@@ -257,6 +262,17 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     {
         Guard.Against.OutOfRange(score, nameof(score), 0m, 1m);
         LastOverallScore = score;
+    }
+
+    /// <summary>
+    /// Aplica o bloqueio internamente, sem alterar o lifecycle state.
+    /// Método centralizado para evitar duplicação entre Lock() e TransitionTo().
+    /// </summary>
+    private void ApplyLock(string? lockedBy, DateTimeOffset lockedAt)
+    {
+        IsLocked = true;
+        LockedAt = lockedAt;
+        LockedBy = lockedBy;
     }
 
     /// <summary>

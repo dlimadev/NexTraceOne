@@ -49,6 +49,14 @@ public static class ContractsErrors
     public static Error SignatureVerificationFailed(string contractVersionId)
         => Error.Business("Contracts.Signing.VerificationFailed", "Signature verification failed for contract version '{0}'.", contractVersionId);
 
+    /// <summary>Data de sunset deve ser posterior à data de depreciação.</summary>
+    public static Error SunsetDateMustBeAfterDeprecation(string deprecationDate, string sunsetDate)
+        => Error.Validation("Contracts.Lifecycle.SunsetDateBeforeDeprecation", "Sunset date '{1}' must be after deprecation date '{0}'.", deprecationDate, sunsetDate);
+
+    /// <summary>Protocolo incompatível entre versões base e alvo para cálculo de diff.</summary>
+    public static Error ProtocolMismatchForDiff(string baseProtocol, string targetProtocol)
+        => Error.Validation("Contracts.ContractDiff.ProtocolMismatch", "Cannot compute diff between different protocols: base='{0}', target='{1}'.", baseProtocol, targetProtocol);
+
     // ── ContractDiff ────────────────────────────────────────────────
 
     /// <summary>Falha ao computar o diff entre versões de contrato.</summary>
