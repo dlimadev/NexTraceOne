@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Globe, Server, Zap, Cog, Database, Radio, Antenna } from 'lucide-react';
+import { Globe, Server, Zap, Cog, Database, FileCode, MessageSquare, Terminal, Webhook } from 'lucide-react';
 import { SERVICE_TYPE_COLORS } from '../constants';
 import type { ContractType } from '../../types';
 
@@ -7,10 +7,12 @@ const ICONS: Record<string, React.ComponentType<{ size?: number; className?: str
   RestApi: Globe,
   Soap: Server,
   Event: Zap,
-  KafkaProducer: Radio,
-  KafkaConsumer: Antenna,
   BackgroundService: Cog,
   SharedSchema: Database,
+  Copybook: FileCode,
+  MqMessage: MessageSquare,
+  CicsCommarea: Terminal,
+  Webhook: Webhook,
 };
 
 interface ServiceTypeBadgeProps {

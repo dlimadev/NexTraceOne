@@ -8,6 +8,10 @@ import {
   Zap,
   Cog,
   Database,
+  FileCode,
+  MessageSquare,
+  Terminal,
+  Webhook,
   Columns,
   Upload,
   Sparkles,
@@ -28,6 +32,10 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?
   Event: Zap,
   BackgroundService: Cog,
   SharedSchema: Database,
+  Copybook: FileCode,
+  MqMessage: MessageSquare,
+  CicsCommarea: Terminal,
+  Webhook: Webhook,
 };
 
 type CreationMode = 'visual' | 'import' | 'ai';

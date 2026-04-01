@@ -6,15 +6,20 @@
 import type { ContractProtocol, ContractLifecycleState } from '../types/index';
 
 // ── Contract Types ─────────────────────────────────────────────────────────
+// Alinhados com o enum ContractType do backend (NexTraceOne.Catalog.Domain.Contracts.Enums.ContractType).
+// KafkaProducer/KafkaConsumer são ServiceType (graph), não ContractType — um contrato Event/AsyncAPI
+// modela channels com roles publish/subscribe.
 
 export const CONTRACT_TYPES = [
   { value: 'RestApi', labelKey: 'contracts.contractTypes.RestApi', icon: 'Globe' },
   { value: 'Soap', labelKey: 'contracts.contractTypes.Soap', icon: 'Server' },
   { value: 'Event', labelKey: 'contracts.contractTypes.Event', icon: 'Zap' },
-  { value: 'KafkaProducer', labelKey: 'contracts.contractTypes.KafkaProducer', icon: 'Radio' },
-  { value: 'KafkaConsumer', labelKey: 'contracts.contractTypes.KafkaConsumer', icon: 'Antenna' },
   { value: 'BackgroundService', labelKey: 'contracts.contractTypes.BackgroundService', icon: 'Cog' },
   { value: 'SharedSchema', labelKey: 'contracts.contractTypes.SharedSchema', icon: 'Database' },
+  { value: 'Copybook', labelKey: 'contracts.contractTypes.Copybook', icon: 'FileCode' },
+  { value: 'MqMessage', labelKey: 'contracts.contractTypes.MqMessage', icon: 'MessageSquare' },
+  { value: 'CicsCommarea', labelKey: 'contracts.contractTypes.CicsCommarea', icon: 'Terminal' },
+  { value: 'Webhook', labelKey: 'contracts.contractTypes.Webhook', icon: 'Webhook' },
 ] as const;
 
 /** @deprecated Use CONTRACT_TYPES instead. */
@@ -38,10 +43,12 @@ export const PROTOCOL_BY_TYPE: Record<ContractTypeValue, ContractProtocol[]> = {
   RestApi: ['OpenApi', 'Swagger'],
   Soap: ['Wsdl'],
   Event: ['AsyncApi'],
-  KafkaProducer: ['AsyncApi'],
-  KafkaConsumer: ['AsyncApi'],
   BackgroundService: ['OpenApi'],
   SharedSchema: ['OpenApi'],
+  Copybook: [],
+  MqMessage: [],
+  CicsCommarea: [],
+  Webhook: ['OpenApi'],
 };
 
 // ── Lifecycle States ──────────────────────────────────────────────────────
@@ -96,10 +103,12 @@ export const SERVICE_TYPE_COLORS: Record<string, string> = {
   RestApi: 'bg-mint/15 text-mint border border-mint/25',
   Soap: 'bg-accent/15 text-accent border border-accent/25',
   Event: 'bg-cyan/15 text-cyan border border-cyan/25',
-  KafkaProducer: 'bg-cyan/10 text-cyan/80 border border-cyan/20',
-  KafkaConsumer: 'bg-accent/10 text-accent/80 border border-accent/20',
   BackgroundService: 'bg-warning/15 text-warning border border-warning/25',
   SharedSchema: 'bg-muted/15 text-muted border border-muted/25',
+  Copybook: 'bg-accent/10 text-accent/80 border border-accent/20',
+  MqMessage: 'bg-cyan/10 text-cyan/80 border border-cyan/20',
+  CicsCommarea: 'bg-warning/10 text-warning/80 border border-warning/20',
+  Webhook: 'bg-mint/10 text-mint/80 border border-mint/20',
 };
 
 /** Cores para métodos HTTP — usado em builders e operations. */

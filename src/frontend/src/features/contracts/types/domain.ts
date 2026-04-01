@@ -9,7 +9,16 @@
 // ── Contract Kind ─────────────────────────────────────────────────────────────
 
 /** Categoria de contrato suportada pelo módulo de contratos. */
-export type ContractKind = 'REST' | 'SOAP' | 'EVENT_API' | 'WORKSERVICE' | 'SHARED_SCHEMA';
+export type ContractKind =
+  | 'REST'
+  | 'SOAP'
+  | 'EVENT_API'
+  | 'WORKSERVICE'
+  | 'SHARED_SCHEMA'
+  | 'COPYBOOK'
+  | 'MQ_MESSAGE'
+  | 'CICS_COMMAREA'
+  | 'WEBHOOK';
 
 /** @deprecated Use ContractKind instead. */
 export type ServiceKind = ContractKind;
@@ -21,6 +30,10 @@ export const CONTRACT_KIND_MAP: Record<ContractKind, string> = {
   EVENT_API: 'Event',
   WORKSERVICE: 'BackgroundService',
   SHARED_SCHEMA: 'SharedSchema',
+  COPYBOOK: 'Copybook',
+  MQ_MESSAGE: 'MqMessage',
+  CICS_COMMAREA: 'CicsCommarea',
+  WEBHOOK: 'Webhook',
 } as const;
 
 /** @deprecated Use CONTRACT_KIND_MAP instead. */
@@ -33,6 +46,10 @@ export const CONTRACT_KIND_REVERSE: Record<string, ContractKind> = {
   Event: 'EVENT_API',
   BackgroundService: 'WORKSERVICE',
   SharedSchema: 'SHARED_SCHEMA',
+  Copybook: 'COPYBOOK',
+  MqMessage: 'MQ_MESSAGE',
+  CicsCommarea: 'CICS_COMMAREA',
+  Webhook: 'WEBHOOK',
 } as const;
 
 /** @deprecated Use CONTRACT_KIND_REVERSE instead. */

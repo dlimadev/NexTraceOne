@@ -912,19 +912,25 @@
       "RestApi": "REST API",
       "Soap": "SOAP Service",
       "Event": "Event API",
-      "KafkaProducer": "Kafka Producer",
-      "KafkaConsumer": "Kafka Consumer",
       "BackgroundService": "Background Service",
-      "SharedSchema": "Shared Schema"
+      "SharedSchema": "Shared Schema",
+      "Copybook": "Copybook",
+      "MqMessage": "MQ Message",
+      "CicsCommarea": "CICS Commarea",
+      "Webhook": "Webhook",
+      "KafkaProducer": "Kafka Producer",
+      "KafkaConsumer": "Kafka Consumer"
     },
     "contractTypes": {
       "RestApi": "REST API",
       "Soap": "SOAP Service",
       "Event": "Event API",
-      "KafkaProducer": "Kafka Producer",
-      "KafkaConsumer": "Kafka Consumer",
       "BackgroundService": "Background Service",
-      "SharedSchema": "Shared Schema"
+      "SharedSchema": "Shared Schema",
+      "Copybook": "Copybook",
+      "MqMessage": "MQ Message",
+      "CicsCommarea": "CICS Commarea",
+      "Webhook": "Webhook"
     },
     "distinctContracts": "Distinct Contracts",
     "clone": "Clone",
