@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save, FileText, Building2, Shield, Link as LinkIcon, Calendar } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
-import { SERVICE_TYPES, LIFECYCLE_STATES } from '../../shared/constants';
+import { CONTRACT_TYPES, LIFECYCLE_STATES } from '../../shared/constants';
 import type { StudioContract } from '../studioTypes';
 
 interface DefinitionSectionProps {
@@ -118,7 +118,7 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
               value={fields.serviceType}
               onChange={(v) => update('serviceType', v)}
               disabled={isReadOnly}
-              options={SERVICE_TYPES.map((st) => st.value)}
+              options={CONTRACT_TYPES.map((st) => st.value)}
             />
             <SelectField
               label={t('contracts.studio.definition.lifecycle', 'Lifecycle State')}

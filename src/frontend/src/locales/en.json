@@ -917,6 +917,15 @@
       "BackgroundService": "Background Service",
       "SharedSchema": "Shared Schema"
     },
+    "contractTypes": {
+      "RestApi": "REST API",
+      "Soap": "SOAP Service",
+      "Event": "Event API",
+      "KafkaProducer": "Kafka Producer",
+      "KafkaConsumer": "Kafka Consumer",
+      "BackgroundService": "Background Service",
+      "SharedSchema": "Shared Schema"
+    },
     "distinctContracts": "Distinct Contracts",
     "clone": "Clone",
     "newVersion": "New Version",

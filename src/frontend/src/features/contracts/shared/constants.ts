@@ -5,19 +5,25 @@
  */
 import type { ContractProtocol, ContractLifecycleState } from '../types/index';
 
-// ── Service Types ─────────────────────────────────────────────────────────
+// ── Contract Types ─────────────────────────────────────────────────────────
 
-export const SERVICE_TYPES = [
-  { value: 'RestApi', labelKey: 'contracts.serviceTypes.RestApi', icon: 'Globe' },
-  { value: 'Soap', labelKey: 'contracts.serviceTypes.Soap', icon: 'Server' },
-  { value: 'Event', labelKey: 'contracts.serviceTypes.Event', icon: 'Zap' },
-  { value: 'KafkaProducer', labelKey: 'contracts.serviceTypes.KafkaProducer', icon: 'Radio' },
-  { value: 'KafkaConsumer', labelKey: 'contracts.serviceTypes.KafkaConsumer', icon: 'Antenna' },
-  { value: 'BackgroundService', labelKey: 'contracts.serviceTypes.BackgroundService', icon: 'Cog' },
-  { value: 'SharedSchema', labelKey: 'contracts.serviceTypes.SharedSchema', icon: 'Database' },
+export const CONTRACT_TYPES = [
+  { value: 'RestApi', labelKey: 'contracts.contractTypes.RestApi', icon: 'Globe' },
+  { value: 'Soap', labelKey: 'contracts.contractTypes.Soap', icon: 'Server' },
+  { value: 'Event', labelKey: 'contracts.contractTypes.Event', icon: 'Zap' },
+  { value: 'KafkaProducer', labelKey: 'contracts.contractTypes.KafkaProducer', icon: 'Radio' },
+  { value: 'KafkaConsumer', labelKey: 'contracts.contractTypes.KafkaConsumer', icon: 'Antenna' },
+  { value: 'BackgroundService', labelKey: 'contracts.contractTypes.BackgroundService', icon: 'Cog' },
+  { value: 'SharedSchema', labelKey: 'contracts.contractTypes.SharedSchema', icon: 'Database' },
 ] as const;
 
-export type ServiceTypeValue = (typeof SERVICE_TYPES)[number]['value'];
+/** @deprecated Use CONTRACT_TYPES instead. */
+export const SERVICE_TYPES = CONTRACT_TYPES;
+
+export type ContractTypeValue = (typeof CONTRACT_TYPES)[number]['value'];
+
+/** @deprecated Use ContractTypeValue instead. */
+export type ServiceTypeValue = ContractTypeValue;
 
 // ── Protocols ─────────────────────────────────────────────────────────────
 
@@ -28,7 +34,7 @@ export const PROTOCOLS: readonly ContractProtocol[] = [
 /** Protocolos reservados — declarados no domínio mas sem implementação completa nesta versão. */
 export const RESERVED_PROTOCOLS: readonly ContractProtocol[] = ['Protobuf', 'GraphQl'];
 
-export const PROTOCOL_BY_TYPE: Record<ServiceTypeValue, ContractProtocol[]> = {
+export const PROTOCOL_BY_TYPE: Record<ContractTypeValue, ContractProtocol[]> = {
   RestApi: ['OpenApi', 'Swagger'],
   Soap: ['Wsdl'],
   Event: ['AsyncApi'],
