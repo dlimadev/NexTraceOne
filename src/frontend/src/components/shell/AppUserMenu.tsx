@@ -24,17 +24,20 @@ export function AppUserMenu() {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 p-1 rounded-md hover:bg-hover transition-all duration-[var(--nto-motion-base)]"
+        className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-hover transition-all duration-[var(--nto-motion-base)]"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('shell.userMenu')}
         data-testid="user-menu-trigger"
       >
-        <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center text-accent text-sm font-semibold">
+        <div
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold"
+          style={{ background: 'linear-gradient(135deg, #1B7FE8 0%, #12C4E8 100%)' }}
+        >
           {initial}
         </div>
         <div className="hidden lg:block text-left">
-          <p className="text-sm font-medium text-heading leading-tight truncate max-w-[120px]">
+          <p className="text-sm font-semibold text-heading leading-tight truncate max-w-[120px]">
             {user?.fullName || user?.email || t('common.user')}
           </p>
           <p className="text-[10px] text-muted leading-tight truncate max-w-[120px]">

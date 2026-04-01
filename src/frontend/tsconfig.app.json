@@ -33,5 +33,6 @@
     "noUncheckedIndexedAccess": true
   },
   "files": ["src/main.tsx"],
+  "include": ["src/**/*.d.ts"],
   "exclude": ["src/__tests__/**/*"]
 }

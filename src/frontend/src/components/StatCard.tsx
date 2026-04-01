@@ -25,10 +25,10 @@ export function StatCard({ title, value, icon, color = 'text-accent', trend, hre
   const content = (
     <div
       className={cn(
-        'bg-card rounded-xl border border-edge shadow-surface p-5',
+        'bg-card rounded-2xl border border-edge shadow-surface p-5',
         'flex items-start gap-4',
         'transition-all duration-[var(--nto-motion-base)]',
-        'hover:border-edge-strong hover:shadow-elevated hover:-translate-y-px',
+        'hover:border-edge-strong hover:shadow-elevated hover:-translate-y-0.5',
         href && 'cursor-pointer',
         'group',
       )}
@@ -38,7 +38,7 @@ export function StatCard({ title, value, icon, color = 'text-accent', trend, hre
       {/* Ícone com fundo tonal da cor semântica */}
       <div
         className={cn(
-          'shrink-0 w-10 h-10 rounded-lg flex items-center justify-center',
+          'shrink-0 w-11 h-11 rounded-xl flex items-center justify-center',
           'bg-elevated border border-edge',
           'transition-all duration-[var(--nto-motion-base)] group-hover:border-edge-strong',
           color,

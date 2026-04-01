@@ -19,7 +19,7 @@ interface AppSidebarGroupProps {
  * AppSidebarGroup — grupo de navegação com label de seção colapsável.
  *
  * Highlighted: acento lateral cyan para seções prioritárias da persona.
- * Labels em overline style (uppercase, tracking-wide, 10px).
+ * Labels em overline style (uppercase, tracking-wide, 11px) com estilo Template NexLink.
  */
 export function AppSidebarGroup({
   sectionKey,
@@ -43,7 +43,7 @@ export function AppSidebarGroup({
 
   return (
     <div
-      className={cn('mb-1', highlighted && 'pl-1 border-l-2 border-cyan/40')}
+      className={cn('mb-2', highlighted && 'pl-2 border-l-2 border-cyan/50')}
       role="group"
       aria-label={labelKey ? t(labelKey) : sectionKey}
     >
@@ -51,9 +51,9 @@ export function AppSidebarGroup({
         <button
           onClick={onToggle}
           className={cn(
-            'w-full flex items-center justify-between px-2.5 pt-3 pb-1',
-            'text-[10px] font-semibold uppercase tracking-[0.06em]',
-            highlighted ? 'text-cyan/80' : 'text-faded',
+            'w-full flex items-center justify-between px-3 pt-4 pb-1.5',
+            'text-[11px] font-semibold uppercase tracking-[0.08em]',
+            highlighted ? 'text-cyan' : 'text-faded',
             hasMultipleItems ? 'hover:text-muted cursor-pointer' : 'cursor-default',
           )}
           aria-expanded={expanded}
@@ -68,7 +68,7 @@ export function AppSidebarGroup({
         </button>
       )}
       {(expanded || !hasMultipleItems) && (
-        <ul className="space-y-px" role="list">
+        <ul className="space-y-0.5" role="list">
           {children}
         </ul>
       )}

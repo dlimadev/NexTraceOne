@@ -130,7 +130,7 @@ export function ContractGovernancePage() {
 function OverviewView({
   summary, insights, policyResults, contracts,
 }: {
-  summary: { distinctContracts: number; draftCount: number; inReviewCount: number; approvedCount: number; byProtocol: { protocol: string; count: number }[] } | undefined;
+  summary: { distinctContracts?: number; draftCount?: number; inReviewCount?: number; approvedCount: number; byProtocol: { protocol: string; count: number }[] } | undefined;
   insights: GovernanceInsights;
   policyResults: PolicySummary;
   contracts: ContractListItem[];
@@ -142,9 +142,9 @@ function OverviewView({
       {/* KPI cards */}
       {summary && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <KpiCard label={t('contracts.governance.totalContracts', 'Total')} value={summary.distinctContracts} icon={<BarChart3 size={16} />} color="text-accent" />
-          <KpiCard label={t('contracts.governance.draftCount', 'Draft')} value={summary.draftCount} icon={<FileText size={14} />} color="text-muted" />
-          <KpiCard label={t('contracts.governance.inReviewCount', 'In Review')} value={summary.inReviewCount} icon={<Eye size={14} />} color="text-cyan" />
+          <KpiCard label={t('contracts.governance.totalContracts', 'Total')} value={summary.distinctContracts ?? 0} icon={<BarChart3 size={16} />} color="text-accent" />
+          <KpiCard label={t('contracts.governance.draftCount', 'Draft')} value={summary.draftCount ?? 0} icon={<FileText size={14} />} color="text-muted" />
+          <KpiCard label={t('contracts.governance.inReviewCount', 'In Review')} value={summary.inReviewCount ?? 0} icon={<Eye size={14} />} color="text-cyan" />
           <KpiCard label={t('contracts.governance.approvedCount', 'Approved')} value={summary.approvedCount} icon={<CheckCircle size={14} />} color="text-mint" />
           <KpiCard label={t('contracts.governance.issuesCount', 'Issues')} value={policyResults.totalViolations} icon={<AlertTriangle size={14} />} color="text-danger" />
         </div>
@@ -725,7 +725,7 @@ function generateAuditTimeline(contracts: ContractListItem[]): AuditEntry[] {
       description: `Version ${c.semVer} created`,
       contract: c.apiAssetId,
       date: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '',
-      versionId: c.versionId,
+      versionId: c.versionId ?? '',
     });
 
     if (c.lifecycleState === 'Approved' || c.lifecycleState === 'Locked') {
@@ -734,7 +734,7 @@ function generateAuditTimeline(contracts: ContractListItem[]): AuditEntry[] {
         description: `Version ${c.semVer} approved`,
         contract: c.apiAssetId,
         date: c.createdAt ? new Date(new Date(c.createdAt).getTime() + 86400000).toLocaleDateString() : '',
-        versionId: c.versionId,
+        versionId: c.versionId ?? '',
       });
     }
 
@@ -744,7 +744,7 @@ function generateAuditTimeline(contracts: ContractListItem[]): AuditEntry[] {
         description: `Version ${c.semVer} locked and published`,
         contract: c.apiAssetId,
         date: c.createdAt ? new Date(new Date(c.createdAt).getTime() + 172800000).toLocaleDateString() : '',
-        versionId: c.versionId,
+        versionId: c.versionId ?? '',
       });
     }
 
@@ -754,7 +754,7 @@ function generateAuditTimeline(contracts: ContractListItem[]): AuditEntry[] {
         description: `Version ${c.semVer} deprecated`,
         contract: c.apiAssetId,
         date: c.createdAt ? new Date(new Date(c.createdAt).getTime() + 2592000000).toLocaleDateString() : '',
-        versionId: c.versionId,
+        versionId: c.versionId ?? '',
       });
     }
   }

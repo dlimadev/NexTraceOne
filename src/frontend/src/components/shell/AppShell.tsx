@@ -8,7 +8,6 @@ import { AppContentFrame } from './AppContentFrame';
 import { MobileDrawer } from './MobileDrawer';
 import { EnvironmentBanner } from './EnvironmentBanner';
 import { cn } from '../../lib/cn';
-import { SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
 
 export function AppShell() {
   const { isAuthenticated, isLoadingUser } = useAuth();
@@ -72,7 +71,7 @@ export function AppShell() {
         className={cn(
           'flex-1 flex flex-col min-h-0 min-w-0',
           'lg:transition-[margin] lg:duration-[var(--nto-motion-medium)] lg:ease-[var(--ease-standard)]',
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-[272px]',
+          sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-[250px]',
         )}
         data-testid="app-shell-main"
       >

@@ -36,11 +36,11 @@ const severityDotColors: Record<string, string> = {
 };
 
 export function getSeverityClasses(severity: string): string {
-  return severityColors[severity] ?? severityColors.Info;
+  return severityColors[severity] ?? severityColors['Info'] ?? '';
 }
 
 export function getSeverityDotColor(severity: string): string {
-  return severityDotColors[severity] ?? severityDotColors.Info;
+  return severityDotColors[severity] ?? severityDotColors['Info'] ?? '';
 }
 
 export function getCategoryKey(category: string): string {

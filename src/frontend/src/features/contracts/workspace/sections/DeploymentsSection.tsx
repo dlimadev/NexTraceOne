@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Rocket, CheckCircle2, XCircle, RotateCcw, Clock, Tag, User, Cpu } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
-import { contractsApi } from '../api/contracts';
+import { contractsApi } from '../../api/contracts';
 import type { ContractDeploymentItem } from '../../../../types';
 
 interface DeploymentsSectionProps {

@@ -25,13 +25,13 @@ export function AppTopbarActions() {
       <div className="relative">
         <button
           onClick={() => setLangOpen(!langOpen)}
-          className="p-2 rounded-md text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
+          className="p-2.5 rounded-lg text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
           title={t('header.toggleLanguage')}
           aria-label={t('header.toggleLanguage')}
           aria-haspopup="true"
           aria-expanded={langOpen}
         >
-          <Globe size={17} />
+          <Globe size={18} />
         </button>
         {langOpen && (
           <>

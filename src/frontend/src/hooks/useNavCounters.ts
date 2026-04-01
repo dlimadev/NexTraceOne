@@ -13,7 +13,7 @@ import { incidentsApi } from '../features/operations/api/incidents';
 export function useNavCounters() {
   const { data } = useQuery({
     queryKey: ['incidents-summary'],
-    queryFn: () => incidentsApi.getIncidentsSummary(),
+    queryFn: () => incidentsApi.getIncidentSummary(),
     staleTime: 60_000,
     refetchInterval: 60_000,
     // Don't throw / show error UI — counters are optional enhancement

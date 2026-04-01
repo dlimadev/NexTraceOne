@@ -93,7 +93,7 @@ export function BenchmarkingPage() {
                 <div className="flex items-center gap-3">
                   <BarChart3 size={16} className="text-accent" />
                   <span className="text-sm font-semibold text-heading">{comp.groupName}</span>
-                  <Badge variant={criticalityBadgeVariant(comp.criticality)}>
+                  <Badge variant={criticalityBadgeVariant(comp.criticality ?? 'default')}>
                     {comp.criticality}
                   </Badge>
                 </div>

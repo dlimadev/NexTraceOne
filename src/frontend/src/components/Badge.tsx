@@ -11,16 +11,17 @@ interface BadgeProps {
 
 /**
  * Badge semântico — DESIGN-SYSTEM.md §4.9
- * Radius pill, fundo translúcido tonal por variante semântica.
+ * Radius pill, fundo translúcido tonal por variante semântica + borda suave.
+ * Alinhado com padrão Template NexLink: border visível, fundo tonal.
  * Altura: 24-28px (md) ou 20-22px (sm), peso 500-600.
  */
 const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
-  default: 'bg-elevated text-body',
-  neutral: 'bg-elevated text-body',
-  success: 'bg-success/15 text-success',
-  warning: 'bg-warning/15 text-warning',
-  danger: 'bg-critical/15 text-critical',
-  info: 'bg-info/15 text-info',
+  default: 'bg-elevated text-body border border-edge',
+  neutral: 'bg-elevated text-muted border border-edge',
+  success: 'bg-success/12 text-success border border-success/25',
+  warning: 'bg-warning/12 text-warning border border-warning/25',
+  danger: 'bg-critical/12 text-critical border border-critical/25',
+  info: 'bg-info/12 text-info border border-info/25',
 };
 
 const sizeClasses: Record<NonNullable<BadgeProps['size']>, string> = {

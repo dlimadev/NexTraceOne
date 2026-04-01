@@ -38,7 +38,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/executive"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <ExecutiveOverviewPage />
           </ProtectedRoute>
         }
@@ -46,7 +46,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/executive/drilldown"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <ExecutiveDrillDownPage />
           </ProtectedRoute>
         }
@@ -54,7 +54,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/executive/finops"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <ExecutiveFinOpsPage />
           </ProtectedRoute>
         }
@@ -62,7 +62,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/reports"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <ReportsPage />
           </ProtectedRoute>
         }
@@ -70,7 +70,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/compliance"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:compliance:read" redirectTo="/unauthorized">
             <CompliancePage />
           </ProtectedRoute>
         }
@@ -78,7 +78,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/risk"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:risk:read" redirectTo="/unauthorized">
             <RiskCenterPage />
           </ProtectedRoute>
         }
@@ -86,7 +86,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/risk/heatmap"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:risk:read" redirectTo="/unauthorized">
             <RiskHeatmapPage />
           </ProtectedRoute>
         }
@@ -94,7 +94,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/finops"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <FinOpsPage />
           </ProtectedRoute>
         }
@@ -102,7 +102,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/finops/service/:serviceId"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <ServiceFinOpsPage />
           </ProtectedRoute>
         }
@@ -110,7 +110,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/finops/team/:teamId"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <TeamFinOpsPage />
           </ProtectedRoute>
         }
@@ -118,7 +118,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/finops/domain/:domainId"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <DomainFinOpsPage />
           </ProtectedRoute>
         }
@@ -126,7 +126,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/policies"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:policies:read" redirectTo="/unauthorized">
             <PolicyCatalogPage />
           </ProtectedRoute>
         }
@@ -134,7 +134,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/controls"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:controls:read" redirectTo="/unauthorized">
             <EnterpriseControlsPage />
           </ProtectedRoute>
         }
@@ -142,7 +142,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/evidence"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:evidence:read" redirectTo="/unauthorized">
             <EvidencePackagesPage />
           </ProtectedRoute>
         }
@@ -150,7 +150,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/maturity"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <MaturityScorecardsPage />
           </ProtectedRoute>
         }
@@ -158,7 +158,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/benchmarking"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <BenchmarkingPage />
           </ProtectedRoute>
         }
@@ -166,7 +166,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/teams"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
             <TeamsOverviewPage />
           </ProtectedRoute>
         }
@@ -174,7 +174,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/teams/:teamId"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:teams:read" redirectTo="/unauthorized">
             <TeamDetailPage />
           </ProtectedRoute>
         }
@@ -182,7 +182,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/domains"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
             <DomainsOverviewPage />
           </ProtectedRoute>
         }
@@ -190,7 +190,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/domains/:domainId"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:domains:read" redirectTo="/unauthorized">
             <DomainDetailPage />
           </ProtectedRoute>
         }
@@ -198,7 +198,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/packs"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
             <GovernancePacksOverviewPage />
           </ProtectedRoute>
         }
@@ -206,7 +206,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/packs/:packId"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:packs:read" redirectTo="/unauthorized">
             <GovernancePackDetailPage />
           </ProtectedRoute>
         }
@@ -214,7 +214,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/waivers"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:waivers:read" redirectTo="/unauthorized">
             <WaiversPage />
           </ProtectedRoute>
         }
@@ -222,7 +222,7 @@ export function GovernanceRoutes() {
       <Route
         path="/governance/delegated-admin"
         element={
-          <ProtectedRoute permission="governance:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="governance:admin:read" redirectTo="/unauthorized">
             <DelegatedAdminPage />
           </ProtectedRoute>
         }

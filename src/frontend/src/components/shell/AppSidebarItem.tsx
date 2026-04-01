@@ -16,7 +16,8 @@ interface AppSidebarItemProps {
 /**
  * AppSidebarItem — item de navegação da sidebar.
  *
- * Estado ativo: borda esquerda cyan, fundo translúcido azul, ícone + texto cyan.
+ * Estado ativo (expandido): fundo azul sólido, ícone + texto brancos. Padrão Template NexLink.
+ * Estado ativo (collapsed): fundo accent translúcido + ring cyan.
  * Estado hover: fundo elevado sutil, texto body.
  * Preview: texto atenuado, badge amber.
  */
@@ -31,10 +32,10 @@ export function AppSidebarItem({ to, icon, labelKey, collapsed = false, preview 
         title={preview ? `${t(labelKey)} (${t('preview.badge', 'Preview')})` : t(labelKey)}
         className={({ isActive }) =>
           cn(
-            'relative flex items-center justify-center w-9 h-9 mx-auto rounded-md mb-0.5',
+            'relative flex items-center justify-center w-11 h-10 mx-auto rounded-lg mb-0.5',
             'transition-all duration-[var(--nto-motion-base)]',
             isActive
-              ? 'bg-blue/10 text-cyan shadow-[inset_0_0_0_1px_rgba(18,196,232,0.20)]'
+              ? 'bg-blue/20 text-cyan shadow-[inset_0_0_0_1px_rgba(18,196,232,0.25)]'
               : preview
                 ? 'text-muted/50 hover:bg-hover hover:text-muted'
                 : 'text-muted hover:bg-hover hover:text-body',
@@ -61,13 +62,13 @@ export function AppSidebarItem({ to, icon, labelKey, collapsed = false, preview 
         end={to === '/'}
         className={({ isActive }) =>
           cn(
-            'flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-sm',
+            'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm',
             'transition-all duration-[var(--nto-motion-fast)]',
             isActive
-              ? 'bg-blue/8 text-cyan font-medium border-l-2 border-cyan -ml-px pl-[9px] shadow-[inset_0_0_0_1px_rgba(18,196,232,0.12)]'
+              ? 'bg-blue text-white font-medium shadow-sm'
               : preview
                 ? 'text-muted/50 hover:bg-hover hover:text-muted'
-                : 'text-muted hover:bg-hover hover:text-body',
+                : 'text-muted hover:bg-hover hover:text-body font-normal',
           )
         }
       >

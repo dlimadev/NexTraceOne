@@ -18,7 +18,7 @@ interface AppTopbarProps {
  * AppTopbar — barra de topo da aplicação.
  *
  * Layout: [menu mobile] [search flex-1] — [workspace] [actions] [divider] [user]
- * Height 56px, bg deep translúcido com backdrop-blur.
+ * Height 80px (alinhado com Template NexLink), bg deep translúcido com backdrop-blur.
  * Breadcrumbs strip abaixo, ocultados na rota home.
  */
 export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarProps) {
@@ -29,31 +29,31 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
     <div className="shrink-0">
       <header
         className={cn(
-          'h-14 border-b border-edge',
-          'flex items-center justify-between px-4 lg:px-5 gap-3',
-          'bg-deep/90 backdrop-blur-md',
+          'h-20 border-b border-edge',
+          'flex items-center justify-between px-5 lg:px-6 gap-3',
+          'bg-deep/90 backdrop-blur-md sticky top-0 z-[var(--z-header)]',
         )}
         role="banner"
       >
         {/* Mobile menu button */}
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-2 rounded-md text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
+          className="lg:hidden p-2 rounded-lg text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
           aria-label={t('shell.openMenu')}
         >
           <Menu size={20} />
         </button>
 
         {/* Search — flex-1 to consume available horizontal space */}
-        <div className="flex-1 min-w-0 max-w-lg">
+        <div className="flex-1 min-w-0 max-w-md">
           <AppTopbarSearch onOpenCommandPalette={onOpenCommandPalette} />
         </div>
 
         {/* Right section */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <WorkspaceSwitcher />
           <AppTopbarActions />
-          <div className="w-px h-6 bg-edge mx-1" aria-hidden="true" />
+          <div className="w-px h-6 bg-edge mx-1.5" aria-hidden="true" />
           <AppUserMenu />
         </div>
       </header>

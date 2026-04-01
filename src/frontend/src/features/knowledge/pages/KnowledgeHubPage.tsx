@@ -57,7 +57,7 @@ export function KnowledgeHubPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<DocumentCategory | ''>('');
 
-  const debounceRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     clearTimeout(debounceRef.current);

@@ -110,7 +110,7 @@ export function AdminRoutes() {
       <Route
         path="/audit"
         element={
-          <ProtectedRoute permission="audit:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="audit:trail:read" redirectTo="/unauthorized">
             <AuditPage />
           </ProtectedRoute>
         }

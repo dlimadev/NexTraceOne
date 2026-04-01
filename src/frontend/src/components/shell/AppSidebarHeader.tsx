@@ -17,11 +17,14 @@ export function AppSidebarHeader({ collapsed = false }: AppSidebarHeaderProps) {
 
   return (
     <div className={cn(
-      'py-3.5 border-b border-edge flex items-center shrink-0',
-      collapsed ? 'justify-center px-3' : 'px-4',
+      'shrink-0 border-b border-edge flex items-center',
+      'transition-all duration-[var(--nto-motion-medium)]',
+      collapsed
+        ? 'justify-center px-2 py-4 h-20'
+        : 'px-5 py-0 h-20',
     )}>
       {collapsed ? (
-        <NexTraceIcon size={30} />
+        <NexTraceIcon size={32} />
       ) : (
         <div className="flex flex-col gap-0.5 min-w-0">
           <NexTraceLogo size={28} variant="compact" />

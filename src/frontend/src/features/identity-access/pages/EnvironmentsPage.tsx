@@ -149,9 +149,9 @@ export function EnvironmentsPage() {
     }
   };
 
-  const getProfileBadgeVariant = (profile: string): 'default' | 'warning' | 'error' | 'success' => {
+  const getProfileBadgeVariant = (profile: string): 'default' | 'warning' | 'danger' | 'success' => {
     switch (profile.toLowerCase()) {
-      case 'production': return 'error';
+      case 'production': return 'danger';
       case 'staging': case 'useracceptancetesting': return 'warning';
       case 'development': case 'sandbox': return 'default';
       default: return 'default';

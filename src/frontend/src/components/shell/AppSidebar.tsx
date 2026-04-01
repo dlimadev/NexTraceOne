@@ -184,7 +184,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         'flex flex-col h-full border-r border-edge',
         !mobile && 'fixed inset-y-0 left-0 z-[var(--z-header)]',
         !mobile && 'transition-[width] duration-[var(--nto-motion-medium)] ease-[var(--ease-standard)]',
-        mobile && 'w-[272px]',
+        mobile && 'w-[250px]',
         className,
       )}
       style={{
@@ -199,7 +199,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
 
       <AppSidebarHeader collapsed={collapsed} />
 
-      <nav className={cn('flex-1 py-2 overflow-y-auto', collapsed ? 'px-1.5' : 'px-2.5')} aria-label={t('shell.mainNavigation')}>
+      <nav className={cn('flex-1 py-3 overflow-y-auto', collapsed ? 'px-2' : 'px-3')} aria-label={t('shell.mainNavigation')}>
         {config.sectionOrder.map(sectionKey => {
           const sectionItems = visibleItems.filter(i => i.section === sectionKey);
           if (sectionItems.length === 0) return null;
@@ -238,10 +238,10 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
       </nav>
 
       {onToggleCollapse && !mobile && (
-        <div className={cn('px-3 py-2 border-t border-edge', collapsed && 'flex justify-center')}>
+        <div className={cn('px-3 py-2.5 border-t border-edge', collapsed && 'flex justify-center')}>
           <button
             onClick={onToggleCollapse}
-            className="flex items-center gap-2 px-2 py-2 rounded-md text-faded hover:text-muted hover:bg-hover transition-all duration-[var(--nto-motion-base)] w-full text-sm"
+            className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-faded hover:text-body hover:bg-hover transition-all duration-[var(--nto-motion-base)] w-full text-sm"
             title={collapsed ? t('common.expand') : t('common.collapse')}
             aria-label={collapsed ? t('common.expand') : t('common.collapse')}
           >

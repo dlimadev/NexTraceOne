@@ -120,7 +120,7 @@ export function PromotionPage() {
                   <option value="">{t('promotion.selectRelease')}</option>
                   {availableReleases.map((rel) => (
                     <option key={rel.id} value={rel.id}>
-                      {rel.serviceName} — v{rel.version} ({rel.environment})
+                      {rel.apiAssetId} — v{rel.version} ({rel.environment})
                     </option>
                   ))}
                 </select>

@@ -2,7 +2,7 @@ import type { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '../lib/cn';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle' | 'institutional';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle' | 'institutional' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   children: ReactNode;
@@ -15,6 +15,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  *   Usa azul profundo (#1B7FE8) — separado do cyan para hierarquia clara.
  * - primary: CTA operacional com gradient cyan, texto escuro (on-accent)
  * - secondary: superfície elevada, borda suave, hover com brilho discreto
+ * - outline: sem fundo, apenas borda — equivale ao btn-white/btn-outline-* do Template
  * - danger: fundo crítico translúcido, para ações destrutivas
  * - ghost: sem fundo, texto muted — hover revela superfície
  * - subtle: fundo accent-muted, tom suave
@@ -26,6 +27,8 @@ const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
     'cta-gradient text-on-accent shadow-sm hover:brightness-110 hover:shadow-glow-sm disabled:opacity-40',
   secondary:
     'bg-elevated text-body border border-edge hover:border-edge-strong hover:bg-hover disabled:opacity-40',
+  outline:
+    'bg-transparent text-body border border-edge-strong hover:bg-hover hover:border-edge-strong hover:text-heading disabled:opacity-40',
   danger:
     'bg-critical/15 text-critical border border-critical/25 hover:bg-critical/20 disabled:opacity-40',
   ghost:

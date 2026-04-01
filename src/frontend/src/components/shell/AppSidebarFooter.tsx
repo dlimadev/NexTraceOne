@@ -22,11 +22,11 @@ export function AppSidebarFooter({ collapsed = false, email, persona, roleName, 
   const displayName = email?.split('@')[0] ?? t('common.user');
 
   return (
-    <div className={cn('border-t border-edge shrink-0', collapsed ? 'p-2 flex justify-center' : 'p-3')}>
+    <div className={cn('border-t border-edge shrink-0', collapsed ? 'p-2 flex justify-center' : 'p-3.5')}>
       {collapsed ? (
         <button
           onClick={onLogout}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold hover:brightness-90 transition-all duration-[var(--nto-motion-base)]"
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold hover:brightness-90 transition-all duration-[var(--nto-motion-base)]"
           style={{ background: 'linear-gradient(135deg, #1B7FE8 0%, #12C4E8 100%)' }}
           title={t('auth.signOut')}
           aria-label={t('auth.signOut')}
@@ -34,10 +34,10 @@ export function AppSidebarFooter({ collapsed = false, email, persona, roleName, 
           {initial}
         </button>
       ) : (
-        <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-hover transition-colors group cursor-default">
+        <div className="flex items-center gap-3 rounded-xl px-2.5 py-2 hover:bg-hover transition-colors group cursor-default">
           {/* Avatar com gradiente da marca */}
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 text-white"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 text-white"
             style={{ background: 'linear-gradient(135deg, #1B7FE8 0%, #12C4E8 100%)' }}
             aria-hidden="true"
           >
@@ -46,7 +46,7 @@ export function AppSidebarFooter({ collapsed = false, email, persona, roleName, 
 
           {/* User info */}
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-heading truncate leading-tight">{displayName}</p>
+            <p className="text-sm font-semibold text-heading truncate leading-tight">{displayName}</p>
             <p className="text-[10px] text-muted truncate leading-tight">
               {persona ? t(`persona.${persona}.label`) : ''}
               {roleName ? ` · ${roleName}` : ''}
@@ -56,11 +56,11 @@ export function AppSidebarFooter({ collapsed = false, email, persona, roleName, 
           {/* Logout — visível ao hover do grupo */}
           <button
             onClick={onLogout}
-            className="p-1 rounded text-faded hover:text-critical opacity-0 group-hover:opacity-100 transition-all duration-[var(--nto-motion-fast)] hover:bg-critical/10 shrink-0"
+            className="p-1.5 rounded-lg text-faded hover:text-critical opacity-0 group-hover:opacity-100 transition-all duration-[var(--nto-motion-fast)] hover:bg-critical/10 shrink-0"
             title={t('auth.signOut')}
             aria-label={t('auth.signOut')}
           >
-            <LogOut size={13} />
+            <LogOut size={14} />
           </button>
         </div>
       )}

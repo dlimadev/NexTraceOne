@@ -146,9 +146,9 @@ export function AiIntegrationsConfigurationPage() {
 
   // ── Data hooks ─────────────────────────────────────────────────────
   const { data: definitions, isLoading: loadingDefs, isError: errorDefs, refetch: refetchDefs } = useConfigurationDefinitions();
-  const { data: effective, isLoading: loadingEffective } = useEffectiveSettings();
+  const { data: effective, isLoading: loadingEffective } = useEffectiveSettings('System');
   const { mutateAsync: setValue } = useSetConfigurationValue();
-  const { data: auditHistory } = useAuditHistory();
+  const { data: auditHistory } = useAuditHistory(null);
 
   // ── Filtered definitions ───────────────────────────────────────────
   const phase7Defs = useMemo(() => {
@@ -184,7 +184,7 @@ export function AiIntegrationsConfigurationPage() {
   const startEdit = useCallback((def: ConfigurationDefinitionDto) => {
     const eff = effective?.find((e: EffectiveConfigurationDto) => e.key === def.key);
     setEditingDef(def.key);
-    setEditValue(eff?.value ?? def.defaultValue ?? '');
+    setEditValue(eff?.effectiveValue ?? def.defaultValue ?? '');
   }, [effective]);
 
   const cancelEdit = useCallback(() => {
@@ -193,7 +193,7 @@ export function AiIntegrationsConfigurationPage() {
   }, []);
 
   const saveEdit = useCallback(async (key: string) => {
-    await setValue({ key, value: editValue, scope: 'System' });
+    await setValue({ key, data: { value: editValue, scope: 'System' } });
     setEditingDef(null);
     setEditValue('');
   }, [editValue, setValue]);
@@ -315,7 +315,7 @@ export function AiIntegrationsConfigurationPage() {
                     {showEffective && eff ? (
                       <div className="text-right">
                         <div className="text-xs text-gray-400">{eff.resolvedScope}</div>
-                        {renderValuePreview(eff.value)}
+                        {renderValuePreview(eff.effectiveValue ?? '')}
                       </div>
                     ) : (
                       renderValuePreview(def.defaultValue ?? '')
@@ -368,7 +368,7 @@ export function AiIntegrationsConfigurationPage() {
                           {t('aiIntegrationsConfig.effectiveValue', 'Effective Value')}
                           <Badge variant="info" className="text-xs">{eff.resolvedScope}</Badge>
                         </div>
-                        <pre className="text-xs overflow-x-auto">{eff.value}</pre>
+                        <pre className="text-xs overflow-x-auto">{eff.effectiveValue}</pre>
                       </div>
                     )}
                   </div>
@@ -462,8 +462,8 @@ export function AiIntegrationsConfigurationPage() {
           <Card>
             <CardBody>
               <div className="space-y-2">
-                {auditHistory.slice(0, 10).map((entry: { id: string; key: string; changedBy: string; changedAt: string; oldValue?: string; newValue?: string }) => (
-                  <div key={entry.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                {auditHistory.slice(0, 10).map((entry) => (
+                  <div key={`${entry.changedAt}-${entry.key}`} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
                     <div>
                       <span className="text-sm font-medium">{entry.key}</span>
                       <span className="text-xs text-gray-400 ml-2">{entry.changedBy}</span>

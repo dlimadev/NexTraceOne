@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/cn';
 import type { ReactNode } from 'react';
@@ -10,6 +10,8 @@ interface PageErrorStateProps {
   message?: string;
   /** Ação de recuperação (botão retry, link back, etc.). */
   action?: ReactNode;
+  /** Atalho: callback de retry — renderiza um botão de retry padronizado quando `action` não for fornecido. */
+  onRetry?: () => unknown;
   className?: string;
 }
 
