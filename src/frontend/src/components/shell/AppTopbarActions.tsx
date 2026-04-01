@@ -27,8 +27,9 @@ export function AppTopbarActions() {
       <button
         onClick={toggleTheme}
         className="p-2.5 rounded-lg text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
-        title={t('header.toggleTheme')}
+        title={theme === 'dark' ? t('header.switchToLight', 'Switch to light mode') : t('header.switchToDark', 'Switch to dark mode')}
         aria-label={t('header.toggleTheme')}
+        aria-pressed={theme === 'dark'}
       >
         {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
       </button>

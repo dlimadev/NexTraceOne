@@ -13,6 +13,11 @@ const STORAGE_KEY = 'nto-theme';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+/**
+ * Returns system color-scheme preference.
+ * Falls back to 'dark' when window or matchMedia is unavailable (e.g. SSR, test environments).
+ * Dark-first enterprise default per DESIGN-SYSTEM.md.
+ */
 function getSystemPreference(): ThemeMode {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'dark';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -28,6 +33,11 @@ function getStoredTheme(): ThemeMode | null {
   return null;
 }
 
+/**
+ * Applies theme to the DOM.
+ * Sets `data-theme` attribute (controls CSS variable selection) and
+ * `colorScheme` style (informs browser for native UI elements like scrollbars and form controls).
+ */
 function applyThemeToDOM(theme: ThemeMode): void {
   const root = document.documentElement;
   root.setAttribute('data-theme', theme);
