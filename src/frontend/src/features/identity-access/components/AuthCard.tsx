@@ -22,7 +22,7 @@ export function AuthCard({ children, className }: AuthCardProps) {
         className,
       )}
       style={{
-        boxShadow: '0 24px 60px rgba(0,0,0,0.42), 0 0 0 1px rgba(129,170,214,0.10)',
+        boxShadow: 'var(--t-shadow-xl)',
       }}
     >
       {/* Accent stripe superior — gradiente da marca */}

@@ -59,7 +59,7 @@ export function ExecutiveFinOpsPage() {
           title={t('governance.finops.overallEfficiency')}
           value={t(`governance.finops.efficiency.${d.overallEfficiency}`)}
           icon={<BarChart3 size={20} />}
-          color="text-amber-500"
+          color="text-warning"
         />
         <StatCard title={t('governance.finops.potentialSavings')} value={fmt(totalPotentialSavings)} icon={<Target size={20} />} color="text-success" />
       </div>

@@ -53,15 +53,15 @@ const severityBadgeVariant = (severity: string): 'success' | 'warning' | 'danger
 
 const scoreBarColor = (score: number): string => {
   const pct = score * 100;
-  if (pct >= 80) return 'bg-emerald-500';
-  if (pct >= 60) return 'bg-amber-500';
-  if (pct >= 40) return 'bg-orange-500';
+  if (pct >= 80) return 'bg-success';
+  if (pct >= 60) return 'bg-warning';
+  if (pct >= 40) return 'bg-warning';
   return 'bg-critical';
 };
 
 function BoolIcon({ value }: { value: boolean }) {
   return value
-    ? <CheckCircle2 size={14} className="text-emerald-500" />
+    ? <CheckCircle2 size={14} className="text-success" />
     : <XCircle size={14} className="text-muted/40" />;
 }
 
@@ -176,10 +176,10 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
                   <span className="text-xs text-muted mb-1">{count}</span>
                   <div className="w-full bg-surface rounded" style={{ height: `${Math.max(pct, 4)}%` }}>
                     <div className={`w-full h-full rounded ${
-                      level === 'Optimizing' ? 'bg-emerald-500'
-                      : level === 'Managed' ? 'bg-emerald-400'
-                      : level === 'Defined' ? 'bg-blue-400'
-                      : level === 'Developing' ? 'bg-amber-400'
+                      level === 'Optimizing' ? 'bg-success'
+                      : level === 'Managed' ? 'bg-success/15'
+                      : level === 'Defined' ? 'bg-info/15'
+                      : level === 'Developing' ? 'bg-warning/15'
                       : 'bg-critical'
                     }`} />
                   </div>
@@ -285,7 +285,7 @@ function AuditTab({ teamName, domain }: { teamName?: string; domain?: string }) 
         <CardBody>
           {findings.length === 0 ? (
             <div className="text-center py-8">
-              <CheckCircle2 size={32} className="mx-auto mb-2 text-emerald-500 opacity-60" />
+              <CheckCircle2 size={32} className="mx-auto mb-2 text-success opacity-60" />
               <p className="text-sm text-muted">{t('serviceMaturity.audit.noFindings')}</p>
             </div>
           ) : (
@@ -303,7 +303,7 @@ function AuditTab({ teamName, domain }: { teamName?: string; domain?: string }) 
                   <div className="flex flex-wrap gap-1.5 pl-1">
                     {f.findings.map((finding, idx) => (
                       <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded bg-surface border border-edge text-muted">
-                        <AlertTriangle size={10} className="text-amber-500" />
+                        <AlertTriangle size={10} className="text-warning" />
                         {t(`serviceMaturity.audit.finding.${finding.split(':')[0]}`, { count: finding.split(':')[1] ?? '' })}
                       </span>
                     ))}
@@ -326,8 +326,8 @@ function SummaryCard({ icon, label, value, variant = 'default' }: {
   value: string | number;
   variant?: 'default' | 'success' | 'warning' | 'danger';
 }) {
-  const colorClass = variant === 'success' ? 'text-emerald-500'
-    : variant === 'warning' ? 'text-amber-500'
+  const colorClass = variant === 'success' ? 'text-success'
+    : variant === 'warning' ? 'text-warning'
     : variant === 'danger' ? 'text-critical'
     : 'text-accent';
 
@@ -344,7 +344,7 @@ function DimensionPill({ icon, label, ok }: { icon: React.ReactNode; label: stri
   return (
     <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] border ${
       ok
-        ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600'
+        ? 'bg-success/5 border-success/25 text-success'
         : 'bg-surface border-edge text-muted'
     }`}>
       {icon}

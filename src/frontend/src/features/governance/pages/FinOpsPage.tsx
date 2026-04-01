@@ -35,9 +35,9 @@ const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' 
 
 const efficiencyIcon = (eff: CostEfficiencyType) => {
   switch (eff) {
-    case 'Efficient': return <CheckCircle size={14} className="text-emerald-400" />;
+    case 'Efficient': return <CheckCircle size={14} className="text-success" />;
     case 'Acceptable': return <AlertCircle size={14} className="text-muted" />;
-    case 'Inefficient': return <AlertTriangle size={14} className="text-orange-400" />;
+    case 'Inefficient': return <AlertTriangle size={14} className="text-warning" />;
     case 'Wasteful': return <XCircle size={14} className="text-critical" />;
     default: return null;
   }
@@ -97,13 +97,13 @@ export function FinOpsPage() {
           title={t('governance.finops.overallEfficiency')}
           value={t(`governance.finops.efficiency.${d.overallEfficiency}`)}
           icon={efficiencyIcon(d.overallEfficiency) ?? <CheckCircle size={20} />}
-          color="text-amber-500"
+          color="text-warning"
         />
         <StatCard
           title={t('governance.finops.costTrend')}
           value={t(`governance.finops.trend.${d.costTrend}`)}
           icon={trendIcon(d.costTrend)}
-          color="text-blue-500"
+          color="text-info"
         />
       </div>
 

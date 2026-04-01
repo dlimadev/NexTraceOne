@@ -32,19 +32,19 @@ const SCOPE_OPTIONS = [
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<string, string> = {
-  Critical: 'bg-red-900/40 text-red-300 border border-red-700/50',
-  High: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Medium: 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50',
-  Low: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
+  Critical: 'bg-critical/15 text-critical border border-critical/25',
+  High: 'bg-warning/15 text-warning border border-warning/25',
+  Medium: 'bg-warning/15 text-warning border border-warning/25',
+  Low: 'bg-elevated text-muted border border-edge',
 };
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
-  OpenApi: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  OpenApi: 'bg-success/15 text-success border border-success/25',
   Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
   Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
-  AsyncApi: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Protobuf: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
+  AsyncApi: 'bg-info/15 text-info border border-info/25',
+  Protobuf: 'bg-warning/15 text-warning border border-warning/25',
   GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
 };
 
@@ -194,15 +194,15 @@ export function SourceOfTruthExplorerPage() {
                         </div>
                         <p className="text-xs text-muted mb-3">{svc.domain}</p>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-300 border border-blue-700/50">
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-info/15 text-info border border-info/25">
                             {svc.teamName}
                           </span>
                           {svc.criticality && (
-                            <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[svc.criticality] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                            <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[svc.criticality] ?? 'bg-elevated text-muted border border-edge'}`}>
                               {t(`catalog.badges.criticality.${svc.criticality}`, svc.criticality)}
                             </span>
                           )}
-                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                             {t(`catalog.badges.lifecycle.${svc.lifecycleStatus}`, svc.lifecycleStatus)}
                           </span>
                         </div>
@@ -237,13 +237,13 @@ export function SourceOfTruthExplorerPage() {
                           <ExternalLink size={14} className="text-muted shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                             v{c.semVer}
                           </span>
-                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-elevated text-muted border border-edge'}`}>
                             {t(`contractGov.badges.protocols.${c.protocol}`, c.protocol)}
                           </span>
-                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                             {t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState)}
                           </span>
                         </div>
@@ -281,10 +281,10 @@ export function SourceOfTruthExplorerPage() {
                       </div>
                       <p className="text-xs text-muted mb-3 line-clamp-2">{ref.description}</p>
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                           {String(t(`sourceOfTruth.assetTypes.${ref.assetType}`, ref.assetType))}
                         </span>
-                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                           {String(t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType))}
                         </span>
                       </div>

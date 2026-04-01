@@ -221,7 +221,7 @@ function OverviewTab({ team, t }: { team: TeamDetail; t: (key: string) => string
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <StatCard title={t('organization.teamDetail.services')} value={team.serviceCount} icon={<Server size={20} />} color="text-accent" />
-      <StatCard title={t('organization.teamDetail.contracts')} value={team.contractCount} icon={<FileText size={20} />} color="text-blue-500" />
+      <StatCard title={t('organization.teamDetail.contracts')} value={team.contractCount} icon={<FileText size={20} />} color="text-info" />
       <StatCard title={t('organization.teamDetail.activeIncidents')} value={team.activeIncidentCount} icon={<AlertTriangle size={20} />} color="text-critical" />
       <StatCard title={t('organization.teamDetail.reliabilityScore')} value={`${team.reliabilityScore}%`} icon={<Activity size={20} />} color="text-success" />
     </div>
@@ -429,7 +429,7 @@ function DependenciesTab({ deps, t }: { deps: CrossTeamDependencyDto[]; t: (key:
       <Card>
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <GitBranch size={16} className="text-blue-500" />
+            <GitBranch size={16} className="text-info" />
             {t('organization.teamDetail.dependencies.inbound')}
           </h2>
         </CardHeader>

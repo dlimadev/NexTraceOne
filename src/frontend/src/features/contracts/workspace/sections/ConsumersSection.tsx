@@ -108,7 +108,7 @@ export function ConsumersSection({ contract, className = '' }: ConsumersSectionP
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bell size={14} className="text-amber-400" />
+              <Bell size={14} className="text-warning" />
               <h3 className="text-xs font-semibold text-heading">
                 {t('contracts.studio.consumers.subscribersTitle', 'Portal Subscribers')}
               </h3>
@@ -152,9 +152,9 @@ export function ConsumersSection({ contract, className = '' }: ConsumersSectionP
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.consumers.totalProducers', 'Total Producers')}</p>
           <p className="text-lg font-bold text-mint">{contract.producers.length}</p>
         </div>
-        <div className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-4 py-3">
+        <div className="rounded-lg border border-warning/25 bg-warning/15 px-4 py-3">
           <p className="text-[10px] text-muted mb-0.5">{t('contracts.studio.consumers.totalSubscribers', 'Total Subscribers')}</p>
-          <p className="text-lg font-bold text-amber-400">{subscribers.length}</p>
+          <p className="text-lg font-bold text-warning">{subscribers.length}</p>
         </div>
       </div>
     </div>
@@ -207,7 +207,7 @@ function RelationshipRow({
 function SubscriberRow({ subscriber }: { subscriber: ContractSubscriber }) {
   return (
     <div className="flex items-center gap-3 px-6 py-3 text-xs hover:bg-elevated/30 transition-colors">
-      <Bell size={12} className="text-amber-400 flex-shrink-0" />
+      <Bell size={12} className="text-warning flex-shrink-0" />
 
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-heading truncate">{subscriber.consumerServiceName}</p>
@@ -227,7 +227,7 @@ function SubscriberRow({ subscriber }: { subscriber: ContractSubscriber }) {
       {subscriber.isActive ? (
         <CheckCircle size={12} className="text-mint flex-shrink-0" />
       ) : (
-        <XCircle size={12} className="text-red-400 flex-shrink-0" />
+        <XCircle size={12} className="text-critical flex-shrink-0" />
       )}
     </div>
   );
@@ -235,7 +235,7 @@ function SubscriberRow({ subscriber }: { subscriber: ContractSubscriber }) {
 
 function ConfidenceBadge({ score }: { score: number }) {
   const pct = Math.round(score * 100);
-  const colorClass = score >= 0.8 ? 'text-mint' : score >= 0.5 ? 'text-amber-400' : 'text-red-400';
+  const colorClass = score >= 0.8 ? 'text-mint' : score >= 0.5 ? 'text-warning' : 'text-critical';
   return <span className={`text-[10px] font-medium ${colorClass}`}>{pct}%</span>;
 }
 

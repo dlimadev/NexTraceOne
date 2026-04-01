@@ -17,12 +17,12 @@ export function ComplianceScoreCard({ score, maxScore = 100, label, className = 
   const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
 
   const variant = pct >= 80
-    ? { color: 'text-emerald-400', bg: 'bg-emerald-900/20', border: 'border-emerald-700/30', Icon: CheckCircle }
+    ? { color: 'text-success', bg: 'bg-success/15', border: 'border-success/25', Icon: CheckCircle }
     : pct >= 50
-      ? { color: 'text-amber-400', bg: 'bg-amber-900/20', border: 'border-amber-700/30', Icon: AlertTriangle }
+      ? { color: 'text-warning', bg: 'bg-warning/15', border: 'border-warning/25', Icon: AlertTriangle }
       : pct > 0
-        ? { color: 'text-red-400', bg: 'bg-red-900/20', border: 'border-red-700/30', Icon: XCircle }
-        : { color: 'text-slate-500', bg: 'bg-slate-800/20', border: 'border-slate-700/30', Icon: Minus };
+        ? { color: 'text-critical', bg: 'bg-critical/15', border: 'border-critical/25', Icon: XCircle }
+        : { color: 'text-faded', bg: 'bg-elevated', border: 'border-edge', Icon: Minus };
 
   return (
     <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${variant.bg} ${variant.border} ${className}`}>

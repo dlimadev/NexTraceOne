@@ -118,7 +118,7 @@ function CreateAgentDialog({ isOpen, onClose, onCreated }: CreateAgentDialogProp
         </div>
         <div className="px-6 py-4 space-y-4">
           {error && (
-            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/30 text-sm text-red-400 flex items-center gap-2">
+            <div className="p-3 rounded-md bg-critical/15 border border-critical/25 text-sm text-critical flex items-center gap-2">
               <AlertCircle size={16} /> {error}
             </div>
           )}
@@ -318,7 +318,7 @@ function ExecuteAgentDialog({ isOpen, agent, onClose }: ExecuteAgentDialogProps)
         </div>
         <div className="px-6 py-4 space-y-4">
           {error && (
-            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/30 text-sm text-red-400 flex items-center gap-2">
+            <div className="p-3 rounded-md bg-critical/15 border border-critical/25 text-sm text-critical flex items-center gap-2">
               <AlertCircle size={16} /> {error}
             </div>
           )}
@@ -395,7 +395,7 @@ function ExecuteAgentDialog({ isOpen, agent, onClose }: ExecuteAgentDialogProps)
                                 onClick={() => handleReview(artifact.artifactId, 'Approve')}
                                 disabled={reviewingArtifact === artifact.artifactId}
                               >
-                                <CheckCircle2 size={14} className="text-green-400 mr-1" />
+                                <CheckCircle2 size={14} className="text-success mr-1" />
                                 {t('agents.approve')}
                               </Button>
                               <Button
@@ -404,7 +404,7 @@ function ExecuteAgentDialog({ isOpen, agent, onClose }: ExecuteAgentDialogProps)
                                 onClick={() => handleReview(artifact.artifactId, 'Reject')}
                                 disabled={reviewingArtifact === artifact.artifactId}
                               >
-                                <Ban size={14} className="text-red-400 mr-1" />
+                                <Ban size={14} className="text-critical mr-1" />
                                 {t('agents.reject')}
                               </Button>
                             </div>
@@ -437,17 +437,17 @@ function ExecuteAgentDialog({ isOpen, agent, onClose }: ExecuteAgentDialogProps)
 function ownershipIcon(type: string) {
   switch (type) {
     case 'System': return <Shield size={12} className="text-accent" />;
-    case 'Tenant': return <Users size={12} className="text-blue-400" />;
-    case 'User': return <User size={12} className="text-green-400" />;
+    case 'Tenant': return <Users size={12} className="text-info" />;
+    case 'User': return <User size={12} className="text-success" />;
     default: return <Bot size={12} className="text-muted" />;
   }
 }
 
 function visibilityIcon(vis: string) {
   switch (vis) {
-    case 'Private': return <Lock size={12} className="text-yellow-400" />;
-    case 'Team': return <Users size={12} className="text-blue-400" />;
-    case 'Tenant': return <Globe size={12} className="text-green-400" />;
+    case 'Private': return <Lock size={12} className="text-warning" />;
+    case 'Team': return <Users size={12} className="text-info" />;
+    case 'Tenant': return <Globe size={12} className="text-success" />;
     default: return null;
   }
 }
@@ -619,7 +619,7 @@ export function AiAgentsPage() {
         {!isLoading && !error && customAgents.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
-              <Sparkles size={14} className="text-blue-400" />
+              <Sparkles size={14} className="text-info" />
               {t('agents.customSection')} ({customAgents.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

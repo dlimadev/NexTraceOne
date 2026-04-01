@@ -111,7 +111,7 @@ export function TeamsOverviewPage() {
       <PageSection>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard title={t('organization.teams.totalTeams')} value={teams.length} icon={<Users size={20} />} color="text-accent" />
-          <StatCard title={t('organization.teams.totalServices')} value={totalServices} icon={<Server size={20} />} color="text-blue-500" />
+          <StatCard title={t('organization.teams.totalServices')} value={totalServices} icon={<Server size={20} />} color="text-info" />
           <StatCard title={t('organization.teams.avgMaturity')} value={t('organization.teams.maturityLevel.Defined')} icon={<BarChart3 size={20} />} color="text-success" />
           <StatCard title={t('organization.teams.activeIncidents')} value="—" icon={<AlertTriangle size={20} />} color="text-critical" />
         </div>

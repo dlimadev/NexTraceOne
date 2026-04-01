@@ -23,16 +23,16 @@ export function useTimeAgo() {
 
 const severityColors: Record<string, string> = {
   Critical: 'text-critical border-critical bg-critical/15',
-  Warning: 'text-yellow-400 border-yellow-400 bg-yellow-400/15',
+  Warning: 'text-warning border-warning/25 bg-warning/15',
   ActionRequired: 'text-cyan border-cyan bg-cyan-400/15',
   Info: 'text-muted border-edge bg-panel',
 };
 
 const severityDotColors: Record<string, string> = {
   Critical: 'bg-critical',
-  Warning: 'bg-yellow-400',
+  Warning: 'bg-warning/15',
   ActionRequired: 'bg-cyan-400',
-  Info: 'bg-gray-400',
+  Info: 'bg-elevated',
 };
 
 export function getSeverityClasses(severity: string): string {

@@ -29,16 +29,16 @@ import type { PersonaUsageProfileDto } from '../../../types';
  */
 
 function trendIcon(depth: number) {
-  if (depth >= 80) return <TrendingUp size={14} className="text-emerald-400" />;
+  if (depth >= 80) return <TrendingUp size={14} className="text-success" />;
   if (depth >= 60) return <Minus size={14} className="text-muted" />;
-  return <TrendingDown size={14} className="text-amber-400" />;
+  return <TrendingDown size={14} className="text-warning" />;
 }
 
 function depthColor(depth: number): string {
-  if (depth >= 80) return 'text-emerald-400';
+  if (depth >= 80) return 'text-success';
   if (depth >= 60) return 'text-accent';
-  if (depth >= 40) return 'text-amber-400';
-  return 'text-red-400';
+  if (depth >= 40) return 'text-warning';
+  return 'text-critical';
 }
 
 export function PersonaUsagePage() {
@@ -160,7 +160,7 @@ export function PersonaUsagePage() {
                     <div className="space-y-1">
                       {p.milestonesReached.map((m) => (
                         <div key={m} className="flex items-center gap-2">
-                          <CheckCircle size={14} className="text-emerald-400" />
+                          <CheckCircle size={14} className="text-success" />
                           <span className="text-sm text-body">{t(`analytics.milestone.${m}`, { defaultValue: m.replace(/([A-Z])/g, ' $1').trim() })}</span>
                         </div>
                       ))}
@@ -173,7 +173,7 @@ export function PersonaUsagePage() {
                     <div className="space-y-1">
                       {p.commonFrictionPoints.map((f) => (
                         <div key={f} className="flex items-center gap-2">
-                          <AlertCircle size={14} className="text-amber-400" />
+                          <AlertCircle size={14} className="text-warning" />
                           <span className="text-sm text-body">{f.replace(/_/g, ' ')}</span>
                         </div>
                       ))}

@@ -80,7 +80,7 @@ export function EvidencePackagesPage() {
         <StatCard title={t('governance.evidence.totalPackages')} value={d.totalPackages} icon={<Package size={20} />} color="text-accent" />
         <StatCard title={t('governance.evidence.sealed')} value={d.sealedCount} icon={<Lock size={20} />} color="text-success" />
         <StatCard title={t('governance.evidence.exported')} value={d.exportedCount} icon={<Download size={20} />} color="text-info" />
-        <StatCard title={t('governance.evidence.draft')} value={d.draftCount} icon={<FileText size={20} />} color="text-amber-500" />
+        <StatCard title={t('governance.evidence.draft')} value={d.draftCount} icon={<FileText size={20} />} color="text-warning" />
       </div>
 
       {/* Filters */}

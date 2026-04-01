@@ -43,13 +43,13 @@ const entityTypeIcons: Record<string, React.ReactNode> = {
 };
 
 /** Cores de badge por status de entidade (mesmo padrão do CommandPalette). */
-const STATUS_COLOR_DEFAULT = 'bg-slate-500/20 text-slate-400';
+const STATUS_COLOR_DEFAULT = 'bg-elevated text-muted';
 const statusColors: Record<string, string> = {
-  active: 'bg-emerald-500/20 text-emerald-400',
-  healthy: 'bg-emerald-500/20 text-emerald-400',
-  degraded: 'bg-amber-500/20 text-amber-400',
+  active: 'bg-success/20 text-success',
+  healthy: 'bg-success/20 text-success',
+  degraded: 'bg-warning/20 text-warning',
   draft: STATUS_COLOR_DEFAULT,
-  deprecated: 'bg-red-500/20 text-red-400',
+  deprecated: 'bg-critical/15 text-critical',
 };
 
 /** Página de resultados de pesquisa global — acessível via /search?q={query}. */
@@ -168,7 +168,7 @@ export function GlobalSearchPage() {
       {/* ── Erro ── */}
       {isError && (
         <div className="flex items-center justify-center py-16">
-          <p className="text-sm text-red-400">{t('common.error')}</p>
+          <p className="text-sm text-critical">{t('common.error')}</p>
         </div>
       )}
 

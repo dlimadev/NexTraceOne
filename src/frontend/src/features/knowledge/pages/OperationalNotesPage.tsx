@@ -22,9 +22,9 @@ import { useOperationalNotes } from '../hooks';
 import type { NoteSeverity } from '../../../types';
 
 const SEVERITY_ICON: Record<NoteSeverity, React.ReactNode> = {
-  Info: <Info size={15} className="text-blue-400" />,
-  Warning: <AlertTriangle size={15} className="text-amber-400" />,
-  Critical: <AlertOctagon size={15} className="text-red-400" />,
+  Info: <Info size={15} className="text-info" />,
+  Warning: <AlertTriangle size={15} className="text-warning" />,
+  Critical: <AlertOctagon size={15} className="text-critical" />,
 };
 
 const SEVERITY_VARIANT: Record<NoteSeverity, 'info' | 'warning' | 'danger'> = {
@@ -108,7 +108,7 @@ export function OperationalNotesPage() {
             onClick={() => { setResolvedFilter(false); setPage(1); }}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               resolvedFilter === false
-                ? 'bg-amber-500 text-white'
+                ? 'bg-warning text-white'
                 : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
             }`}
           >
@@ -118,7 +118,7 @@ export function OperationalNotesPage() {
             onClick={() => { setResolvedFilter(true); setPage(1); }}
             className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               resolvedFilter === true
-                ? 'bg-emerald-500 text-white'
+                ? 'bg-success text-white'
                 : 'bg-surface-raised text-content-secondary hover:bg-surface-hover'
             }`}
           >
@@ -150,7 +150,7 @@ export function OperationalNotesPage() {
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-sm text-content-primary truncate">{note.title}</p>
                           {note.isResolved && (
-                            <CheckCircle size={13} className="text-emerald-400 shrink-0" />
+                            <CheckCircle size={13} className="text-success shrink-0" />
                           )}
                         </div>
                         <p className="text-xs text-content-secondary mt-0.5 line-clamp-2">{note.content}</p>

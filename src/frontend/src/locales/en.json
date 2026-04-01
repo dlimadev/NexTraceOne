@@ -366,6 +366,7 @@
   },
   "header": {
     "toggleLanguage": "Toggle language",
+    "toggleTheme": "Toggle dark/light mode",
     "notifications": "Notifications",
     "settings": "Settings",
     "languagePortuguese": "Português",

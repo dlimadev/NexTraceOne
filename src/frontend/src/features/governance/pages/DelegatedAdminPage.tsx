@@ -109,7 +109,7 @@ export function DelegatedAdminPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <StatCard title={t('organization.delegatedAdmin.activeDelegations')} value={activeDelegations} icon={<ShieldCheck size={20} />} color="text-accent" />
-        <StatCard title={t('organization.delegatedAdmin.teamScoped')} value={teamScoped} icon={<Users size={20} />} color="text-blue-500" />
+        <StatCard title={t('organization.delegatedAdmin.teamScoped')} value={teamScoped} icon={<Users size={20} />} color="text-info" />
         <StatCard title={t('organization.delegatedAdmin.domainScoped')} value={domainScoped} icon={<Globe size={20} />} color="text-success" />
       </div>
 

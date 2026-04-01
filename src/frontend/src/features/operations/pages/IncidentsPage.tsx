@@ -34,12 +34,12 @@ const severityBadge = (severity: string): { variant: 'success' | 'warning' | 'da
 
 const statusIcon = (status: string) => {
   switch (status) {
-    case 'Open': return <AlertCircle size={14} className="text-red-400" />;
-    case 'Investigating': return <Search size={14} className="text-amber-400" />;
-    case 'Mitigating': return <Wrench size={14} className="text-orange-400" />;
-    case 'Monitoring': return <Eye size={14} className="text-blue-400" />;
-    case 'Resolved': return <CheckCircle size={14} className="text-emerald-400" />;
-    case 'Closed': return <XCircle size={14} className="text-gray-400" />;
+    case 'Open': return <AlertCircle size={14} className="text-critical" />;
+    case 'Investigating': return <Search size={14} className="text-warning" />;
+    case 'Mitigating': return <Wrench size={14} className="text-warning" />;
+    case 'Monitoring': return <Eye size={14} className="text-info" />;
+    case 'Resolved': return <CheckCircle size={14} className="text-success" />;
+    case 'Closed': return <XCircle size={14} className="text-muted" />;
     default: return <Clock size={14} className="text-muted" />;
   }
 };
@@ -163,10 +163,10 @@ export function IncidentsPage() {
       {/* Stats */}
       <PageSection className="!mb-6">
         <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
-          <StatCard title={t('incidents.totalOpen')} value={stats.totalOpen} icon={<AlertTriangle size={20} />} color="text-red-500" />
+          <StatCard title={t('incidents.totalOpen')} value={stats.totalOpen} icon={<AlertTriangle size={20} />} color="text-critical" />
           <StatCard title={t('incidents.critical')} value={stats.criticalIncidents} icon={<ShieldAlert size={20} />} color="text-critical" />
-          <StatCard title={t('incidents.withCorrelation')} value={stats.withCorrelatedChanges} icon={<GitBranch size={20} />} color="text-amber-500" />
-          <StatCard title={t('incidents.withMitigation')} value={stats.withMitigationAvailable} icon={<Wrench size={20} />} color="text-blue-500" />
+          <StatCard title={t('incidents.withCorrelation')} value={stats.withCorrelatedChanges} icon={<GitBranch size={20} />} color="text-warning" />
+          <StatCard title={t('incidents.withMitigation')} value={stats.withMitigationAvailable} icon={<Wrench size={20} />} color="text-info" />
           <StatCard title={t('incidents.servicesImpacted')} value={stats.servicesImpacted} icon={<Shield size={20} />} color="text-accent" />
         </ContentGrid>
       </PageSection>
@@ -201,7 +201,7 @@ export function IncidentsPage() {
         </div>
 
         {createSuccess && (
-          <Card className="mb-4 border border-emerald-500/30">
+          <Card className="mb-4 border border-success/25">
             <CardBody className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-body">
                 {t('incidents.create.successMessage', 'Incident {{reference}} was created and persisted successfully.', {

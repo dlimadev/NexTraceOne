@@ -170,7 +170,7 @@ function OperationRow({
         <span className="text-xs font-mono text-body flex-1 truncate">{operation.path}</span>
 
         {operation.deprecated && (
-          <span className="text-[10px] text-orange-400 px-1.5 py-0.5 rounded bg-orange-900/30 border border-orange-700/40">
+          <span className="text-[10px] text-warning px-1.5 py-0.5 rounded bg-warning/15 border border-warning/25">
             {t('contracts.deprecated', 'Deprecated')}
           </span>
         )}
@@ -206,7 +206,7 @@ function OperationRow({
 
           {!isReadOnly && (
             <div className="flex items-center gap-2 pt-1 border-t border-edge mt-1">
-              <button className="text-[10px] text-red-400 hover:text-red-300 inline-flex items-center gap-1">
+              <button className="text-[10px] text-critical hover:text-critical inline-flex items-center gap-1">
                 <Trash2 size={10} /> {t('common.remove', 'Remove')}
               </button>
             </div>

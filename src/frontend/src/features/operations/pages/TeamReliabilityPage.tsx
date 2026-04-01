@@ -29,8 +29,8 @@ const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger
 
 const trendIcon = (trend: string) => {
   switch (trend) {
-    case 'Improving': return <TrendingUp size={14} className="text-emerald-500" />;
-    case 'Declining': return <TrendingDown size={14} className="text-red-500" />;
+    case 'Improving': return <TrendingUp size={14} className="text-success" />;
+    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
     default: return <Minus size={14} className="text-muted" />;
   }
 };
@@ -69,9 +69,9 @@ export function TeamReliabilityPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('reliability.totalServices')} value={stats.total} icon={<Activity size={20} />} />
-        <StatCard title={t('reliability.healthyServices')} value={stats.healthy} icon={<CheckCircle size={20} />} color="text-emerald-500" />
-        <StatCard title={t('reliability.degradedServices')} value={stats.degraded} icon={<AlertTriangle size={20} />} color="text-amber-500" />
-        <StatCard title={t('reliability.needsAttention')} value={stats.needsAttention + stats.unavailable} icon={<Shield size={20} />} color="text-red-500" />
+        <StatCard title={t('reliability.healthyServices')} value={stats.healthy} icon={<CheckCircle size={20} />} color="text-success" />
+        <StatCard title={t('reliability.degradedServices')} value={stats.degraded} icon={<AlertTriangle size={20} />} color="text-warning" />
+        <StatCard title={t('reliability.needsAttention')} value={stats.needsAttention + stats.unavailable} icon={<Shield size={20} />} color="text-critical" />
       </div>
 
       {/* Filters */}

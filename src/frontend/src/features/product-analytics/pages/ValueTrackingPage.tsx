@@ -28,17 +28,17 @@ import type { MilestoneTrend } from '../../../types';
 
 function trendIcon(trend: MilestoneTrend) {
   switch (trend) {
-    case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
-    case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
+    case 'Improving': return <TrendingUp size={14} className="text-success" />;
+    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
     default: return <Minus size={14} className="text-muted" />;
   }
 }
 
 function completionColor(rate: number): string {
-  if (rate >= 75) return 'bg-emerald-500';
+  if (rate >= 75) return 'bg-success';
   if (rate >= 50) return 'bg-accent';
-  if (rate >= 30) return 'bg-amber-500';
-  return 'bg-red-500';
+  if (rate >= 30) return 'bg-warning';
+  return 'bg-critical';
 }
 
 function formatTime(minutes: number): string {
@@ -105,20 +105,20 @@ export function ValueTrackingPage() {
           title={t('analytics.timeToCoreValue')}
           value={formatTime(data.avgTimeToCoreValueMinutes)}
           icon={<CheckCircle size={20} />}
-          color="text-emerald-400"
+          color="text-success"
           trend={{ direction: 'down', label: t('analytics.trendImproving') }}
         />
         <StatCard
           title={t('analytics.value.avgCompletion')}
           value={`${data.overallCompletionRate.toFixed(1)}%`}
           icon={<TrendingUp size={20} />}
-          color="text-blue-400"
+          color="text-info"
         />
         <StatCard
           title={t('analytics.value.totalMilestones')}
           value={milestones.length}
           icon={<Users size={20} />}
-          color="text-amber-400"
+          color="text-warning"
         />
       </StatsGrid>
 
@@ -135,7 +135,7 @@ export function ValueTrackingPage() {
                 <div key={m.milestoneType} className="flex flex-col md:flex-row md:items-center gap-3">
                   {/* Milestone name & trend */}
                   <div className="md:w-72 flex items-center gap-2">
-                    <CheckCircle size={16} className={m.completionRate >= 50 ? 'text-emerald-400' : 'text-zinc-600'} />
+                    <CheckCircle size={16} className={m.completionRate >= 50 ? 'text-success' : 'text-faded'} />
                     <span className="text-sm text-heading">{t(`analytics.milestone.${m.milestoneType}`, { defaultValue: m.milestoneName })}</span>
                     {trendIcon(m.trend)}
                   </div>

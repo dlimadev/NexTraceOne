@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppTopbarSearch } from '../../../components/shell/AppTopbarSearch';
 import { AppTopbarActions } from '../../../components/shell/AppTopbarActions';
 import { AppUserMenu } from '../../../components/shell/AppUserMenu';
@@ -9,6 +10,7 @@ import { PageSection } from '../../../components/shell/PageSection';
 import { ContentGrid } from '../../../components/shell/ContentGrid';
 import { ShellLoader } from '../../../components/shell/ShellLoader';
 import { ModuleUnavailable } from '../../../components/shell/ModuleUnavailable';
+import { ThemeProvider } from '../../../contexts/ThemeContext';
 
 // Mock auth context
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -52,19 +54,37 @@ describe('AppTopbarSearch', () => {
   });
 });
 
+function renderTopbarActions() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <ThemeProvider>
+          <AppTopbarActions />
+        </ThemeProvider>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
 describe('AppTopbarActions', () => {
   it('renders language and notification buttons', () => {
-    render(<AppTopbarActions />);
+    renderTopbarActions();
     expect(screen.getByLabelText('Toggle language')).toBeInTheDocument();
-    expect(screen.getByLabelText('Notifications')).toBeInTheDocument();
+    expect(screen.getByLabelText('Notification Center')).toBeInTheDocument();
   });
 
   it('opens language dropdown on click', () => {
-    render(<AppTopbarActions />);
+    renderTopbarActions();
     fireEvent.click(screen.getByLabelText('Toggle language'));
     expect(screen.getByText('English')).toBeInTheDocument();
     expect(screen.getByText('Português (Brasil)')).toBeInTheDocument();
     expect(screen.getByText('Español')).toBeInTheDocument();
+  });
+
+  it('renders theme toggle button', () => {
+    renderTopbarActions();
+    expect(screen.getByLabelText('Toggle dark/light mode')).toBeInTheDocument();
   });
 });
 

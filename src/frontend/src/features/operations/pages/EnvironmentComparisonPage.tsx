@@ -47,24 +47,24 @@ function severityVariant(severity: string): 'danger' | 'warning' | 'info' | 'def
 function gradeColor(grade: string): string {
   switch (grade?.toUpperCase()) {
     case 'A':
-      return 'text-green-400';
+      return 'text-success';
     case 'B':
       return 'text-lime-400';
     case 'C':
-      return 'text-yellow-400';
+      return 'text-warning';
     case 'D':
-      return 'text-orange-400';
+      return 'text-warning';
     default:
-      return 'text-red-400';
+      return 'text-critical';
   }
 }
 
 function DeltaIcon({ delta }: { delta: number }) {
-  if (Math.abs(delta) < 0.5) return <Minus size={14} className="text-slate-400" />;
+  if (Math.abs(delta) < 0.5) return <Minus size={14} className="text-muted" />;
   return delta > 0 ? (
-    <ArrowUp size={14} className="text-red-400" />
+    <ArrowUp size={14} className="text-critical" />
   ) : (
-    <ArrowDown size={14} className="text-green-400" />
+    <ArrowDown size={14} className="text-success" />
   );
 }
 
@@ -498,7 +498,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
             ) : driftQuery.data?.items.length === 0 ? (
               <Card>
                 <CardBody>
-                  <div className="flex items-center gap-2 text-sm text-green-400 py-2">
+                  <div className="flex items-center gap-2 text-sm text-success py-2">
                     <CheckCircle2 size={16} />
                     {t('environmentComparison.noDriftFindings')}
                   </div>
@@ -515,8 +515,8 @@ export const EnvironmentComparisonPage: React.FC = () => {
                             size={16}
                             className={
                               finding.severity === 'Critical' || finding.severity === 'High'
-                                ? 'text-red-400'
-                                : 'text-yellow-400'
+                                ? 'text-critical'
+                                : 'text-warning'
                             }
                           />
                           <div className="flex flex-col gap-0.5">
@@ -555,7 +555,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                           </span>
                           <span
                             className={`font-medium ${
-                              finding.deviationPercent > 20 ? 'text-red-400' : 'text-yellow-400'
+                              finding.deviationPercent > 20 ? 'text-critical' : 'text-warning'
                             }`}
                           >
                             {finding.deviationPercent.toFixed(1)}%
@@ -598,7 +598,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
                             {t('environmentComparison.metrics.errorRate')}:{' '}
                             <span
                               className={
-                                point.errorRate > 0.05 ? 'text-red-400' : 'text-green-400'
+                                point.errorRate > 0.05 ? 'text-critical' : 'text-success'
                               }
                             >
                               {(point.errorRate * 100).toFixed(2)}%

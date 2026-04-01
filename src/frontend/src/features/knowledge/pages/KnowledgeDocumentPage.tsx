@@ -55,7 +55,7 @@ export function KnowledgeDocumentPage() {
             <CardHeader>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 shrink-0">
+                  <div className="p-2 rounded-lg bg-info/15 text-info shrink-0">
                     <FileText size={20} />
                   </div>
                   <div className="min-w-0">

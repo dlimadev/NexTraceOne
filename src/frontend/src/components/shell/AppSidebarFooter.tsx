@@ -27,7 +27,7 @@ export function AppSidebarFooter({ collapsed = false, email, persona, roleName, 
         <button
           onClick={onLogout}
           className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold hover:brightness-90 transition-all duration-[var(--nto-motion-base)]"
-          style={{ background: 'linear-gradient(135deg, #1B7FE8 0%, #12C4E8 100%)' }}
+          style={{ background: 'var(--nto-gradient-logo)' }}
           title={t('auth.signOut')}
           aria-label={t('auth.signOut')}
         >
@@ -38,7 +38,7 @@ export function AppSidebarFooter({ collapsed = false, email, persona, roleName, 
           {/* Avatar com gradiente da marca */}
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 text-white"
-            style={{ background: 'linear-gradient(135deg, #1B7FE8 0%, #12C4E8 100%)' }}
+            style={{ background: 'var(--nto-gradient-logo)' }}
             aria-hidden="true"
           >
             {initial}

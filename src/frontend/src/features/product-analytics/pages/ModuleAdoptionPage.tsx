@@ -26,17 +26,17 @@ import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
-    case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
-    case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
+    case 'Improving': return <TrendingUp size={14} className="text-success" />;
+    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
     default: return <Minus size={14} className="text-muted" />;
   }
 }
 
 function adoptionColor(percent: number): string {
-  if (percent >= 75) return 'bg-emerald-500';
+  if (percent >= 75) return 'bg-success';
   if (percent >= 50) return 'bg-accent';
-  if (percent >= 30) return 'bg-amber-500';
-  return 'bg-red-500';
+  if (percent >= 30) return 'bg-warning';
+  return 'bg-critical';
 }
 
 export function ModuleAdoptionPage() {

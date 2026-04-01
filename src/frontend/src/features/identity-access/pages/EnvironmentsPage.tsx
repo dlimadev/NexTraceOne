@@ -203,7 +203,7 @@ export function EnvironmentsPage() {
                       maxLength={100}
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                      style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                     />
                   </div>
 
@@ -218,9 +218,9 @@ export function EnvironmentsPage() {
                         pattern="^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
                         value={form.slug}
                         onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value.toLowerCase() }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                       />
-                      <small style={{ color: '#9CA3AF' }}>{t('environments.slugHelp')}</small>
+                      <small style={{ color: 'var(--t-muted)' }}>{t('environments.slugHelp')}</small>
                     </div>
                   )}
 
@@ -232,7 +232,7 @@ export function EnvironmentsPage() {
                         required
                         value={form.profile}
                         onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                       >
                         {PROFILE_OPTIONS.map((p) => (
                           <option key={p} value={p}>
@@ -249,7 +249,7 @@ export function EnvironmentsPage() {
                         required
                         value={form.criticality}
                         onChange={(e) => setForm((f) => ({ ...f, criticality: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                       >
                         {CRITICALITY_OPTIONS.map((c) => (
                           <option key={c} value={c}>
@@ -269,9 +269,9 @@ export function EnvironmentsPage() {
                         maxLength={50}
                         value={form.code}
                         onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                       />
-                      <small style={{ color: '#9CA3AF' }}>{t('environments.codeHelp')}</small>
+                      <small style={{ color: 'var(--t-muted)' }}>{t('environments.codeHelp')}</small>
                     </div>
 
                     <div>
@@ -282,7 +282,7 @@ export function EnvironmentsPage() {
                         maxLength={100}
                         value={form.region}
                         onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                       />
                     </div>
 
@@ -295,7 +295,7 @@ export function EnvironmentsPage() {
                         required
                         value={form.sortOrder}
                         onChange={(e) => setForm((f) => ({ ...f, sortOrder: parseInt(e.target.value, 10) || 0 }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151' }}
+                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
                       />
                     </div>
                   </div>
@@ -307,7 +307,7 @@ export function EnvironmentsPage() {
                       rows={2}
                       value={form.description}
                       onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                      style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid #374151', resize: 'vertical' }}
+                      style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)', resize: 'vertical' }}
                     />
                   </div>
 
@@ -321,7 +321,7 @@ export function EnvironmentsPage() {
                       />
                       <span>{t('environments.isPrimaryProduction')}</span>
                     </label>
-                    <small style={{ color: '#9CA3AF', marginLeft: '24px' }}>
+                    <small style={{ color: 'var(--t-muted)', marginLeft: '24px' }}>
                       {t('environments.isPrimaryProductionHelp')}
                     </small>
                   </div>
@@ -366,17 +366,17 @@ export function EnvironmentsPage() {
                 <CardBody>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <Globe size={16} style={{ color: '#6B7280', flexShrink: 0 }} />
+                      <Globe size={16} style={{ color: 'var(--t-faded)', flexShrink: 0 }} />
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <strong>{env.name}</strong>
                           {env.code && (
-                            <code style={{ fontSize: '11px', background: '#1F2937', padding: '1px 4px', borderRadius: '3px', color: '#9CA3AF' }}>
+                            <code style={{ fontSize: '11px', background: 'var(--t-elevated)', padding: '1px 4px', borderRadius: '3px', color: 'var(--t-muted)' }}>
                               {env.code}
                             </code>
                           )}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#9CA3AF' }}>{env.slug}{env.region ? ` · ${env.region}` : ''}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--t-muted)' }}>{env.slug}{env.region ? ` · ${env.region}` : ''}</div>
                       </div>
                       <Badge variant={getProfileBadgeVariant(env.profile)}>
                         {t(`environments.profiles.${env.profile}`, { defaultValue: env.profile })}
@@ -418,7 +418,7 @@ export function EnvironmentsPage() {
                     </div>
                   </div>
                   {env.description && (
-                    <div style={{ marginTop: '6px', fontSize: '12px', color: '#9CA3AF', paddingLeft: '26px' }}>
+                    <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--t-muted)', paddingLeft: '26px' }}>
                       {env.description}
                     </div>
                   )}

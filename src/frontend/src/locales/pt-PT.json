@@ -358,6 +358,7 @@
   },
   "header": {
     "toggleLanguage": "Alternar idioma",
+    "toggleTheme": "Alternar modo claro/escuro",
     "notifications": "Notificações",
     "settings": "Definições",
     "languagePortuguese": "Português",

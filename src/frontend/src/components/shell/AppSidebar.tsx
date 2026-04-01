@@ -189,7 +189,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
       )}
       style={{
         ...(!mobile ? { width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED } : {}),
-        background: 'linear-gradient(180deg, #0A1730 0%, #081120 100%)',
+        background: 'var(--t-sidebar-gradient)',
       }}
       role="navigation"
       aria-label={t('shell.sidebarNav')}

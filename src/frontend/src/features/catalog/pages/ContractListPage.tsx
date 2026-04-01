@@ -21,23 +21,23 @@ import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
-  OpenApi: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  OpenApi: 'bg-success/15 text-success border border-success/25',
   Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
   Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
-  AsyncApi: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Protobuf: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
+  AsyncApi: 'bg-info/15 text-info border border-info/25',
+  Protobuf: 'bg-warning/15 text-warning border border-warning/25',
   GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
 };
 
 /** Variantes visuais para badges de estado do ciclo de vida. */
 const lifecycleColors: Record<string, string> = {
-  Draft: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
-  InReview: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Approved: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
-  Locked: 'bg-purple-900/40 text-purple-300 border border-purple-700/50',
-  Deprecated: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Sunset: 'bg-red-900/40 text-red-300 border border-red-700/50',
-  Retired: 'bg-slate-900/40 text-slate-400 border border-slate-700/50',
+  Draft: 'bg-elevated text-muted border border-edge',
+  InReview: 'bg-info/15 text-info border border-info/25',
+  Approved: 'bg-success/15 text-success border border-success/25',
+  Locked: 'bg-info/15 text-info border border-info/25',
+  Deprecated: 'bg-warning/15 text-warning border border-warning/25',
+  Sunset: 'bg-critical/15 text-critical border border-critical/25',
+  Retired: 'bg-elevated text-muted border border-edge',
 };
 
 /** Valores disponíveis nos filtros de protocolo. */
@@ -127,37 +127,37 @@ export function ContractListPage() {
             icon={<FileText size={18} />}
             label={t('contractGov.summary.distinctContracts')}
             value={summary.distinctContracts}
-            accent="text-blue-400"
+            accent="text-info"
           />
           <SummaryCard
             icon={<Clock size={18} />}
             label={t('contractGov.summary.draft')}
             value={summary.draftCount}
-            accent="text-slate-400"
+            accent="text-muted"
           />
           <SummaryCard
             icon={<Search size={18} />}
             label={t('contractGov.summary.inReview')}
             value={summary.inReviewCount}
-            accent="text-blue-400"
+            accent="text-info"
           />
           <SummaryCard
             icon={<CheckCircle size={18} />}
             label={t('contractGov.summary.approved')}
             value={summary.approvedCount}
-            accent="text-emerald-400"
+            accent="text-success"
           />
           <SummaryCard
             icon={<Lock size={18} />}
             label={t('contractGov.summary.locked')}
             value={summary.lockedCount}
-            accent="text-purple-400"
+            accent="text-info"
           />
           <SummaryCard
             icon={<Archive size={18} />}
             label={t('contractGov.summary.deprecated')}
             value={summary.deprecatedCount}
-            accent="text-orange-400"
+            accent="text-warning"
           />
         </div>
       )}
@@ -230,7 +230,7 @@ export function ContractListPage() {
 
           {isError && (
             <div className="flex items-center justify-center py-16">
-              <p className="text-sm text-red-400">{t('common.error')}</p>
+              <p className="text-sm text-critical">{t('common.error')}</p>
             </div>
           )}
 
@@ -287,14 +287,14 @@ export function ContractListPage() {
                       <td className="px-4 py-3 text-muted text-xs font-mono">{c.semVer}</td>
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}
+                          className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-elevated text-muted border border-edge'}`}
                         >
                           {t(`contractGov.badges.protocols.${c.protocol}`, c.protocol)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex text-xs px-2 py-0.5 rounded-full ${lifecycleColors[c.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}
+                          className={`inline-flex text-xs px-2 py-0.5 rounded-full ${lifecycleColors[c.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}
                         >
                           {t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState)}
                         </span>
@@ -302,7 +302,7 @@ export function ContractListPage() {
                       <td className="px-4 py-3 text-muted text-xs">{c.format}</td>
                       <td className="px-4 py-3">
                         {c.isSigned ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
+                          <span className="inline-flex items-center gap-1 text-xs text-success">
                             <CheckCircle size={12} />
                             {t('contractGov.badges.signed')}
                           </span>

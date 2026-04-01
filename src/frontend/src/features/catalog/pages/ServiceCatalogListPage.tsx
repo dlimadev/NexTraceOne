@@ -24,21 +24,21 @@ import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../typ
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
-  Critical: 'bg-red-900/40 text-red-300 border border-red-700/50',
-  High: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Medium: 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50',
-  Low: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
+  Critical: 'bg-critical/15 text-critical border border-critical/25',
+  High: 'bg-warning/15 text-warning border border-warning/25',
+  Medium: 'bg-warning/15 text-warning border border-warning/25',
+  Low: 'bg-elevated text-muted border border-edge',
 };
 
 /** Variantes visuais para badges de ciclo de vida. */
 const lifecycleColors: Record<LifecycleStatus, string> = {
-  Planning: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Development: 'bg-indigo-900/40 text-indigo-300 border border-indigo-700/50',
-  Staging: 'bg-purple-900/40 text-purple-300 border border-purple-700/50',
-  Active: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
-  Deprecating: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
-  Deprecated: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Retired: 'bg-slate-900/40 text-slate-400 border border-slate-700/50',
+  Planning: 'bg-info/15 text-info border border-info/25',
+  Development: 'bg-info/15 text-accent border border-accent',
+  Staging: 'bg-info/15 text-info border border-info/25',
+  Active: 'bg-success/15 text-success border border-success/25',
+  Deprecating: 'bg-warning/15 text-warning border border-warning/25',
+  Deprecated: 'bg-warning/15 text-warning border border-warning/25',
+  Retired: 'bg-elevated text-muted border border-edge',
 };
 
 /** Valores disponíveis nos filtros de tipo de serviço. */
@@ -163,31 +163,31 @@ export function ServiceCatalogListPage() {
             icon={<AlertTriangle size={18} />}
             label={t('catalog.summary.critical')}
             value={summary.criticalCount}
-            accent="text-red-400"
+            accent="text-critical"
           />
           <SummaryCard
             icon={<Shield size={18} />}
             label={t('catalog.summary.high')}
             value={summary.highCriticalityCount}
-            accent="text-orange-400"
+            accent="text-warning"
           />
           <SummaryCard
             icon={<Activity size={18} />}
             label={t('catalog.summary.active')}
             value={summary.activeCount}
-            accent="text-emerald-400"
+            accent="text-success"
           />
           <SummaryCard
             icon={<Archive size={18} />}
             label={t('catalog.summary.deprecated')}
             value={summary.deprecatedCount}
-            accent="text-amber-400"
+            accent="text-warning"
           />
           <SummaryCard
             icon={<Layers size={18} />}
             label={t('catalog.summary.retired')}
             value={summary.retiredCount}
-            accent="text-slate-400"
+            accent="text-muted"
           />
           </ContentGrid>
         </PageSection>
@@ -340,7 +340,7 @@ export function ServiceCatalogListPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-blue-900/30 text-blue-300 border border-blue-700/50">
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-info/15 text-info border border-info/25">
                           {t(`catalog.badges.type.${svc.serviceType}`)}
                         </span>
                       </td>

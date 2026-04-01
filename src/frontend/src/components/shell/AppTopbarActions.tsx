@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe, Check } from 'lucide-react';
+import { Globe, Check, Sun, Moon } from 'lucide-react';
 import { NotificationBell } from '../../features/notifications';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -12,6 +13,7 @@ const SUPPORTED_LANGUAGES = [
 
 export function AppTopbarActions() {
   const { t, i18n } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [langOpen, setLangOpen] = useState(false);
 
   const selectLanguage = useCallback((code: string) => {
@@ -21,6 +23,17 @@ export function AppTopbarActions() {
 
   return (
     <>
+      {/* Theme toggle */}
+      <button
+        onClick={toggleTheme}
+        className="p-2.5 rounded-lg text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
+        title={theme === 'dark' ? t('header.switchToLight', 'Switch to light mode') : t('header.switchToDark', 'Switch to dark mode')}
+        aria-label={t('header.toggleTheme')}
+        aria-pressed={theme === 'dark'}
+      >
+        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
+
       {/* Language selector */}
       <div className="relative">
         <button

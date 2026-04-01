@@ -397,7 +397,7 @@ export function AgentDetailPage() {
         {activeTab === 'edit' && !isSystem && (
           <div className="space-y-4 max-w-2xl">
             {saveError && (
-              <div className="p-3 rounded-md bg-red-500/10 border border-red-500/30 text-sm text-red-400 flex items-center gap-2">
+              <div className="p-3 rounded-md bg-critical/15 border border-critical/25 text-sm text-critical flex items-center gap-2">
                 <AlertCircle size={16} /> {saveError}
               </div>
             )}
@@ -482,7 +482,7 @@ export function AgentDetailPage() {
               {t('agents.executeTitle')} — {agent.displayName}
             </h3>
             {executeError && (
-              <div className="p-3 rounded-md bg-red-500/10 border border-red-500/30 text-sm text-red-400 flex items-center gap-2">
+              <div className="p-3 rounded-md bg-critical/15 border border-critical/25 text-sm text-critical flex items-center gap-2">
                 <AlertCircle size={16} /> {executeError}
               </div>
             )}
@@ -533,10 +533,10 @@ export function AgentDetailPage() {
                           {art.reviewStatus === 'Pending' && (
                             <div className="flex items-center gap-1">
                               <Button variant="ghost" size="sm" onClick={() => handleReviewArtifact(art.artifactId, 'Approve')}>
-                                <CheckCircle2 size={12} className="text-green-400 mr-0.5" /> {t('agents.approve')}
+                                <CheckCircle2 size={12} className="text-success mr-0.5" /> {t('agents.approve')}
                               </Button>
                               <Button variant="ghost" size="sm" onClick={() => handleReviewArtifact(art.artifactId, 'Reject')}>
-                                <Ban size={12} className="text-red-400 mr-0.5" /> {t('agents.reject')}
+                                <Ban size={12} className="text-critical mr-0.5" /> {t('agents.reject')}
                               </Button>
                             </div>
                           )}

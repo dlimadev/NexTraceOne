@@ -31,9 +31,9 @@ const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 
 const riskIcon = (level: RiskLevel) => {
   switch (level) {
     case 'Critical': return <ShieldAlert size={14} className="text-critical" />;
-    case 'High': return <AlertTriangle size={14} className="text-orange-400" />;
-    case 'Medium': return <AlertCircle size={14} className="text-amber-400" />;
-    case 'Low': return <CheckCircle size={14} className="text-emerald-400" />;
+    case 'High': return <AlertTriangle size={14} className="text-warning" />;
+    case 'Medium': return <AlertCircle size={14} className="text-warning" />;
+    case 'Low': return <CheckCircle size={14} className="text-success" />;
     default: return <Shield size={14} className="text-muted" />;
   }
 };
@@ -94,9 +94,9 @@ export function RiskCenterPage() {
         <ContentGrid className="!grid-cols-2 lg:!grid-cols-5">
           <StatCard title={t('governance.risk.totalAssessed')} value={d.totalPacksAssessed} icon={<Shield size={20} />} color="text-accent" />
           <StatCard title={t('governance.risk.critical')} value={d.criticalCount} icon={<ShieldAlert size={20} />} color="text-critical" />
-          <StatCard title={t('governance.risk.high')} value={d.highCount} icon={<AlertTriangle size={20} />} color="text-orange-500" />
-          <StatCard title={t('governance.risk.medium')} value={d.mediumCount} icon={<AlertCircle size={20} />} color="text-amber-500" />
-          <StatCard title={t('governance.risk.low')} value={d.lowCount} icon={<CheckCircle size={20} />} color="text-emerald-500" />
+          <StatCard title={t('governance.risk.high')} value={d.highCount} icon={<AlertTriangle size={20} />} color="text-warning" />
+          <StatCard title={t('governance.risk.medium')} value={d.mediumCount} icon={<AlertCircle size={20} />} color="text-warning" />
+          <StatCard title={t('governance.risk.low')} value={d.lowCount} icon={<CheckCircle size={20} />} color="text-success" />
         </ContentGrid>
       </PageSection>
 

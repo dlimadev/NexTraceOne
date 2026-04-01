@@ -25,23 +25,23 @@ import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
-  OpenApi: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  OpenApi: 'bg-success/15 text-success border border-success/25',
   Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
   Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
-  AsyncApi: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Protobuf: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
+  AsyncApi: 'bg-info/15 text-info border border-info/25',
+  Protobuf: 'bg-warning/15 text-warning border border-warning/25',
   GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
 };
 
 /** Variantes visuais para badges de estado do ciclo de vida. */
 const lifecycleColors: Record<string, string> = {
-  Draft: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
-  InReview: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Approved: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
-  Locked: 'bg-purple-900/40 text-purple-300 border border-purple-700/50',
-  Deprecated: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Sunset: 'bg-red-900/40 text-red-300 border border-red-700/50',
-  Retired: 'bg-slate-900/40 text-slate-400 border border-slate-700/50',
+  Draft: 'bg-elevated text-muted border border-edge',
+  InReview: 'bg-info/15 text-info border border-info/25',
+  Approved: 'bg-success/15 text-success border border-success/25',
+  Locked: 'bg-info/15 text-info border border-info/25',
+  Deprecated: 'bg-warning/15 text-warning border border-warning/25',
+  Sunset: 'bg-critical/15 text-critical border border-critical/25',
+  Retired: 'bg-elevated text-muted border border-edge',
 };
 
 /** Página de detalhe de uma versão de contrato — governança e proveniência. */
@@ -113,12 +113,12 @@ export function ContractDetailPage() {
           <h1 className="text-2xl font-bold text-heading">{detail.apiAssetId}</h1>
           <span className="text-sm font-mono text-muted">v{detail.semVer}</span>
           <span
-            className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[detail.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}
+            className={`inline-flex text-xs px-2 py-0.5 rounded-full ${protocolColors[detail.protocol] ?? 'bg-elevated text-muted border border-edge'}`}
           >
             {t(`contractGov.badges.protocols.${detail.protocol}`, detail.protocol)}
           </span>
           <span
-            className={`inline-flex text-xs px-2 py-0.5 rounded-full ${lifecycleColors[detail.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}
+            className={`inline-flex text-xs px-2 py-0.5 rounded-full ${lifecycleColors[detail.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}
           >
             {t(`contractGov.badges.lifecycle.${detail.lifecycleState}`, detail.lifecycleState)}
           </span>
@@ -191,8 +191,8 @@ export function ContractDetailPage() {
                   <dd className="flex items-center gap-1.5 text-sm">
                     {detail.isLocked ? (
                       <>
-                        <Lock size={14} className="text-purple-400" />
-                        <span className="text-purple-300">{t('contractGov.badges.lockedLabel')}</span>
+                        <Lock size={14} className="text-info" />
+                        <span className="text-info">{t('contractGov.badges.lockedLabel')}</span>
                       </>
                     ) : (
                       <>
@@ -213,8 +213,8 @@ export function ContractDetailPage() {
                   <dd className="flex items-center gap-1.5 text-sm">
                     {detail.signedBy ? (
                       <>
-                        <CheckCircle size={14} className="text-emerald-400" />
-                        <span className="text-emerald-300">{t('contractGov.badges.signed')}</span>
+                        <CheckCircle size={14} className="text-success" />
+                        <span className="text-success">{t('contractGov.badges.signed')}</span>
                       </>
                     ) : (
                       <>
@@ -312,7 +312,7 @@ export function ContractDetailPage() {
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-mono text-heading">v{v.version}</span>
-                          <span className={`inline-flex text-[10px] px-1.5 py-0.5 rounded-full ${lifecycleColors[v.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                          <span className={`inline-flex text-[10px] px-1.5 py-0.5 rounded-full ${lifecycleColors[v.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}>
                             {t(`contractGov.badges.lifecycle.${v.lifecycleState}`, v.lifecycleState)}
                           </span>
                         </div>
@@ -345,15 +345,15 @@ export function ContractDetailPage() {
             <CardBody>
               {!violations || violations.length === 0 ? (
                 <div className="flex items-center gap-2 text-sm">
-                  <CheckCircle size={14} className="text-emerald-400" />
-                  <span className="text-emerald-300">{t('contractGov.detail.noViolations')}</span>
+                  <CheckCircle size={14} className="text-success" />
+                  <span className="text-success">{t('contractGov.detail.noViolations')}</span>
                 </div>
               ) : (
                 <ul className="space-y-2">
                   {violations.slice(0, 5).map((v, idx) => (
                     <li key={idx} className="p-2 rounded-md bg-elevated border border-edge">
                       <div className="flex items-start gap-2">
-                        <AlertTriangle size={12} className={v.severity === 'Error' ? 'text-red-400 mt-0.5' : 'text-amber-400 mt-0.5'} />
+                        <AlertTriangle size={12} className={v.severity === 'Error' ? 'text-critical mt-0.5' : 'text-warning mt-0.5'} />
                         <div className="min-w-0">
                           <p className="text-xs font-medium text-heading">{v.ruleName}</p>
                           <p className="text-[11px] text-muted truncate">{v.message}</p>

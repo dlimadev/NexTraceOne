@@ -32,9 +32,9 @@ const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' 
 
 const efficiencyIcon = (eff: CostEfficiencyType) => {
   switch (eff) {
-    case 'Efficient': return <CheckCircle size={14} className="text-emerald-400" />;
+    case 'Efficient': return <CheckCircle size={14} className="text-success" />;
     case 'Acceptable': return <AlertCircle size={14} className="text-muted" />;
-    case 'Inefficient': return <AlertTriangle size={14} className="text-orange-400" />;
+    case 'Inefficient': return <AlertTriangle size={14} className="text-warning" />;
     case 'Wasteful': return <XCircle size={14} className="text-critical" />;
     default: return null;
   }
@@ -83,7 +83,7 @@ export function DomainFinOpsPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('governance.finops.totalMonthlyCost')} value={fmt(d.totalCost)} icon={<DollarSign size={20} />} color="text-accent" />
         <StatCard title={t('governance.finops.totalWaste')} value={fmt(totalWaste)} icon={<AlertTriangle size={20} />} color="text-critical" />
-        <StatCard title={t('governance.finops.overallEfficiency')} value={t(`governance.finops.efficiency.${d.efficiency}`)} icon={<Layers size={20} />} color="text-amber-500" />
+        <StatCard title={t('governance.finops.overallEfficiency')} value={t(`governance.finops.efficiency.${d.efficiency}`)} icon={<Layers size={20} />} color="text-warning" />
         <StatCard title={t('governance.finops.services')} value={String(d.services.length)} icon={<Layers size={20} />} color="text-info" />
       </div>
 

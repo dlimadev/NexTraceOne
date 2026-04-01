@@ -159,7 +159,7 @@ function SchemaCard({
         <span className="text-xs font-semibold text-heading flex-1">{schema.name}</span>
 
         {schema.isShared && (
-          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-900/30 border border-emerald-700/40">
+          <span className="inline-flex items-center gap-1 text-[10px] text-success px-1.5 py-0.5 rounded bg-success/15 border border-success/25">
             <Share2 size={9} /> {t('contracts.schemas.shared', 'Shared')}
           </span>
         )}
@@ -207,7 +207,7 @@ function SchemaCard({
                     </td>
                     <td className="px-3 py-1.5 text-center">
                       {prop.required ? (
-                        <span className="text-amber-400 font-bold">●</span>
+                        <span className="text-warning font-bold">●</span>
                       ) : (
                         <span className="text-muted/40">○</span>
                       )}

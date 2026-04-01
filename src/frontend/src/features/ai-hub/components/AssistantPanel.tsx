@@ -665,7 +665,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
               {t(`assistantPanel.contextLabel.${contextType}`)}: {contextSummary.name}
             </p>
             {isNonProductionEnvironment && activeEnvironmentName && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 mt-2">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs bg-warning/15 text-warning border border-warning/25 mt-2">
                 <AlertTriangle size={11} />
                 <span>{t('assistantPanel.analyzingNonProd', { environment: activeEnvironmentName })}</span>
               </div>
@@ -794,11 +794,11 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
 
               {/* Caveats */}
               {msg.caveats && msg.caveats.length > 0 && (
-                <div className="mt-2 p-2 rounded bg-amber-900/20 border border-amber-700/30">
-                  <span className="text-[10px] font-medium text-amber-300">{t('assistantPanel.caveatsLabel')}:</span>
+                <div className="mt-2 p-2 rounded bg-warning/15 border border-warning/25">
+                  <span className="text-[10px] font-medium text-warning">{t('assistantPanel.caveatsLabel')}:</span>
                   <ul className="mt-0.5 space-y-0.5">
                     {msg.caveats.map((caveat, idx) => (
-                      <li key={idx} className="text-[10px] text-amber-200/80">• {caveat}</li>
+                      <li key={idx} className="text-[10px] text-warning">• {caveat}</li>
                     ))}
                   </ul>
                 </div>
@@ -835,7 +835,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
               {msg.role === 'assistant' && msg.suggestedSteps && msg.suggestedSteps.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-edge">
                   <div className="flex items-center gap-1 mb-1">
-                    <CheckCircle2 size={10} className="text-emerald-400" />
+                    <CheckCircle2 size={10} className="text-success" />
                     <span className="text-[10px] font-medium text-muted">{t('assistantPanel.suggestedSteps')}</span>
                   </div>
                   <ul className="space-y-0.5">

@@ -8,10 +8,10 @@ import { contractsApi } from '../../api/contracts';
 import type { ContractRuleViolation } from '../../types';
 
 const SEVERITY_CONFIG: Record<string, { color: string; bg: string; Icon: React.ComponentType<{ size?: number; className?: string }> }> = {
-  Critical: { color: 'text-red-400', bg: 'bg-red-900/20', Icon: XCircle },
-  Error: { color: 'text-red-400', bg: 'bg-red-900/20', Icon: XCircle },
-  Warning: { color: 'text-amber-400', bg: 'bg-amber-900/20', Icon: AlertTriangle },
-  Info: { color: 'text-blue-400', bg: 'bg-blue-900/20', Icon: CheckCircle },
+  Critical: { color: 'text-critical', bg: 'bg-critical/15', Icon: XCircle },
+  Error: { color: 'text-critical', bg: 'bg-critical/15', Icon: XCircle },
+  Warning: { color: 'text-warning', bg: 'bg-warning/15', Icon: AlertTriangle },
+  Info: { color: 'text-info', bg: 'bg-info/15', Icon: CheckCircle },
 };
 
 interface ComplianceSectionProps {
@@ -100,7 +100,7 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
             {integrityErrors.length > 0 && (
               <div className="space-y-2">
                 {integrityErrors.map((error, index) => (
-                  <div key={`integrity-error-${index}`} className="text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded p-2">
+                  <div key={`integrity-error-${index}`} className="text-xs text-critical bg-critical/15 border border-critical/25 rounded p-2">
                     {error}
                   </div>
                 ))}
@@ -131,7 +131,7 @@ export function ComplianceSection({ contractVersionId, className = '' }: Complia
             <EmptyState
               title={t('contracts.noViolations', 'No violations')}
               description={t('contracts.noViolationsFound', 'No rule violations found for this version')}
-              icon={<CheckCircle size={18} className="text-emerald-400" />}
+              icon={<CheckCircle size={18} className="text-success" />}
               size="compact"
             />
           )}
@@ -185,9 +185,9 @@ function SummaryCard({
   variant: 'success' | 'warning' | 'danger' | 'neutral';
 }) {
   const colors = {
-    success: 'border-emerald-700/30 bg-emerald-900/10 text-emerald-400',
-    warning: 'border-amber-700/30 bg-amber-900/10 text-amber-400',
-    danger: 'border-red-700/30 bg-red-900/10 text-red-400',
+    success: 'border-success/25 bg-success/15 text-success',
+    warning: 'border-warning/25 bg-warning/15 text-warning',
+    danger: 'border-critical/25 bg-critical/15 text-critical',
     neutral: 'border-edge bg-card text-muted',
   };
 

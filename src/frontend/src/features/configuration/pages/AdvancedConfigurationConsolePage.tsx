@@ -91,7 +91,7 @@ function matchDomain(key: string, domain: DomainMeta): boolean {
 
 function renderValuePreview(value: string | null, isSensitive: boolean): React.ReactNode {
   if (isSensitive) return <Badge variant="warning"><Lock className="w-3 h-3 mr-1" />Masked</Badge>;
-  if (!value) return <span className="text-gray-400 italic text-xs">null</span>;
+  if (!value) return <span className="text-muted italic text-xs">null</span>;
   if (value === 'true') return <Badge variant="success">Enabled</Badge>;
   if (value === 'false') return <Badge variant="default">Disabled</Badge>;
   try {
@@ -99,7 +99,7 @@ function renderValuePreview(value: string | null, isSensitive: boolean): React.R
     if (Array.isArray(parsed)) return <Badge variant="info">{parsed.length} items</Badge>;
     if (typeof parsed === 'object') return <Badge variant="info">{Object.keys(parsed).length} fields</Badge>;
   } catch { /* not JSON */ }
-  return <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[200px] inline-block">{value}</span>;
+  return <span className="text-sm text-faded truncate max-w-[200px] inline-block">{value}</span>;
 }
 
 // ── Main Component ─────────────────────────────────────────────────────
@@ -279,7 +279,7 @@ export function AdvancedConfigurationConsolePage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'bg-brand-600 text-white shadow-sm'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                : 'bg-card text-body hover:bg-subtle border border-edge'
             }`}
           >
             {tab.icon}
@@ -296,8 +296,8 @@ export function AdvancedConfigurationConsolePage() {
             onClick={() => setActiveDomain(domain.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
               activeDomain === domain.key
-                ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 border border-brand-300 dark:border-brand-700'
-                : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                ? 'bg-brand-100 text-brand-700 border border-brand-300'
+                : 'bg-subtle text-faded hover:bg-subtle border border-edge'
             }`}
           >
             {domain.icon}
@@ -308,13 +308,13 @@ export function AdvancedConfigurationConsolePage() {
 
       {/* ── Search ────────────────────────────────────────────────────── */}
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t('advancedConfig.searchPlaceholder', 'Search by key or name...')}
-          className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm"
+          className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
         />
       </div>
 
@@ -327,13 +327,13 @@ export function AdvancedConfigurationConsolePage() {
             <select
               value={selectedScope}
               onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-              className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+              className="px-3 py-2 border border-edge rounded-lg text-sm bg-card"
             >
               <option value="System">System</option>
               <option value="Tenant">Tenant</option>
               <option value="Environment">Environment</option>
             </select>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-faded">
               {t('advancedConfig.explorer.showing', 'Showing')} {filteredDefs.length} {t('advancedConfig.explorer.definitions', 'definitions')}
               {loadingEffective && <RefreshCw className="w-3 h-3 ml-2 animate-spin inline" />}
             </span>
@@ -361,12 +361,12 @@ export function AdvancedConfigurationConsolePage() {
                         {!def.isInheritable && <Badge variant="warning" className="text-xs"><Lock className="w-3 h-3 mr-1" />Mandatory</Badge>}
                         {def.isSensitive && <Badge variant="warning" className="text-xs"><Shield className="w-3 h-3 mr-1" />Sensitive</Badge>}
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-5">{def.key}</p>
+                      <p className="text-xs text-faded mt-1 ml-5">{def.key}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       {eff && (
                         <div className="text-right">
-                          <div className="text-xs text-gray-400">{eff.resolvedScope}</div>
+                          <div className="text-xs text-muted">{eff.resolvedScope}</div>
                           {renderValuePreview(eff.effectiveValue, def.isSensitive && !showSensitive)}
                         </div>
                       )}
@@ -375,37 +375,37 @@ export function AdvancedConfigurationConsolePage() {
                   </div>
 
                   {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                    <div className="mt-4 pt-4 border-t border-edge space-y-3">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                         <div>
-                          <span className="text-gray-400">{t('advancedConfig.explorer.type', 'Type')}</span>
+                          <span className="text-muted">{t('advancedConfig.explorer.type', 'Type')}</span>
                           <p className="font-medium">{def.valueType}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400">{t('advancedConfig.explorer.scopes', 'Scopes')}</span>
+                          <span className="text-muted">{t('advancedConfig.explorer.scopes', 'Scopes')}</span>
                           <p className="font-medium">{def.allowedScopes?.join(', ')}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400">{t('advancedConfig.explorer.editor', 'Editor')}</span>
+                          <span className="text-muted">{t('advancedConfig.explorer.editor', 'Editor')}</span>
                           <p className="font-medium">{def.uiEditorType ?? 'text'}</p>
                         </div>
                         <div>
-                          <span className="text-gray-400">{t('advancedConfig.explorer.inheritable', 'Inheritable')}</span>
+                          <span className="text-muted">{t('advancedConfig.explorer.inheritable', 'Inheritable')}</span>
                           <p className="font-medium">{def.isInheritable ? 'Yes' : 'No'}</p>
                         </div>
                       </div>
                       {def.description && (
-                        <p className="text-xs text-gray-500">{def.description}</p>
+                        <p className="text-xs text-faded">{def.description}</p>
                       )}
                       <div>
-                        <span className="text-xs text-gray-400">{t('advancedConfig.explorer.defaultValue', 'Default Value')}</span>
-                        <pre className="mt-1 p-2 bg-gray-50 dark:bg-gray-900 rounded text-xs overflow-x-auto">
+                        <span className="text-xs text-muted">{t('advancedConfig.explorer.defaultValue', 'Default Value')}</span>
+                        <pre className="mt-1 p-2 bg-subtle rounded text-xs overflow-x-auto">
                           {def.defaultValue ?? 'null'}
                         </pre>
                       </div>
                       {eff && (
-                        <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg">
-                          <div className="flex items-center gap-2 text-xs text-brand-700 dark:text-brand-300 mb-1">
+                        <div className="p-3 bg-brand-50 rounded-lg">
+                          <div className="flex items-center gap-2 text-xs text-brand-700 mb-1">
                             <Layers className="w-3 h-3" />
                             {t('advancedConfig.explorer.effectiveValue', 'Effective Value')}
                             <Badge variant="info" className="text-xs">{eff.resolvedScope}</Badge>
@@ -419,7 +419,7 @@ export function AdvancedConfigurationConsolePage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => setSelectedAuditKey(def.key)}
-                          className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-brand-600 transition-colors"
+                          className="flex items-center gap-1 px-2 py-1 text-xs text-faded hover:text-brand-600 transition-colors"
                         >
                           <History className="w-3 h-3" />
                           {t('advancedConfig.explorer.viewHistory', 'View History')}
@@ -435,7 +435,7 @@ export function AdvancedConfigurationConsolePage() {
           {filteredDefs.length === 0 && (
             <Card>
               <CardBody>
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-faded">
                   <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>{t('advancedConfig.explorer.noResults', 'No matching definitions found.')}</p>
                 </div>
@@ -454,24 +454,24 @@ export function AdvancedConfigurationConsolePage() {
             <CardBody>
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-500 mb-1 block">{t('advancedConfig.diff.leftScope', 'Left Scope')}</label>
+                  <label className="text-xs text-faded mb-1 block">{t('advancedConfig.diff.leftScope', 'Left Scope')}</label>
                   <select
                     value={selectedScope}
                     onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+                    className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
                   >
                     <option value="System">System</option>
                     <option value="Tenant">Tenant</option>
                     <option value="Environment">Environment</option>
                   </select>
                 </div>
-                <ArrowLeftRight className="w-5 h-5 text-gray-400 mt-5" />
+                <ArrowLeftRight className="w-5 h-5 text-muted mt-5" />
                 <div className="flex-1">
-                  <label className="text-xs text-gray-500 mb-1 block">{t('advancedConfig.diff.rightScope', 'Right Scope')}</label>
+                  <label className="text-xs text-faded mb-1 block">{t('advancedConfig.diff.rightScope', 'Right Scope')}</label>
                   <select
                     value={compareScope}
                     onChange={(e) => setCompareScope(e.target.value as ConfigurationScope)}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+                    className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
                   >
                     <option value="System">System</option>
                     <option value="Tenant">Tenant</option>
@@ -482,7 +482,7 @@ export function AdvancedConfigurationConsolePage() {
             </CardBody>
           </Card>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-faded">
             <ArrowLeftRight className="w-4 h-4" />
             {diffItems.length} {t('advancedConfig.diff.differences', 'differences found')}
           </div>
@@ -492,15 +492,15 @@ export function AdvancedConfigurationConsolePage() {
               <CardBody>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="font-medium text-sm">{def.displayName}</span>
-                  <span className="text-xs text-gray-400">{def.key}</span>
+                  <span className="text-xs text-muted">{def.key}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-                    <div className="text-xs text-red-600 dark:text-red-400 mb-1">{selectedScope}</div>
+                  <div className="p-3 bg-critical/15 rounded-lg">
+                    <div className="text-xs text-critical mb-1">{selectedScope}</div>
                     <pre className="text-xs overflow-x-auto">{def.isSensitive ? '***' : (leftVal ?? 'null')}</pre>
                   </div>
-                  <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg">
-                    <div className="text-xs text-green-600 dark:text-green-400 mb-1">{compareScope}</div>
+                  <div className="p-3 bg-success/15 rounded-lg">
+                    <div className="text-xs text-success mb-1">{compareScope}</div>
                     <pre className="text-xs overflow-x-auto">{def.isSensitive ? '***' : (rightVal ?? 'null')}</pre>
                   </div>
                 </div>
@@ -511,8 +511,8 @@ export function AdvancedConfigurationConsolePage() {
           {diffItems.length === 0 && (
             <Card>
               <CardBody>
-                <div className="text-center py-8 text-gray-500">
-                  <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-500" />
+                <div className="text-center py-8 text-faded">
+                  <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-success" />
                   <p>{t('advancedConfig.diff.noDifferences', 'No differences between the selected scopes.')}</p>
                 </div>
               </CardBody>
@@ -536,16 +536,16 @@ export function AdvancedConfigurationConsolePage() {
                 </div>
               </CardHeader>
               <CardBody>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-faded mb-4">
                   {t('advancedConfig.export.description', 'Export configuration definitions and effective values as a validated JSON file. Sensitive values are automatically masked.')}
                 </p>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">{t('advancedConfig.export.scope', 'Scope')}</label>
+                    <label className="text-xs text-faded mb-1 block">{t('advancedConfig.export.scope', 'Scope')}</label>
                     <select
                       value={selectedScope}
                       onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-                      className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+                      className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
                     >
                       <option value="System">System</option>
                       <option value="Tenant">Tenant</option>
@@ -553,17 +553,17 @@ export function AdvancedConfigurationConsolePage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">{t('advancedConfig.export.domain', 'Domain')}</label>
+                    <label className="text-xs text-faded mb-1 block">{t('advancedConfig.export.domain', 'Domain')}</label>
                     <select
                       value={activeDomain}
                       onChange={(e) => setActiveDomain(e.target.value as ConfigDomain)}
-                      className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+                      className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
                     >
                       {DOMAINS.map(d => <option key={d.key} value={d.key}>{d.key}</option>)}
                     </select>
                   </div>
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
-                    <div className="flex items-start gap-2 text-xs text-yellow-700 dark:text-yellow-300">
+                  <div className="bg-warning/15 p-3 rounded-lg">
+                    <div className="flex items-start gap-2 text-xs text-warning">
                       <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                       <span>{t('advancedConfig.export.sensitiveWarning', 'Sensitive values will be masked in the export for security.')}</span>
                     </div>
@@ -588,17 +588,17 @@ export function AdvancedConfigurationConsolePage() {
                 </div>
               </CardHeader>
               <CardBody>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-faded mb-4">
                   {t('advancedConfig.import.description', 'Import a previously exported configuration file. All values will be validated against current definitions before applying.')}
                 </p>
                 <div className="space-y-3">
-                  <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center">
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-500">{t('advancedConfig.import.dropzone', 'Drop JSON file here or click to select')}</p>
-                    <p className="text-xs text-gray-400 mt-1">{t('advancedConfig.import.format', 'Accepts NexTraceOne configuration export format')}</p>
+                  <div className="border-2 border-dashed border-edge rounded-lg p-8 text-center">
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted" />
+                    <p className="text-sm text-faded">{t('advancedConfig.import.dropzone', 'Drop JSON file here or click to select')}</p>
+                    <p className="text-xs text-muted mt-1">{t('advancedConfig.import.format', 'Accepts NexTraceOne configuration export format')}</p>
                   </div>
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                    <div className="flex items-start gap-2 text-xs text-blue-700 dark:text-blue-300">
+                  <div className="bg-info/15 p-3 rounded-lg">
+                    <div className="flex items-start gap-2 text-xs text-info">
                       <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
                       <span>{t('advancedConfig.import.previewNote', 'Import will show a preview and validation report before applying any changes.')}</span>
                     </div>
@@ -621,16 +621,16 @@ export function AdvancedConfigurationConsolePage() {
                 <RotateCcw className="w-5 h-5 text-brand-600" />
                 <h3 className="font-semibold">{t('advancedConfig.rollback.title', 'Configuration Rollback')}</h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-sm text-faded mb-6">
                 {t('advancedConfig.rollback.description', 'Select a configuration key to view its version history and restore a previous value. All rollbacks are audited and validated.')}
               </p>
 
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
                 <input
                   type="text"
                   placeholder={t('advancedConfig.rollback.searchKey', 'Search key to rollback...')}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm"
+                  className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     if (e.target.value.length > 3) {
@@ -643,14 +643,14 @@ export function AdvancedConfigurationConsolePage() {
 
               {selectedAuditKey && auditData && auditData.length > 0 && (
                 <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <h4 className="text-sm font-medium text-body">
                     {t('advancedConfig.rollback.historyFor', 'Version History for')} <code className="text-brand-600">{selectedAuditKey}</code>
                   </h4>
                   {auditData.map((entry, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <Clock className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div key={idx} className="flex items-start gap-3 p-3 bg-subtle rounded-lg">
+                      <Clock className="w-4 h-4 text-muted mt-0.5 flex-shrink-0" />
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-xs text-faded">
                           <span>{new Date(entry.changedAt).toLocaleString()}</span>
                           <span>•</span>
                           <span>{entry.changedBy}</span>
@@ -658,22 +658,22 @@ export function AdvancedConfigurationConsolePage() {
                         </div>
                         <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
                           {entry.previousValue !== null && (
-                            <div className="p-2 bg-red-50 dark:bg-red-900/10 rounded">
-                              <span className="text-red-600 dark:text-red-400">Previous:</span>
+                            <div className="p-2 bg-critical/15 rounded">
+                              <span className="text-critical">Previous:</span>
                               <pre className="mt-1 overflow-x-auto">{entry.isSensitive ? '***' : entry.previousValue}</pre>
                             </div>
                           )}
-                          <div className="p-2 bg-green-50 dark:bg-green-900/10 rounded">
-                            <span className="text-green-600 dark:text-green-400">New:</span>
+                          <div className="p-2 bg-success/15 rounded">
+                            <span className="text-success">New:</span>
                             <pre className="mt-1 overflow-x-auto">{entry.isSensitive ? '***' : entry.newValue}</pre>
                           </div>
                         </div>
                         {entry.changeReason && (
-                          <p className="text-xs text-gray-500 mt-1 italic">"{entry.changeReason}"</p>
+                          <p className="text-xs text-faded mt-1 italic">"{entry.changeReason}"</p>
                         )}
                       </div>
                       {idx > 0 && (
-                        <button className="flex items-center gap-1 px-2 py-1 text-xs text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded transition-colors">
+                        <button className="flex items-center gap-1 px-2 py-1 text-xs text-brand-600 hover:bg-brand-50 rounded transition-colors">
                           <RotateCcw className="w-3 h-3" />
                           {t('advancedConfig.rollback.restore', 'Restore')}
                         </button>
@@ -684,7 +684,7 @@ export function AdvancedConfigurationConsolePage() {
               )}
 
               {(!selectedAuditKey || !auditData || auditData.length === 0) && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-faded">
                   <RotateCcw className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>{t('advancedConfig.rollback.selectKey', 'Search and select a configuration key to view its version history.')}</p>
                 </div>
@@ -705,16 +705,16 @@ export function AdvancedConfigurationConsolePage() {
                 <History className="w-5 h-5 text-brand-600" />
                 <h3 className="font-semibold">{t('advancedConfig.history.title', 'Configuration Change Timeline')}</h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-faded mb-4">
                 {t('advancedConfig.history.description', 'View all configuration changes across domains. Filter by key, user, or time period.')}
               </p>
 
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
                 <input
                   type="text"
                   placeholder={t('advancedConfig.history.searchPlaceholder', 'Search by key...')}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm"
+                  className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
                   onChange={(e) => {
                     if (e.target.value.length > 2) setSelectedAuditKey(e.target.value);
                   }}
@@ -724,15 +724,15 @@ export function AdvancedConfigurationConsolePage() {
               {selectedAuditKey && auditData && auditData.length > 0 && (
                 <div className="space-y-2">
                   {auditData.map((entry, idx) => (
-                    <div key={idx} className="flex items-start gap-3 py-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                    <div key={idx} className="flex items-start gap-3 py-3 border-b border-edge last:border-0">
                       <div className="w-2 h-2 rounded-full bg-brand-500 mt-2 flex-shrink-0" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 text-xs">
-                          <span className="font-medium text-gray-700 dark:text-gray-300">{entry.key}</span>
+                          <span className="font-medium text-body">{entry.key}</span>
                           <Badge variant={entry.action === 'Set' ? 'success' : entry.action === 'Remove' ? 'danger' : 'default'} className="text-xs">{entry.action}</Badge>
-                          <span className="text-gray-400">{entry.scope}</span>
+                          <span className="text-muted">{entry.scope}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                        <div className="flex items-center gap-2 text-xs text-faded mt-1">
                           <span>{entry.changedBy}</span>
                           <span>•</span>
                           <span>{new Date(entry.changedAt).toLocaleString()}</span>
@@ -745,7 +745,7 @@ export function AdvancedConfigurationConsolePage() {
               )}
 
               {(!selectedAuditKey || !auditData || auditData.length === 0) && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-faded">
                   <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>{t('advancedConfig.history.empty', 'Enter a configuration key to view its change timeline.')}</p>
                 </div>
@@ -770,14 +770,14 @@ export function AdvancedConfigurationConsolePage() {
             <CardBody>
               <div className="space-y-3">
                 {healthChecks.map((check, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div key={idx} className="flex items-center justify-between p-3 bg-subtle rounded-lg">
                     <div className="flex items-center gap-3">
-                      {check.status === 'ok' && <CheckCircle2 className="w-5 h-5 text-green-500" />}
-                      {check.status === 'warning' && <AlertTriangle className="w-5 h-5 text-yellow-500" />}
-                      {check.status === 'error' && <XCircle className="w-5 h-5 text-red-500" />}
+                      {check.status === 'ok' && <CheckCircle2 className="w-5 h-5 text-success" />}
+                      {check.status === 'warning' && <AlertTriangle className="w-5 h-5 text-warning" />}
+                      {check.status === 'error' && <XCircle className="w-5 h-5 text-critical" />}
                       <span className="text-sm font-medium">{check.name}</span>
                     </div>
-                    <span className="text-xs text-gray-500">{check.message}</span>
+                    <span className="text-xs text-faded">{check.message}</span>
                   </div>
                 ))}
               </div>
@@ -793,33 +793,33 @@ export function AdvancedConfigurationConsolePage() {
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="text-center p-4 bg-subtle rounded-lg">
                   <p className="text-2xl font-bold text-brand-600">{definitions?.length ?? 0}</p>
-                  <p className="text-xs text-gray-500">{t('advancedConfig.health.totalDefinitions', 'Total Definitions')}</p>
+                  <p className="text-xs text-faded">{t('advancedConfig.health.totalDefinitions', 'Total Definitions')}</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-2xl font-bold text-yellow-600">{definitions?.filter((d: ConfigurationDefinitionDto) => d.isSensitive).length ?? 0}</p>
-                  <p className="text-xs text-gray-500">{t('advancedConfig.health.sensitiveDefinitions', 'Sensitive')}</p>
+                <div className="text-center p-4 bg-subtle rounded-lg">
+                  <p className="text-2xl font-bold text-warning">{definitions?.filter((d: ConfigurationDefinitionDto) => d.isSensitive).length ?? 0}</p>
+                  <p className="text-xs text-faded">{t('advancedConfig.health.sensitiveDefinitions', 'Sensitive')}</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">{definitions?.filter((d: ConfigurationDefinitionDto) => d.isEditable).length ?? 0}</p>
-                  <p className="text-xs text-gray-500">{t('advancedConfig.health.editableDefinitions', 'Editable')}</p>
+                <div className="text-center p-4 bg-subtle rounded-lg">
+                  <p className="text-2xl font-bold text-success">{definitions?.filter((d: ConfigurationDefinitionDto) => d.isEditable).length ?? 0}</p>
+                  <p className="text-xs text-faded">{t('advancedConfig.health.editableDefinitions', 'Editable')}</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600">{definitions?.filter((d: ConfigurationDefinitionDto) => !d.isInheritable).length ?? 0}</p>
-                  <p className="text-xs text-gray-500">{t('advancedConfig.health.mandatoryDefinitions', 'Mandatory (System-only)')}</p>
+                <div className="text-center p-4 bg-subtle rounded-lg">
+                  <p className="text-2xl font-bold text-info">{definitions?.filter((d: ConfigurationDefinitionDto) => !d.isInheritable).length ?? 0}</p>
+                  <p className="text-xs text-faded">{t('advancedConfig.health.mandatoryDefinitions', 'Mandatory (System-only)')}</p>
                 </div>
               </div>
 
               <div className="mt-6">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <h4 className="text-sm font-medium text-body mb-3">
                   {t('advancedConfig.health.domainBreakdown', 'Domain Breakdown')}
                 </h4>
                 <div className="space-y-2">
                   {DOMAINS.filter(d => d.key !== 'all').map(domain => {
                     const count = definitions?.filter((def: ConfigurationDefinitionDto) => matchDomain(def.key, domain)).length ?? 0;
                     return (
-                      <div key={domain.key} className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded">
+                      <div key={domain.key} className="flex items-center justify-between py-2 px-3 bg-subtle rounded">
                         <div className="flex items-center gap-2">
                           {domain.icon}
                           <span className="text-sm">{t(`advancedConfig.domains.${domain.key}`, domain.key)}</span>

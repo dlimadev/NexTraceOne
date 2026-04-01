@@ -81,7 +81,7 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
       {/* Left panel: Hero & Branding — hidden below lg */}
       <div
         className="hidden lg:flex lg:w-[55%] xl:w-[55%] flex-col justify-between p-12 xl:p-16 relative border-r border-edge"
-        style={{ background: 'linear-gradient(160deg, #0A1730 0%, #081120 100%)' }}
+        style={{ background: 'var(--t-sidebar-gradient)' }}
       >
         {/* Subtle grid overlay */}
         <div

@@ -125,7 +125,7 @@ export function BenchmarkingPage() {
                   title={t('governance.executive.benchmarkingIncidentRecurrence')}
                   value={comp.incidentRecurrenceRate != null ? `${comp.incidentRecurrenceRate}%` : '—'}
                   icon={<RefreshCw size={16} />}
-                  color={comp.incidentRecurrenceRate != null && comp.incidentRecurrenceRate > 15 ? 'text-critical' : 'text-amber-500'}
+                  color={comp.incidentRecurrenceRate != null && comp.incidentRecurrenceRate > 15 ? 'text-critical' : 'text-warning'}
                 />
                 <StatCard
                   title={t('governance.executive.benchmarkingMaturity')}
@@ -137,7 +137,7 @@ export function BenchmarkingPage() {
                   title={t('governance.executive.benchmarkingRisk')}
                   value={comp.riskScore ?? '—'}
                   icon={<TrendingUp size={16} />}
-                  color={comp.riskScore != null && comp.riskScore > 60 ? 'text-critical' : 'text-amber-500'}
+                  color={comp.riskScore != null && comp.riskScore > 60 ? 'text-critical' : 'text-warning'}
                 />
                 <div className="bg-card rounded-lg shadow-sm border border-edge p-3 flex flex-col items-center justify-center">
                   <DollarSign size={16} className="text-accent mb-1" />

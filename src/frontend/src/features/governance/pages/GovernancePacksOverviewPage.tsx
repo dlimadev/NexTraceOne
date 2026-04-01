@@ -143,7 +143,7 @@ export function GovernancePacksOverviewPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('governancePacks.totalPacks')} value={totalPacks} icon={<Package size={20} />} color="text-accent" />
         <StatCard title={t('governancePacks.published')} value={publishedCount} icon={<CheckCircle size={20} />} color="text-success" />
-        <StatCard title={t('governancePacks.draft')} value={draftCount} icon={<FileText size={20} />} color="text-amber-500" />
+        <StatCard title={t('governancePacks.draft')} value={draftCount} icon={<FileText size={20} />} color="text-warning" />
         <StatCard title={t('governancePacks.deprecated')} value={deprecatedCount} icon={<Archive size={20} />} color="text-muted" />
       </div>
 
