@@ -349,6 +349,46 @@ export function workserviceBuilderToYaml(state: WorkserviceBuilderState): SyncRe
   if (state.sideEffects) yaml += `sideEffects: "${esc(state.sideEffects)}"\n`;
   if (state.healthCheck) yaml += `healthCheck: "${esc(state.healthCheck)}"\n`;
 
+  // ── Messaging Role ────────────────────────────────────────────────────────
+  if (state.messagingRole && state.messagingRole !== 'None') {
+    yaml += `\nmessaging:\n`;
+    yaml += `  role: ${state.messagingRole}\n`;
+
+    if ((state.messagingRole === 'Consumer' || state.messagingRole === 'Both') && state.consumedTopics.length > 0) {
+      yaml += `  consumedTopics:\n`;
+      for (const t of state.consumedTopics) {
+        yaml += `    - topicName: "${esc(t.topicName)}"\n`;
+        if (t.entityType) yaml += `      entityType: "${esc(t.entityType)}"\n`;
+        if (t.format) yaml += `      format: ${t.format}\n`;
+      }
+    }
+
+    if ((state.messagingRole === 'Producer' || state.messagingRole === 'Both') && state.producedTopics.length > 0) {
+      yaml += `  producedTopics:\n`;
+      for (const t of state.producedTopics) {
+        yaml += `    - topicName: "${esc(t.topicName)}"\n`;
+        if (t.entityType) yaml += `      entityType: "${esc(t.entityType)}"\n`;
+        if (t.format) yaml += `      format: ${t.format}\n`;
+      }
+    }
+
+    if ((state.messagingRole === 'Consumer' || state.messagingRole === 'Both') && state.consumedServices.length > 0) {
+      yaml += `  consumedServices:\n`;
+      for (const s of state.consumedServices) {
+        yaml += `    - serviceName: "${esc(s.serviceName)}"\n`;
+        if (s.protocol) yaml += `      protocol: ${s.protocol}\n`;
+      }
+    }
+
+    if ((state.messagingRole === 'Producer' || state.messagingRole === 'Both') && state.producedEvents.length > 0) {
+      yaml += `  producedEvents:\n`;
+      for (const e of state.producedEvents) {
+        yaml += `    - eventName: "${esc(e.eventName)}"\n`;
+        if (e.targetTopic) yaml += `      targetTopic: "${esc(e.targetTopic)}"\n`;
+      }
+    }
+  }
+
   if (state.observabilityNotes) {
     yaml += `\nobservability:\n`;
     yaml += `  notes: "${esc(state.observabilityNotes)}"\n`;

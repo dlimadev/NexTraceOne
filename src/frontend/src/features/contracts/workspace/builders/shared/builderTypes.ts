@@ -170,6 +170,31 @@ export interface EventBuilderState {
 
 export type TriggerType = 'Cron' | 'Queue' | 'Event' | 'Manual' | 'Webhook';
 
+/** Role de messaging de um Background Service: None, Producer, Consumer, Both. */
+export type MessagingRole = 'None' | 'Producer' | 'Consumer' | 'Both';
+
+/** Tópico/fila consumido ou produzido por um Background Service. */
+export interface MessagingTopic {
+  id: string;
+  topicName: string;
+  entityType: string;
+  format: 'avro' | 'json' | 'protobuf' | '';
+}
+
+/** Serviço consumido por um Background Service. */
+export interface ConsumedService {
+  id: string;
+  serviceName: string;
+  protocol: 'REST' | 'gRPC' | 'SOAP' | '';
+}
+
+/** Evento produzido por um Background Service. */
+export interface ProducedEvent {
+  id: string;
+  eventName: string;
+  targetTopic: string;
+}
+
 export interface WorkserviceDependency {
   id: string;
   name: string;
@@ -192,6 +217,16 @@ export interface WorkserviceBuilderState {
   owner: string;
   observabilityNotes: string;
   healthCheck: string;
+  /** Role de messaging: None, Producer, Consumer, Both. */
+  messagingRole: MessagingRole;
+  /** Tópicos/filas consumidos pelo processo. */
+  consumedTopics: MessagingTopic[];
+  /** Tópicos/filas produzidos pelo processo. */
+  producedTopics: MessagingTopic[];
+  /** Serviços consumidos pelo processo. */
+  consumedServices: ConsumedService[];
+  /** Eventos produzidos pelo processo. */
+  producedEvents: ProducedEvent[];
 }
 
 // ── Validation ────────────────────────────────────────────────────────────────

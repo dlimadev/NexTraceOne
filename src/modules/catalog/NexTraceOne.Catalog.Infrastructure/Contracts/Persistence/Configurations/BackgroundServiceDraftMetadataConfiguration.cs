@@ -33,6 +33,13 @@ internal sealed class BackgroundServiceDraftMetadataConfiguration : IEntityTypeC
         builder.Property(x => x.OutputsJson).HasColumnType("text").IsRequired();
         builder.Property(x => x.SideEffectsJson).HasColumnType("text").IsRequired();
 
+        // Messaging role fields
+        builder.Property(x => x.MessagingRole).HasMaxLength(50).IsRequired().HasDefaultValue("None");
+        builder.Property(x => x.ConsumedTopicsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ProducedTopicsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ConsumedServicesJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ProducedEventsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+
         // Um BackgroundServiceDraftMetadata por ContractDraft (1:0..1)
         builder.HasIndex(x => x.ContractDraftId).IsUnique();
     }
