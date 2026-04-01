@@ -211,7 +211,7 @@ export function ContractPortalPage() {
           <GlossaryTab />
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -529,7 +529,7 @@ function SecurityTab({
           )}
         </CardBody>
       </Card>
-    </PageContainer>
+    </div>
   );
 }
 

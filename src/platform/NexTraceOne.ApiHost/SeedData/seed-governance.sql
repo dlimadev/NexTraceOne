@@ -5,6 +5,9 @@
 -- Table/column names must match EF Core entity configurations exactly.
 -- ============================================================================
 
+BEGIN;
+SET CONSTRAINTS ALL DEFERRED;
+
 -- ── TEAMS ───────────────────────────────────────────────────────────────────
 
 -- Platform Team: responsável pela infraestrutura e serviços transversais
@@ -75,100 +78,116 @@ VALUES (
 -- ── GOVERNANCE DOMAINS ──────────────────────────────────────────────────────
 
 -- Core Services Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000001',
     'core-services',
     'Core Services',
     'Serviços core da plataforma: autenticação, autorização, gestão de utilizadores e configurações.',
     'Critical',
-    'Platform'
+    'Platform',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Payments Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000002',
     'payments',
     'Payments',
     'Serviços de processamento de pagamentos, gateways e reconciliação financeira.',
     'Critical',
-    'Business'
+    'Business',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Orders Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000003',
     'orders',
     'Orders',
     'Gestão de encomendas, carrinho de compras e fulfillment.',
     'High',
-    'Business'
+    'Business',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Notifications Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000004',
     'notifications',
     'Notifications',
     'Serviços de notificações: email, SMS, push e webhooks.',
     'Medium',
-    'Support'
+    'Support',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Analytics Domain
-INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification")
+INSERT INTO "gov_domains" ("Id", "Name", "DisplayName", "Description", "Criticality", "CapabilityClassification", "CreatedAt", "UpdatedAt")
 VALUES (
     '20000000-0000-0000-0000-000000000005',
     'analytics',
     'Analytics',
     'Ingestão, processamento e visualização de dados analíticos e operacionais.',
     'Medium',
-    'Data'
+    'Data',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- ── GOVERNANCE PACKS ────────────────────────────────────────────────────────
 
 -- API Contract Standards Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000001',
     'api-contract-standards',
     'API Contract Standards',
     'Padrões obrigatórios para contratos de API REST: versionamento, exemplos, schemas, headers.',
     'ContractQuality',
-    'Active',
-    '1.0.0'
+    'Published',
+    '1.0.0',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Security Baseline Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000002',
     'security-baseline',
     'Security Baseline',
     'Requisitos mínimos de segurança: autenticação, autorização, rate limiting, input validation.',
     'Security',
-    'Active',
-    '1.0.0'
+    'Published',
+    '1.0.0',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Observability Standards Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000003',
     'observability-standards',
     'Observability Standards',
     'Padrões de observabilidade: métricas, logs estruturados, traces, health checks.',
     'Observability',
-    'Active',
-    '1.0.0'
+    'Published',
+    '1.0.0',
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Change Management Pack
-INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion")
+INSERT INTO "gov_packs" ("Id", "Name", "DisplayName", "Description", "Category", "Status", "CurrentVersion", "CreatedAt", "UpdatedAt")
 VALUES (
     '30000000-0000-0000-0000-000000000004',
     'change-management',
@@ -176,13 +195,15 @@ VALUES (
     'Regras de gestão de mudanças: aprovações, blast radius, rollback plans.',
     'ChangeManagement',
     'Draft',
-    NULL
+    NULL,
+    NOW(),
+    NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- ── GOVERNANCE PACK VERSIONS ────────────────────────────────────────────────
 
 -- API Contract Standards v1.0.0
-INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "PublishedAt")
+INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "CreatedAt", "PublishedAt")
 VALUES (
     '40000000-0000-0000-0000-000000000001',
     '30000000-0000-0000-0000-000000000001',
@@ -195,11 +216,12 @@ VALUES (
     'Blocking',
     'Versão inicial do pack de padrões de contratos API.',
     'system',
+    NOW(),
     NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Security Baseline v1.0.0
-INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "PublishedAt")
+INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "CreatedAt", "PublishedAt")
 VALUES (
     '40000000-0000-0000-0000-000000000002',
     '30000000-0000-0000-0000-000000000002',
@@ -212,11 +234,12 @@ VALUES (
     'Blocking',
     'Versão inicial do pack de segurança baseline.',
     'system',
+    NOW(),
     NOW()
 ) ON CONFLICT DO NOTHING;
 
 -- Observability Standards v1.0.0
-INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "PublishedAt")
+INSERT INTO "gov_pack_versions" ("Id", "PackId", "Version", "Rules", "DefaultEnforcementMode", "ChangeDescription", "CreatedBy", "CreatedAt", "PublishedAt")
 VALUES (
     '40000000-0000-0000-0000-000000000003',
     '30000000-0000-0000-0000-000000000003',
@@ -229,6 +252,7 @@ VALUES (
     'Warning',
     'Versão inicial do pack de padrões de observabilidade.',
     'system',
+    NOW(),
     NOW()
 ) ON CONFLICT DO NOTHING;
 
@@ -328,7 +352,7 @@ VALUES (
 INSERT INTO "gov_waivers" ("Id", "PackId", "RuleId", "Scope", "ScopeType", "Justification", "Status", "RequestedBy", "RequestedAt", "ReviewedBy", "ReviewedAt", "ExpiresAt", "EvidenceLinks")
 VALUES (
     '70000000-0000-0000-0000-000000000001',
-    '30000000-0000-0000-0000-000000000002',
+    (SELECT "Id" FROM "gov_packs" WHERE "Name" = 'security-baseline'),
     'must-have-rate-limit',
     'internal-batch-service',
     'Service',
@@ -346,7 +370,7 @@ VALUES (
 INSERT INTO "gov_waivers" ("Id", "PackId", "RuleId", "Scope", "ScopeType", "Justification", "Status", "RequestedBy", "RequestedAt", "ReviewedBy", "ReviewedAt", "ExpiresAt", "EvidenceLinks")
 VALUES (
     '70000000-0000-0000-0000-000000000002',
-    '30000000-0000-0000-0000-000000000001',
+    (SELECT "Id" FROM "gov_packs" WHERE "Name" = 'api-contract-standards'),
     'api-must-have-examples',
     'legacy-integration-api',
     'Service',
@@ -391,3 +415,5 @@ VALUES (
     NOW() - interval '1 hour',
     NULL
 ) ON CONFLICT DO NOTHING;
+
+COMMIT;

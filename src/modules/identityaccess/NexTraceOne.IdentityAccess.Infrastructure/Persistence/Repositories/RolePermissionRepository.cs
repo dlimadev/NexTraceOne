@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
@@ -19,24 +20,33 @@ internal sealed class RolePermissionRepository(IdentityDbContext context) : IRol
     {
         // Prioridade: se existem mapeamentos para o tenant, usar esses;
         // caso contrário, usar mapeamentos do sistema (TenantId nulo).
-        var tenantMappings = await context.RolePermissions
-            .Where(rp => rp.RoleId == roleId
-                         && rp.TenantId != null
-                         && rp.TenantId == tenantId
-                         && rp.IsActive)
-            .Select(rp => rp.PermissionCode)
-            .ToListAsync(cancellationToken);
+        try
+        {
+            var tenantMappings = await context.RolePermissions
+                .Where(rp => rp.RoleId == roleId
+                             && rp.TenantId != null
+                             && rp.TenantId == tenantId
+                             && rp.IsActive)
+                .Select(rp => rp.PermissionCode)
+                .ToListAsync(cancellationToken);
 
-        if (tenantMappings.Count > 0)
-            return tenantMappings;
+            if (tenantMappings.Count > 0)
+                return tenantMappings;
 
-        // Fallback: mapeamentos do sistema (TenantId nulo).
-        return await context.RolePermissions
-            .Where(rp => rp.RoleId == roleId
-                         && rp.TenantId == null
-                         && rp.IsActive)
-            .Select(rp => rp.PermissionCode)
-            .ToListAsync(cancellationToken);
+            // Fallback: mapeamentos do sistema (TenantId nulo).
+            return await context.RolePermissions
+                .Where(rp => rp.RoleId == roleId
+                             && rp.TenantId == null
+                             && rp.IsActive)
+                .Select(rp => rp.PermissionCode)
+                .ToListAsync(cancellationToken);
+        }
+        catch (PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            // Table does not exist yet (migrations not applied). Return empty result
+            // to allow the application to continue in development scenarios.
+            return Array.Empty<string>();
+        }
     }
 
     /// <inheritdoc />
@@ -45,11 +55,19 @@ internal sealed class RolePermissionRepository(IdentityDbContext context) : IRol
         TenantId? tenantId,
         CancellationToken cancellationToken)
     {
-        return await context.RolePermissions
-            .AnyAsync(rp => rp.RoleId == roleId
-                            && (rp.TenantId == tenantId || rp.TenantId == null)
-                            && rp.IsActive,
-                cancellationToken);
+        try
+        {
+            return await context.RolePermissions
+                .AnyAsync(rp => rp.RoleId == roleId
+                                && (rp.TenantId == tenantId || rp.TenantId == null)
+                                && rp.IsActive,
+                    cancellationToken);
+        }
+        catch (PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            // Table missing — treat as no mappings found.
+            return false;
+        }
     }
 
     /// <inheritdoc />

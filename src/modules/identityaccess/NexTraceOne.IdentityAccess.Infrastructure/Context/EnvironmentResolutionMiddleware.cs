@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 namespace NexTraceOne.IdentityAccess.Infrastructure.Context;
 
@@ -78,8 +79,20 @@ public sealed class EnvironmentResolutionMiddleware(
         var tenantId = new TenantId(currentTenant.Id);
         var environmentId = new EnvironmentId(rawEnvironmentId);
 
-        var tenantEnvContext = await contextResolver.ResolveAsync(
-            tenantId, environmentId, context.RequestAborted);
+        TenantEnvironmentContext? tenantEnvContext;
+        try
+        {
+            tenantEnvContext = await contextResolver.ResolveAsync(
+                tenantId, environmentId, context.RequestAborted);
+        }
+        catch (OperationCanceledException)
+        {
+            // Request was aborted (client disconnected or timeout). Treat resolution as skipped.
+            logger.LogDebug(
+                "Environment resolution canceled: request aborted while resolving EnvironmentId={EnvironmentId}",
+                rawEnvironmentId);
+            return;
+        }
 
         if (tenantEnvContext is null)
         {
@@ -93,15 +106,15 @@ public sealed class EnvironmentResolutionMiddleware(
         }
 
         environmentContextAccessor.Set(
-            tenantEnvContext.EnvironmentId,
-            tenantEnvContext.Profile,
-            tenantEnvContext.IsProductionLike);
+            tenantEnvContext!.EnvironmentId,
+            tenantEnvContext!.Profile,
+            tenantEnvContext!.IsProductionLike);
 
         logger.LogDebug(
             "Environment resolved: EnvironmentId={EnvironmentId}, Profile={Profile}, ProductionLike={ProductionLike}",
             rawEnvironmentId,
-            tenantEnvContext.Profile,
-            tenantEnvContext.IsProductionLike);
+            tenantEnvContext!.Profile,
+            tenantEnvContext!.IsProductionLike);
     }
 
     private static bool TryResolveEnvironmentId(HttpContext context, out Guid environmentId)

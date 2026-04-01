@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import SimpleSplitPane from '/src/components/SimpleSplitPane';
 import { GripVertical, Check, AlertTriangle } from 'lucide-react';
 import { MonacoEditorWrapper } from './MonacoEditorWrapper';
 import { LivePreviewRenderer } from './LivePreviewRenderer';
@@ -28,6 +29,7 @@ export function ContractEditorSplitPane({
   className = '',
 }: ContractEditorSplitPaneProps) {
   const { t } = useTranslation();
+  // Use internal simple split pane to avoid dependency issues in dev.
   const { preview, error, isLoading } = useSpecPreview(content, protocol);
 
   const monacoLanguage = format === 'xml' ? 'xml' : format === 'json' ? 'json' : 'yaml';
@@ -36,72 +38,70 @@ export function ContractEditorSplitPane({
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* ── Split panels ── */}
-      <PanelGroup direction="horizontal" className="flex-1 min-h-0">
-        {/* ── Editor Panel (left) ── */}
-        <Panel defaultSize={50} minSize={25} className="flex flex-col min-w-0">
-          <div className="flex items-center gap-2 px-2 py-1 border-b border-edge bg-panel/50">
-            <span className="text-[10px] text-muted px-2 py-0.5 rounded bg-elevated border border-edge uppercase">
-              {monacoLanguage}
-            </span>
-            <span className="text-[10px] text-muted">
-              {t('contracts.workspace.lineCount', '{{count}} lines', { count: lineCount })}
-            </span>
-            {isReadOnly && (
-              <span className="text-[10px] text-muted px-2 ml-auto">
-                {t('contracts.readOnly', 'Read-only')}
+      <SimpleSplitPane
+        className="flex-1 min-h-0"
+        initialLeftPercent={50}
+        left={(
+          <>
+            <div className="flex items-center gap-2 px-2 py-1 border-b border-edge bg-panel/50">
+              <span className="text-[10px] text-muted px-2 py-0.5 rounded bg-elevated border border-edge uppercase">
+                {monacoLanguage}
               </span>
-            )}
-          </div>
-          <div className="flex-1 min-h-0">
-            <MonacoEditorWrapper
-              value={content}
-              language={monacoLanguage}
-              isReadOnly={isReadOnly}
-              onChange={onChange}
-            />
-          </div>
-        </Panel>
-
-        {/* ── Resize Handle ── */}
-        <PanelResizeHandle className="w-1.5 bg-edge hover:bg-accent/40 transition-colors flex items-center justify-center cursor-col-resize group">
-          <GripVertical size={12} className="text-muted/40 group-hover:text-accent transition-colors" />
-        </PanelResizeHandle>
-
-        {/* ── Preview Panel (right) ── */}
-        <Panel defaultSize={50} minSize={20} className="flex flex-col min-w-0">
-          <div className="flex items-center gap-2 px-2 py-1 border-b border-edge bg-panel/50">
-            <span className="text-[10px] font-medium text-muted uppercase tracking-wider">
-              {t('contracts.workspace.splitEditor.livePreview', 'Live Preview')}
-            </span>
-            <div className="ml-auto flex items-center gap-2">
-              {isLoading && (
-                <span className="text-[10px] text-muted animate-pulse">
-                  {t('contracts.workspace.splitEditor.updating', 'Updating...')}
-                </span>
-              )}
-              {!isLoading && preview && !error && (
-                <span className="inline-flex items-center gap-1 text-[10px] text-mint">
-                  <Check size={10} />
-                  {t('contracts.workspace.splitEditor.valid', 'Valid')}
-                </span>
-              )}
-              {!isLoading && error && (
-                <span className="inline-flex items-center gap-1 text-[10px] text-warning">
-                  <AlertTriangle size={10} />
-                  {t('contracts.workspace.splitEditor.invalid', 'Invalid')}
+              <span className="text-[10px] text-muted">
+                {t('contracts.workspace.lineCount', '{{count}} lines', { count: lineCount })}
+              </span>
+              {isReadOnly && (
+                <span className="text-[10px] text-muted px-2 ml-auto">
+                  {t('contracts.readOnly', 'Read-only')}
                 </span>
               )}
             </div>
-          </div>
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <LivePreviewRenderer
-              preview={preview}
-              error={error}
-              isLoading={isLoading}
-            />
-          </div>
-        </Panel>
-      </PanelGroup>
+            <div className="flex-1 min-h-0">
+              <MonacoEditorWrapper
+                value={content}
+                language={monacoLanguage}
+                isReadOnly={isReadOnly}
+                onChange={onChange}
+              />
+            </div>
+          </>
+        )}
+        right={(
+          <>
+            <div className="flex items-center gap-2 px-2 py-1 border-b border-edge bg-panel/50">
+              <span className="text-[10px] font-medium text-muted uppercase tracking-wider">
+                {t('contracts.workspace.splitEditor.livePreview', 'Live Preview')}
+              </span>
+              <div className="ml-auto flex items-center gap-2">
+                {isLoading && (
+                  <span className="text-[10px] text-muted animate-pulse">
+                    {t('contracts.workspace.splitEditor.updating', 'Updating...')}
+                  </span>
+                )}
+                {!isLoading && preview && !error && (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-mint">
+                    <Check size={10} />
+                    {t('contracts.workspace.splitEditor.valid', 'Valid')}
+                  </span>
+                )}
+                {!isLoading && error && (
+                  <span className="inline-flex items-center gap-1 text-[10px] text-warning">
+                    <AlertTriangle size={10} />
+                    {t('contracts.workspace.splitEditor.invalid', 'Invalid')}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <LivePreviewRenderer
+                preview={preview}
+                error={error}
+                isLoading={isLoading}
+              />
+            </div>
+          </>
+        )}
+      />
 
       {/* ── Status bar ── */}
       <div className="flex items-center gap-3 px-3 py-1 border-t border-edge bg-panel text-[10px] text-muted">

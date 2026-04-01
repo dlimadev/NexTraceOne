@@ -68,6 +68,11 @@ public static class DependencyInjection
         services.AddScoped<IAiAgentExecutionRepository, AiAgentExecutionRepository>();
         services.AddScoped<IAiAgentArtifactRepository, AiAgentArtifactRepository>();
         services.AddScoped<IAiKnowledgeSourceWeightRepository, AiKnowledgeSourceWeightRepository>();
+        // Repository for persisted tool definitions (Phase 4)
+        services.AddScoped<IAiToolDefinitionRepository, AiToolDefinitionRepository>();
+        services.AddScoped<IPromptTemplateRepository, PromptTemplateRepository>();
+        services.AddScoped<IAiGuardrailRepository, AiGuardrailRepository>();
+        services.AddScoped<IAiEvaluationRepository, AiEvaluationRepository>();
         services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
 

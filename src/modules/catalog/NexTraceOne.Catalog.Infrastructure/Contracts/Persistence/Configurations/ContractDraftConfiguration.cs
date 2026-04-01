@@ -35,7 +35,9 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         builder.Property(x => x.Author).HasMaxLength(200).IsRequired();
 
         builder.Property(x => x.ContractType)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString(),
+                s => ParseContractType(s))
             .HasMaxLength(50)
             .IsRequired();
 
@@ -80,5 +82,49 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
             .HasForeignKey(e => e.DraftId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private static ContractType ParseContractType(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s))
+            return ContractType.RestApi;
+
+        // Try direct enum parse (case-insensitive)
+        if (Enum.TryParse<ContractType>(s, true, out var parsed))
+            return parsed;
+
+        // Handle legacy string values that were stored in older schema versions
+        switch (s.Trim().ToLowerInvariant())
+        {
+            case "api":
+            case "rest":
+            case "restapi":
+                return ContractType.RestApi;
+            case "soap":
+                return ContractType.Soap;
+            case "event":
+            case "eventapi":
+                return ContractType.Event;
+            case "background":
+            case "backgroundservice":
+                return ContractType.BackgroundService;
+            case "sharedschema":
+            case "schema":
+                return ContractType.SharedSchema;
+            case "copybook":
+                return ContractType.Copybook;
+            case "mqmessage":
+            case "mq":
+                return ContractType.MqMessage;
+            case "fixedlayout":
+                return ContractType.FixedLayout;
+            case "cicscomarea":
+                return ContractType.CicsCommarea;
+            case "webhook":
+                return ContractType.Webhook;
+            default:
+                // Fallback to RestApi to avoid failures for unknown legacy values.
+                return ContractType.RestApi;
+        }
     }
 }

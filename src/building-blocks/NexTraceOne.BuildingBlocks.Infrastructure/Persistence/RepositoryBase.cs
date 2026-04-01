@@ -17,7 +17,7 @@ public abstract class RepositoryBase<TEntity, TId>(DbContext context)
     protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
 
     public virtual async Task<TEntity?> GetByIdAsync(TId id, CancellationToken ct = default)
-        => await DbSet.FindAsync([id], ct);
+        => await DbSet.FindAsync(new object[] { id }, ct);
 
     public async Task<TEntity> GetByIdOrThrowAsync(TId id, CancellationToken ct = default)
     {

@@ -1,6 +1,29 @@
+/// <reference types="vite/client" />
+import * as monaco from 'monaco-editor';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import { useCallback, useRef } from 'react';
-import Editor, { type OnMount, type OnChange } from '@monaco-editor/react';
-import type * as Monaco from 'monaco-editor';
+import Editor, { loader, type OnMount, type OnChange } from '@monaco-editor/react';
+
+// ---------------------------------------------------------------------------
+// Monaco bootstrap — executado uma vez no carregamento do módulo.
+//
+// 1. MonacoEnvironment.getWorker: usa o import nativo ?worker do Vite para
+//    criar workers a partir de URLs same-origin (bundled pelo Vite).
+//    Não usa blob: nem CDN — compatível com CSP strict-dynamic / script-src 'self'.
+//
+// 2. loader.config({ monaco }): passa a instância do monaco-editor instalado
+//    localmente para o @monaco-editor/react, eliminando completamente qualquer
+//    requisição HTTP ao loader.js ou CDN. Sem script injection, sem 404s.
+// ---------------------------------------------------------------------------
+(self as any).MonacoEnvironment = {
+  getWorker(_: unknown, label: string): Worker {
+    if (label === 'json') return new jsonWorker();
+    return new editorWorker();
+  },
+};
+
+loader.config({ monaco });
 
 interface MonacoEditorWrapperProps {
   value: string;
@@ -22,13 +45,13 @@ export function MonacoEditorWrapper({
   onChange,
   className = '',
 }: MonacoEditorWrapperProps) {
-  const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const handleMount: OnMount = useCallback((editor, monaco) => {
+  const handleMount: OnMount = useCallback((editor, monacoInstance) => {
     editorRef.current = editor;
 
     // Define NexTraceOne dark theme
-    monaco.editor.defineTheme('nto-dark', {
+    monacoInstance.editor.defineTheme('nto-dark', {
       base: 'vs-dark',
       inherit: true,
       rules: [
@@ -53,7 +76,7 @@ export function MonacoEditorWrapper({
       },
     });
 
-    monaco.editor.setTheme('nto-dark');
+    monacoInstance.editor.setTheme('nto-dark');
   }, []);
 
   const handleChange: OnChange = useCallback(

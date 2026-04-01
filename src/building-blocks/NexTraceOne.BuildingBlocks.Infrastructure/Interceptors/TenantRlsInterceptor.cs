@@ -93,7 +93,21 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
         }
 
         using var configCmd = CreateTenantCommand(command);
-        configCmd.ExecuteNonQuery();
+
+        if (command.CommandTimeout > 0)
+        {
+            configCmd.CommandTimeout = command.CommandTimeout;
+        }
+
+        try
+        {
+            configCmd.ExecuteNonQuery();
+        }
+        catch (OperationCanceledException)
+        {
+            // swallow cancellation here to avoid the interceptor bubbling the exception
+            // to EF Core internals; the main operation will observe cancellation as needed.
+        }
     }
 
     /// <summary>
@@ -109,7 +123,22 @@ public sealed class TenantRlsInterceptor(ICurrentTenant currentTenant) : DbComma
         }
 
         await using var configCmd = CreateTenantCommand(command);
-        await configCmd.ExecuteNonQueryAsync(cancellationToken);
+        // align timeouts so the helper command doesn't outlive the main command
+        if (command.CommandTimeout > 0)
+        {
+            configCmd.CommandTimeout = command.CommandTimeout;
+        }
+
+        try
+        {
+            await configCmd.ExecuteNonQueryAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // cancellation requested for the overall operation — swallow here so the
+            // interceptor doesn't mask upstream handling. The caller will observe
+            // cancellation via its own token as appropriate.
+        }
     }
 
     /// <summary>
