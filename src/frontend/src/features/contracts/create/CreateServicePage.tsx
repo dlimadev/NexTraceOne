@@ -239,7 +239,7 @@ export function CreateServicePage() {
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium
               ${step === s ? 'bg-accent text-white' :
-                i < ['type', 'mode', 'details'].indexOf(step) ? 'bg-emerald-900/40 text-emerald-300' :
+                i < ['type', 'mode', 'details'].indexOf(step) ? 'bg-success/15 text-success' :
                 'bg-elevated text-muted'}`}
             >
               {i + 1}
@@ -678,7 +678,7 @@ export function CreateServicePage() {
           </Card>
 
           {createMutation.isError && (
-            <div className="text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded-md px-3 py-2">
+            <div className="text-xs text-critical bg-critical/15 border border-critical/25 rounded-md px-3 py-2">
               {t('contracts.errors.createVersionFailed', 'Failed to create contract')}
             </div>
           )}

@@ -67,11 +67,11 @@ export function SecuritySection({ specContent, protocol, isReadOnly = false, onS
       <div className="flex items-center gap-4 p-4 rounded-lg bg-panel border border-edge">
         <div className="flex-shrink-0">
           {securityScore >= 80 ? (
-            <ShieldCheck size={28} className="text-emerald-400" />
+            <ShieldCheck size={28} className="text-success" />
           ) : securityScore >= 50 ? (
-            <Shield size={28} className="text-amber-400" />
+            <Shield size={28} className="text-warning" />
           ) : (
-            <ShieldAlert size={28} className="text-red-400" />
+            <ShieldAlert size={28} className="text-critical" />
           )}
         </div>
         <div className="flex-1">
@@ -80,7 +80,7 @@ export function SecuritySection({ specContent, protocol, isReadOnly = false, onS
               {t('contracts.security.score', 'Security Score')}
             </h3>
             <span className={`text-sm font-bold ${
-              securityScore >= 80 ? 'text-emerald-400' : securityScore >= 50 ? 'text-amber-400' : 'text-red-400'
+              securityScore >= 80 ? 'text-success' : securityScore >= 50 ? 'text-warning' : 'text-critical'
             }`}>
               {securityScore}%
             </span>
@@ -98,7 +98,7 @@ export function SecuritySection({ specContent, protocol, isReadOnly = false, onS
           <div className="h-1.5 bg-elevated rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${
-                securityScore >= 80 ? 'bg-emerald-400' : securityScore >= 50 ? 'bg-amber-400' : 'bg-red-400'
+                securityScore >= 80 ? 'bg-success/15' : securityScore >= 50 ? 'bg-warning/15' : 'bg-critical/15'
               }`}
               style={{ width: `${securityScore}%` }}
             />
@@ -285,17 +285,17 @@ function SelectField({ label, value, onChange, options, disabled }: { label: str
 
 function StateIndicator({ label, state }: { label: string; state: string }) {
   const color =
-    state === 'Passed' ? 'text-emerald-400' :
-    state === 'In Progress' ? 'text-blue-400' :
-    state === 'Failed' ? 'text-red-400' :
-    state === 'Waived' ? 'text-amber-400' :
+    state === 'Passed' ? 'text-success' :
+    state === 'In Progress' ? 'text-info' :
+    state === 'Failed' ? 'text-critical' :
+    state === 'Waived' ? 'text-warning' :
     'text-muted';
 
   const bg =
-    state === 'Passed' ? 'bg-emerald-900/30 border-emerald-700/40' :
-    state === 'In Progress' ? 'bg-blue-900/30 border-blue-700/40' :
-    state === 'Failed' ? 'bg-red-900/30 border-red-700/40' :
-    state === 'Waived' ? 'bg-amber-900/30 border-amber-700/40' :
+    state === 'Passed' ? 'bg-success/15 border-success/25' :
+    state === 'In Progress' ? 'bg-info/15 border-info/25' :
+    state === 'Failed' ? 'bg-critical/15 border-critical/25' :
+    state === 'Waived' ? 'bg-warning/15 border-warning/25' :
     'bg-elevated border-edge';
 
   return (

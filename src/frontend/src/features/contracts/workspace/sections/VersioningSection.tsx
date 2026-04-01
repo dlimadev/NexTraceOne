@@ -154,7 +154,7 @@ export function VersioningSection({ apiAssetId, currentVersionId, className = ''
 
           {/* Diff results */}
           {diffMutation.isError && (
-            <div className="text-xs text-red-400 mb-2">
+            <div className="text-xs text-critical mb-2">
               {t('contracts.errors.diffFailed', 'Failed to compute diff')}
             </div>
           )}
@@ -185,9 +185,9 @@ function DiffResults({ data }: { data: SemanticDiff }) {
     Icon: typeof AlertTriangle;
     changes: ChangeEntry[];
   }> = [
-    { key: 'breakingChanges', labelKey: 'contracts.diff.breakingChanges', color: 'text-red-400', Icon: AlertTriangle, changes: breakingChanges },
-    { key: 'additiveChanges', labelKey: 'contracts.diff.additiveChanges', color: 'text-emerald-400', Icon: Plus, changes: additiveChanges },
-    { key: 'nonBreakingChanges', labelKey: 'contracts.diff.nonBreakingChanges', color: 'text-blue-400', Icon: Minus, changes: nonBreakingChanges },
+    { key: 'breakingChanges', labelKey: 'contracts.diff.breakingChanges', color: 'text-critical', Icon: AlertTriangle, changes: breakingChanges },
+    { key: 'additiveChanges', labelKey: 'contracts.diff.additiveChanges', color: 'text-success', Icon: Plus, changes: additiveChanges },
+    { key: 'nonBreakingChanges', labelKey: 'contracts.diff.nonBreakingChanges', color: 'text-info', Icon: Minus, changes: nonBreakingChanges },
   ];
 
   return (
@@ -195,9 +195,9 @@ function DiffResults({ data }: { data: SemanticDiff }) {
       {/* Summary badges */}
       <div className="flex items-center gap-3">
         <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-          changeLevel === 'Breaking' ? 'bg-red-900/30 text-red-400' :
-          changeLevel === 'Additive' ? 'bg-emerald-900/30 text-emerald-400' :
-          'bg-blue-900/30 text-blue-400'
+          changeLevel === 'Breaking' ? 'bg-critical/15 text-critical' :
+          changeLevel === 'Additive' ? 'bg-success/15 text-success' :
+          'bg-info/15 text-info'
         }`}>
           {changeLevel}
         </span>

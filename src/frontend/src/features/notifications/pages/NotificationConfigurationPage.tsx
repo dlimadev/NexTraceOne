@@ -229,7 +229,7 @@ export function NotificationConfigurationPage() {
           action={
             <button
               onClick={() => refetchDefinitions()}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-accent rounded-lg hover:bg-info/15"
             >
               <RefreshCw className="w-4 h-4" />
               {t('notificationConfig.error.retry', 'Retry')}
@@ -258,8 +258,8 @@ export function NotificationConfigurationPage() {
             onClick={() => setActiveSection(section.key)}
             className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
               activeSection === section.key
-                ? 'bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300'
-                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700'
+                ? 'bg-info/15 border-info/25 text-info'
+                : 'bg-card border-edge text-faded hover:bg-subtle'
             }`}
           >
             {section.icon}
@@ -273,13 +273,13 @@ export function NotificationConfigurationPage() {
         <CardBody>
           <div className="flex flex-wrap gap-4 items-end">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-body mb-1">
                 {t('notificationConfig.scope', 'Scope')}
               </label>
               <select
                 value={scope}
                 onChange={(e) => setScope(e.target.value as ConfigurationScope)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
               >
                 {SCOPES.map((s) => (
                   <option key={s} value={s}>
@@ -290,7 +290,7 @@ export function NotificationConfigurationPage() {
             </div>
             {scope !== 'System' && (
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-body mb-1">
                   {t('notificationConfig.scopeReference', 'Scope Reference ID')}
                 </label>
                 <input
@@ -298,12 +298,12 @@ export function NotificationConfigurationPage() {
                   value={scopeReferenceId}
                   onChange={(e) => setScopeReferenceId(e.target.value)}
                   placeholder={t('notificationConfig.scopeReferencePlaceholder', 'Enter tenant/environment ID...')}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                  className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
                 />
               </div>
             )}
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-body mb-1">
                 <Search className="w-3 h-3 inline mr-1" />
                 {t('notificationConfig.search', 'Search')}
               </label>
@@ -312,7 +312,7 @@ export function NotificationConfigurationPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('notificationConfig.searchPlaceholder', 'Search by key or name...')}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -323,7 +323,7 @@ export function NotificationConfigurationPage() {
       {filteredDefinitions.length === 0 ? (
         <Card>
           <CardBody>
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-12 text-faded">
               <Filter className="w-8 h-8 mx-auto mb-3 opacity-50" />
               <p className="font-medium">
                 {t('notificationConfig.empty.title', 'No definitions found')}
@@ -350,7 +350,7 @@ export function NotificationConfigurationPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        <h3 className="text-sm font-semibold text-heading truncate">
                           {def.displayName}
                         </h3>
                         <Badge
@@ -370,20 +370,20 @@ export function NotificationConfigurationPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mb-1">
+                      <p className="text-xs text-faded font-mono mb-1">
                         {def.key}
                       </p>
                       {def.description && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-xs text-faded mt-1">
                           {def.description}
                         </p>
                       )}
 
                       {/* Effective Value Display */}
                       {eff && !isEditing && (
-                        <div className="mt-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                        <div className="mt-3 p-3 rounded-lg bg-subtle border border-edge">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            <span className="text-xs font-medium text-faded">
                               {t('notificationConfig.effectiveValue', 'Effective Value')}
                             </span>
                             {eff.isDefault && (
@@ -403,14 +403,14 @@ export function NotificationConfigurationPage() {
                               </Badge>
                             )}
                           </div>
-                          <div className="text-sm text-gray-900 dark:text-gray-100 font-mono break-all">
+                          <div className="text-sm text-heading font-mono break-all">
                             {def.isSensitive
                               ? '••••••••'
                               : def.valueType === 'Json'
                                 ? formatJsonPreview(eff.effectiveValue)
                                 : eff.effectiveValue ?? '(empty)'}
                           </div>
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs text-muted mt-1">
                             {t('notificationConfig.resolvedFrom', 'Resolved from')}: {eff.resolvedScope}
                             {eff.resolvedScopeReferenceId ? ` (${eff.resolvedScopeReferenceId})` : ''}
                           </div>
@@ -419,8 +419,8 @@ export function NotificationConfigurationPage() {
 
                       {/* Editing Form */}
                       {isEditing && (
-                        <div className="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <div className="mt-3 p-3 rounded-lg bg-info/15 border border-info/25">
+                          <label className="block text-xs font-medium text-body mb-1">
                             {t('notificationConfig.edit.value', 'Value')}
                           </label>
                           {def.valueType === 'Boolean' ? (
@@ -428,8 +428,8 @@ export function NotificationConfigurationPage() {
                               onClick={() => setEditValue(editValue === 'true' ? 'false' : 'true')}
                               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                                 editValue === 'true'
-                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                  ? 'bg-success/15 text-success'
+                                  : 'bg-critical/15 text-critical'
                               }`}
                             >
                               {editValue === 'true' ? 'Enabled' : 'Disabled'}
@@ -439,17 +439,17 @@ export function NotificationConfigurationPage() {
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
                               rows={6}
-                              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-mono dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm font-mono"
                             />
                           ) : (
                             <input
                               type={def.valueType === 'Integer' || def.valueType === 'Decimal' ? 'number' : 'text'}
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                              className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
                             />
                           )}
-                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mt-2 mb-1">
+                          <label className="block text-xs font-medium text-body mt-2 mb-1">
                             {t('notificationConfig.edit.reason', 'Change Reason')}
                           </label>
                           <input
@@ -457,20 +457,20 @@ export function NotificationConfigurationPage() {
                             value={editReason}
                             onChange={(e) => setEditReason(e.target.value)}
                             placeholder={t('notificationConfig.edit.reasonPlaceholder', 'Optional reason for this change...')}
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                            className="w-full rounded-lg border border-edge bg-card px-3 py-2 text-sm"
                           />
                           <div className="flex gap-2 mt-3">
                             <button
                               onClick={handleSave}
                               disabled={setValueMutation.isPending}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-accent rounded-lg hover:bg-info/15 disabled:opacity-50"
                             >
                               <Check className="w-3 h-3" />
                               {t('notificationConfig.edit.save', 'Save')}
                             </button>
                             <button
                               onClick={handleCancelEdit}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-faded bg-subtle rounded-lg hover:bg-subtle"
                             >
                               <X className="w-3 h-3" />
                               {t('notificationConfig.edit.cancel', 'Cancel')}
@@ -485,7 +485,7 @@ export function NotificationConfigurationPage() {
                       {def.isEditable && !isEditing && (
                         <button
                           onClick={() => handleEdit(def)}
-                          className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                          className="p-2 rounded-lg text-muted hover:text-info hover:bg-info/15 transition-colors"
                           title={t('notificationConfig.actions.edit', 'Edit')}
                         >
                           <Edit3 className="w-4 h-4" />
@@ -495,7 +495,7 @@ export function NotificationConfigurationPage() {
                         onClick={() =>
                           setExpandedAudit(isAuditExpanded ? null : def.key)
                         }
-                        className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                        className="p-2 rounded-lg text-muted hover:text-warning hover:bg-warning/15 transition-colors"
                         title={t('notificationConfig.actions.audit', 'Audit History')}
                       >
                         {isAuditExpanded ? (
@@ -517,7 +517,7 @@ export function NotificationConfigurationPage() {
       )}
 
       {/* ── Summary Footer ───────────────────────────────────────── */}
-      <div className="mt-6 text-xs text-gray-400 dark:text-gray-500 text-center">
+      <div className="mt-6 text-xs text-muted text-center">
         {t('notificationConfig.footer', '{{count}} notification definitions configured', {
           count: notificationDefinitions.length,
         })}
@@ -534,51 +534,51 @@ function AuditHistoryPanel({ configKey }: { configKey: string }) {
 
   if (isLoading) {
     return (
-      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-        <p className="text-xs text-gray-400">{t('notificationConfig.audit.loading', 'Loading audit history...')}</p>
+      <div className="mt-3 pt-3 border-t border-edge">
+        <p className="text-xs text-muted">{t('notificationConfig.audit.loading', 'Loading audit history...')}</p>
       </div>
     );
   }
 
   if (!audits || audits.length === 0) {
     return (
-      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-        <p className="text-xs text-gray-400">{t('notificationConfig.audit.empty', 'No audit history available.')}</p>
+      <div className="mt-3 pt-3 border-t border-edge">
+        <p className="text-xs text-muted">{t('notificationConfig.audit.empty', 'No audit history available.')}</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-      <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+    <div className="mt-3 pt-3 border-t border-edge">
+      <h4 className="text-xs font-semibold text-faded mb-2">
         {t('notificationConfig.audit.title', 'Audit History')}
       </h4>
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {audits.map((audit, idx) => (
           <div
             key={idx}
-            className="text-xs bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 border border-gray-100 dark:border-gray-700"
+            className="text-xs bg-subtle rounded-lg p-2 border border-edge"
           >
             <div className="flex justify-between items-center mb-1">
               <Badge variant={audit.action === 'Created' ? 'success' : audit.action === 'Updated' ? 'info' : 'default'}>
                 {audit.action}
               </Badge>
-              <span className="text-gray-400">
+              <span className="text-muted">
                 {audit.changedAt ? new Date(audit.changedAt).toLocaleString() : ''}
               </span>
             </div>
             {audit.changedBy && (
-              <p className="text-gray-500">
+              <p className="text-faded">
                 {t('notificationConfig.audit.by', 'By')}: {audit.changedBy}
               </p>
             )}
             {audit.changeReason && (
-              <p className="text-gray-500 italic">
+              <p className="text-faded italic">
                 {t('notificationConfig.audit.reason', 'Reason')}: {audit.changeReason}
               </p>
             )}
             {audit.previousValue && !audit.isSensitive && (
-              <p className="text-gray-400 font-mono truncate">
+              <p className="text-muted font-mono truncate">
                 {audit.previousValue} → {audit.newValue}
               </p>
             )}

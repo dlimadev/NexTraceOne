@@ -62,10 +62,10 @@ interface ReadinessResult {
 
 function riskColor(level: string): string {
   switch (level?.toUpperCase()) {
-    case 'HIGH': return 'text-red-400';
-    case 'MEDIUM': return 'text-yellow-400';
-    case 'LOW': return 'text-green-400';
-    default: return 'text-slate-400';
+    case 'HIGH': return 'text-critical';
+    case 'MEDIUM': return 'text-warning';
+    case 'LOW': return 'text-success';
+    default: return 'text-muted';
   }
 }
 
@@ -80,12 +80,12 @@ function severityBadgeVariant(severity: string): 'danger' | 'warning' | 'info' {
 function recommendationColor(rec: string): string {
   switch (rec?.toUpperCase()) {
     case 'BLOCK_PROMOTION':
-    case 'NOT_READY': return 'text-red-400';
+    case 'NOT_READY': return 'text-critical';
     case 'REVIEW_REQUIRED':
-    case 'NEEDS_REVIEW': return 'text-yellow-400';
+    case 'NEEDS_REVIEW': return 'text-warning';
     case 'SAFE_TO_PROMOTE':
-    case 'READY': return 'text-green-400';
-    default: return 'text-slate-400';
+    case 'READY': return 'text-success';
+    default: return 'text-muted';
   }
 }
 
@@ -98,7 +98,7 @@ function FallbackBadge({ show, label }: { show: boolean; label: string }) {
 
 function CorrelationIdRow({ label, id }: { label: string; id: string }) {
   return (
-    <p className="text-xs text-slate-500 mt-2">
+    <p className="text-xs text-faded mt-2">
       {label}: <span className="font-mono">{id}</span>
     </p>
   );
@@ -145,7 +145,7 @@ function NonProdTab({
 
   if (isProductionLike) {
     return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6 text-sm text-slate-400">
+      <div className="rounded-lg border border-edge bg-elevated p-6 text-sm text-muted">
         {t('aiAnalysis.nonProd.productionNotApplicable')}
       </div>
     );
@@ -153,9 +153,9 @@ function NonProdTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-        <h3 className="text-sm font-semibold text-slate-200 mb-1">{t('aiAnalysis.nonProd.title')}</h3>
-        <p className="text-xs text-slate-400 mb-4">
+      <div className="rounded-lg border border-edge bg-elevated p-6">
+        <h3 className="text-sm font-semibold text-heading mb-1">{t('aiAnalysis.nonProd.title')}</h3>
+        <p className="text-xs text-muted mb-4">
           {t('aiAnalysis.nonProd.description', { environment: environmentName })}
         </p>
         <Button onClick={runAnalysis} disabled={loading} size="sm">
@@ -165,16 +165,16 @@ function NonProdTab({
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-700 bg-red-900/20 p-4 text-sm text-red-400 flex items-center gap-2">
+        <div className="rounded-lg border border-critical/25 bg-critical/15 p-4 text-sm text-critical flex items-center gap-2">
           <XCircle size={16} />
           {error}
         </div>
       )}
 
       {result && (
-        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6 space-y-4">
+        <div className="rounded-lg border border-edge bg-elevated p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 uppercase tracking-wide">{t('aiAnalysis.nonProd.overallRisk')}</span>
+            <span className="text-xs text-muted uppercase tracking-wide">{t('aiAnalysis.nonProd.overallRisk')}</span>
             <span className={`text-sm font-bold ${riskColor(result.overallRiskLevel)}`}>
               {result.overallRiskLevel}
             </span>
@@ -182,18 +182,18 @@ function NonProdTab({
           </div>
 
           {result.recommendation && (
-            <p className="text-sm text-slate-300">{result.recommendation}</p>
+            <p className="text-sm text-muted">{result.recommendation}</p>
           )}
 
           {result.findings.length > 0 && (
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-2">{t('aiAnalysis.nonProd.findings')}</p>
+              <p className="text-xs text-muted uppercase tracking-wide mb-2">{t('aiAnalysis.nonProd.findings')}</p>
               <ul className="space-y-2">
                 {result.findings.map((f, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Badge variant={severityBadgeVariant(f.severity)}>{f.severity}</Badge>
-                    <span className="text-slate-400 text-xs">[{f.category}]</span>
-                    <span className="text-slate-300">{f.description}</span>
+                    <span className="text-muted text-xs">[{f.category}]</span>
+                    <span className="text-muted">{f.description}</span>
                   </li>
                 ))}
               </ul>
@@ -257,21 +257,21 @@ function CompareTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-        <h3 className="text-sm font-semibold text-slate-200 mb-1">{t('aiAnalysis.compare.title')}</h3>
-        <p className="text-xs text-slate-400 mb-4">{t('aiAnalysis.compare.description')}</p>
+      <div className="rounded-lg border border-edge bg-elevated p-6">
+        <h3 className="text-sm font-semibold text-heading mb-1">{t('aiAnalysis.compare.title')}</h3>
+        <p className="text-xs text-muted mb-4">{t('aiAnalysis.compare.description')}</p>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1">
-            <label className="block text-xs text-slate-400 mb-1">{t('aiAnalysis.compare.subjectLabel')}</label>
-            <div className="rounded border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm text-slate-300">
+            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.compare.subjectLabel')}</label>
+            <div className="rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted">
               {environmentName}
             </div>
           </div>
           <div className="flex-1">
-            <label className="block text-xs text-slate-400 mb-1">{t('aiAnalysis.compare.referenceLabel')}</label>
+            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.compare.referenceLabel')}</label>
             <select
-              className="w-full rounded border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm text-slate-300 focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
               value={referenceId}
               onChange={e => setReferenceId(e.target.value)}
             >
@@ -289,14 +289,14 @@ function CompareTab({
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-700 bg-red-900/20 p-4 text-sm text-red-400 flex items-center gap-2">
+        <div className="rounded-lg border border-critical/25 bg-critical/15 p-4 text-sm text-critical flex items-center gap-2">
           <XCircle size={16} />
           {error}
         </div>
       )}
 
       {result && (
-        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6 space-y-4">
+        <div className="rounded-lg border border-edge bg-elevated p-6 space-y-4">
           <div className="flex items-center gap-3">
             <span className={`text-sm font-bold ${recommendationColor(result.promotionRecommendation)}`}>
               {result.promotionRecommendation}
@@ -305,18 +305,18 @@ function CompareTab({
           </div>
 
           {result.summary && (
-            <p className="text-sm text-slate-300">{result.summary}</p>
+            <p className="text-sm text-muted">{result.summary}</p>
           )}
 
           {result.divergences.length > 0 && (
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-2">{t('aiAnalysis.compare.divergences')}</p>
+              <p className="text-xs text-muted uppercase tracking-wide mb-2">{t('aiAnalysis.compare.divergences')}</p>
               <ul className="space-y-2">
                 {result.divergences.map((d, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Badge variant={severityBadgeVariant(d.severity)}>{d.severity}</Badge>
-                    <span className="text-slate-400 text-xs">[{d.dimension}]</span>
-                    <span className="text-slate-300">{d.description}</span>
+                    <span className="text-muted text-xs">[{d.dimension}]</span>
+                    <span className="text-muted">{d.description}</span>
                   </li>
                 ))}
               </ul>
@@ -382,33 +382,33 @@ function ReadinessTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-        <h3 className="text-sm font-semibold text-slate-200 mb-1">{t('aiAnalysis.readiness.title')}</h3>
-        <p className="text-xs text-slate-400 mb-4">{t('aiAnalysis.readiness.description')}</p>
+      <div className="rounded-lg border border-edge bg-elevated p-6">
+        <h3 className="text-sm font-semibold text-heading mb-1">{t('aiAnalysis.readiness.title')}</h3>
+        <p className="text-xs text-muted mb-4">{t('aiAnalysis.readiness.description')}</p>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs text-slate-400 mb-1">{t('aiAnalysis.readiness.serviceName')}</label>
+            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.readiness.serviceName')}</label>
             <input
-              className="w-full rounded border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm text-slate-300 focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
               value={serviceName}
               onChange={e => setServiceName(e.target.value)}
               placeholder="e.g. payment-service"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">{t('aiAnalysis.readiness.version')}</label>
+            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.readiness.version')}</label>
             <input
-              className="w-full rounded border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm text-slate-300 focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
               value={version}
               onChange={e => setVersion(e.target.value)}
               placeholder="e.g. 2.1.0"
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-xs text-slate-400 mb-1">{t('aiAnalysis.readiness.targetEnvironment')}</label>
+            <label className="block text-xs text-muted mb-1">{t('aiAnalysis.readiness.targetEnvironment')}</label>
             <select
-              className="w-full rounded border border-slate-600 bg-slate-700/50 px-3 py-2 text-sm text-slate-300 focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
               value={targetId}
               onChange={e => setTargetId(e.target.value)}
             >
@@ -429,17 +429,17 @@ function ReadinessTab({
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-700 bg-red-900/20 p-4 text-sm text-red-400 flex items-center gap-2">
+        <div className="rounded-lg border border-critical/25 bg-critical/15 p-4 text-sm text-critical flex items-center gap-2">
           <XCircle size={16} />
           {error}
         </div>
       )}
 
       {result && (
-        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6 space-y-4">
+        <div className="rounded-lg border border-edge bg-elevated p-6 space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">{t('aiAnalysis.readiness.score')}</span>
+              <span className="text-xs text-muted">{t('aiAnalysis.readiness.score')}</span>
               <span className={`text-2xl font-bold ${recommendationColor(result.readinessLevel)}`}>
                 {result.readinessScore}
               </span>
@@ -454,21 +454,21 @@ function ReadinessTab({
           </div>
 
           {result.summary && (
-            <p className="text-sm text-slate-300">{result.summary}</p>
+            <p className="text-sm text-muted">{result.summary}</p>
           )}
 
           {result.blockers.length > 0 && (
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1">
-                <XCircle size={12} className="text-red-400" />
+              <p className="text-xs text-muted uppercase tracking-wide mb-2 flex items-center gap-1">
+                <XCircle size={12} className="text-critical" />
                 {t('aiAnalysis.readiness.blockers')}
               </p>
               <ul className="space-y-2">
                 {result.blockers.map((b, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Badge variant="danger">{t('aiAnalysis.readiness.blocker')}</Badge>
-                    <span className="text-slate-400 text-xs">[{b.category}]</span>
-                    <span className="text-slate-300">{b.description}</span>
+                    <span className="text-muted text-xs">[{b.category}]</span>
+                    <span className="text-muted">{b.description}</span>
                   </li>
                 ))}
               </ul>
@@ -477,16 +477,16 @@ function ReadinessTab({
 
           {result.warnings.length > 0 && (
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-1">
-                <AlertTriangle size={12} className="text-yellow-400" />
+              <p className="text-xs text-muted uppercase tracking-wide mb-2 flex items-center gap-1">
+                <AlertTriangle size={12} className="text-warning" />
                 {t('aiAnalysis.readiness.warnings')}
               </p>
               <ul className="space-y-2">
                 {result.warnings.map((w, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <Badge variant="warning">{t('aiAnalysis.readiness.warning')}</Badge>
-                    <span className="text-slate-400 text-xs">[{w.category}]</span>
-                    <span className="text-slate-300">{w.description}</span>
+                    <span className="text-muted text-xs">[{w.category}]</span>
+                    <span className="text-muted">{w.description}</span>
                   </li>
                 ))}
               </ul>
@@ -517,8 +517,8 @@ export function AiAnalysisPage() {
   if (!tenantId || !activeEnvironment) {
     return (
       <PageContainer>
-        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-8 text-center">
-          <p className="text-sm text-slate-400">{t('aiAnalysis.noContextAvailable')}</p>
+        <div className="rounded-lg border border-edge bg-elevated p-8 text-center">
+          <p className="text-sm text-muted">{t('aiAnalysis.noContextAvailable')}</p>
         </div>
       </PageContainer>
     );
@@ -529,27 +529,27 @@ export function AiAnalysisPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-xl font-semibold text-slate-100">{t('aiAnalysis.title')}</h1>
+          <h1 className="text-xl font-semibold text-heading">{t('aiAnalysis.title')}</h1>
           {!activeEnvironment.isProductionLike && (
             <Badge variant="info">{t('aiAnalysis.nonProductionMode')}</Badge>
           )}
         </div>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted">
           {t('aiAnalysis.analyzingContext', { environment: activeEnvironment.name })}
         </p>
-        <p className="text-xs text-slate-500 mt-1">{t('aiAnalysis.subtitle')}</p>
+        <p className="text-xs text-faded mt-1">{t('aiAnalysis.subtitle')}</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-slate-700">
+      <div className="flex gap-1 mb-6 border-b border-edge">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.key
-                ? 'border-indigo-500 text-indigo-400'
-                : 'border-transparent text-slate-400 hover:text-slate-300'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-muted hover:text-muted'
             }`}
           >
             {tab.icon}

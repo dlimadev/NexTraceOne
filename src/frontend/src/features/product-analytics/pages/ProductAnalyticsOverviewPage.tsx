@@ -31,8 +31,8 @@ import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 function trendIcon(trend: 'Improving' | 'Stable' | 'Declining') {
   switch (trend) {
-    case 'Improving': return <TrendingUp size={14} className="text-emerald-400" />;
-    case 'Declining': return <TrendingDown size={14} className="text-red-400" />;
+    case 'Improving': return <TrendingUp size={14} className="text-success" />;
+    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
     default: return <Minus size={14} className="text-muted" />;
   }
 }
@@ -95,21 +95,21 @@ export function ProductAnalyticsOverviewPage() {
             title={t('analytics.valueScore')}
             value={`${d.valueScore}%`}
             icon={<Award size={20} />}
-            color="text-emerald-400"
+            color="text-success"
             trend={{ direction: 'up', label: t('analytics.trendImproving') }}
           />
           <StatCard
             title={t('analytics.frictionScore')}
             value={`${d.frictionScore}%`}
             icon={<AlertTriangle size={20} />}
-            color="text-amber-400"
+            color="text-warning"
             trend={{ direction: 'down', label: t('analytics.trendDeclining') }}
           />
           <StatCard
             title={t('analytics.uniqueUsers')}
             value={d.uniqueUsers}
             icon={<Users size={20} />}
-            color="text-blue-400"
+            color="text-info"
           />
         </StatsGrid>
       </PageSection>
@@ -132,12 +132,12 @@ export function ProductAnalyticsOverviewPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Award size={18} className="text-emerald-400" />
+                <Award size={18} className="text-success" />
                 <span className="font-semibold text-heading">{t('analytics.timeToCoreValue')}</span>
               </div>
             </CardHeader>
             <CardBody>
-              <div className="text-3xl font-bold text-emerald-400">{d.avgTimeToCoreValueMinutes} {t('analytics.minutes')}</div>
+              <div className="text-3xl font-bold text-success">{d.avgTimeToCoreValueMinutes} {t('analytics.minutes')}</div>
               <p className="text-muted text-sm mt-1">{t('analytics.timeToCoreValueDesc')}</p>
             </CardBody>
           </Card>
@@ -176,15 +176,15 @@ export function ProductAnalyticsOverviewPage() {
           <span className="text-sm text-body">{t('analytics.viewModuleAdoption')}</span>
         </Link>
         <Link to="/analytics/personas" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
-          <Users size={24} className="mx-auto mb-2 text-blue-400" />
+          <Users size={24} className="mx-auto mb-2 text-info" />
           <span className="text-sm text-body">{t('analytics.viewPersonaUsage')}</span>
         </Link>
         <Link to="/analytics/journeys" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
-          <Target size={24} className="mx-auto mb-2 text-emerald-400" />
+          <Target size={24} className="mx-auto mb-2 text-success" />
           <span className="text-sm text-body">{t('analytics.viewJourneys')}</span>
         </Link>
         <Link to="/analytics/value" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
-          <Award size={24} className="mx-auto mb-2 text-amber-400" />
+          <Award size={24} className="mx-auto mb-2 text-warning" />
           <span className="text-sm text-body">{t('analytics.viewValueTracking')}</span>
         </Link>
       </StatsGrid>

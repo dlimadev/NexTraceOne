@@ -27,10 +27,10 @@ const riskBadgeVariant = (level: RiskLevel): 'success' | 'warning' | 'danger' | 
 /** Mapeia RiskLevel para classe de borda do card. */
 const riskBorderClass = (level: RiskLevel): string => {
   switch (level) {
-    case 'Critical': return 'border-red-500/60';
-    case 'High': return 'border-amber-500/60';
-    case 'Medium': return 'border-yellow-500/40';
-    case 'Low': return 'border-emerald-500/40';
+    case 'Critical': return 'border-critical/25';
+    case 'High': return 'border-warning/25';
+    case 'Medium': return 'border-warning/25';
+    case 'Low': return 'border-success/25';
     default: return 'border-edge';
   }
 };
@@ -120,22 +120,22 @@ export function RiskHeatmapPage() {
                 {/* Indicators */}
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   <div className="flex items-center gap-1.5 text-xs">
-                    <AlertTriangle size={12} className="text-orange-400 shrink-0" />
+                    <AlertTriangle size={12} className="text-warning shrink-0" />
                     <span className="text-muted">{t('governance.executive.heatmapChangeFailures')}</span>
                     <span className="font-medium text-heading ml-auto">{cell.changeFailures}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs">
-                    <FileWarning size={12} className="text-amber-400 shrink-0" />
+                    <FileWarning size={12} className="text-warning shrink-0" />
                     <span className="text-muted">{t('governance.executive.heatmapContractGaps')}</span>
                     <span className="font-medium text-heading ml-auto">{cell.contractGaps}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs">
-                    <BookOpen size={12} className="text-amber-400 shrink-0" />
+                    <BookOpen size={12} className="text-warning shrink-0" />
                     <span className="text-muted">{t('governance.executive.heatmapDocumentationGaps')}</span>
                     <span className="font-medium text-heading ml-auto">{cell.documentationGaps}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs">
-                    <ShieldAlert size={12} className="text-orange-400 shrink-0" />
+                    <ShieldAlert size={12} className="text-warning shrink-0" />
                     <span className="text-muted">{t('governance.executive.heatmapRunbookGaps')}</span>
                     <span className="font-medium text-heading ml-auto">{cell.runbookGaps}</span>
                   </div>

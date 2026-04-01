@@ -175,7 +175,7 @@ function buildTimeline(
         : '',
       date: v.createdAt,
       icon: <GitCommit size={11} />,
-      iconColor: 'bg-blue-900/40 text-blue-300 border-blue-700/50',
+      iconColor: 'bg-info/15 text-info border-info/25',
       metadata: {
         [t('contracts.protocol', 'Protocol')]: v.protocol,
         [t('contracts.format', 'Format')]: v.format?.toUpperCase(),
@@ -207,7 +207,7 @@ function buildTimeline(
         description: v.lockedBy ? `${t('contracts.changelog.by', 'by')} ${v.lockedBy}` : '',
         date: v.lockedAt,
         icon: <Lock size={11} />,
-        iconColor: 'bg-purple-900/40 text-purple-300 border-purple-700/50',
+        iconColor: 'bg-info/15 text-info border-info/25',
         metadata: {},
         isCurrent: false,
       });
@@ -222,7 +222,7 @@ function buildTimeline(
         description: `${t('contracts.changelog.by', 'by')} ${v.signedBy}`,
         date: v.signedAt,
         icon: <FileSignature size={11} />,
-        iconColor: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50',
+        iconColor: 'bg-success/15 text-success border-success/25',
         metadata: {},
         isCurrent: false,
       });
@@ -237,7 +237,7 @@ function buildTimeline(
         description: v.deprecationNotice,
         date: v.sunsetDate ?? v.createdAt,
         icon: <AlertTriangle size={11} />,
-        iconColor: 'bg-orange-900/40 text-orange-300 border-orange-700/50',
+        iconColor: 'bg-warning/15 text-warning border-warning/25',
         metadata: v.sunsetDate ? { [t('contracts.changelog.sunsetDate', 'Sunset')]: v.sunsetDate } : {},
         isCurrent: false,
       });
@@ -269,18 +269,18 @@ function stateIcon(state: string): React.ReactNode {
 function stateColor(state: string): string {
   switch (state) {
     case 'Approved':
-      return 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50';
+      return 'bg-success/15 text-success border-success/25';
     case 'InReview':
-      return 'bg-blue-900/40 text-blue-300 border-blue-700/50';
+      return 'bg-info/15 text-info border-info/25';
     case 'Locked':
-      return 'bg-purple-900/40 text-purple-300 border-purple-700/50';
+      return 'bg-info/15 text-info border-info/25';
     case 'Deprecated':
     case 'Sunset':
-      return 'bg-orange-900/40 text-orange-300 border-orange-700/50';
+      return 'bg-warning/15 text-warning border-warning/25';
     case 'Retired':
-      return 'bg-red-900/40 text-red-300 border-red-700/50';
+      return 'bg-critical/15 text-critical border-critical/25';
     default:
-      return 'bg-slate-800/40 text-slate-300 border-slate-700/50';
+      return 'bg-elevated text-muted border-edge';
   }
 }
 

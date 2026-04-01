@@ -23,27 +23,27 @@ import { PageContainer } from '../../../components/shell';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<string, string> = {
-  Critical: 'bg-red-900/40 text-red-300 border border-red-700/50',
-  High: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Medium: 'bg-yellow-900/40 text-yellow-300 border border-yellow-700/50',
-  Low: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
+  Critical: 'bg-critical/15 text-critical border border-critical/25',
+  High: 'bg-warning/15 text-warning border border-warning/25',
+  Medium: 'bg-warning/15 text-warning border border-warning/25',
+  Low: 'bg-elevated text-muted border border-edge',
 };
 
 /** Variantes visuais para badges de ciclo de vida. */
 const lifecycleColors: Record<string, string> = {
-  Active: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
-  Deprecated: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Draft: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
-  Retired: 'bg-red-900/40 text-red-300 border border-red-700/50',
+  Active: 'bg-success/15 text-success border border-success/25',
+  Deprecated: 'bg-warning/15 text-warning border border-warning/25',
+  Draft: 'bg-elevated text-muted border border-edge',
+  Retired: 'bg-critical/15 text-critical border border-critical/25',
 };
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
-  OpenApi: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  OpenApi: 'bg-success/15 text-success border border-success/25',
   Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
   Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
-  AsyncApi: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Protobuf: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
+  AsyncApi: 'bg-info/15 text-info border border-info/25',
+  Protobuf: 'bg-warning/15 text-warning border border-warning/25',
   GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
 };
 
@@ -131,11 +131,11 @@ export function ServiceSourceOfTruthPage() {
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-sm text-muted">{sot.domain}</span>
             {sot.criticality && (
-              <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[sot.criticality] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+              <span className={`text-[11px] px-2 py-0.5 rounded-full ${criticalityColors[sot.criticality] ?? 'bg-elevated text-muted border border-edge'}`}>
                 {t(`catalog.badges.criticality.${sot.criticality}`, sot.criticality)}
               </span>
             )}
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[lifecycleStatus] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[lifecycleStatus] ?? 'bg-elevated text-muted border border-edge'}`}>
               {String(t(`catalog.badges.lifecycle.${lifecycleStatus}`, lifecycleStatus))}
             </span>
           </div>
@@ -231,7 +231,7 @@ export function ServiceSourceOfTruthPage() {
                           <td className="px-6 py-3 text-muted font-mono text-xs">{api.routePattern}</td>
                           <td className="px-6 py-3 text-muted">{api.version}</td>
                           <td className="px-6 py-3">
-                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                               {String(t(`catalog.badges.exposure.${api.visibility}`, api.visibility))}
                             </span>
                           </td>
@@ -280,12 +280,12 @@ export function ServiceSourceOfTruthPage() {
                           </td>
                           <td className="px-6 py-3 text-muted">v{c.semVer}</td>
                           <td className="px-6 py-3">
-                            <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                            <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[c.protocol] ?? 'bg-elevated text-muted border border-edge'}`}>
                               {String(t(`contractGov.badges.protocols.${c.protocol}`, c.protocol))}
                             </span>
                           </td>
                           <td className="px-6 py-3">
-                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                               {String(t(`contractGov.badges.lifecycle.${c.lifecycleState}`, c.lifecycleState))}
                             </span>
                           </td>
@@ -318,7 +318,7 @@ export function ServiceSourceOfTruthPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-heading truncate">{ref.title}</p>
                         <p className="text-xs text-muted line-clamp-2">{ref.description}</p>
-                        <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                        <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                           {String(t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType))}
                         </span>
                       </div>
@@ -379,9 +379,9 @@ export function ServiceSourceOfTruthPage() {
                   return (
                     <li key={String(key)} className="flex items-center gap-2 text-sm">
                       {met ? (
-                        <CheckCircle size={14} className="text-emerald-400 shrink-0" />
+                        <CheckCircle size={14} className="text-success shrink-0" />
                       ) : (
-                        <XCircle size={14} className="text-red-400 shrink-0" />
+                        <XCircle size={14} className="text-critical shrink-0" />
                       )}
                       <span className={met ? 'text-body' : 'text-muted'}>
                         {String(t(`sourceOfTruth.service.indicators.${String(key)}`))}

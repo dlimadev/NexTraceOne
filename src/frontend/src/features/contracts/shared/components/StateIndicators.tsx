@@ -37,8 +37,8 @@ export function ErrorState({ message, onRetry, className = '' }: ErrorStateProps
 
   return (
     <div className={`flex flex-col items-center justify-center py-12 ${className}`}>
-      <div className="w-12 h-12 rounded-full bg-red-900/20 border border-red-700/30 flex items-center justify-center mb-3">
-        <span className="text-red-400 text-lg font-bold">!</span>
+      <div className="w-12 h-12 rounded-full bg-critical/15 border border-critical/25 flex items-center justify-center mb-3">
+        <span className="text-critical text-lg font-bold">!</span>
       </div>
       <p className="text-sm text-heading mb-1">{t('common.error')}</p>
       <p className="text-xs text-muted max-w-sm text-center mb-3">

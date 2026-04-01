@@ -30,7 +30,7 @@ export function EnvironmentBanner() {
       aria-atomic="true"
       className={cn(
         'flex items-center gap-2 px-4 py-2 text-xs',
-        'bg-yellow-500/10 border-b border-yellow-500/20 text-yellow-300',
+        'bg-warning/15 border-b border-warning/25 text-warning',
       )}
     >
       <AlertTriangle size={13} className="shrink-0" aria-hidden="true" />

@@ -108,10 +108,10 @@ export function ReportsPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <StatCard title={t('governance.reports.totalPacks')} value={data.totalPacks} icon={<Package size={20} />} color="text-accent" />
           <StatCard title={t('governance.reports.publishedPacks')} value={`${packPublishedPct}%`} icon={<CheckCircle size={20} />} color="text-success" />
-          <StatCard title={t('governance.reports.completedRollouts')} value={`${rolloutCompletionPct}%`} icon={<CheckCircle size={20} />} color="text-emerald-500" />
-          <StatCard title={t('governance.reports.pendingRollouts')} value={data.pendingRollouts} icon={<Clock size={20} />} color="text-amber-500" />
+          <StatCard title={t('governance.reports.completedRollouts')} value={`${rolloutCompletionPct}%`} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('governance.reports.pendingRollouts')} value={data.pendingRollouts} icon={<Clock size={20} />} color="text-warning" />
           <StatCard title={t('governance.reports.failedRollouts')} value={data.failedRollouts} icon={<XCircle size={20} />} color="text-critical" />
-          <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={20} />} color="text-emerald-500" />
+          <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={20} />} color="text-success" />
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export function ReportsPage() {
           <Card>
             <CardBody>
               <p className="text-xs text-muted mb-1">{t('governance.reports.pendingWaivers')}</p>
-              <span className={`text-lg font-bold ${data.pendingWaivers > 0 ? 'text-amber-500' : 'text-success'}`}>
+              <span className={`text-lg font-bold ${data.pendingWaivers > 0 ? 'text-warning' : 'text-success'}`}>
                 {data.pendingWaivers}
               </span>
             </CardBody>
@@ -209,8 +209,8 @@ export function ReportsPage() {
               <div className="py-3">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <StatCard title={t('governance.reports.totalPacks')} value={data.totalPacks} icon={<Package size={18} />} color="text-accent" />
-                  <StatCard title={t('governance.reports.pendingRollouts')} value={data.pendingRollouts} icon={<Clock size={18} />} color="text-amber-500" />
-                  <StatCard title={t('governance.reports.failedRollouts')} value={data.failedRollouts} icon={<XCircle size={18} />} color="text-red-500" />
+                  <StatCard title={t('governance.reports.pendingRollouts')} value={data.pendingRollouts} icon={<Clock size={18} />} color="text-warning" />
+                  <StatCard title={t('governance.reports.failedRollouts')} value={data.failedRollouts} icon={<XCircle size={18} />} color="text-critical" />
                 </div>
               </div>
             )}
@@ -218,16 +218,16 @@ export function ReportsPage() {
               <div className="py-3">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <StatCard title={t('governance.reports.publishedPacks')} value={data.publishedPacks} icon={<CheckCircle size={18} />} color="text-success" />
-                  <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-emerald-500" />
-                  <StatCard title={t('governance.reports.riskLevel')} value={t(`governance.risk.level.${data.overallRiskLevel}`)} icon={<AlertTriangle size={18} />} color="text-amber-500" />
+                  <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-success" />
+                  <StatCard title={t('governance.reports.riskLevel')} value={t(`governance.risk.level.${data.overallRiskLevel}`)} icon={<AlertTriangle size={18} />} color="text-warning" />
                 </div>
               </div>
             )}
             {(persona === 'Executive' || persona === 'Product') && (
               <div className="py-3">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-emerald-500" />
-                  <StatCard title={t('governance.reports.riskLevel')} value={t(`governance.risk.level.${data.overallRiskLevel}`)} icon={<AlertTriangle size={18} />} color="text-amber-500" />
+                  <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-success" />
+                  <StatCard title={t('governance.reports.riskLevel')} value={t(`governance.risk.level.${data.overallRiskLevel}`)} icon={<AlertTriangle size={18} />} color="text-warning" />
                   <StatCard title={t('governance.reports.maturityLevel')} value={t(`governance.maturity.${data.overallMaturity}`)} icon={<BarChart3 size={18} />} color="text-accent" />
                 </div>
               </div>
@@ -235,9 +235,9 @@ export function ReportsPage() {
             {persona === 'Auditor' && (
               <div className="py-3">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-emerald-500" />
-                  <StatCard title={t('governance.reports.totalWaivers')} value={data.totalWaivers} icon={<FileText size={18} />} color="text-blue-500" />
-                  <StatCard title={t('governance.reports.pendingWaivers')} value={data.pendingWaivers} icon={<AlertTriangle size={18} />} color="text-amber-500" />
+                  <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-success" />
+                  <StatCard title={t('governance.reports.totalWaivers')} value={data.totalWaivers} icon={<FileText size={18} />} color="text-info" />
+                  <StatCard title={t('governance.reports.pendingWaivers')} value={data.pendingWaivers} icon={<AlertTriangle size={18} />} color="text-warning" />
                 </div>
               </div>
             )}

@@ -234,7 +234,7 @@ function OverviewTab({ domain, t }: { domain: DomainDetail; t: (key: string) => 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <StatCard title={t('organization.domainDetail.teams')} value={domain.teamCount} icon={<Users size={20} />} color="text-accent" />
-      <StatCard title={t('organization.domainDetail.services')} value={domain.serviceCount} icon={<Server size={20} />} color="text-blue-500" />
+      <StatCard title={t('organization.domainDetail.services')} value={domain.serviceCount} icon={<Server size={20} />} color="text-info" />
       <StatCard title={t('organization.domainDetail.activeIncidents')} value={domain.activeIncidentCount} icon={<AlertTriangle size={20} />} color="text-critical" />
       <StatCard title={t('organization.domainDetail.reliabilityScore')} value={`${domain.reliabilityScore}%`} icon={<Activity size={20} />} color="text-success" />
     </div>
@@ -444,7 +444,7 @@ function DependenciesTab({ deps, t }: { deps: CrossDomainDependencyDto[]; t: (ke
       <Card>
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <GitBranch size={16} className="text-blue-500" />
+            <GitBranch size={16} className="text-info" />
             {t('organization.domainDetail.dependencies.inbound')}
           </h2>
         </CardHeader>

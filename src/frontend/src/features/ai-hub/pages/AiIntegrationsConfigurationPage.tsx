@@ -129,7 +129,7 @@ function renderValuePreview(value: string): React.ReactNode {
   } catch {
     /* not JSON */
   }
-  return <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[200px] inline-block">{value}</span>;
+  return <span className="text-sm text-faded truncate max-w-[200px] inline-block">{value}</span>;
 }
 
 // ── Component ──────────────────────────────────────────────────────────
@@ -222,7 +222,7 @@ export function AiIntegrationsConfigurationPage() {
         />
         <Card>
           <CardBody>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-faded">
               {t('aiIntegrationsConfig.empty', 'No AI & integrations configuration definitions found. Ensure Phase 7 definitions have been seeded.')}
             </p>
           </CardBody>
@@ -247,7 +247,7 @@ export function AiIntegrationsConfigurationPage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeSection === section.key
                 ? 'bg-brand-600 text-white shadow-sm'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                : 'bg-card text-body hover:bg-subtle border border-edge'
             }`}
           >
             {section.icon}
@@ -259,13 +259,13 @@ export function AiIntegrationsConfigurationPage() {
       {/* ── Search & Filters ──────────────────────────────────────────── */}
       <div className="flex gap-4 mb-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('aiIntegrationsConfig.searchPlaceholder', 'Search configuration...')}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-sm"
+            className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
           />
         </div>
         <button
@@ -273,7 +273,7 @@ export function AiIntegrationsConfigurationPage() {
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm border transition-colors ${
             showEffective
               ? 'bg-brand-50 border-brand-300 text-brand-700'
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+              : 'bg-card border-edge'
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -308,13 +308,13 @@ export function AiIntegrationsConfigurationPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-5">{def.key}</p>
+                    <p className="text-xs text-faded mt-1 ml-5">{def.key}</p>
                   </div>
 
                   <div className="flex items-center gap-3">
                     {showEffective && eff ? (
                       <div className="text-right">
-                        <div className="text-xs text-gray-400">{eff.resolvedScope}</div>
+                        <div className="text-xs text-muted">{eff.resolvedScope}</div>
                         {renderValuePreview(eff.effectiveValue ?? '')}
                       </div>
                     ) : (
@@ -323,7 +323,7 @@ export function AiIntegrationsConfigurationPage() {
                     {def.isEditable !== false && (
                       <button
                         onClick={() => startEdit(def)}
-                        className="p-1 text-gray-400 hover:text-brand-600"
+                        className="p-1 text-muted hover:text-brand-600"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
@@ -333,37 +333,37 @@ export function AiIntegrationsConfigurationPage() {
 
                 {/* ── Expanded Detail ────────────────────────────────── */}
                 {isExpanded && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                  <div className="mt-4 pt-4 border-t border-edge space-y-3">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                       <div>
-                        <span className="text-gray-400">{t('aiIntegrationsConfig.detail.type', 'Type')}</span>
+                        <span className="text-muted">{t('aiIntegrationsConfig.detail.type', 'Type')}</span>
                         <p className="font-medium">{def.valueType}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">{t('aiIntegrationsConfig.detail.scopes', 'Scopes')}</span>
+                        <span className="text-muted">{t('aiIntegrationsConfig.detail.scopes', 'Scopes')}</span>
                         <p className="font-medium">{def.allowedScopes?.join(', ')}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">{t('aiIntegrationsConfig.detail.editor', 'Editor')}</span>
+                        <span className="text-muted">{t('aiIntegrationsConfig.detail.editor', 'Editor')}</span>
                         <p className="font-medium">{def.uiEditorType}</p>
                       </div>
                       <div>
-                        <span className="text-gray-400">{t('aiIntegrationsConfig.detail.inheritable', 'Inheritable')}</span>
+                        <span className="text-muted">{t('aiIntegrationsConfig.detail.inheritable', 'Inheritable')}</span>
                         <p className="font-medium">{def.isInheritable ? 'Yes' : 'No'}</p>
                       </div>
                     </div>
                     {def.description && (
-                      <p className="text-xs text-gray-500">{def.description}</p>
+                      <p className="text-xs text-faded">{def.description}</p>
                     )}
                     <div>
-                      <span className="text-xs text-gray-400">{t('aiIntegrationsConfig.detail.defaultValue', 'Default Value')}</span>
-                      <pre className="mt-1 p-2 bg-gray-50 dark:bg-gray-900 rounded text-xs overflow-x-auto">
+                      <span className="text-xs text-muted">{t('aiIntegrationsConfig.detail.defaultValue', 'Default Value')}</span>
+                      <pre className="mt-1 p-2 bg-subtle rounded text-xs overflow-x-auto">
                         {def.defaultValue}
                       </pre>
                     </div>
                     {showEffective && eff && (
-                      <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg">
-                        <div className="flex items-center gap-2 text-xs text-brand-700 dark:text-brand-300 mb-1">
+                      <div className="p-3 bg-brand-50 rounded-lg">
+                        <div className="flex items-center gap-2 text-xs text-brand-700 mb-1">
                           <Layers className="w-3 h-3" />
                           {t('aiIntegrationsConfig.effectiveValue', 'Effective Value')}
                           <Badge variant="info" className="text-xs">{eff.resolvedScope}</Badge>
@@ -376,14 +376,14 @@ export function AiIntegrationsConfigurationPage() {
 
                 {/* ── Inline Editor ──────────────────────────────────── */}
                 {isEditing && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="mt-4 pt-4 border-t border-edge">
                     {def.uiEditorType === 'toggle' ? (
                       <label className="flex items-center gap-3">
                         <input
                           type="checkbox"
                           checked={editValue === 'true'}
                           onChange={(e) => setEditValue(e.target.checked ? 'true' : 'false')}
-                          className="rounded border-gray-300"
+                          className="rounded border-edge"
                         />
                         <span className="text-sm">{editValue === 'true' ? 'Enabled' : 'Disabled'}</span>
                       </label>
@@ -391,7 +391,7 @@ export function AiIntegrationsConfigurationPage() {
                       <select
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+                        className="w-full p-2 border border-edge rounded-lg text-sm bg-card"
                       >
                         {def.validationRules && (() => {
                           try {
@@ -407,14 +407,14 @@ export function AiIntegrationsConfigurationPage() {
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                         rows={6}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-mono bg-white dark:bg-gray-800"
+                        className="w-full p-2 border border-edge rounded-lg text-sm font-mono bg-card"
                       />
                     ) : (
                       <input
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800"
+                        className="w-full p-2 border border-edge rounded-lg text-sm bg-card"
                       />
                     )}
                     <div className="flex gap-2 mt-3">
@@ -427,7 +427,7 @@ export function AiIntegrationsConfigurationPage() {
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-subtle text-body rounded-lg text-sm hover:bg-subtle"
                       >
                         <X className="w-3 h-3" />
                         {t('common.cancel', 'Cancel')}
@@ -443,7 +443,7 @@ export function AiIntegrationsConfigurationPage() {
         {sectionDefs.length === 0 && (
           <Card>
             <CardBody>
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-faded">
                 <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p>{t('aiIntegrationsConfig.noResults', 'No matching configuration definitions found.')}</p>
               </div>
@@ -463,12 +463,12 @@ export function AiIntegrationsConfigurationPage() {
             <CardBody>
               <div className="space-y-2">
                 {auditHistory.slice(0, 10).map((entry) => (
-                  <div key={`${entry.changedAt}-${entry.key}`} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                  <div key={`${entry.changedAt}-${entry.key}`} className="flex items-center justify-between py-2 border-b border-edge last:border-0">
                     <div>
                       <span className="text-sm font-medium">{entry.key}</span>
-                      <span className="text-xs text-gray-400 ml-2">{entry.changedBy}</span>
+                      <span className="text-xs text-muted ml-2">{entry.changedBy}</span>
                     </div>
-                    <span className="text-xs text-gray-400">{new Date(entry.changedAt).toLocaleString()}</span>
+                    <span className="text-xs text-muted">{new Date(entry.changedAt).toLocaleString()}</span>
                   </div>
                 ))}
               </div>

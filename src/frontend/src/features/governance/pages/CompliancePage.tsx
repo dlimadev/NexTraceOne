@@ -71,7 +71,7 @@ export function CompliancePage() {
     return true;
   });
 
-  const scoreColor = d.overallScore >= 80 ? 'text-success' : d.overallScore >= 60 ? 'text-amber-400' : 'text-critical';
+  const scoreColor = d.overallScore >= 80 ? 'text-success' : d.overallScore >= 60 ? 'text-warning' : 'text-critical';
   const percent = (value: number, total: number) => (total > 0 ? Math.round((value / total) * 100) : 0);
 
   const coverageItems = [
@@ -98,8 +98,8 @@ export function CompliancePage() {
             <p className={`text-4xl font-bold ${scoreColor}`}>{d.overallScore}%</p>
           </div>
           <StatCard title={t('governance.compliance.totalAssessed')} value={d.totalPacksAssessed} icon={<Scale size={20} />} color="text-accent" />
-          <StatCard title={t('governance.compliance.compliant')} value={d.compliantCount} icon={<CheckCircle size={20} />} color="text-emerald-500" />
-          <StatCard title={t('governance.compliance.partiallyCompliant')} value={d.partiallyCompliantCount} icon={<AlertCircle size={20} />} color="text-amber-500" />
+          <StatCard title={t('governance.compliance.compliant')} value={d.compliantCount} icon={<CheckCircle size={20} />} color="text-success" />
+          <StatCard title={t('governance.compliance.partiallyCompliant')} value={d.partiallyCompliantCount} icon={<AlertCircle size={20} />} color="text-warning" />
           <StatCard title={t('governance.compliance.nonCompliant')} value={d.nonCompliantCount} icon={<ShieldAlert size={20} />} color="text-critical" />
         </ContentGrid>
       </PageSection>
@@ -116,7 +116,7 @@ export function CompliancePage() {
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {coverageItems.map(item => {
-                const barColor = item.value >= 80 ? 'bg-emerald-500' : item.value >= 60 ? 'bg-amber-500' : 'bg-critical';
+                const barColor = item.value >= 80 ? 'bg-success' : item.value >= 60 ? 'bg-warning' : 'bg-critical';
                 return (
                   <div key={item.key}>
                     <div className="flex items-center justify-between mb-1">

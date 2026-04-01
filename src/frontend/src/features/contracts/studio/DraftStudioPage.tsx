@@ -237,27 +237,27 @@ export function DraftStudioPage() {
       <div className="flex-1 overflow-y-auto p-6">
         {/* Feedback messages */}
         {(saveContentMutation.isError || saveMetadataMutation.isError) && (
-          <div className="mb-4 text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded-md px-3 py-2">
+          <div className="mb-4 text-xs text-critical bg-critical/15 border border-critical/25 rounded-md px-3 py-2">
             {t('contracts.studio.saveFailed', 'Failed to save changes.')}
           </div>
         )}
         {(saveContentMutation.isSuccess || saveMetadataMutation.isSuccess) && !isSaving && (
-          <div className="mb-4 text-xs text-emerald-400 bg-emerald-900/10 border border-emerald-700/20 rounded-md px-3 py-2">
+          <div className="mb-4 text-xs text-success bg-success/15 border border-success/25 rounded-md px-3 py-2">
             {t('contracts.studio.saveSuccess', 'Changes saved successfully.')}
           </div>
         )}
         {submitMutation.isError && (
-          <div className="mb-4 text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded-md px-3 py-2">
+          <div className="mb-4 text-xs text-critical bg-critical/15 border border-critical/25 rounded-md px-3 py-2">
             {t('contracts.studio.submitFailed', 'Failed to submit for review.')}
           </div>
         )}
         {submitMutation.isSuccess && (
-          <div className="mb-4 text-xs text-emerald-400 bg-emerald-900/10 border border-emerald-700/20 rounded-md px-3 py-2">
+          <div className="mb-4 text-xs text-success bg-success/15 border border-success/25 rounded-md px-3 py-2">
             {t('contracts.studio.submitSuccess', 'Draft submitted for review successfully.')}
           </div>
         )}
         {exportError && (
-          <div className="mb-4 text-xs text-red-400 bg-red-900/10 border border-red-700/20 rounded-md px-3 py-2">
+          <div className="mb-4 text-xs text-critical bg-critical/15 border border-critical/25 rounded-md px-3 py-2">
             {t('contracts.studio.exportDraftFailed', 'Failed to export draft.')}
           </div>
         )}

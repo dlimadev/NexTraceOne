@@ -28,10 +28,10 @@ export function ServiceCatalogOverviewTab({ graph, healthData, onSelectNode }: S
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: t('serviceCatalog.overview.requestsPerMin'), value: '—', icon: <Activity size={18} />, color: 'text-blue-500' },
-          { label: t('serviceCatalog.overview.throughput'), value: '—', icon: <TrendingUp size={18} />, color: 'text-emerald-500' },
-          { label: t('serviceCatalog.overview.avgLatency'), value: '—', icon: <Timer size={18} />, color: 'text-amber-500' },
-          { label: t('serviceCatalog.overview.errorRate'), value: '—', icon: <AlertTriangle size={18} />, color: 'text-red-500' },
+          { label: t('serviceCatalog.overview.requestsPerMin'), value: '—', icon: <Activity size={18} />, color: 'text-info' },
+          { label: t('serviceCatalog.overview.throughput'), value: '—', icon: <TrendingUp size={18} />, color: 'text-success' },
+          { label: t('serviceCatalog.overview.avgLatency'), value: '—', icon: <Timer size={18} />, color: 'text-warning' },
+          { label: t('serviceCatalog.overview.errorRate'), value: '—', icon: <AlertTriangle size={18} />, color: 'text-critical' },
         ].map((kpi) => (
           <Card key={kpi.label}>
             <CardBody className="flex items-center gap-3">
@@ -56,10 +56,10 @@ export function ServiceCatalogOverviewTab({ graph, healthData, onSelectNode }: S
               {(['healthy', 'degraded', 'unhealthy', 'unknown'] as const).map((status) => {
                 const count = healthData.items.filter((h) => h.status.toLowerCase() === status).length;
                 const colors = {
-                  healthy: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/50',
-                  degraded: 'bg-amber-900/40 text-amber-300 border-amber-700/50',
-                  unhealthy: 'bg-red-900/40 text-red-300 border-red-700/50',
-                  unknown: 'bg-slate-800/40 text-slate-300 border-slate-700/50',
+                  healthy: 'bg-success/15 text-success border-success/25',
+                  degraded: 'bg-warning/15 text-warning border-warning/25',
+                  unhealthy: 'bg-critical/15 text-critical border-critical/25',
+                  unknown: 'bg-elevated text-muted border-edge',
                 };
                 return (
                   <div key={status} className={`rounded-lg border p-4 text-center ${colors[status]}`}>

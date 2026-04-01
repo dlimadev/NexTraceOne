@@ -115,19 +115,19 @@ const entityTypeLabelKeys: Record<string, string> = {
 };
 
 /** Cores de badge por status de entidade. */
-const STATUS_COLOR_DEFAULT = 'bg-slate-500/20 text-slate-400';
+const STATUS_COLOR_DEFAULT = 'bg-elevated text-muted';
 const statusColors: Record<string, string> = {
-  active: 'bg-emerald-500/20 text-emerald-400',
-  healthy: 'bg-emerald-500/20 text-emerald-400',
-  degraded: 'bg-amber-500/20 text-amber-400',
+  active: 'bg-success/20 text-success',
+  healthy: 'bg-success/20 text-success',
+  degraded: 'bg-warning/20 text-warning',
   draft: STATUS_COLOR_DEFAULT,
-  deprecated: 'bg-red-500/20 text-red-400',
-  published: 'bg-emerald-500/20 text-emerald-400',
+  deprecated: 'bg-critical/15 text-critical',
+  published: 'bg-success/20 text-success',
   archived: STATUS_COLOR_DEFAULT,
-  resolved: 'bg-emerald-500/20 text-emerald-400',
-  info: 'bg-blue-500/20 text-blue-400',
-  warning: 'bg-amber-500/20 text-amber-400',
-  critical: 'bg-red-500/20 text-red-400',
+  resolved: 'bg-success/20 text-success',
+  info: 'bg-info/15 text-info',
+  warning: 'bg-warning/20 text-warning',
+  critical: 'bg-critical/15 text-critical',
 };
 
  /** Hook utilitário para debounce de valor. */
@@ -347,7 +347,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         <span className="shrink-0 opacity-70">{item.icon}</span>
                         <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
                         {item.preview && (
-                          <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-amber-300">
+                          <span className="rounded border border-warning/25 bg-warning/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-warning">
                             {t('preview.bannerTitle', 'Preview')}
                           </span>
                         )}

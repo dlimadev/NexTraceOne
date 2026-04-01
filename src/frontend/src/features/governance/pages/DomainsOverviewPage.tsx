@@ -113,7 +113,7 @@ export function DomainsOverviewPage() {
       <PageSection>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard title={t('organization.domains.totalDomains')} value={domains.length} icon={<Globe size={20} />} color="text-accent" />
-          <StatCard title={t('organization.domains.totalTeams')} value={totalTeams} icon={<Users size={20} />} color="text-blue-500" />
+          <StatCard title={t('organization.domains.totalTeams')} value={totalTeams} icon={<Users size={20} />} color="text-info" />
           <StatCard title={t('organization.domains.totalServices')} value={totalServices} icon={<Server size={20} />} color="text-success" />
           <StatCard title={t('organization.domains.avgMaturity')} value={t('organization.domains.maturityLevel.Defined')} icon={<BarChart3 size={20} />} color="text-info" />
         </div>

@@ -49,8 +49,8 @@ const confidenceVariant = (score: number): 'default' | 'success' | 'warning' | '
 
 /** Cores dos nós do grafo por tipo. */
 const nodeColors = {
-  service: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-300 dark:border-blue-700' },
-  api: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-300 dark:border-emerald-700' },
+  service: { bg: 'bg-info/15', text: 'text-info', border: 'border-info/25' },
+  api: { bg: 'bg-success/15', text: 'text-success', border: 'border-success/25' },
 };
 
 type Tab = 'overview' | 'services' | 'apis' | 'graph' | 'impact' | 'temporal';
@@ -199,10 +199,10 @@ export function ServiceCatalogPage() {
       {/* ── Estatísticas resumidas ──────────────────────────────────── */}
       <StatsGrid columns={4}>
         {[
-          { label: t('serviceCatalog.stats.services'), value: graphStats.services, icon: <Server size={18} />, color: 'text-blue-500' },
-          { label: t('serviceCatalog.stats.apis'), value: graphStats.apis, icon: <Globe size={18} />, color: 'text-emerald-500' },
-          { label: t('serviceCatalog.stats.edges'), value: graphStats.edges, icon: <GitBranch size={18} />, color: 'text-purple-500' },
-          { label: t('serviceCatalog.stats.domains'), value: graphStats.domains, icon: <Layers size={18} />, color: 'text-amber-500' },
+          { label: t('serviceCatalog.stats.services'), value: graphStats.services, icon: <Server size={18} />, color: 'text-info' },
+          { label: t('serviceCatalog.stats.apis'), value: graphStats.apis, icon: <Globe size={18} />, color: 'text-success' },
+          { label: t('serviceCatalog.stats.edges'), value: graphStats.edges, icon: <GitBranch size={18} />, color: 'text-info' },
+          { label: t('serviceCatalog.stats.domains'), value: graphStats.domains, icon: <Layers size={18} />, color: 'text-warning' },
         ].map((stat) => (
           <Card key={stat.label}>
             <CardBody className="flex items-center gap-3">
@@ -519,7 +519,7 @@ function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSele
                         {api.consumers.map((c) => (
                           <span
                             key={c.relationshipId}
-                            className="inline-flex items-center gap-1 text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded px-1.5 py-0.5"
+                            className="inline-flex items-center gap-1 text-xs bg-info/15 text-info rounded px-1.5 py-0.5"
                           >
                             <ArrowRight size={10} />
                             {c.consumerName}
@@ -662,13 +662,13 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
             </Card>
             <Card>
               <CardBody className="text-center">
-                <p className="text-3xl font-bold text-amber-600">{impactResult.directCount}</p>
+                <p className="text-3xl font-bold text-warning">{impactResult.directCount}</p>
                 <p className="text-xs text-muted">{t('serviceCatalog.impact.directConsumers')}</p>
               </CardBody>
             </Card>
             <Card>
               <CardBody className="text-center">
-                <p className="text-3xl font-bold text-red-600">{impactResult.transitiveCount}</p>
+                <p className="text-3xl font-bold text-critical">{impactResult.transitiveCount}</p>
                 <p className="text-xs text-muted">{t('serviceCatalog.impact.transitiveConsumers')}</p>
               </CardBody>
             </Card>
@@ -695,9 +695,9 @@ function ImpactPanel({ graph, selectedNodeId, impactResult, impactLoading, impac
                         <td className="px-4 py-2 text-body font-medium">
                           <div className="flex items-center gap-2">
                             {node.depth === 1 ? (
-                              <AlertTriangle size={14} className="text-amber-500" />
+                              <AlertTriangle size={14} className="text-warning" />
                             ) : (
-                              <Shield size={14} className="text-red-400" />
+                              <Shield size={14} className="text-critical" />
                             )}
                             {node.nodeName}
                           </div>
@@ -851,25 +851,25 @@ function TemporalPanel({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardBody className="text-center">
-              <p className="text-2xl font-bold text-emerald-600">+{diffResult.addedNodesCount}</p>
+              <p className="text-2xl font-bold text-success">+{diffResult.addedNodesCount}</p>
               <p className="text-xs text-muted">{t('serviceCatalog.temporal.addedNodes')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-center">
-              <p className="text-2xl font-bold text-red-600">-{diffResult.removedNodesCount}</p>
+              <p className="text-2xl font-bold text-critical">-{diffResult.removedNodesCount}</p>
               <p className="text-xs text-muted">{t('serviceCatalog.temporal.removedNodes')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-center">
-              <p className="text-2xl font-bold text-emerald-600">+{diffResult.addedEdgesCount}</p>
+              <p className="text-2xl font-bold text-success">+{diffResult.addedEdgesCount}</p>
               <p className="text-xs text-muted">{t('serviceCatalog.temporal.addedEdges')}</p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-center">
-              <p className="text-2xl font-bold text-red-600">-{diffResult.removedEdgesCount}</p>
+              <p className="text-2xl font-bold text-critical">-{diffResult.removedEdgesCount}</p>
               <p className="text-xs text-muted">{t('serviceCatalog.temporal.removedEdges')}</p>
             </CardBody>
           </Card>

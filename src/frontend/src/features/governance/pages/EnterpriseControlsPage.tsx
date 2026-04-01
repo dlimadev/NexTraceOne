@@ -48,8 +48,8 @@ const maturityBadge = (mat: MaturityLevelType): 'success' | 'info' | 'warning' |
 };
 
 const coverageColor = (pct: number): string => {
-  if (pct >= 80) return 'bg-emerald-500';
-  if (pct >= 60) return 'bg-amber-500';
+  if (pct >= 80) return 'bg-success';
+  if (pct >= 60) return 'bg-warning';
   return 'bg-critical';
 };
 
@@ -96,7 +96,7 @@ export function EnterpriseControlsPage() {
     );
   }
 
-  const overallColor = data.overallCoverage >= 80 ? 'text-success' : data.overallCoverage >= 60 ? 'text-amber-400' : 'text-critical';
+  const overallColor = data.overallCoverage >= 80 ? 'text-success' : data.overallCoverage >= 60 ? 'text-warning' : 'text-critical';
 
   return (
     <PageContainer>
@@ -122,7 +122,7 @@ export function EnterpriseControlsPage() {
           <Card key={dim.dimension}>
             <CardBody>
               <div className="flex items-start gap-3">
-                <div className={`mt-0.5 ${dim.coveragePercent >= 80 ? 'text-success' : dim.coveragePercent >= 60 ? 'text-amber-400' : 'text-critical'}`}>
+                <div className={`mt-0.5 ${dim.coveragePercent >= 80 ? 'text-success' : dim.coveragePercent >= 60 ? 'text-warning' : 'text-critical'}`}>
                   {dimensionIcon(dim.dimension)}
                 </div>
                 <div className="flex-1 min-w-0">

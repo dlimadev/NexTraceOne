@@ -27,9 +27,9 @@ const maturityBadgeVariant = (level: MaturityLevelType): 'success' | 'warning' |
 /** Mapeia score para classe de cor da barra de progresso. */
 const scoreBarColor = (score: number, maxScore: number): string => {
   const pct = maxScore === 0 ? 0 : (score / maxScore) * 100;
-  if (pct >= 80) return 'bg-emerald-500';
-  if (pct >= 60) return 'bg-amber-500';
-  if (pct >= 40) return 'bg-orange-500';
+  if (pct >= 80) return 'bg-success';
+  if (pct >= 60) return 'bg-warning';
+  if (pct >= 40) return 'bg-warning';
   return 'bg-critical';
 };
 

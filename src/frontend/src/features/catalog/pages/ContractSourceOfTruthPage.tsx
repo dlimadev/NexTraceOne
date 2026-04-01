@@ -24,23 +24,23 @@ import type { SourceOfTruthReferenceItem } from '../../../types';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
-  OpenApi: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
+  OpenApi: 'bg-success/15 text-success border border-success/25',
   Swagger: 'bg-teal-900/40 text-teal-300 border border-teal-700/50',
   Wsdl: 'bg-violet-900/40 text-violet-300 border border-violet-700/50',
-  AsyncApi: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Protobuf: 'bg-amber-900/40 text-amber-300 border border-amber-700/50',
+  AsyncApi: 'bg-info/15 text-info border border-info/25',
+  Protobuf: 'bg-warning/15 text-warning border border-warning/25',
   GraphQl: 'bg-pink-900/40 text-pink-300 border border-pink-700/50',
 };
 
 /** Variantes visuais para badges de ciclo de vida. */
 const lifecycleColors: Record<string, string> = {
-  Draft: 'bg-slate-800/40 text-slate-300 border border-slate-700/50',
-  InReview: 'bg-blue-900/40 text-blue-300 border border-blue-700/50',
-  Approved: 'bg-emerald-900/40 text-emerald-300 border border-emerald-700/50',
-  Locked: 'bg-purple-900/40 text-purple-300 border border-purple-700/50',
-  Deprecated: 'bg-orange-900/40 text-orange-300 border border-orange-700/50',
-  Sunset: 'bg-red-900/40 text-red-300 border border-red-700/50',
-  Retired: 'bg-slate-900/40 text-slate-400 border border-slate-700/50',
+  Draft: 'bg-elevated text-muted border border-edge',
+  InReview: 'bg-info/15 text-info border border-info/25',
+  Approved: 'bg-success/15 text-success border border-success/25',
+  Locked: 'bg-info/15 text-info border border-info/25',
+  Deprecated: 'bg-warning/15 text-warning border border-warning/25',
+  Sunset: 'bg-critical/15 text-critical border border-critical/25',
+  Retired: 'bg-elevated text-muted border border-edge',
 };
 
 /** Página consolidada de Source of Truth de um contrato. */
@@ -103,10 +103,10 @@ export function ContractSourceOfTruthPage() {
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-sm text-muted">{sot.apiAssetId}</span>
             <span className="text-sm text-muted">v{sot.semVer}</span>
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[sot.protocol] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full ${protocolColors[sot.protocol] ?? 'bg-elevated text-muted border border-edge'}`}>
               {t(`contractGov.badges.protocols.${sot.protocol}`, sot.protocol)}
             </span>
-            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}>
               {t(`contractGov.badges.lifecycle.${sot.governance.lifecycleState}`, sot.governance.lifecycleState)}
             </span>
           </div>
@@ -152,7 +152,7 @@ export function ContractSourceOfTruthPage() {
                 <div>
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.lifecycleState')}</dt>
                   <dd>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'}`}>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${lifecycleColors[sot.governance.lifecycleState] ?? 'bg-elevated text-muted border border-edge'}`}>
                       {t(`contractGov.badges.lifecycle.${sot.governance.lifecycleState}`, sot.governance.lifecycleState)}
                     </span>
                   </dd>
@@ -161,7 +161,7 @@ export function ContractSourceOfTruthPage() {
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.lockStatus')}</dt>
                   <dd className="flex items-center gap-1.5 text-body">
                     {sot.governance.isLocked ? (
-                      <><Lock size={14} className="text-purple-400" /><span>{t('common.yes')}</span></>
+                      <><Lock size={14} className="text-info" /><span>{t('common.yes')}</span></>
                     ) : (
                       <><Unlock size={14} className="text-muted" /><span>{t('common.no')}</span></>
                     )}
@@ -171,7 +171,7 @@ export function ContractSourceOfTruthPage() {
                   <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.signedStatus')}</dt>
                   <dd className="flex items-center gap-1.5 text-body">
                     {sot.governance.isSigned ? (
-                      <><CheckCircle size={14} className="text-emerald-400" /><span>{t('common.yes')}</span></>
+                      <><CheckCircle size={14} className="text-success" /><span>{t('common.yes')}</span></>
                     ) : (
                       <><XCircle size={14} className="text-muted" /><span>{t('common.no')}</span></>
                     )}
@@ -180,7 +180,7 @@ export function ContractSourceOfTruthPage() {
                 {sot.governance.deprecationNotice && (
                   <div className="sm:col-span-2">
                     <dt className="text-muted text-xs mb-0.5">{t('sourceOfTruth.contract.deprecationNotice')}</dt>
-                    <dd className="text-orange-300 text-sm">{sot.governance.deprecationNotice}</dd>
+                    <dd className="text-warning text-sm">{sot.governance.deprecationNotice}</dd>
                   </div>
                 )}
                 {sot.governance.deprecationDate && (
@@ -218,7 +218,7 @@ export function ContractSourceOfTruthPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-heading truncate">{ref.title}</p>
                         <p className="text-xs text-muted line-clamp-2">{ref.description}</p>
-                        <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-800/40 text-slate-300 border border-slate-700/50">
+                        <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded-full bg-elevated text-muted border border-edge">
                           {String(t(`sourceOfTruth.referenceTypes.${ref.referenceType}`, ref.referenceType))}
                         </span>
                       </div>
@@ -256,7 +256,7 @@ export function ContractSourceOfTruthPage() {
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-elevated border border-edge">
                   <span className="text-sm text-muted">{t('sourceOfTruth.contract.violations')}</span>
-                  <span className={`text-lg font-bold ${sot.violationCount > 0 ? 'text-red-400' : 'text-heading'}`}>
+                  <span className={`text-lg font-bold ${sot.violationCount > 0 ? 'text-critical' : 'text-heading'}`}>
                     {sot.violationCount}
                   </span>
                 </div>

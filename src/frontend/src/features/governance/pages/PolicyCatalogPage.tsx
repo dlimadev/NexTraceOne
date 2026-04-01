@@ -118,7 +118,7 @@ export function PolicyCatalogPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('governance.policies.totalPolicies')} value={d.totalPolicies} icon={<Shield size={20} />} color="text-accent" />
         <StatCard title={t('governance.policies.active')} value={d.activeCount} icon={<ShieldCheck size={20} />} color="text-success" />
-        <StatCard title={t('governance.policies.draft')} value={d.draftCount} icon={<FileText size={20} />} color="text-amber-500" />
+        <StatCard title={t('governance.policies.draft')} value={d.draftCount} icon={<FileText size={20} />} color="text-warning" />
         <StatCard title={t('governance.policies.totalViolations')} value={totalViolations} icon={<ShieldAlert size={20} />} color="text-critical" />
       </div>
 

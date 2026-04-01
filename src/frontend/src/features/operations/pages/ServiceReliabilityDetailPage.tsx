@@ -25,8 +25,8 @@ const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger
 
 const trendIcon = (dir: string) => {
   switch (dir) {
-    case 'Improving': return <TrendingUp size={14} className="text-emerald-500" />;
-    case 'Declining': return <TrendingDown size={14} className="text-red-500" />;
+    case 'Improving': return <TrendingUp size={14} className="text-success" />;
+    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
     default: return <Minus size={14} className="text-muted" />;
   }
 };
@@ -105,7 +105,7 @@ export function ServiceReliabilityDetailPage() {
 
         {/* Anomaly Summary */}
         <Card>
-          <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><AlertTriangle size={16} className="text-amber-500" />{t('reliability.detail.anomalySummary')}</h2></CardHeader>
+          <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><AlertTriangle size={16} className="text-warning" />{t('reliability.detail.anomalySummary')}</h2></CardHeader>
           <CardBody>
             <p className="text-sm text-body">{data.anomalySummary}</p>
           </CardBody>
@@ -144,7 +144,7 @@ export function ServiceReliabilityDetailPage() {
 
         {/* Linked Incidents */}
         <Card>
-          <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><AlertTriangle size={16} className="text-red-500" />{t('reliability.detail.linkedIncidents')}</h2></CardHeader>
+          <CardHeader><h2 className="text-sm font-semibold text-heading flex items-center gap-2"><AlertTriangle size={16} className="text-critical" />{t('reliability.detail.linkedIncidents')}</h2></CardHeader>
           <CardBody>
             {data.linkedIncidents.length === 0 ? (
               <p className="text-sm text-muted">{t('reliability.detail.noIncidents')}</p>
@@ -242,7 +242,7 @@ export function ServiceReliabilityDetailPage() {
               { key: 'changes', value: data.coverage.hasRecentChangeContext },
               { key: 'incidents', value: data.coverage.hasIncidentLinkage },
             ].map(({ key, value }) => (
-              <div key={key} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border ${value ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600' : 'border-red-500/20 bg-red-500/5 text-red-500'}`}>
+              <div key={key} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md border ${value ? 'border-success/25 bg-success/5 text-success' : 'border-critical/25 bg-critical/15 text-critical'}`}>
                 {value ? <CheckCircle size={14} /> : <XCircle size={14} />}
                 {t(`reliability.coverage.${key}`)}
               </div>

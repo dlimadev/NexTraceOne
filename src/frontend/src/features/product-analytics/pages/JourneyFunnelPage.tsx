@@ -24,17 +24,17 @@ import type { JourneyItemDto } from '../../../types';
  */
 
 function completionColor(rate: number): string {
-  if (rate >= 60) return 'text-emerald-400';
+  if (rate >= 60) return 'text-success';
   if (rate >= 40) return 'text-accent';
-  if (rate >= 25) return 'text-amber-400';
-  return 'text-red-400';
+  if (rate >= 25) return 'text-warning';
+  return 'text-critical';
 }
 
 function barColor(percent: number): string {
-  if (percent >= 80) return 'bg-emerald-500';
+  if (percent >= 80) return 'bg-success';
   if (percent >= 50) return 'bg-accent';
-  if (percent >= 30) return 'bg-amber-500';
-  return 'bg-red-500';
+  if (percent >= 30) return 'bg-warning';
+  return 'bg-critical';
 }
 
 export function JourneyFunnelPage() {
@@ -145,7 +145,7 @@ export function JourneyFunnelPage() {
                           <div className="flex items-center gap-3 text-sm">
                             <span className="text-heading font-medium">{step.completionPercent}%</span>
                             {dropOff > 5 && (
-                              <span className="text-red-400 text-xs">-{dropOff.toFixed(1)}%</span>
+                              <span className="text-critical text-xs">-{dropOff.toFixed(1)}%</span>
                             )}
                           </div>
                         </div>
@@ -162,9 +162,9 @@ export function JourneyFunnelPage() {
 
                 {/* Drop-off insight */}
                 {j.biggestDropOff && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                    <AlertTriangle size={14} className="text-amber-400 flex-shrink-0" />
-                    <span className="text-sm text-amber-300">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-warning/10 border border-warning/25">
+                    <AlertTriangle size={14} className="text-warning flex-shrink-0" />
+                    <span className="text-sm text-warning">
                       {t('analytics.journey.biggestDropOff')}: {j.biggestDropOff}
                     </span>
                   </div>

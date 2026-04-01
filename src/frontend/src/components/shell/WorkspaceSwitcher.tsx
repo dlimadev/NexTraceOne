@@ -6,12 +6,12 @@ import { useEnvironment, type EnvironmentProfile } from '../../contexts/Environm
 
 function getProfileBadgeClass(profile: EnvironmentProfile): string {
   switch (profile) {
-    case 'production': return 'text-red-400 border-red-400/30 bg-red-400/10';
-    case 'staging': return 'text-orange-400 border-orange-400/30 bg-orange-400/10';
-    case 'uat': return 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10';
-    case 'qa': return 'text-blue-400 border-blue-400/30 bg-blue-400/10';
-    case 'development': return 'text-green-400 border-green-400/30 bg-green-400/10';
-    case 'sandbox': return 'text-purple-400 border-purple-400/30 bg-purple-400/10';
+    case 'production': return 'text-critical border-critical/25 bg-critical/15';
+    case 'staging': return 'text-warning border-warning/25 bg-warning/15';
+    case 'uat': return 'text-warning border-warning/25 bg-warning/15';
+    case 'qa': return 'text-info border-info/25 bg-info/15';
+    case 'development': return 'text-success border-success/25 bg-success/15';
+    case 'sandbox': return 'text-info border-info/25 bg-info/15';
     default: return 'text-faded border-edge';
   }
 }
@@ -50,7 +50,7 @@ export function WorkspaceSwitcher() {
           </span>
         )}
         {activeEnvironment && !activeEnvironment.isProductionLike && (
-          <AlertTriangle size={12} className="text-yellow-400 shrink-0" aria-hidden="true" />
+          <AlertTriangle size={12} className="text-warning shrink-0" aria-hidden="true" />
         )}
         <ChevronDown size={12} className="text-faded shrink-0" />
       </button>
@@ -107,7 +107,7 @@ export function WorkspaceSwitcher() {
                       <span>{env.name}</span>
                       <div className="flex items-center gap-1">
                         {!env.isProductionLike && (
-                          <AlertTriangle size={10} className="text-yellow-400" aria-hidden="true" />
+                          <AlertTriangle size={10} className="text-warning" aria-hidden="true" />
                         )}
                         {isActive && <Check size={11} className="text-cyan" />}
                       </div>

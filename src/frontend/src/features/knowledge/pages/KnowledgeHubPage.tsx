@@ -114,7 +114,7 @@ export function KnowledgeHubPage() {
         <Card>
           <CardBody>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+              <div className="p-2 rounded-lg bg-info/15 text-info">
                 <FileText size={20} />
               </div>
               <div>
@@ -127,7 +127,7 @@ export function KnowledgeHubPage() {
         <Card>
           <CardBody>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+              <div className="p-2 rounded-lg bg-warning/10 text-warning">
                 <StickyNote size={20} />
               </div>
               <div>
