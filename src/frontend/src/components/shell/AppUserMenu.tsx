@@ -32,7 +32,7 @@ export function AppUserMenu() {
       >
         <div
           className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold"
-          style={{ background: 'linear-gradient(135deg, #1B7FE8 0%, #12C4E8 100%)' }}
+          style={{ background: 'var(--nto-gradient-logo)' }}
         >
           {initial}
         </div>

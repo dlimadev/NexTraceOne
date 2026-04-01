@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { PersonaProvider } from './contexts/PersonaContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './components/Toast';
 import { AppShell } from './components/shell/AppShell';
 
@@ -45,6 +46,7 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <AuthProvider>
         <EnvironmentProvider>
           <PersonaProvider>
@@ -86,6 +88,7 @@ export default function App() {
           </PersonaProvider>
         </EnvironmentProvider>
       </AuthProvider>
+      </ThemeProvider>
       {/* PHASE-0 guardrail: ReactQueryDevtools must only render in DEV.
           The import.meta.env.DEV flag is evaluated at build time by Vite —
           this entire branch is tree-shaken out of production bundles. */}

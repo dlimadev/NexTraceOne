@@ -31,8 +31,9 @@ export function AppTopbar({ onOpenCommandPalette, onOpenMobileMenu }: AppTopbarP
         className={cn(
           'h-20 border-b border-edge',
           'flex items-center justify-between px-5 lg:px-6 gap-3',
-          'bg-deep/90 backdrop-blur-md sticky top-0 z-[var(--z-header)]',
+          'backdrop-blur-md sticky top-0 z-[var(--z-header)]',
         )}
+        style={{ backgroundColor: 'var(--t-header-bg)' }}
         role="banner"
       >
         {/* Mobile menu button */}

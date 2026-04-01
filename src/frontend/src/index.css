@@ -3,8 +3,8 @@
    Sovereign Engineering Governance Platform
 
    Fonte da verdade: docs/DESIGN-SYSTEM.md
-   Identidade visual: navy profundo + cyan/mint como acentos sobre superfícies
-   escuras sofisticadas. Dark-first enterprise, sem purple, sem neon.
+   Suporte a tema claro e escuro com transição suave.
+   Tema controlado por data-theme="light|dark" no <html>.
 
    Camadas: canvas → deep → panel/card → elevated → hover
    Acentos: cyan (foco/ativo) · mint (sucesso/saúde) · blue (CTA institucional)
@@ -13,81 +13,235 @@
 
 @import "tailwindcss";
 
+/* ─── Theme Variables (light/dark) ─────────────────────────────────────────────
+   CSS custom properties mudam com data-theme no <html>.
+   Tailwind @theme consome estas variáveis para gerar utilities.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── LIGHT THEME ─────────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  --t-canvas: #F8F9FC;
+  --t-deep: #F0F1F5;
+  --t-panel: #FFFFFF;
+  --t-card: #FFFFFF;
+  --t-elevated: #F2F3F7;
+  --t-subtle: #F5F6FA;
+  --t-hover: #ECEDF2;
+  --t-active: #E4E5EB;
+  --t-selected: #E8EAEF;
+  --t-input: #FFFFFF;
+  --t-overlay: rgba(15, 23, 42, 0.45);
+
+  --t-edge: rgba(15, 23, 42, 0.12);
+  --t-edge-strong: rgba(15, 23, 42, 0.20);
+  --t-edge-focus: rgba(27, 127, 232, 0.42);
+  --t-divider: rgba(15, 23, 42, 0.06);
+
+  --t-heading: #0C243C;
+  --t-body: #4A5568;
+  --t-muted: #718096;
+  --t-faded: #A0AEC0;
+  --t-on-accent: #FFFFFF;
+
+  --t-accent: #1B7FE8;
+  --t-accent-hover: #1468CC;
+  --t-accent-muted: rgba(27, 127, 232, 0.10);
+  --t-focus-ring: rgba(27, 127, 232, 0.40);
+  --t-cyan: #0891B2;
+  --t-cyan-hover: #0E7490;
+  --t-mint: #059669;
+  --t-mint-hover: #047857;
+
+  --t-blue: #1B7FE8;
+  --t-blue-hover: #1468CC;
+  --t-blue-muted: rgba(27, 127, 232, 0.10);
+  --t-blue-glow: rgba(27, 127, 232, 0.20);
+
+  --t-success: #059669;
+  --t-success-muted: rgba(5, 150, 105, 0.10);
+  --t-info: #0891B2;
+  --t-info-muted: rgba(8, 145, 178, 0.10);
+  --t-warning: #D97706;
+  --t-warning-muted: rgba(217, 119, 6, 0.10);
+  --t-critical: #DC2626;
+  --t-critical-muted: rgba(220, 38, 38, 0.10);
+  --t-danger: #DC2626;
+  --t-neutral: #718096;
+
+  --t-data-1: #0891B2;
+  --t-data-2: #059669;
+  --t-data-3: #718096;
+  --t-data-4: #D97706;
+  --t-data-5: #DC2626;
+  --t-data-6: #4F6EE5;
+
+  --t-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --t-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --t-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --t-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+  --t-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.10), 0 8px 10px rgba(0, 0, 0, 0.04);
+  --t-shadow-glow-cyan: 0 0 0 1px rgba(8, 145, 178, 0.18), 0 0 16px rgba(8, 145, 178, 0.10);
+  --t-shadow-glow-mint: 0 0 0 1px rgba(5, 150, 105, 0.16), 0 0 16px rgba(5, 150, 105, 0.08);
+  --t-shadow-glow-danger: 0 0 0 1px rgba(220, 38, 38, 0.20), 0 0 16px rgba(220, 38, 38, 0.08);
+  --t-shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.22), 0 0 16px rgba(27, 127, 232, 0.12);
+  --t-shadow-glow: 0 0 16px rgba(27, 127, 232, 0.10);
+  --t-shadow-glow-sm: 0 0 8px rgba(27, 127, 232, 0.06);
+
+  --t-sidebar-bg: #FFFFFF;
+  --t-sidebar-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8F9FC 100%);
+  --t-header-bg: rgba(248, 249, 252, 0.92);
+  --t-scrollbar: rgba(15, 23, 42, 0.14);
+  --t-scrollbar-hover: rgba(15, 23, 42, 0.24);
+  --t-selection-bg: rgba(27, 127, 232, 0.18);
+}
+
+/* ─── DARK THEME ──────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --t-canvas: #081120;
+  --t-deep: #0A1730;
+  --t-panel: #0F1E38;
+  --t-card: #0F1E38;
+  --t-elevated: #132543;
+  --t-subtle: #0D1B32;
+  --t-hover: #132543;
+  --t-active: #1A2E50;
+  --t-selected: #162A48;
+  --t-input: #091729;
+  --t-overlay: rgba(3, 10, 22, 0.72);
+
+  --t-edge: rgba(129, 170, 214, 0.14);
+  --t-edge-strong: rgba(129, 170, 214, 0.22);
+  --t-edge-focus: rgba(55, 190, 233, 0.42);
+  --t-divider: rgba(255, 255, 255, 0.06);
+
+  --t-heading: #F2F7FF;
+  --t-body: #B5C4D8;
+  --t-muted: #8EA0B7;
+  --t-faded: #6D7E96;
+  --t-on-accent: #04111E;
+
+  --t-accent: #27ABDA;
+  --t-accent-hover: #62CBEC;
+  --t-accent-muted: rgba(39, 171, 218, 0.12);
+  --t-focus-ring: rgba(39, 171, 218, 0.50);
+  --t-cyan: #12C4E8;
+  --t-cyan-hover: #3DD2F5;
+  --t-mint: #18E8B8;
+  --t-mint-hover: #6CF5D8;
+
+  --t-blue: #1B7FE8;
+  --t-blue-hover: #3D96F2;
+  --t-blue-muted: rgba(27, 127, 232, 0.14);
+  --t-blue-glow: rgba(27, 127, 232, 0.30);
+
+  --t-success: #18E8B8;
+  --t-success-muted: rgba(24, 232, 184, 0.12);
+  --t-info: #12C4E8;
+  --t-info-muted: rgba(18, 196, 232, 0.12);
+  --t-warning: #F5C062;
+  --t-warning-muted: rgba(245, 192, 98, 0.12);
+  --t-critical: #FF7A86;
+  --t-critical-muted: rgba(255, 122, 134, 0.12);
+  --t-danger: #FF7A86;
+  --t-neutral: #8EA0B7;
+
+  --t-data-1: #12C4E8;
+  --t-data-2: #18E8B8;
+  --t-data-3: #8EA0B7;
+  --t-data-4: #F5C062;
+  --t-data-5: #FF7A86;
+  --t-data-6: #5F8DFF;
+
+  --t-shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.18);
+  --t-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.20);
+  --t-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+  --t-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.20);
+  --t-shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.40), 0 8px 20px rgba(0, 0, 0, 0.24);
+  --t-shadow-glow-cyan: 0 0 0 1px rgba(18, 196, 232, 0.22), 0 0 24px rgba(18, 196, 232, 0.16);
+  --t-shadow-glow-mint: 0 0 0 1px rgba(24, 232, 184, 0.20), 0 0 24px rgba(24, 232, 184, 0.14);
+  --t-shadow-glow-danger: 0 0 0 1px rgba(255, 122, 134, 0.24), 0 0 20px rgba(255, 122, 134, 0.14);
+  --t-shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.30), 0 0 24px rgba(27, 127, 232, 0.20);
+  --t-shadow-glow: 0 0 24px rgba(18, 196, 232, 0.16);
+  --t-shadow-glow-sm: 0 0 12px rgba(18, 196, 232, 0.10);
+
+  --t-sidebar-bg: #081120;
+  --t-sidebar-gradient: linear-gradient(180deg, #0A1730 0%, #081120 100%);
+  --t-header-bg: rgba(10, 23, 48, 0.90);
+  --t-scrollbar: rgba(129, 170, 214, 0.18);
+  --t-scrollbar-hover: rgba(129, 170, 214, 0.28);
+  --t-selection-bg: rgba(24, 207, 242, 0.25);
+}
+
+/* ─── Tailwind @theme — maps semantic tokens to CSS variables ─────────────── */
 @theme {
-  /* ─── Canvas & Surfaces ─────────────────────────────────────────────────────
-     Sistema de layering dark com profundidade navy.
-     canvas < deep < panel/card < elevated < hover < active < selected
-     ──────────────────────────────────────────────────────────────────────────── */
-  --color-canvas: #081120;
-  --color-deep: #0A1730;
-  --color-panel: #0F1E38;  /* alias for card — prefer card */
-  --color-card: #0F1E38;
-  --color-elevated: #132543;
-  --color-subtle: #0D1B32;
-  --color-hover: #132543;
-  --color-active: #1A2E50;
-  --color-selected: #162A48;
-  --color-input: #091729;
-  --color-overlay: rgba(3, 10, 22, 0.72);
+  /* Canvas & Surfaces */
+  --color-canvas: var(--t-canvas);
+  --color-deep: var(--t-deep);
+  --color-panel: var(--t-panel);
+  --color-card: var(--t-card);
+  --color-elevated: var(--t-elevated);
+  --color-subtle: var(--t-subtle);
+  --color-hover: var(--t-hover);
+  --color-active: var(--t-active);
+  --color-selected: var(--t-selected);
+  --color-input: var(--t-input);
+  --color-overlay: var(--t-overlay);
 
-  /* ─── Borders & Dividers ─────────────────────────────────────────────────── */
-  --color-edge: rgba(129, 170, 214, 0.14);
-  --color-edge-strong: rgba(129, 170, 214, 0.22);
-  --color-edge-focus: rgba(55, 190, 233, 0.42);
-  --color-divider: rgba(255, 255, 255, 0.06);
+  /* Borders & Dividers */
+  --color-edge: var(--t-edge);
+  --color-edge-strong: var(--t-edge-strong);
+  --color-edge-focus: var(--t-edge-focus);
+  --color-divider: var(--t-divider);
 
-  /* ─── Text Hierarchy ─────────────────────────────────────────────────────── */
-  --color-heading: #F2F7FF;
-  --color-body: #B5C4D8;
-  --color-muted: #8EA0B7;
-  --color-faded: #6D7E96;
-  --color-on-accent: #04111E;
+  /* Text Hierarchy */
+  --color-heading: var(--t-heading);
+  --color-body: var(--t-body);
+  --color-muted: var(--t-muted);
+  --color-faded: var(--t-faded);
+  --color-on-accent: var(--t-on-accent);
 
-  /* ─── Accent (Cyan / Mint / Blue CTA) ────────────────────────────────────── */
-  /* F4-02: saturation reduced ~15% — enterprise-grade, not neon */
-  --color-accent: #27ABDA;
-  --color-accent-hover: #62CBEC;
-  --color-accent-muted: rgba(39, 171, 218, 0.12);
-  --color-focus-ring: rgba(39, 171, 218, 0.50);
-  --color-cyan: #12C4E8;
-  --color-cyan-hover: #3DD2F5;
-  --color-mint: #18E8B8;
-  --color-mint-hover: #6CF5D8;
+  /* Accent */
+  --color-accent: var(--t-accent);
+  --color-accent-hover: var(--t-accent-hover);
+  --color-accent-muted: var(--t-accent-muted);
+  --color-focus-ring: var(--t-focus-ring);
+  --color-cyan: var(--t-cyan);
+  --color-cyan-hover: var(--t-cyan-hover);
+  --color-mint: var(--t-mint);
+  --color-mint-hover: var(--t-mint-hover);
 
-  /* ─── Blue Institucional (CTA primário, SSO, ações destaque) ──────────────
-     Azul rico e profundo alinhado com a identidade visual do logo.
-     Separado do cyan para criar hierarquia de CTA clara.
-     ──────────────────────────────────────────────────────────────────────── */
-  --color-blue: #1B7FE8;
-  --color-blue-hover: #3D96F2;
-  --color-blue-muted: rgba(27, 127, 232, 0.14);
-  --color-blue-glow: rgba(27, 127, 232, 0.30);
+  /* Blue Institucional */
+  --color-blue: var(--t-blue);
+  --color-blue-hover: var(--t-blue-hover);
+  --color-blue-muted: var(--t-blue-muted);
+  --color-blue-glow: var(--t-blue-glow);
 
-  /* ─── Semantic Status ────────────────────────────────────────────────────── */
-  --color-success: #18E8B8;
-  --color-success-muted: rgba(24, 232, 184, 0.12);
-  --color-info: #12C4E8;
-  --color-info-muted: rgba(18, 196, 232, 0.12);
-  --color-warning: #F5C062;
-  --color-warning-muted: rgba(245, 192, 98, 0.12);
-  --color-critical: #FF7A86;
-  --color-critical-muted: rgba(255, 122, 134, 0.12);
-  --color-danger: #FF7A86;  /* consolidated with critical — same semantic intent */
-  --color-neutral: #8EA0B7;
+  /* Semantic Status */
+  --color-success: var(--t-success);
+  --color-success-muted: var(--t-success-muted);
+  --color-info: var(--t-info);
+  --color-info-muted: var(--t-info-muted);
+  --color-warning: var(--t-warning);
+  --color-warning-muted: var(--t-warning-muted);
+  --color-critical: var(--t-critical);
+  --color-critical-muted: var(--t-critical-muted);
+  --color-danger: var(--t-danger);
+  --color-neutral: var(--t-neutral);
 
-  /* ─── Data Visualization ─────────────────────────────────────────────────── */
-  --color-data-1: #12C4E8;
-  --color-data-2: #18E8B8;
-  --color-data-3: #8EA0B7;
-  --color-data-4: #F5C062;
-  --color-data-5: #FF7A86;
-  --color-data-6: #5F8DFF;
+  /* Data Visualization */
+  --color-data-1: var(--t-data-1);
+  --color-data-2: var(--t-data-2);
+  --color-data-3: var(--t-data-3);
+  --color-data-4: var(--t-data-4);
+  --color-data-5: var(--t-data-5);
+  --color-data-6: var(--t-data-6);
 
-  /* ─── Typography ─────────────────────────────────────────────────────────── */
+  /* Typography */
   --font-sans: 'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
-  /* ─── Border Radius (suavemente arredondado, nunca quadrado duro) ─────── */
+  /* Border Radius */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -96,23 +250,23 @@
   --radius-2xl: 32px;
   --radius-pill: 999px;
 
-  /* ─── Shadows (escuras e difusas para dark UI) ───────────────────────────── */
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.18);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28), 0 1px 3px rgba(0, 0, 0, 0.20);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
-  --shadow-surface: var(--shadow-md);  /* semantic alias */
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.20);
-  --shadow-elevated: var(--shadow-lg);  /* semantic alias */
-  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.40), 0 8px 20px rgba(0, 0, 0, 0.24);
-  --shadow-floating: var(--shadow-xl);  /* semantic alias */
-  --shadow-glow-cyan: 0 0 0 1px rgba(18, 196, 232, 0.22), 0 0 24px rgba(18, 196, 232, 0.16);
-  --shadow-glow-mint: 0 0 0 1px rgba(24, 232, 184, 0.20), 0 0 24px rgba(24, 232, 184, 0.14);
-  --shadow-glow-danger: 0 0 0 1px rgba(255, 122, 134, 0.24), 0 0 20px rgba(255, 122, 134, 0.14);
-  --shadow-glow-blue: 0 0 0 1px rgba(27, 127, 232, 0.30), 0 0 24px rgba(27, 127, 232, 0.20);
-  --shadow-glow: 0 0 24px rgba(18, 196, 232, 0.16);
-  --shadow-glow-sm: 0 0 12px rgba(18, 196, 232, 0.10);
+  /* Shadows */
+  --shadow-xs: var(--t-shadow-xs);
+  --shadow-sm: var(--t-shadow-sm);
+  --shadow-md: var(--t-shadow-md);
+  --shadow-surface: var(--t-shadow-md);
+  --shadow-lg: var(--t-shadow-lg);
+  --shadow-elevated: var(--t-shadow-lg);
+  --shadow-xl: var(--t-shadow-xl);
+  --shadow-floating: var(--t-shadow-xl);
+  --shadow-glow-cyan: var(--t-shadow-glow-cyan);
+  --shadow-glow-mint: var(--t-shadow-glow-mint);
+  --shadow-glow-danger: var(--t-shadow-glow-danger);
+  --shadow-glow-blue: var(--t-shadow-glow-blue);
+  --shadow-glow: var(--t-shadow-glow);
+  --shadow-glow-sm: var(--t-shadow-glow-sm);
 
-  /* ─── Spacing (base 8pt) ─────────────────────────────────────────────────── */
+  /* Spacing (base 8pt) */
   --spacing-1: 4px;
   --spacing-2: 8px;
   --spacing-3: 12px;
@@ -124,7 +278,7 @@
   --spacing-12: 48px;
   --spacing-16: 64px;
 
-  /* ─── Animations ─────────────────────────────────────────────────────────── */
+  /* Animations */
   --animate-fade-in: fade-in 180ms var(--ease-standard);
   --animate-slide-up: slide-up 240ms var(--ease-standard);
   --animate-slide-right: slide-right 240ms var(--ease-standard);
@@ -151,15 +305,12 @@
   --ease-emphasis: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Gradients */
-  --nto-gradient-page: linear-gradient(180deg, #0A1730 0%, #081120 100%);
+  --nto-gradient-page: var(--t-sidebar-gradient);
   --nto-gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%);
   --nto-gradient-accent: linear-gradient(135deg, rgba(24,207,242,0.18) 0%, rgba(30,242,193,0.08) 100%);
   --nto-gradient-cta: linear-gradient(135deg, #29C0E5 0%, #2BB7E3 100%);
-  /* Gradiente azul institucional para SSO e ações de destaque primário */
   --nto-gradient-blue: linear-gradient(135deg, #1B7FE8 0%, #1468CC 100%);
-  /* Gradiente do logo da marca: azul → cyan → mint */
   --nto-gradient-logo: linear-gradient(135deg, #1B7FE8 0%, #12C4E8 50%, #18E8B8 100%);
-  /* Gradiente hero para painéis de apresentação */
   --nto-gradient-hero: radial-gradient(ellipse at 30% 40%, rgba(27,127,232,0.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 70%, rgba(18,196,232,0.08) 0%, transparent 55%);
 
   /* Z-index layers */
@@ -201,13 +352,21 @@
 /* ─── Global Base ────────────────────────────────────────────────────────────── */
 
 html {
-  background-color: var(--color-canvas);
+  background-color: var(--t-canvas);
+  transition: background-color 200ms ease;
+}
+
+[data-theme="dark"] {
   color-scheme: dark;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
   font-family: var(--font-sans);
-  color: var(--color-heading);
+  color: var(--t-heading);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -224,26 +383,26 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(129, 170, 214, 0.18);
+  background: var(--t-scrollbar);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(129, 170, 214, 0.28);
+  background: var(--t-scrollbar-hover);
 }
 
 /* ─── Focus Ring (acessibilidade) ────────────────────────────────────────────── */
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--t-accent);
   outline-offset: 2px;
 }
 
 /* ─── Text Selection ─────────────────────────────────────────────────────────── */
 
 ::selection {
-  background-color: rgba(24, 207, 242, 0.25);
-  color: var(--color-heading);
+  background-color: var(--t-selection-bg);
+  color: var(--t-heading);
 }
 
 /* ─── Brand Gradient Utilities ───────────────────────────────────────────────── */
@@ -385,9 +544,9 @@ body {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-elevated) 25%,
-    var(--color-hover) 50%,
-    var(--color-elevated) 75%
+    var(--t-elevated) 25%,
+    var(--t-hover) 50%,
+    var(--t-elevated) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
