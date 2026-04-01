@@ -3,6 +3,44 @@
  * Define os estados completos de cada builder, validações e serialização.
  */
 
+// ── Property Constraints ──────────────────────────────────────────────────────
+
+/** Constraints de uma propriedade de schema/parâmetro (alinhado com OpenAPI 3.x). */
+export interface PropertyConstraints {
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  exclusiveMinimum?: boolean;
+  exclusiveMaximum?: boolean;
+  pattern?: string;
+  format?: string;
+  defaultValue?: string;
+  readOnly?: boolean;
+  writeOnly?: boolean;
+  nullable?: boolean;
+  enumValues?: string[];
+  example?: string;
+}
+
+// ── Schema Property ───────────────────────────────────────────────────────────
+
+/** Propriedade de schema com suporte a tipos complexos (objectos, listas, referências). */
+export interface SchemaProperty {
+  id: string;
+  name: string;
+  type: 'string' | 'integer' | 'number' | 'boolean' | 'array' | 'object' | '$ref';
+  description: string;
+  required: boolean;
+  constraints: PropertyConstraints;
+  /** Referência a schema definido em #/components/schemas/ (quando type === '$ref'). */
+  $ref?: string;
+  /** Propriedades filhas (quando type === 'object'). */
+  properties?: SchemaProperty[];
+  /** Tipo dos itens do array (quando type === 'array'). */
+  items?: SchemaProperty;
+}
+
 // ── REST API Builder ──────────────────────────────────────────────────────────
 
 export interface RestParameter {
@@ -12,6 +50,7 @@ export interface RestParameter {
   required: boolean;
   type: string;
   description: string;
+  constraints: PropertyConstraints;
 }
 
 export interface RestRequestBody {
@@ -19,6 +58,8 @@ export interface RestRequestBody {
   schema: string;
   required: boolean;
   example: string;
+  /** Propriedades do request body (modo visual). */
+  properties?: SchemaProperty[];
 }
 
 export interface RestResponse {
@@ -28,6 +69,8 @@ export interface RestResponse {
   contentType: string;
   schema: string;
   example: string;
+  /** Propriedades da resposta (modo visual). */
+  properties?: SchemaProperty[];
 }
 
 export interface RestEndpoint {

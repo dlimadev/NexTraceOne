@@ -104,8 +104,28 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
             yaml += `        - name: ${p.name}\n`;
             yaml += `          in: ${p.in}\n`;
             if (p.required) yaml += `          required: true\n`;
-            if (p.type) yaml += `          schema:\n            type: ${p.type}\n`;
             if (p.description) yaml += `          description: "${esc(p.description)}"\n`;
+            if (p.type) {
+              yaml += `          schema:\n            type: ${p.type}\n`;
+              // Emit constraints when present
+              const c = p.constraints;
+              if (c) {
+                if (c.format) yaml += `            format: ${c.format}\n`;
+                if (c.minLength !== undefined) yaml += `            minLength: ${c.minLength}\n`;
+                if (c.maxLength !== undefined) yaml += `            maxLength: ${c.maxLength}\n`;
+                if (c.minimum !== undefined) yaml += `            minimum: ${c.minimum}\n`;
+                if (c.maximum !== undefined) yaml += `            maximum: ${c.maximum}\n`;
+                if (c.pattern) yaml += `            pattern: "${esc(c.pattern)}"\n`;
+                if (c.defaultValue !== undefined) yaml += `            default: ${c.defaultValue}\n`;
+                if (c.readOnly) yaml += `            readOnly: true\n`;
+                if (c.writeOnly) yaml += `            writeOnly: true\n`;
+                if (c.nullable) yaml += `            nullable: true\n`;
+                if (c.enumValues && c.enumValues.length > 0) {
+                  yaml += `            enum:\n`;
+                  for (const v of c.enumValues) yaml += `              - ${v}\n`;
+                }
+              }
+            }
           }
         }
 
