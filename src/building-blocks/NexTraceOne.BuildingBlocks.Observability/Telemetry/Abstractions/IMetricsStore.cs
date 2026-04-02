@@ -2,10 +2,9 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 
-// IMPLEMENTATION STATUS: Planned — no implementation exists.
-// These interfaces define the Metrics Store abstraction layer for aggregated service/dependency metrics.
-// They will be implemented when the metrics aggregation pipeline is built.
-// Do NOT register in DI or reference in handlers until implementations exist.
+// IMPLEMENTATION STATUS: Implemented — EF Core repositories in OperationalIntelligence.Infrastructure.TelemetryStore.
+// ServiceMetricsRepository and DependencyMetricsRepository provide PostgreSQL-backed persistence.
+// Registered in DI via AddTelemetryStoreInfrastructure().
 
 /// <summary>
 /// Porta de escrita do Product Store para métricas de serviço agregadas.
