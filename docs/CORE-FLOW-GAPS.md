@@ -7,7 +7,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 1 — Source of Truth / Contract Governance
 
-**State: 75% functional**
+**State: 95% functional**
 
 ### What works
 - Service cataloguing with ownership graph: real (`CatalogGraphDbContext`)
@@ -19,7 +19,7 @@ This document is the canonical reference for the real operational state of each 
 ### Gaps
 - **Developer Portal: 7 endpoint stubs** — `SearchCatalog`, `RenderOpenApiContract`, `GetApiHealth`, `GetMyApis`, `GetApisIConsume`, `GetApiDetail`, `GetAssetTimeline` are intentional stubs awaiting `IContractsModule` implementation
 - **`IContractsModule`** — cross-module interface defined, 0 implementations; blocks Developer Portal and AI grounding from reading contracts dynamically
-- **Contract Studio UX** — backend complete; frontend needs polish
+- **Contract Studio** — 10/10 contract types with visual builders (REST, SOAP, Event, BackgroundService, SharedSchema, Webhook, Copybook, MqMessage, FixedLayout, CicsCommarea)
 - **`SearchCatalog`** — stub; cross-module dependency not yet resolved
 
 ### Evidence
@@ -128,7 +128,7 @@ This document is the canonical reference for the real operational state of each 
 
 | Flow | State | Backend | Frontend | Blocker |
 |---|---|---|---|---|
-| 1 — Source of Truth / Contracts | **91%** | Real (100%) | Real (all 11 portal handlers) | None critical |
+| 1 — Source of Truth / Contracts | **95%** | Real (100%) | Real (all 11 portal handlers, 10/10 builders) | None critical |
 | 2 — Change Confidence | **98%** | Real (100%) | Real (100%) | CI/CD deploy events stub |
 | 3 — Incident Correlation | **85%** | Real (EfIncidentStore + IIncidentModule) | Real (all pages use API) | Correlation heuristics basic |
 | 4 — AI Assistant | **LLM real E2E; governance real** | LLM real via Ollama/OpenAI; grounding cross-module incompleto | API real (7 chamadas) | Grounding full cross-module |

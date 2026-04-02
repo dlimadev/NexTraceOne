@@ -29,6 +29,7 @@ interface RestEndpointParameter {
   required?: boolean;
   type?: string;
   description?: string;
+  constraints?: import('./builderTypes').PropertyConstraints;
 }
 
 interface RestEndpointRequestBody {

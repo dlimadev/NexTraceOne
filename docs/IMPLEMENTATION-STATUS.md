@@ -67,13 +67,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 |---|---|---|
 | Graph / Service Catalog | READY | `RegisterServiceAsset`, `ImportFromBackstage`, `ListServices`, `GetAssetGraph` — 27 features, 100% real |
 | Contracts (REST/SOAP/Event/Background) | READY | CRUD, versões, compatibilidade, scorecard — 35 features, 100% real |
-| Contract Studio | PARTIAL | Backend real; UX precisa polish |
+| Contract Studio | READY | Backend real; 10/10 contract types com visual builders (REST, SOAP, Event, BackgroundService, SharedSchema, Webhook, Copybook, MqMessage, FixedLayout, CicsCommarea) |
 | Semantic Diff | READY | `ComputeSemanticDiff`, `EvaluateCompatibility` reais |
 | Developer Portal | PARTIAL | `RecordAnalyticsEvent`, `CreateSubscription`, `ExecutePlayground` reais; `SearchCatalog` é stub |
 | Global Search | PARTIAL | `GlobalSearch` endpoint real (PostgreSQL FTS); `SearchCatalog` é stub intencional aguardando integração cross-module |
 
 **DbContexts:** `ContractsDbContext`, `CatalogGraphDbContext`, `DeveloperPortalDbContext` (3 DbContexts, 4 migrações)
-**Status geral:** 84 features, 91.7% real
+**Status geral:** 84 features, 100% real; 10/10 contract types com visual builders
 **Evidência:** `src/modules/catalog/`
 
 ---

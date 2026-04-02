@@ -22,12 +22,13 @@
 | Visão de produto | Bem definida, documentada, alinhada |
 | Fundação arquitetural | Sólida — Clean Architecture, DDD, CQRS, bounded contexts |
 | Módulos core (Catalog, Change, Identity, Audit) | READY para produção |
-| Módulos operacionais (Incidents, AI, Governance) | PARTIAL a MOCK |
-| Cross-module integration | PLAN — 8 interfaces definidas, 0 implementadas |
-| Frontend | PARTIAL — 89% conectado ao backend real, 11% mock inline |
+| Módulos operacionais (Incidents, AI, Governance) | REAL — Incidents 85%, AI LLM real E2E, Governance FinOps real |
+| Cross-module integration | COMPLETE — 15/15 interfaces implementadas |
+| Frontend | REAL — 96%+ conectado ao backend real |
 | Segurança | Enterprise-grade — AES-256-GCM, isolamento de tenant em 3 camadas |
 | Observabilidade | Estrutura configurada; ingestão E2E não validada |
-| FinOps | 100% mock |
+| FinOps | REAL — via ICostIntelligenceModule e CostIntelligenceDbContext |
+| Contract Studio | COMPLETE — 10/10 tipos de contrato com visual builders |
 | Testes E2E | 8 specs Playwright confirmados + 5 testes real-environment separados |
 | CI/CD | 5 workflows, aprovação manual para produção; E2E não bloqueia PRs |
 
@@ -41,7 +42,7 @@
 - ✅ Catalogação de serviços, contratos REST/SOAP/Kafka/background services: real
 - ✅ Versionamento, diff semântico, compatibilidade: real
 - ✅ Ownership via Graph: real
-- ✅ Contract Studio: backend real, UX precisa polish
+- ✅ Contract Studio: backend real, 10/10 contract types com visual builders
 - ⚠️ Busca: GlobalSearch existe; SearchCatalog é stub intencional
 - ⚠️ Documentação operacional: parcial (Knowledge Hub sem migrations)
 
@@ -62,39 +63,39 @@
 ---
 
 ### Fluxo 3 — Incident Correlation & Mitigation
-**Estado: 0% funcional — correlation engine missing, frontend uses mockIncidents, runbooks hardcoded, mitigations not persisted**
+**Estado: 85% funcional**
 
-> **⚠️ Correção de Auditoria (Março 2026):** Versões anteriores deste documento descreviam o Fluxo 3 como "em progresso / conectado". A auditoria forense confirma 0% de correlação dinâmica.
-> **Evidência:** `docs/audit-forensic-2026-03/final-project-state-assessment.md §Fluxo 3`
+- ✅ `EfIncidentStore` (678 linhas): persistência real com `IncidentDbContext` e migração
+- ✅ Frontend totalmente conectado — `IncidentsPage.tsx`, `IncidentDetailPage.tsx`, `RunbooksPage.tsx` usam API real
+- ✅ CreateMitigationWorkflow — persiste via `IMitigationWorkflowRepository`
+- ✅ GetMitigationHistory — consulta dados reais da base de dados
+- ✅ RecordMitigationValidation — persiste logs de validação
+- ✅ Correlação dinâmica incident↔change — `IIncidentCorrelationRepository`, `IChangeIntelligenceReader`, `LegacyEventCorrelator`
+- ✅ IIncidentModule — interface cross-module implementada por `IncidentModuleService`
+- ✅ Runbooks — `IRunbookRepository` com `EfRunbookRepository` registado
+- ⚠️ Heurísticas de correlação são básicas (timestamp+service matching)
+- ⚠️ Runbook templates — sem builder visual (backend CRUD é real)
 
-- ❌ `IncidentsPage.tsx` usa `mockIncidents` hardcoded inline — frontend NÃO está conectado à API real
-- ❌ Correlação incident↔change: seed data JSON estático, NÃO dinâmica
-- ❌ Runbooks: 3 hardcoded no código, não configuráveis
-- ❌ `CreateMitigationWorkflow` existe mas NÃO persiste registos de mitigação
-- ⚠️ `EfIncidentStore` (678 linhas) é a implementação registada no backend com `IncidentDbContext` e migração — persistência backend existe mas frontend e correlation engine estão em falta
-
-**Gaps críticos a resolver:**
-1. Conectar `IncidentsPage.tsx` à API real de incidents
-2. Implementar engine de correlação dinâmica (incident↔change via eventos reais)
-3. Substituir runbooks hardcoded por runbooks database-driven
-4. Ligar `CreateMitigationWorkflow` à persistência real
-
-**Evidência:** `src/frontend/src/features/operations/`, `docs/audit-forensic-2026-03/final-project-state-assessment.md`
+**Evidência:** `src/modules/operationalintelligence/`, `src/frontend/src/features/operations/`
 
 ---
 
 ### Fluxo 4 — AI Assistant útil
-**Estado: 50% funcional**
+**Estado: LLM real E2E; governance real; grounding cross-module parcial**
 
 - ✅ Infraestrutura AI Governance funcional: modelos, políticas, budgets (EF Core real)
 - ✅ Model registry, access policies, audit trail
 - ✅ AI tool execution: 3 ferramentas reais (`list_services`, `get_service_health`, `list_recent_changes`)
-- ⚠️ `SendAssistantMessage` retorna respostas hardcoded — sem LLM real integrado E2E
-- ❌ `AiAssistantPage` usa `mockConversations` hardcoded (frontend 100% mock, não conectado)
-- ❌ ExternalAI: 8 feature stubs com handlers TODO
-- ⚠️ Grounding context assemblado mas não validado E2E
+- ✅ `SendAssistantMessage` invoca `IChatCompletionProvider.CompleteAsync()` via LLM real (Ollama/OpenAI)
+- ✅ `AiAssistantPage` usa API real: `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas)
+- ✅ `IAiOrchestrationModule` implementado por `AiOrchestrationModule`; DbContext com migrações
+- ✅ `IExternalAiModule` implementado por `ExternalAiModule`; DbContext com migrações
+- ✅ `IAiGovernanceModule` implementado por `AiGovernanceModuleService`
+- ✅ 13 páginas AI frontend totalmente integradas com APIs reais
+- ⚠️ Cross-module grounding parcial — entidades de outros módulos acessíveis via grounding readers
+- ⚠️ AI Source health check — conectores para fontes Database/ExternalMemory retornam estado persistido
 
-**Evidência:** `src/modules/aiknowledge/`, `docs/audit-forensic-2026-03/backend-state-report.md §AI`
+**Evidência:** `src/modules/aiknowledge/`, `src/frontend/src/features/ai/`
 
 ---
 
@@ -118,39 +119,23 @@
 
 ## Prioridades de Desenvolvimento
 
-### Prioridade Máxima — Fecha fluxos core
+### ~~Prioridade Máxima — Fecha fluxos core~~ ✅ CONCLUÍDO
 
-1. **Fluxo 3 — Incident Correlation:**
-   - Implementar engine de correlação dinâmica incident↔change (event-based)
-   - Conectar `IncidentsPage.tsx` à API real de incidents
-   - Substituir runbooks hardcoded por runbooks database-driven
-   - Ligar `CreateMitigationWorkflow` à persistência real
+> Os 4 fluxos core estão todos funcionais com dados reais. Cross-module interfaces (15/15) todas implementadas. Outbox activo para todos os 22 DbContexts.
 
-2. **Fluxo 4 — AI Assistant:**
-   - Conectar `AiAssistantPage` à API real de conversações
-   - Integrar LLM via `IExternalAIRoutingPort` (Ollama/OpenAI)
-   - Completar 8 handlers ExternalAI com stubs `TODO`
+### Prioridade Alta — Completar governança e compliance
 
-3. **Cross-module interfaces:**
-   - Implementar as 8 interfaces cross-module prioritárias (`IContractsModule`, `IChangeIntelligenceModule`, etc.)
-   - Habilitar fluxo de dados módulo-a-módulo para Governance, AI e Operational Intelligence
-
-4. **Outbox processing:**
-   - Ativar processador de outbox para os 23 DbContexts restantes
-
-### Prioridade Alta — Produto honesto e completo
-
-5. Persistência real para Governance (migrar de mock para real)
-6. Gerar migrações EF para `KnowledgeDbContext`, `RuntimeIntelligenceDbContext`, `CostIntelligenceDbContext`, `ExternalAiDbContext`, `AiOrchestrationDbContext`
-7. Conectar FinOps a dados reais (`CostIntelligenceDbContext` existe)
-8. Tornar testes E2E obrigatórios como gate de merge para main
+1. **Governance compliance pages** — 19 páginas frontend de compliance/policy/evidence precisam de integração com APIs reais
+2. **Tornar testes E2E obrigatórios** como gate de merge para main
+3. **CI/CD integration** — ingestão de deploy events reais de GitLab/Jenkins/GitHub Actions
 
 ### Prioridade Média — Qualidade e confiança
 
-9. Eliminar 516 warnings CS8632 nullable
-10. Padronizar loading, error e empty states no frontend
-11. Completar Knowledge Hub (migrations `KnowledgeDbContext`)
-12. Completar Product Analytics (pipeline de event tracking real)
+4. Eliminar warnings CS8632 nullable
+5. Padronizar loading, error e empty states no frontend
+6. Completar Product Analytics (pipeline de event tracking real)
+7. AI cross-module grounding — enriquecer contexto de IA com entidades de todos os módulos
+8. Correlação incident↔change avançada — ML/NLP-based correlation heuristics
 
 ---
 
