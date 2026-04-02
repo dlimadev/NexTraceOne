@@ -4,18 +4,20 @@ using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Portal.Errors;
 
 namespace NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract;
 
 /// <summary>
-/// Feature: RenderOpenApiContract — retorna contrato OpenAPI formatado para renderização.
-/// Inclui metadados de versão, validade e sinais de confiança do contrato.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Feature: RenderOpenApiContract — retorna contrato formatado para renderização.
+/// Busca a versão de contrato pelo ApiAssetId (opcionalmente por versão semântica)
+/// e retorna o SpecContent real para renderização no Developer Portal.
 /// </summary>
 public static class RenderOpenApiContract
 {
-    /// <summary>Query para obter contrato OpenAPI de uma API.</summary>
+    /// <summary>Query para obter contrato de uma API.</summary>
     public sealed record Query(Guid ApiAssetId, string? Version = null) : IQuery<Response>;
 
     /// <summary>Valida os parâmetros da consulta de contrato.</summary>
@@ -28,21 +30,47 @@ public static class RenderOpenApiContract
     }
 
     /// <summary>
-    /// Handler que retorna contrato OpenAPI para renderização.
-    /// Em produção, consulta módulo Contracts para obter o spec real.
+    /// Handler que retorna contrato para renderização.
+    /// Busca a versão mais recente ou uma versão específica do contrato
+    /// e devolve o SpecContent real com metadados de confiança.
     /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IContractVersionRepository contractVersionRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            return Task.FromResult<Result<Response>>(
-                DeveloperPortalErrors.ApiNotFound(request.ApiAssetId.ToString()));
+            // Fetch specific version or latest
+            var contract = !string.IsNullOrWhiteSpace(request.Version)
+                ? await contractVersionRepository.GetByApiAssetAndSemVerAsync(
+                    request.ApiAssetId, request.Version, cancellationToken)
+                : await contractVersionRepository.GetLatestByApiAssetAsync(
+                    request.ApiAssetId, cancellationToken);
+
+            if (contract is null)
+            {
+                return DeveloperPortalErrors.ApiNotFound(request.ApiAssetId.ToString());
+            }
+
+            var isValidState = contract.LifecycleState is
+                ContractLifecycleState.Approved or
+                ContractLifecycleState.Locked or
+                ContractLifecycleState.Deprecated;
+
+            return Result<Response>.Success(new Response(
+                ApiAssetId: contract.ApiAssetId,
+                ContractContent: contract.SpecContent,
+                Version: contract.SemVer,
+                Format: contract.Format,
+                IsValid: isValidState,
+                IsLocked: contract.IsLocked,
+                LastUpdated: contract.UpdatedAt,
+                Owner: null));
         }
     }
 
-    /// <summary>Resposta com contrato OpenAPI e metadados de confiança.</summary>
+    /// <summary>Resposta com contrato e metadados de confiança.</summary>
     public sealed record Response(
         Guid ApiAssetId,
         string? ContractContent,
