@@ -169,13 +169,16 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
             musts.Add(new { term = new Dictionary<string, object> { ["status.code"] = "Error" } });
 
         // Query root spans only (no parent span) for trace summaries
-        musts.Add(new { bool_query = new { must_not = new object[] { new { exists = new { field = "parent_span_id" } } } } });
+        var mustNots = new List<object>
+        {
+            new { exists = new { field = "parent_span_id" } }
+        };
 
         var query = new
         {
             size = filter.Limit,
             sort = new object[] { new Dictionary<string, object> { ["start_time"] = new { order = "desc" } } },
-            query = new { @bool = new { must = musts } }
+            query = new { @bool = new { must = musts, must_not = mustNots } }
         };
 
         var indexPattern = $"{_elasticOptions.IndexPrefix}-traces-*";

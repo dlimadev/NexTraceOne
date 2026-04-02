@@ -32,9 +32,13 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         PropertyNameCaseInsensitive = true
     };
 
+    private static readonly System.Text.RegularExpressions.Regex ValidIdentifierPattern =
+        new(@"^[a-zA-Z_][a-zA-Z0-9_]*$", System.Text.RegularExpressions.RegexOptions.Compiled);
+
     private readonly HttpClient _httpClient;
     private readonly ClickHouseProviderOptions _clickHouseOptions;
     private readonly ILogger<ClickHouseObservabilityProvider> _logger;
+    private readonly string _database;
 
     public ClickHouseObservabilityProvider(
         HttpClient httpClient,
@@ -44,6 +48,12 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         _httpClient = httpClient;
         _clickHouseOptions = options.Value.ObservabilityProvider.ClickHouse;
         _logger = logger;
+
+        // Validate database name at construction time to prevent SQL injection via configuration
+        var db = _database;
+        if (string.IsNullOrWhiteSpace(db) || !ValidIdentifierPattern.IsMatch(db))
+            throw new ArgumentException($"Invalid ClickHouse database name: '{db}'. Must contain only alphanumeric characters and underscores.");
+        _database = db;
     }
 
     /// <inheritdoc />
@@ -77,7 +87,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         LogQueryFilter filter,
         CancellationToken cancellationToken = default)
     {
-        var db = _clickHouseOptions.Database;
+        var db = _database;
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT Timestamp, ServiceName, SeverityText, Body, TraceId, SpanId, " +
@@ -95,7 +105,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             AppendCondition(sb, "SeverityText", filter.Level);
 
         if (!string.IsNullOrWhiteSpace(filter.MessageContains))
-            sb.Append(CultureInfo.InvariantCulture, $" AND Body LIKE '%{EscapeSqlString(filter.MessageContains)}%'");
+            sb.Append(CultureInfo.InvariantCulture, $" AND Body LIKE '%{EscapeLikePattern(filter.MessageContains)}%'");
 
         if (!string.IsNullOrWhiteSpace(filter.TraceId))
             AppendCondition(sb, "TraceId", filter.TraceId);
@@ -129,7 +139,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         TraceQueryFilter filter,
         CancellationToken cancellationToken = default)
     {
-        var db = _clickHouseOptions.Database;
+        var db = _database;
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT TraceId, ServiceName, SpanName, Timestamp, Duration, " +
@@ -195,7 +205,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         if (string.IsNullOrWhiteSpace(traceId))
             return null;
 
-        var db = _clickHouseOptions.Database;
+        var db = _database;
         var query = $"SELECT TraceId, SpanId, ParentSpanId, ServiceName, SpanName, " +
                     $"Timestamp, Duration, StatusCode, StatusMessage, " +
                     $"ResourceAttributes, SpanAttributes, Events.Name, Events.Timestamp " +
@@ -267,7 +277,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         MetricQueryFilter filter,
         CancellationToken cancellationToken = default)
     {
-        var db = _clickHouseOptions.Database;
+        var db = _database;
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT TimeUnix, MetricName, Value, ServiceName, ResourceAttributes, Attributes " +
@@ -386,12 +396,21 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         => dt.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
     /// <summary>
-    /// Escapa aspas simples numa string para uso seguro em queries SQL do ClickHouse.
+    /// Escapa aspas simples e barras invertidas numa string para uso seguro em queries SQL do ClickHouse.
     /// Protege contra SQL injection em valores fornecidos pelo utilizador.
     /// </summary>
     private static string EscapeSqlString(string value)
         => value.Replace("\\", "\\\\", StringComparison.Ordinal)
                 .Replace("'", "\\'", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Escapa caracteres especiais do operador LIKE do ClickHouse (% e _) além do escape SQL padrão.
+    /// Usado quando o valor do utilizador é inserido dentro de um padrão LIKE.
+    /// </summary>
+    private static string EscapeLikePattern(string value)
+        => EscapeSqlString(value)
+            .Replace("%", "\\%", StringComparison.Ordinal)
+            .Replace("_", "\\_", StringComparison.Ordinal);
 
     /// <summary>
     /// Adiciona uma condição de igualdade ao StringBuilder da query SQL.
