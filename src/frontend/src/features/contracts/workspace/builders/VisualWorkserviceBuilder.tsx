@@ -19,19 +19,37 @@ import { workserviceBuilderToYaml } from './shared/builderSync';
 import type {
   WorkserviceBuilderState,
   WorkserviceDependency,
+  MessagingTopic,
+  ConsumedService,
+  ProducedEvent,
   TriggerType,
+  MessagingRole,
   BuilderValidationResult,
   SyncResult,
 } from './shared/builderTypes';
 
 const TRIGGER_TYPES: readonly TriggerType[] = ['Cron', 'Queue', 'Event', 'Manual', 'Webhook'];
 const DEP_TYPES = ['Service', 'Database', 'Queue', 'ExternalApi', 'Cache', 'Storage'] as const;
+const MESSAGING_ROLES: readonly MessagingRole[] = ['None', 'Producer', 'Consumer', 'Both'];
+const MSG_FORMATS = ['json', 'avro', 'protobuf', ''] as const;
+const SVC_PROTOCOLS = ['REST', 'gRPC', 'SOAP', ''] as const;
 
-let nextId = 1;
-function genId() { return `dep-${nextId++}`; }
+function genId() { return crypto.randomUUID(); }
 
 function createDependency(): WorkserviceDependency {
   return { id: genId(), name: '', type: 'Service', required: true };
+}
+
+function createTopic(): MessagingTopic {
+  return { id: genId(), topicName: '', entityType: '', format: '' };
+}
+
+function createConsumedService(): ConsumedService {
+  return { id: genId(), serviceName: '', protocol: '' };
+}
+
+function createProducedEvent(): ProducedEvent {
+  return { id: genId(), eventName: '', targetTopic: '' };
 }
 
 interface VisualWorkserviceBuilderProps {
@@ -71,6 +89,11 @@ export function VisualWorkserviceBuilder({
       owner: '',
       observabilityNotes: '',
       healthCheck: '',
+      messagingRole: 'None',
+      consumedTopics: [],
+      producedTopics: [],
+      consumedServices: [],
+      producedEvents: [],
     },
   );
   const [validation, setValidation] = useState<BuilderValidationResult | null>(null);
@@ -95,6 +118,34 @@ export function VisualWorkserviceBuilder({
   const removeDep = (id: string) => {
     update({ dependencies: state.dependencies.filter((d) => d.id !== id) });
   };
+
+  // ── Messaging Role helpers ──────────────────────────────────────────────────
+  const isConsumer = state.messagingRole === 'Consumer' || state.messagingRole === 'Both';
+  const isProducer = state.messagingRole === 'Producer' || state.messagingRole === 'Both';
+
+  const addConsumedTopic = () => update({ consumedTopics: [...state.consumedTopics, createTopic()] });
+  const updateConsumedTopic = (id: string, partial: Partial<MessagingTopic>) =>
+    update({ consumedTopics: state.consumedTopics.map((t) => (t.id === id ? { ...t, ...partial } : t)) });
+  const removeConsumedTopic = (id: string) =>
+    update({ consumedTopics: state.consumedTopics.filter((t) => t.id !== id) });
+
+  const addProducedTopic = () => update({ producedTopics: [...state.producedTopics, createTopic()] });
+  const updateProducedTopic = (id: string, partial: Partial<MessagingTopic>) =>
+    update({ producedTopics: state.producedTopics.map((t) => (t.id === id ? { ...t, ...partial } : t)) });
+  const removeProducedTopic = (id: string) =>
+    update({ producedTopics: state.producedTopics.filter((t) => t.id !== id) });
+
+  const addConsumedService = () => update({ consumedServices: [...state.consumedServices, createConsumedService()] });
+  const updateConsumedSvc = (id: string, partial: Partial<ConsumedService>) =>
+    update({ consumedServices: state.consumedServices.map((s) => (s.id === id ? { ...s, ...partial } : s)) });
+  const removeConsumedSvc = (id: string) =>
+    update({ consumedServices: state.consumedServices.filter((s) => s.id !== id) });
+
+  const addProducedEvent = () => update({ producedEvents: [...state.producedEvents, createProducedEvent()] });
+  const updateProducedEvt = (id: string, partial: Partial<ProducedEvent>) =>
+    update({ producedEvents: state.producedEvents.map((e) => (e.id === id ? { ...e, ...partial } : e)) });
+  const removeProducedEvt = (id: string) =>
+    update({ producedEvents: state.producedEvents.filter((e) => e.id !== id) });
 
   const handleValidate = () => { setValidation(validateWorkserviceBuilder(state)); };
 
@@ -250,6 +301,170 @@ export function VisualWorkserviceBuilder({
               )}
             </div>
           ))}
+        </CardBody>
+      </Card>
+
+      {/* ── Messaging Role — Producer / Consumer ── */}
+      <Card>
+        <CardHeader>
+          <h3 className="text-xs font-semibold text-heading">
+            {t('contracts.builder.workservice.messagingRole', 'Messaging Role')}
+          </h3>
+        </CardHeader>
+        <CardBody className="space-y-3">
+          <FieldSelect
+            label={t('contracts.builder.workservice.messagingRoleLabel', 'Role')}
+            value={state.messagingRole}
+            onChange={(v) => update({ messagingRole: v as MessagingRole })}
+            options={MESSAGING_ROLES}
+            disabled={isReadOnly}
+          />
+          <p className="text-[10px] text-muted">
+            {t('contracts.builder.workservice.messagingRoleHint', 'Indicate if this background service produces and/or consumes messages from topics/queues.')}
+          </p>
+
+          {/* Consumed Topics */}
+          {isConsumer && (
+            <div className="space-y-2 pt-2 border-t border-edge">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium text-heading uppercase tracking-wider">
+                  {t('contracts.builder.workservice.consumedTopics', 'Consumed Topics')} ({state.consumedTopics.length})
+                </span>
+                {!isReadOnly && (
+                  <button type="button" onClick={addConsumedTopic} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+                    <Plus size={10} /> {t('contracts.builder.workservice.addTopic', 'Add Topic')}
+                  </button>
+                )}
+              </div>
+              {state.consumedTopics.length === 0 && (
+                <div className="py-2 text-center text-xs text-muted">
+                  {t('contracts.builder.workservice.noConsumedTopics', 'No consumed topics defined.')}
+                </div>
+              )}
+              {state.consumedTopics.map((topic) => (
+                <div key={topic.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end">
+                  <Field label={t('contracts.builder.workservice.topicName', 'Topic')} value={topic.topicName}
+                    onChange={(v) => updateConsumedTopic(topic.id, { topicName: v })} placeholder="orders.created" mono disabled={isReadOnly} />
+                  <Field label={t('contracts.builder.workservice.entityType', 'Entity Type')} value={topic.entityType}
+                    onChange={(v) => updateConsumedTopic(topic.id, { entityType: v })} placeholder="OrderEvent" disabled={isReadOnly} />
+                  <FieldSelect label={t('contracts.builder.workservice.format', 'Format')} value={topic.format}
+                    onChange={(v) => updateConsumedTopic(topic.id, { format: v as MessagingTopic['format'] })}
+                    options={MSG_FORMATS} disabled={isReadOnly} />
+                  {!isReadOnly && (
+                    <button type="button" onClick={() => removeConsumedTopic(topic.id)} className="text-muted hover:text-danger transition-colors pb-1">
+                      <Trash2 size={11} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Produced Topics */}
+          {isProducer && (
+            <div className="space-y-2 pt-2 border-t border-edge">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium text-heading uppercase tracking-wider">
+                  {t('contracts.builder.workservice.producedTopics', 'Produced Topics')} ({state.producedTopics.length})
+                </span>
+                {!isReadOnly && (
+                  <button type="button" onClick={addProducedTopic} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+                    <Plus size={10} /> {t('contracts.builder.workservice.addTopic', 'Add Topic')}
+                  </button>
+                )}
+              </div>
+              {state.producedTopics.length === 0 && (
+                <div className="py-2 text-center text-xs text-muted">
+                  {t('contracts.builder.workservice.noProducedTopics', 'No produced topics defined.')}
+                </div>
+              )}
+              {state.producedTopics.map((topic) => (
+                <div key={topic.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end">
+                  <Field label={t('contracts.builder.workservice.topicName', 'Topic')} value={topic.topicName}
+                    onChange={(v) => updateProducedTopic(topic.id, { topicName: v })} placeholder="orders.processed" mono disabled={isReadOnly} />
+                  <Field label={t('contracts.builder.workservice.entityType', 'Entity Type')} value={topic.entityType}
+                    onChange={(v) => updateProducedTopic(topic.id, { entityType: v })} placeholder="OrderProcessedEvent" disabled={isReadOnly} />
+                  <FieldSelect label={t('contracts.builder.workservice.format', 'Format')} value={topic.format}
+                    onChange={(v) => updateProducedTopic(topic.id, { format: v as MessagingTopic['format'] })}
+                    options={MSG_FORMATS} disabled={isReadOnly} />
+                  {!isReadOnly && (
+                    <button type="button" onClick={() => removeProducedTopic(topic.id)} className="text-muted hover:text-danger transition-colors pb-1">
+                      <Trash2 size={11} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Consumed Services */}
+          {isConsumer && (
+            <div className="space-y-2 pt-2 border-t border-edge">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium text-heading uppercase tracking-wider">
+                  {t('contracts.builder.workservice.consumedServices', 'Consumed Services')} ({state.consumedServices.length})
+                </span>
+                {!isReadOnly && (
+                  <button type="button" onClick={addConsumedService} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+                    <Plus size={10} /> {t('contracts.builder.workservice.addService', 'Add Service')}
+                  </button>
+                )}
+              </div>
+              {state.consumedServices.length === 0 && (
+                <div className="py-2 text-center text-xs text-muted">
+                  {t('contracts.builder.workservice.noConsumedServices', 'No consumed services defined.')}
+                </div>
+              )}
+              {state.consumedServices.map((svc) => (
+                <div key={svc.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                  <Field label={t('contracts.builder.workservice.serviceName', 'Service Name')} value={svc.serviceName}
+                    onChange={(v) => updateConsumedSvc(svc.id, { serviceName: v })} placeholder="user-api" disabled={isReadOnly} />
+                  <FieldSelect label={t('contracts.builder.workservice.protocol', 'Protocol')} value={svc.protocol}
+                    onChange={(v) => updateConsumedSvc(svc.id, { protocol: v as ConsumedService['protocol'] })}
+                    options={SVC_PROTOCOLS} disabled={isReadOnly} />
+                  {!isReadOnly && (
+                    <button type="button" onClick={() => removeConsumedSvc(svc.id)} className="text-muted hover:text-danger transition-colors pb-1">
+                      <Trash2 size={11} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Produced Events */}
+          {isProducer && (
+            <div className="space-y-2 pt-2 border-t border-edge">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium text-heading uppercase tracking-wider">
+                  {t('contracts.builder.workservice.producedEvents', 'Produced Events')} ({state.producedEvents.length})
+                </span>
+                {!isReadOnly && (
+                  <button type="button" onClick={addProducedEvent} className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+                    <Plus size={10} /> {t('contracts.builder.workservice.addEvent', 'Add Event')}
+                  </button>
+                )}
+              </div>
+              {state.producedEvents.length === 0 && (
+                <div className="py-2 text-center text-xs text-muted">
+                  {t('contracts.builder.workservice.noProducedEvents', 'No produced events defined.')}
+                </div>
+              )}
+              {state.producedEvents.map((evt) => (
+                <div key={evt.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                  <Field label={t('contracts.builder.workservice.eventName', 'Event Name')} value={evt.eventName}
+                    onChange={(v) => updateProducedEvt(evt.id, { eventName: v })} placeholder="OrderProcessed" disabled={isReadOnly} />
+                  <Field label={t('contracts.builder.workservice.targetTopic', 'Target Topic')} value={evt.targetTopic}
+                    onChange={(v) => updateProducedEvt(evt.id, { targetTopic: v })} placeholder="orders.processed" mono disabled={isReadOnly} />
+                  {!isReadOnly && (
+                    <button type="button" onClick={() => removeProducedEvt(evt.id)} className="text-muted hover:text-danger transition-colors pb-1">
+                      <Trash2 size={11} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </CardBody>
       </Card>
 

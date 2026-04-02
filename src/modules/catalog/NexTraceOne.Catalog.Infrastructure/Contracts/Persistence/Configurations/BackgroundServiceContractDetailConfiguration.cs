@@ -20,6 +20,9 @@ internal sealed class BackgroundServiceContractDetailConfiguration : IEntityType
             t.HasCheckConstraint(
                 "CK_ctr_bg_service_details_trigger_type",
                 "\"TriggerType\" IN ('Cron', 'Interval', 'EventTriggered', 'OnDemand', 'Continuous')");
+            t.HasCheckConstraint(
+                "CK_ctr_bg_service_details_messaging_role",
+                "\"MessagingRole\" IN ('None', 'Producer', 'Consumer', 'Both')");
         });
 
         builder.HasKey(x => x.Id);
@@ -39,6 +42,13 @@ internal sealed class BackgroundServiceContractDetailConfiguration : IEntityType
         builder.Property(x => x.InputsJson).HasColumnType("text").IsRequired();
         builder.Property(x => x.OutputsJson).HasColumnType("text").IsRequired();
         builder.Property(x => x.SideEffectsJson).HasColumnType("text").IsRequired();
+
+        // Messaging role fields
+        builder.Property(x => x.MessagingRole).HasMaxLength(50).IsRequired().HasDefaultValue("None");
+        builder.Property(x => x.ConsumedTopicsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ProducedTopicsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ConsumedServicesJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ProducedEventsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
 
         // Auditoria
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();

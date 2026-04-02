@@ -25,6 +25,7 @@ import type {
   RestEndpoint,
   RestParameter,
   RestResponse,
+  PropertyConstraints,
   BuilderValidationResult,
   SyncResult,
 } from './shared/builderTypes';
@@ -44,8 +45,10 @@ const METHOD_COLORS: Record<string, string> = {
   OPTIONS: 'bg-muted/10 text-muted/60 border border-muted/15',
 };
 
-let nextId = 1;
-function genId(prefix: string) { return `${prefix}-${nextId++}`; }
+/** Gera IDs únicos por instância do builder usando crypto.randomUUID(). */
+function genId(prefix: string) {
+  return `${prefix}-${crypto.randomUUID()}`;
+}
 
 function createEndpoint(): RestEndpoint {
   return {
@@ -69,7 +72,7 @@ function createEndpoint(): RestEndpoint {
 }
 
 function createParameter(): RestParameter {
-  return { id: genId('param'), name: '', in: 'query', required: false, type: 'string', description: '' };
+  return { id: genId('param'), name: '', in: 'query', required: false, type: 'string', description: '', constraints: {} };
 }
 
 function createResponse(): RestResponse {
@@ -383,26 +386,50 @@ export function VisualRestBuilder({
                         onToggle={() => toggleSubSection(ep.id, 'params')}
                       >
                         {ep.parameters.map((param, pi) => (
-                          <div key={param.id} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 items-end">
-                            <Field label={pi === 0 ? t('contracts.builder.rest.paramName', 'Name') : ''} value={param.name} onChange={(v) => {
-                              const next = [...ep.parameters]; next[pi] = { ...param, name: v };
-                              updateEndpoint(ep.id, { parameters: next });
-                            }} placeholder={t('contracts.builder.rest.paramNamePlaceholder', 'id')} mono disabled={isReadOnly} />
-                            <FieldSelect label={pi === 0 ? t('contracts.builder.rest.paramIn', 'In') : ''} value={param.in} onChange={(v) => {
-                              const next = [...ep.parameters]; next[pi] = { ...param, in: v as RestParameter['in'] };
-                              updateEndpoint(ep.id, { parameters: next });
-                            }} options={PARAM_LOCATIONS} disabled={isReadOnly} />
-                            <FieldSelect label={pi === 0 ? t('contracts.builder.rest.paramType', 'Type') : ''} value={param.type as typeof PARAM_TYPES[number]} onChange={(v) => {
-                              const next = [...ep.parameters]; next[pi] = { ...param, type: v };
-                              updateEndpoint(ep.id, { parameters: next });
-                            }} options={PARAM_TYPES} disabled={isReadOnly} />
-                            <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={param.required} onChange={(v) => {
-                              const next = [...ep.parameters]; next[pi] = { ...param, required: v };
-                              updateEndpoint(ep.id, { parameters: next });
-                            }} disabled={isReadOnly} />
-                            {!isReadOnly && (
-                              <button type="button" onClick={() => updateEndpoint(ep.id, { parameters: ep.parameters.filter((_, j) => j !== pi) })}
-                                className="text-muted hover:text-danger transition-colors pb-1"><Trash2 size={11} /></button>
+                          <div key={param.id} className="space-y-1">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 items-end">
+                              <Field label={pi === 0 ? t('contracts.builder.rest.paramName', 'Name') : ''} value={param.name} onChange={(v) => {
+                                const next = [...ep.parameters]; next[pi] = { ...param, name: v };
+                                updateEndpoint(ep.id, { parameters: next });
+                              }} placeholder={t('contracts.builder.rest.paramNamePlaceholder', 'id')} mono disabled={isReadOnly} />
+                              <FieldSelect label={pi === 0 ? t('contracts.builder.rest.paramIn', 'In') : ''} value={param.in} onChange={(v) => {
+                                const next = [...ep.parameters]; next[pi] = { ...param, in: v as RestParameter['in'] };
+                                updateEndpoint(ep.id, { parameters: next });
+                              }} options={PARAM_LOCATIONS} disabled={isReadOnly} />
+                              <FieldSelect label={pi === 0 ? t('contracts.builder.rest.paramType', 'Type') : ''} value={param.type as typeof PARAM_TYPES[number]} onChange={(v) => {
+                                const next = [...ep.parameters]; next[pi] = { ...param, type: v };
+                                updateEndpoint(ep.id, { parameters: next });
+                              }} options={PARAM_TYPES} disabled={isReadOnly} />
+                              <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={param.required} onChange={(v) => {
+                                const next = [...ep.parameters]; next[pi] = { ...param, required: v };
+                                updateEndpoint(ep.id, { parameters: next });
+                              }} disabled={isReadOnly} />
+                              <div className="flex items-center gap-1 pb-1">
+                                {!isReadOnly && (
+                                  <button type="button" onClick={() => toggleSubSection(ep.id, `param-constraints-${param.id}`)}
+                                    className="text-[9px] text-accent/70 hover:text-accent transition-colors whitespace-nowrap"
+                                    title={t('contracts.builder.rest.constraintsToggle', 'Show constraints')}>
+                                    {isSubExpanded(ep.id, `param-constraints-${param.id}`) ? '▾' : '▸'} {t('contracts.builder.rest.constraints', 'Constraints')}
+                                  </button>
+                                )}
+                                {!isReadOnly && (
+                                  <button type="button" onClick={() => updateEndpoint(ep.id, { parameters: ep.parameters.filter((_, j) => j !== pi) })}
+                                    className="text-muted hover:text-danger transition-colors"><Trash2 size={11} /></button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* ── Parameter Constraints Panel ── */}
+                            {isSubExpanded(ep.id, `param-constraints-${param.id}`) && (
+                              <ParameterConstraintsPanel
+                                constraints={param.constraints ?? {}}
+                                paramType={param.type}
+                                onChange={(c) => {
+                                  const next = [...ep.parameters]; next[pi] = { ...param, constraints: c };
+                                  updateEndpoint(ep.id, { parameters: next });
+                                }}
+                                isReadOnly={isReadOnly}
+                              />
                             )}
                           </div>
                         ))}
@@ -568,6 +595,104 @@ export function VisualRestBuilder({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Parameter Constraints Panel ────────────────────────────────────────────────
+
+const FORMAT_OPTIONS = ['', 'date', 'date-time', 'email', 'uri', 'uuid', 'hostname', 'ipv4', 'ipv6', 'byte', 'binary', 'password', 'int32', 'int64', 'float', 'double'] as const;
+
+function ParameterConstraintsPanel({
+  constraints,
+  paramType,
+  onChange,
+  isReadOnly,
+}: {
+  constraints: PropertyConstraints;
+  paramType: string;
+  onChange: (c: PropertyConstraints) => void;
+  isReadOnly?: boolean;
+}) {
+  const { t } = useTranslation();
+  const isString = paramType === 'string';
+  const isNumber = ['integer', 'number'].includes(paramType);
+
+  const update = (patch: Partial<PropertyConstraints>) => onChange({ ...constraints, ...patch });
+
+  return (
+    <div className="ml-2 pl-3 border-l-2 border-accent/20 pb-2 space-y-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {/* String constraints */}
+        {isString && (
+          <>
+            <div>
+              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.minLength', 'Min Length')}</label>
+              <input type="number" min={0} value={constraints.minLength ?? ''} onChange={(e) => update({ minLength: e.target.value ? Number(e.target.value) : undefined })}
+                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
+            </div>
+            <div>
+              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.maxLength', 'Max Length')}</label>
+              <input type="number" min={0} value={constraints.maxLength ?? ''} onChange={(e) => update({ maxLength: e.target.value ? Number(e.target.value) : undefined })}
+                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
+            </div>
+            <div>
+              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.pattern', 'Pattern (Regex)')}</label>
+              <input type="text" value={constraints.pattern ?? ''} onChange={(e) => update({ pattern: e.target.value || undefined })}
+                placeholder="^[a-z]+$" className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body font-mono" disabled={isReadOnly} />
+            </div>
+          </>
+        )}
+
+        {/* Number constraints */}
+        {isNumber && (
+          <>
+            <div>
+              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.minimum', 'Minimum')}</label>
+              <input type="number" value={constraints.minimum ?? ''} onChange={(e) => update({ minimum: e.target.value ? Number(e.target.value) : undefined })}
+                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
+            </div>
+            <div>
+              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.maximum', 'Maximum')}</label>
+              <input type="number" value={constraints.maximum ?? ''} onChange={(e) => update({ maximum: e.target.value ? Number(e.target.value) : undefined })}
+                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
+            </div>
+          </>
+        )}
+
+        {/* Format */}
+        <div>
+          <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.format', 'Format')}</label>
+          <select value={constraints.format ?? ''} onChange={(e) => update({ format: e.target.value || undefined })}
+            className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly}>
+            {FORMAT_OPTIONS.map((f) => <option key={f} value={f}>{f || '—'}</option>)}
+          </select>
+        </div>
+
+        {/* Default Value */}
+        <div>
+          <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.defaultValue', 'Default Value')}</label>
+          <input type="text" value={constraints.defaultValue ?? ''} onChange={(e) => update({ defaultValue: e.target.value || undefined })}
+            className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
+        </div>
+      </div>
+
+      {/* Boolean flags */}
+      <div className="flex flex-wrap gap-4">
+        <FieldCheckbox label={t('contracts.builder.rest.readOnly', 'Read Only')} checked={constraints.readOnly ?? false} onChange={(v) => update({ readOnly: v || undefined })} disabled={isReadOnly} />
+        <FieldCheckbox label={t('contracts.builder.rest.writeOnly', 'Write Only')} checked={constraints.writeOnly ?? false} onChange={(v) => update({ writeOnly: v || undefined })} disabled={isReadOnly} />
+        <FieldCheckbox label={t('contracts.builder.rest.nullable', 'Nullable')} checked={constraints.nullable ?? false} onChange={(v) => update({ nullable: v || undefined })} disabled={isReadOnly} />
+      </div>
+
+      {/* Enum values */}
+      <div>
+        <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.enumValues', 'Enum Values')}</label>
+        <input type="text" value={constraints.enumValues?.join(', ') ?? ''} onChange={(e) => {
+          const values = e.target.value ? e.target.value.split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+          update({ enumValues: values?.length ? values : undefined });
+        }} placeholder={t('contracts.builder.rest.enumPlaceholder', 'Comma-separated values')}
+          className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
+      </div>
     </div>
   );
 }

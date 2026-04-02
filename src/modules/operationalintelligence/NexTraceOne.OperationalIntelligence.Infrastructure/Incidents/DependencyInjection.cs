@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.EventHandlers;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.Repositories;
@@ -44,6 +45,9 @@ public static class DependencyInjection
         services.AddScoped<IChangeIntelligenceReader, EfChangeIntelligenceReader>();
         services.AddScoped<IIntegrationEventHandler<DeploymentEventReceivedEvent>, DeploymentEventReceivedHandler>();
         services.AddScoped<ILegacyEventCorrelator, LegacyEventCorrelator>();
+
+        // Cross-module contract: IIncidentModule — consumido pelo Governance para métricas executivas
+        services.AddScoped<IIncidentModule, IncidentModuleService>();
 
         return services;
     }

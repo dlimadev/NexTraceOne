@@ -4,13 +4,14 @@ using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
 namespace NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline;
 
 /// <summary>
 /// Feature: GetAssetTimeline — retorna histórico cronológico de eventos de uma API.
-/// Inclui deployments, breaking changes, depreciações e mudanças de versão.
-/// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
+/// Constrói timeline a partir de versões de contrato (criação, aprovação, depreciação)
+/// e eventos de deployment.
 /// </summary>
 public static class GetAssetTimeline
 {
@@ -30,20 +31,87 @@ public static class GetAssetTimeline
 
     /// <summary>
     /// Handler que retorna timeline de eventos da API.
-    /// Em produção, agrega dados de releases, contratos e mudanças.
+    /// Agrega dados de versões de contrato e deployments registados.
     /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IContractVersionRepository contractVersionRepository,
+        IContractDeploymentRepository contractDeploymentRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            var result = new Response(
-                ApiAssetId: request.ApiAssetId,
-                Events: new List<TimelineEventDto>().AsReadOnly(),
-                TotalCount: 0);
+            var events = new List<TimelineEventDto>();
 
-            return Task.FromResult(Result<Response>.Success(result));
+            // Fetch all contract versions for this API
+            var versions = await contractVersionRepository.ListByApiAssetAsync(
+                request.ApiAssetId, cancellationToken);
+
+            // Add version events
+            foreach (var version in versions)
+            {
+                // Contract created/imported
+                events.Add(new TimelineEventDto(
+                    EventType: "ContractVersion",
+                    Title: $"Contract v{version.SemVer} created",
+                    Description: $"Protocol: {version.Protocol}, Format: {version.Format}",
+                    Version: version.SemVer,
+                    Actor: version.ImportedFrom,
+                    OccurredAt: version.CreatedAt));
+
+                // If deprecated, add deprecation event
+                if (version.DeprecationDate.HasValue)
+                {
+                    events.Add(new TimelineEventDto(
+                        EventType: "Deprecation",
+                        Title: $"Contract v{version.SemVer} deprecated",
+                        Description: version.DeprecationNotice,
+                        Version: version.SemVer,
+                        Actor: null,
+                        OccurredAt: version.DeprecationDate.Value));
+                }
+
+                // If locked, add lock event
+                if (version.LockedAt.HasValue)
+                {
+                    events.Add(new TimelineEventDto(
+                        EventType: "Locked",
+                        Title: $"Contract v{version.SemVer} locked",
+                        Description: null,
+                        Version: version.SemVer,
+                        Actor: version.LockedBy,
+                        OccurredAt: version.LockedAt.Value));
+                }
+
+                // Add deployment events for each version
+                var deployments = await contractDeploymentRepository.ListByContractVersionAsync(
+                    version.Id, cancellationToken);
+                foreach (var deployment in deployments)
+                {
+                    events.Add(new TimelineEventDto(
+                        EventType: "Deployment",
+                        Title: $"Deployed v{deployment.SemVer} to {deployment.Environment}",
+                        Description: $"Status: {deployment.Status}, Source: {deployment.SourceSystem}",
+                        Version: deployment.SemVer,
+                        Actor: deployment.DeployedBy,
+                        OccurredAt: deployment.DeployedAt));
+                }
+            }
+
+            // Sort by date descending (most recent first)
+            events.Sort((a, b) => b.OccurredAt.CompareTo(a.OccurredAt));
+
+            // Apply pagination
+            var totalCount = events.Count;
+            var pagedEvents = events
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+
+            return Result<Response>.Success(new Response(
+                ApiAssetId: request.ApiAssetId,
+                Events: pagedEvents.AsReadOnly(),
+                TotalCount: totalCount));
         }
     }
 

@@ -1,6 +1,8 @@
 // ── Pages ─────────────────────────────────────────────────────────────────────
 export { ContractCatalogPage } from './catalog/ContractCatalogPage';
-export { CreateServicePage } from './create/CreateServicePage';
+export { CreateContractPage } from './create/CreateContractPage';
+/** @deprecated Use CreateContractPage instead. */
+export { CreateContractPage as CreateServicePage } from './create/CreateContractPage';
 export { ContractWorkspacePage } from './workspace/ContractWorkspacePage';
 export { ContractGovernancePage } from './governance/ContractGovernancePage';
 export { ContractPortalPage } from './portal/ContractPortalPage';
@@ -29,7 +31,7 @@ export {
 } from './hooks/index';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-export type { WorkspaceSectionId, ServiceKind, AuthoringMode, SpecFormat } from './types/index';
+export type { WorkspaceSectionId, ContractKind, ServiceKind, AuthoringMode, SpecFormat } from './types/index';
 
 // ── Publication Center ─────────────────────────────────────────────────────────
 export { PublicationCenterPage } from './publication/PublicationCenterPage';

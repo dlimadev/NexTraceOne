@@ -15,7 +15,12 @@ internal sealed class BackgroundServiceDraftMetadataConfiguration : IEntityTypeC
     /// <summary>Configura o mapeamento da entidade BackgroundServiceDraftMetadata.</summary>
     public void Configure(EntityTypeBuilder<BackgroundServiceDraftMetadata> builder)
     {
-        builder.ToTable("ctr_background_service_draft_metadata");
+        builder.ToTable("ctr_background_service_draft_metadata", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ctr_bg_service_draft_messaging_role",
+                "\"MessagingRole\" IN ('None', 'Producer', 'Consumer', 'Both')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -32,6 +37,13 @@ internal sealed class BackgroundServiceDraftMetadataConfiguration : IEntityTypeC
         builder.Property(x => x.InputsJson).HasColumnType("text").IsRequired();
         builder.Property(x => x.OutputsJson).HasColumnType("text").IsRequired();
         builder.Property(x => x.SideEffectsJson).HasColumnType("text").IsRequired();
+
+        // Messaging role fields
+        builder.Property(x => x.MessagingRole).HasMaxLength(50).IsRequired().HasDefaultValue("None");
+        builder.Property(x => x.ConsumedTopicsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ProducedTopicsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ConsumedServicesJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
+        builder.Property(x => x.ProducedEventsJson).HasColumnType("text").IsRequired().HasDefaultValue("[]");
 
         // Um BackgroundServiceDraftMetadata por ContractDraft (1:0..1)
         builder.HasIndex(x => x.ContractDraftId).IsUnique();

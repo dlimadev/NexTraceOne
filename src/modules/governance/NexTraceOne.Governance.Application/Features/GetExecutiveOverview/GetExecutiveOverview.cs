@@ -3,13 +3,14 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetExecutiveOverview;
 
 /// <summary>
 /// Feature: GetExecutiveOverview — visão executiva agregada de governança enterprise.
 /// Compliance, risco e foco de atenção derivados de dados reais de Packs, Rollouts e Waivers.
-/// Métricas cross-module (incidentes, mudanças) não estão disponíveis neste módulo.
+/// Métricas de incidentes derivadas do módulo OpsIntel via IIncidentModule.
 /// </summary>
 public static class GetExecutiveOverview
 {
@@ -21,12 +22,13 @@ public static class GetExecutiveOverview
 
     /// <summary>
     /// Handler que agrega indicadores executivos a partir de dados reais de Governance Packs,
-    /// Rollouts e Waivers. Métricas de incidentes e mudanças são cross-module e retornam valores neutros.
+    /// Rollouts, Waivers e métricas de incidentes cross-module via IIncidentModule.
     /// </summary>
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,
-        IGovernanceRolloutRecordRepository rolloutRepository) : IQueryHandler<Query, Response>
+        IGovernanceRolloutRecordRepository rolloutRepository,
+        IIncidentModule incidentModule) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -42,6 +44,9 @@ public static class GetExecutiveOverview
             var completedRollouts = rollouts.Count(r => r.Status == RolloutStatus.Completed);
             var pendingRollouts = rollouts.Count(r => r.Status == RolloutStatus.Pending);
 
+            // Métricas de incidentes cross-module
+            var incidentTrend = await incidentModule.GetTrendSummaryAsync(days: 30, cancellationToken);
+
             // Compliance score real
             var nonCompliantPacks = packs.Count(p =>
                 waivers.Any(w => w.PackId == p.Id && w.Status == WaiverStatus.Pending));
@@ -49,12 +54,12 @@ public static class GetExecutiveOverview
             var compliantPct = complianceScore;
             var gapCount = nonCompliantPacks + packs.Count(p => p.Status == GovernancePackStatus.Draft);
 
-            // Risk derivado de rollouts/waivers
-            var overallRisk = failedRollouts > 0
+            // Risk derivado de rollouts/waivers + incidentes
+            var overallRisk = failedRollouts > 0 || incidentTrend.OpenIncidents > 5
                 ? RiskLevel.Critical
-                : pendingWaivers > 2
+                : pendingWaivers > 2 || incidentTrend.OpenIncidents > 2
                     ? RiskLevel.High
-                    : pendingWaivers > 0 || pendingRollouts > 0
+                    : pendingWaivers > 0 || pendingRollouts > 0 || incidentTrend.OpenIncidents > 0
                         ? RiskLevel.Medium
                         : RiskLevel.Low;
 
@@ -89,10 +94,18 @@ public static class GetExecutiveOverview
                 ? TrendDirection.Improving
                 : failedRollouts > 0 ? TrendDirection.Declining : TrendDirection.Stable;
 
+            // Incident rate change: derivado do trend cross-module
+            var incidentRateChange = incidentTrend.ResolvedInPeriod > 0
+                ? Math.Round((decimal)(incidentTrend.OpenIncidents - incidentTrend.ResolvedInPeriod)
+                    / incidentTrend.ResolvedInPeriod * 100m, 1)
+                : incidentTrend.OpenIncidents > 0
+                    ? 100m
+                    : 0m;
+
             var operationalTrend = new OperationalTrendDto(
                 StabilityTrend: riskTrend,
-                IncidentRateChange: 0m,    // cross-module — não disponível neste módulo
-                AvgResolutionHours: 0m);   // cross-module — não disponível neste módulo
+                IncidentRateChange: incidentRateChange,
+                AvgResolutionHours: incidentTrend.AvgResolutionHours);
 
             var riskSummary = new RiskSummaryDto(
                 OverallRisk: overallRisk,
@@ -114,12 +127,19 @@ public static class GetExecutiveOverview
                 Rollbacks: failedRollouts,
                 ConfidenceTrend: changeTrend);
 
+            var incidentTrendDirection = incidentTrend.Trend switch
+            {
+                "Improving" => TrendDirection.Improving,
+                "Declining" => TrendDirection.Declining,
+                _ => TrendDirection.Stable
+            };
+
             var incidentTrendSummary = new IncidentTrendSummaryDto(
-                OpenIncidents: 0,        // cross-module — não disponível neste módulo
-                ResolvedLast30Days: 0,   // cross-module — não disponível neste módulo
-                AvgResolutionHours: 0m,  // cross-module — não disponível neste módulo
-                RecurrenceRate: 0m,      // cross-module — não disponível neste módulo
-                Trend: TrendDirection.Stable);
+                OpenIncidents: incidentTrend.OpenIncidents,
+                ResolvedLast30Days: incidentTrend.ResolvedInPeriod,
+                AvgResolutionHours: incidentTrend.AvgResolutionHours,
+                RecurrenceRate: incidentTrend.RecurrenceRate,
+                Trend: incidentTrendDirection);
 
             var complianceCoverageSummary = new ComplianceCoverageSummaryDto(
                 OverallScore: complianceScore,
@@ -136,7 +156,8 @@ public static class GetExecutiveOverview
                 IncidentTrendSummary: incidentTrendSummary,
                 ComplianceCoverageSummary: complianceCoverageSummary,
                 TopDomainsRequiringAttention: topDomains,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: DateTimeOffset.UtcNow,
+                CrossModuleDataAvailable: true);
 
             return Result<Response>.Success(response);
         }
@@ -226,8 +247,8 @@ public static class GetExecutiveOverview
 
     /// <summary>
     /// Resposta da visão executiva agregada.
-    /// CrossModuleDataAvailable=false indica que métricas de incidentes e mudanças cross-module
-    /// retornam valores neutros (0) porque dependem de integração futura entre módulos.
+    /// CrossModuleDataAvailable indica se métricas de incidentes cross-module
+    /// estão disponíveis via IIncidentModule.
     /// </summary>
     public sealed record Response(
         OperationalTrendDto OperationalTrend,

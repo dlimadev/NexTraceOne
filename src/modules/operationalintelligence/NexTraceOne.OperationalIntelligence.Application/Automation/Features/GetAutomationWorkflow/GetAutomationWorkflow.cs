@@ -1,6 +1,8 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Errors;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
@@ -11,8 +13,6 @@ namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.Ge
 /// Feature: GetAutomationWorkflow — retorna os detalhes completos de um workflow de automação,
 /// incluindo pré-condições, passos de execução, validação e trilha de auditoria.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
-///
-/// Nota: nesta fase os dados são simulados até integração completa entre módulos.
 /// </summary>
 public static class GetAutomationWorkflow
 {
@@ -29,100 +29,76 @@ public static class GetAutomationWorkflow
     }
 
     /// <summary>Handler que compõe o detalhe completo do workflow de automação.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IAutomationWorkflowRepository workflowRepository,
+        IAutomationAuditRepository auditRepository,
+        IAutomationValidationRepository validationRepository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = FindWorkflow(request.WorkflowId);
-            if (response is null)
-                return Task.FromResult<Result<Response>>(AutomationErrors.WorkflowNotFound(request.WorkflowId));
+            if (!Guid.TryParse(request.WorkflowId, out var parsedId))
+                return AutomationErrors.WorkflowNotFound(request.WorkflowId);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var workflowId = new AutomationWorkflowRecordId(parsedId);
+            var workflow = await workflowRepository.GetByIdAsync(workflowId, cancellationToken);
+
+            if (workflow is null)
+                return AutomationErrors.WorkflowNotFound(request.WorkflowId);
+
+            var auditRecords = await auditRepository.GetByWorkflowIdAsync(workflowId, cancellationToken);
+            var validationRecord = await validationRepository.GetByWorkflowIdAsync(workflowId, cancellationToken);
+
+            var actionDisplayName = AutomationActionCatalog.GetAll()
+                .FirstOrDefault(a => a.ActionId.Equals(workflow.ActionId, StringComparison.OrdinalIgnoreCase))
+                ?.DisplayName ?? workflow.ActionId;
+
+            ApproverInfoDto? approverInfo = workflow.ApprovedBy is not null && workflow.ApprovedAt.HasValue
+                ? new ApproverInfoDto(workflow.ApprovedBy, workflow.ApprovedAt.Value, workflow.ApprovalStatus)
+                : null;
+
+            ValidationInfoDto? validationInfo = validationRecord is not null
+                ? new ValidationInfoDto(
+                    MapOutcomeToValidationStatus(validationRecord.Outcome),
+                    validationRecord.ObservedOutcome,
+                    validationRecord.ValidatedBy,
+                    validationRecord.ValidatedAt)
+                : null;
+
+            var auditEntries = auditRecords
+                .Select(a => new AuditEntry(a.Action, a.Actor, a.OccurredAt, a.Details))
+                .ToList();
+
+            var response = new Response(
+                WorkflowId: workflow.Id.Value,
+                ActionId: workflow.ActionId,
+                ActionDisplayName: actionDisplayName,
+                Status: workflow.Status,
+                RiskLevel: workflow.RiskLevel,
+                Rationale: workflow.Rationale,
+                RequestedBy: workflow.RequestedBy,
+                ApproverInfo: approverInfo,
+                Scope: workflow.TargetScope,
+                Environment: workflow.TargetEnvironment,
+                ServiceId: workflow.ServiceId,
+                IncidentId: workflow.IncidentId,
+                ChangeId: workflow.ChangeId,
+                Preconditions: Array.Empty<PreconditionItem>(),
+                ExecutionSteps: Array.Empty<ExecutionStep>(),
+                ValidationInfo: validationInfo,
+                AuditEntries: auditEntries,
+                CreatedAt: workflow.CreatedAt,
+                UpdatedAt: workflow.UpdatedAt);
+
+            return Result<Response>.Success(response);
         }
 
-        private static Response? FindWorkflow(string workflowId)
+        private static ValidationStatus MapOutcomeToValidationStatus(AutomationOutcome outcome) => outcome switch
         {
-            if (workflowId.Equals("aw-0001-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
-            {
-                return new Response(
-                    WorkflowId: Guid.Parse("b0a10001-0001-0000-0000-000000000001"),
-                    ActionId: "action-restart-controlled",
-                    ActionDisplayName: "Controlled Service Restart",
-                    Status: AutomationWorkflowStatus.Executing,
-                    RiskLevel: RiskLevel.Medium,
-                    Rationale: "Payment gateway error rate exceeded 5% after last deployment — controlled restart to restore baseline.",
-                    RequestedBy: "ops-engineer@nextraceone.io",
-                    ApproverInfo: new ApproverInfoDto("tech-lead@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:30:00Z"), AutomationApprovalStatus.Approved),
-                    Scope: "svc-payment-gateway pod group A",
-                    Environment: "Production",
-                    ServiceId: "svc-payment-gateway",
-                    IncidentId: "a1b2c3d4-0001-0000-0000-000000000001",
-                    ChangeId: "chg-deploy-2026-0042",
-                    Preconditions: new[]
-                    {
-                        new PreconditionItem(PreconditionType.ServiceHealthCheck, "Service health check must pass before restart.", "Passed", DateTimeOffset.Parse("2024-06-15T10:25:00Z")),
-                        new PreconditionItem(PreconditionType.ApprovalPresence, "Approval from Tech Lead or Architect is required.", "Passed", DateTimeOffset.Parse("2024-06-15T10:30:00Z")),
-                        new PreconditionItem(PreconditionType.BlastRadiusConstraint, "Blast radius must be limited to single pod group.", "Passed", DateTimeOffset.Parse("2024-06-15T10:26:00Z")),
-                    },
-                    ExecutionSteps: new[]
-                    {
-                        new ExecutionStep(1, "Drain active connections from pod group A", "Completed", DateTimeOffset.Parse("2024-06-15T10:36:00Z"), "ops-engineer@nextraceone.io"),
-                        new ExecutionStep(2, "Execute controlled restart on pod group A", "Completed", DateTimeOffset.Parse("2024-06-15T10:40:00Z"), "ops-engineer@nextraceone.io"),
-                        new ExecutionStep(3, "Validate pod health after restart", "InProgress", null, null),
-                        new ExecutionStep(4, "Restore traffic routing to pod group A", "Pending", null, null),
-                    },
-                    ValidationInfo: null,
-                    AuditEntries: new[]
-                    {
-                        new AuditEntry(AutomationAuditAction.WorkflowCreated, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:15:00Z"), "Workflow created for controlled restart of payment-gateway."),
-                        new AuditEntry(AutomationAuditAction.PreconditionsEvaluated, "system", DateTimeOffset.Parse("2024-06-15T10:26:00Z"), "All 3 preconditions evaluated — all passed."),
-                        new AuditEntry(AutomationAuditAction.ApprovalRequested, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:27:00Z"), "Approval requested from tech-lead@nextraceone.io."),
-                        new AuditEntry(AutomationAuditAction.ApprovalGranted, "tech-lead@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:30:00Z"), "Approved — low blast radius, controlled restart is safe."),
-                        new AuditEntry(AutomationAuditAction.ExecutionStarted, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:35:00Z"), "Execution started for controlled restart workflow."),
-                        new AuditEntry(AutomationAuditAction.StepCompleted, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:36:00Z"), "Step 1 completed: connections drained."),
-                        new AuditEntry(AutomationAuditAction.StepCompleted, "ops-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-15T10:40:00Z"), "Step 2 completed: restart executed."),
-                    },
-                    CreatedAt: DateTimeOffset.Parse("2024-06-15T10:15:00Z"),
-                    UpdatedAt: DateTimeOffset.Parse("2024-06-15T10:40:00Z"));
-            }
-
-            if (workflowId.Equals("aw-0002-0000-0000-000000000001", StringComparison.OrdinalIgnoreCase))
-            {
-                return new Response(
-                    WorkflowId: Guid.Parse("b0a10002-0001-0000-0000-000000000001"),
-                    ActionId: "action-observe-validate",
-                    ActionDisplayName: "Observe and Validate",
-                    Status: AutomationWorkflowStatus.AwaitingApproval,
-                    RiskLevel: RiskLevel.Low,
-                    Rationale: "Post-deployment observation requested for catalog-sync service after config update.",
-                    RequestedBy: "platform-engineer@nextraceone.io",
-                    ApproverInfo: null,
-                    Scope: "svc-catalog-sync all instances",
-                    Environment: "Production",
-                    ServiceId: "svc-catalog-sync",
-                    IncidentId: null,
-                    ChangeId: "chg-config-2026-0100",
-                    Preconditions: new[]
-                    {
-                        new PreconditionItem(PreconditionType.ServiceHealthCheck, "Service must be reporting healthy status.", "Pending", null),
-                    },
-                    ExecutionSteps: new[]
-                    {
-                        new ExecutionStep(1, "Collect baseline metrics snapshot", "Pending", null, null),
-                        new ExecutionStep(2, "Monitor error rate for 30 minutes", "Pending", null, null),
-                        new ExecutionStep(3, "Compare metrics against baseline", "Pending", null, null),
-                    },
-                    ValidationInfo: null,
-                    AuditEntries: new[]
-                    {
-                        new AuditEntry(AutomationAuditAction.WorkflowCreated, "platform-engineer@nextraceone.io", DateTimeOffset.Parse("2024-06-16T08:00:00Z"), "Workflow created for post-deployment observation."),
-                    },
-                    CreatedAt: DateTimeOffset.Parse("2024-06-16T08:00:00Z"),
-                    UpdatedAt: DateTimeOffset.Parse("2024-06-16T08:00:00Z"));
-            }
-
-            return null;
-        }
+            AutomationOutcome.Successful => ValidationStatus.Passed,
+            AutomationOutcome.Failed => ValidationStatus.Failed,
+            AutomationOutcome.Cancelled => ValidationStatus.Failed,
+            _ => ValidationStatus.InProgress
+        };
     }
 
     /// <summary>Resposta com detalhes completos do workflow de automação.</summary>

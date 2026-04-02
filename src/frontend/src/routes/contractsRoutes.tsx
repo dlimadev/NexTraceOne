@@ -7,7 +7,7 @@ import { Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
 const ContractCatalogPage = lazy(() => import('../features/contracts/catalog/ContractCatalogPage').then(m => ({ default: m.ContractCatalogPage })));
-const CreateServicePage = lazy(() => import('../features/contracts/create/CreateServicePage').then(m => ({ default: m.CreateServicePage })));
+const CreateContractPage = lazy(() => import('../features/contracts/create/CreateContractPage').then(m => ({ default: m.CreateContractPage })));
 const DraftStudioPage = lazy(() => import('../features/contracts/studio/DraftStudioPage').then(m => ({ default: m.DraftStudioPage })));
 const ContractWorkspacePage = lazy(() => import('../features/contracts/workspace/ContractWorkspacePage').then(m => ({ default: m.ContractWorkspacePage })));
 const SpectralRulesetManagerPage = lazy(() => import('../features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
@@ -31,7 +31,7 @@ export function ContractsRoutes() {
         path="/contracts/new"
         element={
           <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
-            <CreateServicePage />
+            <CreateContractPage />
           </ProtectedRoute>
         }
       />

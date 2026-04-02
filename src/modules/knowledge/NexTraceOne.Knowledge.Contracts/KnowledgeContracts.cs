@@ -10,6 +10,46 @@ public static class KnowledgeContracts
     public const string ModuleName = "Knowledge";
 }
 
+// IMPLEMENTATION STATUS: Implemented — KnowledgeModuleService (Infrastructure).
+
+/// <summary>
+/// Interface pública do módulo Knowledge para comunicação entre módulos.
+/// Outros módulos que precisarem de dados de conhecimento devem usar este contrato —
+/// nunca acessar o DbContext ou repositórios diretamente.
+/// Garante isolamento de base de dados entre módulos.
+/// </summary>
+public interface IKnowledgeModule
+{
+    /// <summary>
+    /// Conta o total de documentos de conhecimento registados.
+    /// </summary>
+    Task<int> CountDocumentsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Conta o total de notas operacionais registadas.
+    /// </summary>
+    Task<int> CountOperationalNotesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Conta documentos de conhecimento associados a um serviço específico.
+    /// </summary>
+    Task<int> CountDocumentsByServiceAsync(string serviceId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém um resumo do módulo Knowledge para consumo cross-module.
+    /// </summary>
+    Task<KnowledgeModuleSummary> GetModuleSummaryAsync(CancellationToken cancellationToken = default);
+}
+
+/// <summary>
+/// Resumo do módulo Knowledge para consumo cross-module.
+/// Contém contagens de documentos e notas para dashboards de governança.
+/// </summary>
+public sealed record KnowledgeModuleSummary(
+    int TotalDocuments,
+    int TotalOperationalNotes,
+    int TotalRelations);
+
 /// <summary>
 /// Item de resultado de pesquisa do módulo Knowledge para consumo cross-module.
 /// Usado pelo GlobalSearch para incluir documentos de conhecimento e notas operacionais

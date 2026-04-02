@@ -16,6 +16,10 @@ import type {
   SoapBuilderState,
   EventBuilderState,
   WorkserviceBuilderState,
+  SharedSchemaBuilderState,
+  SharedSchemaProperty,
+  WebhookBuilderState,
+  LegacyContractBuilderState,
   SyncResult,
 } from './builderTypes';
 
@@ -25,6 +29,7 @@ interface RestEndpointParameter {
   required?: boolean;
   type?: string;
   description?: string;
+  constraints?: import('./builderTypes').PropertyConstraints;
 }
 
 interface RestEndpointRequestBody {
@@ -104,8 +109,28 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
             yaml += `        - name: ${p.name}\n`;
             yaml += `          in: ${p.in}\n`;
             if (p.required) yaml += `          required: true\n`;
-            if (p.type) yaml += `          schema:\n            type: ${p.type}\n`;
             if (p.description) yaml += `          description: "${esc(p.description)}"\n`;
+            if (p.type) {
+              yaml += `          schema:\n            type: ${p.type}\n`;
+              // Emit constraints when present
+              const c = p.constraints;
+              if (c) {
+                if (c.format) yaml += `            format: ${c.format}\n`;
+                if (c.minLength !== undefined) yaml += `            minLength: ${c.minLength}\n`;
+                if (c.maxLength !== undefined) yaml += `            maxLength: ${c.maxLength}\n`;
+                if (c.minimum !== undefined) yaml += `            minimum: ${c.minimum}\n`;
+                if (c.maximum !== undefined) yaml += `            maximum: ${c.maximum}\n`;
+                if (c.pattern) yaml += `            pattern: "${esc(c.pattern)}"\n`;
+                if (c.defaultValue !== undefined) yaml += `            default: ${c.defaultValue}\n`;
+                if (c.readOnly) yaml += `            readOnly: true\n`;
+                if (c.writeOnly) yaml += `            writeOnly: true\n`;
+                if (c.nullable) yaml += `            nullable: true\n`;
+                if (c.enumValues && c.enumValues.length > 0) {
+                  yaml += `            enum:\n`;
+                  for (const v of c.enumValues) yaml += `              - ${v}\n`;
+                }
+              }
+            }
           }
         }
 
@@ -329,6 +354,46 @@ export function workserviceBuilderToYaml(state: WorkserviceBuilderState): SyncRe
   if (state.sideEffects) yaml += `sideEffects: "${esc(state.sideEffects)}"\n`;
   if (state.healthCheck) yaml += `healthCheck: "${esc(state.healthCheck)}"\n`;
 
+  // ── Messaging Role ────────────────────────────────────────────────────────
+  if (state.messagingRole && state.messagingRole !== 'None') {
+    yaml += `\nmessaging:\n`;
+    yaml += `  role: ${state.messagingRole}\n`;
+
+    if ((state.messagingRole === 'Consumer' || state.messagingRole === 'Both') && state.consumedTopics.length > 0) {
+      yaml += `  consumedTopics:\n`;
+      for (const t of state.consumedTopics) {
+        yaml += `    - topicName: "${esc(t.topicName)}"\n`;
+        if (t.entityType) yaml += `      entityType: "${esc(t.entityType)}"\n`;
+        if (t.format) yaml += `      format: ${t.format}\n`;
+      }
+    }
+
+    if ((state.messagingRole === 'Producer' || state.messagingRole === 'Both') && state.producedTopics.length > 0) {
+      yaml += `  producedTopics:\n`;
+      for (const t of state.producedTopics) {
+        yaml += `    - topicName: "${esc(t.topicName)}"\n`;
+        if (t.entityType) yaml += `      entityType: "${esc(t.entityType)}"\n`;
+        if (t.format) yaml += `      format: ${t.format}\n`;
+      }
+    }
+
+    if ((state.messagingRole === 'Consumer' || state.messagingRole === 'Both') && state.consumedServices.length > 0) {
+      yaml += `  consumedServices:\n`;
+      for (const s of state.consumedServices) {
+        yaml += `    - serviceName: "${esc(s.serviceName)}"\n`;
+        if (s.protocol) yaml += `      protocol: ${s.protocol}\n`;
+      }
+    }
+
+    if ((state.messagingRole === 'Producer' || state.messagingRole === 'Both') && state.producedEvents.length > 0) {
+      yaml += `  producedEvents:\n`;
+      for (const e of state.producedEvents) {
+        yaml += `    - eventName: "${esc(e.eventName)}"\n`;
+        if (e.targetTopic) yaml += `      targetTopic: "${esc(e.targetTopic)}"\n`;
+      }
+    }
+  }
+
   if (state.observabilityNotes) {
     yaml += `\nobservability:\n`;
     yaml += `  notes: "${esc(state.observabilityNotes)}"\n`;
@@ -355,4 +420,210 @@ function groupByPath(endpoints: RestEndpointShape[]): Record<string, RestEndpoin
     map[ep.path] = bucket;
   }
   return map;
+}
+
+// ── SharedSchema → JSON Schema ────────────────────────────────────────────────
+
+function emitSchemaProperty(prop: SharedSchemaProperty, indent: string): string {
+  let out = '';
+  if (prop.type === '$ref' && prop.$ref) {
+    out += `${indent}"${esc(prop.name)}": { "$ref": "${esc(prop.$ref)}" }`;
+  } else if (prop.type === 'object' && prop.properties && prop.properties.length > 0) {
+    out += `${indent}"${esc(prop.name)}": {\n`;
+    out += `${indent}  "type": "object",\n`;
+    if (prop.description) out += `${indent}  "description": "${esc(prop.description)}",\n`;
+    out += `${indent}  "properties": {\n`;
+    const childProps = prop.properties.map((p) => emitSchemaProperty(p, indent + '    '));
+    out += childProps.join(',\n') + '\n';
+    out += `${indent}  }\n`;
+    out += `${indent}}`;
+  } else if (prop.type === 'array' && prop.items) {
+    out += `${indent}"${esc(prop.name)}": {\n`;
+    out += `${indent}  "type": "array",\n`;
+    if (prop.description) out += `${indent}  "description": "${esc(prop.description)}",\n`;
+    out += `${indent}  "items": { "type": "${esc(prop.items.type)}" }\n`;
+    out += `${indent}}`;
+  } else {
+    out += `${indent}"${esc(prop.name)}": {\n`;
+    out += `${indent}  "type": "${esc(prop.type)}"`;
+    if (prop.description) out += `,\n${indent}  "description": "${esc(prop.description)}"`;
+    const c = prop.constraints;
+    if (c) {
+      if (c.format) out += `,\n${indent}  "format": "${esc(c.format)}"`;
+      if (c.minLength !== undefined) out += `,\n${indent}  "minLength": ${c.minLength}`;
+      if (c.maxLength !== undefined) out += `,\n${indent}  "maxLength": ${c.maxLength}`;
+      if (c.minimum !== undefined) out += `,\n${indent}  "minimum": ${c.minimum}`;
+      if (c.maximum !== undefined) out += `,\n${indent}  "maximum": ${c.maximum}`;
+      if (c.pattern) out += `,\n${indent}  "pattern": "${esc(c.pattern)}"`;
+      if (c.defaultValue !== undefined) out += `,\n${indent}  "default": "${esc(c.defaultValue)}"`;
+      if (c.enumValues && c.enumValues.length > 0) {
+        out += `,\n${indent}  "enum": [${c.enumValues.map((v) => `"${esc(v)}"`).join(', ')}]`;
+      }
+    }
+    out += `\n${indent}}`;
+  }
+  return out;
+}
+
+export function sharedSchemaBuilderToJson(state: SharedSchemaBuilderState): SyncResult {
+  const warnings: string[] = [];
+  const unsupported: string[] = [];
+
+  if (state.format !== 'json-schema') {
+    warnings.push('contracts.builder.sync.schemaFormatLimitation');
+  }
+
+  let json = '{\n';
+  json += `  "$schema": "https://json-schema.org/draft/2020-12/schema",\n`;
+  json += `  "$id": "${esc(state.namespace ? state.namespace + '/' + state.name : state.name)}",\n`;
+  json += `  "title": "${esc(state.name)}",\n`;
+  json += `  "description": "${esc(state.description)}",\n`;
+  json += `  "type": "object",\n`;
+
+  json += `  "x-nto-metadata": {\n`;
+  json += `    "version": "${esc(state.version)}",\n`;
+  json += `    "namespace": "${esc(state.namespace)}",\n`;
+  json += `    "format": "${esc(state.format)}",\n`;
+  json += `    "compatibility": "${esc(state.compatibility)}",\n`;
+  json += `    "owner": "${esc(state.owner)}"`;
+  if (state.tags.length > 0) {
+    json += `,\n    "tags": [${state.tags.map((t) => `"${esc(t)}"`).join(', ')}]`;
+  }
+  json += `\n  },\n`;
+
+  json += `  "properties": {\n`;
+  const props = state.properties.map((p) => emitSchemaProperty(p, '    '));
+  json += props.join(',\n') + '\n';
+  json += `  }`;
+
+  const required = state.properties.filter((p) => p.required).map((p) => p.name);
+  if (required.length > 0) {
+    json += `,\n  "required": [${required.map((r) => `"${esc(r)}"`).join(', ')}]`;
+  }
+
+  json += '\n}\n';
+
+  return { success: true, content: json, warnings, unsupportedFeatures: unsupported };
+}
+
+// ── Webhook → NTO YAML ────────────────────────────────────────────────────────
+
+export function webhookBuilderToYaml(state: WebhookBuilderState): SyncResult {
+  const warnings: string[] = [];
+  const unsupported: string[] = [];
+
+  let yaml = `# NexTraceOne Webhook Definition\n`;
+  yaml += `kind: Webhook\n`;
+  yaml += `metadata:\n`;
+  yaml += `  name: "${esc(state.name || 'unnamed-webhook')}"\n`;
+  if (state.owner) yaml += `  owner: "${esc(state.owner)}"\n`;
+  if (state.description) yaml += `  description: "${esc(state.description)}"\n`;
+  yaml += `\n`;
+
+  yaml += `spec:\n`;
+  yaml += `  method: ${state.method}\n`;
+  yaml += `  urlPattern: "${esc(state.urlPattern)}"\n`;
+  yaml += `  contentType: "${esc(state.contentType || 'application/json')}"\n`;
+  yaml += `\n`;
+
+  yaml += `  authentication:\n`;
+  yaml += `    type: ${state.authentication}\n`;
+  if (state.secretHeaderName) yaml += `    secretHeaderName: "${esc(state.secretHeaderName)}"\n`;
+  yaml += `\n`;
+
+  if (state.headers.length > 0) {
+    yaml += `  headers:\n`;
+    for (const h of state.headers) {
+      yaml += `    - name: "${esc(h.name)}"\n`;
+      yaml += `      value: "${esc(h.value)}"\n`;
+      if (h.required) yaml += `      required: true\n`;
+    }
+    yaml += `\n`;
+  }
+
+  if (state.payloadSchema) {
+    yaml += `  payloadSchema: |\n`;
+    for (const line of state.payloadSchema.split('\n')) {
+      yaml += `    ${line}\n`;
+    }
+    yaml += `\n`;
+  }
+
+  yaml += `  retry:\n`;
+  yaml += `    count: ${state.retryCount || '3'}\n`;
+  yaml += `    timeout: "${esc(state.timeout || '30')}s"\n`;
+  if (state.retryPolicy) yaml += `    policy: "${esc(state.retryPolicy)}"\n`;
+  yaml += `\n`;
+
+  if (state.events.length > 0) {
+    yaml += `  events:\n`;
+    for (const ev of state.events) {
+      yaml += `    - ${ev}\n`;
+    }
+    yaml += `\n`;
+  }
+
+  if (state.observabilityNotes) {
+    yaml += `observability:\n`;
+    yaml += `  notes: "${esc(state.observabilityNotes)}"\n`;
+  }
+
+  return { success: true, content: yaml, warnings, unsupportedFeatures: unsupported };
+}
+
+// ── Legacy Contract → NTO YAML ────────────────────────────────────────────────
+
+export function legacyContractBuilderToYaml(state: LegacyContractBuilderState): SyncResult {
+  const warnings: string[] = [];
+  const unsupported: string[] = [];
+
+  let yaml = `# NexTraceOne Legacy Contract Definition\n`;
+  yaml += `kind: ${state.kind}\n`;
+  yaml += `metadata:\n`;
+  yaml += `  name: "${esc(state.name || 'unnamed-contract')}"\n`;
+  if (state.version) yaml += `  version: "${esc(state.version)}"\n`;
+  if (state.owner) yaml += `  owner: "${esc(state.owner)}"\n`;
+  if (state.description) yaml += `  description: "${esc(state.description)}"\n`;
+  yaml += `\n`;
+
+  yaml += `spec:\n`;
+  yaml += `  encoding: ${state.encoding}\n`;
+  if (state.totalLength) yaml += `  totalLength: ${state.totalLength}\n`;
+
+  if (state.kind === 'Copybook' && state.programName) {
+    yaml += `  programName: "${esc(state.programName)}"\n`;
+  }
+  if (state.kind === 'MqMessage') {
+    if (state.queueManager) yaml += `  queueManager: "${esc(state.queueManager)}"\n`;
+    if (state.queueName) yaml += `  queueName: "${esc(state.queueName)}"\n`;
+    if (state.messageFormat) yaml += `  messageFormat: "${esc(state.messageFormat)}"\n`;
+  }
+  if (state.kind === 'CicsCommarea') {
+    if (state.transactionId) yaml += `  transactionId: "${esc(state.transactionId)}"\n`;
+    if (state.commareaLength) yaml += `  commareaLength: ${state.commareaLength}\n`;
+  }
+  yaml += `\n`;
+
+  if (state.fields.length > 0) {
+    yaml += `fields:\n`;
+    for (const f of state.fields) {
+      yaml += `  - name: "${esc(f.name)}"\n`;
+      if (f.level) yaml += `    level: ${f.level}\n`;
+      yaml += `    type: ${f.type}\n`;
+      if (f.length) yaml += `    length: ${f.length}\n`;
+      if (f.offset) yaml += `    offset: ${f.offset}\n`;
+      if (f.picture) yaml += `    picture: "${esc(f.picture)}"\n`;
+      if (f.description) yaml += `    description: "${esc(f.description)}"\n`;
+      if (f.occurs) yaml += `    occurs: ${f.occurs}\n`;
+      if (f.redefines) yaml += `    redefines: "${esc(f.redefines)}"\n`;
+    }
+    yaml += `\n`;
+  }
+
+  if (state.observabilityNotes) {
+    yaml += `observability:\n`;
+    yaml += `  notes: "${esc(state.observabilityNotes)}"\n`;
+  }
+
+  return { success: true, content: yaml, warnings, unsupportedFeatures: unsupported };
 }

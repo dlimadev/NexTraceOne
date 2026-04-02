@@ -6,28 +6,57 @@
  * Aqui vivem tipos semânticos e de apresentação usados pelo módulo.
  */
 
-// ── Service Kind ──────────────────────────────────────────────────────────────
+// ── Contract Kind ─────────────────────────────────────────────────────────────
 
-/** Categoria de serviço suportada pelo módulo de contratos. */
-export type ServiceKind = 'REST' | 'SOAP' | 'EVENT_API' | 'WORKSERVICE' | 'SHARED_SCHEMA';
+/** Categoria de contrato suportada pelo módulo de contratos. */
+export type ContractKind =
+  | 'REST'
+  | 'SOAP'
+  | 'EVENT_API'
+  | 'WORKSERVICE'
+  | 'SHARED_SCHEMA'
+  | 'COPYBOOK'
+  | 'MQ_MESSAGE'
+  | 'FIXED_LAYOUT'
+  | 'CICS_COMMAREA'
+  | 'WEBHOOK';
 
-/** Mapeamento entre ServiceKind e o valor persistido no backend. */
-export const SERVICE_KIND_MAP: Record<ServiceKind, string> = {
+/** @deprecated Use ContractKind instead. */
+export type ServiceKind = ContractKind;
+
+/** Mapeamento entre ContractKind e o valor persistido no backend. */
+export const CONTRACT_KIND_MAP: Record<ContractKind, string> = {
   REST: 'RestApi',
   SOAP: 'Soap',
   EVENT_API: 'Event',
   WORKSERVICE: 'BackgroundService',
   SHARED_SCHEMA: 'SharedSchema',
+  COPYBOOK: 'Copybook',
+  MQ_MESSAGE: 'MqMessage',
+  FIXED_LAYOUT: 'FixedLayout',
+  CICS_COMMAREA: 'CicsCommarea',
+  WEBHOOK: 'Webhook',
 } as const;
 
-/** Mapeamento inverso — valor do backend para ServiceKind. */
-export const SERVICE_KIND_REVERSE: Record<string, ServiceKind> = {
+/** @deprecated Use CONTRACT_KIND_MAP instead. */
+export const SERVICE_KIND_MAP = CONTRACT_KIND_MAP;
+
+/** Mapeamento inverso — valor do backend para ContractKind. */
+export const CONTRACT_KIND_REVERSE: Record<string, ContractKind> = {
   RestApi: 'REST',
   Soap: 'SOAP',
   Event: 'EVENT_API',
   BackgroundService: 'WORKSERVICE',
   SharedSchema: 'SHARED_SCHEMA',
+  Copybook: 'COPYBOOK',
+  MqMessage: 'MQ_MESSAGE',
+  FixedLayout: 'FIXED_LAYOUT',
+  CicsCommarea: 'CICS_COMMAREA',
+  Webhook: 'WEBHOOK',
 } as const;
+
+/** @deprecated Use CONTRACT_KIND_REVERSE instead. */
+export const SERVICE_KIND_REVERSE = CONTRACT_KIND_REVERSE;
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 

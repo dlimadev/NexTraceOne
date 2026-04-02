@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { X, SlidersHorizontal } from 'lucide-react';
 import { SearchInput } from '../../../../components/SearchInput';
 import { cn } from '../../../../lib/cn';
-import { PROTOCOLS, LIFECYCLE_STATES, SERVICE_TYPES } from '../../shared/constants';
+import { PROTOCOLS, LIFECYCLE_STATES, CONTRACT_TYPES } from '../../shared/constants';
 import type { CatalogFilters, CatalogServiceType } from '../types';
 import { EMPTY_FILTERS, activeFilterCount } from '../types';
 
@@ -115,7 +115,7 @@ export function CatalogToolbar({
           <InlineSelect
             value={filters.serviceType}
             onChange={(v) => set('serviceType', v)}
-            options={SERVICE_TYPES.map((s) => ({
+            options={CONTRACT_TYPES.map((s) => ({
               value: s.value,
               label: t(s.labelKey, s.value),
             }))}

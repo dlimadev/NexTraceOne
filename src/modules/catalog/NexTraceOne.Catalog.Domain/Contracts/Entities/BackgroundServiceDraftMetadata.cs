@@ -8,7 +8,7 @@ namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 /// <summary>
 /// Entidade que armazena metadados específicos de Background Service para um ContractDraft em edição.
 /// Permite que o Contract Studio mantenha informações do processo (nome, categoria, trigger, schedule,
-/// inputs/outputs, side effects) desacopladas do SpecContent genérico do draft.
+/// inputs/outputs, side effects, messaging role e tópicos consumidos/produzidos) desacopladas do SpecContent genérico do draft.
 /// Vinculada a um ContractDraft com ContractType = BackgroundService.
 /// </summary>
 public sealed class BackgroundServiceDraftMetadata : Entity<BackgroundServiceDraftMetadataId>
@@ -39,6 +39,26 @@ public sealed class BackgroundServiceDraftMetadata : Entity<BackgroundServiceDra
     /// <summary>JSON de side effects declarados do processo.</summary>
     public string SideEffectsJson { get; private set; } = "[]";
 
+    // ── Messaging Role ──────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Role de messaging do background service: None, Producer, Consumer, Both.
+    /// Indica se este processo produz e/ou consome mensagens de tópicos/filas.
+    /// </summary>
+    public string MessagingRole { get; private set; } = "None";
+
+    /// <summary>JSON dos tópicos/filas consumidos pelo processo.</summary>
+    public string ConsumedTopicsJson { get; private set; } = "[]";
+
+    /// <summary>JSON dos tópicos/filas produzidos pelo processo.</summary>
+    public string ProducedTopicsJson { get; private set; } = "[]";
+
+    /// <summary>JSON dos serviços consumidos pelo processo.</summary>
+    public string ConsumedServicesJson { get; private set; } = "[]";
+
+    /// <summary>JSON dos eventos produzidos pelo processo.</summary>
+    public string ProducedEventsJson { get; private set; } = "[]";
+
     /// <summary>
     /// Cria novos metadados de background service para um draft de contrato.
     /// </summary>
@@ -50,7 +70,12 @@ public sealed class BackgroundServiceDraftMetadata : Entity<BackgroundServiceDra
         string? scheduleExpression = null,
         string inputsJson = "{}",
         string outputsJson = "{}",
-        string sideEffectsJson = "[]")
+        string sideEffectsJson = "[]",
+        string messagingRole = "None",
+        string consumedTopicsJson = "[]",
+        string producedTopicsJson = "[]",
+        string consumedServicesJson = "[]",
+        string producedEventsJson = "[]")
     {
         Guard.Against.Null(contractDraftId);
         Guard.Against.NullOrWhiteSpace(serviceName);
@@ -65,7 +90,12 @@ public sealed class BackgroundServiceDraftMetadata : Entity<BackgroundServiceDra
             ScheduleExpression = scheduleExpression,
             InputsJson = inputsJson,
             OutputsJson = outputsJson,
-            SideEffectsJson = sideEffectsJson
+            SideEffectsJson = sideEffectsJson,
+            MessagingRole = messagingRole,
+            ConsumedTopicsJson = consumedTopicsJson,
+            ProducedTopicsJson = producedTopicsJson,
+            ConsumedServicesJson = consumedServicesJson,
+            ProducedEventsJson = producedEventsJson
         };
     }
 
@@ -77,7 +107,12 @@ public sealed class BackgroundServiceDraftMetadata : Entity<BackgroundServiceDra
         string? scheduleExpression,
         string inputsJson,
         string outputsJson,
-        string sideEffectsJson)
+        string sideEffectsJson,
+        string messagingRole = "None",
+        string consumedTopicsJson = "[]",
+        string producedTopicsJson = "[]",
+        string consumedServicesJson = "[]",
+        string producedEventsJson = "[]")
     {
         Guard.Against.NullOrWhiteSpace(serviceName);
         Guard.Against.NullOrWhiteSpace(category);
@@ -89,6 +124,11 @@ public sealed class BackgroundServiceDraftMetadata : Entity<BackgroundServiceDra
         InputsJson = inputsJson;
         OutputsJson = outputsJson;
         SideEffectsJson = sideEffectsJson;
+        MessagingRole = messagingRole;
+        ConsumedTopicsJson = consumedTopicsJson;
+        ProducedTopicsJson = producedTopicsJson;
+        ConsumedServicesJson = consumedServicesJson;
+        ProducedEventsJson = producedEventsJson;
     }
 }
 

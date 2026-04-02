@@ -68,12 +68,15 @@ public static class ComputeSemanticDiff
             if (targetVersion is null)
                 return ContractsErrors.ContractVersionNotFound(request.TargetVersionId.ToString());
 
+            if (baseVersion.Protocol != targetVersion.Protocol)
+                return ContractsErrors.ProtocolMismatchForDiff(baseVersion.Protocol.ToString(), targetVersion.Protocol.ToString());
+
             var diffResult = ContractDiffCalculator.ComputeDiff(
                 baseVersion.SpecContent, targetVersion.SpecContent, targetVersion.Protocol);
 
             var baseSemVer = SemanticVersion.Parse(baseVersion.SemVer);
             var suggestedSemVer = baseSemVer is null
-                ? baseVersion.SemVer
+                ? "0.0.1"
                 : diffResult.ChangeLevel switch
                 {
                     ChangeLevel.Breaking => baseSemVer.BumpMajor().ToString(),
@@ -119,7 +122,7 @@ public static class ComputeSemanticDiff
                 ApiAssetId.From(targetVersion.ApiAssetId), cancellationToken);
 
             var description = breakingChanges.Count > 0
-                ? string.Join("; ", breakingChanges.Take(3).Select(c => c.Description))
+                ? string.Join("; ", breakingChanges.Take(3).Select(c => c.Description ?? "Unspecified breaking change"))
                 : "Breaking changes detected.";
 
             _ = Guid.TryParse(currentUser.Id, out var ownerUserId);
