@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 # NexTraceOne Lab — Verify Telemetry
 #
-# Verifica se a telemetria está a ser ingerida correctamente no Elasticsearch.
+# Verifica se a telemetria está a ser ingerida corretamente no Elasticsearch.
 #
 # Uso:
 #   ./scripts/verify-telemetry.sh
