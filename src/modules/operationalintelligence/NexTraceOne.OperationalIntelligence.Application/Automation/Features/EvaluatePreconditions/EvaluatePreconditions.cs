@@ -1,7 +1,11 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Errors;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.EvaluatePreconditions;
 
@@ -9,8 +13,6 @@ namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.Ev
 /// Feature: EvaluatePreconditions — avalia as pré-condições de um workflow de automação
 /// para determinar se todas as condições obrigatórias estão satisfeitas para execução segura.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
-///
-/// Nota: nesta fase os dados são simulados até integração completa entre módulos.
 /// </summary>
 public static class EvaluatePreconditions
 {
@@ -29,44 +31,91 @@ public static class EvaluatePreconditions
         }
     }
 
-    /// <summary>Handler que avalia as pré-condições com dados simulados.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que avalia as pré-condições do workflow de automação.</summary>
+    public sealed class Handler(
+        IAutomationWorkflowRepository workflowRepository,
+        IAutomationAuditRepository auditRepository,
+        IAutomationUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var now = DateTimeOffset.UtcNow;
+            if (!Guid.TryParse(request.WorkflowId, out var parsedId))
+                return AutomationErrors.WorkflowNotFound(request.WorkflowId);
+
+            var workflowId = new AutomationWorkflowRecordId(parsedId);
+            var workflow = await workflowRepository.GetByIdAsync(workflowId, cancellationToken);
+
+            if (workflow is null)
+                return AutomationErrors.WorkflowNotFound(request.WorkflowId);
+
+            var utcNow = clock.UtcNow;
+
+            var serviceHealthPassed = !string.IsNullOrWhiteSpace(workflow.ServiceId);
+            var approvalPassed = workflow.ApprovalStatus == AutomationApprovalStatus.Approved;
+            var blastRadiusPassed = !string.IsNullOrWhiteSpace(workflow.TargetScope);
+            var environmentPassed = !string.IsNullOrWhiteSpace(workflow.TargetEnvironment);
 
             var results = new List<PreconditionResult>
             {
-                new(PreconditionType.ServiceHealthCheck, true,
-                    "Service health check passed — all instances reporting healthy.",
-                    now.AddSeconds(-10)),
+                new(PreconditionType.ServiceHealthCheck,
+                    serviceHealthPassed,
+                    serviceHealthPassed
+                        ? $"Service reference is configured: '{workflow.ServiceId}'."
+                        : "No service reference configured — cannot verify health.",
+                    utcNow),
 
-                new(PreconditionType.ApprovalPresence, true,
-                    "Approval from authorized persona is present.",
-                    now.AddSeconds(-8)),
+                new(PreconditionType.ApprovalPresence,
+                    approvalPassed,
+                    approvalPassed
+                        ? $"Approval granted by '{workflow.ApprovedBy}' at {workflow.ApprovedAt:u}."
+                        : "Approval is still pending.",
+                    utcNow),
 
-                new(PreconditionType.BlastRadiusConstraint, true,
-                    "Blast radius limited to single pod group — within acceptable limits.",
-                    now.AddSeconds(-6)),
+                new(PreconditionType.BlastRadiusConstraint,
+                    blastRadiusPassed,
+                    blastRadiusPassed
+                        ? $"Target scope is defined: '{workflow.TargetScope}'."
+                        : "No target scope defined — blast radius cannot be assessed.",
+                    utcNow),
 
-                new(PreconditionType.EnvironmentRestriction, true,
-                    "Target environment 'Production' is within allowed environments for this action.",
-                    now.AddSeconds(-4)),
+                new(PreconditionType.EnvironmentRestriction,
+                    environmentPassed,
+                    environmentPassed
+                        ? $"Target environment is set: '{workflow.TargetEnvironment}'."
+                        : "No target environment specified.",
+                    utcNow),
 
-                new(PreconditionType.CooldownPeriod, true,
-                    "No recent executions of this action type — cooldown period satisfied.",
-                    now.AddSeconds(-2)),
+                new(PreconditionType.CooldownPeriod,
+                    true,
+                    "Cooldown period check passed (no real cooldown logic implemented yet).",
+                    utcNow),
             };
 
             var allPassed = results.All(r => r.Passed);
 
-            var response = new Response(
-                WorkflowId: Guid.TryParse(request.WorkflowId, out var wfId) ? wfId : Guid.NewGuid(),
-                AllPassed: allPassed,
-                Results: results);
+            if (workflow.Status == AutomationWorkflowStatus.Draft)
+                workflow.UpdateStatus(AutomationWorkflowStatus.PendingPreconditions, utcNow);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            await workflowRepository.UpdateAsync(workflow, cancellationToken);
+
+            var auditEntry = AutomationAuditRecord.Create(
+                workflowId: workflowId,
+                action: AutomationAuditAction.PreconditionsEvaluated,
+                actor: request.EvaluatedBy,
+                details: allPassed
+                    ? $"All {results.Count} preconditions evaluated — all passed."
+                    : $"{results.Count} preconditions evaluated — {results.Count(r => !r.Passed)} failed.",
+                utcNow: utcNow,
+                serviceId: workflow.ServiceId);
+
+            await auditRepository.AddAsync(auditEntry, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return Result<Response>.Success(new Response(
+                WorkflowId: workflow.Id.Value,
+                AllPassed: allPassed,
+                Results: results));
         }
     }
 

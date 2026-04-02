@@ -1,6 +1,11 @@
 using FluentValidation;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Automation.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Entities;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Enums;
+using NexTraceOne.OperationalIntelligence.Domain.Automation.Errors;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.RecordAutomationValidation;
@@ -9,8 +14,6 @@ namespace NexTraceOne.OperationalIntelligence.Application.Automation.Features.Re
 /// Feature: RecordAutomationValidation — regista o resultado de uma validação pós-execução
 /// de um workflow de automação, incluindo verificações individuais e resultado observado.
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
-///
-/// Nota: nesta fase os dados são simulados até integração completa entre módulos.
 /// </summary>
 public static class RecordAutomationValidation
 {
@@ -40,18 +43,75 @@ public static class RecordAutomationValidation
         }
     }
 
-    /// <summary>Handler que regista a validação do workflow de automação com dados simulados.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que regista a validação do workflow de automação.</summary>
+    public sealed class Handler(
+        IAutomationWorkflowRepository workflowRepository,
+        IAutomationValidationRepository validationRepository,
+        IAutomationAuditRepository auditRepository,
+        IAutomationUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var response = new Response(
-                WorkflowId: Guid.TryParse(request.WorkflowId, out var wfId) ? wfId : Guid.NewGuid(),
-                ValidationStatus: request.Status,
-                RecordedAt: DateTimeOffset.UtcNow);
+            if (!Guid.TryParse(request.WorkflowId, out var parsedId))
+                return AutomationErrors.WorkflowNotFound(request.WorkflowId);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var workflowId = new AutomationWorkflowRecordId(parsedId);
+            var workflow = await workflowRepository.GetByIdAsync(workflowId, cancellationToken);
+
+            if (workflow is null)
+                return AutomationErrors.WorkflowNotFound(request.WorkflowId);
+
+            var utcNow = clock.UtcNow;
+            var outcome = MapValidationStatusToOutcome(request.Status);
+
+            var notes = request.Checks is { Count: > 0 }
+                ? string.Join("; ", request.Checks.Select(c => $"{c.CheckName}: {(c.Passed ? "Passed" : "Failed")}{(c.Details is not null ? $" — {c.Details}" : "")}"))
+                : string.Empty;
+
+            var validation = AutomationValidationRecord.Create(
+                workflowId: workflowId,
+                outcome: outcome,
+                validatedBy: request.ValidatedBy ?? "system",
+                notes: notes,
+                observedOutcome: request.ObservedOutcome,
+                utcNow: utcNow);
+
+            await validationRepository.AddAsync(validation, cancellationToken);
+
+            var newStatus = request.Status switch
+            {
+                ValidationStatus.Passed => AutomationWorkflowStatus.Completed,
+                ValidationStatus.Failed => AutomationWorkflowStatus.Failed,
+                _ => AutomationWorkflowStatus.AwaitingValidation
+            };
+
+            workflow.UpdateStatus(newStatus, utcNow);
+            await workflowRepository.UpdateAsync(workflow, cancellationToken);
+
+            var auditEntry = AutomationAuditRecord.Create(
+                workflowId: workflowId,
+                action: AutomationAuditAction.ValidationRecorded,
+                actor: request.ValidatedBy ?? "system",
+                details: $"Validation recorded with outcome '{outcome}'. Observed: {request.ObservedOutcome ?? "N/A"}",
+                utcNow: utcNow,
+                serviceId: workflow.ServiceId);
+
+            await auditRepository.AddAsync(auditEntry, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return Result<Response>.Success(new Response(
+                WorkflowId: workflow.Id.Value,
+                ValidationStatus: request.Status,
+                RecordedAt: utcNow));
         }
+
+        private static AutomationOutcome MapValidationStatusToOutcome(ValidationStatus status) => status switch
+        {
+            ValidationStatus.Passed => AutomationOutcome.Successful,
+            ValidationStatus.Failed => AutomationOutcome.Failed,
+            _ => AutomationOutcome.Inconclusive
+        };
     }
 
     /// <summary>Resposta do registo de validação do workflow de automação.</summary>
