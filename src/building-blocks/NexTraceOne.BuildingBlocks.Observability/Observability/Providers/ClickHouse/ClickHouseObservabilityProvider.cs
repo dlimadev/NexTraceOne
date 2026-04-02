@@ -49,8 +49,10 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         _clickHouseOptions = options.Value.ObservabilityProvider.ClickHouse;
         _logger = logger;
 
+        // Extract database name from structured connection string (Host=...;Port=...;Database=...;)
+        var db = ExtractDatabaseFromConnectionString(_clickHouseOptions.ConnectionString);
+
         // Validate database name at construction time to prevent SQL injection via configuration
-        var db = _database;
         if (string.IsNullOrWhiteSpace(db) || !ValidIdentifierPattern.IsMatch(db))
             throw new ArgumentException($"Invalid ClickHouse database name: '{db}'. Must contain only alphanumeric characters and underscores.");
         _database = db;
@@ -365,6 +367,20 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             _logger.LogWarning(ex, "ClickHouse query failed: {Message}", ex.Message);
             return [];
         }
+    }
+
+    /// <summary>
+    /// Extrai o nome da base de dados a partir da connection string estruturada.
+    /// Formato esperado: Host=clickhouse;Port=8123;Database=nextraceone_obs;...
+    /// </summary>
+    private static string ExtractDatabaseFromConnectionString(string connectionString)
+    {
+        var parts = connectionString.Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => p.Split('=', 2))
+            .Where(p => p.Length == 2)
+            .ToDictionary(p => p[0].Trim(), p => p[1].Trim(), StringComparer.OrdinalIgnoreCase);
+
+        return parts.GetValueOrDefault("Database") ?? "nextraceone_obs";
     }
 
     /// <summary>
