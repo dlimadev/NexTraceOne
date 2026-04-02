@@ -1,0 +1,175 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Laboratory Docker Compose
+#
+# Ambiente de laboratório com fake APIs instrumentadas, Elasticsearch,
+# OpenTelemetry Collector e Kibana para testes reais de observabilidade.
+#
+# Uso:
+#   cd lab
+#   docker compose -f docker-compose.lab.yml up -d
+#   docker compose -f docker-compose.lab.yml down -v
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Elasticsearch (Observability Store) ─────────────────────────────────────
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    container_name: nextraceone-lab-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
+      cluster.name: nextraceone-lab
+    volumes:
+      - lab-elasticsearch-data:/usr/share/elasticsearch/data
+      - ./elasticsearch/setup-indices.sh:/docker-entrypoint-initdb.d/setup-indices.sh:ro
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - lab-net
+
+  # ── Kibana (Visualization) ─────────────────────────────────────────────────
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.0
+    container_name: nextraceone-lab-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      SERVER_NAME: nextraceone-lab-kibana
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    networks:
+      - lab-net
+
+  # ── OpenTelemetry Collector ─────────────────────────────────────────────────
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.115.0
+    container_name: nextraceone-lab-otel-collector
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./otel-collector/otel-collector-lab.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+      - "8888:8888"    # Prometheus metrics (Collector self-monitoring)
+      - "13133:13133"  # Health check
+    environment:
+      ELASTICSEARCH_ENDPOINT: "${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - lab-net
+
+  # ── Order Service (Fake API #1) ─────────────────────────────────────────────
+  order-service:
+    build:
+      context: ./fake-apis/order-service
+      dockerfile: Dockerfile
+    container_name: nextraceone-lab-order-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5010
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: order-service
+      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=nextraceone-lab,deployment.environment=laboratory"
+      PaymentService__BaseUrl: http://payment-service:5020
+      InventoryService__BaseUrl: http://inventory-service:5030
+    ports:
+      - "${ORDER_SERVICE_PORT:-5010}:5010"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5010/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - lab-net
+
+  # ── Payment Service (Fake API #2) ──────────────────────────────────────────
+  payment-service:
+    build:
+      context: ./fake-apis/payment-service
+      dockerfile: Dockerfile
+    container_name: nextraceone-lab-payment-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5020
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: payment-service
+      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=nextraceone-lab,deployment.environment=laboratory"
+      InventoryService__BaseUrl: http://inventory-service:5030
+    ports:
+      - "${PAYMENT_SERVICE_PORT:-5020}:5020"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5020/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - lab-net
+
+  # ── Inventory Service (Fake API #3) ────────────────────────────────────────
+  inventory-service:
+    build:
+      context: ./fake-apis/inventory-service
+      dockerfile: Dockerfile
+    container_name: nextraceone-lab-inventory-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5030
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: inventory-service
+      OTEL_RESOURCE_ATTRIBUTES: "service.namespace=nextraceone-lab,deployment.environment=laboratory"
+    ports:
+      - "${INVENTORY_SERVICE_PORT:-5030}:5030"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5030/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - lab-net
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  lab-elasticsearch-data:
+    driver: local
+
+# ── Networks ─────────────────────────────────────────────────────────────────
+networks:
+  lab-net:
+    name: nextraceone-lab-net
+    driver: bridge
