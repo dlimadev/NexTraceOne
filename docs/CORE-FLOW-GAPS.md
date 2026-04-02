@@ -130,7 +130,7 @@ This document is the canonical reference for the real operational state of each 
 |---|---|---|---|---|
 | 1 — Source of Truth / Contracts | **95%** | Real (100%) | Real (all 11 portal handlers, 10/10 builders) | None critical |
 | 2 — Change Confidence | **98%** | Real (100%) | Real (100%) | CI/CD deploy events stub |
-| 3 — Incident Correlation | **85%** | Real (EfIncidentStore + IIncidentModule) | Real (all pages use API) | Correlation heuristics basic |
+| 3 — Incident Correlation & Operations | **90%** | Real (EfIncidentStore + IIncidentModule, Automation 10/10 real, Reliability 15/15 real) | Real (all pages use API) | Correlation heuristics basic |
 | 4 — AI Assistant | **LLM real E2E; governance real** | LLM real via Ollama/OpenAI; grounding cross-module incompleto | API real (7 chamadas) | Grounding full cross-module |
 
 ---

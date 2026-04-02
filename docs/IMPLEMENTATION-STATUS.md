@@ -115,16 +115,16 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Feature Area | Status | Notas |
 |---|---|---|
 | Incidents | READY | `EfIncidentStore` é a implementação registada. Frontend totalmente conectado via API real. `IIncidentModule` implementado para cross-module. Correlação dinâmica via `IIncidentCorrelationRepository` + `IChangeIntelligenceReader`. |
-| Automation | SIM | Catálogo estático, workflows não persistidos — 10 features mock |
-| Reliability | SIM | 8 serviços hardcoded, sem integração cross-module — 7 features mock |
-| Runtime Intelligence | PARTIAL | `RuntimeIntelligenceDbContext` existe, repositórios EF Core presentes; `IRuntimeIntelligenceModule` = PLAN (interface vazia) |
-| Cost Intelligence | PARTIAL | `CostIntelligenceDbContext` existe; `ICostIntelligenceModule` = PLAN (interface vazia); dados FinOps 100% mock |
-| CreateMitigationWorkflow | PARTIAL | Handler existe mas não persiste registos de mitigação |
-| GetMitigationHistory | SIM | Retorna dados estáticos hardcoded |
+| Automation | READY | 10/10 handlers reais — workflows persistidos via `AutomationDbContext`, catálogo estático, auditoria, validação pós-execução e precondições avaliadas contra estado real do workflow. `IAutomationModule` implementado. |
+| Reliability | READY | 15/15 handlers reais — SLO/SLA definitions, burn rate, error budget, snapshots de fiabilidade, sumários por equipa/domínio. `IReliabilityModule` implementado. |
+| Runtime Intelligence | PARTIAL | `RuntimeIntelligenceDbContext` existe, repositórios EF Core presentes; `IRuntimeIntelligenceModule` implementado por `RuntimeIntelligenceModule`. |
+| Cost Intelligence | PARTIAL | `CostIntelligenceDbContext` existe; `ICostIntelligenceModule` implementado por `CostIntelligenceModuleService`; dados FinOps consumidos via cross-module pela Governance. |
+| Mitigation Workflows | READY | `CreateMitigationWorkflow` persiste via `IMitigationWorkflowRepository`; `GetMitigationHistory` consulta dados reais; `RecordMitigationValidation` persiste logs de validação. |
 
-**DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (ModelSnapshot apenas), `CostIntelligenceDbContext` (ModelSnapshot apenas)
-**Gap crítico:** Correlação dinâmica incident↔change é ZERO. Frontend usa mock inline.
-**Evidência:** `src/modules/operationalintelligence/`, `docs/audit-forensic-2026-03/backend-state-report.md`
+**DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
+**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). Runbook visual builder pendente.
+**Testes:** 527/527 passam.
+**Evidência:** `src/modules/operationalintelligence/`
 
 ---
 
@@ -149,18 +149,19 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 ## §Governance — Governance, FinOps, Reports, Compliance
 
-> **Nota de design:** Este módulo usa dados simulados intencionalmente na fase atual ("Fase atual: sem persistência própria — agrega dados de outros módulos"). Todos os handlers retornam `IsSimulated: true`.
+> **Nota de design:** Este módulo agrega dados de outros módulos via cross-module interfaces. GetExecutiveOverview usa IIncidentModule para métricas reais de incidentes. ListTeams usa ICatalogGraphModule para contagens de contratos. FinOps usa ICostIntelligenceModule. Todos os 44+ handlers retornam dados reais (`IsSimulated: false`).
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Teams / Domains | SIM (intencional) | CRUD via repositório; contagens cross-module são `TODO`; `GovernanceDbContext` existe |
-| Governance Packs / Evidence | SIM (intencional) | 74 handlers retornam `IsSimulated: true`, `DataSource: "demo"` |
-| Policies / Compliance | SIM (intencional) | Dados hardcoded, sem persistência |
-| FinOps | SIM (intencional) | 100% hardcoded com `IsSimulated: true` |
-| Reports | SIM (intencional) | Dados hardcoded, sem agregação real |
-| Executive Views | SIM (intencional) | Mock de dados agregados |
+| Teams / Domains | READY | CRUD via repositório; contagens cross-module implementadas via `ICatalogGraphModule` e `IIncidentModule`; `GovernanceDbContext` real |
+| Governance Packs / Evidence | READY | Handlers retornam dados reais via repositórios (`IsSimulated: false`) |
+| Policies / Compliance | READY | Persistência via `GovernanceDbContext`; handlers consultam repositórios reais |
+| FinOps | READY | Dados reais via `ICostIntelligenceModule` (cross-module); `IsSimulated: false` |
+| Reports | READY | Dados reais via agregação cross-module |
+| Executive Views | READY | `GetExecutiveOverview` usa `IIncidentModule` para métricas reais; `CrossModuleDataAvailable: true` |
 
-**Risco crítico:** Todas as demos desta área mostram dados falsos.
+**Frontend:** 25/26 páginas conectadas a APIs reais (50+ endpoints). GovernanceConfigurationPage usa sistema de configuração.
+**Testes:** 158/158 passam.
 **Evidência:** `src/modules/governance/`
 
 ---
@@ -259,19 +260,19 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 |---|---|---|
 | Building Blocks | READY | Sim |
 | Identity Access | READY | Sim |
-| Catalog | READY | Sim (100% real, 11 portal handlers implementados) |
+| Catalog | READY | Sim (100% real, 11 portal handlers, 10/10 contract types com visual builders) |
 | Change Governance | READY | Sim (100% real, módulo flagship) |
 | Audit Compliance | READY | Sim (hash chain SHA-256) |
-| Operational Intelligence | READY | Sim — EfIncidentStore real, frontend conectado, IIncidentModule implementado |
+| Operational Intelligence | READY | Sim — Incidents real, Automation 10/10 real, Reliability 15/15 real, IIncidentModule + IAutomationModule + IReliabilityModule implementados |
 | AI Knowledge | PARTIAL | LLM real E2E; grounding cross-module incompleto |
-| Governance | PARTIAL | Dados reais via repositórios; FinOps via ICostIntelligenceModule; incidentes via IIncidentModule |
+| Governance | READY | Dados reais via repositórios e cross-module; FinOps real; 25/26 frontend pages conectadas; 158/158 testes passam |
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | PARTIAL | Pendente validação E2E |
 | Configuration | PARTIAL | Sim para feature flags |
 | Integrations | INCOMPLETE | Não |
-| Product Analytics | SIM | Não |
+| Product Analytics | PARTIAL | IProductAnalyticsModule implementado; pipeline de event tracking pendente |
 
 ---
 
-*Última atualização: Março 2026 — corrigido contra os achados da auditoria forense*
-*Ver: `docs/audit-forensic-2026-03/final-project-state-assessment.md`*
+*Última atualização: Abril 2026 — Phase 7: Automation real data, documentation alignment*
+*Ver: `docs/ROADMAP.md`, `docs/CORE-FLOW-GAPS.md`*
