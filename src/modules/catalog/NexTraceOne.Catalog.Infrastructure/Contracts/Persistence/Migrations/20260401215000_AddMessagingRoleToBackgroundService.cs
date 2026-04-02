@@ -95,6 +95,11 @@ public partial class AddMessagingRoleToBackgroundService : Migration
             type: "text",
             nullable: false,
             defaultValue: "[]");
+
+        migrationBuilder.AddCheckConstraint(
+            name: "CK_ctr_bg_service_draft_messaging_role",
+            table: "ctr_background_service_draft_metadata",
+            sql: "\"MessagingRole\" IN ('None', 'Producer', 'Consumer', 'Both')");
     }
 
     /// <inheritdoc />
@@ -113,6 +118,10 @@ public partial class AddMessagingRoleToBackgroundService : Migration
         migrationBuilder.DropColumn(name: "ProducedEventsJson", table: "ctr_background_service_contract_details");
 
         // ── BackgroundServiceDraftMetadata ───────────────────────────────────────
+
+        migrationBuilder.DropCheckConstraint(
+            name: "CK_ctr_bg_service_draft_messaging_role",
+            table: "ctr_background_service_draft_metadata");
 
         migrationBuilder.DropColumn(name: "MessagingRole", table: "ctr_background_service_draft_metadata");
         migrationBuilder.DropColumn(name: "ConsumedTopicsJson", table: "ctr_background_service_draft_metadata");

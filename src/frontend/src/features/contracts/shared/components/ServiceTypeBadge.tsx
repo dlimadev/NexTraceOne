@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Globe, Server, Zap, Cog, Database, FileCode, MessageSquare, Terminal, Webhook } from 'lucide-react';
+import { Globe, Server, Zap, Cog, Database, FileCode, MessageSquare, AlignJustify, Terminal, Webhook } from 'lucide-react';
 import { SERVICE_TYPE_COLORS } from '../constants';
 import type { ContractType } from '../../types';
 
@@ -11,6 +11,7 @@ const ICONS: Record<string, React.ComponentType<{ size?: number; className?: str
   SharedSchema: Database,
   Copybook: FileCode,
   MqMessage: MessageSquare,
+  FixedLayout: AlignJustify,
   CicsCommarea: Terminal,
   Webhook: Webhook,
 };

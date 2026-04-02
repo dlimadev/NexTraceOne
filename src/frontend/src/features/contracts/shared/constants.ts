@@ -18,6 +18,7 @@ export const CONTRACT_TYPES = [
   { value: 'SharedSchema', labelKey: 'contracts.contractTypes.SharedSchema', icon: 'Database' },
   { value: 'Copybook', labelKey: 'contracts.contractTypes.Copybook', icon: 'FileCode' },
   { value: 'MqMessage', labelKey: 'contracts.contractTypes.MqMessage', icon: 'MessageSquare' },
+  { value: 'FixedLayout', labelKey: 'contracts.contractTypes.FixedLayout', icon: 'AlignJustify' },
   { value: 'CicsCommarea', labelKey: 'contracts.contractTypes.CicsCommarea', icon: 'Terminal' },
   { value: 'Webhook', labelKey: 'contracts.contractTypes.Webhook', icon: 'Webhook' },
 ] as const;
@@ -47,6 +48,7 @@ export const PROTOCOL_BY_TYPE: Record<ContractTypeValue, ContractProtocol[]> = {
   SharedSchema: ['OpenApi'],
   Copybook: [],
   MqMessage: [],
+  FixedLayout: [],
   CicsCommarea: [],
   Webhook: ['OpenApi'],
 };
@@ -107,6 +109,7 @@ export const SERVICE_TYPE_COLORS: Record<string, string> = {
   SharedSchema: 'bg-muted/15 text-muted border border-muted/25',
   Copybook: 'bg-accent/10 text-accent/80 border border-accent/20',
   MqMessage: 'bg-cyan/10 text-cyan/80 border border-cyan/20',
+  FixedLayout: 'bg-muted/10 text-muted/80 border border-muted/20',
   CicsCommarea: 'bg-warning/10 text-warning/80 border border-warning/20',
   Webhook: 'bg-mint/10 text-mint/80 border border-mint/20',
 };

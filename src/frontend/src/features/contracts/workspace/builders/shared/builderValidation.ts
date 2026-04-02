@@ -284,5 +284,53 @@ export function validateWorkserviceBuilder(state: WorkserviceBuilderState): Buil
     errors.push({ field: 'retries', messageKey: 'contracts.builder.validation.retriesMustBeNumber', fallback: 'Retries must be a positive number' });
   }
 
+  // ── Messaging Role validation ─────────────────────────────────────────────
+  const isConsumer = state.messagingRole === 'Consumer' || state.messagingRole === 'Both';
+  const isProducer = state.messagingRole === 'Producer' || state.messagingRole === 'Both';
+
+  // Consumed topics devem ter topicName quando role é Consumer/Both
+  if (isConsumer) {
+    for (const topic of state.consumedTopics) {
+      if (!topic.topicName.trim()) {
+        errors.push({
+          field: `consumedTopic.${topic.id}.topicName`,
+          messageKey: 'contracts.builder.validation.topicRequired',
+          fallback: 'Consumed topic name is required',
+        });
+      }
+    }
+    for (const svc of state.consumedServices) {
+      if (!svc.serviceName.trim()) {
+        errors.push({
+          field: `consumedService.${svc.id}.serviceName`,
+          messageKey: 'contracts.builder.validation.serviceNameRequired',
+          fallback: 'Consumed service name is required',
+        });
+      }
+    }
+  }
+
+  // Produced topics devem ter topicName quando role é Producer/Both
+  if (isProducer) {
+    for (const topic of state.producedTopics) {
+      if (!topic.topicName.trim()) {
+        errors.push({
+          field: `producedTopic.${topic.id}.topicName`,
+          messageKey: 'contracts.builder.validation.topicRequired',
+          fallback: 'Produced topic name is required',
+        });
+      }
+    }
+    for (const evt of state.producedEvents) {
+      if (!evt.eventName.trim()) {
+        errors.push({
+          field: `producedEvent.${evt.id}.eventName`,
+          messageKey: 'contracts.builder.validation.eventNameRequired',
+          fallback: 'Produced event name is required',
+        });
+      }
+    }
+  }
+
   return { valid: errors.length === 0, errors };
 }

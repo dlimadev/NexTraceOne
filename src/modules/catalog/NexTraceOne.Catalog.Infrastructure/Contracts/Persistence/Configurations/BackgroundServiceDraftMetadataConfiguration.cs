@@ -15,7 +15,12 @@ internal sealed class BackgroundServiceDraftMetadataConfiguration : IEntityTypeC
     /// <summary>Configura o mapeamento da entidade BackgroundServiceDraftMetadata.</summary>
     public void Configure(EntityTypeBuilder<BackgroundServiceDraftMetadata> builder)
     {
-        builder.ToTable("ctr_background_service_draft_metadata");
+        builder.ToTable("ctr_background_service_draft_metadata", t =>
+        {
+            t.HasCheckConstraint(
+                "CK_ctr_bg_service_draft_messaging_role",
+                "\"MessagingRole\" IN ('None', 'Producer', 'Consumer', 'Both')");
+        });
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

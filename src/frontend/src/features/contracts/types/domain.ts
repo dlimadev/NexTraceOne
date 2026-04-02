@@ -17,6 +17,7 @@ export type ContractKind =
   | 'SHARED_SCHEMA'
   | 'COPYBOOK'
   | 'MQ_MESSAGE'
+  | 'FIXED_LAYOUT'
   | 'CICS_COMMAREA'
   | 'WEBHOOK';
 
@@ -32,6 +33,7 @@ export const CONTRACT_KIND_MAP: Record<ContractKind, string> = {
   SHARED_SCHEMA: 'SharedSchema',
   COPYBOOK: 'Copybook',
   MQ_MESSAGE: 'MqMessage',
+  FIXED_LAYOUT: 'FixedLayout',
   CICS_COMMAREA: 'CicsCommarea',
   WEBHOOK: 'Webhook',
 } as const;
@@ -48,6 +50,7 @@ export const CONTRACT_KIND_REVERSE: Record<string, ContractKind> = {
   SharedSchema: 'SHARED_SCHEMA',
   Copybook: 'COPYBOOK',
   MqMessage: 'MQ_MESSAGE',
+  FixedLayout: 'FIXED_LAYOUT',
   CicsCommarea: 'CICS_COMMAREA',
   Webhook: 'WEBHOOK',
 } as const;

@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Terminal,
   Webhook,
+  AlignJustify,
   Columns,
   Upload,
   Sparkles,
@@ -34,6 +35,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number; className?
   SharedSchema: Database,
   Copybook: FileCode,
   MqMessage: MessageSquare,
+  FixedLayout: AlignJustify,
   CicsCommarea: Terminal,
   Webhook: Webhook,
 };

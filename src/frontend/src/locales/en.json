@@ -916,6 +916,7 @@
       "SharedSchema": "Shared Schema",
       "Copybook": "Copybook",
       "MqMessage": "MQ Message",
+      "FixedLayout": "Fixed Layout",
       "CicsCommarea": "CICS Commarea",
       "Webhook": "Webhook",
       "KafkaProducer": "Kafka Producer",
@@ -929,6 +930,7 @@
       "SharedSchema": "Shared Schema",
       "Copybook": "Copybook",
       "MqMessage": "MQ Message",
+      "FixedLayout": "Fixed Layout",
       "CicsCommarea": "CICS Commarea",
       "Webhook": "Webhook"
     },
@@ -1038,6 +1040,7 @@
         "minGtMax": "minLength cannot be greater than maxLength",
         "minValueGtMax": "minimum cannot be greater than maximum",
         "serviceNameRequired": "Service name is required",
+        "eventNameRequired": "Produced event name is required",
         "namespaceRequired": "Target namespace is required",
         "namespaceMustBeUri": "Target namespace must be a valid URI",
         "endpointMustBeUrl": "Endpoint must be a valid URL",
