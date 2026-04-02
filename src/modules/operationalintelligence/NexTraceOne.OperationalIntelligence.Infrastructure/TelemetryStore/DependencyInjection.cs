@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.Repositories;
+using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Services;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore;
 
@@ -47,6 +48,10 @@ public static class TelemetryStoreDependencyInjection
         services.AddScoped<IReleaseCorrelationReader, ReleaseCorrelationRepository>();
         services.AddScoped<IInvestigationContextWriter, InvestigationContextRepository>();
         services.AddScoped<IInvestigationContextReader, InvestigationContextRepository>();
+
+        // ── Telemetry Lifecycle ──────────────────────────────────────────────
+        services.AddScoped<ITelemetryRetentionService, TelemetryRetentionService>();
+        services.AddScoped<ITelemetryAggregationService, TelemetryAggregationService>();
 
         return services;
     }
