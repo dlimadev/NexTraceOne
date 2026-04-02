@@ -10,6 +10,7 @@ namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
 /// Entidade específica para metadados de Background Service Contracts publicados.
 /// Captura informações estruturais que distinguem jobs/workers/schedulers de APIs HTTP e Event Contracts:
 /// categoria do processo, schedule/trigger, inputs/outputs esperados, side effects e dependências operacionais.
+/// Inclui modelo de messaging role (Producer/Consumer/Both/None) com tópicos consumidos e produzidos.
 /// Vinculada a uma ContractVersion com ContractType = BackgroundService.
 /// </summary>
 public sealed class BackgroundServiceContractDetail : AuditableEntity<BackgroundServiceContractDetailId>
@@ -65,6 +66,38 @@ public sealed class BackgroundServiceContractDetail : AuditableEntity<Background
     /// <summary>Indica se o processo suporta execução em paralelo / concorrente.</summary>
     public bool AllowsConcurrency { get; private set; }
 
+    // ── Messaging Role ──────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Role de messaging do background service: None, Producer, Consumer, Both.
+    /// Indica se este processo produz e/ou consome mensagens de tópicos/filas.
+    /// </summary>
+    public string MessagingRole { get; private set; } = "None";
+
+    /// <summary>
+    /// JSON dos tópicos/filas consumidos pelo processo.
+    /// Formato: [{ "topicName": "...", "entityType": "...", "format": "avro|json|protobuf" }]
+    /// </summary>
+    public string ConsumedTopicsJson { get; private set; } = "[]";
+
+    /// <summary>
+    /// JSON dos tópicos/filas produzidos pelo processo.
+    /// Formato: [{ "topicName": "...", "entityType": "...", "format": "avro|json|protobuf" }]
+    /// </summary>
+    public string ProducedTopicsJson { get; private set; } = "[]";
+
+    /// <summary>
+    /// JSON dos serviços consumidos pelo processo (REST, gRPC, SOAP).
+    /// Formato: [{ "serviceName": "...", "protocol": "REST|gRPC|SOAP" }]
+    /// </summary>
+    public string ConsumedServicesJson { get; private set; } = "[]";
+
+    /// <summary>
+    /// JSON dos eventos produzidos pelo processo para tópicos/destinos.
+    /// Formato: [{ "eventName": "...", "targetTopic": "..." }]
+    /// </summary>
+    public string ProducedEventsJson { get; private set; } = "[]";
+
     /// <summary>
     /// Cria um novo BackgroundServiceContractDetail com os metadados do processo.
     /// </summary>
@@ -78,7 +111,12 @@ public sealed class BackgroundServiceContractDetail : AuditableEntity<Background
         string sideEffectsJson,
         string? scheduleExpression = null,
         string? timeoutExpression = null,
-        bool allowsConcurrency = false)
+        bool allowsConcurrency = false,
+        string messagingRole = "None",
+        string consumedTopicsJson = "[]",
+        string producedTopicsJson = "[]",
+        string consumedServicesJson = "[]",
+        string producedEventsJson = "[]")
     {
         Guard.Against.Null(contractVersionId);
         Guard.Against.NullOrWhiteSpace(serviceName);
@@ -97,7 +135,12 @@ public sealed class BackgroundServiceContractDetail : AuditableEntity<Background
             SideEffectsJson = sideEffectsJson,
             ScheduleExpression = scheduleExpression,
             TimeoutExpression = timeoutExpression,
-            AllowsConcurrency = allowsConcurrency
+            AllowsConcurrency = allowsConcurrency,
+            MessagingRole = messagingRole,
+            ConsumedTopicsJson = consumedTopicsJson,
+            ProducedTopicsJson = producedTopicsJson,
+            ConsumedServicesJson = consumedServicesJson,
+            ProducedEventsJson = producedEventsJson
         };
     }
 
@@ -111,7 +154,12 @@ public sealed class BackgroundServiceContractDetail : AuditableEntity<Background
         string sideEffectsJson,
         string? scheduleExpression,
         string? timeoutExpression,
-        bool allowsConcurrency)
+        bool allowsConcurrency,
+        string messagingRole = "None",
+        string consumedTopicsJson = "[]",
+        string producedTopicsJson = "[]",
+        string consumedServicesJson = "[]",
+        string producedEventsJson = "[]")
     {
         Guard.Against.NullOrWhiteSpace(serviceName);
         Guard.Against.NullOrWhiteSpace(category);
@@ -126,6 +174,11 @@ public sealed class BackgroundServiceContractDetail : AuditableEntity<Background
         ScheduleExpression = scheduleExpression;
         TimeoutExpression = timeoutExpression;
         AllowsConcurrency = allowsConcurrency;
+        MessagingRole = messagingRole;
+        ConsumedTopicsJson = consumedTopicsJson;
+        ProducedTopicsJson = producedTopicsJson;
+        ConsumedServicesJson = consumedServicesJson;
+        ProducedEventsJson = producedEventsJson;
     }
 }
 

@@ -5,6 +5,7 @@
 
 // ── Tipos de domínio do módulo ────────────────────────────────────────────────
 export type {
+  ContractKind,
   ServiceKind,
   ApprovalState,
   ApprovalRole,
@@ -43,7 +44,7 @@ export type {
   CanonicalUsageReference,
 } from './domain';
 
-export { SERVICE_KIND_MAP, SERVICE_KIND_REVERSE } from './domain';
+export { CONTRACT_KIND_MAP, CONTRACT_KIND_REVERSE, SERVICE_KIND_MAP, SERVICE_KIND_REVERSE } from './domain';
 
 // ── Tipos de workspace ────────────────────────────────────────────────────────
 export type {
