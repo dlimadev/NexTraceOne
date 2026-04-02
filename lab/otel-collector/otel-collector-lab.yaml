@@ -1,0 +1,121 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne Lab — OpenTelemetry Collector Configuration
+#
+# Configuração simplificada para o ambiente de laboratório.
+# Exporta traces, logs e métricas para Elasticsearch.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+        cors:
+          allowed_origins:
+            - "http://localhost:*"
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 256
+    spike_limit_mib: 64
+
+  batch:
+    send_batch_size: 1024
+    timeout: 2s
+
+  resource:
+    attributes:
+      - key: lab.environment
+        value: "nextraceone-laboratory"
+        action: upsert
+      - key: nextraceone.platform
+        value: "true"
+        action: upsert
+
+  attributes/normalize:
+    actions:
+      - key: deployment.environment
+        action: upsert
+        from_attribute: environment
+      - key: service.namespace
+        action: upsert
+        value: "nextraceone-lab"
+
+exporters:
+  elasticsearch:
+    endpoints: ["${ELASTICSEARCH_ENDPOINT:-http://elasticsearch:9200}"]
+    logs_index: nextraceone-obs-logs
+    traces_index: nextraceone-obs-traces
+    mapping:
+      mode: ecs
+    flush:
+      bytes: 1048576
+    retry:
+      enabled: true
+      max_requests: 3
+
+  debug:
+    verbosity: detailed
+    sampling_initial: 10
+    sampling_thereafter: 50
+
+connectors:
+  spanmetrics:
+    histogram:
+      explicit:
+        buckets: [5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s]
+    dimensions:
+      - name: http.method
+      - name: http.status_code
+      - name: http.route
+    exemplars:
+      enabled: true
+    resource_metrics_key_attributes:
+      - service.name
+      - deployment.environment
+      - service.namespace
+
+service:
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: detailed
+      address: "0.0.0.0:8888"
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - resource
+        - attributes/normalize
+        - batch
+      exporters: [elasticsearch, spanmetrics, debug]
+
+    metrics:
+      receivers: [otlp, spanmetrics]
+      processors:
+        - memory_limiter
+        - resource
+        - attributes/normalize
+        - batch
+      exporters: [elasticsearch, debug]
+
+    logs:
+      receivers: [otlp]
+      processors:
+        - memory_limiter
+        - resource
+        - attributes/normalize
+        - batch
+      exporters: [elasticsearch, debug]
+
+  extensions: [health_check]
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
