@@ -12,6 +12,15 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Serv
 /// </summary>
 public sealed class TelemetryAggregationService : ITelemetryAggregationService
 {
+    /// <summary>Number of calls at which volume-based confidence reaches maximum (1.0).</summary>
+    private const double ConfidenceCallCountThreshold = 1000.0;
+
+    /// <summary>Weight of volume component in confidence score (70%).</summary>
+    private const double ConfidenceVolumeWeight = 0.7;
+
+    /// <summary>Weight of reliability component (no errors) in confidence score (30%).</summary>
+    private const double ConfidenceReliabilityWeight = 0.3;
+
     private readonly TelemetryStoreDbContext _dbContext;
     private readonly ILogger<TelemetryAggregationService> _logger;
 
@@ -332,8 +341,8 @@ public sealed class TelemetryAggregationService : ITelemetryAggregationService
     /// </summary>
     private static double CalculateConfidenceScore(long totalCallCount, bool hasNoErrors)
     {
-        var volumeComponent = Math.Min(1.0, totalCallCount / 1000.0) * 0.7;
-        var reliabilityComponent = hasNoErrors ? 0.3 : 0.0;
+        var volumeComponent = Math.Min(1.0, totalCallCount / ConfidenceCallCountThreshold) * ConfidenceVolumeWeight;
+        var reliabilityComponent = hasNoErrors ? ConfidenceReliabilityWeight : 0.0;
         return volumeComponent + reliabilityComponent;
     }
 

@@ -11,6 +11,12 @@ namespace NexTraceOne.BuildingBlocks.Observability.Observability.Services;
 /// </summary>
 public sealed class TelemetryQueryService : ITelemetryQueryService
 {
+    /// <summary>
+    /// Minimum percentage increase in P95 latency to qualify as a performance regression.
+    /// Operations with P95 increase above this threshold are flagged.
+    /// </summary>
+    private const double PerformanceRegressionThresholdPercent = 20.0;
+
     private readonly IObservabilityProvider _provider;
     private readonly ILogger<TelemetryQueryService> _logger;
 
@@ -388,7 +394,6 @@ public sealed class TelemetryQueryService : ITelemetryQueryService
                     g => g.Key,
                     g => CalculatePercentile(g.Select(t => t.DurationMs).ToList(), 0.95));
 
-            const double regressionThreshold = 20.0;
             var regressions = new List<OperationRegression>();
 
             foreach (var (key, currentP95) in currentByOp)
@@ -400,7 +405,7 @@ public sealed class TelemetryQueryService : ITelemetryQueryService
 
                 var regressionPercent = ((currentP95 - baselineP95) / baselineP95) * 100.0;
 
-                if (regressionPercent > regressionThreshold)
+                if (regressionPercent > PerformanceRegressionThresholdPercent)
                 {
                     regressions.Add(new OperationRegression
                     {
