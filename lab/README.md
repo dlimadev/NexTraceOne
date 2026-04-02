@@ -12,6 +12,7 @@ Este laboratório fornece:
 - **Kibana** para visualização direta dos dados no Elasticsearch
 - **PostgreSQL** para os serviços fake
 - **Gerador de tráfego** para produzir telemetria realista
+- **Postman Collection** com todos os endpoints, testes automáticos e fluxo E2E
 
 ## Arquitetura do Laboratório
 
@@ -92,11 +93,32 @@ curl http://localhost:9200/nextraceone-obs-logs/_search?pretty&size=5
 curl http://localhost:9200/nextraceone-obs-metrics/_search?pretty&size=5
 ```
 
-### 5. Aceder ao Kibana
+### 5. Usar a Postman Collection
+
+A coleção Postman em `postman/NexTraceOne-Lab.postman_collection.json` cobre todos os endpoints com testes automáticos.
+
+**Importar no Postman:**
+1. Abrir o Postman → Import → selecionar `lab/postman/NexTraceOne-Lab.postman_collection.json`
+2. Todas as variáveis (URLs, IDs) estão pré-configuradas com os defaults do lab
+
+**Folders disponíveis:**
+
+| Folder | Descrição |
+|--------|-----------|
+| 🏥 Health Checks | Saúde de todos os serviços (APIs + Elasticsearch + OTel Collector) |
+| 📦 Order Service | CRUD completo de encomendas (list, create, get, cancel) |
+| 💳 Payment Service | Processamento e consulta de pagamentos |
+| 📦 Inventory Service | Consulta de stock, reservas e libertações |
+| 🔄 E2E Flow | Fluxo completo em 6 passos (stock → order → verify → cancel) |
+| 🔍 Observability Verification | Queries ao Elasticsearch para validar traces, logs e distributed trace |
+
+**Variáveis automáticas:** `order_id`, `payment_id`, `reservation_id` e `trace_id` são preenchidas automaticamente pelos scripts de teste de cada request.
+
+### 6. Aceder ao Kibana
 
 Abrir no browser: http://localhost:5601
 
-### 6. Parar o laboratório
+### 7. Parar o laboratório
 
 ```bash
 docker compose -f docker-compose.lab.yml down -v

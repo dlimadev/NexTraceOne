@@ -1,0 +1,1544 @@
+{
+  "info": {
+    "_postman_id": "nextraceone-lab-v1",
+    "name": "NexTraceOne Lab — API Collection",
+    "description": "Coleção completa para testar as fake APIs do laboratório NexTraceOne e validar a telemetria no Elasticsearch.\n\n## Serviços cobertos\n- **Order Service** (`:5010`) — gestão de encomendas\n- **Payment Service** (`:5020`) — processamento de pagamentos\n- **Inventory Service** (`:5030`) — gestão de stock\n- **Elasticsearch** (`:9200`) — verificação de traces, logs e métricas\n- **OTel Collector** (`:13133`) — health check do pipeline de telemetria\n\n## Como usar\n1. Subir o lab: `cd lab && docker compose -f docker-compose.lab.yml up -d`\n2. Importar esta coleção no Postman\n3. Executar o folder **🏥 Health Checks** para confirmar que tudo arrancou\n4. Executar pedidos individuais por serviço ou o folder **🔄 E2E Flow** para o fluxo completo\n5. Verificar telemetria no folder **🔍 Observability Verification**\n\n## Variáveis automáticas\nOs scripts de teste preenchem automaticamente `order_id`, `payment_id` e `reservation_id` depois de criar os recursos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "order_service_url",
+      "value": "http://localhost:5010",
+      "type": "string",
+      "description": "URL base do order-service"
+    },
+    {
+      "key": "payment_service_url",
+      "value": "http://localhost:5020",
+      "type": "string",
+      "description": "URL base do payment-service"
+    },
+    {
+      "key": "inventory_service_url",
+      "value": "http://localhost:5030",
+      "type": "string",
+      "description": "URL base do inventory-service"
+    },
+    {
+      "key": "elasticsearch_url",
+      "value": "http://localhost:9200",
+      "type": "string",
+      "description": "URL do Elasticsearch"
+    },
+    {
+      "key": "otel_collector_url",
+      "value": "http://localhost:13133",
+      "type": "string",
+      "description": "URL do OTel Collector health endpoint"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string",
+      "description": "Preenchido automaticamente após criar uma encomenda"
+    },
+    {
+      "key": "payment_id",
+      "value": "",
+      "type": "string",
+      "description": "Preenchido automaticamente após processar um pagamento"
+    },
+    {
+      "key": "reservation_id",
+      "value": "",
+      "type": "string",
+      "description": "Preenchido automaticamente após reservar inventário"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏥 Health Checks",
+      "description": "Verificação de saúde de todos os serviços. Executar primeiro para confirmar que o lab está operacional.",
+      "item": [
+        {
+          "name": "Order Service — Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/health",
+              "host": ["{{order_service_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verifica se o order-service está a responder em :5010."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('order-service is healthy', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('healthy');",
+                  "    pm.expect(json.service).to.eql('order-service');",
+                  "    pm.expect(json).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payment Service — Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{payment_service_url}}/health",
+              "host": ["{{payment_service_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verifica se o payment-service está a responder em :5020."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('payment-service is healthy', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('healthy');",
+                  "    pm.expect(json.service).to.eql('payment-service');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Inventory Service — Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/health",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verifica se o inventory-service está a responder em :5030."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('inventory-service is healthy', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('healthy');",
+                  "    pm.expect(json.service).to.eql('inventory-service');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Elasticsearch — Cluster Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{elasticsearch_url}}/_cluster/health?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["_cluster", "health"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Verifica a saúde do cluster Elasticsearch. Status deve ser 'green' ou 'yellow'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Elasticsearch cluster is reachable', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.cluster_name).to.eql('nextraceone-lab');",
+                  "    pm.expect(json.status).to.be.oneOf(['green', 'yellow']);",
+                  "    console.log('Cluster status: ' + json.status + ', nodes: ' + json.number_of_nodes);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OTel Collector — Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{otel_collector_url}}",
+              "host": ["{{otel_collector_url}}"]
+            },
+            "description": "Verifica se o OpenTelemetry Collector health endpoint está a responder em :13133."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('OTel Collector is reachable', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "📦 Order Service",
+      "description": "API de gestão de encomendas (order-service :5010).\n\nCada POST /api/orders desencadeia chamadas em cadeia:\n1. Reserva inventário no inventory-service\n2. Processa pagamento no payment-service\n\nIsto gera distributed traces completos entre os 3 serviços.",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Lista todas as encomendas criadas (ordenadas por data descendente)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    console.log('Total orders in memory: ' + json.length);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Order — Single Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customerId\": \"cust-001\",\n    \"items\": [\n        {\n            \"productId\": \"prod-100\",\n            \"quantity\": 2\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{order_service_url}}/api/orders",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Cria uma encomenda com 1 item (prod-100: NexTraceOne Enterprise License).\n\nO `order_id` é guardado automaticamente para uso nos pedidos seguintes.\n\n**Nota:** ~5% de falha aleatória simulada — pode retornar 500."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order created or expected transient error', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409, 422, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "",
+                  "    pm.test('Order has valid structure', function () {",
+                  "        pm.expect(json.id).to.match(/^ORD-/);",
+                  "        pm.expect(json.customerId).to.eql('cust-001');",
+                  "        pm.expect(json.status).to.eql('Confirmed');",
+                  "        pm.expect(json.totalAmount).to.be.above(0);",
+                  "        pm.expect(json.items).to.be.an('array').with.lengthOf(1);",
+                  "    });",
+                  "",
+                  "    pm.collectionVariables.set('order_id', json.id);",
+                  "    console.log('✅ Order created: ' + json.id + ' | Total: ' + json.totalAmount + ' EUR');",
+                  "} else {",
+                  "    console.log('⚠️  Response ' + pm.response.code + ' (random failure or stock conflict — retry if needed)');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Order — Multiple Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customerId\": \"cust-002\",\n    \"items\": [\n        {\n            \"productId\": \"prod-101\",\n            \"quantity\": 1\n        },\n        {\n            \"productId\": \"prod-103\",\n            \"quantity\": 3\n        },\n        {\n            \"productId\": \"prod-107\",\n            \"quantity\": 5\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{order_service_url}}/api/orders",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Cria uma encomenda com múltiplos itens (prod-101, prod-103, prod-107) para gerar payload mais complexo e mais spans no trace."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order created or expected transient error', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409, 422, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Order has 3 items', function () {",
+                  "        pm.expect(json.items).to.have.lengthOf(3);",
+                  "    });",
+                  "    pm.collectionVariables.set('order_id', json.id);",
+                  "    console.log('✅ Multi-item order created: ' + json.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders/{{order_id}}",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            },
+            "description": "Consulta o detalhe de uma encomenda pelo ID.\n\nRequer que `order_id` esteja preenchido (executar 'Create Order' primeiro)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order found or not found', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Returned order matches requested ID', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.id).to.eql(pm.collectionVariables.get('order_id'));",
+                  "        pm.expect(json).to.have.all.keys('id', 'customerId', 'items', 'status', 'createdAt', 'totalAmount');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order — Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders/ORD-NONEXISTENT",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders", "ORD-NONEXISTENT"]
+            },
+            "description": "Valida o comportamento de 404 quando a encomenda não existe."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql('Order not found');",
+                  "    pm.expect(json.orderId).to.eql('ORD-NONEXISTENT');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders/{{order_id}}",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            },
+            "description": "Cancela uma encomenda existente (muda status para 'Cancelled').\n\nRequer que `order_id` esteja preenchido."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Order cancelled or not found', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Status changed to Cancelled', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.status).to.eql('Cancelled');",
+                  "    });",
+                  "    console.log('✅ Order cancelled: ' + pm.collectionVariables.get('order_id'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "💳 Payment Service",
+      "description": "API de pagamentos (payment-service :5020).\n\nSimula:\n- Latência de gateway real (100–500 ms)\n- Timeout aleatório (~5%)\n- Rejeição por fraude (~3%)\n- Validação cruzada com inventory-service",
+      "item": [
+        {
+          "name": "Process Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderId\": \"ORD-MANUAL-TEST\",\n    \"amount\": 59.98,\n    \"currency\": \"EUR\",\n    \"customerId\": \"cust-001\"\n}"
+            },
+            "url": {
+              "raw": "{{payment_service_url}}/api/payments",
+              "host": ["{{payment_service_url}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Processa um pagamento diretamente no payment-service.\n\nO `payment_id` é guardado automaticamente para uso nos pedidos seguintes."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Payment processed or expected transient error', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 422, 503]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Payment approved with valid structure', function () {",
+                  "        pm.expect(json.id).to.match(/^PAY-/);",
+                  "        pm.expect(json.status).to.eql('Approved');",
+                  "        pm.expect(json.amount).to.eql(59.98);",
+                  "        pm.expect(json.currency).to.eql('EUR');",
+                  "        pm.expect(json.orderId).to.eql('ORD-MANUAL-TEST');",
+                  "    });",
+                  "    pm.collectionVariables.set('payment_id', json.id);",
+                  "    console.log('✅ Payment approved: ' + json.id);",
+                  "}",
+                  "",
+                  "if (pm.response.code === 422) {",
+                  "    pm.test('Payment rejected by fraud check', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.status).to.eql('Rejected');",
+                  "        pm.expect(json.reason).to.eql('Fraud check failed');",
+                  "    });",
+                  "    console.log('⚠️  Payment rejected (fraud simulation)');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process Payment — Zero Amount (Invalid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderId\": \"ORD-BAD-AMOUNT\",\n    \"amount\": 0,\n    \"currency\": \"EUR\",\n    \"customerId\": \"cust-bad\"\n}"
+            },
+            "url": {
+              "raw": "{{payment_service_url}}/api/payments",
+              "host": ["{{payment_service_url}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Testa validação de montante inválido (zero). Deve retornar 400 Bad Request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Note: random 5% timeout can hit before validation",
+                  "pm.test('Returns 400 Bad Request or 503 (transient timeout)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 503]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 400) {",
+                  "    pm.test('Error message mentions invalid amount', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.error).to.eql('Invalid amount');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process Payment — Negative Amount (Invalid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderId\": \"ORD-NEG-AMOUNT\",\n    \"amount\": -25.00,\n    \"currency\": \"EUR\",\n    \"customerId\": \"cust-bad\"\n}"
+            },
+            "url": {
+              "raw": "{{payment_service_url}}/api/payments",
+              "host": ["{{payment_service_url}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Testa validação de montante negativo. Deve retornar 400 Bad Request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns 400 or 503 (transient timeout)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 503]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 400) {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql('Invalid amount');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Payment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{payment_service_url}}/api/payments/{{payment_id}}",
+              "host": ["{{payment_service_url}}"],
+              "path": ["api", "payments", "{{payment_id}}"]
+            },
+            "description": "Consulta o estado de um pagamento.\n\nRequer que `payment_id` esteja preenchido (executar 'Process Payment' primeiro)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Payment found or not found', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Payment has valid structure', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.id).to.match(/^PAY-/);",
+                  "        pm.expect(json).to.have.all.keys('id', 'orderId', 'amount', 'currency', 'status', 'reason', 'processedAt');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Payment — Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{payment_service_url}}/api/payments/PAY-NONEXISTENT",
+              "host": ["{{payment_service_url}}"],
+              "path": ["api", "payments", "PAY-NONEXISTENT"]
+            },
+            "description": "Valida o comportamento de 404 quando o pagamento não existe."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql('Payment not found');",
+                  "    pm.expect(json.paymentId).to.eql('PAY-NONEXISTENT');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "📦 Inventory Service",
+      "description": "API de inventário (inventory-service :5030).\n\n10 produtos seed disponíveis (prod-100 a prod-109), todos relacionados ao ecossistema NexTraceOne.",
+      "item": [
+        {
+          "name": "List All Inventory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory"]
+            },
+            "description": "Lista todos os 10 produtos disponíveis no inventário seed."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Has 10 seed products', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array').with.lengthOf(10);",
+                  "});",
+                  "",
+                  "pm.test('Each product has required fields', function () {",
+                  "    const json = pm.response.json();",
+                  "    json.forEach(function (item) {",
+                  "        pm.expect(item).to.have.all.keys('productId', 'name', 'stock', 'reserved', 'available');",
+                  "        pm.expect(item.available).to.equal(item.stock - item.reserved);",
+                  "    });",
+                  "    console.log('Products: ' + json.map(i => i.productId + '(' + i.available + ')').join(', '));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Product Stock — prod-100",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/prod-100",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "prod-100"]
+            },
+            "description": "Consulta o stock do produto `prod-100` — NexTraceOne Enterprise License (stock inicial: 500)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('prod-100 has valid stock', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.productId).to.eql('prod-100');",
+                  "    pm.expect(json.name).to.eql('NexTraceOne Enterprise License');",
+                  "    pm.expect(json.stock).to.be.above(0);",
+                  "    pm.expect(json.available).to.be.at.least(0);",
+                  "    console.log('prod-100 — stock: ' + json.stock + ', reserved: ' + json.reserved + ', available: ' + json.available);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Product Stock — prod-108 (Low Stock)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/prod-108",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "prod-108"]
+            },
+            "description": "Consulta o stock do produto `prod-108` — Incident Response Toolkit (stock inicial baixo: 50 unidades)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('prod-108 has low initial stock', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.productId).to.eql('prod-108');",
+                  "    pm.expect(json.name).to.eql('Incident Response Toolkit');",
+                  "    pm.expect(json.stock).to.eql(50);",
+                  "    console.log('prod-108 (low stock) — available: ' + json.available);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Product Stock — Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/prod-999",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "prod-999"]
+            },
+            "description": "Valida o comportamento de 404 quando o produto não existe."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql('Product not found');",
+                  "    pm.expect(json.productId).to.eql('prod-999');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reserve Inventory",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderId\": \"ORD-MANUAL-TEST\",\n    \"items\": [\n        {\n            \"productId\": \"prod-102\",\n            \"quantity\": 5\n        },\n        {\n            \"productId\": \"prod-106\",\n            \"quantity\": 2\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/reserve",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "reserve"]
+            },
+            "description": "Reserva itens no inventário:\n- `prod-102`: Observability Add-on (stock: 1000)\n- `prod-106`: Contract Studio Pro (stock: 250)\n\nO `reservation_id` é guardado automaticamente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reservation created or transient error', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 409, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Reservation has valid structure', function () {",
+                  "        pm.expect(json.reservationId).to.match(/^RSV-/);",
+                  "        pm.expect(json.orderId).to.eql('ORD-MANUAL-TEST');",
+                  "        pm.expect(json.status).to.eql('Reserved');",
+                  "        pm.expect(json.items).to.be.an('array').with.lengthOf(2);",
+                  "    });",
+                  "    pm.collectionVariables.set('reservation_id', json.reservationId);",
+                  "    console.log('✅ Reservation created: ' + json.reservationId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reserve Inventory — Insufficient Stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderId\": \"ORD-OVERSTOCK\",\n    \"items\": [\n        {\n            \"productId\": \"prod-108\",\n            \"quantity\": 9999\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/reserve",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "reserve"]
+            },
+            "description": "Testa reserva com stock insuficiente.\n\n`prod-108` tem apenas 50 unidades — pedir 9999 deve retornar 409 Conflict."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns 409 Conflict or 500 (transient)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([409, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 409) {",
+                  "    pm.test('Error mentions insufficient stock', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.error).to.eql('Insufficient stock');",
+                  "        pm.expect(json.productId).to.eql('prod-108');",
+                  "        pm.expect(json.requested).to.eql(9999);",
+                  "        console.log('Available: ' + json.available + ', Requested: ' + json.requested);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Release Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reservationId\": \"{{reservation_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/release",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "release"]
+            },
+            "description": "Liberta uma reserva de inventário e devolve o stock.\n\nRequer que `reservation_id` esteja preenchido (executar 'Reserve Inventory' primeiro)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Reservation released or not found', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Release confirmed', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.status).to.eql('Released');",
+                  "        pm.expect(json.releasedItems).to.be.above(0);",
+                  "    });",
+                  "    console.log('✅ Reservation released: ' + pm.collectionVariables.get('reservation_id'));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Release Reservation — Not Found",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reservationId\": \"RSV-NONEXISTENT\"\n}"
+            },
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/release",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "release"]
+            },
+            "description": "Valida o comportamento de 404 quando a reserva não existe."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql('Reservation not found');",
+                  "    pm.expect(json.reservationId).to.eql('RSV-NONEXISTENT');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔄 E2E Flow — Full Order Lifecycle",
+      "description": "Fluxo completo end-to-end simulando o ciclo de vida de uma encomenda.\n\n**Executar os requests nesta ordem:**\n1. Check Initial Stock\n2. Create Order → gera trace distribuído entre os 3 serviços\n3. Verify Order Created\n4. Check Updated Stock\n5. List All Orders\n6. Cancel Order\n\nOs IDs são passados automaticamente entre requests via variáveis de coleção.",
+      "item": [
+        {
+          "name": "Step 1 — Check Initial Stock (prod-104)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/prod-104",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "prod-104"]
+            },
+            "description": "Verifica o stock disponível de `prod-104` (Change Intelligence Pack, stock: 300) antes de criar a encomenda."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[E2E Step 1] Initial stock check', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.productId).to.eql('prod-104');",
+                  "    pm.expect(json.available).to.be.above(0);",
+                  "    pm.collectionVariables.set('e2e_initial_stock', json.available);",
+                  "    console.log('[E2E] Initial stock for prod-104: ' + json.available + ' available');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Step 2 — Create Order (triggers inventory + payment chain)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customerId\": \"cust-e2e-001\",\n    \"items\": [\n        {\n            \"productId\": \"prod-104\",\n            \"quantity\": 1\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{order_service_url}}/api/orders",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Cria a encomenda E2E.\n\nEste request desencadeia automaticamente:\n1. `POST /api/inventory/reserve` → inventory-service\n2. `POST /api/payments` → payment-service\n\nGera 1 trace distribuído com spans em todos os 3 serviços visíveis no Kibana/Elasticsearch."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[E2E Step 2] Order created or transient error', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409, 422, 500]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Order confirmed with correct customer', function () {",
+                  "        pm.expect(json.customerId).to.eql('cust-e2e-001');",
+                  "        pm.expect(json.status).to.eql('Confirmed');",
+                  "        pm.expect(json.totalAmount).to.eql(29.99);",
+                  "    });",
+                  "    pm.collectionVariables.set('order_id', json.id);",
+                  "    console.log('[E2E] ✅ Order created: ' + json.id + ' | Total: ' + json.totalAmount + ' EUR');",
+                  "    console.log('[E2E] Check distributed trace in Kibana at http://localhost:5601');",
+                  "} else {",
+                  "    console.log('[E2E] ⚠️  Response ' + pm.response.code + ' — retry Step 2 if transient failure');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Step 3 — Verify Order Created",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders/{{order_id}}",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            },
+            "description": "Confirma que a encomenda foi persistida e está com status 'Confirmed'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.collectionVariables.get('order_id')) {",
+                  "    console.log('[E2E] Skipping — no order_id set (Step 2 may have failed)');",
+                  "    return;",
+                  "}",
+                  "",
+                  "pm.test('[E2E Step 3] Order persisted', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.id).to.eql(pm.collectionVariables.get('order_id'));",
+                  "    pm.expect(json.customerId).to.eql('cust-e2e-001');",
+                  "    pm.expect(json.status).to.eql('Confirmed');",
+                  "    console.log('[E2E] Order verified: ' + json.id + ' | status: ' + json.status);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Step 4 — Check Updated Stock (prod-104)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_service_url}}/api/inventory/prod-104",
+              "host": ["{{inventory_service_url}}"],
+              "path": ["api", "inventory", "prod-104"]
+            },
+            "description": "Verifica que o stock de `prod-104` foi reduzido após a encomenda (reserved += 1)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[E2E Step 4] Stock reflects reservation', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    console.log('[E2E] Stock after order — available: ' + json.available + ', reserved: ' + json.reserved);",
+                  "    // Available should be less than initial if order succeeded",
+                  "    const initial = parseInt(pm.collectionVariables.get('e2e_initial_stock') || '0');",
+                  "    if (initial > 0) {",
+                  "        pm.expect(json.available).to.be.at.most(initial);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Step 5 — List All Orders (verify E2E order appears)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders"]
+            },
+            "description": "Lista todas as encomendas e verifica que a encomenda E2E aparece na lista."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[E2E Step 5] E2E order appears in list', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    const json = pm.response.json();",
+                  "    const orderId = pm.collectionVariables.get('order_id');",
+                  "    if (orderId) {",
+                  "        const found = json.find(o => o.id === orderId);",
+                  "        pm.expect(found).to.not.be.undefined;",
+                  "        console.log('[E2E] Order found in list. Total orders: ' + json.length);",
+                  "    } else {",
+                  "        console.log('[E2E] No order_id set — skipping list check');",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Step 6 — Cancel Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{order_service_url}}/api/orders/{{order_id}}",
+              "host": ["{{order_service_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            },
+            "description": "Cancela a encomenda E2E. Status muda para 'Cancelled'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[E2E Step 6] Order cancelled', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Status is Cancelled', function () {",
+                  "        const json = pm.response.json();",
+                  "        pm.expect(json.status).to.eql('Cancelled');",
+                  "    });",
+                  "    console.log('[E2E] ✅ Order cancelled: ' + pm.collectionVariables.get('order_id'));",
+                  "    pm.collectionVariables.set('order_id', '');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔍 Observability Verification",
+      "description": "Verificação de telemetria no Elasticsearch.\n\nExecutar após gerar tráfego (via requests acima ou `./scripts/generate-traffic.sh`) para validar que:\n- Traces chegam a `nextraceone-obs-traces`\n- Logs chegam a `nextraceone-obs-logs`\n- O pipeline OTel Collector → Elasticsearch está a funcionar\n\nKibana disponível em http://localhost:5601",
+      "item": [
+        {
+          "name": "ES — List Indices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{elasticsearch_url}}/_cat/indices?v&s=index&h=index,docs.count,store.size,status",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["_cat", "indices"],
+              "query": [
+                { "key": "v", "value": null },
+                { "key": "s", "value": "index" },
+                { "key": "h", "value": "index,docs.count,store.size,status" }
+              ]
+            },
+            "description": "Lista todos os índices Elasticsearch com contagem de documentos.\n\nIndices esperados após ingestão:\n- `nextraceone-obs-traces`\n- `nextraceone-obs-logs`"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Elasticsearch responds', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('NexTraceOne indices present', function () {",
+                  "    const body = pm.response.text();",
+                  "    pm.expect(body).to.include('nextraceone');",
+                  "    console.log('Indices:\\n' + body);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Count Traces",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-traces/_count",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-traces", "_count"]
+            },
+            "description": "Conta o número total de documentos de trace no Elasticsearch."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Traces index reachable', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    console.log('Total trace documents: ' + json.count);",
+                  "    pm.test('Has trace documents', function () {",
+                  "        pm.expect(json.count).to.be.above(0);",
+                  "    });",
+                  "} else {",
+                  "    console.log('⚠️  nextraceone-obs-traces index not found — generate traffic first');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Count Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-logs/_count",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-logs", "_count"]
+            },
+            "description": "Conta o número total de documentos de log no Elasticsearch."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logs index reachable', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    console.log('Total log documents: ' + json.count);",
+                  "    pm.test('Has log documents', function () {",
+                  "        pm.expect(json.count).to.be.above(0);",
+                  "    });",
+                  "} else {",
+                  "    console.log('⚠️  nextraceone-obs-logs index not found — generate traffic first');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Latest Traces (5 most recent)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"size\": 5,\n    \"sort\": [{ \"@timestamp\": \"desc\" }],\n    \"_source\": [\"@timestamp\", \"Name\", \"resource.attributes.service.name\", \"Status\", \"TraceId\"],\n    \"query\": { \"match_all\": {} }\n}"
+            },
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-traces/_search?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-traces", "_search"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Retorna os 5 traces mais recentes. Verifica que o pipeline OTel → Elasticsearch está activo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Traces query succeeds', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Has trace documents', function () {",
+                  "        pm.expect(json.hits.total.value).to.be.above(0);",
+                  "    });",
+                  "    console.log('Total traces: ' + json.hits.total.value);",
+                  "    if (json.hits.hits.length > 0) {",
+                  "        json.hits.hits.forEach(function(h) {",
+                  "            const src = h._source;",
+                  "            const svc = (src.resource && src.resource.attributes) ? src.resource.attributes['service.name'] : 'unknown';",
+                  "            console.log('  span: ' + (src.Name || '-') + ' | service: ' + svc + ' | ts: ' + src['@timestamp']);",
+                  "        });",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Latest Logs (5 most recent)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"size\": 5,\n    \"sort\": [{ \"@timestamp\": \"desc\" }],\n    \"_source\": [\"@timestamp\", \"severity_text\", \"body\", \"resource.attributes.service.name\"],\n    \"query\": { \"match_all\": {} }\n}"
+            },
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-logs/_search?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-logs", "_search"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Retorna os 5 logs mais recentes de todos os serviços."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logs query succeeds', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Has log documents', function () {",
+                  "        pm.expect(json.hits.total.value).to.be.above(0);",
+                  "    });",
+                  "    console.log('Total logs: ' + json.hits.total.value);",
+                  "    if (json.hits.hits.length > 0) {",
+                  "        json.hits.hits.forEach(function(h) {",
+                  "            const src = h._source;",
+                  "            const svc = (src.resource && src.resource.attributes) ? src.resource.attributes['service.name'] : 'unknown';",
+                  "            console.log('  [' + (src.severity_text || 'INFO') + '] ' + svc + ': ' + (src.body || '-'));",
+                  "        });",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Error Logs",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"size\": 10,\n    \"sort\": [{ \"@timestamp\": \"desc\" }],\n    \"_source\": [\"@timestamp\", \"severity_text\", \"body\", \"resource.attributes.service.name\"],\n    \"query\": {\n        \"term\": { \"severity_text\": \"Error\" }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-logs/_search?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-logs", "_search"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Filtra logs de nível 'Error' para verificar se os cenários de falha aleatória (~5%) estão a gerar telemetria correcta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Error logs query succeeds', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    console.log('Error log count: ' + json.hits.total.value);",
+                  "    if (json.hits.hits.length > 0) {",
+                  "        json.hits.hits.slice(0, 3).forEach(function(h) {",
+                  "            const src = h._source;",
+                  "            const svc = (src.resource && src.resource.attributes) ? src.resource.attributes['service.name'] : 'unknown';",
+                  "            console.log('  ERROR ' + svc + ': ' + (src.body || '-'));",
+                  "        });",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Traces by order-service",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"size\": 5,\n    \"sort\": [{ \"@timestamp\": \"desc\" }],\n    \"_source\": [\"@timestamp\", \"Name\", \"TraceId\", \"SpanId\", \"ParentSpanId\"],\n    \"query\": {\n        \"term\": { \"resource.attributes.service.name\": \"order-service\" }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-traces/_search?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-traces", "_search"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Filtra traces apenas do `order-service`. Permite verificar o `TraceId` e depois procurar spans relacionados em payment e inventory."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('order-service traces query succeeds', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    console.log('order-service traces: ' + json.hits.total.value);",
+                  "    if (json.hits.hits.length > 0) {",
+                  "        const first = json.hits.hits[0]._source;",
+                  "        if (first.TraceId) {",
+                  "            pm.collectionVariables.set('trace_id', first.TraceId);",
+                  "            console.log('Latest TraceId: ' + first.TraceId + ' (saved for next request)');",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Distributed Trace by TraceId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"size\": 20,\n    \"sort\": [{ \"@timestamp\": \"asc\" }],\n    \"_source\": [\"@timestamp\", \"Name\", \"resource.attributes.service.name\", \"SpanId\", \"ParentSpanId\", \"Status\"],\n    \"query\": {\n        \"term\": { \"TraceId\": \"{{trace_id}}\" }\n    }\n}"
+            },
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-traces/_search?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-traces", "_search"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Retorna todos os spans de um trace distribuído pelo seu `TraceId`.\n\nDepois de executar 'Traces by order-service', o `trace_id` é preenchido automaticamente.\n\nDevia mostrar spans de todos os 3 serviços (order, payment, inventory) para o mesmo trace."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Distributed trace query succeeds', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    console.log('Spans for trace ' + pm.collectionVariables.get('trace_id') + ': ' + json.hits.total.value);",
+                  "    if (json.hits.hits.length > 0) {",
+                  "        const services = [...new Set(json.hits.hits.map(h => {",
+                  "            const src = h._source;",
+                  "            return (src.resource && src.resource.attributes) ? src.resource.attributes['service.name'] : 'unknown';",
+                  "        }))];",
+                  "        console.log('Services in trace: ' + services.join(', '));",
+                  "        pm.test('Distributed trace spans multiple services', function () {",
+                  "            pm.expect(services.length).to.be.above(1);",
+                  "        });",
+                  "        json.hits.hits.forEach(function(h) {",
+                  "            const src = h._source;",
+                  "            const svc = (src.resource && src.resource.attributes) ? src.resource.attributes['service.name'] : 'unknown';",
+                  "            console.log('  ' + (src['@timestamp'] || '-') + ' | ' + svc + ' | ' + (src.Name || '-'));",
+                  "        });",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ES — Index Mapping (traces)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{elasticsearch_url}}/nextraceone-obs-traces/_mapping?pretty",
+              "host": ["{{elasticsearch_url}}"],
+              "path": ["nextraceone-obs-traces", "_mapping"],
+              "query": [{ "key": "pretty", "value": null }]
+            },
+            "description": "Inspeciona o mapping do índice de traces. Útil para perceber a estrutura de campos disponíveis para queries."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Mapping reachable', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
