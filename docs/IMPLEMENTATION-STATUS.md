@@ -114,7 +114,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Incidents | PARTIAL — EfIncidentStore real (678 linhas), IncidentDbContext com migração, dynamic correlation 0%, frontend mock | `EfIncidentStore` é a implementação registada. `InMemoryIncidentStore` é test-only (deprecated). `IncidentsPage.tsx` usa `mockIncidents` hardcoded inline. Correlação incident↔change é seed data estático, não dinâmica. |
+| Incidents | READY | `EfIncidentStore` é a implementação registada. Frontend totalmente conectado via API real. `IIncidentModule` implementado para cross-module. Correlação dinâmica via `IIncidentCorrelationRepository` + `IChangeIntelligenceReader`. |
 | Automation | SIM | Catálogo estático, workflows não persistidos — 10 features mock |
 | Reliability | SIM | 8 serviços hardcoded, sem integração cross-module — 7 features mock |
 | Runtime Intelligence | PARTIAL | `RuntimeIntelligenceDbContext` existe, repositórios EF Core presentes; `IRuntimeIntelligenceModule` = PLAN (interface vazia) |
@@ -169,12 +169,14 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Knowledge Documents | INCOMPLETE | `KnowledgeDbContext` existe (prefixo `knw_`); sem migrações EF geradas |
-| Operational Notes | INCOMPLETE | Entidade existe; schema não deployável |
-| Knowledge Relations | INCOMPLETE | Entidade existe; schema não deployável |
-| Knowledge Endpoints | PARTIAL | Endpoints CRUD adicionados (P10.3); migração necessária para deploy |
+| Knowledge Documents | READY | `KnowledgeDbContext` com migração confirmada; CRUD completo |
+| Operational Notes | READY | Create/List/Update funcional |
+| Knowledge Relations | READY | Ligações entre entidades de conhecimento e serviços |
+| Knowledge Endpoints | READY | 11 endpoints CRUD implementados |
+| IKnowledgeModule | READY | Cross-module interface implementada por `KnowledgeModuleService` |
 
-**DbContexts:** `KnowledgeDbContext` (sem migrações confirmadas)
+**DbContexts:** `KnowledgeDbContext` (migração confirmada: `20260328162322_InitialCreate`)
+**Tests:** 44/44 passam
 **Evidência:** `src/modules/knowledge/`
 
 ---
@@ -225,15 +227,20 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | `IChangeIntelligenceModule` | REAL | Implementado por `ChangeIntelligenceModule` (ChangeGovernance.Infrastructure) |
 | `IPromotionModule` | REAL | Implementado por `PromotionModuleService` (ChangeGovernance.Infrastructure) |
 | `IRulesetGovernanceModule` | REAL | Implementado por `RulesetGovernanceModuleService` (ChangeGovernance.Infrastructure) |
-| `ICatalogGraphModule` | PARTIAL | Usada em Governance para `ServiceCount` (único uso ativo) |
-| `IRuntimeIntelligenceModule` | PLAN | Interface vazia, sem implementação |
-| `ICostIntelligenceModule` | PLAN | Interface vazia, sem implementação |
+| `ICatalogGraphModule` | REAL | Implementado por `CatalogGraphModuleService` (Catalog.Infrastructure) |
+| `IRuntimeIntelligenceModule` | REAL | Implementado por `RuntimeIntelligenceModule` (OpsIntel.Infrastructure) |
+| `ICostIntelligenceModule` | REAL | Implementado por `CostIntelligenceModuleService` (OpsIntel.Infrastructure) |
+| `IReliabilityModule` | REAL | Implementado por `ReliabilityModuleService` (OpsIntel.Infrastructure) |
+| `IAutomationModule` | REAL | Implementado por `AutomationModuleService` (OpsIntel.Infrastructure) |
+| `IIncidentModule` | REAL | Implementado por `IncidentModuleService` (OpsIntel.Infrastructure) — métricas para Governance executive |
+| `IKnowledgeModule` | REAL | Implementado por `KnowledgeModuleService` (Knowledge.Infrastructure) — contagens e resumo cross-module |
+| `IProductAnalyticsModule` | REAL | Implementado por `ProductAnalyticsModuleService` (ProductAnalytics.Infrastructure) |
 | `IAiOrchestrationModule` | REAL | Implementado por `AiOrchestrationModule` (Infrastructure) |
 | `IExternalAiModule` | REAL | Implementado por `ExternalAiModule` (Infrastructure) |
-| `IKnowledgeModule` | PLAN | Definida, 0 implementações |
+| `IAiGovernanceModule` | REAL | Implementado por `AiGovernanceModuleService` (AIKnowledge.Infrastructure) |
 
-**Gap:** 10 interfaces cross-module definidas; 3 de 10 com zero implementações (`IRuntimeIntelligenceModule`, `ICostIntelligenceModule`, `IKnowledgeModule`).
-**Evidência:** `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Infrastructure/Promotion/Services/PromotionModuleService.cs`
+**Status:** 15 interfaces cross-module definidas; 15 de 15 com implementação real.
+**Evidência:** `src/modules/*/Infrastructure/*/Services/`
 
 ---
 
@@ -241,9 +248,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Componente | Status | Notas |
 |---|---|---|
-| Outbox Pattern (`IdentityDbContext`) | ATIVO | Único processador de outbox ativo |
-| Outbox Pattern (outros 23 DbContexts) | PLAN — sem consumers | Tabelas existem; sem processamento ativo |
-| Domain Event Publishing | PARTIAL | Eventos publicados para outbox em Identity; restantes inativos |
+| Outbox Pattern (todos os 22 DbContexts) | ATIVO | `ModuleOutboxProcessorJob` registado para cada DbContext |
+| Domain Event Publishing | ATIVO | Eventos capturados pelo outbox durante SaveChanges e entregues pelo processador |
 
 ---
 
@@ -251,15 +257,15 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Módulo | Prontidão | Apto para Produção? |
 |---|---|---|
-| Building Blocks | READY | Sim (com ressalva do outbox) |
+| Building Blocks | READY | Sim |
 | Identity Access | READY | Sim |
-| Catalog | READY | Sim (91.7% real) |
+| Catalog | READY | Sim (100% real, 11 portal handlers implementados) |
 | Change Governance | READY | Sim (100% real, módulo flagship) |
 | Audit Compliance | READY | Sim (hash chain SHA-256) |
-| Operational Intelligence | PARTIAL | Não — correlação quebrada, frontend mock |
-| AI Knowledge | PARTIAL | Não — grounding cross-module incompleto; health checks de AI sources parcialmente implementados |
-| Governance | SIM (por design) | Não |
-| Knowledge | INCOMPLETE | Não |
+| Operational Intelligence | READY | Sim — EfIncidentStore real, frontend conectado, IIncidentModule implementado |
+| AI Knowledge | PARTIAL | LLM real E2E; grounding cross-module incompleto |
+| Governance | PARTIAL | Dados reais via repositórios; FinOps via ICostIntelligenceModule; incidentes via IIncidentModule |
+| Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | PARTIAL | Pendente validação E2E |
 | Configuration | PARTIAL | Sim para feature flags |
 | Integrations | INCOMPLETE | Não |

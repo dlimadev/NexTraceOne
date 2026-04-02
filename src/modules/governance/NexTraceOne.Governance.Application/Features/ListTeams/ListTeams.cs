@@ -29,6 +29,7 @@ public static class ListTeams
             {
                 var links = await teamDomainLinkRepository.ListByTeamIdAsync(t.Id, cancellationToken);
                 var serviceCount = await catalogGraph.CountServicesByTeamAsync(t.Name, cancellationToken);
+                var contracts = await catalogGraph.ListContractsByTeamAsync(t.Name, cancellationToken);
                 dtos.Add(new TeamSummaryDto(
                     TeamId: t.Id.Value.ToString(),
                     Name: t.Name,
@@ -36,7 +37,7 @@ public static class ListTeams
                     Description: t.Description,
                     Status: t.Status.ToString(),
                     ServiceCount: serviceCount,
-                    ContractCount: 0,   // Deferred: requires IContractsModule implementation
+                    ContractCount: contracts.Count,
                     MemberCount: 0,     // Deferred: requires IdentityAccess integration
                     MaturityLevel: "Developing",
                     ParentOrganizationUnit: t.ParentOrganizationUnit
@@ -66,6 +67,6 @@ public static class ListTeams
     {
         /// <summary>Fields not yet backed by real data.</summary>
         public IReadOnlyList<string> DeferredFields { get; init; } =
-            ["ContractCount", "MemberCount", "MaturityLevel"];
+            ["MemberCount", "MaturityLevel"];
     }
 }
