@@ -10,6 +10,7 @@ using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Automation;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
@@ -50,6 +51,9 @@ public static class DependencyInjection
 
         // ── Automation (Workflow Persistence) infrastructure ──
         services.AddAutomationInfrastructure(configuration);
+
+        // ── TelemetryStore (Product Store) infrastructure ──
+        services.AddTelemetryStoreInfrastructure(configuration);
 
         return services;
     }

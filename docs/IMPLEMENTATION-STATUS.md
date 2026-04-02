@@ -24,7 +24,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | BuildingBlocks.Application | READY | Abstrações CQRS, MediatR behaviors, `ICurrentUser`/`ICurrentTenant` |
 | BuildingBlocks.Infrastructure | READY | `NexTraceDbContextBase`, `TenantRlsInterceptor`, `AuditInterceptor` |
 | BuildingBlocks.Security | READY | JWT, API Key, CORS, rate limiting (6 policies), AES-256-GCM, `AssemblyIntegrityChecker` |
-| BuildingBlocks.Observability | PARTIAL | OpenTelemetry configurado; aponta para `localhost:4317` em produção (requer config por ambiente) |
+| BuildingBlocks.Observability | READY | OpenTelemetry configurado; Elastic + ClickHouse providers reais; ITelemetryQueryService implementado; Product Store (5 reader/writer pairs) + Metrics Store (2 reader/writer pairs) com EF Core PostgreSQL; TelemetryRetentionService + TelemetryAggregationService implementados |
 | Outbox Processing | PARTIAL — gap crítico | Apenas `IdentityDbContext` tem processamento ativo; 23 outros DbContexts têm tabelas de outbox sem processamento |
 
 **Evidência:** `src/building-blocks/`

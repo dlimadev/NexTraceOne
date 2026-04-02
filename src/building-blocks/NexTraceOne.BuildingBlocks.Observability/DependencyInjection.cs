@@ -14,6 +14,7 @@ using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrProfi
 using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.OpenTelemetryCollector;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.ClickHouse;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Elastic;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Services;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using OpenTelemetry.Metrics;
@@ -134,17 +135,25 @@ public static class DependencyInjection
 
         if (string.Equals(providerName, "ClickHouse", StringComparison.OrdinalIgnoreCase))
         {
-            services.AddSingleton<ClickHouseObservabilityProvider>();
+            services.AddHttpClient<ClickHouseObservabilityProvider>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
             services.AddSingleton<IObservabilityProvider>(sp =>
                 sp.GetRequiredService<ClickHouseObservabilityProvider>());
         }
         else
         {
             // Default: Elastic
-            services.AddSingleton<ElasticObservabilityProvider>();
+            services.AddHttpClient<ElasticObservabilityProvider>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
             services.AddSingleton<IObservabilityProvider>(sp =>
                 sp.GetRequiredService<ElasticObservabilityProvider>());
         }
+
+        services.AddSingleton<ITelemetryQueryService, TelemetryQueryService>();
     }
 
     /// <summary>
