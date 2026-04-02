@@ -118,6 +118,36 @@ internal sealed class NotificationMetricsService(
             ? (decimal)totalAcknowledged / totalRequiringAction
             : 0m;
 
+        var totalUnacknowledgedActionRequired = await notifications.CountAsync(
+            n => n.RequiresAction && n.AcknowledgedAt == null,
+            cancellationToken);
+
+        var readDurations = await notifications
+            .Where(n => n.ReadAt != null)
+            .Select(n => new
+            {
+                n.CreatedAt,
+                ReadAt = n.ReadAt!.Value
+            })
+            .ToListAsync(cancellationToken);
+
+        var acknowledgeDurations = await notifications
+            .Where(n => n.RequiresAction && n.AcknowledgedAt != null)
+            .Select(n => new
+            {
+                n.CreatedAt,
+                AcknowledgedAt = n.AcknowledgedAt!.Value
+            })
+            .ToListAsync(cancellationToken);
+
+        var averageTimeToReadMinutes = readDurations.Count > 0
+            ? readDurations.Average(item => (decimal)(item.ReadAt - item.CreatedAt).TotalMinutes)
+            : 0m;
+
+        var averageTimeToAcknowledgeMinutes = acknowledgeDurations.Count > 0
+            ? acknowledgeDurations.Average(item => (decimal)(item.AcknowledgedAt - item.CreatedAt).TotalMinutes)
+            : 0m;
+
         return new NotificationInteractionMetrics
         {
             TotalRead = totalRead,
@@ -128,7 +158,10 @@ internal sealed class NotificationMetricsService(
             TotalDismissed = totalDismissed,
             TotalEscalated = totalEscalated,
             ReadRate = Math.Round(readRate, 4),
-            AcknowledgeRate = Math.Round(ackRate, 4)
+            AcknowledgeRate = Math.Round(ackRate, 4),
+            AverageTimeToReadMinutes = Math.Round(averageTimeToReadMinutes, 2),
+            AverageTimeToAcknowledgeMinutes = Math.Round(averageTimeToAcknowledgeMinutes, 2),
+            TotalUnacknowledgedActionRequired = totalUnacknowledgedActionRequired
         };
     }
 
@@ -179,6 +212,14 @@ internal sealed class NotificationMetricsService(
             .Take(5)
             .ToListAsync(cancellationToken);
 
+        var unacknowledgedActionTypes = await notifications
+            .Where(n => n.RequiresAction && n.AcknowledgedAt == null)
+            .GroupBy(n => n.EventType)
+            .Select(g => new { EventType = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(5)
+            .ToListAsync(cancellationToken);
+
         return new NotificationQualityMetrics
         {
             AveragePerUserPerDay = Math.Round(avgPerUserPerDay, 2),
@@ -186,7 +227,8 @@ internal sealed class NotificationMetricsService(
             TotalGrouped = totalGrouped,
             TotalCorrelatedWithIncidents = totalCorrelated,
             TopNoisyTypes = topNoisyTypes.Select(t => new NotificationTypeCount(t.EventType, t.Count)).ToList(),
-            LeastEngagedTypes = leastEngaged.Select(t => new NotificationTypeCount(t.EventType, t.Total)).ToList()
+            LeastEngagedTypes = leastEngaged.Select(t => new NotificationTypeCount(t.EventType, t.Total)).ToList(),
+            UnacknowledgedActionTypes = unacknowledgedActionTypes.Select(t => new NotificationTypeCount(t.EventType, t.Count)).ToList()
         };
     }
 }

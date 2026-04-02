@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Shield, Search, ShieldCheck, ShieldAlert, FileText, AlertTriangle,
@@ -13,6 +14,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 
 
@@ -58,30 +60,21 @@ export function PolicyCatalogPage() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
-  const [data, setData] = useState<PolicyListResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const policyQuery = useQuery<PolicyListResponse>({
+    queryKey: [...queryKeys.governance.all, 'policies'],
+    queryFn: () => organizationGovernanceApi.listPolicies(),
+    staleTime: 30_000,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.listPolicies()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [t]);
-
-  if (loading) {
+  if (policyQuery.isLoading) {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (error || !data) {
-    return <PageContainer><PageErrorState message={error ?? undefined} /></PageContainer>;
+  if (policyQuery.isError || !policyQuery.data) {
+    return <PageContainer><PageErrorState message={t('common.errorLoading')} /></PageContainer>;
   }
 
-  const d = data;
+  const d = policyQuery.data;
   const totalViolations = d.policies.reduce((sum, p) => sum + p.violationCount, 0);
 
   const filtered = d.policies.filter(p => {

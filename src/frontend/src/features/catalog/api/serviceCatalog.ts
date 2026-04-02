@@ -190,6 +190,16 @@ export const serviceCatalogApi = {
   }) =>
     client.put(`/catalog/services/${serviceId}`, data).then((r) => r.data),
 
+  /** Transita o ciclo de vida de um serviço para um novo estado. */
+  transitionLifecycle: (serviceId: string, data: { newStatus: string }) =>
+    client.patch<{
+      serviceId: string;
+      serviceName: string;
+      previousStatus: string;
+      currentStatus: string;
+      transitionedAt: string;
+    }>(`/catalog/services/${serviceId}/lifecycle`, data).then((r) => r.data),
+
   /** Atualiza o ownership de um serviço. */
   updateOwnership: (serviceId: string, data: {
     teamName: string;

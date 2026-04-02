@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, NavLink } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type IncidentDetailResponse, type DynamicCorrelatedChange } from '../api/incidents';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
+import { KnowledgeContextPanel } from '../../knowledge/components/KnowledgeContextPanel';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
@@ -67,6 +68,15 @@ function formatDate(dateStr: string): string {
   });
 }
 
+function formatChangeToIncidentDelta(changeAt: string, incidentAt: string, t: (key: string, options?: Record<string, unknown>) => string): string {
+  const deltaMs = new Date(incidentAt).getTime() - new Date(changeAt).getTime();
+  const deltaMinutes = Math.round(deltaMs / (1000 * 60));
+  if (deltaMinutes >= 0) {
+    return t('incidents.postChangeVerification.afterIncident', { minutes: deltaMinutes });
+  }
+  return t('incidents.postChangeVerification.beforeIncident', { minutes: Math.abs(deltaMinutes) });
+}
+
 /**
  * Página de detalhe do incidente — visão consolidada com correlação, evidência,
  * mitigação, runbooks, timeline, serviços vinculados e contratos relacionados.
@@ -88,6 +98,24 @@ export function IncidentDetailPage() {
     queryKey: ['incident-correlated-changes', incidentId],
     queryFn: () => incidentsApi.getCorrelatedChanges(incidentId!),
     enabled: !!incidentId,
+  });
+
+  const mitigationHistoryQuery = useQuery({
+    queryKey: ['incident-mitigation-history', incidentId],
+    queryFn: () => incidentsApi.getMitigationHistory(incidentId!),
+    enabled: !!incidentId,
+  });
+
+  const latestWorkflowId = useMemo(() => {
+    const entries = mitigationHistoryQuery.data?.entries ?? [];
+    const firstWithWorkflow = entries.find((entry) => !!entry.workflowId);
+    return firstWithWorkflow?.workflowId;
+  }, [mitigationHistoryQuery.data?.entries]);
+
+  const mitigationValidationQuery = useQuery({
+    queryKey: ['incident-mitigation-validation', incidentId, latestWorkflowId],
+    queryFn: () => incidentsApi.getMitigationValidation(incidentId!, latestWorkflowId!),
+    enabled: !!incidentId && !!latestWorkflowId,
   });
 
   const triggerCorrelationMutation = useMutation({
@@ -183,6 +211,9 @@ export function IncidentDetailPage() {
   const stsBadge = statusBadge(identity.status);
   const confBadge = confidenceBadge(correlation.confidence);
   const mitBadge = mitigationBadge(mitigation.status);
+  const temporalCorrelations = [...correlation.relatedChanges]
+    .filter((change) => !!change.deployedAt)
+    .sort((a, b) => new Date(b.deployedAt).getTime() - new Date(a.deployedAt).getTime());
 
   return (
     <PageContainer className="animate-fade-in">
@@ -316,6 +347,21 @@ export function IncidentDetailPage() {
                     <p className="text-sm text-muted">{t('incidents.correlation.noRelatedChanges', 'No correlated changes were confirmed for this incident yet.')}</p>
                   )}
                 </div>
+                {temporalCorrelations.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted mb-2">{t('incidents.postChangeVerification.title')}</p>
+                    <div className="space-y-2">
+                      {temporalCorrelations.map((change, idx) => (
+                        <div key={`${change.changeId}-${idx}`} className="p-2 rounded bg-elevated">
+                          <p className="text-sm text-body">{change.description}</p>
+                          <p className="text-xs text-muted mt-1">
+                            {formatDate(change.deployedAt)} • {formatChangeToIncidentDelta(change.deployedAt, identity.createdAt, t)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {/* Dynamic correlation results from P01.1 engine */}
                 {correlatedChangesQuery.data && correlatedChangesQuery.data.totalCorrelations > 0 && (
                   <div>
@@ -471,6 +517,48 @@ export function IncidentDetailPage() {
             </CardBody>
           </Card>
 
+          {/* Post-change verification */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+                <Shield size={16} className="text-accent" aria-hidden="true" /> {t('incidents.postChangeVerification.title')}
+              </h2>
+            </CardHeader>
+            <CardBody>
+              {!latestWorkflowId ? (
+                <p className="text-sm text-muted">{t('incidents.postChangeVerification.noWorkflow')}</p>
+              ) : mitigationValidationQuery.isLoading ? (
+                <p className="text-sm text-muted">{t('common.loading')}</p>
+              ) : mitigationValidationQuery.data ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted">{t('incidents.postChangeVerification.validationStatus')}</span>
+                    <Badge variant={mitigationValidationQuery.data.status === 'Verified' ? 'success' : 'warning'}>
+                      {mitigationValidationQuery.data.status}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-muted">
+                    {mitigationValidationQuery.data.validatedAt
+                      ? `${t('incidents.postChangeVerification.lastValidatedAt')}: ${formatDate(mitigationValidationQuery.data.validatedAt)}`
+                      : t('incidents.postChangeVerification.notValidatedYet')}
+                  </div>
+                  {mitigationValidationQuery.data.expectedChecks.length > 0 && (
+                    <div className="space-y-1">
+                      {mitigationValidationQuery.data.expectedChecks.map((check, idx) => (
+                        <div key={`${check.checkName}-${idx}`} className="flex items-center justify-between text-sm p-2 rounded bg-elevated">
+                          <span className="text-body">{check.checkName}</span>
+                          <Badge variant={check.isPassed ? 'success' : 'danger'}>{check.isPassed ? t('common.yes') : t('common.no')}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-muted">{t('incidents.postChangeVerification.noValidation')}</p>
+              )}
+            </CardBody>
+          </Card>
+
           {/* Runbooks */}
           <Card>
             <CardHeader>
@@ -527,6 +615,8 @@ export function IncidentDetailPage() {
               </CardBody>
             </Card>
           )}
+
+          <KnowledgeContextPanel targetType="Incident" targetEntityId={incidentId} />
         </div>
       </div>
       </PageSection>

@@ -28,6 +28,7 @@ using SearchServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.Sea
 using SyncConsumersFeature = NexTraceOne.Catalog.Application.Graph.Features.SyncConsumers.SyncConsumers;
 using UpdateServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceAsset.UpdateServiceAsset;
 using UpdateServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceOwnership.UpdateServiceOwnership;
+using TransitionServiceLifecycleFeature = NexTraceOne.Catalog.Application.Graph.Features.TransitionServiceLifecycle.TransitionServiceLifecycle;
 using AddServiceLinkFeature = NexTraceOne.Catalog.Application.Graph.Features.AddServiceLink.AddServiceLink;
 using ListServiceLinksFeature = NexTraceOne.Catalog.Application.Graph.Features.ListServiceLinks.ListServiceLinks;
 using RemoveServiceLinkFeature = NexTraceOne.Catalog.Application.Graph.Features.RemoveServiceLink.RemoveServiceLink;
@@ -178,6 +179,18 @@ public sealed class ServiceCatalogEndpointModule
             var result = await sender.Send(new GetServiceDetailFeature.Query(serviceId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
+
+        group.MapPatch("/services/{serviceId:guid}/lifecycle", async (
+            Guid serviceId,
+            TransitionServiceLifecycleFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
 
         group.MapPatch("/services/{serviceId:guid}/ownership", async (
             Guid serviceId,

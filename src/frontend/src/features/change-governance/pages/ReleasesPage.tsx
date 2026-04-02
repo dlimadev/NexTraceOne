@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
@@ -22,6 +22,7 @@ import type { ChangeLevel, DeploymentState } from '../../../types';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { ReleasesIntelligenceTab } from '../components/ReleasesIntelligenceTab';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ─── Constantes auxiliares ───────────────────────────────────────────────────
 
@@ -62,12 +63,13 @@ interface NotifyForm {
   commitSha: string;
 }
 
-const emptyForm: NotifyForm = { apiAssetId: '', version: '', environment: 'production', commitSha: '' };
+const emptyForm: NotifyForm = { apiAssetId: '', version: '', environment: '', commitSha: '' };
 
 // ─── Componente principal ────────────────────────────────────────────────────
 
 export function ReleasesPage() {
   const { t } = useTranslation();
+  const { availableEnvironments } = useEnvironment();
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<TabId>('overview');
@@ -77,6 +79,18 @@ export function ReleasesPage() {
   const [form, setForm] = useState<NotifyForm>(emptyForm);
   const [page] = useState(1);
   const [freezeCheckEnv, setFreezeCheckEnv] = useState('');
+
+  const environmentOptions = useMemo(() => {
+    const options = availableEnvironments.map((env) => env.name).filter(Boolean);
+    return Array.from(new Set(options)).sort((a, b) => a.localeCompare(b));
+  }, [availableEnvironments]);
+
+  useEffect(() => {
+    if (!environmentOptions.length) return;
+    if (!form.environment || !environmentOptions.includes(form.environment)) {
+      setForm((current) => ({ ...current, environment: environmentOptions[0] }));
+    }
+  }, [environmentOptions, form.environment]);
 
   // ── Queries ────────────────────────────────────────────────────────────────
 
@@ -225,9 +239,9 @@ export function ReleasesPage() {
                       onChange={(e) => setForm((f) => ({ ...f, environment: e.target.value }))}
                       className={INPUT_CLS}
                     >
-                      <option value="development">{t('releases.environments.development')}</option>
-                      <option value="staging">{t('releases.environments.staging')}</option>
-                      <option value="production">{t('releases.environments.production')}</option>
+                      {environmentOptions.map((env) => (
+                        <option key={env} value={env}>{env}</option>
+                      ))}
                     </select>
                   </div>
                   <div>

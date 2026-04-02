@@ -1,5 +1,7 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
@@ -8,6 +10,8 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
 /// Retorna jornadas e funis do produto com métricas de conclusão.
 /// Responde: quais jornadas chegam até valor real? Onde há abandono?
 /// Qual é o tempo médio por jornada? Onde estão os pontos de drop-off?
+/// Consome dados reais do IAnalyticsEventRepository — computação de funil
+/// baseada em presença de tipos de evento por sessão.
 /// </summary>
 public static class GetJourneys
 {
@@ -17,92 +21,184 @@ public static class GetJourneys
         string? Persona,
         string? Range) : IQuery<Response>;
 
-    /// <summary>Handler que calcula e retorna métricas de jornadas.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que calcula e retorna métricas de jornadas a partir de dados reais.</summary>
+    public sealed class Handler(
+        IAnalyticsEventRepository repository,
+        IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        /// <summary>
+        /// Definições de jornadas do produto.
+        /// Cada jornada é uma sequência de event types que representa um fluxo de valor.
+        /// Extraível para configuração no banco em fase futura.
+        /// </summary>
+        private static readonly JourneyDefinition[] JourneyDefinitions =
+        [
+            new("search_to_entity", "Search to Entity View",
+            [
+                new("search_executed", "Search Executed", AnalyticsEventType.SearchExecuted),
+                new("results_displayed", "Results Displayed", AnalyticsEventType.SearchResultClicked),
+                new("entity_viewed", "Entity Viewed", AnalyticsEventType.EntityViewed)
+            ]),
+            new("ai_prompt_to_action", "AI Prompt to Useful Action",
+            [
+                new("assistant_opened", "Assistant Opened", AnalyticsEventType.AssistantPromptSubmitted),
+                new("response_received", "Response Received", AnalyticsEventType.AssistantResponseUsed),
+            ]),
+            new("contract_draft_to_publish", "Contract Draft to Publication",
+            [
+                new("draft_created", "Draft Created", AnalyticsEventType.ContractDraftCreated),
+                new("contract_published", "Contract Published", AnalyticsEventType.ContractPublished)
+            ]),
+            new("incident_to_mitigation", "Incident to Mitigation Completion",
+            [
+                new("incident_opened", "Incident Opened", AnalyticsEventType.IncidentInvestigated),
+                new("mitigation_started", "Mitigation Started", AnalyticsEventType.MitigationWorkflowStarted),
+                new("mitigation_completed", "Mitigation Completed", AnalyticsEventType.MitigationWorkflowCompleted)
+            ]),
+            new("onboarding_to_first_action", "Onboarding to First Meaningful Action",
+            [
+                new("first_login", "First Login", AnalyticsEventType.ModuleViewed),
+                new("first_search", "First Search", AnalyticsEventType.SearchExecuted),
+                new("first_meaningful_action", "First Meaningful Action", AnalyticsEventType.OnboardingStepCompleted)
+            ])
+        ];
+
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var journeys = new List<JourneyDto>
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+
+            var allEventTypes = JourneyDefinitions
+                .SelectMany(j => j.Steps.Select(s => s.EventType))
+                .Distinct()
+                .ToArray();
+
+            var sessionEventTypes = await repository.GetSessionEventTypesAsync(
+                allEventTypes, request.Persona, from, to, cancellationToken);
+
+            if (sessionEventTypes.Count == 0)
             {
-                new("search_to_entity",
-                    "Search to Entity View",
-                    new[]
-                    {
-                        new JourneyStepDto("search_executed", "Search Executed", 100.0m, 0),
-                        new JourneyStepDto("results_displayed", "Results Displayed", 87.2m, 1),
-                        new JourneyStepDto("result_clicked", "Result Clicked", 64.5m, 2),
-                        new JourneyStepDto("entity_viewed", "Entity Viewed", 61.8m, 3)
-                    },
-                    61.8m, 4.2m, JourneyStatus.Completed, "search_executed → results_displayed"),
-
-                new("ai_prompt_to_action",
-                    "AI Prompt to Useful Action",
-                    new[]
-                    {
-                        new JourneyStepDto("assistant_opened", "Assistant Opened", 100.0m, 0),
-                        new JourneyStepDto("prompt_submitted", "Prompt Submitted", 82.4m, 1),
-                        new JourneyStepDto("response_received", "Response Received", 80.1m, 2),
-                        new JourneyStepDto("response_used", "Response Used", 48.6m, 3)
-                    },
-                    48.6m, 6.8m, JourneyStatus.Completed, "response_received → response_used"),
-
-                new("contract_draft_to_publish",
-                    "Contract Draft to Publication",
-                    new[]
-                    {
-                        new JourneyStepDto("studio_opened", "Studio Opened", 100.0m, 0),
-                        new JourneyStepDto("draft_created", "Draft Created", 72.3m, 1),
-                        new JourneyStepDto("draft_validated", "Draft Validated", 58.1m, 2),
-                        new JourneyStepDto("review_submitted", "Review Submitted", 41.2m, 3),
-                        new JourneyStepDto("contract_published", "Contract Published", 34.8m, 4)
-                    },
-                    34.8m, 48.5m, JourneyStatus.Completed, "draft_validated → review_submitted"),
-
-                new("incident_to_mitigation",
-                    "Incident to Mitigation Completion",
-                    new[]
-                    {
-                        new JourneyStepDto("incident_opened", "Incident Opened", 100.0m, 0),
-                        new JourneyStepDto("investigation_started", "Investigation Started", 91.2m, 1),
-                        new JourneyStepDto("cause_identified", "Cause Identified", 68.4m, 2),
-                        new JourneyStepDto("mitigation_started", "Mitigation Started", 55.7m, 3),
-                        new JourneyStepDto("mitigation_completed", "Mitigation Completed", 42.3m, 4)
-                    },
-                    42.3m, 125.0m, JourneyStatus.Completed, "cause_identified → mitigation_started"),
-
-                new("onboarding_to_first_action",
-                    "Onboarding to First Meaningful Action",
-                    new[]
-                    {
-                        new JourneyStepDto("first_login", "First Login", 100.0m, 0),
-                        new JourneyStepDto("persona_selected", "Persona Selected", 94.5m, 1),
-                        new JourneyStepDto("dashboard_viewed", "Dashboard Viewed", 92.1m, 2),
-                        new JourneyStepDto("first_search", "First Search", 78.3m, 3),
-                        new JourneyStepDto("first_meaningful_action", "First Meaningful Action", 62.4m, 4)
-                    },
-                    62.4m, 18.5m, JourneyStatus.Completed, "first_search → first_meaningful_action")
-            };
-
-            // Filtrar por journeyId se especificado
-            if (!string.IsNullOrWhiteSpace(request.JourneyId))
-            {
-                journeys = journeys
-                    .Where(j => j.JourneyId.Equals(request.JourneyId, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                return Result<Response>.Success(new Response(
+                    Journeys: Array.Empty<JourneyDto>(),
+                    AverageCompletionRate: 0m,
+                    MostCompletedJourney: string.Empty,
+                    HighestDropOffJourney: string.Empty,
+                    PeriodLabel: periodLabel));
             }
 
-            var response = new Response(
-                Journeys: journeys,
-                AverageCompletionRate: journeys.Count > 0
-                    ? journeys.Average(j => j.CompletionRate)
-                    : 0m,
-                MostCompletedJourney: "search_to_entity",
-                HighestDropOffJourney: "contract_draft_to_publish",
-                PeriodLabel: request.Range ?? "last_30d");
+            var sessionMap = sessionEventTypes
+                .GroupBy(e => e.SessionId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToDictionary(x => x.EventType, x => x.FirstOccurrence));
 
-            return Task.FromResult(Result<Response>.Success(response));
+            var journeys = new List<JourneyDto>();
+
+            foreach (var def in JourneyDefinitions)
+            {
+                if (!string.IsNullOrWhiteSpace(request.JourneyId) &&
+                    !def.JourneyId.Equals(request.JourneyId, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var firstStepType = def.Steps[0].EventType;
+                var sessionsWithStart = sessionMap
+                    .Where(s => s.Value.ContainsKey(firstStepType))
+                    .ToList();
+
+                var totalStartSessions = sessionsWithStart.Count;
+                if (totalStartSessions == 0)
+                {
+                    var emptySteps = def.Steps.Select((s, idx) =>
+                        new JourneyStepDto(s.StepId, s.StepName, idx == 0 ? 100m : 0m, idx)).ToArray();
+
+                    journeys.Add(new JourneyDto(
+                        def.JourneyId, def.JourneyName, emptySteps,
+                        0m, 0m, JourneyStatus.Started, string.Empty));
+                    continue;
+                }
+
+                var steps = new List<JourneyStepDto>();
+                var biggestDropOff = string.Empty;
+                var biggestDropValue = 0m;
+                var totalDurationMinutes = new List<decimal>();
+
+                for (var i = 0; i < def.Steps.Length; i++)
+                {
+                    var step = def.Steps[i];
+                    var sessionsReachingStep = sessionsWithStart
+                        .Count(s => s.Value.ContainsKey(step.EventType));
+
+                    var completionPercent = Math.Round(
+                        (sessionsReachingStep / (decimal)totalStartSessions) * 100m, 1);
+
+                    steps.Add(new JourneyStepDto(step.StepId, step.StepName, completionPercent, i));
+
+                    if (i > 0)
+                    {
+                        var drop = steps[i - 1].CompletionPercent - completionPercent;
+                        if (drop > biggestDropValue)
+                        {
+                            biggestDropValue = drop;
+                            biggestDropOff = $"{def.Steps[i - 1].StepName} → {step.StepName}";
+                        }
+                    }
+                }
+
+                var lastStep = def.Steps[^1];
+                foreach (var session in sessionsWithStart)
+                {
+                    if (session.Value.TryGetValue(firstStepType, out var startTime) &&
+                        session.Value.TryGetValue(lastStep.EventType, out var endTime))
+                    {
+                        var duration = (decimal)(endTime - startTime).TotalMinutes;
+                        if (duration >= 0) totalDurationMinutes.Add(duration);
+                    }
+                }
+
+                var avgDuration = totalDurationMinutes.Count > 0
+                    ? Math.Round(totalDurationMinutes.Average(), 1)
+                    : 0m;
+
+                var completionRate = steps.Count > 0 ? steps[^1].CompletionPercent : 0m;
+                var status = completionRate >= 50 ? JourneyStatus.Completed : JourneyStatus.InProgress;
+
+                journeys.Add(new JourneyDto(
+                    def.JourneyId, def.JourneyName, steps,
+                    completionRate, avgDuration, status, biggestDropOff));
+            }
+
+            var avgCompletionRate = journeys.Count > 0
+                ? Math.Round(journeys.Average(j => j.CompletionRate), 1)
+                : 0m;
+
+            var mostCompleted = journeys.OrderByDescending(j => j.CompletionRate).FirstOrDefault()?.JourneyId ?? string.Empty;
+            var highestDropOff = journeys.OrderBy(j => j.CompletionRate).FirstOrDefault()?.JourneyId ?? string.Empty;
+
+            return Result<Response>.Success(new Response(
+                Journeys: journeys,
+                AverageCompletionRate: avgCompletionRate,
+                MostCompletedJourney: mostCompleted,
+                HighestDropOffJourney: highestDropOff,
+                PeriodLabel: periodLabel));
+        }
+
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        {
+            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
+            var days = label switch
+            {
+                "last_7d" => 7,
+                "last_1d" => 1,
+                "last_90d" => 90,
+                _ => 30
+            };
+            return (utcNow.AddDays(-days), utcNow, label);
         }
     }
+
+    private sealed record JourneyDefinition(string JourneyId, string JourneyName, JourneyStepDefinition[] Steps);
+    private sealed record JourneyStepDefinition(string StepId, string StepName, AnalyticsEventType EventType);
 
     /// <summary>Resposta com jornadas e funis do produto.</summary>
     public sealed record Response(

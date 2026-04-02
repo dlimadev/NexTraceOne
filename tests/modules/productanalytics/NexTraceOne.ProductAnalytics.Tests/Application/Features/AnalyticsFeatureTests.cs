@@ -2,6 +2,10 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary;
 using NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
 using NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
+using NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
+using NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones;
+using NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel;
+using NexTraceOne.ProductAnalytics.Application.Features.GetFeatureHeatmap;
 using NexTraceOne.ProductAnalytics.Application.Features.RecordAnalyticsEvent;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
@@ -167,7 +171,27 @@ public sealed class AnalyticsFeatureTests
     public async Task GetPersonaUsage_ShouldReturnProfiles()
     {
         // Arrange
-        var handler = new GetPersonaUsage.Handler();
+        _analyticsRepository.GetPersonaBreakdownAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<PersonaBreakdownRow>
+            {
+                new("Engineer", 50, 10),
+                new("Architect", 20, 5)
+            });
+        _analyticsRepository.GetTopModulesAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleUsageRow>());
+        _analyticsRepository.GetTopEventTypesAsync(
+            Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<EventTypeCountRow>());
+        _analyticsRepository.GetDistinctEventTypesAsync(
+            Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<AnalyticsEventType>());
+
+        var handler = new GetPersonaUsage.Handler(_analyticsRepository, _clock);
         var query = new GetPersonaUsage.Query(null, null, null);
 
         // Act
@@ -176,15 +200,34 @@ public sealed class AnalyticsFeatureTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Profiles.Should().NotBeEmpty();
-        result.Value.TotalPersonas.Should().BeGreaterThan(0);
-        result.Value.MostActivePersona.Should().NotBeNullOrWhiteSpace();
+        result.Value.TotalPersonas.Should().Be(2);
+        result.Value.MostActivePersona.Should().Be("Engineer");
     }
 
     [Fact]
     public async Task GetPersonaUsage_WithFilter_ShouldReturnFilteredProfiles()
     {
         // Arrange
-        var handler = new GetPersonaUsage.Handler();
+        _analyticsRepository.GetPersonaBreakdownAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<PersonaBreakdownRow>
+            {
+                new("Engineer", 50, 10)
+            });
+        _analyticsRepository.GetTopModulesAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleUsageRow>());
+        _analyticsRepository.GetTopEventTypesAsync(
+            Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<EventTypeCountRow>());
+        _analyticsRepository.GetDistinctEventTypesAsync(
+            Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<AnalyticsEventType>());
+
+        var handler = new GetPersonaUsage.Handler(_analyticsRepository, _clock);
 
         // Act
         var result = await handler.Handle(new GetPersonaUsage.Query("Engineer", null, null), CancellationToken.None);
@@ -228,5 +271,178 @@ public sealed class AnalyticsFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Modules.Should().HaveCount(2);
         result.Value.OverallAdoptionScore.Should().BeGreaterThan(0);
+    }
+
+    // ── GetJourneys ──
+
+    [Fact]
+    public async Task GetJourneys_ShouldReturnJourneys()
+    {
+        // Arrange
+        _analyticsRepository.GetSessionEventTypesAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SessionEventTypeRow>());
+        _analyticsRepository.CountDistinctSessionsAsync(
+            Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(50);
+
+        var handler = new GetJourneys.Handler(_analyticsRepository, _clock);
+        var query = new GetJourneys.Query(null, null, null);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        // With no session data, handler returns empty journeys
+        result.Value.Journeys.Should().BeEmpty();
+        result.Value.AverageCompletionRate.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task GetJourneys_WithNoSessions_ShouldReturnZeroCompletion()
+    {
+        // Arrange
+        _analyticsRepository.GetSessionEventTypesAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SessionEventTypeRow>());
+        _analyticsRepository.CountDistinctSessionsAsync(
+            Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(0);
+
+        var handler = new GetJourneys.Handler(_analyticsRepository, _clock);
+
+        // Act
+        var result = await handler.Handle(new GetJourneys.Query(null, null, null), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        foreach (var j in result.Value.Journeys)
+        {
+            j.CompletionRate.Should().Be(0);
+        }
+    }
+
+    // ── GetValueMilestones ──
+
+    [Fact]
+    public async Task GetValueMilestones_ShouldReturnMilestones()
+    {
+        // Arrange
+        _analyticsRepository.CountUniqueUsersAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(100);
+        _analyticsRepository.CountUsersByEventTypeAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<EventTypeUserCountRow>());
+        _analyticsRepository.GetUserFirstEventTimesAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<UserFirstEventRow>());
+
+        var handler = new GetValueMilestones.Handler(_analyticsRepository, _clock);
+        var query = new GetValueMilestones.Query(null, null, null);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Milestones.Should().HaveCount(15);
+    }
+
+    [Fact]
+    public async Task GetValueMilestones_WithZeroUsers_ShouldReturnZeroCompletion()
+    {
+        // Arrange
+        _analyticsRepository.CountUniqueUsersAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(0);
+        _analyticsRepository.CountUsersByEventTypeAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<EventTypeUserCountRow>());
+        _analyticsRepository.GetUserFirstEventTimesAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<UserFirstEventRow>());
+
+        var handler = new GetValueMilestones.Handler(_analyticsRepository, _clock);
+
+        // Act
+        var result = await handler.Handle(new GetValueMilestones.Query(null, null, null), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        foreach (var m in result.Value.Milestones)
+        {
+            m.CompletionRate.Should().Be(0);
+        }
+    }
+
+    // ── GetAdoptionFunnel ──
+
+    [Fact]
+    public async Task GetAdoptionFunnel_ShouldReturnModuleFunnels()
+    {
+        // Arrange
+        _analyticsRepository.GetSessionEventTypesAsync(
+            Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<SessionEventTypeRow>());
+        _analyticsRepository.CountDistinctSessionsAsync(
+            Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(20);
+
+        var handler = new GetAdoptionFunnel.Handler(_analyticsRepository, _clock);
+        var query = new GetAdoptionFunnel.Query(null, null, null, null);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Funnels.Should().NotBeEmpty();
+        result.Value.Funnels.Should().HaveCountGreaterThanOrEqualTo(6);
+    }
+
+    // ── GetFeatureHeatmap ──
+
+    [Fact]
+    public async Task GetFeatureHeatmap_ShouldReturnCells()
+    {
+        // Arrange
+        _analyticsRepository.GetModuleAdoptionAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleAdoptionRow>
+            {
+                new(ProductModule.ServiceCatalog, 200, 30),
+                new(ProductModule.ContractStudio, 100, 15)
+            });
+        _analyticsRepository.GetFeatureCountsAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleFeatureCountRow>());
+        _analyticsRepository.CountUniqueUsersAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(40);
+
+        var handler = new GetFeatureHeatmap.Handler(_analyticsRepository, _clock);
+        var query = new GetFeatureHeatmap.Query(null, null, null);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Cells.Should().HaveCount(2);
+        result.Value.TotalUniqueUsers.Should().Be(40);
     }
 }

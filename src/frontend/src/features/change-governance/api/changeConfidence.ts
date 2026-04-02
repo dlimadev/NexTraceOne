@@ -23,6 +23,12 @@ export interface ChangesFilterParams {
   pageSize: number;
 }
 
+export interface ChangeFilterOptionsResponse {
+  changeTypes: string[];
+  confidenceStatuses: string[];
+  deploymentStatuses: string[];
+}
+
 /** Cliente de API para o módulo Change Confidence do NexTraceOne. */
 export const changeConfidenceApi = {
   /** Lista mudanças com filtros avançados. */
@@ -32,6 +38,10 @@ export const changeConfidenceApi = {
   /** Obtém resumo agregado de mudanças. */
   getSummary: (params?: { teamName?: string; environment?: string; from?: string; to?: string }) =>
     client.get<ChangesSummaryResponse>('/changes/summary', { params }).then((r) => r.data),
+
+  /** Obtém opções dinâmicas de filtro para o catálogo de mudanças. */
+  getFilterOptions: () =>
+    client.get<ChangeFilterOptionsResponse>('/changes/filter-options').then((r) => r.data),
 
   /** Lista mudanças por serviço. */
   listByService: (serviceName: string, page = 1, pageSize = 20) =>

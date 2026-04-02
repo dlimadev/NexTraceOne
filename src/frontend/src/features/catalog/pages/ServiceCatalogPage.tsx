@@ -10,7 +10,6 @@ import {
   Clock,
   ChevronRight,
   AlertTriangle,
-  ArrowRight,
   Layers,
   GitBranch,
   Shield,
@@ -27,12 +26,11 @@ import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
 import { ServiceCatalogOverviewTab } from '../components/ServiceCatalogOverviewTab';
 import { ServiceCatalogServicesTab } from '../components/ServiceCatalogServicesTab';
+import { DependencyGraph } from '../components/DependencyGraph';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import type {
   AssetGraph,
-  ApiNode,
-  ServiceNode,
   ImpactPropagationResult,
   GraphSnapshotSummary,
   TemporalDiffResult,
@@ -45,12 +43,6 @@ const confidenceVariant = (score: number): 'default' | 'success' | 'warning' | '
   if (score >= 0.7) return 'info';
   if (score >= 0.4) return 'warning';
   return 'danger';
-};
-
-/** Cores dos nós do grafo por tipo. */
-const nodeColors = {
-  service: { bg: 'bg-info/15', text: 'text-info', border: 'border-info/25' },
-  api: { bg: 'bg-success/15', text: 'text-success', border: 'border-success/25' },
 };
 
 type Tab = 'overview' | 'services' | 'apis' | 'graph' | 'impact' | 'temporal';
@@ -337,8 +329,13 @@ export function ServiceCatalogPage() {
 
           {/* ── Aba: Grafo Visual ──────────────────────────────────── */}
           {tab === 'graph' && graph && (
-            <div className="relative">
-              <GraphVisualization graph={graph} onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }} />
+            <div className="relative space-y-3">
+              <DependencyGraph
+                graph={graph}
+                selectedNodeId={selectedDetailNode}
+                onSelectNode={(id) => { selectNodeForImpact(id); setSelectedDetailNode(id); }}
+                height={560}
+              />
               {selectedDetailNode && (
                 <ServiceDetailPanel
                   graph={graph}
@@ -425,153 +422,8 @@ export function ServiceCatalogPage() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// Componente: Visualização do grafo em layout visual
+// Componente: Painel de propagação de impacto (Blast Radius)
 // ═══════════════════════════════════════════════════════════════════════
-
-/** Componente de visualização do grafo como diagrama de dependências. */
-function GraphVisualization({ graph, onSelectNode }: { graph: AssetGraph; onSelectNode: (id: string) => void }) {
-  const { t } = useTranslation();
-
-  if (!graph.services.length && !graph.apis.length) {
-    return (
-      <Card>
-        <CardBody className="py-12 text-center">
-          <GitBranch size={40} className="mx-auto text-muted mb-4" />
-          <p className="text-muted">{t('serviceCatalog.emptyGraph')}</p>
-        </CardBody>
-      </Card>
-    );
-  }
-
-  /** Agrupa APIs pelo serviço proprietário para layout hierárquico. */
-  const serviceApiMap = new Map<string, { service: ServiceNode; apis: ApiNode[] }>();
-  for (const svc of graph.services) {
-    serviceApiMap.set(svc.serviceAssetId, { service: svc, apis: [] });
-  }
-  for (const api of graph.apis) {
-    const entry = serviceApiMap.get(api.ownerServiceAssetId);
-    if (entry) entry.apis.push(api);
-  }
-
-  /** Coleta todas as arestas de consumo cross-service para exibição na tabela. */
-  const crossServiceEdges: { fromApi: string; toConsumer: string; confidence: number }[] = [];
-  for (const api of graph.apis) {
-    for (const consumer of api.consumers ?? []) {
-      crossServiceEdges.push({
-        fromApi: api.apiAssetId,
-        toConsumer: consumer.consumerName,
-        confidence: consumer.confidenceScore,
-      });
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      {/* ── Legenda ───────────────────────────────────────────── */}
-      <Card>
-        <CardBody className="flex items-center gap-6 py-2">
-          <span className="text-xs font-medium text-muted">{t('serviceCatalog.legend')}:</span>
-          <span className="flex items-center gap-1.5 text-xs">
-            <span className={`w-3 h-3 rounded ${nodeColors.service.bg} ${nodeColors.service.border} border`} />
-            {t('serviceCatalog.legendService')}
-          </span>
-          <span className="flex items-center gap-1.5 text-xs">
-            <span className={`w-3 h-3 rounded ${nodeColors.api.bg} ${nodeColors.api.border} border`} />
-            {t('serviceCatalog.legendApi')}
-          </span>
-          <span className="flex items-center gap-1.5 text-xs">
-            <ArrowRight size={12} className="text-muted" />
-            {t('serviceCatalog.legendDependency')}
-          </span>
-        </CardBody>
-      </Card>
-
-      {/* ── Grafo por domínio (agrupado por serviço) ──────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {Array.from(serviceApiMap.values()).map(({ service, apis }) => (
-          <Card key={service.serviceAssetId} className="overflow-hidden">
-            <CardHeader className={`${nodeColors.service.bg} cursor-pointer`} role="button" tabIndex={0} onClick={() => onSelectNode(service.serviceAssetId)} onKeyDown={(e: React.KeyboardEvent) => { if (e.key === ' ') { e.preventDefault(); } if (e.key === 'Enter' || e.key === ' ') { onSelectNode(service.serviceAssetId); } }}>
-              <div className="flex items-center gap-2">
-                <Server size={16} className={nodeColors.service.text} />
-                <div>
-                  <p className={`font-semibold text-sm ${nodeColors.service.text}`}>{service.name}</p>
-                  <p className="text-xs text-muted">{service.teamName} · {service.domain}</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardBody className="p-3 space-y-2">
-              {apis.length === 0 ? (
-                <p className="text-xs text-muted italic">{t('serviceCatalog.noApisForService')}</p>
-              ) : (
-                apis.map((api) => (
-                  <div
-                    key={api.apiAssetId}
-                    className={`${nodeColors.api.bg} rounded-md p-2 border ${nodeColors.api.border} cursor-pointer hover:shadow-sm transition-shadow`}
-                    onClick={() => onSelectNode(api.apiAssetId)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs font-medium ${nodeColors.api.text}`}>{api.name}</span>
-                      <Badge variant="default">v{api.version}</Badge>
-                    </div>
-                    <p className="text-xs text-muted font-mono mt-0.5">{api.routePattern}</p>
-                    {(api.consumers?.length ?? 0) > 0 && (
-                      <div className="mt-1.5 flex flex-wrap gap-1">
-                        {api.consumers.map((c) => (
-                          <span
-                            key={c.relationshipId}
-                            className="inline-flex items-center gap-1 text-xs bg-info/15 text-info rounded px-1.5 py-0.5"
-                          >
-                            <ArrowRight size={10} />
-                            {c.consumerName}
-                            <span className="text-[10px] opacity-60">({Math.round(c.confidenceScore * 100)}%)</span>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </CardBody>
-          </Card>
-        ))}
-      </div>
-
-      {/* ── Resumo de relações cross-service ──────────────────── */}
-      {crossServiceEdges.length > 0 && (
-        <Card>
-          <CardHeader>
-            <h3 className="font-semibold text-heading text-sm">{t('serviceCatalog.crossServiceDependencies')}</h3>
-          </CardHeader>
-          <CardBody className="p-0">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="border-b border-edge bg-panel text-left">
-                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.sourceApi')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.consumerService')}</th>
-                  <th className="px-4 py-2 font-medium text-muted">{t('serviceCatalog.confidence')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-edge">
-                {crossServiceEdges.slice(0, 20).map((edge) => (
-                  <tr key={`${edge.fromApi}-${edge.toConsumer}`} className="hover:bg-hover transition-colors">
-                    <td className="px-4 py-2 font-mono text-xs text-body">{edge.fromApi.slice(0, 8)}…</td>
-                    <td className="px-4 py-2 text-body">{edge.toConsumer}</td>
-                    <td className="px-4 py-2">
-                      <Badge variant={confidenceVariant(edge.confidence)}>
-                        {Math.round(edge.confidence * 100)}%
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardBody>
-        </Card>
-      )}
-    </div>
-  );
-}
-
 // ═══════════════════════════════════════════════════════════════════════
 // Componente: Painel de propagação de impacto (Blast Radius)
 // ═══════════════════════════════════════════════════════════════════════

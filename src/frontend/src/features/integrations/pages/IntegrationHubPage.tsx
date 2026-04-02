@@ -18,9 +18,17 @@ import type { IntegrationConnectorDto } from '../../../types';
 
 const statusBadge = (s: string): 'success' | 'warning' | 'danger' | 'default' => {
   switch (s) {
-    case 'Active': return 'success';
-    case 'Degraded': return 'warning';
-    case 'Failed': return 'danger';
+    case 'Active':
+    case 'Healthy':
+      return 'success';
+    case 'Pending':
+    case 'Paused':
+    case 'Degraded':
+      return 'warning';
+    case 'Failed':
+    case 'Critical':
+    case 'Unhealthy':
+      return 'danger';
     default: return 'default';
   }
 };
@@ -45,6 +53,8 @@ export function IntegrationHubPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
+  const translateState = (value: string) => t(`integrations.${value.toLowerCase()}`, { defaultValue: value });
+
   const { data: response, isLoading, isError, refetch } = useQuery({
     queryKey: ['integrations', 'connectors', { search, connectorType: typeFilter === 'all' ? undefined : typeFilter, status: statusFilter === 'all' ? undefined : statusFilter }],
     queryFn: () => integrationsApi.listConnectors({
@@ -61,10 +71,19 @@ export function IntegrationHubPage() {
     staleTime: 30_000,
   });
 
+  const { data: filterOptions } = useQuery({
+    queryKey: ['integrations', 'filter-options'],
+    queryFn: () => integrationsApi.getFilterOptions(),
+    staleTime: 300_000,
+  });
+
   const connectors = response?.connectors ?? [];
   const totalCount = response?.totalCount ?? 0;
-
-  const types = Array.from(new Set(connectors.map((c: IntegrationConnectorDto) => c.connectorType)));
+  const typeOptions = filterOptions?.connectorTypes ?? [];
+  const statusOptions = Array.from(new Set([
+    ...(filterOptions?.connectorStatuses ?? []),
+    ...(filterOptions?.connectorHealthStatuses ?? []),
+  ]));
 
   const formatDate = (iso: string | null) => {
     if (!iso) return '—';
@@ -111,7 +130,7 @@ export function IntegrationHubPage() {
           className="px-3 py-2 text-xs rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
         >
           <option value="all">{t('integrations.filterType')}</option>
-          {types.map(tp => (
+          {typeOptions.map(tp => (
             <option key={tp} value={tp}>{tp}</option>
           ))}
         </select>
@@ -121,8 +140,8 @@ export function IntegrationHubPage() {
           className="px-3 py-2 text-xs rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
         >
           <option value="all">{t('integrations.filterStatus')}</option>
-          {(['Active', 'Degraded', 'Failed', 'Disabled']).map(s => (
-            <option key={s} value={s}>{t(`integrations.${s.toLowerCase()}`)}</option>
+          {statusOptions.map(s => (
+            <option key={s} value={s}>{translateState(s)}</option>
           ))}
         </select>
       </div>
@@ -162,8 +181,8 @@ export function IntegrationHubPage() {
                   </span>
                   <span className="text-xs text-muted">{c.connectorType}</span>
                   <span className="text-xs text-muted">{c.provider}</span>
-                  <span><Badge variant={statusBadge(c.status)}>{t(`integrations.${c.status.toLowerCase()}`)}</Badge></span>
-                  <span><Badge variant={healthBadge(c.healthScore)}>{healthLabel(c.healthScore)}</Badge></span>
+                  <span><Badge variant={statusBadge(c.status)}>{translateState(c.status)}</Badge></span>
+                  <span><Badge variant={healthBadge(c.healthScore)}>{translateState(healthLabel(c.healthScore))}</Badge></span>
                   <span className="text-xs text-muted">{formatDate(c.lastSyncAt)}</span>
                   <span className="text-xs font-mono text-heading text-right flex items-center justify-end gap-1">
                     {c.sourcesCount}

@@ -60,6 +60,9 @@ public sealed class NotificationMetricsModelsTests
         metrics.TotalEscalated.Should().Be(0);
         metrics.ReadRate.Should().Be(0);
         metrics.AcknowledgeRate.Should().Be(0);
+        metrics.AverageTimeToReadMinutes.Should().Be(0);
+        metrics.AverageTimeToAcknowledgeMinutes.Should().Be(0);
+        metrics.TotalUnacknowledgedActionRequired.Should().Be(0);
     }
 
     [Fact]
@@ -75,13 +78,19 @@ public sealed class NotificationMetricsModelsTests
             TotalDismissed = 3,
             TotalEscalated = 2,
             ReadRate = 0.80m,
-            AcknowledgeRate = 0.75m
+            AcknowledgeRate = 0.75m,
+            AverageTimeToReadMinutes = 6.5m,
+            AverageTimeToAcknowledgeMinutes = 11.25m,
+            TotalUnacknowledgedActionRequired = 4
         };
 
         metrics.TotalRead.Should().Be(80);
         metrics.TotalUnread.Should().Be(20);
         metrics.ReadRate.Should().Be(0.80m);
         metrics.AcknowledgeRate.Should().Be(0.75m);
+        metrics.AverageTimeToReadMinutes.Should().Be(6.5m);
+        metrics.AverageTimeToAcknowledgeMinutes.Should().Be(11.25m);
+        metrics.TotalUnacknowledgedActionRequired.Should().Be(4);
     }
 
     [Fact]
@@ -95,6 +104,7 @@ public sealed class NotificationMetricsModelsTests
         metrics.TotalCorrelatedWithIncidents.Should().Be(0);
         metrics.TopNoisyTypes.Should().NotBeNull().And.BeEmpty();
         metrics.LeastEngagedTypes.Should().NotBeNull().And.BeEmpty();
+        metrics.UnacknowledgedActionTypes.Should().NotBeNull().And.BeEmpty();
     }
 
     [Fact]
@@ -107,13 +117,15 @@ public sealed class NotificationMetricsModelsTests
             TotalGrouped = 30,
             TotalCorrelatedWithIncidents = 10,
             TopNoisyTypes = [new("IncidentCreated", 200), new("BudgetExceeded", 100)],
-            LeastEngagedTypes = [new("EvidenceExpiring", 50)]
+            LeastEngagedTypes = [new("EvidenceExpiring", 50)],
+            UnacknowledgedActionTypes = [new("ApprovalPending", 18)]
         };
 
         metrics.AveragePerUserPerDay.Should().Be(12.5m);
         metrics.TotalSuppressed.Should().Be(50);
         metrics.TopNoisyTypes.Should().HaveCount(2);
         metrics.LeastEngagedTypes.Should().HaveCount(1);
+        metrics.UnacknowledgedActionTypes.Should().HaveCount(1);
     }
 
     [Fact]

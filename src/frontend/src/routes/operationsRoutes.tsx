@@ -8,9 +8,11 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 
 const IncidentsPage = lazy(() => import('../features/operations/pages/IncidentsPage').then(m => ({ default: m.IncidentsPage })));
 const IncidentDetailPage = lazy(() => import('../features/operations/pages/IncidentDetailPage').then(m => ({ default: m.IncidentDetailPage })));
+const IncidentTimelinePage = lazy(() => import('../features/operations/pages/IncidentTimelinePage').then(m => ({ default: m.IncidentTimelinePage })));
 const RunbooksPage = lazy(() => import('../features/operations/pages/RunbooksPage').then(m => ({ default: m.RunbooksPage })));
 const TeamReliabilityPage = lazy(() => import('../features/operations/pages/TeamReliabilityPage').then(m => ({ default: m.TeamReliabilityPage })));
 const ServiceReliabilityDetailPage = lazy(() => import('../features/operations/pages/ServiceReliabilityDetailPage').then(m => ({ default: m.ServiceReliabilityDetailPage })));
+const ReliabilitySloManagementPage = lazy(() => import('../features/operations/pages/ReliabilitySloManagementPage').then(m => ({ default: m.ReliabilitySloManagementPage })));
 const AutomationWorkflowsPage = lazy(() => import('../features/operations/pages/AutomationWorkflowsPage').then(m => ({ default: m.AutomationWorkflowsPage })));
 const AutomationAdminPage = lazy(() => import('../features/operations/pages/AutomationAdminPage').then(m => ({ default: m.AutomationAdminPage })));
 const AutomationWorkflowDetailPage = lazy(() => import('../features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
@@ -25,6 +27,14 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
             <IncidentsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/incidents/timeline"
+        element={
+          <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+            <IncidentTimelinePage />
           </ProtectedRoute>
         }
       />
@@ -49,6 +59,14 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
             <TeamReliabilityPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/reliability/slos"
+        element={
+          <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+            <ReliabilitySloManagementPage />
           </ProtectedRoute>
         }
       />

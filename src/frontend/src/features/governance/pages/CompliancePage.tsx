@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Scale, Search, ShieldCheck, ShieldAlert, AlertCircle, CheckCircle,
@@ -12,6 +13,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import type { ComplianceSummaryResponse, ComplianceStatusType, CompliancePackRowDto } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 
 
@@ -34,30 +36,21 @@ export function CompliancePage() {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<ComplianceFilter>('all');
   const [search, setSearch] = useState('');
-  const [data, setData] = useState<ComplianceSummaryResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const complianceQuery = useQuery<ComplianceSummaryResponse>({
+    queryKey: queryKeys.governance.compliance(),
+    queryFn: () => organizationGovernanceApi.getComplianceSummary(),
+    staleTime: 30_000,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getComplianceSummary()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [t]);
-
-  if (loading) {
+  if (complianceQuery.isLoading) {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (error || !data) {
-    return <PageContainer><PageErrorState message={error ?? undefined} /></PageContainer>;
+  if (complianceQuery.isError || !complianceQuery.data) {
+    return <PageContainer><PageErrorState message={t('common.errorLoading')} /></PageContainer>;
   }
 
-  const d = data;
+  const d = complianceQuery.data;
 
   const filteredGaps = d.packs.filter((gap: CompliancePackRowDto) => {
     if (filter === 'NonCompliant' && gap.status !== 'NonCompliant') return false;

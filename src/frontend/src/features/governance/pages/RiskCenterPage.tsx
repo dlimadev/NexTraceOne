@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldAlert, Search, AlertTriangle, AlertCircle,
@@ -13,6 +14,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import type { RiskSummaryResponse, RiskLevel } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 
 
@@ -46,30 +48,21 @@ export function RiskCenterPage() {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<RiskFilter>('all');
   const [search, setSearch] = useState('');
-  const [data, setData] = useState<RiskSummaryResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const riskQuery = useQuery<RiskSummaryResponse>({
+    queryKey: queryKeys.governance.risk(),
+    queryFn: () => organizationGovernanceApi.getRiskSummary(),
+    staleTime: 30_000,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getRiskSummary()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [t]);
-
-  if (loading) {
+  if (riskQuery.isLoading) {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (error || !data) {
-    return <PageContainer><PageErrorState message={error ?? undefined} /></PageContainer>;
+  if (riskQuery.isError || !riskQuery.data) {
+    return <PageContainer><PageErrorState message={t('common.errorLoading')} /></PageContainer>;
   }
 
-  const d = data;
+  const d = riskQuery.data;
 
   const filtered = d.indicators.filter(ind => {
     if (filter !== 'all' && ind.riskLevel !== filter) return false;

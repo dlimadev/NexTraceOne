@@ -12,6 +12,8 @@ using GetPersonaUsageFeature = NexTraceOne.ProductAnalytics.Application.Features
 using GetJourneysFeature = NexTraceOne.ProductAnalytics.Application.Features.GetJourneys.GetJourneys;
 using GetValueMilestonesFeature = NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones.GetValueMilestones;
 using GetFrictionIndicatorsFeature = NexTraceOne.ProductAnalytics.Application.Features.GetFrictionIndicators.GetFrictionIndicators;
+using GetAdoptionFunnelFeature = NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel.GetAdoptionFunnel;
+using GetFeatureHeatmapFeature = NexTraceOne.ProductAnalytics.Application.Features.GetFeatureHeatmap.GetFeatureHeatmap;
 
 namespace NexTraceOne.ProductAnalytics.API.Endpoints;
 
@@ -141,6 +143,41 @@ public sealed class ProductAnalyticsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetFrictionIndicatorsFeature.Query(persona, module, range);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("analytics:read");
+
+        // ────────────────────────────────────────
+        // Funil de adoção por módulo
+        // ────────────────────────────────────────
+
+        group.MapGet("/adoption/funnel", async (
+            string? module,
+            string? persona,
+            string? teamId,
+            string? range,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetAdoptionFunnelFeature.Query(module, persona, teamId, range);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("analytics:read");
+
+        // ────────────────────────────────────────
+        // Mapa de calor de adoção de funcionalidades
+        // ────────────────────────────────────────
+
+        group.MapGet("/heatmap", async (
+            string? persona,
+            string? teamId,
+            string? range,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetFeatureHeatmapFeature.Query(persona, teamId, range);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("analytics:read");

@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Bot,
   Plus,
@@ -54,27 +55,59 @@ interface AgentsResponse {
   totalCount: number;
 }
 
+const FALLBACK_AGENT_CATEGORIES = [
+  'General',
+  'ApiDesign',
+  'TestGeneration',
+  'EventDesign',
+  'Documentation',
+  'Analysis',
+  'CodeReview',
+  'Security',
+  'Operations',
+];
+
+function humanizeEnumValue(value: string): string {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/_/g, ' ')
+    .trim();
+}
+
 // ── Create Agent Dialog ─────────────────────────────────────────────────
 
 interface CreateAgentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onCreated: () => void;
+  categories: string[];
+  defaultCategory: string;
 }
 
-function CreateAgentDialog({ isOpen, onClose, onCreated }: CreateAgentDialogProps) {
+function CreateAgentDialog({
+  isOpen,
+  onClose,
+  onCreated,
+  categories,
+  defaultCategory,
+}: CreateAgentDialogProps) {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('General');
+  const [category, setCategory] = useState(defaultCategory);
   const [systemPrompt, setSystemPrompt] = useState('');
   const [objective, setObjective] = useState('');
   const [visibility, setVisibility] = useState('Team');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const categories = ['General', 'ApiDesign', 'TestGeneration', 'EventDesign', 'Documentation', 'Analysis', 'CodeReview', 'Security', 'Operations'];
+  useEffect(() => {
+    if (!categories.length) return;
+    if (!categories.includes(category)) {
+      setCategory(defaultCategory);
+    }
+  }, [categories, category, defaultCategory]);
 
   const handleSubmit = async () => {
     if (!name.trim() || !displayName.trim() || !systemPrompt.trim()) return;
@@ -96,7 +129,7 @@ function CreateAgentDialog({ isOpen, onClose, onCreated }: CreateAgentDialogProp
       setName('');
       setDisplayName('');
       setDescription('');
-      setCategory('General');
+      setCategory(defaultCategory);
       setSystemPrompt('');
       setObjective('');
       setVisibility('Team');
@@ -163,7 +196,7 @@ function CreateAgentDialog({ isOpen, onClose, onCreated }: CreateAgentDialogProp
                 className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent"
               >
                 {categories.map(c => (
-                  <option key={c} value={c}>{t(`agents.category.${c}`)}</option>
+                  <option key={c} value={c}>{t(`agents.category.${c}`, humanizeEnumValue(c))}</option>
                 ))}
               </select>
             </div>
@@ -477,36 +510,41 @@ export function AiAgentsPage() {
   const navigate = useNavigate();
   const { toastSuccess } = useToast();
 
-  const [agents, setAgents] = useState<AgentListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'official' | 'custom'>('all');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [executeAgent, setExecuteAgent] = useState<AgentListItem | null>(null);
 
-  const loadAgents = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const isOfficial = filter === 'official' ? true : filter === 'custom' ? false : undefined;
-      const data: AgentsResponse = await aiGovernanceApi.listAgents({ isOfficial });
-      setAgents(data.items || []);
-    } catch {
-      setError(t('agents.loadError'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filter, t]);
+  const isOfficial = filter === 'official' ? true : filter === 'custom' ? false : undefined;
 
-  useEffect(() => {
-    void loadAgents();
-  }, [loadAgents]);
+  const agentsQuery = useQuery({
+    queryKey: ['ai-agents', isOfficial],
+    queryFn: () => aiGovernanceApi.listAgents({ isOfficial }) as Promise<AgentsResponse>,
+    staleTime: 20_000,
+  });
 
-  const handleAgentCreated = useCallback(() => {
-    void loadAgents();
+  const agentCategoriesQuery = useQuery({
+    queryKey: ['ai-agent-categories'],
+    queryFn: () => aiGovernanceApi.listAgentCategories(),
+    staleTime: 5 * 60_000,
+  });
+
+  const agents = agentsQuery.data?.items ?? [];
+
+  const availableCategories = useMemo(() => {
+    const fromEndpoint = agentCategoriesQuery.data?.items ?? [];
+    const fromAgents = agents.map((agent) => agent.category);
+    const merged = [...fromEndpoint, ...fromAgents, ...FALLBACK_AGENT_CATEGORIES]
+      .filter((value): value is string => Boolean(value && value.trim()));
+    return Array.from(new Set(merged));
+  }, [agentCategoriesQuery.data?.items, agents]);
+
+  const defaultCategory = availableCategories[0] ?? 'General';
+
+  const handleAgentCreated = async () => {
+    await agentsQuery.refetch();
     toastSuccess(t('agents.createSuccess'));
-  }, [loadAgents, toastSuccess, t]);
+  };
 
   const filteredAgents = agents.filter(a => {
     if (!searchTerm) return true;
@@ -570,23 +608,23 @@ export function AiAgentsPage() {
         </div>
 
         {/* Loading */}
-        {isLoading && (
+        {agentsQuery.isLoading && (
           <CardListSkeleton count={4} showStats={false} />
         )}
 
         {/* Error */}
-        {error && !isLoading && (
+        {agentsQuery.isError && !agentsQuery.isLoading && (
           <div className="text-center py-12">
             <AlertCircle size={32} className="text-warning mx-auto mb-3" />
-            <p className="text-sm text-muted">{error}</p>
-            <Button variant="ghost" size="sm" className="mt-3" onClick={loadAgents}>
+            <p className="text-sm text-muted">{t('agents.loadError')}</p>
+            <Button variant="ghost" size="sm" className="mt-3" onClick={() => agentsQuery.refetch()}>
               {t('common.retry')}
             </Button>
           </div>
         )}
 
         {/* Empty */}
-        {!isLoading && !error && filteredAgents.length === 0 && (
+        {!agentsQuery.isLoading && !agentsQuery.isError && filteredAgents.length === 0 && (
           <div className="text-center py-16">
             <Inbox size={40} className="text-muted mx-auto mb-3" />
             <p className="text-lg text-heading mb-1">{t('agents.emptyTitle')}</p>
@@ -595,7 +633,7 @@ export function AiAgentsPage() {
         )}
 
         {/* Official Agents */}
-        {!isLoading && !error && officialAgents.length > 0 && (
+        {!agentsQuery.isLoading && !agentsQuery.isError && officialAgents.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
               <Shield size={14} className="text-accent" />
@@ -616,7 +654,7 @@ export function AiAgentsPage() {
         )}
 
         {/* Custom Agents */}
-        {!isLoading && !error && customAgents.length > 0 && (
+        {!agentsQuery.isLoading && !agentsQuery.isError && customAgents.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold text-heading mb-3 flex items-center gap-2">
               <Sparkles size={14} className="text-info" />
@@ -648,6 +686,8 @@ export function AiAgentsPage() {
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onCreated={handleAgentCreated}
+        categories={availableCategories}
+        defaultCategory={defaultCategory}
       />
       <ExecuteAgentDialog
         isOpen={!!executeAgent}
@@ -696,7 +736,7 @@ function AgentCard({ agent, onView, onExecute, t }: AgentCardProps) {
           {visibilityIcon(agent.visibility)}
           <span className="ml-0.5">{t(`agents.visibility.${agent.visibility}`)}</span>
         </Badge>
-        <Badge variant="info">{t(`agents.category.${agent.category}`)}</Badge>
+        <Badge variant="info">{t(`agents.category.${agent.category}`, humanizeEnumValue(agent.category))}</Badge>
       </div>
 
       <div className="flex items-center justify-between text-[10px] text-muted mb-3">

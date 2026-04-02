@@ -31,13 +31,18 @@ export function ServiceTypeBadge({ type, size = 'sm', showIcon = true, className
   const { t } = useTranslation();
   const colors = SERVICE_TYPE_COLORS[type] ?? 'bg-elevated text-muted border border-edge';
   const sizeClass = size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs';
-  const Icon = ICONS[type];
+  const Icon = ICONS[type] ?? Server;
   const iconSize = size === 'sm' ? 10 : 12;
+  const translatedType = t(`contracts.serviceTypes.${type}`, type);
 
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full font-medium whitespace-nowrap ${colors} ${sizeClass} ${className}`}>
-      {showIcon && Icon && <Icon size={iconSize} />}
-      {t(`contracts.serviceTypes.${type}`, type)}
+    <span
+      className={`inline-flex items-center gap-1 rounded-full font-medium whitespace-nowrap ${colors} ${sizeClass} ${className}`}
+      title={translatedType}
+      aria-label={translatedType}
+    >
+      {showIcon && <Icon size={iconSize} />}
+      {translatedType}
     </span>
   );
 }

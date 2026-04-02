@@ -1,5 +1,7 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
@@ -8,6 +10,7 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
 /// Retorna perfil de uso por persona.
 /// Responde: quais personas usam quais capacidades? Qual a profundidade de uso?
 /// Quais são os pontos de fricção e milestones atingidos por persona?
+/// Consome dados reais do IAnalyticsEventRepository.
 /// </summary>
 public static class GetPersonaUsage
 {
@@ -17,112 +20,177 @@ public static class GetPersonaUsage
         string? TeamId,
         string? Range) : IQuery<Response>;
 
-    /// <summary>Handler que calcula e retorna o perfil de uso por persona.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que calcula e retorna o perfil de uso por persona a partir de dados reais.</summary>
+    public sealed class Handler(
+        IAnalyticsEventRepository repository,
+        IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        private static readonly HashSet<AnalyticsEventType> FrictionEventTypes =
+        [
+            AnalyticsEventType.ZeroResultSearch,
+            AnalyticsEventType.EmptyStateEncountered,
+            AnalyticsEventType.JourneyAbandoned
+        ];
+
+        private static readonly (ValueMilestoneType Milestone, AnalyticsEventType EventType)[] MilestoneMap =
+        [
+            (ValueMilestoneType.FirstSearchSuccess, AnalyticsEventType.SearchResultClicked),
+            (ValueMilestoneType.FirstServiceLookup, AnalyticsEventType.EntityViewed),
+            (ValueMilestoneType.FirstContractView, AnalyticsEventType.EntityViewed),
+            (ValueMilestoneType.FirstContractDraftCreated, AnalyticsEventType.ContractDraftCreated),
+            (ValueMilestoneType.FirstContractPublished, AnalyticsEventType.ContractPublished),
+            (ValueMilestoneType.FirstAiUsefulInteraction, AnalyticsEventType.AssistantResponseUsed),
+            (ValueMilestoneType.FirstIncidentInvestigation, AnalyticsEventType.IncidentInvestigated),
+            (ValueMilestoneType.FirstMitigationCompleted, AnalyticsEventType.MitigationWorkflowCompleted),
+            (ValueMilestoneType.FirstExecutiveOverviewConsumed, AnalyticsEventType.ExecutiveOverviewViewed),
+            (ValueMilestoneType.FirstRunbookConsulted, AnalyticsEventType.RunbookViewed),
+            (ValueMilestoneType.FirstSourceOfTruthUsed, AnalyticsEventType.SourceOfTruthQueried),
+            (ValueMilestoneType.FirstEvidenceExported, AnalyticsEventType.EvidencePackageExported),
+            (ValueMilestoneType.FirstReportGenerated, AnalyticsEventType.ReportGenerated),
+            (ValueMilestoneType.FirstReliabilityViewed, AnalyticsEventType.ReliabilityDashboardViewed),
+            (ValueMilestoneType.FirstAutomationCreated, AnalyticsEventType.OnboardingStepCompleted)
+        ];
+
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var profiles = new List<PersonaUsageProfileDto>
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+
+            var personas = await repository.GetPersonaBreakdownAsync(
+                request.TeamId, domainId: null, from, to, cancellationToken);
+
+            if (personas.Count == 0)
             {
-                new("Engineer", 98, 4_520,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.SourceOfTruth, 92, 1_240),
-                        new PersonaModuleDto(ProductModule.ContractStudio, 84, 980),
-                        new PersonaModuleDto(ProductModule.AiAssistant, 78, 720),
-                        new PersonaModuleDto(ProductModule.Search, 96, 1_580)
-                    },
-                    new[] { "search_executed", "entity_viewed", "contract_draft_created", "assistant_prompt_submitted" },
-                    85.2m,
-                    new[] { "zero_result_search", "empty_state_contracts" },
-                    new[] { ValueMilestoneType.FirstSearchSuccess, ValueMilestoneType.FirstContractDraftCreated, ValueMilestoneType.FirstAiUsefulInteraction }),
+                return Result<Response>.Success(new Response(
+                    Profiles: Array.Empty<PersonaUsageProfileDto>(),
+                    TotalPersonas: 0,
+                    MostActivePersona: string.Empty,
+                    DeepestAdoptionPersona: string.Empty,
+                    PeriodLabel: periodLabel));
+            }
 
-                new("TechLead", 72, 2_840,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.ChangeIntelligence, 88, 680),
-                        new PersonaModuleDto(ProductModule.Reliability, 82, 520),
-                        new PersonaModuleDto(ProductModule.Incidents, 76, 440),
-                        new PersonaModuleDto(ProductModule.SourceOfTruth, 70, 380)
-                    },
-                    new[] { "change_viewed", "reliability_dashboard_viewed", "incident_investigated", "source_of_truth_queried" },
-                    78.4m,
-                    new[] { "navigation_loop_reliability", "aborted_journey_mitigation" },
-                    new[] { ValueMilestoneType.FirstIncidentInvestigation, ValueMilestoneType.FirstMitigationCompleted }),
-
-                new("Architect", 45, 1_620,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.ContractStudio, 90, 520),
-                        new PersonaModuleDto(ProductModule.SourceOfTruth, 86, 480),
-                        new PersonaModuleDto(ProductModule.Governance, 62, 220),
-                        new PersonaModuleDto(ProductModule.ChangeIntelligence, 58, 180)
-                    },
-                    new[] { "contract_published", "source_of_truth_queried", "policy_viewed", "change_viewed" },
-                    72.1m,
-                    new[] { "empty_state_policies", "late_discovery_evidence" },
-                    new[] { ValueMilestoneType.FirstContractPublished, ValueMilestoneType.FirstSourceOfTruthUsed }),
-
-                new("Product", 18, 980,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.ExecutiveViews, 92, 340),
-                        new PersonaModuleDto(ProductModule.Governance, 78, 280),
-                        new PersonaModuleDto(ProductModule.FinOps, 65, 180),
-                        new PersonaModuleDto(ProductModule.Search, 88, 180)
-                    },
-                    new[] { "executive_overview_viewed", "report_generated", "search_executed" },
-                    68.5m,
-                    new[] { "empty_state_reports" },
-                    new[] { ValueMilestoneType.FirstExecutiveOverviewConsumed, ValueMilestoneType.FirstReportGenerated }),
-
-                new("Executive", 12, 420,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.ExecutiveViews, 96, 280),
-                        new PersonaModuleDto(ProductModule.FinOps, 42, 80),
-                        new PersonaModuleDto(ProductModule.Governance, 38, 60)
-                    },
-                    new[] { "executive_overview_viewed", "report_generated" },
-                    82.3m,
-                    new[] { "navigation_loop_reports" },
-                    new[] { ValueMilestoneType.FirstExecutiveOverviewConsumed }),
-
-                new("PlatformAdmin", 8, 580,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.Admin, 94, 280),
-                        new PersonaModuleDto(ProductModule.IntegrationHub, 86, 180),
-                        new PersonaModuleDto(ProductModule.Governance, 72, 120)
-                    },
-                    new[] { "policy_viewed", "connector_configured", "user_managed" },
-                    71.8m,
-                    new[] { "quota_exceeded", "blocked_by_policy" },
-                    new[] { ValueMilestoneType.FirstSourceOfTruthUsed }),
-
-                new("Auditor", 6, 320,
-                    new[] {
-                        new PersonaModuleDto(ProductModule.Governance, 92, 180),
-                        new PersonaModuleDto(ProductModule.ExecutiveViews, 68, 80),
-                        new PersonaModuleDto(ProductModule.SourceOfTruth, 54, 60)
-                    },
-                    new[] { "evidence_package_exported", "policy_viewed", "compliance_check_viewed" },
-                    75.4m,
-                    new[] { "empty_state_evidence" },
-                    new[] { ValueMilestoneType.FirstEvidenceExported })
-            };
-
-            // Filtrar por persona se especificado
             if (!string.IsNullOrWhiteSpace(request.Persona))
             {
-                profiles = profiles
+                personas = personas
                     .Where(p => p.Persona.Equals(request.Persona, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
-            var response = new Response(
-                Profiles: profiles,
-                TotalPersonas: 7,
-                MostActivePersona: "Engineer",
-                DeepestAdoptionPersona: "Engineer",
-                PeriodLabel: request.Range ?? "last_30d");
+            var maxActionsPerUser = personas
+                .Where(p => p.UniqueUsers > 0)
+                .Select(p => p.EventCount / (decimal)p.UniqueUsers)
+                .DefaultIfEmpty(1m)
+                .Max();
 
-            return Task.FromResult(Result<Response>.Success(response));
+            if (maxActionsPerUser <= 0) maxActionsPerUser = 1m;
+
+            var profiles = new List<PersonaUsageProfileDto>();
+
+            foreach (var persona in personas)
+            {
+                var topModules = await repository.GetTopModulesAsync(
+                    persona: persona.Persona, teamId: request.TeamId, domainId: null,
+                    from, to, top: 4, cancellationToken);
+
+                var topEventTypes = await repository.GetTopEventTypesAsync(
+                    persona: persona.Persona, from, to, top: 6, cancellationToken);
+
+                var distinctEventTypes = await repository.GetDistinctEventTypesAsync(
+                    persona: persona.Persona, from, to, cancellationToken);
+
+                var actionsPerUser = persona.UniqueUsers > 0
+                    ? persona.EventCount / (decimal)persona.UniqueUsers
+                    : 0m;
+
+                var adoptionDepth = Math.Round(Math.Min(100m, (actionsPerUser / maxActionsPerUser) * 100m), 1);
+
+                var frictionPoints = topEventTypes
+                    .Where(e => FrictionEventTypes.Contains(e.EventType))
+                    .Select(e => MapFrictionLabel(e.EventType))
+                    .ToArray();
+
+                var distinctSet = distinctEventTypes.ToHashSet();
+                var milestonesReached = MilestoneMap
+                    .Where(m => distinctSet.Contains(m.EventType))
+                    .Select(m => m.Milestone)
+                    .Distinct()
+                    .ToArray();
+
+                var moduleDtos = topModules
+                    .Select(m => new PersonaModuleDto(
+                        m.Module,
+                        persona.UniqueUsers > 0
+                            ? (int)Math.Round((m.UniqueUsers / (decimal)persona.UniqueUsers) * 100m)
+                            : 0,
+                        m.EventCount))
+                    .ToArray();
+
+                var topActions = topEventTypes
+                    .Where(e => !FrictionEventTypes.Contains(e.EventType))
+                    .Take(4)
+                    .Select(e => MapEventTypeLabel(e.EventType))
+                    .ToArray();
+
+                profiles.Add(new PersonaUsageProfileDto(
+                    Persona: persona.Persona,
+                    ActiveUsers: persona.UniqueUsers,
+                    TotalActions: persona.EventCount,
+                    TopModules: moduleDtos,
+                    TopActions: topActions,
+                    AdoptionDepth: adoptionDepth,
+                    CommonFrictionPoints: frictionPoints,
+                    MilestonesReached: milestonesReached));
+            }
+
+            var mostActive = profiles.OrderByDescending(p => p.TotalActions).FirstOrDefault()?.Persona ?? string.Empty;
+            var deepest = profiles.OrderByDescending(p => p.AdoptionDepth).FirstOrDefault()?.Persona ?? string.Empty;
+
+            return Result<Response>.Success(new Response(
+                Profiles: profiles,
+                TotalPersonas: profiles.Count,
+                MostActivePersona: mostActive,
+                DeepestAdoptionPersona: deepest,
+                PeriodLabel: periodLabel));
         }
+
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        {
+            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
+            var days = label switch
+            {
+                "last_7d" => 7,
+                "last_1d" => 1,
+                "last_90d" => 90,
+                _ => 30
+            };
+            return (utcNow.AddDays(-days), utcNow, label);
+        }
+
+        private static string MapFrictionLabel(AnalyticsEventType eventType) => eventType switch
+        {
+            AnalyticsEventType.ZeroResultSearch => "zero_result_search",
+            AnalyticsEventType.EmptyStateEncountered => "empty_state_encountered",
+            AnalyticsEventType.JourneyAbandoned => "journey_abandoned",
+            _ => eventType.ToString()
+        };
+
+        private static string MapEventTypeLabel(AnalyticsEventType eventType) => eventType switch
+        {
+            AnalyticsEventType.SearchExecuted => "search_executed",
+            AnalyticsEventType.SearchResultClicked => "search_result_clicked",
+            AnalyticsEventType.EntityViewed => "entity_viewed",
+            AnalyticsEventType.ContractDraftCreated => "contract_draft_created",
+            AnalyticsEventType.ContractPublished => "contract_published",
+            AnalyticsEventType.AssistantPromptSubmitted => "assistant_prompt_submitted",
+            AnalyticsEventType.AssistantResponseUsed => "assistant_response_used",
+            AnalyticsEventType.ChangeViewed => "change_viewed",
+            AnalyticsEventType.IncidentInvestigated => "incident_investigated",
+            AnalyticsEventType.MitigationWorkflowStarted => "mitigation_started",
+            AnalyticsEventType.MitigationWorkflowCompleted => "mitigation_completed",
+            AnalyticsEventType.ExecutiveOverviewViewed => "executive_overview_viewed",
+            AnalyticsEventType.ReportGenerated => "report_generated",
+            AnalyticsEventType.SourceOfTruthQueried => "source_of_truth_queried",
+            _ => eventType.ToString()
+        };
     }
 
     /// <summary>Resposta com perfis de uso por persona.</summary>

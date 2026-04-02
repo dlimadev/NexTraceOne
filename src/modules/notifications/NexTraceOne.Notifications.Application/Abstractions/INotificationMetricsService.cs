@@ -101,6 +101,15 @@ public sealed record NotificationInteractionMetrics
 
     /// <summary>Taxa de acknowledge (acknowledged / total que requer ação).</summary>
     public decimal AcknowledgeRate { get; init; }
+
+    /// <summary>Tempo médio até leitura, em minutos.</summary>
+    public decimal AverageTimeToReadMinutes { get; init; }
+
+    /// <summary>Tempo médio até acknowledge, em minutos.</summary>
+    public decimal AverageTimeToAcknowledgeMinutes { get; init; }
+
+    /// <summary>Total de notificações que requerem ação e ainda não foram acknowledged.</summary>
+    public int TotalUnacknowledgedActionRequired { get; init; }
 }
 
 /// <summary>
@@ -125,6 +134,9 @@ public sealed record NotificationQualityMetrics
 
     /// <summary>Tipos de notificação com menor taxa de leitura (top 5).</summary>
     public IReadOnlyList<NotificationTypeCount> LeastEngagedTypes { get; init; } = [];
+
+    /// <summary>Tipos de notificação que requerem ação e permanecem sem acknowledge (top 5).</summary>
+    public IReadOnlyList<NotificationTypeCount> UnacknowledgedActionTypes { get; init; } = [];
 }
 
 /// <summary>

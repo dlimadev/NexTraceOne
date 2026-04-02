@@ -40,6 +40,33 @@ export interface IncidentListFilters {
   pageSize?: number;
 }
 
+export interface UnifiedTimelineEntry {
+  id: string;
+  source: string;
+  eventType: string;
+  title: string | null;
+  severity: string | null;
+  serviceName: string | null;
+  systemName: string | null;
+  timestamp: string;
+  details: Record<string, string> | null;
+}
+
+export interface UnifiedTimelineResponse {
+  entries: UnifiedTimelineEntry[];
+  totalCount: number;
+}
+
+export interface UnifiedTimelineFilters {
+  serviceName?: string;
+  systemName?: string;
+  environment?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 // ── Incident Detail ──────────────────────────────────────────────────
 
 export interface IncidentIdentity {
@@ -469,6 +496,9 @@ export const incidentsApi = {
 
   getIncidentSummary: () =>
     client.get<IncidentSummaryResponse>('/incidents/summary').then(r => r.data),
+
+  getUnifiedTimeline: (filters?: UnifiedTimelineFilters) =>
+    client.get<UnifiedTimelineResponse>('/incidents/timeline', { params: filters }).then(r => r.data),
 
   getIncidentCorrelation: (incidentId: string) =>
     client.get<IncidentCorrelationResponse>(`/incidents/${incidentId}/correlation`).then(r => r.data),

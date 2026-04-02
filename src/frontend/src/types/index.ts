@@ -2184,6 +2184,12 @@ export interface IntegrationConnectorsListResponse {
   pageSize: number;
 }
 
+export interface IntegrationFilterOptionsResponse {
+  connectorTypes: string[];
+  connectorStatuses: string[];
+  connectorHealthStatuses: string[];
+}
+
 export interface IntegrationConnectorDetailDto {
   connectorId: string;
   name: string;
@@ -2607,6 +2613,54 @@ export interface FrictionIndicatorsResponse {
   generatedAt: string;
 }
 
+// ── Product Analytics: Adoption Funnel ──────────────────────────
+
+export interface AdoptionFunnelStepDto {
+  stepId: string;
+  stepName: string;
+  sessionCount: number;
+  completionPercent: number;
+}
+
+export interface ModuleFunnelDto {
+  module: string;
+  moduleName: string;
+  steps: AdoptionFunnelStepDto[];
+  completionRate: number;
+  totalSessions: number;
+  biggestDropOff: string;
+}
+
+export interface AdoptionFunnelResponse {
+  funnels: ModuleFunnelDto[];
+  periodLabel: string;
+}
+
+// ── Product Analytics: Feature Heatmap ──────────────────────────
+
+export interface FeatureUsageDto {
+  feature: string;
+  count: number;
+}
+
+export interface HeatmapCellDto {
+  module: string;
+  moduleName: string;
+  adoptionPercent: number;
+  totalActions: number;
+  uniqueUsers: number;
+  intensity: number;
+  topFeatures: FeatureUsageDto[];
+}
+
+export interface FeatureHeatmapResponse {
+  cells: HeatmapCellDto[];
+  modules: string[];
+  maxIntensity: number;
+  totalUniqueUsers: number;
+  periodLabel: string;
+}
+
 // ── Knowledge Hub ───────────────────────────────────────────────
 
 export type DocumentCategory =
@@ -2694,6 +2748,31 @@ export interface KnowledgeRelationDto {
   targetEntityType: KnowledgeRelationType;
   relationType: string;
   createdAt: string;
+}
+
+export interface KnowledgeDocumentRelationItem {
+  relationId: string;
+  documentId: string;
+  title: string;
+  slug: string;
+  status: string;
+  category: string;
+  relationDescription: string | null;
+  relationContext: string | null;
+  relationCreatedAt: string;
+}
+
+export interface OperationalNoteRelationItem {
+  relationId: string;
+  noteId: string;
+  title: string;
+  severity: string;
+  noteType: string;
+  origin: string;
+  isResolved: boolean;
+  relationDescription: string | null;
+  relationContext: string | null;
+  relationCreatedAt: string;
 }
 
 export interface KnowledgeSearchItem {

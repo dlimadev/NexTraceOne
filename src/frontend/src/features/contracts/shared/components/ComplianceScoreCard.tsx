@@ -14,7 +14,9 @@ interface ComplianceScoreCardProps {
  */
 export function ComplianceScoreCard({ score, maxScore = 100, label, className = '' }: ComplianceScoreCardProps) {
   const { t } = useTranslation();
-  const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+  const normalizedMax = maxScore > 0 ? maxScore : 100;
+  const normalizedScore = Math.min(Math.max(score, 0), normalizedMax);
+  const pct = Math.round((normalizedScore / normalizedMax) * 100);
 
   const variant = pct >= 80
     ? { color: 'text-success', bg: 'bg-success/15', border: 'border-success/25', Icon: CheckCircle }
@@ -25,7 +27,11 @@ export function ComplianceScoreCard({ score, maxScore = 100, label, className = 
         : { color: 'text-faded', bg: 'bg-elevated', border: 'border-edge', Icon: Minus };
 
   return (
-    <div className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${variant.bg} ${variant.border} ${className}`}>
+    <div
+      className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${variant.bg} ${variant.border} ${className}`}
+      role="status"
+      aria-label={`${label ?? t('contracts.compliance.score', 'Compliance')}: ${pct}%`}
+    >
       <variant.Icon size={16} className={variant.color} />
       <div className="flex flex-col">
         <span className={`text-sm font-semibold ${variant.color}`}>{pct}%</span>

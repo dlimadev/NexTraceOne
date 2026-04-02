@@ -21,6 +21,7 @@ const AuditPage = lazy(() => import('../features/audit-compliance/pages/AuditPag
 
 // Notifications
 const NotificationCenterPage = lazy(() => import('../features/notifications/pages/NotificationCenterPage').then(m => ({ default: m.NotificationCenterPage })));
+const NotificationAnalyticsPage = lazy(() => import('../features/notifications/pages/NotificationAnalyticsPage').then(m => ({ default: m.NotificationAnalyticsPage })));
 const NotificationPreferencesPage = lazy(() => import('../features/notifications/pages/NotificationPreferencesPage').then(m => ({ default: m.NotificationPreferencesPage })));
 const NotificationConfigurationPage = lazy(() => import('../features/notifications/pages/NotificationConfigurationPage').then(m => ({ default: m.NotificationConfigurationPage })));
 
@@ -43,6 +44,9 @@ const ModuleAdoptionPage = lazy(() => import('../features/product-analytics/page
 const PersonaUsagePage = lazy(() => import('../features/product-analytics/pages/PersonaUsagePage').then(m => ({ default: m.PersonaUsagePage })));
 const JourneyFunnelPage = lazy(() => import('../features/product-analytics/pages/JourneyFunnelPage').then(m => ({ default: m.JourneyFunnelPage })));
 const ValueTrackingPage = lazy(() => import('../features/product-analytics/pages/ValueTrackingPage').then(m => ({ default: m.ValueTrackingPage })));
+const AdoptionFunnelPage = lazy(() => import('../features/product-analytics/pages/AdoptionFunnelPage').then(m => ({ default: m.AdoptionFunnelPage })));
+const FeatureHeatmapPage = lazy(() => import('../features/product-analytics/pages/FeatureHeatmapPage').then(m => ({ default: m.FeatureHeatmapPage })));
+const TimeToValuePage = lazy(() => import('../features/product-analytics/pages/TimeToValuePage').then(m => ({ default: m.TimeToValuePage })));
 
 export function AdminRoutes() {
   return (
@@ -130,6 +134,14 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="notifications:inbox:read" redirectTo="/unauthorized">
             <NotificationPreferencesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications/analytics"
+        element={
+          <ProtectedRoute permission="notifications:configuration:read" redirectTo="/unauthorized">
+            <NotificationAnalyticsPage />
           </ProtectedRoute>
         }
       />
@@ -256,6 +268,30 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
             <ValueTrackingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics/funnel"
+        element={
+          <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
+            <AdoptionFunnelPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics/heatmap"
+        element={
+          <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
+            <FeatureHeatmapPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics/time-to-value"
+        element={
+          <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
+            <TimeToValuePage />
           </ProtectedRoute>
         }
       />

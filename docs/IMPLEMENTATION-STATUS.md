@@ -150,6 +150,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 ## §Governance — Governance, FinOps, Reports, Compliance
 
 > **Nota de design:** Este módulo agrega dados de outros módulos via cross-module interfaces. GetExecutiveOverview usa IIncidentModule para métricas reais de incidentes. ListTeams usa ICatalogGraphModule para contagens de contratos. FinOps usa ICostIntelligenceModule. Todos os 44+ handlers retornam dados reais (`IsSimulated: false`).
+>
+> **Ownership explícito de FinOps:** a **experiência de produto FinOps** (dashboards, KPIs, drill-down e leitura por persona) pertence ao módulo Governance. O módulo OperationalIntelligence atua como **provider de dados de custo** via `ICostIntelligenceModule`, sem ownership da UX/fluxo de governança FinOps.
 
 | Feature Area | Status | Notas |
 |---|---|---|

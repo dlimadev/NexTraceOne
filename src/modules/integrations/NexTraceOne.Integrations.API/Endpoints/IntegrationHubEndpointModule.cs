@@ -6,6 +6,7 @@ using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using ListIntegrationConnectorsFeature = NexTraceOne.Integrations.Application.Features.ListIntegrationConnectors.ListIntegrationConnectors;
+using GetIntegrationFilterOptionsFeature = NexTraceOne.Integrations.Application.Features.GetIntegrationFilterOptions.GetIntegrationFilterOptions;
 using GetIntegrationConnectorFeature = NexTraceOne.Integrations.Application.Features.GetIntegrationConnector.GetIntegrationConnector;
 using ListIngestionSourcesFeature = NexTraceOne.Integrations.Application.Features.ListIngestionSources.ListIngestionSources;
 using ListIngestionExecutionsFeature = NexTraceOne.Integrations.Application.Features.ListIngestionExecutions.ListIngestionExecutions;
@@ -47,6 +48,15 @@ public sealed class IntegrationHubEndpointModule
                 connectorType, status, environment, search,
                 page ?? 1, pageSize ?? 20);
             var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("integrations:read");
+
+        integrations.MapGet("/filter-options", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetIntegrationFilterOptionsFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("integrations:read");
 

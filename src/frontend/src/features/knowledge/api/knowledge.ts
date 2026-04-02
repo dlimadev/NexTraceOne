@@ -5,6 +5,8 @@ import type {
   OperationalNotesListResponse,
   KnowledgeSearchResponse,
   KnowledgeRelationDto,
+  KnowledgeDocumentRelationItem,
+  OperationalNoteRelationItem,
   CreateKnowledgeDocumentRequest,
   CreateOperationalNoteRequest,
   CreateKnowledgeRelationRequest,
@@ -49,12 +51,12 @@ export const knowledgeApi = {
     client.post<{ relationId: string }>('/knowledge/relations', data),
 
   getRelationsByTarget: (targetType: KnowledgeRelationType, targetEntityId: string) =>
-    client.get<{ relations: KnowledgeRelationDto[] }>(
+    client.get<{ documents: KnowledgeDocumentRelationItem[]; notes: OperationalNoteRelationItem[] }>(
       `/knowledge/relations/by-target/${targetType}/${targetEntityId}`
     ),
 
   getRelationsBySource: (sourceEntityId: string) =>
-    client.get<{ relations: KnowledgeRelationDto[] }>(
+    client.get<{ items: KnowledgeRelationDto[] }>(
       `/knowledge/relations/by-source/${sourceEntityId}`
     ),
 };

@@ -10,6 +10,9 @@ import {
   Target,
   Award,
   AlertTriangle,
+  Filter,
+  Flame,
+  Clock,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
@@ -186,6 +189,18 @@ export function ProductAnalyticsOverviewPage() {
         <Link to="/analytics/value" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
           <Award size={24} className="mx-auto mb-2 text-warning" />
           <span className="text-sm text-body">{t('analytics.viewValueTracking')}</span>
+        </Link>
+        <Link to="/analytics/funnel" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+          <Filter size={24} className="mx-auto mb-2 text-accent" />
+          <span className="text-sm text-body">{t('analytics.funnel.title')}</span>
+        </Link>
+        <Link to="/analytics/heatmap" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+          <Flame size={24} className="mx-auto mb-2 text-critical" />
+          <span className="text-sm text-body">{t('analytics.heatmap.title')}</span>
+        </Link>
+        <Link to="/analytics/time-to-value" className="p-4 rounded-xl bg-panel border border-edge hover:border-accent/40 transition text-center">
+          <Clock size={24} className="mx-auto mb-2 text-success" />
+          <span className="text-sm text-body">{t('analytics.timeToValue.title')}</span>
         </Link>
       </StatsGrid>
 

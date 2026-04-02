@@ -66,6 +66,15 @@ export function TeamReliabilityPage() {
         subtitle={t('reliability.subtitle')}
       />
 
+      <div className="mb-4 flex justify-end">
+        <NavLink
+          to="/operations/reliability/slos"
+          className="px-3 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body"
+        >
+          {t('reliability.slo.openManagement')}
+        </NavLink>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('reliability.totalServices')} value={stats.total} icon={<Activity size={20} />} />

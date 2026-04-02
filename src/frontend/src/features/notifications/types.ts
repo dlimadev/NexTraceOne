@@ -43,6 +43,61 @@ export interface NotificationPreferencesResponse {
   preferences: NotificationPreferenceDto[];
 }
 
+export interface NotificationAnalyticsWindowDto {
+  days: number;
+  from: string;
+  until: string;
+}
+
+export interface NotificationTypeCountDto {
+  eventType: string;
+  count: number;
+}
+
+export interface NotificationPlatformMetricsDto {
+  totalGenerated: number;
+  byCategory: Record<string, number>;
+  bySeverity: Record<string, number>;
+  bySourceModule: Record<string, number>;
+  deliveriesByChannel: Record<string, number>;
+  totalDelivered: number;
+  totalFailed: number;
+  totalPending: number;
+  totalSkipped: number;
+}
+
+export interface NotificationInteractionMetricsDto {
+  totalRead: number;
+  totalUnread: number;
+  totalAcknowledged: number;
+  totalSnoozed: number;
+  totalArchived: number;
+  totalDismissed: number;
+  totalEscalated: number;
+  readRate: number;
+  acknowledgeRate: number;
+  averageTimeToReadMinutes: number;
+  averageTimeToAcknowledgeMinutes: number;
+  totalUnacknowledgedActionRequired: number;
+}
+
+export interface NotificationQualityMetricsDto {
+  averagePerUserPerDay: number;
+  totalSuppressed: number;
+  totalGrouped: number;
+  totalCorrelatedWithIncidents: number;
+  topNoisyTypes: NotificationTypeCountDto[];
+  leastEngagedTypes: NotificationTypeCountDto[];
+  unacknowledgedActionTypes: NotificationTypeCountDto[];
+}
+
+export interface NotificationAnalyticsResponse {
+  window: NotificationAnalyticsWindowDto;
+  platform: NotificationPlatformMetricsDto;
+  interaction: NotificationInteractionMetricsDto;
+  quality: NotificationQualityMetricsDto;
+}
+
 export interface UpdatePreferenceRequest {
   category: string;
   channel: string;

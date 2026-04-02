@@ -130,6 +130,96 @@ internal sealed class AnalyticsEventRepository(ProductAnalyticsDbContext context
             .Select(e => new SessionEventRow(e.SessionId!, e.EventType, e.OccurredAt))
             .ToListAsync(ct);
 
+    public async Task<IReadOnlyList<PersonaBreakdownRow>> GetPersonaBreakdownAsync(
+        string? teamId,
+        string? domainId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona: null, module: null, teamId, domainId)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to && e.Persona != null)
+            .GroupBy(e => e.Persona!)
+            .Select(g => new PersonaBreakdownRow(
+                g.Key,
+                EventCount: g.LongCount(),
+                UniqueUsers: g.Where(x => x.UserId != null).Select(x => x.UserId!).Distinct().Count()))
+            .OrderByDescending(x => x.EventCount)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<EventTypeCountRow>> GetTopEventTypesAsync(
+        string? persona,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int top,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId: null, domainId: null)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to)
+            .GroupBy(e => e.EventType)
+            .Select(g => new EventTypeCountRow(g.Key, g.LongCount()))
+            .OrderByDescending(x => x.Count)
+            .Take(top)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<AnalyticsEventType>> GetDistinctEventTypesAsync(
+        string? persona,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId: null, domainId: null)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to)
+            .Select(e => e.EventType)
+            .Distinct()
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<EventTypeUserCountRow>> CountUsersByEventTypeAsync(
+        AnalyticsEventType[] eventTypes,
+        string? persona,
+        string? teamId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId, domainId: null)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to && e.UserId != null && eventTypes.Contains(e.EventType))
+            .GroupBy(e => e.EventType)
+            .Select(g => new EventTypeUserCountRow(g.Key, g.Select(x => x.UserId!).Distinct().Count()))
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<SessionEventTypeRow>> GetSessionEventTypesAsync(
+        AnalyticsEventType[] eventTypes,
+        string? persona,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId: null, domainId: null)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to && e.SessionId != null && eventTypes.Contains(e.EventType))
+            .GroupBy(e => new { SessionId = e.SessionId!, e.EventType })
+            .Select(g => new SessionEventTypeRow(g.Key.SessionId, g.Key.EventType, g.Min(x => x.OccurredAt)))
+            .ToListAsync(ct);
+
+    public async Task<int> CountDistinctSessionsAsync(
+        string? persona,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId: null, domainId: null)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to && e.SessionId != null)
+            .Select(e => e.SessionId!)
+            .Distinct()
+            .CountAsync(ct);
+
+    public async Task<IReadOnlyList<UserFirstEventRow>> GetUserFirstEventTimesAsync(
+        AnalyticsEventType[] eventTypes,
+        string? persona,
+        string? teamId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken ct)
+        => await ApplyFilters(context.AnalyticsEvents.AsNoTracking(), persona, module: null, teamId, domainId: null)
+            .Where(e => e.OccurredAt >= from && e.OccurredAt <= to && e.UserId != null && eventTypes.Contains(e.EventType))
+            .GroupBy(e => new { UserId = e.UserId!, e.EventType })
+            .Select(g => new UserFirstEventRow(g.Key.UserId, g.Key.EventType, g.Min(x => x.OccurredAt)))
+            .ToListAsync(ct);
+
     private static IQueryable<AnalyticsEvent> ApplyFilters(
         IQueryable<AnalyticsEvent> query,
         string? persona,

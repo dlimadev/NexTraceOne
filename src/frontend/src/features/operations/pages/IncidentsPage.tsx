@@ -157,6 +157,15 @@ export function IncidentsPage() {
         subtitle={t('incidents.subtitle')}
       />
 
+      <div className="mb-4 flex justify-end">
+        <NavLink
+          to="/operations/incidents/timeline"
+          className="px-3 py-1.5 text-xs rounded-md border border-edge text-muted hover:text-body"
+        >
+          {t('incidents.timelineView.open')}
+        </NavLink>
+      </div>
+
       {/* Onboarding hints — orientação contextual para novos utilizadores */}
       <OnboardingHints module="operations" />
 

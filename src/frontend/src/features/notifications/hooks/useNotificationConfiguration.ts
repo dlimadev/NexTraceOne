@@ -14,6 +14,11 @@ export const notificationConfigKeys = {
   smtp: ['notifications', 'configuration', 'smtp'] as const,
 };
 
+export const notificationAnalyticsKeys = {
+  summary: (days: number) =>
+    ['notifications', 'configuration', 'analytics', days] as const,
+};
+
 export const notificationDeliveryKeys = {
   history: (notificationId: string) =>
     ['notifications', 'delivery', 'history', notificationId] as const,
@@ -75,6 +80,14 @@ export function useSmtpConfiguration() {
   return useQuery({
     queryKey: notificationConfigKeys.smtp,
     queryFn: () => notificationsApi.getSmtpConfiguration(),
+  });
+}
+
+export function useNotificationAnalytics(days = 30) {
+  return useQuery({
+    queryKey: notificationAnalyticsKeys.summary(days),
+    queryFn: () => notificationsApi.getAnalytics(days),
+    staleTime: 15_000,
   });
 }
 

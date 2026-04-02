@@ -25,6 +25,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { useAuth } from '../../../contexts/AuthContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
+import { KnowledgeContextPanel } from '../../knowledge/components/KnowledgeContextPanel';
 import type { AdvisoryFactorDto, ChangeAdvisoryResponse, DecisionHistoryItemDto } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
@@ -759,6 +760,9 @@ export function ChangeDetailPage() {
           </div>
         </CardBody>
       </Card>
+
+      {/* ── Quick Links ── */}
+      <KnowledgeContextPanel targetType="Change" targetEntityId={changeId} />
 
       {/* ── Quick Links ── */}
       <Card>

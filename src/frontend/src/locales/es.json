@@ -39,6 +39,7 @@
     "expand": "Expandir",
     "vs": "vs",
     "errorLoading": "Error al cargar datos",
+    "allStatuses": "Todos los estados",
     "timeAgo": {
       "lessThanHour": "< 1h atrás",
       "hours": "{{count}}h atrás",
@@ -142,8 +143,10 @@
     "serviceCatalog": "Catálogo de Servicios",
     "apiContracts": "Contratos de API",
     "incidents": "Incidentes",
+    "incidentTimeline": "Línea de Tiempo de Incidentes",
     "runbooks": "Runbooks",
     "reliability": "Fiabilidad de Servicios",
+    "sloManagement": "Gestión de SLO",
     "automation": "Automatización",
     "aiAssistant": "Asistente IA",
     "modelRegistry": "Registro de Modelos",
@@ -686,11 +689,13 @@
       "validateFailed": "La validación falló. Por favor, inténtelo de nuevo."
     },
     "export": "Exportar",
+    "exportSuccess": "Contrato exportado con éxito.",
     "filterPlaceholder": "Ingrese UUID para ver historial de contratos",
     "fingerprint": "Fingerprint",
     "format": "Formato",
     "humanCreated": "Creado por Humano",
     "import": "Importar",
+    "importSuccess": "Contrato importado con éxito.",
     "importContract": "Importar Contrato",
     "importTitle": "Importar Contrato",
     "importedFrom": "Importado de",
@@ -795,6 +800,99 @@
     "violationSeverity": "Severidad",
     "violations": "Violaciones",
     "violationsTitle": "Violaciones de Reglas",
+    "create": {
+      "title": "Crear Contrato de Servicio",
+      "subtitle": "Defina un nuevo servicio y su especificación de contrato",
+      "selectType": "¿Qué tipo de servicio?",
+      "selectMode": "¿Cómo desea crearlo?",
+      "details": "Detalles del Contrato",
+      "name": "Nombre",
+      "namePlaceholder": "p. ej., API de Gestión de Usuarios",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describa qué hace este servicio...",
+      "aiPrompt": "Prompt IA",
+      "aiPromptPlaceholder": "Describa la API que desea generar. Incluya endpoints, operaciones y modelos de datos...",
+      "importContent": "Contenido de la Especificación",
+      "modeVisual": "Constructor Visual",
+      "modeVisualDesc": "Crear con una interfaz guiada basada en formularios",
+      "modeImport": "Importar",
+      "modeImportDesc": "Importar desde un archivo de especificación existente",
+      "modeAi": "Generación con IA",
+      "modeAiDesc": "Generar un contrato con asistencia de IA",
+      "modeTemplate": "Desde Plantilla",
+      "modeTemplateDesc": "Comenzar desde una plantilla predefinida",
+      "modeClone": "Clonar Existente",
+      "modeCloneDesc": "Clonar y modificar un contrato existente",
+      "modeSource": "Editor de Código",
+      "modeSourceDesc": "Escribir la especificación directamente en código",
+      "stepType": "Tipo de Servicio",
+      "stepMode": "Modo de Creación",
+      "stepDetails": "Detalles",
+      "defaultContentType": "Tipo de contenido predeterminado",
+      "soapMetadata": "Metadatos del servicio SOAP",
+      "soapServiceName": "Nombre del servicio",
+      "soapServiceNamePlaceholder": "p. ej., CustomerAccountService",
+      "soapTargetNamespace": "Namespace objetivo",
+      "soapEndpointUrl": "URL del endpoint",
+      "soapVersion": "Versión SOAP",
+      "wsdlPlaceholder": "Pegue aquí la especificación XML WSDL...",
+      "wsdlXmlHint": "Use XML WSDL 1.1/2.0 válido e incluya imports cuando sea necesario.",
+      "asyncApiMetadata": "Metadatos AsyncAPI",
+      "asyncApiVersion": "Versión AsyncAPI",
+      "asyncApiJsonHint": "Use AsyncAPI 2.x JSON/YAML con canales y esquemas de mensajes.",
+      "asyncApiPlaceholder": "Pegue aquí el documento AsyncAPI...",
+      "bgServiceMetadata": "Metadatos del servicio background",
+      "bgServiceName": "Nombre del servicio",
+      "bgServiceNamePlaceholder": "p. ej., OrderSettlementWorker",
+      "bgCategory": "Categoría del servicio",
+      "bgTriggerType": "Tipo de trigger",
+      "bgScheduleExpression": "Expresión de programación",
+      "bgCronPlaceholder": "p. ej., 0 */15 * * * *",
+      "bgIntervalPlaceholder": "p. ej., cada 5 minutos"
+    },
+    "portal": {
+      "validationOnlyHint": "El modo solo validación está activo. Esta vista no publica ni modifica contratos."
+    },
+    "publication": {
+      "title": "Centro de Publicación",
+      "subtitle": "Gestione qué versiones de contrato son visibles en el Developer Portal. Solo contratos Aprobados o Bloqueados pueden publicarse.",
+      "newContract": "Nuevo Contrato",
+      "entries": "entradas",
+      "withdraw": "Retirar",
+      "empty": {
+        "title": "No se encontraron publicaciones",
+        "description": "Todavía no hay contratos publicados en el Developer Portal."
+      },
+      "filter": {
+        "all": "Todos",
+        "published": "Publicado",
+        "pending": "Pendiente",
+        "withdrawn": "Retirado",
+        "deprecated": "Deprecado"
+      },
+      "col": {
+        "contract": "Contrato",
+        "version": "Versión",
+        "status": "Estado",
+        "visibility": "Visibilidad",
+        "publishedBy": "Publicado por",
+        "actions": "Acciones"
+      },
+      "status": {
+        "published": "Publicado",
+        "pending": "Pendiente",
+        "withdrawn": "Retirado",
+        "deprecated": "Deprecado",
+        "notPublished": "No Publicado"
+      },
+      "withdrawModal": {
+        "title": "Retirar Publicación",
+        "description": "El contrato {{title}} (v{{version}}) se eliminará del Developer Portal.",
+        "reason": "Motivo (opcional)",
+        "reasonPlaceholder": "p. ej. Reemplazado por v2.0.0",
+        "confirm": "Retirar"
+      }
+    },
     "builder": {
       "validation": {
         "hasErrors": "Por favor, corrija los siguientes problemas:",
@@ -1311,6 +1409,32 @@
       "title": "Lista de Incidentes",
       "correlationIndicator": "Correlacionado",
       "mitigationIndicator": "Mitigación"
+    },
+    "timelineView": {
+      "open": "Abrir Línea de Tiempo Unificada",
+      "title": "Línea de Tiempo Unificada de Incidentes",
+      "subtitle": "Línea temporal contextual de incidentes y observabilidad para acelerar investigación cambio-incidente",
+      "filters": "Filtros",
+      "servicePlaceholder": "Nombre del servicio",
+      "environmentPlaceholder": "Entorno",
+      "entries": "Entradas de la Línea de Tiempo ({{count}})",
+      "empty": "No se encontraron eventos para los filtros seleccionados.",
+      "noTitle": "Evento sin título",
+      "source": {
+        "all": "Todas las fuentes",
+        "incident": "Incidentes",
+        "observability": "Observabilidad"
+      }
+    },
+    "postChangeVerification": {
+      "title": "Verificación Post-cambio",
+      "afterIncident": "el incidente ocurrió {{minutes}} min después de este cambio",
+      "beforeIncident": "el cambio ocurrió {{minutes}} min después de detectar el incidente",
+      "validationStatus": "Estado de validación",
+      "lastValidatedAt": "Última validación en",
+      "notValidatedYet": "La validación aún no fue registrada.",
+      "noWorkflow": "Aún no hay workflow de mitigación vinculado, por eso no hay checks post-cambio disponibles.",
+      "noValidation": "No se registraron checks de validación post-cambio."
     }
   },
   "runbooks": {
@@ -1396,6 +1520,30 @@
       "deps": "Dependencias",
       "changes": "Cambios",
       "incidents": "Incidentes"
+    },
+    "slo": {
+      "openManagement": "Abrir Gestión de SLO",
+      "title": "Gestión de SLO",
+      "subtitle": "Defina SLOs, monitorice consumo de error budget y ejecute verificaciones de burn rate",
+      "serviceAndDefinitions": "Servicio y Definiciones",
+      "service": "Servicio",
+      "noSlo": "No hay definiciones de SLO para este servicio.",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "create": "Crear SLO",
+      "namePlaceholder": "Nombre del SLO",
+      "environment": "Entorno",
+      "createAction": "Crear SLO",
+      "health": "Salud del SLO",
+      "selectSlo": "Seleccione un SLO para inspeccionar error budget y burn rate.",
+      "burnRateAlert": "El burn rate indica riesgo de agotar el budget antes del final de la ventana del SLO.",
+      "errorBudgetConsumed": "Error budget consumido",
+      "remainingBudget": "Budget restante",
+      "burnRate": "Burn rate",
+      "recomputeBudget": "Recalcular budget",
+      "recomputeBurn": "Recalcular burn rate",
+      "linkedSlas": "SLAs vinculados",
+      "slaCount": "definiciones de SLA"
     }
   },
   "aiHub": {
@@ -1495,6 +1643,8 @@
     "routingSubtitle": "Estrategias de enrutamiento, ponderación de fuentes y gobernanza de enriquecimiento",
     "routingStrategiesTab": "Estrategias de Enrutamiento",
     "routingSourceWeightsTab": "Pesos de Fuentes",
+    "noRoutingStrategiesFound": "No se encontraron estrategias de enrutamiento",
+    "noRoutingWeightsFound": "No se encontraron pesos de fuentes",
     "routingName": "Nombre",
     "routingDescription": "Descripción",
     "routingTargetPersona": "Persona objetivo",
@@ -1514,6 +1664,8 @@
     "routingWeightSecondary": "Secundario",
     "routingWeightSupplementary": "Suplementario",
     "routingGovernanceNotice": "Las estrategias de enrutamiento y pesos de fuentes gobiernan cómo la IA selecciona modelos, prioriza fuentes de conocimiento y enriquece el contexto para cada consulta.",
+    "noModelsFound": "No se encontraron modelos",
+    "noModelsFoundDescription": "Intente ajustar los filtros o la búsqueda.",
     "activeModels": "Modelos Activos",
     "auditBlockedStat": "Bloqueados por Política",
     "auditColClient": "Cliente",
@@ -1620,10 +1772,14 @@
       "compliant": "Conforme",
       "partiallyCompliant": "Parcialmente conforme",
       "nonCompliant": "No conforme",
+      "coverageIndicators": "Indicadores de cobertura",
       "rollouts": "Rollouts",
+      "rolloutCompletion": "Finalización de rollouts",
+      "rolloutFailure": "Fallo de rollouts",
       "pendingRollouts": "Rollouts pendientes",
       "failedRollouts": "Rollouts fallidos",
       "waivers": "Waivers",
+      "waiverApproval": "Aprobación de waivers",
       "pendingWaivers": "Waivers pendientes",
       "approvedWaivers": "Waivers aprobados",
       "searchPlaceholder": "Buscar packs…",
@@ -1673,6 +1829,55 @@
         "IncidentRecurrence": "Recurrencia de incidentes",
         "AiGovernance": "Gobernanza de IA"
       }
+    },
+    "finops": {
+      "title": "FinOps",
+      "subtitle": "Insights de costo contextual por servicio, equipo y dominio.",
+      "executiveTitle": "FinOps Ejecutivo",
+      "executiveSubtitle": "Principales impulsores de costo y oportunidades de optimización.",
+      "filterAll": "Todos",
+      "searchPlaceholder": "Buscar servicios, equipos o dominios...",
+      "backToOverview": "Volver al resumen",
+      "totalMonthlyCost": "Costo mensual total",
+      "totalWaste": "Desperdicio total",
+      "overallEfficiency": "Eficiencia global",
+      "optimizationOpportunities": "Oportunidades de optimización",
+      "optimizationHighlights": "Destaques de optimización",
+      "costTrend": "Tendencia de costo",
+      "reliabilityTrend": "Tendencia de confiabilidad",
+      "topCostDrivers": "Principales impulsores de costo",
+      "domainBreakdown": "Distribución por dominio",
+      "serviceCosts": "Costos por servicio",
+      "monthlyCost": "Costo mensual",
+      "wasteAmount": "Monto de desperdicio",
+      "wasteSignals": "Señales de desperdicio",
+      "potentialSavings": "Ahorro potencial",
+      "services": "Servicios",
+      "incidents": "Incidentes",
+      "reliability": "Confiabilidad",
+      "serviceFinOpsProfile": "Perfil FinOps del servicio",
+      "teamFinOpsProfile": "Perfil FinOps del equipo",
+      "domainFinOpsProfile": "Perfil FinOps del dominio"
+    },
+    "controls": {
+      "title": "Gestión de controles",
+      "subtitle": "Controles enterprise y madurez por dimensión de gobernanza.",
+      "overallCoverage": "Cobertura global",
+      "overallMaturity": "Madurez global",
+      "criticalGaps": "Gaps críticos",
+      "totalDimensions": "Total de dimensiones",
+      "coverageOverview": "Resumen de cobertura",
+      "coverageOverviewDescription": "Cobertura de controles y madurez por dimensión.",
+      "coverage": "Cobertura",
+      "maturity": "Madurez",
+      "gaps": "Gaps",
+      "assessed": "Evaluados",
+      "dimensionColumn": "Dimensión",
+      "coverageColumn": "Cobertura",
+      "maturityColumn": "Madurez",
+      "gapsColumn": "Gaps",
+      "assessedColumn": "Evaluados",
+      "trendColumn": "Tendencia"
     }
   },
   "serviceCatalog": {
@@ -1943,6 +2148,7 @@
       "relatedIncidentsDescription": "Incidentes activos que impactan este servicio",
       "noRelatedIncidents": "No hay incidentes activos",
       "viewIncident": "Ver incidente",
+      "backToCatalog": "Volver al Catálogo",
       "serviceLinks": {
         "addLink": "Agregar Enlace",
         "editLink": "Editar Enlace",
@@ -1971,6 +2177,28 @@
           "Dashboard": "Dashboard",
           "Other": "Otro"
         }
+      },
+      "lifecycleTransition": {
+        "title": "Ciclo de Vida del Servicio",
+        "currentStatus": "Estado Actual",
+        "transitionTo": "Transicionar a",
+        "confirmTitle": "Confirmar Transición de Ciclo de Vida",
+        "confirmDescription": "Está a punto de transicionar {{serviceName}} de {{from}} a {{to}}. Esta acción sigue la política de ciclo de vida del servicio y no puede deshacerse directamente.",
+        "confirm": "Confirmar Transición",
+        "cancel": "Cancelar",
+        "success": "Ciclo de vida del servicio transitado con éxito.",
+        "errorInvalid": "Esta transición no está permitida por las reglas del ciclo de vida.",
+        "statuses": {
+          "Planning": "Planificación",
+          "Development": "Desarrollo",
+          "Staging": "Pre-producción",
+          "Active": "Activo",
+          "Deprecating": "Depreciando",
+          "Deprecated": "Deprecado",
+          "Retired": "Retirado"
+        },
+        "noTransitions": "No hay transiciones disponibles desde este estado.",
+        "transitionedAt": "Transicionado el"
       }
     },
     "actions": {
@@ -1979,7 +2207,61 @@
       "edit": "Editar",
       "updateOwnership": "Actualizar Propiedad"
     },
-    "totalCount": "({{count}} total)"
+    "totalCount": "({{count}} total)",
+    "discovery": {
+      "title": "Service Discovery",
+      "subtitle": "Descubra automáticamente servicios desde la telemetría y gestione el registro en el catálogo.",
+      "runDiscovery": "Ejecutar Discovery",
+      "noServices": "No se encontraron servicios descubiertos.",
+      "searchPlaceholder": "Buscar nombre del servicio...",
+      "stats": {
+        "total": "Total",
+        "pending": "Pendientes",
+        "matched": "Asociados",
+        "registered": "Registrados",
+        "ignored": "Ignorados",
+        "newThisWeek": "Nuevos esta semana"
+      },
+      "filters": {
+        "allStatuses": "Todos los estados",
+        "pending": "Pendiente",
+        "matched": "Asociado",
+        "registered": "Registrado",
+        "ignored": "Ignorado",
+        "environment": "Entorno"
+      },
+      "table": {
+        "service": "Servicio",
+        "environment": "Entorno",
+        "traces": "Traces",
+        "endpoints": "Endpoints",
+        "lastSeen": "Última Observación",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "match": "Asociar",
+        "register": "Registrar",
+        "ignore": "Ignorar"
+      },
+      "recentRuns": "Ejecuciones Recientes de Discovery",
+      "found": "encontrados",
+      "new": "nuevos",
+      "modal": {
+        "matchTitle": "Asociar a Servicio Existente",
+        "registerTitle": "Registrar como Nuevo Servicio",
+        "ignoreTitle": "Ignorar Servicio Descubierto",
+        "service": "Servicio",
+        "serviceAssetId": "ID del Servicio",
+        "serviceAssetIdPlaceholder": "Seleccione o ingrese el ID del servicio...",
+        "domain": "Dominio",
+        "domainPlaceholder": "ej. Pagos",
+        "teamName": "Equipo",
+        "teamNamePlaceholder": "ej. Ingeniería de Plataforma",
+        "reason": "Motivo",
+        "reasonPlaceholder": "ej. Herramienta interna, no es un servicio de negocio"
+      }
+    }
   },
   "discovery": {
     "title": "Service Discovery",
@@ -2692,8 +2974,35 @@
   "automation": {
     "title": "Automatización de Workflows",
     "subtitle": "Automatización operacional con controles de seguridad, aprobaciones y auditoría",
+    "adminLink": "Controles de administración",
+    "searchPlaceholder": "Buscar workflows...",
+    "workflowsTitle": "Workflows de Automatización",
     "emptyTitle": "Sin workflows de automatización",
     "emptyDescription": "Los workflows de automatización operacional aparecerán aquí cuando se creen.",
+    "stats": {
+      "total": "Total",
+      "completed": "Completados",
+      "failed": "Fallidos",
+      "pending": "Pendientes"
+    },
+    "status": {
+      "created": "Creado",
+      "pendingApproval": "Aprobación Pendiente",
+      "approved": "Aprobado",
+      "executing": "En ejecución",
+      "completed": "Completado",
+      "failed": "Fallido",
+      "cancelled": "Cancelado",
+      "rejected": "Rechazado"
+    },
+    "table": {
+      "action": "Acción",
+      "status": "Estado",
+      "risk": "Riesgo",
+      "requestedBy": "Solicitado por",
+      "service": "Servicio",
+      "createdAt": "Creado"
+    },
     "catalog": {
       "title": "Catálogo de Acciones",
       "subtitle": "Acciones de automatización disponibles con controles de seguridad",
@@ -2721,6 +3030,10 @@
     },
     "detail": {
       "title": "Detalle del Workflow",
+      "notFound": "Workflow no encontrado",
+      "notFoundDescription": "No se pudo encontrar el workflow solicitado.",
+      "backToList": "Volver a workflows",
+      "overview": "Resumen",
       "rationale": "Justificación",
       "scope": "Alcance",
       "environment": "Entorno",
@@ -2729,6 +3042,27 @@
       "linkedService": "Servicio Vinculado",
       "requestedBy": "Solicitado Por",
       "approvedBy": "Aprobado Por",
+      "approval": "Aprobación",
+      "approvalStatus": "Estado",
+      "approvedAt": "Aprobado en",
+      "preconditions": "Precondiciones",
+      "executionSteps": "Pasos de ejecución",
+      "stepTitle": "Paso",
+      "stepStatus": "Estado",
+      "stepCompletedBy": "Completado por",
+      "stepCompletedAt": "Completado en",
+      "validation": "Validación Post-Ejecución",
+      "validationStatus": "Estado",
+      "observedOutcome": "Resultado observado",
+      "validatedBy": "Validado por",
+      "auditTrail": "Pista de auditoría",
+      "auditAction": "Acción",
+      "auditPerformedBy": "Ejecutado por",
+      "auditAt": "En",
+      "auditDetails": "Detalles",
+      "service": "Servicio",
+      "created": "Creado",
+      "updated": "Última actualización",
       "createdAt": "Creado",
       "updatedAt": "Última Actualización"
     },
@@ -2806,6 +3140,22 @@
     "admin": {
       "title": "Controles de Automatización",
       "subtitle": "Gestione acciones de automatización, políticas y controles de seguridad",
+      "catalogTitle": "Catálogo de Acciones",
+      "auditTitle": "Pista de auditoría reciente",
+      "stats": {
+        "totalActions": "Total de acciones",
+        "approvalRequired": "Requiere aprobación",
+        "withValidation": "Con post-validación",
+        "auditEntries": "Entradas de auditoría"
+      },
+      "table": {
+        "name": "Nombre",
+        "risk": "Riesgo",
+        "approval": "Aprobación",
+        "environments": "Entornos",
+        "personas": "Personas",
+        "preconditions": "Precondiciones"
+      },
       "actionCatalog": "Catálogo de Acciones",
       "safetyPolicies": "Políticas de Seguridad",
       "approvalRules": "Reglas de Aprobación",
@@ -2928,7 +3278,10 @@
     "untrusted": "No Confiable",
     "active": "Activo",
     "disabled": "Deshabilitado",
+    "configuring": "Configurando",
+    "pending": "Pendiente",
     "paused": "Pausado",
+    "unhealthy": "No Saludable",
     "success": "Éxito",
     "partialSuccess": "Éxito Parcial",
     "backToHub": "Volver al Hub de Integraciones",
@@ -3016,6 +3369,40 @@
       "FirstReportGenerated": "Primer Informe Generado",
       "FirstReliabilityViewed": "Primera Vista de Confiabilidad",
       "FirstAutomationCreated": "Primera Automatización Creada"
+    },
+    "funnel": {
+      "title": "Embudos de Adopción",
+      "subtitle": "Embudos cohort por módulo mostrando dónde los usuarios abandonan flujos críticos",
+      "allModules": "Todos los Módulos",
+      "sessions": "sesiones",
+      "completion": "conclusión",
+      "biggestDropOff": "Mayor abandono"
+    },
+    "heatmap": {
+      "title": "Mapa de Calor de Adopción",
+      "subtitle": "Mapa visual de intensidad de adopción por módulo y funcionalidad en la plataforma",
+      "totalModules": "Total de Módulos",
+      "uniqueUsers": "Usuarios Únicos",
+      "period": "Período",
+      "adoptionMap": "Mapa de Adopción",
+      "users": "usuarios",
+      "actions": "acciones",
+      "topFeatures": "Top Funcionalidades",
+      "legend": "Adopción",
+      "lowAdoptionTitle": "Módulos con Baja Adopción",
+      "lowAdoptionDesc": "Estos módulos tienen adopción por debajo del 30% y pueden beneficiarse de mejoras de UX, onboarding o documentación."
+    },
+    "timeToValue": {
+      "title": "Tiempo hasta Valor",
+      "subtitle": "Medir la rapidez con que los usuarios alcanzan resultados significativos y completan flujos centrales",
+      "ttfv": "Tiempo Medio hasta Primer Valor",
+      "ttcv": "Tiempo Medio hasta Valor Central",
+      "milestonesReached": "Milestones Alcanzados",
+      "totalUsers": "Total de Usuarios",
+      "milestoneProgress": "Progreso de Milestones",
+      "avgTime": "Tiempo medio",
+      "users": "usuarios",
+      "highCompletionTitle": "Milestones con Alta Conclusión"
     }
   },
   "governancePacks": {
@@ -3489,6 +3876,37 @@
       "errorLoading": "Error al cargar preferencias",
       "channelHeader": "Canales de Entrega",
       "description": "Configura qué notificaciones deseas recibir y a través de qué canales. Algunas notificaciones críticas son obligatorias y no se pueden desactivar."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Supervisa volumen de notificaciones, fiabilidad de entrega, comportamiento de respuesta y ruido de alertas para el tenant activo.",
+      "backToInbox": "Volver a la bandeja",
+      "openConfiguration": "Abrir configuración",
+      "generated": "Notificaciones generadas",
+      "deliverySuccessRate": "Tasa de éxito de entrega",
+      "readRate": "Tasa de lectura",
+      "avgReadTime": "Tiempo medio hasta lectura",
+      "avgAcknowledgeTime": "Tiempo medio hasta acknowledge",
+      "unacknowledgedActionItems": "Acciones pendientes sin acknowledge",
+      "pendingDeliveries": "Entregas pendientes",
+      "suppressed": "Suprimidas",
+      "grouped": "Agrupadas",
+      "correlatedIncidents": "Correlacionadas con incidentes",
+      "avgPerUserPerDay": "Promedio por usuario/día",
+      "byCategory": "Por categoría",
+      "bySeverity": "Por severidad",
+      "byChannel": "Entregas por canal",
+      "bySourceModule": "Por módulo de origen",
+      "topNoisyTypes": "Tipos más ruidosos",
+      "leastEngagedTypes": "Tipos con menor engagement",
+      "unacknowledgedByType": "Sin acknowledge por tipo",
+      "empty": "No se encontraron analytics de notificaciones para la ventana seleccionada.",
+      "none": "Sin señal en la ventana seleccionada.",
+      "range": {
+        "last7Days": "Últimos 7 días",
+        "last30Days": "Últimos 30 días",
+        "last90Days": "Últimos 90 días"
+      }
     }
   },
   "configuration": {

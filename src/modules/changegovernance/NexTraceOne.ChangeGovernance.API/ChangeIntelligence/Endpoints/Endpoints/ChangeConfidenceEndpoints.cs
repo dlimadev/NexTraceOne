@@ -83,6 +83,15 @@ internal static class ChangeConfidenceEndpoints
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
 
+        // ── Opções dinâmicas para filtros ─────────────────────────
+
+        group.MapGet("/filter-options", () =>
+            Results.Ok(new ChangeFilterOptionsResponse(
+                Enum.GetNames<ChangeType>(),
+                Enum.GetNames<ConfidenceStatus>(),
+                Enum.GetNames<DeploymentStatus>())))
+            .RequirePermission("change-intelligence:read");
+
         // ── Mudanças por serviço ────────────────────────────────────
 
         group.MapGet("/by-service/{serviceName}", async (
@@ -183,4 +192,9 @@ internal static class ChangeConfidenceEndpoints
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
     }
+
+    private sealed record ChangeFilterOptionsResponse(
+        string[] ChangeTypes,
+        string[] ConfidenceStatuses,
+        string[] DeploymentStatuses);
 }

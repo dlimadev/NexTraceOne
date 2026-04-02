@@ -1,10 +1,13 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.Notifications.Application.Abstractions;
 
 using ListTemplatesFeature = NexTraceOne.Notifications.Application.Features.ListNotificationTemplates.ListNotificationTemplates;
 using UpsertTemplateFeature = NexTraceOne.Notifications.Application.Features.UpsertNotificationTemplate.UpsertNotificationTemplate;
@@ -99,5 +102,64 @@ public sealed class NotificationConfigurationEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("notifications:configuration:write");
+
+        // ── Analytics ─────────────────────────────────────────────────────────
+
+        group.MapGet("/analytics", async (
+            int? days,
+            INotificationMetricsService metricsService,
+            ICurrentTenant currentTenant,
+            CancellationToken cancellationToken) =>
+        {
+            if (currentTenant.Id == Guid.Empty || !currentTenant.IsActive)
+            {
+                return Results.BadRequest(new { error = "Tenant context is required." });
+            }
+
+            var lookbackDays = days.GetValueOrDefault(30);
+            if (lookbackDays is < 1 or > 90)
+            {
+                return Results.BadRequest(new { error = "Days must be between 1 and 90." });
+            }
+
+            var until = DateTimeOffset.UtcNow;
+            var from = until.AddDays(-lookbackDays);
+
+            var platform = await metricsService.GetPlatformMetricsAsync(
+                currentTenant.Id,
+                from,
+                until,
+                cancellationToken);
+
+            var interaction = await metricsService.GetInteractionMetricsAsync(
+                currentTenant.Id,
+                from,
+                until,
+                cancellationToken);
+
+            var quality = await metricsService.GetQualityMetricsAsync(
+                currentTenant.Id,
+                from,
+                until,
+                cancellationToken);
+
+            return Results.Ok(new NotificationAnalyticsResponse(
+                new NotificationAnalyticsWindow(lookbackDays, from, until),
+                platform,
+                interaction,
+                quality));
+        })
+        .RequirePermission("notifications:configuration:read");
     }
 }
+
+internal sealed record NotificationAnalyticsResponse(
+    NotificationAnalyticsWindow Window,
+    NotificationPlatformMetrics Platform,
+    NotificationInteractionMetrics Interaction,
+    NotificationQualityMetrics Quality);
+
+internal sealed record NotificationAnalyticsWindow(
+    int Days,
+    DateTimeOffset From,
+    DateTimeOffset Until);

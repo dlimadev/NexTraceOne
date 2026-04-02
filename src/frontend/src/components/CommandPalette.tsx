@@ -31,6 +31,7 @@ import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
 import { globalSearchApi } from '../features/catalog/api/globalSearch';
 import type { SearchResultItem } from '../features/catalog/api/globalSearch';
+import { knowledgeApi } from '../features/knowledge/api/knowledge';
 import { usePersona } from '../contexts/PersonaContext';
 
 interface PaletteItem {
@@ -66,8 +67,10 @@ const paletteItems: PaletteItem[] = [
   { id: 'promotion', labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={16} />, group: 'commandPalette.changes', permission: 'promotion:requests:read' },
   // ── Operations ──
   { id: 'incidents', labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },
+  { id: 'incident-timeline', labelKey: 'sidebar.incidentTimeline', to: '/operations/incidents/timeline', icon: <Clock size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },
   { id: 'runbooks', labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={16} />, group: 'commandPalette.operations', permission: 'operations:runbooks:read' },
   { id: 'reliability', labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read' },
+  { id: 'slo-management', labelKey: 'sidebar.sloManagement', to: '/operations/reliability/slos', icon: <ShieldCheck size={16} />, group: 'commandPalette.operations', permission: 'operations:reliability:read' },
   { id: 'automation', labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Zap size={16} />, group: 'commandPalette.operations', permission: 'operations:automation:read' },
   // ── AI Hub ──
   { id: 'ai-assistant', labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={16} />, group: 'commandPalette.aiHub', permission: 'ai:assistant:read' },
@@ -100,6 +103,8 @@ const entityTypeIcons: Record<string, React.ReactNode> = {
   contract: <FileText size={16} />,
   runbook: <FileCode size={16} />,
   doc: <BookOpen size={16} />,
+  knowledgedocument: <BookOpen size={16} />,
+  operationalnote: <ClipboardList size={16} />,
   knowledge: <BookOpen size={16} />,
   note: <ClipboardList size={16} />,
 };
@@ -110,6 +115,8 @@ const entityTypeLabelKeys: Record<string, string> = {
   contract: 'commandPalette.entityContract',
   runbook: 'commandPalette.entityRunbook',
   doc: 'commandPalette.entityDoc',
+  knowledgedocument: 'commandPalette.entityKnowledge',
+  operationalnote: 'commandPalette.entityNote',
   knowledge: 'commandPalette.entityKnowledge',
   note: 'commandPalette.entityNote',
 };
@@ -175,15 +182,43 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     staleTime: 30_000,
   });
 
+  const { data: knowledgeSearchData, isFetching: isSearchingKnowledge } = useQuery({
+    queryKey: ['knowledgeSearch', debouncedQuery],
+    queryFn: () => knowledgeApi.search({ q: debouncedQuery.trim(), maxResults: 8 }).then((r) => r.data),
+    enabled: open && shouldSearchEntities,
+    staleTime: 30_000,
+  });
+
   const visibleItems = useMemo(
     () => paletteItems.filter((item) => !item.permission || can(item.permission)),
     [can],
   );
 
-  const entityResults = useMemo(
-    () => searchData?.items ?? [],
-    [searchData?.items],
-  );
+  const entityResults = useMemo(() => {
+    const globalItems = searchData?.items ?? [];
+    const knowledgeItems = (knowledgeSearchData?.items ?? []).map((item): SearchResultItem => ({
+      entityId: item.entityId,
+      entityType: item.entityType,
+      title: item.title,
+      subtitle: item.subtitle,
+      owner: null,
+      status: item.status,
+      route: item.route,
+      relevanceScore: item.relevanceScore,
+    }));
+
+    const merged = [...globalItems, ...knowledgeItems];
+    const deduplicated = new Map<string, SearchResultItem>();
+
+    for (const item of merged) {
+      const key = `${item.entityType}:${item.entityId}:${item.route}`;
+      if (!deduplicated.has(key)) {
+        deduplicated.set(key, item);
+      }
+    }
+
+    return Array.from(deduplicated.values());
+  }, [searchData?.items, knowledgeSearchData?.items]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return visibleItems;
@@ -310,7 +345,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             className="flex-1 bg-transparent text-heading text-sm placeholder:text-muted outline-none"
             aria-label={t('commandPalette.placeholder')}
           />
-          {isSearching && (
+          {(isSearching || isSearchingKnowledge) && (
             <Loader2 size={16} className="text-muted animate-spin shrink-0" />
           )}
           <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-edge px-1.5 py-0.5 text-[10px] text-muted font-mono">
@@ -367,7 +402,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     {t('commandPalette.searchResults')}
                   </p>
 
-                  {isSearching && entityResults.length === 0 && (
+                  {(isSearching || isSearchingKnowledge) && entityResults.length === 0 && (
                     <p className="flex items-center gap-2 px-3 py-3 text-sm text-muted">
                       <Loader2 size={14} className="animate-spin" />
                       {t('commandPalette.loading')}
@@ -382,6 +417,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
                   {entityResults.map((entity, entityIdx) => {
                     const index = navCount + entityIdx;
+                    const normalizedEntityType = entity.entityType.toLowerCase();
                     return (
                       <button
                         key={entity.entityId}
@@ -395,13 +431,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         aria-selected={index === activeIndex}
                       >
                         <span className="shrink-0 opacity-70">
-                          {entityTypeIcons[entity.entityType] ?? <Search size={16} />}
+                          {entityTypeIcons[normalizedEntityType] ?? <Search size={16} />}
                         </span>
                         <span className="flex-1 text-left min-w-0">
                           <span className="block truncate">{entity.title}</span>
                           <span className="block truncate text-[11px] text-muted">
                             {entity.subtitle ??
-                              t(entityTypeLabelKeys[entity.entityType] ?? '', entity.entityType)}
+                              t(entityTypeLabelKeys[normalizedEntityType] ?? '', entity.entityType)}
                           </span>
                         </span>
                         {entity.status && (

@@ -18,6 +18,7 @@ import type {
   DeliveryHistoryResponse,
   DeliveryStatusResponse,
   NotificationTrailResponse,
+  NotificationAnalyticsResponse,
 } from '../types';
 
 export type { NotificationDto };
@@ -103,5 +104,12 @@ export const notificationsApi = {
   getNotificationTrail: (notificationId: string) =>
     client
       .get<NotificationTrailResponse>(`/notifications/${notificationId}/trail`)
+      .then((r) => r.data),
+
+  getAnalytics: (days = 30) =>
+    client
+      .get<NotificationAnalyticsResponse>('/notifications/configuration/analytics', {
+        params: { days },
+      })
       .then((r) => r.data),
 };

@@ -4,5 +4,8 @@ export { ModuleAdoptionPage } from './pages/ModuleAdoptionPage';
 export { PersonaUsagePage } from './pages/PersonaUsagePage';
 export { JourneyFunnelPage } from './pages/JourneyFunnelPage';
 export { ValueTrackingPage } from './pages/ValueTrackingPage';
+export { AdoptionFunnelPage } from './pages/AdoptionFunnelPage';
+export { FeatureHeatmapPage } from './pages/FeatureHeatmapPage';
+export { TimeToValuePage } from './pages/TimeToValuePage';
 export { AnalyticsEventTracker } from './AnalyticsEventTracker';
 export { productAnalyticsApi } from './api/productAnalyticsApi';

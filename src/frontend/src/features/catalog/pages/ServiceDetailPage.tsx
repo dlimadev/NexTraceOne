@@ -26,6 +26,7 @@ import { serviceCatalogApi } from '../api';
 import { contractsApi } from '../api/contracts';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { ServiceLinksSection } from '../components/ServiceLinksSection';
+import { ServiceLifecyclePanel } from '../components/ServiceLifecyclePanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
 import { PageContainer, PageSection, TableWrapper } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
@@ -488,6 +489,13 @@ export function ServiceDetailPage() {
               </dl>
             </CardBody>
           </Card>
+
+          {/* Lifecycle Transition */}
+          <ServiceLifecyclePanel
+            serviceId={serviceId!}
+            serviceName={service.displayName || service.name}
+            currentStatus={service.lifecycleStatus}
+          />
 
           {/* Links (enriched) */}
           <ServiceLinksSection serviceId={serviceId!} />

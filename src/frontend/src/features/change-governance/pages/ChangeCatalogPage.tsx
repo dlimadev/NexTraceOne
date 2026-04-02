@@ -22,6 +22,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import type { ChangesFilterParams } from '../api/changeConfidence';
 import type { ChangeDto } from '../../../types';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Delay em ms para debounce da pesquisa textual. */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -29,11 +30,8 @@ const SEARCH_DEBOUNCE_MS = 350;
 /** Tamanho padrão de página. */
 const PAGE_SIZE = 20;
 
-/** Opções de ambiente disponíveis. */
-const ENVIRONMENTS = ['dev', 'staging', 'prod'] as const;
-
-/** Tipos de mudança suportados pelo backend. */
-const CHANGE_TYPES = [
+/** Fallback de tipos de mudança quando o endpoint de opções ainda não estiver disponível. */
+const FALLBACK_CHANGE_TYPES = [
   'Deployment',
   'ConfigurationChange',
   'ContractChange',
@@ -86,6 +84,7 @@ function scoreColor(score: number): string {
 export function ChangeCatalogPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { availableEnvironments } = useEnvironment();
 
   // ── Filtros ──
   const [serviceName, setServiceName] = useState('');
@@ -133,10 +132,42 @@ export function ChangeCatalogPage() {
     queryFn: () => changeConfidenceApi.listChanges(filterParams),
   });
 
+  const filterOptionsQuery = useQuery({
+    queryKey: ['change-confidence-filter-options'],
+    queryFn: () => changeConfidenceApi.getFilterOptions(),
+    staleTime: 5 * 60_000,
+  });
+
   const summary = summaryQuery.data;
   const changes = changesQuery.data?.changes ?? [];
   const totalCount = changesQuery.data?.totalCount ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  const environmentOptions = useMemo(() => {
+    const set = new Set<string>();
+
+    for (const env of availableEnvironments) {
+      if (env.name) set.add(env.name);
+    }
+
+    for (const change of changes) {
+      if (change.environment) set.add(change.environment);
+    }
+
+    if (environment) set.add(environment);
+
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [availableEnvironments, changes, environment]);
+
+  const changeTypeOptions = useMemo(() => {
+    const fromEndpoint = filterOptionsQuery.data?.changeTypes ?? [];
+    const fromChanges = changes.map((c) => c.changeType).filter(Boolean);
+    const set = new Set<string>([...fromEndpoint, ...fromChanges, ...FALLBACK_CHANGE_TYPES]);
+
+    if (changeType) set.add(changeType);
+
+    return Array.from(set);
+  }, [filterOptionsQuery.data?.changeTypes, changes, changeType]);
 
   /** Configuração dos cards de resumo. */
   const summaryCards = [
@@ -211,7 +242,7 @@ export function ChangeCatalogPage() {
               className="px-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading outline-none focus:border-accent transition-colors"
             >
               <option value="">{t('changeConfidence.filters.allEnvironments')}</option>
-              {ENVIRONMENTS.map((env) => (
+              {environmentOptions.map((env) => (
                 <option key={env} value={env}>{env}</option>
               ))}
             </select>
@@ -223,7 +254,7 @@ export function ChangeCatalogPage() {
               className="px-3 py-2 rounded-md bg-elevated border border-edge text-sm text-heading outline-none focus:border-accent transition-colors"
             >
               <option value="">{t('changeConfidence.filters.allTypes')}</option>
-              {CHANGE_TYPES.map((ct) => (
+              {changeTypeOptions.map((ct) => (
                 <option key={ct} value={ct}>{t(`changeConfidence.changeType.${ct}`)}</option>
               ))}
             </select>

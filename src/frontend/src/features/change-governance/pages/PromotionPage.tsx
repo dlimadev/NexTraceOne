@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUpCircle, CheckCircle, XCircle, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { promotionApi, changeIntelligenceApi } from '../api';
 import type { PromotionRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type PromotionStatus = PromotionRequest['status'];
 
@@ -21,13 +22,6 @@ function statusVariant(status: PromotionStatus): 'default' | 'success' | 'warnin
   return 'default';
 }
 
-const ENVIRONMENTS = ['development', 'staging', 'production'];
-const ENV_COLORS: Record<string, string> = {
-  development: 'bg-success',
-  staging: 'bg-warning',
-  production: 'bg-critical',
-};
-
 interface CreateForm {
   releaseId: string;
   sourceEnvironment: string;
@@ -36,12 +30,27 @@ interface CreateForm {
 
 const emptyForm: CreateForm = {
   releaseId: '',
-  sourceEnvironment: 'staging',
-  targetEnvironment: 'production',
+  sourceEnvironment: '',
+  targetEnvironment: '',
 };
+
+function environmentColor(profile?: string): string {
+  if (profile === 'production') return 'bg-critical';
+  if (profile === 'staging') return 'bg-warning';
+  if (profile === 'development' || profile === 'qa' || profile === 'sandbox' || profile === 'uat') return 'bg-success';
+  return 'bg-muted';
+}
+
+function translateEnvironment(t: (key: string) => string, env: string): string {
+  const normalized = env.toLowerCase();
+  const key = `releases.environments.${normalized}`;
+  const translated = t(key);
+  return translated === key ? env : translated;
+}
 
 export function PromotionPage() {
   const { t } = useTranslation();
+  const { availableEnvironments } = useEnvironment();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CreateForm>(emptyForm);
@@ -82,6 +91,49 @@ export function PromotionPage() {
 
   const requests = data?.items ?? [];
   const pending = requests.filter((r) => r.status === 'Pending' || r.status === 'Approved');
+
+  const environmentProfiles = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const env of availableEnvironments) {
+      map.set(env.name.toLowerCase(), env.profile);
+    }
+    return map;
+  }, [availableEnvironments]);
+
+  const environmentOptions = useMemo(() => {
+    const set = new Set<string>();
+
+    for (const env of availableEnvironments) {
+      if (env.name) set.add(env.name);
+    }
+
+    for (const req of requests) {
+      if (req.sourceEnvironment) set.add(req.sourceEnvironment);
+      if (req.targetEnvironment) set.add(req.targetEnvironment);
+    }
+
+    for (const rel of availableReleases) {
+      if (rel.environment) set.add(rel.environment);
+    }
+
+    const list = Array.from(set);
+    return list.sort((a, b) => a.localeCompare(b));
+  }, [availableEnvironments, requests, availableReleases]);
+
+  useEffect(() => {
+    if (!environmentOptions.length) return;
+
+    const source = environmentOptions.includes(form.sourceEnvironment)
+      ? form.sourceEnvironment
+      : environmentOptions[0];
+    const target = environmentOptions.includes(form.targetEnvironment)
+      ? form.targetEnvironment
+      : (environmentOptions.find((env) => env !== source) ?? source);
+
+    if (source !== form.sourceEnvironment || target !== form.targetEnvironment) {
+      setForm((current) => ({ ...current, sourceEnvironment: source, targetEnvironment: target }));
+    }
+  }, [environmentOptions, form.sourceEnvironment, form.targetEnvironment]);
 
   return (
     <PageContainer>
@@ -132,8 +184,8 @@ export function PromotionPage() {
                   onChange={(e) => setForm((f) => ({ ...f, sourceEnvironment: e.target.value }))}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
-                  {ENVIRONMENTS.map((env) => (
-                    <option key={env} value={env}>{t(`releases.environments.${env}`)}</option>
+                  {environmentOptions.map((env) => (
+                    <option key={env} value={env}>{translateEnvironment(t, env)}</option>
                   ))}
                 </select>
               </div>
@@ -144,8 +196,8 @@ export function PromotionPage() {
                   onChange={(e) => setForm((f) => ({ ...f, targetEnvironment: e.target.value }))}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
-                  {ENVIRONMENTS.map((env) => (
-                    <option key={env} value={env}>{t(`releases.environments.${env}`)}</option>
+                  {environmentOptions.map((env) => (
+                    <option key={env} value={env}>{translateEnvironment(t, env)}</option>
                   ))}
                 </select>
               </div>
@@ -169,13 +221,13 @@ export function PromotionPage() {
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-4">
-            {ENVIRONMENTS.map((env, i) => (
+            {environmentOptions.map((env, i) => (
               <div key={env} className="flex items-center gap-4">
                 <div className="flex flex-col items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${ENV_COLORS[env] ?? 'bg-muted'}`} />
-                  <span className="text-sm font-medium text-body">{t(`releases.environments.${env}`)}</span>
+                  <div className={`w-3 h-3 rounded-full ${environmentColor(environmentProfiles.get(env.toLowerCase()))}`} />
+                  <span className="text-sm font-medium text-body">{translateEnvironment(t, env)}</span>
                 </div>
-                {i < ENVIRONMENTS.length - 1 && (
+                {i < environmentOptions.length - 1 && (
                   <ArrowUpCircle size={20} className="text-edge-strong rotate-90" />
                 )}
               </div>

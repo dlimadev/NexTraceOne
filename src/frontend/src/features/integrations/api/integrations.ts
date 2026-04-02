@@ -1,6 +1,7 @@
 import client from '../../../api/client';
 import type {
   IntegrationConnectorsListResponse,
+  IntegrationFilterOptionsResponse,
   IntegrationConnectorDetailDto,
   IngestionSourcesListResponse,
   IngestionExecutionsListResponse,
@@ -19,6 +20,9 @@ export const integrationsApi = {
     pageSize?: number;
   }) =>
     client.get<IntegrationConnectorsListResponse>('/integrations/connectors', { params }).then((r) => r.data),
+
+  getFilterOptions: () =>
+    client.get<IntegrationFilterOptionsResponse>('/integrations/filter-options').then((r) => r.data),
 
   getConnector: (id: string) =>
     client.get<IntegrationConnectorDetailDto>(`/integrations/connectors/${id}`).then((r) => r.data),

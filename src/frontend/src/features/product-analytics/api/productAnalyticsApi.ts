@@ -6,6 +6,8 @@ import type {
   JourneysResponse,
   ValueMilestonesResponse,
   FrictionIndicatorsResponse,
+  AdoptionFunnelResponse,
+  FeatureHeatmapResponse,
 } from '../../../types';
 
 export const productAnalyticsApi = {
@@ -32,6 +34,12 @@ export const productAnalyticsApi = {
 
   getFriction: (params?: { persona?: string; module?: string; range?: string }) =>
     client.get<FrictionIndicatorsResponse>('/product-analytics/friction', { params }).then((r) => r.data),
+
+  getAdoptionFunnel: (params?: { module?: string; persona?: string; teamId?: string; range?: string }) =>
+    client.get<AdoptionFunnelResponse>('/product-analytics/adoption/funnel', { params }).then((r) => r.data),
+
+  getFeatureHeatmap: (params?: { persona?: string; teamId?: string; range?: string }) =>
+    client.get<FeatureHeatmapResponse>('/product-analytics/heatmap', { params }).then((r) => r.data),
 
   recordEvent: (data: {
     eventType: string;

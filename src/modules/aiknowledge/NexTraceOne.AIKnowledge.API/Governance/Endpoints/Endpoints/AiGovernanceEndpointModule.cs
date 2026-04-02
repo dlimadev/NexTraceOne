@@ -201,6 +201,13 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:read");
 
+        group.MapGet("/categories", () =>
+            Results.Ok(new
+            {
+                items = typeof(AgentCategory).GetEnumNames(),
+            }))
+            .RequirePermission("ai:assistant:read");
+
         group.MapGet("/by-context", async (
             string context,
             ISender sender,

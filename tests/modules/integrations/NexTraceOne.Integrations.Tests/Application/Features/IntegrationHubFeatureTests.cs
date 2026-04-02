@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Integrations.Application.Features.GetIngestionFreshness;
 using NexTraceOne.Integrations.Application.Features.GetIngestionHealth;
+using NexTraceOne.Integrations.Application.Features.GetIntegrationFilterOptions;
 using NexTraceOne.Integrations.Application.Features.GetIntegrationConnector;
 using NexTraceOne.Integrations.Application.Features.ListIngestionExecutions;
 using NexTraceOne.Integrations.Application.Features.ListIngestionSources;
@@ -82,6 +83,44 @@ public sealed class IntegrationHubFeatureTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Items.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetIntegrationFilterOptions_ShouldReturnDistinctConnectorTypesAndSupportedStates()
+    {
+        // Arrange
+        var connectors = CreateTestConnectors(2);
+        var duplicateTypeConnector = IntegrationConnector.Create(
+            name: "github-sync",
+            connectorType: connectors[0].ConnectorType,
+            description: "Duplicate connector type",
+            provider: "GitHub",
+            endpoint: null,
+            environment: null,
+            authenticationMode: null,
+            pollingMode: null,
+            allowedTeams: null,
+            utcNow: DateTimeOffset.UtcNow);
+
+        _connectorRepository.ListAsync(
+            Arg.Any<ConnectorStatus?>(),
+            Arg.Any<ConnectorHealth?>(),
+            Arg.Any<string?>(),
+            Arg.Any<string?>(),
+            Arg.Any<CancellationToken>())
+            .Returns(new List<IntegrationConnector> { connectors[0], connectors[1], duplicateTypeConnector });
+
+        var handler = new GetIntegrationFilterOptions.Handler(_connectorRepository);
+
+        // Act
+        var result = await handler.Handle(new GetIntegrationFilterOptions.Query(), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.ConnectorTypes.Should().OnlyHaveUniqueItems();
+        result.Value.ConnectorTypes.Should().Contain(connectors[0].ConnectorType);
+        result.Value.ConnectorStatuses.Should().Contain(new[] { "Active", "Configuring", "Pending", "Paused" });
+        result.Value.ConnectorHealthStatuses.Should().Contain(new[] { "Healthy", "Degraded", "Unhealthy", "Critical", "Unknown" });
     }
 
     // ── GetIntegrationConnector ──

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
+  BarChart3,
   Bell,
   CheckCheck,
   Eye,
@@ -81,6 +82,14 @@ export function NotificationCenterPage() {
             >
               <Settings className="h-4 w-4 mr-1.5" />
               {t('notifications.preferences.title')}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/notifications/analytics')}
+            >
+              <BarChart3 className="h-4 w-4 mr-1.5" />
+              {t('notifications.analytics.title')}
             </Button>
             <Button
               variant="secondary"
