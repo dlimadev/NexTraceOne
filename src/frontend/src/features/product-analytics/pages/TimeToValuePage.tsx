@@ -6,7 +6,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { StatCardSmall } from '../../../components/StatCardSmall';
+import { StatCard } from '../../../components/StatCard';
 import { productAnalyticsApi } from '../api/productAnalyticsApi';
 
 /**
@@ -92,34 +92,34 @@ export function TimeToValuePage() {
 
       {/* Top-level time metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCardSmall
+        <StatCard
           icon={<Clock size={16} />}
-          label={t('analytics.timeToValue.ttfv')}
+          title={t('analytics.timeToValue.ttfv')}
           value={milestones.avgTimeToFirstValueMinutes != null
             ? `${milestones.avgTimeToFirstValueMinutes} min`
             : '—'}
-          accent="accent"
+          color="text-accent"
         />
-        <StatCardSmall
+        <StatCard
           icon={<Target size={16} />}
-          label={t('analytics.timeToValue.ttcv')}
+          title={t('analytics.timeToValue.ttcv')}
           value={milestones.avgTimeToCoreValueMinutes != null
             ? `${milestones.avgTimeToCoreValueMinutes} min`
             : '—'}
-          accent="accent"
+          color="text-accent"
         />
-        <StatCardSmall
+        <StatCard
           icon={<TrendingDown size={16} />}
-          label={t('analytics.timeToValue.milestonesReached')}
+          title={t('analytics.timeToValue.milestonesReached')}
           value={`${reached.length} / ${milestones.milestones.length}`}
-          accent={reached.length > milestones.milestones.length / 2 ? 'success' : 'warning'}
+          color={reached.length > milestones.milestones.length / 2 ? 'text-success' : 'text-warning'}
         />
         {summary && (
-          <StatCardSmall
+          <StatCard
             icon={<Target size={16} />}
-            label={t('analytics.timeToValue.totalUsers')}
-            value={String(summary.totalUsers ?? 0)}
-            accent="accent"
+            title={t('analytics.timeToValue.totalUsers')}
+            value={String(summary.uniqueUsers ?? 0)}
+            color="text-accent"
           />
         )}
       </div>
@@ -135,10 +135,10 @@ export function TimeToValuePage() {
           ) : (
             <div className="space-y-4">
               {milestones.milestones.map((m) => (
-                <div key={m.milestone} className="space-y-1">
+                <div key={m.milestoneType} className="space-y-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-heading font-medium">{m.label}</span>
+                      <span className="text-sm text-heading font-medium">{m.milestoneName}</span>
                       <span className={`text-xs ${trendColor(m.trend)}`}>{trendIcon(m.trend)}</span>
                     </div>
                     <div className="flex items-center gap-4 text-sm">
@@ -180,10 +180,10 @@ export function TimeToValuePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {highCompletion.map((m) => (
                 <div
-                  key={m.milestone}
+                  key={m.milestoneType}
                   className="rounded-lg bg-success/10 border border-success/25 p-3"
                 >
-                  <p className="text-sm font-medium text-heading">{m.label}</p>
+                  <p className="text-sm font-medium text-heading">{m.milestoneName}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-lg font-bold text-success">{m.completionRate}%</span>
                     {m.avgTimeToReachMinutes != null && (

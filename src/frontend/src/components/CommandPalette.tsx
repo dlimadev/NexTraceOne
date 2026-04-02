@@ -26,6 +26,7 @@ import {
   Loader2,
   ArrowRight,
   BarChart3,
+  Clock,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';

@@ -8,7 +8,7 @@ import type { AssetGraph, ServiceNode, ApiNode } from '../../../types/index';
 
 echarts.use([GraphChart, TooltipComponent, LegendComponent, CanvasRenderer]);
 
-type GraphNode = NonNullable<GraphSeriesOption['data']>[number] & { id: string };
+type GraphNode = NonNullable<GraphSeriesOption['data']>[number] & { id: string; tooltip?: { formatter: string } };
 type GraphLink = NonNullable<GraphSeriesOption['links']>[number];
 
 /** Paleta de cores dos nós — alinha com o design system. */

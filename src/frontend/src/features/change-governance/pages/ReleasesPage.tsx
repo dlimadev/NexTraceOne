@@ -88,7 +88,7 @@ export function ReleasesPage() {
   useEffect(() => {
     if (!environmentOptions.length) return;
     if (!form.environment || !environmentOptions.includes(form.environment)) {
-      setForm((current) => ({ ...current, environment: environmentOptions[0] }));
+      setForm((current) => ({ ...current, environment: environmentOptions[0] ?? '' }));
     }
   }, [environmentOptions, form.environment]);
 

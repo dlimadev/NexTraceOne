@@ -161,8 +161,8 @@ export function ChangeCatalogPage() {
 
   const changeTypeOptions = useMemo(() => {
     const fromEndpoint = filterOptionsQuery.data?.changeTypes ?? [];
-    const fromChanges = changes.map((c) => c.changeType).filter(Boolean);
-    const set = new Set<string>([...fromEndpoint, ...fromChanges, ...FALLBACK_CHANGE_TYPES]);
+    const fromChanges = changes.map((c) => c.changeType).filter((v): v is string => Boolean(v));
+    const set = new Set<string>([...fromEndpoint, ...fromChanges, ...(FALLBACK_CHANGE_TYPES as readonly string[])]);
 
     if (changeType) set.add(changeType);
 

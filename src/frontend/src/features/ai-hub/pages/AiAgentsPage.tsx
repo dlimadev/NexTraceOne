@@ -196,7 +196,7 @@ function CreateAgentDialog({
                 className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body focus:outline-none focus:ring-1 focus:ring-accent"
               >
                 {categories.map(c => (
-                  <option key={c} value={c}>{t(`agents.category.${c}`, humanizeEnumValue(c))}</option>
+                  <option key={c} value={c}>{t(`agents.category.${c}`) || humanizeEnumValue(c)}</option>
                 ))}
               </select>
             </div>
@@ -736,7 +736,7 @@ function AgentCard({ agent, onView, onExecute, t }: AgentCardProps) {
           {visibilityIcon(agent.visibility)}
           <span className="ml-0.5">{t(`agents.visibility.${agent.visibility}`)}</span>
         </Badge>
-        <Badge variant="info">{t(`agents.category.${agent.category}`, humanizeEnumValue(agent.category))}</Badge>
+        <Badge variant="info">{t(`agents.category.${agent.category}`) || humanizeEnumValue(agent.category)}</Badge>
       </div>
 
       <div className="flex items-center justify-between text-[10px] text-muted mb-3">
