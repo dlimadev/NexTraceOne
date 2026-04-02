@@ -2,10 +2,10 @@ using NexTraceOne.BuildingBlocks.Observability.Telemetry.Models;
 
 namespace NexTraceOne.BuildingBlocks.Observability.Telemetry.Abstractions;
 
-// IMPLEMENTATION STATUS: Planned — no implementation exists.
-// These interfaces define the Product Store telemetry abstraction layer.
-// They will be implemented when the telemetry aggregation pipeline is built.
-// Do NOT register in DI or reference in handlers until implementations exist.
+// IMPLEMENTATION STATUS: Implemented — EF Core repositories in OperationalIntelligence.Infrastructure.TelemetryStore.
+// ObservedTopologyRepository, AnomalySnapshotRepository, TelemetryReferenceRepository,
+// ReleaseCorrelationRepository, InvestigationContextRepository provide PostgreSQL-backed persistence.
+// Registered in DI via AddTelemetryStoreInfrastructure().
 
 /// <summary>
 /// Porta de escrita para topologia observada no Product Store.
