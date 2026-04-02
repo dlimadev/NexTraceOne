@@ -183,8 +183,43 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task GetAutomationWorkflow_KnownWorkflowId_ShouldReturnWorkflowDetail()
     {
-        var handler = new GetAutomationWorkflow.Handler();
-        var query = new GetAutomationWorkflow.Query("aw-0001-0000-0000-000000000001");
+        var workflowId = Guid.Parse("a0a10001-0001-0000-0000-000000000001");
+        var typedId = new AutomationWorkflowRecordId(workflowId);
+        var utcNow = DateTimeOffset.UtcNow;
+
+        var workflow = AutomationWorkflowRecord.Create(
+            actionId: "action-restart-controlled",
+            serviceId: "svc-payment-gateway",
+            incidentId: null,
+            changeId: null,
+            rationale: "Error rate exceeded threshold — controlled restart needed.",
+            requestedBy: "ops-engineer@nextraceone.io",
+            targetScope: "pod group A",
+            targetEnvironment: "Production",
+            riskLevel: RiskLevel.Medium,
+            utcNow: utcNow);
+        workflow.Approve("tech-lead@nextraceone.io", utcNow);
+        workflow.UpdateStatus(AutomationWorkflowStatus.Executing, utcNow);
+
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(workflow);
+
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        auditRepo.GetByWorkflowIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(new List<AutomationAuditRecord>
+            {
+                AutomationAuditRecord.Create(
+                    workflow.Id, AutomationAuditAction.WorkflowCreated,
+                    "ops-engineer@nextraceone.io", "Workflow created.", utcNow)
+            });
+
+        var validationRepo = Substitute.For<IAutomationValidationRepository>();
+        validationRepo.GetByWorkflowIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns((AutomationValidationRecord?)null);
+
+        var handler = new GetAutomationWorkflow.Handler(workflowRepo, auditRepo, validationRepo);
+        var query = new GetAutomationWorkflow.Query(workflow.Id.Value.ToString());
 
         var result = await handler.Handle(query, CancellationToken.None);
 
@@ -198,17 +233,21 @@ public sealed class AutomationFeatureTests
         result.Value.ApproverInfo.Should().NotBeNull();
         result.Value.ApproverInfo!.ApprovedBy.Should().Be("tech-lead@nextraceone.io");
         result.Value.ApproverInfo.ApprovalStatus.Should().Be(AutomationApprovalStatus.Approved);
-        result.Value.Preconditions.Should().HaveCount(3);
-        result.Value.ExecutionSteps.Should().HaveCount(4);
-        result.Value.ExecutionSteps[0].Status.Should().Be("Completed");
-        result.Value.ExecutionSteps[2].Status.Should().Be("InProgress");
+        result.Value.Preconditions.Should().HaveCount(0);
+        result.Value.ExecutionSteps.Should().HaveCount(0);
         result.Value.AuditEntries.Should().NotBeEmpty();
     }
 
     [Fact]
     public async Task GetAutomationWorkflow_UnknownWorkflowId_ShouldReturnError()
     {
-        var handler = new GetAutomationWorkflow.Handler();
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns((AutomationWorkflowRecord?)null);
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var validationRepo = Substitute.For<IAutomationValidationRepository>();
+
+        var handler = new GetAutomationWorkflow.Handler(workflowRepo, auditRepo, validationRepo);
         var query = new GetAutomationWorkflow.Query("nonexistent-workflow-id");
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -270,12 +309,38 @@ public sealed class AutomationFeatureTests
 
     // ── UpdateAutomationWorkflowAction ───────────────────────────────
 
+    private static (UpdateAutomationWorkflowAction.Handler handler, IAutomationWorkflowRepository workflowRepo) CreateUpdateActionHandler(AutomationWorkflowRecord? workflow = null)
+    {
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(workflow);
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var unitOfWork = Substitute.For<IAutomationUnitOfWork>();
+        unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        return (new UpdateAutomationWorkflowAction.Handler(workflowRepo, auditRepo, unitOfWork, clock), workflowRepo);
+    }
+
     [Fact]
     public async Task UpdateAutomationWorkflowAction_ApproveAction_ShouldReturnApprovedStatus()
     {
-        var handler = new UpdateAutomationWorkflowAction.Handler();
+        var utcNow = DateTimeOffset.UtcNow;
+        var workflow = AutomationWorkflowRecord.Create(
+            actionId: "action-restart-controlled",
+            serviceId: "svc-payment-gateway",
+            incidentId: null, changeId: null,
+            rationale: "Controlled restart needed.",
+            requestedBy: "ops-engineer@nextraceone.io",
+            targetScope: "pod group A",
+            targetEnvironment: "Production",
+            riskLevel: RiskLevel.Medium,
+            utcNow: utcNow);
+        workflow.UpdateStatus(AutomationWorkflowStatus.AwaitingApproval, utcNow);
+
+        var (handler, _) = CreateUpdateActionHandler(workflow);
         var command = new UpdateAutomationWorkflowAction.Command(
-            WorkflowId: "b0a10001-0001-0000-0000-000000000001",
+            WorkflowId: workflow.Id.Value.ToString(),
             Action: "approve",
             PerformedBy: "tech-lead@nextraceone.io",
             Reason: "Low blast radius, safe to proceed.",
@@ -291,9 +356,22 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task UpdateAutomationWorkflowAction_RejectAction_ShouldReturnRejectedStatus()
     {
-        var handler = new UpdateAutomationWorkflowAction.Handler();
+        var utcNow = DateTimeOffset.UtcNow;
+        var workflow = AutomationWorkflowRecord.Create(
+            actionId: "action-restart-controlled",
+            serviceId: "svc-payment-gateway",
+            incidentId: null, changeId: null,
+            rationale: "Controlled restart needed.",
+            requestedBy: "ops-engineer@nextraceone.io",
+            targetScope: "pod group A",
+            targetEnvironment: "Production",
+            riskLevel: RiskLevel.Medium,
+            utcNow: utcNow);
+        workflow.UpdateStatus(AutomationWorkflowStatus.AwaitingApproval, utcNow);
+
+        var (handler, _) = CreateUpdateActionHandler(workflow);
         var command = new UpdateAutomationWorkflowAction.Command(
-            WorkflowId: "b0a10001-0001-0000-0000-000000000001",
+            WorkflowId: workflow.Id.Value.ToString(),
             Action: "reject",
             PerformedBy: "architect@nextraceone.io",
             Reason: "Risk too high — requires further analysis.",
@@ -302,14 +380,14 @@ public sealed class AutomationFeatureTests
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.NewStatus.Should().Be(AutomationWorkflowStatus.Rejected);
+        result.Value.NewStatus.Should().Be(AutomationWorkflowStatus.Failed);
         result.Value.ActionPerformed.Should().Be("reject");
     }
 
     [Fact]
     public async Task UpdateAutomationWorkflowAction_InvalidAction_ShouldReturnError()
     {
-        var handler = new UpdateAutomationWorkflowAction.Handler();
+        var (handler, _) = CreateUpdateActionHandler();
         var command = new UpdateAutomationWorkflowAction.Command(
             WorkflowId: "b0a10001-0001-0000-0000-000000000001",
             Action: "invalid-action",
@@ -324,9 +402,9 @@ public sealed class AutomationFeatureTests
     }
 
     [Fact]
-    public async Task UpdateAutomationWorkflowAction_UnknownWorkflow_ValidAction_ShouldStillProcessAction()
+    public async Task UpdateAutomationWorkflowAction_UnknownWorkflow_ValidAction_ShouldReturnNotFoundError()
     {
-        var handler = new UpdateAutomationWorkflowAction.Handler();
+        var (handler, _) = CreateUpdateActionHandler(null);
         var command = new UpdateAutomationWorkflowAction.Command(
             WorkflowId: "nonexistent-workflow-id",
             Action: "approve",
@@ -336,9 +414,8 @@ public sealed class AutomationFeatureTests
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        // Handler currently validates action type only; workflow existence check is deferred to integration layer.
-        result.IsSuccess.Should().BeTrue();
-        result.Value.NewStatus.Should().Be(AutomationWorkflowStatus.Approved);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("NotFound");
     }
 
     [Fact]
@@ -368,9 +445,31 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task EvaluatePreconditions_KnownWorkflowId_ShouldReturnEvaluatedPreconditions()
     {
-        var handler = new EvaluatePreconditions.Handler();
+        var utcNow = DateTimeOffset.UtcNow;
+        var workflow = AutomationWorkflowRecord.Create(
+            actionId: "action-restart-controlled",
+            serviceId: "svc-payment-gateway",
+            incidentId: null, changeId: null,
+            rationale: "Error rate exceeded threshold.",
+            requestedBy: "ops-engineer@nextraceone.io",
+            targetScope: "pod group A",
+            targetEnvironment: "Production",
+            riskLevel: RiskLevel.Medium,
+            utcNow: utcNow);
+        workflow.Approve("tech-lead@nextraceone.io", utcNow);
+
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(workflow);
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var unitOfWork = Substitute.For<IAutomationUnitOfWork>();
+        unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(utcNow);
+
+        var handler = new EvaluatePreconditions.Handler(workflowRepo, auditRepo, unitOfWork, clock);
         var command = new EvaluatePreconditions.Command(
-            WorkflowId: "b0a10001-0001-0000-0000-000000000001",
+            WorkflowId: workflow.Id.Value.ToString(),
             EvaluatedBy: "system");
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -385,18 +484,25 @@ public sealed class AutomationFeatureTests
     }
 
     [Fact]
-    public async Task EvaluatePreconditions_UnknownWorkflowId_ShouldStillReturnPreconditions()
+    public async Task EvaluatePreconditions_UnknownWorkflowId_ShouldReturnNotFoundError()
     {
-        var handler = new EvaluatePreconditions.Handler();
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns((AutomationWorkflowRecord?)null);
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var unitOfWork = Substitute.For<IAutomationUnitOfWork>();
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+
+        var handler = new EvaluatePreconditions.Handler(workflowRepo, auditRepo, unitOfWork, clock);
         var command = new EvaluatePreconditions.Command(
             WorkflowId: "nonexistent-workflow-id",
             EvaluatedBy: "system");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        // Handler currently returns simulated preconditions for any workflow; existence check deferred to integration layer.
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Results.Should().NotBeEmpty();
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("NotFound");
     }
 
     [Fact]
@@ -415,9 +521,31 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task RecordAutomationValidation_ValidInputs_ShouldRecordSuccessfully()
     {
-        var handler = new RecordAutomationValidation.Handler();
+        var utcNow = DateTimeOffset.UtcNow;
+        var workflow = AutomationWorkflowRecord.Create(
+            actionId: "action-restart-controlled",
+            serviceId: "svc-payment-gateway",
+            incidentId: null, changeId: null,
+            rationale: "Error rate exceeded threshold.",
+            requestedBy: "ops-engineer@nextraceone.io",
+            targetScope: "pod group A",
+            targetEnvironment: "Production",
+            riskLevel: RiskLevel.Medium,
+            utcNow: utcNow);
+
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(workflow);
+        var validationRepo = Substitute.For<IAutomationValidationRepository>();
+        var auditRepo = Substitute.For<IAutomationAuditRepository>();
+        var unitOfWork = Substitute.For<IAutomationUnitOfWork>();
+        unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(utcNow);
+
+        var handler = new RecordAutomationValidation.Handler(workflowRepo, validationRepo, auditRepo, unitOfWork, clock);
         var command = new RecordAutomationValidation.Command(
-            WorkflowId: "b0a10001-0001-0000-0000-000000000001",
+            WorkflowId: workflow.Id.Value.ToString(),
             Status: ValidationStatus.Passed,
             ObservedOutcome: "Error rate dropped to 0.4% — within threshold.",
             ValidatedBy: "ops-engineer@nextraceone.io",
@@ -451,16 +579,41 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task GetAutomationValidation_KnownWorkflowId_ShouldReturnValidationData()
     {
-        var handler = new GetAutomationValidation.Handler();
-        var query = new GetAutomationValidation.Query("aw-0001-0000-0000-000000000001");
+        var utcNow = DateTimeOffset.UtcNow;
+        var workflow = AutomationWorkflowRecord.Create(
+            actionId: "action-restart-controlled",
+            serviceId: "svc-payment-gateway",
+            incidentId: null, changeId: null,
+            rationale: "Error rate exceeded threshold.",
+            requestedBy: "ops-engineer@nextraceone.io",
+            targetScope: "pod group A",
+            targetEnvironment: "Production",
+            riskLevel: RiskLevel.Medium,
+            utcNow: utcNow);
+
+        var validation = AutomationValidationRecord.Create(
+            workflowId: workflow.Id,
+            outcome: AutomationOutcome.Inconclusive,
+            validatedBy: "ops-engineer@nextraceone.io",
+            notes: "Validation in progress.",
+            observedOutcome: "Error rate stabilizing — need more data.",
+            utcNow: utcNow);
+
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(workflow);
+        var validationRepo = Substitute.For<IAutomationValidationRepository>();
+        validationRepo.GetByWorkflowIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns(validation);
+
+        var handler = new GetAutomationValidation.Handler(workflowRepo, validationRepo);
+        var query = new GetAutomationValidation.Query(workflow.Id.Value.ToString());
 
         var result = await handler.Handle(query, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(ValidationStatus.InProgress);
-        result.Value.Checks.Should().HaveCount(4);
-        result.Value.Checks[0].IsPassed.Should().BeTrue();
-        result.Value.Checks[3].IsPassed.Should().BeFalse();
+        result.Value.Checks.Should().HaveCount(0);
         result.Value.ObservedOutcome.Should().NotBeNullOrEmpty();
         result.Value.ValidatedBy.Should().Be("ops-engineer@nextraceone.io");
     }
@@ -468,7 +621,12 @@ public sealed class AutomationFeatureTests
     [Fact]
     public async Task GetAutomationValidation_UnknownWorkflowId_ShouldReturnError()
     {
-        var handler = new GetAutomationValidation.Handler();
+        var workflowRepo = Substitute.For<IAutomationWorkflowRepository>();
+        workflowRepo.GetByIdAsync(Arg.Any<AutomationWorkflowRecordId>(), Arg.Any<CancellationToken>())
+            .Returns((AutomationWorkflowRecord?)null);
+        var validationRepo = Substitute.For<IAutomationValidationRepository>();
+
+        var handler = new GetAutomationValidation.Handler(workflowRepo, validationRepo);
         var query = new GetAutomationValidation.Query("nonexistent-workflow-id");
 
         var result = await handler.Handle(query, CancellationToken.None);
