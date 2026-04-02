@@ -67,7 +67,7 @@ const ADMIN_PERMISSIONS = [
 ];
 
 /** Permissões para o perfil Engineer (acesso limitado). */
-const ENGINEER_PERMISSIONS = [
+export const ENGINEER_PERMISSIONS = [
   'catalog:assets:read',
   'contracts:read',
   'contracts:write',
@@ -76,6 +76,22 @@ const ENGINEER_PERMISSIONS = [
   'operations:incidents:read',
   'operations:incidents:write',
   'operations:runbooks:read',
+];
+
+/** Permissões para o perfil Viewer (apenas leitura). */
+export const VIEWER_PERMISSIONS = [
+  'catalog:assets:read',
+  'contracts:read',
+  'change-intelligence:read',
+];
+
+/** Permissões para o perfil Auditor (audit + leitura básica). */
+export const AUDITOR_PERMISSIONS = [
+  'catalog:assets:read',
+  'contracts:read',
+  'audit:read',
+  'audit:trail:read',
+  'audit:export',
 ];
 
 /**

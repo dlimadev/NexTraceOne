@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockAuthSession } from './helpers/auth';
+import { mockAuthSession, mockEngineerSession, ENGINEER_PERMISSIONS, VIEWER_PERMISSIONS, AUDITOR_PERMISSIONS } from './helpers/auth';
 
 test.describe('Login Page', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,31 +11,27 @@ test.describe('Login Page', () => {
 
   test('exibe o formulário de login na rota /login', async ({ page }) => {
     await page.goto('/login');
-    await expect(page.getByText('NexTraceOne')).toBeVisible();
-    await expect(page.getByText('Sovereign Change Intelligence Platform')).toBeVisible();
-    await expect(page.getByLabel('Tenant ID')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /welcome to nextraceone/i })).toBeVisible();
+    await expect(page.getByText(/access your governance platform/i)).toBeVisible();
     await expect(page.getByLabel('Email')).toBeVisible();
     await expect(page.getByLabel('Password')).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
 
-  test('redireciona para / quando já autenticado', async ({ page }) => {
-    await mockAuthSession(page);
-    await page.goto('/login');
-    // Com autenticação simulada, o AppLayout deve redirecionar para dashboard
-    await expect(page).toHaveURL('/');
-  });
-
   test('exibe mensagem de erro com credenciais inválidas', async ({ page }) => {
     await page.goto('/login');
 
-    await page.getByLabel('Tenant ID').fill('tenant-invalid');
+    // Intercepta login API para retornar erro
+    await page.route('**/api/v1/identity/auth/login', (route) =>
+      route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'Invalid credentials' }) }),
+    );
+
     await page.getByLabel('Email').fill('invalid@test.com');
     await page.getByLabel('Password').fill('wrongpass');
     await page.getByRole('button', { name: /sign in/i }).click();
 
     await expect(
-      page.getByText(/invalid credentials or tenant/i)
+      page.getByText(/invalid credentials/i)
     ).toBeVisible({ timeout: 5_000 });
   });
 
@@ -45,10 +41,9 @@ test.describe('Login Page', () => {
     // Simula uma resposta lenta da API interceptando a requisição
     await page.route('**/api/v1/identity/auth/login', async (route) => {
       await new Promise((r) => setTimeout(r, 500));
-      await route.fulfill({ status: 401, body: JSON.stringify({ error: 'Unauthorized' }) });
+      await route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'Unauthorized' }) });
     });
 
-    await page.getByLabel('Tenant ID').fill('tenant-001');
     await page.getByLabel('Email').fill('user@test.com');
     await page.getByLabel('Password').fill('pass');
 
@@ -62,6 +57,15 @@ test.describe('Login Page', () => {
   test('exibe o rodapé indicando self-hosted', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByText(/self-hosted/i)).toBeVisible();
+  });
+});
+
+test.describe('Login Page — redirect quando autenticado', () => {
+  test('redireciona para / quando já autenticado', async ({ page }) => {
+    await mockAuthSession(page);
+    await page.goto('/login');
+    // Com autenticação simulada, o AppLayout deve redirecionar para dashboard
+    await expect(page).toHaveURL('/');
   });
 });
 
@@ -79,8 +83,8 @@ test.describe('Navigation (autenticado)', () => {
     await page.goto('/');
     await expect(page.getByRole('link', { name: /dashboard/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /releases/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /engineering graph/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /contracts/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /dependency graph/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /contract catalog/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /workflow/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /promotion/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /users/i })).toBeVisible();
@@ -96,16 +100,16 @@ test.describe('Navigation (autenticado)', () => {
 
   test('navega para a página de Contracts', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: /contracts/i }).click();
+    await page.getByRole('link', { name: /contract catalog/i }).click();
     await expect(page).toHaveURL('/contracts');
-    await expect(page.getByRole('heading', { name: /contracts/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /contract/i })).toBeVisible();
   });
 
-  test('navega para a página de Engineering Graph', async ({ page }) => {
+  test('navega para a página de Dependency Graph', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: /engineering graph/i }).click();
-    await expect(page).toHaveURL('/graph');
-    await expect(page.getByRole('heading', { name: /engineering graph/i })).toBeVisible();
+    await page.getByRole('link', { name: /dependency graph/i }).click();
+    await expect(page).toHaveURL('/services/graph');
+    await expect(page.getByRole('heading', { name: /dependency graph/i })).toBeVisible();
   });
 
   test('navega para a página de Workflow', async ({ page }) => {
@@ -176,8 +180,8 @@ test.describe('Dashboard (autenticado)', () => {
   test('exibe os stat cards', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByText('Active Services')).toBeVisible();
-    await expect(page.getByText('Registered APIs')).toBeVisible();
-    await expect(page.getByText('Consumer Relations')).toBeVisible();
+    await expect(page.getByText('Total Contracts')).toBeVisible();
+    await expect(page.getByText('Recent Changes')).toBeVisible();
   });
 
   test('exibe serviços do grafo', async ({ page }) => {
@@ -214,7 +218,7 @@ test.describe('Releases Page (autenticado)', () => {
 
 test.describe('Controle de Acesso (RBAC)', () => {
   test('Developer não vê link de Users na sidebar', async ({ page }) => {
-    await mockAuthSession(page, { roles: ['Developer'] });
+    await mockEngineerSession(page);
     await page.goto('/');
     // Aguarda perfil ser carregado (sidebar renderizar sem Users)
     await expect(page.getByRole('link', { name: /releases/i })).toBeVisible({ timeout: 5_000 });
@@ -234,7 +238,7 @@ test.describe('Controle de Acesso (RBAC)', () => {
   });
 
   test('Developer é redirecionado ao tentar acessar /users diretamente', async ({ page }) => {
-    await mockAuthSession(page, { roles: ['Developer'] });
+    await mockAuthSession(page, { roles: ['Developer'], permissions: ENGINEER_PERMISSIONS });
     await page.goto('/users');
     // Deve redirecionar para /unauthorized
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
@@ -242,26 +246,33 @@ test.describe('Controle de Acesso (RBAC)', () => {
   });
 
   test('Viewer é redirecionado ao tentar acessar /users diretamente', async ({ page }) => {
-    await mockAuthSession(page, { roles: ['Viewer'] });
+    await mockAuthSession(page, { roles: ['Viewer'], permissions: VIEWER_PERMISSIONS });
     await page.goto('/users');
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
   });
 
   test('Auditor pode acessar /audit', async ({ page }) => {
-    await mockAuthSession(page, { roles: ['Auditor'] });
+    await mockAuthSession(page, { roles: ['Auditor'], permissions: AUDITOR_PERMISSIONS });
+    await page.route('**/api/v1/audit/events**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }),
+      }),
+    );
     await page.goto('/audit');
     await expect(page.getByRole('heading', { name: /audit log/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('página /unauthorized exibe mensagem e botão de retorno', async ({ page }) => {
-    await mockAuthSession(page, { roles: ['Developer'] });
+    await mockAuthSession(page, { roles: ['Developer'], permissions: ENGINEER_PERMISSIONS });
     await page.goto('/users');
     await expect(page.getByText(/access denied/i)).toBeVisible({ timeout: 5_000 });
     await expect(page.getByRole('button', { name: /go to dashboard/i })).toBeVisible();
   });
 
   test('botão Go to Dashboard redireciona para /', async ({ page }) => {
-    await mockAuthSession(page, { roles: ['Developer'] });
+    await mockAuthSession(page, { roles: ['Developer'], permissions: ENGINEER_PERMISSIONS });
     await page.goto('/users');
     await page.getByRole('button', { name: /go to dashboard/i }).click();
     await expect(page).toHaveURL('/');
