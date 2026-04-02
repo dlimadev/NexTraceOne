@@ -7,6 +7,9 @@ import type {
   SoapBuilderState,
   EventBuilderState,
   WorkserviceBuilderState,
+  SharedSchemaBuilderState,
+  WebhookBuilderState,
+  LegacyContractBuilderState,
   BuilderValidationResult,
   BuilderValidationError,
 } from './builderTypes';
@@ -329,6 +332,115 @@ export function validateWorkserviceBuilder(state: WorkserviceBuilderState): Buil
           fallback: 'Produced event name is required',
         });
       }
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+// ── SharedSchema Validation ───────────────────────────────────────────────────
+
+export function validateSharedSchemaBuilder(state: SharedSchemaBuilderState): BuilderValidationResult {
+  const errors: BuilderValidationError[] = [];
+
+  if (!state.name.trim()) {
+    errors.push({ field: 'name', messageKey: 'contracts.builder.validation.nameRequired', fallback: 'Schema name is required' });
+  }
+  if (!state.version.trim()) {
+    errors.push({ field: 'version', messageKey: 'contracts.builder.validation.versionRequired', fallback: 'Version is required' });
+  }
+  if (state.properties.length === 0) {
+    errors.push({ field: 'properties', messageKey: 'contracts.builder.validation.propertiesRequired', fallback: 'At least one property is required' });
+  }
+
+  const propNames = new Set<string>();
+  for (const prop of state.properties) {
+    if (!prop.name.trim()) {
+      errors.push({ field: `property.${prop.id}.name`, messageKey: 'contracts.builder.validation.paramNameRequired', fallback: 'Property name is required' });
+    }
+    if (prop.name.trim()) {
+      if (propNames.has(prop.name)) {
+        errors.push({ field: `property.${prop.id}.name`, messageKey: 'contracts.builder.validation.duplicatePropertyName', fallback: `Duplicate property name '${prop.name}'` });
+      }
+      propNames.add(prop.name);
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+// ── Webhook Validation ────────────────────────────────────────────────────────
+
+export function validateWebhookBuilder(state: WebhookBuilderState): BuilderValidationResult {
+  const errors: BuilderValidationError[] = [];
+
+  if (!state.name.trim()) {
+    errors.push({ field: 'name', messageKey: 'contracts.builder.validation.nameRequired', fallback: 'Webhook name is required' });
+  }
+  if (!state.urlPattern.trim()) {
+    errors.push({ field: 'urlPattern', messageKey: 'contracts.builder.validation.urlPatternRequired', fallback: 'URL pattern is required' });
+  }
+  if (!state.method) {
+    errors.push({ field: 'method', messageKey: 'contracts.builder.validation.methodRequired', fallback: 'HTTP method is required' });
+  }
+
+  if (state.urlPattern.trim() && !/^https?:\/\/.+/i.test(state.urlPattern)) {
+    errors.push({ field: 'urlPattern', messageKey: 'contracts.builder.validation.endpointMustBeUrl', fallback: 'URL pattern must be a valid URL (http:// or https://)' });
+  }
+
+  const needsSecret = state.authentication === 'hmac-sha256' || state.authentication === 'bearer' || state.authentication === 'api-key';
+  if (needsSecret && !state.secretHeaderName.trim()) {
+    errors.push({ field: 'secretHeaderName', messageKey: 'contracts.builder.validation.secretHeaderRequired', fallback: 'Secret header name is required for the selected authentication type' });
+  }
+
+  if (state.retryCount.trim() && !/^\d+$/.test(state.retryCount)) {
+    errors.push({ field: 'retryCount', messageKey: 'contracts.builder.validation.retriesMustBeNumber', fallback: 'Retry count must be a positive number' });
+  }
+  if (state.timeout.trim() && !/^\d+$/.test(state.timeout)) {
+    errors.push({ field: 'timeout', messageKey: 'contracts.builder.validation.timeoutMustBeNumber', fallback: 'Timeout must be a positive number' });
+  }
+
+  for (const h of state.headers) {
+    if (!h.name.trim()) {
+      errors.push({ field: `header.${h.id}.name`, messageKey: 'contracts.builder.validation.paramNameRequired', fallback: 'Header name is required' });
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+// ── Legacy Contract Validation ────────────────────────────────────────────────
+
+export function validateLegacyContractBuilder(state: LegacyContractBuilderState): BuilderValidationResult {
+  const errors: BuilderValidationError[] = [];
+
+  if (!state.name.trim()) {
+    errors.push({ field: 'name', messageKey: 'contracts.builder.validation.nameRequired', fallback: 'Contract name is required' });
+  }
+  if (!state.encoding) {
+    errors.push({ field: 'encoding', messageKey: 'contracts.builder.validation.encodingRequired', fallback: 'Character encoding is required' });
+  }
+  if (state.fields.length === 0) {
+    errors.push({ field: 'fields', messageKey: 'contracts.builder.validation.fieldsRequired', fallback: 'At least one field is required' });
+  }
+
+  if (state.kind === 'Copybook' && !state.programName.trim()) {
+    errors.push({ field: 'programName', messageKey: 'contracts.builder.validation.programNameRequired', fallback: 'COBOL program name is required for Copybook contracts' });
+  }
+  if (state.kind === 'MqMessage' && !state.queueName.trim()) {
+    errors.push({ field: 'queueName', messageKey: 'contracts.builder.validation.queueNameRequired', fallback: 'Queue name is required for MQ Message contracts' });
+  }
+  if (state.kind === 'CicsCommarea' && !state.transactionId.trim()) {
+    errors.push({ field: 'transactionId', messageKey: 'contracts.builder.validation.transactionIdRequired', fallback: 'Transaction ID is required for CICS Commarea contracts' });
+  }
+
+  if (state.totalLength.trim() && !/^\d+$/.test(state.totalLength)) {
+    errors.push({ field: 'totalLength', messageKey: 'contracts.builder.validation.totalLengthMustBeNumber', fallback: 'Total length must be a positive number' });
+  }
+
+  for (const f of state.fields) {
+    if (!f.name.trim()) {
+      errors.push({ field: `field.${f.id}.name`, messageKey: 'contracts.builder.validation.paramNameRequired', fallback: 'Field name is required' });
     }
   }
 

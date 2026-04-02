@@ -5,8 +5,11 @@ import { VisualRestBuilder } from '../builders/VisualRestBuilder';
 import { VisualSoapBuilder } from '../builders/VisualSoapBuilder';
 import { VisualEventBuilder } from '../builders/VisualEventBuilder';
 import { VisualWorkserviceBuilder } from '../builders/VisualWorkserviceBuilder';
+import { VisualSharedSchemaBuilder } from '../builders/VisualSharedSchemaBuilder';
+import { VisualWebhookBuilder } from '../builders/VisualWebhookBuilder';
+import { VisualLegacyContractBuilder } from '../builders/VisualLegacyContractBuilder';
 import { ContractEditorSplitPane } from '../editor/ContractEditorSplitPane';
-import type { SyncResult } from '../builders/shared/builderTypes';
+import type { SyncResult, LegacyContractKind } from '../builders/shared/builderTypes';
 
 type EditorMode = 'visual' | 'source' | 'split' | 'preview';
 
@@ -290,6 +293,15 @@ function VisualBuilderByProtocol({
       return <VisualEventBuilder isReadOnly={isReadOnly} onSync={onSync} />;
     case 'BackgroundService':
       return <VisualWorkserviceBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+    case 'SharedSchema':
+      return <VisualSharedSchemaBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+    case 'Webhook':
+      return <VisualWebhookBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+    case 'Copybook':
+    case 'MqMessage':
+    case 'FixedLayout':
+    case 'CicsCommarea':
+      return <VisualLegacyContractBuilder kind={resolvedType as LegacyContractKind} isReadOnly={isReadOnly} onSync={onSync} />;
     default:
       return <VisualRestBuilder isReadOnly={isReadOnly} onSync={onSync} />;
   }

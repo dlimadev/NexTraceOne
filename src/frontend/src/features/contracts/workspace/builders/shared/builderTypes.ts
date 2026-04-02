@@ -229,6 +229,103 @@ export interface WorkserviceBuilderState {
   producedEvents: ProducedEvent[];
 }
 
+// ── Shared Schema Builder ─────────────────────────────────────────────────────
+
+export interface SharedSchemaProperty {
+  id: string;
+  name: string;
+  type: 'string' | 'integer' | 'number' | 'boolean' | 'array' | 'object' | '$ref';
+  description: string;
+  required: boolean;
+  constraints: PropertyConstraints;
+  $ref?: string;
+  properties?: SharedSchemaProperty[];
+  items?: SharedSchemaProperty;
+}
+
+export interface SharedSchemaBuilderState {
+  name: string;
+  version: string;
+  description: string;
+  namespace: string;
+  format: 'json-schema' | 'avro' | 'protobuf';
+  compatibility: 'BACKWARD' | 'FORWARD' | 'FULL' | 'NONE';
+  owner: string;
+  tags: string[];
+  properties: SharedSchemaProperty[];
+  example: string;
+}
+
+// ── Webhook Builder ───────────────────────────────────────────────────────────
+
+export interface WebhookHeader {
+  id: string;
+  name: string;
+  value: string;
+  required: boolean;
+}
+
+export interface WebhookBuilderState {
+  name: string;
+  description: string;
+  method: 'POST' | 'PUT' | 'PATCH';
+  urlPattern: string;
+  contentType: string;
+  payloadSchema: string;
+  headers: WebhookHeader[];
+  authentication: 'none' | 'hmac-sha256' | 'basic' | 'bearer' | 'api-key';
+  secretHeaderName: string;
+  retryPolicy: string;
+  retryCount: string;
+  timeout: string;
+  events: string[];
+  owner: string;
+  observabilityNotes: string;
+}
+
+// ── Legacy Contract Builder (Copybook, MQ, FixedLayout, CICS) ─────────────────
+
+export type LegacyContractKind = 'Copybook' | 'MqMessage' | 'FixedLayout' | 'CicsCommarea';
+export type LegacyFieldType = 'alphanumeric' | 'numeric' | 'packed-decimal' | 'binary' | 'display' | 'group' | 'filler';
+export type LegacyEncoding = 'EBCDIC' | 'ASCII' | 'UTF-8';
+
+export interface LegacyField {
+  id: string;
+  name: string;
+  level: string;
+  type: LegacyFieldType;
+  length: string;
+  offset: string;
+  picture: string;
+  description: string;
+  occurs: string;
+  redefines: string;
+}
+
+export interface LegacyContractBuilderState {
+  kind: LegacyContractKind;
+  name: string;
+  version: string;
+  description: string;
+  encoding: LegacyEncoding;
+  totalLength: string;
+  owner: string;
+  /** Copybook-specific: COBOL program name */
+  programName: string;
+  /** MQ-specific: queue manager */
+  queueManager: string;
+  /** MQ-specific: queue name */
+  queueName: string;
+  /** MQ-specific: message format */
+  messageFormat: string;
+  /** CICS-specific: transaction ID */
+  transactionId: string;
+  /** CICS-specific: commarea length */
+  commareaLength: string;
+  fields: LegacyField[];
+  observabilityNotes: string;
+}
+
 // ── Validation ────────────────────────────────────────────────────────────────
 
 export interface BuilderValidationError {

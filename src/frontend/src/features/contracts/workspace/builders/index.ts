@@ -2,6 +2,9 @@ export { VisualRestBuilder } from './VisualRestBuilder';
 export { VisualSoapBuilder } from './VisualSoapBuilder';
 export { VisualEventBuilder } from './VisualEventBuilder';
 export { VisualWorkserviceBuilder } from './VisualWorkserviceBuilder';
+export { VisualSharedSchemaBuilder } from './VisualSharedSchemaBuilder';
+export { VisualWebhookBuilder } from './VisualWebhookBuilder';
+export { VisualLegacyContractBuilder } from './VisualLegacyContractBuilder';
 
 // Shared builder infrastructure
 export type {
@@ -13,6 +16,13 @@ export type {
   EventChannel,
   WorkserviceBuilderState,
   WorkserviceDependency,
+  SharedSchemaBuilderState,
+  SharedSchemaProperty,
+  WebhookBuilderState,
+  WebhookHeader,
+  LegacyContractBuilderState,
+  LegacyContractKind,
+  LegacyField,
   BuilderValidationResult,
   SyncResult,
 } from './shared/builderTypes';
@@ -22,6 +32,9 @@ export {
   soapBuilderToXml,
   eventBuilderToYaml,
   workserviceBuilderToYaml,
+  sharedSchemaBuilderToJson,
+  webhookBuilderToYaml,
+  legacyContractBuilderToYaml,
 } from './shared/builderSync';
 
 export {
@@ -29,4 +42,7 @@ export {
   validateSoapBuilder,
   validateEventBuilder,
   validateWorkserviceBuilder,
+  validateSharedSchemaBuilder,
+  validateWebhookBuilder,
+  validateLegacyContractBuilder,
 } from './shared/builderValidation';
