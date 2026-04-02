@@ -14,6 +14,7 @@ using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrProfi
 using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.OpenTelemetryCollector;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.ClickHouse;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Elastic;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Services;
 using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using OpenTelemetry.Metrics;
@@ -151,6 +152,8 @@ public static class DependencyInjection
             services.AddSingleton<IObservabilityProvider>(sp =>
                 sp.GetRequiredService<ElasticObservabilityProvider>());
         }
+
+        services.AddSingleton<ITelemetryQueryService, TelemetryQueryService>();
     }
 
     /// <summary>
