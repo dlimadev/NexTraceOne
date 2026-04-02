@@ -106,34 +106,42 @@ public static class GetApiDetail
                 Tags: []));
         }
 
+        private const decimal ScoreHasContract = 30m;
+        private const decimal ScoreValidState = 20m;
+        private const decimal ScoreHasOwner = 15m;
+        private const decimal ScoreHasTeam = 10m;
+        private const decimal QualityScoreWeight = 0.25m;
+        private const decimal MaxQualityContribution = 25m;
+        private const decimal MaxTotalScore = 100m;
+
         private static decimal CalculateTrustScore(
             Domain.Contracts.Entities.ContractVersion? contract,
             ApiAsset apiAsset)
         {
             var score = 0m;
 
-            // Has contract: +30
-            if (contract is not null) score += 30m;
+            // Has contract
+            if (contract is not null) score += ScoreHasContract;
 
-            // Contract is valid (Approved/Locked): +20
+            // Contract is valid (Approved/Locked)
             if (contract?.LifecycleState is
                 Domain.Contracts.Enums.ContractLifecycleState.Approved or
                 Domain.Contracts.Enums.ContractLifecycleState.Locked)
-                score += 20m;
+                score += ScoreValidState;
 
-            // Has owner: +15
+            // Has owner
             if (!string.IsNullOrEmpty(apiAsset.OwnerService?.TechnicalOwner))
-                score += 15m;
+                score += ScoreHasOwner;
 
-            // Has team: +10
+            // Has team
             if (!string.IsNullOrEmpty(apiAsset.OwnerService?.TeamName))
-                score += 10m;
+                score += ScoreHasTeam;
 
-            // Contract quality score: up to +25
+            // Contract quality score contribution
             if (contract?.LastOverallScore is not null)
-                score += Math.Min(contract.LastOverallScore.Value * 0.25m, 25m);
+                score += Math.Min(contract.LastOverallScore.Value * QualityScoreWeight, MaxQualityContribution);
 
-            return Math.Min(score, 100m);
+            return Math.Min(score, MaxTotalScore);
         }
     }
 
