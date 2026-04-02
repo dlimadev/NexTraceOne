@@ -1,32 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-/**
- * Utilitário para simular uma sessão autenticada nos testes E2E de módulos.
- *
- * Segurança: utiliza sessionStorage com as chaves reais do tokenStorage (nxt_at, nxt_tid, nxt_uid),
- * mantendo paridade com o comportamento de produção. O refresh token permanece apenas em memória.
- */
-async function mockAuthSession(page: Page, roles: string[] = ['Admin']): Promise<void> {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('nxt_at', 'mock-e2e-token');
-    sessionStorage.setItem('nxt_tid', 'tenant-e2e-001');
-    sessionStorage.setItem('nxt_uid', 'user-e2e-001');
-  });
-
-  await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        id: 'user-e2e-001',
-        email: 'admin@acme.com',
-        fullName: 'Admin User',
-        roles,
-        tenantId: 'tenant-e2e-001',
-      }),
-    })
-  );
-}
+import { test, expect } from '@playwright/test';
+import { mockAuthSession } from './helpers/auth';
 
 // ─── Workflow Page ────────────────────────────────────────────────────────────
 

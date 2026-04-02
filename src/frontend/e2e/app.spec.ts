@@ -1,36 +1,14 @@
-import { test, expect, type Page } from '@playwright/test';
-
-/**
- * Utilitário para simular uma sessão autenticada nos testes E2E.
- *
- * Segurança: utiliza sessionStorage com as chaves reais do tokenStorage (nxt_at, nxt_tid, nxt_uid),
- * garantindo que os testes reflitam o comportamento real da aplicação.
- * O refresh token NÃO é persistido no storage (apenas em memória), conforme a estratégia de segurança.
- */
-async function mockAuthSession(page: Page, roles: string[] = ['Admin']): Promise<void> {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('nxt_at', 'mock-e2e-token');
-    sessionStorage.setItem('nxt_tid', 'tenant-e2e-001');
-    sessionStorage.setItem('nxt_uid', 'user-e2e-001');
-  });
-
-  // Intercepta a chamada de perfil para retornar roles configuráveis
-  await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        id: 'user-e2e-001',
-        email: 'admin@acme.com',
-        fullName: 'Admin User',
-        roles,
-        tenantId: 'tenant-e2e-001',
-      }),
-    })
-  );
-}
+import { test, expect } from '@playwright/test';
+import { mockAuthSession } from './helpers/auth';
 
 test.describe('Login Page', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock /auth/me to return 401 so the app stays on login without proxy errors
+    await page.route('**/api/v1/identity/auth/me', (route) =>
+      route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'Unauthorized' }) }),
+    );
+  });
+
   test('exibe o formulário de login na rota /login', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByText('NexTraceOne')).toBeVisible();
@@ -236,7 +214,7 @@ test.describe('Releases Page (autenticado)', () => {
 
 test.describe('Controle de Acesso (RBAC)', () => {
   test('Developer não vê link de Users na sidebar', async ({ page }) => {
-    await mockAuthSession(page, ['Developer']);
+    await mockAuthSession(page, { roles: ['Developer'] });
     await page.goto('/');
     // Aguarda perfil ser carregado (sidebar renderizar sem Users)
     await expect(page.getByRole('link', { name: /releases/i })).toBeVisible({ timeout: 5_000 });
@@ -244,19 +222,19 @@ test.describe('Controle de Acesso (RBAC)', () => {
   });
 
   test('Admin vê o link de Users na sidebar', async ({ page }) => {
-    await mockAuthSession(page, ['Admin']);
+    await mockAuthSession(page, { roles: ['Admin'] });
     await page.goto('/');
     await expect(page.getByRole('link', { name: /users/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('Manager vê o link de Users na sidebar', async ({ page }) => {
-    await mockAuthSession(page, ['Manager']);
+    await mockAuthSession(page, { roles: ['Manager'] });
     await page.goto('/');
     await expect(page.getByRole('link', { name: /users/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('Developer é redirecionado ao tentar acessar /users diretamente', async ({ page }) => {
-    await mockAuthSession(page, ['Developer']);
+    await mockAuthSession(page, { roles: ['Developer'] });
     await page.goto('/users');
     // Deve redirecionar para /unauthorized
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
@@ -264,26 +242,26 @@ test.describe('Controle de Acesso (RBAC)', () => {
   });
 
   test('Viewer é redirecionado ao tentar acessar /users diretamente', async ({ page }) => {
-    await mockAuthSession(page, ['Viewer']);
+    await mockAuthSession(page, { roles: ['Viewer'] });
     await page.goto('/users');
     await expect(page).toHaveURL('/unauthorized', { timeout: 5_000 });
   });
 
   test('Auditor pode acessar /audit', async ({ page }) => {
-    await mockAuthSession(page, ['Auditor']);
+    await mockAuthSession(page, { roles: ['Auditor'] });
     await page.goto('/audit');
     await expect(page.getByRole('heading', { name: /audit log/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('página /unauthorized exibe mensagem e botão de retorno', async ({ page }) => {
-    await mockAuthSession(page, ['Developer']);
+    await mockAuthSession(page, { roles: ['Developer'] });
     await page.goto('/users');
     await expect(page.getByText(/access denied/i)).toBeVisible({ timeout: 5_000 });
     await expect(page.getByRole('button', { name: /go to dashboard/i })).toBeVisible();
   });
 
   test('botão Go to Dashboard redireciona para /', async ({ page }) => {
-    await mockAuthSession(page, ['Developer']);
+    await mockAuthSession(page, { roles: ['Developer'] });
     await page.goto('/users');
     await page.getByRole('button', { name: /go to dashboard/i }).click();
     await expect(page).toHaveURL('/');

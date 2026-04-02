@@ -39,6 +39,12 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    preview: {
+      // Preview server (usado por E2E/Playwright) não deve usar proxy.
+      // O proxy do dev server (server.proxy) não é necessário em preview
+      // porque os testes E2E interceptam as chamadas via page.route().
+      proxy: {},
+    },
     build: {
       // Segurança on-premise: nunca gerar source maps em produção.
       // Source maps expõem o código-fonte original e facilitam engenharia reversa.
