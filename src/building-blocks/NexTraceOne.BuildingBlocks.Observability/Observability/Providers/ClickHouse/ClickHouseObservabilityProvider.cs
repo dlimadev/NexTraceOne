@@ -49,6 +49,10 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         _clickHouseOptions = options.Value.ObservabilityProvider.ClickHouse;
         _logger = logger;
 
+        // Validate connection string before attempting to extract database name
+        if (string.IsNullOrWhiteSpace(_clickHouseOptions.ConnectionString))
+            throw new ArgumentException("ClickHouse connection string is required but was null or empty.");
+
         // Extract database name from structured connection string (Host=...;Port=...;Database=...;)
         var db = ExtractDatabaseFromConnectionString(_clickHouseOptions.ConnectionString);
 
