@@ -16,6 +16,8 @@ internal sealed class IncidentModuleService(
     IncidentDbContext context,
     ILogger<IncidentModuleService> logger) : IIncidentModule
 {
+    /// <summary>When open incidents exceed this multiplier × resolved, the trend is declining.</summary>
+    private const int DecliningThresholdMultiplier = 2;
     /// <inheritdoc />
     public async Task<int> CountOpenIncidentsAsync(CancellationToken cancellationToken = default)
     {
@@ -102,9 +104,9 @@ internal sealed class IncidentModuleService(
         var avgHours = await GetAverageResolutionHoursAsync(days, cancellationToken);
         var recurrenceRate = await GetRecurrenceRateAsync(days, cancellationToken);
 
-        // Trend: improving if resolved > open, declining if open > resolved * 2
+        // Trend: improving if resolved > open, declining if open > resolved × DecliningThresholdMultiplier
         var trend = resolvedCount > openCount ? "Improving"
-            : openCount > resolvedCount * 2 ? "Declining"
+            : openCount > resolvedCount * DecliningThresholdMultiplier ? "Declining"
             : "Stable";
 
         return new IncidentTrendSummary(
