@@ -178,7 +178,7 @@ test.describe('Change Confidence — listagem', () => {
     await page.goto('/changes');
     // Aguarda os dados do summary serem visíveis — label "Total Changes" with value
     await expect(page.getByText('Total Changes')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Validated')).toBeVisible();
+    await expect(page.getByRole('paragraph').filter({ hasText: 'Validated' })).toBeVisible();
   });
 
   test('lista as mudanças devolvidas pela API', async ({ page }) => {
@@ -189,9 +189,10 @@ test.describe('Change Confidence — listagem', () => {
 
   test('exibe os tipos e estados das mudanças', async ({ page }) => {
     await page.goto('/changes');
-    await expect(page.getByText('Deployment').first()).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Configuration').first()).toBeVisible();
-    await expect(page.getByText('Contract').first()).toBeVisible();
+    const table = page.getByRole('table');
+    await expect(table.getByText('Deployment').first()).toBeVisible({ timeout: 5_000 });
+    await expect(table.getByText('Configuration').first()).toBeVisible();
+    await expect(table.getByText('Contract').first()).toBeVisible();
   });
 
   test('exibe o estado "no changes" quando a API devolve lista vazia', async ({ page }) => {
@@ -303,7 +304,7 @@ test.describe('Change Confidence — detalhe', () => {
 
   test('exibe o advisory com a recomendação de governança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('Approve Conditionally')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approve Conditionally').first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe os factores de análise do advisory', async ({ page }) => {
@@ -366,12 +367,12 @@ test.describe('Change Confidence — decisão de governança', () => {
   test('exibe opções de decisão Approve e Reject', async ({ page }) => {
     await page.goto('/changes/chg-001');
     // Aguarda o advisory ser carregado (indica que a página está pronta)
-    await expect(page.getByText('Approve Conditionally')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approve Conditionally').first()).toBeVisible({ timeout: 5_000 });
     // Os botões de decisão devem estar visíveis
     const approveBtn = page.getByRole('button', { name: /approve/i });
     const rejectBtn = page.getByRole('button', { name: /reject/i });
     // Pelo menos um dos botões deve estar visível (o detalhe tem workflow de decisão)
-    const hasDecisionButtons = await approveBtn.isVisible() || await rejectBtn.isVisible();
+    const hasDecisionButtons = await approveBtn.first().isVisible() || await rejectBtn.first().isVisible();
     expect(hasDecisionButtons).toBeTruthy();
   });
 });
