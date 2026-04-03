@@ -7,13 +7,14 @@ import { mockAuthSession } from './helpers/auth';
  */
 
 const CONTRACTS_SUMMARY_FIXTURE = {
-  total: 3,
-  draft: 1,
-  inReview: 1,
-  approved: 1,
-  locked: 0,
-  deprecated: 0,
-  retired: 0,
+  totalCount: 3,
+  totalVersions: 3,
+  byProtocol: { OpenApi: 2, AsyncApi: 1 },
+  approvedCount: 1,
+  lockedCount: 0,
+  draftCount: 1,
+  inReviewCount: 1,
+  deprecatedCount: 0,
 };
 
 const CONTRACTS_LIST_FIXTURE = {

@@ -8,7 +8,7 @@ import { mockAuthSession } from './helpers/auth';
 const SERVICE_LIST_FIXTURE = {
   items: [
     {
-      id: 'svc-pay-001',
+      serviceId: 'svc-pay-001',
       name: 'payments-service',
       displayName: 'Payments Service',
       description: 'Handles payment processing and reconciliation',
@@ -21,7 +21,7 @@ const SERVICE_LIST_FIXTURE = {
       registeredAt: '2025-01-10T10:00:00Z',
     },
     {
-      id: 'svc-auth-002',
+      serviceId: 'svc-auth-002',
       name: 'auth-service',
       displayName: 'Auth Service',
       description: 'Identity and authentication provider',
@@ -40,15 +40,16 @@ const SERVICE_LIST_FIXTURE = {
 };
 
 const SERVICES_SUMMARY_FIXTURE = {
-  total: 2,
-  critical: 1,
-  high: 1,
-  active: 2,
-  deprecated: 0,
-  retired: 0,
+  totalCount: 2,
+  criticalCount: 1,
+  highCriticalityCount: 1,
+  activeCount: 2,
+  deprecatedCount: 0,
+  retiredCount: 0,
 };
 
 const SERVICE_DETAIL_FIXTURE = {
+  serviceId: 'svc-pay-001',
   id: 'svc-pay-001',
   name: 'payments-service',
   displayName: 'Payments Service',
@@ -98,7 +99,7 @@ test.describe('Service Catalog — listagem', () => {
 
   test('exibe o título da página Service Catalog', async ({ page }) => {
     await page.goto('/services');
-    await expect(page.getByRole('heading', { name: /service catalog/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /service catalog/i, level: 1 })).toBeVisible();
   });
 
   test('exibe as métricas de resumo (summary cards)', async ({ page }) => {

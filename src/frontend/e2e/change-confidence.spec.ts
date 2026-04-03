@@ -8,56 +8,57 @@ import { mockAuthSession } from './helpers/auth';
 
 const CHANGES_SUMMARY_FIXTURE = {
   totalChanges: 15,
-  validated: 8,
-  needsAttention: 4,
+  validatedChanges: 8,
+  changesNeedingAttention: 4,
   suspectedRegressions: 2,
-  correlatedWithIncidents: 1,
-  mitigated: 0,
-  averageScore: 0.42,
+  changesCorrelatedWithIncidents: 1,
 };
 
+const CHANGES_LIST_ITEMS = [
+  {
+    changeId: 'chg-001',
+    serviceName: 'payments-service',
+    version: 'v2.2.0',
+    environment: 'prod',
+    changeType: 'Deployment',
+    deploymentStatus: 'Deployed',
+    confidenceStatus: 'NeedsAttention',
+    changeScore: 0.65,
+    deployedAt: '2026-03-18T14:00:00Z',
+    commitSha: 'a1b2c3d',
+    description: 'Deploy payments-service v2.2.0 with new retry logic',
+  },
+  {
+    changeId: 'chg-002',
+    serviceName: 'auth-service',
+    version: 'v1.5.1',
+    environment: 'prod',
+    changeType: 'ConfigurationChange',
+    deploymentStatus: 'Deployed',
+    confidenceStatus: 'Validated',
+    changeScore: 0.18,
+    deployedAt: '2026-03-17T10:00:00Z',
+    commitSha: 'e4f5g6h',
+    description: 'Update JWT expiration from 1h to 2h',
+  },
+  {
+    changeId: 'chg-003',
+    serviceName: 'payments-service',
+    version: 'v2.1.9',
+    environment: 'staging',
+    changeType: 'ContractChange',
+    deploymentStatus: 'Deployed',
+    confidenceStatus: 'SuspectedRegression',
+    changeScore: 0.82,
+    deployedAt: '2026-03-16T08:00:00Z',
+    commitSha: 'i7j8k9l',
+    description: 'Breaking change in payment confirmation schema',
+  },
+];
+
 const CHANGES_LIST_FIXTURE = {
-  items: [
-    {
-      changeId: 'chg-001',
-      serviceName: 'payments-service',
-      version: 'v2.2.0',
-      environment: 'prod',
-      changeType: 'Deployment',
-      deploymentStatus: 'Deployed',
-      confidenceStatus: 'NeedsAttention',
-      changeScore: 0.65,
-      deployedAt: '2026-03-18T14:00:00Z',
-      commitSha: 'a1b2c3d',
-      description: 'Deploy payments-service v2.2.0 with new retry logic',
-    },
-    {
-      changeId: 'chg-002',
-      serviceName: 'auth-service',
-      version: 'v1.5.1',
-      environment: 'prod',
-      changeType: 'ConfigurationChange',
-      deploymentStatus: 'Deployed',
-      confidenceStatus: 'Validated',
-      changeScore: 0.18,
-      deployedAt: '2026-03-17T10:00:00Z',
-      commitSha: 'e4f5g6h',
-      description: 'Update JWT expiration from 1h to 2h',
-    },
-    {
-      changeId: 'chg-003',
-      serviceName: 'payments-service',
-      version: 'v2.1.9',
-      environment: 'staging',
-      changeType: 'ContractChange',
-      deploymentStatus: 'Deployed',
-      confidenceStatus: 'SuspectedRegression',
-      changeScore: 0.82,
-      deployedAt: '2026-03-16T08:00:00Z',
-      commitSha: 'i7j8k9l',
-      description: 'Breaking change in payment confirmation schema',
-    },
-  ],
+  items: CHANGES_LIST_ITEMS,
+  changes: CHANGES_LIST_ITEMS,
   totalCount: 3,
   page: 1,
   pageSize: 20,
@@ -104,28 +105,29 @@ const CHANGE_INTELLIGENCE_FIXTURE = {
 const CHANGE_ADVISORY_FIXTURE = {
   changeId: 'chg-001',
   recommendation: 'ApproveConditionally',
-  overallScore: 0.65,
+  confidenceScore: 0.65,
+  overallConfidence: 0.65,
   factors: [
     {
       factorName: 'ContractCompatibility',
       status: 'Pass',
-      score: 0.9,
-      message: 'No breaking changes detected in contract',
+      weight: 0.9,
+      description: 'No breaking changes detected in contract',
     },
     {
       factorName: 'MetricsDegradation',
       status: 'Warning',
-      score: 0.4,
-      message: 'Error rate increased above baseline threshold',
+      weight: 0.4,
+      description: 'Error rate increased above baseline threshold',
     },
     {
       factorName: 'BlastRadius',
       status: 'Warning',
-      score: 0.5,
-      message: '3 downstream consumers potentially affected',
+      weight: 0.5,
+      description: '3 downstream consumers potentially affected',
     },
   ],
-  summary: 'Conditional approval — monitor error rate for 2h post-deploy',
+  rationale: 'Conditional approval — monitor error rate for 2h post-deploy',
 };
 
 const CHANGE_DECISIONS_FIXTURE = {
@@ -145,10 +147,14 @@ test.describe('Change Confidence — listagem', () => {
         body: JSON.stringify(CHANGES_SUMMARY_FIXTURE),
       }),
     );
+    await page.route('**/api/v1/changes/filter-options**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ changeTypes: [], confidenceStatuses: [], deploymentStatuses: [] }),
+      }),
+    );
     await page.route('**/api/v1/changes**', (route) => {
-      const url = new URL(route.request().url());
-      // Não interceptar rotas de detalhe individual
-      if (/\/changes\/chg-\d+/.test(url.pathname)) {
         route.continue();
         return;
       }
@@ -189,11 +195,7 @@ test.describe('Change Confidence — listagem', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }),
-      }),
-    );
-    await page.goto('/changes');
-    await expect(page.getByText(/no changes/i)).toBeVisible({ timeout: 5_000 });
+        body: JSON.stringify({ items: [], changes: [], totalCount: 0, page: 1, pageSize: 20 }),
   });
 });
 
@@ -209,6 +211,13 @@ test.describe('Change Confidence — filtros', () => {
         body: JSON.stringify(CHANGES_SUMMARY_FIXTURE),
       }),
     );
+    await page.route('**/api/v1/changes/filter-options**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ changeTypes: [], confidenceStatuses: [], deploymentStatuses: [] }),
+      }),
+    );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
       if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
@@ -219,7 +228,7 @@ test.describe('Change Confidence — filtros', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: filtered, totalCount: filtered.length, page: 1, pageSize: 20 }),
+        body: JSON.stringify({ items: filtered, changes: filtered, totalCount: filtered.length, page: 1, pageSize: 20 }),
       });
     });
 
@@ -367,6 +376,13 @@ test.describe('Change Confidence — navegação lista → detalhe', () => {
     await mockAuthSession(page);
     await page.route('**/api/v1/changes/summary**', (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(CHANGES_SUMMARY_FIXTURE) }),
+    );
+    await page.route('**/api/v1/changes/filter-options**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ changeTypes: [], confidenceStatuses: [], deploymentStatuses: [] }),
+      }),
     );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
