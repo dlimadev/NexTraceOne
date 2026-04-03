@@ -177,13 +177,13 @@ test.describe('Incidents — listagem', () => {
 
   test('exibe o título da página Incidents', async ({ page }) => {
     await page.goto('/operations/incidents');
-    await expect(page.getByRole('heading', { name: /incidents/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /incidents/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe os stat cards com métricas de resumo', async ({ page }) => {
     await page.goto('/operations/incidents');
     await expect(page.getByText('Open Incidents')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Critical')).toBeVisible();
+    await expect(page.getByText('Critical').first()).toBeVisible();
     await expect(page.getByText('With Correlated Changes')).toBeVisible();
   });
 
@@ -325,7 +325,7 @@ test.describe('Incidents — detalhe', () => {
 
   test('exibe a severidade e o status do incidente', async ({ page }) => {
     await page.goto('/operations/incidents/inc-001');
-    await expect(page.getByText('Critical')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Critical').first()).toBeVisible({ timeout: 5_000 });
     await expect(page.getByText('Investigating')).toBeVisible();
   });
 

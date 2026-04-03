@@ -236,7 +236,7 @@ test.describe('Promotion Page (autenticado)', () => {
       })
     );
     await page.goto('/promotion');
-    await expect(page.getByRole('heading', { name: 'Promotion' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Promotion', level: 1 })).toBeVisible();
   });
 
   test('exibe o pipeline de ambientes', async ({ page }) => {

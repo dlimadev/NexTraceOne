@@ -155,9 +155,8 @@ test.describe('Change Confidence — listagem', () => {
       }),
     );
     await page.route('**/api/v1/changes**', (route) => {
-        route.continue();
-        return;
-      }
+      const url = new URL(route.request().url());
+      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -196,6 +195,10 @@ test.describe('Change Confidence — listagem', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ items: [], changes: [], totalCount: 0, page: 1, pageSize: 20 }),
+      }),
+    );
+    await page.goto('/changes');
+    await expect(page.getByText(/no changes/i)).toBeVisible({ timeout: 5_000 });
   });
 });
 

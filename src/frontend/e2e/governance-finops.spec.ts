@@ -48,7 +48,7 @@ const RISK_FIXTURE = {
 test.describe('Governance — Reports page', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/governance/executive-drill-down**', (route) =>
+    await page.route('**/api/v1/reports/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -58,6 +58,10 @@ test.describe('Governance — Reports page', () => {
           complianceScore: 87,
           riskLevel: 'Medium',
           isSimulated: false,
+          totalPacks: 5,
+          coveredServices: 12,
+          uncoveredServices: 3,
+          packCoverage: 80,
         }),
       }),
     );
@@ -65,7 +69,7 @@ test.describe('Governance — Reports page', () => {
 
   test('opens governance reports page', async ({ page }) => {
     await page.goto('/governance/reports');
-    await expect(page.getByRole('heading', { name: /report/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /report/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 });
 
@@ -74,21 +78,14 @@ test.describe('Governance — Reports page', () => {
 test.describe('Governance — FinOps page', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/governance/finops-summary**', (route) =>
+    await page.route('**/api/v1/finops/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(FINOPS_SUMMARY_FIXTURE),
       }),
     );
-    await page.route('**/api/v1/governance/waste-signals**', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0 }),
-      }),
-    );
-    await page.route('**/api/v1/governance/efficiency-indicators**', (route) =>
+    await page.route('**/api/v1/finops/trends**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -99,7 +96,7 @@ test.describe('Governance — FinOps page', () => {
 
   test('opens FinOps page and displays summary', async ({ page }) => {
     await page.goto('/governance/finops');
-    await expect(page.getByRole('heading', { name: /finops/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /finops/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 });
 
@@ -108,7 +105,7 @@ test.describe('Governance — FinOps page', () => {
 test.describe('Governance — Compliance page', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/governance/compliance-checks**', (route) =>
+    await page.route('**/api/v1/compliance/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -119,7 +116,7 @@ test.describe('Governance — Compliance page', () => {
 
   test('opens compliance page', async ({ page }) => {
     await page.goto('/governance/compliance');
-    await expect(page.getByRole('heading', { name: /compliance/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /compliance/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 });
 
@@ -128,7 +125,7 @@ test.describe('Governance — Compliance page', () => {
 test.describe('Governance — Risk Center page', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/governance/risk-signals**', (route) =>
+    await page.route('**/api/v1/risk/summary**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -139,7 +136,7 @@ test.describe('Governance — Risk Center page', () => {
 
   test('opens risk center page', async ({ page }) => {
     await page.goto('/governance/risk');
-    await expect(page.getByRole('heading', { name: /risk/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /risk/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 });
 
@@ -148,7 +145,7 @@ test.describe('Governance — Risk Center page', () => {
 test.describe('Governance — Platform Health', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
-    await page.route('**/api/v1/governance/platform-health**', (route) =>
+    await page.route('**/api/v1/platform/health**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -158,7 +155,7 @@ test.describe('Governance — Platform Health', () => {
   });
 
   test('opens platform ops and shows health status', async ({ page }) => {
-    await page.goto('/operations/platform-ops');
-    await expect(page.getByRole('heading', { name: /platform/i })).toBeVisible({ timeout: 5_000 });
+    await page.goto('/platform/operations');
+    await expect(page.getByRole('heading', { name: /platform/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 });

@@ -59,9 +59,8 @@ test.describe('Refresh Token — automatic renewal', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          services: [{ id: 's1', name: 'test-service', team: 'QA', createdAt: '2025-01-01' }],
+          services: [{ serviceAssetId: 's1', name: 'test-service', teamName: 'QA', domain: 'test', criticality: 'Low' }],
           apis: [],
-          relationships: [],
         }),
       });
     });
