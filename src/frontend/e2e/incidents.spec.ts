@@ -163,8 +163,8 @@ test.describe('Incidents — listagem', () => {
     );
     await page.route('**/api/v1/incidents**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/incidents\/inc-\d+/.test(url.pathname)) {
-        route.continue();
+      if (url.pathname.includes('/summary') || /\/incidents\/inc-\d+/.test(url.pathname)) {
+        route.fallback();
         return;
       }
       route.fulfill({
@@ -242,7 +242,7 @@ test.describe('Incidents — criar incidente', () => {
         });
         return;
       }
-      if (/\/incidents\/inc-\d+/.test(url.pathname)) { route.continue(); return; }
+      if (url.pathname.includes('/summary') || /\/incidents\/inc-\d+/.test(url.pathname)) { route.fallback(); return; }
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -429,7 +429,7 @@ test.describe('Incidents — navegação lista → detalhe', () => {
     );
     await page.route('**/api/v1/incidents**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/incidents\/inc-\d+/.test(url.pathname)) { route.continue(); return; }
+      if (url.pathname.includes('/summary') || /\/incidents\/inc-\d+/.test(url.pathname)) { route.fallback(); return; }
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(INCIDENTS_LIST_FIXTURE) });
     });
     await page.route('**/api/v1/incidents/inc-001**', (route) =>

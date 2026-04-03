@@ -158,7 +158,7 @@ test.describe('Change Confidence — listagem', () => {
       const url = new URL(route.request().url());
       // Let more specific routes handle summary, filter-options, and individual changes
       if (url.pathname.includes('/summary') || url.pathname.includes('/filter-options') || /\/changes\/chg-\d+/.test(url.pathname)) {
-        route.continue();
+        route.fallback();
         return;
       }
       route.fulfill({
@@ -228,7 +228,7 @@ test.describe('Change Confidence — filtros', () => {
     );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
+      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.fallback(); return; }
       const env = url.searchParams.get('environment') ?? '';
       const filtered = env
         ? CHANGES_LIST_FIXTURE.items.filter((c) => c.environment === env)
@@ -394,7 +394,7 @@ test.describe('Change Confidence — navegação lista → detalhe', () => {
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
       if (url.pathname.includes('/summary') || url.pathname.includes('/filter-options') || /\/changes\/chg-\d+/.test(url.pathname)) {
-        route.continue();
+        route.fallback();
         return;
       }
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(CHANGES_LIST_FIXTURE) });

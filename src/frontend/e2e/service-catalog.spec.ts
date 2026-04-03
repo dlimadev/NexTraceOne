@@ -48,6 +48,16 @@ const SERVICES_SUMMARY_FIXTURE = {
   retiredCount: 0,
 };
 
+const GRAPH_FIXTURE = {
+  services: [
+    { serviceAssetId: 'svc-pay-001', name: 'payments-service', domain: 'Finance', teamName: 'Payments Team', serviceType: 'RestApi', criticality: 'Critical', lifecycleStatus: 'Active' },
+    { serviceAssetId: 'svc-auth-002', name: 'auth-service', domain: 'Platform', teamName: 'Identity Team', serviceType: 'RestApi', criticality: 'High', lifecycleStatus: 'Active' },
+  ],
+  apis: [
+    { apiAssetId: 'api-pay-001', name: 'Payments API', ownerServiceId: 'svc-pay-001', protocol: 'OpenApi', baseUrl: '/api/payments', consumers: ['svc-auth-002'] },
+  ],
+};
+
 const SERVICE_DETAIL_FIXTURE = {
   serviceId: 'svc-pay-001',
   id: 'svc-pay-001',
@@ -81,6 +91,13 @@ const SERVICE_DETAIL_FIXTURE = {
 test.describe('Service Catalog — listagem', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
+    await page.route('**/api/v1/catalog/graph**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(GRAPH_FIXTURE),
+      }),
+    );
     await page.route('**/api/v1/catalog/services/summary**', (route) =>
       route.fulfill({
         status: 200,
@@ -88,12 +105,23 @@ test.describe('Service Catalog — listagem', () => {
         body: JSON.stringify(SERVICES_SUMMARY_FIXTURE),
       }),
     );
-    await page.route('**/api/v1/catalog/services**', (route) =>
+    await page.route('**/api/v1/catalog/snapshots**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0 }) }),
+    );
+    await page.route('**/api/v1/catalog/services**', (route) => {
+      const url = new URL(route.request().url());
+      if (url.pathname.includes('/summary') || url.pathname.includes('/svc-')) {
+        route.fallback();
+        return;
+      }
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(SERVICE_LIST_FIXTURE),
-      }),
+      });
+    });
+    await page.route('**/api/v1/catalog/health**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0 }) }),
     );
   });
 
@@ -104,15 +132,15 @@ test.describe('Service Catalog — listagem', () => {
 
   test('exibe as métricas de resumo (summary cards)', async ({ page }) => {
     await page.goto('/services');
-    await expect(page.getByText('Total Services')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Critical')).toBeVisible();
-    await expect(page.getByText('Active')).toBeVisible();
+    // The page shows graph-based stats: Services, APIs, Relationships, Domains
+    await expect(page.getByText('Services').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('APIs')).toBeVisible();
   });
 
   test('lista os serviços devolvidos pela API', async ({ page }) => {
     await page.goto('/services');
-    await expect(page.getByText('Payments Service')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Auth Service')).toBeVisible();
+    await expect(page.getByText('payments-service').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('auth-service').first()).toBeVisible();
   });
 
   test('exibe os atributos de criticidade e lifecycle dos serviços', async ({ page }) => {
@@ -123,21 +151,21 @@ test.describe('Service Catalog — listagem', () => {
   });
 
   test('exibe estado vazio quando a API devolve lista vazia', async ({ page }) => {
-    // Sobrescreve o mock para lista vazia
-    await page.route('**/api/v1/catalog/services**', (route) =>
+    // Sobrescreve o mock do graph para vazio
+    await page.route('**/api/v1/catalog/graph**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }),
+        body: JSON.stringify({ services: [], apis: [] }),
       }),
     );
     await page.goto('/services');
-    // O EmptyState deve aparecer quando não há resultados
-    await expect(page.getByText(/no services/i)).toBeVisible({ timeout: 5_000 });
+    // With empty graph, stat values should be 0
+    await expect(page.getByText('0').first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe erro quando a API falha', async ({ page }) => {
-    await page.route('**/api/v1/catalog/services**', (route) =>
+    await page.route('**/api/v1/catalog/graph**', (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
     );
     await page.goto('/services');
@@ -248,9 +276,8 @@ test.describe('Service Catalog — navegação lista → detalhe', () => {
     );
     await page.route('**/api/v1/catalog/services**', (route) => {
       const url = new URL(route.request().url());
-      // Evita intercetar /services/svc-pay-001
-      if (url.pathname.includes('/svc-pay-001')) {
-        route.continue();
+      if (url.pathname.includes('/summary') || url.pathname.includes('/svc-pay-001')) {
+        route.fallback();
         return;
       }
       route.fulfill({
