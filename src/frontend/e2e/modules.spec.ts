@@ -161,7 +161,7 @@ test.describe('Audit Page (autenticado)', () => {
   });
 
   test('exibe eventos de auditoria carregados da API', async ({ page }) => {
-    await page.route('**/api/v1/audit/events**', (route) =>
+    await page.route('**/api/v1/audit/search**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -169,11 +169,14 @@ test.describe('Audit Page (autenticado)', () => {
           items: [
             {
               id: 'evt-1',
+              eventId: 'evt-1',
               eventType: 'ReleaseCreated',
               aggregateId: 'rel-001',
               aggregateType: 'Release',
               actorId: 'usr-001',
+              actor: 'admin@acme.com',
               actorEmail: 'admin@acme.com',
+              action: 'Created',
               payload: {},
               hash: 'abc123abc123abc123abc123abc123abc123abc123abc123',
               occurredAt: '2024-01-15T10:00:00Z',
@@ -192,18 +195,18 @@ test.describe('Audit Page (autenticado)', () => {
   });
 
   test('exibe resultado de verificação de integridade', async ({ page }) => {
-    await page.route('**/api/v1/audit/events**', (route) =>
+    await page.route('**/api/v1/audit/search**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }),
       })
     );
-    await page.route('**/api/v1/audit/verify', (route) =>
+    await page.route('**/api/v1/audit/verify-chain**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ valid: true, message: 'Hash chain is valid. All events verified.' }),
+        body: JSON.stringify({ valid: true, totalLinks: 0, message: 'Hash chain is valid. All events verified.' }),
       })
     );
     await page.goto('/audit');
