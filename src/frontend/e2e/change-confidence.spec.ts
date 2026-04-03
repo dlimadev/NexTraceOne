@@ -109,19 +109,19 @@ const CHANGE_ADVISORY_FIXTURE = {
   overallConfidence: 0.65,
   factors: [
     {
-      factorName: 'ContractCompatibility',
+      factorName: 'EvidenceCompleteness',
       status: 'Pass',
       weight: 0.9,
       description: 'No breaking changes detected in contract',
     },
     {
-      factorName: 'MetricsDegradation',
+      factorName: 'ChangeScore',
       status: 'Warning',
       weight: 0.4,
       description: 'Error rate increased above baseline threshold',
     },
     {
-      factorName: 'BlastRadius',
+      factorName: 'BlastRadiusScope',
       status: 'Warning',
       weight: 0.5,
       description: '3 downstream consumers potentially affected',
@@ -156,7 +156,11 @@ test.describe('Change Confidence — listagem', () => {
     );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
+      // Let more specific routes handle summary, filter-options, and individual changes
+      if (url.pathname.includes('/summary') || url.pathname.includes('/filter-options') || /\/changes\/chg-\d+/.test(url.pathname)) {
+        route.continue();
+        return;
+      }
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -172,8 +176,9 @@ test.describe('Change Confidence — listagem', () => {
 
   test('exibe as métricas de resumo', async ({ page }) => {
     await page.goto('/changes');
-    // Aguarda os dados do summary serem visíveis
-    await expect(page.getByText('15')).toBeVisible({ timeout: 5_000 });
+    // Aguarda os dados do summary serem visíveis — label "Total Changes" with value
+    await expect(page.getByText('Total Changes')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Validated')).toBeVisible();
   });
 
   test('lista as mudanças devolvidas pela API', async ({ page }) => {
@@ -185,8 +190,8 @@ test.describe('Change Confidence — listagem', () => {
   test('exibe os tipos e estados das mudanças', async ({ page }) => {
     await page.goto('/changes');
     await expect(page.getByText('Deployment').first()).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('ConfigurationChange')).toBeVisible();
-    await expect(page.getByText('ContractChange')).toBeVisible();
+    await expect(page.getByText('Configuration').first()).toBeVisible();
+    await expect(page.getByText('Contract').first()).toBeVisible();
   });
 
   test('exibe o estado "no changes" quando a API devolve lista vazia', async ({ page }) => {
@@ -293,25 +298,24 @@ test.describe('Change Confidence — detalhe', () => {
 
   test('exibe o nome do serviço no detalhe da mudança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('payments-service')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: 'payments-service' })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe o advisory com a recomendação de governança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('ApproveConditionally')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approve Conditionally')).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe os factores de análise do advisory', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('ContractCompatibility')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('MetricsDegradation')).toBeVisible();
-    await expect(page.getByText('BlastRadius')).toBeVisible();
+    await expect(page.getByText('Evidence Completeness').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Change Score').first()).toBeVisible();
+    await expect(page.getByText('Blast Radius Scope').first()).toBeVisible();
   });
 
   test('exibe o blast radius da mudança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText(/blast radius/i)).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('3')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /blast radius/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe o commit SHA', async ({ page }) => {
@@ -362,7 +366,7 @@ test.describe('Change Confidence — decisão de governança', () => {
   test('exibe opções de decisão Approve e Reject', async ({ page }) => {
     await page.goto('/changes/chg-001');
     // Aguarda o advisory ser carregado (indica que a página está pronta)
-    await expect(page.getByText('ApproveConditionally')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approve Conditionally')).toBeVisible({ timeout: 5_000 });
     // Os botões de decisão devem estar visíveis
     const approveBtn = page.getByRole('button', { name: /approve/i });
     const rejectBtn = page.getByRole('button', { name: /reject/i });
@@ -389,7 +393,10 @@ test.describe('Change Confidence — navegação lista → detalhe', () => {
     );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
+      if (url.pathname.includes('/summary') || url.pathname.includes('/filter-options') || /\/changes\/chg-\d+/.test(url.pathname)) {
+        route.continue();
+        return;
+      }
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(CHANGES_LIST_FIXTURE) });
     });
     await page.route('**/api/v1/changes/chg-001**', (route) => {

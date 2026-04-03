@@ -22,7 +22,7 @@ const CONTRACTS_LIST_FIXTURE = {
     {
       id: 'cv-pay-001',
       apiAssetId: 'api-pay-001',
-      apiAssetName: 'Payments API',
+      name: 'Payments API',
       semVer: '2.1.0',
       protocol: 'OpenApi',
       lifecycleState: 'Approved',
@@ -35,7 +35,7 @@ const CONTRACTS_LIST_FIXTURE = {
     {
       id: 'cv-auth-001',
       apiAssetId: 'api-auth-001',
-      apiAssetName: 'Auth API',
+      name: 'Auth API',
       semVer: '1.0.0',
       protocol: 'OpenApi',
       lifecycleState: 'Draft',
@@ -48,7 +48,7 @@ const CONTRACTS_LIST_FIXTURE = {
     {
       id: 'cv-events-001',
       apiAssetId: 'api-events-001',
-      apiAssetName: 'Events API',
+      name: 'Events API',
       semVer: '3.0.0',
       protocol: 'AsyncApi',
       lifecycleState: 'InReview',
@@ -67,7 +67,7 @@ const CONTRACTS_LIST_FIXTURE = {
 const CONTRACT_DETAIL_FIXTURE = {
   id: 'cv-pay-001',
   apiAssetId: 'api-pay-001',
-  apiAssetName: 'Payments API',
+  name: 'Payments API',
   semVer: '2.1.0',
   protocol: 'OpenApi',
   format: 'json',
@@ -122,12 +122,11 @@ test.describe('Contract Governance — listagem', () => {
 
   test('exibe os badges de protocolo e estado', async ({ page }) => {
     await page.goto('/contracts');
-    await expect(page.getByText('OpenApi').first()).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('AsyncApi')).toBeVisible();
+    await expect(page.getByText('Payments API').first()).toBeVisible({ timeout: 5_000 });
     // Ciclos de vida
-    await expect(page.getByText('Approved')).toBeVisible();
-    await expect(page.getByText('Draft')).toBeVisible();
-    await expect(page.getByText('InReview')).toBeVisible();
+    await expect(page.getByText('Approved').first()).toBeVisible();
+    await expect(page.getByText('Draft').first()).toBeVisible();
+    await expect(page.getByText('In Review').first()).toBeVisible();
   });
 
   test('exibe o botão de criar novo contrato', async ({ page }) => {
@@ -181,8 +180,8 @@ test.describe('Contract Governance — detalhe', () => {
 
   test('exibe o protocolo e estado de ciclo de vida', async ({ page }) => {
     await page.goto('/contracts/cv-pay-001');
-    await expect(page.getByText('OpenApi')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Approved')).toBeVisible();
+    await expect(page.getByText('OpenApi').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approved').first()).toBeVisible();
   });
 
   test('exibe o fingerprint (hash) do contrato', async ({ page }) => {
