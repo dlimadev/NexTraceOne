@@ -115,65 +115,74 @@ test.describe('Navigation (autenticado)', () => {
     await expect(page).toHaveURL('/');
   });
 
-  test('exibe a sidebar com todos os itens de navegação', async ({ page }) => {
+  test('exibe a sidebar com seções de navegação', async ({ page }) => {
     await page.goto('/');
+    // O Dashboard (seção home) é visível por padrão
     await expect(page.getByRole('link', { name: /dashboard/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /releases/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /dependency graph/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /contract catalog/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /workflow/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /promotion/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /users/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /audit/i })).toBeVisible();
+    // Sidebar tem botões de seção no icon rail
+    await expect(page.getByRole('button', { name: /services/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /changes/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /operations/i })).toBeVisible();
   });
 
-  test('navega para a página de Releases', async ({ page }) => {
+  test('navega para a página de Releases expandindo seção Changes', async ({ page }) => {
     await page.goto('/');
+    // Expande a seção Changes no icon rail
+    await page.getByRole('button', { name: /changes/i }).click();
+    // Agora o link Releases deve aparecer no painel de conteúdo
+    await expect(page.getByRole('link', { name: /releases/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /releases/i }).click();
     await expect(page).toHaveURL('/releases');
     await expect(page.getByRole('heading', { name: /releases/i })).toBeVisible();
   });
 
-  test('navega para a página de Contracts', async ({ page }) => {
+  test('navega para a página de Contracts expandindo seção Contracts', async ({ page }) => {
     await page.goto('/');
+    // Expande a seção Contracts no icon rail
+    await page.getByRole('button', { name: /contracts/i }).click();
+    await expect(page.getByRole('link', { name: /contract catalog/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /contract catalog/i }).click();
     await expect(page).toHaveURL('/contracts');
     await expect(page.getByRole('heading', { name: /contract/i })).toBeVisible();
   });
 
-  test('navega para a página de Dependency Graph', async ({ page }) => {
+  test('navega para a página de Dependency Graph expandindo seção Services', async ({ page }) => {
     await page.goto('/');
+    await page.getByRole('button', { name: /services/i }).click();
+    await expect(page.getByRole('link', { name: /dependency graph/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /dependency graph/i }).click();
     await expect(page).toHaveURL('/services/graph');
     await expect(page.getByRole('heading', { name: /dependency graph/i })).toBeVisible();
   });
 
-  test('navega para a página de Workflow', async ({ page }) => {
+  test('navega para a página de Workflow expandindo seção Changes', async ({ page }) => {
     await page.goto('/');
+    await page.getByRole('button', { name: /changes/i }).click();
+    await expect(page.getByRole('link', { name: /workflow/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /workflow/i }).click();
     await expect(page).toHaveURL('/workflow');
     await expect(page.getByRole('heading', { name: /workflow/i })).toBeVisible();
   });
 
-  test('navega para a página de Promotion', async ({ page }) => {
+  test('navega para a página de Promotion expandindo seção Changes', async ({ page }) => {
     await page.goto('/');
+    await page.getByRole('button', { name: /changes/i }).click();
+    await expect(page.getByRole('link', { name: /promotion/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /promotion/i }).click();
     await expect(page).toHaveURL('/promotion');
     await expect(page.getByRole('heading', { name: /promotion/i })).toBeVisible();
   });
 
-  test('navega para a página de Users', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('link', { name: /users/i }).click();
-    await expect(page).toHaveURL('/users');
-    await expect(page.getByRole('heading', { name: /users/i })).toBeVisible();
+  test('navega para a página de Users via URL direta', async ({ page }) => {
+    // Users está na seção admin — navegação direta
+    await page.goto('/users');
+    await expect(page.getByRole('heading', { name: /users/i })).toBeVisible({ timeout: 5_000 });
   });
 
-  test('navega para a página de Audit', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('link', { name: /audit/i }).click();
-    await expect(page).toHaveURL('/audit');
-    await expect(page.getByRole('heading', { name: /audit/i })).toBeVisible();
+  test('navega para a página de Audit via URL direta', async ({ page }) => {
+    // Audit está na seção admin — navegação direta
+    await page.goto('/audit');
+    await expect(page.getByRole('heading', { name: /audit/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('faz logout ao clicar no botão de sair', async ({ page }) => {

@@ -143,6 +143,27 @@ export async function mockAuthSession(
     }),
   );
 
+  // Endpoint CSRF token — chamado pelo bootstrapSession após getCurrentUser
+  await page.route('**/api/v1/identity/auth/cookie-session/csrf-token', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ csrfToken: 'mock-csrf-e2e' }),
+    }),
+  );
+
+  // Endpoint de refresh — evita que o interceptor de 401 tente renovar tokens
+  await page.route('**/api/v1/identity/auth/refresh', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        accessToken: 'mock-refreshed-token',
+        refreshToken: 'mock-refreshed-refresh-token',
+      }),
+    }),
+  );
+
   // Endpoint usado por identityApi.getUserProfile(id)
   await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>
     route.fulfill({

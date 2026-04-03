@@ -40,16 +40,20 @@ export function AppShell() {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
+  // Deve verificar isLoadingUser ANTES de isAuthenticated.
+  // Durante o bootstrap, isAuthenticated inicia como false e isLoadingUser como true.
+  // Se verificarmos isAuthenticated primeiro, redireciona para /login antes
+  // da chamada /auth/me ter oportunidade de definir isAuthenticated=true.
   if (isLoadingUser) {
     return (
       <div className="flex items-center justify-center h-screen bg-canvas">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
   return (
