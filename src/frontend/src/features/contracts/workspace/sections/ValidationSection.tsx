@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronRight,
   Sparkles,
+  Fingerprint,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import { EmptyState } from '../../../../components/EmptyState';
@@ -121,6 +122,13 @@ export function ValidationSection({ contractVersionId, className = '' }: Validat
                 />
               </div>
             </div>
+            {summary.fingerprint && (
+              <div className="mt-3 pt-3 border-t border-edge flex items-center gap-2">
+                <Fingerprint size={13} className="text-muted shrink-0" />
+                <span className="text-xs text-muted">{t('contracts.validation.fingerprint', 'Fingerprint')}:</span>
+                <code className="text-xs font-mono text-heading break-all">{summary.fingerprint}</code>
+              </div>
+            )}
           </CardBody>
         </Card>
       )}
