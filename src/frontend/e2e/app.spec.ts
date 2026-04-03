@@ -15,20 +15,20 @@ test.describe('Login Page', () => {
     await expect(page.getByText(/access your governance platform/i)).toBeVisible();
     await expect(page.getByLabel('Email')).toBeVisible();
     await expect(page.locator('#password')).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
   });
 
   test('exibe mensagem de erro com credenciais inválidas', async ({ page }) => {
     await page.goto('/login');
 
-    // Intercepta login API para retornar erro
+    // Intercepta login API para retornar erro com formato ProblemDetails
     await page.route('**/api/v1/identity/auth/login', (route) =>
-      route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ error: 'Invalid credentials' }) }),
+      route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ code: 'Identity.Auth.InvalidCredentials', detail: 'Invalid credentials' }) }),
     );
 
     await page.getByLabel('Email').fill('invalid@test.com');
     await page.locator('#password').fill('wrongpass');
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
 
     await expect(
       page.getByText(/invalid credentials/i)
@@ -47,7 +47,7 @@ test.describe('Login Page', () => {
     await page.getByLabel('Email').fill('user@test.com');
     await page.locator('#password').fill('pass');
 
-    const submitBtn = page.getByRole('button', { name: /sign in/i });
+    const submitBtn = page.getByRole('button', { name: 'Sign in', exact: true });
     await submitBtn.click();
 
     // Durante o envio, o botão deve estar desabilitado
