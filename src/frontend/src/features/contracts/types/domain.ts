@@ -300,6 +300,7 @@ export interface ValidationSummary {
   validatedAt: string;
   /** Hash SHA-256 do conteúdo do contrato — garante integridade e rastreabilidade. */
   fingerprint?: string;
+  /** Estado global da validação (e.g. 'Valid', 'Invalid', 'Partial'). */
   overallStatus?: string;
 }
 
