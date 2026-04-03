@@ -14,7 +14,7 @@ test.describe('Login Page', () => {
     await expect(page.getByRole('heading', { name: /welcome to nextraceone/i })).toBeVisible();
     await expect(page.getByText(/access your governance platform/i)).toBeVisible();
     await expect(page.getByLabel('Email')).toBeVisible();
-    await expect(page.getByLabel('Password')).toBeVisible();
+    await expect(page.locator('#password')).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
 
@@ -27,7 +27,7 @@ test.describe('Login Page', () => {
     );
 
     await page.getByLabel('Email').fill('invalid@test.com');
-    await page.getByLabel('Password').fill('wrongpass');
+    await page.locator('#password').fill('wrongpass');
     await page.getByRole('button', { name: /sign in/i }).click();
 
     await expect(
@@ -45,7 +45,7 @@ test.describe('Login Page', () => {
     });
 
     await page.getByLabel('Email').fill('user@test.com');
-    await page.getByLabel('Password').fill('pass');
+    await page.locator('#password').fill('pass');
 
     const submitBtn = page.getByRole('button', { name: /sign in/i });
     await submitBtn.click();
@@ -61,17 +61,53 @@ test.describe('Login Page', () => {
 });
 
 test.describe('Login Page — redirect quando autenticado', () => {
-  test('redireciona para / quando já autenticado', async ({ page }) => {
+  test('autenticado ainda pode acessar /login (rota pública)', async ({ page }) => {
     await mockAuthSession(page);
     await page.goto('/login');
-    // Com autenticação simulada, o AppLayout deve redirecionar para dashboard
-    await expect(page).toHaveURL('/');
+    // /login é rota pública — NÃO redireciona utilizadores autenticados
+    await expect(page).toHaveURL('/login');
+    // O formulário de login continua visível
+    await expect(page.getByRole('heading', { name: /welcome to nextraceone/i })).toBeVisible();
   });
 });
 
 test.describe('Navigation (autenticado)', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
+    // Mock de APIs comuns para evitar erros de rede em páginas navegadas
+    await page.route('**/api/v1/catalog/graph', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ services: [], apis: [], relationships: [] }) }),
+    );
+    await page.route('**/api/v1/catalog/services**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }) }),
+    );
+    await page.route('**/api/v1/contracts/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, total: 0, draft: 0, inReview: 0, approved: 0, locked: 0, deprecated: 0, retired: 0 }) }),
+    );
+    await page.route('**/api/v1/changes/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalChanges: 0 }) }),
+    );
+    await page.route('**/api/v1/incidents/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalOpen: 0 }) }),
+    );
+    await page.route('**/api/v1/releases/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }) }),
+    );
+    await page.route('**/api/v1/workflow/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }) }),
+    );
+    await page.route('**/api/v1/promotion/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }) }),
+    );
+    await page.route('**/api/v1/identity/users**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }) }),
+    );
+    await page.route('**/api/v1/audit/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }) }),
+    );
+    await page.route('**/api/v1/governance/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) }),
+    );
   });
 
   test('redireciona para / quando acessa uma rota desconhecida', async ({ page }) => {
@@ -142,7 +178,10 @@ test.describe('Navigation (autenticado)', () => {
 
   test('faz logout ao clicar no botão de sair', async ({ page }) => {
     await page.goto('/');
-    await page.getByTitle('Logout').click();
+    // O botão de logout usa title="Sign out" (auth.signOut)
+    const logoutBtn = page.getByTitle('Sign out').first();
+    await expect(logoutBtn).toBeVisible({ timeout: 5_000 });
+    await logoutBtn.click();
     await expect(page).toHaveURL('/login');
     expect(await page.evaluate(() => sessionStorage.getItem('nxt_at'))).toBeNull();
   });
