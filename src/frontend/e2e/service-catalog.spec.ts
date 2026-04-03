@@ -267,13 +267,13 @@ test.describe('Service Catalog — detalhe do serviço', () => {
 
   test('exibe o nome do serviço no detalhe', async ({ page }) => {
     await page.goto('/services/svc-pay-001');
-    await expect(page.getByText('Payments Service')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: 'Payments Service' })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe o domínio e equipa do serviço', async ({ page }) => {
     await page.goto('/services/svc-pay-001');
-    await expect(page.getByText('Finance')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Payments Team')).toBeVisible();
+    await expect(page.getByText('Finance').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Payments Team').first()).toBeVisible();
   });
 
   test('exibe a lista de API assets do serviço', async ({ page }) => {
@@ -283,7 +283,7 @@ test.describe('Service Catalog — detalhe do serviço', () => {
     if (await apisTab.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await apisTab.click();
     }
-    await expect(page.getByText('Payments API')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Payments API').first()).toBeVisible({ timeout: 5_000 });
   });
 });
 

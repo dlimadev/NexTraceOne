@@ -16,24 +16,11 @@ test.describe('Refresh Token — automatic renewal', () => {
     await mockAuthSession(page);
     let refreshCallCount = 0;
 
-    // Intercept /auth/me to succeed initially
-    await page.route('**/api/v1/identity/auth/me', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          id: 'user-e2e-001',
-          email: 'admin@acme.com',
-          fullName: 'Admin E2E',
-          roles: ['Admin'],
-          permissions: ['catalog:assets:read', 'contracts:read', 'governance:reports:read'],
-          tenantId: 'tenant-e2e-001',
-          roleName: 'Admin',
-        }),
-      }),
-    );
+    // Override refresh to count calls
+    await page.unrouteAll({ behavior: 'ignoreErrors' });
+    await mockAuthSession(page);
 
-    // Mock the refresh endpoint to succeed and return new tokens
+    // Re-register refresh to track calls
     await page.route('**/api/v1/identity/auth/refresh', (route) => {
       refreshCallCount++;
       return route.fulfill({

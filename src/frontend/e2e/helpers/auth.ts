@@ -172,6 +172,19 @@ export async function mockAuthSession(
       body: JSON.stringify(profile),
     }),
   );
+
+  // Ambientes do tenant — usado pelo EnvironmentContext
+  await page.route('**/api/v1/identity/environments', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        { id: 'env-dev-001', name: 'development', profile: 'development', tenantId: 'tenant-e2e-001', isDefault: false, isActive: true },
+        { id: 'env-stg-001', name: 'staging', profile: 'staging', tenantId: 'tenant-e2e-001', isDefault: false, isActive: true },
+        { id: 'env-prd-001', name: 'production', profile: 'production', tenantId: 'tenant-e2e-001', isDefault: true, isActive: true },
+      ]),
+    }),
+  );
 }
 
 /**

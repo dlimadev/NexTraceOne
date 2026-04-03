@@ -168,24 +168,19 @@ test.describe('Audit Page (autenticado)', () => {
         body: JSON.stringify({
           items: [
             {
-              id: 'evt-1',
               eventId: 'evt-1',
-              eventType: 'ReleaseCreated',
-              aggregateId: 'rel-001',
-              aggregateType: 'Release',
-              actorId: 'usr-001',
-              actor: 'admin@acme.com',
-              actorEmail: 'admin@acme.com',
-              action: 'Created',
-              payload: {},
-              hash: 'abc123abc123abc123abc123abc123abc123abc123abc123',
+              sourceModule: 'ChangeIntelligence',
+              actionType: 'ReleaseCreated',
+              resourceType: 'Release',
+              resourceId: 'rel-001',
+              performedBy: 'admin@acme.com',
               occurredAt: '2024-01-15T10:00:00Z',
+              correlationId: 'cor-001',
+              chainHash: 'abc123abc123abc123abc123abc123abc123abc123abc123',
+              previousHash: null,
+              sequenceNumber: 1,
             },
           ],
-          totalCount: 1,
-          page: 1,
-          pageSize: 20,
-          totalPages: 1,
         }),
       })
     );
@@ -199,14 +194,14 @@ test.describe('Audit Page (autenticado)', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }),
+        body: JSON.stringify({ items: [] }),
       })
     );
     await page.route('**/api/v1/audit/verify-chain**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ valid: true, totalLinks: 0, message: 'Hash chain is valid. All events verified.' }),
+        body: JSON.stringify({ isIntact: true, totalLinks: 5, violations: [], isTruncated: false, truncatedAtSequence: null }),
       })
     );
     await page.goto('/audit');
@@ -215,7 +210,7 @@ test.describe('Audit Page (autenticado)', () => {
   });
 
   test('exibe mensagem de erro quando API falha', async ({ page }) => {
-    await page.route('**/api/v1/audit/events**', (route) =>
+    await page.route('**/api/v1/audit/search**', (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({}) })
     );
     await page.goto('/audit');
@@ -228,6 +223,14 @@ test.describe('Audit Page (autenticado)', () => {
 test.describe('Promotion Page (autenticado)', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
+    // Mock releases endpoint used by the release dropdown
+    await page.route('**/api/v1/releases**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 50, totalPages: 0 }),
+      })
+    );
   });
 
   test('exibe o título Promotion', async ({ page }) => {
@@ -251,9 +254,10 @@ test.describe('Promotion Page (autenticado)', () => {
       })
     );
     await page.goto('/promotion');
-    await expect(page.getByText('development')).toBeVisible();
-    await expect(page.getByText('staging')).toBeVisible();
-    await expect(page.getByText('production')).toBeVisible();
+    // Environment pipeline comes from /identity/environments mock (development, staging, production)
+    await expect(page.getByText('development').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('staging').first()).toBeVisible();
+    await expect(page.getByText('production').first()).toBeVisible();
   });
 
   test('exibe o botão de nova requisição', async ({ page }) => {
@@ -278,7 +282,8 @@ test.describe('Promotion Page (autenticado)', () => {
     );
     await page.goto('/promotion');
     await page.getByRole('button', { name: /new promotion request/i }).click();
-    await expect(page.getByPlaceholder(/uuid of the release/i)).toBeVisible();
+    // The form shows a "Release" label and a "Create Request" button
+    await expect(page.getByText(/create promotion request/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /create request/i })).toBeVisible();
   });
 

@@ -177,9 +177,9 @@ test.describe('Contract Governance — detalhe', () => {
 
   test('exibe o nome e versão do contrato no detalhe', async ({ page }) => {
     await page.goto('/contracts/cv-pay-001');
-    // The contract detail heading shows the apiAssetId, not the name
-    await expect(page.getByText('api-pay-001')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('2.1.0')).toBeVisible();
+    // The contract detail heading shows the apiAssetId (appears multiple times, use heading)
+    await expect(page.getByRole('heading', { name: 'api-pay-001' }).first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('2.1.0').first()).toBeVisible();
   });
 
   test('exibe o protocolo e estado de ciclo de vida', async ({ page }) => {
@@ -190,7 +190,21 @@ test.describe('Contract Governance — detalhe', () => {
 
   test('exibe o fingerprint (hash) do contrato', async ({ page }) => {
     await page.goto('/contracts/cv-pay-001');
-    // The fingerprint is shown in the Validation section
+    // Mock the validation summary endpoint which the Validation tab calls
+    await page.route('**/api/v1/contracts/cv-pay-001/validation-summary**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          contractVersionId: 'cv-pay-001',
+          fingerprint: 'sha256:abc123def456',
+          spectralResults: [],
+          policyResults: [],
+          overallStatus: 'Valid',
+        }),
+      }),
+    );
+    // The fingerprint is shown in the Validation tab
     const validationBtn = page.getByRole('button', { name: /validation/i });
     await expect(validationBtn).toBeVisible({ timeout: 5_000 });
     await validationBtn.click();
@@ -245,7 +259,7 @@ test.describe('Contract Governance — criar novo contrato', () => {
     if (await nextBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
       await nextBtn.click();
       // On step 2, creation modes should be visible (Visual Builder, Import, AI)
-      await expect(page.getByText(/import/i)).toBeVisible({ timeout: 3_000 });
+      await expect(page.getByRole('heading', { name: /import/i })).toBeVisible({ timeout: 3_000 });
     }
   });
 });

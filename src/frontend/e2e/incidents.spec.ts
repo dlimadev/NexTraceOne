@@ -339,8 +339,8 @@ test.describe('Incidents — detalhe', () => {
 
   test('exibe o título e referência do incidente', async ({ page }) => {
     await page.goto('/operations/incidents/inc-001');
-    await expect(page.getByText('Payment processing degradation')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('INC-2026-001')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Payment processing degradation' })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('INC-2026-001').first()).toBeVisible();
   });
 
   test('exibe a equipa responsável e o domínio', async ({ page }) => {
