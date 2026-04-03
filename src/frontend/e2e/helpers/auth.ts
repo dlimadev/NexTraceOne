@@ -25,9 +25,11 @@ const ADMIN_PERMISSIONS = [
   'workflow:read',
   'workflow:write',
   'workflow:approve',
+  'workflow:instances:read',
   'promotion:read',
   'promotion:write',
   'promotion:promote',
+  'promotion:requests:read',
   'operations:incidents:read',
   'operations:incidents:write',
   'operations:runbooks:read',
@@ -45,6 +47,7 @@ const ADMIN_PERMISSIONS = [
   'identity:sessions:read',
   'audit:read',
   'audit:export',
+  'audit:trail:read',
   'governance:packs:read',
   'governance:waivers:read',
   'governance:reports:read',
@@ -64,7 +67,7 @@ const ADMIN_PERMISSIONS = [
 ];
 
 /** Permissões para o perfil Engineer (acesso limitado). */
-const ENGINEER_PERMISSIONS = [
+export const ENGINEER_PERMISSIONS = [
   'catalog:assets:read',
   'contracts:read',
   'contracts:write',
@@ -73,6 +76,22 @@ const ENGINEER_PERMISSIONS = [
   'operations:incidents:read',
   'operations:incidents:write',
   'operations:runbooks:read',
+];
+
+/** Permissões para o perfil Viewer (apenas leitura). */
+export const VIEWER_PERMISSIONS = [
+  'catalog:assets:read',
+  'contracts:read',
+  'change-intelligence:read',
+];
+
+/** Permissões para o perfil Auditor (audit + leitura básica). */
+export const AUDITOR_PERMISSIONS = [
+  'catalog:assets:read',
+  'contracts:read',
+  'audit:read',
+  'audit:trail:read',
+  'audit:export',
 ];
 
 /**
@@ -124,12 +143,46 @@ export async function mockAuthSession(
     }),
   );
 
+  // Endpoint CSRF token — chamado pelo bootstrapSession após getCurrentUser
+  await page.route('**/api/v1/identity/auth/cookie-session/csrf-token', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ csrfToken: 'mock-csrf-e2e' }),
+    }),
+  );
+
+  // Endpoint de refresh — evita que o interceptor de 401 tente renovar tokens
+  await page.route('**/api/v1/identity/auth/refresh', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        accessToken: 'mock-refreshed-token',
+        refreshToken: 'mock-refreshed-refresh-token',
+      }),
+    }),
+  );
+
   // Endpoint usado por identityApi.getUserProfile(id)
   await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(profile),
+    }),
+  );
+
+  // Ambientes do tenant — usado pelo EnvironmentContext
+  await page.route('**/api/v1/identity/environments', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        { id: 'env-dev-001', name: 'development', profile: 'development', tenantId: 'tenant-e2e-001', isDefault: false, isActive: true },
+        { id: 'env-stg-001', name: 'staging', profile: 'staging', tenantId: 'tenant-e2e-001', isDefault: false, isActive: true },
+        { id: 'env-prd-001', name: 'production', profile: 'production', tenantId: 'tenant-e2e-001', isDefault: true, isActive: true },
+      ]),
     }),
   );
 }

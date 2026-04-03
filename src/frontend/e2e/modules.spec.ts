@@ -1,32 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-/**
- * Utilitário para simular uma sessão autenticada nos testes E2E de módulos.
- *
- * Segurança: utiliza sessionStorage com as chaves reais do tokenStorage (nxt_at, nxt_tid, nxt_uid),
- * mantendo paridade com o comportamento de produção. O refresh token permanece apenas em memória.
- */
-async function mockAuthSession(page: Page, roles: string[] = ['Admin']): Promise<void> {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('nxt_at', 'mock-e2e-token');
-    sessionStorage.setItem('nxt_tid', 'tenant-e2e-001');
-    sessionStorage.setItem('nxt_uid', 'user-e2e-001');
-  });
-
-  await page.route('**/api/v1/identity/users/user-e2e-001', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        id: 'user-e2e-001',
-        email: 'admin@acme.com',
-        fullName: 'Admin User',
-        roles,
-        tenantId: 'tenant-e2e-001',
-      }),
-    })
-  );
-}
+import { test, expect } from '@playwright/test';
+import { mockAuthSession } from './helpers/auth';
 
 // ─── Workflow Page ────────────────────────────────────────────────────────────
 
@@ -188,28 +161,26 @@ test.describe('Audit Page (autenticado)', () => {
   });
 
   test('exibe eventos de auditoria carregados da API', async ({ page }) => {
-    await page.route('**/api/v1/audit/events**', (route) =>
+    await page.route('**/api/v1/audit/search**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           items: [
             {
-              id: 'evt-1',
-              eventType: 'ReleaseCreated',
-              aggregateId: 'rel-001',
-              aggregateType: 'Release',
-              actorId: 'usr-001',
-              actorEmail: 'admin@acme.com',
-              payload: {},
-              hash: 'abc123abc123abc123abc123abc123abc123abc123abc123',
+              eventId: 'evt-1',
+              sourceModule: 'ChangeIntelligence',
+              actionType: 'ReleaseCreated',
+              resourceType: 'Release',
+              resourceId: 'rel-001',
+              performedBy: 'admin@acme.com',
               occurredAt: '2024-01-15T10:00:00Z',
+              correlationId: 'cor-001',
+              chainHash: 'abc123abc123abc123abc123abc123abc123abc123abc123',
+              previousHash: null,
+              sequenceNumber: 1,
             },
           ],
-          totalCount: 1,
-          page: 1,
-          pageSize: 20,
-          totalPages: 1,
         }),
       })
     );
@@ -219,18 +190,18 @@ test.describe('Audit Page (autenticado)', () => {
   });
 
   test('exibe resultado de verificação de integridade', async ({ page }) => {
-    await page.route('**/api/v1/audit/events**', (route) =>
+    await page.route('**/api/v1/audit/search**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }),
+        body: JSON.stringify({ items: [] }),
       })
     );
-    await page.route('**/api/v1/audit/verify', (route) =>
+    await page.route('**/api/v1/audit/verify-chain**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ valid: true, message: 'Hash chain is valid. All events verified.' }),
+        body: JSON.stringify({ isIntact: true, totalLinks: 5, violations: [], isTruncated: false, truncatedAtSequence: null }),
       })
     );
     await page.goto('/audit');
@@ -239,7 +210,7 @@ test.describe('Audit Page (autenticado)', () => {
   });
 
   test('exibe mensagem de erro quando API falha', async ({ page }) => {
-    await page.route('**/api/v1/audit/events**', (route) =>
+    await page.route('**/api/v1/audit/search**', (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({}) })
     );
     await page.goto('/audit');
@@ -252,6 +223,14 @@ test.describe('Audit Page (autenticado)', () => {
 test.describe('Promotion Page (autenticado)', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
+    // Mock releases endpoint used by the release dropdown
+    await page.route('**/api/v1/releases**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 50, totalPages: 0 }),
+      })
+    );
   });
 
   test('exibe o título Promotion', async ({ page }) => {
@@ -263,7 +242,7 @@ test.describe('Promotion Page (autenticado)', () => {
       })
     );
     await page.goto('/promotion');
-    await expect(page.getByRole('heading', { name: 'Promotion' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Promotion', level: 1 })).toBeVisible();
   });
 
   test('exibe o pipeline de ambientes', async ({ page }) => {
@@ -275,9 +254,10 @@ test.describe('Promotion Page (autenticado)', () => {
       })
     );
     await page.goto('/promotion');
-    await expect(page.getByText('development')).toBeVisible();
-    await expect(page.getByText('staging')).toBeVisible();
-    await expect(page.getByText('production')).toBeVisible();
+    // Environment pipeline comes from /identity/environments mock (development, staging, production)
+    await expect(page.getByText('development').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('staging').first()).toBeVisible();
+    await expect(page.getByText('production').first()).toBeVisible();
   });
 
   test('exibe o botão de nova requisição', async ({ page }) => {
@@ -302,7 +282,8 @@ test.describe('Promotion Page (autenticado)', () => {
     );
     await page.goto('/promotion');
     await page.getByRole('button', { name: /new promotion request/i }).click();
-    await expect(page.getByPlaceholder(/uuid of the release/i)).toBeVisible();
+    // The form shows a "Release" label and a "Create Request" button
+    await expect(page.getByText(/create promotion request/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /create request/i })).toBeVisible();
   });
 

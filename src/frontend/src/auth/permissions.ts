@@ -17,6 +17,8 @@
 // Roles disponíveis no sistema RBAC do NexTraceOne (alinhados com o backend)
 export type AppRole =
   | 'PlatformAdmin'
+  | 'Admin'
+  | 'Manager'
   | 'TechLead'
   | 'Developer'
   | 'Viewer'

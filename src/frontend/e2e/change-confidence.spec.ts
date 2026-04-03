@@ -8,56 +8,57 @@ import { mockAuthSession } from './helpers/auth';
 
 const CHANGES_SUMMARY_FIXTURE = {
   totalChanges: 15,
-  validated: 8,
-  needsAttention: 4,
+  validatedChanges: 8,
+  changesNeedingAttention: 4,
   suspectedRegressions: 2,
-  correlatedWithIncidents: 1,
-  mitigated: 0,
-  averageScore: 0.42,
+  changesCorrelatedWithIncidents: 1,
 };
 
+const CHANGES_LIST_ITEMS = [
+  {
+    changeId: 'chg-001',
+    serviceName: 'payments-service',
+    version: 'v2.2.0',
+    environment: 'prod',
+    changeType: 'Deployment',
+    deploymentStatus: 'Deployed',
+    confidenceStatus: 'NeedsAttention',
+    changeScore: 0.65,
+    deployedAt: '2026-03-18T14:00:00Z',
+    commitSha: 'a1b2c3d',
+    description: 'Deploy payments-service v2.2.0 with new retry logic',
+  },
+  {
+    changeId: 'chg-002',
+    serviceName: 'auth-service',
+    version: 'v1.5.1',
+    environment: 'prod',
+    changeType: 'ConfigurationChange',
+    deploymentStatus: 'Deployed',
+    confidenceStatus: 'Validated',
+    changeScore: 0.18,
+    deployedAt: '2026-03-17T10:00:00Z',
+    commitSha: 'e4f5g6h',
+    description: 'Update JWT expiration from 1h to 2h',
+  },
+  {
+    changeId: 'chg-003',
+    serviceName: 'payments-service',
+    version: 'v2.1.9',
+    environment: 'staging',
+    changeType: 'ContractChange',
+    deploymentStatus: 'Deployed',
+    confidenceStatus: 'SuspectedRegression',
+    changeScore: 0.82,
+    deployedAt: '2026-03-16T08:00:00Z',
+    commitSha: 'i7j8k9l',
+    description: 'Breaking change in payment confirmation schema',
+  },
+];
+
 const CHANGES_LIST_FIXTURE = {
-  items: [
-    {
-      changeId: 'chg-001',
-      serviceName: 'payments-service',
-      version: 'v2.2.0',
-      environment: 'prod',
-      changeType: 'Deployment',
-      deploymentStatus: 'Deployed',
-      confidenceStatus: 'NeedsAttention',
-      changeScore: 0.65,
-      deployedAt: '2026-03-18T14:00:00Z',
-      commitSha: 'a1b2c3d',
-      description: 'Deploy payments-service v2.2.0 with new retry logic',
-    },
-    {
-      changeId: 'chg-002',
-      serviceName: 'auth-service',
-      version: 'v1.5.1',
-      environment: 'prod',
-      changeType: 'ConfigurationChange',
-      deploymentStatus: 'Deployed',
-      confidenceStatus: 'Validated',
-      changeScore: 0.18,
-      deployedAt: '2026-03-17T10:00:00Z',
-      commitSha: 'e4f5g6h',
-      description: 'Update JWT expiration from 1h to 2h',
-    },
-    {
-      changeId: 'chg-003',
-      serviceName: 'payments-service',
-      version: 'v2.1.9',
-      environment: 'staging',
-      changeType: 'ContractChange',
-      deploymentStatus: 'Deployed',
-      confidenceStatus: 'SuspectedRegression',
-      changeScore: 0.82,
-      deployedAt: '2026-03-16T08:00:00Z',
-      commitSha: 'i7j8k9l',
-      description: 'Breaking change in payment confirmation schema',
-    },
-  ],
+  items: CHANGES_LIST_ITEMS,
+  changes: CHANGES_LIST_ITEMS,
   totalCount: 3,
   page: 1,
   pageSize: 20,
@@ -104,28 +105,29 @@ const CHANGE_INTELLIGENCE_FIXTURE = {
 const CHANGE_ADVISORY_FIXTURE = {
   changeId: 'chg-001',
   recommendation: 'ApproveConditionally',
-  overallScore: 0.65,
+  confidenceScore: 0.65,
+  overallConfidence: 0.65,
   factors: [
     {
-      factorName: 'ContractCompatibility',
+      factorName: 'EvidenceCompleteness',
       status: 'Pass',
-      score: 0.9,
-      message: 'No breaking changes detected in contract',
+      weight: 0.9,
+      description: 'No breaking changes detected in contract',
     },
     {
-      factorName: 'MetricsDegradation',
+      factorName: 'ChangeScore',
       status: 'Warning',
-      score: 0.4,
-      message: 'Error rate increased above baseline threshold',
+      weight: 0.4,
+      description: 'Error rate increased above baseline threshold',
     },
     {
-      factorName: 'BlastRadius',
+      factorName: 'BlastRadiusScope',
       status: 'Warning',
-      score: 0.5,
-      message: '3 downstream consumers potentially affected',
+      weight: 0.5,
+      description: '3 downstream consumers potentially affected',
     },
   ],
-  summary: 'Conditional approval — monitor error rate for 2h post-deploy',
+  rationale: 'Conditional approval — monitor error rate for 2h post-deploy',
 };
 
 const CHANGE_DECISIONS_FIXTURE = {
@@ -145,11 +147,18 @@ test.describe('Change Confidence — listagem', () => {
         body: JSON.stringify(CHANGES_SUMMARY_FIXTURE),
       }),
     );
+    await page.route('**/api/v1/changes/filter-options**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ changeTypes: [], confidenceStatuses: [], deploymentStatuses: [] }),
+      }),
+    );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
-      // Não interceptar rotas de detalhe individual
-      if (/\/changes\/chg-\d+/.test(url.pathname)) {
-        route.continue();
+      // Let more specific routes handle summary, filter-options, and individual changes
+      if (url.pathname.includes('/summary') || url.pathname.includes('/filter-options') || /\/changes\/chg-\d+/.test(url.pathname)) {
+        route.fallback();
         return;
       }
       route.fulfill({
@@ -167,8 +176,9 @@ test.describe('Change Confidence — listagem', () => {
 
   test('exibe as métricas de resumo', async ({ page }) => {
     await page.goto('/changes');
-    // Aguarda os dados do summary serem visíveis
-    await expect(page.getByText('15')).toBeVisible({ timeout: 5_000 });
+    // Aguarda os dados do summary serem visíveis — label "Total Changes" with value
+    await expect(page.getByText('Total Changes')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('paragraph').filter({ hasText: 'Validated' })).toBeVisible();
   });
 
   test('lista as mudanças devolvidas pela API', async ({ page }) => {
@@ -179,9 +189,10 @@ test.describe('Change Confidence — listagem', () => {
 
   test('exibe os tipos e estados das mudanças', async ({ page }) => {
     await page.goto('/changes');
-    await expect(page.getByText('Deployment').first()).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('ConfigurationChange')).toBeVisible();
-    await expect(page.getByText('ContractChange')).toBeVisible();
+    const table = page.getByRole('table');
+    await expect(table.getByText('Deployment').first()).toBeVisible({ timeout: 5_000 });
+    await expect(table.getByText('Configuration').first()).toBeVisible();
+    await expect(table.getByText('Contract').first()).toBeVisible();
   });
 
   test('exibe o estado "no changes" quando a API devolve lista vazia', async ({ page }) => {
@@ -189,7 +200,7 @@ test.describe('Change Confidence — listagem', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }),
+        body: JSON.stringify({ items: [], changes: [], totalCount: 0, page: 1, pageSize: 20 }),
       }),
     );
     await page.goto('/changes');
@@ -209,9 +220,16 @@ test.describe('Change Confidence — filtros', () => {
         body: JSON.stringify(CHANGES_SUMMARY_FIXTURE),
       }),
     );
+    await page.route('**/api/v1/changes/filter-options**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ changeTypes: [], confidenceStatuses: [], deploymentStatuses: [] }),
+      }),
+    );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
+      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.fallback(); return; }
       const env = url.searchParams.get('environment') ?? '';
       const filtered = env
         ? CHANGES_LIST_FIXTURE.items.filter((c) => c.environment === env)
@@ -219,7 +237,7 @@ test.describe('Change Confidence — filtros', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: filtered, totalCount: filtered.length, page: 1, pageSize: 20 }),
+        body: JSON.stringify({ items: filtered, changes: filtered, totalCount: filtered.length, page: 1, pageSize: 20 }),
       });
     });
 
@@ -281,25 +299,24 @@ test.describe('Change Confidence — detalhe', () => {
 
   test('exibe o nome do serviço no detalhe da mudança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('payments-service')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: 'payments-service' })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe o advisory com a recomendação de governança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('ApproveConditionally')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approve Conditionally').first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe os factores de análise do advisory', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText('ContractCompatibility')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('MetricsDegradation')).toBeVisible();
-    await expect(page.getByText('BlastRadius')).toBeVisible();
+    await expect(page.getByText('Evidence Completeness').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Change Score').first()).toBeVisible();
+    await expect(page.getByText('Blast Radius Scope').first()).toBeVisible();
   });
 
   test('exibe o blast radius da mudança', async ({ page }) => {
     await page.goto('/changes/chg-001');
-    await expect(page.getByText(/blast radius/i)).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('3')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /blast radius/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe o commit SHA', async ({ page }) => {
@@ -350,12 +367,12 @@ test.describe('Change Confidence — decisão de governança', () => {
   test('exibe opções de decisão Approve e Reject', async ({ page }) => {
     await page.goto('/changes/chg-001');
     // Aguarda o advisory ser carregado (indica que a página está pronta)
-    await expect(page.getByText('ApproveConditionally')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Approve Conditionally').first()).toBeVisible({ timeout: 5_000 });
     // Os botões de decisão devem estar visíveis
     const approveBtn = page.getByRole('button', { name: /approve/i });
     const rejectBtn = page.getByRole('button', { name: /reject/i });
     // Pelo menos um dos botões deve estar visível (o detalhe tem workflow de decisão)
-    const hasDecisionButtons = await approveBtn.isVisible() || await rejectBtn.isVisible();
+    const hasDecisionButtons = await approveBtn.first().isVisible() || await rejectBtn.first().isVisible();
     expect(hasDecisionButtons).toBeTruthy();
   });
 });
@@ -368,9 +385,19 @@ test.describe('Change Confidence — navegação lista → detalhe', () => {
     await page.route('**/api/v1/changes/summary**', (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(CHANGES_SUMMARY_FIXTURE) }),
     );
+    await page.route('**/api/v1/changes/filter-options**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ changeTypes: [], confidenceStatuses: [], deploymentStatuses: [] }),
+      }),
+    );
     await page.route('**/api/v1/changes**', (route) => {
       const url = new URL(route.request().url());
-      if (/\/changes\/chg-\d+/.test(url.pathname)) { route.continue(); return; }
+      if (url.pathname.includes('/summary') || url.pathname.includes('/filter-options') || /\/changes\/chg-\d+/.test(url.pathname)) {
+        route.fallback();
+        return;
+      }
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(CHANGES_LIST_FIXTURE) });
     });
     await page.route('**/api/v1/changes/chg-001**', (route) => {

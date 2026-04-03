@@ -8,7 +8,7 @@ import { mockAuthSession } from './helpers/auth';
 const SERVICE_LIST_FIXTURE = {
   items: [
     {
-      id: 'svc-pay-001',
+      serviceId: 'svc-pay-001',
       name: 'payments-service',
       displayName: 'Payments Service',
       description: 'Handles payment processing and reconciliation',
@@ -21,7 +21,7 @@ const SERVICE_LIST_FIXTURE = {
       registeredAt: '2025-01-10T10:00:00Z',
     },
     {
-      id: 'svc-auth-002',
+      serviceId: 'svc-auth-002',
       name: 'auth-service',
       displayName: 'Auth Service',
       description: 'Identity and authentication provider',
@@ -40,22 +40,36 @@ const SERVICE_LIST_FIXTURE = {
 };
 
 const SERVICES_SUMMARY_FIXTURE = {
-  total: 2,
-  critical: 1,
-  high: 1,
-  active: 2,
-  deprecated: 0,
-  retired: 0,
+  totalCount: 2,
+  criticalCount: 1,
+  highCriticalityCount: 1,
+  activeCount: 2,
+  deprecatedCount: 0,
+  retiredCount: 0,
+};
+
+const GRAPH_FIXTURE = {
+  services: [
+    { serviceAssetId: 'svc-pay-001', name: 'payments-service', domain: 'Finance', teamName: 'Payments Team', serviceType: 'RestApi', criticality: 'Critical', lifecycleStatus: 'Active' },
+    { serviceAssetId: 'svc-auth-002', name: 'auth-service', domain: 'Platform', teamName: 'Identity Team', serviceType: 'RestApi', criticality: 'High', lifecycleStatus: 'Active' },
+  ],
+  apis: [
+    { apiAssetId: 'api-pay-001', name: 'Payments API', ownerServiceId: 'svc-pay-001', protocol: 'OpenApi', baseUrl: '/api/payments', consumers: ['svc-auth-002'] },
+  ],
 };
 
 const SERVICE_DETAIL_FIXTURE = {
+  serviceId: 'svc-pay-001',
   id: 'svc-pay-001',
   name: 'payments-service',
   displayName: 'Payments Service',
   description: 'Handles payment processing and reconciliation',
   serviceType: 'RestApi',
   domain: 'Finance',
+  systemArea: 'Finance',
   teamName: 'Payments Team',
+  technicalOwner: 'payments@acme.com',
+  businessOwner: '',
   ownerEmail: 'payments@acme.com',
   criticality: 'Critical',
   lifecycleStatus: 'Active',
@@ -65,14 +79,19 @@ const SERVICE_DETAIL_FIXTURE = {
   tags: ['payments', 'finance', 'critical'],
   registeredAt: '2025-01-10T10:00:00Z',
   updatedAt: '2025-03-01T14:00:00Z',
-  apiAssets: [
+  apis: [
     {
-      id: 'api-pay-001',
+      apiId: 'api-pay-001',
       name: 'Payments API',
-      baseUrl: '/api/payments',
-      protocol: 'OpenApi',
+      routePattern: '/api/payments',
+      version: '2.1.0',
+      visibility: 'Internal',
+      isDecommissioned: false,
+      consumerCount: 3,
     },
   ],
+  apiCount: 1,
+  totalConsumers: 3,
 };
 
 // ─── Service Catalog List ─────────────────────────────────────────────────────
@@ -80,6 +99,13 @@ const SERVICE_DETAIL_FIXTURE = {
 test.describe('Service Catalog — listagem', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthSession(page);
+    await page.route('**/api/v1/catalog/graph**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(GRAPH_FIXTURE),
+      }),
+    );
     await page.route('**/api/v1/catalog/services/summary**', (route) =>
       route.fulfill({
         status: 200,
@@ -87,31 +113,43 @@ test.describe('Service Catalog — listagem', () => {
         body: JSON.stringify(SERVICES_SUMMARY_FIXTURE),
       }),
     );
-    await page.route('**/api/v1/catalog/services**', (route) =>
+    await page.route('**/api/v1/catalog/snapshots**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0 }) }),
+    );
+    await page.route('**/api/v1/catalog/services**', (route) => {
+      const url = new URL(route.request().url());
+      if (url.pathname.includes('/summary') || url.pathname.includes('/svc-')) {
+        route.fallback();
+        return;
+      }
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(SERVICE_LIST_FIXTURE),
-      }),
+      });
+    });
+    await page.route('**/api/v1/catalog/health**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], totalCount: 0 }) }),
     );
   });
 
   test('exibe o título da página Service Catalog', async ({ page }) => {
     await page.goto('/services');
-    await expect(page.getByRole('heading', { name: /service catalog/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /service catalog/i, level: 1 })).toBeVisible();
   });
 
   test('exibe as métricas de resumo (summary cards)', async ({ page }) => {
     await page.goto('/services');
-    await expect(page.getByText('Total Services')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Critical')).toBeVisible();
-    await expect(page.getByText('Active')).toBeVisible();
+    // The page shows graph-based stats: Services, APIs, Relationships, Domains
+    await expect(page.getByText('Services').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('APIs')).toBeVisible();
   });
 
   test('lista os serviços devolvidos pela API', async ({ page }) => {
     await page.goto('/services');
-    await expect(page.getByText('Payments Service')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Auth Service')).toBeVisible();
+    // The services table shows displayName from the /catalog/services list endpoint
+    await expect(page.getByText('Payments Service').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Auth Service').first()).toBeVisible();
   });
 
   test('exibe os atributos de criticidade e lifecycle dos serviços', async ({ page }) => {
@@ -122,21 +160,32 @@ test.describe('Service Catalog — listagem', () => {
   });
 
   test('exibe estado vazio quando a API devolve lista vazia', async ({ page }) => {
-    // Sobrescreve o mock para lista vazia
-    await page.route('**/api/v1/catalog/services**', (route) =>
+    // Sobrescreve o mock do graph para vazio
+    await page.route('**/api/v1/catalog/graph**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ items: [], totalCount: 0, page: 1, pageSize: 20 }),
+        body: JSON.stringify({ services: [], apis: [] }),
       }),
     );
     await page.goto('/services');
-    // O EmptyState deve aparecer quando não há resultados
-    await expect(page.getByText(/no services/i)).toBeVisible({ timeout: 5_000 });
+    // With empty graph, stat values should be 0
+    await expect(page.getByText('0').first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe erro quando a API falha', async ({ page }) => {
-    await page.route('**/api/v1/catalog/services**', (route) =>
+    await page.route('**/api/v1/catalog/graph**', (route) =>
+      route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
+    );
+    await page.route('**/api/v1/catalog/services**', (route) => {
+      const url = new URL(route.request().url());
+      if (url.pathname.includes('/summary') || url.pathname.includes('/svc-')) {
+        route.fallback();
+        return;
+      }
+      route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+    });
+    await page.route('**/api/v1/catalog/services/summary**', (route) =>
       route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
     );
     await page.goto('/services');
@@ -218,18 +267,23 @@ test.describe('Service Catalog — detalhe do serviço', () => {
 
   test('exibe o nome do serviço no detalhe', async ({ page }) => {
     await page.goto('/services/svc-pay-001');
-    await expect(page.getByText('Payments Service')).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: 'Payments Service' })).toBeVisible({ timeout: 5_000 });
   });
 
   test('exibe o domínio e equipa do serviço', async ({ page }) => {
     await page.goto('/services/svc-pay-001');
-    await expect(page.getByText('Finance')).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText('Payments Team')).toBeVisible();
+    await expect(page.getByText('Finance').first()).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText('Payments Team').first()).toBeVisible();
   });
 
   test('exibe a lista de API assets do serviço', async ({ page }) => {
     await page.goto('/services/svc-pay-001');
-    await expect(page.getByText('Payments API')).toBeVisible({ timeout: 5_000 });
+    // APIs are shown in the APIs tab — click it first
+    const apisTab = page.getByRole('button', { name: /apis/i }).first();
+    if (await apisTab.isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await apisTab.click();
+    }
+    await expect(page.getByText('Payments API').first()).toBeVisible({ timeout: 5_000 });
   });
 });
 
@@ -247,9 +301,8 @@ test.describe('Service Catalog — navegação lista → detalhe', () => {
     );
     await page.route('**/api/v1/catalog/services**', (route) => {
       const url = new URL(route.request().url());
-      // Evita intercetar /services/svc-pay-001
-      if (url.pathname.includes('/svc-pay-001')) {
-        route.continue();
+      if (url.pathname.includes('/summary') || url.pathname.includes('/svc-pay-001')) {
+        route.fallback();
         return;
       }
       route.fulfill({

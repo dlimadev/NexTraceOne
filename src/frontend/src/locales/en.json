@@ -2839,6 +2839,8 @@
     },
     "complianceTitle": "Compliance",
     "complianceSubtitle": "Enterprise compliance derived from governance pack adoption (rollouts) and exceptions (waivers).",
+    "finopsTitle": "FinOps",
+    "finopsSubtitle": "Contextual cost intelligence by service, domain, team, environment and operation.",
     "compliance": {
       "overallScore": "Overall score",
       "totalAssessed": "Packs assessed",

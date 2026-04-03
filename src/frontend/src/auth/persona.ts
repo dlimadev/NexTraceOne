@@ -34,6 +34,8 @@ export type Persona =
 export function derivePersona(roleName: string): Persona {
   const mapping: Record<AppRole, Persona> = {
     PlatformAdmin: 'PlatformAdmin',
+    Admin: 'PlatformAdmin',
+    Manager: 'TechLead',
     TechLead: 'TechLead',
     Developer: 'Engineer',
     Viewer: 'Product',
