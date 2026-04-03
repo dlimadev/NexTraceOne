@@ -16,31 +16,67 @@ const GOVERNANCE_HEALTH_FIXTURE = {
 
 const FINOPS_SUMMARY_FIXTURE = {
   totalMonthlyCost: 12500.0,
+  totalWaste: 2100.0,
+  overallEfficiency: 'Efficient',
   costTrend: 'Stable',
-  topServices: [
-    { serviceName: 'payments-service', monthlyCost: 4200.0 },
-    { serviceName: 'auth-service', monthlyCost: 2800.0 },
+  services: [
+    {
+      serviceId: 'svc-pay-001',
+      serviceName: 'payments-service',
+      domain: 'Finance',
+      team: 'Payments Team',
+      monthlyCost: 4200.0,
+      waste: 300.0,
+      efficiency: 'Efficient',
+      trend: 'Stable',
+      wasteSignals: [],
+    },
+    {
+      serviceId: 'svc-auth-001',
+      serviceName: 'auth-service',
+      domain: 'Platform',
+      team: 'Identity Team',
+      monthlyCost: 2800.0,
+      waste: 100.0,
+      efficiency: 'Acceptable',
+      trend: 'Improving',
+      wasteSignals: [],
+    },
   ],
-  wasteSignals: 3,
-  efficiencyScore: 78,
-  isSimulated: false,
+  topCostDrivers: [],
+  topWasteSignals: [],
+  optimizationOpportunities: [],
+  generatedAt: '2026-03-18T14:00:00Z',
 };
 
 const COMPLIANCE_FIXTURE = {
-  items: [
-    { id: 'cc-001', name: 'API versioning compliance', status: 'Passed', severity: 'High' },
-    { id: 'cc-002', name: 'Contract ownership required', status: 'Passed', severity: 'Medium' },
-    { id: 'cc-003', name: 'Breaking change detection', status: 'Failed', severity: 'Critical' },
+  overallScore: 87,
+  totalPacksAssessed: 3,
+  compliantCount: 2,
+  partiallyCompliantCount: 0,
+  nonCompliantCount: 1,
+  totalRollouts: 2,
+  completedRollouts: 1,
+  failedRollouts: 0,
+  totalWaivers: 0,
+  approvedWaivers: 0,
+  packs: [
+    { packId: 'cc-001', packName: 'API versioning compliance', complianceLevel: 'Compliant', assessedAt: '2026-03-01T10:00:00Z' },
+    { packId: 'cc-002', packName: 'Contract ownership required', complianceLevel: 'Compliant', assessedAt: '2026-03-01T10:00:00Z' },
+    { packId: 'cc-003', packName: 'Breaking change detection', complianceLevel: 'NonCompliant', assessedAt: '2026-03-01T10:00:00Z' },
   ],
-  totalCount: 3,
 };
 
 const RISK_FIXTURE = {
-  items: [
-    { id: 'r-001', title: 'Unowned services detected', severity: 'High', status: 'Open', affectedServices: 2 },
-    { id: 'r-002', title: 'Deprecated APIs still in use', severity: 'Medium', status: 'Open', affectedServices: 1 },
+  totalPacksAssessed: 2,
+  criticalCount: 0,
+  highCount: 1,
+  mediumCount: 1,
+  lowCount: 0,
+  indicators: [
+    { packId: 'r-001', packName: 'Unowned services detected', category: 'Ownership', riskLevel: 'High', dimensions: [] },
+    { packId: 'r-002', packName: 'Deprecated APIs still in use', category: 'Lifecycle', riskLevel: 'Medium', dimensions: [] },
   ],
-  totalCount: 2,
 };
 
 // ─── Governance Reports ───────────────────────────────────────────────────────

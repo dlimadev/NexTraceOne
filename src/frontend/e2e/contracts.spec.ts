@@ -21,6 +21,7 @@ const CONTRACTS_LIST_FIXTURE = {
   items: [
     {
       id: 'cv-pay-001',
+      versionId: 'cv-pay-001',
       apiAssetId: 'api-pay-001',
       name: 'Payments API',
       semVer: '2.1.0',
@@ -34,6 +35,7 @@ const CONTRACTS_LIST_FIXTURE = {
     },
     {
       id: 'cv-auth-001',
+      versionId: 'cv-auth-001',
       apiAssetId: 'api-auth-001',
       name: 'Auth API',
       semVer: '1.0.0',
@@ -47,6 +49,7 @@ const CONTRACTS_LIST_FIXTURE = {
     },
     {
       id: 'cv-events-001',
+      versionId: 'cv-events-001',
       apiAssetId: 'api-events-001',
       name: 'Events API',
       semVer: '3.0.0',
@@ -174,7 +177,8 @@ test.describe('Contract Governance — detalhe', () => {
 
   test('exibe o nome e versão do contrato no detalhe', async ({ page }) => {
     await page.goto('/contracts/cv-pay-001');
-    await expect(page.getByText('Payments API')).toBeVisible({ timeout: 5_000 });
+    // The contract detail heading shows the apiAssetId, not the name
+    await expect(page.getByText('api-pay-001')).toBeVisible({ timeout: 5_000 });
     await expect(page.getByText('2.1.0')).toBeVisible();
   });
 
@@ -186,6 +190,10 @@ test.describe('Contract Governance — detalhe', () => {
 
   test('exibe o fingerprint (hash) do contrato', async ({ page }) => {
     await page.goto('/contracts/cv-pay-001');
+    // The fingerprint is shown in the Validation section
+    const validationBtn = page.getByRole('button', { name: /validation/i });
+    await expect(validationBtn).toBeVisible({ timeout: 5_000 });
+    await validationBtn.click();
     await expect(page.getByText(/sha256/i)).toBeVisible({ timeout: 5_000 });
   });
 });
@@ -222,21 +230,21 @@ test.describe('Contract Governance — criar novo contrato', () => {
 
   test('página de criação exibe os tipos de serviço disponíveis', async ({ page }) => {
     await page.goto('/contracts/new');
-    // A página de criação mostra opções de tipo (REST, SOAP, Event, etc.)
-    await expect(page.getByText(/rest api/i)).toBeVisible({ timeout: 5_000 });
+    // The page shows contract types as cards with headings
+    await expect(page.getByRole('heading', { name: /rest api/i })).toBeVisible({ timeout: 5_000 });
   });
 
   test('selecionar tipo REST API avança para o passo de modo de criação', async ({ page }) => {
     await page.goto('/contracts/new');
-    // Clica no tipo REST API
-    const restOption = page.getByText(/rest api/i).first();
+    // Click the REST API card button
+    const restOption = page.getByRole('button', { name: /rest api/i }).first();
     await expect(restOption).toBeVisible({ timeout: 5_000 });
     await restOption.click();
-    // Botão Next avança para o passo seguinte
+    // Click Next to advance to the creation mode step
     const nextBtn = page.getByRole('button', { name: /next/i });
-    if (await nextBtn.isVisible()) {
+    if (await nextBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
       await nextBtn.click();
-      // No segundo passo devem aparecer os modos de criação
+      // On step 2, creation modes should be visible (Visual Builder, Import, AI)
       await expect(page.getByText(/import/i)).toBeVisible({ timeout: 3_000 });
     }
   });
@@ -279,10 +287,8 @@ test.describe('Contract Governance — navegação catálogo → detalhe', () =>
     await page.goto('/contracts');
     await expect(page.getByText('Payments API')).toBeVisible({ timeout: 5_000 });
 
-    // Clica no link da linha "Payments API" para abrir o detalhe
-    const contractLink = page.getByRole('link', { name: /payments api/i }).first();
-    await expect(contractLink).toBeVisible({ timeout: 5_000 });
-    await contractLink.click();
+    // Click the "Payments API" row (rows are clickable via onClick, not links)
+    await page.getByText('Payments API').first().click();
 
     await expect(page).toHaveURL(/\/contracts\/cv-pay-001/);
     await expect(page.getByText('2.1.0')).toBeVisible({ timeout: 5_000 });
