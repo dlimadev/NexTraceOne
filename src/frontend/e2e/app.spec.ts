@@ -152,7 +152,7 @@ test.describe('Navigation (autenticado)', () => {
     await expect(page.getByRole('link', { name: /dependency graph/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /dependency graph/i }).click();
     await expect(page).toHaveURL('/services/graph');
-    await expect(page.getByRole('heading', { name: /dependency graph/i })).toBeVisible();
+    await expect(page.getByText('Dependency Graph')).toBeVisible();
   });
 
   test('navega para a página de Workflow expandindo seção Changes', async ({ page }) => {
@@ -161,7 +161,7 @@ test.describe('Navigation (autenticado)', () => {
     await expect(page.getByRole('link', { name: /workflow/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /workflow/i }).click();
     await expect(page).toHaveURL('/workflow');
-    await expect(page.getByRole('heading', { name: /workflow/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /workflow/i, level: 1 })).toBeVisible();
   });
 
   test('navega para a página de Promotion expandindo seção Changes', async ({ page }) => {
@@ -170,19 +170,19 @@ test.describe('Navigation (autenticado)', () => {
     await expect(page.getByRole('link', { name: /promotion/i })).toBeVisible({ timeout: 5_000 });
     await page.getByRole('link', { name: /promotion/i }).click();
     await expect(page).toHaveURL('/promotion');
-    await expect(page.getByRole('heading', { name: /promotion/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /promotion/i, level: 1 })).toBeVisible();
   });
 
   test('navega para a página de Users via URL direta', async ({ page }) => {
     // Users está na seção admin — navegação direta
     await page.goto('/users');
-    await expect(page.getByRole('heading', { name: /users/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /users/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 
   test('navega para a página de Audit via URL direta', async ({ page }) => {
     // Audit está na seção admin — navegação direta
     await page.goto('/audit');
-    await expect(page.getByRole('heading', { name: /audit/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('heading', { name: /audit/i, level: 1 })).toBeVisible({ timeout: 5_000 });
   });
 
   test('faz logout ao clicar no botão de sair', async ({ page }) => {
@@ -192,7 +192,8 @@ test.describe('Navigation (autenticado)', () => {
     await expect(logoutBtn).toBeVisible({ timeout: 5_000 });
     await logoutBtn.click();
     await expect(page).toHaveURL('/login');
-    expect(await page.evaluate(() => sessionStorage.getItem('nxt_at'))).toBeNull();
+    // O token de acesso está em memória (não em sessionStorage),
+    // por isso validamos apenas o redirect para /login
   });
 });
 
@@ -268,20 +269,30 @@ test.describe('Controle de Acesso (RBAC)', () => {
   test('Developer não vê link de Users na sidebar', async ({ page }) => {
     await mockEngineerSession(page);
     await page.goto('/');
-    // Aguarda perfil ser carregado (sidebar renderizar sem Users)
-    await expect(page.getByRole('link', { name: /releases/i })).toBeVisible({ timeout: 5_000 });
+    // Aguarda perfil ser carregado (Dashboard é visível na seção home)
+    await expect(page.getByRole('link', { name: /dashboard/i })).toBeVisible({ timeout: 5_000 });
+    // Developer não tem permissão identity:users:read, então a seção admin
+    // não tem items → botão admin não aparece no icon rail
     await expect(page.getByRole('link', { name: /users/i })).not.toBeVisible();
   });
 
-  test('Admin vê o link de Users na sidebar', async ({ page }) => {
+  test('Admin vê o link de Users ao expandir seção admin', async ({ page }) => {
     await mockAuthSession(page, { roles: ['Admin'] });
     await page.goto('/');
+    // Admin → PlatformAdmin persona → seção admin está disponível
+    // Expandir a seção admin no icon rail para ver Users
+    const adminBtn = page.getByRole('button', { name: /administration/i });
+    await expect(adminBtn).toBeVisible({ timeout: 5_000 });
+    await adminBtn.click();
     await expect(page.getByRole('link', { name: /users/i })).toBeVisible({ timeout: 5_000 });
   });
 
-  test('Manager vê o link de Users na sidebar', async ({ page }) => {
+  test('Manager vê o link de Users ao expandir seção admin', async ({ page }) => {
     await mockAuthSession(page, { roles: ['Manager'] });
     await page.goto('/');
+    const adminBtn = page.getByRole('button', { name: /administration/i });
+    await expect(adminBtn).toBeVisible({ timeout: 5_000 });
+    await adminBtn.click();
     await expect(page.getByRole('link', { name: /users/i })).toBeVisible({ timeout: 5_000 });
   });
 
