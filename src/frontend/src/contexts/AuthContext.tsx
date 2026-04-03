@@ -95,6 +95,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const profile = await identityApi.getCurrentUser();
 
+        // Tenta refresh silencioso via cookie para repor o access token em memória.
+        // Necessário para que o interceptor de 401 funcione após recarregamento de página.
+        try {
+          const refreshData = await identityApi.bootRefresh();
+          const newAccess = refreshData?.accessToken;
+          const newRefresh = refreshData?.refreshToken;
+          if (
+            typeof newAccess === 'string' && newAccess.length > 0 &&
+            typeof newRefresh === 'string' && newRefresh.length > 0
+          ) {
+            storeTokens(newAccess, newRefresh);
+          }
+        } catch {
+          // Refresh silencioso falhou — continua com autenticação baseada em cookie.
+        }
+
         try {
           const csrf = await identityApi.getCsrfToken();
           if (csrf?.csrfToken) {

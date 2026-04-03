@@ -92,6 +92,20 @@ export const identityApi = {
       .post<LoginResponse>('/identity/auth/refresh', { refreshToken })
       .then((r) => r.data),
 
+  /**
+   * Refresh silencioso via cookie de sessão — não depende de refresh token em memória.
+   * Usa axios diretamente (não apiClient) para evitar acionar o interceptor de 401
+   * e causar recursão infinita no arranque da aplicação.
+   */
+  bootRefresh: (): Promise<{ accessToken: string; refreshToken: string }> =>
+    axios
+      .post<{ accessToken: string; refreshToken: string }>(
+        '/api/v1/identity/auth/refresh',
+        {},
+        { withCredentials: true },
+      )
+      .then((r) => r.data),
+
   logout: async () => {
     try {
       return await client.delete('/identity/auth/cookie-session');

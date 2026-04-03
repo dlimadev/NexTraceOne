@@ -298,6 +298,10 @@ export interface ValidationSummary {
   isReviewReady: boolean;
   sources: string[];
   validatedAt: string;
+  /** Hash SHA-256 do conteúdo do contrato — garante integridade e rastreabilidade. */
+  fingerprint?: string;
+  /** Estado global da validação (e.g. 'Valid', 'Invalid', 'Partial'). */
+  overallStatus?: string;
 }
 
 /** Modo de execução do linting de contratos. */

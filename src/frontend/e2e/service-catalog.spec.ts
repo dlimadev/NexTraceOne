@@ -278,11 +278,10 @@ test.describe('Service Catalog — detalhe do serviço', () => {
 
   test('exibe a lista de API assets do serviço', async ({ page }) => {
     await page.goto('/services/svc-pay-001');
-    // APIs are shown in the APIs tab — click it first
-    const apisTab = page.getByRole('button', { name: /apis/i }).first();
-    if (await apisTab.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await apisTab.click();
-    }
+    // APIs são exibidos no separador "APIs" — o Tabs renderiza <button role="tab">
+    const apisTab = page.getByRole('tab', { name: /apis/i }).first();
+    await expect(apisTab).toBeVisible({ timeout: 5_000 });
+    await apisTab.click();
     await expect(page.getByText('Payments API').first()).toBeVisible({ timeout: 5_000 });
   });
 });
