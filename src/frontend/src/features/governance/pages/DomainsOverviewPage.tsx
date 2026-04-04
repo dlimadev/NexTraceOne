@@ -12,6 +12,7 @@ import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
 
@@ -121,7 +122,12 @@ export function DomainsOverviewPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filtered.length === 0 ? (
-              <div className="col-span-full p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+              <div className="col-span-full">
+                <EmptyState
+                  title={t('organization.domains.empty', 'No domains found')}
+                  description={t('organization.domains.emptyDescription', 'No domains match your search criteria.')}
+                />
+              </div>
             ) : (
               filtered.map(domain => (
                 <Card key={domain.domainId}>

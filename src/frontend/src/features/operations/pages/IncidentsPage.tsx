@@ -14,6 +14,7 @@ import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { incidentsApi, type IncidentListItem } from '../api/incidents';
@@ -389,7 +390,11 @@ export function IncidentsPage() {
             ) : (
               <div className="divide-y divide-edge">
                 {incidents.length === 0 ? (
-                  <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+                  <EmptyState
+                    title={t('incidents.empty', 'No incidents found')}
+                    description={t('incidents.emptyDescription', 'No incidents match your current filters.')}
+                    icon={<AlertTriangle size={40} />}
+                  />
                 ) : (
                   incidents.map((inc: IncidentListItem) => {
                     const badge = severityBadge(inc.severity);

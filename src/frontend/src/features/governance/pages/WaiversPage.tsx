@@ -11,6 +11,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import type { WaiverStatus as WaiverStatusType } from '../../../types';
@@ -143,7 +144,10 @@ export function WaiversPage() {
           <CardBody className="p-0">
             <div className="divide-y divide-edge">
               {filtered.length === 0 ? (
-                <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+                <EmptyState
+                  title={t('governance.waivers.empty', 'No waivers found')}
+                  description={t('governance.waivers.emptyDescription', 'No waivers match your current filters.')}
+                />
               ) : (
                 filtered.map(waiver => (
                   <div key={waiver.waiverId} className="px-4 py-4 hover:bg-hover transition-colors">

@@ -9,6 +9,7 @@ import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
 
@@ -117,8 +118,11 @@ export function DelegatedAdminPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filtered.length === 0 ? (
-            <div className="col-span-full p-8 text-center text-muted text-sm">
-              {t('organization.delegatedAdmin.noDelegations')}
+            <div className="col-span-full">
+              <EmptyState
+                title={t('governance.delegations.empty', 'No delegations found')}
+                description={t('governance.delegations.emptyDescription', 'No delegated access entries match your filters.')}
+              />
             </div>
           ) : (
             filtered.map(delegation => (

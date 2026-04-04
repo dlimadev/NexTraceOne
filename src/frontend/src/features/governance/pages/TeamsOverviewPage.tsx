@@ -12,6 +12,7 @@ import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
 
@@ -119,7 +120,12 @@ export function TeamsOverviewPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filtered.length === 0 ? (
-              <div className="col-span-full p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+              <div className="col-span-full">
+                <EmptyState
+                  title={t('organization.teams.empty', 'No teams found')}
+                  description={t('organization.teams.emptyDescription', 'No teams match your search criteria.')}
+                />
+              </div>
             ) : (
               filtered.map(team => (
                 <Card key={team.teamId}>
