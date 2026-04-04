@@ -32,7 +32,7 @@
 | FinOps | REAL — via ICostIntelligenceModule e CostIntelligenceDbContext |
 | Contract Studio | COMPLETE — 10/10 tipos de contrato com visual builders |
 | Testes E2E | 8 specs Playwright confirmados + 5 testes real-environment separados |
-| CI/CD | 5 workflows, aprovação manual para produção; E2E não bloqueia PRs |
+| CI/CD | 5 workflows + e2e-smoke gate; E2E @smoke bloqueia PRs para main |
 
 ---
 
@@ -107,15 +107,17 @@
 |---|---|---|
 | Testes unitários backend (.NET) | ~1.447 | Passando |
 | Testes unitários frontend (Vitest) | ~264 | Passando |
-| **Testes E2E (Playwright)** | **8 specs confirmados** | Cobertura parcial — `incidents.spec.ts` usa mock fixtures |
+| **Testes E2E (Playwright)** | **8 specs confirmados** | ✅ E2E @smoke testes agora bloqueiam PRs via CI |
 | Testes E2E real-environment | 5 arquivos (`e2e-real/`) | Configuração separada, não são specs Playwright CI padrão |
 | Testes de carga (k6) | 5 cenários | Thresholds não documentados |
 
 > **⚠️ Correção de Auditoria (Março 2026):** Versões anteriores deste documento afirmavam "13 novos testes E2E". Apenas 8 Playwright specs existem confirmados. Os 5 testes real-environment (`e2e-real/`) são uma configuração separada e não integram o CI padrão.
 
-**Gap crítico:** Testes E2E não bloqueiam PRs. `incidents.spec.ts` valida mock data, não correlação dinâmica real.
+> **✅ Atualização Abril 2026:** E2E @smoke testes agora são obrigatórios como gate de merge via `e2e-smoke` job no CI. `ci-status` job agrega todos os resultados para branch protection.
 
-**Evidência:** `docs/audit-forensic-2026-03/tests-quality-pipelines-report.md`
+**~~Gap crítico:~~ Testes E2E agora bloqueiam PRs** via `e2e-smoke` job no CI.
+
+**Evidência:** `.github/workflows/ci.yml` (e2e-smoke + ci-status jobs), `docs/audit-forensic-2026-03/tests-quality-pipelines-report.md`
 
 ---
 
@@ -128,13 +130,13 @@
 ### Prioridade Alta — Completar governança e compliance
 
 1. ~~**Governance compliance pages** — 19 páginas frontend de compliance/policy/evidence precisam de integração com APIs reais~~ ✅ CONCLUÍDO (25/26 páginas conectadas)
-2. **Tornar testes E2E obrigatórios** como gate de merge para main
+2. ~~**Tornar testes E2E obrigatórios** como gate de merge para main~~ ✅ CONCLUÍDO — `e2e-smoke` job + `ci-status` aggregator
 3. **CI/CD integration** — ingestão de deploy events reais de GitLab/Jenkins/GitHub Actions
 
 ### Prioridade Média — Qualidade e confiança
 
 4. Eliminar warnings CS8632 nullable
-5. Padronizar loading, error e empty states no frontend
+5. ~~Padronizar loading, error e empty states no frontend~~ ✅ CONCLUÍDO — 7 governance pages migradas para TanStack Query + PageLoadingState/PageErrorState
 6. Completar Product Analytics (pipeline de event tracking real)
 7. AI cross-module grounding — enriquecer contexto de IA com entidades de todos os módulos
 8. Correlação incident↔change avançada — ML/NLP-based correlation heuristics

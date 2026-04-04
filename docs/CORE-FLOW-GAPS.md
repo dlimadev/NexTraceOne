@@ -17,13 +17,14 @@ This document is the canonical reference for the real operational state of each 
 - Global search (`/api/v1/source-of-truth/global-search`): real
 
 ### Gaps
-- **Developer Portal: 7 endpoint stubs** — `SearchCatalog`, `RenderOpenApiContract`, `GetApiHealth`, `GetMyApis`, `GetApisIConsume`, `GetApiDetail`, `GetAssetTimeline` are intentional stubs awaiting `IContractsModule` implementation
-- **`IContractsModule`** — cross-module interface defined, 0 implementations; blocks Developer Portal and AI grounding from reading contracts dynamically
+- **Developer Portal: 7 endpoint stubs** — `SearchCatalog`, `RenderOpenApiContract`, `GetApiHealth`, `GetMyApis`, `GetApisIConsume`, `GetApiDetail`, `GetAssetTimeline` are intentional stubs (implementation planned)
+- ~~**`IContractsModule`** — cross-module interface defined, 0 implementations~~ ✅ IMPLEMENTED — `ContractsModuleService` in `Catalog.Infrastructure` provides `GetLatestChangeLevelAsync`, `HasContractVersionAsync`, `GetLatestOverallScoreAsync`, `RequiresWorkflowApprovalAsync`
 - **Contract Studio** — 10/10 contract types with visual builders (REST, SOAP, Event, BackgroundService, SharedSchema, Webhook, Copybook, MqMessage, FixedLayout, CicsCommarea)
-- **`SearchCatalog`** — stub; cross-module dependency not yet resolved
+- **`SearchCatalog`** — stub; cross-module dependency resolved (IContractsModule available), needs handler implementation
 
 ### Evidence
 - `src/modules/catalog/` — 3 DbContexts, 84 features (77 real, 7 stubs)
+- `src/modules/catalog/NexTraceOne.Catalog.Infrastructure/Contracts/Services/ContractsModuleService.cs` — IContractsModule implementation
 - `docs/audit-forensic-2026-03/backend-state-report.md §Catalog`
 - `docs/audit-forensic-2026-03/capability-gap-matrix.md` — SERVICE CATALOG, CONTRACT GOVERNANCE rows
 
