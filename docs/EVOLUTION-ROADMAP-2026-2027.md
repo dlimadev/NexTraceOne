@@ -46,8 +46,8 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Fix tipo `GovernanceSummary | undefined` em `DomainDetailPage.tsx` e `TeamDetailPage.tsx`
 - [x] Migrar `onSuccess` do `RunbookBuilderPage.tsx` para pattern correto do TanStack Query v5
 - [x] Criar `TestWrapper` universal com todos os providers (QueryClient, Theme, Environment, Toast)
-- [x] Aplicar TestWrapper — deve resolver ~111 dos 141 testes falhando
-- [ ] Fix 8 mocks desatualizados de `aiGovernanceApi`
+- [x] Aplicar TestWrapper — 141 falhas resolvidas ✅ 144 ficheiros / 915 testes passando
+- [x] Fix 8 mocks desatualizados de `aiGovernanceApi` ✅ (resolvido com renderWithProviders migration)
 - [x] Fix 53 ESLint errors (imports não utilizados, `any` types, hooks deps) ✅ 56→0 errors
 
 ### 0.3 Database Critical ⏱️ 2 dias
@@ -84,7 +84,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 ### 1.3 Segurança ⏱️ 5 dias
 - [x] Mover password de dev (`ouro18`) para `dotnet user-secrets` ✅ FIXED — password replaced with CHANGE_ME placeholder in appsettings.Development.json
 - [ ] Implementar PostgreSQL RLS policies como defesa em profundidade
-- [ ] Documentar procedimento de rotação de chaves (JWT + encryption)
+- [x] Documentar procedimento de rotação de chaves (JWT + encryption) ✅ `docs/security/KEY-ROTATION.md` criado
 - [x] Configurar CORS por ambiente ✅ Already implemented with environment-aware validation, wildcard rejection, and explicit origins required for non-dev
 - [ ] Encriptar `AuditEvent.Payload` para campos sensíveis
 - [ ] Avaliar mover `TenantId` para `AuditableEntity<TId>` base
@@ -131,11 +131,11 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Completar 827 keys em PT-BR ✅ 0 keys em falta
 - [x] Completar 795 keys em PT-PT ✅ 0 keys em falta
 - [x] Completar 999 keys em ES ✅ 0 keys em falta
-- [ ] Script de verificação de i18n coverage no CI
+- [x] Script de verificação de i18n coverage no CI ✅ `scripts/quality/check-i18n-coverage.sh` + CI validate job
 
 ### 2.6 Testes ⏱️ 5 dias
-- [ ] Adicionar testes para as 40 páginas sem cobertura (pelo menos smoke tests)
-- [ ] Atingir 90%+ de testes passando
+- [x] Adicionar testes para as 40 páginas sem cobertura ✅ 34 novos ficheiros adicionados — **todas as 113 páginas têm testes**
+- [x] Atingir 90%+ de testes passando ✅ 144/144 ficheiros / 915/915 testes passando (100%)
 
 ---
 

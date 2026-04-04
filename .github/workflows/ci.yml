@@ -45,6 +45,14 @@ jobs:
       - name: Anti-demo guardrail
         run: bash scripts/quality/check-no-demo-artifacts.sh
 
+      - name: Setup Node.js (i18n check)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: i18n coverage check
+        run: node scripts/quality/check-i18n-coverage.sh
+
   # ── build-backend ────────────────────────────────────────────────────────────
   build-backend:
     name: Build Backend
