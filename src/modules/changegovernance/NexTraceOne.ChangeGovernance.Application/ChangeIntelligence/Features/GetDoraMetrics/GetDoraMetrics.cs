@@ -97,24 +97,15 @@ public static class GetDoraMetrics
                     .ToList();
             }
 
-            // Lead time: proxy via CreatedAt (quando CI/CD real estiver integrado,
-            // será commit→deploy time). Atualmente calculamos o tempo médio desde
-            // a criação do release até agora como indicador de frequência.
+            // Lead time: tempo médio desde a criação de cada release até ao fim
+            // do período de análise. Quando CI/CD real estiver integrado,
+            // será calculado como commit time → deploy time.
             var leadTimeHours = 0m;
             if (succeededReleases.Count > 0)
             {
-                // Com integração CI/CD, lead time = commit time → deploy time.
-                // Sem essa integração, usamos o spread temporal dos releases como proxy.
                 leadTimeHours = Math.Round(
-                    (decimal)succeededReleases.Average(r =>
-                        (to - r.CreatedAt).TotalHours / Math.Max(succeededReleases.Count, 1)),
+                    (decimal)succeededReleases.Average(r => (to - r.CreatedAt).TotalHours),
                     1);
-
-                // Garantir valor mínimo positivo
-                if (leadTimeHours <= 0)
-                {
-                    leadTimeHours = 0.1m;
-                }
             }
 
             // ── 3. Change Failure Rate ───────────────────────────────
