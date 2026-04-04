@@ -39,6 +39,7 @@ const navItems: NavItem[] = [
   { labelKey: 'legacyCatalog.sidebar.legacyAssets', to: '/services/legacy', icon: <Database size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.serviceDiscovery', to: '/services/discovery', icon: <Radar size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.serviceMaturity', to: '/services/maturity', icon: <Award size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.serviceScorecards', to: '/services/scorecards', icon: <TrendingUp size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.sourceOfTruth', to: '/source-of-truth', icon: <Globe size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
   { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
   { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },

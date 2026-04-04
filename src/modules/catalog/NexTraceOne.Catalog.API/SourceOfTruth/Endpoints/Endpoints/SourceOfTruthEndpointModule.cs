@@ -11,6 +11,7 @@ using GetContractSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOf
 using GetServiceCoverageFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GetServiceCoverage.GetServiceCoverage;
 using SearchSourceOfTruthFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.SearchSourceOfTruth.SearchSourceOfTruth;
 using GlobalSearchFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.GlobalSearch.GlobalSearch;
+using ComputeServiceScorecardFeature = NexTraceOne.Catalog.Application.SourceOfTruth.Features.ComputeServiceScorecard.ComputeServiceScorecard;
 
 namespace NexTraceOne.Catalog.API.SourceOfTruth.Endpoints.Endpoints;
 
@@ -96,6 +97,21 @@ public sealed class SourceOfTruthEndpointModule
         {
             var result = await sender.Send(
                 new GlobalSearchFeature.Query(q, scope, persona, maxResults ?? 25), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Service Scorecard (maturidade) ──────────────────────────
+
+        group.MapGet("/services/scorecard", async (
+            string serviceName,
+            string? environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ComputeServiceScorecardFeature.Query(serviceName, environment ?? "Production"),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
     }

@@ -18,6 +18,7 @@ const LegacyAssetCatalogPage = lazy(() => import('../features/legacy-assets/page
 const MainframeSystemDetailPage = lazy(() => import('../features/legacy-assets/pages/MainframeSystemDetailPage'));
 const ServiceDiscoveryPage = lazy(() => import('../features/catalog/pages/ServiceDiscoveryPage'));
 const ServiceMaturityPage = lazy(() => import('../features/catalog/pages/ServiceMaturityPage'));
+const ServiceScorecardPage = lazy(() => import('../features/catalog/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
 
 export function CatalogRoutes() {
   return (
@@ -108,6 +109,14 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <ServiceMaturityPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/scorecards"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <ServiceScorecardPage />
           </ProtectedRoute>
         }
       />

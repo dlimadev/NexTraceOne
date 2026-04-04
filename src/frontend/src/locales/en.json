@@ -319,7 +319,8 @@
     "serviceDiscovery": "Service Discovery",
     "serviceMaturity": "Service Maturity",
     "releaseCalendar": "Release Calendar",
-    "doraMetrics": "DORA Metrics"
+    "doraMetrics": "DORA Metrics",
+    "serviceScorecards": "Service Scorecards"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -6200,5 +6201,31 @@
     "allTeams": "All teams",
     "apply": "Apply",
     "noData": "No deployment data available for the selected period and filters."
+  },
+  "serviceScorecard": {
+    "title": "Service Scorecards",
+    "subtitle": "Cross-module maturity scoring for services",
+    "serviceName": "Service Name",
+    "searchPlaceholder": "Enter service name...",
+    "environment": "Environment",
+    "compute": "Compute",
+    "emptyTitle": "No service selected",
+    "emptyDescription": "Enter a service name above to compute its maturity scorecard.",
+    "errorMessage": "Failed to compute scorecard.",
+    "team": "Team",
+    "domain": "Domain",
+    "computedAt": "Computed at",
+    "dimensionsTitle": "Maturity Dimensions",
+    "weight": "{{weight}}% weight",
+    "dimensions": {
+      "ownership": "Ownership",
+      "documentation": "Documentation",
+      "contracts": "Contracts",
+      "slos": "SLOs",
+      "observability": "Observability",
+      "changeGovernance": "Change Governance",
+      "runbooks": "Runbooks",
+      "security": "Security"
+    }
   }
 }

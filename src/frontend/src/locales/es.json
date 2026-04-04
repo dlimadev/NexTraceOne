@@ -211,7 +211,8 @@
     "serviceDiscovery": "Service Discovery",
     "serviceMaturity": "Madurez de Servicios",
     "releaseCalendar": "Calendario de Releases",
-    "doraMetrics": "Métricas DORA"
+    "doraMetrics": "Métricas DORA",
+    "serviceScorecards": "Scorecards de Servicio"
   },
   "platformOps": {
     "title": "Operaciones de la Plataforma",
@@ -5104,5 +5105,31 @@
     "allTeams": "Todos los equipos",
     "apply": "Aplicar",
     "noData": "Sin datos de deploy disponibles para el período y filtros seleccionados."
+  },
+  "serviceScorecard": {
+    "title": "Scorecards de Servicio",
+    "subtitle": "Puntuación de madurez cross-module para servicios",
+    "serviceName": "Nombre del Servicio",
+    "searchPlaceholder": "Introduzca el nombre del servicio...",
+    "environment": "Entorno",
+    "compute": "Calcular",
+    "emptyTitle": "Ningún servicio seleccionado",
+    "emptyDescription": "Introduzca el nombre de un servicio para calcular su scorecard de madurez.",
+    "errorMessage": "Error al calcular scorecard.",
+    "team": "Equipo",
+    "domain": "Dominio",
+    "computedAt": "Calculado en",
+    "dimensionsTitle": "Dimensiones de Madurez",
+    "weight": "{{weight}}% peso",
+    "dimensions": {
+      "ownership": "Ownership",
+      "documentation": "Documentación",
+      "contracts": "Contratos",
+      "slos": "SLOs",
+      "observability": "Observabilidad",
+      "changeGovernance": "Gobernanza de Cambios",
+      "runbooks": "Runbooks",
+      "security": "Seguridad"
+    }
   }
 }
