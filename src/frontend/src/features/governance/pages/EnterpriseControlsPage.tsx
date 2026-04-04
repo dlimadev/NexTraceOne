@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Layers, ShieldCheck, TrendingUp, TrendingDown, Minus, AlertTriangle,
-  FileText, Globe, Zap, Bot, BookOpen, Users, Loader2,
+  FileText, Globe, Zap, Bot, BookOpen, Users,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import type {
-  ControlsSummaryResponse, ControlDimensionType,
+  ControlDimensionType,
   MaturityLevelType, GovernanceTrendDirection,
 } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
@@ -60,38 +63,23 @@ const coverageColor = (pct: number): string => {
  */
 export function EnterpriseControlsPage() {
   const { t } = useTranslation();
-  const [data, setData] = useState<ControlsSummaryResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.executive.controls(),
+    queryFn: () => organizationGovernanceApi.getControlsSummary(),
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getControlsSummary()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [t]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+        <PageLoadingState size="lg" />
       </PageContainer>
     );
   }
 
-  if (error || !data) {
+  if (isError || !data) {
     return (
       <PageContainer>
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <AlertTriangle size={32} className="text-critical mb-2" />
-          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
-        </div>
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }

@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Award } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import type { MaturityScorecardsResponse, MaturityLevelType } from '../../../types';
+import type { MaturityLevelType } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 type MaturityDimension = 'team' | 'domain';
@@ -41,22 +43,12 @@ const scoreBarColor = (score: number, maxScore: number): string => {
 export function MaturityScorecardsPage() {
   const { t } = useTranslation();
   const [dimension, setDimension] = useState<MaturityDimension>('team');
-  const [data, setData] = useState<MaturityScorecardsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const dimensions: MaturityDimension[] = ['team', 'domain'];
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getMaturityScorecards(dimension)
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [dimension, t]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.executive.scorecards(dimension),
+    queryFn: () => organizationGovernanceApi.getMaturityScorecards(dimension),
+  });
 
   return (
     <PageContainer>
@@ -82,14 +74,14 @@ export function MaturityScorecardsPage() {
         ))}
       </div>
 
-      {loading && <PageLoadingState />}
+      {isLoading && <PageLoadingState />}
 
-      {!loading && (error || !data) && (
-        <PageErrorState message={error ?? undefined} />
+      {!isLoading && (isError || !data) && (
+        <PageErrorState />
       )}
 
       {/* Scorecards */}
-      {!loading && data && (
+      {!isLoading && data && (
         <div className="space-y-6">
           {data.scorecards.length === 0 && (
             <div className="text-center py-12 text-muted">

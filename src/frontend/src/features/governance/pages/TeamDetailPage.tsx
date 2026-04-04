@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -13,6 +14,7 @@ import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { TeamDetail, GovernanceSummary, TeamServiceDto, TeamContractDto, CrossTeamDependencyDto } from '../../../types';
 
@@ -74,38 +76,20 @@ export function TeamDetailPage() {
   const { t } = useTranslation();
   const { teamId } = useParams<{ teamId: string }>();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
-  const [team, setTeam] = useState<TeamDetail | null>(null);
-  const [gov, setGov] = useState<GovernanceSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.teamDetail(teamId!),
+    queryFn: async () => {
+      const [team, gov] = await Promise.all([
+        organizationGovernanceApi.getTeamDetail(teamId!),
+        organizationGovernanceApi.getTeamGovernanceSummary(teamId!).catch(() => null),
+      ]);
+      return { team, gov };
+    },
+    enabled: !!teamId,
+  });
 
-  useEffect(() => {
-    if (!teamId) return;
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      organizationGovernanceApi.getTeamDetail(teamId),
-      organizationGovernanceApi.getTeamGovernanceSummary(teamId).catch(() => null),
-    ])
-      .then(([teamData, govData]) => {
-        if (!cancelled) {
-          setTeam(teamData);
-          setGov(govData);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [teamId, t]);
+  const team = data?.team;
+  const gov = data?.gov;
 
   const tabs: { id: TabId; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'organization.teamDetail.tabs.overview', icon: <Users size={16} /> },
@@ -118,7 +102,7 @@ export function TeamDetailPage() {
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
   const formatPct = (v: number) => `${Math.round(v * 100)}%`;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <Link to="/governance/teams" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
@@ -130,14 +114,14 @@ export function TeamDetailPage() {
     );
   }
 
-  if (error || !team) {
+  if (isError || !team) {
     return (
       <PageContainer>
         <Link to="/governance/teams" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
           <ArrowLeft size={14} />
           {t('organization.teams.title')}
         </Link>
-        <PageErrorState message={error || t('organization.teamDetail.notFound')} />
+        <PageErrorState message={t('organization.teamDetail.notFound')} />
       </PageContainer>
     );
   }

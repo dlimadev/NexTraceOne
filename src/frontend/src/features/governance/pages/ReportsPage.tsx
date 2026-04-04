@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   BarChart3, FileText, AlertTriangle,
   ShieldCheck, TrendingUp, TrendingDown, Minus,
@@ -11,11 +11,11 @@ import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { OnboardingHints } from '../../../components/OnboardingHints';
 import { usePersona } from '../../../contexts/PersonaContext';
-import type { ReportsSummaryResponse } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 const trendIcon = (dir: string) => {
@@ -52,10 +52,6 @@ const riskBadgeVariant = (level: string): 'success' | 'warning' | 'danger' | 'de
 export function ReportsPage() {
   const { t } = useTranslation();
   const { persona } = usePersona();
-  const [data, setData] = useState<ReportsSummaryResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const personaKeyMap: Record<string, string> = {
     Engineer: 'engineer', TechLead: 'techLead', Architect: 'architect',
     Product: 'product', Executive: 'executive', PlatformAdmin: 'platformAdmin', Auditor: 'auditor',
@@ -63,23 +59,17 @@ export function ReportsPage() {
   const personaKey = personaKeyMap[persona] ?? 'engineer';
   const personaFocusKey = `governance.reports.${personaKey}.focus`;
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getReportsSummary()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [t]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.reports(),
+    queryFn: () => organizationGovernanceApi.getReportsSummary(),
+  });
 
-  if (loading) {
+  if (isLoading) {
     return <PageContainer><PageLoadingState /></PageContainer>;
   }
 
-  if (error || !data) {
-    return <PageContainer><PageErrorState message={error ?? undefined} /></PageContainer>;
+  if (isError || !data) {
+    return <PageContainer><PageErrorState /></PageContainer>;
   }
 
   const rolloutCompletionPct = data.totalRollouts === 0 ? 0 : Math.round((data.completedRollouts / data.totalRollouts) * 100);

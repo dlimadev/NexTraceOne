@@ -83,6 +83,9 @@ export const queryKeys = {
     },
     executive: {
       all: () => [...queryKeys.governance.all, 'executive'] as const,
+      controls: () => [...queryKeys.governance.executive.all(), 'controls'] as const,
+      heatmap: (dimension: string) => [...queryKeys.governance.executive.all(), 'heatmap', dimension] as const,
+      scorecards: (dimension: string) => [...queryKeys.governance.executive.all(), 'scorecards', dimension] as const,
       drillDown: (entityType: string, entityId: string) => [...queryKeys.governance.executive.all(), 'drillDown', entityType, entityId] as const,
     },
   },

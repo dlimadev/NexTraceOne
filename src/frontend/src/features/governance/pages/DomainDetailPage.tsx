@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -13,6 +14,7 @@ import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import type { DomainDetail, GovernanceSummary, DomainTeamDto, DomainServiceDto, CrossDomainDependencyDto } from '../../../types';
 
@@ -87,38 +89,20 @@ export function DomainDetailPage() {
   const { t } = useTranslation();
   const { domainId } = useParams<{ domainId: string }>();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
-  const [domain, setDomain] = useState<DomainDetail | null>(null);
-  const [gov, setGov] = useState<GovernanceSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.domainDetail(domainId!),
+    queryFn: async () => {
+      const [domain, gov] = await Promise.all([
+        organizationGovernanceApi.getDomainDetail(domainId!),
+        organizationGovernanceApi.getDomainGovernanceSummary(domainId!).catch(() => null),
+      ]);
+      return { domain, gov };
+    },
+    enabled: !!domainId,
+  });
 
-  useEffect(() => {
-    if (!domainId) return;
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      organizationGovernanceApi.getDomainDetail(domainId),
-      organizationGovernanceApi.getDomainGovernanceSummary(domainId).catch(() => null),
-    ])
-      .then(([domainData, govData]) => {
-        if (!cancelled) {
-          setDomain(domainData);
-          setGov(govData);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [domainId, t]);
+  const domain = data?.domain;
+  const gov = data?.gov;
 
   const tabs: { id: TabId; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'organization.domainDetail.tabs.overview', icon: <Globe size={16} /> },
@@ -131,7 +115,7 @@ export function DomainDetailPage() {
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
   const formatPct = (v: number) => `${Math.round(v * 100)}%`;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <Link to="/governance/domains" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
@@ -143,14 +127,14 @@ export function DomainDetailPage() {
     );
   }
 
-  if (error || !domain) {
+  if (isError || !domain) {
     return (
       <PageContainer>
         <Link to="/governance/domains" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
           <ArrowLeft size={14} />
           {t('organization.domains.title')}
         </Link>
-        <PageErrorState message={error || t('organization.domainDetail.notFound')} />
+        <PageErrorState message={t('organization.domainDetail.notFound')} />
       </PageContainer>
     );
   }
