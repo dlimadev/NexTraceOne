@@ -147,10 +147,12 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 **Inspiração:** Backstage Software Templates
 
 O NexTraceOne já tem o catálogo, contratos e governança. O próximo passo natural é:
-- [ ] Template engine para criação de novos serviços com contratos pré-definidos
-- [ ] Auto-geração de scaffolding de projeto (.NET, Node, Java) com contratos embedidos
-- [ ] Pipeline de criação: template → repositório → contratos → ownership → registro no catálogo
-- [ ] Templates versionados e governados
+- [x] Template engine para criação de novos serviços com contratos pré-definidos ✅ `ServiceTemplate` domain entity + `IServiceTemplateRepository` + `CreateServiceTemplate`, `GetServiceTemplate`, `ListServiceTemplates`, `ScaffoldServiceFromTemplate` features
+- [x] Auto-geração de scaffolding de projeto (.NET, Node, Java) com contratos embedidos ✅ `ScaffoldServiceFromTemplate` — substituição de variáveis (`{{ServiceName}}`, `{{Domain}}`, etc.) + manifesto de ficheiros JSON + 23 testes unitários
+- [x] Pipeline de criação: template → repositório → contratos → ownership → registro no catálogo ✅ `ScaffoldServiceFromTemplate` retorna plano completo com GovernancePolicyIds, BaseContractSpec, Files e Variables
+- [x] Templates versionados e governados ✅ `ServiceTemplate.Slug` (kebab-case único) + `Version` + `IsActive` + `UsageCount` + `TenantId`
+
+API: `POST /api/v1/catalog/templates`, `GET /api/v1/catalog/templates`, `GET /api/v1/catalog/templates/{id}`, `GET /api/v1/catalog/templates/slug/{slug}`, `POST /api/v1/catalog/templates/{id}/scaffold`, `POST /api/v1/catalog/templates/slug/{slug}/scaffold`
 
 **Valor:** Developers criam serviços conformes desde o primeiro commit.
 
@@ -183,11 +185,11 @@ Evoluir o scoring existente com:
 O NexTraceOne já tem LLM E2E com grounding. Evoluir para:
 - [x] **Auto-triage** ✅ `TriageIncident` — auto-triage baseado em correlação (confiança × tipo × ambiente × blast radius) + `GET /api/v1/incidents/{id}/triage` + 3 testes unitários
 - [x] **Root cause suggestion** ✅ `GetRootCauseSuggestion` — análise de timeline de mudanças + categorização (Deployment/Configuration/Infrastructure) + passos de investigação + `GET /api/v1/incidents/{id}/root-cause` + 3 testes unitários
-- [ ] **Mitigation playbook** — seleção automática de runbook baseada em correlação de incidente ⚠️ Pendente — requer integração com RunbookStore
+- [x] **Mitigation playbook** ✅ `SelectMitigationPlaybook` — seleção automática de runbook por score (serviço + tipo) com fallback textual, contexto de execução (urgência por severidade) e lista de alternativas + `GET /api/v1/incidents/{id}/mitigation-playbook` + 6 testes unitários
 - [x] **Impact assessment** ✅ `GetIncidentImpactAssessment` — serviços afetados, contratos impactados, blast radius, propagation risk + `GET /api/v1/incidents/{id}/impact` + 3 testes unitários
 - [x] **Similar incident search** ✅ `FindSimilarIncidents` — scoring por serviço+tipo+ambiente, padrão de recorrência, lookback configurável + `GET /api/v1/incidents/{id}/similar` + 6 testes unitários
 
-Total: 542/542 OI tests passing.
+Total: 548/548 OI tests passing.
 
 **Valor:** Tempo de resolução reduzido de horas para minutos.
 
@@ -199,9 +201,9 @@ O NexTraceOne já tem audit trail e governance packs. Evoluir para:
 - [x] **Continuous compliance** ✅ `EvaluateContinuousCompliance` — avaliação automática de recursos contra políticas ativas + `POST /api/v1/audit/compliance/evaluate` + 2 testes unitários
 - [x] **Evidence collection automática** ✅ `ExportComplianceEvidences` — pacote de evidências por framework/categoria/período + `GET /api/v1/audit/compliance/evidences/export` + 3 testes unitários
 - [x] **Compliance dashboard** ✅ `GetComplianceDashboard` — estado por categoria, critical gaps, score por tenant + `GET /api/v1/audit/compliance/dashboard` + 3 testes unitários
-- [ ] **Audit-ready reports** ⚠️ Pendente — exportação em formato PDF/XLSX com assinatura auditável
+- [x] **Audit-ready reports** ✅ `GenerateAuditReadyReport` — relatório enterprise com assinatura digital SHA-256, sumário executivo por módulo/ação, suporte JSON/PDF/XLSX, entregável a auditores externos + `GET /api/v1/audit/compliance/report` + 8 testes unitários
 
-Total: 132/132 compliance tests passing.
+Total: 147/147 compliance tests passing.
 
 ---
 

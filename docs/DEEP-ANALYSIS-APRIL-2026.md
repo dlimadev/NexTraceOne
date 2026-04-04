@@ -308,7 +308,7 @@ O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com 
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~95% COMPLETO** ✅
-**Phase 3 (parcial) — 3.3 + 3.4 + 3.5 COMPLETOS** ✅
+**Phase 3 (parcial) — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
@@ -323,6 +323,9 @@ Gaps resolvidos desde a análise inicial:
 - ~~Pre-prod comparison~~ → `GetPreProductionComparison` ✅ (Phase 3.3)
 - ~~AI Incident Investigation~~ → `TriageIncident` + `GetRootCauseSuggestion` + `GetIncidentImpactAssessment` + `FindSimilarIncidents` ✅ (Phase 3.4)
 - ~~Compliance as Code~~ → `GetComplianceFrameworkSummary` + `EvaluateContinuousCompliance` + `GetComplianceDashboard` + `ExportComplianceEvidences` ✅ (Phase 3.5)
+- ~~Service Templates & Scaffolding~~ → `ServiceTemplate` domain entity + `CreateServiceTemplate` + `GetServiceTemplate` + `ListServiceTemplates` + `ScaffoldServiceFromTemplate` ✅ (Phase 3.1) — 23 testes unitários; API: 6 endpoints
+- ~~Mitigation playbook auto-selection~~ → `SelectMitigationPlaybook` ✅ (Phase 3.4) — score por serviço+tipo, fallback textual, urgência por severidade + 6 testes unitários
+- ~~Audit-ready PDF/XLSX export~~ → `GenerateAuditReadyReport` ✅ (Phase 3.5) — assinatura SHA-256, sumário executivo, formato JSON/PDF/XLSX + 8 testes unitários + `GET /api/v1/audit/compliance/report`
 
 ### Gaps Remanescentes (Phase 1-2)
 
@@ -337,16 +340,17 @@ Gaps resolvidos desde a análise inicial:
 
 ### Gaps Remanescentes (Phase 3)
 
-- **Mitigation playbook auto-selection** (Phase 3.4) — seleção automática de runbook por correlação; requer `IRunbookSelectionEngine` dedicado
-- **Audit-ready PDF/XLSX export** (Phase 3.5) — exportação com assinatura digital auditável; requer integração com gerador de documentos
+- **EF Core migrations para ServiceTemplate** — `ServiceTemplate` entity criada em domínio e application; migration EF pendente (requer PostgreSQL activo localmente); IServiceTemplateRepository precisa de `EfServiceTemplateRepository` na infra
+- **PDF/XLSX rendering adapter** — `GenerateAuditReadyReport` retorna dados estruturados + assinatura SHA-256; a renderização final (QuestPDF, ClosedXML) deve ser implementada via `IReportRenderer` na infra quando disponível
 - **Phase 4 (Ecosystem Expansion)** — CI/CD nativo (GitHub Actions, GitLab, Azure DevOps), Service Mesh intelligence, FinOps dashboard, AI Governance avançada
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 9)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 11)
 
 | Módulo | Testes |
 |--------|--------|
 | ChangeGovernance | 301/301 ✅ |
-| OperationalIntelligence | 542/542 ✅ |
-| AuditCompliance | 132/132 ✅ |
+| OperationalIntelligence | 548/548 ✅ |
+| AuditCompliance | 147/147 ✅ |
+| Catalog (inclui ServiceTemplate) | 873/876 ✅ (3 pre-existentes falhos em ContractEntities) |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.500+ testes |
+| Total backend | ~1.600+ testes |

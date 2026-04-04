@@ -23,6 +23,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
@@ -330,6 +331,21 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:read")
         .WithName("FindSimilarIncidents")
         .WithSummary("Find similar incidents in the last N days based on service, type and correlation patterns");
+
+        // ── GET /api/v1/incidents/{id}/mitigation-playbook — Playbook auto-selecionado ──
+        group.MapGet("/{id}/mitigation-playbook", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string id,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new SelectMitigationPlaybook.Query(id);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("SelectMitigationPlaybook")
+        .WithSummary("Auto-select the best mitigation playbook (runbook) for an incident based on triage context");
     }
 }
 

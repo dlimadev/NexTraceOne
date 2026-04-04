@@ -30,6 +30,7 @@ using GetComplianceFrameworkSummaryFeature = NexTraceOne.AuditCompliance.Applica
 using EvaluateContinuousComplianceFeature = NexTraceOne.AuditCompliance.Application.Features.EvaluateContinuousCompliance.EvaluateContinuousCompliance;
 using GetComplianceDashboardFeature = NexTraceOne.AuditCompliance.Application.Features.GetComplianceDashboard.GetComplianceDashboard;
 using ExportComplianceEvidencesFeature = NexTraceOne.AuditCompliance.Application.Features.ExportComplianceEvidences.ExportComplianceEvidences;
+using GenerateAuditReadyReportFeature = NexTraceOne.AuditCompliance.Application.Features.GenerateAuditReadyReport.GenerateAuditReadyReport;
 
 namespace NexTraceOne.AuditCompliance.API.Endpoints.Endpoints;
 
@@ -336,5 +337,25 @@ public sealed class AuditEndpointModule
         .RequirePermission("audit:compliance:read")
         .WithName("ExportComplianceEvidences")
         .WithSummary("Export compliance evidence pack grouped by framework and policy for auditor review");
+
+        // GET /api/v1/audit/compliance/report — Relatório de auditoria enterprise-ready com assinatura digital
+        dashboardGroup.MapGet("/report", async (
+            Guid tenantId,
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string format,
+            string? title,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GenerateAuditReadyReportFeature.Query(tenantId, from, to, format, title),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:read")
+        .WithName("GenerateAuditReadyReport")
+        .WithSummary("Generate audit-ready report with digital SHA-256 signature (JSON/PDF/XLSX) for regulatory delivery");
     }
 }
