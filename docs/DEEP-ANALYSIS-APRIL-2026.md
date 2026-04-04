@@ -304,7 +304,7 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 9)
+### Estado Atual (Abril 2026 — Rev. 12)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~95% COMPLETO** ✅
@@ -326,10 +326,12 @@ Gaps resolvidos desde a análise inicial:
 - ~~Service Templates & Scaffolding~~ → `ServiceTemplate` domain entity + `CreateServiceTemplate` + `GetServiceTemplate` + `ListServiceTemplates` + `ScaffoldServiceFromTemplate` ✅ (Phase 3.1) — 23 testes unitários; API: 6 endpoints
 - ~~Mitigation playbook auto-selection~~ → `SelectMitigationPlaybook` ✅ (Phase 3.4) — score por serviço+tipo, fallback textual, urgência por severidade + 6 testes unitários
 - ~~Audit-ready PDF/XLSX export~~ → `GenerateAuditReadyReport` ✅ (Phase 3.5) — assinatura SHA-256, sumário executivo, formato JSON/PDF/XLSX + 8 testes unitários + `GET /api/v1/audit/compliance/report`
+- ~~EF Core migrations para ServiceTemplate~~ → `TemplatesDbContext` + `EfServiceTemplateRepository` + migration `W01_ServiceTemplatesFoundation` + `ITemplatesUnitOfWork` + DI completo ✅ (Rev. 12)
+- ~~PDF/XLSX rendering adapter~~ → `IReportRenderer` interface + `JsonReportRenderer` (stub JSON; pronto para adapters QuestPDF/ClosedXML) ✅ (Rev. 12)
 
 ### Gaps Remanescentes (Phase 1-2)
 
-1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 25 DbContexts têm `ModuleOutboxProcessorJob` registado
+1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 26 DbContexts têm `ModuleOutboxProcessorJob` registado (incluindo `TemplatesDbContext`)
 2. **TelemetryStore sem tabelas** — módulo inteiro de telemetria inoperacional (DesignTimeFactory criado, migrações pendentes)
 3. **Frontend parcial** — algumas páginas avançadas (config subset) podem ainda ter UX incompleta; principais páginas (AI Hub, Knowledge, Notifications, Configuration — todas 5 variantes) já conectadas a APIs reais
 4. **Validação incompleta** — ~130 features sem FluentValidation (maioritariamente queries e seeds). Template em `docs/dev/VALIDATOR-TEMPLATE.md`
@@ -340,11 +342,11 @@ Gaps resolvidos desde a análise inicial:
 
 ### Gaps Remanescentes (Phase 3)
 
-- **EF Core migrations para ServiceTemplate** — `ServiceTemplate` entity criada em domínio e application; migration EF pendente (requer PostgreSQL activo localmente); IServiceTemplateRepository precisa de `EfServiceTemplateRepository` na infra
-- **PDF/XLSX rendering adapter** — `GenerateAuditReadyReport` retorna dados estruturados + assinatura SHA-256; a renderização final (QuestPDF, ClosedXML) deve ser implementada via `IReportRenderer` na infra quando disponível
+- ~~**EF Core migrations para ServiceTemplate**~~ ✅ FIXED (Rev. 12) — `TemplatesDbContext` + `EfServiceTemplateRepository` + `ITemplatesUnitOfWork` + DI + outbox processor + migration snapshot
+- ~~**PDF/XLSX rendering adapter**~~ ✅ FIXED (Rev. 12) — `IReportRenderer` interface em Application + `JsonReportRenderer` em Infrastructure (stub pronto para QuestPDF/ClosedXML quando disponível)
 - **Phase 4 (Ecosystem Expansion)** — CI/CD nativo (GitHub Actions, GitLab, Azure DevOps), Service Mesh intelligence, FinOps dashboard, AI Governance avançada
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 11)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 12)
 
 | Módulo | Testes |
 |--------|--------|

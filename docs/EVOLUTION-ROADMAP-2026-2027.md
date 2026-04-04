@@ -151,6 +151,7 @@ O NexTraceOne já tem o catálogo, contratos e governança. O próximo passo nat
 - [x] Auto-geração de scaffolding de projeto (.NET, Node, Java) com contratos embedidos ✅ `ScaffoldServiceFromTemplate` — substituição de variáveis (`{{ServiceName}}`, `{{Domain}}`, etc.) + manifesto de ficheiros JSON + 23 testes unitários
 - [x] Pipeline de criação: template → repositório → contratos → ownership → registro no catálogo ✅ `ScaffoldServiceFromTemplate` retorna plano completo com GovernancePolicyIds, BaseContractSpec, Files e Variables
 - [x] Templates versionados e governados ✅ `ServiceTemplate.Slug` (kebab-case único) + `Version` + `IsActive` + `UsageCount` + `TenantId`
+- [x] **Infrastructure completa** ✅ `TemplatesDbContext` + `EfServiceTemplateRepository` + `ITemplatesUnitOfWork` + `ServiceTemplateConfiguration` + migration `W01_ServiceTemplatesFoundation` + outbox processor `tpl_outbox_messages` + DI registado em ApiHost e BackgroundWorkers (Rev. 12)
 
 API: `POST /api/v1/catalog/templates`, `GET /api/v1/catalog/templates`, `GET /api/v1/catalog/templates/{id}`, `GET /api/v1/catalog/templates/slug/{slug}`, `POST /api/v1/catalog/templates/{id}/scaffold`, `POST /api/v1/catalog/templates/slug/{slug}/scaffold`
 
@@ -202,6 +203,7 @@ O NexTraceOne já tem audit trail e governance packs. Evoluir para:
 - [x] **Evidence collection automática** ✅ `ExportComplianceEvidences` — pacote de evidências por framework/categoria/período + `GET /api/v1/audit/compliance/evidences/export` + 3 testes unitários
 - [x] **Compliance dashboard** ✅ `GetComplianceDashboard` — estado por categoria, critical gaps, score por tenant + `GET /api/v1/audit/compliance/dashboard` + 3 testes unitários
 - [x] **Audit-ready reports** ✅ `GenerateAuditReadyReport` — relatório enterprise com assinatura digital SHA-256, sumário executivo por módulo/ação, suporte JSON/PDF/XLSX, entregável a auditores externos + `GET /api/v1/audit/compliance/report` + 8 testes unitários
+- [x] **IReportRenderer** ✅ Interface `IReportRenderer` em Application.Abstractions + `JsonReportRenderer` (default) registado na infra — abstração pronta para adapters QuestPDF (PDF) e ClosedXML (XLSX) quando disponíveis (Rev. 12)
 
 Total: 147/147 compliance tests passing.
 

@@ -112,6 +112,7 @@ declare -A CONTEXT_DB_MAP=(
   ["NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.ContractsDbContext"]="CATALOG"
   ["NexTraceOne.Catalog.Infrastructure.Portal.Persistence.DeveloperPortalDbContext"]="CATALOG"
   ["NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.LegacyAssetsDbContext"]="CATALOG"
+  ["NexTraceOne.Catalog.Infrastructure.Templates.Persistence.TemplatesDbContext"]="CATALOG"
 
   # Operations (database: nextraceone_operations)
   ["NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.ChangeIntelligenceDbContext"]="OPERATIONS"
