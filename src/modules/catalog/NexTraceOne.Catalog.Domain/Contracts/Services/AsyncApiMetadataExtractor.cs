@@ -119,6 +119,9 @@ public static class AsyncApiMetadataExtractor
                 "AsyncApiMetadataExtractor: Failed to extract messages JSON — {0}: {1}", ex.GetType().Name, ex.Message);
             return "{}";
         }
+    }
+
+    private static string ExtractServersJson(JsonElement root)
     {
         try
         {
@@ -141,3 +144,5 @@ public static class AsyncApiMetadataExtractor
                 "AsyncApiMetadataExtractor: Failed to extract servers JSON — {0}: {1}", ex.GetType().Name, ex.Message);
             return "{}";
         }
+    }
+}

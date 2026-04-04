@@ -142,9 +142,10 @@ public static class GetExecutiveDrillDown
                     if (status is not null)
                         statuses.Add(status);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Resilient — skip services without reliability data
+                    System.Diagnostics.Trace.TraceWarning(
+                        "GetExecutiveDrillDown: Reliability check failed for service '{0}' — {1}", record.ServiceName, ex.Message);
                 }
             }
 
@@ -172,9 +173,10 @@ public static class GetExecutiveDrillDown
                         if (hasContract) withContract++;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Resilient — skip services that fail contract lookup
+                    System.Diagnostics.Trace.TraceWarning(
+                        "GetExecutiveDrillDown: Contract coverage check failed for service '{0}' — {1}", record.ServiceId, ex.Message);
                 }
             }
 

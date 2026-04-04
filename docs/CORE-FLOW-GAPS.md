@@ -168,8 +168,8 @@ This document is the canonical reference for the real operational state of each 
 - ~~**Build Errors** — ~~1 backend (AiGovernanceEndpointModule.cs)~~ ✅ FIXED, 3 frontend (type mismatches + deprecated API)~~ ✅ ALL FIXED — DomainDetailPage/TeamDetailPage GovernanceSummary type coercion fixed; RunbookBuilderPage deprecated onSuccess replaced with useEffect
 
 ### High
-- **Validation** — ~160 features (29.3%) have NO FluentValidation validator (includes write Commands) — incremental improvement ongoing
-- **Error Handling** — 16+ silent exception swallowing without logging in spec parsers — incremental improvement ongoing
+- **Validation** — ~160 features (29.3%) have NO FluentValidation validator (includes write Commands) — incremental improvement ongoing; 4 critical write commands now have validators (UpdateDomain, ApproveGovernanceWaiver, CreateGovernanceWaiver, RunComplianceChecks)
+- ~~**Error Handling** — 16+ silent exception swallowing without logging in spec parsers~~ ✅ FIXED — All 20+ silent catch blocks now have structured logging via `System.Diagnostics.Trace.TraceWarning` (domain static classes) and `ILogger.LogWarning` (OllamaHttpClient)
 - **PostgreSQL RLS** — no CREATE POLICY statements; tenant isolation is 100% application-side — by design for MVP1
 - ~~**Unimplemented Interfaces** — IEmbeddingProvider, INotificationTemplateResolver, IPlatformHealthProvider, ILegacyEventParser~~ ✅ CORRECTED — Only IEmbeddingProvider was truly unimplemented; now implemented with OllamaEmbeddingProvider + OpenAiEmbeddingProvider. INotificationTemplateResolver has NotificationTemplateResolver, IPlatformHealthProvider has HealthCheckPlatformHealthProvider, ILegacyEventParser has 3 parsers (BatchEventParser, MainframeEventParser, MqEventParser)
 - **i18n** — 800-999 missing keys per non-EN language — incremental improvement ongoing
@@ -177,5 +177,6 @@ This document is the canonical reference for the real operational state of each 
 ### Medium
 - **Frontend pages without API** — 27/113 pages (24%) still disconnected — incremental improvement ongoing
 - ~~**3 stub handlers** — GetAutomationAction, ListAutomationActions, GetPlatformConfig~~ ✅ CORRECTED — These are NOT stubs: GetAutomationAction/ListAutomationActions read from AutomationActionCatalog (static catalog by design), GetPlatformConfig reads from real config and health checks
-- **ESLint** — 53 errors across frontend — incremental improvement ongoing
+- ~~**ESLint** — 53 errors across frontend~~ ✅ FIXED — All 56 ESLint errors resolved; only 4 acceptable `react-hooks/exhaustive-deps` warnings remain
 - **Dev password** in appsettings.Development.json — acceptable for local dev (comment recommends dotnet user-secrets for real use)
+- ~~**GetExecutiveDrillDown partial stub** — ReliabilityScore, ChangeSafety, ContractCoverage hardcoded as "N/A"~~ ✅ FIXED — Now wires IReliabilityModule + IContractsModule for real Reliability Score and Contract Coverage data; dynamic gaps and recommended focus based on real cross-module data
