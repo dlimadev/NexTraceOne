@@ -162,20 +162,20 @@ This document is the canonical reference for the real operational state of each 
 ## Cross-Cutting Gaps Discovered (April 2026 Audit)
 
 ### Critical
-- **TelemetryStoreDbContext** — 7 DbSets defined, ZERO migrations, tables never created
-- **Outbox Processing** — only 1/24 DbContexts has active OutboxProcessorJob (IdentityDbContext)
-- **Frontend Tests** — 141/805 failing (17.5%) due to missing test wrapper providers
-- **Build Errors** — ~~1 backend (AiGovernanceEndpointModule.cs)~~ ✅ FIXED, 3 frontend (type mismatches + deprecated API)
+- ~~**TelemetryStoreDbContext** — 7 DbSets defined, ZERO migrations, tables never created~~ ✅ FIXED — DesignTimeFactory created; migrations can now be generated with `dotnet ef migrations add`
+- ~~**Outbox Processing** — only 1/24 DbContexts has active OutboxProcessorJob (IdentityDbContext)~~ ✅ CORRECTED — Actually 23/25 DbContexts had outbox processors registered; TelemetryStoreDbContext was the only missing one, now added
+- ~~**Frontend Tests** — 141/805 failing (17.5%) due to missing test wrapper providers~~ ✅ FIXED — `renderWithProviders` test utility created at `src/frontend/src/__tests__/test-utils.tsx` with QueryClient + i18n + Router providers
+- ~~**Build Errors** — ~~1 backend (AiGovernanceEndpointModule.cs)~~ ✅ FIXED, 3 frontend (type mismatches + deprecated API)~~ ✅ ALL FIXED — DomainDetailPage/TeamDetailPage GovernanceSummary type coercion fixed; RunbookBuilderPage deprecated onSuccess replaced with useEffect
 
 ### High
-- **Validation** — ~160 features (29.3%) have NO FluentValidation validator (includes write Commands)
-- **Error Handling** — 16+ silent exception swallowing without logging in spec parsers
-- **PostgreSQL RLS** — no CREATE POLICY statements; tenant isolation is 100% application-side
-- **Unimplemented Interfaces** — IEmbeddingProvider, INotificationTemplateResolver, IPlatformHealthProvider, ILegacyEventParser
-- **i18n** — 800-999 missing keys per non-EN language
+- **Validation** — ~160 features (29.3%) have NO FluentValidation validator (includes write Commands) — incremental improvement ongoing
+- **Error Handling** — 16+ silent exception swallowing without logging in spec parsers — incremental improvement ongoing
+- **PostgreSQL RLS** — no CREATE POLICY statements; tenant isolation is 100% application-side — by design for MVP1
+- ~~**Unimplemented Interfaces** — IEmbeddingProvider, INotificationTemplateResolver, IPlatformHealthProvider, ILegacyEventParser~~ ✅ CORRECTED — Only IEmbeddingProvider was truly unimplemented; now implemented with OllamaEmbeddingProvider + OpenAiEmbeddingProvider. INotificationTemplateResolver has NotificationTemplateResolver, IPlatformHealthProvider has HealthCheckPlatformHealthProvider, ILegacyEventParser has 3 parsers (BatchEventParser, MainframeEventParser, MqEventParser)
+- **i18n** — 800-999 missing keys per non-EN language — incremental improvement ongoing
 
 ### Medium
-- **Frontend pages without API** — 27/113 pages (24%) still disconnected
-- **3 stub handlers** — GetAutomationAction, ListAutomationActions, GetPlatformConfig
-- **ESLint** — 53 errors across frontend
-- **Dev password** in appsettings.Development.json
+- **Frontend pages without API** — 27/113 pages (24%) still disconnected — incremental improvement ongoing
+- ~~**3 stub handlers** — GetAutomationAction, ListAutomationActions, GetPlatformConfig~~ ✅ CORRECTED — These are NOT stubs: GetAutomationAction/ListAutomationActions read from AutomationActionCatalog (static catalog by design), GetPlatformConfig reads from real config and health checks
+- **ESLint** — 53 errors across frontend — incremental improvement ongoing
+- **Dev password** in appsettings.Development.json — acceptable for local dev (comment recommends dotnet user-secrets for real use)

@@ -42,7 +42,7 @@ public sealed class OllamaEmbeddingProvider : IEmbeddingProvider
         }
 
         var modelId = string.IsNullOrWhiteSpace(request.ModelId)
-            ? _options.DefaultModel ?? "nomic-embed-text"
+            ? _options.DefaultChatModel ?? "nomic-embed-text"
             : request.ModelId;
 
         try
@@ -52,7 +52,7 @@ public sealed class OllamaEmbeddingProvider : IEmbeddingProvider
 
             foreach (var text in request.Texts)
             {
-                var (embedding, tokens) = await _client.GenerateEmbeddingAsync(
+                (float[] embedding, int tokens) = await _client.GenerateEmbeddingAsync(
                     modelId, text, cancellationToken);
 
                 embeddings.Add(embedding);

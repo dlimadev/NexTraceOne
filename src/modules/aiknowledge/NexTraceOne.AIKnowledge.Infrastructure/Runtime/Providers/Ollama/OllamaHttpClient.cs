@@ -179,8 +179,8 @@ public sealed class OllamaHttpClient
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<OllamaEmbeddingResponse>(JsonOptions, cancellationToken);
-        var embedding = result?.Embedding ?? Array.Empty<float>();
-        return (embedding.ToArray(), text.Length / 4); // approximate token count
+        float[] embedding = result?.Embedding?.ToArray() ?? Array.Empty<float>();
+        return (embedding, text.Length / 4); // approximate token count
     }
 }
 
