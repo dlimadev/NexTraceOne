@@ -38,8 +38,8 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 
 ### 0.1 Backend Build & Compilation ⏱️ 1 dia
 - [x] Fix `AiGovernanceEndpointModule.cs:205` — adicionar `using Microsoft.AspNetCore.Http;`
-- [ ] Resolver 24 conflitos de assembly version (EF Core 10.0.4 vs 10.0.5)
-- [ ] Remover 3 PackageReferences desnecessárias
+- [x] Resolver conflitos de assembly version — **nenhum conflito real encontrado** (EF Core 10.0.4/10.0.5 não presente nos .csproj reais; apenas NU1605 histórico)
+- [x] Remover 3 PackageReferences redundantes ✅ `Microsoft.Extensions.Options.ConfigurationExtensions` (Observability) + `Microsoft.Extensions.Localization` e `Microsoft.Extensions.Logging.Abstractions` (Application) removidos — todos transitivamente disponíveis via `FrameworkReference Microsoft.AspNetCore.App`
 - [x] Remover duplicação de xunit em `BuildingBlocks.Security.Tests.csproj` ✅ Explicit `xunit` PackageReference removed (included transitively)
 
 ### 0.2 Frontend Build & Tests ⏱️ 3 dias
@@ -74,7 +74,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
   - AuditCompliance: `ApplyRetention` — N/A (empty command, no parameters)
   - IdentityAccess: `Logout`, `SeedDefaultModuleAccessPolicies`, `SeedDefaultRolePermissions` — N/A (empty commands, no parameters)
   - Notifications: `MarkAllNotificationsRead` — N/A (empty command, no parameters)
-- [ ] Template de validador para as restantes ~130 features (maioritariamente queries e seeds)
+- [x] Template de validador para as restantes ~130 features ✅ `docs/dev/VALIDATOR-TEMPLATE.md` criado com padrão completo para commands e queries, incluindo exemplos para string, guid, int, coleções, regras condicionais e testes unitários
 
 ### 1.2 Error Handling ⏱️ 3 dias
 - [x] Substituir 4 bare catch blocks em `CanonicalModelBuilder.cs` com logging ✅ All 5 catches now log via Trace.TraceWarning
@@ -86,8 +86,8 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Implementar PostgreSQL RLS policies como defesa em profundidade ✅ `infra/postgres/apply-rls.sql` — 38 tabelas cobertas com `get_current_tenant_id()` helper function + USING/WITH CHECK policies para todos os módulos tenant-aware
 - [x] Documentar procedimento de rotação de chaves (JWT + encryption) ✅ `docs/security/KEY-ROTATION.md` criado
 - [x] Configurar CORS por ambiente ✅ Already implemented with environment-aware validation, wildcard rejection, and explicit origins required for non-dev
-- [ ] Encriptar `AuditEvent.Payload` para campos sensíveis ✅ `[EncryptedField]` adicionado ao `AuditEvent.Payload` — AES-256-GCM aplicado automaticamente via `NexTraceDbContextBase.ApplyEncryptedFieldConvention`
-- [ ] Avaliar mover `TenantId` para `AuditableEntity<TId>` base
+- [x] Encriptar `AuditEvent.Payload` para campos sensíveis ✅ `[EncryptedField]` adicionado ao `AuditEvent.Payload` — AES-256-GCM aplicado automaticamente via `NexTraceDbContextBase.ApplyEncryptedFieldConvention`
+- [x] Avaliar mover `TenantId` para `AuditableEntity<TId>` base — **Decisão: não aplicar**. A maioria das entidades já declara `TenantId` individualmente e o risco de breaking changes em EF Core mappings (column names, FK configurations) supera o benefício. Manter padrão atual + checklist de code review para novas entidades tenant-aware.
 
 ### 1.4 Implementar Interfaces Críticas ⏱️ 5-8 dias
 - [x] `IEmbeddingProvider` — implementação com Ollama ou OpenAI embeddings para RAG funcional ✅ OllamaEmbeddingProvider + OpenAiEmbeddingProvider
@@ -116,7 +116,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 ### 2.2 Páginas de Configuração ⏱️ 5 dias
 - [x] `ConfigurationAdminPage` (908 linhas) — conectar a API de configuração ✅ Already uses `useConfigurationDefinitions` + `useConfigurationEntries` hooks
 - [x] `AdvancedConfigurationConsolePage` (839 linhas) — conectar a admin API ✅ Already uses `useConfigurationDefinitions` hook
-- [ ] 5 config pages (Governance, Notification, OperationsFinOps, CatalogContracts, Workflow) — verificação pendente
+- [x] 5 config pages (Governance, Notification, OperationsFinOps, CatalogContracts, Workflow) ✅ Already connected — all use `useConfigurationDefinitions` + `useEffectiveSettings` + `useSetConfigurationValue` hooks
 
 ### 2.3 Knowledge & Notifications ⏱️ 3 dias
 - [x] `KnowledgeHubPage`, `OperationalNotesPage`, `KnowledgeDocumentPage` — conectar a Knowledge API ✅ Already use `useKnowledgeDocuments`, `useOperationalNotes`, `useKnowledgeSearch`, `useKnowledgeDocument` hooks

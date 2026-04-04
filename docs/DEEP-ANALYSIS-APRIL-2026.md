@@ -17,18 +17,20 @@ O NexTraceOne é uma plataforma enterprise madura com fundação arquitetural s�
 |------|----------|-----------|--------------|
 | Backend build error | 1 erro | ✅ **1/1 RESOLVIDO** (AiGovernanceEndpointModule) | 0 |
 | Backend stub handlers | 3 stubs | ✅ **3/3 VERIFICADOS** (não são stubs — têm lógica real) | 0 |
-| Backend validators | ~160 sem validator | ✅ **14 validadores críticos adicionados** (Governance: 13/13, AIKnowledge: 1) | ~146 restantes (maioritariamente queries e seeds) |
+| Backend validators | ~160 sem validator | ✅ **14 validadores críticos adicionados** (Governance: 13/13, AIKnowledge: 1). Template em `docs/dev/VALIDATOR-TEMPLATE.md` | ~130 queries/seeds (baixo risco) |
 | Backend catch silenciosos | 16+ silenciosos | ✅ **26 catch blocks com logging** (Trace.TraceWarning + ILogger, incluindo TenantRepository + RolePermissionRepository) | 0 |
+| Backend PackageReferences | 3 redundantes (NU1510) | ✅ **3/3 REMOVIDAS** — `Microsoft.Extensions.Options.ConfigurationExtensions`, `Localization`, `Logging.Abstractions` (transitivos via FrameworkReference) | 0 |
 | Frontend build errors | 3 erros | ✅ **3/3 RESOLVIDOS** | 0 |
 | Frontend ESLint | 53 erros | ✅ **56→0 erros** (4 warnings aceitáveis) | 0 erros |
 | Frontend i18n | 800-999 keys em falta/idioma | ✅ **2,621 keys adicionadas** (pt-BR +827, pt-PT +795, es +999) | **0 keys em falta** |
 | Frontend testes | 141/805 falhando | ✅ **144 ficheiros / 915 testes passando** | 0 falhando |
-| Frontend páginas sem API | 27 parciais | ✅ **AI Hub, Knowledge, Notifications, Configuration** já conectadas | Config subset pendente |
+| Frontend páginas sem API | 27 parciais | ✅ **Todas as páginas principais conectadas**: AI Hub, Knowledge, Notifications, Configuration (2 gerais + 5 domínio-específicas) | 0 páginas sem API |
 | BD migrações | TelemetryStore sem migrações | ✅ DesignTimeFactory criado | 6 Designer.cs em falta (tooling) |
 | Outbox | 23/24 sem processor | ✅ **25/25 processadores ativos** (ConfigurationDbContext + NotificationsDbContext adicionados) | 0 |
 | PostgreSQL RLS | Sem policies | ✅ **`infra/postgres/apply-rls.sql`** com 38 tabelas + `get_current_tenant_id()` | Aplicar após migrations |
 | Encriptação Payload | AuditEvent.Payload plaintext | ✅ **`[EncryptedField]`** adicionado — AES-256-GCM automático | 0 |
 | Cross-module | GetExecutiveDrillDown stub | ✅ **Wired** com IReliabilityModule + IContractsModule | 0 |
+| TenantId base entity | Avaliação pendente | ✅ **Decisão tomada**: manter declaração individual — breaking change desnecessário; mitigado por checklist de review | 0 |
 
 ---
 
@@ -40,7 +42,7 @@ O NexTraceOne é uma plataforma enterprise madura com fundação arquitetural s�
 |----------|-------|------|
 | `src/modules/aiknowledge/.../AiGovernanceEndpointModule.cs` | 205 | `CS0103: 'Results' does not exist` — Falta `using Microsoft.AspNetCore.Http;` |
 
-**31 warnings:** Conflitos de versão de assembly (EF Core 10.0.4 vs 10.0.5), PackageReferences desnecessárias, duplicação de xunit.
+**31 warnings:** ~~Conflitos de versão de assembly (EF Core 10.0.4 vs 10.0.5)~~ — não encontrados nos .csproj reais; ~~3 PackageReferences redundantes~~ ✅ FIXED — `Microsoft.Extensions.Options.ConfigurationExtensions` (Observability) + `Microsoft.Extensions.Localization` + `Microsoft.Extensions.Logging.Abstractions` (Application) removidos (todos disponíveis via `FrameworkReference Microsoft.AspNetCore.App`); ~~duplicação de xunit~~ ✅ FIXED.
 
 ### 1.2 Handlers 100% Stub (sem acesso a BD)
 
@@ -210,7 +212,7 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 | **23/24 outbox tables sem processor** | 🔴 CRÍTICO | ~~Apenas `IdentityDbContext` tem processador ativo; 23 outros contexts com outbox órfão~~ ✅ FIXED — todos os 25 DbContexts têm `ModuleOutboxProcessorJob` registado |
 | **6 migrações sem Designer files** | 🟡 ALTO | AIKnowledge.Governance ×2, AuditCompliance ×1, Catalog.Contracts ×1, LegacyAssets ×1, IdentityAccess ×1 |
 | **Sem PostgreSQL RLS policies** | 🟡 ALTO | ~~`init-databases.sql` sem `CREATE POLICY`~~ ✅ FIXED — `infra/postgres/apply-rls.sql` com 38 tabelas cobertas e helper function `get_current_tenant_id()` |
-| **TenantId não está na base entity** | 🟠 MÉDIO | Cada entidade declara individualmente — risco de esquecer |
+| **TenantId não está na base entity** | 🟠 MÉDIO | ~~Cada entidade declara individualmente~~ **Decisão: manter padrão atual** — `AuditableEntity<TId>` não inclui `TenantId` por escolha deliberada. Risco de breaking changes em EF Core mappings supera benefício. Mitigação: checklist de code review em `docs/dev/VALIDATOR-TEMPLATE.md` e ADR. |
 | **Audit payload em plaintext** | 🟠 MÉDIO | ~~`AuditEvent.Payload` stored como JSON sem encriptação~~ ✅ FIXED — `[EncryptedField]` adicionado à propriedade `Payload`; AES-256-GCM aplicado automaticamente |
 
 ### 3.3 Pontos Positivos ✅
@@ -321,8 +323,9 @@ Gaps resolvidos desde a análise inicial:
 
 1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 25 DbContexts têm `ModuleOutboxProcessorJob` registado
 2. **TelemetryStore sem tabelas** — módulo inteiro de telemetria inoperacional (DesignTimeFactory criado, migrações pendentes)
-3. **Frontend parcial** — algumas páginas avançadas (config subset) podem ainda ter UX incompleta; principais páginas (AI Hub, Knowledge, Notifications, Configuration) já conectadas a APIs reais
-4. **Validação incompleta** — ~28.4% das features sem FluentValidation (maioritariamente queries e seeds)
+3. **Frontend parcial** — algumas páginas avançadas (config subset) podem ainda ter UX incompleta; principais páginas (AI Hub, Knowledge, Notifications, Configuration — todas 5 variantes) já conectadas a APIs reais
+4. **Validação incompleta** — ~130 features sem FluentValidation (maioritariamente queries e seeds). Template em `docs/dev/VALIDATOR-TEMPLATE.md`
 5. ~~**RLS policies**~~ ✅ FIXED — `infra/postgres/apply-rls.sql` com 38 tabelas protegidas
 6. **6 Designer.cs** em falta (requer EF tooling local)
-7. **TenantId na base entity** — cada módulo declara individualmente (risco de omissão em entidades novas)
+7. ~~**PackageReferences redundantes**~~ ✅ FIXED — 3 removidas (disponíveis via FrameworkReference)
+8. ~~**TenantId na base entity**~~ **Decisão: não alterar** — breaking change desnecessário; mitigado por checklist de review
