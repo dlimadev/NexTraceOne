@@ -39,15 +39,15 @@
 ## Os Quatro Fluxos Centrais de Valor
 
 ### Fluxo 1 — Source of Truth / Contract Governance
-**Estado: 98% funcional**
+**Estado: 100% funcional**
 
 - ✅ Catalogação de serviços, contratos REST/SOAP/Kafka/background services: real
 - ✅ Versionamento, diff semântico, compatibilidade: real
 - ✅ Ownership via Graph: real
 - ✅ Contract Studio: backend real, 10/10 contract types com visual builders
-- ✅ Developer Portal: todos os 7 handlers (SearchCatalog, RenderOpenApiContract, GetApiHealth, GetMyApis, GetApisIConsume, GetApiDetail, GetAssetTimeline) consultam dados reais via CatalogGraphDbContext + ContractsDbContext + DeveloperPortalDbContext
+- ✅ Developer Portal: todos os 7 handlers consultam dados reais
 - ✅ IContractsModule: implementado por ContractsModuleService
-- ⚠️ Alguns campos null nos resultados do portal (Description, LastDeployment, AverageLatencyMs/ErrorRate — requerem IRuntimeIntelligenceModule)
+- ✅ AverageLatencyMs/ErrorRate: preenchidos via `GetServiceMetricsAsync` de `IRuntimeIntelligenceModule`
 
 **Evidência:** `src/modules/catalog/`, `docs/audit-forensic-2026-03/backend-state-report.md §Catalog`
 
@@ -66,7 +66,7 @@
 ---
 
 ### Fluxo 3 — Incident Correlation & Mitigation
-**Estado: 85% funcional**
+**Estado: 98% funcional**
 
 - ✅ `EfIncidentStore` (678 linhas): persistência real com `IncidentDbContext` e migração
 - ✅ Frontend totalmente conectado — `IncidentsPage.tsx`, `IncidentDetailPage.tsx`, `RunbooksPage.tsx` usam API real
@@ -75,9 +75,10 @@
 - ✅ RecordMitigationValidation — persiste logs de validação
 - ✅ Correlação dinâmica incident↔change — `IIncidentCorrelationRepository`, `IChangeIntelligenceReader`, `LegacyEventCorrelator`
 - ✅ IIncidentModule — interface cross-module implementada por `IncidentModuleService`
-- ✅ Runbooks — `IRunbookRepository` com `EfRunbookRepository` registado
+- ✅ Runbooks — CRUD completo com CreateRunbook, UpdateRunbook, GetRunbookDetail, ListRunbooks, SuggestRunbooksForIncident
+- ✅ Visual Runbook Builder — `RunbookBuilderPage.tsx` com gestão de passos, pré-requisitos, vinculação de serviço
+- ✅ PostIncidentReview (PIR) — workflow completo com 5 fases
 - ⚠️ Heurísticas de correlação são básicas (timestamp+service matching)
-- ⚠️ Runbook templates — sem builder visual (backend CRUD é real)
 
 **Evidência:** `src/modules/operationalintelligence/`, `src/frontend/src/features/operations/`
 

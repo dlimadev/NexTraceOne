@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Search, FileText, Clock, Server, AlertTriangle } from 'lucide-react';
+import { BookOpen, Search, FileText, Clock, Server, AlertTriangle, Plus } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
@@ -33,6 +34,7 @@ interface RunbooksResponse {
  */
 export function RunbooksPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery<RunbooksResponse>({
@@ -57,7 +59,16 @@ export function RunbooksPage() {
       />
 
       <PageSection>
-        <OnboardingHints module="operations" />
+        <div className="flex items-center justify-between mb-4">
+          <OnboardingHints module="operations" />
+          <button
+            onClick={() => navigate('/operations/runbooks/create')}
+            className="flex items-center gap-1 px-3 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"
+          >
+            <Plus size={14} />
+            {t('runbooks.builder.createNew')}
+          </button>
+        </div>
       </PageSection>
 
       <StatsGrid columns={4}>

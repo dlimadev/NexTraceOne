@@ -7,7 +7,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 1 — Source of Truth / Contract Governance
 
-**State: 95% functional**
+**State: 100% functional**
 
 ### What works
 - Service cataloguing with ownership graph: real (`CatalogGraphDbContext`)
@@ -23,7 +23,7 @@ This document is the canonical reference for the real operational state of each 
 - ~~**GetApisIConsume HasBreakingChanges always false**~~ ✅ FIXED — Now computed from `ContractDiff.BreakingChanges`; counter incremented for accurate `PendingActions` and `BreakingChangesCount`
 - ~~**GetApiHealth AverageLatencyMs/ErrorRate null**~~ ✅ FIXED — Handler now injects `IRuntimeIntelligenceModule` + `IApiAssetRepository`; queries runtime health to refine contract-based status when runtime reports degraded/critical
 - **Contract Studio** — 10/10 contract types with visual builders (REST, SOAP, Event, BackgroundService, SharedSchema, Webhook, Copybook, MqMessage, FixedLayout, CicsCommarea)
-- **Remaining minor:** AverageLatencyMs/ErrorRate still null until RuntimeIntelligence aggregates actual metrics; these fields are populated when runtime data becomes available
+- ~~**AverageLatencyMs/ErrorRate null pending RuntimeIntelligence**~~ ✅ FIXED — `GetServiceMetricsAsync` added to `IRuntimeIntelligenceModule`; aggregates `AvgLatencyMs`/`ErrorRate` from RuntimeSnapshots (24h window, max 50 samples); wired into `GetApiHealth` handler
 
 ### Evidence
 - `src/modules/catalog/` — 3 DbContexts, 84 features (all real, 0 stubs)
@@ -59,7 +59,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 3 — Incident Correlation & Mitigation
 
-**State: 95% functional**
+**State: 98% functional**
 
 ### What works
 - `IncidentDbContext` with 6 DbSets: IncidentRecord, MitigationWorkflowRecord, MitigationWorkflowActionLog, MitigationValidationLog, RunbookRecord, IncidentChangeCorrelation — real, with confirmed migration
@@ -74,10 +74,12 @@ This document is the canonical reference for the real operational state of each 
 - **Runbooks** — `IRunbookRepository` with `EfRunbookRepository` registered; database-driven
 - **SuggestRunbooksForIncident** — runbook recommendation engine with relevance scoring (service match, type match, text search) at `GET /api/v1/runbooks/suggest`
 - **PostIncidentReview (PIR)** — formal PIR workflow with phase progression: FactGathering→RootCauseAnalysis→PreventiveActions→FinalReview→Completed. Entity `PostIncidentReview` + `EfPostIncidentReviewRepository`. API: `POST/GET /api/v1/incidents/{id}/pir`, `PUT /api/v1/incidents/{id}/pir/progress`
+- **UpdateRunbook** — CRUD complete with `PUT /api/v1/runbooks/{runbookId}` endpoint
+- **Visual Runbook Builder** — frontend `RunbookBuilderPage.tsx` with step management, prerequisites, service linking at `/operations/runbooks/create` and `/operations/runbooks/:runbookId/edit`
 
 ### Gaps (low)
 - **Correlation engine heuristics** — correlation uses basic timestamp+service matching; no ML/NLP-based correlation (functional for production use)
-- ~~**Runbook templates** — no visual runbook builder yet~~ ✅ ENHANCED — `SuggestRunbooksForIncident` feature added with relevance scoring (service match, type match, text search) at `GET /api/v1/runbooks/suggest`
+- ~~**Runbook templates** — no visual runbook builder yet~~ ✅ IMPLEMENTED — `RunbookBuilderPage.tsx` with structured step management, prerequisites editor, create/edit routes, i18n
 - ~~**Post-incident review** — no formal PIR workflow~~ ✅ IMPLEMENTED — `PostIncidentReview` entity with phase progression (FactGathering→RootCauseAnalysis→PreventiveActions→FinalReview→Completed), `StartPostIncidentReview`, `ProgressPostIncidentReview`, `GetPostIncidentReview` features with REST API at `/api/v1/incidents/{id}/pir`
 
 ### Evidence
@@ -109,7 +111,7 @@ This document is the canonical reference for the real operational state of each 
 
 ### Gaps (low)
 - ~~**Cross-module grounding**~~ ✅ VERIFIED — `DatabaseRetrievalService` queries Catalog (services), ChangeIntelligence (releases), OperationalIntelligence (incidents), and Knowledge (documents) via 4 dedicated grounding readers (`CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader`, `KnowledgeDocumentGroundingReader`)
-- **AI Source health check** — conectores para fontes Database e ExternalMemory ainda retornam estado persistido (sem teste de conectividade real para esses tipos)
+- ~~**AI Source health check** — conectores para fontes Database e ExternalMemory retornavam estado persistido~~ ✅ FIXED — `PerformConnectivityCheckAsync` now supports Database (PostgreSQL connection test via Npgsql) and ExternalMemory (HTTP endpoint test)
 - **Model selection routing** — classificação de caso de uso usa heurística de palavras-chave; NLP real não implementado
 
 ### Evidence
@@ -134,10 +136,10 @@ This document is the canonical reference for the real operational state of each 
 
 | Flow | State | Backend | Frontend | Blocker |
 |---|---|---|---|---|
-| 1 — Source of Truth / Contracts | **99%** | Real (100% — all 84 features real, 0 stubs, 3 data gaps fixed) | Real (all 11 portal handlers, 10/10 builders) | AverageLatencyMs/ErrorRate pending runtime data |
+| 1 — Source of Truth / Contracts | **100%** | Real (100% — all 84 features real, 0 stubs, all data gaps fixed, runtime metrics wired) | Real (all 11 portal handlers, 10/10 builders) | None |
 | 2 — Change Confidence | **99%** | Real (100%, deploy-events endpoint added) | Real (100%) | None — CI/CD webhook ready for external pipeline integration |
-| 3 — Incident Correlation & Operations | **95%** | Real (EfIncidentStore + IIncidentModule, Automation 10/10 real, Reliability 15/15 real, PIR workflow complete, Runbook suggestions complete) | Real (all pages use API) | Visual runbook builder (UI) |
-| 4 — AI Assistant | **LLM real E2E; governance real; grounding cross-module completo** | LLM real via Ollama/OpenAI; grounding cross-module 4 readers verified | API real (7 chamadas) | AI Source health for DB/Memory types |
+| 3 — Incident Correlation & Operations | **98%** | Real (EfIncidentStore + IIncidentModule, Automation 10/10 real, Reliability 15/15 real, PIR workflow complete, Runbook CRUD complete with visual builder) | Real (all pages use API, RunbookBuilderPage added) | ML/NLP correlation heuristics |
+| 4 — AI Assistant | **LLM real E2E; governance real; grounding cross-module completo** | LLM real via Ollama/OpenAI; grounding cross-module 4 readers verified; AI Source health for Database+ExternalMemory fixed | API real (7 chamadas) | Model selection routing NLP |
 
 ---
 

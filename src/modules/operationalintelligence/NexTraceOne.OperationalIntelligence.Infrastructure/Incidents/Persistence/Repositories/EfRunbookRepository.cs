@@ -46,13 +46,19 @@ internal sealed class EfRunbookRepository(IncidentDbContext context) : IRunbookR
     /// <inheritdoc />
     public async Task<RunbookRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await context.Runbooks
-            .AsNoTracking()
             .SingleOrDefaultAsync(r => r.Id == RunbookRecordId.From(id), cancellationToken);
 
     /// <inheritdoc />
     public async Task AddAsync(RunbookRecord runbook, CancellationToken cancellationToken = default)
     {
         context.Runbooks.Add(runbook);
+        await context.CommitAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateAsync(RunbookRecord runbook, CancellationToken cancellationToken = default)
+    {
+        context.Runbooks.Update(runbook);
         await context.CommitAsync(cancellationToken);
     }
 }

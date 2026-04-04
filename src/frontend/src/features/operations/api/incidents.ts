@@ -481,6 +481,37 @@ export interface MitigationRecommendationsResponse {
   recommendations: MitigationRecommendation[];
 }
 
+// ── Runbook Builder Types ────────────────────────────────────────────
+
+export interface RunbookStepDto {
+  stepOrder: number;
+  title: string;
+  description?: string;
+  isOptional: boolean;
+}
+
+export interface CreateRunbookRequest {
+  title: string;
+  description: string;
+  linkedService?: string;
+  linkedIncidentType?: string;
+  steps?: RunbookStepDto[];
+  prerequisites?: string[];
+  postNotes?: string;
+  maintainedBy: string;
+}
+
+export interface UpdateRunbookRequest {
+  title: string;
+  description: string;
+  linkedService?: string;
+  linkedIncidentType?: string;
+  steps?: RunbookStepDto[];
+  prerequisites?: string[];
+  postNotes?: string;
+  maintainedBy: string;
+}
+
 // ── API Service ──────────────────────────────────────────────────────
 
 export const incidentsApi = {
@@ -553,4 +584,10 @@ export const incidentsApi = {
 
   getRunbookDetail: (runbookId: string) =>
     client.get(`/runbooks/${runbookId}`).then(r => r.data),
+
+  createRunbook: (data: CreateRunbookRequest) =>
+    client.post('/runbooks', data).then(r => r.data),
+
+  updateRunbook: (runbookId: string, data: UpdateRunbookRequest) =>
+    client.put(`/runbooks/${runbookId}`, data).then(r => r.data),
 };

@@ -23,4 +23,7 @@ public interface IRunbookRepository
 
     /// <summary>Persiste um novo runbook e confirma a transação.</summary>
     Task AddAsync(RunbookRecord runbook, CancellationToken cancellationToken = default);
+
+    /// <summary>Atualiza um runbook existente e confirma a transação.</summary>
+    Task UpdateAsync(RunbookRecord runbook, CancellationToken cancellationToken = default);
 }
