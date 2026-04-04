@@ -85,7 +85,11 @@ public static class GetApiHealth
                 ? latestContract.Sla.AvailabilityTarget
                 : null;
 
-            // Query runtime metrics via IRuntimeIntelligenceModule for latency/error rate
+            // Query runtime metrics via IRuntimeIntelligenceModule for latency/error rate.
+            // Note: AverageLatencyMs and ErrorRate remain null until the RuntimeIntelligence module
+            // aggregates actual telemetry metrics from the observability pipeline. The module currently
+            // provides health status only. When metric aggregation is implemented, populate these fields
+            // from IRuntimeIntelligenceModule.
             long? averageLatencyMs = null;
             decimal? errorRate = null;
 

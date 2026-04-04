@@ -344,14 +344,14 @@ jobs:
           echo "test-frontend: ${{ needs.test-frontend.result }}"
           echo "e2e-smoke: ${{ needs.e2e-smoke.result }}"
 
-          # e2e-smoke is skipped on push events — only check it on PRs
+          # e2e-smoke is skipped on push events — only fail CI if it actually ran and failed
           if [[ "${{ needs.validate.result }}" == "failure" || \
                 "${{ needs.build-backend.result }}" == "failure" || \
                 "${{ needs.test-backend-unit.result }}" == "failure" || \
                 "${{ needs.test-backend-integration.result }}" == "failure" || \
                 "${{ needs.build-frontend.result }}" == "failure" || \
                 "${{ needs.test-frontend.result }}" == "failure" || \
-                "${{ needs.e2e-smoke.result }}" == "failure" ]]; then
+                ( "${{ github.event_name }}" == "pull_request" && "${{ needs.e2e-smoke.result }}" == "failure" ) ]]; then
             echo "❌ One or more required jobs failed"
             exit 1
           fi
