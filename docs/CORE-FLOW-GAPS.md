@@ -1,5 +1,5 @@
 # Core Flow Gaps — NexTraceOne
-**Last updated: March 2026 — aligned to forensic audit findings**
+**Last updated: April 2026 — aligned to deep analysis audit**
 
 This document is the canonical reference for the real operational state of each of the four central value flows. It is the first place to check before working on any module that touches a core flow.
 
@@ -154,3 +154,28 @@ This document is the canonical reference for the real operational state of each 
 | `docs/audit-forensic-2026-03/final-project-state-assessment.md` | §3 Four Core Value Flows, percentages |
 | `docs/audit-forensic-2026-03/capability-gap-matrix.md` | Per-capability status for all flows |
 | `docs/REBASELINE.md` | Cross-reference for confirmed module states |
+| `docs/DEEP-ANALYSIS-APRIL-2026.md` | April 2026 deep audit — backend, frontend, DB, infra |
+| `docs/EVOLUTION-ROADMAP-2026-2027.md` | New evolution roadmap with phases 0-5 |
+
+---
+
+## Cross-Cutting Gaps Discovered (April 2026 Audit)
+
+### Critical
+- **TelemetryStoreDbContext** — 7 DbSets defined, ZERO migrations, tables never created
+- **Outbox Processing** — only 1/24 DbContexts has active OutboxProcessorJob (IdentityDbContext)
+- **Frontend Tests** — 141/805 failing (17.5%) due to missing test wrapper providers
+- **Build Errors** — ~~1 backend (AiGovernanceEndpointModule.cs)~~ ✅ FIXED, 3 frontend (type mismatches + deprecated API)
+
+### High
+- **Validation** — ~160 features (29.3%) have NO FluentValidation validator (includes write Commands)
+- **Error Handling** — 16+ silent exception swallowing without logging in spec parsers
+- **PostgreSQL RLS** — no CREATE POLICY statements; tenant isolation is 100% application-side
+- **Unimplemented Interfaces** — IEmbeddingProvider, INotificationTemplateResolver, IPlatformHealthProvider, ILegacyEventParser
+- **i18n** — 800-999 missing keys per non-EN language
+
+### Medium
+- **Frontend pages without API** — 27/113 pages (24%) still disconnected
+- **3 stub handlers** — GetAutomationAction, ListAutomationActions, GetPlatformConfig
+- **ESLint** — 53 errors across frontend
+- **Dev password** in appsettings.Development.json
