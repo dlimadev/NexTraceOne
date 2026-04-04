@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/governance/api/organizationGovernance', () => ({
   organizationGovernanceApi: {
     listPolicies: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { organizationGovernanceApi } from '../../features/governance/api/organizationGovernance';
@@ -44,14 +40,14 @@ describe('PolicyCatalogPage', () => {
   });
 
   it('renders page heading', async () => {
-    render(<MemoryRouter><PolicyCatalogPage /></MemoryRouter>);
+    renderWithProviders(<PolicyCatalogPage />);
     await waitFor(() => {
-      expect(screen.getByText('governance.policies.title')).toBeInTheDocument();
+      expect(screen.getByText('Policy Catalog')).toBeInTheDocument();
     });
   });
 
   it('renders data after loading', async () => {
-    render(<MemoryRouter><PolicyCatalogPage /></MemoryRouter>);
+    renderWithProviders(<PolicyCatalogPage />);
     await waitFor(() => {
       expect(screen.getByText('Service Ownership Required')).toBeInTheDocument();
     });
@@ -59,18 +55,18 @@ describe('PolicyCatalogPage', () => {
 
   it('shows loading state while fetching', () => {
     vi.mocked(organizationGovernanceApi.listPolicies).mockReturnValue(new Promise(() => {}));
-    render(<MemoryRouter><PolicyCatalogPage /></MemoryRouter>);
+    renderWithProviders(<PolicyCatalogPage />);
     expect(screen.queryByText('Service Ownership Required')).not.toBeInTheDocument();
   });
 
   it('does not render DemoBanner', async () => {
-    render(<MemoryRouter><PolicyCatalogPage /></MemoryRouter>);
+    renderWithProviders(<PolicyCatalogPage />);
     await waitFor(() => screen.getByText('Service Ownership Required'));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 
   it('calls listPolicies on mount', async () => {
-    render(<MemoryRouter><PolicyCatalogPage /></MemoryRouter>);
+    renderWithProviders(<PolicyCatalogPage />);
     await waitFor(() => expect(organizationGovernanceApi.listPolicies).toHaveBeenCalledTimes(1));
   });
 });

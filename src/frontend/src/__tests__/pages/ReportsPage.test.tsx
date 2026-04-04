@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/governance/api/organizationGovernance', () => ({
   organizationGovernanceApi: {
@@ -10,10 +10,6 @@ vi.mock('../../features/governance/api/organizationGovernance', () => ({
 
 vi.mock('../../contexts/PersonaContext', () => ({
   usePersona: () => ({ persona: 'Engineer', config: {} }),
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { organizationGovernanceApi } from '../../features/governance/api/organizationGovernance';
@@ -43,14 +39,14 @@ describe('ReportsPage', () => {
   });
 
   it('renders page heading', async () => {
-    render(<MemoryRouter><ReportsPage /></MemoryRouter>);
+    renderWithProviders(<ReportsPage />);
     await waitFor(() => {
       expect(screen.getByText('governance.reportsTitle')).toBeInTheDocument();
     });
   });
 
   it('renders data after loading', async () => {
-    render(<MemoryRouter><ReportsPage /></MemoryRouter>);
+    renderWithProviders(<ReportsPage />);
     await waitFor(() => {
       expect(screen.getByText('governance.reports.packCoverage')).toBeInTheDocument();
     });
@@ -58,18 +54,18 @@ describe('ReportsPage', () => {
 
   it('shows loading state while fetching', () => {
     vi.mocked(organizationGovernanceApi.getReportsSummary).mockReturnValue(new Promise(() => {}));
-    render(<MemoryRouter><ReportsPage /></MemoryRouter>);
+    renderWithProviders(<ReportsPage />);
     expect(screen.queryByText('governance.reports.packCoverage')).not.toBeInTheDocument();
   });
 
   it('does not render DemoBanner', async () => {
-    render(<MemoryRouter><ReportsPage /></MemoryRouter>);
+    renderWithProviders(<ReportsPage />);
     await waitFor(() => screen.getByText('governance.reportsTitle'));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 
   it('calls getReportsSummary on mount', async () => {
-    render(<MemoryRouter><ReportsPage /></MemoryRouter>);
+    renderWithProviders(<ReportsPage />);
     await waitFor(() => expect(organizationGovernanceApi.getReportsSummary).toHaveBeenCalledTimes(1));
   });
 });

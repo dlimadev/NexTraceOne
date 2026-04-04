@@ -1,16 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { Routes, Route } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/governance/api/organizationGovernance', () => ({
   organizationGovernanceApi: {
     getDomainDetail: vi.fn(),
     getDomainGovernanceSummary: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { organizationGovernanceApi } from '../../features/governance/api/organizationGovernance';
@@ -44,12 +41,11 @@ const mockGov = {
 };
 
 function renderPage() {
-  return render(
-    <MemoryRouter initialEntries={['/governance/domains/domain-1']}>
-      <Routes>
-        <Route path="/governance/domains/:domainId" element={<DomainDetailPage />} />
-      </Routes>
-    </MemoryRouter>,
+  return renderWithProviders(
+    <Routes>
+      <Route path="/governance/domains/:domainId" element={<DomainDetailPage />} />
+    </Routes>,
+    { routerProps: { initialEntries: ['/governance/domains/domain-1'] } },
   );
 }
 

@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { ReleasesPage } from '../../features/change-governance/pages/ReleasesPage';
 import type { Release, PagedList } from '../../types';
 
@@ -11,6 +10,20 @@ vi.mock('../../features/change-governance/api', () => ({
     listReleases: vi.fn(),
     notifyDeployment: vi.fn(),
   },
+}));
+
+vi.mock('../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn().mockReturnValue({
+    activeEnvironmentId: 'tenant-1-prod',
+    activeEnvironment: { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [
+      { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+      { id: 'tenant-1-stg', name: 'Staging', profile: 'staging', isProductionLike: false },
+    ],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  }),
 }));
 
 import { changeIntelligenceApi } from '../../features/change-governance/api';
@@ -47,16 +60,7 @@ const mockReleases: PagedList<Release> = {
 };
 
 function renderReleases() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <ReleasesPage />
-      </MemoryRouter>
-    </QueryClientProvider>
-  );
+  return renderWithProviders(<ReleasesPage />);
 }
 
 describe('ReleasesPage', () => {

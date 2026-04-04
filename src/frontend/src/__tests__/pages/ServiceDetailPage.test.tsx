@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { ServiceDetailPage } from '../../features/catalog/pages/ServiceDetailPage';
 
 beforeAll(() => {
@@ -118,17 +118,11 @@ const mockContracts = {
 };
 
 function renderServiceDetail(serviceId = 's1') {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[`/services/${serviceId}`]}>
-        <Routes>
-          <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
+    </Routes>,
+    { routerProps: { initialEntries: [`/services/${serviceId}`] } },
   );
 }
 

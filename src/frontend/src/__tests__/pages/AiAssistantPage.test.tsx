@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { AiAssistantPage } from '../../features/ai-hub/pages/AiAssistantPage';
 
 beforeAll(() => {
@@ -47,6 +47,8 @@ vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
     getConversation: getConversationMock,
     listMessages: vi.fn(),
     listSuggestedPrompts: vi.fn().mockResolvedValue({ items: [] }),
+    listAvailableModels: vi.fn().mockResolvedValue({ items: [] }),
+    listAgents: vi.fn().mockResolvedValue({ items: [] }),
     checkProvidersHealth: checkProvidersHealthMock,
     chat: vi.fn().mockRejectedValue(new Error('API not available')),
   },
@@ -57,17 +59,11 @@ vi.mock('../../api/client', () => ({
 }));
 
 function renderPage(initialEntry = '/ai/assistant') {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[initialEntry]}>
-        <Routes>
-          <Route path="/ai/assistant" element={<AiAssistantPage />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route path="/ai/assistant" element={<AiAssistantPage />} />
+    </Routes>,
+    { routerProps: { initialEntries: [initialEntry] } },
   );
 }
 

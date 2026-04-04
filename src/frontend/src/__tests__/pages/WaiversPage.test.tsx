@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/governance/api/organizationGovernance', () => ({
   organizationGovernanceApi: {
     listGovernanceWaivers: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { organizationGovernanceApi } from '../../features/governance/api/organizationGovernance';
@@ -40,14 +36,14 @@ describe('WaiversPage', () => {
   });
 
   it('renders page heading', async () => {
-    render(<MemoryRouter><WaiversPage /></MemoryRouter>);
+    renderWithProviders(<WaiversPage />);
     await waitFor(() => {
-      expect(screen.getByText('governancePacks.waivers.title')).toBeInTheDocument();
+      expect(screen.getByText('Waivers & Exceptions')).toBeInTheDocument();
     });
   });
 
   it('renders data after loading', async () => {
-    render(<MemoryRouter><WaiversPage /></MemoryRouter>);
+    renderWithProviders(<WaiversPage />);
     await waitFor(() => {
       expect(screen.getByText('Contract Required')).toBeInTheDocument();
     });
@@ -55,18 +51,18 @@ describe('WaiversPage', () => {
 
   it('shows loading state while fetching', () => {
     vi.mocked(organizationGovernanceApi.listGovernanceWaivers).mockReturnValue(new Promise(() => {}));
-    render(<MemoryRouter><WaiversPage /></MemoryRouter>);
+    renderWithProviders(<WaiversPage />);
     expect(screen.queryByText('Contract Required')).not.toBeInTheDocument();
   });
 
   it('does not render DemoBanner', async () => {
-    render(<MemoryRouter><WaiversPage /></MemoryRouter>);
+    renderWithProviders(<WaiversPage />);
     await waitFor(() => screen.getByText('Contract Required'));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 
   it('calls listGovernanceWaivers on mount', async () => {
-    render(<MemoryRouter><WaiversPage /></MemoryRouter>);
+    renderWithProviders(<WaiversPage />);
     await waitFor(() => expect(organizationGovernanceApi.listGovernanceWaivers).toHaveBeenCalledTimes(1));
   });
 });

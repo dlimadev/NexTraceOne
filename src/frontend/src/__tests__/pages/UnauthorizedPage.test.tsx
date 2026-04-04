@@ -1,26 +1,22 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 import { UnauthorizedPage } from '../../features/identity-access/pages/UnauthorizedPage';
 
 describe('UnauthorizedPage', () => {
   it('renders access denied heading', () => {
-    render(<MemoryRouter><UnauthorizedPage /></MemoryRouter>);
-    expect(screen.getByText('authorization.accessDenied')).toBeInTheDocument();
+    renderWithProviders(<UnauthorizedPage />);
+    expect(screen.getByText('Access Denied')).toBeInTheDocument();
   });
 
   it('renders description text', () => {
-    render(<MemoryRouter><UnauthorizedPage /></MemoryRouter>);
-    expect(screen.getByText('authorization.noPermission')).toBeInTheDocument();
+    renderWithProviders(<UnauthorizedPage />);
+    expect(screen.getByText('You do not have permission to access this page. Contact your administrator to request access.')).toBeInTheDocument();
   });
 
   it('renders go to dashboard button', () => {
-    render(<MemoryRouter><UnauthorizedPage /></MemoryRouter>);
-    expect(screen.getByRole('button', { name: /authorization.goToDashboard/i })).toBeInTheDocument();
+    renderWithProviders(<UnauthorizedPage />);
+    expect(screen.getByRole('button', { name: /go to dashboard/i })).toBeInTheDocument();
   });
 });

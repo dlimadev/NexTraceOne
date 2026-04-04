@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { ChangeCatalogPage } from '../../features/change-governance/pages/ChangeCatalogPage';
 
 vi.mock('../../features/change-governance/api/changeConfidence', () => ({
@@ -9,6 +9,20 @@ vi.mock('../../features/change-governance/api/changeConfidence', () => ({
     listChanges: vi.fn(),
     getSummary: vi.fn(),
   },
+}));
+
+vi.mock('../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn().mockReturnValue({
+    activeEnvironmentId: 'tenant-1-prod',
+    activeEnvironment: { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [
+      { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+      { id: 'tenant-1-stg', name: 'Staging', profile: 'staging', isProductionLike: false },
+    ],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  }),
 }));
 
 import { changeConfidenceApi } from '../../features/change-governance/api/changeConfidence';
@@ -68,17 +82,11 @@ const mockChanges = {
 };
 
 function renderChangeCatalog() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/changes']}>
-        <Routes>
-          <Route path="/changes" element={<ChangeCatalogPage />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route path="/changes" element={<ChangeCatalogPage />} />
+    </Routes>,
+    { routerProps: { initialEntries: ['/changes'] } },
   );
 }
 
@@ -99,7 +107,6 @@ describe('ChangeCatalogPage', () => {
     vi.mocked(changeConfidenceApi.getSummary).mockResolvedValue(mockSummary);
     renderChangeCatalog();
     await waitFor(() => {
-      // Title text may appear multiple times (heading + onboarding hints)
       expect(screen.getAllByText(/change confidence/i).length).toBeGreaterThanOrEqual(1);
     });
   });
