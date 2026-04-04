@@ -132,7 +132,9 @@ public static class SuggestRunbooksForIncident
                 score += 0.1m;
             }
 
-            return score > 0 ? score : 0.2m; // Mínimo de 0.2 para candidatos parciais
+            // Runbook parcialmente relevante: serviço ou tipo definido mas sem match exato.
+            // Score base 0.2 garante que candidatos com contexto parcial aparecem acima de genéricos (0.1).
+            return score > 0 ? score : 0.2m;
         }
 
         private static string GetMatchReason(decimal score)

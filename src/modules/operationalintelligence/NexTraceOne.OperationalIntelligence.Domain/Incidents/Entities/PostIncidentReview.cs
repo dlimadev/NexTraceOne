@@ -81,6 +81,8 @@ public sealed class PostIncidentReview : AuditableEntity<PostIncidentReviewId>
 
     /// <summary>
     /// Avança o PIR para a próxima fase, atualizando dados de análise.
+    /// Transições permitidas: FactGathering→RootCauseAnalysis→PreventiveActions→FinalReview→Completed.
+    /// A fase Completed só pode ser atingida a partir de FinalReview.
     /// </summary>
     public void Progress(
         PostIncidentReviewPhase newPhase,
@@ -93,7 +95,13 @@ public sealed class PostIncidentReview : AuditableEntity<PostIncidentReviewId>
     {
         Guard.Against.EnumOutOfRange(newPhase);
 
-        if ((int)newPhase <= (int)CurrentPhase && newPhase != PostIncidentReviewPhase.Completed)
+        if (newPhase == PostIncidentReviewPhase.Completed && CurrentPhase != PostIncidentReviewPhase.FinalReview)
+        {
+            throw new InvalidOperationException(
+                $"Cannot complete PIR from phase {CurrentPhase}. Only FinalReview can transition to Completed.");
+        }
+
+        if (newPhase != PostIncidentReviewPhase.Completed && (int)newPhase <= (int)CurrentPhase)
         {
             throw new InvalidOperationException(
                 $"Cannot move PIR from phase {CurrentPhase} to {newPhase}. Phase must advance forward.");

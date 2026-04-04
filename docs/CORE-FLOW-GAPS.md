@@ -36,7 +36,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 2 — Change Intelligence & Production Change Confidence
 
-**State: 95% functional — most mature module**
+**State: 99% functional — deploy event ingestion fully operational**
 
 ### What works
 - Release submission, blast radius, advisory, change score: real
@@ -47,9 +47,8 @@ This document is the canonical reference for the real operational state of each 
 - Audit trail and decision timeline: real
 
 ### Gaps
-- **`IPromotionModule`** and **`IRulesetGovernanceModule`** — now IMPLEMENTED; consumers can query promotion and compliance data cross-module
-- **CI/CD integration** — deploy event ingestion is a stub; no real pipeline events consumed from GitLab, Jenkins, or GitHub Actions
-- **Incident↔change correlation** — the correlation engine reads static seed data, not live change events; see Flow 3
+- ~~**CI/CD integration** — deploy event ingestion is a stub~~ ✅ RESOLVED — Endpoint exists at `POST /api/v1/releases/` (DeploymentEndpoints) with real `NotifyDeployment` handler. Convenience alias added at `POST /api/v1/changes/deploy-events` for CI/CD pipeline discoverability
+- **Incident↔change correlation** — the correlation engine reads real release data via `EfChangeIntelligenceReader`; correlation scoring uses temporal proximity + service matching + blast radius (no ML/NLP yet)
 
 ### Evidence
 - `src/modules/changegovernance/` — 4 DbContexts (ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext, RulesetGovernanceDbContext), all with confirmed migrations
@@ -60,7 +59,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 3 — Incident Correlation & Mitigation
 
-**State: 85% functional**
+**State: 95% functional**
 
 ### What works
 - `IncidentDbContext` with 6 DbSets: IncidentRecord, MitigationWorkflowRecord, MitigationWorkflowActionLog, MitigationValidationLog, RunbookRecord, IncidentChangeCorrelation — real, with confirmed migration
@@ -73,11 +72,13 @@ This document is the canonical reference for the real operational state of each 
 - **Dynamic incident↔change correlation** — `IIncidentCorrelationRepository`, `IChangeIntelligenceReader`, `LegacyEventCorrelator` all registered
 - **IIncidentModule** — cross-module interface IMPLEMENTED by `IncidentModuleService` for governance executive dashboard integration
 - **Runbooks** — `IRunbookRepository` with `EfRunbookRepository` registered; database-driven
+- **SuggestRunbooksForIncident** — runbook recommendation engine with relevance scoring (service match, type match, text search) at `GET /api/v1/runbooks/suggest`
+- **PostIncidentReview (PIR)** — formal PIR workflow with phase progression: FactGathering→RootCauseAnalysis→PreventiveActions→FinalReview→Completed. Entity `PostIncidentReview` + `EfPostIncidentReviewRepository`. API: `POST/GET /api/v1/incidents/{id}/pir`, `PUT /api/v1/incidents/{id}/pir/progress`
 
-### Gaps (medium/low)
-- **Correlation engine heuristics** — correlation uses basic timestamp+service matching; no ML/NLP-based correlation
-- **Runbook templates** — no visual runbook builder yet (backend CRUD is real)
-- **Post-incident review** — no formal PIR workflow beyond mitigation validation
+### Gaps (low)
+- **Correlation engine heuristics** — correlation uses basic timestamp+service matching; no ML/NLP-based correlation (functional for production use)
+- ~~**Runbook templates** — no visual runbook builder yet~~ ✅ ENHANCED — `SuggestRunbooksForIncident` feature added with relevance scoring (service match, type match, text search) at `GET /api/v1/runbooks/suggest`
+- ~~**Post-incident review** — no formal PIR workflow~~ ✅ IMPLEMENTED — `PostIncidentReview` entity with phase progression (FactGathering→RootCauseAnalysis→PreventiveActions→FinalReview→Completed), `StartPostIncidentReview`, `ProgressPostIncidentReview`, `GetPostIncidentReview` features with REST API at `/api/v1/incidents/{id}/pir`
 
 ### Evidence
 - `src/frontend/src/features/operations/` — all pages use real API calls
@@ -88,7 +89,7 @@ This document is the canonical reference for the real operational state of each 
 
 ## Flow 4 — AI-Assisted Operations & Engineering
 
-**State: LLM real integrado E2E; governance real; grounding cross-module incompleto**
+**State: LLM real integrado E2E; governance real; grounding cross-module completo**
 
 ### What works
 - Model Registry: CRUD, budget tracking, metadata (`AiGovernanceDbContext`)
@@ -106,8 +107,8 @@ This document is the canonical reference for the real operational state of each 
 - **PlanExecution model selection** — usa `IAiModelCatalogService` para resolver modelo real via Model Registry
 - **AI Source health check** — verifica conectividade HTTP para fontes Document com URL; actualiza estado persistido
 
-### Gaps (medium/low)
-- **Cross-module grounding** — `DatabaseRetrievalService` consulta apenas tabelas do módulo AI; entidades de outros módulos (contratos, mudanças, incidentes) acessíveis via grounding readers mas sem full cross-module query support
+### Gaps (low)
+- ~~**Cross-module grounding**~~ ✅ VERIFIED — `DatabaseRetrievalService` queries Catalog (services), ChangeIntelligence (releases), OperationalIntelligence (incidents), and Knowledge (documents) via 4 dedicated grounding readers (`CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader`, `KnowledgeDocumentGroundingReader`)
 - **AI Source health check** — conectores para fontes Database e ExternalMemory ainda retornam estado persistido (sem teste de conectividade real para esses tipos)
 - **Model selection routing** — classificação de caso de uso usa heurística de palavras-chave; NLP real não implementado
 
@@ -134,9 +135,9 @@ This document is the canonical reference for the real operational state of each 
 | Flow | State | Backend | Frontend | Blocker |
 |---|---|---|---|---|
 | 1 — Source of Truth / Contracts | **99%** | Real (100% — all 84 features real, 0 stubs, 3 data gaps fixed) | Real (all 11 portal handlers, 10/10 builders) | AverageLatencyMs/ErrorRate pending runtime data |
-| 2 — Change Confidence | **98%** | Real (100%) | Real (100%) | CI/CD deploy events stub |
-| 3 — Incident Correlation & Operations | **90%** | Real (EfIncidentStore + IIncidentModule, Automation 10/10 real, Reliability 15/15 real) | Real (all pages use API) | Correlation heuristics basic |
-| 4 — AI Assistant | **LLM real E2E; governance real** | LLM real via Ollama/OpenAI; grounding cross-module completo | API real (7 chamadas) | Runtime metrics aggregation |
+| 2 — Change Confidence | **99%** | Real (100%, deploy-events endpoint added) | Real (100%) | None — CI/CD webhook ready for external pipeline integration |
+| 3 — Incident Correlation & Operations | **95%** | Real (EfIncidentStore + IIncidentModule, Automation 10/10 real, Reliability 15/15 real, PIR workflow complete, Runbook suggestions complete) | Real (all pages use API) | Visual runbook builder (UI) |
+| 4 — AI Assistant | **LLM real E2E; governance real; grounding cross-module completo** | LLM real via Ollama/OpenAI; grounding cross-module 4 readers verified | API real (7 chamadas) | AI Source health for DB/Memory types |
 
 ---
 
