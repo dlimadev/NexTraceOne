@@ -26,6 +26,7 @@ export const queryKeys = {
       list: (params?: Record<string, unknown>) => [...queryKeys.catalog.services.all(), 'list', params] as const,
       detail: (id: string) => [...queryKeys.catalog.services.all(), 'detail', id] as const,
       summary: () => [...queryKeys.catalog.services.all(), 'summary'] as const,
+      scorecard: (serviceName: string, environment: string) => [...queryKeys.catalog.services.all(), 'scorecard', serviceName, environment] as const,
     },
   },
 

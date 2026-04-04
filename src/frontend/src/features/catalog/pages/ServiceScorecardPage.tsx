@@ -160,7 +160,7 @@ export function ServiceScorecardPage() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: [...queryKeys.services.all(), 'scorecard', serviceName, environment],
+    queryKey: queryKeys.catalog.services.scorecard(serviceName, environment),
     queryFn: () => sourceOfTruthApi.getServiceScorecard(serviceName, environment),
     enabled: serviceName.length > 0,
     staleTime: 60_000,
