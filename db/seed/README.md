@@ -46,7 +46,7 @@ psql -h localhost -p 5432 -U nextraceone -d nextraceone -f db/seed/seed_developm
 ### Via PowerShell (ambiente local)
 
 ```powershell
-$env:PGPASSWORD = "ouro18"
+$env:PGPASSWORD = $env:NEXTRACEONE_DB_PASSWORD  # Set via dotnet user-secrets or environment variable
 
 psql -h localhost -p 5432 -U nextraceone -d nextraceone `
      -f "db\seed\seed_production.sql"

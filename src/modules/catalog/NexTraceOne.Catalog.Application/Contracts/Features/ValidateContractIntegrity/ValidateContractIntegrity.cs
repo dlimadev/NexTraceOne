@@ -36,8 +36,8 @@ public static class ValidateContractIntegrity
     /// <summary>
     /// Handler multi-protocolo que verifica se a especificação da versão é válida e retorna seus metadados.
     /// Delega o parsing ao domain service correspondente ao protocolo da versão:
-    /// OpenAPI, Swagger (paths/endpoints), AsyncAPI (channels/operations), WSDL (portTypes/operations).
-    /// Protobuf e GraphQL retornam sucesso com contagens zeradas (suporte stub).
+    /// OpenAPI, Swagger (paths/endpoints), AsyncAPI (channels/operations), WSDL (portTypes/operations),
+    /// Protobuf (messages/rpcs), GraphQL (types/root fields).
     /// </summary>
     public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
     {
@@ -57,7 +57,8 @@ public static class ValidateContractIntegrity
                     ContractProtocol.Swagger => ValidateSwagger(version),
                     ContractProtocol.AsyncApi => ValidateAsyncApi(version),
                     ContractProtocol.Wsdl => ValidateWsdl(version),
-                    ContractProtocol.Protobuf or ContractProtocol.GraphQl => new Response(true, 0, 0, null, null),
+                    ContractProtocol.Protobuf => ValidateProtobuf(version),
+                    ContractProtocol.GraphQl => ValidateGraphQl(version),
                     _ => new Response(false, 0, 0, null, $"Unsupported protocol: {version.Protocol}.")
                 };
             }
@@ -123,6 +124,80 @@ public static class ValidateContractIntegrity
             var operationCount = portTypesAndOps.Values.Sum(o => o.Count);
 
             return new Response(true, portTypeCount, operationCount, null, null);
+        }
+
+        /// <summary>
+        /// Valida especificação Protocol Buffers (.proto) via análise textual.
+        /// Conta blocos 'message' (PathCount) e blocos 'service' (EndpointCount).
+        /// Detecta versão de sintaxe (proto2/proto3).
+        /// </summary>
+        private static Response ValidateProtobuf(ContractVersion version)
+        {
+            var content = version.SpecContent;
+            if (string.IsNullOrWhiteSpace(content))
+                return new Response(false, 0, 0, null, "Empty Protobuf specification.");
+
+            var messageCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*message\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            var serviceCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*service\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            var rpcCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*rpc\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            string? syntaxVersion = null;
+            var syntaxMatch = System.Text.RegularExpressions.Regex.Match(
+                content, @"syntax\s*=\s*""(proto[23])""");
+            if (syntaxMatch.Success)
+                syntaxVersion = syntaxMatch.Groups[1].Value;
+
+            if (messageCount == 0 && serviceCount == 0)
+                return new Response(false, 0, 0, syntaxVersion, "No message or service definitions found in Protobuf spec.");
+
+            return new Response(true, messageCount, serviceCount > 0 ? rpcCount : 0, syntaxVersion, null);
+        }
+
+        /// <summary>
+        /// Valida especificação GraphQL SDL via análise textual.
+        /// Conta definições de tipo (PathCount) e campos de Query/Mutation/Subscription (EndpointCount).
+        /// </summary>
+        private static Response ValidateGraphQl(ContractVersion version)
+        {
+            var content = version.SpecContent;
+            if (string.IsNullOrWhiteSpace(content))
+                return new Response(false, 0, 0, null, "Empty GraphQL specification.");
+
+            var typeCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*type\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            var inputCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*input\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            var enumCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*enum\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            var interfaceCount = System.Text.RegularExpressions.Regex.Matches(
+                content, @"^\s*interface\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+
+            var totalDefinitions = typeCount + inputCount + enumCount + interfaceCount;
+
+            // Count fields in Query, Mutation, and Subscription root types
+            var rootFieldCount = 0;
+            var rootTypePattern = new System.Text.RegularExpressions.Regex(
+                @"type\s+(?:Query|Mutation|Subscription)\s*\{([^}]*)\}",
+                System.Text.RegularExpressions.RegexOptions.Singleline);
+            foreach (System.Text.RegularExpressions.Match match in rootTypePattern.Matches(content))
+            {
+                var body = match.Groups[1].Value;
+                rootFieldCount += System.Text.RegularExpressions.Regex.Matches(
+                    body, @"^\s*\w+\s*[\(:]", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            }
+
+            if (totalDefinitions == 0)
+                return new Response(false, 0, 0, null, "No type definitions found in GraphQL SDL.");
+
+            return new Response(true, totalDefinitions, rootFieldCount, null, null);
         }
     }
 
