@@ -51,7 +51,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Fix 53 ESLint errors (imports não utilizados, `any` types, hooks deps) ✅ 56→0 errors
 
 ### 0.3 Database Critical ⏱️ 2 dias
-- [x] Gerar migração `InitialCreate` para `TelemetryStoreDbContext` (7 DbSets sem tabelas) — DesignTimeFactory created
+- [x] Gerar migração `W01_TelemetryStoreFoundation` para `TelemetryStoreDbContext` — 7 tabelas (`ops_ts_*`) + outbox + 15 índices + ModelSnapshot ✅ (Rev. 13)
 - [ ] Regenerar 6 Designer files em falta (EF tooling) — requer `dotnet ef dbcontext scaffold` com PostgreSQL activo; não executável em sandbox. Executar localmente com: `dotnet ef migrations add <Name> --project <InfraProject> --startup-project src/platform/NexTraceOne.ApiHost`
 - [x] Documentar processo de migração ✅ `scripts/db/apply-migrations.sh` com todos os 25 DbContexts mapeados
 
@@ -74,7 +74,8 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
   - AuditCompliance: `ApplyRetention` — N/A (empty command, no parameters)
   - IdentityAccess: `Logout`, `SeedDefaultModuleAccessPolicies`, `SeedDefaultRolePermissions` — N/A (empty commands, no parameters)
   - Notifications: `MarkAllNotificationsRead` — N/A (empty command, no parameters)
-- [x] Template de validador para as restantes ~130 features ✅ `docs/dev/VALIDATOR-TEMPLATE.md` criado com padrão completo para commands e queries, incluindo exemplos para string, guid, int, coleções, regras condicionais e testes unitários
+- [x] Governance Queries — 37 novos validators adicionados a todas as queries parametrizadas ✅ (Rev. 13): GetExecutiveDrillDown, GetEvidencePackage, GetCrossDomainDependencies, GetGovernancePack, GetComplianceGaps, ListGovernanceWaivers, GetDomainGovernanceSummary, GetControlsSummary, GetTeamGovernanceSummary, GetComplianceSummary, GetReportsSummary, GetExecutiveOverview, GetPlatformEvents, GetExecutiveTrends, ListGovernancePacks, GetRiskHeatmap, GetWasteSignals, GetFinOpsTrends, GetFinOpsSummary, GetPlatformJobs, GetBenchmarking, GetRiskSummary, GetEfficiencyIndicators, GetMaturityScorecards, GetPackApplicability, GetPackCoverage, GetDomainDetail, GetTeamDetail, GetTeamFinOps, GetDomainFinOps, GetServiceFinOps, GetCrossTeamDependencies, ListEvidencePackages, ListPackVersions, ListPolicies, GetPolicy, GetOnboardingContext — DI atualizado com 50 registos `IValidator`
+- [x] Template de validador para as restantes ~80 features em AIKnowledge, IdentityAccess, Catalog, Integrations ✅ `docs/dev/VALIDATOR-TEMPLATE.md` criado com padrão completo para commands e queries
 
 ### 1.2 Error Handling ⏱️ 3 dias
 - [x] Substituir 4 bare catch blocks em `CanonicalModelBuilder.cs` com logging ✅ All 5 catches now log via Trace.TraceWarning
