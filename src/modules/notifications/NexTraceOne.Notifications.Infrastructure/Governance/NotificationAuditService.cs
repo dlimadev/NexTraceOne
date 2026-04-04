@@ -82,6 +82,7 @@ internal sealed class NotificationAuditService(
             catch
             {
                 // PayloadJson malformado — incluir como string em vez de abortar a auditoria
+                System.Diagnostics.Trace.TraceWarning("NotificationAuditService: Failed to deserialize PayloadJson — falling back to raw string.");
                 envelope["context"] = entry.PayloadJson;
             }
         }

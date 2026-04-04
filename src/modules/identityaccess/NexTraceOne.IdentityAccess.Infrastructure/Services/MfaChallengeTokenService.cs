@@ -74,6 +74,7 @@ internal sealed class MfaChallengeTokenService(
         }
         catch
         {
+            System.Diagnostics.Trace.TraceWarning("MfaChallengeTokenService: Failed to validate MFA challenge token.");
             return false;
         }
     }

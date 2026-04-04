@@ -65,6 +65,7 @@ internal static class IdTokenDecoder
         catch
         {
             // Token malformado — retorna dicionário vazio para não bloquear o fluxo
+            System.Diagnostics.Trace.TraceWarning("IdTokenDecoder: Failed to decode id_token payload — returning empty claims.");
             return [];
         }
     }
