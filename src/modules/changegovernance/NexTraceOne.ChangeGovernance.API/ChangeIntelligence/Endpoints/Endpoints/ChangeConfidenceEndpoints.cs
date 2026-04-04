@@ -19,6 +19,7 @@ using GetChangeAdvisoryFeature = NexTraceOne.ChangeGovernance.Application.Change
 using RecordChangeDecisionFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision.RecordChangeDecision;
 using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
 using GetDoraMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDoraMetrics.GetDoraMetrics;
+using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -214,6 +215,20 @@ internal static class ChangeConfidenceEndpoints
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
+
+        // ── Endpoint de conveniência para ingestão de eventos de deploy via CI/CD ───
+        // Alias acessível em /api/v1/changes/deploy-events para facilitar integração
+        // com pipelines CI/CD (GitHub Actions, Jenkins, GitLab). O endpoint canónico
+        // permanece em POST /api/v1/releases/ (DeploymentEndpoints).
+        group.MapPost("/deploy-events", async (
+            NotifyDeploymentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToCreatedResult("/api/v1/releases/{0}", localizer);
+        }).RequirePermission("change-intelligence:write");
     }
 
     private sealed record ChangeFilterOptionsResponse(

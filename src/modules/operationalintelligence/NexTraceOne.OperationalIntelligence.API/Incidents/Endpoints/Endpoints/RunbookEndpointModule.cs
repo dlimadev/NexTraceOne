@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SuggestRunbooksForIncident;
 
 namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
 
@@ -72,5 +73,23 @@ public sealed class RunbookEndpointModule
         .RequirePermission("operations:runbooks:write")
         .WithName("CreateRunbook")
         .WithSummary("Create a new operational runbook");
+
+        // ── GET /api/v1/runbooks/suggest — Sugerir runbooks para um incidente ──
+        group.MapGet("/suggest", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string? serviceId,
+            string? incidentType,
+            string? incidentTitle,
+            int maxResults = 5,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new SuggestRunbooksForIncident.Query(serviceId, incidentType, incidentTitle, maxResults);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runbooks:read")
+        .WithName("SuggestRunbooksForIncident")
+        .WithSummary("Suggest relevant runbooks for an incident based on service, type and title matching");
     }
 }

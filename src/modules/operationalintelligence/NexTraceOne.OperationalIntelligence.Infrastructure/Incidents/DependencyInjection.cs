@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IOperationalAlertHandler, IncidentAlertHandler>();
         services.AddScoped<IIncidentCorrelationRepository, EfIncidentCorrelationRepository>();
         services.AddScoped<IRunbookRepository, EfRunbookRepository>();
+        services.AddScoped<IPostIncidentReviewRepository, EfPostIncidentReviewRepository>();
         services.AddScoped<IMitigationWorkflowRepository, EfMitigationWorkflowRepository>();
         services.AddScoped<IMitigationValidationRepository, EfMitigationValidationRepository>();
         services.AddScoped<IChangeIntelligenceReader, EfChangeIntelligenceReader>();
