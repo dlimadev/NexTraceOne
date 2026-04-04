@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -18,6 +19,20 @@ public static class UpdateGovernancePack
         string? DisplayName,
         string? Description,
         string? Category) : ICommand<Response>;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.DisplayName).MaximumLength(200)
+                .When(x => x.DisplayName is not null);
+            RuleFor(x => x.Description).MaximumLength(2000)
+                .When(x => x.Description is not null);
+            RuleFor(x => x.Category).MaximumLength(100)
+                .When(x => x.Category is not null);
+        }
+    }
 
     /// <summary>Handler que atualiza o governance pack e retorna o ID confirmado.</summary>
     public sealed class Handler(

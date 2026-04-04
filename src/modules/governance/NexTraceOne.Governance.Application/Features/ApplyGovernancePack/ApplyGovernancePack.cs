@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -20,6 +21,18 @@ public static class ApplyGovernancePack
         string ScopeValue,
         string EnforcementMode,
         string AppliedBy) : ICommand<Response>;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.ScopeType).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.ScopeValue).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.EnforcementMode).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.AppliedBy).NotEmpty().MaximumLength(100);
+        }
+    }
 
     /// <summary>Handler que aplica o governance pack com persistência real.</summary>
     public sealed class Handler(

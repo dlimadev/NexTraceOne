@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -20,6 +21,20 @@ public static class CreateDomain
         string? Description,
         string Criticality,
         string? CapabilityClassification) : ICommand<Response>;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.DisplayName).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.Description).MaximumLength(2000)
+                .When(x => x.Description is not null);
+            RuleFor(x => x.Criticality).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.CapabilityClassification).MaximumLength(200)
+                .When(x => x.CapabilityClassification is not null);
+        }
+    }
 
     /// <summary>Handler que cria um novo domínio e retorna o ID gerado.</summary>
     public sealed class Handler(

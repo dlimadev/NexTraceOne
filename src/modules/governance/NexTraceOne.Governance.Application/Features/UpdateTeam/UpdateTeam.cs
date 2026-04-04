@@ -1,3 +1,4 @@
+using FluentValidation;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -19,6 +20,19 @@ public static class UpdateTeam
         string DisplayName,
         string? Description,
         string? ParentOrganizationUnit) : ICommand;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.DisplayName).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.Description).MaximumLength(2000)
+                .When(x => x.Description is not null);
+            RuleFor(x => x.ParentOrganizationUnit).MaximumLength(200)
+                .When(x => x.ParentOrganizationUnit is not null);
+        }
+    }
 
     /// <summary>Handler que atualiza os dados da equipa.</summary>
     public sealed class Handler(
