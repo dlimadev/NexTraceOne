@@ -60,8 +60,10 @@ public static class WsdlMetadataExtractor
                 BindingName: bindingName,
                 ExtractedOperationsJson: operationsJson);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceWarning(
+                "WsdlMetadataExtractor: Failed to extract WSDL metadata — {0}: {1}", ex.GetType().Name, ex.Message);
             return BuildDefault(fallbackServiceName);
         }
     }

@@ -62,7 +62,12 @@ public static class CanonicalModelBuilder
                 securitySchemes.Count > 0, hasExamples,
                 operations.Any(o => !string.IsNullOrWhiteSpace(o.Description)));
         }
-        catch { return EmptyModel(ContractProtocol.OpenApi); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "CanonicalModelBuilder: Failed to parse OpenAPI spec — {0}: {1}", ex.GetType().Name, ex.Message);
+            return EmptyModel(ContractProtocol.OpenApi);
+        }
     }
 
     /// <summary>
@@ -91,7 +96,12 @@ public static class CanonicalModelBuilder
                 securitySchemes.Count > 0, false,
                 operations.Any(o => !string.IsNullOrWhiteSpace(o.Description)));
         }
-        catch { return EmptyModel(ContractProtocol.Swagger); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "CanonicalModelBuilder: Failed to parse Swagger spec — {0}: {1}", ex.GetType().Name, ex.Message);
+            return EmptyModel(ContractProtocol.Swagger);
+        }
     }
 
     /// <summary>
@@ -120,7 +130,12 @@ public static class CanonicalModelBuilder
                 false, false,
                 operations.Any(o => !string.IsNullOrWhiteSpace(o.Description)));
         }
-        catch { return EmptyModel(ContractProtocol.AsyncApi); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "CanonicalModelBuilder: Failed to parse AsyncAPI spec — {0}: {1}", ex.GetType().Name, ex.Message);
+            return EmptyModel(ContractProtocol.AsyncApi);
+        }
     }
 
     /// <summary>
@@ -147,7 +162,12 @@ public static class CanonicalModelBuilder
                 false, false,
                 operations.Any(o => !string.IsNullOrWhiteSpace(o.Description)));
         }
-        catch { return EmptyModel(ContractProtocol.Wsdl); }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "CanonicalModelBuilder: Failed to parse WSDL spec — {0}: {1}", ex.GetType().Name, ex.Message);
+            return EmptyModel(ContractProtocol.Wsdl);
+        }
     }
 
     // ── Helpers privados ─────────────────────────────────────────────
@@ -216,8 +236,10 @@ public static class CanonicalModelBuilder
                 hasExamples,
                 hasDescriptions);
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceWarning(
+                "CanonicalModelBuilder: Failed to parse WorkerService spec — {0}: {1}", ex.GetType().Name, ex.Message);
             return EmptyModel(ContractProtocol.WorkerService);
         }
     }

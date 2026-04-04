@@ -52,7 +52,11 @@ public static class AsyncApiSpecParser
                 }
             }
         }
-        catch (JsonException) { /* Spec inválida — retorna dicionário vazio para não bloquear o diff */ }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "AsyncApiSpecParser: Failed to parse AsyncAPI channels — {0}", ex.Message);
+        }
         return result;
     }
 
@@ -99,7 +103,12 @@ public static class AsyncApiSpecParser
                 }
             }
         }
-        catch (JsonException) { /* Ignora erros de parse para retornar dicionário vazio */ }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "AsyncApiSpecParser: Failed to parse message schema for channel '{0}' operation '{1}' — {2}",
+                channel, operation, ex.Message);
+        }
         return result;
     }
 }

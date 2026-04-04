@@ -164,8 +164,9 @@ public sealed class OllamaHttpClient
             var response = await _httpClient.GetAsync(string.Empty, cts.Token);
             return response.IsSuccessStatusCode;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Ollama health check failed");
             return false;
         }
     }

@@ -61,8 +61,11 @@ public static class ValidateContractIntegrity
                     _ => new Response(false, 0, 0, null, $"Unsupported protocol: {version.Protocol}.")
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.TraceWarning(
+                    "ValidateContractIntegrity: Failed to validate contract version {0} — {1}: {2}",
+                    request.ContractVersionId, ex.GetType().Name, ex.Message);
                 return new Response(false, 0, 0, null, "The specification content could not be parsed.");
             }
         }
