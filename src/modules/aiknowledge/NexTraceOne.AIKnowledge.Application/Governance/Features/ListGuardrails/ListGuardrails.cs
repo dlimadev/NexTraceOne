@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -17,6 +18,16 @@ public static class ListGuardrails
         string? Category,
         string? GuardType,
         bool? IsActive) : IQuery<Response>;
+
+    /// <summary>Validador da query ListGuardrails.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Category).MaximumLength(100).When(x => x.Category is not null);
+            RuleFor(x => x.GuardType).MaximumLength(100).When(x => x.GuardType is not null);
+        }
+    }
 
     /// <summary>Handler que lista guardrails com filtros opcionais.</summary>
     public sealed class Handler(

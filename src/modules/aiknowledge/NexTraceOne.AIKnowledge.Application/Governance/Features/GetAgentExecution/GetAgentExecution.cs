@@ -1,3 +1,5 @@
+using FluentValidation;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
@@ -15,6 +17,15 @@ public static class GetAgentExecution
 {
     /// <summary>Query para obter uma execução por ID.</summary>
     public sealed record Query(Guid ExecutionId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetAgentExecution.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ExecutionId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém detalhes de uma execução.</summary>
     public sealed class Handler(

@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -20,6 +21,17 @@ public static class ListIdeClients
         string? ClientType,
         bool? IsActive,
         int PageSize = 50) : IQuery<Response>;
+
+    /// <summary>Validador da query ListIdeClients.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.UserId).MaximumLength(200).When(x => x.UserId is not null);
+            RuleFor(x => x.ClientType).MaximumLength(200).When(x => x.ClientType is not null);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+        }
+    }
 
     /// <summary>Handler que lista clientes IDE com filtros.</summary>
     public sealed class Handler(

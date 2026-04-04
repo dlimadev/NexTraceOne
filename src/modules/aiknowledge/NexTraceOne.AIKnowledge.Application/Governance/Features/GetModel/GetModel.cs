@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -17,6 +18,15 @@ public static class GetModel
 {
     /// <summary>Query de consulta de um modelo de IA pelo identificador.</summary>
     public sealed record Query(Guid ModelId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetModel.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ModelId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém os detalhes completos de um modelo de IA.</summary>
     public sealed class Handler(

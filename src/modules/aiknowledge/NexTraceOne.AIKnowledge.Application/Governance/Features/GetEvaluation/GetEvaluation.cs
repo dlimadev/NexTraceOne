@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -16,6 +17,15 @@ public static class GetEvaluation
 {
     /// <summary>Query de consulta de uma avaliação de qualidade pelo identificador.</summary>
     public sealed record Query(Guid EvaluationId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetEvaluation.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.EvaluationId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém os detalhes completos de uma avaliação.</summary>
     public sealed class Handler(

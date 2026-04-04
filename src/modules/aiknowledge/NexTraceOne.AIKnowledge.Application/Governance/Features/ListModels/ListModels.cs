@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -20,6 +21,15 @@ public static class ListModels
         ModelType? ModelType,
         ModelStatus? Status,
         bool? IsInternal) : IQuery<Response>;
+
+    /// <summary>Validador da query ListModels.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Provider).MaximumLength(100).When(x => x.Provider is not null);
+        }
+    }
 
     /// <summary>Handler que lista modelos com filtros opcionais.</summary>
     public sealed class Handler(

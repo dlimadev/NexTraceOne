@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -19,6 +20,16 @@ public static class GetIdeCapabilities
     public sealed record Query(
         string ClientType,
         string? Persona) : IQuery<Response>;
+
+    /// <summary>Validador da query GetIdeCapabilities.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ClientType).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.Persona).MaximumLength(100).When(x => x.Persona is not null);
+        }
+    }
 
     /// <summary>Handler que resolve capacidades IDE baseadas em política ou defaults.</summary>
     public sealed class Handler(

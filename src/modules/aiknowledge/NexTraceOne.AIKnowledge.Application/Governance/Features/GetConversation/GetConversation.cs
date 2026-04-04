@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -24,6 +25,16 @@ public static class GetConversation
     public sealed record Query(
         Guid ConversationId,
         int MessagePageSize = 50) : IQuery<Response>;
+
+    /// <summary>Validador da query GetConversation.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ConversationId).NotEmpty();
+            RuleFor(x => x.MessagePageSize).InclusiveBetween(1, 200);
+        }
+    }
 
     /// <summary>Handler que obtém conversa e mensagens com metadados completos.</summary>
     public sealed class Handler(
