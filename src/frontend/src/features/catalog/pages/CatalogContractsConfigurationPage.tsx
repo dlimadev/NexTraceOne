@@ -17,6 +17,7 @@ import {
   Lock,
   RefreshCw,
   Layers,
+  GitBranch,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/identity-access/api', () => ({
   identityApi: {
@@ -15,19 +14,10 @@ vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ tenantId: 't1', user: { id: 'u1' } }),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
-
 import { AccessReviewPage } from '../../features/identity-access/pages/AccessReviewPage';
 
 function renderPage() {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <QueryClientProvider client={qc}>
-      <MemoryRouter><AccessReviewPage /></MemoryRouter>
-    </QueryClientProvider>
-  );
+  return renderWithProviders(<AccessReviewPage />);
 }
 
 describe('AccessReviewPage', () => {
@@ -35,18 +25,18 @@ describe('AccessReviewPage', () => {
 
   it('renders page heading', () => {
     renderPage();
-    expect(screen.getByText('accessReview.title')).toBeInTheDocument();
+    expect(screen.getByText('Access Review')).toBeInTheDocument();
   });
 
   it('renders start campaign button', () => {
     renderPage();
-    expect(screen.getByText('accessReview.startCampaign')).toBeInTheDocument();
+    expect(screen.getByText('Start Campaign')).toBeInTheDocument();
   });
 
   it('shows empty state when no campaigns', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('accessReview.noCampaigns')).toBeInTheDocument();
+      expect(screen.getByText(/no access review campaigns/i)).toBeInTheDocument();
     });
   });
 });

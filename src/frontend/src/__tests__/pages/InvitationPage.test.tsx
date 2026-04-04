@@ -1,16 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/identity-access/api', () => ({
   identityApi: {
     getInvitationDetails: vi.fn(),
     acceptInvitation: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { identityApi } from '../../features/identity-access/api';
@@ -24,11 +20,9 @@ const mockInvitationDetails = {
 };
 
 function renderPage(search = '?token=valid-token-123') {
-  return render(
-    <MemoryRouter initialEntries={[`/invitation${search}`]}>
-      <InvitationPage />
-    </MemoryRouter>,
-  );
+  return renderWithProviders(<InvitationPage />, {
+    routerProps: { initialEntries: [`/invitation${search}`] },
+  });
 }
 
 describe('InvitationPage', () => {
@@ -58,7 +52,7 @@ describe('InvitationPage', () => {
   it('shows invalid token state when no token provided', async () => {
     renderPage('');
     await waitFor(() => {
-      expect(screen.getByText('invitation.invalidToken')).toBeInTheDocument();
+      expect(screen.getByText(/invitation link is invalid/i)).toBeInTheDocument();
     });
   });
 
