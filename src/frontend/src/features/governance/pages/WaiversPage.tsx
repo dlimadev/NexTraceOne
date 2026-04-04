@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   FileCheck, Search, Clock, CheckCircle, XCircle, Shield,
 } from 'lucide-react';
@@ -11,7 +12,8 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-import type { GovernanceWaiverDto, WaiverStatus as WaiverStatusType } from '../../../types';
+import { queryKeys } from '../../../shared/api/queryKeys';
+import type { WaiverStatus as WaiverStatusType } from '../../../types';
 
 type StatusFilter = 'all' | WaiverStatusType;
 
@@ -34,39 +36,17 @@ export function WaiversPage() {
   const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
-  const [waivers, setWaivers] = useState<GovernanceWaiverDto[]>([]);
-  const [totalWaivers, setTotalWaivers] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [approvedCount, setApprovedCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.waivers(),
+    queryFn: () => organizationGovernanceApi.listGovernanceWaivers(),
+    staleTime: 30_000,
+  });
 
-    organizationGovernanceApi.listGovernanceWaivers()
-      .then((data) => {
-        if (!cancelled) {
-          setWaivers(data.waivers);
-          setTotalWaivers(data.totalWaivers);
-          setPendingCount(data.pendingCount);
-          setApprovedCount(data.approvedCount);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [t]);
-
+  const waivers = data?.waivers ?? [];
+  const totalWaivers = data?.totalWaivers ?? 0;
+  const pendingCount = data?.pendingCount ?? 0;
+  const approvedCount = data?.approvedCount ?? 0;
   const expiredCount = waivers.filter(w => w.status === 'Expired').length;
 
   const filtered = waivers.filter(w => {
@@ -82,7 +62,7 @@ export function WaiversPage() {
     return true;
   });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <PageHeader
@@ -94,14 +74,14 @@ export function WaiversPage() {
     );
   }
 
-  if (error) {
+  if (isError || !data) {
     return (
       <PageContainer>
         <PageHeader
           title={t('governancePacks.waivers.title')}
           subtitle={t('governancePacks.waivers.subtitle')}
         />
-        <PageErrorState message={error} />
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }

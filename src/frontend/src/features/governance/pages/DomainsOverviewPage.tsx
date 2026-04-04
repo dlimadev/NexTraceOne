@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   Globe, Search, Server, BarChart3, Users, ArrowRight, Tag,
@@ -12,7 +13,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-import type { DomainSummary } from '../../../types';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 const maturityBadgeVariant = (level: string): 'success' | 'info' | 'warning' | 'danger' => {
   switch (level) {
@@ -46,33 +47,14 @@ const criticalityBadgeVariant = (c: string): 'danger' | 'warning' | 'info' | 'de
 export function DomainsOverviewPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const [domains, setDomains] = useState<DomainSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.domains(),
+    queryFn: () => organizationGovernanceApi.listDomains(),
+    staleTime: 30_000,
+  });
 
-    organizationGovernanceApi.listDomains()
-      .then((data) => {
-        if (!cancelled) {
-          setDomains(data.domains);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [t]);
-
+  const domains = data?.domains ?? [];
   const totalTeams = domains.reduce((sum, d) => sum + d.teamCount, 0);
   const totalServices = domains.reduce((sum, d) => sum + d.serviceCount, 0);
 
@@ -84,7 +66,7 @@ export function DomainsOverviewPage() {
       || domain.capabilityClassification?.toLowerCase().includes(q);
   });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.domains.title" subtitleKey="organization.domains.subtitle" />
@@ -93,11 +75,11 @@ export function DomainsOverviewPage() {
     );
   }
 
-  if (error) {
+  if (isError || !data) {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.domains.title" subtitleKey="organization.domains.subtitle" />
-        <PageErrorState message={error} />
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }

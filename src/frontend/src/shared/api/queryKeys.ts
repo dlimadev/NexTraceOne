@@ -59,6 +59,14 @@ export const queryKeys = {
     reports: () => [...queryKeys.governance.all, 'reports'] as const,
     risk: () => [...queryKeys.governance.all, 'risk'] as const,
     compliance: () => [...queryKeys.governance.all, 'compliance'] as const,
+    waivers: () => [...queryKeys.governance.all, 'waivers'] as const,
+    teams: () => [...queryKeys.governance.all, 'teams'] as const,
+    teamDetail: (id: string) => [...queryKeys.governance.all, 'teams', id] as const,
+    delegations: () => [...queryKeys.governance.all, 'delegations'] as const,
+    domains: () => [...queryKeys.governance.all, 'domains'] as const,
+    domainDetail: (id: string) => [...queryKeys.governance.all, 'domains', id] as const,
+    packs: () => [...queryKeys.governance.all, 'packs'] as const,
+    packDetail: (id: string) => [...queryKeys.governance.all, 'packs', id] as const,
     finops: {
       all: () => [...queryKeys.governance.all, 'finops'] as const,
       summary: (params?: Record<string, unknown>) => [...queryKeys.governance.finops.all(), 'summary', params] as const,
@@ -105,6 +113,8 @@ export const queryKeys = {
     all: ['ai'] as const,
     models: () => [...queryKeys.ai.all, 'models'] as const,
     policies: () => [...queryKeys.ai.all, 'policies'] as const,
+    conversations: () => [...queryKeys.ai.all, 'conversations'] as const,
+    agents: () => [...queryKeys.ai.all, 'agents'] as const,
   },
 
   // ── Identity ──

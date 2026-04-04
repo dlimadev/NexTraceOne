@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldCheck, Users, Globe, Calendar, Clock, Loader2, AlertTriangle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ShieldCheck, Users, Globe, Calendar, Clock } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-import type { DelegatedAdminDto } from '../../../types';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 type DelegationScope = 'TeamAdmin' | 'DomainAdmin' | 'ReadOnly' | 'FullAdmin';
 
@@ -31,33 +34,14 @@ type ScopeFilter = 'All' | DelegationScope;
 export function DelegatedAdminPage() {
   const { t } = useTranslation();
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('All');
-  const [delegations, setDelegations] = useState<DelegatedAdminDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.delegations(),
+    queryFn: () => organizationGovernanceApi.listDelegations(),
+    staleTime: 30_000,
+  });
 
-    organizationGovernanceApi.listDelegations()
-      .then((data) => {
-        if (!cancelled) {
-          setDelegations(data.delegations);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [t]);
-
+  const delegations = data?.delegations ?? [];
   const activeDelegations = delegations.filter(d => d.isActive).length;
   const teamScoped = delegations.filter(d => d.teamId !== null && d.teamId !== undefined).length;
   const domainScoped = delegations.filter(d => d.domainId !== null && d.domainId !== undefined).length;
@@ -76,25 +60,20 @@ export function DelegatedAdminPage() {
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.delegatedAdmin.title" subtitleKey="organization.delegatedAdmin.subtitle" />
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+        <PageLoadingState />
       </PageContainer>
     );
   }
 
-  if (error) {
+  if (isError || !data) {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.delegatedAdmin.title" subtitleKey="organization.delegatedAdmin.subtitle" />
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <AlertTriangle size={48} className="text-critical" />
-          <p className="text-sm text-muted">{error}</p>
-        </div>
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }

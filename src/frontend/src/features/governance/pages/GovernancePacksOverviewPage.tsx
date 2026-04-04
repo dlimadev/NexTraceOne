@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   Package, Search, FileText, Shield, Zap, Bot, AlertTriangle,
@@ -13,7 +14,8 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-import type { GovernancePackSummary, GovernancePackCategory, GovernancePackStatus } from '../../../types';
+import { queryKeys } from '../../../shared/api/queryKeys';
+import type { GovernancePackCategory, GovernancePackStatus } from '../../../types';
 
 type CategoryFilter = 'all' | GovernancePackCategory;
 type StatusFilter = 'all' | GovernancePackStatus;
@@ -49,39 +51,17 @@ export function GovernancePacksOverviewPage() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
-  const [packs, setPacks] = useState<GovernancePackSummary[]>([]);
-  const [totalPacks, setTotalPacks] = useState(0);
-  const [publishedCount, setPublishedCount] = useState(0);
-  const [draftCount, setDraftCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.packs(),
+    queryFn: () => organizationGovernanceApi.listGovernancePacks(),
+    staleTime: 30_000,
+  });
 
-    organizationGovernanceApi.listGovernancePacks()
-      .then((data) => {
-        if (!cancelled) {
-          setPacks(data.packs);
-          setTotalPacks(data.totalPacks);
-          setPublishedCount(data.publishedCount);
-          setDraftCount(data.draftCount);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [t]);
-
+  const packs = data?.packs ?? [];
+  const totalPacks = data?.totalPacks ?? 0;
+  const publishedCount = data?.publishedCount ?? 0;
+  const draftCount = data?.draftCount ?? 0;
   const deprecatedCount = packs.filter(p => p.status === 'Deprecated').length;
 
   const filtered = packs.filter(p => {
@@ -107,7 +87,7 @@ export function GovernancePacksOverviewPage() {
     { key: 'Operations', labelKey: 'governancePacks.category.Operations' },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <PageHeader
@@ -119,14 +99,14 @@ export function GovernancePacksOverviewPage() {
     );
   }
 
-  if (error) {
+  if (isError || !data) {
     return (
       <PageContainer>
         <PageHeader
           title={t('governancePacks.title')}
           subtitle={t('governancePacks.subtitle')}
         />
-        <PageErrorState message={error} />
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }
