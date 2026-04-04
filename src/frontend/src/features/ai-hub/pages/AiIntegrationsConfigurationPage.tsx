@@ -33,7 +33,6 @@ import {
 import type {
   ConfigurationDefinitionDto,
   EffectiveConfigurationDto,
-  ConfigurationScope,
 } from '../../configuration/types';
 
 // ── Section Definitions ────────────────────────────────────────────────
@@ -141,12 +140,11 @@ export function AiIntegrationsConfigurationPage() {
   const [editingDef, setEditingDef] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [scopeFilter, setScopeFilter] = useState<ConfigurationScope | 'all'>('all');
   const [showEffective, setShowEffective] = useState(false);
 
   // ── Data hooks ─────────────────────────────────────────────────────
   const { data: definitions, isLoading: loadingDefs, isError: errorDefs, refetch: refetchDefs } = useConfigurationDefinitions();
-  const { data: effective, isLoading: loadingEffective } = useEffectiveSettings('System');
+  const { data: effective } = useEffectiveSettings('System');
   const { mutateAsync: setValue } = useSetConfigurationValue();
   const { data: auditHistory } = useAuditHistory(null);
 

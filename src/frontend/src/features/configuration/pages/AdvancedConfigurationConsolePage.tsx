@@ -23,7 +23,6 @@ import {
   FileJson,
   RefreshCw,
   ArrowRight,
-  Copy,
   Clock,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -112,7 +111,7 @@ export function AdvancedConfigurationConsolePage() {
   const [selectedScope, setSelectedScope] = useState<ConfigurationScope>('System');
   const [compareScope, setCompareScope] = useState<ConfigurationScope>('Tenant');
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
-  const [showSensitive, setShowSensitive] = useState(false);
+  const [showSensitive] = useState(false);
   const [selectedAuditKey, setSelectedAuditKey] = useState<string | null>(null);
 
   // ── Data ────────────────────────────────────────────────────────────

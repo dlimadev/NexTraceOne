@@ -36,6 +36,7 @@ function createTestQueryClient(): QueryClient {
 /**
  * Wrapper component that provides all necessary providers for component testing.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 function AllProviders({
   children,
   queryClient,
@@ -91,6 +92,7 @@ export function renderWithProviders(
 }
 
 // Re-export everything from @testing-library/react for convenience
+// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react';
 // Override the default render with our custom one
 export { renderWithProviders as render };

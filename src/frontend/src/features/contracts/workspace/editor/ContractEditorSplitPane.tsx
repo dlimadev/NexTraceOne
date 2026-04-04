@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import SimpleSplitPane from '../../../../components/SimpleSplitPane';
-import { GripVertical, Check, AlertTriangle } from 'lucide-react';
+import { Check, AlertTriangle } from 'lucide-react';
 import { MonacoEditorWrapper } from './MonacoEditorWrapper';
 import { LivePreviewRenderer } from './LivePreviewRenderer';
 import { useSpecPreview } from '../../hooks/useSpecPreview';

@@ -6,7 +6,6 @@ import {
   Snowflake,
   Plus,
   Search,
-  XCircle,
   CheckCircle2,
   AlertTriangle,
   Zap,
@@ -24,7 +23,6 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import {
   changeIntelligenceApi,
   type CalendarReleaseDto,
-  type CalendarFreezeDto,
   type FreezeWindowListDto,
   type CreateFreezeWindowRequest,
   type UpdateFreezeWindowRequest,

@@ -222,16 +222,20 @@ describe('AiIntegrationsConfigurationPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     vi.mocked(useEffectiveSettings).mockReturnValue({
       data: [],
       isLoading: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     vi.mocked(useSetConfigurationValue).mockReturnValue({
       mutateAsync: vi.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     vi.mocked(useAuditHistory).mockReturnValue({
       data: [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
   });
 
@@ -302,6 +306,7 @@ describe('AiIntegrationsConfigurationPage', () => {
       isLoading: true,
       isError: false,
       refetch: vi.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     renderPage();
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
@@ -313,6 +318,7 @@ describe('AiIntegrationsConfigurationPage', () => {
       isLoading: false,
       isError: true,
       refetch: vi.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     renderPage();
     expect(screen.getByText(/failed to load/i)).toBeInTheDocument();
@@ -324,6 +330,7 @@ describe('AiIntegrationsConfigurationPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
     renderPage();
     expect(screen.getByText(/no ai.*integrations/i)).toBeInTheDocument();
