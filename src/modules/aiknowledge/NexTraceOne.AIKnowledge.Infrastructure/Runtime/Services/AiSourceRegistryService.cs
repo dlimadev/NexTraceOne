@@ -16,6 +16,7 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 public sealed class AiSourceRegistryService : IAiSourceRegistryService
 {
     private static readonly TimeSpan HttpHealthCheckTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan DatabaseHealthCheckTimeout = TimeSpan.FromSeconds(5);
 
     private readonly IAiSourceRepository _sourceRepository;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -89,19 +90,26 @@ public sealed class AiSourceRegistryService : IAiSourceRegistryService
     /// <summary>
     /// Realiza verificação de conectividade dependendo do tipo da fonte.
     /// Document com URL HTTP/HTTPS: HEAD request com timeout de 5 s.
-    /// Database, Telemetry, ExternalMemory: retorna estado persistido
-    /// (conectores por tipo serão adicionados progressivamente).
+    /// Database: testa conectividade PostgreSQL via Npgsql (ou fallback a estado persistido).
+    /// ExternalMemory: HEAD request se ConnectionInfo for HTTP/HTTPS.
+    /// Telemetry: retorna estado persistido.
     /// </summary>
     private async Task<(bool IsHealthy, string Message)> PerformConnectivityCheckAsync(
         AiSource source, CancellationToken ct)
     {
-        if (source.SourceType == AiSourceType.Document
+        if ((source.SourceType == AiSourceType.Document || source.SourceType == AiSourceType.ExternalMemory)
             && IsHttpUrl(source.ConnectionInfo))
         {
             return await CheckHttpConnectivityAsync(source.ConnectionInfo, ct);
         }
 
-        // Para tipos sem conector HTTP, reportar o estado persistido
+        if (source.SourceType == AiSourceType.Database
+            && IsConnectionString(source.ConnectionInfo))
+        {
+            return await CheckDatabaseConnectivityAsync(source.ConnectionInfo, ct);
+        }
+
+        // Para tipos sem conector específico, reportar o estado persistido
         var isHealthy = string.Equals(source.HealthStatus, "Healthy", StringComparison.OrdinalIgnoreCase);
         return (isHealthy, source.HealthStatus);
     }
@@ -142,6 +150,41 @@ public sealed class AiSourceRegistryService : IAiSourceRegistryService
     private static bool IsHttpUrl(string connectionInfo)
         => connectionInfo.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
            || connectionInfo.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Verifica conectividade com uma base de dados PostgreSQL via Npgsql.
+    /// Executa apenas um Open/Close rápido — não executa queries.
+    /// </summary>
+    private async Task<(bool IsHealthy, string Message)> CheckDatabaseConnectivityAsync(
+        string connectionString, CancellationToken ct)
+    {
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(DatabaseHealthCheckTimeout);
+
+            await using var connection = new Npgsql.NpgsqlConnection(connectionString);
+            await connection.OpenAsync(cts.Token);
+
+            _logger.LogDebug("Database health check succeeded for AI source");
+            return (true, "Database connection successful");
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Database health check timed out after {Timeout}s", DatabaseHealthCheckTimeout.TotalSeconds);
+            return (false, "Database connection timed out");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Database health check failed for AI source");
+            return (false, $"Database connection failed: {ex.Message}");
+        }
+    }
+
+    private static bool IsConnectionString(string connectionInfo)
+        => connectionInfo.Contains("Host=", StringComparison.OrdinalIgnoreCase)
+           || connectionInfo.Contains("Server=", StringComparison.OrdinalIgnoreCase)
+           || connectionInfo.Contains("Data Source=", StringComparison.OrdinalIgnoreCase);
 
     private static AiSourceInfo MapToInfo(AiSource source) =>
         new(

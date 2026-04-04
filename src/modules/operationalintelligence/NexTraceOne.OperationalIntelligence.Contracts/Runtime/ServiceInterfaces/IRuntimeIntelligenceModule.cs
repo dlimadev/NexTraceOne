@@ -21,4 +21,23 @@ public interface IRuntimeIntelligenceModule
     /// Retorna null se o perfil de observabilidade ainda não foi avaliado.
     /// </summary>
     Task<decimal?> GetObservabilityScoreAsync(string serviceName, string environment, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém métricas agregadas de runtime (latência média e taxa de erro) para um serviço.
+    /// Calcula a média dos snapshots mais recentes (últimas 24 horas).
+    /// Retorna null se nenhum snapshot de runtime foi capturado.
+    /// </summary>
+    Task<ServiceRuntimeMetrics?> GetServiceMetricsAsync(string serviceName, string environment, CancellationToken cancellationToken = default);
 }
+
+/// <summary>
+/// Métricas de runtime agregadas para um serviço num ambiente específico.
+/// Valores derivados dos RuntimeSnapshots mais recentes.
+/// AverageLatencyMs: latência média em milissegundos.
+/// ErrorRate: taxa de erro como fração entre 0 e 1 (ex: 0.05 = 5%).
+/// SampleCount: número de snapshots usados no cálculo.
+/// </summary>
+public sealed record ServiceRuntimeMetrics(
+    long AverageLatencyMs,
+    decimal ErrorRate,
+    int SampleCount);

@@ -86,10 +86,7 @@ public static class GetApiHealth
                 : null;
 
             // Query runtime metrics via IRuntimeIntelligenceModule for latency/error rate.
-            // Note: AverageLatencyMs and ErrorRate remain null until the RuntimeIntelligence module
-            // aggregates actual telemetry metrics from the observability pipeline. The module currently
-            // provides health status only. When metric aggregation is implemented, populate these fields
-            // from IRuntimeIntelligenceModule.
+            // These fields are populated from RuntimeSnapshots (last 24h average) when data is available.
             long? averageLatencyMs = null;
             decimal? errorRate = null;
 
@@ -106,6 +103,16 @@ public static class GetApiHealth
                 if (runtimeHealth is "Degraded" or "Critical" && healthStatus == "Healthy")
                 {
                     healthStatus = runtimeHealth;
+                }
+
+                // Populate latency and error rate from runtime metric aggregation
+                var metrics = await runtimeIntelligenceModule.GetServiceMetricsAsync(
+                    serviceName, "production", cancellationToken);
+
+                if (metrics is not null)
+                {
+                    averageLatencyMs = metrics.AverageLatencyMs;
+                    errorRate = metrics.ErrorRate;
                 }
             }
 
