@@ -78,13 +78,17 @@ public static class GetApisIConsume
 
                 if (isDeprecated) deprecations++;
 
+                // Compute breaking changes from semantic diff data
+                var hasBreakingChanges = latestContract?.Diffs.Any(d => d.BreakingChanges.Count > 0) ?? false;
+                if (hasBreakingChanges) breakingChanges++;
+
                 items.Add(new ConsumedApiDto(
                     ApiAssetId: sub.ApiAssetId,
                     ApiName: apiAsset?.Name ?? "Unknown",
                     CurrentVersion: latestContract?.SemVer,
                     LatestVersion: latestContract?.SemVer,
                     Status: latestContract?.LifecycleState.ToString() ?? "Unknown",
-                    HasBreakingChanges: false,
+                    HasBreakingChanges: hasBreakingChanges,
                     IsDeprecated: isDeprecated,
                     DeprecationDate: latestContract?.DeprecationDate,
                     LastChange: latestContract?.UpdatedAt,

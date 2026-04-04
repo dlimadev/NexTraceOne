@@ -5,15 +5,17 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 
 namespace NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth;
 
 /// <summary>
 /// Feature: GetApiHealth — retorna indicadores de saúde e disponibilidade de uma API.
-/// Compõe health status a partir do estado do contrato, deployments e ownership.
-/// Métricas de runtime (SLO, latência, error rate) aguardam integração cross-module
-/// com RuntimeIntelligence.
+/// Compõe health status a partir do estado do contrato, deployments, ownership e
+/// métricas de runtime via IRuntimeIntelligenceModule.
 /// </summary>
 public static class GetApiHealth
 {
@@ -31,12 +33,13 @@ public static class GetApiHealth
 
     /// <summary>
     /// Handler que retorna indicadores de saúde da API.
-    /// Constrói health status a partir do contrato e deployments.
-    /// Métricas de runtime (SLO, latência, error rate) aguardam IRuntimeIntelligenceModule.
+    /// Constrói health status a partir do contrato, deployments e métricas de runtime.
     /// </summary>
     public sealed class Handler(
         IContractVersionRepository contractVersionRepository,
-        IContractDeploymentRepository contractDeploymentRepository) : IQueryHandler<Query, Response>
+        IContractDeploymentRepository contractDeploymentRepository,
+        IApiAssetRepository apiAssetRepository,
+        IRuntimeIntelligenceModule runtimeIntelligenceModule) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -82,12 +85,32 @@ public static class GetApiHealth
                 ? latestContract.Sla.AvailabilityTarget
                 : null;
 
+            // Query runtime metrics via IRuntimeIntelligenceModule for latency/error rate
+            long? averageLatencyMs = null;
+            decimal? errorRate = null;
+
+            var apiAsset = await apiAssetRepository.GetByIdAsync(
+                ApiAssetId.From(request.ApiAssetId), cancellationToken);
+
+            if (apiAsset?.OwnerService is not null)
+            {
+                var serviceName = apiAsset.OwnerService.Name;
+                var runtimeHealth = await runtimeIntelligenceModule.GetCurrentHealthStatusAsync(
+                    serviceName, "production", cancellationToken);
+
+                // If runtime reports degraded/unhealthy and contract says Healthy, refine the status
+                if (runtimeHealth is "Degraded" or "Critical" && healthStatus == "Healthy")
+                {
+                    healthStatus = runtimeHealth;
+                }
+            }
+
             return Result<Response>.Success(new Response(
                 ApiAssetId: request.ApiAssetId,
                 HealthStatus: healthStatus,
                 SloCompliance: sloCompliance,
-                AverageLatencyMs: null, // Requires IRuntimeIntelligenceModule
-                ErrorRate: null,        // Requires IRuntimeIntelligenceModule
+                AverageLatencyMs: averageLatencyMs,
+                ErrorRate: errorRate,
                 LastDeploymentStatus: lastDeploymentStatus,
                 LastCheckedAt: DateTimeOffset.UtcNow));
         }
