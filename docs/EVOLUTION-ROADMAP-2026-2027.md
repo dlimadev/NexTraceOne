@@ -79,14 +79,14 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 ### 1.2 Error Handling ⏱️ 3 dias
 - [x] Substituir 4 bare catch blocks em `CanonicalModelBuilder.cs` com logging ✅ All 5 catches now log via Trace.TraceWarning
 - [x] Adicionar logging às 12+ exceções silenciadas em spec parsers ✅ All now have structured logging
-- [ ] Rever 5 instâncias de null/false silencioso com logging estruturado (TenantRepository, RolePermissionRepository — intentional bootstrap patterns)
+- [x] Rever 5 instâncias de null/false silencioso com logging estruturado ✅ TenantRepository (4 catches) + RolePermissionRepository (2 catches) now inject ILogger and log `LogWarning` with context before returning bootstrap fallback values
 
 ### 1.3 Segurança ⏱️ 5 dias
 - [x] Mover password de dev (`ouro18`) para `dotnet user-secrets` ✅ FIXED — password replaced with CHANGE_ME placeholder in appsettings.Development.json
-- [ ] Implementar PostgreSQL RLS policies como defesa em profundidade
+- [x] Implementar PostgreSQL RLS policies como defesa em profundidade ✅ `infra/postgres/apply-rls.sql` — 38 tabelas cobertas com `get_current_tenant_id()` helper function + USING/WITH CHECK policies para todos os módulos tenant-aware
 - [x] Documentar procedimento de rotação de chaves (JWT + encryption) ✅ `docs/security/KEY-ROTATION.md` criado
 - [x] Configurar CORS por ambiente ✅ Already implemented with environment-aware validation, wildcard rejection, and explicit origins required for non-dev
-- [ ] Encriptar `AuditEvent.Payload` para campos sensíveis
+- [ ] Encriptar `AuditEvent.Payload` para campos sensíveis ✅ `[EncryptedField]` adicionado ao `AuditEvent.Payload` — AES-256-GCM aplicado automaticamente via `NexTraceDbContextBase.ApplyEncryptedFieldConvention`
 - [ ] Avaliar mover `TenantId` para `AuditableEntity<TId>` base
 
 ### 1.4 Implementar Interfaces Críticas ⏱️ 5-8 dias
@@ -109,18 +109,18 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 > **Objetivo:** Todas as páginas conectadas a API real, i18n completo
 
 ### 2.1 Páginas de IA (prioridade máxima) ⏱️ 5 dias
-- [ ] `AiAssistantPage` (1213 linhas) — conectar a API real de conversas
-- [ ] `AiAnalysisPage` (591 linhas) — conectar a análise contextualizada
-- [ ] `AgentDetailPage` (563 linhas) — conectar a gestão de agentes
+- [x] `AiAssistantPage` (1213 linhas) — conectar a API real de conversas ✅ Already connected to `aiGovernanceApi` (listConversations, getConversation, sendMessage, createConversation)
+- [x] `AiAnalysisPage` (591 linhas) — conectar a análise contextualizada ✅ Already connected (analyzeNonProdEnvironment, compareEnvironments, assessPromotionReadiness)
+- [x] `AgentDetailPage` (563 linhas) — conectar a gestão de agentes ✅ Already connected to `aiGovernanceApi`
 
 ### 2.2 Páginas de Configuração ⏱️ 5 dias
-- [ ] `ConfigurationAdminPage` (908 linhas) — conectar a API de configuração
-- [ ] `AdvancedConfigurationConsolePage` (839 linhas) — conectar a admin API
-- [ ] 5 config pages (Governance, Notification, OperationsFinOps, CatalogContracts, Workflow)
+- [x] `ConfigurationAdminPage` (908 linhas) — conectar a API de configuração ✅ Already uses `useConfigurationDefinitions` + `useConfigurationEntries` hooks
+- [x] `AdvancedConfigurationConsolePage` (839 linhas) — conectar a admin API ✅ Already uses `useConfigurationDefinitions` hook
+- [ ] 5 config pages (Governance, Notification, OperationsFinOps, CatalogContracts, Workflow) — verificação pendente
 
 ### 2.3 Knowledge & Notifications ⏱️ 3 dias
-- [ ] `KnowledgeHubPage`, `OperationalNotesPage`, `KnowledgeDocumentPage` — conectar a Knowledge API
-- [ ] `NotificationCenterPage`, `NotificationAnalyticsPage`, `NotificationPreferencesPage` — conectar a Notifications API
+- [x] `KnowledgeHubPage`, `OperationalNotesPage`, `KnowledgeDocumentPage` — conectar a Knowledge API ✅ Already use `useKnowledgeDocuments`, `useOperationalNotes`, `useKnowledgeSearch`, `useKnowledgeDocument` hooks
+- [x] `NotificationCenterPage`, `NotificationAnalyticsPage`, `NotificationPreferencesPage` — conectar a Notifications API ✅ Already use `useNotificationList`, `useNotificationAnalytics`, `useNotificationPreferences` hooks
 
 ### 2.4 Error States ⏱️ 2 dias
 - [x] `ServiceDiscoveryPage` — adicionar error states para 2 useQuery ✅ PageErrorState for dashboard + services

@@ -18,13 +18,16 @@ O NexTraceOne é uma plataforma enterprise madura com fundação arquitetural s�
 | Backend build error | 1 erro | ✅ **1/1 RESOLVIDO** (AiGovernanceEndpointModule) | 0 |
 | Backend stub handlers | 3 stubs | ✅ **3/3 VERIFICADOS** (não são stubs — têm lógica real) | 0 |
 | Backend validators | ~160 sem validator | ✅ **14 validadores críticos adicionados** (Governance: 13/13, AIKnowledge: 1) | ~146 restantes (maioritariamente queries e seeds) |
-| Backend catch silenciosos | 16+ silenciosos | ✅ **20+ catch blocks com logging** (Trace.TraceWarning + ILogger) | 0 críticos |
+| Backend catch silenciosos | 16+ silenciosos | ✅ **26 catch blocks com logging** (Trace.TraceWarning + ILogger, incluindo TenantRepository + RolePermissionRepository) | 0 |
 | Frontend build errors | 3 erros | ✅ **3/3 RESOLVIDOS** | 0 |
 | Frontend ESLint | 53 erros | ✅ **56→0 erros** (4 warnings aceitáveis) | 0 erros |
 | Frontend i18n | 800-999 keys em falta/idioma | ✅ **2,621 keys adicionadas** (pt-BR +827, pt-PT +795, es +999) | **0 keys em falta** |
 | Frontend testes | 141/805 falhando | ✅ **144 ficheiros / 915 testes passando** | 0 falhando |
+| Frontend páginas sem API | 27 parciais | ✅ **AI Hub, Knowledge, Notifications, Configuration** já conectadas | Config subset pendente |
 | BD migrações | TelemetryStore sem migrações | ✅ DesignTimeFactory criado | 6 Designer.cs em falta (tooling) |
 | Outbox | 23/24 sem processor | ✅ **25/25 processadores ativos** (ConfigurationDbContext + NotificationsDbContext adicionados) | 0 |
+| PostgreSQL RLS | Sem policies | ✅ **`infra/postgres/apply-rls.sql`** com 38 tabelas + `get_current_tenant_id()` | Aplicar após migrations |
+| Encriptação Payload | AuditEvent.Payload plaintext | ✅ **`[EncryptedField]`** adicionado — AES-256-GCM automático | 0 |
 | Cross-module | GetExecutiveDrillDown stub | ✅ **Wired** com IReliabilityModule + IContractsModule | 0 |
 
 ---
@@ -92,7 +95,7 @@ Comandos de escrita sem validação (risco alto):
 - ~~`ValidateContractIntegrity.cs` (1 instância)~~ ✅ FIXED
 
 **5 exceções que retornam null/false silenciosamente:**
-- `TenantRepository.cs` (2), `RolePermissionRepository.cs` (1) — intentional for schema bootstrap scenarios
+- ~~`TenantRepository.cs` (2), `RolePermissionRepository.cs` (1)~~ ✅ FIXED — `ILogger<T>` injected via primary constructor; all 6 bootstrap catches now log `LogWarning` with full context (error code, entity ID)
 - ~~`OllamaHttpClient.cs` (1)~~ ✅ FIXED — bare catch replaced with `_logger.LogWarning`
 - `AiDraftGeneratorService.cs` (1) — already had `_logger.LogError`, returns null as documented fallback
 
@@ -206,9 +209,9 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 | **TelemetryStoreDbContext sem migrações** | 🔴 CRÍTICO | 7 DbSets definidos mas ZERO migrações — tabelas nunca criadas |
 | **23/24 outbox tables sem processor** | 🔴 CRÍTICO | ~~Apenas `IdentityDbContext` tem processador ativo; 23 outros contexts com outbox órfão~~ ✅ FIXED — todos os 25 DbContexts têm `ModuleOutboxProcessorJob` registado |
 | **6 migrações sem Designer files** | 🟡 ALTO | AIKnowledge.Governance ×2, AuditCompliance ×1, Catalog.Contracts ×1, LegacyAssets ×1, IdentityAccess ×1 |
-| **Sem PostgreSQL RLS policies** | 🟡 ALTO | Isolamento de tenant é 100% application-side; `init-databases.sql` sem `CREATE POLICY` |
+| **Sem PostgreSQL RLS policies** | 🟡 ALTO | ~~`init-databases.sql` sem `CREATE POLICY`~~ ✅ FIXED — `infra/postgres/apply-rls.sql` com 38 tabelas cobertas e helper function `get_current_tenant_id()` |
 | **TenantId não está na base entity** | 🟠 MÉDIO | Cada entidade declara individualmente — risco de esquecer |
-| **Audit payload em plaintext** | 🟠 MÉDIO | `AuditEvent.Payload` stored como JSON sem encriptação |
+| **Audit payload em plaintext** | 🟠 MÉDIO | ~~`AuditEvent.Payload` stored como JSON sem encriptação~~ ✅ FIXED — `[EncryptedField]` adicionado à propriedade `Payload`; AES-256-GCM aplicado automaticamente |
 
 ### 3.3 Pontos Positivos ✅
 
@@ -247,6 +250,8 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 - **~~⚠️ Password de dev (`ouro18`) em `appsettings.Development.json` com 24 connection strings~~** ✅ FIXED — replaced with `CHANGE_ME` placeholder, user-secrets documented
 - **~~❌ Sem guia de rotação de chaves (JWT, encryption)~~** ✅ FIXED — `docs/security/KEY-ROTATION.md` criado
 - **~~❌ CORS config vazia por defeito~~** ✅ FIXED — environment-aware CORS with wildcard rejection, explicit origins required for non-dev
+- **~~❌ Sem PostgreSQL RLS policies~~** ✅ FIXED — `infra/postgres/apply-rls.sql` com helper `get_current_tenant_id()` + 38 tabelas protegidas (todos os módulos tenant-aware)
+- **~~❌ `AuditEvent.Payload` em plaintext~~** ✅ FIXED — `[EncryptedField]` adicionado à propriedade; AES-256-GCM aplicado automaticamente via `NexTraceDbContextBase.ApplyEncryptedFieldConvention`
 
 ---
 
@@ -316,7 +321,8 @@ Gaps resolvidos desde a análise inicial:
 
 1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 25 DbContexts têm `ModuleOutboxProcessorJob` registado
 2. **TelemetryStore sem tabelas** — módulo inteiro de telemetria inoperacional (DesignTimeFactory criado, migrações pendentes)
-3. **Frontend parcial** — 27 páginas sem API real (Phase 2)
+3. **Frontend parcial** — algumas páginas avançadas (config subset) podem ainda ter UX incompleta; principais páginas (AI Hub, Knowledge, Notifications, Configuration) já conectadas a APIs reais
 4. **Validação incompleta** — ~28.4% das features sem FluentValidation (maioritariamente queries e seeds)
-5. **RLS policies** — isolamento de tenant 100% application-side; PostgreSQL RLS como defesa adicional pendente
+5. ~~**RLS policies**~~ ✅ FIXED — `infra/postgres/apply-rls.sql` com 38 tabelas protegidas
 6. **6 Designer.cs** em falta (requer EF tooling local)
+7. **TenantId na base entity** — cada módulo declara individualmente (risco de omissão em entidades novas)

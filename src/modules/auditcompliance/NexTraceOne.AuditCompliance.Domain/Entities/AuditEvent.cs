@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 
+using NexTraceOne.BuildingBlocks.Core.Attributes;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
@@ -34,7 +35,8 @@ public sealed class AuditEvent : AggregateRoot<AuditEventId>
     /// <summary>Tenant onde a ação ocorreu.</summary>
     public Guid TenantId { get; private set; }
 
-    /// <summary>Payload serializado com detalhes adicionais do evento.</summary>
+    /// <summary>Payload serializado com detalhes adicionais do evento. Encriptado em repouso via AES-256-GCM.</summary>
+    [EncryptedField]
     public string? Payload { get; private set; }
 
     /// <summary>Identificador de correlação distribuída, quando aplicável.</summary>
