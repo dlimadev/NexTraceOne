@@ -27,6 +27,7 @@ O NexTraceOne é uma plataforma enterprise madura com fundação arquitetural s�
 | Frontend páginas sem API | 27 parciais | ✅ **Todas as páginas principais conectadas**: AI Hub, Knowledge, Notifications, Configuration (2 gerais + 5 domínio-específicas) | 0 páginas sem API |
 | BD migrações | TelemetryStore sem migrações | ✅ DesignTimeFactory criado | 6 Designer.cs em falta (tooling) |
 | Outbox | 23/24 sem processor | ✅ **25/25 processadores ativos** (ConfigurationDbContext + NotificationsDbContext adicionados) | 0 |
+| Outbox testes cross-module | 1 cenário (happy path) | ✅ **3/3 cenários críticos** em `OutboxCrossModuleScenariosTests.cs` — retry transient, dead-letter | 0 |
 | PostgreSQL RLS | Sem policies | ✅ **`infra/postgres/apply-rls.sql`** com 38 tabelas + `get_current_tenant_id()` | Aplicar após migrations |
 | Encriptação Payload | AuditEvent.Payload plaintext | ✅ **`[EncryptedField]`** adicionado — AES-256-GCM automático | 0 |
 | Cross-module | GetExecutiveDrillDown stub | ✅ **Wired** com IReliabilityModule + IContractsModule | 0 |

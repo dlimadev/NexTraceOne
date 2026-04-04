@@ -52,13 +52,13 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 
 ### 0.3 Database Critical ⏱️ 2 dias
 - [x] Gerar migração `InitialCreate` para `TelemetryStoreDbContext` (7 DbSets sem tabelas) — DesignTimeFactory created
-- [ ] Regenerar 6 Designer files em falta (EF tooling)
+- [ ] Regenerar 6 Designer files em falta (EF tooling) — requer `dotnet ef dbcontext scaffold` com PostgreSQL activo; não executável em sandbox. Executar localmente com: `dotnet ef migrations add <Name> --project <InfraProject> --startup-project src/platform/NexTraceOne.ApiHost`
 - [x] Documentar processo de migração ✅ `scripts/db/apply-migrations.sh` com todos os 25 DbContexts mapeados
 
 ### 0.4 Outbox Processing ⏱️ 3-5 dias
 - [x] Wire `OutboxProcessorJob` para todos os 25 DbContexts ✅ ConfigurationDbContext + NotificationsDbContext adicionados (Program.cs + csproj)
 - [x] Documentar quais contexts têm outbox: todos os 25 que herdam `NexTraceDbContextBase` ✅ comentários no Program.cs
-- [ ] Testar comunicação cross-module via outbox para 3 cenários críticos
+- [x] Testar comunicação cross-module via outbox para 3 cenários críticos ✅ `OutboxCrossModuleScenariosTests.cs` — Cenário 1 (happy path, em `OutboxEndToEndFlowTests`), Cenário 2 (retry after transient failure), Cenário 3 (exhausted retries / dead-letter behaviour)
 
 ---
 
