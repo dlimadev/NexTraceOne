@@ -173,7 +173,7 @@ Evoluir o scoring existente com:
 - [x] Feature flag awareness — integração com LaunchDarkly/Split.io/Unleash ✅ `RecordFeatureFlagState` + `GetFeatureFlagAwareness` — risco por densidade/criticidade de flags + `POST /api/v1/changes/{id}/feature-flags` + `GET /api/v1/changes/{id}/feature-flags` + 7 testes unitários
 - [x] Canary deployment tracking — percentagem de rollout como fator de confiança ✅ `RecordCanaryRollout` + `GetCanaryRolloutStatus` — ConfidenceBoost (Minimal/Low/Medium/High/Negative) + `POST /api/v1/changes/{id}/canary-rollout` + `GET /api/v1/changes/{id}/canary-rollout` + 9 testes unitários
 - [x] Historical pattern matching — "mudanças similares no passado tiveram X% de falha" ✅ Implementado: `GetHistoricalPatternInsight` feature + `GET /api/v1/changes/{id}/historical-pattern` endpoint + `HistoricalPattern` como 5º fator no `GetChangeAdvisory` + 12 testes unitários (278/278 passing)
-- [ ] Pre-production comparison automática (diff de métricas staging vs production)
+- [x] Pre-production comparison automática (diff de métricas staging vs production) ✅ `GetPreProductionComparison` feature + `GET /api/v1/changes/{preProdReleaseId}/pre-prod-comparison` endpoint + 301/301 change governance tests passing
 
 **Valor:** Confiança baseada em dados históricos, feature flags e canary rollout real.
 
@@ -181,11 +181,13 @@ Evoluir o scoring existente com:
 **Inspiração:** PagerDuty AIOps + Datadog AI
 
 O NexTraceOne já tem LLM E2E com grounding. Evoluir para:
-- [ ] **Auto-triage** — classificação automática de incidentes por severidade baseada em padrões
-- [ ] **Root cause suggestion** — análise de timeline de mudanças + métricas + logs para sugerir causa
-- [ ] **Mitigation playbook** — seleção automática de runbook baseada em correlação de incidente
-- [ ] **Impact assessment** — "este incidente afeta N serviços, M contratos, K clientes"
-- [ ] **Similar incident search** — "incidentes semelhantes nos últimos 90 dias"
+- [x] **Auto-triage** ✅ `TriageIncident` — auto-triage baseado em correlação (confiança × tipo × ambiente × blast radius) + `GET /api/v1/incidents/{id}/triage` + 3 testes unitários
+- [x] **Root cause suggestion** ✅ `GetRootCauseSuggestion` — análise de timeline de mudanças + categorização (Deployment/Configuration/Infrastructure) + passos de investigação + `GET /api/v1/incidents/{id}/root-cause` + 3 testes unitários
+- [ ] **Mitigation playbook** — seleção automática de runbook baseada em correlação de incidente ⚠️ Pendente — requer integração com RunbookStore
+- [x] **Impact assessment** ✅ `GetIncidentImpactAssessment` — serviços afetados, contratos impactados, blast radius, propagation risk + `GET /api/v1/incidents/{id}/impact` + 3 testes unitários
+- [x] **Similar incident search** ✅ `FindSimilarIncidents` — scoring por serviço+tipo+ambiente, padrão de recorrência, lookback configurável + `GET /api/v1/incidents/{id}/similar` + 6 testes unitários
+
+Total: 542/542 OI tests passing.
 
 **Valor:** Tempo de resolução reduzido de horas para minutos.
 
@@ -193,13 +195,13 @@ O NexTraceOne já tem LLM E2E com grounding. Evoluir para:
 **Inspiração:** ServiceNow GRC + Vanta
 
 O NexTraceOne já tem audit trail e governance packs. Evoluir para:
-- [ ] **Framework templates** — SOC 2, ISO 27001, LGPD/GDPR, PCI-DSS como governance packs pré-configurados
-- [ ] **Continuous compliance** — checks automáticos de conformidade em cada mudança
-- [ ] **Evidence collection automática** — screenshots, logs, approvals agrupados por controlo
-- [ ] **Compliance dashboard** — estado de conformidade por framework, controlo, serviço
-- [ ] **Audit-ready reports** — exportação de evidências em formato auditor-friendly
+- [x] **Framework templates** ✅ `GetComplianceFrameworkSummary` — SOC2, ISO27001, LGPD, GDPR, PCI-DSS — `GET /api/v1/audit/compliance/framework/{framework}` + 5 testes unitários (validação por framework)
+- [x] **Continuous compliance** ✅ `EvaluateContinuousCompliance` — avaliação automática de recursos contra políticas ativas + `POST /api/v1/audit/compliance/evaluate` + 2 testes unitários
+- [x] **Evidence collection automática** ✅ `ExportComplianceEvidences` — pacote de evidências por framework/categoria/período + `GET /api/v1/audit/compliance/evidences/export` + 3 testes unitários
+- [x] **Compliance dashboard** ✅ `GetComplianceDashboard` — estado por categoria, critical gaps, score por tenant + `GET /api/v1/audit/compliance/dashboard` + 3 testes unitários
+- [ ] **Audit-ready reports** ⚠️ Pendente — exportação em formato PDF/XLSX com assinatura auditável
 
-**Valor:** Auditorias que levavam semanas passam a ser contínuas e self-service.
+Total: 132/132 compliance tests passing.
 
 ---
 

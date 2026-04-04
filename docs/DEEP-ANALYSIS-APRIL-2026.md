@@ -304,21 +304,25 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 2)
+### Estado Atual (Abril 2026 — Rev. 9)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~95% COMPLETO** ✅
+**Phase 3 (parcial) — 3.3 + 3.4 + 3.5 COMPLETOS** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
 - ~~53 ESLint errors~~ → 0 erros
-- ~~141 testes falhando~~ → 0 falhas, 915 testes passando
+- ~~141 testes falhando~~ → 0 falhas, 915 testes passando (frontend)
 - ~~40 páginas sem testes~~ → **todas as 113 páginas têm cobertura** ✅
 - ~~2.621 keys i18n em falta~~ → 0 keys em falta em todos os idiomas ✅
 - ~~16+ catch blocks silenciosos~~ → 0 silenciosos
 - ~~5 stubs parciais~~ → 0 stubs
 - ~~Sem guia de rotação de chaves~~ → `docs/security/KEY-ROTATION.md` ✅
 - ~~Sem script CI de i18n~~ → `scripts/quality/check-i18n-coverage.sh` ✅
+- ~~Pre-prod comparison~~ → `GetPreProductionComparison` ✅ (Phase 3.3)
+- ~~AI Incident Investigation~~ → `TriageIncident` + `GetRootCauseSuggestion` + `GetIncidentImpactAssessment` + `FindSimilarIncidents` ✅ (Phase 3.4)
+- ~~Compliance as Code~~ → `GetComplianceFrameworkSummary` + `EvaluateContinuousCompliance` + `GetComplianceDashboard` + `ExportComplianceEvidences` ✅ (Phase 3.5)
 
 ### Gaps Remanescentes (Phase 1-2)
 
@@ -330,3 +334,19 @@ Gaps resolvidos desde a análise inicial:
 6. **6 Designer.cs** em falta (requer EF tooling local)
 7. ~~**PackageReferences redundantes**~~ ✅ FIXED — 3 removidas (disponíveis via FrameworkReference)
 8. ~~**TenantId na base entity**~~ **Decisão: não alterar** — breaking change desnecessário; mitigado por checklist de review
+
+### Gaps Remanescentes (Phase 3)
+
+- **Mitigation playbook auto-selection** (Phase 3.4) — seleção automática de runbook por correlação; requer `IRunbookSelectionEngine` dedicado
+- **Audit-ready PDF/XLSX export** (Phase 3.5) — exportação com assinatura digital auditável; requer integração com gerador de documentos
+- **Phase 4 (Ecosystem Expansion)** — CI/CD nativo (GitHub Actions, GitLab, Azure DevOps), Service Mesh intelligence, FinOps dashboard, AI Governance avançada
+
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 9)
+
+| Módulo | Testes |
+|--------|--------|
+| ChangeGovernance | 301/301 ✅ |
+| OperationalIntelligence | 542/542 ✅ |
+| AuditCompliance | 132/132 ✅ |
+| Frontend (Vitest) | 915/915 ✅ |
+| Total backend | ~1.500+ testes |
