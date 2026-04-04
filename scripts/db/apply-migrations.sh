@@ -103,11 +103,17 @@ fi
 
 # ── DbContexts mapeados por banco ─────────────────────────────────────────────
 declare -A CONTEXT_DB_MAP=(
+  # Identity (database: nextraceone_identity)
   ["NexTraceOne.IdentityAccess.Infrastructure.Persistence.IdentityDbContext"]="IDENTITY"
   ["NexTraceOne.AuditCompliance.Infrastructure.Persistence.AuditDbContext"]="IDENTITY"
+
+  # Catalog (database: nextraceone_catalog)
   ["NexTraceOne.Catalog.Infrastructure.Graph.Persistence.CatalogGraphDbContext"]="CATALOG"
   ["NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.ContractsDbContext"]="CATALOG"
   ["NexTraceOne.Catalog.Infrastructure.Portal.Persistence.DeveloperPortalDbContext"]="CATALOG"
+  ["NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.LegacyAssetsDbContext"]="CATALOG"
+
+  # Operations (database: nextraceone_operations)
   ["NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.ChangeIntelligenceDbContext"]="OPERATIONS"
   ["NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence.RulesetGovernanceDbContext"]="OPERATIONS"
   ["NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.WorkflowDbContext"]="OPERATIONS"
@@ -115,7 +121,17 @@ declare -A CONTEXT_DB_MAP=(
   ["NexTraceOne.Governance.Infrastructure.Persistence.GovernanceDbContext"]="OPERATIONS"
   ["NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence.IncidentDbContext"]="OPERATIONS"
   ["NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.RuntimeIntelligenceDbContext"]="OPERATIONS"
+  ["NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.ReliabilityDbContext"]="OPERATIONS"
   ["NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.CostIntelligenceDbContext"]="OPERATIONS"
+  ["NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence.AutomationDbContext"]="OPERATIONS"
+  ["NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence.TelemetryStoreDbContext"]="OPERATIONS"
+  ["NexTraceOne.Integrations.Infrastructure.Persistence.IntegrationsDbContext"]="OPERATIONS"
+  ["NexTraceOne.Knowledge.Infrastructure.Persistence.KnowledgeDbContext"]="OPERATIONS"
+  ["NexTraceOne.ProductAnalytics.Infrastructure.Persistence.ProductAnalyticsDbContext"]="OPERATIONS"
+  ["NexTraceOne.Notifications.Infrastructure.Persistence.NotificationsDbContext"]="OPERATIONS"
+  ["NexTraceOne.Configuration.Infrastructure.Persistence.ConfigurationDbContext"]="OPERATIONS"
+
+  # AI (database: nextraceone_ai)
   ["NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.AiGovernanceDbContext"]="AI"
   ["NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence.ExternalAiDbContext"]="AI"
   ["NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence.AiOrchestrationDbContext"]="AI"

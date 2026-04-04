@@ -40,7 +40,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Fix `AiGovernanceEndpointModule.cs:205` — adicionar `using Microsoft.AspNetCore.Http;`
 - [ ] Resolver 24 conflitos de assembly version (EF Core 10.0.4 vs 10.0.5)
 - [ ] Remover 3 PackageReferences desnecessárias
-- [ ] Remover duplicação de xunit em `BuildingBlocks.Security.Tests.csproj`
+- [x] Remover duplicação de xunit em `BuildingBlocks.Security.Tests.csproj` ✅ Explicit `xunit` PackageReference removed (included transitively)
 
 ### 0.2 Frontend Build & Tests ⏱️ 3 dias
 - [x] Fix tipo `GovernanceSummary | undefined` em `DomainDetailPage.tsx` e `TeamDetailPage.tsx`
@@ -53,11 +53,11 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 ### 0.3 Database Critical ⏱️ 2 dias
 - [x] Gerar migração `InitialCreate` para `TelemetryStoreDbContext` (7 DbSets sem tabelas) — DesignTimeFactory created
 - [ ] Regenerar 6 Designer files em falta (EF tooling)
-- [ ] Documentar processo de migração
+- [x] Documentar processo de migração ✅ `scripts/db/apply-migrations.sh` com todos os 25 DbContexts mapeados
 
 ### 0.4 Outbox Processing ⏱️ 3-5 dias
-- [x] Wire `OutboxProcessorJob` para todos os 24 DbContexts (atualmente apenas 1/24) ✅ 23/25 already had outbox; TelemetryStore added
-- [ ] Ou: documentar intencionalmente quais contexts NÃO precisam de outbox
+- [x] Wire `OutboxProcessorJob` para todos os 25 DbContexts ✅ ConfigurationDbContext + NotificationsDbContext adicionados (Program.cs + csproj)
+- [x] Documentar quais contexts têm outbox: todos os 25 que herdam `NexTraceDbContextBase` ✅ comentários no Program.cs
 - [ ] Testar comunicação cross-module via outbox para 3 cenários críticos
 
 ---
