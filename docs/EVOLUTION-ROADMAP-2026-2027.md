@@ -170,12 +170,12 @@ O NexTraceOne já tem dependency topology básica. Evoluir para:
 **Inspiração:** Sleuth + Split.io
 
 Evoluir o scoring existente com:
-- [ ] Feature flag awareness — integração com LaunchDarkly/Split.io/Unleash
-- [ ] Canary deployment tracking — percentagem de rollout como fator de confiança
+- [x] Feature flag awareness — integração com LaunchDarkly/Split.io/Unleash ✅ `RecordFeatureFlagState` + `GetFeatureFlagAwareness` — risco por densidade/criticidade de flags + `POST /api/v1/changes/{id}/feature-flags` + `GET /api/v1/changes/{id}/feature-flags` + 7 testes unitários
+- [x] Canary deployment tracking — percentagem de rollout como fator de confiança ✅ `RecordCanaryRollout` + `GetCanaryRolloutStatus` — ConfidenceBoost (Minimal/Low/Medium/High/Negative) + `POST /api/v1/changes/{id}/canary-rollout` + `GET /api/v1/changes/{id}/canary-rollout` + 9 testes unitários
 - [x] Historical pattern matching — "mudanças similares no passado tiveram X% de falha" ✅ Implementado: `GetHistoricalPatternInsight` feature + `GET /api/v1/changes/{id}/historical-pattern` endpoint + `HistoricalPattern` como 5º fator no `GetChangeAdvisory` + 12 testes unitários (278/278 passing)
 - [ ] Pre-production comparison automática (diff de métricas staging vs production)
 
-**Valor:** Confiança baseada em dados históricos, não apenas análise estática.
+**Valor:** Confiança baseada em dados históricos, feature flags e canary rollout real.
 
 ### 3.4 AI-Powered Incident Investigation ⏱️ 10-12 dias
 **Inspiração:** PagerDuty AIOps + Datadog AI
