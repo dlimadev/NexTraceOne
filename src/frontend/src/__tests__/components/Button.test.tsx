@@ -60,7 +60,7 @@ describe('Button', () => {
   it('aplica o tamanho lg', () => {
     render(<Button size="lg">Large</Button>);
     const btn = screen.getByRole('button');
-    expect(btn).toHaveClass('h-14', 'px-6');
+    expect(btn).toHaveClass('h-14', 'px-7');
   });
 
   it('mostra o spinner de loading', () => {

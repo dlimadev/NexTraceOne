@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -16,6 +17,15 @@ public static class ProcessIngestionPayload
 {
     /// <summary>Comando para processar o payload de uma execução de ingestão.</summary>
     public sealed record Command(Guid ExecutionId, string? RawPayload) : ICommand<Response>;
+
+    /// <summary>Validates the command parameters.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ExecutionId).NotEmpty();
+        }
+    }
 
     /// <summary>
     /// Handler que carrega a execução, invoca o parser, persiste os campos extraídos
