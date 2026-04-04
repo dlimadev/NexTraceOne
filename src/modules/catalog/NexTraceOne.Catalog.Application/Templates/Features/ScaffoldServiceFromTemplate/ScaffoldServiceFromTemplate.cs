@@ -126,7 +126,9 @@ public static class ScaffoldServiceFromTemplate
         {
             var serviceName = request.ServiceName;
             var pascalCase = string.Concat(
-                serviceName.Split('-').Select(p => char.ToUpperInvariant(p[0]) + p[1..]));
+                serviceName.Split('-').Select(p => p.Length > 0
+                    ? char.ToUpperInvariant(p[0]) + (p.Length > 1 ? p[1..] : string.Empty)
+                    : string.Empty));
 
             return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {

@@ -130,17 +130,21 @@ public static class SelectMitigationPlaybook
             string? rbService, string? rbType,
             string? queryService, string? queryType)
         {
+            const decimal ServiceMatchScore = 0.5m;
+            const decimal TypeMatchScore = 0.4m;
+            const decimal TextSearchFallbackScore = 0.1m;
+
             var score = 0m;
 
             if (rbService is not null && queryService is not null &&
                 string.Equals(rbService, queryService, StringComparison.OrdinalIgnoreCase))
-                score += 0.5m;
+                score += ServiceMatchScore;
 
             if (rbType is not null && queryType is not null &&
                 string.Equals(rbType, queryType, StringComparison.OrdinalIgnoreCase))
-                score += 0.4m;
+                score += TypeMatchScore;
 
-            return score > 0 ? score : 0.1m;
+            return score > 0 ? score : TextSearchFallbackScore;
         }
 
         private static string BuildSelectionRationale(
