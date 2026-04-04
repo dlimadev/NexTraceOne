@@ -17,6 +17,7 @@ using GetIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.C
 using GetChangeAdvisoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory.GetChangeAdvisory;
 using RecordChangeDecisionFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision.RecordChangeDecision;
 using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
+using GetDoraMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDoraMetrics.GetDoraMetrics;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -188,6 +189,27 @@ internal static class ChangeConfidenceEndpoints
         {
             var result = await sender.Send(
                 new GetChangeDecisionHistoryFeature.Query(changeId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        // ── DORA Metrics ────────────────────────────────────────────
+
+        group.MapGet("/dora-metrics", async (
+            string? serviceName,
+            string? teamName,
+            string? environment,
+            int? days,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetDoraMetricsFeature.Query(
+                    serviceName,
+                    teamName,
+                    environment ?? "Production",
+                    days ?? 30),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");

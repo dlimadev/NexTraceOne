@@ -318,7 +318,8 @@
     "platformConfiguration": "Platform Configuration",
     "serviceDiscovery": "Service Discovery",
     "serviceMaturity": "Service Maturity",
-    "releaseCalendar": "Release Calendar"
+    "releaseCalendar": "Release Calendar",
+    "doraMetrics": "DORA Metrics"
   },
   "platformOps": {
     "title": "Platform Operations",
@@ -6167,5 +6168,37 @@
         "NoMonitoring": "No monitoring"
       }
     }
+  },
+  "doraMetrics": {
+    "title": "DORA Metrics",
+    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore — powered by real release and incident data.",
+    "deploymentFrequency": "Deployment Frequency",
+    "deploysPerDay": "deploys/day",
+    "totalDeploys": "Total Deploys",
+    "leadTime": "Lead Time for Changes",
+    "hours": "hours",
+    "changeFailureRate": "Change Failure Rate",
+    "failedDeploys": "Failed",
+    "rolledBackDeploys": "Rolled Back",
+    "totalDeploysLabel": "Total Deploys",
+    "timeToRestore": "Time to Restore Service",
+    "avgResolution": "Avg Resolution",
+    "overallPerformance": "Overall Performance",
+    "classification": {
+      "Elite": "Elite",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low"
+    },
+    "period": "Period",
+    "days": "{{count}} days",
+    "filterService": "Service",
+    "filterTeam": "Team",
+    "filterEnvironment": "Environment",
+    "filterDays": "Period (days)",
+    "allServices": "All services",
+    "allTeams": "All teams",
+    "apply": "Apply",
+    "noData": "No deployment data available for the selected period and filters."
   }
 }

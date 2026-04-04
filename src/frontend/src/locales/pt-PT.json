@@ -310,7 +310,8 @@
     "platformConfiguration": "Configuração da Plataforma",
     "serviceDiscovery": "Service Discovery",
     "serviceMaturity": "Maturidade de Serviços",
-    "releaseCalendar": "Calendário de Releases"
+    "releaseCalendar": "Calendário de Releases",
+    "doraMetrics": "Métricas DORA"
   },
   "platformOps": {
     "title": "Operações da Plataforma",
@@ -5306,5 +5307,37 @@
         "NoMonitoring": "Sem monitorização"
       }
     }
+  },
+  "doraMetrics": {
+    "title": "Métricas DORA",
+    "subtitle": "Frequência de Deploy, Lead Time, Taxa de Falha, Tempo de Restauração — baseado em dados reais de releases e incidentes.",
+    "deploymentFrequency": "Frequência de Deploy",
+    "deploysPerDay": "deploys/dia",
+    "totalDeploys": "Total de Deploys",
+    "leadTime": "Lead Time para Mudanças",
+    "hours": "horas",
+    "changeFailureRate": "Taxa de Falha de Mudança",
+    "failedDeploys": "Falhados",
+    "rolledBackDeploys": "Revertidos",
+    "totalDeploysLabel": "Total de Deploys",
+    "timeToRestore": "Tempo para Restaurar Serviço",
+    "avgResolution": "Resolução Média",
+    "overallPerformance": "Performance Geral",
+    "classification": {
+      "Elite": "Elite",
+      "High": "Alto",
+      "Medium": "Médio",
+      "Low": "Baixo"
+    },
+    "period": "Período",
+    "days": "{{count}} dias",
+    "filterService": "Serviço",
+    "filterTeam": "Equipa",
+    "filterEnvironment": "Ambiente",
+    "filterDays": "Período (dias)",
+    "allServices": "Todos os serviços",
+    "allTeams": "Todas as equipas",
+    "apply": "Aplicar",
+    "noData": "Sem dados de deploy disponíveis para o período e filtros selecionados."
   }
 }

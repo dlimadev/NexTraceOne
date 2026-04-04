@@ -43,6 +43,7 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => [...queryKeys.changes.all, 'list', params] as const,
     detail: (id: string) => [...queryKeys.changes.all, 'detail', id] as const,
     summary: () => [...queryKeys.changes.all, 'summary'] as const,
+    dora: (params?: Record<string, unknown>) => [...queryKeys.changes.all, 'dora', params] as const,
   },
 
   // ── Operations / Incidents ──
