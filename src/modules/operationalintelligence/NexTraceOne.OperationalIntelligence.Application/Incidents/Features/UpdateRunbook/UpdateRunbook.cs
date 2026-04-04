@@ -65,7 +65,7 @@ public static class UpdateRunbook
         {
             Guard.Against.Null(request);
 
-            var runbook = await repository.GetByIdAsync(request.RunbookId, cancellationToken);
+            var runbook = await repository.GetByIdForUpdateAsync(request.RunbookId, cancellationToken);
 
             if (runbook is null)
                 return Error.NotFound("runbook.not_found", "Runbook {0} not found.", request.RunbookId);

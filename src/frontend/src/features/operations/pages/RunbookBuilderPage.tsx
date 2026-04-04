@@ -10,6 +10,20 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type RunbookStepDto } from '../api/incidents';
 
+interface RunbookDetailResponse {
+  runbookId: string;
+  title: string;
+  summary: string;
+  linkedServiceId: string | null;
+  linkedIncidentType: string | null;
+  steps: RunbookStepDto[];
+  preconditions: string[];
+  postValidationGuidance: string | null;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
 interface RunbookFormState {
   title: string;
   description: string;
@@ -52,8 +66,7 @@ export function RunbookBuilderPage() {
     queryKey: ['runbooks', 'detail', runbookId],
     queryFn: () => incidentsApi.getRunbookDetail(runbookId!),
     enabled: isEditing,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess: (data: any) => {
+    onSuccess: (data: RunbookDetailResponse) => {
       setForm({
         title: data.title ?? '',
         description: data.summary ?? '',
@@ -171,11 +184,11 @@ export function RunbookBuilderPage() {
 
   const validate = (): boolean => {
     const errs: string[] = [];
-    if (!form.title.trim()) errs.push('Title is required');
-    if (!form.description.trim()) errs.push('Description is required');
-    if (!form.maintainedBy.trim()) errs.push('Maintained By is required');
+    if (!form.title.trim()) errs.push(t('runbooks.builder.errors.titleRequired', 'Title is required'));
+    if (!form.description.trim()) errs.push(t('runbooks.builder.errors.descriptionRequired', 'Description is required'));
+    if (!form.maintainedBy.trim()) errs.push(t('runbooks.builder.errors.maintainedByRequired', 'Maintained By is required'));
     if (form.steps.length === 0 || !form.steps.some((s) => s.title.trim()))
-      errs.push('At least one step with a title is required');
+      errs.push(t('runbooks.builder.errors.stepsRequired', 'At least one step with a title is required'));
     setErrors(errs);
     return errs.length === 0;
   };

@@ -2423,7 +2423,13 @@
       "saved": "Runbook saved successfully",
       "errorSaving": "Failed to save runbook",
       "back": "Back to Runbooks",
-      "createNew": "Create Runbook"
+      "createNew": "Create Runbook",
+      "errors": {
+        "titleRequired": "Title is required",
+        "descriptionRequired": "Description is required",
+        "maintainedByRequired": "Maintained By is required",
+        "stepsRequired": "At least one step with a title is required"
+      }
     }
   },
   "reliability": {
