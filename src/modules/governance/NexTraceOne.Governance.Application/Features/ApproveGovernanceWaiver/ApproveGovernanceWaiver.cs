@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -15,6 +16,16 @@ public static class ApproveGovernanceWaiver
     public sealed record Command(
         string WaiverId,
         string ReviewedBy) : ICommand<Response>;
+
+    /// <summary>Valida a entrada do comando de aprovação de waiver.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.WaiverId).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.ReviewedBy).NotEmpty().MaximumLength(200);
+        }
+    }
 
     /// <summary>Handler que aprova o waiver e retorna o ID confirmado.</summary>
     public sealed class Handler(

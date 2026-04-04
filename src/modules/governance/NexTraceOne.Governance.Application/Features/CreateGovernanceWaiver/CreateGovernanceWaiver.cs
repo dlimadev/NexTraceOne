@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -23,6 +24,26 @@ public static class CreateGovernanceWaiver
         string RequestedBy,
         DateTimeOffset? ExpiresAt,
         IReadOnlyList<string> EvidenceLinks) : ICommand<Response>;
+
+    /// <summary>Valida a entrada do comando de criação de waiver.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.RuleId).MaximumLength(200)
+                .When(x => x.RuleId is not null);
+            RuleFor(x => x.Scope).NotEmpty().MaximumLength(500);
+            RuleFor(x => x.ScopeType).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.Justification).NotEmpty().MaximumLength(4000);
+            RuleFor(x => x.RequestedBy).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.ExpiresAt).GreaterThan(DateTimeOffset.UtcNow)
+                .When(x => x.ExpiresAt.HasValue)
+                .WithMessage("ExpiresAt must be a future date.");
+            RuleFor(x => x.EvidenceLinks).NotNull();
+            RuleForEach(x => x.EvidenceLinks).NotEmpty().MaximumLength(2000);
+        }
+    }
 
     /// <summary>Handler que cria o waiver e retorna o ID gerado.</summary>
     public sealed class Handler(
