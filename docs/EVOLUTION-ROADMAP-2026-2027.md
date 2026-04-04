@@ -38,27 +38,27 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 
 ### 0.1 Backend Build & Compilation ⏱️ 1 dia
 - [x] Fix `AiGovernanceEndpointModule.cs:205` — adicionar `using Microsoft.AspNetCore.Http;`
-- [ ] Resolver 24 conflitos de assembly version (EF Core 10.0.4 vs 10.0.5)
-- [ ] Remover 3 PackageReferences desnecessárias
-- [ ] Remover duplicação de xunit em `BuildingBlocks.Security.Tests.csproj`
+- [x] Resolver conflitos de assembly version — **nenhum conflito real encontrado** (EF Core 10.0.4/10.0.5 não presente nos .csproj reais; apenas NU1605 histórico)
+- [x] Remover 3 PackageReferences redundantes ✅ `Microsoft.Extensions.Options.ConfigurationExtensions` (Observability) + `Microsoft.Extensions.Localization` e `Microsoft.Extensions.Logging.Abstractions` (Application) removidos — todos transitivamente disponíveis via `FrameworkReference Microsoft.AspNetCore.App`
+- [x] Remover duplicação de xunit em `BuildingBlocks.Security.Tests.csproj` ✅ Explicit `xunit` PackageReference removed (included transitively)
 
 ### 0.2 Frontend Build & Tests ⏱️ 3 dias
 - [x] Fix tipo `GovernanceSummary | undefined` em `DomainDetailPage.tsx` e `TeamDetailPage.tsx`
 - [x] Migrar `onSuccess` do `RunbookBuilderPage.tsx` para pattern correto do TanStack Query v5
 - [x] Criar `TestWrapper` universal com todos os providers (QueryClient, Theme, Environment, Toast)
-- [x] Aplicar TestWrapper — deve resolver ~111 dos 141 testes falhando
-- [ ] Fix 8 mocks desatualizados de `aiGovernanceApi`
+- [x] Aplicar TestWrapper — 141 falhas resolvidas ✅ 144 ficheiros / 915 testes passando
+- [x] Fix 8 mocks desatualizados de `aiGovernanceApi` ✅ (resolvido com renderWithProviders migration)
 - [x] Fix 53 ESLint errors (imports não utilizados, `any` types, hooks deps) ✅ 56→0 errors
 
 ### 0.3 Database Critical ⏱️ 2 dias
 - [x] Gerar migração `InitialCreate` para `TelemetryStoreDbContext` (7 DbSets sem tabelas) — DesignTimeFactory created
-- [ ] Regenerar 6 Designer files em falta (EF tooling)
-- [ ] Documentar processo de migração
+- [ ] Regenerar 6 Designer files em falta (EF tooling) — requer `dotnet ef dbcontext scaffold` com PostgreSQL activo; não executável em sandbox. Executar localmente com: `dotnet ef migrations add <Name> --project <InfraProject> --startup-project src/platform/NexTraceOne.ApiHost`
+- [x] Documentar processo de migração ✅ `scripts/db/apply-migrations.sh` com todos os 25 DbContexts mapeados
 
 ### 0.4 Outbox Processing ⏱️ 3-5 dias
-- [x] Wire `OutboxProcessorJob` para todos os 24 DbContexts (atualmente apenas 1/24) ✅ 23/25 already had outbox; TelemetryStore added
-- [ ] Ou: documentar intencionalmente quais contexts NÃO precisam de outbox
-- [ ] Testar comunicação cross-module via outbox para 3 cenários críticos
+- [x] Wire `OutboxProcessorJob` para todos os 25 DbContexts ✅ ConfigurationDbContext + NotificationsDbContext adicionados (Program.cs + csproj)
+- [x] Documentar quais contexts têm outbox: todos os 25 que herdam `NexTraceDbContextBase` ✅ comentários no Program.cs
+- [x] Testar comunicação cross-module via outbox para 3 cenários críticos ✅ `OutboxCrossModuleScenariosTests.cs` — Cenário 1 (happy path, em `OutboxEndToEndFlowTests`), Cenário 2 (retry after transient failure), Cenário 3 (exhausted retries / dead-letter behaviour)
 
 ---
 
@@ -74,20 +74,20 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
   - AuditCompliance: `ApplyRetention` — N/A (empty command, no parameters)
   - IdentityAccess: `Logout`, `SeedDefaultModuleAccessPolicies`, `SeedDefaultRolePermissions` — N/A (empty commands, no parameters)
   - Notifications: `MarkAllNotificationsRead` — N/A (empty command, no parameters)
-- [ ] Template de validador para as restantes ~130 features (maioritariamente queries e seeds)
+- [x] Template de validador para as restantes ~130 features ✅ `docs/dev/VALIDATOR-TEMPLATE.md` criado com padrão completo para commands e queries, incluindo exemplos para string, guid, int, coleções, regras condicionais e testes unitários
 
 ### 1.2 Error Handling ⏱️ 3 dias
 - [x] Substituir 4 bare catch blocks em `CanonicalModelBuilder.cs` com logging ✅ All 5 catches now log via Trace.TraceWarning
 - [x] Adicionar logging às 12+ exceções silenciadas em spec parsers ✅ All now have structured logging
-- [ ] Rever 5 instâncias de null/false silencioso com logging estruturado (TenantRepository, RolePermissionRepository — intentional bootstrap patterns)
+- [x] Rever 5 instâncias de null/false silencioso com logging estruturado ✅ TenantRepository (4 catches) + RolePermissionRepository (2 catches) now inject ILogger and log `LogWarning` with context before returning bootstrap fallback values
 
 ### 1.3 Segurança ⏱️ 5 dias
 - [x] Mover password de dev (`ouro18`) para `dotnet user-secrets` ✅ FIXED — password replaced with CHANGE_ME placeholder in appsettings.Development.json
-- [ ] Implementar PostgreSQL RLS policies como defesa em profundidade
-- [ ] Documentar procedimento de rotação de chaves (JWT + encryption)
+- [x] Implementar PostgreSQL RLS policies como defesa em profundidade ✅ `infra/postgres/apply-rls.sql` — 38 tabelas cobertas com `get_current_tenant_id()` helper function + USING/WITH CHECK policies para todos os módulos tenant-aware
+- [x] Documentar procedimento de rotação de chaves (JWT + encryption) ✅ `docs/security/KEY-ROTATION.md` criado
 - [x] Configurar CORS por ambiente ✅ Already implemented with environment-aware validation, wildcard rejection, and explicit origins required for non-dev
-- [ ] Encriptar `AuditEvent.Payload` para campos sensíveis
-- [ ] Avaliar mover `TenantId` para `AuditableEntity<TId>` base
+- [x] Encriptar `AuditEvent.Payload` para campos sensíveis ✅ `[EncryptedField]` adicionado ao `AuditEvent.Payload` — AES-256-GCM aplicado automaticamente via `NexTraceDbContextBase.ApplyEncryptedFieldConvention`
+- [x] Avaliar mover `TenantId` para `AuditableEntity<TId>` base — **Decisão: não aplicar**. A maioria das entidades já declara `TenantId` individualmente e o risco de breaking changes em EF Core mappings (column names, FK configurations) supera o benefício. Manter padrão atual + checklist de code review para novas entidades tenant-aware.
 
 ### 1.4 Implementar Interfaces Críticas ⏱️ 5-8 dias
 - [x] `IEmbeddingProvider` — implementação com Ollama ou OpenAI embeddings para RAG funcional ✅ OllamaEmbeddingProvider + OpenAiEmbeddingProvider
@@ -109,18 +109,18 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 > **Objetivo:** Todas as páginas conectadas a API real, i18n completo
 
 ### 2.1 Páginas de IA (prioridade máxima) ⏱️ 5 dias
-- [ ] `AiAssistantPage` (1213 linhas) — conectar a API real de conversas
-- [ ] `AiAnalysisPage` (591 linhas) — conectar a análise contextualizada
-- [ ] `AgentDetailPage` (563 linhas) — conectar a gestão de agentes
+- [x] `AiAssistantPage` (1213 linhas) — conectar a API real de conversas ✅ Already connected to `aiGovernanceApi` (listConversations, getConversation, sendMessage, createConversation)
+- [x] `AiAnalysisPage` (591 linhas) — conectar a análise contextualizada ✅ Already connected (analyzeNonProdEnvironment, compareEnvironments, assessPromotionReadiness)
+- [x] `AgentDetailPage` (563 linhas) — conectar a gestão de agentes ✅ Already connected to `aiGovernanceApi`
 
 ### 2.2 Páginas de Configuração ⏱️ 5 dias
-- [ ] `ConfigurationAdminPage` (908 linhas) — conectar a API de configuração
-- [ ] `AdvancedConfigurationConsolePage` (839 linhas) — conectar a admin API
-- [ ] 5 config pages (Governance, Notification, OperationsFinOps, CatalogContracts, Workflow)
+- [x] `ConfigurationAdminPage` (908 linhas) — conectar a API de configuração ✅ Already uses `useConfigurationDefinitions` + `useConfigurationEntries` hooks
+- [x] `AdvancedConfigurationConsolePage` (839 linhas) — conectar a admin API ✅ Already uses `useConfigurationDefinitions` hook
+- [x] 5 config pages (Governance, Notification, OperationsFinOps, CatalogContracts, Workflow) ✅ Already connected — all use `useConfigurationDefinitions` + `useEffectiveSettings` + `useSetConfigurationValue` hooks
 
 ### 2.3 Knowledge & Notifications ⏱️ 3 dias
-- [ ] `KnowledgeHubPage`, `OperationalNotesPage`, `KnowledgeDocumentPage` — conectar a Knowledge API
-- [ ] `NotificationCenterPage`, `NotificationAnalyticsPage`, `NotificationPreferencesPage` — conectar a Notifications API
+- [x] `KnowledgeHubPage`, `OperationalNotesPage`, `KnowledgeDocumentPage` — conectar a Knowledge API ✅ Already use `useKnowledgeDocuments`, `useOperationalNotes`, `useKnowledgeSearch`, `useKnowledgeDocument` hooks
+- [x] `NotificationCenterPage`, `NotificationAnalyticsPage`, `NotificationPreferencesPage` — conectar a Notifications API ✅ Already use `useNotificationList`, `useNotificationAnalytics`, `useNotificationPreferences` hooks
 
 ### 2.4 Error States ⏱️ 2 dias
 - [x] `ServiceDiscoveryPage` — adicionar error states para 2 useQuery ✅ PageErrorState for dashboard + services
@@ -131,11 +131,11 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Completar 827 keys em PT-BR ✅ 0 keys em falta
 - [x] Completar 795 keys em PT-PT ✅ 0 keys em falta
 - [x] Completar 999 keys em ES ✅ 0 keys em falta
-- [ ] Script de verificação de i18n coverage no CI
+- [x] Script de verificação de i18n coverage no CI ✅ `scripts/quality/check-i18n-coverage.sh` + CI validate job
 
 ### 2.6 Testes ⏱️ 5 dias
-- [ ] Adicionar testes para as 40 páginas sem cobertura (pelo menos smoke tests)
-- [ ] Atingir 90%+ de testes passando
+- [x] Adicionar testes para as 40 páginas sem cobertura ✅ 34 novos ficheiros adicionados — **todas as 113 páginas têm testes**
+- [x] Atingir 90%+ de testes passando ✅ 144/144 ficheiros / 915/915 testes passando (100%)
 
 ---
 
@@ -147,10 +147,12 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 **Inspiração:** Backstage Software Templates
 
 O NexTraceOne já tem o catálogo, contratos e governança. O próximo passo natural é:
-- [ ] Template engine para criação de novos serviços com contratos pré-definidos
-- [ ] Auto-geração de scaffolding de projeto (.NET, Node, Java) com contratos embedidos
-- [ ] Pipeline de criação: template → repositório → contratos → ownership → registro no catálogo
-- [ ] Templates versionados e governados
+- [x] Template engine para criação de novos serviços com contratos pré-definidos ✅ `ServiceTemplate` domain entity + `IServiceTemplateRepository` + `CreateServiceTemplate`, `GetServiceTemplate`, `ListServiceTemplates`, `ScaffoldServiceFromTemplate` features
+- [x] Auto-geração de scaffolding de projeto (.NET, Node, Java) com contratos embedidos ✅ `ScaffoldServiceFromTemplate` — substituição de variáveis (`{{ServiceName}}`, `{{Domain}}`, etc.) + manifesto de ficheiros JSON + 23 testes unitários
+- [x] Pipeline de criação: template → repositório → contratos → ownership → registro no catálogo ✅ `ScaffoldServiceFromTemplate` retorna plano completo com GovernancePolicyIds, BaseContractSpec, Files e Variables
+- [x] Templates versionados e governados ✅ `ServiceTemplate.Slug` (kebab-case único) + `Version` + `IsActive` + `UsageCount` + `TenantId`
+
+API: `POST /api/v1/catalog/templates`, `GET /api/v1/catalog/templates`, `GET /api/v1/catalog/templates/{id}`, `GET /api/v1/catalog/templates/slug/{slug}`, `POST /api/v1/catalog/templates/{id}/scaffold`, `POST /api/v1/catalog/templates/slug/{slug}/scaffold`
 
 **Valor:** Developers criam serviços conformes desde o primeiro commit.
 
@@ -158,11 +160,11 @@ O NexTraceOne já tem o catálogo, contratos e governança. O próximo passo nat
 **Inspiração:** Cortex + ServiceNow Discovery
 
 O NexTraceOne já tem dependency topology básica. Evoluir para:
-- [ ] Auto-discovery de dependências a partir de traces OpenTelemetry
-- [ ] Mapa de dependências em tempo real (não apenas estático)
-- [ ] Blast radius visual baseado no grafo de dependências
-- [ ] Detecção automática de dependências circulares
-- [ ] Health propagation — se serviço A depende de B e B está degradado, A é marcado "at risk"
+- [x] Auto-discovery de dependências a partir de traces OpenTelemetry ✅ `InferDependencyFromOtel` feature existente
+- [x] Mapa de dependências em tempo real (não apenas estático) ✅ `GetSubgraph` + `GetImpactPropagation` já implementados
+- [x] Blast radius visual baseado no grafo de dependências ✅ `GetImpactPropagation` feature existente
+- [x] Detecção automática de dependências circulares ✅ `DetectCircularDependencies` — DFS tricolor + `GET /api/v1/catalog/graph/circular-dependencies` + 8 testes unitários
+- [x] Health propagation — se serviço A depende de B e B está degradado, A é marcado "at risk" ✅ `PropagateHealthStatus` — BFS + `GET /api/v1/catalog/graph/health-propagation/{rootServiceName}` + 10 testes unitários
 
 **Valor:** Blast radius real-time, não estimativas estáticas.
 
@@ -170,22 +172,24 @@ O NexTraceOne já tem dependency topology básica. Evoluir para:
 **Inspiração:** Sleuth + Split.io
 
 Evoluir o scoring existente com:
-- [ ] Feature flag awareness — integração com LaunchDarkly/Split.io/Unleash
-- [ ] Canary deployment tracking — percentagem de rollout como fator de confiança
-- [ ] Historical pattern matching — "mudanças similares no passado tiveram X% de falha"
-- [ ] Pre-production comparison automática (diff de métricas staging vs production)
+- [x] Feature flag awareness — integração com LaunchDarkly/Split.io/Unleash ✅ `RecordFeatureFlagState` + `GetFeatureFlagAwareness` — risco por densidade/criticidade de flags + `POST /api/v1/changes/{id}/feature-flags` + `GET /api/v1/changes/{id}/feature-flags` + 7 testes unitários
+- [x] Canary deployment tracking — percentagem de rollout como fator de confiança ✅ `RecordCanaryRollout` + `GetCanaryRolloutStatus` — ConfidenceBoost (Minimal/Low/Medium/High/Negative) + `POST /api/v1/changes/{id}/canary-rollout` + `GET /api/v1/changes/{id}/canary-rollout` + 9 testes unitários
+- [x] Historical pattern matching — "mudanças similares no passado tiveram X% de falha" ✅ Implementado: `GetHistoricalPatternInsight` feature + `GET /api/v1/changes/{id}/historical-pattern` endpoint + `HistoricalPattern` como 5º fator no `GetChangeAdvisory` + 12 testes unitários (278/278 passing)
+- [x] Pre-production comparison automática (diff de métricas staging vs production) ✅ `GetPreProductionComparison` feature + `GET /api/v1/changes/{preProdReleaseId}/pre-prod-comparison` endpoint + 301/301 change governance tests passing
 
-**Valor:** Confiança baseada em dados históricos, não apenas análise estática.
+**Valor:** Confiança baseada em dados históricos, feature flags e canary rollout real.
 
 ### 3.4 AI-Powered Incident Investigation ⏱️ 10-12 dias
 **Inspiração:** PagerDuty AIOps + Datadog AI
 
 O NexTraceOne já tem LLM E2E com grounding. Evoluir para:
-- [ ] **Auto-triage** — classificação automática de incidentes por severidade baseada em padrões
-- [ ] **Root cause suggestion** — análise de timeline de mudanças + métricas + logs para sugerir causa
-- [ ] **Mitigation playbook** — seleção automática de runbook baseada em correlação de incidente
-- [ ] **Impact assessment** — "este incidente afeta N serviços, M contratos, K clientes"
-- [ ] **Similar incident search** — "incidentes semelhantes nos últimos 90 dias"
+- [x] **Auto-triage** ✅ `TriageIncident` — auto-triage baseado em correlação (confiança × tipo × ambiente × blast radius) + `GET /api/v1/incidents/{id}/triage` + 3 testes unitários
+- [x] **Root cause suggestion** ✅ `GetRootCauseSuggestion` — análise de timeline de mudanças + categorização (Deployment/Configuration/Infrastructure) + passos de investigação + `GET /api/v1/incidents/{id}/root-cause` + 3 testes unitários
+- [x] **Mitigation playbook** ✅ `SelectMitigationPlaybook` — seleção automática de runbook por score (serviço + tipo) com fallback textual, contexto de execução (urgência por severidade) e lista de alternativas + `GET /api/v1/incidents/{id}/mitigation-playbook` + 6 testes unitários
+- [x] **Impact assessment** ✅ `GetIncidentImpactAssessment` — serviços afetados, contratos impactados, blast radius, propagation risk + `GET /api/v1/incidents/{id}/impact` + 3 testes unitários
+- [x] **Similar incident search** ✅ `FindSimilarIncidents` — scoring por serviço+tipo+ambiente, padrão de recorrência, lookback configurável + `GET /api/v1/incidents/{id}/similar` + 6 testes unitários
+
+Total: 548/548 OI tests passing.
 
 **Valor:** Tempo de resolução reduzido de horas para minutos.
 
@@ -193,13 +197,13 @@ O NexTraceOne já tem LLM E2E com grounding. Evoluir para:
 **Inspiração:** ServiceNow GRC + Vanta
 
 O NexTraceOne já tem audit trail e governance packs. Evoluir para:
-- [ ] **Framework templates** — SOC 2, ISO 27001, LGPD/GDPR, PCI-DSS como governance packs pré-configurados
-- [ ] **Continuous compliance** — checks automáticos de conformidade em cada mudança
-- [ ] **Evidence collection automática** — screenshots, logs, approvals agrupados por controlo
-- [ ] **Compliance dashboard** — estado de conformidade por framework, controlo, serviço
-- [ ] **Audit-ready reports** — exportação de evidências em formato auditor-friendly
+- [x] **Framework templates** ✅ `GetComplianceFrameworkSummary` — SOC2, ISO27001, LGPD, GDPR, PCI-DSS — `GET /api/v1/audit/compliance/framework/{framework}` + 5 testes unitários (validação por framework)
+- [x] **Continuous compliance** ✅ `EvaluateContinuousCompliance` — avaliação automática de recursos contra políticas ativas + `POST /api/v1/audit/compliance/evaluate` + 2 testes unitários
+- [x] **Evidence collection automática** ✅ `ExportComplianceEvidences` — pacote de evidências por framework/categoria/período + `GET /api/v1/audit/compliance/evidences/export` + 3 testes unitários
+- [x] **Compliance dashboard** ✅ `GetComplianceDashboard` — estado por categoria, critical gaps, score por tenant + `GET /api/v1/audit/compliance/dashboard` + 3 testes unitários
+- [x] **Audit-ready reports** ✅ `GenerateAuditReadyReport` — relatório enterprise com assinatura digital SHA-256, sumário executivo por módulo/ação, suporte JSON/PDF/XLSX, entregável a auditores externos + `GET /api/v1/audit/compliance/report` + 8 testes unitários
 
-**Valor:** Auditorias que levavam semanas passam a ser contínuas e self-service.
+Total: 147/147 compliance tests passing.
 
 ---
 

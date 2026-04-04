@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 using NexTraceOne.IdentityAccess.Application.Abstractions;
@@ -10,7 +11,9 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 /// Repositório de mapeamentos papel→permissão persistidos via EF Core.
 /// Resolve permissões com prioridade: tenant-specific > sistema (TenantId nulo).
 /// </summary>
-internal sealed class RolePermissionRepository(IdentityDbContext context) : IRolePermissionRepository
+internal sealed class RolePermissionRepository(
+    IdentityDbContext context,
+    ILogger<RolePermissionRepository> logger) : IRolePermissionRepository
 {
     /// <inheritdoc />
     public async Task<IReadOnlyList<string>> GetPermissionCodesForRoleAsync(
@@ -45,6 +48,9 @@ internal sealed class RolePermissionRepository(IdentityDbContext context) : IRol
         {
             // Table does not exist yet (migrations not applied). Return empty result
             // to allow the application to continue in development scenarios.
+            logger.LogWarning(ex,
+                "Bootstrap: iam_role_permissions table missing (42P01) for role {RoleId}. Migration may not have been applied.",
+                roleId.Value);
             return Array.Empty<string>();
         }
     }
@@ -66,6 +72,9 @@ internal sealed class RolePermissionRepository(IdentityDbContext context) : IRol
         catch (PostgresException ex) when (ex.SqlState == "42P01")
         {
             // Table missing — treat as no mappings found.
+            logger.LogWarning(ex,
+                "Bootstrap: iam_role_permissions table missing (42P01) for HasMappingsForRoleAsync role {RoleId}. Migration may not have been applied.",
+                roleId.Value);
             return false;
         }
     }

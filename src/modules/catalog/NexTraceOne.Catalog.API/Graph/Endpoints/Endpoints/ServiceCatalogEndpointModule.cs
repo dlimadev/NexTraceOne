@@ -41,6 +41,8 @@ using IgnoreDiscoveredServiceFeature = NexTraceOne.Catalog.Application.Graph.Fea
 using GetDiscoveryDashboardFeature = NexTraceOne.Catalog.Application.Graph.Features.GetDiscoveryDashboard.GetDiscoveryDashboard;
 using ComputeServiceMaturityFeature = NexTraceOne.Catalog.Application.Graph.Features.ComputeServiceMaturity.ComputeServiceMaturity;
 using GetServiceMaturityDashboardFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceMaturityDashboard.GetServiceMaturityDashboard;
+using DetectCircularDependenciesFeature = NexTraceOne.Catalog.Application.Graph.Features.DetectCircularDependencies.DetectCircularDependencies;
+using PropagateHealthStatusFeature = NexTraceOne.Catalog.Application.Graph.Features.PropagateHealthStatus.PropagateHealthStatus;
 using GetOwnershipAuditFeature = NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipAudit.GetOwnershipAudit;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
@@ -347,6 +349,33 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetNodeHealthFeature.Query(overlayMode);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Propagação de Saúde ──────────────────────────────────────────
+
+        group.MapGet("/health-propagation/{rootServiceName}", async (
+            string rootServiceName,
+            int? maxDepth,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new PropagateHealthStatusFeature.Query(rootServiceName, maxDepth ?? 4);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Dependências Circulares ──────────────────────────────────────
+
+        group.MapGet("/circular-dependencies", async (
+            string? serviceName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new DetectCircularDependenciesFeature.Query(serviceName);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");

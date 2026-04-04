@@ -15,11 +15,16 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetInci
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentEvidence;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentMitigation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentSummary;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.FindSimilarIncidents;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentImpactAssessment;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRootCauseSuggestion;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetUnifiedTimeline;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
@@ -264,6 +269,83 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:read")
         .WithName("ListIncidentsByTeam")
         .WithSummary("List incidents by team");
+
+        // ── GET /api/v1/incidents/{id}/triage — Auto-triage de incidente ──
+        group.MapGet("/{id}/triage", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string id,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new TriageIncident.Query(id);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("TriageIncident")
+        .WithSummary("Get AI-powered auto-triage suggestion for an incident");
+
+        // ── GET /api/v1/incidents/{id}/root-cause — Sugestão de causa raiz ──
+        group.MapGet("/{id}/root-cause", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string id,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new GetRootCauseSuggestion.Query(id);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("GetRootCauseSuggestion")
+        .WithSummary("Get AI-assisted root cause suggestion based on change correlation");
+
+        // ── GET /api/v1/incidents/{id}/impact — Avaliação de impacto ──
+        group.MapGet("/{id}/impact", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string id,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new GetIncidentImpactAssessment.Query(id);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("GetIncidentImpactAssessment")
+        .WithSummary("Get impact assessment: affected services, contracts and blast radius");
+
+        // ── GET /api/v1/incidents/{id}/similar — Incidentes semelhantes ──
+        group.MapGet("/{id}/similar", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string id,
+            int lookbackDays = 90,
+            int maxResults = 10,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new FindSimilarIncidents.Query(id, lookbackDays, maxResults);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("FindSimilarIncidents")
+        .WithSummary("Find similar incidents in the last N days based on service, type and correlation patterns");
+
+        // ── GET /api/v1/incidents/{id}/mitigation-playbook — Playbook auto-selecionado ──
+        group.MapGet("/{id}/mitigation-playbook", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string id,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new SelectMitigationPlaybook.Query(id);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("SelectMitigationPlaybook")
+        .WithSummary("Auto-select the best mitigation playbook (runbook) for an incident based on triage context");
     }
 }
 

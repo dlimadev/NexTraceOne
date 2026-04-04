@@ -16,6 +16,8 @@
     <ProjectReference Include="..\..\modules\integrations\NexTraceOne.Integrations.Infrastructure\NexTraceOne.Integrations.Infrastructure.csproj" />
     <ProjectReference Include="..\..\modules\knowledge\NexTraceOne.Knowledge.Infrastructure\NexTraceOne.Knowledge.Infrastructure.csproj" />
     <ProjectReference Include="..\..\modules\productanalytics\NexTraceOne.ProductAnalytics.Infrastructure\NexTraceOne.ProductAnalytics.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\notifications\NexTraceOne.Notifications.Infrastructure\NexTraceOne.Notifications.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\modules\configuration\NexTraceOne.Configuration.Infrastructure\NexTraceOne.Configuration.Infrastructure.csproj" />
     <ProjectReference Include="..\..\modules\aiknowledge\NexTraceOne.AIKnowledge.API\NexTraceOne.AIKnowledge.API.csproj" />
     <ProjectReference Include="..\..\modules\auditcompliance\NexTraceOne.AuditCompliance.API\NexTraceOne.AuditCompliance.API.csproj" />
     <ProjectReference Include="..\..\modules\governance\NexTraceOne.Governance.API\NexTraceOne.Governance.API.csproj" />

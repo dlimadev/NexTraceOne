@@ -7,17 +7,22 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory;
 
 /// <summary>
 /// Feature: GetChangeAdvisory — gera uma recomendação de governança para uma release
-/// com base em evidências, blast radius, score e rollback readiness.
+/// com base em evidências, blast radius, score, rollback readiness e padrão histórico.
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class GetChangeAdvisory
 {
+    private const int HistoricalLookbackDays = 90;
+    private const int HistoricalMaxSamples = 50;
+    private const int HistoricalMinSamplesForSignal = 5;
+
     /// <summary>Query para obter a recomendação de governança de uma release.</summary>
     public sealed record Query(Guid ReleaseId) : IQuery<Response>;
 
@@ -31,8 +36,8 @@ public static class GetChangeAdvisory
     }
 
     /// <summary>
-    /// Handler que agrega score, blast radius e rollback assessment para produzir
-    /// uma recomendação de confiança sobre a mudança.
+    /// Handler que agrega score, blast radius, rollback assessment e padrão histórico
+    /// para produzir uma recomendação de confiança sobre a mudança.
     /// </summary>
     public sealed class Handler(
         IReleaseRepository releaseRepository,
@@ -55,7 +60,17 @@ public static class GetChangeAdvisory
             var blastRadius = await blastRadiusRepository.GetByReleaseIdAsync(releaseId, cancellationToken);
             var rollback = await rollbackRepository.GetByReleaseIdAsync(releaseId, cancellationToken);
 
-            var factors = BuildFactors(score, blastRadius, rollback, release);
+            var similarReleases = await releaseRepository.ListSimilarReleasesAsync(
+                excludeReleaseId: releaseId,
+                serviceName: release.ServiceName,
+                environment: release.Environment,
+                changeLevel: release.ChangeLevel,
+                from: release.CreatedAt.AddDays(-HistoricalLookbackDays),
+                to: release.CreatedAt,
+                maxResults: HistoricalMaxSamples,
+                cancellationToken: cancellationToken);
+
+            var factors = BuildFactors(score, blastRadius, rollback, release, similarReleases);
             var overallConfidence = ComputeOverallConfidence(factors);
             var recommendation = DetermineRecommendation(factors, release.ChangeScore);
             var rationale = BuildRationale(recommendation, factors, release.ChangeScore);
@@ -73,7 +88,8 @@ public static class GetChangeAdvisory
             ChangeIntelligenceScore? score,
             BlastRadiusReport? blastRadius,
             RollbackAssessment? rollback,
-            Release release)
+            Release release,
+            IReadOnlyList<Release> similarReleases)
         {
             var factors = new List<AdvisoryFactorDto>();
 
@@ -91,7 +107,7 @@ public static class GetChangeAdvisory
                     : evidenceStatus == "Unknown"
                         ? "No evidence data is available for this release."
                         : "Some evidence sources are missing.",
-                0.25m));
+                0.20m));
 
             // Blast radius scope
             if (blastRadius is not null)
@@ -106,13 +122,13 @@ public static class GetChangeAdvisory
                     "BlastRadiusScope",
                     blastStatus,
                     $"Total affected consumers: {blastRadius.TotalAffectedConsumers}.",
-                    0.25m));
+                    0.20m));
             }
             else
             {
                 factors.Add(new AdvisoryFactorDto(
                     "BlastRadiusScope", "Unknown",
-                    "Blast radius has not been calculated.", 0.25m));
+                    "Blast radius has not been calculated.", 0.20m));
             }
 
             // Change score
@@ -128,7 +144,7 @@ public static class GetChangeAdvisory
                     "ChangeScore",
                     scoreStatus,
                     $"Change score is {score.Score:F2}.",
-                    0.25m));
+                    0.20m));
             }
             else
             {
@@ -142,7 +158,7 @@ public static class GetChangeAdvisory
                     "ChangeScore",
                     fallbackStatus,
                     $"Change score is {release.ChangeScore:F2} (from release record).",
-                    0.25m));
+                    0.20m));
             }
 
             // Rollback readiness
@@ -155,16 +171,52 @@ public static class GetChangeAdvisory
                     rollback.IsViable
                         ? $"Rollback is viable with readiness score {rollback.ReadinessScore:F2}."
                         : $"Rollback is not viable. Recommendation: {rollback.Recommendation}.",
-                    0.25m));
+                    0.20m));
             }
             else
             {
                 factors.Add(new AdvisoryFactorDto(
                     "RollbackReadiness", "Unknown",
-                    "Rollback assessment has not been performed.", 0.25m));
+                    "Rollback assessment has not been performed.", 0.20m));
             }
 
+            // Historical pattern risk (5th factor — Change Confidence Score V2)
+            factors.Add(BuildHistoricalPatternFactor(similarReleases, release));
+
             return factors;
+        }
+
+        private static AdvisoryFactorDto BuildHistoricalPatternFactor(
+            IReadOnlyList<Release> similarReleases,
+            Release release)
+        {
+            if (similarReleases.Count < HistoricalMinSamplesForSignal)
+                return new AdvisoryFactorDto(
+                    "HistoricalPattern",
+                    "Unknown",
+                    $"Only {similarReleases.Count} similar release(s) found in the last {HistoricalLookbackDays} days — " +
+                    "insufficient data for a historical risk signal.",
+                    0.20m);
+
+            var total = similarReleases.Count;
+            var adverseCount = similarReleases.Count(r =>
+                r.Status is DeploymentStatus.RolledBack or DeploymentStatus.Failed);
+            var adverseRate = (decimal)adverseCount / total;
+
+            var (status, description) = adverseRate switch
+            {
+                >= 0.50m => ("Fail",
+                    $"{adverseRate:P0} of {total} similar past {release.ChangeLevel} changes " +
+                    $"in {release.Environment} resulted in rollback or failure. High historical risk."),
+                >= 0.25m => ("Warning",
+                    $"{adverseRate:P0} of {total} similar past {release.ChangeLevel} changes " +
+                    $"in {release.Environment} resulted in rollback or failure. Moderate historical risk."),
+                _ => ("Pass",
+                    $"{((decimal)(total - adverseCount) / total):P0} success rate on {total} similar past " +
+                    $"{release.ChangeLevel} changes in {release.Environment}. Low historical risk.")
+            };
+
+            return new AdvisoryFactorDto("HistoricalPattern", status, description, 0.20m);
         }
 
         private static decimal ComputeOverallConfidence(IReadOnlyList<AdvisoryFactorDto> factors)
@@ -197,7 +249,8 @@ public static class GetChangeAdvisory
         {
             var hasFail = factors.Any(f => f.Status == "Fail");
             var unknownCount = factors.Count(f => f.Status == "Unknown");
-            var allPass = factors.All(f => f.Status == "Pass");
+            // "Unknown" from insufficient historical data is treated as neutral — does not block approval.
+            var allPassOrUnknown = factors.All(f => f.Status is "Pass" or "Unknown");
 
             if (hasFail)
                 return "Reject";
@@ -205,7 +258,7 @@ public static class GetChangeAdvisory
             if (unknownCount >= 2)
                 return "NeedsMoreEvidence";
 
-            if (changeScore <= 0.3m && allPass)
+            if (changeScore <= 0.3m && allPassOrUnknown)
                 return "Approve";
 
             // Score above safe threshold or some factors have warnings — require conditional review

@@ -1,6 +1,8 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 using NexTraceOne.AuditCompliance.Domain.Enums;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
@@ -24,6 +26,11 @@ using RecordAuditEventFeature = NexTraceOne.AuditCompliance.Application.Features
 using RecordComplianceResultFeature = NexTraceOne.AuditCompliance.Application.Features.RecordComplianceResult.RecordComplianceResult;
 using SearchAuditLogFeature = NexTraceOne.AuditCompliance.Application.Features.SearchAuditLog.SearchAuditLog;
 using VerifyChainIntegrityFeature = NexTraceOne.AuditCompliance.Application.Features.VerifyChainIntegrity.VerifyChainIntegrity;
+using GetComplianceFrameworkSummaryFeature = NexTraceOne.AuditCompliance.Application.Features.GetComplianceFrameworkSummary.GetComplianceFrameworkSummary;
+using EvaluateContinuousComplianceFeature = NexTraceOne.AuditCompliance.Application.Features.EvaluateContinuousCompliance.EvaluateContinuousCompliance;
+using GetComplianceDashboardFeature = NexTraceOne.AuditCompliance.Application.Features.GetComplianceDashboard.GetComplianceDashboard;
+using ExportComplianceEvidencesFeature = NexTraceOne.AuditCompliance.Application.Features.ExportComplianceEvidences.ExportComplianceEvidences;
+using GenerateAuditReadyReportFeature = NexTraceOne.AuditCompliance.Application.Features.GenerateAuditReadyReport.GenerateAuditReadyReport;
 
 namespace NexTraceOne.AuditCompliance.API.Endpoints.Endpoints;
 
@@ -258,5 +265,97 @@ public sealed class AuditEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("audit:compliance:read");
+
+        // ── Compliance as Code (Phase 3.5) ────────────────────────────────────────────────
+
+        // GET /api/v1/audit/compliance/dashboard — Dashboard de compliance contínuo
+        var dashboardGroup = app.MapGroup("/api/v1/audit/compliance");
+
+        dashboardGroup.MapGet("/dashboard", async (
+            Guid tenantId,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetComplianceDashboardFeature.Query(tenantId, from, to), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:read")
+        .WithName("GetComplianceDashboard")
+        .WithSummary("Get continuous compliance dashboard with status by category and critical gaps");
+
+        // GET /api/v1/audit/compliance/framework/{framework} — Resumo por framework
+        dashboardGroup.MapGet("/framework/{framework}", async (
+            string framework,
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetComplianceFrameworkSummaryFeature.Query(framework, tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:read")
+        .WithName("GetComplianceFrameworkSummary")
+        .WithSummary("Get compliance status summary for a specific regulatory framework (SOC2, ISO27001, LGPD, GDPR, PCI-DSS)");
+
+        // POST /api/v1/audit/compliance/evaluate — Avaliação contínua de recurso
+        dashboardGroup.MapPost("/evaluate", async (
+            EvaluateContinuousComplianceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("EvaluateContinuousCompliance")
+        .WithSummary("Evaluate a resource against all active compliance policies and persist results");
+
+        // GET /api/v1/audit/compliance/evidences/export — Exportação de evidências para auditores
+        dashboardGroup.MapGet("/evidences/export", async (
+            Guid tenantId,
+            string? framework,
+            string? category,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            bool includeCompliant,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ExportComplianceEvidencesFeature.Query(tenantId, framework, category, from, to, includeCompliant),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:read")
+        .WithName("ExportComplianceEvidences")
+        .WithSummary("Export compliance evidence pack grouped by framework and policy for auditor review");
+
+        // GET /api/v1/audit/compliance/report — Relatório de auditoria enterprise-ready com assinatura digital
+        dashboardGroup.MapGet("/report", async (
+            Guid tenantId,
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string format,
+            string? title,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GenerateAuditReadyReportFeature.Query(tenantId, from, to, format, title),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:read")
+        .WithName("GenerateAuditReadyReport")
+        .WithSummary("Generate audit-ready report with digital SHA-256 signature (JSON/PDF/XLSX) for regulatory delivery");
     }
 }

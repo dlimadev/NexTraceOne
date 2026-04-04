@@ -1,6 +1,8 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
@@ -12,6 +14,7 @@ using GetBlastRadiusReportFeature = NexTraceOne.ChangeGovernance.Application.Cha
 using ComputeChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeScore.ComputeChangeScore;
 using GetChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeScore.GetChangeScore;
 using AttachWorkItemContextFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AttachWorkItemContext.AttachWorkItemContext;
+using GetPreProductionComparisonFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPreProductionComparison.GetPreProductionComparison;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -97,5 +100,21 @@ internal static class AnalysisEndpoints
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:write");
+
+        // ── GET /api/v1/changes/{preProdReleaseId}/pre-prod-comparison — Comparação pré-produção ──
+        group.MapGet("/{preProdReleaseId:guid}/pre-prod-comparison", async (
+            Guid preProdReleaseId,
+            Guid productionReleaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPreProductionComparisonFeature.Query(preProdReleaseId, productionReleaseId);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("change-intelligence:read")
+        .WithName("GetPreProductionComparison")
+        .WithSummary("Compare pre-production baseline metrics against production baseline before promoting a release");
     }
 }

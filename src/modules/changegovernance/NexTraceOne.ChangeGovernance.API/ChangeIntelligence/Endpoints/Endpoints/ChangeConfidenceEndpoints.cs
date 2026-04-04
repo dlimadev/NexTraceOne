@@ -20,6 +20,11 @@ using RecordChangeDecisionFeature = NexTraceOne.ChangeGovernance.Application.Cha
 using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
 using GetDoraMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDoraMetrics.GetDoraMetrics;
 using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
+using GetHistoricalPatternInsightFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetHistoricalPatternInsight.GetHistoricalPatternInsight;
+using RecordFeatureFlagStateFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordFeatureFlagState.RecordFeatureFlagState;
+using GetFeatureFlagAwarenessFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetFeatureFlagAwareness.GetFeatureFlagAwareness;
+using RecordCanaryRolloutFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordCanaryRollout.RecordCanaryRollout;
+using GetCanaryRolloutStatusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetCanaryRolloutStatus.GetCanaryRolloutStatus;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -229,6 +234,73 @@ internal static class ChangeConfidenceEndpoints
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/releases/{0}", localizer);
         }).RequirePermission("change-intelligence:write");
+
+        // ── Padrão histórico de mudanças similares (Change Confidence Score V2) ──
+
+        group.MapGet("/{changeId:guid}/historical-pattern", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int? lookbackDays = null) =>
+        {
+            var result = await sender.Send(
+                new GetHistoricalPatternInsightFeature.Query(changeId, lookbackDays),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        // ── Feature Flag Awareness (Change Confidence Score V2) ─────────────
+
+        group.MapPost("/{changeId:guid}/feature-flags", async (
+            Guid changeId,
+            RecordFeatureFlagStateFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var effectiveCommand = command with { ReleaseId = changeId };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
+            return result.ToCreatedResult("/api/v1/changes/{0}/feature-flags", localizer);
+        }).RequirePermission("change-intelligence:write");
+
+        group.MapGet("/{changeId:guid}/feature-flags", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetFeatureFlagAwarenessFeature.Query(changeId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        // ── Canary Deployment Tracking (Change Confidence Score V2) ──────────
+
+        group.MapPost("/{changeId:guid}/canary-rollout", async (
+            Guid changeId,
+            RecordCanaryRolloutFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var effectiveCommand = command with { ReleaseId = changeId };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
+            return result.ToCreatedResult("/api/v1/changes/{0}/canary-rollout", localizer);
+        }).RequirePermission("change-intelligence:write");
+
+        group.MapGet("/{changeId:guid}/canary-rollout", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetCanaryRolloutStatusFeature.Query(changeId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
     }
 
     private sealed record ChangeFilterOptionsResponse(
